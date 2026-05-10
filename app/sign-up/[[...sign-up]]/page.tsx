@@ -1,52 +1,39 @@
-import { SignUp } from '@clerk/nextjs';
-import { ChartLine, Clock, ShieldCheck, Sparkles } from 'lucide-react';
+import { SignUp } from '@clerk/nextjs'
 
 export default function SignUpPage() {
   return (
-    <div className='bg-muted grid flex-1 lg:grid-cols-2'>
-      <div className='hidden flex-1 items-center justify-end p-6 md:p-10 lg:flex'>
-        <ul className='max-w-sm space-y-8'>
-          <li>
-            <div className='flex items-center gap-2'>
-              <Clock className='size-4' />
-              <p className='font-semibold'>Save on development time</p>
-            </div>
-            <p className='text-muted-foreground mt-2 text-sm'>
-              Add authentication and user management to your app with just a few lines of code.
-            </p>
-          </li>
-          <li>
-            <div className='flex items-center gap-2'>
-              <ChartLine className='size-4' />
-              <p className='font-semibold'>Increase engagement</p>
-            </div>
-            <p className='text-muted-foreground mt-2 text-sm'>
-              Add intuitive UIs designed to decrease friction for your users.
-            </p>
-          </li>
-          <li>
-            <div className='flex items-center gap-2'>
-              <ShieldCheck className='size-4' />
-              <p className='font-semibold'>Protect your users</p>
-            </div>
-            <p className='text-muted-foreground mt-2 text-sm'>
-              Enable features like two-step verification and enjoy automatic security updates.
-            </p>
-          </li>
-          <li>
-            <div className='flex items-center gap-2'>
-              <Sparkles className='size-4' />
-              <p className='font-semibold'>Match your brand</p>
-            </div>
-            <p className='text-muted-foreground mt-2 text-sm'>
-              Theme our pre-built components, or integrate with our easy-to-use APIs.
-            </p>
-          </li>
-        </ul>
+    <div className="grid flex-1 lg:grid-cols-2">
+      <div className="hidden flex-1 items-center justify-end p-10 lg:flex">
+        <div className="max-w-sm space-y-8">
+          <div>
+            <span className="text-base font-medium text-primary">FavPoll</span>
+          </div>
+          <ul className="space-y-7">
+            {[
+              {
+                heading: 'Honour the people you love',
+                body: 'Create a poll for a memorial, birthday, or retirement — and turn your guests\u2019 favourites into a lasting tribute.',
+              },
+              {
+                heading: 'Every pledge goes to charity',
+                body: 'You choose the charity. Guests pledge donations split across their answers. Nothing is kept.',
+              },
+              {
+                heading: 'A permanent record of favourites',
+                body: 'Each event feeds an all-time ranking of human favourites — a gentle, growing picture of what people love.',
+              },
+            ].map((item) => (
+              <li key={item.heading}>
+                <p className="text-sm font-medium text-foreground">{item.heading}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <div className='flex flex-1 items-center justify-center p-6 md:p-10 lg:justify-start'>
+      <div className="flex flex-1 items-center justify-center p-6 md:p-10 lg:justify-start">
         <SignUp />
       </div>
     </div>
-  );
+  )
 }

@@ -1,0 +1,132 @@
+'use client'
+
+import { useState } from 'react'
+import { loadStripe } from '@stripe/stripe-js'
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+type CheckoutFormProps = {
+  onSuccess: () => void
+  onCancel: () => void
+  submitting: boolean
+  setSubmitting: (v: boolean) => void
+  setError: (v: string | null) => void
+  error: string | null
+}
+
+function CheckoutForm({
+  onSuccess,
+  onCancel,
+  submitting,
+  setSubmitting,
+  setError,
+  error,
+}: CheckoutFormProps) {
+  const stripe = useStripe()
+  const elements = useElements()
+
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!stripe || !elements) return
+
+    setSubmitting(true)
+    setError(null)
+
+    const { error: stripeError } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href,
+      },
+      redirect: 'if_required',
+    })
+
+    if (stripeError) {
+      setError(stripeError.message ?? 'Payment failed')
+      setSubmitting(false)
+      return
+    }
+
+    onSuccess()
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <PaymentElement />
+      {error && <p className="text-sm text-destructive">{error}</p>}
+      <div className="flex gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={submitting}
+          className="flex-1 rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-muted disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={submitting || !stripe}
+          className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {submitting ? 'Processing…' : 'Pay now'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
+const gbp = (n: number) =>
+  new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n)
+
+type Props = {
+  clientSecret: string
+  chargeAmount: number
+  charityAmount?: number  // if provided, shows breakdown; omit for fund top-ups
+  onSuccess: () => void
+  onClose: () => void
+}
+
+export function StripeCheckout({ clientSecret, chargeAmount, charityAmount, onSuccess, onClose }: Props) {
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Complete payment"
+    >
+      <div className="w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-lg">
+        <h2 className="mb-1 text-lg font-medium text-foreground">Complete your pledge</h2>
+        <p className="mb-1 text-sm text-muted-foreground">
+          You will be charged <span className="font-medium text-foreground">{gbp(chargeAmount)}</span>
+        </p>
+        {charityAmount !== undefined && (
+          <p className="mb-5 text-xs text-muted-foreground">
+            {gbp(charityAmount)} to charity · {gbp(chargeAmount - charityAmount)} platform fee
+          </p>
+        )}
+        {charityAmount === undefined && <div className="mb-5" />}
+        <Elements
+          stripe={stripePromise}
+          options={{ clientSecret, appearance: { theme: 'stripe' } }}
+        >
+          <CheckoutForm
+            onSuccess={onSuccess}
+            onCancel={onClose}
+            submitting={submitting}
+            setSubmitting={setSubmitting}
+            error={error}
+            setError={setError}
+          />
+        </Elements>
+      </div>
+    </div>
+  )
+}
