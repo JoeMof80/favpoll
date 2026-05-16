@@ -12,7 +12,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 - **Events** honour a person on a specific occasion
 - **Topics** are canonical questions — Colour, Season, Biscuit, Film, etc.
-- **Event polls** activate a topic within an event, with a personal framing ("Belinda's favourite colour was purple — what's yours?") and an optional quote
+- **Event polls** activate a topic within an event, with a personal framing (withholds the protagonist's answer) and an optional reveal (shown to each guest only after they pledge)
 - **Pledges** are financial commitments against specific topic items, contributing to both the event ranking and the all-time universal ranking
 - **Pledge allocations** split a single pledge across multiple items (e.g. 60% Purple, 40% Blue)
 - **Shared fund** allows generous donors to top up a communal pot so others (e.g. children) can participate without paying
@@ -130,8 +130,8 @@ event_polls (
   id uuid primary key,
   event_id uuid references events(id) on delete cascade,
   topic_id uuid references topics(id),
-  personal_framing text,
-  personal_quote text,
+  personal_framing text,            -- shown upfront; withholds the protagonist's favourite
+  personal_quote text,              -- the reveal; shown to each guest only after they pledge
   created_at timestamptz
 )
 
@@ -252,6 +252,39 @@ Each topic has a `placeholders` JSONB column with entries keyed by occasion slug
 }
 ```
 Used to pre-fill the event poll framing/quote fields in the canvas. All 15 occasion keys + `default` should be present on every topic.
+
+---
+
+## The Reveal Mechanic
+
+`event_polls.personal_quote` is a post-pledge reveal — not shown upfront.
+
+**Framing** (shown before pledging): withholds the protagonist's favourite. Invites the guest to share their own.
+> "Belinda had a colour she returned to all her life — what's yours?"
+
+**Reveal** (shown after pledging): discloses the protagonist's specific favourite. Intimate, in the organiser's voice.
+> "Belinda's was purple. She wore it to every important occasion."
+
+### Implementation
+
+- `PollHeading` (view mode): renders `framing` only — `personal_quote` is never shown here
+- `PollSection`: shows a quiet hint ("After pledging, Belinda has something to share with you.") while the guest is in pledge view, if a reveal exists
+- After `hasPledged` transitions `false → true` (payment confirmed via `router.refresh()`): `pledgeConfirmed` fires, the reveal card appears, rankings are delayed 300ms
+- Edit mode (`PollHeading`): quote textarea labelled "The reveal (optional)" with helper text "Shown to each guest after they pledge — write it as if speaking to them directly."
+- If `personal_quote` is null/empty: no hint shown, no reveal shown. The pledge still works normally.
+
+### Placeholder copy
+
+Placeholder text in the canvas follows the withhold/reveal pattern.
+
+**Framing placeholder:** "e.g. Belinda had a colour she returned to all her life — what's yours?"
+**Reveal placeholder:** "e.g. Belinda's was purple. She wore it to every important occasion."
+
+Source of truth for placeholder copy: `lib/occasions.ts`
+- `OCCASION_PLACEHOLDERS` — per-occasion fallback (keyed by occasion slug)
+- `TOPIC_REVEAL_PLACEHOLDERS` — per-topic-title overrides for 10 common topics (Colour, Season, Film, Song, Flower, Animal, Comfort food, Drink, Way to spend Sunday, Biscuit)
+- Topic JSONB (`topics.placeholders`) — most specific, per-occasion per-topic; takes precedence over all static fallbacks
+- `{name}` tokens in `TOPIC_REVEAL_PLACEHOLDERS` are substituted with the occasion persona's first name at render time in `PollEditor`
 
 ---
 

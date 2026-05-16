@@ -7,6 +7,7 @@ import { TopicPriorityEditor } from "./topic-priority-editor"
 import { PollHeading } from "@/components/poll-heading"
 import type { Category, CanvasPoll, TopicWithMeta } from "@/types"
 import type { OccasionPlaceholders } from "@/lib/occasions"
+import { TOPIC_REVEAL_PLACEHOLDERS } from "@/lib/occasions"
 
 type Props = {
   poll: CanvasPoll
@@ -46,9 +47,16 @@ export function PollEditor({
     : topic ? topic.topic_items.filter((i) => i.is_master) : []
 
   const topicPlaceholders = topic?.placeholders
+  const personFirstName = placeholders.name.split(" ")[0]
+  const substituteNames = (s: string) => s.replace(/\{name\}/g, personFirstName)
+  const topicReveal = TOPIC_REVEAL_PLACEHOLDERS[topicTitle]
+  const topicRevealSubstituted = topicReveal
+    ? { framing: substituteNames(topicReveal.framing), quote: substituteNames(topicReveal.quote) }
+    : null
+  const occasionFallback = { framing: placeholders.framing, quote: placeholders.quote }
   const pollPlaceholders = topicPlaceholders
-    ? (topicPlaceholders[occasion] ?? topicPlaceholders["default"] ?? { framing: placeholders.framing, quote: placeholders.quote })
-    : { framing: placeholders.framing, quote: placeholders.quote }
+    ? (topicPlaceholders[occasion] ?? topicPlaceholders["default"] ?? topicRevealSubstituted ?? occasionFallback)
+    : (topicRevealSubstituted ?? occasionFallback)
 
   return (
     <div className="space-y-4">

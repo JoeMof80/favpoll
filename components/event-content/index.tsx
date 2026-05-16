@@ -39,6 +39,8 @@ export function EventContent({
     setPledgeAmount,
     pollSelections,
     handleSelectionsChange,
+    handlePledgeSuccess,
+    confirmedPollIds,
     addItemHandler,
     showPledgeCard,
     isOrganiser,
@@ -70,6 +72,8 @@ export function EventContent({
                 pledgeAmount={pledgeAmount}
                 isClosed={isClosed}
                 hasPledged={existingSet.has(poll.id)}
+                pledgeJustConfirmed={confirmedPollIds.has(poll.id)}
+                personName={event.persons.name}
                 onSelectionsChange={handleSelectionsChange}
                 onAddItem={addItemHandler(poll)}
               />
@@ -114,6 +118,7 @@ export function EventContent({
             userPotAllocation={userPotAllocation}
             pollSelections={pollSelections}
             onPledgeAmountChange={setPledgeAmount}
+            onPledgeSuccess={handlePledgeSuccess}
           />
         )}
       </div>

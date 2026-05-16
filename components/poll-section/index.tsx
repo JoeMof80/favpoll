@@ -14,6 +14,8 @@ type Props = {
   pledgeAmount: string
   isClosed: boolean
   hasPledged: boolean
+  pledgeJustConfirmed?: boolean
+  personName: string
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
   onAddItem?: (label: string) => Promise<void>
 }
@@ -23,11 +25,23 @@ export function PollSection({
   pledgeAmount,
   isClosed,
   hasPledged,
+  pledgeJustConfirmed,
+  personName,
   onSelectionsChange,
   onAddItem,
 }: Props) {
-  const { view, setView, rankingView, setRankingView, handleSelectionsChange } =
-    usePollSection({ pollId: poll.id, hasPledged, isClosed, onSelectionsChange })
+  const {
+    view,
+    setView,
+    rankingView,
+    setRankingView,
+    pledgeConfirmed,
+    showRankings,
+    handleSelectionsChange,
+  } = usePollSection({ pollId: poll.id, hasPledged, isClosed, pledgeJustConfirmed, onSelectionsChange })
+
+  const personFirstName = personName.split(" ")[0]
+  const quote = poll.personal_quote ?? null
 
   return (
     <section aria-labelledby={`poll-heading-${poll.id}`} className="space-y-4">
@@ -35,42 +49,58 @@ export function PollSection({
         pollId={poll.id}
         topicTitle={poll.topics.title}
         framing={poll.personal_framing ?? null}
-        quote={poll.personal_quote ?? null}
+        quote={null}
       />
 
       {/* Results view */}
       {view === "results" && (
         <>
-          <div className="flex items-center justify-end">
-            <Tabs
-              value={rankingView}
-              onValueChange={(v) => setRankingView(v as "amount" | "count")}
+          {/* Reveal — shown immediately after pledging, before rankings */}
+          {pledgeConfirmed && quote && (
+            <blockquote
+              className="border-l-4 border-primary/40 pl-4 text-base text-primary/80 italic"
+              role="status"
+              aria-label={`${personFirstName}'s reveal`}
+              aria-live="polite"
             >
-              <TabsList className="h-7">
-                <TabsTrigger value="amount" className="px-3 text-xs">
-                  By amount
-                </TabsTrigger>
-                <TabsTrigger value="count" className="px-3 text-xs">
-                  By pledges
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-          <RankingList
-            initialItems={poll.topics.topic_items}
-            eventPollId={poll.id}
-            topicId={poll.topic_id}
-            rankingView={rankingView}
-          />
-          {!isClosed && (
-            <Button
-              type="button"
-              variant="link"
-              onClick={() => setView("pledge")}
-              className="mt-4 h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
-            >
-              {hasPledged ? "Change my pledge" : "Make a pledge"}
-            </Button>
+              &ldquo;{quote}&rdquo;
+            </blockquote>
+          )}
+
+          {showRankings && (
+            <>
+              <div className="flex items-center justify-end">
+                <Tabs
+                  value={rankingView}
+                  onValueChange={(v) => setRankingView(v as "amount" | "count")}
+                >
+                  <TabsList className="h-7">
+                    <TabsTrigger value="amount" className="px-3 text-xs">
+                      By amount
+                    </TabsTrigger>
+                    <TabsTrigger value="count" className="px-3 text-xs">
+                      By pledges
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              <RankingList
+                initialItems={poll.topics.topic_items}
+                eventPollId={poll.id}
+                topicId={poll.topic_id}
+                rankingView={rankingView}
+              />
+              {!isClosed && (
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => setView("pledge")}
+                  className="mt-4 h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  {hasPledged ? "Change my pledge" : "Make a pledge"}
+                </Button>
+              )}
+            </>
           )}
         </>
       )}
@@ -83,13 +113,23 @@ export function PollSection({
               This poll has closed.
             </p>
           ) : (
-            <PledgePanel
-              items={poll.topics.topic_items}
-              totalAmount={pledgeAmount}
-              onSelectionsChange={handleSelectionsChange}
-              isInfinite={!poll.topics.is_finite}
-              onAddItem={onAddItem}
-            />
+            <>
+              <PledgePanel
+                items={poll.topics.topic_items}
+                totalAmount={pledgeAmount}
+                onSelectionsChange={handleSelectionsChange}
+                isInfinite={!poll.topics.is_finite}
+                onAddItem={onAddItem}
+              />
+              {quote && !hasPledged && !pledgeConfirmed && (
+                <p
+                  className="text-center text-xs text-muted-foreground"
+                  aria-live="polite"
+                >
+                  After pledging, {personFirstName} has something to share with you.
+                </p>
+              )}
+            </>
           )}
           {(hasPledged || isClosed) && (
             <Button

@@ -122,9 +122,12 @@ export function PollHeading(props: Props) {
         </p>
       ) : null}
 
-      {/* Quote */}
+      {/* Quote / reveal — edit mode only */}
       {isEdit && props.hasTopicSelected ? (
         <div className="border-l-4 border-primary/40 pl-4">
+          <p className="mb-1.5 text-[11px] text-muted-foreground">
+            The reveal (optional)
+          </p>
           <div className="relative">
             <p
               aria-hidden
@@ -143,11 +146,10 @@ export function PollHeading(props: Props) {
               aria-hidden
             />
           </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Shown to each guest after they pledge — write it as if speaking to them directly.
+          </p>
         </div>
-      ) : !isEdit && props.quote ? (
-        <blockquote className="border-l-4 border-primary/40 pl-4 text-base text-primary/80 italic">
-          &ldquo;{props.quote}&rdquo;
-        </blockquote>
       ) : null}
 
       {(isEdit ? props.hasTopicSelected : true) && (

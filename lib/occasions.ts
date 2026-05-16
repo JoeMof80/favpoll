@@ -120,121 +120,148 @@ export const OCCASION_PLACEHOLDERS: Record<string, OccasionPlaceholders> = {
   memorial: {
     name: "Belinda Johnson",
     bio: "A beloved mother, teacher, and friend who spent her life bringing people together and always had time for a long conversation over tea…",
-    framing: "Belinda's favourite was always the Lake District — what's yours?",
-    quote:
-      "She always said the best journeys are the ones you take with people you love…",
+    framing: "e.g. Belinda had a colour she returned to all her life — what's yours?",
+    quote: "e.g. Belinda's was purple. She wore it to every important occasion.",
   },
   tribute: {
     name: "David Osei",
     bio: "A mentor to dozens, a friend to hundreds, and the person who always knew exactly what to say…",
-    framing:
-      "David introduced so many people to jazz — what's your favourite genre?",
-    quote: "He always believed that good music makes every moment better…",
+    framing: "e.g. There was a song that always stopped David in his tracks — what's yours?",
+    quote: "e.g. David's was Waterloo Sunset. He said it made him feel London was beautiful.",
   },
   birthday: {
     name: "Sarah Mitchell",
     bio: "Sarah is turning 40 and has never met a cheese she didn't like. She spends her weekends hiking, hosting elaborate dinner parties, and planning trips she may or may not actually take…",
-    framing: "Sarah's been dreaming about Japan — where would you send her?",
-    quote: "She always says life's too short to order the same thing twice…",
+    framing: "e.g. Sarah has strong opinions about biscuits — what's your favourite?",
+    quote: "e.g. Sarah's is the Bourbon. She once ate four packets in one sitting.",
   },
   retirement: {
     name: "David Clarke",
     bio: "After 35 years building the engineering team from four people to four hundred, David is finally putting down his laptop, ignoring his email, and picking up his golf clubs for good…",
-    framing:
-      "David always talked about exploring South America — where should he go first?",
-    quote:
-      "He's been saying 'one more year' for five years running — we're holding him to it…",
+    framing: "e.g. David had a place he always talked about going back to — where would you send him?",
+    quote: "e.g. David's was the Dordogne. He kept a photo of it on his desk for thirty years.",
   },
   wedding: {
     name: "Emma & James",
     bio: "Emma and James met at a rainy music festival in 2019 and haven't been apart since. They share a love of travel, strong coffee, and an ongoing argument about the best pizza in Naples…",
-    framing:
-      "They're both obsessed with food — what cuisine should they discover on honeymoon?",
-    quote:
-      "James proposed at the exact spot where they had their first dance, three years to the day…",
+    framing: "e.g. Emma & James have strong opinions about food — what cuisine should they discover on honeymoon?",
+    quote: "e.g. Theirs was Italian. They've been arguing about the best pizza in Naples since 2019.",
   },
   anniversary: {
     name: "Mum & Dad",
     bio: "Forty years of adventures, arguments, laughter, and love — still each other's favourite person to share a pot of tea with…",
-    framing:
-      "They've been to so many places together — where should they go next?",
-    quote:
-      "The secret? Never go to bed angry — and always have good biscuits in the tin.",
+    framing: "e.g. There's something Mum & Dad have always come back to — what's yours?",
+    quote: "e.g. Theirs was a pot of tea and a good biscuit. Same time every morning for forty years.",
   },
   leaving: {
     name: "Priya Sharma",
     bio: "Priya's heading off to start her own studio after six brilliant years. She leaves a trail of good work, better jokes, and a coffee machine that finally gets used properly…",
-    framing:
-      "Priya always said she'd travel more once she left — where should she go first?",
-    quote: "She leaves a hole in the team that will be very hard to fill…",
+    framing: "e.g. Priya had a comfort food she always came back to — what's yours?",
+    quote: "e.g. Priya's was dal. She said it made any flat feel like home.",
   },
   graduation: {
     name: "Tom Ellis",
     bio: "Tom just finished four years of architecture at Manchester — somehow managing to graduate with a first, a collection of impressive scale models, and zero sleep debt…",
-    framing:
-      "Tom's dreamed of living abroad — which city should he explore first?",
-    quote:
-      "He always said buildings should make people feel something — his certainly do.",
+    framing: "e.g. Tom had a film he watched through every deadline — what's yours?",
+    quote: "e.g. Tom's was Spirited Away. He said it reminded him why things worth doing take time.",
   },
   christening: {
     name: "Lily Rose",
     bio: "Born on a Tuesday in March, already an expert at looking unimpressed. We couldn't be happier to have her…",
-    framing:
-      "Everyone has a favourite book from childhood — what should Lily's first library include?",
-    quote: "Welcome to the world, little one.",
+    framing: "e.g. Everyone has a favourite from childhood — what should Lily Rose discover first?",
+    quote: "e.g. We'll tell her one day. For now, we're just glad she's here.",
   },
   achievement: {
     name: "Marcus Webb",
     bio: "Marcus just ran his first marathon — raising over £4,000 for the RNLI along the way. He trained for eight months, mostly in the dark, mostly in the rain…",
-    framing: "What's the achievement you're most proud of?",
-    quote: "The only race worth running is the one you set for yourself…",
+    framing: "e.g. Marcus had a song he trained to — what's yours?",
+    quote: "e.g. Marcus's was Mr. Brightside. Apparently it got him through mile 18.",
   },
   recovery: {
     name: "Claire Hennessy",
     bio: "Claire completed her treatment last month and is celebrating one year of recovery. She's been braver than most of us will ever need to be…",
-    framing:
-      "Claire says music got her through — what song always lifts your spirits?",
-    quote: "One day at a time, and then one more.",
+    framing: "e.g. There was a song Claire always said got her through — what's yours?",
+    quote: "e.g. Claire's was Vienna by Ultravox. She played it on repeat for months.",
   },
   award: {
     name: "Dr. Amelia Grant",
     bio: "Amelia has just been named Teacher of the Year — recognised for turning her classroom into one of the most inspiring places in the county…",
-    framing:
-      "Amelia inspired so many people — who was a teacher that changed your life?",
-    quote:
-      "A great teacher doesn't just teach the subject — they teach you to think.",
+    framing: "e.g. Dr. Grant had a book she recommended to every student she taught — what's yours?",
+    quote: "e.g. Dr. Grant's was The Lion, the Witch and the Wardrobe. She said it taught her how to teach.",
   },
   promotion: {
     name: "Kwame Asante",
     bio: "After three years of going above and beyond, Kwame has been promoted to Head of Product. Nobody deserves it more…",
-    framing:
-      "Kwame's favourite part of the job is shipping things people love — what product has delighted you recently?",
-    quote:
-      "He always finds a way to make the impossible feel completely achievable.",
+    framing: "e.g. Kwame had a coffee order that never changed — what's yours?",
+    quote: "e.g. Kwame's was a flat white. Two sugars. Never wavered once.",
   },
   celebration: {
-    name: "The Johnson Family",
+    name: "The guest of honour",
     bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
-    framing:
-      "Add some context — what are you asking, and why does it matter to them?",
-    quote:
-      "A favourite saying, a running joke, or something that perfectly captures who they are…",
+    framing: "e.g. There was something they always came back to — what's yours?",
+    quote: "e.g. Theirs was something they never tired of. Ask them about it some time.",
   },
   other: {
-    name: "The Johnson Family",
+    name: "The guest of honour",
     bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
-    framing:
-      "Add some context — what are you asking, and why does it matter to them?",
-    quote:
-      "A favourite saying, a running joke, or something that perfectly captures who they are…",
+    framing: "e.g. There was something they always came back to — what's yours?",
+    quote: "e.g. Theirs was something they never tired of. Ask them about it some time.",
+  },
+}
+
+/**
+ * Per-topic-title placeholder overrides for the reveal field.
+ * Used in PollEditor as a fallback when no topic JSONB placeholder exists.
+ * {name} is substituted with the first name of the occasion persona at render time.
+ */
+export const TOPIC_REVEAL_PLACEHOLDERS: Record<string, { framing: string; quote: string }> = {
+  Colour: {
+    framing: "e.g. Belinda had a colour she returned to all her life — what's yours?",
+    quote: "e.g. Belinda's was purple. She wore it to every important occasion.",
+  },
+  Season: {
+    framing: "e.g. There was a season {name} always loved most — which is yours?",
+    quote: "e.g. {name}'s was autumn. She said it always felt like coming home.",
+  },
+  Film: {
+    framing: "e.g. {name} had a film she could watch again and again — what's yours?",
+    quote: "e.g. {name}'s was It's a Wonderful Life. She cried every time.",
+  },
+  Song: {
+    framing: "e.g. There was a song that always stopped {name} in her tracks — what's yours?",
+    quote: "e.g. {name}'s was Waterloo Sunset. She said it made London feel beautiful.",
+  },
+  Flower: {
+    framing: "e.g. {name} had a flower she never tired of — what's yours?",
+    quote: "e.g. {name}'s was lavender. She grew it in every garden she ever had.",
+  },
+  Animal: {
+    framing: "e.g. {name} felt closest to one animal above all others — which is yours?",
+    quote: "e.g. {name}'s was the robin. She said they were the bravest small thing.",
+  },
+  "Comfort food": {
+    framing: "e.g. There was a meal {name} always came back to — what's yours?",
+    quote: "e.g. {name}'s was beans on toast. She said nothing else did the job.",
+  },
+  Drink: {
+    framing: "e.g. {name} had a drink that was entirely her own — what's yours?",
+    quote: "e.g. {name}'s was tea. Builders brew, milk no sugar, never negotiable.",
+  },
+  "Way to spend Sunday": {
+    framing: "e.g. {name} had a perfect Sunday — what does yours look like?",
+    quote: "e.g. {name}'s was a long walk followed by a roast. Every week without fail.",
+  },
+  Biscuit: {
+    framing: "e.g. {name} had strong opinions about biscuits — what's your favourite?",
+    quote: "e.g. {name}'s was the Bourbon. She once ate four packets in one sitting.",
   },
 }
 
 export const DEFAULT_PLACEHOLDERS: OccasionPlaceholders = {
   name: "Name",
   bio: "A short bio…",
-  framing: "Add a personal framing for this question…",
-  quote: "A quote or memory (optional)",
+  framing: "e.g. Belinda had a colour she returned to all her life — what's yours?",
+  quote: "e.g. Belinda's was purple. She wore it to every important occasion.",
 }
 
 export function shortTopicLabel(title: string): string {

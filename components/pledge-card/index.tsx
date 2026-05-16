@@ -25,6 +25,7 @@ type Props = {
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
+  onPledgeSuccess?: (pollIds: string[]) => void
 }
 
 export function PledgeCard(props: Props) {

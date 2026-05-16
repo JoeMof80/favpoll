@@ -20,6 +20,7 @@ export type UsePledgeOptions = {
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
+  onPledgeSuccess?: (pollIds: string[]) => void
 }
 
 export function usePledge({
@@ -31,6 +32,7 @@ export function usePledge({
   userPotAllocation,
   pollSelections,
   onPledgeAmountChange,
+  onPledgeSuccess,
 }: UsePledgeOptions) {
   const router = useRouter()
 
@@ -120,6 +122,12 @@ export function usePledge({
         }
       : null
 
+  function pledgedPollIds() {
+    return pollsWithItems
+      .filter((p) => (pollSelections[p.id]?.length ?? 0) > 0)
+      .map((p) => p.id)
+  }
+
   async function savePledge(guestEmailParam?: string) {
     const pollsToSubmit = pollsWithItems.filter(
       (p) => (pollSelections[p.id]?.length ?? 0) > 0
@@ -187,6 +195,7 @@ export function usePledge({
         (p) => (pollSelections[p.id]?.length ?? 0) > 0
       )
       let potAllocated = pot.total_allocated
+      const ids = pollsToSubmit.map((p) => p.id)
       for (const poll of pollsToSubmit) {
         await pledgeFromFund({
           eventPollId: poll.id,
@@ -201,6 +210,7 @@ export function usePledge({
         })
         potAllocated += numericPledge
       }
+      onPledgeSuccess?.(ids)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -212,9 +222,11 @@ export function usePledge({
   async function handlePledgePaymentSuccess() {
     setPledgeClientSecret(null)
     try {
+      const ids = pledgedPollIds()
       await savePledge(guestEmail)
       if (pendingTopUp) await topUpFund(eventId, numericTopUp)
       setPendingTopUp(false)
+      onPledgeSuccess?.(ids)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")

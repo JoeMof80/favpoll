@@ -19,12 +19,17 @@ export function useEventContent({
   const router = useRouter()
   const [pledgeAmount, setPledgeAmount] = useState("")
   const [pollSelections, setPollSelections] = useState<Record<string, string[]>>({})
+  const [confirmedPollIds, setConfirmedPollIds] = useState<Set<string>>(new Set())
 
   const handleSelectionsChange = useCallback(
     (pollId: string, selectedIds: string[]) =>
       setPollSelections((prev) => ({ ...prev, [pollId]: selectedIds })),
     []
   )
+
+  const handlePledgeSuccess = useCallback((pollIds: string[]) => {
+    setConfirmedPollIds((prev) => new Set([...prev, ...pollIds]))
+  }, [])
 
   // Returns an addItem handler for infinite, open polls — undefined otherwise
   function addItemHandler(poll: EventPollWithItems) {
@@ -43,6 +48,8 @@ export function useEventContent({
     setPledgeAmount,
     pollSelections,
     handleSelectionsChange,
+    handlePledgeSuccess,
+    confirmedPollIds,
     addItemHandler,
     showPledgeCard,
     isOrganiser,
