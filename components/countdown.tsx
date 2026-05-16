@@ -19,9 +19,10 @@ function getTimeLeft(closesAt: string) {
 }
 
 export function Countdown({ closesAt }: Props) {
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(closesAt))
+  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
+    setTimeLeft(getTimeLeft(closesAt))
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(closesAt))
     }, 1000)

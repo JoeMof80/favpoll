@@ -2,6 +2,7 @@
 
 import { Menu, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +16,14 @@ export function MenuButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-md text-muted-foreground"
           aria-label="Open menu"
         >
           <Menu className="h-4 w-4" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem

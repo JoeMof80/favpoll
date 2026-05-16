@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation"
+import { Suspense } from "react"
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
 import type { Topic, TopicItem } from "@/types"
+import { TopicRankings } from "./topic-rankings"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -41,8 +43,7 @@ export default async function TopicPage({ params }: Props) {
   ].sort((a, b) => b.all_time_pledged - a.all_time_pledged)
 
   const typedTopic = topic as Topic
-  const maxPledged = items[0]?.all_time_pledged ?? 0
-  const hasActivity = maxPledged > 0
+  const hasActivity = items.some((i) => i.all_time_pledged > 0)
   const totalPledged = items.reduce((s, i) => s + i.all_time_pledged, 0)
   const totalVotes = items.reduce((s, i) => s + i.all_time_count, 0)
   const topItem = items[0]
@@ -69,74 +70,15 @@ export default async function TopicPage({ params }: Props) {
             </p>
           )}
 
-          <ol
-            aria-label={`${typedTopic.title} — all-time rankings`}
-            className="mt-6 space-y-2"
-          >
-            {items.map((item, i) => {
-              const barWidth = hasActivity
-                ? (item.all_time_pledged / maxPledged) * 100
-                : 0
-
-              return (
-                <li
-                  key={item.id}
-                  className={`rounded-lg border bg-card px-4 py-3 ${i === 0 && hasActivity ? "border-primary/30" : "border-border"}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="w-6 shrink-0 text-right text-sm text-muted-foreground tabular-nums"
-                      aria-label={`Rank ${i + 1}`}
-                    >
-                      {i + 1}
-                    </span>
-
-                    {typedTopic.title.toLowerCase().includes('colour') && (
-                      <span
-                        className="h-4 w-4 shrink-0 rounded-full border border-border/50"
-                        style={{ backgroundColor: item.label.toLowerCase() }}
-                        aria-hidden="true"
-                      />
-                    )}
-
-                    <span
-                      className={`flex-1 text-sm ${i === 0 && hasActivity ? "font-medium text-foreground" : "text-foreground"}`}
-                    >
-                      {item.label}
-                    </span>
-
-                    <div className="text-right">
-                      <span className="text-sm text-muted-foreground tabular-nums">
-                        {formatAmount(item.all_time_pledged)}
-                      </span>
-                      {item.all_time_count > 0 && (
-                        <p className="text-xs text-muted-foreground">
-                          {item.all_time_count} pledge
-                          {item.all_time_count !== 1 ? "s" : ""}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    className="mt-2 h-1 overflow-hidden rounded-full bg-muted"
-                    role="presentation"
-                  >
-                    <div
-                      className="h-full rounded-full bg-primary transition-all"
-                      style={{ width: `${barWidth}%` }}
-                    />
-                  </div>
-                </li>
-              )
-            })}
-          </ol>
-
-          {items.length === 0 && (
-            <p className="mt-8 text-center text-sm text-muted-foreground">
-              No pledges have been made on this topic yet.
-            </p>
-          )}
+          <div className="mt-6">
+            <Suspense fallback={null}>
+              <TopicRankings
+                items={items}
+                topicTitle={typedTopic.title}
+                hasColourSwatch={typedTopic.title.toLowerCase().includes('colour')}
+              />
+            </Suspense>
+          </div>
         </div>
 
         {/* Right — sticky sidebar */}

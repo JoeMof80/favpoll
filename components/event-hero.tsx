@@ -1,51 +1,286 @@
+"use client"
+
+import { useState } from "react"
+import { Pencil } from "lucide-react"
+import {
+  OCCASION_LABELS,
+  DATE_LABEL_PLACEHOLDERS,
+  type OccasionPlaceholders,
+} from "@/lib/occasions"
+import { getEventHeadline } from "@/lib/display"
+import { uploadPersonPhoto } from "@/app/events/new/actions"
 import type { Event, Person } from "@/types"
 
-const OCCASION_LABELS: Record<string, string> = {
-  memorial: "In memory of",
-  birthday: "Celebrating",
-  retirement: "Honouring",
-  wedding: "Celebrating",
-  other: "A tribute to",
-}
-
-function formatYear(person: Person): string {
-  if (person.birth_year && person.death_year) {
-    return `${person.birth_year}–${person.death_year}`
-  }
-  if (person.birth_year) {
-    return `Born ${person.birth_year}`
-  }
-  return ""
-}
-
-type Props = {
+type ViewProps = {
+  mode?: "view"
   event: Event
   person: Person
 }
 
-export function EventHero({ event, person }: Props) {
-  const label = OCCASION_LABELS[event.occasion] ?? "A tribute to"
-  const years = formatYear(person)
+type EditProps = {
+  mode: "edit"
+  occasion: string
+  occasionLabel: string
+  personName: string
+  personBio: string
+  dateLabel: string
+  initialPhotoUrl?: string | null
+  placeholders: Pick<OccasionPlaceholders, "name" | "bio">
+  onOccasionLabelChange: (v: string) => void
+  onPersonNameChange: (v: string) => void
+  onPersonBioChange: (v: string) => void
+  onDateLabelChange: (v: string) => void
+  onPhotoUrlChange: (url: string) => void
+}
+
+type Props = ViewProps | EditProps
+
+export function EventHero(props: Props) {
+  const isEdit = props.mode === "edit"
+
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    isEdit ? (props.initialPhotoUrl ?? null) : null
+  )
+  const [photoUploading, setPhotoUploading] = useState(false)
+
+  const occasion = isEdit ? props.occasion : props.event.occasion
+  const label = OCCASION_LABELS[occasion] ?? "A tribute to"
+
+  const headline = isEdit
+    ? null
+    : getEventHeadline({
+        occasion: props.event.occasion,
+        occasionLabel: props.event.occasion_label,
+        personName: props.person.name,
+        dateLabel: props.person.date_label,
+      })
+
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!isEdit) return
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoPreview(URL.createObjectURL(file))
+    setPhotoUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append("photo", file)
+      const url = await uploadPersonPhoto(fd)
+      props.onPhotoUrlChange(url)
+    } catch {
+      /* ignore */
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
+
+  // Derived view-mode values
+  const person = isEdit ? null : props.person
+
+  const editInitials = isEdit
+    ? props.personName
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase()
+    : ""
 
   return (
-    <div className="flex items-center gap-5 rounded-lg border border-border bg-card px-5 py-5">
-      {person.photo_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={person.photo_url}
-          alt={person.name}
-          className="mb-3 h-14 w-14 rounded-full border border-border object-cover"
-        />
-      )}
-      <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="mt-1 text-xl font-medium tracking-tight text-foreground">
-          {person.name}
-        </p>
-        {years && (
-          <p className="mt-0.5 text-xs text-muted-foreground">{years}</p>
+    <div className="mb-10">
+      <div className="flex items-start gap-6">
+        {/* Photo */}
+        {isEdit ? (
+          <label
+            className="group shrink-0 cursor-pointer"
+            aria-label="Upload photo"
+          >
+            <div className="relative h-28 w-28 overflow-hidden rounded-full border border-dashed border-border transition-colors group-hover:border-primary">
+              {photoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={photoPreview}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <>
+                  <svg
+                    className="absolute inset-0 h-full w-full text-border"
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <pattern
+                        id="hatch-canvas"
+                        patternUnits="userSpaceOnUse"
+                        width="8"
+                        height="8"
+                        patternTransform="rotate(45)"
+                      >
+                        <line
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="8"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                        />
+                      </pattern>
+                    </defs>
+                    <rect
+                      width="100%"
+                      height="100%"
+                      fill="url(#hatch-canvas)"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
+                    {photoUploading ? "…" : editInitials || "Photo"}
+                  </span>
+                </>
+              )}
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handlePhotoChange}
+              disabled={photoUploading}
+            />
+          </label>
+        ) : (
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-border">
+            {person?.photo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={person.photo_url}
+                alt={person.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <>
+                <svg
+                  className="absolute inset-0 h-full w-full text-border"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <pattern
+                      id="hatch"
+                      patternUnits="userSpaceOnUse"
+                      width="8"
+                      height="8"
+                      patternTransform="rotate(45)"
+                    >
+                      <line
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="8"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                      />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#hatch)" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-muted-foreground">
+                  {person?.name
+                    .split(" ")
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((w) => w[0])
+                    .join("")
+                    .toUpperCase()}
+                </span>
+              </>
+            )}
+          </div>
         )}
+
+        {/* Text */}
+        <div className="min-w-0 flex-1">
+          {/* Occasion label */}
+          {isEdit ? (
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={props.occasionLabel}
+                onChange={(e) => props.onOccasionLabelChange(e.target.value)}
+                placeholder={label || "In memory of"}
+                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-xs font-medium tracking-widest text-muted-foreground uppercase outline-none transition-colors placeholder:text-muted-foreground/30 focus:border-primary/40"
+              />
+              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
+            </div>
+          ) : (
+            <p className="mb-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+              {headline?.prefix ?? label}
+            </p>
+          )}
+
+          {/* Name */}
+          {isEdit ? (
+            <div className="relative">
+              <input
+                type="text"
+                value={props.personName}
+                onChange={(e) => props.onPersonNameChange(e.target.value)}
+                placeholder={props.placeholders.name}
+                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-6 text-4xl leading-tight font-medium tracking-tight text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40 sm:text-5xl"
+              />
+              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
+            </div>
+          ) : (
+            <h1 className="border-b border-transparent text-4xl leading-tight font-medium tracking-tight text-foreground sm:text-5xl">
+              {person?.name}
+            </h1>
+          )}
+
+          {/* Dates — edit mode: free text; view mode: rendered from date_label */}
+          {isEdit ? (
+            <div className="relative mt-2">
+              <input
+                type="text"
+                value={props.dateLabel}
+                onChange={(e) => props.onDateLabelChange(e.target.value)}
+                placeholder={
+                  DATE_LABEL_PLACEHOLDERS[occasion] ?? "Dates (optional)"
+                }
+                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-2xl font-normal text-primary outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
+              />
+              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
+            </div>
+          ) : headline?.suffix ? (
+            <p className="mt-2 text-2xl font-normal text-primary">
+              {headline.suffix}
+            </p>
+          ) : null}
+
+          {/* Bio (edit mode) / Description (view mode) */}
+          {isEdit ? (
+            <div className="relative mt-4 w-full max-w-prose">
+              {/* Mirror p drives the height — textarea is absolutely positioned over it */}
+              <p
+                aria-hidden="true"
+                className="invisible min-h-13 w-full border-b-2 border-dotted border-border text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
+              >
+                {(props as EditProps).personBio || "\u00A0"}
+              </p>
+              <textarea
+                value={(props as EditProps).personBio}
+                onChange={(e) => props.onPersonBioChange(e.target.value)}
+                placeholder={props.placeholders.bio}
+                className="absolute inset-0 h-full w-full resize-none appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-base leading-relaxed text-muted-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
+              />
+              <Pencil className="pointer-events-none absolute right-0 top-2 h-3.5 w-3.5 text-muted-foreground/25" aria-hidden />
+            </div>
+          ) : props.person.bio ? (
+            <p className="mt-4 w-full max-w-prose border-b border-transparent text-base leading-relaxed text-muted-foreground">
+              {props.person.bio}
+            </p>
+          ) : null}
+        </div>
       </div>
+
+      <hr className="mt-8 border-border" />
     </div>
   )
 }

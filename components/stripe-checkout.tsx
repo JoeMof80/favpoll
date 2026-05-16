@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
@@ -60,21 +61,22 @@ function CheckoutForm({
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-3 pt-2">
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
           disabled={submitting}
-          className="flex-1 rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-muted disabled:opacity-50"
+          className="flex-1"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={submitting || !stripe}
-          className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          className="flex-1"
         >
           {submitting ? 'Processing…' : 'Pay now'}
-        </button>
+        </Button>
       </div>
     </form>
   )

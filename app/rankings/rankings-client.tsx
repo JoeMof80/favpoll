@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import type { Category, Topic, TopicItem } from "@/types"
 
 type TopicWithItems = Topic & {
@@ -51,34 +52,34 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
           role="tablist"
           aria-label="Filter by category"
         >
-          <button
+          <Button
             role="tab"
             aria-selected={activeCategory === null}
             onClick={() => setActiveCategory(null)}
-            className={`shrink-0 rounded-full px-3 py-1 text-sm transition-colors focus:ring-2 focus:ring-ring focus:outline-none ${
+            className={`shrink-0 rounded-full px-3 py-1 text-sm ${
               activeCategory === null
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
             }`}
           >
             All
-          </button>
+          </Button>
           {categories.map((cat) => (
-            <button
+            <Button
               key={cat.id}
               role="tab"
               aria-selected={activeCategory === cat.id}
               onClick={() =>
                 setActiveCategory(activeCategory === cat.id ? null : cat.id)
               }
-              className={`shrink-0 rounded-full px-3 py-1 text-sm transition-colors focus:ring-2 focus:ring-ring focus:outline-none ${
+              className={`shrink-0 rounded-full px-3 py-1 text-sm ${
                 activeCategory === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
               }`}
             >
               {cat.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

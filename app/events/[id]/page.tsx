@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventContent } from "@/components/event-content"
+import { EventSubheader } from "@/components/event-subheader"
 import type {
   EventWithDetails,
   EventPollWithItems,
@@ -22,7 +23,7 @@ export default async function EventPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, persons(*), charities(*)")
+    .select("*, persons!events_person_id_fkey(*), event_charities(charities(*))")
     .eq("id", id)
     .single()
 
@@ -45,8 +46,13 @@ export default async function EventPage({ params }: Props) {
   if (polls.length > 0) {
     const topicIds = [...new Set(polls.map((p) => p.topic_id as string))]
 
-    const { data: topicsData } = await supabase.from("topics").select("*").in("id", topicIds)
-    const topicsById = Object.fromEntries((topicsData ?? []).map((t) => [t.id, t as Topic]))
+    const { data: topicsData } = await supabase
+      .from("topics")
+      .select("*")
+      .in("id", topicIds)
+    const topicsById = Object.fromEntries(
+      (topicsData ?? []).map((t) => [t.id, t as Topic])
+    )
 
     const finiteTopicIds = topicIds.filter((id) => topicsById[id]?.is_finite)
     const infiniteTopicIds = topicIds.filter((id) => !topicsById[id]?.is_finite)
@@ -56,15 +62,19 @@ export default async function EventPage({ params }: Props) {
 
     const finiteItemsPromise =
       finiteTopicIds.length > 0
-        ? supabase.from("topic_items").select("*").in("topic_id", finiteTopicIds)
+        ? supabase
+            .from("topic_items")
+            .select("*")
+            .in("topic_id", finiteTopicIds)
         : Promise.resolve({ data: null })
 
     const epiPromise =
       infinitePollIds.length > 0
         ? supabase
             .from("event_poll_items")
-            .select("id, event_poll_id, topic_item_id, topic_items(*)")
+            .select("id, event_poll_id, topic_item_id, display_order, topic_items(*)")
             .in("event_poll_id", infinitePollIds)
+            .order("display_order", { ascending: true })
         : Promise.resolve({ data: null })
 
     const [{ data: finiteItemsData }, { data: epiData }] = await Promise.all([
@@ -77,7 +87,13 @@ export default async function EventPage({ params }: Props) {
       ;(finiteItemsByTopicId[item.topic_id] ??= []).push(item)
     }
 
-    type EpiRow = { id: string; event_poll_id: string; topic_item_id: string; topic_items: TopicItem }
+    type EpiRow = {
+      id: string
+      event_poll_id: string
+      topic_item_id: string
+      display_order: number
+      topic_items: TopicItem
+    }
     const epiByPollId: Record<string, EpiRow[]> = {}
     for (const epi of (epiData ?? []) as unknown as EpiRow[]) {
       ;(epiByPollId[epi.event_poll_id] ??= []).push(epi)
@@ -89,12 +105,17 @@ export default async function EventPage({ params }: Props) {
 
       if (topic?.is_finite) {
         items = (finiteItemsByTopicId[poll.topic_id] ?? []).sort(
-          (a, b) => b.all_time_pledged - a.all_time_pledged,
+          (a, b) => b.all_time_pledged - a.all_time_pledged
         )
       } else {
         items = (epiByPollId[poll.id] ?? [])
-          .map((epi) => ({ ...epi.topic_items, event_poll_item_id: epi.id }))
-          .sort((a, b) => b.all_time_pledged - a.all_time_pledged)
+          .map((epi) => ({ ...epi.topic_items, event_poll_item_id: epi.id, _ord: epi.display_order }))
+          .sort((a, b) => {
+            if (b.all_time_pledged !== a.all_time_pledged) return b.all_time_pledged - a.all_time_pledged
+            return (a._ord ?? 0) - (b._ord ?? 0)
+          })
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          .map(({ _ord, ...item }) => item)
       }
 
       return { ...poll, topics: { ...topic, topic_items: items } }
@@ -148,20 +169,30 @@ export default async function EventPage({ params }: Props) {
   )
 
   const typedEvent = event as EventWithDetails
-  const isClosed = new Date(event.closes_at) < new Date()
+  const isClosed = !!event.closed_at || new Date(event.closes_at) < new Date()
+
+  const isOrganiser = userId === event.created_by
+
+  // Hide polls with unvetted custom topics from non-organisers
+  const visiblePolls = isOrganiser
+    ? pollsWithItems
+    : pollsWithItems.filter((p) => p.topics.is_active !== false)
 
   return (
-    <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
-      <EventContent
-        event={typedEvent}
-        pollsWithItems={pollsWithItems}
-        pot={pot ?? null}
-        userPotAllocation={userPotAllocation}
-        existingPledgesByPollId={existingPledgesByPollId}
-        totalRaised={totalRaised}
-        isClosed={isClosed}
-        clerkUserId={userId}
-      />
-    </main>
+    <>
+      <EventSubheader eventId={id} isOrganiser={isOrganiser} isClosed={isClosed} />
+      <main className={`mx-auto max-w-330 px-6 pt-8 ${isOrganiser ? "pb-28" : "pb-16"}`}>
+        <EventContent
+          event={typedEvent}
+          pollsWithItems={visiblePolls}
+          pot={pot ?? null}
+          userPotAllocation={userPotAllocation}
+          existingPledgesByPollId={existingPledgesByPollId}
+          totalRaised={totalRaised}
+          isClosed={isClosed}
+          clerkUserId={userId}
+        />
+      </main>
+    </>
   )
 }

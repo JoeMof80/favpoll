@@ -1,8 +1,8 @@
 import { Geist_Mono, Inter } from "next/font/google"
-import { ClerkProvider } from "@clerk/nextjs"
-
 import "./globals.css"
+import { ClerkProvider } from "@/components/clerk-provider"
 import { ThemeProvider } from "@/components/theme-provider"
+import { EditModeProvider } from "@/lib/edit-mode-context"
 import { Header } from "@/components/header"
 import { cn } from "@/lib/utils"
 
@@ -27,8 +27,10 @@ export default function RootLayout({
       >
         <body>
           <ThemeProvider>
-            <Header />
-            {children}
+            <EditModeProvider>
+              <Header />
+              {children}
+            </EditModeProvider>
           </ThemeProvider>
         </body>
       </html>

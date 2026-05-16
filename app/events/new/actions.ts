@@ -9,23 +9,32 @@ type CustomTopic = {
 }
 
 type InfiniteItems = {
+  prioritizedItemIds: string[]
   masterItemIds: string[]
   customLabels: string[]
 }
 
-type CreateEventInput = {
-  personName: string
-  photoUrl: string | null
-  occasion: string
-  charityId: string
+type PollInput = {
   topicId: string | null
   customTopic: CustomTopic | null
-  topicFraming: string | null
-  topicQuote: string | null
+  framing: string | null
+  quote: string | null
+  infiniteItems: InfiniteItems | null
+}
+
+type CreateEventInput = {
+  personName: string
+  personBio: string | null
+  photoUrl: string | null
+  dateLabel: string | null
+  occasion: string
+  occasionLabel: string | null
+  description: string | null
+  charityIds: string[]
   closesAt: string
   isPrivate: boolean
   potAmount: number | null
-  infiniteItems: InfiniteItems | null
+  polls: PollInput[]
 }
 
 async function ensureUser(supabase: ReturnType<typeof createAdminClient>, userId: string) {
@@ -51,7 +60,6 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
 
   const supabase = createAdminClient()
 
-  // Ensure bucket exists (no-op if already exists)
   await supabase.storage.createBucket('persons', { public: true }).catch(() => null)
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
@@ -69,61 +77,26 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
   return data.publicUrl
 }
 
-export async function createEvent(input: CreateEventInput): Promise<{ eventId: string }> {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Not authenticated')
-
-  const supabase = createAdminClient()
-
-  await ensureUser(supabase, userId)
-
-  const personRow: Record<string, unknown> = {
-    name: input.personName.trim(),
-    created_by: userId,
-  }
-  if (input.photoUrl) personRow.photo_url = input.photoUrl
-
-  const { data: person, error: personErr } = await supabase
-    .from('persons')
-    .insert(personRow)
-    .select('id')
-    .single()
-
-  if (personErr || !person) throw new Error(`Failed to create person: ${personErr?.message}`)
-
-  const { data: event, error: eventErr } = await supabase
-    .from('events')
-    .insert({
-      person_id: person.id,
-      occasion: input.occasion,
-      charity_id: input.charityId,
-      created_by: userId,
-      closes_at: new Date(input.closesAt).toISOString(),
-      is_private: input.isPrivate,
-    })
-    .select('id')
-    .single()
-
-  if (eventErr || !event) throw new Error(`Failed to create event: ${eventErr?.message}`)
-
-  // Resolve topic — create a custom one if needed
-  let topicId = input.topicId
-
+async function createPollForEvent(
+  supabase: ReturnType<typeof createAdminClient>,
+  eventId: string,
+  userId: string,
+  poll: PollInput,
+) {
+  let topicId = poll.topicId
   let customItemIds: string[] = []
 
-  if (!topicId && input.customTopic) {
+  if (!topicId && poll.customTopic) {
     const { data: newTopic, error: topicErr } = await supabase
       .from('topics')
-      .insert({ title: input.customTopic.title.trim(), created_by: userId })
+      .insert({ title: poll.customTopic.title.trim(), created_by: userId, is_finite: false, is_active: false })
       .select('id')
       .single()
-
     if (topicErr || !newTopic) throw new Error(`Failed to create topic: ${topicErr?.message}`)
-
     topicId = newTopic.id
 
-    const itemsToInsert = input.customTopic.items
-      .map((label) => label.trim())
+    const itemsToInsert = poll.customTopic.items
+      .map((l) => l.trim())
       .filter(Boolean)
       .map((label) => ({ topic_id: topicId!, label, source: 'organiser', is_master: false }))
 
@@ -133,63 +106,124 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
     }
   }
 
-  if (topicId) {
-    const { data: poll, error: pollErr } = await supabase
-      .from('event_polls')
-      .insert({
-        event_id: event.id,
-        topic_id: topicId,
-        personal_framing: input.topicFraming?.trim() || null,
-        personal_quote: input.topicQuote?.trim() || null,
-      })
-      .select('id')
-      .single()
+  if (!topicId) return
 
-    if (pollErr || !poll) throw new Error(`Failed to create poll: ${pollErr?.message}`)
+  const { data: eventPoll, error: pollErr } = await supabase
+    .from('event_polls')
+    .insert({
+      event_id: eventId,
+      topic_id: topicId,
+      personal_framing: poll.framing?.trim() || null,
+      personal_quote: poll.quote?.trim() || null,
+    })
+    .select('id')
+    .single()
 
-    // Custom topics: create event_poll_items for all items (custom topics are infinite-style)
-    if (customItemIds.length > 0) {
+  if (pollErr || !eventPoll) throw new Error(`Failed to create poll: ${pollErr?.message}`)
+
+  if (customItemIds.length > 0) {
+    await supabase.from('event_poll_items').insert(
+      customItemIds.map((itemId) => ({
+        event_poll_id: eventPoll.id,
+        topic_item_id: itemId,
+        is_guest_added: false,
+        added_by: userId,
+      })),
+    )
+  }
+
+  if (!poll.customTopic && poll.infiniteItems) {
+    const { prioritizedItemIds, masterItemIds, customLabels } = poll.infiniteItems
+    const allItemIds = [...masterItemIds]
+
+    if (customLabels.length > 0) {
+      const { data: newCustomItems } = await supabase
+        .from('topic_items')
+        .insert(
+          customLabels.map((label) => ({
+            topic_id: topicId!,
+            label: label.trim(),
+            source: 'organiser',
+            is_master: false,
+          })),
+        )
+        .select('id')
+      allItemIds.push(...(newCustomItems ?? []).map((i) => i.id))
+    }
+
+    if (allItemIds.length > 0) {
       await supabase.from('event_poll_items').insert(
-        customItemIds.map((itemId) => ({
-          event_poll_id: poll.id,
+        allItemIds.map((itemId, index) => ({
+          event_poll_id: eventPoll.id,
           topic_item_id: itemId,
           is_guest_added: false,
           added_by: userId,
+          display_order: index,
+          is_prioritized: prioritizedItemIds.includes(itemId),
         })),
       )
     }
+  }
+}
 
-    // Existing infinite topics: create event_poll_items from curated selection
-    if (!input.customTopic && input.infiniteItems) {
-      const { masterItemIds, customLabels } = input.infiniteItems
-      const allItemIds = [...masterItemIds]
+export async function createEvent(input: CreateEventInput): Promise<{ eventId: string }> {
+  const { userId } = await auth()
+  if (!userId) throw new Error('Not authenticated')
 
-      if (customLabels.length > 0) {
-        const { data: newCustomItems } = await supabase
-          .from('topic_items')
-          .insert(
-            customLabels.map((label) => ({
-              topic_id: topicId!,
-              label: label.trim(),
-              source: 'organiser',
-              is_master: false,
-            })),
-          )
-          .select('id')
-        allItemIds.push(...(newCustomItems ?? []).map((i) => i.id))
-      }
+  const supabase = createAdminClient()
+  await ensureUser(supabase, userId)
 
-      if (allItemIds.length > 0) {
-        await supabase.from('event_poll_items').insert(
-          allItemIds.map((itemId) => ({
-            event_poll_id: poll.id,
-            topic_item_id: itemId,
-            is_guest_added: false,
-            added_by: userId,
-          })),
-        )
-      }
-    }
+  const personRow: Record<string, unknown> = {
+    name: input.personName.trim(),
+    bio: input.personBio || null,
+    photo_url: input.photoUrl || null,
+    date_label: input.dateLabel || null,
+    created_by: userId,
+  }
+
+  const { data: person, error: personErr } = await supabase
+    .from('persons')
+    .insert(personRow)
+    .select('id')
+    .single()
+
+  if (personErr || !person) throw new Error(`Failed to create person: ${personErr?.message}`)
+
+  const closesAt = new Date(input.closesAt).toISOString()
+  const hardCloseAt = new Date(input.closesAt)
+  hardCloseAt.setDate(hardCloseAt.getDate() + 90)
+
+  const { data: event, error: eventErr } = await supabase
+    .from('events')
+    .insert({
+      person_id: person.id,
+      occasion: input.occasion,
+      occasion_label: input.occasionLabel,
+      created_by: userId,
+      closes_at: closesAt,
+      original_closes_at: closesAt,
+      hard_close_at: hardCloseAt.toISOString(),
+      extension_count: 0,
+      is_private: input.isPrivate,
+      description: input.description,
+    })
+    .select('id')
+    .single()
+
+  if (eventErr || !event) throw new Error(`Failed to create event: ${eventErr?.message}`)
+
+  if (input.charityIds.length > 0) {
+    await supabase.from('event_charities').insert(
+      input.charityIds.map((charityId, i) => ({
+        event_id: event.id,
+        charity_id: charityId,
+        display_order: i,
+      })),
+    )
+  }
+
+  for (const poll of input.polls) {
+    await createPollForEvent(supabase, event.id, userId, poll)
   }
 
   if (input.potAmount && input.potAmount > 0) {

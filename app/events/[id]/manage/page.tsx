@@ -1,31 +1,34 @@
-import { notFound, redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
-import Link from 'next/link'
-import { createAdminClient } from '@/lib/supabase/admin'
-import type { EventWithDetails } from '@/types'
+import { notFound, redirect } from "next/navigation"
+import { auth } from "@clerk/nextjs/server"
+import Link from "next/link"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { LiveDisplaySection } from "@/components/live-display-section"
+import type { EventWithDetails } from "@/types"
 
 type Props = {
   params: Promise<{ id: string }>
 }
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
   }).format(amount)
 }
 
 export default async function ManageEventPage({ params }: Props) {
   const { id } = await params
   const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  if (!userId) redirect("/sign-in")
 
   const supabase = createAdminClient()
 
   const { data: event } = await supabase
-    .from('events')
-    .select('*, persons(*), charities(*)')
-    .eq('id', id)
+    .from("events")
+    .select(
+      "*, persons!events_person_id_fkey(*), event_charities(charities(name))"
+    )
+    .eq("id", id)
     .single()
 
   if (!event) notFound()
@@ -37,18 +40,18 @@ export default async function ManageEventPage({ params }: Props) {
 
   // Fetch polls
   const { data: polls } = await supabase
-    .from('event_polls')
-    .select('*, topics(*)')
-    .eq('event_id', id)
-    .order('created_at')
+    .from("event_polls")
+    .select("*, topics(*)")
+    .eq("event_id", id)
+    .order("created_at")
 
   // Fetch pledge totals per poll
   const pollIds = (polls ?? []).map((p) => p.id)
   const { data: pledges } = await supabase
-    .from('pledges')
-    .select('event_poll_id, total_amount')
-    .in('event_poll_id', pollIds)
-    .is('withdrawn_at', null)
+    .from("pledges")
+    .select("event_poll_id, total_amount")
+    .in("event_poll_id", pollIds)
+    .is("withdrawn_at", null)
 
   const pledgeTotalsByPoll: Record<string, number> = {}
   pledges?.forEach((p) => {
@@ -56,18 +59,21 @@ export default async function ManageEventPage({ params }: Props) {
       (pledgeTotalsByPoll[p.event_poll_id] ?? 0) + p.total_amount
   })
 
-  const totalRaised = Object.values(pledgeTotalsByPoll).reduce((s, v) => s + v, 0)
-  const isClosed = new Date(event.closes_at) < new Date()
+  const totalRaised = Object.values(pledgeTotalsByPoll).reduce(
+    (s, v) => s + v,
+    0
+  )
+  const isClosed = !!event.closed_at || new Date(event.closes_at) < new Date()
 
   // Fetch pot info
   const { data: pot } = await supabase
-    .from('event_pots')
-    .select('*')
-    .eq('event_id', id)
+    .from("event_pots")
+    .select("*")
+    .eq("event_id", id)
     .maybeSingle()
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-16 pt-10">
+    <main className="mx-auto max-w-2xl px-4 pt-10 pb-16">
       <div className="flex items-center gap-3 text-sm text-muted-foreground">
         <Link href="/events" className="hover:text-foreground">
           Your events
@@ -82,16 +88,19 @@ export default async function ManageEventPage({ params }: Props) {
             {typedEvent.persons.name}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {typedEvent.charities.name}
+            {typedEvent.event_charities
+              ?.map((ec) => ec.charities.name)
+              .join(", ")}
           </p>
         </div>
         <Link
           href={`/events/${id}`}
-          className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+          className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted focus:ring-2 focus:ring-ring focus:outline-none"
         >
           View event
         </Link>
       </div>
+
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-border bg-card px-4 py-4">
@@ -103,7 +112,7 @@ export default async function ManageEventPage({ params }: Props) {
         <div className="rounded-lg border border-border bg-card px-4 py-4">
           <p className="text-xs text-muted-foreground">Status</p>
           <p className="mt-1 text-xl font-medium text-foreground">
-            {isClosed ? 'Closed' : 'Active'}
+            {isClosed ? "Closed" : "Active"}
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card px-4 py-4">
@@ -115,7 +124,10 @@ export default async function ManageEventPage({ params }: Props) {
       </div>
 
       <section className="mt-8" aria-labelledby="polls-heading">
-        <h2 id="polls-heading" className="mb-3 text-base font-medium text-foreground">
+        <h2
+          id="polls-heading"
+          className="mb-3 text-base font-medium text-foreground"
+        >
           Polls
         </h2>
         {polls && polls.length > 0 ? (
@@ -126,9 +138,9 @@ export default async function ManageEventPage({ params }: Props) {
                 className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3"
               >
                 <p className="text-sm text-foreground">
-                  {poll.personal_framing ?? poll.topics?.title ?? '—'}
+                  {poll.personal_framing ?? poll.topics?.title ?? "—"}
                 </p>
-                <p className="text-sm tabular-nums text-muted-foreground">
+                <p className="text-sm text-muted-foreground tabular-nums">
                   {formatCurrency(pledgeTotalsByPoll[poll.id] ?? 0)}
                 </p>
               </li>
@@ -141,7 +153,10 @@ export default async function ManageEventPage({ params }: Props) {
 
       {pot && (
         <section className="mt-8" aria-labelledby="pot-heading">
-          <h2 id="pot-heading" className="mb-3 text-base font-medium text-foreground">
+          <h2
+            id="pot-heading"
+            className="mb-3 text-base font-medium text-foreground"
+          >
             Shared pot
           </h2>
           <div className="rounded-lg border border-border bg-card px-4 py-4">
@@ -152,7 +167,9 @@ export default async function ManageEventPage({ params }: Props) {
               </p>
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Allocated to guests</p>
+              <p className="text-sm text-muted-foreground">
+                Allocated to guests
+              </p>
               <p className="text-sm font-medium text-foreground">
                 {formatCurrency(pot.total_allocated)}
               </p>
@@ -167,17 +184,22 @@ export default async function ManageEventPage({ params }: Props) {
         </section>
       )}
 
+      <LiveDisplaySection eventId={id} />
+
       <section className="mt-8">
-        <h2 className="mb-3 text-base font-medium text-foreground">Share link</h2>
+        <h2 className="mb-3 text-base font-medium text-foreground">
+          Share link
+        </h2>
         <div className="flex gap-2">
-          <code className="flex-1 truncate rounded-md border border-border bg-muted/30 px-3 py-2 text-sm font-mono text-foreground">
-            {typeof window !== 'undefined'
+          <code className="flex-1 truncate rounded-md border border-border bg-muted/30 px-3 py-2 font-mono text-sm text-foreground">
+            {typeof window !== "undefined"
               ? `${window.location.origin}/events/${id}`
               : `/events/${id}`}
           </code>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Share this link with guests so they can view the event and make pledges.
+          Share this link with guests so they can view the event and make
+          pledges.
         </p>
       </section>
     </main>

@@ -1,23 +1,23 @@
-import Link from 'next/link'
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { DeleteEventButton } from './delete-event-button'
-import type { EventWithDetails } from '@/types'
+import Link from "next/link"
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { DeleteEventButton } from "./delete-event-button"
+import type { EventWithDetails } from "@/types"
 
 const OCCASION_LABELS: Record<string, string> = {
-  memorial: 'Memorial',
-  birthday: 'Birthday',
-  retirement: 'Retirement',
-  wedding: 'Wedding',
-  other: 'Event',
+  memorial: "Memorial",
+  birthday: "Birthday",
+  retirement: "Retirement",
+  wedding: "Wedding",
+  other: "Event",
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   })
 }
 
@@ -32,23 +32,25 @@ function daysUntilClose(closesAt: string): number {
 
 export default async function EventsPage() {
   const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  if (!userId) redirect("/sign-in")
 
   const supabase = createAdminClient()
 
   const { data: events } = await supabase
-    .from('events')
-    .select('*, persons(*), charities(*), event_polls(topics(title))')
-    .eq('created_by', userId)
-    .order('created_at', { ascending: false })
+    .from("events")
+    .select(
+      "*, persons!events_person_id_fkey(*), event_charities(charities(name)), event_polls(topics(title))"
+    )
+    .eq("created_by", userId)
+    .order("created_at", { ascending: false })
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-16 pt-10">
+    <main className="mx-auto max-w-2xl px-4 pt-10 pb-16">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium text-foreground">Your events</h1>
         <Link
           href="/events/new"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
         >
           New event
         </Link>
@@ -59,11 +61,19 @@ export default async function EventsPage() {
           {(events as EventWithDetails[]).map((event) => {
             const closed = isClosed(event.closes_at)
             const days = daysUntilClose(event.closes_at)
-            const polls = (event as unknown as { event_polls: { topics: { title: string } }[] }).event_polls ?? []
+            const polls =
+              (
+                event as unknown as {
+                  event_polls: { topics: { title: string } }[]
+                }
+              ).event_polls ?? []
             const topicTitle = polls[0]?.topics?.title ?? null
 
             return (
-              <li key={event.id} className="rounded-lg border border-border bg-card transition-colors hover:border-primary/30 hover:bg-secondary/30">
+              <li
+                key={event.id}
+                className="rounded-lg border border-border bg-card transition-colors hover:border-primary/30 hover:bg-secondary/30"
+              >
                 <div className="flex items-start justify-between px-5 py-4">
                   <Link
                     href={`/events/${event.id}`}
@@ -71,7 +81,7 @@ export default async function EventsPage() {
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">
-                        {OCCASION_LABELS[event.occasion] ?? 'Event'}
+                        {OCCASION_LABELS[event.occasion] ?? "Event"}
                       </span>
                       {closed && (
                         <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -88,7 +98,13 @@ export default async function EventsPage() {
                       </p>
                     )}
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {event.charities.name}
+                      {(
+                        event as unknown as {
+                          event_charities: { charities: { name: string } }[]
+                        }
+                      ).event_charities
+                        ?.map((ec) => ec.charities.name)
+                        .join(", ")}
                     </p>
                   </Link>
 
@@ -100,7 +116,11 @@ export default async function EventsPage() {
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">
-                          {days === 0 ? 'Closes today' : days === 1 ? '1 day left' : `${days} days left`}
+                          {days === 0
+                            ? "Closes today"
+                            : days === 1
+                              ? "1 day left"
+                              : `${days} days left`}
                         </p>
                       )}
                       <p className="mt-1 text-xs text-primary group-hover:underline">
@@ -121,7 +141,7 @@ export default async function EventsPage() {
           </p>
           <Link
             href="/events/new"
-            className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
           >
             Create your first event
           </Link>

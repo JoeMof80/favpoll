@@ -1,13 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { CreateEventWizard } from './create-event-wizard'
-import type { Category, Charity, Topic, TopicItem } from '@/types'
-
-export type TopicWithMeta = Topic & {
-  topic_items: TopicItem[]
-  category_ids: string[]
-}
+import { EventCanvas } from '@/components/event-canvas'
+import type { Category, Charity, Topic, TopicItem, TopicWithMeta } from '@/types'
 
 export default async function NewEventPage({
   searchParams,
@@ -21,14 +16,16 @@ export default async function NewEventPage({
 
   const supabase = createAdminClient()
 
-  const [{ data: charities }, { data: topics }, { data: categories }] = await Promise.all([
-    supabase.from('charities').select('*').order('name'),
-    supabase
-      .from('topics')
-      .select('*, topic_items(*), topic_categories(category_id)')
-      .order('title'),
-    supabase.from('categories').select('*').order('label'),
-  ])
+  const [{ data: charities }, { data: topics }, { data: categories }] =
+    await Promise.all([
+      supabase.from('charities').select('*').order('name'),
+      supabase
+        .from('topics')
+        .select('*, topic_items(*), topic_categories(category_id)')
+        .eq('is_active', true)
+        .order('title'),
+      supabase.from('categories').select('*').order('label'),
+    ])
 
   const enrichedTopics: TopicWithMeta[] = (topics ?? []).map((t) => ({
     ...(t as Topic),
@@ -39,13 +36,12 @@ export default async function NewEventPage({
   }))
 
   return (
-    <main className="mx-auto max-w-xl px-4 pb-16 pt-10">
-      <CreateEventWizard
-        charities={(charities ?? []) as Charity[]}
-        topics={enrichedTopics}
-        categories={(categories ?? []) as Category[]}
-        preselectedTopicId={preselectedTopicId ?? null}
-      />
-    </main>
+    <EventCanvas
+      mode="create"
+      charities={(charities ?? []) as Charity[]}
+      topics={enrichedTopics}
+      categories={(categories ?? []) as Category[]}
+      preselectedTopicId={preselectedTopicId ?? null}
+    />
   )
 }
