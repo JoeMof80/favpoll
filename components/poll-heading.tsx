@@ -147,14 +147,11 @@ export function PollHeading(props: Props) {
             />
           </div>
           <p className="mt-1.5 text-[11px] text-muted-foreground">
-            Shown to each guest after they pledge — write it as if speaking to them directly.
+            Shown to each guest after they pledge — write it as if speaking to
+            them directly.
           </p>
         </div>
       ) : null}
-
-      {(isEdit ? props.hasTopicSelected : true) && (
-        <Separator className="my-8" />
-      )}
     </div>
   )
 }

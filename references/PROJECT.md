@@ -2,7 +2,7 @@
 
 ## What is favpoll?
 
-favpoll is a charitable polling platform for life events — memorials, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks poll topics (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
+favpoll is a charitable polling platform for life events — memorials, funerals, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks poll topics (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
 
 Every pledge also feeds a permanent all-time universal ranking of human favourites — a collectively funded, financially weighted record of what people love most, built through acts of generosity.
 
@@ -12,7 +12,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 - **Events** honour a person on a specific occasion
 - **Topics** are canonical questions — Colour, Season, Biscuit, Film, etc.
-- **Event polls** activate a topic within an event, with a personal framing (withholds the protagonist's answer) and an optional reveal (shown to each guest only after they pledge)
+- **Event polls** activate a topic within an event, with a personal framing ("Rebecca's favourite colour was purple — what's yours?") and an optional quote
 - **Pledges** are financial commitments against specific topic items, contributing to both the event ranking and the all-time universal ranking
 - **Pledge allocations** split a single pledge across multiple items (e.g. 60% Purple, 40% Blue)
 - **Shared fund** allows generous donors to top up a communal pot so others (e.g. children) can participate without paying
@@ -21,15 +21,15 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## Stack
 
-- **Framework:** Next.js 15, App Router, TypeScript — no `src/` prefix, files live at root level (`app/`, `components/`, `lib/`, `types/`, `scripts/`)
+- **Framework:** Next.js 15, App Router, TypeScript, `src/` directory
 - **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests
 - **Database:** Supabase (Postgres + Realtime)
 - **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities)
-- **Email:** Resend (`lib/email.ts`)
-- **Package manager:** pnpm only — never npm or yarn
+- **Email:** Resend
+- **Package manager:** pnpm
 - **Hosting:** Vercel
-- **Cron:** Vercel cron (`vercel.json`) — hourly `POST /api/cron/close-events`
+- **Domain:** favpoll.com
 
 ---
 
@@ -56,7 +56,7 @@ charities (
 
 categories (
   id uuid primary key,
-  label text not null,              -- Nature, Music, Film & TV, Food & Drink, Places, Sport, Literature, Everyday life, Childhood, Time
+  label text not null,              -- Nature, Music, Film & TV, etc.
   description text,
   created_at timestamptz
 )
@@ -66,8 +66,6 @@ topics (
   title text not null,              -- Short title, no "Favourite" prefix: "Colour", "Season"
   description text,
   is_finite boolean default false,
-  is_active boolean default true,   -- false = not shown to guests (unvetted custom topics)
-  placeholders jsonb default '{}',  -- per-occasion { framing, quote } pairs keyed by occasion slug
   created_by text references users(id),
   created_at timestamptz
 )
@@ -84,37 +82,33 @@ topic_items (
   label text not null,
   all_time_pledged numeric default 0,
   all_time_count integer default 0,
-  is_master boolean default true,
-  source text default 'seed',       -- 'seed' | 'organiser' | 'guest'
+  is_canonical boolean default true,
+  source text default 'seed',
   event_count integer default 0,
   total_pledge_count integer default 0,
   created_at timestamptz
 )
 
-persons (
+protagonists (
   id uuid primary key,
   name text not null,
-  date_label text,                  -- Free-text date string, e.g. "1940–2024" or "Turning 40"
-  bio text,
-  photo_url text,
   created_by text references users(id),
   created_at timestamptz
 )
 
 events (
   id uuid primary key,
-  person_id uuid references persons(id),
-  occasion text not null,           -- see Occasion Types below
-  occasion_label text,              -- custom override, e.g. "In loving memory of"
+  protagonist_id uuid references persons(id),
+  occasion text not null,
   created_by text references users(id),
   description text,
   closes_at timestamptz not null,
-  original_closes_at timestamptz,   -- set at creation = closes_at, never updated
-  hard_close_at timestamptz,        -- set at creation = closes_at + 90 days, immutable
-  extension_count integer default 0,
-  closed_at timestamptz,            -- set by cron when closes_at passes
-  total_raised numeric default 0,   -- stamped by cron at close
   is_private boolean default false,
+  closed_at timestamptz,
+  total_raised numeric default 0,
+  extension_count integer default 0,
+  original_closes_at timestamptz,
+  hard_close_at timestamptz,        -- created_at + 90 days, immutable
   created_at timestamptz
 )
 
@@ -130,8 +124,8 @@ event_polls (
   id uuid primary key,
   event_id uuid references events(id) on delete cascade,
   topic_id uuid references topics(id),
-  personal_framing text,            -- shown upfront; withholds the protagonist's favourite
-  personal_quote text,              -- the reveal; shown to each guest only after they pledge
+  personal_framing text,
+  personal_reveal text,
   created_at timestamptz
 )
 
@@ -141,8 +135,6 @@ event_poll_items (
   topic_item_id uuid references topic_items(id),
   is_guest_added boolean default false,
   added_by text references users(id),
-  display_order integer default 0,
-  is_prioritized boolean default false,
   created_at timestamptz
 )
 
@@ -192,6 +184,14 @@ event_invites (
   email text not null,
   created_at timestamptz
 )
+
+item_flags (
+  id uuid primary key,
+  topic_item_id uuid references topic_items(id) on delete cascade,
+  clerk_user_id text references users(id),
+  reason text,
+  created_at timestamptz
+)
 ```
 
 ---
@@ -199,160 +199,89 @@ event_invites (
 ## Occasion Types
 
 ```
-'memorial' | 'tribute' | 'birthday' | 'retirement' |
-'wedding' | 'anniversary' | 'leaving' | 'graduation' |
-'christening' | 'achievement' | 'recovery' | 'award' |
-'promotion' | 'celebration' | 'other'
+'memorial' | 'funeral' | 'birthday' | 'retirement' |
+'wedding' | 'anniversary' | 'leaving_do' | 'inclusion' |
+'christening' | 'bar_bat_mitzvah' | 'get_well_soon' |
+'sports_achievement' | 'work_milestone' | 'just_because' | 'other'
 ```
 
-### Default display headline prefixes (from `lib/display.ts`)
+### Fields shown per occasion
+
+| Field | Occasions |
+|---|---|
+| Birth year | memorial, funeral, birthday, christening |
+| Death year | memorial, funeral (required) |
+| Description | all (required for sports_achievement, work_milestone, just_because, other) |
+
+### Display headline prefixes
 
 ```
-memorial   → "In memory of"
-tribute    → "A tribute to"
-birthday   → "Happy birthday"
-retirement → "Celebrating the retirement of"
-wedding    → "Congratulations to"
-anniversary→ "Happy anniversary"
-leaving    → "Farewell"
-graduation → "Congratulations"
-christening→ "Welcome"
-achievement→ "Well done"
-recovery   → "Cheering on"
-award      → "Congratulations to"
-promotion  → "Congratulations to"
-celebration→ "Celebrating"
-other      → "Honouring"
+memorial / funeral → 'In memory of'
+birthday           → 'Happy birthday'
+retirement         → 'Celebrating the retirement of'
+wedding            → 'Congratulations to'
+anniversary        → 'Happy anniversary'
+leaving_do         → 'Farewell'
+inclusion         → 'Congratulations'
+christening        → 'Welcome'
+bar_bat_mitzvah    → 'Mazel tov'
+get_well_soon      → 'Get well soon'
+sports_achievement → 'Well done'
+work_milestone     → 'Celebrating'
+just_because       → 'For'
+other              → 'Honouring'
 ```
-
-The organiser can override the prefix with a custom `occasion_label` stored on the event.
 
 ---
 
 ## Topic Types
 
-### Finite (`is_finite = true`) — fixed answer set
-Colour, Season, Day of the week, Meal of the day, Time of day, Decade, and others.
+### Finite (is_finite = true) — fixed list, no additions
+Colour, Season, Day of the week, Meal of the day, Time of day, Decade
 
-### Infinite (`is_finite = false`) — open answer set
-Organiser can pin/prioritise items. Guests can suggest additions (flagged for review). Custom organiser topics are created with `is_active = false`.
+### Infinite (is_finite = false) — open list
+Organiser can pin/reorder (not remove) items. Guests can suggest additions.
 
 ### Canonical colour list (CSS named colours, no hex stored)
 Red, Orange, Yellow, Green, Blue, Purple, Pink, Brown, Black, White, Grey
 Rendered as: `<div style={{ backgroundColor: item.label.toLowerCase() }} />`
-
-### Topic placeholders
-Each topic has a `placeholders` JSONB column with entries keyed by occasion slug:
-```json
-{
-  "memorial": { "framing": "Belinda always loved...", "quote": "She always said..." },
-  "birthday":  { "framing": "...", "quote": "..." },
-  ...
-  "default":   { "framing": "...", "quote": "..." }
-}
-```
-Used to pre-fill the event poll framing/quote fields in the canvas. All 15 occasion keys + `default` should be present on every topic.
-
----
-
-## The Reveal Mechanic
-
-`event_polls.personal_quote` is a post-pledge reveal — not shown upfront.
-
-**Framing** (shown before pledging): withholds the protagonist's favourite. Invites the guest to share their own.
-> "Belinda had a colour she returned to all her life — what's yours?"
-
-**Reveal** (shown after pledging): discloses the protagonist's specific favourite. Intimate, in the organiser's voice.
-> "Belinda's was purple. She wore it to every important occasion."
-
-### Implementation
-
-- `PollHeading` (view mode): renders `framing` only — `personal_quote` is never shown here
-- `PollSection`: shows a quiet hint ("After pledging, Belinda has something to share with you.") while the guest is in pledge view, if a reveal exists
-- After `hasPledged` transitions `false → true` (payment confirmed via `router.refresh()`): `pledgeConfirmed` fires, the reveal card appears, rankings are delayed 300ms
-- Edit mode (`PollHeading`): quote textarea labelled "The reveal (optional)" with helper text "Shown to each guest after they pledge — write it as if speaking to them directly."
-- If `personal_quote` is null/empty: no hint shown, no reveal shown. The pledge still works normally.
-
-### Placeholder copy
-
-Placeholder text in the canvas follows the withhold/reveal pattern.
-
-**Framing placeholder:** "e.g. Belinda had a colour she returned to all her life — what's yours?"
-**Reveal placeholder:** "e.g. Belinda's was purple. She wore it to every important occasion."
-
-Source of truth for placeholder copy: `lib/occasions.ts`
-- `OCCASION_PLACEHOLDERS` — per-occasion fallback (keyed by occasion slug)
-- `TOPIC_REVEAL_PLACEHOLDERS` — per-topic-title overrides for 10 common topics (Colour, Season, Film, Song, Flower, Animal, Comfort food, Drink, Way to spend Sunday, Biscuit)
-- Topic JSONB (`topics.placeholders`) — most specific, per-occasion per-topic; takes precedence over all static fallbacks
-- `{name}` tokens in `TOPIC_REVEAL_PLACEHOLDERS` are substituted with the occasion persona's first name at render time in `PollEditor`
 
 ---
 
 ## Key Application Files
 
 ```
-app/
-├── layout.tsx
-├── page.tsx                              -- Landing page / home carousel
-├── events/
-│   ├── page.tsx                          -- Organiser's event list
-│   ├── actions.ts                        -- deleteEvent server action
-│   ├── delete-event-button.tsx
-│   ├── new/
-│   │   ├── page.tsx                      -- Create event (EventCanvas in create mode)
-│   │   └── actions.ts                    -- createEvent server action
-│   └── [id]/
-│       ├── page.tsx                      -- Public event page
-│       ├── display/page.tsx              -- Live display for projector
-│       ├── manage/page.tsx               -- Organiser dashboard
-│       ├── actions.ts                    -- Per-event server actions
-│       └── edit/
-│           ├── page.tsx                  -- Edit event (EventCanvas in edit mode)
-│           └── actions.ts               -- updateEvent server action
-├── topics/[id]/page.tsx                  -- Topic detail / all-time rankings
-├── rankings/page.tsx                     -- All-time rankings browse
-├── pledges/withdraw/
-│   ├── page.tsx
-│   └── actions.ts
-├── api/
-│   ├── webhooks/clerk/route.ts
-│   ├── stripe/payment-intent/route.ts
-│   ├── events/[id]/request-extension/route.ts
-│   └── cron/close-events/route.ts
-├── sign-in/ and sign-up/
-
-components/
-├── ui/                                   -- shadcn primitives
-├── event-canvas/                         -- EventCanvas + useCanvas + utils (create/edit)
-├── canvas/                               -- Sub-components: PollEditor, CanvasSidebar, TopicPicker, etc.
-│   └── canvas-sidebar/                   -- ClosingDate, CharityPicker, SharedFund, PrivacyToggle
-├── event-content/                        -- EventContent + useEventContent (public view)
-├── poll-section/                         -- PollSection + usePollSection
-├── pledge-card/                          -- PledgeCard + usePledge + helpers
-├── ranking-list/                         -- RankingList component
-├── display-screen/                       -- LiveDisplay component
-├── event-hero.tsx
-├── event-subheader.tsx                   -- Organiser bottom bar (edit / share results)
-├── charity-banner.tsx
-├── countdown.tsx
-├── favpoll-logo.tsx
-├── header.tsx
-├── home-carousel.tsx
-└── poll-heading.tsx
-
-lib/
-├── supabase/
-│   ├── client.ts                         -- Browser client (use in client components)
-│   ├── server.ts                         -- Server client (use in server components/actions)
-│   └── admin.ts                          -- Service role client (use in API routes / cron)
-├── occasions.ts                          -- OCCASION_LIST, OCCASION_LABELS, NAME_LABELS, OCCASION_PLACEHOLDERS
-├── display.ts                            -- getEventHeadline, formatEventDate, ordinal
-├── email.ts                              -- sendPledgeConfirmation, sendEventClosed, sendExtensionRequest
-├── edit-mode-context.tsx
-└── utils.ts
-
-types/index.ts                            -- All shared TypeScript types
-scripts/seed.ts                           -- pnpm seed — idempotent, additive only
+src/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                       -- Landing page
+│   ├── events/
+│   │   ├── new/page.tsx               -- Create event (in-place editing)
+│   │   └── [id]/
+│   │       ├── page.tsx               -- Event page (guest + edit mode)
+│   │       └── display/page.tsx       -- Live display for projector
+│   ├── pledges/withdraw/page.tsx      -- Guest withdrawal via token
+│   └── api/
+│       ├── webhooks/clerk/route.ts
+│       ├── topics/[id]/check-duplicate/route.ts
+│       ├── events/[id]/request-extension/route.ts
+│       └── cron/close-events/route.ts
+├── components/
+│   ├── ui/
+│   ├── event-hero.tsx
+│   ├── charity-banner.tsx
+│   ├── pot-banner.tsx
+│   ├── poll-section.tsx
+│   ├── ranking-list.tsx
+│   ├── pledge-panel.tsx
+│   └── shared-fund-pledge.tsx
+├── lib/
+│   ├── supabase/client.ts
+│   ├── supabase/server.ts
+│   ├── display.ts                     -- getEventHeadline, formatEventDate, ordinal
+│   └── utils.ts
+├── types/index.ts
+└── scripts/seed.ts                    -- pnpm seed
 ```
 
 ---
@@ -372,49 +301,43 @@ Green:     #1D9E75
 - Filled editable field: `border-b-[1.5px] border-[#AFA9EC] pb-0.5`
 - Focused: `border-[#534AB7]`
 - Placeholder: `text-muted-foreground italic`
-- Guest view: no underlines, no placeholders, no edit controls
+- Guest view: no underlines, no placeholders
 
 ### Button conventions
-- Never use raw `<button>` — always use shadcn `Button`
-- Primary: `<Button>` — solid purple
+- Primary: `<Button className="w-full">` — solid purple, full width
 - Quiet secondary: `<Button variant="ghost" size="sm">`
-
-### Other conventions
-- `aria-live="polite"` on all live-updating values
-- American spelling in code (color, organize), UK English in UI copy strings
-- Colour items rendered using `item.label.toLowerCase()` as CSS colour — no hex stored
+- Never use raw `<button>` — always use shadcn Button
 
 ---
 
-## Poll Closing Rules
+## Poll End Date Rules
 
-- Closing date required at creation; no suggested default shown
-- `original_closes_at` = `closes_at` at creation, never updated
-- `hard_close_at` = `closes_at` + 90 days at creation, immutable
-- **Extension count = 0**: standard date picker, no warning
-- **Extension count = 1**: date picker + quiet note "One extension remaining after this."
-- **Extension count ≥ 2**: picker disabled; organiser must submit a request form → `POST /api/events/[id]/request-extension` → Resend email to `SUPPORT_EMAIL`
-- **Auto-close**: Vercel cron runs hourly, closes events where `closes_at <= now` and `closed_at IS NULL`, stamps `closed_at` and `total_raised`, emails organiser
-- Cannot reopen a closed event
-- Closed event UI: summary card (closed date + total raised) replaces pledge panel; "Poll closed" replaces countdown; edit button hidden; organiser sees "Share results" (copies link)
+- Required at creation, no suggested default
+- Organiser can extend freely up to hard_close_at (created_at + 90 days, immutable)
+- 1st extension: free
+- 2nd extension: inline warning
+- 3rd extension: blocked, must request via form (emails FAVPOLL_ADMIN_EMAIL)
+- Auto-close: Vercel cron hourly, closes events where closes_at <= now
+- Disbursement: automatic on close (Stripe TODO)
+- Cannot reopen closed events
 
 ---
 
 ## Multiple Charities
 
 - Up to 3 per event (enforced in application logic)
-- Stored in `event_charities` join table with `display_order`
-- Proceeds split equally on disbursement (Stripe TODO)
+- Stored in event_charities join table
+- Proceeds split equally on disbursement
 
 ---
 
 ## Auth — Guest Pledging
 
 - Login optional for guests
-- Guest pledges: `clerk_user_id = null`, `guest_email` required
-- `guest_token`: UUID for withdrawal link, nulled after use
+- Guest pledges: clerk_user_id = null, guest_email required
+- guest_token: UUID for withdrawal link, nulled after use
 - Signed-in users: withdraw from profile page
-- Duplicate check: `guest_email + event_poll_id + withdrawn_at IS NULL`
+- Duplicate check: guest_email + event_poll_id + withdrawn_at is null
 
 ---
 
@@ -435,32 +358,21 @@ STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 RESEND_API_KEY
-RESEND_FROM_EMAIL                         -- From address for all outbound email
-SUPPORT_EMAIL                             -- Receives extension requests
 NEXT_PUBLIC_BASE_URL
-CRON_SECRET                               -- Bearer token checked by /api/cron/close-events
+FAVPOLL_ADMIN_EMAIL
+CRON_SECRET
 ```
-
----
-
-## Claude Code Skills (`.claude/commands/`)
-
-| Skill | Purpose |
-|---|---|
-| `/seed` | Check seed.ts diff, run `pnpm seed`, flag anomalies |
-| `/add-placeholders` | Write/update placeholder blocks for one or more topics |
-| `/new-topic` | Scaffold a complete new TopicSeed object with all 15 occasion keys |
-| `/db-migrate` | Audit schema vs types, generate safe `ADD COLUMN IF NOT EXISTS` SQL |
-| `/favpoll-context` | Load full project context at session start |
 
 ---
 
 ## Outstanding TODO
 
-- Stripe Connect — charity disbursement on close (cron has placeholder)
-- Stripe Checkout — payment flow in pledge card
+- Stripe Connect — charity disbursement (cron has placeholder)
+- Stripe Checkout — payment in pledge panel
 - User profile / donor history page
-- All-time rankings browse page (`/rankings` exists but may be incomplete)
-- Email templates — currently plain HTML strings, no design
+- All-time rankings browse page
+- Email templates (currently plain text)
+- Localisation (UI copy is UK English, code uses American spelling)
+- Mobile app
 - Rate limiting on API routes
 - Analytics

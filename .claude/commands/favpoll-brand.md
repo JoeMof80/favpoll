@@ -69,11 +69,19 @@ The framing is shown upfront, before pledging. It invites the guest to share the
 ✓ "There was a season Margaret always loved most — which is yours?"
 ✓ "Tom had a film he watched every Christmas without fail — what's yours?"
 
-The reveal is shown after pledging. It is intimate, specific, in the organiser's voice:
+The reveal is shown after pledging. The voice depends on who wrote it:
 
-✓ "Belinda's was purple. She wore it to every important occasion."
-✓ "Margaret's was autumn. She said it always felt like coming home."
-✓ "Tom's was It's a Wonderful Life. He cried every time and denied it."
+- **Written by an organiser about someone else** — third person, warm and specific:
+  ✓ "Belinda's was purple. She wore it to every important occasion."
+  ✓ "Margaret's was autumn. She said it always felt like coming home."
+
+- **Written by the protagonist in advance** — first person, a final act of self-expression:
+  ✓ "Mine was purple. I wore it to every occasion that mattered."
+  ✓ "Autumn, always. It felt like the world was making itself beautiful one last time."
+
+- **Written by an executor following will instructions** — either voice, depending on what was left
+
+The first-person version is particularly powerful and should be encouraged when the organiser indicates the event is will-directed. It gives guests the experience of hearing the person's own voice after they are gone.
 
 **Framing placeholder copy by topic:**
 
@@ -119,7 +127,29 @@ Way to spend Sunday:
   reveal:  "e.g. Tom's was a long walk followed by a roast. Every week without fail."
 ```
 
-**When no reveal is written:**
+**Will-directed event placeholder copy** — encourage first person:
+
+```
+Colour:
+  framing: "e.g. I had a colour I came back to all my life — what's yours?"
+  reveal:  "e.g. Mine was purple. I wore it to every occasion that mattered."
+
+Season:
+  framing: "e.g. There was a season I always loved most — which is yours?"
+  reveal:  "e.g. Autumn, always. It felt like the world was making itself beautiful one last time."
+
+Film:
+  framing: "e.g. I had a film I could watch again and again — what's yours?"
+  reveal:  "e.g. It's a Wonderful Life. I cried every time and I'm not sorry."
+
+Song:
+  framing: "e.g. There was a song that always stopped me — what's yours?"
+  reveal:  "e.g. Waterloo Sunset. It made London feel worth everything."
+
+Flower:
+  framing: "e.g. I had a flower I never tired of — what's yours?"
+  reveal:  "e.g. Lavender. I grew it in every garden I ever had."
+```
 The quote field is empty. Guests see the framing, pledge, and see the current rankings. No reveal moment. This is fine — not every topic suits one, and not every organiser will want to write one. Do not force it.
 
 **When the organiser has already disclosed the favourite in the framing:**
@@ -198,8 +228,88 @@ Never describe favpoll as:
 
 ---
 
+## Design tokens — use these when writing UI copy or building components
+
+These are the canonical values from the favpoll style guide. Use them whenever building or reviewing UI — do not invent new values.
+
+### Colours
+```
+Purple primary:   #534AB7   — buttons, logo, links, brand moments
+Purple mid:       #7F77DD   — ranking bars, progress indicators
+Purple light:     #EEEDFE   — backgrounds, reveals, selected states
+Purple border:    #AFA9EC   — borders on purple-tinted surfaces
+Purple dark:      #3C3489   — text on purple-tinted surfaces
+Purple 900:       #26215C   — darkest purple, rarely needed
+
+Green:            #1D9E75   — shared fund, positive states, availability
+Green light:      #E1F5EE   — shared fund backgrounds
+
+Gray 50:          #F1EFE8   — page background, subtle surfaces
+Gray 100:         #D3D1C7   — borders, dividers
+Gray 400:         #888780   — placeholder text, tertiary labels
+Gray 600:         #5F5E5A   — secondary body text
+Gray 900:         #2C2C2A   — primary text
+
+Amber:            #EF9F27   — warnings, progress near limit
+Red:              #E24B4A   — errors, validation failures
+Blue:             #378ADD   — informational states
+```
+
+### Typography
+```
+Typeface:         Plus Jakarta Sans (Google Fonts, free)
+Weights:          400 regular, 500 medium — never 600 or 700
+
+Display:          48px / 500 / letter-spacing: -0.02em / line-height: 1.1
+Heading 1:        32px / 500 / letter-spacing: -0.01em / line-height: 1.2
+Heading 2:        22px / 500 / letter-spacing: -0.01em
+Heading 3:        17px / 500
+Body:             15px / 400 / line-height: 1.7
+Small:            13px / 400 / line-height: 1.5 / color: gray-600
+Label:            11px / 500 / letter-spacing: 0.08em / UPPERCASE / color: purple-600
+Quote/Reveal:     14px / 400 / italic / color: #3C3489 / border-left: 3px solid #AFA9EC
+```
+
+### Borders and surfaces
+```
+Cards:            background white, border 0.5px solid #D3D1C7, border-radius 10px
+Dividers:         0.5px solid #D3D1C7 — never thicker
+Edit fields:      border-bottom 1.5px solid #AFA9EC, turns #534AB7 on focus
+Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
+```
+
+### Spacing scale
+```
+4px   — component internals (icon gaps, tight padding)
+8px   — element gaps within components
+12px  — standard internal padding
+16px  — component gaps
+24px  — section spacing
+32px  — major section spacing
+```
+
+### Button hierarchy
+```
+Primary:   solid #534AB7, white text, border-radius 7px — one per panel
+Ghost:     transparent, border 0.5px solid #AFA9EC, purple text — secondary actions
+Text:      no border, no background, gray-400 text — quiet actions (cancel, skip)
+```
+
+### Writing conventions
+```
+Product name:   favpoll (always lowercase, never FavPoll)
+Spelling:       UK English in UI copy (favourite, honour, colour)
+               American spelling in code only (color, organize)
+Dates:          13th May 2026 — ordinal, never ISO or US format
+Currency:       £10.30 in summaries, £340 in rankings (no pence in headlines)
+Case:           Sentence case everywhere — never Title Case or ALL CAPS in UI
+```
+
+---
+
 ## Updating these documents
 
 Fee model, product facts, or positioning changes → update the relevant reference file.
 Placeholder copy changes → update this SKILL.md directly under the framing/reveal section.
+Design token changes → update the tokens block above AND the style guide HTML at favpoll-style-guide.html.
 Tone guidelines → do not update without explicit instruction. Voice should be stable.
