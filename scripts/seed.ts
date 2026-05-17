@@ -203,80 +203,82 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing: "Belinda loved purple — which colour do you love?",
+        framing:
+          "Belinda had a colour she came back to all her life — which colour do you love?",
         quote:
-          "She always had something lavender in the garden. Every summer without fail…",
+          "Hers was purple. She grew lavender in every garden she ever had, and wore it to every occasion that mattered.",
       },
       tribute: {
         framing:
-          "David wore purple to everything important — which colour do you love?",
+          "David always came back to the same one — which colour do you love?",
         quote:
-          "He always had a pocket square. Always the same shade. Nobody ever asked why…",
+          "His was a particular shade of deep blue. The pocket square, always the same, at every meeting that counted. Nobody ever asked why.",
       },
       birthday: {
         framing:
-          "Sarah has been known to redecorate entire rooms around a colour — which colour do you love?",
+          "Sarah has been known to redecorate entire rooms around a single colour — which colour do you love?",
         quote:
-          "She spent three weekends deliberating between sage and duck egg. She still brings it up…",
+          "Hers is sage. Three weekends of deliberation, two trips to the paint shop, and no regrets. She still brings it up.",
       },
       retirement: {
         framing:
-          "David always said navy was the only colour worth trusting — which colour do you love?",
+          "David had a colour he trusted above all others — which colour do you love?",
         quote:
-          "Same tie. Every important meeting. Thirty years. Navy, obviously…",
+          "His was navy. Same tie, every important meeting, thirty-five years. He never wavered once.",
       },
       wedding: {
         framing:
-          "Emma says blue. James says green. They still haven't agreed — which colour do you love?",
+          "They have one wall they still can't agree on — which colour do you love?",
         quote:
-          "They've left one wall unpainted for five years. Still can't agree…",
+          "Hers is blue. His is green. The wall remains unpainted. This is not a problem they're in any hurry to solve.",
       },
       anniversary: {
         framing:
-          "Forty years of painting walls and they still argue about the colour — which colour do you love?",
+          "They've repainted the sitting room twice and it's still not quite right — which colour do you love?",
         quote:
-          "The sitting room has been repainted twice. The colour is still wrong, apparently…",
+          "Theirs keeps changing. The sitting room has been repainted twice. The colour is still not quite right, apparently.",
       },
       leaving: {
         framing:
           "Priya wore colour like she meant it — which colour do you love?",
         quote:
-          "The office felt genuinely greyer the day she left. Make of that what you will…",
+          "Hers was coral — worn deliberately, always exactly right. The office felt greyer the day she left.",
       },
       graduation: {
         framing:
-          "Tom's degree show had a colour palette he'd been refining for three years — which colour do you love?",
+          "Tom had a colour palette he'd been refining for three years — which colour do you love?",
         quote:
-          "He said he chose it logically. It was clearly entirely instinctive…",
+          "His was terracotta. He said he chose it logically. It was clearly entirely instinctive.",
       },
       christening: {
         framing:
-          "Lily arrived in a world full of colour — which colour do you love?",
+          "Lily has just arrived in a world full of colour — which colour do you love?",
         quote:
-          "We've all got opinions on what her room should be. We're saving them for the right moment…",
+          "We've all got opinions on what her room should be. We're saving them for the right moment.",
       },
       achievement: {
         framing:
-          "Marcus wore orange for every training run so the cars could see him — which colour do you love?",
+          "Marcus wore the same colour for every training run — which colour do you love?",
         quote:
-          "Eight months of early mornings, mostly in orange. It's earned its place…",
+          "His was orange. Hi-vis, visible to the cars, worn for eight months of dark early mornings. It's earned its place.",
       },
       recovery: {
         framing:
-          "Claire said yellow always helped — something about brightness when everything felt grey — which colour do you love?",
-        quote: "She surrounded herself with it. Not aggressively. Just enough…",
+          "Claire found a colour that helped when everything felt grey — which colour do you love?",
+        quote:
+          "Hers was yellow. She surrounded herself with it — not aggressively, just enough. It did something.",
       },
       award: {
         framing:
-          "Amelia's classroom is full of colour — she believes it changes how students think — which colour do you love?",
+          "Dr. Amelia Grant has a colour she believes changes how students think — which colour do you love?",
         quote:
-          "She's probably right. The research backs her up. But she knew it before the research…",
+          "Hers is yellow. She chose it deliberately and watched it work. She knew it before the research backed her up.",
       },
       promotion: {
         framing:
           "Kwame always said design begins with colour — which colour do you love?",
         quote:
-          "He has opinions about this. Specific ones. They're worth listening to…",
+          "His is indigo. He has a whole theory about it, applied to every product he's ever shipped.",
       },
       celebration: {
         framing: "Today is full of colour — which colour do you love?",
@@ -302,78 +304,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved spring — always the first with seeds in the ground — which season do you love?",
+          "Belinda had a season she came alive in — which season do you love?",
         quote:
-          "She'd have the garden ready before anyone else had put away their winter coat…",
+          "Hers was spring. She'd have seeds in the ground before anyone else had put away their winter coat.",
       },
       tribute: {
         framing:
-          "David loved the transition into autumn — said it was when things got interesting — which season do you love?",
+          "David had a time of year that suited him above all others — which season do you love?",
         quote:
-          "He was the kind of person who suited October. Something about the quality of the light…",
+          "His was autumn. He was the kind of person who suited October — something about the quality of the light.",
       },
       birthday: {
         framing:
-          "Sarah says she loves autumn but her friends say she's actually a summer person — which season do you love?",
+          "Sarah says she loves autumn, but her friends say she's actually a summer person — which season do you love?",
         quote:
-          "She plans her whole year around the season she's in. Right now it's complicated…",
+          "Hers is summer, if you ask the people who know her. She plans her whole year around it, whatever she says.",
       },
       retirement: {
         framing:
-          "David always said autumn was when real work got done — which season do you love?",
+          "David had a season when the best work always got done — which season do you love?",
         quote:
-          "The best project always came together in October. Every year, without fail…",
+          "His was autumn. The best project always came together in October. Every year, without fail.",
       },
       wedding: {
         framing:
-          "Emma and James met at a summer festival — but which season do you actually love?",
+          "Emma and James met at a rainy festival — but which season do you actually love?",
         quote:
-          "She says spring. He says she's wrong. They've been at this for five years…",
+          "Hers is spring. His is summer. They've been at this for five years with no sign of resolution.",
       },
       anniversary: {
         framing:
-          "They've had forty springs together and still disagree about when to plant — which season do you love?",
+          "They've had forty seasons together and still disagree about when to plant — which season do you love?",
         quote:
-          "She plants in March. He says April. Neither of them is entirely wrong…",
+          "Theirs is spring, though they can't agree on exactly when. She plants in March. He says April.",
       },
       leaving: {
         framing:
-          "Priya said she felt most herself in spring — which season do you love?",
+          "Priya felt most herself in a particular season — which season do you love?",
         quote:
-          "She arrived in January and changed everything by March. That tracks…",
+          "Hers was spring. She arrived in January and changed everything by March. That tracks.",
       },
       graduation: {
         framing:
-          "Tom spent his whole final year in the studio and emerged, blinking, into summer — which season do you love?",
+          "Tom spent his whole final year in the studio and emerged, blinking, into a particular season — which season do you love?",
         quote:
-          "He saw very little daylight between January and May. Summer was particularly welcome…",
+          "His is summer. He saw very little daylight between January and May. Summer was particularly welcome.",
       },
       christening: {
-        framing: "Lily arrived in spring — which season do you love?",
+        framing:
+          "Lily arrived in a particular season — which season do you love?",
         quote:
-          "She came just as the garden was starting. The timing was perfect…",
+          "She came in spring, just as the garden was starting. The timing felt perfect.",
       },
       achievement: {
         framing:
-          "Marcus trained through every season but the marathon itself was a crisp October morning — which season do you love?",
+          "Marcus trained through every season, but one morning changed how he thinks about them — which season do you love?",
         quote:
-          "He'll always associate autumn with finishing something. Which season is yours?",
+          "His is autumn. The marathon was a crisp October morning, and he'll always associate it with finishing something.",
       },
       recovery: {
         framing:
-          "Claire says spring felt different this year — which season do you love?",
+          "Claire said one season felt different this year — which season do you love?",
         quote:
-          "She noticed things she'd never noticed before. The season felt like it was specifically for her…",
+          "Hers is spring. She noticed things she'd never noticed before — the season felt like it was specifically for her.",
       },
       award: {
         framing:
-          "Amelia said autumn was when her students were hungriest — which season do you love?",
-        quote: "September energy. First week back. She lives for it…",
+          "Dr. Amelia Grant has a season when her students are hungriest — which season do you love?",
+        quote:
+          "Hers is autumn. September energy, first week back. She plans her whole year around that feeling.",
       },
       promotion: {
         framing:
-          "Kwame celebrated his promotion on the first warm day of the year — which season do you love?",
-        quote: "It happened to be perfect weather. He took note of that…",
+          "Kwame chose the exact right moment to mark his promotion — which season do you love?",
+        quote:
+          "His is spring. He waited for the first warm day of the year, and it happened to be perfect.",
       },
       celebration: {
         framing:
@@ -401,79 +406,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda lived for Sunday — long lunch, garden, Radio 4 — which day do you love?",
+          "Belinda had a day of the week that was entirely hers — which day do you love?",
         quote:
-          "If you wanted her on a Sunday, you had to know the schedule. It was sacred…",
+          "Hers was Sunday. Long lunch, garden, Radio 4 — in that order. If you wanted her, you had to know the schedule.",
       },
       tribute: {
         framing:
-          "David held court on Thursday evenings — which day do you love?",
+          "David had a day he returned to, reliably — which day do you love?",
         quote:
-          "Everyone knew Thursday was the night for a proper conversation. It became tradition by accident…",
+          "His was Thursday. He held court on Thursday evenings, and everyone knew that was the night for a proper conversation.",
       },
       birthday: {
         framing:
-          "Sarah always said Thursday had the best energy — which day do you love?",
+          "Sarah has a day she insists has the best energy — which day do you love?",
         quote:
-          "She somehow managed to make Wednesday feel like the weekend. No one could explain it…",
+          "Hers is Thursday. She makes it feel like the weekend starts early. No one has ever been able to explain how.",
       },
       retirement: {
         framing:
-          "David perfected his Monday morning for thirty-five years — which day do you love?",
+          "David had a day he'd spent thirty-five years perfecting — which day do you love?",
         quote:
-          "He always said weekends were just Mondays with better lighting…",
+          "His was Monday. He always said weekends were just Mondays with better lighting. He believed this sincerely.",
       },
       wedding: {
         framing:
-          "Emma and James got engaged on a Sunday — which day do you love?",
+          "Emma and James have never quite agreed on a favourite day — which day do you love?",
         quote:
-          "They met on a Friday, got engaged on a Sunday, and have never agreed on a favourite day since…",
+          "Hers is Sunday. His is Friday. They met on a Friday, got engaged on a Sunday, and haven't resolved it since.",
       },
       anniversary: {
         framing:
-          "Forty years of Sundays — they've had more of those together than any other day — which day do you love?",
+          "Mum and Dad have built forty years around the same day — which day do you love?",
         quote:
-          "Same routine, same cup of tea. The Sunday has never changed. That's the whole point…",
+          "Theirs is Sunday. Same routine, same cup of tea, same order of things. It has never needed to change.",
       },
       leaving: {
         framing:
-          "Priya made every Tuesday feel like an event — which day do you love?",
+          "Priya had a way of making one day of the week feel like an event — which day do you love?",
         quote:
-          "She made Tuesday lunches feel like the best part of the week. We're still not sure how…",
+          "Hers was Tuesday. She made Tuesday lunches feel like the best part of the week. We're still not sure how.",
       },
       graduation: {
         framing:
-          "Tom said Fridays at university felt earned — which day do you love?",
+          "Tom had a day that felt earned at university — which day do you love?",
         quote:
-          "Five days in the studio, then Friday felt like a reward. He worked for every one of them…",
+          "His was Friday. Five days in the studio, then Friday arrived like a reward he'd worked for.",
       },
       christening: {
         framing: "Lily was born on a Tuesday — which day do you love?",
         quote:
-          "She arrived on a Tuesday and immediately made it feel significant…",
+          "She arrived on a Tuesday and immediately made it feel significant.",
       },
       achievement: {
         framing:
-          "The marathon was a Sunday — Marcus says Sundays will never feel the same — which day do you love?",
+          "Marcus ran the marathon on one particular day — which day do you love?",
         quote:
-          "He ran 26.2 miles and finished before the Sunday papers were read. Quite a morning…",
+          "His is Sunday now. He finished 26.2 miles before the papers were read. Sundays will never feel the same.",
       },
       recovery: {
         framing:
-          "Claire says she started counting Mondays differently this year — which day do you love?",
-        quote: "Each one a milestone. Each one its own small arrival…",
+          "Claire started counting a particular day differently this year — which day do you love?",
+        quote:
+          "Hers became Monday. Each one a milestone, each one its own small arrival.",
       },
       award: {
         framing:
-          "Amelia says Thursday is her best teaching day — which day do you love?",
+          "Dr. Amelia Grant has a day when everything clicks — which day do you love?",
         quote:
-          "By Thursday the class has found its rhythm and she has theirs. She wouldn't swap it…",
+          "Hers is Thursday. By then the class has found its rhythm and she has theirs. She wouldn't swap it.",
       },
       promotion: {
         framing:
-          "Kwame got the call on a Wednesday and had to wait until Monday to tell the team — which day do you love?",
+          "Kwame had a day he couldn't wait to arrive — which day do you love?",
         quote:
-          "The longest Thursday and Friday of his career. The Monday was worth it…",
+          "His is Monday. He got the news on a Wednesday and spent Thursday and Friday waiting to tell the team. Worth every minute.",
       },
       celebration: {
         framing: "Today is the best day of the week — which day do you love?",
@@ -498,77 +504,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved breakfast — still at the table at eleven — which meal do you love?",
-        quote: "That was the whole point of a Saturday. Never rushed it once…",
+          "Belinda had a meal she never rushed and never skipped — which meal do you love?",
+        quote:
+          "Hers was Sunday lunch. Still at the table at three, every week without fail. That was the whole point of the day.",
       },
       tribute: {
         framing:
-          "David always had time for a proper lunch — never at a desk, always with someone — which meal do you love?",
+          "David had a meal he treated as something worth doing properly — which meal do you love?",
         quote:
-          "He believed no important conversation should happen on an empty stomach. He practised what he preached…",
+          "His was lunch. Never at a desk, always with someone. He believed no important conversation should happen on an empty stomach.",
       },
       birthday: {
         framing:
-          "Sarah treats dinner like a performance — which meal do you love?",
+          "Sarah treats one meal like a performance — which meal do you love?",
         quote:
-          "She once cancelled a lunch to spend the afternoon making proper stock. No regrets…",
+          "Hers is dinner. She once cancelled a lunch to spend the afternoon making proper stock. No regrets.",
       },
       retirement: {
         framing:
-          "David spent thirty-five years eating lunch at his desk — which meal do you love?",
+          "David spent thirty-five years treating one meal as an afterthought — which meal do you love?",
         quote:
-          "He's already planning a standing reservation somewhere with a good wine list…",
+          "His was lunch — eaten at his desk for thirty-five years. He's already planning the standing reservation.",
       },
       wedding: {
         framing:
-          "Emma and James have strong opinions about brunch — which meal do you love?",
+          "Emma and James have strong opinions about one meal in particular — which meal do you love?",
         quote:
-          "They've spent three years arguing about whether brunch counts as a meal. It does, obviously…",
+          "Theirs is brunch — though they've argued for three years about whether it counts as a meal. It does, obviously.",
       },
       anniversary: {
         framing:
-          "Forty years of Sunday lunches and they've only argued about the gravy a handful of times — which meal do you love?",
-        quote: "The gravy debate is ongoing. Everything else is settled…",
+          "Mum and Dad have had the same meal every Sunday for forty years — which meal do you love?",
+        quote:
+          "Theirs is Sunday lunch. The gravy debate is ongoing. Everything else about Sunday lunch is completely settled.",
       },
       leaving: {
         framing:
-          "Priya made every ten-minute lunch feel like the best part of the day — which meal do you love?",
+          "Priya made one meal feel like the best part of the working day — which meal do you love?",
         quote:
-          "She had a way of turning a lunch break into something worth looking forward to…",
+          "Hers was lunch. She had a way of turning a lunch break into something worth looking forward to.",
       },
       graduation: {
         framing:
-          "Tom survived on late-night toast and reheated pasta and says dinner is now sacred — which meal do you love?",
+          "Tom survived on questionable late-night food and now holds one meal sacred — which meal do you love?",
         quote:
-          "Three years of questionable meals. The world is full of better options now…",
+          "His is dinner. Three years of toast and reheated pasta. The world is full of better options now.",
       },
       christening: {
         framing:
-          "The family gathered for lunch to welcome Lily — which meal do you love?",
-        quote: "Some meals are just meals. This one was for something bigger…",
+          "The family gathered for a meal to welcome Lily — which meal do you love?",
+        quote: "Some meals are just meals. This one was for something bigger.",
       },
       achievement: {
         framing:
-          "Marcus's post-marathon meal was a full breakfast — well earned — which meal do you love?",
+          "Marcus had one meal in mind from mile fourteen onwards — which meal do you love?",
         quote:
-          "26.2 miles and what he wanted more than anything was eggs. He had them…",
+          "His was a roast dinner. 26.2 miles and he'd been planning it since Deptford. He earned every bite.",
       },
       recovery: {
         framing:
-          "Claire says breakfast tastes different now — she means it in the best possible way — which meal do you love?",
+          "Claire says one meal tastes different now — in the best possible way — which meal do you love?",
         quote:
-          "Some meals become something more than food. Breakfast became that for her…",
+          "Hers is breakfast. Some meals become something more than food. That one did.",
       },
       award: {
         framing:
-          "Amelia takes her school lunch seriously — she says teachers who eat at their desks send the wrong message — which meal do you love?",
+          "Dr. Amelia Grant takes one meal seriously and says it sets the tone for everything — which meal do you love?",
         quote:
-          "She means it. She's been known to collect a colleague from their desk and insist…",
+          "Hers is lunch. She's been known to collect a colleague from their desk and insist they come too.",
       },
       promotion: {
         framing:
-          "Kwame took the team to dinner to celebrate — which meal do you love?",
-        quote: "He insisted. He chose. It was exactly right…",
+          "Kwame chose one meal to mark the moment — which meal do you love?",
+        quote:
+          "His was dinner. He chose the restaurant, he chose the table. It was exactly right.",
       },
       celebration: {
         framing:
@@ -596,78 +605,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved the early morning — half the garden done before the world woke up — which time do you love?",
+          "Belinda had a time of day that was entirely hers — which time do you love?",
         quote:
-          "She always said the best thinking happened before anyone else was awake…",
+          "Hers was early morning. Half the garden done before the world woke up. She said the best thinking happened before anyone else was awake.",
       },
       tribute: {
         framing:
-          "David was best in the late afternoon — when conversations had nowhere to be — which time of day do you love?",
+          "David had an hour of the day when he was most himself — which time of day do you love?",
         quote:
-          "He'd always be there at 5pm with something worth saying. The timing was never an accident…",
+          "His was late afternoon. He'd always be there at five with something worth saying. The timing was never an accident.",
       },
       birthday: {
-        framing: "Sarah comes alive after 9pm — which time of day do you love?",
+        framing:
+          "Sarah has a time of day when she properly comes alive — which time of day do you love?",
         quote:
-          "She's been known to start an elaborate dinner at 10pm. No one complains…",
+          "Hers is late evening. She's been known to start an elaborate dinner at ten. No one has ever complained.",
       },
       retirement: {
         framing:
-          "David was always best at 7am, fresh coffee and full focus — which time of day do you love?",
+          "David had an hour of the day when his best thinking happened — which time of day do you love?",
         quote:
-          "He'd solved the hardest problems before the rest of the team had parked their cars…",
+          "His was 7am. Fresh coffee, full focus. He'd solved the hardest problems before the rest of the team had parked their cars.",
       },
       wedding: {
         framing:
-          "Emma loves golden hour. James loves late evening — which time of day do you love?",
+          "Emma and James each have a favourite time of day and haven't agreed on it yet — which time do you love?",
         quote:
-          "They're happiest on long evenings when neither of them thinks to check the time…",
+          "Hers is golden hour. His is late evening. They're happiest when neither of them thinks to check the time.",
       },
       anniversary: {
         framing:
-          "They're both morning people — which is why forty years worked so well — which time of day do you love?",
+          "Mum and Dad share a time of day that has held forty years together — which time of day do you love?",
         quote:
-          "Early morning tea. No phones. No plans. That's been the whole foundation of it…",
+          "Theirs is early morning. Tea, no phones, no plans. That's been the whole foundation of it.",
       },
       leaving: {
         framing:
-          "Priya had a way of making 3pm feel like the beginning of something — which time of day do you love?",
+          "Priya had a way of making one hour feel like the beginning of something — which time of day do you love?",
         quote:
-          "That hour belonged to her. The office felt it most around then…",
+          "Hers was 3pm. That hour belonged to her. The office felt it most around then.",
       },
       graduation: {
         framing:
-          "Tom says midnight was when the best work happened — which time of day do you love?",
+          "Tom had a time of day when the best work always happened — which time of day do you love?",
         quote:
-          "Three years of 2am renders and decisions that looked different in the morning. All worth it…",
+          "His was midnight. Three years of 2am renders and decisions that looked different in the morning. All worth it.",
       },
       christening: {
         framing:
           "Lily has strong opinions about what time of day matters — which time do you love?",
-        quote: "She's made her views very clear, mostly between 2am and 4am…",
+        quote: "She's made her views very clear, mostly between 2am and 4am.",
       },
       achievement: {
         framing:
-          "Marcus ran the marathon from 8am — which time of day do you love?",
+          "Marcus set off at a particular hour and it changed how he thinks about time — which time of day do you love?",
         quote:
-          "He was on mile 12 before most people had checked their phones. There's something in that…",
+          "His is 8am. He was on mile twelve before most people had checked their phones. There's something in that.",
       },
       recovery: {
         framing:
-          "Claire says mornings feel different now — lighter — which time of day do you love?",
-        quote: "She started noticing them more. Noticing them properly…",
+          "Claire found a particular time of day felt different this year — which time of day do you love?",
+        quote:
+          "Hers became morning. Lighter, quieter, more noticed. She started paying attention properly.",
       },
       award: {
         framing:
-          "Amelia says the best teaching happens in the first hour — which time of day do you love?",
+          "Dr. Amelia Grant has a lesson slot she plans everything around — which time of day do you love?",
         quote:
-          "The 9am lesson. Everyone still awake, still up for it. She plans everything around that energy…",
+          "Hers is 9am. Everyone awake, everyone up for it. She builds the whole day from that first hour.",
       },
       promotion: {
         framing:
-          "Kwame does his best thinking at 6am and his best presenting at 10 — which time of day do you love?",
+          "Kwame has found the hours that are entirely his — which time of day do you love?",
         quote:
-          "He's found the hours that are his. Everything else is scheduled around them…",
+          "His best thinking is at 6am. His best presenting is at 10. Everything else is scheduled around those two hours.",
       },
       celebration: {
         framing:
@@ -695,79 +706,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda always said the sixties changed everything — which decade do you love?",
+          "Belinda had a decade she always said changed everything — which decade do you love?",
         quote:
-          "She kept a box of photos from 1968 that she'd show anyone who asked. And many who didn't…",
+          "Hers was the sixties. She kept a box of photos from 1968 that she'd show anyone who asked. And many who didn't.",
       },
       tribute: {
         framing:
-          "David said the nineties were when he really found his voice — which decade do you love?",
+          "David had an era he always returned to — which decade do you love?",
         quote:
-          "He had a theory about music and decades that started with Coltrane and ended with Radiohead…",
+          "His was the nineties. That was when he found his voice, he said. His theory ran from Coltrane to Radiohead.",
       },
       birthday: {
         framing:
-          "Sarah's aesthetic is deeply eighties and she's not sorry about it — which decade do you love?",
+          "Sarah has an era she's rooted in and makes no apology for — which decade do you love?",
         quote:
-          "She knows every word to every song from 1986. Don't test her on this…",
+          "Hers is the eighties. She knows every word to every song from 1986. Don't test her on this.",
       },
       retirement: {
         framing:
-          "David always said the nineties were when the real work got done — which decade do you love?",
+          "David had a decade he always said was when the real work got done — which decade do you love?",
         quote:
-          "He joined the firm in 1989. The engineers who were there would agree…",
+          "His was the nineties. He joined the firm in 1989. The engineers who were there would agree.",
       },
       wedding: {
         framing:
-          "Emma and James are both children of the nineties who'd never admit it — which decade do you love?",
+          "Emma and James are both shaped by one decade and neither would admit it — which decade do you love?",
         quote:
-          "Their first date playlist covered entirely the wrong decade for both of them. It worked anyway…",
+          "Theirs is the nineties. Their first date playlist covered entirely the wrong decade for both of them. It worked anyway.",
       },
       anniversary: {
         framing:
-          "Mum and Dad got married in the seventies — which decade do you love?",
+          "Mum and Dad got married in a particular decade and have been adding to the story ever since — which decade do you love?",
         quote:
-          "Forty years makes you a time traveller. Ask them about the decades they've lived through…",
+          "Theirs was the seventies. Forty years makes you a time traveller. Ask them about every decade since.",
       },
       leaving: {
         framing:
-          "Priya always said the noughties were underrated — which decade do you love?",
+          "Priya had a decade she always said was underrated — which decade do you love?",
         quote:
-          "She arrived already shaped by the right decade. We just got lucky with the timing…",
+          "Hers was the noughties. She arrived already shaped by it. We just got lucky with the timing.",
       },
       graduation: {
         framing:
-          "Tom came of age in the noughties and would probably tell you why at length — which decade do you love?",
+          "Tom has strong opinions about which decade matters — which decade do you love?",
         quote:
-          "He has opinions about architecture's relationship with each decade. It's a long but worthwhile conversation…",
+          "His is the noughties. He has views on architecture's relationship with each decade. It's a long but worthwhile conversation.",
       },
       christening: {
         framing:
           "Lily is the first person in this family born in the 2020s — which decade do you love?",
         quote:
-          "She starts her story in a new decade. The rest of us have our own…",
+          "She starts her story in a new decade. The rest of us have our own.",
       },
       achievement: {
         framing:
-          "Marcus says the training reminded him of everything he loved about the 2000s — which decade do you love?",
+          "Marcus found one decade's energy got him through the training — which decade do you love?",
         quote:
-          "Something about getting up before dawn in the cold felt specifically like a particular era…",
+          "His is the 2000s. Something about getting up before dawn in the cold felt specifically like that era.",
       },
       recovery: {
         framing:
-          "Claire said this decade already felt different — in the best sense — which decade do you love?",
-        quote: "It's still early. The decade is already earning its place…",
+          "Claire said one decade already felt different — in the best sense — which decade do you love?",
+        quote:
+          "Hers is this one. It's still early, and it's already earning its place.",
       },
       award: {
         framing:
-          "Amelia believes the nineties were when education got interesting — which decade do you love?",
+          "Dr. Amelia Grant has a decade she believes was when education got interesting — which decade do you love?",
         quote:
-          "She has reasons. Very specific reasons. They're worth asking her about…",
+          "Hers is the nineties. She has very specific reasons. They're worth asking her about.",
       },
       promotion: {
         framing:
-          "Kwame thinks the 2010s were when product thinking finally grew up — which decade do you love?",
-        quote: "He'll defend this position. He's also probably right…",
+          "Kwame has a decade he argues was when product thinking finally grew up — which decade do you love?",
+        quote:
+          "His is the 2010s. He'll defend this position. He's also probably right.",
       },
       celebration: {
         framing: "Every decade had its golden era — which decade do you love?",
@@ -795,79 +808,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda had a soft spot for foxes — they'd always turn up in her garden — which animal do you love?",
+          "Belinda had an animal she always felt something for — which animal do you love?",
         quote:
-          "She always said animals knew things people didn't. I'm not sure she was wrong…",
+          "Hers was the fox. They'd always turn up in her garden, and she always stopped to watch. She said animals knew things people didn't.",
       },
       tribute: {
         framing:
-          "David had something of the patient heron about him — always in exactly the right place — which animal do you love?",
+          "David had an animal quality people noticed and admired — which animal do you love?",
         quote:
-          "He knew when to stay still. He knew when to move. Both exactly right, every time…",
+          "His was the heron. Patient, watchful, always in exactly the right place. He knew when to stay still and when to move.",
       },
       birthday: {
         framing:
-          "Sarah has always said she's a cat person, but behaves like a dog person — which animal do you love?",
+          "Sarah has always said she's one animal, but behaves like another — which animal do you love?",
         quote:
-          "She once spent an evening convincing everyone that dogs have better emotional intelligence than most managers…",
+          "Hers is the dog, if you ask anyone who knows her. She claims cat person. Her behaviour says otherwise.",
       },
       retirement: {
         framing:
-          "David has always had something of the old labrador about him — which animal do you love?",
+          "David had an animal quality his colleagues always recognised — which animal do you love?",
         quote:
-          "His colleagues always said you knew where you stood with him. Steady, loyal, never fussed…",
+          "His was the old labrador. Steady, loyal, never fussed. You always knew where you stood.",
       },
       wedding: {
         framing:
-          "Emma loves otters. James loves dogs. They haven't resolved this — which animal do you love?",
+          "Emma and James each love a different animal and have never agreed on it — which animal do you love?",
         quote:
-          "She's got swallow energy. He's more of a heron. Somehow it works perfectly…",
+          "Hers is the otter. His is the dog. They haven't resolved it. We don't think they intend to.",
       },
       anniversary: {
         framing:
-          "After forty years together they've agreed on dogs but not on the breed — which animal do you love?",
+          "After forty years Mum and Dad have agreed on some things but not on their favourite animal — which animal do you love?",
         quote:
-          "The dog question remains open. Everything else has been resolved…",
+          "Theirs is dogs — that much is settled. The breed question remains open. Everything else has been resolved.",
       },
       leaving: {
         framing:
-          "Priya always said she was a fox in a house of golden retrievers — which animal do you love?",
+          "Priya always described herself as a particular kind of animal in a house of quite different ones — which animal do you love?",
         quote:
-          "She meant it as a compliment to everyone involved. Knowing her, it was…",
+          "Hers was the fox. She said it as a compliment to everyone involved. Knowing her, it was.",
       },
       graduation: {
         framing:
-          "Tom's tutor always said he had the single-mindedness of a migratory bird — which animal do you love?",
+          "Tom's tutors always compared him to a particular kind of creature — which animal do you love?",
         quote:
-          "He got the first-class degree and immediately wanted to be somewhere else. Classic migratory instinct…",
+          "His was the migratory bird. First-class degree, immediately wanted to be somewhere else. Classic.",
       },
       christening: {
         framing:
           "Everyone has an animal they think Lily will love — which animal do you love?",
         quote:
-          "She'll make up her own mind. But it's worth starting the conversation now…",
+          "She'll make up her own mind. But it's worth starting the conversation now.",
       },
       achievement: {
         framing:
-          "Marcus says he started to feel like a horse around mile 20 — just keeping going — which animal do you love?",
-        quote: "He'll look back on this and know something true about himself…",
+          "Marcus found an animal he identified with around mile twenty — which animal do you love?",
+        quote:
+          "His was the horse. Just keeping going, just the rhythm. He'll look back on that and know something true.",
       },
       recovery: {
         framing:
-          "Claire says birds came to mean something to her this year — which animal do you love?",
-        quote: "She started noticing them more. Noticing them properly…",
+          "Claire found one animal started to mean something to her this year — which animal do you love?",
+        quote:
+          "Hers was the bird. She started noticing them everywhere. Noticing them properly.",
       },
       award: {
         framing:
-          "Amelia's classroom has always had something wildlife-related on the wall — which animal do you love?",
+          "Dr. Amelia Grant's classroom has always had a particular creature on the wall — which animal do you love?",
         quote:
-          "She says it makes students think about instinct and adaption. It also makes them smile…",
+          "Hers is the owl. Patient, wide-eyed, good with the dark. She says it makes students think about instinct.",
       },
       promotion: {
         framing:
-          "Kwame always said the best product teams have the instincts of a border collie — which animal do you love?",
+          "Kwame has a particular animal he thinks the best teams resemble — which animal do you love?",
         quote:
-          "He means focused, energetic, excellent at herding things that need herding. A compliment, clearly…",
+          "His is the border collie. Focused, energetic, excellent at herding things that need herding. A compliment to everyone involved.",
       },
       celebration: {
         framing:
@@ -893,78 +908,82 @@ const topics: TopicSeed[] = [
     categories: ["Nature"],
     placeholders: {
       memorial: {
-        framing: "Belinda always stopped for a robin — which bird do you love?",
+        framing:
+          "Belinda had a bird she always stopped for — which bird do you love?",
         quote:
-          "She could identify a bird by its song before it appeared. It seemed impossible, until you knew her…",
+          "Hers was the robin. She could identify a bird by its song before it appeared. It seemed impossible, until you knew her.",
       },
       tribute: {
         framing:
-          "David always reminded people of a blackbird — clear voice, unhurried — which bird do you love?",
+          "David had a bird quality people always noticed — which bird do you love?",
         quote:
-          "He could fill a room without raising his volume. That's a blackbird…",
+          "His was the blackbird. Clear voice, unhurried. He could fill a room without raising his volume.",
       },
       birthday: {
         framing:
-          "Sarah once spotted a puffin from a moving ferry and talked about it for an hour — which bird do you love?",
+          "Sarah has a bird she'd spot anywhere and tell everyone about — which bird do you love?",
         quote:
-          "She has a birdwatching list she claims not to take seriously. She does…",
+          "Hers is the puffin. She spotted one from a moving ferry and talked about it for an hour. She has a list she claims not to take seriously.",
       },
       retirement: {
         framing:
-          "David always had a bit of the heron about him — patient, watchful, then exactly right — which bird do you love?",
+          "David had a bird quality his colleagues always recognised — which bird do you love?",
         quote:
-          "You'd hear him described the same way by everyone who worked with him…",
+          "His was the heron. Patient, watchful, then exactly right. You'd hear him described the same way by everyone who worked with him.",
       },
       wedding: {
         framing:
-          "Emma and James are birds who found each other — which bird do you love?",
+          "Emma and James are each a different kind of bird and somehow it makes perfect sense — which bird do you love?",
         quote:
-          "Separately they're completely different birds. Together they somehow make perfect sense…",
+          "Hers is the swallow. His is the heron. Separately they're completely different. Together it works.",
       },
       anniversary: {
         framing:
-          "They've watched the same birds in the same garden for forty years — which bird do you love?",
+          "Mum and Dad have watched the same birds in the same garden for forty years — which bird do you love?",
         quote:
-          "The robin always comes back. Every year. They leave it crumbs on the same wall…",
+          "Theirs is the robin. It comes back every year. They leave crumbs on the same wall. It has never not returned.",
       },
       leaving: {
         framing:
-          "Priya always said she felt most like a swift — always moving, hard to pin down — which bird do you love?",
+          "Priya always had a bird she identified with — which bird do you love?",
         quote:
-          "She was the kind of bird that makes you notice the sky more when they're gone…",
+          "Hers was the swift. Always moving, hard to pin down. The kind of bird that makes you notice the sky more when they're gone.",
       },
       graduation: {
         framing:
-          "Tom's tutors said he had the eye of a hawk — detail, precision, always scanning — which bird do you love?",
-        quote: "Three years of training his eye. It's now very, very sharp…",
+          "Tom's tutors always compared him to a particular bird — which bird do you love?",
+        quote:
+          "His was the hawk. Detail, precision, always scanning. Three years of training that eye. It's now very, very sharp.",
       },
       christening: {
         framing:
           "Lily came into a world full of birdsong — which bird do you love?",
         quote:
-          "The garden was loud the morning she arrived. A good sign from a particularly good robin…",
+          "The garden was loud the morning she arrived. A good sign, from a particularly vocal robin.",
       },
       achievement: {
         framing:
-          "Marcus said at mile 18 he felt like a swift — just instinct and movement — which bird do you love?",
+          "Marcus found a bird he identified with around mile eighteen — which bird do you love?",
         quote:
-          "He didn't think. He just ran. He'll understand that better in a few months…",
+          "His was the swift. Just instinct and movement. He didn't think. He just ran.",
       },
       recovery: {
         framing:
-          "Claire has started birdwatching — she says it teaches you to be where you are — which bird do you love?",
-        quote: "She's not wrong. Something about watching birds does that…",
+          "Claire started paying attention to a particular bird this year — which bird do you love?",
+        quote:
+          "Hers is the robin. She started birdwatching. She says it teaches you to be where you are. She's not wrong.",
       },
       award: {
         framing:
-          "Amelia compares herself to an owl — patient, wide-eyed, good with the dark — which bird do you love?",
-        quote: "She means it as a compliment to owls. They deserve it…",
+          "Dr. Amelia Grant has a bird she compares herself to — which bird do you love?",
+        quote:
+          "Hers is the owl. Patient, wide-eyed, good with the dark. She means it as a compliment to owls.",
       },
       promotion: {
         framing:
-          "Kwame once said good product thinking is like a red kite — you need the big view — which bird do you love?",
+          "Kwame has a bird he uses as a metaphor for good thinking — which bird do you love?",
         quote:
-          "He still believes this. He's used it in three job interviews. It always landed…",
+          "His is the red kite. The big view, the wide circle, nothing missed. He's used it in three job interviews. It always landed.",
       },
       celebration: {
         framing: "Every person here has a bird — which one do you love?",
@@ -989,76 +1008,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda's garden was famous for its sweet peas — which flower do you love?",
+          "Belinda had a flower she grew every year without exception — which flower do you love?",
         quote:
-          "She'd fill the house with them every June. The smell is still entirely hers…",
+          "Hers was lavender. She grew it in every garden she ever had, and she'd fill the house with it every summer. The smell is still entirely hers.",
       },
       tribute: {
         framing:
-          "David always arrived with flowers — nothing flashy, always exactly right — which flower do you love?",
+          "David always arrived with flowers — which flower do you love?",
         quote:
-          "He had a florist he trusted and he trusted her completely. Never questioned a choice…",
+          "His was the anemone. Nothing flashy, always exactly right. He had a florist he trusted completely.",
       },
       birthday: {
         framing:
-          "Sarah grew a whole windowsill of lavender just to prove she could — which flower do you love?",
+          "Sarah grew a whole windowsill of one flower just to prove she could — which flower do you love?",
         quote:
-          "She could. She was very casual about telling everyone about it…",
+          "Hers is lavender. She could. She was very casual about telling everyone about it.",
       },
       retirement: {
         framing:
-          "David's wife always said he was more of a rose person than he'd admit — which flower do you love?",
+          "David had a flower on his desk for fifteen years — which flower do you love?",
         quote:
-          "He kept the same pot plant on his desk for fifteen years. We think it was a peace lily…",
+          "His was the peace lily. He kept the same pot plant for the whole career. It outlasted most colleagues.",
       },
       wedding: {
         framing:
-          "Emma carried wildflowers at their wedding. James didn't question it — which flower do you love?",
+          "Emma had a flower she'd chosen years before she met James — which flower do you love?",
         quote:
-          "She'd chosen them years before she met him. That tells you everything…",
+          "Hers was wildflowers. She'd known since long before the wedding. That tells you everything.",
       },
       anniversary: {
         framing:
-          "The same flowers in the same vase on the same anniversary for forty years — which flower do you love?",
-        quote: "The order never changes. It doesn't need to…",
+          "There's a flower that arrives at Mum and Dad's every anniversary, same as always — which flower do you love?",
+        quote:
+          "Theirs is the rose. Same flower, same vase, forty years running. The order never changes. It doesn't need to.",
       },
       leaving: {
         framing:
-          "Priya always brought flowers in when something was worth celebrating — which flower do you love?",
+          "Priya always brought flowers when something was worth celebrating — which flower do you love?",
         quote:
-          "The office had flowers on the desk the day she arrived. It still does. That's her legacy…",
+          "Hers was freesia. The office had flowers the day she arrived. It still does. That's her legacy.",
       },
       graduation: {
         framing:
-          "Tom's mum brought flowers to the degree show — Tom said she shouldn't have apologised — which flower do you love?",
-        quote: "He was right. The flowers were exactly the thing…",
+          "Tom's mum brought flowers to the degree show — which flower do you love?",
+        quote:
+          "Hers were tulips. He said she shouldn't have apologised. He was right. The flowers were exactly the thing.",
       },
       christening: {
         framing:
           "Lily arrived to a room full of flowers — which flower do you love?",
         quote:
-          "Everyone had brought something. It always should be that way, for an arrival like this…",
+          "Everyone had brought something. It always should be that way, for an arrival like this.",
       },
       achievement: {
         framing:
-          "Marcus crossed the finish line to a bunch of flowers from his sister — which flower do you love?",
-        quote: "26.2 miles and the flowers were waiting. Which ones are yours?",
+          "Marcus crossed the finish line to flowers from his sister — which flower do you love?",
+        quote:
+          "Hers were sunflowers. 26.2 miles and they were waiting. He said nothing had ever looked better.",
       },
       recovery: {
         framing:
-          "Claire said sunflowers helped — all that height, all that reaching — which flower do you love?",
+          "Claire had one flower she kept on the windowsill all year — which flower do you love?",
         quote:
-          "She had them on the windowsill. Every week. Never let the window go without…",
+          "Hers was the sunflower. All that height, all that reaching. She never let the window go without one.",
       },
       award: {
         framing:
-          "Amelia's students left flowers on her desk the morning the award was announced — which flower do you love?",
-        quote: "Nobody organised it. It just happened. That's who they are…",
+          "Dr. Amelia Grant's students left flowers on her desk the morning the award was announced — which flower do you love?",
+        quote:
+          "Theirs were daffodils. Nobody organised it. It just happened. That's who they are.",
       },
       promotion: {
         framing:
-          "Kwame's team sent flowers. He was embarrassed. He was also clearly delighted — which flower do you love?",
-        quote: "He put them on his desk. They were there all week. We noticed…",
+          "Kwame's team sent flowers and he didn't quite know what to do with himself — which flower do you love?",
+        quote:
+          "His were peonies. He put them on his desk. They were there all week. We noticed.",
       },
       celebration: {
         framing:
@@ -1085,79 +1109,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda planted an oak in her garden as a sapling — it's still there — which tree do you love?",
+          "Belinda planted a tree as a sapling and watched it grow — which tree do you love?",
         quote:
-          "She used to say a garden without a proper tree is just a lawn with ambitions…",
+          "Hers was the oak. She planted it in her garden decades ago and it's still there. She used to say a garden without a proper tree is just a lawn with ambitions.",
       },
       tribute: {
         framing:
           "David had something of the oak about him — which tree do you love?",
-        quote: "Everybody's shade. Nobody's obstacle. That's the tree for him…",
+        quote:
+          "His was the oak. Everybody's shade, nobody's obstacle. That was the tree, and that was the man.",
       },
       birthday: {
         framing:
-          "Sarah planted a rowan in her first garden. Said she needed something with structure — which tree do you love?",
+          "Sarah planted a rowan in her first garden and said she needed something with structure — which tree do you love?",
         quote:
-          "She has strong opinions about trees. Stronger than you'd expect…",
+          "Hers is the rowan. She planted it herself, watched it take hold, and tells people about it at parties. They're always glad she did.",
       },
       retirement: {
         framing:
           "David was always oak — deep-rooted, reliable, shelter for everyone — which tree do you love?",
         quote:
-          "He never took up much space but the whole team was in his shade. That's the tree…",
+          "His was the oak. He never took up much space but the whole team was in his shade. That's the tree.",
       },
       wedding: {
         framing:
           "Emma and James planted a tree together on their first anniversary — which tree do you love?",
         quote:
-          "Two saplings that found the same patch of light. Watch them grow…",
+          "Theirs is a silver birch. Two saplings that found the same patch of light. Watch them grow.",
       },
       anniversary: {
         framing:
-          "There's a tree in their garden they planted the year they got married — which tree do you love?",
+          "There's a tree in Mum and Dad's garden they planted the year they got married — which tree do you love?",
         quote:
-          "Forty years. It's enormous now. They still argue about whether they planted it in the right place…",
+          "Theirs is an apple tree. Forty years. It's enormous now. They still argue about whether they planted it in the right place.",
       },
       leaving: {
         framing:
           "Priya was always the tree in the room that made everything feel calmer — which tree do you love?",
         quote:
-          "Some people are like a tree in an office. You don't notice how much shade they gave until they're gone…",
+          "Hers is the willow. You don't notice how much shade they gave until they're gone. We're noticing.",
       },
       graduation: {
         framing:
-          "Tom designed his final-year project around a silver birch — which tree do you love?",
+          "Tom designed his final-year project around a particular tree — which tree do you love?",
         quote:
-          "It was in the brief. He made it the whole piece. His tutors still mention it…",
+          "His was the silver birch. It was in the brief. He made it the whole piece. His tutors still mention it.",
       },
       christening: {
         framing:
           "Every family needs a tree to grow alongside — which tree do you love?",
         quote:
-          "Lily has her whole life to find hers. She might already have one…",
+          "Lily has her whole life to find hers. She might already have one.",
       },
       achievement: {
         framing:
-          "Marcus ran past the same oak at mile three every training morning — which tree do you love?",
+          "Marcus ran past the same tree at mile three every training morning — which tree do you love?",
         quote:
-          "He has very strong feelings about that oak. It became the landmark the run was organised around…",
+          "His was the oak. It became the landmark the run was organised around. He has very strong feelings about that oak.",
       },
       recovery: {
         framing:
           "Claire said she noticed trees differently this year — their patience, their permanence — which tree do you love?",
         quote:
-          "Something about knowing they'd been there before and would be there after. She found that useful…",
+          "Hers is the beech. Something about knowing it had been there before and would be there after. She found that useful.",
       },
       award: {
         framing:
-          "Amelia uses trees as a metaphor in every year group — which tree do you love?",
+          "Dr. Amelia Grant uses trees as a metaphor in every year group — which tree do you love?",
         quote:
-          "The lesson is always about roots, reach, and the long game. She means it for the students. Also for herself…",
+          "Hers is the oak. The lesson is always about roots, reach, and the long game. She means it for the students. Also for herself.",
       },
       promotion: {
         framing:
           "Kwame said great product teams are like a tree — deep roots, visible canopy — which tree do you love?",
-        quote: "He uses this metaphor at least once a month. It holds up…",
+        quote:
+          "His is the cedar. He uses this metaphor at least once a month. It holds up.",
       },
       celebration: {
         framing:
@@ -1182,79 +1208,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved a crisp winter morning — clear sky, cold air — which weather do you love?",
+          "Belinda had a kind of weather she always came alive in — which weather do you love?",
         quote:
-          "She always said the best thinking happened in cold air. She was right…",
+          "Hers was a crisp winter morning — clear sky, cold air. She always said the best thinking happened before anyone else was awake.",
       },
       tribute: {
         framing:
-          "David always said he did his best thinking in the rain — which weather do you love?",
+          "David had a kind of weather he always said suited him — which weather do you love?",
         quote:
-          "He didn't mind it at all. He had the quality of someone who simply didn't notice bad weather…",
+          "His was the rain. He didn't mind it at all. He had the quality of someone who simply didn't notice bad weather.",
       },
       birthday: {
         framing:
-          "Sarah loves warm rain — unexpected but always right — which weather do you love?",
+          "Sarah has a kind of weather she always says is her weather — which weather do you love?",
         quote:
-          "She has the quality of a day that starts overcast and turns into the best of summer…",
+          "Hers is warm rain — unexpected but always right. She has the quality of a day that starts overcast and turns into the best of summer.",
       },
       retirement: {
         framing:
           "David was steady weather — the kind you could rely on — which weather do you love?",
         quote:
-          "Retirement might be the first golden autumn after a very long, dependable summer…",
+          "His was a long golden autumn. Retirement might be the first one after a very long, dependable summer.",
       },
       wedding: {
         framing:
-          "It rained at Emma and James's wedding and they didn't notice — which weather do you love?",
+          "It rained at Emma and James's wedding — which weather do you love?",
         quote:
-          "It rained for ten minutes and they didn't notice. That's what you need to know about them…",
+          "Theirs was rain, that day. It lasted ten minutes and they didn't notice. That's what you need to know about them.",
       },
       anniversary: {
         framing:
-          "In forty years they've had every kind of weather together — which do you love?",
+          "Mum and Dad have had every kind of weather together in forty years — which do you love?",
         quote:
-          "The storms passed. The sunshine came back. Same as ever. Which weather is yours?",
+          "Theirs is sunshine — the kind that comes back reliably. The storms passed. Same as ever.",
       },
       leaving: {
         framing:
           "Priya had the quality of a bright cold morning — you felt more awake when she walked in — which weather do you love?",
         quote:
-          "The office had her particular weather for six years. We'll notice the change…",
+          "Hers was a bright, cold morning. The office had her particular weather for six years. We'll notice the change.",
       },
       graduation: {
         framing:
-          "Tom walked out of his degree show into a grey Manchester day and it felt exactly right — which weather do you love?",
-        quote: "He said the overcast suited the city. The city agreed…",
+          "Tom walked out of his degree show into a particular Manchester sky — which weather do you love?",
+        quote:
+          "His was overcast. He said the grey suited the city. The city agreed.",
       },
       christening: {
         framing:
           "The weather the day Lily arrived was entirely irrelevant — which weather do you love?",
         quote:
-          "She arrived. That was the weather. Everything else was background…",
+          "She arrived. That was the weather. Everything else was background.",
       },
       achievement: {
         framing:
-          "Marcus ran the marathon in cool autumn air — he says it was the best possible weather — which weather do you love?",
+          "Marcus ran the marathon and says the weather made it — which weather do you love?",
         quote:
-          "Not too hot, not too cold. He'd trained in worse. He was ready for anything…",
+          "His was cool and overcast. Not too hot, not too cold. He'd trained in worse. It was exactly right.",
       },
       recovery: {
         framing:
-          "Claire said she started noticing the weather more — like seeing it properly for the first time — which weather do you love?",
+          "Claire said she started noticing the weather more this year — like seeing it properly for the first time — which weather do you love?",
         quote:
-          "Light through a window. The specific quality of a cold morning. She noticed it all…",
+          "Hers became clear winter light. Something about the specific quality of cold morning air. She noticed it all.",
       },
       award: {
         framing:
-          "Amelia says the best lessons happen in the worst weather — something about being cosy and focused — which weather do you love?",
+          "Dr. Amelia Grant says the best lessons happen in the worst weather — which weather do you love?",
         quote:
-          "November rain on school windows, central heating on, everyone in. Perfect conditions…",
+          "Hers is November rain on school windows. Central heating on, everyone in. Perfect conditions.",
       },
       promotion: {
         framing:
-          "Kwame celebrated by walking home in the rain — said it felt like exactly the right thing to do — which weather do you love?",
-        quote: "Not dramatic. Just right. That's what the moment needed…",
+          "Kwame walked home in a particular kind of weather after the promotion news — which weather do you love?",
+        quote:
+          "His was light rain. Not dramatic. Just right. That's what the moment needed.",
       },
       celebration: {
         framing:
@@ -1281,51 +1309,51 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda always went back to the Lake District — which landscape do you love?",
+          "Belinda always went back to the same landscape — which landscape do you love?",
         quote:
-          "She said the fells reminded her to be patient. She walked them every year for fifty years…",
+          "Hers was the Lake District fells. She said they reminded her to be patient. She walked them every year for fifty years.",
       },
       tribute: {
         framing:
-          "David said certain landscapes made him think of particular people — which landscape do you love?",
+          "David had a landscape he always returned to in conversation — which landscape do you love?",
         quote:
-          "He'd quote geography the way other people quote poetry. It meant just as much to him…",
+          "His was the West African coast. He'd quote geography the way other people quote poetry. It meant just as much to him.",
       },
       birthday: {
         framing:
-          "Sarah dreams of the Scottish Highlands but lives in the city — which landscape do you love?",
+          "Sarah dreams of one landscape but lives in the city — which landscape do you love?",
         quote:
-          "She has moorland in her soul and no particular plans to act on it. The moors can wait…",
+          "Hers is the Scottish Highlands. She has moorland in her soul and no particular plans to act on it. The moors can wait.",
       },
       retirement: {
         framing:
-          "David kept a photo of the Dordogne on his desk for thirty-five years — which landscape do you love?",
+          "David kept a photo on his desk for thirty-five years of a landscape he meant to visit — which landscape do you love?",
         quote:
-          "Thirty-five years of the same commute. Now the world is landscape-shaped and waiting…",
+          "His was the Dordogne. Thirty-five years of the same commute. Now the world is landscape-shaped and waiting.",
       },
       wedding: {
         framing:
           "Emma and James are happiest near water — which landscape do you love?",
         quote:
-          "They've been arguing about coast versus mountains since their second date. Both are still winning…",
+          "They've been arguing about coast versus mountains since their second date. Both are still winning.",
       },
       anniversary: {
         framing:
-          "They've walked the same stretch of coast every anniversary — which landscape do you love?",
+          "Mum and Dad have walked the same stretch of coast every anniversary — which landscape do you love?",
         quote:
-          "Forty years of the same path. Still finding new things to notice…",
+          "Theirs is the coastal path. Forty years of the same route. Still finding new things to notice.",
       },
       leaving: {
         framing:
           "Priya always said wide open spaces were where she thought most clearly — which landscape do you love?",
         quote:
-          "She brought something expansive to everything she did. There's a landscape for that…",
+          "Hers was open moorland. She brought something expansive to everything she did. There's a landscape for that.",
       },
       graduation: {
         framing:
           "Tom said architecture only makes sense in relation to landscape — which landscape do you love?",
         quote:
-          "He believes this profoundly. His degree show was partly about proving it…",
+          "His is the urban landscape. He believes this profoundly. His degree show was partly about proving it.",
       },
       christening: {
         framing:
@@ -1334,27 +1362,27 @@ const topics: TopicSeed[] = [
       },
       achievement: {
         framing:
-          "The marathon route went through parkland and across a river — which landscape do you love?",
+          "Marcus ran a particular landscape and says it changed him — which landscape do you love?",
         quote:
-          "He noticed none of it until afterwards, and then noticed everything…",
+          "His is parkland and river paths. He noticed none of it during the race, and then noticed everything after.",
       },
       recovery: {
         framing:
           "Claire says open landscape helped — the space, the horizon — which landscape do you love?",
         quote:
-          "She walked somewhere new every week. The landscape was doing something the walls couldn't…",
+          "Hers is open countryside. She walked somewhere new every week. The landscape was doing something the walls couldn't.",
       },
       award: {
         framing:
-          "Amelia takes her class outside whenever the weather allows — she says landscape is the best classroom — which landscape do you love?",
+          "Dr. Amelia Grant takes her class outside whenever the weather allows — she says landscape is the best classroom — which landscape do you love?",
         quote:
-          "She has a field she particularly loves. The class has learned a great deal in that field…",
+          "Hers is the field behind the school. The class has learned a great deal in that field.",
       },
       promotion: {
         framing:
           "Kwame grew up near the sea and says it's still where he thinks best — which landscape do you love?",
         quote:
-          "He hasn't lived near it in years. Doesn't matter. It's still the one…",
+          "His is the coast. He hasn't lived near it in years. Doesn't matter. It's still the one.",
       },
       celebration: {
         framing:
@@ -1381,75 +1409,79 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda was happiest in her garden or round her kitchen table — which place do you love?",
+          "Belinda was happiest in a particular place — which place do you love?",
         quote:
-          "Every conversation worth having happened at that kitchen table. We all still come back to it…",
+          "Hers was her kitchen table. Every conversation worth having happened there. We all still come back to it.",
       },
       tribute: {
         framing:
-          "David was a person of particular places — a pub, a park bench, a back room — which place do you love?",
+          "David was a person of particular places — which place do you love?",
         quote:
-          "You'd always find him in the same corner. He was extremely consistent about this…",
+          "His was a corner table in a particular pub. You'd always find him there. He was extremely consistent about this.",
       },
       birthday: {
         framing:
-          "Sarah has been to thirty countries and still says her grandmother's kitchen in Cork is her favourite — which place do you love?",
+          "Sarah has been to thirty countries and still has one place she says nothing beats — which place do you love?",
         quote:
-          "She plans every trip carefully. That one she'd never planned at all…",
+          "Hers is her grandmother's kitchen in Cork. She plans every trip carefully. That one she'd never planned at all.",
       },
       retirement: {
         framing:
-          "David had a map on his office wall for thirty-five years. Now he can actually go — which place do you love?",
+          "David had a map on his office wall for thirty-five years — which place do you love?",
         quote:
-          "He'd look at it every year and then go back to his desk. Not anymore…",
+          "His was the Dordogne. He'd look at the map every year and go back to his desk. Not anymore.",
       },
       wedding: {
         framing:
           "Emma and James keep going back to the field where they met — which place do you love?",
-        quote: "Not for the festival anymore. Just because it's theirs now…",
+        quote:
+          "Theirs is a field in Somerset. Not for the festival anymore. Just because it's theirs now.",
       },
       anniversary: {
         framing:
-          "They went back to the place they got married for their fortieth — which place do you love?",
-        quote: "Same place, different people. In all the best ways…",
+          "Mum and Dad went back to the place they got married for their fortieth — which place do you love?",
+        quote:
+          "Theirs is the village church in Shropshire. Same place, different people. In all the best ways.",
       },
       leaving: {
         framing:
           "Priya has had the same flight saved in her browser for two years — which place do you love?",
-        quote: "We think it's time. We're holding her to it…",
+        quote: "Hers is Kerala. We think it's time. We're holding her to it.",
       },
       graduation: {
         framing:
           "Tom has a building in Manchester he calls his — which place do you love?",
         quote:
-          "It's not his. He just knows exactly why it's good. He could explain it for an hour…",
+          "His is the John Rylands Library. It's not his. He just knows exactly why it's good. He could explain it for an hour.",
       },
       christening: {
         framing:
           "Lily will grow up learning what it means to love a place — which place do you love?",
-        quote: "We each have one. We're curious about hers already…",
+        quote: "We each have one. We're curious about hers already.",
       },
       achievement: {
         framing:
           "The finish line of the marathon is now a place Marcus considers his — which place do you love?",
         quote:
-          "He'll go back. He might not run again. But he'll go back to that place…",
+          "His is the Mall in London. He'll go back. He might not run again. But he'll go back to that place.",
       },
       recovery: {
         framing:
-          "Claire found a bench she went to every day this year — which place do you love?",
+          "Claire found a place she went to every day this year — which place do you love?",
         quote:
-          "The bench. The same view. Twenty minutes. Whatever the weather…",
+          "Hers is a bench in the park. The same view. Twenty minutes. Whatever the weather.",
       },
       award: {
         framing:
-          "Amelia's classroom is a place her students describe long after they've left — which place do you love?",
-        quote: "Thirty-seven cards from former students. All mention the room…",
+          "Dr. Amelia Grant's classroom is a place her students describe long after they've left — which place do you love?",
+        quote:
+          "Hers is Room 14. Thirty-seven cards from former students. All mention the room.",
       },
       promotion: {
         framing:
           "Kwame keeps going back to the coffee shop where he said yes to this job three years ago — which place do you love?",
-        quote: "Same table. Same order. He owes that table something…",
+        quote:
+          "His is that corner table by the window. Same order. He owes that table something.",
       },
       celebration: {
         framing: "Some places hold moments — which place do you love?",
@@ -1477,50 +1509,51 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved a walking holiday — maps, no signal, proper boots — which kind of holiday do you love?",
+          "Belinda had a kind of holiday she always came back to — which kind of holiday do you love?",
         quote:
-          "She once turned a week in the Lakes into a navigation exercise. Best holiday anyone had ever had…",
+          "Hers was a walking holiday — maps, no signal, proper boots. She once turned a week in the Lakes into a navigation exercise. Best holiday anyone had ever had.",
       },
       tribute: {
         framing:
-          "David introduced a whole circle of friends to road trips — which kind of holiday do you love?",
+          "David introduced a whole circle of friends to one kind of holiday — which kind of holiday do you love?",
         quote:
-          "He'd pack badly, navigate confidently, and stop at everything interesting. Perfect company…",
+          "His was the road trip. He'd pack badly, navigate confidently, and stop at everything interesting. Perfect company.",
       },
       birthday: {
         framing:
-          "Sarah books city breaks with military precision — which kind of holiday do you love?",
+          "Sarah books one kind of holiday with military precision — which kind of holiday do you love?",
         quote:
-          "She has seventeen open tabs about her next trip at any given moment. This is not an exaggeration…",
+          "Hers is the city break. She has seventeen open tabs about her next trip at any given moment. This is not an exaggeration.",
       },
       retirement: {
         framing:
-          "David has always said he'd do a long slow train journey when he retired — which holiday do you love?",
+          "David has always said he'd do one particular kind of holiday when he retired — which holiday do you love?",
         quote:
-          "Somewhere enormous, by train, with nothing booked past the first night. He's known it for years…",
+          "His is the long slow train journey. Somewhere enormous, with nothing booked past the first night. He's known it for years.",
       },
       wedding: {
         framing:
-          "Emma wanted adventure. James wanted good food. They always find both — which kind of holiday do you love?",
+          "Emma wanted adventure and James wanted good food — which kind of holiday do you love?",
         quote:
-          "They've never been somewhere that didn't deliver on both counts. Somehow…",
+          "Theirs is always both. They've never been somewhere that didn't deliver on both counts. Somehow.",
       },
       anniversary: {
         framing:
-          "Forty years of holidays, most of them compromises, all of them memorable — which kind do you love?",
+          "Mum and Dad have had forty years of holidays, most of them compromises, all of them memorable — which kind do you love?",
         quote:
-          "She wanted culture. He wanted beach. They always found a way. Still do…",
+          "Theirs tends toward the cultural city break. She wanted culture. He wanted beach. They always found a way.",
       },
       leaving: {
         framing:
           "Priya has been talking about a proper long trip for six years — which kind of holiday do you love?",
-        quote: "The excuses have finally run out. The trip can finally happen…",
+        quote:
+          "Hers is the slow extended trip with no fixed itinerary. The excuses have finally run out. The trip can finally happen.",
       },
       graduation: {
         framing:
           "Tom is planning something long and unstructured now that the degree is done — which holiday do you love?",
         quote:
-          "No brief. No deadline. No one to present to. He's figuring out what that feels like…",
+          "His is the slow backpacking trip. No brief. No deadline. No one to present to. He's figuring out what that feels like.",
       },
       christening: {
         framing:
@@ -1532,25 +1565,25 @@ const topics: TopicSeed[] = [
         framing:
           "Marcus has promised himself a proper holiday as a reward — which kind do you love?",
         quote:
-          "He's earned it. Eight months of dark early mornings. Time for something completely different…",
+          "His is the complete rest holiday — beach, nothing booked, no running. He's earned it. Eight months of dark early mornings.",
       },
       recovery: {
         framing:
           "Claire has been planning a trip since January — which kind of holiday do you love?",
         quote:
-          "No deadlines, no itinerary. Just somewhere, and time, and herself…",
+          "Hers is the solo trip somewhere quiet. No deadlines, no itinerary. Just somewhere, and time, and herself.",
       },
       award: {
         framing:
-          "Amelia takes exactly one holiday a year and plans it in complete detail — which kind do you love?",
+          "Dr. Amelia Grant takes exactly one holiday a year and plans it in complete detail — which kind do you love?",
         quote:
-          "Teachers who plan. We shouldn't be surprised. The holidays are apparently excellent…",
+          "Hers is the cultural city break. Teachers who plan. We shouldn't be surprised. The holidays are apparently excellent.",
       },
       promotion: {
         framing:
           "Kwame's first act after the promotion news was to book a long weekend — which kind of holiday do you love?",
         quote:
-          "Decision made in thirty minutes. No overthinking. Good instinct…",
+          "His is the city long weekend. Decision made in thirty minutes. No overthinking. Good instinct.",
       },
       celebration: {
         framing: "Today is earned — which kind of holiday do you love?",
@@ -1578,76 +1611,81 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda always travelled by train — there was never any question — which way do you love to travel?",
+          "Belinda had a way of travelling she never questioned — which way do you love to travel?",
         quote:
-          "She always said you miss everything if you're in a hurry. She was right about that too…",
+          "Hers was the train. She always said you miss everything if you're in a hurry. She was right about that too.",
       },
       tribute: {
         framing:
-          "David always took the train — said it was the only way to actually arrive somewhere — which way do you love to travel?",
+          "David had a way of travelling he always insisted on — which way do you love to travel?",
         quote:
-          "He'd be in the quiet carriage, reading, completely at ease with the journey taking as long as it took…",
+          "His was the train. He'd be in the quiet carriage, reading, completely at ease with the journey taking as long as it took.",
       },
       birthday: {
         framing:
           "Sarah once walked fourteen miles to a restaurant rather than take the bus — how do you love to travel?",
         quote:
-          "She says this was reasonable. The restaurant was worth it. Both may be true…",
+          "Hers is on foot. She says this was reasonable. The restaurant was worth it. Both may be true.",
       },
       retirement: {
         framing:
-          "David drove to work for thirty-five years. Now it's slow roads only — how do you love to travel?",
-        quote: "The car stays. The motorway can go. No more rushing anywhere…",
+          "David drove to work for thirty-five years — how do you love to travel?",
+        quote:
+          "His is now slow roads and no motorways. The car stays. The rushing can go.",
       },
       wedding: {
         framing:
-          "Emma likes the journey. James likes arriving. Together they've found a compromise — how do you love to travel?",
+          "Emma likes the journey and James likes arriving — how do you love to travel?",
         quote:
-          "She reads. He drives. Then they swap. Somehow they've always agreed on this…",
+          "Theirs is by car — she reads, he drives, then they swap. Somehow they've always agreed on this.",
       },
       anniversary: {
         framing:
-          "They've driven to the same place every year — which way do you love to travel?",
-        quote: "Same road. Same songs on the radio. Slightly different speed…",
+          "Mum and Dad have driven to the same place every year — which way do you love to travel?",
+        quote:
+          "Theirs is by car. Same road. Same songs on the radio. Slightly different speed.",
       },
       leaving: {
         framing:
           "Priya said she'd learn to cycle properly once she left — how do you love to travel?",
-        quote: "We're holding her to it. The bike is already on her list…",
+        quote:
+          "Hers will be by bike. We're holding her to it. The bike is already on her list.",
       },
       graduation: {
         framing:
-          "Tom cycled across Manchester every day for three years and says cycling is still the only way — which way do you love to travel?",
+          "Tom cycled across Manchester every day for three years — which way do you love to travel?",
         quote:
-          "He timed every route. He knows exactly which roads to avoid and at what time…",
+          "His is by bike. He timed every route. He knows exactly which roads to avoid and at what time.",
       },
       christening: {
         framing:
           "Lily's world is small right now, but it will expand — which way do you love to travel?",
         quote:
-          "For now she goes everywhere in someone's arms. This will not last long…",
+          "For now she goes everywhere in someone's arms. This will not last long.",
       },
       achievement: {
         framing:
           "Marcus has run so many miles that running still feels like a natural way to get places — how do you love to travel?",
         quote:
-          "He's been known to run to places most people drive to. This is a choice he makes freely…",
+          "His is on foot. He's been known to run to places most people drive to. This is a choice he makes freely.",
       },
       recovery: {
         framing:
-          "Claire has started walking places she used to drive — not for the exercise, just for the different quality of arrival — how do you love to travel?",
-        quote: "Something about arriving having covered the ground yourself…",
+          "Claire started walking places she used to drive — not for the exercise, just for the different quality of arrival — how do you love to travel?",
+        quote:
+          "Hers is on foot now. Something about arriving having covered the ground yourself.",
       },
       award: {
         framing:
-          "Amelia cycles to school — she says it's the right way to arrive — which way do you love to travel?",
-        quote: "It sets the tone for the day. She's noticed the difference…",
+          "Dr. Amelia Grant cycles to school — she says it's the right way to arrive — which way do you love to travel?",
+        quote:
+          "Hers is by bike. It sets the tone for the day. She's noticed the difference.",
       },
       promotion: {
         framing:
           "Kwame upgraded his travel for the first time after the promotion news — which way do you love to travel?",
         quote:
-          "He'll say it was just a train upgrade. It was also a small moment of arrival…",
+          "His is first class on the train. He'll say it was just an upgrade. It was also a small moment of arrival.",
       },
       celebration: {
         framing:
@@ -1674,50 +1712,51 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda watched Brief Encounter every Christmas — which film do you love?",
+          "Belinda had a film she came back to every year — which film do you love?",
         quote:
-          "She could quote it entirely from memory. It never seemed to get less affecting…",
+          "Hers was Brief Encounter. She could quote it entirely from memory. It never seemed to get less affecting.",
       },
       tribute: {
         framing:
           "David once watched the same film seven times in one month to understand why it worked — which film do you love?",
         quote:
-          "He eventually explained it. The explanation was better than the film…",
+          "His was Tokyo Story. He eventually explained it. The explanation was better than the film.",
       },
       birthday: {
         framing:
           "Sarah has a film she's watched so many times she knows every line — which film do you love?",
         quote:
-          "She watches it whenever she needs reminding that some decisions are worth making…",
+          "Hers is When Harry Met Sally. She watches it whenever she needs reminding that some decisions are worth making.",
       },
       retirement: {
         framing:
           "David always said the best projects had the structure of a good heist film — which film do you love?",
         quote:
-          "He still believes this. He has evidence. It's a long conversation…",
+          "His was The Italian Job. He still believes this. He has evidence. It's a long conversation.",
       },
       wedding: {
         framing:
           "Emma and James argued about a film for an hour before they'd even introduced themselves — which film do you love?",
-        quote: "She was right, he eventually admitted. Three years later…",
+        quote:
+          "Hers was right, he eventually admitted. Three years later. It was Before Sunrise.",
       },
       anniversary: {
         framing:
-          "They have a film they watch on every anniversary — which film do you love?",
+          "Mum and Dad have a film they watch on every anniversary — which film do you love?",
         quote:
-          "Forty viewings. Different things noticed each time. Still the same feeling at the end…",
+          "Theirs is Casablanca. Forty viewings. Different things noticed each time. Still the same feeling at the end.",
       },
       leaving: {
         framing:
-          "Someone said Priya's leaving felt like the end of a great arc in a brilliant series — which film do you love?",
+          "Someone said Priya's leaving felt like the end of a great arc in a brilliant film — which film do you love?",
         quote:
-          "Not the show ending. Just that particular chapter. We're still watching…",
+          "Not the ending. Just that particular chapter. We're still watching.",
       },
       graduation: {
         framing:
           "Tom says architecture school ruined certain films for him in the best possible way — which film do you love?",
         quote:
-          "He can't watch a building on screen without having opinions. This is both a gift and a burden…",
+          "His is Blade Runner. He can't watch a building on screen without having opinions. This is both a gift and a burden.",
       },
       christening: {
         framing:
@@ -1729,25 +1768,25 @@ const topics: TopicSeed[] = [
         framing:
           "Marcus watched a film the night before the marathon and ran a mile faster than ever — which film do you love?",
         quote:
-          "He won't reveal which film. He's worried it only works for him…",
+          "His was Chariots of Fire. He'll tell you it was coincidence. It wasn't.",
       },
       recovery: {
         framing:
           "Claire watched films she'd been avoiding for years this year — which film do you love?",
         quote:
-          "She worked through the whole list. Some were worth the wait. One in particular…",
+          "Hers was Amélie. She worked through the whole list. Some were worth the wait. That one in particular.",
       },
       award: {
         framing:
-          "Amelia uses films in class regularly — says the best ones teach without feeling like teaching — which film do you love?",
+          "Dr. Amelia Grant uses films in class regularly — says the best ones teach without feeling like teaching — which film do you love?",
         quote:
-          "She's got a list. It's organised by theme, then year. It's a very good list…",
+          "Hers is Dead Poets Society. She's got a list. It's organised by theme, then year. It's a very good list.",
       },
       promotion: {
         framing:
           "Kwame said the best product launches feel like the third act of a well-made film — which film do you love?",
         quote:
-          "He means it as a design principle. The films he uses as examples are always perfect choices…",
+          "His is The Social Network. He means it as a design principle. The films he uses as examples are always perfect choices.",
       },
       celebration: {
         framing:
@@ -1774,80 +1813,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved a proper documentary — said they were the only honest films — which genre do you love?",
+          "Belinda had a film genre she always came back to — which genre do you love?",
         quote:
-          "She lived in fine detail. The kind that makes the best documentaries…",
+          "Hers was the documentary. She said they were the only honest films. She lived in fine detail. The kind that makes the best ones.",
       },
       tribute: {
         framing:
-          "David loved a good biography film — said they were the most honest kind — which genre do you love?",
+          "David had a film genre he always said was the most honest — which genre do you love?",
         quote:
-          "He'd always name three you'd never seen and somehow they were all exactly right…",
+          "His was the biographical drama. He'd always name three you'd never seen and somehow they were all exactly right.",
       },
       birthday: {
         framing:
           "Sarah's life is clearly a caper film — charming, one step ahead, always — which genre do you love?",
         quote:
-          "She'd say drama. Her friends would say comedy. The truth is probably both at once…",
+          "Hers is the romantic comedy, if you ask anyone who knows her. She'd say drama. Her friends say otherwise.",
       },
       retirement: {
         framing:
           "David always said his career had the structure of a good thriller — which genre do you love?",
         quote:
-          "Procedural with occasional moments of genuine horror. His words. Probably right…",
+          "His was the thriller. Procedural with occasional moments of genuine horror. His words. Probably right.",
       },
       wedding: {
         framing:
-          "Emma says romance. James says adventure. They're both right — which genre do you love?",
+          "Emma says romance, James says adventure — which genre do you love?",
         quote:
-          "Which is the whole point. They've been arguing about this since the second date…",
+          "Hers is romance. His is adventure. They've been arguing about this since the second date. They're both right.",
       },
       anniversary: {
         framing:
-          "Forty years of films together — they've watched every genre and still haven't agreed on a favourite — which genre do you love?",
+          "Mum and Dad have watched every genre together over forty years and still haven't agreed — which genre do you love?",
         quote:
-          "She says romance. He says thriller. They watch both. This is the system…",
+          "Hers is romance. His is thriller. They watch both. This is the system.",
       },
       leaving: {
         framing:
           "Priya's time here was fast-paced, warm, and had a few genuinely brilliant set pieces — which genre do you love?",
         quote:
-          "We know the genre. The question is what comes next in the series…",
+          "Hers was comedy-drama. We know the genre. The question is what comes next in the series.",
       },
       graduation: {
         framing:
           "Tom's architecture thesis included a chapter on film and space — which genre do you love?",
         quote:
-          "He's written 4,000 words about the relationship between noir and brutalism. He'll tell you about it…",
+          "His is noir. He's written 4,000 words about the relationship between noir and brutalism. He'll tell you about it.",
       },
       christening: {
         framing:
           "We'll recommend genres to Lily for years — which genre do you love?",
-        quote: "Start them young on the right ones. That's the task…",
+        quote: "Start them young on the right ones. That's the task.",
       },
       achievement: {
         framing:
           "Marcus says a good sports documentary is in a genre of its own — which genre do you love?",
         quote:
-          "He's watched every marathon documentary in existence. Some twice…",
+          "His is the sports documentary. He's watched every marathon one in existence. Some twice.",
       },
       recovery: {
         framing:
-          "Claire says comedy got her through as much as anything — which genre do you love?",
+          "Claire says one genre got her through as much as anything — which genre do you love?",
         quote:
-          "Not escapism. Just genuine laughter. She chose it deliberately…",
+          "Hers was comedy. Not escapism. Just genuine laughter. She chose it deliberately.",
       },
       award: {
         framing:
-          "Amelia says the best genre for teaching empathy is drama — which genre do you love?",
+          "Dr. Amelia Grant says the best genre for teaching empathy is drama — which genre do you love?",
         quote:
-          "She uses drama films like some teachers use textbooks. The results speak for themselves…",
+          "Hers is drama. She uses drama films like some teachers use textbooks. The results speak for themselves.",
       },
       promotion: {
         framing:
           "Kwame only watches things he calls 'structurally interesting' — which genre do you love?",
         quote:
-          "This is somehow not as narrow as it sounds. His taste is excellent…",
+          "His is the heist film. This is somehow not as narrow as it sounds. His taste is excellent.",
       },
       celebration: {
         framing:
@@ -1875,76 +1914,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda watched Midsomer Murders with total commitment — which TV show do you love?",
+          "Belinda had a TV show she watched with total commitment — which TV show do you love?",
         quote:
-          "She could identify the murderer inside fifteen minutes. It was impressive and slightly alarming…",
+          "Hers was Midsomer Murders. She could identify the murderer inside fifteen minutes. It was impressive and slightly alarming.",
       },
       tribute: {
         framing:
           "David watched exactly one TV show at a time and watched it properly — which TV show do you love?",
         quote:
-          "No multitasking. Fully present. He said it was the only respectful way to watch…",
+          "His was The Wire. No multitasking. Fully present. He said it was the only respectful way to watch.",
       },
       birthday: {
         framing:
           "Sarah rewatched a whole series to write one paragraph to a friend — which TV show do you love?",
-        quote: "She did not consider this excessive. It wasn't…",
+        quote:
+          "Hers is Schitt's Creek. She did not consider this excessive. It wasn't.",
       },
       retirement: {
         framing:
           "David has a watch list that's been building for fifteen years — which TV show do you love?",
-        quote: "There's a list. It's long. The time has finally come…",
+        quote:
+          "His starts with The Sopranos. There's a list. It's long. The time has finally come.",
       },
       wedding: {
         framing:
-          "Emma picks one. James picks one. Neither has ever not watched both — which TV show do you love?",
+          "Emma picks one show, James picks one — which TV show do you love?",
         quote:
-          "They haven't argued about it once. This is the foundation of the marriage…",
+          "They haven't argued about it once. This is the foundation of the marriage.",
       },
       anniversary: {
         framing:
-          "They have a show they've been watching together since their first flat — which TV show do you love?",
-        quote: "The show changed. The routine hasn't. Same sofa. Same time…",
+          "Mum and Dad have a show they've been watching together since their first flat — which TV show do you love?",
+        quote:
+          "Theirs started with Fawlty Towers. The show changed over the years. The routine hasn't. Same sofa. Same time.",
       },
       leaving: {
         framing:
           "Priya got all the best lines in every meeting — which TV show do you love?",
         quote:
-          "Every team has the character who makes every scene better. That was her…",
+          "Every team has the character who makes every scene better. That was her.",
       },
       graduation: {
         framing:
-          "Tom watched an architectural documentary series in his final week and called it revision — which TV show do you love?",
+          "Tom watched a particular documentary series in his final week and called it revision — which TV show do you love?",
         quote:
-          "It was technically revision. He also just really liked the show…",
+          "His was Abstract: The Art of Design. It was technically revision. He also just really liked the show.",
       },
       christening: {
         framing:
           "One day Lily will have a favourite show — which TV show do you love?",
-        quote: "For now she has opinions about ceiling fans. This will evolve…",
+        quote: "For now she has opinions about ceiling fans. This will evolve.",
       },
       achievement: {
         framing:
-          "Marcus says he watched nature documentaries on rest days because they required nothing — which TV show do you love?",
+          "Marcus watched nature documentaries on rest days because they required nothing — which TV show do you love?",
         quote:
-          "Rest days needed something genuinely restful. David Attenborough delivered…",
+          "His was Planet Earth. Rest days needed something genuinely restful. David Attenborough delivered.",
       },
       recovery: {
         framing:
           "Claire says one particular show got her through the hardest weeks — which TV show do you love?",
         quote:
-          "She couldn't have said why. It just worked. Which show does that for you?",
+          "Hers was Fleabag. She couldn't have said why. It just worked. Which show does that for you?",
       },
       award: {
         framing:
-          "Amelia recommends TV shows to her students the way other teachers recommend books — which TV show do you love?",
-        quote: "She's never recommended a bad one. The students have checked…",
+          "Dr. Amelia Grant recommends TV shows to her students the way other teachers recommend books — which TV show do you love?",
+        quote:
+          "Hers is The Crown. She's never recommended a bad one. The students have checked.",
       },
       promotion: {
         framing:
           "Kwame started a show the night he got promoted and watched it through over the next month — which TV show do you love?",
         quote:
-          "He hadn't let himself start it until then. Some things are worth saving…",
+          "His was Succession. He hadn't let himself start it until then. Some things are worth saving.",
       },
       celebration: {
         framing: "Tonight is a TV night — which show do you love?",
@@ -1970,78 +2013,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda always played Jerusalem on Sunday mornings — which song do you love?",
+          "Belinda had a song she always played on Sunday mornings — which song do you love?",
         quote:
-          "She'd sing along under her breath. Every time. Always the same verse first…",
+          "Hers was Jerusalem. She'd sing along under her breath. Every time. Always the same verse first.",
       },
       tribute: {
         framing:
           "David introduced so many people to a particular song — which song do you love?",
         quote:
-          "He'd play it without context and watch people react. It never failed to work…",
+          "His was My Favourite Things. He'd play it without context and watch people react. It never failed to work.",
       },
       birthday: {
         framing:
-          "Sarah turns the volume up every time that song comes on — which song do you love?",
+          "Sarah turns the volume up every time a particular song comes on — which song do you love?",
         quote:
-          "She has a playlist called The Big One. It has exactly one song. We're not allowed to know which…",
+          "Hers is Dancing Queen. She has a playlist called The Big One. It has exactly one song. Now you know which.",
       },
       retirement: {
         framing:
           "David always said good music should say what people can't — which song do you love?",
         quote:
-          "There's a song that says thirty-five years better than any speech could. Which one is it?",
+          "His was Waterloo Sunset. There's a song that says thirty-five years better than any speech could. That's the one.",
       },
       wedding: {
         framing:
-          "Emma had been saving that song for years — which song do you love?",
+          "Emma had been saving a particular song for years — which song do you love?",
         quote:
-          "The moment it played, everyone at the wedding understood why. That was the one…",
+          "Hers was This Will Be. The moment it played, everyone at the wedding understood why. That was the one.",
       },
       anniversary: {
         framing:
-          "Their song hasn't changed in forty years — which song do you love?",
-        quote: "First dance. Same song. They've never needed another…",
+          "Mum and Dad's song hasn't changed in forty years — which song do you love?",
+        quote:
+          "Theirs was Can't Help Falling in Love. First dance. Same song. They've never needed another.",
       },
       leaving: {
         framing:
-          "There's a song that's Priya's now, irreversibly — which song do you love?",
+          "There's a song that belongs to Priya now, irreversibly — which song do you love?",
         quote:
-          "There's a song playing somewhere in the world that belongs entirely to her. Which one is it?",
+          "Hers is Gold by Spandau Ballet. Ask her why. The answer is worth hearing.",
       },
       graduation: {
         framing:
           "Tom played the same song on the morning of every deadline — which song do you love?",
         quote:
-          "It started as superstition. It became ritual. It apparently always worked…",
+          "His was Pyramid Song by Radiohead. It started as superstition. It became ritual. It apparently always worked.",
       },
       christening: {
         framing:
           "Every person in this room has a song they'd want Lily to know — which song do you love?",
-        quote: "She'll find her own. But there's time to share yours…",
+        quote: "She'll find her own. But there's time to share yours.",
       },
       achievement: {
         framing:
-          "Marcus had a song he played in the final kilometre and it will always be that song now — which song do you love?",
+          "Marcus had a song he played in the final kilometre — which song do you love?",
         quote:
-          "It belonged to the finish line before it belonged to anything else…",
+          "His was Mr. Brightside. It belonged to the finish line before it belonged to anything else.",
       },
       recovery: {
         framing:
-          "Claire says music got her through — there was one song more than any other — which song do you love?",
-        quote: "She won't name it. It's hers. Which song is yours?",
+          "Claire says there was one song more than any other that got her through — which song do you love?",
+        quote:
+          "Hers was Vienna by Ultravox. She played it on repeat for months. It held up every time.",
       },
       award: {
         framing:
-          "Amelia played a song at the start of every term for years — which song do you love?",
+          "Dr. Amelia Grant played a song at the start of every term for years — which song do you love?",
         quote:
-          "Year 7s who've since graduated still remember it. That song did something…",
+          "Hers was Here Comes the Sun. Year 7s who've since graduated still remember it. That song did something.",
       },
       promotion: {
         framing:
-          "Kwame played a song on the walk home after the promotion news and it's been his ever since — which song do you love?",
+          "Kwame played a song on the walk home after the promotion news — which song do you love?",
         quote:
-          "He made the decision on that walk too. The song was present for both…",
+          "His was Higher Ground by Stevie Wonder. He made the decision on that walk too. The song was present for both.",
       },
       celebration: {
         framing: "Every celebration needs its song — which song do you love?",
@@ -2067,75 +2112,79 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved folk music — said it was the only genre that told the truth — which genre do you love?",
+          "Belinda had a music genre she always came back to — which genre do you love?",
         quote:
-          "She had strong opinions about what made a good song. Folk always won. No contest…",
+          "Hers was folk. She said it was the only genre that told the truth. She had strong opinions about what made a good song. Folk always won.",
       },
       tribute: {
         framing:
-          "David lived in jazz and thought everyone should — which genre do you love?",
+          "David had a music genre he lived in and thought everyone should — which genre do you love?",
         quote:
-          "He wasn't evangelical about it. He just quietly played the right things until you understood…",
+          "His was jazz. He wasn't evangelical about it. He just quietly played the right things until you understood.",
       },
       birthday: {
         framing:
           "Sarah's taste is eclectic but there's always a gravitational centre — which genre do you love?",
         quote:
-          "She'll tell you she listens to everything. Her playlist says otherwise. In the best way…",
+          "Hers is nineties pop, if you ask the playlist. She'll tell you she listens to everything. Her Spotify says otherwise. In the best way.",
       },
       retirement: {
         framing:
           "David had the same CDs in the car for twenty years — which genre do you love?",
         quote:
-          "That's the genre, right there. Twenty years and not once did it change…",
+          "His was classic rock. Twenty years and not once did it change. That's the genre.",
       },
       wedding: {
         framing:
-          "She's jazz. He's indie. Together they're something without a name yet — which genre do you love?",
-        quote: "It sounds exactly right, whatever it's called…",
+          "Emma and James are each a different genre and together something without a name — which genre do you love?",
+        quote:
+          "Hers is jazz. His is indie. Together it sounds exactly right, whatever it's called.",
       },
       anniversary: {
         framing:
-          "Forty years of shared music — a playlist of every genre and all of them right — which genre do you love?",
+          "Mum and Dad have forty years of shared music — which genre do you love?",
         quote:
-          "She's soul. He's folk. Together it sounds like something entirely different…",
+          "Hers is soul. His is folk. Together it sounds like something entirely different and entirely theirs.",
       },
       leaving: {
         framing:
           "Priya had the quality of a genre you didn't know you needed until it started playing — which genre do you love?",
-        quote: "We know the genre now. We'll miss the sound…",
+        quote:
+          "Hers was Afrobeats. We know the genre now. We'll miss the sound.",
       },
       graduation: {
         framing:
-          "Tom's playlist from final year is a document of exactly what he was listening to while making something impossible — which genre do you love?",
-        quote: "It tells the whole story. Three years in one playlist…",
+          "Tom's playlist from final year tells the whole story — which genre do you love?",
+        quote:
+          "His is post-rock. It carries the whole degree. Three years in one playlist.",
       },
       christening: {
         framing: "Music will fill Lily's life — which genre do you love?",
-        quote: "Every person here has one they'd want her to discover…",
+        quote: "Every person here has one they'd want her to discover.",
       },
       achievement: {
         framing:
           "Marcus ran to one genre for eight months — which genre do you love?",
         quote:
-          "It carried every kilometre. He can't listen to it now without feeling like he's moving…",
+          "His was drum and bass. It carried every kilometre. He can't listen to it now without feeling like he's moving.",
       },
       recovery: {
         framing:
           "Claire found one genre worked better than anything else — which genre do you love?",
-        quote: "She couldn't say why logically. She just knew it was the one…",
+        quote:
+          "Hers was classical. She couldn't say why logically. She just knew it was the one.",
       },
       award: {
         framing:
-          "Amelia believes music education is the most important kind — which genre do you love?",
+          "Dr. Amelia Grant believes music education is the most important kind — which genre do you love?",
         quote:
-          "She has strong feelings about this. They're backed by thirty years of watching students…",
+          "Hers is folk. She has strong feelings about this. Backed by thirty years of watching students.",
       },
       promotion: {
         framing:
           "Kwame says jazz and product thinking have more in common than people realise — which genre do you love?",
         quote:
-          "He's given a version of this talk at three different companies. It's always well received…",
+          "His is jazz. He's given a version of this talk at three different companies. It's always well received.",
       },
       celebration: {
         framing:
@@ -2164,78 +2213,79 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda said the seventies was when music finally understood itself — which era do you love?",
+          "Belinda had a music era she always said was the one — which era do you love?",
         quote:
-          "She could tell you where she was when she heard every important record from 1971 to 1979…",
+          "Hers was the seventies. She could tell you where she was when she heard every important record from 1971 to 1979.",
       },
       tribute: {
         framing:
-          "David always said the golden era of music was whatever you were seventeen for — which era do you love?",
+          "David had a music era he always said was his — which era do you love?",
         quote:
-          "His golden era was specifically 1975. He had evidence for this…",
+          "His was the mid-seventies — specifically 1975. He had evidence for this. The evidence was compelling.",
       },
       birthday: {
         framing:
           "Sarah has nineties in her bones and she's not remotely sorry — which era do you love?",
         quote:
-          "She knows every B-side from 1994. Don't test her on this either…",
+          "Hers is the nineties. She knows every B-side from 1994. Don't test her on this either.",
       },
       retirement: {
         framing:
-          "David has a theory about how eighties pop predicted modern engineering — which era do you love?",
-        quote: "It's a long theory. It's also kind of right…",
+          "David has a theory about how one era of music predicted modern engineering — which era do you love?",
+        quote:
+          "His is the eighties. It's a long theory. It's also kind of right.",
       },
       wedding: {
         framing:
-          "They made a playlist on their first anniversary that covered six decades without effort — which era do you love?",
+          "Emma and James made a playlist on their first anniversary that covered six decades without effort — which era do you love?",
         quote:
-          "That playlist is still the best one either of them has ever made…",
+          "That playlist is still the best one either of them has ever made.",
       },
       anniversary: {
         framing:
-          "Mum and Dad danced to the same music at their wedding they still put on now — which era do you love?",
+          "Mum and Dad danced to the same music at their wedding and still put it on now — which era do you love?",
         quote:
-          "The era that was theirs first is still theirs. Some things don't change…",
+          "Theirs is the late seventies. The era that was theirs first is still theirs. Some things don't change.",
       },
       leaving: {
         framing:
-          "Priya had the energy of an era that felt like the right one for everything to change — which era do you love?",
+          "Priya had the energy of a particular musical era — which era do you love?",
         quote:
-          "Some people belong to a particular musical moment. She was one of them…",
+          "Hers was the early 2000s. Some people belong to a particular musical moment. She was one of them.",
       },
       graduation: {
         framing:
-          "Tom spent three years surrounded by the same era of music and now it's filed under 'final year' — which era do you love?",
+          "Tom spent three years surrounded by the same era of music — which era do you love?",
         quote:
-          "It's useful and slightly limiting. He can't hear it without thinking about structural drawings…",
+          "His is the early 2000s indie era. It's filed under 'final year' now. He can't hear it without thinking about structural drawings.",
       },
       christening: {
         framing: "Lily will have her own golden era — which era do you love?",
-        quote: "She's yet to discover it. Tell her what yours was…",
+        quote: "She's yet to discover it. Tell her what yours was.",
       },
       achievement: {
         framing:
           "Marcus trained through one era of music and finished the race to another — which era do you love?",
         quote:
-          "The training era was chosen for rhythm. The finish line era chose itself…",
+          "His training era was the nineties — chosen for rhythm. The finish line era chose itself.",
       },
       recovery: {
         framing:
           "Claire found one era particularly useful this year — which era do you love?",
         quote:
-          "Old music. Familiar. Known. It felt like the right steady ground…",
+          "Hers was the seventies. Old music. Familiar. Known. It felt like the right steady ground.",
       },
       award: {
         framing:
-          "Amelia believes every generation deserves to understand every era — which era do you love?",
+          "Dr. Amelia Grant believes every generation deserves to understand every era — which era do you love?",
         quote:
-          "She teaches music history alongside the curriculum. Not officially. She just does it…",
+          "Hers is the sixties. She teaches music history alongside the curriculum. Not officially. She just does it.",
       },
       promotion: {
         framing:
           "Kwame believes the music era you love most tells you everything about your working style — which era do you love?",
         quote:
-          "He's got a theory. He'll tell you about it in the right setting…",
+          "His is the late nineties. He's got a theory. He'll tell you about it in the right setting.",
       },
       celebration: {
         framing: "Every era had its moment — which music era do you love?",
@@ -2264,50 +2314,51 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda played piano quietly, for herself and whoever happened to be there — which instrument do you love?",
+          "Belinda had an instrument she played quietly, just for herself — which instrument do you love?",
         quote:
-          "She never performed. She just played. That was the whole point…",
+          "Hers was the piano. She never performed. She just played. That was the whole point.",
       },
       tribute: {
         framing:
-          "David loved the piano — said it was the only instrument that could hold a whole conversation — which instrument do you love?",
-        quote: "He couldn't play a note. He was still completely right…",
+          "David had an instrument he loved above all others — which instrument do you love?",
+        quote:
+          "His was the piano. He couldn't play a note. He was still completely right about it.",
       },
       birthday: {
         framing:
-          "Sarah plays guitar badly and with tremendous enthusiasm — which instrument do you love?",
+          "Sarah plays one instrument badly and with tremendous enthusiasm — which instrument do you love?",
         quote:
-          "She'd tell you she's getting better. Her friends would say she's consistent. Both are true…",
+          "Hers is the guitar. She'd tell you she's getting better. Her friends would say she's consistent. Both are true.",
       },
       retirement: {
         framing:
           "David was the instrument in the firm that everything else was built around — which instrument do you love?",
         quote:
-          "You only notice some instruments when they stop. The whole band feels it…",
+          "His was the bass guitar. You only notice some instruments when they stop. The whole band feels it.",
       },
       wedding: {
         framing:
-          "She's the melody. He's the chord structure beneath it — which instrument do you love?",
+          "Emma is the melody and James is the chord structure beneath it — which instrument do you love?",
         quote:
-          "Together it's a complete piece. Separately it's still good, but not quite right…",
+          "Together it's a complete piece. Separately it's still good, but not quite right.",
       },
       anniversary: {
         framing:
-          "There's been a piano in the house for the whole forty years — which instrument do you love?",
+          "There's been a piano in Mum and Dad's house for the whole forty years — which instrument do you love?",
         quote:
-          "Neither of them plays. It stays because it's always stayed. Some things are like that…",
+          "Theirs is the piano. Neither of them plays. It stays because it's always stayed. Some things are like that.",
       },
       leaving: {
         framing:
           "Priya was the instrument in the team you don't notice until the song starts again — which instrument do you love?",
         quote:
-          "Something is missing in the arrangement. We all know which part…",
+          "Hers was the cello. Something is missing in the arrangement. We all know which part.",
       },
       graduation: {
         framing:
-          "Tom's studio played guitar in the background for three years — which instrument do you love?",
+          "Tom's studio had one instrument playing in the background for three years — which instrument do you love?",
         quote:
-          "Someone always had a guitar. It became the ambient sound of the degree. He misses it…",
+          "His is the guitar. Someone always had one. It became the ambient sound of the degree. He misses it.",
       },
       christening: {
         framing:
@@ -2318,25 +2369,25 @@ const topics: TopicSeed[] = [
         framing:
           "Marcus says running is its own instrument — rhythm, tempo, endurance — which instrument do you love?",
         quote:
-          "He's thought about this more than you'd expect. He has a case to make…",
+          "His is the drum. He's thought about this more than you'd expect. He has a case to make.",
       },
       recovery: {
         framing:
-          "Claire plays piano — quietly, for herself — and says it helped more than she can explain — which instrument do you love?",
+          "Claire plays one instrument quietly, for herself — and says it helped more than she can explain — which instrument do you love?",
         quote:
-          "She kept playing all the way through. The playing came back with everything else…",
+          "Hers is the piano. She kept playing all the way through. The playing came back with everything else.",
       },
       award: {
         framing:
-          "Amelia taught music for five years before moving to English — the instrument never left her — which instrument do you love?",
+          "Dr. Amelia Grant taught music for five years before moving to English — the instrument never left her — which instrument do you love?",
         quote:
-          "She still plays. She doesn't mention it. The students who've heard her do…",
+          "Hers is the violin. She still plays. She doesn't mention it. The students who've heard her do.",
       },
       promotion: {
         framing:
-          "Kwame says he listens to piano when he needs to think — which instrument do you love?",
+          "Kwame says he listens to one instrument when he needs to think — which instrument do you love?",
         quote:
-          "Specifically piano. Specifically certain kinds of piano. Very specific indeed…",
+          "His is the piano. Specifically piano. Specifically certain kinds. Very specific indeed.",
       },
       celebration: {
         framing: "Every moment deserves its instrument — which do you love?",
@@ -2363,78 +2414,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda loved a good hymn — said they were just the best folk songs — which type of song do you love?",
-        quote: "She knew every word to every hymn. Never missed a verse…",
+          "Belinda had a type of song she always came back to — which type of song do you love?",
+        quote:
+          "Hers was the hymn. She said they were just the best folk songs. She knew every word to every one. Never missed a verse.",
       },
       tribute: {
         framing:
-          "David always said jazz standards were the only songs worth singing — which type of song do you love?",
+          "David had a type of song he always said was the only kind worth singing — which type of song do you love?",
         quote:
-          "He meant it as a principle about form. It applies more broadly than jazz…",
+          "His was the jazz standard. He meant it as a principle about form. It applies more broadly than jazz.",
       },
       birthday: {
         framing:
-          "Sarah has an anthem she updates every year — it's always unmistakably an anthem — which type of song do you love?",
+          "Sarah has a type of song she returns to every year — it's always unmistakably hers — which type of song do you love?",
         quote:
-          "She's been working on a karaoke setlist for years. It's ambitious. It suits her completely…",
+          "Hers is the anthem. She's been working on a karaoke setlist for years. It's ambitious. It suits her completely.",
       },
       retirement: {
         framing:
           "David always said the best songs knew how to end — which type of song do you love?",
         quote:
-          "He's right about this. The right ending is everything. Which song type gets it right?",
+          "His was the ballad. He's right about the ending. The right kind takes its time and earns it.",
       },
       wedding: {
         framing:
-          "It started as a love song, became an adventure, and it's been both ever since — which type of song do you love?",
+          "Emma and James's story started as a love song and became something else — which type of song do you love?",
         quote:
-          "Their relationship has a particular kind of song. Which type captures it?",
+          "Theirs is the love song. It started there and it's stayed there. The best ones do.",
       },
       anniversary: {
         framing:
-          "Their song was a love song that became a hymn — which type of song do you love?",
-        quote: "It changed over the years. The feeling underneath it didn't…",
+          "Mum and Dad's song was a love song that became a hymn — which type of song do you love?",
+        quote:
+          "Theirs is the love song. It changed over the years. The feeling underneath it didn't.",
       },
       leaving: {
         framing:
-          "Some departures deserve a particular kind of music — which type of song do you love?",
+          "Priya deserves exactly the right type of song for this moment — which type of song do you love?",
         quote:
-          "Pick the type that fits the moment. Priya deserves the right one…",
+          "Hers is the anthem. Pick the type that fits the moment. This one earns it.",
       },
       graduation: {
         framing:
-          "Tom played an anthem at the end of every all-nighter to tell himself it was done — which type of song do you love?",
+          "Tom played a particular type of song at the end of every all-nighter to tell himself it was done — which type of song do you love?",
         quote:
-          "He has one specific anthem for this purpose. It's been earned three years running…",
+          "His was the anthem. One specific one, earned three years running. It always worked.",
       },
       christening: {
         framing: "Lily will need a lullaby — which type of song do you love?",
         quote:
-          "And an anthem. And a hymn. And eventually, a love song. Start with the lullaby…",
+          "And an anthem. And a hymn. And eventually, a love song. Start with the lullaby.",
       },
       achievement: {
         framing:
-          "Marcus's finish line song was an anthem — he'd planned it that way — which type of song do you love?",
+          "Marcus's finish line song was a particular type — he'd planned it that way — which type of song do you love?",
         quote:
-          "He knew exactly which song he wanted playing in his head at mile 26. It was the right one…",
+          "His was the anthem. He knew exactly which one he wanted playing in his head at mile 26. It was the right one.",
       },
       recovery: {
         framing:
-          "Claire says she needed songs that told a story — which type of song do you love?",
+          "Claire says she needed a particular type of song this year — which type of song do you love?",
         quote:
-          "Not escapism. Not distraction. Something with a narrative she could follow…",
+          "Hers was the ballad. Not escapism. Not distraction. Something with a narrative she could follow.",
       },
       award: {
         framing:
-          "Amelia has a hymn she comes back to — says it's about the long game — which type of song do you love?",
+          "Dr. Amelia Grant has a type of song she comes back to — says it's about the long game — which type of song do you love?",
         quote:
-          "She means it literally and also as a metaphor for teaching. Both interpretations hold…",
+          "Hers is the hymn. She means it literally and also as a metaphor for teaching. Both interpretations hold.",
       },
       promotion: {
         framing:
-          "Kwame celebrated with exactly the kind of song that needed no explanation — which type of song do you love?",
+          "Kwame celebrated with a particular type of song that needed no explanation — which type of song do you love?",
         quote:
-          "Not a love song. Not a ballad. Something with propulsion. Which type is yours?",
+          "His was the anthem. Not a ballad. Not a love song. Something with propulsion. Exactly right.",
       },
       celebration: {
         framing:
@@ -2461,77 +2514,79 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda's answer was always tea — proper loose leaf, pot on the table — which drink do you love?",
+          "Belinda had a drink she always came back to — which drink do you love?",
         quote:
-          "She said everything worth talking about happened over tea. She had a point…",
+          "Hers was tea — proper loose leaf, pot on the table. She said everything worth talking about happened over tea. She had a point.",
       },
       tribute: {
         framing:
           "David always had a glass of something interesting to offer — which drink do you love?",
         quote:
-          "He never drank alone. The drink was always the beginning of a conversation…",
+          "His was a good single malt. He never drank alone. The drink was always the beginning of a conversation.",
       },
       birthday: {
         framing:
-          "Sarah has opinions about coffee that are not appropriate for this level of conversation — which drink do you love?",
+          "Sarah has opinions about one drink that are not appropriate for this level of conversation — which drink do you love?",
         quote:
-          "She has opinions about brewing methods too. The opinions are extensive and correct…",
+          "Hers is coffee. She has opinions about brewing methods too. The opinions are extensive and correct.",
       },
       retirement: {
         framing:
-          "David kept a good whisky for significant moments — which drink do you love?",
+          "David kept a good drink for significant moments — which drink do you love?",
         quote:
-          "He always said a project was finished when he poured the good stuff. There's a lot due…",
+          "His was whisky. He always said a project was finished when he poured the good stuff. There's a lot due.",
       },
       wedding: {
         framing:
           "Emma and James fell in love over terrible festival beer and have significantly upgraded since — which drink do you love?",
         quote:
-          "There's still an ongoing argument about the exact moment it improved. Probably 2021…",
+          "Theirs is now good wine, mostly. There's still an ongoing argument about the exact moment it improved. Probably 2021.",
       },
       anniversary: {
         framing:
-          "Forty years and the same cup of tea every morning — which drink do you love?",
+          "Mum and Dad have had the same drink every morning for forty years — which drink do you love?",
         quote:
-          "The tea hasn't changed. The brand, the mug, the time. All the same. All exactly right…",
+          "Theirs is tea. The brand, the mug, the time — all the same. All exactly right.",
       },
       leaving: {
         framing:
           "Priya has a drink she orders every time something good happens — which drink do you love?",
-        quote: "Tonight qualifies. We know which one it is…",
+        quote: "Hers is a negroni. Tonight qualifies. We know which one it is.",
       },
       graduation: {
         framing:
           "Tom says he'll drink something better than student flat coffee now — which drink do you love?",
-        quote: "He has spent three years subsisting. The upgrade is overdue…",
+        quote:
+          "His will be a proper flat white. He has spent three years subsisting. The upgrade is overdue.",
       },
       christening: {
         framing: "We raise a glass for Lily — which drink do you love?",
         quote:
-          "She'll form her own preferences eventually. For now, we drink on her behalf…",
+          "She'll form her own preferences eventually. For now, we drink on her behalf.",
       },
       achievement: {
         framing:
-          "Marcus crossed the finish line and someone handed him a water that tasted better than anything — which drink do you love?",
-        quote: "26.2 miles. The first sip of water. Which drink is yours?",
+          "Marcus crossed the finish line and someone handed him a drink that tasted better than anything — which drink do you love?",
+        quote:
+          "His was water. Just water. 26.2 miles. The first sip. Nothing has ever tasted better.",
       },
       recovery: {
         framing:
-          "Claire says a particular cup of tea became a ritual — which drink do you love?",
+          "Claire says a particular drink became a ritual that held the day together — which drink do you love?",
         quote:
-          "Same mug, same time, same routine. The drink held the day together…",
+          "Hers is tea. Same mug, same time, same routine. The drink held the day together.",
       },
       award: {
         framing:
-          "Amelia's staffroom tea is apparently legendary — which drink do you love?",
+          "Dr. Amelia Grant's staffroom tea is apparently legendary — which drink do you love?",
         quote:
-          "She makes it once a day at exactly 11am. The staff know to be there…",
+          "Hers is tea — made once a day at exactly 11am. The staff know to be there.",
       },
       promotion: {
         framing:
           "Kwame poured a specific drink to mark the moment — which drink do you love?",
         quote:
-          "He'd been saving it. That night was the occasion. Which drink would you pour?",
+          "His was a flat white, two sugars. He'd been making it that way since year one. That night he made it extra slowly. He'd earned the time.",
       },
       celebration: {
         framing: "Today calls for the right drink — which do you love?",
@@ -2559,79 +2614,79 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda's shepherd's pie was legendary — which comfort food do you love?",
+          "Belinda had a comfort food she always made for anyone who needed it — which comfort food do you love?",
         quote:
-          "She'd leave it in the oven and say she'd barely done anything. Lies, but kind ones…",
+          "Hers was shepherd's pie. She'd leave it in the oven and say she'd barely done anything. Lies, but kind ones.",
       },
       tribute: {
         framing:
           "David made exactly one dish but made it perfectly — which comfort food do you love?",
         quote:
-          "He wouldn't tell anyone what was in it. The recipe died with him. The memory didn't…",
+          "His was a jollof rice that nobody else could replicate. He wouldn't tell anyone what was in it. The recipe died with him. The memory didn't.",
       },
       birthday: {
         framing:
-          "Sarah makes no apologies for her relationship with cheese — which comfort food do you love?",
+          "Sarah makes no apologies for her relationship with one comfort food — which comfort food do you love?",
         quote:
-          "She once paused a holiday to find the right local cheese. No one complained. It was worth it…",
+          "Hers is cheese. She once paused a holiday to find the right local one. No one complained. It was worth it.",
       },
       retirement: {
         framing:
-          "David ate lunch at his desk for thirty-five years. No more — which comfort food do you love?",
+          "David ate lunch at his desk for thirty-five years — which comfort food do you love?",
         quote:
-          "He can eat it properly now. In a chair. With a view. With no emails…",
+          "His was a proper ploughman's. He can eat it now. In a chair. With a view. With no emails.",
       },
       wedding: {
         framing:
-          "They argue about pizza but always agree on pasta — which comfort food do you love?",
+          "Emma and James argue about pizza but always agree on one comfort food — which comfort food do you love?",
         quote:
-          "This is probably the actual foundation of the marriage. The pasta part…",
+          "Theirs is Neapolitan pizza — the best they had in Naples. The argument is about which place was better. The pizza is not in question.",
       },
       anniversary: {
         framing:
-          "Forty years and the same roast dinner on Sundays — which comfort food do you love?",
+          "Mum and Dad have had the same comfort food on Sundays for forty years — which comfort food do you love?",
         quote:
-          "The recipe is the same as her mother's. The method takes all afternoon. Worth every minute…",
+          "Theirs is the Sunday roast. The recipe is the same as her mother's. The method takes all afternoon. Worth every minute.",
       },
       leaving: {
         framing:
           "Priya once brought something in for no reason and transformed the mood in the office — which comfort food do you love?",
         quote:
-          "No occasion. No explanation. Just the right thing at the right time…",
+          "Hers was dal. No occasion. No explanation. Just the right thing at the right time. It made any flat feel like home.",
       },
       graduation: {
         framing:
           "Tom ate nothing but toast for the last week of finals — which comfort food do you love?",
         quote:
-          "He has strong opinions about toast now. Strong, specific, very particular opinions…",
+          "His is toast. He has strong opinions about it now. Strong, specific, very particular opinions.",
       },
       christening: {
         framing: "The family laid on food — which comfort food do you love?",
-        quote: "Every family has its dishes. Today was no exception…",
+        quote: "Every family has its dishes. Today was no exception.",
       },
       achievement: {
         framing:
-          "Marcus's post-marathon plan was a roast dinner — which comfort food do you love?",
+          "Marcus had a post-marathon comfort food planned from mile fourteen — which comfort food do you love?",
         quote:
-          "He'd been thinking about it since mile 14. He earned every bite…",
+          "His was a roast dinner. He'd been thinking about it since mile 14. He earned every bite.",
       },
       recovery: {
         framing:
-          "Claire's friend always brought soup — which comfort food do you love?",
+          "Claire's friend always brought one particular comfort food — which comfort food do you love?",
         quote:
-          "She didn't have to. She always did. That's the friend, and that's the soup…",
+          "Hers was soup. Her friend brought it every time, without being asked. That's the friend, and that's the soup.",
       },
       award: {
         framing:
-          "Amelia celebrates small wins with specific food — which comfort food do you love?",
+          "Dr. Amelia Grant celebrates wins with specific food — which comfort food do you love?",
         quote:
-          "The bigger the win, the better the food. This particular win calls for the best version…",
+          "Hers is a proper Victoria sponge. The bigger the win, the better the cake. This win calls for the best version.",
       },
       promotion: {
         framing:
           "Kwame and his partner cooked together to celebrate — which comfort food do you love?",
         quote:
-          "Nothing fancy. Just the thing they always made. Which is the whole point…",
+          "His was jollof rice. Nothing fancy. Just the thing they always made together. Which is the whole point.",
       },
       celebration: {
         framing:
@@ -2661,78 +2716,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda always had hobnobs in the tin — which biscuit do you love?",
+          "Belinda always had a tin of biscuits on the table for visitors — which biscuit do you love?",
         quote:
-          "She'd put the tin on the table the moment anyone came round. That was the signal everything was fine…",
+          "Hers were hobnobs. She'd put the tin down the moment anyone came round. That was the signal everything was fine.",
       },
       tribute: {
         framing:
           "David's office always had a good tin — which biscuit do you love?",
         quote:
-          "Not just any biscuit. The right biscuit, for the right conversation. He had a system…",
+          "His was the digestive. Not just any biscuit. The right biscuit, for the right conversation. He had a system.",
       },
       birthday: {
         framing:
-          "Sarah says she doesn't have a favourite biscuit. This is demonstrably untrue — which biscuit do you love?",
+          "Sarah says she doesn't have a favourite biscuit — which biscuit do you love?",
         quote:
-          "Everyone who knows her knows the answer. She just won't admit it…",
+          "Hers is the Bourbon. Everyone who knows her knows the answer. She just won't admit it.",
       },
       retirement: {
         framing:
           "David has earned something better than a Rich Tea — which biscuit do you love?",
-        quote: "He's earned it. The question is just which one…",
+        quote:
+          "His will be a proper shortbread. He's earned it. The question is just which one.",
       },
       wedding: {
         framing:
-          "She's a chocolate digestive. He's a shortbread. Somehow this works — which biscuit do you love?",
+          "Emma and James have incompatible biscuit preferences — which biscuit do you love?",
         quote:
-          "Incompatible biscuit preferences. Completely compatible in every other way…",
+          "Hers is the chocolate digestive. His is the shortbread. Somehow this works. Completely compatible in every other way.",
       },
       anniversary: {
         framing:
-          "Forty years and the same biscuit in the tin — which biscuit do you love?",
+          "Mum and Dad have had the same biscuit in the tin for forty years — which biscuit do you love?",
         quote:
-          "She buys the tin. He refills it. This is the division of labour that has sustained forty years…",
+          "Theirs is the custard cream. She buys the tin. He refills it. This is the division of labour that has sustained forty years.",
       },
       leaving: {
         framing:
           "Priya always brought the right biscuit without explaining why — which biscuit do you love?",
         quote:
-          "You'd understand the moment you ate one. That was the genius of it…",
+          "Hers was the cardamom biscuit from the bakery down the road. You'd understand the moment you ate one. That was the genius of it.",
       },
       graduation: {
         framing:
           "Tom says biscuits got him through finals — which biscuit do you love?",
         quote:
-          "He was specific about this. The wrong biscuit in the wrong hour was genuinely not an option…",
+          "His was the rich tea. He was specific about this. The wrong biscuit in the wrong hour was genuinely not an option.",
       },
       christening: {
-        framing:
-          "Someone brought biscuits. The right ones — which biscuit do you love?",
+        framing: "Someone brought biscuits — which biscuit do you love?",
         quote:
-          "The biscuit question matters more than people admit. This is just true…",
+          "The biscuit question matters more than people admit. This is just true.",
       },
       achievement: {
         framing:
           "Marcus had one particular biscuit at every post-long-run breakfast — which biscuit do you love?",
-        quote: "He's very clear about which one. Don't suggest alternatives…",
+        quote:
+          "His was the hobnob. He's very clear about which one. Don't suggest alternatives.",
       },
       recovery: {
         framing:
           "Claire's sister always brought the right biscuit — which biscuit do you love?",
         quote:
-          "Not the expensive ones. Not the obvious ones. Exactly the right one. She knew…",
+          "Hers were Bourbons. Not the expensive ones. Not the obvious ones. Exactly the right one. She knew.",
       },
       award: {
         framing:
-          "Amelia's classroom biscuit tin is a well-known institution — which biscuit do you love?",
+          "Dr. Amelia Grant's classroom biscuit tin is a well-known institution — which biscuit do you love?",
         quote:
-          "It's never empty. She's never explained how. The students have long since stopped asking…",
+          "Hers is the ginger nut. It's never empty. She's never explained how. The students have long since stopped asking.",
       },
       promotion: {
         framing:
           "Kwame brought biscuits to the team on his first day as Head of Product — which biscuit do you love?",
-        quote: "He chose them carefully. He's that kind of person…",
+        quote:
+          "His were chocolate hobnobs. He chose them carefully. He's that kind of person.",
       },
       celebration: {
         framing: "Every gathering needs a biscuit — which do you love?",
@@ -2759,78 +2816,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda watched cricket on the radio — never the TV — which sport do you love to watch?",
+          "Belinda had a sport she followed with total devotion — which sport do you love to watch?",
         quote:
-          "She could tell you the score of any Test match from 1987. It was a gift…",
+          "Hers was cricket — on the radio, never the TV. She could tell you the score of any Test match from 1987. It was a gift.",
       },
       tribute: {
         framing:
           "David was quietly devoted to one sport and never needed to explain why — which sport do you love to watch?",
         quote:
-          "He watched alone, on his terms, with complete concentration. He didn't need company for it…",
+          "His was football. He watched alone, on his terms, with complete concentration. He didn't need company for it.",
       },
       birthday: {
         framing:
-          "Sarah watches tennis with a level of engagement that concerns her friends — which sport do you love to watch?",
+          "Sarah watches one sport with a level of engagement that concerns her friends — which sport do you love to watch?",
         quote:
-          "She once lost her voice during Wimbledon and didn't notice until the next morning…",
+          "Hers is tennis. She once lost her voice during Wimbledon and didn't notice until the next morning.",
       },
       retirement: {
         framing:
-          "David missed the second half of the 2005 Ashes for a board meeting — which sport do you love to watch?",
-        quote: "He hasn't forgiven anyone. Now he'll never miss another ball…",
+          "David missed the second half of a match he'll never forgive himself for — which sport do you love to watch?",
+        quote:
+          "His is cricket. He missed the 2005 Ashes for a board meeting. He hasn't forgiven anyone. Now he'll never miss another ball.",
       },
       wedding: {
         framing:
-          "Emma says cricket. James says football. They've been at this for five years — which sport do you love to watch?",
-        quote: "No sign of resolution. We think it might be the point…",
+          "Emma and James haven't agreed on a sport in five years — which sport do you love to watch?",
+        quote:
+          "Hers is cricket. His is football. No sign of resolution. We think it might be the point.",
       },
       anniversary: {
         framing:
-          "They've watched the same sport from the same seats for forty years — which sport do you love to watch?",
-        quote: "The seats changed once. The sport never did…",
+          "Mum and Dad have watched the same sport from the same seats for forty years — which sport do you love to watch?",
+        quote: "Theirs is rugby. The seats changed once. The sport never did.",
       },
       leaving: {
         framing:
           "Priya had three half-finished seasons in her queue — which sport do you love to watch?",
         quote:
-          "The time has officially arrived. The queue can finally be cleared…",
+          "Hers is Formula 1. The time has officially arrived. The queue can finally be cleared.",
       },
       graduation: {
         framing:
           "Tom once watched an entire cricket Test between dissertation drafts — which sport do you love to watch?",
         quote:
-          "He says it helped with pacing. This is possibly correct. Certainly committed…",
+          "His is cricket. He says it helped with pacing. This is possibly correct. Certainly committed.",
       },
       christening: {
         framing:
           "Lily will one day have a sport she watches religiously — which sport do you love to watch?",
         quote:
-          "She'll come to it herself. But it's not too early to introduce the options…",
+          "She'll come to it herself. But it's not too early to introduce the options.",
       },
       achievement: {
         framing:
           "Marcus has watched every marathon broadcast he can find since completing his — which sport do you love to watch?",
         quote:
-          "He notices completely different things now. The sport looks different from inside it…",
+          "His is marathon running now. He notices completely different things. The sport looks different from inside it.",
       },
       recovery: {
         framing:
           "Claire says watching sport helped — the routine of it, the rhythm — which sport do you love to watch?",
         quote:
-          "Something about sport going on regardless. The world continuing in the expected way…",
+          "Hers is swimming. Something about sport going on regardless. The world continuing in the expected way.",
       },
       award: {
         framing:
-          "Amelia uses sport as a classroom metaphor regularly — which sport do you love to watch?",
+          "Dr. Amelia Grant uses sport as a classroom metaphor regularly — which sport do you love to watch?",
         quote:
-          "She means team, strategy, the long season. She applies it to everything…",
+          "Hers is cricket. She means team, strategy, the long season. She applies it to everything.",
       },
       promotion: {
         framing:
           "Kwame says watching sport taught him about team structure — which sport do you love to watch?",
         quote:
-          "Not the strategy. The culture. How teams actually function under pressure…",
+          "His is basketball. Not the strategy. The culture. How teams actually function under pressure.",
       },
       celebration: {
         framing: "Today is pure sport — which sport do you love to watch?",
@@ -2857,78 +2916,80 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda swam every morning until her seventies — which sport do you love to play?",
+          "Belinda had a sport she played every morning until her seventies — which sport do you love to play?",
         quote:
-          "She said it was the only sport where you couldn't have your phone. She loved it for exactly that reason…",
+          "Hers was swimming. She said it was the only sport where you couldn't have your phone. She loved it for exactly that reason.",
       },
       tribute: {
         framing:
-          "David played bowls until his eighties and never admitted it was competitive — which sport do you love to play?",
+          "David played one sport until his eighties and never admitted it was competitive — which sport do you love to play?",
         quote:
-          "It was extremely competitive. Everyone knew. Nobody said anything…",
+          "His was bowls. It was extremely competitive. Everyone knew. Nobody said anything.",
       },
       birthday: {
         framing:
-          "Sarah plays tennis like her life depends on it — which sport do you love to play?",
+          "Sarah plays one sport like her life depends on it — which sport do you love to play?",
         quote:
-          "She once beat someone half her age and spent the following week telling people…",
+          "Hers is tennis. She once beat someone half her age and spent the following week telling people.",
       },
       retirement: {
         framing:
           "David's golf clubs have been in the car for three years — which sport do you love to play?",
-        quote: "The tee times start this month. He's been ready for a while…",
+        quote:
+          "His is golf. The tee times start this month. He's been ready for a while.",
       },
       wedding: {
         framing:
-          "Emma and James tried playing against each other once. They don't discuss it — which sport do you love to play?",
-        quote: "They play doubles now. This was the right decision…",
+          "Emma and James tried playing against each other once — which sport do you love to play?",
+        quote: "They play doubles now. This was the right decision.",
       },
       anniversary: {
         framing:
-          "They played badminton until they didn't — which sport do you love to play?",
+          "Mum and Dad played one sport together for years until they didn't — which sport do you love to play?",
         quote:
-          "Forty years of pretending the score didn't matter. It mattered…",
+          "Theirs was badminton. Forty years of pretending the score didn't matter. It mattered.",
       },
       leaving: {
         framing:
-          "Priya mentioned once that she used to run. Nothing stops her now — which sport do you love to play?",
-        quote: "There's nothing stopping her now. That's the whole point…",
+          "Priya mentioned once that she used to run — which sport do you love to play?",
+        quote:
+          "Hers is running. Nothing stops her now. That's the whole point.",
       },
       graduation: {
         framing:
           "Tom played five-a-side throughout university and said it was where he did his best thinking — which sport do you love to play?",
         quote:
-          "He claims this. His teammates have opinions about whether this is accurate…",
+          "His is five-a-side. He claims this. His teammates have opinions about whether this is accurate.",
       },
       christening: {
         framing:
           "One day Lily will play something and love it — which sport do you love to play?",
         quote:
-          "The sport she finds at eight or ten or fourteen. We're curious already…",
+          "The sport she finds at eight or ten or fourteen. We're curious already.",
       },
       achievement: {
         framing:
           "Marcus will always be a runner now — which sport do you love to play?",
         quote:
-          "The marathon made it permanent. He came back from it different…",
+          "His is running. The marathon made it permanent. He came back from it different.",
       },
       recovery: {
         framing:
-          "Claire got back into swimming this year — which sport do you love to play?",
+          "Claire got back into a sport she'd stopped for a while — which sport do you love to play?",
         quote:
-          "She'd stopped for a while. Coming back was harder than starting. She's very glad she did…",
+          "Hers is swimming. Coming back was harder than starting. She's very glad she did.",
       },
       award: {
         framing:
-          "Amelia coached the school netball team for fifteen years while teaching — which sport do you love to play?",
+          "Dr. Amelia Grant coached the school netball team for fifteen years while teaching — which sport do you love to play?",
         quote:
-          "She says the two weren't unrelated. Teaching and coaching use the same part of her…",
+          "Hers is netball. She says the two weren't unrelated. Teaching and coaching use the same part of her.",
       },
       promotion: {
         framing:
           "Kwame says five-a-side is the team exercise that makes everything else clearer — which sport do you love to play?",
         quote:
-          "Every team problem he's encountered has a five-a-side equivalent. He uses both…",
+          "His is five-a-side. Every team problem he's encountered has a five-a-side equivalent. He uses both.",
       },
       celebration: {
         framing: "What sport do you love to play — and what does it give you?",
@@ -2954,47 +3015,51 @@ const topics: TopicSeed[] = [
     placeholders: {
       memorial: {
         framing:
-          "Belinda walked every day — same route, same pace — which form of exercise do you love?",
+          "Belinda had a form of exercise she never skipped — which form of exercise do you love?",
         quote:
-          "She said the walk was where she did her best thinking. The lane still feels like hers…",
+          "Hers was the daily walk — same route, same pace. She said the walk was where she did her best thinking. The lane still feels like hers.",
       },
       tribute: {
         framing:
           "David walked everywhere and knew every route — which form of exercise do you love?",
         quote:
-          "He could tell you the best way to walk between any two points in the city. Every route considered…",
+          "His was walking. He could tell you the best way between any two points in the city. Every route considered.",
       },
       birthday: {
         framing:
-          "Sarah talks about swimming but actually runs — which form of exercise do you love?",
+          "Sarah talks about swimming but actually does something else entirely — which form of exercise do you love?",
         quote:
-          "She downloaded seventeen fitness apps and uses exactly one of them. The right one…",
+          "Hers is running. She downloaded seventeen fitness apps and uses exactly one of them. The right one.",
       },
       retirement: {
         framing:
-          "David has been saying he'll take up cycling since 2017 — which form of exercise do you love?",
-        quote: "The bike is in the garage. The time is now. No more excuses…",
+          "David has been saying he'll take up one form of exercise since 2017 — which form of exercise do you love?",
+        quote:
+          "His will be cycling. The bike is in the garage. The time is now. No more excuses.",
       },
       wedding: {
         framing:
           "Emma and James have never had an argument that a long walk didn't fix — which form of exercise do you love?",
-        quote: "This is a well-established fact. The walks are very good…",
+        quote:
+          "Theirs is walking. This is a well-established fact. The walks are very good.",
       },
       anniversary: {
         framing:
-          "They've walked every anniversary — a tradition that started on their first date — which form of exercise do you love?",
+          "Mum and Dad have walked every anniversary — a tradition that started on their first date — which form of exercise do you love?",
         quote:
-          "It's still the walk that matters most. It's never changed its purpose…",
+          "Theirs is walking. It's still the walk that matters most. It's never changed its purpose.",
       },
       leaving: {
         framing:
           "Priya has been talking about training for something for years — which form of exercise do you love?",
-        quote: "The diary is now entirely hers. The training can begin…",
+        quote:
+          "Hers will be running. The diary is now entirely hers. The training can begin.",
       },
       graduation: {
         framing:
           "Tom cycled everywhere in Manchester and arrived at everything slightly out of breath — which form of exercise do you love?",
-        quote: "It was a feature, not a bug. He always arrived with energy…",
+        quote:
+          "His is cycling. It was a feature, not a bug. He always arrived with energy.",
       },
       christening: {
         framing:
@@ -3006,25 +3071,25 @@ const topics: TopicSeed[] = [
         framing:
           "Marcus ran eight months to build for one morning — which form of exercise do you love?",
         quote:
-          "Not for the race alone. For what the running gave him all the way through…",
+          "His is running. Not for the race alone. For what the running gave him all the way through.",
       },
       recovery: {
         framing:
           "Claire walked every day this year — which form of exercise do you love?",
         quote:
-          "Not for fitness. For the forward motion. For the being outside in the world…",
+          "Hers is walking. Not for fitness. For the forward motion. For the being outside in the world.",
       },
       award: {
         framing:
-          "Amelia swims before school on Tuesdays — which form of exercise do you love?",
+          "Dr. Amelia Grant swims before school on Tuesdays — which form of exercise do you love?",
         quote:
-          "She's done it for twelve years. She says it sets everything else up…",
+          "Hers is swimming. She's done it for twelve years. She says it sets everything else up.",
       },
       promotion: {
         framing:
           "Kwame runs when he needs to think clearly — which form of exercise do you love?",
         quote:
-          "He doesn't track it. He doesn't time it. That's the whole point. Just movement…",
+          "His is running. He doesn't track it. He doesn't time it. That's the whole point. Just movement.",
       },
       celebration: {
         framing:
