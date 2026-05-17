@@ -53,9 +53,9 @@ export async function sendEventClosed(params: EventClosedParams) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: `Your FavPoll for ${personName} has closed`,
+    subject: `Your favpoll for ${personName} has closed`,
     html: `
-      <p>Your FavPoll for <strong>${personName}</strong> has now closed.</p>
+      <p>Your favpoll for <strong>${personName}</strong> has now closed.</p>
       <p>Total raised: <strong>${GBP.format(totalRaised)}</strong></p>
       <p><a href="${resultsUrl}">View the results</a></p>
     `,

@@ -1,20 +1,20 @@
-# FavPoll — For Will Writers and Estate Planners
+# favpoll — For Will Writers and Estate Planners
 
 ## A new kind of memorial instruction
 
-People plan their funerals. They choose music, readings, flowers. They specify charities for donations. FavPoll gives them one more thing to plan: a meaningful experience for the people who come to say goodbye.
+People plan their funerals. They choose music, readings, flowers. They specify charities for donations. favpoll gives them one more thing to plan: a meaningful experience for the people who come to say goodbye.
 
-A FavPoll can be included in a will or letter of wishes as a specific instruction. When the time comes, an executor or family member follows the instructions, creates the FavPoll, and shares it with guests. Everything the person specified — the charity, the questions, the reveals — is ready to go.
+A favpoll can be included in a will or letter of wishes as a specific instruction. When the time comes, an executor or family member follows the instructions, creates the favpoll, and shares it with guests. Everything the person specified — the charity, the questions, the reveals — is ready to go.
 
 ---
 
 ## What your client leaves behind
 
-A FavPoll instruction in a will or letter of wishes specifies:
+A favpoll instruction in a will or letter of wishes specifies:
 
-**The charity** — where the donations should go. Up to three charities can share the proceeds equally. Your client may already have charitable wishes in their will; FavPoll can direct the memorial collection to the same beneficiaries.
+**The charity** — where the donations should go. Up to three charities can share the proceeds equally. Your client may already have charitable wishes in their will; favpoll can direct the memorial collection to the same beneficiaries.
 
-**The questions** — which topics guests will be asked about. Colour, season, film, song, flower — anything that connects to the person's life and loves. FavPoll provides a curated list of universal topics, or your client can write their own.
+**The questions** — which topics guests will be asked about. Colour, season, film, song, flower — anything that connects to the person's life and loves. favpoll provides a curated list of universal topics, or your client can write their own.
 
 **The reveals** — the answers, held back until after guests have pledged. *"My favourite colour was purple. I wore it to every important occasion."* Written in the person's own words, shown to each guest after they donate.
 
@@ -33,7 +33,7 @@ When the time comes, an executor or family member:
 5. Sets the closing date
 6. Shares the link with family, friends, and guests
 
-The FavPoll handles everything else — payments, real-time rankings, automatic disbursement to the charity when the poll closes.
+The favpoll handles everything else — payments, real-time rankings, automatic disbursement to the charity when the poll closes.
 
 No technical knowledge is required. The process takes around five minutes.
 
@@ -45,7 +45,7 @@ We recommend a simple paragraph in the letter of wishes, alongside other funeral
 
 ---
 
-*I would like a FavPoll created in my memory at favpoll.com. Please use the following instructions:*
+*I would like a favpoll created in my memory at favpoll.com. Please use the following instructions:*
 
 *Charity: [charity name and registered number]*
 
@@ -57,23 +57,23 @@ We recommend a simple paragraph in the letter of wishes, alongside other funeral
 
 ---
 
-Your client can write as many or as few questions as they like. FavPoll also works without reveals — the questions alone create a meaningful collection experience.
+Your client can write as many or as few questions as they like. favpoll also works without reveals — the questions alone create a meaningful collection experience.
 
 ---
 
 ## Wills that include charitable giving
 
-If your client is leaving charitable bequests in their will, FavPoll complements rather than replaces them. A bequest is a private financial gift. A FavPoll is a public, communal act — guests choosing to give in someone's memory. Many families find both meaningful.
+If your client is leaving charitable bequests in their will, favpoll complements rather than replaces them. A bequest is a private financial gift. A favpoll is a public, communal act — guests choosing to give in someone's memory. Many families find both meaningful.
 
-For clients who want their memorial collection to support a specific charity, FavPoll provides a structured, transparent way to do this — with automatic disbursement, full reporting, and a 5% platform fee that covers operational costs.
+For clients who want their memorial collection to support a specific charity, favpoll provides a structured, transparent way to do this — with automatic disbursement, full reporting, and a 5% platform fee that covers operational costs.
 
 ---
 
 ## Partnerships and referrals
 
-FavPoll is available to will writers, solicitors, and estate planners who wish to offer it to clients as part of their funeral planning guidance.
+favpoll is available to will writers, solicitors, and estate planners who wish to offer it to clients as part of their funeral planning guidance.
 
-If you regularly discuss charitable giving or funeral arrangements with clients, we would welcome a conversation about how FavPoll might fit into your practice.
+If you regularly discuss charitable giving or funeral arrangements with clients, we would welcome a conversation about how favpoll might fit into your practice.
 
 Please contact us at partnerships@favpoll.com.
 
@@ -81,6 +81,6 @@ Please contact us at partnerships@favpoll.com.
 
 ## For clients using online will-writing services
 
-If your client is writing their own will through an online service, they can include a FavPoll instruction in their letter of wishes using the template above. No partnership or special arrangement is needed — the executor simply follows the instructions when the time comes.
+If your client is writing their own will through an online service, they can include a favpoll instruction in their letter of wishes using the template above. No partnership or special arrangement is needed — the executor simply follows the instructions when the time comes.
 
-FavPoll is free to create. A 5% platform fee is deducted from donations before disbursement to the charity.
+favpoll is free to create. A 5% platform fee is deducted from donations before disbursement to the charity.

@@ -1,8 +1,8 @@
 ---
 name: favpoll-brand
 description: >
-  FavPoll brand voice, tone, and pitch documents. Use this skill whenever
-  writing or editing any user-facing copy for FavPoll — landing page text,
+  favpoll brand voice, tone, and pitch documents. Use this skill whenever
+  writing or editing any user-facing copy for favpoll — landing page text,
   email templates, UI copy, error messages, onboarding text, charity
   communications, placeholder text, or any other content a user will read.
   Also use when asked about the product's purpose, fee model, reveal mechanic,
@@ -10,11 +10,11 @@ description: >
   wording, tone, messaging, placeholders, or content.
 ---
 
-# FavPoll Brand and Voice
+# favpoll Brand and Voice
 
 Read the relevant reference files before writing any copy:
 
-- `references/founding-story.md` — why FavPoll exists, the 15-year origin, the reveal mechanic, the will-writing angle
+- `references/founding-story.md` — why favpoll exists, the 15-year origin, the reveal mechanic, the will-writing angle
 - `references/charity-pitch.md` — what charities need to know, fee model, compliance, planned giving
 - `references/organiser-pitch.md` — the emotional case for organisers, the reveal experience, will instructions
 - `references/will-writers-pitch.md` — for solicitors and estate planners, letter of wishes template
@@ -23,13 +23,13 @@ Read the relevant reference files before writing any copy:
 
 ## Voice in one paragraph
 
-FavPoll speaks with warmth and quiet dignity. It is never corporate, never salesy, never cute. It understands that it will be used at funerals and it holds that responsibility seriously — while also knowing it will be used at birthdays and retirements where a lighter touch is right. The tone shifts with the occasion but the character is constant: thoughtful, human, honest.
+favpoll speaks with warmth and quiet dignity. It is never corporate, never salesy, never cute. It understands that it will be used at funerals and it holds that responsibility seriously — while also knowing it will be used at birthdays and retirements where a lighter touch is right. The tone shifts with the occasion but the character is constant: thoughtful, human, honest.
 
 ---
 
 ## Core product facts — always accurate
 
-**What FavPoll is:**
+**What favpoll is:**
 A charitable polling platform for life events. Guests pledge real money against their favourite things. Rankings update live. Proceeds go to charity. Every pledge contributes to a permanent all-time record of human favourites.
 
 **The reveal mechanic:**
@@ -38,7 +38,7 @@ The quote field on each event poll is a reveal — shown to guests only after th
 This is not a "pay to unlock" mechanic. Frame it as something waiting for them, not something gated.
 
 **The dual purpose:**
-FavPoll is genuinely both things simultaneously — a fundraising platform and a data project. Neither is a pretence. In user-facing copy, lead with whichever is more relevant to the audience. For organisers and guests: fundraising and experience. For press or investors: the data story.
+favpoll is genuinely both things simultaneously — a fundraising platform and a data project. Neither is a pretence. In user-facing copy, lead with whichever is more relevant to the audience. For organisers and guests: fundraising and experience. For press or investors: the data story.
 
 **Fee model:**
 5% platform fee, deducted before disbursement. 95% reaches the charity. Stripe processes payments. Fee always shown to donors before confirmation. Never hide it, never apologise for it — frame it as what makes the platform sustainable.
@@ -51,15 +51,15 @@ FavPoll is genuinely both things simultaneously — a fundraising platform and a
 
 **Shared fund:** donors can top up a communal pot so others (e.g. children) can participate without paying. Privacy preserved — nobody knows who used it.
 
-**Will instructions:** a FavPoll can be specified in a will or letter of wishes. The person writes the questions and reveals in advance. An executor creates the FavPoll when the time comes.
+**Will instructions:** a favpoll can be specified in a will or letter of wishes. The person writes the questions and reveals in advance. An executor creates the favpoll when the time comes.
 
-**All-time rankings:** shown publicly once sufficient data exists across topics. The long-term vision is for the all-time rankings page to become FavPoll's home page — the record first, the platform second.
+**All-time rankings:** shown publicly once sufficient data exists across topics. The long-term vision is for the all-time rankings page to become favpoll's home page — the record first, the platform second.
 
 ---
 
 ## The framing / reveal pattern
 
-This is the most important copy pattern in FavPoll. Get it right every time.
+This is the most important copy pattern in favpoll. Get it right every time.
 
 **The framing question withholds. The reveal discloses.**
 
@@ -146,7 +146,7 @@ e.g. "Rebecca's favourite colour was purple — what's yours?" — this is a val
 - Over-promise on the data story to ordinary users.
 - Use the word "simply" — it patronises.
 - Frame the reveal as "pay to unlock" — it is a gift, not a gate.
-- Use "we" for FavPoll in organiser-facing copy — say "FavPoll" or restructure.
+- Use "we" for favpoll in organiser-facing copy — say "favpoll" or restructure.
 
 ---
 
@@ -182,14 +182,14 @@ When writing for the platform generally: acknowledge the full range without lead
 
 Always transparent, never apologetic:
 
-✓ "A 5% platform fee covers FavPoll's costs. The remaining 95% reaches your chosen charity in full."
+✓ "A 5% platform fee covers favpoll's costs. The remaining 95% reaches your chosen charity in full."
 ✗ "We take a small fee to keep the lights on." (too casual)
 
 ---
 
-## What FavPoll is not
+## What favpoll is not
 
-Never describe FavPoll as:
+Never describe favpoll as:
 - A social network or community platform
 - A gamified experience
 - A prediction market

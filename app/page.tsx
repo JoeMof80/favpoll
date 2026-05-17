@@ -164,7 +164,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-border px-6 py-6">
         <div className="mx-auto flex max-w-330 items-center justify-between">
-          <span className="text-sm font-semibold text-foreground">FavPoll</span>
+          <span className="text-sm font-semibold text-foreground">favpoll</span>
           <span className="text-xs text-muted-foreground">
             Every pledge goes to charity
           </span>

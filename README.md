@@ -1,4 +1,4 @@
-# FavPoll
+# favpoll
 
 A charitable polling platform where guests share their favourite things while pledging donations to charity. Organisers create events for special occasions — memorials, birthdays, retirements, weddings — each with a customised poll question. Guests pledge money and split it across their favourite answers, building a permanent record of what people love most while raising funds for good causes.
 

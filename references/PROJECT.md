@@ -1,8 +1,8 @@
-# FavPoll — Project Document
+# favpoll — Project Document
 
-## What is FavPoll?
+## What is favpoll?
 
-FavPoll is a charitable polling platform for life events — memorials, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks poll topics (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
+favpoll is a charitable polling platform for life events — memorials, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks poll topics (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
 
 Every pledge also feeds a permanent all-time universal ranking of human favourites — a collectively funded, financially weighted record of what people love most, built through acts of generosity.
 
@@ -25,7 +25,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests
 - **Database:** Supabase (Postgres + Realtime)
-- **Payments:** Stripe (marketplace model — FavPoll collects, disburses to charities)
+- **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities)
 - **Email:** Resend (`lib/email.ts`)
 - **Package manager:** pnpm only — never npm or yarn
 - **Hosting:** Vercel

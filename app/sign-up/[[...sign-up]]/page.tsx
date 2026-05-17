@@ -6,7 +6,7 @@ export default function SignUpPage() {
       <div className="hidden flex-1 items-center justify-end p-10 lg:flex">
         <div className="max-w-sm space-y-8">
           <div>
-            <span className="text-base font-medium text-primary">FavPoll</span>
+            <span className="text-base font-medium text-primary">favpoll</span>
           </div>
           <ul className="space-y-7">
             {[

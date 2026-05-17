@@ -1,15 +1,15 @@
 ---
 name: favpoll-context
 description: >
-  Complete project context for the FavPoll application. Use this skill at the
-  start of every Claude Code session working on FavPoll, or whenever you need
+  Complete project context for the favpoll application. Use this skill at the
+  start of every Claude Code session working on favpoll, or whenever you need
   to understand the project architecture, database schema, design decisions,
-  or conventions. Trigger whenever the user mentions FavPoll, asks about the
+  or conventions. Trigger whenever the user mentions favpoll, asks about the
   schema, asks about a component, or begins any task on this codebase. Also
   use when the user asks to update the project document itself.
 ---
 
-# FavPoll Project Context
+# favpoll Project Context
 
 Read `references/PROJECT.md` for the full project document before doing
 anything else. It contains the complete schema, stack, design system,
