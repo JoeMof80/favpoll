@@ -8,17 +8,17 @@ import type { CanvasPoll, TopicItem } from "@/types"
 
 type Props = {
   poll: CanvasPoll
-  masterItems: TopicItem[]
+  canonicalItems: TopicItem[]
   onUpdatePoll: (updates: Partial<CanvasPoll>) => void
 }
 
 type UnprioritizedEntry =
-  | { type: "master"; id: string; label: string }
+  | { type: "canonical"; id: string; label: string }
   | { type: "custom"; index: number; label: string }
 
 export function TopicPriorityEditor({
   poll,
-  masterItems,
+  canonicalItems,
   onUpdatePoll,
 }: Props) {
   const [addingCustom, setAddingCustom] = useState(false)
@@ -26,9 +26,9 @@ export function TopicPriorityEditor({
   const [customError, setCustomError] = useState("")
 
   const unprioritizedEntries: UnprioritizedEntry[] = [
-    ...masterItems
+    ...canonicalItems
       .filter((i) => !poll.prioritizedItemIds.includes(i.id))
-      .map((i) => ({ type: "master" as const, id: i.id, label: i.label })),
+      .map((i) => ({ type: "canonical" as const, id: i.id, label: i.label })),
     ...poll.curatedCustomLabels
       .filter((l) => !poll.prioritizedCustomLabels.includes(l))
       .map((label) => ({
@@ -47,7 +47,7 @@ export function TopicPriorityEditor({
     }
     const lowerLabel = label.toLowerCase()
     const isDuplicate =
-      masterItems.some((i) => i.label.toLowerCase() === lowerLabel) ||
+      canonicalItems.some((i) => i.label.toLowerCase() === lowerLabel) ||
       poll.curatedCustomLabels.some((l) => l.toLowerCase() === lowerLabel)
     if (isDuplicate) {
       setCustomError("This option already exists")
@@ -86,9 +86,9 @@ export function TopicPriorityEditor({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {/* Prioritised master items */}
+        {/* Prioritised canonical items */}
         {poll.prioritizedItemIds.map((id, i) => {
-          const item = masterItems.find((m) => m.id === id)
+          const item = canonicalItems.find((m) => m.id === id)
           if (!item) return null
           return (
             <Button
@@ -138,7 +138,7 @@ export function TopicPriorityEditor({
 
         {/* Unprioritised entries */}
         {unprioritizedEntries.map((entry) =>
-          entry.type === "master" ? (
+          entry.type === "canonical" ? (
             <Button
               key={entry.id}
               type="button"
@@ -214,8 +214,8 @@ export function TopicPriorityEditor({
 
       {poll.curatedCustomLabels.length > 0 && (
         <p className="text-xs text-amber-600 dark:text-amber-500">
-          Custom options will appear in this poll but must be validated before
-          they can appear in the all-time rankings.
+          Custom options will appear in this poll but must be included before
+          they can contribute to the record.
         </p>
       )}
     </div>

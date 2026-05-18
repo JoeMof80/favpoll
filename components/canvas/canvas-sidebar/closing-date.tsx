@@ -197,7 +197,6 @@ export function ClosingDate({
         onTimeChange={(t) => onClosesAtChange(joinDateTime(closingDate, t))}
         minDate={today}
         disabled={isBlocked}
-        {...(hardCloseDate && !isBlocked ? { minDate: today } : {})}
       />
 
       {extensionCount === 1 && (

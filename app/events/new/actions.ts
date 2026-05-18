@@ -10,7 +10,7 @@ type CustomTopic = {
 
 type InfiniteItems = {
   prioritizedItemIds: string[]
-  masterItemIds: string[]
+  canonicalItemIds: string[]
   customLabels: string[]
 }
 
@@ -18,13 +18,13 @@ type PollInput = {
   topicId: string | null
   customTopic: CustomTopic | null
   framing: string | null
-  quote: string | null
+  reveal: string | null
   infiniteItems: InfiniteItems | null
 }
 
 type CreateEventInput = {
-  personName: string
-  personBio: string | null
+  protagonistName: string
+  protagonistBio: string | null
   photoUrl: string | null
   dateLabel: string | null
   occasion: string
@@ -60,20 +60,20 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
 
   const supabase = createAdminClient()
 
-  await supabase.storage.createBucket('persons', { public: true }).catch(() => null)
+  await supabase.storage.createBucket('protagonists', { public: true }).catch(() => null)
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
   const path = `${userId}/${Date.now()}.${ext}`
   const bytes = await file.arrayBuffer()
 
-  const { error } = await supabase.storage.from('persons').upload(path, bytes, {
+  const { error } = await supabase.storage.from('protagonists').upload(path, bytes, {
     contentType: file.type,
     upsert: true,
   })
 
   if (error) throw new Error(`Upload failed: ${error.message}`)
 
-  const { data } = supabase.storage.from('persons').getPublicUrl(path)
+  const { data } = supabase.storage.from('protagonists').getPublicUrl(path)
   return data.publicUrl
 }
 
@@ -98,7 +98,7 @@ async function createPollForEvent(
     const itemsToInsert = poll.customTopic.items
       .map((l) => l.trim())
       .filter(Boolean)
-      .map((label) => ({ topic_id: topicId!, label, source: 'organiser', is_master: false }))
+      .map((label) => ({ topic_id: topicId!, label, source: 'organiser', is_canonical: false }))
 
     if (itemsToInsert.length > 0) {
       const { data: newItems } = await supabase.from('topic_items').insert(itemsToInsert).select('id')
@@ -114,7 +114,7 @@ async function createPollForEvent(
       event_id: eventId,
       topic_id: topicId,
       personal_framing: poll.framing?.trim() || null,
-      personal_quote: poll.quote?.trim() || null,
+      personal_reveal: poll.reveal?.trim() || null,
     })
     .select('id')
     .single()
@@ -133,8 +133,8 @@ async function createPollForEvent(
   }
 
   if (!poll.customTopic && poll.infiniteItems) {
-    const { prioritizedItemIds, masterItemIds, customLabels } = poll.infiniteItems
-    const allItemIds = [...masterItemIds]
+    const { prioritizedItemIds, canonicalItemIds, customLabels } = poll.infiniteItems
+    const allItemIds = [...canonicalItemIds]
 
     if (customLabels.length > 0) {
       const { data: newCustomItems } = await supabase
@@ -144,7 +144,7 @@ async function createPollForEvent(
             topic_id: topicId!,
             label: label.trim(),
             source: 'organiser',
-            is_master: false,
+            is_canonical: false,
           })),
         )
         .select('id')
@@ -173,21 +173,21 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
   const supabase = createAdminClient()
   await ensureUser(supabase, userId)
 
-  const personRow: Record<string, unknown> = {
-    name: input.personName.trim(),
-    bio: input.personBio || null,
+  const protagonistRow: Record<string, unknown> = {
+    name: input.protagonistName.trim(),
+    bio: input.protagonistBio || null,
     photo_url: input.photoUrl || null,
     date_label: input.dateLabel || null,
     created_by: userId,
   }
 
-  const { data: person, error: personErr } = await supabase
-    .from('persons')
-    .insert(personRow)
+  const { data: protagonist, error: protagonistErr } = await supabase
+    .from('protagonists')
+    .insert(protagonistRow)
     .select('id')
     .single()
 
-  if (personErr || !person) throw new Error(`Failed to create person: ${personErr?.message}`)
+  if (protagonistErr || !protagonist) throw new Error(`Failed to create protagonist: ${protagonistErr?.message}`)
 
   const closesAt = new Date(input.closesAt).toISOString()
   const hardCloseAt = new Date(input.closesAt)
@@ -196,7 +196,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
   const { data: event, error: eventErr } = await supabase
     .from('events')
     .insert({
-      person_id: person.id,
+      protagonist_id: protagonist.id,
       occasion: input.occasion,
       occasion_label: input.occasionLabel,
       created_by: userId,

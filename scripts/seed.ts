@@ -4513,7 +4513,7 @@ async function seedTopicItems() {
       .map((label) => ({
         topic_id: topicId,
         label,
-        is_master: true,
+        is_canonical: true,
         source: "seed",
       }))
 

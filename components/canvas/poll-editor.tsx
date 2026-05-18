@@ -42,18 +42,18 @@ export function PollEditor({
   const topicTitle = poll.topicIsCustom
     ? poll.customTopicTitle
     : (topic?.title ?? "")
-  const masterItems = isCustomSaved
+  const canonicalItems = isCustomSaved
     ? (topic?.topic_items ?? [])
-    : topic ? topic.topic_items.filter((i) => i.is_master) : []
+    : topic ? topic.topic_items.filter((i) => i.is_canonical) : []
 
   const topicPlaceholders = topic?.placeholders
   const personFirstName = placeholders.name.split(" ")[0]
   const substituteNames = (s: string) => s.replace(/\{name\}/g, personFirstName)
   const topicReveal = TOPIC_REVEAL_PLACEHOLDERS[topicTitle]
   const topicRevealSubstituted = topicReveal
-    ? { framing: substituteNames(topicReveal.framing), quote: substituteNames(topicReveal.quote) }
+    ? { framing: substituteNames(topicReveal.framing), reveal: substituteNames(topicReveal.reveal) }
     : null
-  const occasionFallback = { framing: placeholders.framing, quote: placeholders.quote }
+  const occasionFallback = { framing: placeholders.framing, reveal: placeholders.reveal }
   const pollPlaceholders = topicPlaceholders
     ? (topicPlaceholders[occasion] ?? topicPlaceholders["default"] ?? topicRevealSubstituted ?? occasionFallback)
     : (topicRevealSubstituted ?? occasionFallback)
@@ -68,10 +68,10 @@ export function PollEditor({
             hasTopicSelected={!!(poll.topicId || poll.topicIsCustom)}
             topicIsCustom={poll.topicIsCustom}
             framing={poll.framing}
-            quote={poll.quote}
+            reveal={poll.reveal}
             placeholders={pollPlaceholders}
             onFramingChange={(v) => onUpdatePoll({ framing: v })}
-            onQuoteChange={(v) => onUpdatePoll({ quote: v })}
+            onRevealChange={(v) => onUpdatePoll({ reveal: v })}
             onTopicTitleChange={(v) => onUpdatePoll({ customTopicTitle: v })}
             onChangeTopic={() =>
               onUpdatePoll({
@@ -137,7 +137,7 @@ export function PollEditor({
       {!poll.topicIsCustom && isInfinite && topic && !poll.pickingTopic && (
         <TopicPriorityEditor
           poll={poll}
-          masterItems={masterItems}
+          canonicalItems={canonicalItems}
           onUpdatePoll={onUpdatePoll}
         />
       )}

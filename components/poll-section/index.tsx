@@ -15,7 +15,7 @@ type Props = {
   isClosed: boolean
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
-  personName: string
+  protagonistName: string
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
   onAddItem?: (label: string) => Promise<void>
 }
@@ -26,7 +26,7 @@ export function PollSection({
   isClosed,
   hasPledged,
   pledgeJustConfirmed,
-  personName,
+  protagonistName,
   onSelectionsChange,
   onAddItem,
 }: Props) {
@@ -40,8 +40,8 @@ export function PollSection({
     handleSelectionsChange,
   } = usePollSection({ pollId: poll.id, hasPledged, isClosed, pledgeJustConfirmed, onSelectionsChange })
 
-  const personFirstName = personName.split(" ")[0]
-  const quote = poll.personal_quote ?? null
+  const personFirstName = protagonistName.split(" ")[0]
+  const reveal = poll.personal_reveal ?? null
 
   return (
     <section aria-labelledby={`poll-heading-${poll.id}`} className="space-y-4">
@@ -49,21 +49,21 @@ export function PollSection({
         pollId={poll.id}
         topicTitle={poll.topics.title}
         framing={poll.personal_framing ?? null}
-        quote={null}
+        reveal={null}
       />
 
       {/* Results view */}
       {view === "results" && (
         <>
           {/* Reveal — shown immediately after pledging, before rankings */}
-          {pledgeConfirmed && quote && (
+          {pledgeConfirmed && reveal && (
             <blockquote
               className="border-l-4 border-primary/40 pl-4 text-base text-primary/80 italic"
               role="status"
               aria-label={`${personFirstName}'s reveal`}
               aria-live="polite"
             >
-              &ldquo;{quote}&rdquo;
+              &ldquo;{reveal}&rdquo;
             </blockquote>
           )}
 
@@ -121,7 +121,7 @@ export function PollSection({
                 isInfinite={!poll.topics.is_finite}
                 onAddItem={onAddItem}
               />
-              {quote && !hasPledged && !pledgeConfirmed && (
+              {reveal && !hasPledged && !pledgeConfirmed && (
                 <p
                   className="text-center text-xs text-muted-foreground"
                   aria-live="polite"

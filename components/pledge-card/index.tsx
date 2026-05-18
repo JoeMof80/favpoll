@@ -102,7 +102,7 @@ export function PledgeCard(props: Props) {
                 className="w-56 text-xs leading-relaxed"
               >
                 Pledge the amount that reflects how strongly you feel about your
-                favourites. Donate more to the shared fund, if you wish. All
+                favourites. Add more to the shared fund, if you wish. All
                 pledges are anonymous.
               </PopoverContent>
             </Popover>

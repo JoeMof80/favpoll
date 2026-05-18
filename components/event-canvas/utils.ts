@@ -3,8 +3,8 @@ import type { CanvasPoll } from "@/types"
 export const MAX_CHARITIES = 3
 
 export type CanvasState = {
-  personName: string
-  personBio: string
+  protagonistName: string
+  protagonistBio: string
   dateLabel: string
   occasion: string
   occasionLabel: string
@@ -25,7 +25,7 @@ export function newPoll(topicId = ""): CanvasPoll {
     customTopicTitle: "",
     customTopicItems: [],
     framing: "",
-    quote: "",
+    reveal: "",
     prioritizedItemIds: [],
     prioritizedCustomLabels: [],
     curatedCustomLabels: [],

@@ -25,7 +25,7 @@ const HOW_IT_WORKS = [
   {
     step: 3,
     heading: "Guests make a pledge",
-    body: "Each guest pledges a donation and splits it across their favourite options.",
+    body: "Each guest makes a pledge and splits it across their favourite options.",
   },
   {
     step: 4,
@@ -48,14 +48,14 @@ export default function HomePage() {
       <section className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center px-6 py-20">
         <div className="mx-auto max-w-xl text-center">
           <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium tracking-widest text-primary uppercase">
-            Donate with meaning
+            Pledge with meaning
           </span>
           <h1 className="mt-5 text-5xl leading-tight font-bold tracking-tight text-foreground">
             Share what you love.
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-            Create a charitable poll for any occasion. Guests pledge donations
-            against their favourite things — and every pledge builds a permanent
+            Create a charitable poll for any occasion. Guests pledge against
+            their favourite things — and every pledge builds a permanent
             record of what people cherish most.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

@@ -60,7 +60,7 @@ export function EventContent({
     <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
       {/* Left — hero + polls */}
       <div>
-        <EventHero event={event} person={event.persons} />
+        <EventHero event={event} protagonist={event.protagonists} />
 
         {pollsWithItems.length > 0 ? (
           <div className="space-y-12">
@@ -73,7 +73,7 @@ export function EventContent({
                 isClosed={isClosed}
                 hasPledged={existingSet.has(poll.id)}
                 pledgeJustConfirmed={confirmedPollIds.has(poll.id)}
-                personName={event.persons.name}
+                protagonistName={event.protagonists.name}
                 onSelectionsChange={handleSelectionsChange}
                 onAddItem={addItemHandler(poll)}
               />

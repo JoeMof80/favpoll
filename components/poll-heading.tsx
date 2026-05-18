@@ -10,7 +10,7 @@ type ViewProps = {
   pollId: string
   topicTitle: string
   framing: string | null
-  quote: string | null
+  reveal: string | null
 }
 
 type EditProps = {
@@ -19,10 +19,10 @@ type EditProps = {
   hasTopicSelected: boolean
   topicIsCustom?: boolean
   framing: string
-  quote: string
-  placeholders: Pick<OccasionPlaceholders, "framing" | "quote">
+  reveal: string
+  placeholders: Pick<OccasionPlaceholders, "framing" | "reveal">
   onFramingChange: (v: string) => void
-  onQuoteChange: (v: string) => void
+  onRevealChange: (v: string) => void
   onTopicTitleChange?: (v: string) => void
   onChangeTopic: () => void
 }
@@ -122,7 +122,7 @@ export function PollHeading(props: Props) {
         </p>
       ) : null}
 
-      {/* Quote / reveal — edit mode only */}
+      {/* Reveal — edit mode only */}
       {isEdit && props.hasTopicSelected ? (
         <div className="border-l-4 border-primary/40 pl-4">
           <p className="mb-1.5 text-[11px] text-muted-foreground">
@@ -133,12 +133,12 @@ export function PollHeading(props: Props) {
               aria-hidden
               className="invisible w-full text-base wrap-break-word whitespace-pre-wrap text-primary/80 italic"
             >
-              {props.quote || "\u00A0"}
+              {props.reveal || "\u00A0"}
             </p>
             <textarea
-              value={props.quote}
-              onChange={(e) => props.onQuoteChange(e.target.value)}
-              placeholder={props.placeholders.quote}
+              value={props.reveal}
+              onChange={(e) => props.onRevealChange(e.target.value)}
+              placeholder={props.placeholders.reveal}
               className="absolute inset-0 h-full w-full resize-none appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-base text-primary/60 italic transition-colors outline-none placeholder:text-muted-foreground/40 focus:border-primary/40 focus:text-primary/80"
             />
             <Pencil

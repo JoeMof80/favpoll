@@ -9,26 +9,26 @@ import {
 } from "@/lib/occasions"
 import { getEventHeadline } from "@/lib/display"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
-import type { Event, Person } from "@/types"
+import type { Event, Protagonist } from "@/types"
 
 type ViewProps = {
   mode?: "view"
   event: Event
-  person: Person
+  protagonist: Protagonist
 }
 
 type EditProps = {
   mode: "edit"
   occasion: string
   occasionLabel: string
-  personName: string
-  personBio: string
+  protagonistName: string
+  protagonistBio: string
   dateLabel: string
   initialPhotoUrl?: string | null
   placeholders: Pick<OccasionPlaceholders, "name" | "bio">
   onOccasionLabelChange: (v: string) => void
-  onPersonNameChange: (v: string) => void
-  onPersonBioChange: (v: string) => void
+  onProtagonistNameChange: (v: string) => void
+  onProtagonistBioChange: (v: string) => void
   onDateLabelChange: (v: string) => void
   onPhotoUrlChange: (url: string) => void
 }
@@ -51,8 +51,8 @@ export function EventHero(props: Props) {
     : getEventHeadline({
         occasion: props.event.occasion,
         occasionLabel: props.event.occasion_label,
-        personName: props.person.name,
-        dateLabel: props.person.date_label,
+        name: props.protagonist.name,
+        dateLabel: props.protagonist.date_label,
       })
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -74,10 +74,10 @@ export function EventHero(props: Props) {
   }
 
   // Derived view-mode values
-  const person = isEdit ? null : props.person
+  const protagonist = isEdit ? null : props.protagonist
 
   const editInitials = isEdit
-    ? props.personName
+    ? props.protagonistName
         .split(" ")
         .filter(Boolean)
         .slice(0, 2)
@@ -149,11 +149,11 @@ export function EventHero(props: Props) {
           </label>
         ) : (
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-border">
-            {person?.photo_url ? (
+            {protagonist?.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={person.photo_url}
-                alt={person.name}
+                src={protagonist.photo_url}
+                alt={protagonist.name}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -183,7 +183,7 @@ export function EventHero(props: Props) {
                   <rect width="100%" height="100%" fill="url(#hatch)" />
                 </svg>
                 <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-muted-foreground">
-                  {person?.name
+                  {protagonist?.name
                     .split(" ")
                     .filter(Boolean)
                     .slice(0, 2)
@@ -221,8 +221,8 @@ export function EventHero(props: Props) {
             <div className="relative">
               <input
                 type="text"
-                value={props.personName}
-                onChange={(e) => props.onPersonNameChange(e.target.value)}
+                value={props.protagonistName}
+                onChange={(e) => props.onProtagonistNameChange(e.target.value)}
                 placeholder={props.placeholders.name}
                 className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-6 text-4xl leading-tight font-medium tracking-tight text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40 sm:text-5xl"
               />
@@ -230,7 +230,7 @@ export function EventHero(props: Props) {
             </div>
           ) : (
             <h1 className="border-b border-transparent text-4xl leading-tight font-medium tracking-tight text-foreground sm:text-5xl">
-              {person?.name}
+              {protagonist?.name}
             </h1>
           )}
 
@@ -262,19 +262,19 @@ export function EventHero(props: Props) {
                 aria-hidden="true"
                 className="invisible min-h-13 w-full border-b-2 border-dotted border-border text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
               >
-                {(props as EditProps).personBio || "\u00A0"}
+                {(props as EditProps).protagonistBio || "\u00A0"}
               </p>
               <textarea
-                value={(props as EditProps).personBio}
-                onChange={(e) => props.onPersonBioChange(e.target.value)}
+                value={(props as EditProps).protagonistBio}
+                onChange={(e) => props.onProtagonistBioChange(e.target.value)}
                 placeholder={props.placeholders.bio}
                 className="absolute inset-0 h-full w-full resize-none appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-base leading-relaxed text-muted-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
               />
               <Pencil className="pointer-events-none absolute right-0 top-2 h-3.5 w-3.5 text-muted-foreground/25" aria-hidden />
             </div>
-          ) : props.person.bio ? (
+          ) : props.protagonist.bio ? (
             <p className="mt-4 w-full max-w-prose border-b border-transparent text-base leading-relaxed text-muted-foreground">
-              {props.person.bio}
+              {props.protagonist.bio}
             </p>
           ) : null}
         </div>

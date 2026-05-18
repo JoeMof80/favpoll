@@ -32,7 +32,7 @@ export type TopicItem = {
   label: string
   all_time_pledged: number
   all_time_count: number
-  is_master: boolean
+  is_canonical: boolean
   source: 'seed' | 'organiser' | 'guest'
   event_count: number
   total_pledge_count: number
@@ -41,7 +41,7 @@ export type TopicItem = {
   event_poll_item_id?: string
 }
 
-export type Person = {
+export type Protagonist = {
   id: string
   name: string
   date_label: string | null
@@ -70,7 +70,7 @@ export type OccasionType =
 
 export type Event = {
   id: string
-  person_id: string
+  protagonist_id: string
   occasion: OccasionType
   occasion_label: string | null
   created_by: string
@@ -90,7 +90,7 @@ export type EventPoll = {
   event_id: string
   topic_id: string
   personal_framing: string | null
-  personal_quote: string | null
+  personal_reveal: string | null
   created_at: string
 }
 
@@ -161,7 +161,7 @@ export type TopicCategory = {
 
 // Joined types for UI
 export type EventWithDetails = Event & {
-  persons: Person
+  protagonists: Protagonist
   event_charities: { charities: Charity }[]
 }
 
@@ -174,7 +174,7 @@ export type PledgeWithAllocations = Pledge & {
 }
 
 // Canvas types — shared between EventCanvas sub-components and server pages
-export type TopicPlaceholders = Record<string, { framing: string; quote: string }>
+export type TopicPlaceholders = Record<string, { framing: string; reveal: string }>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[]
@@ -190,7 +190,7 @@ export type CanvasPoll = {
   customTopicTitle: string
   customTopicItems: string[]
   framing: string
-  quote: string
+  reveal: string
   prioritizedItemIds: string[]
   prioritizedCustomLabels: string[]
   curatedCustomLabels: string[]
@@ -198,8 +198,8 @@ export type CanvasPoll = {
 }
 
 export type CanvasSubmitData = {
-  personName: string
-  personBio?: string | null
+  protagonistName: string
+  protagonistBio?: string | null
   dateLabel: string | null
   photoUrl?: string | null
   occasion: string
@@ -216,14 +216,14 @@ export type CanvasSubmitData = {
     customTopicTitle: string
     customTopicItems: string[]
     framing: string | null
-    quote: string | null
-    infiniteItems: { prioritizedItemIds: string[]; masterItemIds: string[]; customLabels: string[] } | null
+    reveal: string | null
+    infiniteItems: { prioritizedItemIds: string[]; canonicalItemIds: string[]; customLabels: string[] } | null
   }[]
 }
 
 export type CanvasInitialData = {
-  personName?: string
-  personBio?: string
+  protagonistName?: string
+  protagonistBio?: string
   dateLabel?: string
   occasion?: string
   occasionLabel?: string

@@ -59,7 +59,7 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
       </div>
 
       <ol
-        aria-label={`${topicTitle} — all-time rankings`}
+        aria-label={`${topicTitle} — the record`}
         aria-live="polite"
         className="space-y-2"
       >

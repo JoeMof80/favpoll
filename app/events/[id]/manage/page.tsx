@@ -26,7 +26,7 @@ export default async function ManageEventPage({ params }: Props) {
   const { data: event } = await supabase
     .from("events")
     .select(
-      "*, persons!events_person_id_fkey(*), event_charities(charities(name))"
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name))"
     )
     .eq("id", id)
     .single()
@@ -85,7 +85,7 @@ export default async function ManageEventPage({ params }: Props) {
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium text-foreground">
-            {typedEvent.persons.name}
+            {typedEvent.protagonists.name}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {typedEvent.event_charities

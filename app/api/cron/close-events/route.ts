@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   // Find all events that have passed closes_at but haven't been closed yet
   const { data: events, error } = await supabase
     .from('events')
-    .select('id, created_by, persons!events_person_id_fkey(name)')
+    .select('id, created_by, protagonists!events_protagonist_id_fkey(name)')
     .lte('closes_at', now)
     .is('closed_at', null)
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
   const raisedByEvent: Record<string, number> = {}
   for (const row of pledgeTotals ?? []) {
-    const eventId = (row.event_polls as { event_id: string }).event_id
+    const eventId = (row.event_polls as unknown as { event_id: string }).event_id
     raisedByEvent[eventId] = (raisedByEvent[eventId] ?? 0) + (row.total_amount ?? 0)
   }
 
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
 
   for (const event of events) {
     const totalRaised = raisedByEvent[event.id] ?? 0
-    const personName = (event.persons as { name: string } | null)?.name ?? 'someone special'
+    const protagonistName = (event.protagonists as unknown as { name: string } | null)?.name ?? 'someone special'
 
     const { error: updateErr } = await supabase
       .from('events')
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       try {
         await sendEventClosed({
           to: organiser.email,
-          personName,
+          protagonistName,
           totalRaised,
           eventId: event.id,
         })

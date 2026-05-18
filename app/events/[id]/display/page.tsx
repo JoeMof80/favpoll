@@ -14,7 +14,7 @@ export default async function DisplayPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, persons!events_person_id_fkey(*), event_charities(charities(name))")
+    .select("*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name))")
     .eq("id", id)
     .single()
 
@@ -60,7 +60,7 @@ export default async function DisplayPage({ params }: Props) {
   const displayPolls = polls.map((poll) => ({
     id: poll.id,
     personal_framing: poll.personal_framing ?? null,
-    personal_quote: poll.personal_quote ?? null,
+    personal_reveal: poll.personal_reveal ?? null,
     topic: {
       id: poll.topics?.id ?? poll.topic_id,
       title: poll.topics?.title ?? "",
@@ -78,8 +78,8 @@ export default async function DisplayPage({ params }: Props) {
   return (
     <DisplayScreen
       eventId={id}
-      personName={event.persons.name}
-      dateLabel={event.persons.date_label ?? null}
+      protagonistName={event.protagonists.name}
+      dateLabel={event.protagonists.date_label ?? null}
       occasionLabel={event.occasion_label ?? null}
       description={event.description ?? null}
       occasion={event.occasion}

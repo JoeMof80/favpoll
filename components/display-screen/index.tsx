@@ -14,7 +14,7 @@ const ROW_HEIGHT = 72
 type DisplayPoll = {
   id: string
   personal_framing: string | null
-  personal_quote: string | null
+  personal_reveal: string | null
   topic: {
     id: string
     title: string
@@ -24,7 +24,7 @@ type DisplayPoll = {
 
 type Props = {
   eventId: string
-  personName: string
+  protagonistName: string
   dateLabel: string | null
   occasionLabel: string | null
   description: string | null
@@ -110,11 +110,11 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
       >
         {poll.personal_framing ?? poll.topic.title}
       </h2>
-      {poll.personal_quote && (
+      {poll.personal_reveal && (
         <p className="mb-4 border-l-2 pl-3 text-sm italic text-muted-foreground"
           style={{ borderColor: "#EEEDFE" }}
         >
-          {poll.personal_quote}
+          {poll.personal_reveal}
         </p>
       )}
       <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -142,7 +142,7 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
 
 export function DisplayScreen({
   eventId,
-  personName,
+  protagonistName,
   dateLabel,
   occasionLabel,
   description,
@@ -185,7 +185,7 @@ export function DisplayScreen({
   const headline = getEventHeadline({
     occasion,
     occasionLabel,
-    personName,
+    name: protagonistName,
     dateLabel,
   })
 
@@ -203,7 +203,7 @@ export function DisplayScreen({
             </p>
           )}
           <h1 className="mb-4 text-5xl font-medium tracking-tight text-foreground">
-            {personName}
+            {protagonistName}
           </h1>
           {headline.suffix && (
             <p className="text-lg" style={{ color: BRAND }}>

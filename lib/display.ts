@@ -14,11 +14,11 @@ export function formatEventDate(date: string | Date): string {
 
 export function getEventHeadline(params: {
   occasion: string
-  personName: string
+  name: string
   dateLabel?: string | null
   occasionLabel?: string | null
 }): { prefix: string; name: string; suffix: string } {
-  const { occasion, personName, dateLabel, occasionLabel } = params
+  const { occasion, name: personName, dateLabel, occasionLabel } = params
 
   const PREFIXES: Record<string, string> = {
     memorial: "In memory of",

@@ -11,7 +11,7 @@ type EventPollRow = {
   event_id: string
   events: {
     closes_at: string | null
-    persons: { name: string } | null
+    protagonists: { name: string } | null
     event_charities: { charities: { name: string } }[]
   } | null
 } | null
@@ -39,7 +39,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
         event_id,
         events(
           closes_at,
-          persons(name),
+          protagonists(name),
           event_charities(charities(name))
         )
       )
@@ -52,7 +52,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
 
   const eventPoll = pledge.event_polls as unknown as EventPollRow
   const eventData = eventPoll?.events
-  const personName: string = eventData?.persons?.name ?? "this event"
+  const protagonistName: string = eventData?.protagonists?.name ?? "this event"
   const closesAt: string = eventData?.closes_at ?? ""
   const charityNames: string[] = (eventData?.event_charities ?? []).map(
     (ec) => ec.charities.name
@@ -106,7 +106,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
         </span>{" "}
         to <span className="font-medium text-foreground">{charityLabel}</span>{" "}
         in honour of{" "}
-        <span className="font-medium text-foreground">{personName}</span>.
+        <span className="font-medium text-foreground">{protagonistName}</span>.
       </p>
       <div className="mt-6 flex gap-3">
         <form action={withdrawPledge}>

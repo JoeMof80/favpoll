@@ -17,21 +17,21 @@ async function upsertPollForEvent(
       .from('event_polls')
       .update({
         personal_framing: poll.framing?.trim() || null,
-        personal_quote: poll.quote?.trim() || null,
+        personal_reveal: poll.reveal?.trim() || null,
       })
       .eq('id', poll.id)
 
     if (poll.infiniteItems) {
-      const { prioritizedItemIds, masterItemIds } = poll.infiniteItems
+      const { prioritizedItemIds, canonicalItemIds } = poll.infiniteItems
       await supabase
         .from('event_poll_items')
         .delete()
         .eq('event_poll_id', poll.id)
         .eq('is_guest_added', false)
 
-      if (masterItemIds.length > 0) {
+      if (canonicalItemIds.length > 0) {
         await supabase.from('event_poll_items').insert(
-          masterItemIds.map((itemId, index) => ({
+          canonicalItemIds.map((itemId, index) => ({
             event_poll_id: poll.id,
             topic_item_id: itemId,
             is_guest_added: false,
@@ -61,7 +61,7 @@ async function upsertPollForEvent(
     const itemsToInsert = poll.customTopicItems
       .map((l) => l.trim())
       .filter(Boolean)
-      .map((label) => ({ topic_id: topicId!, label, source: 'organiser' as const, is_master: false }))
+      .map((label) => ({ topic_id: topicId!, label, source: 'organiser' as const, is_canonical: false }))
 
     if (itemsToInsert.length > 0) {
       const { data: newItems } = await supabase.from('topic_items').insert(itemsToInsert).select('id')
@@ -77,7 +77,7 @@ async function upsertPollForEvent(
       event_id: eventId,
       topic_id: topicId,
       personal_framing: poll.framing?.trim() || null,
-      personal_quote: poll.quote?.trim() || null,
+      personal_reveal: poll.reveal?.trim() || null,
     })
     .select('id')
     .single()
@@ -96,8 +96,8 @@ async function upsertPollForEvent(
   }
 
   if (!poll.topicIsCustom && poll.infiniteItems) {
-    const { masterItemIds, customLabels } = poll.infiniteItems
-    const allItemIds = [...masterItemIds]
+    const { canonicalItemIds, customLabels } = poll.infiniteItems
+    const allItemIds = [...canonicalItemIds]
 
     if (customLabels.length > 0) {
       const { data: newCustomItems } = await supabase
@@ -107,7 +107,7 @@ async function upsertPollForEvent(
             topic_id: topicId!,
             label: label.trim(),
             source: 'organiser' as const,
-            is_master: false,
+            is_canonical: false,
           })),
         )
         .select('id')
@@ -129,7 +129,7 @@ async function upsertPollForEvent(
 
 export async function updateEvent(
   eventId: string,
-  personId: string,
+  protagonistId: string,
   input: CanvasSubmitData,
 ) {
   const { userId } = await auth()
@@ -165,16 +165,16 @@ export async function updateEvent(
     }
   }
 
-  // Update person
+  // Update protagonist
   await supabase
-    .from('persons')
+    .from('protagonists')
     .update({
-      name: input.personName.trim(),
+      name: input.protagonistName.trim(),
       date_label: input.dateLabel,
-      bio: input.personBio ?? null,
+      bio: input.protagonistBio ?? null,
       photo_url: input.photoUrl ?? null,
     })
-    .eq('id', personId)
+    .eq('id', protagonistId)
 
   // Update event
   await supabase

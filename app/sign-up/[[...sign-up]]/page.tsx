@@ -16,11 +16,11 @@ export default function SignUpPage() {
               },
               {
                 heading: 'Every pledge goes to charity',
-                body: 'You choose the charity. Guests pledge donations split across their answers. Nothing is kept.',
+                body: 'You choose the charity. Guests make pledges split across their answers. Nothing is kept.',
               },
               {
                 heading: 'A permanent record of favourites',
-                body: 'Each event feeds an all-time ranking of human favourites — a gentle, growing picture of what people love.',
+                body: 'Each event feeds the record of human favourites — a gentle, growing picture of what people love.',
               },
             ].map((item) => (
               <li key={item.heading}>

@@ -23,7 +23,7 @@ export default async function EventPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, persons!events_person_id_fkey(*), event_charities(charities(*))")
+    .select("*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(*))")
     .eq("id", id)
     .single()
 

@@ -129,7 +129,7 @@ export default async function TopicPage({ params }: Props) {
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Ask your guests what their favourite{" "}
               {typedTopic.title.toLowerCase().replace("favourite ", "")} is —
-              and turn their answers into donations for a charity you care
+              and turn their pledges into funds for a charity you care
               about.
             </p>
             <Link

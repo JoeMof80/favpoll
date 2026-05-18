@@ -6,7 +6,7 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'noreply@favpoll.com'
 
 type PledgeConfirmationParams = {
   to: string
-  personName: string
+  protagonistName: string
   charityNames: string[]
   amount: number
   closesAt: string
@@ -40,22 +40,22 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
 
 type EventClosedParams = {
   to: string
-  personName: string
+  protagonistName: string
   totalRaised: number
   eventId: string
 }
 
 export async function sendEventClosed(params: EventClosedParams) {
-  const { to, personName, totalRaised, eventId } = params
+  const { to, protagonistName, totalRaised, eventId } = params
   const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
   const resultsUrl = `${BASE_URL}/events/${eventId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: `Your favpoll for ${personName} has closed`,
+    subject: `Your favpoll for ${protagonistName} has closed`,
     html: `
-      <p>Your favpoll for <strong>${personName}</strong> has now closed.</p>
+      <p>Your favpoll for <strong>${protagonistName}</strong> has now closed.</p>
       <p>Total raised: <strong>${GBP.format(totalRaised)}</strong></p>
       <p><a href="${resultsUrl}">View the results</a></p>
     `,
@@ -63,7 +63,7 @@ export async function sendEventClosed(params: EventClosedParams) {
 }
 
 export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
-  const { to, personName, charityNames, amount, closesAt, guestToken } = params
+  const { to, protagonistName, charityNames, amount, closesAt, guestToken } = params
   const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
   const withdrawUrl = `${BASE_URL}/pledges/withdraw?token=${guestToken}`
   const closesDate = new Date(closesAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -74,9 +74,9 @@ export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: `Your pledge for ${personName}`,
+    subject: `Your pledge for ${protagonistName}`,
     html: `
-      <p>Thank you for pledging ${GBP.format(amount)} to ${charityLabel} in honour of ${personName}.</p>
+      <p>Thank you for pledging ${GBP.format(amount)} to ${charityLabel} in honour of ${protagonistName}.</p>
       <p>You can withdraw your pledge any time before ${closesDate} using the link below:</p>
       <p><a href="${withdrawUrl}">Withdraw my pledge</a></p>
       <p>If you did not make this pledge, you can safely ignore this email.</p>

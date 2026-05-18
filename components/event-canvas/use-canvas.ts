@@ -31,8 +31,8 @@ export function useCanvas({
   const router = useRouter()
 
   const [state, setState] = useState<CanvasState>({
-    personName: "",
-    personBio: "",
+    protagonistName: "",
+    protagonistBio: "",
     dateLabel: "",
     occasion: "",
     occasionLabel: "",
@@ -98,7 +98,7 @@ export function useCanvas({
   async function handleSubmit() {
     setError(null)
 
-    if (!state.personName.trim()) return setError("Please enter a name")
+    if (!state.protagonistName.trim()) return setError("Please enter a name")
     if (!state.occasion) return setError("Please select an occasion")
     if (state.charityIds.length === 0)
       return setError("Please select at least one charity")
@@ -120,8 +120,8 @@ export function useCanvas({
     setSubmitting(true)
     try {
       const submitData: CanvasSubmitData = {
-        personName: state.personName,
-        personBio: state.personBio || null,
+        protagonistName: state.protagonistName,
+        protagonistBio: state.protagonistBio || null,
         dateLabel: state.dateLabel || null,
         photoUrl,
         occasionLabel: state.occasionLabel || null,
@@ -140,17 +140,17 @@ export function useCanvas({
             customTopicTitle: poll.customTopicTitle,
             customTopicItems: poll.customTopicItems,
             framing: poll.framing || null,
-            quote: poll.quote || null,
+            reveal: poll.reveal || null,
             infiniteItems:
               !poll.topicIsCustom && topic && !topic.is_finite
                 ? {
                     prioritizedItemIds: poll.prioritizedItemIds,
-                    masterItemIds: [
+                    canonicalItemIds: [
                       ...poll.prioritizedItemIds,
                       ...topic.topic_items
                         .filter(
                           (i) =>
-                            (topic.is_active === false || i.is_master) &&
+                            (topic.is_active === false || i.is_canonical) &&
                             !poll.prioritizedItemIds.includes(i.id)
                         )
                         .map((i) => i.id),
@@ -168,8 +168,8 @@ export function useCanvas({
         await onSave(submitData)
       } else {
         const { eventId: newId } = await createEvent({
-          personName: submitData.personName,
-          personBio: submitData.personBio ?? null,
+          protagonistName: submitData.protagonistName,
+          protagonistBio: submitData.protagonistBio ?? null,
           photoUrl: submitData.photoUrl ?? null,
           dateLabel: submitData.dateLabel,
           occasion: submitData.occasion,
@@ -188,7 +188,7 @@ export function useCanvas({
                 }
               : null,
             framing: p.framing,
-            quote: p.quote,
+            reveal: p.reveal,
             infiniteItems: p.infiniteItems,
           })),
         })

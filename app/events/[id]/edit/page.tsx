@@ -28,7 +28,7 @@ export default async function EditEventPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from('events')
-    .select('*, persons!events_person_id_fkey(*), event_charities(charity_id)')
+    .select('*, protagonists!events_protagonist_id_fkey(*), event_charities(charity_id)')
     .eq('id', id)
     .single()
 
@@ -99,7 +99,7 @@ export default async function EditEventPage({ params }: Props) {
       customTopicTitle: '',
       customTopicItems: [],
       framing: poll.personal_framing ?? '',
-      quote: poll.personal_quote ?? '',
+      reveal: poll.personal_reveal ?? '',
       prioritizedItemIds: isInfinite ? (epiByPollId[poll.id] ?? []) : [],
       prioritizedCustomLabels: [],
       curatedCustomLabels: [],
@@ -108,10 +108,10 @@ export default async function EditEventPage({ params }: Props) {
   })
 
   const initialData: CanvasInitialData = {
-    personName: event.persons.name,
-    personBio: event.persons.bio ?? '',
-    photoUrl: event.persons.photo_url ?? null,
-    dateLabel: event.persons.date_label ?? '',
+    protagonistName: event.protagonists.name,
+    protagonistBio: event.protagonists.bio ?? '',
+    photoUrl: event.protagonists.photo_url ?? null,
+    dateLabel: event.protagonists.date_label ?? '',
     occasion: event.occasion,
     occasionLabel: event.occasion_label ?? OCCASION_LABELS[event.occasion] ?? '',
     description: event.description ?? '',
@@ -126,7 +126,7 @@ export default async function EditEventPage({ params }: Props) {
 
   async function handleSave(data: CanvasSubmitData) {
     'use server'
-    await updateEvent(id, event.person_id, data)
+    await updateEvent(id, event.protagonist_id, data)
     redirect(`/events/${id}`)
   }
 

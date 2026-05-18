@@ -39,7 +39,7 @@ export default async function EventsPage() {
   const { data: events } = await supabase
     .from("events")
     .select(
-      "*, persons!events_person_id_fkey(*), event_charities(charities(name)), event_polls(topics(title))"
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name)), event_polls(topics(title))"
     )
     .eq("created_by", userId)
     .order("created_at", { ascending: false })
@@ -90,7 +90,7 @@ export default async function EventsPage() {
                       )}
                     </div>
                     <p className="mt-0.5 truncate text-base font-medium text-foreground">
-                      {event.persons.name}
+                      {event.protagonists.name}
                     </p>
                     {topicTitle && (
                       <p className="mt-0.5 truncate text-sm text-muted-foreground">

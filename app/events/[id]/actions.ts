@@ -117,19 +117,19 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   // Fetch event data for confirmation email
   const { data: pollData } = await supabase
     .from('event_polls')
-    .select('event_id, events(closes_at, persons(name), event_charities(charities(name)))')
+    .select('event_id, events(closes_at, protagonists(name), event_charities(charities(name)))')
     .eq('id', input.eventPollId)
     .single()
 
   try {
     const eventData = (pollData?.events as any)
-    const personName: string = eventData?.persons?.name ?? 'this event'
+    const protagonistName: string = eventData?.protagonists?.name ?? 'this event'
     const closesAt: string = eventData?.closes_at ?? ''
     const charityNames: string[] = (eventData?.event_charities ?? []).map((ec: any) => ec.charities.name)
 
     await sendPledgeConfirmation({
       to: input.guestEmail,
-      personName,
+      protagonistName,
       charityNames,
       amount: input.totalAmount,
       closesAt,
@@ -165,7 +165,7 @@ export async function addGuestItem(eventPollId: string, topicId: string, label: 
   } else {
     const { data: newItem, error } = await supabase
       .from('topic_items')
-      .insert({ topic_id: topicId, label: trimmed, source: 'guest', is_master: false })
+      .insert({ topic_id: topicId, label: trimmed, source: 'guest', is_canonical: false })
       .select('id')
       .single()
     if (error || !newItem) throw new Error(error?.message ?? 'Failed to create item')
