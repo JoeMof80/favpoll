@@ -100,3 +100,26 @@ Full definitions in `references/GLOSSARY.md`.
 
 Run with `pnpm seed` → `scripts/seed.ts`
 Never delete data — the script is additive and idempotent.
+
+## Testing conventions
+
+Run tests with `pnpm test:run`. All 261 tests must pass before committing.
+
+**When to write tests:**
+- Every new pure function in `lib/` → add a case to the relevant `lib/__tests__/*.test.ts`
+- Every new custom hook → new `__tests__/use-*.test.ts` alongside it
+- Every new server action or API route → new `__tests__/actions.test.ts` or `__tests__/route.test.ts` with `// @vitest-environment node`
+
+**File placement:** co-located `__tests__/` directory next to the file under test.
+
+**Environments:**
+- Default (jsdom): pure functions, React hooks
+- `// @vitest-environment node` (first line): server actions (`'use server'`), API route handlers
+
+**Supabase mock:** use `makeSupabaseMock()` from `@/tests/mocks/supabase-admin` for all server-side DB tests. Call `mock.queue(data, error?)` in order for each DB operation the action will perform.
+
+**`vi.hoisted()`** is required for any mock variable referenced inside a `vi.mock()` factory.
+
+**`redirect()` must throw** — mock it as `vi.fn().mockImplementation((url) => { throw new Error(url) })` and assert with `.rejects.toThrow(url)`.
+
+**Date-sensitive tests:** use `vi.useFakeTimers()` / `vi.setSystemTime()` rather than hardcoded near-future dates that will eventually become past.
