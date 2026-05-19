@@ -86,7 +86,7 @@ favpoll is genuinely both things simultaneously — a fundraising platform and a
 ### Headline — fixed across all occasions
 
 ```
-A new way to honour them.
+Introducing a new way to honour them.
 ```
 
 ### Brand subheader — fixed
@@ -98,10 +98,10 @@ Expressions of joy, for charitable causes, in the name of those we love.
 ### Eyebrows — update with active occasion in hero demo
 
 ```
-Memorial:   In memory of someone you loved
-Birthday:   For the birthday they'll remember
+Memorial:   In memory of someone special
+Birthday:   On the birthday they'll always remember
 Retirement: After a lifetime of good work
-Wedding:    On the day they say yes
+Wedding:    On the day they say 'I do'
 Engagement: The yes that changes everything
 Graduation: As they take their next step
 ```

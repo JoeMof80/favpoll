@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { createAdminClient } from "@/lib/supabase/admin"
 import type { Topic, TopicItem } from "@/types"
 import { TopicRankings } from "./topic-rankings"
@@ -132,12 +133,9 @@ export default async function TopicPage({ params }: Props) {
               and turn their pledges into funds for a charity you care
               about.
             </p>
-            <Link
-              href={`/events/new?topic=${id}`}
-              className="mt-4 block rounded-md bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
-            >
-              Create an event
-            </Link>
+            <Button asChild className="mt-4">
+              <Link href={`/events/new?topic=${id}`}>Create an event</Link>
+            </Button>
           </div>
         </div>
       </div>

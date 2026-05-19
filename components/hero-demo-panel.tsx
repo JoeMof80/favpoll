@@ -8,7 +8,6 @@ import type { Transition } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
-import { OccasionTag } from "@/components/ui/occasion-tag"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 import { RankingBar } from "@/components/ui/ranking-bar"
@@ -26,7 +25,6 @@ type Phase =
 
 type HeroScene = {
   occasion: string
-  occasionTag: string
   protagonistName: string
   protagonistInitials: string
   avatarColor: string
@@ -45,27 +43,15 @@ type HeroScene = {
   totalLabel: string
 }
 
-// "In memory of",
-// "Birthday",
-// "Retirement",
-// "Wedding",
-// "Engagement",
-// "Anniversary",
-// "Leaving do",
-// "Graduation",
-// "Christening",
-// "Achievement",
-
 const SCENES: HeroScene[] = [
   {
     occasion: "Memorial",
-    occasionTag: "In memory of",
     protagonistName: "Belinda Hartley",
     protagonistInitials: "BH",
     avatarColor: "#7F77DD",
     topicTitle: "Colour",
     question:
-      "Belinda had a colour she returned to all her life — what's yours?",
+      "Belinda had a colour that she made her own — what's your colour?",
     options: [
       { label: "Purple" },
       { label: "Blue" },
@@ -87,7 +73,6 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Birthday",
-    occasionTag: "15 Today!",
     protagonistName: "Poppy Chen",
     protagonistInitials: "PC",
     avatarColor: "#E87D6A",
@@ -105,8 +90,7 @@ const SCENES: HeroScene[] = [
     pledgeAmount: "£20",
     charity: "Comic Relief",
     revealLabel: "Poppy's reveal",
-    revealText:
-      "Mint choc chip, obviously. (What do you mean you didn't know?)",
+    revealText: "Mint choc chip, of course. What do you mean you didn't know?",
     barLabels: ["Mint choc chip", "Vanilla", "Chocolate", "Strawberry"],
     barWidths: [82, 61, 38, 19],
     barAmounts: ["£200", "£145", "£90", "£45"],
@@ -115,7 +99,6 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Retirement",
-    occasionTag: "Happy Retirement",
     protagonistName: "Margaret Osei",
     protagonistInitials: "MO",
     avatarColor: "#4AAB8A",
@@ -141,7 +124,6 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Engagement",
-    occasionTag: "She said yes!",
     protagonistName: "Alex & Jordan",
     protagonistInitials: "AJ",
     avatarColor: "#D4936B",
@@ -167,7 +149,6 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Wedding",
-    occasionTag: "Congratulations!",
     protagonistName: "Sarah & Tom",
     protagonistInitials: "ST",
     avatarColor: "#534AB7",
@@ -192,7 +173,6 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Graduation",
-    occasionTag: "Happy Graduation",
     protagonistName: "James Okafor",
     protagonistInitials: "JO",
     avatarColor: "#5B9BD5",
@@ -227,11 +207,11 @@ const OCCASION_CHIPS = SCENES.map((s, i) => ({ label: s.occasion, index: i }))
 const PLEDGE_AMOUNTS = ["£5", "£10", "£20", "£50"]
 
 const SCENE_EYEBROWS = [
-  "In memory of someone you loved",
-  "For the birthday they'll remember",
+  "In memory of someone special",
+  "On the birthday they'll always remember",
   "After a lifetime of good work",
-  "The yes that changes everything",
-  "On the day they say yes",
+  "For the yes that changes everything",
+  "On the day they say 'I do'",
   "As they take their next step",
 ]
 
@@ -383,7 +363,7 @@ export function HeroDemoPanel() {
 
             {/* Headline — fixed */}
             <h1 className="mb-[1.1rem] text-5xl leading-[1.15] font-light tracking-tight text-foreground">
-              A new way to
+              Introducing a new way to
               <br />
               <span className="font-medium">honour them.</span>
             </h1>
@@ -396,7 +376,7 @@ export function HeroDemoPanel() {
 
             {/* CTA — fixed */}
             <div className="flex items-center gap-3.5">
-              <Button asChild>
+              <Button asChild size="lg">
                 <Link href="/events/new">Create an event</Link>
               </Button>
               <Button variant="ghost" asChild>
@@ -406,10 +386,7 @@ export function HeroDemoPanel() {
           </div>
 
           {/* Right — demo card (desktop only) */}
-          <div
-            className="hidden flex-col p-5 md:flex"
-            style={{ flex: "0.95" }}
-          >
+          <div className="hidden flex-col p-5 md:flex" style={{ flex: "0.95" }}>
             {/* Occasion chips */}
             <div className="mb-3 flex flex-wrap gap-1.25">
               {OCCASION_CHIPS.map(({ label, index }) => (
@@ -439,18 +416,7 @@ export function HeroDemoPanel() {
               >
                 <div className="relative flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
                   <div className="space-y-4">
-                    {/* Occasion tag — fades in first */}
-                    <motion.div
-                      key={`card-occasion-${sceneIndex}`}
-                      {...fadeUp}
-                      transition={
-                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0 }
-                      }
-                    >
-                      <OccasionTag label={scene.occasionTag} />
-                    </motion.div>
-
-                    {/* Protagonist avatar + name — fades in just after eyebrow */}
+                    {/* Protagonist avatar + name — fades in first */}
                     <motion.div
                       key={`protagonist-${sceneIndex}`}
                       {...fadeUp}
@@ -511,11 +477,7 @@ export function HeroDemoPanel() {
                               key={opt.label}
                               initial={{ opacity: 0, y: 4 }}
                               animate={{
-                                opacity:
-                                  phase === "selected" &&
-                                  i !== scene.selectedIndex
-                                    ? 0.3
-                                    : 1,
+                                opacity: 1,
                                 y: 0,
                                 scale:
                                   phase === "selected" &&
@@ -535,11 +497,11 @@ export function HeroDemoPanel() {
                                     }
                               }
                               className={cn(
-                                "rounded-full px-3 py-1.5 text-[11.5px] transition-colors duration-200",
+                                "h-auto rounded-full border px-3 py-1.5 text-xs transition-all duration-200",
                                 phase !== "arriving" &&
                                   i === scene.selectedIndex
-                                  ? "bg-[#534AB7] font-medium text-white"
-                                  : "bg-muted text-muted-foreground"
+                                  ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
+                                  : "border-border bg-background font-normal text-muted-foreground shadow-none"
                               )}
                             >
                               {opt.label}
@@ -579,13 +541,13 @@ export function HeroDemoPanel() {
                                     : { ...MEDIUM, delay: 0.06 * i }
                                 }
                                 className={cn(
-                                  "flex-1 rounded-md border py-1 text-center text-[11px] transition-colors duration-200",
+                                  "flex h-6 flex-1 items-center justify-center rounded-md px-2 text-xs transition-colors duration-200",
                                   amt === scene.pledgeAmount &&
                                     (phase === "amount-picked" ||
                                       phase === "pledging" ||
                                       phase === "confirmed")
-                                    ? "border-[#534AB7] bg-[#534AB7] text-white"
-                                    : "border-border bg-background text-muted-foreground"
+                                    ? "bg-primary font-medium text-primary-foreground"
+                                    : "bg-muted text-muted-foreground"
                                 )}
                               >
                                 {amt}

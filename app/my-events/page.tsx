@@ -137,12 +137,9 @@ export default async function EventsPage() {
           <p className="text-sm text-muted-foreground">
             You haven&apos;t created any events yet.
           </p>
-          <Link
-            href="/events/new"
-            className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
-          >
-            Create your first event
-          </Link>
+          <Button asChild className="mt-4">
+            <Link href="/events/new">Create your first event</Link>
+          </Button>
         </div>
       )}
     </main>

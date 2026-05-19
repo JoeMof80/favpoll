@@ -24,14 +24,14 @@ export function EventSubheader({ eventId, isOrganiser, isClosed }: Props) {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background">
+    <div className="fixed right-0 bottom-0 left-0 z-30 border-t border-border bg-background">
       <div className="mx-auto flex h-14 max-w-330 items-center justify-end px-6">
         {isClosed ? (
           <Button type="button" onClick={handleShareResults}>
             {copied ? "Link copied!" : "Share results"}
           </Button>
         ) : (
-          <Button asChild>
+          <Button asChild size="lg">
             <Link href={`/events/${eventId}/edit`}>Edit event</Link>
           </Button>
         )}
