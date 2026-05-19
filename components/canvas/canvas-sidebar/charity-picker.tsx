@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react"
 import { X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import type { Charity } from "@/types"
@@ -113,21 +114,15 @@ export function CharityPicker({
                   const isSelected = charityIds.includes(c.id)
                   const disabled = !isSelected && atMax
                   return (
-                    <Button
+                    <Chip
                       key={c.id}
-                      type="button"
-                      size="sm"
+                      selected={isSelected}
                       disabled={disabled}
                       onMouseDown={(e) => {
                         // Prevent blur from firing before toggle
                         e.preventDefault()
                         handleToggle(c.id)
                       }}
-                      className={`rounded-full px-3 py-1.5 text-xs ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                          : "bg-muted text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                      }`}
                     >
                       {isSelected && (
                         <Check
@@ -136,7 +131,7 @@ export function CharityPicker({
                         />
                       )}
                       {c.name}
-                    </Button>
+                    </Chip>
                   )
                 })}
               </div>

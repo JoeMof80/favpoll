@@ -2,6 +2,7 @@
 
 import { shortTopicLabel } from "@/lib/occasions"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { RemovablePill } from "./removable-pill"
 import type { Category, CanvasPoll, TopicWithMeta } from "@/types"
 
@@ -166,19 +167,13 @@ export function TopicPicker({
               selected={poll.topicId === t.id}
             />
           ) : (
-            <Button
+            <Chip
               key={t.id}
-              type="button"
-              size="sm"
+              selected={poll.topicId === t.id}
               onClick={() => onSelectTopic(t)}
-              className={`rounded-full px-3 py-1.5 text-xs ${
-                poll.topicId === t.id
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-muted text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              }`}
             >
               {shortTopicLabel(t.title)}
-            </Button>
+            </Chip>
           )
         )}
       </div>

@@ -32,7 +32,7 @@ export function Header() {
             >
               Your events
             </Link>
-            <Button asChild size="sm">
+            <Button asChild size="lg">
               <Link href="/events/new">New event</Link>
             </Button>
             <UserButtonClient />

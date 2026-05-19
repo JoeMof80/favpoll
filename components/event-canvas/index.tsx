@@ -6,6 +6,7 @@ import { CanvasSidebar } from "@/components/canvas/canvas-sidebar"
 import { ShareScreen } from "@/components/canvas/share-screen"
 import { OCCASIONS, OCCASION_LABELS } from "@/lib/occasions"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import type {
   Category,
   Charity,
@@ -75,23 +76,19 @@ export function EventCanvas(props: Props) {
             {OCCASIONS.map((occ) => {
               const selected = state.occasion === occ.value
               return (
-                <Button
+                <Chip
                   key={occ.value}
-                  type="button"
                   role="radio"
                   aria-checked={selected}
+                  selected={selected}
                   onClick={() => {
                     set("occasion", occ.value)
                     set("occasionLabel", OCCASION_LABELS[occ.value] ?? "")
                   }}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs ${
-                    selected
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-muted text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                  }`}
+                  className="shrink-0"
                 >
                   {occ.label}
-                </Button>
+                </Chip>
               )
             })}
           </div>

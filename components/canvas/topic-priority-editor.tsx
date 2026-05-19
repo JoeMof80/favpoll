@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { InlineOptionInput } from "./inline-option-input"
 import { RemovablePill } from "./removable-pill"
 import type { CanvasPoll, TopicItem } from "@/types"
@@ -91,10 +92,9 @@ export function TopicPriorityEditor({
           const item = canonicalItems.find((m) => m.id === id)
           if (!item) return null
           return (
-            <Button
+            <Chip
               key={item.id}
-              type="button"
-              size="sm"
+              selected
               onClick={() =>
                 onUpdatePoll({
                   prioritizedItemIds: poll.prioritizedItemIds.filter(
@@ -102,11 +102,10 @@ export function TopicPriorityEditor({
                   ),
                 })
               }
-              className="h-auto rounded-full px-3 py-1.5 text-xs"
             >
-              <span className="mr-0.5 opacity-50">{i + 1}</span>
+              <span className="mr-0.5 opacity-60">{i + 1}</span>
               {item.label}
-            </Button>
+            </Chip>
           )
         })}
 
@@ -139,20 +138,16 @@ export function TopicPriorityEditor({
         {/* Unprioritised entries */}
         {unprioritizedEntries.map((entry) =>
           entry.type === "canonical" ? (
-            <Button
+            <Chip
               key={entry.id}
-              type="button"
-              variant="outline"
-              size="sm"
               onClick={() =>
                 onUpdatePoll({
                   prioritizedItemIds: [...poll.prioritizedItemIds, entry.id],
                 })
               }
-              className="h-auto rounded-full px-3 py-1.5 text-xs"
             >
               {entry.label}
-            </Button>
+            </Chip>
           ) : (
             <RemovablePill
               key={`custom-${entry.index}`}

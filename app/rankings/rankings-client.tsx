@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import type { Category, Topic, TopicItem } from "@/types"
 
 type TopicWithItems = Topic & {
@@ -52,34 +52,28 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
           role="tablist"
           aria-label="Filter by category"
         >
-          <Button
+          <Chip
             role="tab"
             aria-selected={activeCategory === null}
+            selected={activeCategory === null}
             onClick={() => setActiveCategory(null)}
-            className={`shrink-0 rounded-full px-3 py-1 text-sm ${
-              activeCategory === null
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
-            }`}
+            className="shrink-0 py-1 text-sm"
           >
             All
-          </Button>
+          </Chip>
           {categories.map((cat) => (
-            <Button
+            <Chip
               key={cat.id}
               role="tab"
               aria-selected={activeCategory === cat.id}
+              selected={activeCategory === cat.id}
               onClick={() =>
                 setActiveCategory(activeCategory === cat.id ? null : cat.id)
               }
-              className={`shrink-0 rounded-full px-3 py-1 text-sm ${
-                activeCategory === cat.id
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
-              }`}
+              className="shrink-0 py-1 text-sm"
             >
               {cat.label}
-            </Button>
+            </Chip>
           ))}
         </div>
       </div>

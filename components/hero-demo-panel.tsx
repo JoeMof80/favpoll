@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import type { Transition } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { OccasionTag } from "@/components/ui/occasion-tag"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -412,28 +413,14 @@ export function HeroDemoPanel() {
             {/* Occasion chips */}
             <div className="mb-3 flex flex-wrap gap-1.25">
               {OCCASION_CHIPS.map(({ label, index }) => (
-                <button
+                <Chip
                   key={label}
-                  type="button"
-                  role="button"
-                  aria-pressed={index === sceneIndex}
-                  tabIndex={0}
+                  selected={index === sceneIndex}
                   onClick={() => handleOccasionClick(index)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault()
-                      handleOccasionClick(index)
-                    }
-                  }}
-                  className={cn(
-                    "cursor-pointer rounded-full border px-3 py-1 text-[11px] transition-all duration-200",
-                    index === sceneIndex
-                      ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
-                      : "border-border bg-background text-muted-foreground hover:border-[#AFA9EC] hover:text-[#534AB7]"
-                  )}
+                  className="py-1 text-[11px]"
                 >
                   {label}
-                </button>
+                </Chip>
               ))}
             </div>
 
