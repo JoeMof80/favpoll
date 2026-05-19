@@ -10,9 +10,9 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## The Core Idea
 
-- **Events** honour a person on a specific occasion
+- **Events** honour a person (protagonist) on a specific occasion
 - **Topics** are canonical questions — Colour, Season, Biscuit, Film, etc.
-- **Event polls** activate a topic within an event, with a personal framing ("Rebecca's favourite colour was purple — what's yours?") and an optional quote
+- **Event polls** activate a topic within an event, with a personal framing ("Belinda had a colour she returned to all her life — what's yours?") and an optional personal reveal (shown after pledging)
 - **Pledges** are financial commitments against specific topic items, contributing to both the event ranking and the all-time universal ranking
 - **Pledge allocations** split a single pledge across multiple items (e.g. 60% Purple, 40% Blue)
 - **Shared fund** allows generous donors to top up a communal pot so others (e.g. children) can participate without paying
@@ -21,8 +21,9 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## Stack
 
-- **Framework:** Next.js 15, App Router, TypeScript, `src/` directory
-- **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons
+- **Framework:** Next.js 15, App Router, TypeScript
+- **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel
+- **Component catalogue:** Storybook (`@storybook/nextjs-vite`), co-located `.stories.tsx` files
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests
 - **Database:** Supabase (Postgres + Realtime)
 - **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities)
@@ -66,6 +67,8 @@ topics (
   title text not null,              -- Short title, no "Favourite" prefix: "Colour", "Season"
   description text,
   is_finite boolean default false,
+  is_active boolean not null default true,
+  placeholders jsonb default '{}',  -- Keyed framing/reveal pairs by topic title
   created_by text references users(id),
   created_at timestamptz
 )
@@ -83,7 +86,7 @@ topic_items (
   all_time_pledged numeric default 0,
   all_time_count integer default 0,
   is_canonical boolean default true,
-  source text default 'seed',
+  source text default 'seed',       -- 'seed' | 'organiser' | 'guest'
   event_count integer default 0,
   total_pledge_count integer default 0,
   created_at timestamptz
@@ -92,14 +95,18 @@ topic_items (
 protagonists (
   id uuid primary key,
   name text not null,
+  date_label text,                  -- e.g. "1940 – 2024", "Turning 35"
+  bio text,
+  photo_url text,
   created_by text references users(id),
   created_at timestamptz
 )
 
 events (
   id uuid primary key,
-  protagonist_id uuid references persons(id),
-  occasion text not null,
+  protagonist_id uuid references protagonists(id),
+  occasion text not null,           -- OccasionType value
+  occasion_label text,              -- Optional organiser override of display label
   created_by text references users(id),
   description text,
   closes_at timestamptz not null,
@@ -124,8 +131,8 @@ event_polls (
   id uuid primary key,
   event_id uuid references events(id) on delete cascade,
   topic_id uuid references topics(id),
-  personal_framing text,
-  personal_reveal text,
+  personal_framing text,            -- The question shown before pledging
+  personal_reveal text,             -- Disclosed after pledging
   created_at timestamptz
 )
 
@@ -133,6 +140,8 @@ event_poll_items (
   id uuid primary key,
   event_poll_id uuid references event_polls(id) on delete cascade,
   topic_item_id uuid references topic_items(id),
+  display_order int not null default 0,
+  is_prioritized boolean not null default false,
   is_guest_added boolean default false,
   added_by text references users(id),
   created_at timestamptz
@@ -198,48 +207,53 @@ item_flags (
 
 ## Occasion Types
 
-```
-'memorial' | 'funeral' | 'birthday' | 'retirement' |
-'wedding' | 'anniversary' | 'leaving_do' | 'inclusion' |
-'christening' | 'bar_bat_mitzvah' | 'get_well_soon' |
-'sports_achievement' | 'work_milestone' | 'just_because' | 'other'
+```typescript
+type OccasionType =
+  | 'memorial' | 'tribute'    | 'birthday'    | 'retirement'
+  | 'wedding'  | 'engagement' | 'anniversary' | 'leaving'
+  | 'graduation' | 'christening' | 'achievement' | 'recovery'
+  | 'award'    | 'promotion'  | 'celebration' | 'other'
 ```
 
-### Fields shown per occasion
+### Display headline prefixes (from `lib/display.ts` PREFIXES)
 
-| Field | Occasions |
+```
+memorial    → 'In memory of'
+tribute     → 'In honour of'
+birthday    → 'Happy birthday'
+retirement  → 'Celebrating the retirement of'
+wedding     → 'Congratulations to'
+engagement  → 'Congratulations to'
+anniversary → 'Happy anniversary'
+leaving     → 'Farewell'
+graduation  → 'Congratulations to'
+christening → 'Welcome'
+achievement → 'Well done'
+recovery    → 'Wishing a speedy recovery to'
+award       → 'Congratulations to'
+promotion   → 'Congratulations to'
+celebration → 'Celebrating'
+other       → 'Honouring'
+```
+
+Full closing defaults and placeholder data in `lib/occasions.ts`.
+
+### Default poll closing period by occasion
+
+| Occasion | Days until close |
 |---|---|
-| Birth year | memorial, funeral, birthday, christening |
-| Death year | memorial, funeral (required) |
-| Description | all (required for sports_achievement, work_milestone, just_because, other) |
-
-### Display headline prefixes
-
-```
-memorial / funeral → 'In memory of'
-birthday           → 'Happy birthday'
-retirement         → 'Celebrating the retirement of'
-wedding            → 'Congratulations to'
-anniversary        → 'Happy anniversary'
-leaving_do         → 'Farewell'
-inclusion         → 'Congratulations'
-christening        → 'Welcome'
-bar_bat_mitzvah    → 'Mazel tov'
-get_well_soon      → 'Get well soon'
-sports_achievement → 'Well done'
-work_milestone     → 'Celebrating'
-just_because       → 'For'
-other              → 'Honouring'
-```
+| memorial | 30 |
+| tribute, retirement, anniversary | 21 |
+| All others | 14 |
 
 ---
 
 ## Topic Types
 
-### Finite (is_finite = true) — fixed list, no additions
+### Finite (`is_finite = true`) — fixed list, no guest additions
 Colour, Season, Day of the week, Meal of the day, Time of day, Decade
 
-### Infinite (is_finite = false) — open list
+### Infinite (`is_finite = false`) — open list
 Organiser can pin/reorder (not remove) items. Guests can suggest additions.
 
 ### Canonical colour list (CSS named colours, no hex stored)
@@ -248,41 +262,144 @@ Rendered as: `<div style={{ backgroundColor: item.label.toLowerCase() }} />`
 
 ---
 
-## Key Application Files
+## Application Routes
 
 ```
-src/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx                       -- Landing page
-│   ├── events/
-│   │   ├── new/page.tsx               -- Create event (in-place editing)
-│   │   └── [id]/
-│   │       ├── page.tsx               -- Event page (guest + edit mode)
-│   │       └── display/page.tsx       -- Live display for projector
-│   ├── pledges/withdraw/page.tsx      -- Guest withdrawal via token
-│   └── api/
-│       ├── webhooks/clerk/route.ts
-│       ├── topics/[id]/check-duplicate/route.ts
-│       ├── events/[id]/request-extension/route.ts
-│       └── cron/close-events/route.ts
-├── components/
-│   ├── ui/
-│   ├── event-hero.tsx
-│   ├── charity-banner.tsx
-│   ├── pot-banner.tsx
-│   ├── poll-section.tsx
-│   ├── ranking-list.tsx
-│   ├── pledge-panel.tsx
-│   └── shared-fund-pledge.tsx
-├── lib/
-│   ├── supabase/client.ts
-│   ├── supabase/server.ts
-│   ├── display.ts                     -- getEventHeadline, formatEventDate, ordinal
-│   └── utils.ts
-├── types/index.ts
-└── scripts/seed.ts                    -- pnpm seed
+/                              -- Home: HeroDemoPanel + live events carousel + CTA
+/events                        -- Live events grid (public, no auth)
+/events/new                    -- Create event (EventCanvas)
+/events/[id]                   -- Event page — guest pledge view + edit mode toggle
+/events/[id]/edit              -- Edit event (EventCanvas edit mode)
+/events/[id]/manage            -- Management panel (organiser only)
+/events/[id]/display           -- Live display for projector screen
+/my-events                     -- Organiser's created events (auth required)
+/rankings                      -- Global all-time rankings
+/topics/[id]                   -- Individual topic rankings
+/pledges/withdraw              -- Guest pledge withdrawal via token
+/sign-in, /sign-up             -- Clerk auth pages
+
+API:
+/api/cron/close-events         -- Vercel cron (hourly), closes expired events
+/api/stripe/payment-intent     -- Creates Stripe PaymentIntent for pledge checkout
+/api/webhooks/clerk            -- Clerk user sync webhook
+/api/events/[id]/request-extension -- Sends extension request email to admin
 ```
+
+---
+
+## Key Files
+
+```
+app/
+├── layout.tsx                        -- Root layout (Clerk, theme, header)
+├── page.tsx                          -- Home page (server component)
+├── events/
+│   ├── page.tsx                      -- Live events listing
+│   ├── actions.ts                    -- Shared event server actions
+│   ├── new/
+│   │   ├── page.tsx                  -- EventCanvas (create)
+│   │   └── actions.ts
+│   └── [id]/
+│       ├── page.tsx                  -- Event view + pledge flow
+│       ├── actions.ts                -- Pledge/reveal/close actions
+│       ├── display/page.tsx          -- Live display
+│       ├── edit/page.tsx             -- EventCanvas (edit)
+│       ├── edit/actions.ts
+│       └── manage/page.tsx           -- Organiser management
+├── my-events/page.tsx
+├── rankings/page.tsx
+└── topics/[id]/page.tsx
+
+components/
+├── ui/                               -- Atoms (shadcn + custom)
+│   ├── button.tsx
+│   ├── card.tsx
+│   ├── input.tsx
+│   ├── field.tsx                     -- Form field wrapper (vertical/horizontal)
+│   ├── occasion-tag.tsx              -- Small uppercase occasion label (brand purple)
+│   ├── section-eyebrow.tsx           -- Small uppercase section label (brand | muted variants)
+│   ├── ranking-bar.tsx               -- Label + amount + progress bar row
+│   └── reveal-quote.tsx             -- Left-bordered italic blockquote
+├── canvas/                           -- Event creation/editing UI
+│   ├── poll-editor.tsx
+│   ├── topic-picker.tsx
+│   ├── topic-priority-editor.tsx
+│   ├── custom-topic-options.tsx
+│   ├── share-screen.tsx
+│   └── canvas-sidebar/
+│       ├── index.tsx
+│       ├── charity-picker.tsx
+│       ├── closing-date.tsx
+│       ├── privacy-toggle.tsx
+│       └── shared-fund.tsx
+├── pledge-card/                      -- Pledge flow components
+│   ├── index.tsx                     -- Main pledge card (uses usePledge hook)
+│   ├── use-pledge.ts                 -- All pledge logic + Stripe state
+│   ├── amount-input.tsx              -- £-prefixed number input
+│   ├── amount-presets.tsx            -- Preset amount button row
+│   ├── pledge-breakdown.tsx          -- Line items + total row
+│   └── utils.ts                      -- GBP formatter
+├── ranking-list/
+│   ├── index.tsx                     -- Realtime ranking list
+│   ├── use-ranking-items.ts          -- Supabase realtime subscription
+│   └── utils.ts
+├── poll-section/
+│   ├── index.tsx                     -- Poll UI (item selection + reveal)
+│   └── use-poll-section.ts
+├── hero-demo-panel.tsx               -- Animated homepage demo (no props, self-contained)
+├── event-hero.tsx                    -- Event header with protagonist info
+├── event-card.tsx                    -- Card for live events listings
+├── event-card-empty.tsx              -- Empty state card
+├── home-carousel.tsx                 -- Embla carousel for all-time data
+├── charity-banner.tsx                -- Charity names + logos
+├── countdown.tsx                     -- Closing countdown display
+├── header.tsx                        -- App header (nav + auth)
+├── poll-heading.tsx                  -- Poll topic heading + framing
+├── stripe-checkout.tsx               -- Stripe Elements checkout wrapper
+└── pot-banner.tsx                    -- Shared fund banner
+
+lib/
+├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders
+├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline
+├── email.ts                          -- Resend email helpers
+├── edit-mode-context.tsx             -- React context for organiser edit mode
+├── utils.ts                          -- cn(), misc helpers
+└── supabase/
+    ├── client.ts                     -- Browser client
+    ├── server.ts                     -- Server component client (SSR)
+    └── admin.ts                      -- Service role client for webhooks/cron
+
+types/index.ts                        -- All domain types + composite query types
+scripts/seed.ts                       -- pnpm seed — additive, idempotent
+.storybook/
+├── main.ts                           -- Stories glob: components/**/*.stories.tsx
+└── preview.tsx                       -- globals.css, brand backgrounds, layout: centered
+```
+
+---
+
+## Atomic UI Components
+
+Four shared atoms in `components/ui/` extracted from duplicated inline patterns:
+
+| Component | Props | Usage |
+|---|---|---|
+| `OccasionTag` | `label, className?` | Small uppercase occasion label, brand purple, opacity 70 |
+| `SectionEyebrow` | `children, className?, variant?` | Section label; `variant="brand"` (purple, default) or `variant="muted"` (gray) |
+| `RankingBar` | `label, amount, widthPercent, barClassName?, barStyle?, className?` | Label + amount + coloured progress bar |
+| `RevealQuote` | `text, className?, role?, aria-label?, aria-live?` | Left-bordered italic blockquote for reveal text |
+
+`SectionEyebrow` with framer-motion: `const MotionEyebrow = motion(SectionEyebrow)` — used in `hero-demo-panel.tsx`.
+
+---
+
+## Storybook
+
+Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. 16 story files co-located alongside components:
+
+- **UI atoms:** button, card, input, field, occasion-tag, section-eyebrow, ranking-bar, reveal-quote
+- **Feature components:** event-card, event-card-empty, countdown, charity-banner
+- **Pledge form:** amount-input, amount-presets, pledge-breakdown
 
 ---
 
@@ -290,43 +407,53 @@ src/
 
 ### Brand colours
 ```
-Primary:   #534AB7
-Mid:       #7F77DD
-Light:     #EEEDFE
-Border:    #AFA9EC
-Green:     #1D9E75
+Primary:   #534AB7   — buttons, logo, links
+Mid:       #7F77DD   — ranking bars
+Light:     #EEEDFE   — selected states, reveal backgrounds
+Border:    #AFA9EC   — purple-tinted borders, edit underlines
+Dark:      #3C3489   — text on purple surfaces
+Green:     #1D9E75   — shared fund, positive states
+Gray 50:   #F1EFE8   — page background
+Gray 100:  #D3D1C7   — borders, dividers
 ```
 
+### Typography
+- Typeface: Plus Jakarta Sans
+- Weights: 400 regular, 500 medium only (never 600/700)
+- Reveal/quote: 14px, italic, `text-primary/80`, `border-l-4 border-primary/40`
+- Section eyebrow (brand): 11px, medium, `tracking-widest`, uppercase, `text-[#534AB7]`
+- Section eyebrow (muted): `text-xs`, medium, `tracking-widest`, uppercase, `text-muted-foreground`
+
 ### Edit mode field treatment
-- Filled editable field: `border-b-[1.5px] border-[#AFA9EC] pb-0.5`
-- Focused: `border-[#534AB7]`
+- Editable field: `border-b border-[#AFA9EC]` persistent underline
+- Focused: border turns `#534AB7`
 - Placeholder: `text-muted-foreground italic`
-- Guest view: no underlines, no placeholders
+- Guest view: no underlines, no placeholders, no edit controls
 
 ### Button conventions
-- Primary: `<Button className="w-full">` — solid purple, full width
-- Quiet secondary: `<Button variant="ghost" size="sm">`
-- Never use raw `<button>` — always use shadcn Button
+- Primary: `<Button>` — solid purple, one per panel
+- Ghost: `<Button variant="ghost">` — secondary actions
+- Never use raw `<button>` — always use shadcn `Button`
 
 ---
 
-## Poll End Date Rules
+## Poll Close / Extension Rules
 
-- Required at creation, no suggested default
-- Organiser can extend freely up to hard_close_at (created_at + 90 days, immutable)
+- Required at creation, `lib/occasions.ts suggestClosingDate()` provides defaults
+- Max duration: 90 days from creation (`hard_close_at`, immutable)
 - 1st extension: free
 - 2nd extension: inline warning
-- 3rd extension: blocked, must request via form (emails FAVPOLL_ADMIN_EMAIL)
-- Auto-close: Vercel cron hourly, closes events where closes_at <= now
-- Disbursement: automatic on close (Stripe TODO)
+- 3rd extension: blocked — must request via form (emails `FAVPOLL_ADMIN_EMAIL`)
+- Auto-close: Vercel cron (hourly), closes events where `closes_at <= now`
+- Disbursement: Stripe TODO — placeholder in cron
 - Cannot reopen closed events
 
 ---
 
 ## Multiple Charities
 
-- Up to 3 per event (enforced in application logic)
-- Stored in event_charities join table
+- Up to 3 per event (enforced in `canvas-sidebar/charity-picker.tsx`)
+- Stored in `event_charities` join table with `display_order`
 - Proceeds split equally on disbursement
 
 ---
@@ -334,10 +461,32 @@ Green:     #1D9E75
 ## Auth — Guest Pledging
 
 - Login optional for guests
-- Guest pledges: clerk_user_id = null, guest_email required
-- guest_token: UUID for withdrawal link, nulled after use
-- Signed-in users: withdraw from profile page
-- Duplicate check: guest_email + event_poll_id + withdrawn_at is null
+- Guest pledges: `clerk_user_id = null`, `guest_email` required
+- `guest_token`: UUID for withdrawal link, nulled after use
+- Signed-in users: withdraw from `/my-events`
+- Duplicate check: `guest_email + event_poll_id + withdrawn_at is null`
+
+---
+
+## Testing
+
+Run with `pnpm test:run`. **356 tests must pass** before committing.
+
+Tests are co-located in `__tests__/` directories alongside their subjects:
+
+| Area | File |
+|---|---|
+| display helpers | `lib/__tests__/display.test.ts` |
+| occasions helpers | `lib/__tests__/occasions.test.ts` |
+| pledge utils | `components/pledge-card/__tests__/utils.test.ts` |
+| usePledge hook | `components/pledge-card/__tests__/use-pledge.test.ts` |
+| useRankingItems hook | `components/ranking-list/__tests__/use-ranking-items.test.ts` |
+| usePollSection hook | `components/poll-section/__tests__/use-poll-section.test.ts` |
+| cron route | `app/api/cron/close-events/__tests__/route.test.ts` |
+| Clerk webhook | `app/api/webhooks/clerk/__tests__/route.test.ts` |
+| event actions | `app/events/[id]/__tests__/actions.test.ts` |
+| pledge withdraw | `app/pledges/withdraw/__tests__/actions.test.ts` |
+| Storybook smoke | auto-generated via `@storybook/addon-vitest` (chromium) |
 
 ---
 
@@ -367,12 +516,10 @@ CRON_SECRET
 
 ## Outstanding TODO
 
-- Stripe Connect — charity disbursement (cron has placeholder)
-- Stripe Checkout — payment in pledge panel
+- Stripe Connect — charity disbursement (cron has placeholder; `api/stripe/payment-intent` creates PaymentIntents but Connect payout not wired)
+- All-time rankings browse page (`/rankings` exists but needs data threshold logic)
 - User profile / donor history page
-- All-time rankings browse page
-- Email templates (currently plain text)
-- Localisation (UI copy is UK English, code uses American spelling)
-- Mobile app
+- Email templates (currently plain text via Resend)
 - Rate limiting on API routes
 - Analytics
+- Mobile app
