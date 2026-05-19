@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -48,12 +49,9 @@ export default async function EventsPage() {
     <main className="mx-auto max-w-2xl px-4 pt-10 pb-16">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium text-foreground">Your events</h1>
-        <Link
-          href="/events/new"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
-        >
-          New event
-        </Link>
+        <Button asChild size="lg">
+          <Link href="/events/new">New event</Link>
+        </Button>
       </div>
 
       {events && events.length > 0 ? (
