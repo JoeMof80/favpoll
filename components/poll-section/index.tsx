@@ -6,6 +6,7 @@ import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@/types"
 import { Button } from "@/components/ui/button"
+import { RevealQuote } from "@/components/ui/reveal-quote"
 import { usePollSection } from "./use-poll-section"
 
 type Props = {
@@ -57,14 +58,12 @@ export function PollSection({
         <>
           {/* Reveal — shown immediately after pledging, before rankings */}
           {pledgeConfirmed && reveal && (
-            <blockquote
-              className="border-l-4 border-primary/40 pl-4 text-base text-primary/80 italic"
+            <RevealQuote
+              text={reveal}
               role="status"
               aria-label={`${personFirstName}'s reveal`}
               aria-live="polite"
-            >
-              &ldquo;{reveal}&rdquo;
-            </blockquote>
+            />
           )}
 
           {showRankings && (

@@ -3,6 +3,7 @@
 import type { TopicItem } from "@/types"
 import { useRankingItems } from "./use-ranking-items"
 import { formatAmount } from "./utils"
+import { RankingBar } from "@/components/ui/ranking-bar"
 
 type Props = {
   initialItems: TopicItem[]
@@ -49,24 +50,12 @@ export function RankingList({
               style={{ order: item.rank }}
               aria-label={`${item.label}, ranked ${item.rank}, ${valueLabel}`}
             >
-              <div className="flex justify-between text-sm">
-                <span className="truncate pr-3 text-foreground">
-                  {item.label}
-                </span>
-                <span className="shrink-0 tabular-nums text-muted-foreground">
-                  {valueLabel}
-                </span>
-              </div>
-              <div
-                className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                role="presentation"
-              >
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-700 ease-out"
-                  style={{ width: `${barWidth}%` }}
-                  aria-hidden="true"
-                />
-              </div>
+              <RankingBar
+                label={item.label}
+                amount={valueLabel}
+                widthPercent={barWidth}
+                barClassName="transition-all duration-700 ease-out"
+              />
             </li>
           )
         })}

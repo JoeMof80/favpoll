@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { occasionLabel, charityNames, formatAmount, formatRelativeDate } from "@/lib/display"
+import { OccasionTag } from "@/components/ui/occasion-tag"
 
 type EventCardEvent = {
   id: string
@@ -29,9 +30,7 @@ export function EventCard({ event, className }: Props) {
         <div className="group flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background p-5 transition-colors duration-200 hover:border-[#AFA9EC]">
 
           {/* Occasion tag */}
-          <p className="mb-2 text-[10px] font-medium tracking-[0.08em] uppercase text-[#534AB7] opacity-70">
-            {occasionLabel(event.occasion)}
-          </p>
+          <OccasionTag label={occasionLabel(event.occasion)} className="mb-2" />
 
           {/* Heading — topic if available, else protagonist name */}
           <h2 className="mb-2 text-[20px] font-medium tracking-tight text-foreground transition-colors duration-200 group-hover:text-[#534AB7]">

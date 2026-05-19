@@ -7,6 +7,10 @@ import { AnimatePresence, motion } from "framer-motion"
 import type { Transition } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { OccasionTag } from "@/components/ui/occasion-tag"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { RankingBar } from "@/components/ui/ranking-bar"
+import { RevealQuote } from "@/components/ui/reveal-quote"
 
 type Phase =
   | "arriving" // step 1
@@ -364,7 +368,7 @@ export function HeroDemoPanel() {
                 <motion.p
                   key={`eyebrow-${sceneIndex}`}
                   {...TEXT_FADE}
-                  className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase"
+                  className="text-[11px] font-medium tracking-widest uppercase text-[#534AB7]"
                 >
                   {eyebrow}
                 </motion.p>
@@ -421,9 +425,7 @@ export function HeroDemoPanel() {
                       {...fadeUp}
                       transition={prefersReducedMotion ? FAST : MEDIUM}
                     >
-                      <p className="mb-1 text-[10px] font-medium tracking-[0.07em] text-[#534AB7] uppercase opacity-70">
-                        {scene.occasion}
-                      </p>
+                      <OccasionTag label={scene.occasion} className="mb-1" />
                       <h2 className="text-3xl font-medium tracking-tight text-foreground">
                         Favourite {scene.topicTitle}
                       </h2>
@@ -579,13 +581,11 @@ export function HeroDemoPanel() {
                           {...revealVariant}
                           transition={prefersReducedMotion ? FAST : SLOW}
                         >
-                          <blockquote
-                            className="border-l-4 border-primary/40 pl-4 text-base text-primary/80 italic"
+                          <RevealQuote
+                            text={scene.revealText}
                             aria-live="polite"
                             role="status"
-                          >
-                            &ldquo;{scene.revealText}&rdquo;
-                          </blockquote>
+                          />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -609,31 +609,17 @@ export function HeroDemoPanel() {
                           >
                             {scene.barLabels.map((label, i) => (
                               <li key={label}>
-                                <div className="mb-1 flex justify-between text-sm">
-                                  <span className="truncate pr-2 text-foreground">
-                                    {label}
-                                  </span>
-                                  <span className="shrink-0 text-muted-foreground tabular-nums">
-                                    {scene.barAmounts[i]}
-                                  </span>
-                                </div>
-                                <div
-                                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                                  role="presentation"
-                                >
-                                  <div
-                                    className="h-full rounded-full ease-out"
-                                    style={{
-                                      width: `${barWidths[i] ?? 0}%`,
-                                      background:
-                                        i === 0 ? "#534AB7" : "#AFA9EC",
-                                      transition: prefersReducedMotion
-                                        ? "none"
-                                        : `width ${700 + i * 80}ms ease-out`,
-                                    }}
-                                    aria-hidden="true"
-                                  />
-                                </div>
+                                <RankingBar
+                                  label={label}
+                                  amount={scene.barAmounts[i]}
+                                  widthPercent={barWidths[i] ?? 0}
+                                  barStyle={{
+                                    background: i === 0 ? "#534AB7" : "#AFA9EC",
+                                    transition: prefersReducedMotion
+                                      ? "none"
+                                      : `width ${700 + i * 80}ms ease-out`,
+                                  }}
+                                />
                               </li>
                             ))}
                           </ol>

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { HeroDemoPanel } from "@/components/hero-demo-panel"
 import { EventCard } from "@/components/event-card"
 import { Button } from "@/components/ui/button"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { createClient } from "@/lib/supabase/server"
 
 export default async function HomePage() {
@@ -40,9 +41,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-330 px-6">
           <div className="mb-8 flex items-baseline justify-between">
             <div>
-              <p className="mb-2 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
-                Live events
-              </p>
+              <SectionEyebrow className="mb-2">Live events</SectionEyebrow>
             </div>
             <Button variant="ghost" asChild>
               <Link href="/events">See all →</Link>
