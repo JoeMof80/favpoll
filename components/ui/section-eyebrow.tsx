@@ -3,13 +3,19 @@ import { cn } from "@/lib/utils"
 type Props = {
   children: React.ReactNode
   className?: string
+  variant?: "brand" | "muted"
 }
 
-export function SectionEyebrow({ children, className }: Props) {
+export function SectionEyebrow({
+  children,
+  className,
+  variant = "brand",
+}: Props) {
   return (
     <p
       className={cn(
-        "text-[11px] font-medium tracking-widest uppercase text-[#534AB7]",
+        "font-medium tracking-widest uppercase text-shadow-xs",
+        variant === "brand" ? "text-[#534AB7]" : "text-muted-foreground",
         className
       )}
     >

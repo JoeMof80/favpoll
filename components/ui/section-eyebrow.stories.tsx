@@ -25,13 +25,25 @@ export const WithHeading: Story = {
   ),
 }
 
-export const Variations: Story = {
+export const Muted: Story = {
+  args: { children: "Poll closed", variant: "muted" },
+}
+
+export const BothVariants: Story = {
   render: () => (
-    <div className="flex flex-col gap-4">
-      <SectionEyebrow>Live events</SectionEyebrow>
-      <SectionEyebrow>In memory of someone you loved</SectionEyebrow>
-      <SectionEyebrow>After a lifetime of good work</SectionEyebrow>
-      <SectionEyebrow>The yes that changes everything</SectionEyebrow>
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="mb-2 text-xs text-muted-foreground">brand (default)</p>
+        <SectionEyebrow>Live events</SectionEyebrow>
+      </div>
+      <div>
+        <p className="mb-2 text-xs text-muted-foreground">muted</p>
+        <SectionEyebrow variant="muted">Poll closed</SectionEyebrow>
+      </div>
+      <div>
+        <p className="mb-2 text-xs text-muted-foreground">muted + font-semibold</p>
+        <SectionEyebrow variant="muted" className="font-semibold">Charity</SectionEyebrow>
+      </div>
     </div>
   ),
 }

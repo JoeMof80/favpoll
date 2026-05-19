@@ -8,6 +8,7 @@ import {
   type OccasionPlaceholders,
 } from "@/lib/occasions"
 import { getEventHeadline } from "@/lib/display"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import type { Event, Protagonist } from "@/types"
 
@@ -211,9 +212,9 @@ export function EventHero(props: Props) {
               <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
             </div>
           ) : (
-            <p className="mb-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            <SectionEyebrow variant="muted" className="mb-4">
               {headline?.prefix ?? label}
-            </p>
+            </SectionEyebrow>
           )}
 
           {/* Name */}

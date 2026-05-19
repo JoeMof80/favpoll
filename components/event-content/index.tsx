@@ -1,6 +1,7 @@
 "use client"
 
 import { Countdown } from "@/components/countdown"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EventHero } from "@/components/event-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
@@ -90,9 +91,9 @@ export function EventContent({
       <div className="sticky top-20 space-y-4 self-start">
         {isClosed ? (
           <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-1">
-            <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+            <SectionEyebrow variant="muted" className="font-semibold">
               Poll closed
-            </p>
+            </SectionEyebrow>
             {closedAt && (
               <p className="text-sm text-muted-foreground">{closedAt}</p>
             )}

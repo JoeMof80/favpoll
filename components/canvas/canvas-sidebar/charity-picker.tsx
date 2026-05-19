@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react"
 import { X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import type { Charity } from "@/types"
 
@@ -63,9 +64,9 @@ export function CharityPicker({
   return (
     <div className="space-y-2 rounded-lg border border-border bg-card px-5 py-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+        <SectionEyebrow variant="muted" className="font-semibold">
           Charity
-        </p>
+        </SectionEyebrow>
         {charityIds.length > 0 && (
           <p className="text-xs text-muted-foreground">
             {charityIds.length}/{MAX_CHARITIES}

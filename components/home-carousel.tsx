@@ -5,6 +5,7 @@ import Autoplay from "embla-carousel-autoplay"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 type PollResult = { label: string; pct: number }
 
@@ -112,9 +113,9 @@ export function HomeCarousel() {
               className="min-w-0 shrink-0 grow-0 basis-full px-4 sm:basis-1/2 lg:basis-1/3"
             >
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-1 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                <SectionEyebrow variant="muted" className="mb-1">
                   {event.occasion}
-                </div>
+                </SectionEyebrow>
                 <h3 className="text-xl font-bold tracking-tight text-foreground">
                   {event.name}
                 </h3>
@@ -123,9 +124,9 @@ export function HomeCarousel() {
                 </p>
 
                 <div className="mt-5">
-                  <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                  <SectionEyebrow variant="muted" className="font-semibold">
                     {event.question}
-                  </p>
+                  </SectionEyebrow>
                   <ul className="mt-3 space-y-2.5">
                     {event.results.map((r) => (
                       <li key={r.label} className="space-y-1">

@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { OccasionTag } from "@/components/ui/occasion-tag"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+
+const MotionEyebrow = motion(SectionEyebrow)
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { RevealQuote } from "@/components/ui/reveal-quote"
 
@@ -365,13 +367,12 @@ export function HeroDemoPanel() {
             {/* Eyebrow — updates with scene */}
             <div className="mb-2 h-3.5">
               <AnimatePresence mode="wait">
-                <motion.p
+                <MotionEyebrow
                   key={`eyebrow-${sceneIndex}`}
                   {...TEXT_FADE}
-                  className="text-[11px] font-medium tracking-widest uppercase text-[#534AB7]"
                 >
                   {eyebrow}
-                </motion.p>
+                </MotionEyebrow>
               </AnimatePresence>
             </div>
 

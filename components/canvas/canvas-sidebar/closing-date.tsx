@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { CalendarIcon, Clock2Icon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import {
@@ -56,14 +57,14 @@ function DateTimePicker({
 
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+      <SectionEyebrow variant="muted" className="mb-2 font-semibold">
         {label}
         {optional && (
           <span className="ml-1 font-normal tracking-normal normal-case">
             (optional)
           </span>
         )}
-      </p>
+      </SectionEyebrow>
       <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
         <PopoverTrigger asChild>
           <Button
