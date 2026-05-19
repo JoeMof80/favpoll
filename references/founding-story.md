@@ -20,7 +20,7 @@ That is favpoll.
 
 favpoll is a charitable polling platform for life events. An organiser creates an event — a memorial, a birthday, a retirement — selects a charity, and invites guests to pledge donations against their favourite things. The rankings update in real time. At the event itself, a live display screen shows the rankings shifting as guests pledge from their phones, creating a shared, living tribute that no funeral collection tin ever could.
 
-Every pledge contributes to two things simultaneously: the charity chosen by the organiser, and favpoll's permanent all-time record of human favourites. A record built entirely through acts of generosity, at moments of genuine emotional significance.
+Every pledge contributes to two things simultaneously: the charity chosen by the organiser, and favpoll's permanent record of human favourites. A record built entirely through acts of generosity, at moments of genuine emotional significance.
 
 ## The reveal
 
@@ -34,18 +34,30 @@ Some favpolls are created by people planning their own memorial. A person writes
 
 This is not morbid. It is generous. It says: here is something I want you to know about me, and here is how I want you to be remembered knowing it.
 
-## The all-time record
+## The record
 
-The all-time rankings are unlike anything that exists. When favpoll eventually records that Britain's favourite colour — weighted by charitable conviction, gathered at thousands of life events — is Blue, that finding means something. It wasn't gamed. It wasn't passively accumulated. It was paid for, freely, by people honouring someone they loved.
+The record is unlike anything that exists. When favpoll eventually records that Britain's favourite colour — weighted by charitable conviction, gathered at thousands of life events — is Blue, that finding means something. It wasn't gamed. It wasn't passively accumulated. It was paid for, freely, by people honouring someone they loved.
 
-Over time, as the dataset grows, the all-time rankings become the product's public face — a living record that anyone can explore, not just people planning events. The landing page becomes secondary. The record comes first.
+Over time, as the dataset grows, the record becomes the product's public face — a living record that anyone can explore, not just people planning events. The landing page becomes secondary. The record comes first.
 
 That is data with soul.
 
+## The identity
+
+favpoll sits at the intersection of three things that rarely appear together:
+
+**Charity.** Every pledge goes to a cause chosen in someone's name.
+**Honour.** Every event is an act of remembrance or celebration.
+**Love.** Every answer is a small piece of what someone genuinely cares about.
+
+Most charitable platforms have charity without honour. Most tributes have honour and love without charity. favpoll has all three. That intersection is not accidental — it is the point.
+
+*Expressions of joy, for charitable causes, in the name of those we love.*
+
 ## Where it's going
 
-favpoll is starting with the occasions that matter most — memorials and funerals, where the need for a meaningful collection is clearest and the emotional resonance of sharing favourites is deepest. Every life event is an opportunity: birthdays, retirements, weddings, graduations. Anywhere people gather to honour someone, favpoll can turn a financial transaction into something memorable.
+favpoll is starting with the occasions that matter most — memorials and funerals, where the need for a meaningful collection is clearest and the emotional resonance of sharing favourites is deepest. Every life event is an opportunity: birthdays, retirements, weddings, engagements, graduations. Anywhere people gather to honour someone, favpoll can turn a financial transaction into something memorable.
 
 The live display — a real-time ranking on a screen at the event itself — is the experience that makes this tangible. Guests watch Purple climb as people pledge. The room shares something. The collection becomes a conversation.
 
-Over time, as thousands of events contribute to the all-time rankings, favpoll becomes something else entirely: the most human dataset ever assembled. Built not by a corporation harvesting behaviour, but by communities choosing to participate, at the moments when what they love matters most.
+Over time, as thousands of events contribute to the record, favpoll becomes something else entirely: the most human dataset ever assembled. Built not by a corporation harvesting behaviour, but by communities choosing to participate, at the moments when what they love matters most.

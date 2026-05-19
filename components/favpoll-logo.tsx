@@ -31,7 +31,7 @@ export function FavpollLogo({ className }: { className?: string }) {
         />
       </svg>
 
-      <span className="text-3xl tracking-tight text-primary">
+      <span className="text-2xl tracking-tight text-primary">
         fav<span className="opacity-60">poll</span>
       </span>
     </span>

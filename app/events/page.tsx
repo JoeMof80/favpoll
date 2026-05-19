@@ -1,151 +1,71 @@
 import Link from "next/link"
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
-import { createAdminClient } from "@/lib/supabase/admin"
-import { DeleteEventButton } from "./delete-event-button"
-import type { EventWithDetails } from "@/types"
+import { createClient } from "@/lib/supabase/server"
+import { EventCard } from "@/components/event-card"
+import { EventCardEmpty } from "@/components/event-card-empty"
 
-const OCCASION_LABELS: Record<string, string> = {
-  memorial: "Memorial",
-  birthday: "Birthday",
-  retirement: "Retirement",
-  wedding: "Wedding",
-  other: "Event",
+export const metadata = {
+  title: "Live events — favpoll",
+  description:
+    "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  })
-}
-
-function isClosed(closesAt: string) {
-  return new Date(closesAt) < new Date()
-}
-
-function daysUntilClose(closesAt: string): number {
-  const diff = new Date(closesAt).getTime() - Date.now()
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-}
-
-export default async function EventsPage() {
-  const { userId } = await auth()
-  if (!userId) redirect("/sign-in")
-
-  const supabase = createAdminClient()
+export default async function LiveEventsPage() {
+  const supabase = await createClient()
 
   const { data: events } = await supabase
     .from("events")
     .select(
-      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name)), event_polls(topics(title))"
+      `
+      id,
+      occasion,
+      description,
+      closes_at,
+      total_raised,
+      protagonist:protagonists ( name ),
+      charities:event_charities (
+        charity:charities ( name )
+      ),
+      polls:event_polls (
+        personal_framing,
+        topic:topics ( title )
+      )
+    `
     )
-    .eq("created_by", userId)
+    .eq("is_private", false)
+    .is("closed_at", null)
     .order("created_at", { ascending: false })
+    .limit(24)
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pt-10 pb-16">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium text-foreground">Your events</h1>
-        <Link
-          href="/events/new"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
-        >
-          New event
-        </Link>
+    <main className="mx-auto max-w-330 px-6 py-12">
+      <div className="mb-10">
+        <p className="mb-3 text-[11px] font-medium tracking-[0.1em] text-[#534AB7] uppercase">
+          Live events
+        </p>
+        <h1 className="mb-3 text-[32px] font-medium tracking-tight text-foreground">
+          Happening right now
+        </h1>
+        <p className="max-w-[480px] text-[14px] leading-relaxed text-muted-foreground">
+          Real events, real people, real causes. Pledge to any of these — or{" "}
+          <Link href="/events/new" className="text-[#534AB7]">
+            create your own.
+          </Link>
+        </p>
       </div>
 
-      {events && events.length > 0 ? (
-        <ul className="mt-8 space-y-3" role="list">
-          {(events as EventWithDetails[]).map((event) => {
-            const closed = isClosed(event.closes_at)
-            const days = daysUntilClose(event.closes_at)
-            const polls =
-              (
-                event as unknown as {
-                  event_polls: { topics: { title: string } }[]
-                }
-              ).event_polls ?? []
-            const topicTitle = polls[0]?.topics?.title ?? null
-
-            return (
-              <li
-                key={event.id}
-                className="rounded-lg border border-border bg-card transition-colors hover:border-primary/30 hover:bg-secondary/30"
-              >
-                <div className="flex items-start justify-between px-5 py-4">
-                  <Link
-                    href={`/events/${event.id}`}
-                    className="group min-w-0 flex-1 focus:outline-none"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {OCCASION_LABELS[event.occasion] ?? "Event"}
-                      </span>
-                      {closed && (
-                        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                          Closed
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-0.5 truncate text-base font-medium text-foreground">
-                      {event.protagonists.name}
-                    </p>
-                    {topicTitle && (
-                      <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                        {topicTitle}
-                      </p>
-                    )}
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {(
-                        event as unknown as {
-                          event_charities: { charities: { name: string } }[]
-                        }
-                      ).event_charities
-                        ?.map((ec) => ec.charities.name)
-                        .join(", ")}
-                    </p>
-                  </Link>
-
-                  <div className="ml-4 flex shrink-0 flex-col items-end gap-2">
-                    <div className="text-right">
-                      {closed ? (
-                        <p className="text-xs text-muted-foreground">
-                          Closed {formatDate(event.closes_at)}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">
-                          {days === 0
-                            ? "Closes today"
-                            : days === 1
-                              ? "1 day left"
-                              : `${days} days left`}
-                        </p>
-                      )}
-                      <p className="mt-1 text-xs text-primary group-hover:underline">
-                        View →
-                      </p>
-                    </div>
-                    <DeleteEventButton eventId={event.id} />
-                  </div>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+      {events?.length === 0 ? (
+        <EventCardEmpty />
       ) : (
-        <div className="mt-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            You haven&apos;t created any events yet.
-          </p>
-          <Link
-            href="/events/new"
-            className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none"
-          >
-            Create your first event
-          </Link>
-        </div>
+        <ul
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          role="list"
+        >
+          {(
+            events as unknown as Parameters<typeof EventCard>[0]["event"][]
+          )?.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </ul>
       )}
     </main>
   )

@@ -1,5 +1,13 @@
-import { describe, it, expect } from "vitest"
-import { ordinal, formatEventDate, getEventHeadline } from "@/lib/display"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import {
+  ordinal,
+  formatEventDate,
+  getEventHeadline,
+  occasionLabel,
+  charityNames,
+  formatAmount,
+  formatRelativeDate,
+} from "@/lib/display"
 
 describe("ordinal", () => {
   it.each([
@@ -111,5 +119,114 @@ describe("getEventHeadline", () => {
   it("passes name through unchanged", () => {
     const result = getEventHeadline({ occasion: "other", name: "Grace & Henry" })
     expect(result.name).toBe("Grace & Henry")
+  })
+})
+
+describe("occasionLabel", () => {
+  it.each([
+    ["memorial", "In memory of"],
+    ["funeral", "In memory of"],
+    ["birthday", "Birthday"],
+    ["retirement", "Retirement"],
+    ["wedding", "Wedding"],
+    ["anniversary", "Anniversary"],
+    ["leaving_do", "Leaving do"],
+    ["graduation", "Graduation"],
+    ["christening", "Christening"],
+    ["bar_bat_mitzvah", "Bar / Bat Mitzvah"],
+    ["get_well_soon", "Get well soon"],
+    ["sports_achievement", "Achievement"],
+    ["work_milestone", "Work milestone"],
+    ["just_because", "Just because"],
+    ["other", "Event"],
+  ])("occasionLabel(%s) → %s", (occasion, expected) => {
+    expect(occasionLabel(occasion)).toBe(expected)
+  })
+
+  it("returns 'Event' for unknown occasion", () => {
+    expect(occasionLabel("unknown_type")).toBe("Event")
+  })
+})
+
+describe("charityNames", () => {
+  it("returns empty string for empty array", () => {
+    expect(charityNames([])).toBe("")
+  })
+
+  it("returns single name", () => {
+    expect(charityNames([{ charity: { name: "Age UK" } }])).toBe("Age UK")
+  })
+
+  it("joins two names with &", () => {
+    expect(
+      charityNames([
+        { charity: { name: "Age UK" } },
+        { charity: { name: "Macmillan" } },
+      ])
+    ).toBe("Age UK & Macmillan")
+  })
+
+  it("joins three names with commas and &", () => {
+    expect(
+      charityNames([
+        { charity: { name: "Age UK" } },
+        { charity: { name: "Macmillan" } },
+        { charity: { name: "RNLI" } },
+      ])
+    ).toBe("Age UK, Macmillan & RNLI")
+  })
+})
+
+describe("formatAmount", () => {
+  it("formats zero as £0", () => {
+    expect(formatAmount(0)).toBe("£0")
+  })
+
+  it("formats a whole number without pence", () => {
+    expect(formatAmount(750)).toBe("£750")
+  })
+
+  it("formats thousands with comma separator", () => {
+    expect(formatAmount(1500)).toBe("£1,500")
+  })
+
+  it("rounds to nearest pound", () => {
+    expect(formatAmount(99.7)).toBe("£100")
+  })
+})
+
+describe("formatRelativeDate", () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2027-06-15T12:00:00Z"))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it("returns 'soon' for past dates", () => {
+    expect(formatRelativeDate("2027-06-14T12:00:00Z")).toBe("soon")
+  })
+
+  it("returns 'today' for a date earlier the same day (diff rounds to 0)", () => {
+    // now = noon; date = 6am same day → diff = -0.25 days → Math.ceil = 0
+    expect(formatRelativeDate("2027-06-15T06:00:00Z")).toBe("today")
+  })
+
+  it("returns 'tomorrow' for next day", () => {
+    expect(formatRelativeDate("2027-06-16T12:00:00Z")).toBe("tomorrow")
+  })
+
+  it("returns 'in N days' for 2–6 days ahead", () => {
+    expect(formatRelativeDate("2027-06-19T12:00:00Z")).toBe("in 4 days")
+  })
+
+  it("returns 'next week' for 7–13 days ahead", () => {
+    expect(formatRelativeDate("2027-06-22T12:00:00Z")).toBe("next week")
+  })
+
+  it("returns ordinal day + month for 14+ days ahead", () => {
+    expect(formatRelativeDate("2027-07-10T12:00:00Z")).toBe("10th July")
   })
 })

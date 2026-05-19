@@ -21,6 +21,28 @@ Read the relevant reference files before writing any copy:
 
 ---
 
+## The brand statement
+
+> _Expressions of joy, for charitable causes, in the name of those we love._
+
+This is favpoll's foundational brand statement. It appears in the founding story, on the about page, and on printed materials. It must never be paraphrased, reworded, or broken across lines differently. Use it exactly as written.
+
+---
+
+## The identity — charity, honour, love
+
+favpoll sits at the intersection of three things that rarely appear together:
+
+- **Charity** — every pledge goes to a cause chosen in someone's name
+- **Honour** — every event is an act of remembrance or celebration
+- **Love** — every answer is a small piece of what someone genuinely cares about
+
+Use this as an internal design principle when evaluating copy or features: does this serve charity, honour, or love? If it serves none of them, it probably doesn't belong.
+
+This framing appears explicitly on the about page. It does not need to appear on every page — it is a truth that underpins everything rather than a message to repeat.
+
+---
+
 ## Voice in one paragraph
 
 favpoll speaks with warmth and quiet dignity. It is never corporate, never salesy, never cute. It understands that it will be used at funerals and it holds that responsibility seriously — while also knowing it will be used at birthdays and retirements where a lighter touch is right. The tone shifts with the occasion but the character is constant: thoughtful, human, honest.
@@ -30,7 +52,7 @@ favpoll speaks with warmth and quiet dignity. It is never corporate, never sales
 ## Core product facts — always accurate
 
 **What favpoll is:**
-A charitable polling platform for life events. Guests pledge real money against their favourite things. Rankings update live. Proceeds go to charity. Every pledge contributes to a permanent all-time record of human favourites.
+A charitable polling platform for life events. Guests pledge real money against their favourite things. Rankings update live. Proceeds go to charity. Every pledge contributes to a permanent record of human favourites.
 
 **The reveal mechanic:**
 The quote field on each event poll is a reveal — shown to guests only after they have pledged. The framing question withholds the protagonist's favourite; the reveal discloses it after payment. The pledge becomes a two-way act: the guest shares something of themselves, the person being honoured shares something back.
@@ -53,9 +75,48 @@ favpoll is genuinely both things simultaneously — a fundraising platform and a
 
 **Will instructions:** a favpoll can be specified in a will or letter of wishes. The person writes the questions and reveals in advance. An executor creates the favpoll when the time comes.
 
-**All-time rankings:** shown publicly once sufficient data exists across topics. The long-term vision is for the all-time rankings page to become favpoll's home page — the record first, the platform second.
+**All-time rankings:** shown publicly once sufficient data exists across topics. The long-term vision is for the the record page to become favpoll's home page — the record first, the platform second.
 
 ---
+
+---
+
+## Landing page — headline and eyebrow copy
+
+### Headline — fixed across all occasions
+
+```
+A new way to honour them.
+```
+
+### Brand subheader — fixed
+
+```
+Expressions of joy, for charitable causes, in the name of those we love.
+```
+
+### Eyebrows — update with active occasion in hero demo
+
+```
+Memorial:   In memory of someone you loved
+Birthday:   For the birthday they'll remember
+Retirement: After a lifetime of good work
+Wedding:    On the day they say yes
+Engagement: The yes that changes everything
+Graduation: As they take their next step
+```
+
+Never show the headline without an eyebrow. Never change the headline to match
+the occasion — only the eyebrow changes.
+
+### Supporting line — fixed
+
+```
+Expressions of joy, for charitable causes, in the name of those we love.
+```
+
+This is the brand statement used as the supporting line. Static. No animation.
+Do not update per occasion. Do not personalise with protagonist names.
 
 ## The framing / reveal pattern
 
@@ -150,6 +211,7 @@ Flower:
   framing: "e.g. I had a flower I never tired of — what's yours?"
   reveal:  "e.g. Lavender. I grew it in every garden I ever had."
 ```
+
 The quote field is empty. Guests see the framing, pledge, and see the current rankings. No reveal moment. This is fine — not every topic suits one, and not every organiser will want to write one. Do not force it.
 
 **When the organiser has already disclosed the favourite in the framing:**
@@ -160,6 +222,7 @@ e.g. "Rebecca's favourite colour was purple — what's yours?" — this is a val
 ## Tone guidelines
 
 **Do:**
+
 - Use short sentences. Let them breathe.
 - Name the feeling before the feature.
 - Trust the reader. Don't over-explain.
@@ -170,6 +233,7 @@ e.g. "Rebecca's favourite colour was purple — what's yours?" — this is a val
 - Write reveals in the third person when the organiser is speaking about someone else: "Belinda's was purple."
 
 **Don't:**
+
 - Use exclamation marks in anything memorial-adjacent.
 - Use corporate language: "leverage," "seamless," "innovative," "solution."
 - Use fundraising clichés: "every penny counts," "make a difference," "give generously."
@@ -189,7 +253,7 @@ Always describe as an experience, not a feature:
 
 ---
 
-## The all-time rankings
+## The the record
 
 Frame as a lasting contribution, not a data product:
 
@@ -220,6 +284,7 @@ Always transparent, never apologetic:
 ## What favpoll is not
 
 Never describe favpoll as:
+
 - A social network or community platform
 - A gamified experience
 - A prediction market
@@ -233,6 +298,7 @@ Never describe favpoll as:
 These are the canonical values from the favpoll style guide. Use them whenever building or reviewing UI — do not invent new values.
 
 ### Colours
+
 ```
 Purple primary:   #534AB7   — buttons, logo, links, brand moments
 Purple mid:       #7F77DD   — ranking bars, progress indicators
@@ -256,6 +322,7 @@ Blue:             #378ADD   — informational states
 ```
 
 ### Typography
+
 ```
 Typeface:         Plus Jakarta Sans (Google Fonts, free)
 Weights:          400 regular, 500 medium — never 600 or 700
@@ -271,6 +338,7 @@ Quote/Reveal:     14px / 400 / italic / color: #3C3489 / border-left: 3px solid 
 ```
 
 ### Borders and surfaces
+
 ```
 Cards:            background white, border 0.5px solid #D3D1C7, border-radius 10px
 Dividers:         0.5px solid #D3D1C7 — never thicker
@@ -279,6 +347,7 @@ Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
 ```
 
 ### Spacing scale
+
 ```
 4px   — component internals (icon gaps, tight padding)
 8px   — element gaps within components
@@ -289,6 +358,7 @@ Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
 ```
 
 ### Button hierarchy
+
 ```
 Primary:   solid #534AB7, white text, border-radius 7px — one per panel
 Ghost:     transparent, border 0.5px solid #AFA9EC, purple text — secondary actions
@@ -296,8 +366,9 @@ Text:      no border, no background, gray-400 text — quiet actions (cancel, sk
 ```
 
 ### Writing conventions
+
 ```
-Product name:   favpoll (always lowercase, never FavPoll)
+Product name:   favpoll (always lowercase, never favpoll)
 Spelling:       UK English in UI copy (favourite, honour, colour)
                American spelling in code only (color, organize)
 Dates:          13th May 2026 — ordinal, never ISO or US format

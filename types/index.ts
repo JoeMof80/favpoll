@@ -57,6 +57,7 @@ export type OccasionType =
   | 'birthday'
   | 'retirement'
   | 'wedding'
+  | 'engagement'
   | 'anniversary'
   | 'leaving'
   | 'graduation'

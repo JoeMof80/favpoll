@@ -19,13 +19,22 @@ export function Header() {
           >
             Rankings
           </Link>
+          <Link
+            href="/events"
+            className="mr-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            Live events
+          </Link>
           <Show when="signed-in">
             <Link
-              href="/events"
+              href="/my-events"
               className="mr-2 text-sm text-muted-foreground hover:text-foreground"
             >
               Your events
             </Link>
+            <Button asChild size="sm">
+              <Link href="/events/new">New event</Link>
+            </Button>
             <UserButtonClient />
           </Show>
           <Show when="signed-out">
