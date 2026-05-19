@@ -316,6 +316,7 @@ components/
 │   ├── card.tsx
 │   ├── input.tsx
 │   ├── field.tsx                     -- Form field wrapper (vertical/horizontal)
+│   ├── chip.tsx                      -- Selectable pill toggle (border-based, built on Button)
 │   ├── occasion-tag.tsx              -- Small uppercase occasion label (brand purple)
 │   ├── section-eyebrow.tsx           -- Small uppercase section label (brand | muted variants)
 │   ├── ranking-bar.tsx               -- Label + amount + progress bar row
@@ -346,7 +347,7 @@ components/
 ├── poll-section/
 │   ├── index.tsx                     -- Poll UI (item selection + reveal)
 │   └── use-poll-section.ts
-├── hero-demo-panel.tsx               -- Animated homepage demo (no props, self-contained)
+├── hero-demo-panel.tsx               -- Animated homepage demo (no props, self-contained). Occasion chips in right column; protagonist avatar + name shown in card; poll options styled as Chip; amounts styled as AmountPresets
 ├── event-hero.tsx                    -- Event header with protagonist info
 ├── event-card.tsx                    -- Card for live events listings
 ├── event-card-empty.tsx              -- Empty state card
@@ -380,7 +381,7 @@ scripts/seed.ts                       -- pnpm seed — additive, idempotent
 
 ## Atomic UI Components
 
-Four shared atoms in `components/ui/` extracted from duplicated inline patterns:
+Shared atoms in `components/ui/` extracted from duplicated inline patterns:
 
 | Component | Props | Usage |
 |---|---|---|
@@ -388,18 +389,23 @@ Four shared atoms in `components/ui/` extracted from duplicated inline patterns:
 | `SectionEyebrow` | `children, className?, variant?` | Section label; `variant="brand"` (purple, default) or `variant="muted"` (gray) |
 | `RankingBar` | `label, amount, widthPercent, barClassName?, barStyle?, className?` | Label + amount + coloured progress bar |
 | `RevealQuote` | `text, className?, role?, aria-label?, aria-live?` | Left-bordered italic blockquote for reveal text |
+| `Chip` | `selected?, className?, ...buttonProps` | Selectable pill — border-based toggle; selected: brand purple fill; unselected: `border-border bg-background` |
 
-`SectionEyebrow` with framer-motion: `const MotionEyebrow = motion(SectionEyebrow)` — used in `hero-demo-panel.tsx`.
+`Chip` is used for occasion selectors, topic pickers, category filters, and charity selection. Built on `Button`; accepts all button props. Use `className` for size overrides (e.g. `py-1 text-[11px]` for compact). Do not use for amount presets (those are input shortcuts, not filters — use `Button` directly).
+
+`SectionEyebrow` with framer-motion: wrap with `motion()` as needed — see `hero-demo-panel.tsx`.
 
 ---
 
 ## Storybook
 
-Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. 16 story files co-located alongside components:
+Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. 17 story files co-located alongside components:
 
-- **UI atoms:** button, card, input, field, occasion-tag, section-eyebrow, ranking-bar, reveal-quote
+- **UI atoms:** button, card, input, field, occasion-tag, section-eyebrow, ranking-bar, reveal-quote, chip
 - **Feature components:** event-card, event-card-empty, countdown, charity-banner
 - **Pledge form:** amount-input, amount-presets, pledge-breakdown
+
+Font fix: `.storybook/preview-head.html` loads Plus Jakarta Sans from Google Fonts and sets `--font-sans` — required because `next/font` only runs through the Next.js layout, not Storybook. `@storybook/react` is a direct devDependency (required for TypeScript to resolve `Meta`/`StoryObj` types with pnpm's strict node_modules).
 
 ---
 
