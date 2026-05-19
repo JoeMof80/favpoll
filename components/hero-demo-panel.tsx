@@ -25,6 +25,7 @@ type Phase =
 
 type HeroScene = {
   occasion: string
+  occasionTag: string
   protagonistName: string
   protagonistInitials: string
   avatarColor: string
@@ -43,9 +44,21 @@ type HeroScene = {
   totalLabel: string
 }
 
+// "In memory of",
+// "Birthday",
+// "Retirement",
+// "Wedding",
+// "Engagement",
+// "Anniversary",
+// "Leaving do",
+// "Graduation",
+// "Christening",
+// "Achievement",
+
 const SCENES: HeroScene[] = [
   {
     occasion: "Memorial",
+    occasionTag: "In memory of",
     protagonistName: "Belinda Hartley",
     protagonistInitials: "BH",
     avatarColor: "#7F77DD",
@@ -73,6 +86,7 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Birthday",
+    occasionTag: "15 Today!",
     protagonistName: "Poppy Chen",
     protagonistInitials: "PC",
     avatarColor: "#E87D6A",
@@ -100,6 +114,7 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Retirement",
+    occasionTag: "Happy Retirement",
     protagonistName: "Margaret Osei",
     protagonistInitials: "MO",
     avatarColor: "#4AAB8A",
@@ -125,6 +140,7 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Engagement",
+    occasionTag: "She said yes!",
     protagonistName: "Alex & Jordan",
     protagonistInitials: "AJ",
     avatarColor: "#D4936B",
@@ -150,6 +166,7 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Wedding",
+    occasionTag: "Congratulations!",
     protagonistName: "Sarah & Tom",
     protagonistInitials: "ST",
     avatarColor: "#534AB7",
@@ -174,6 +191,7 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Graduation",
+    occasionTag: "Happy Graduation",
     protagonistName: "James Okafor",
     protagonistInitials: "JO",
     avatarColor: "#5B9BD5",
@@ -340,36 +358,6 @@ export function HeroDemoPanel() {
   return (
     <section id="how-it-works" className="border-b border-border bg-muted">
       <div className="mx-auto max-w-330">
-        {/* Occasion strip — full width */}
-        <div className="border-b border-border">
-          <div className="mx-auto flex max-w-330 flex-wrap gap-1.25 px-6 py-3">
-            {OCCASION_CHIPS.map(({ label, index }) => (
-              <button
-                key={label}
-                type="button"
-                role="button"
-                aria-pressed={index === sceneIndex}
-                tabIndex={0}
-                onClick={() => handleOccasionClick(index)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault()
-                    handleOccasionClick(index)
-                  }
-                }}
-                className={cn(
-                  "cursor-pointer rounded-full border px-3 py-1 text-[11px] transition-all duration-200",
-                  index === sceneIndex
-                    ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
-                    : "border-border bg-background text-muted-foreground hover:border-[#AFA9EC] hover:text-[#534AB7]"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Split — pitch left, demo right */}
         <div className="mx-auto flex h-158 w-full max-w-330">
           {/* Left — pitch copy */}
@@ -418,10 +406,38 @@ export function HeroDemoPanel() {
 
           {/* Right — demo card (desktop only) */}
           <div
-            className="hidden flex-col items-center justify-center p-5 md:flex"
+            className="hidden flex-col p-5 md:flex"
             style={{ flex: "0.95" }}
           >
-            <div className="flex h-full w-full flex-col">
+            {/* Occasion chips */}
+            <div className="mb-3 flex flex-wrap gap-1.25">
+              {OCCASION_CHIPS.map(({ label, index }) => (
+                <button
+                  key={label}
+                  type="button"
+                  role="button"
+                  aria-pressed={index === sceneIndex}
+                  tabIndex={0}
+                  onClick={() => handleOccasionClick(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      handleOccasionClick(index)
+                    }
+                  }}
+                  className={cn(
+                    "cursor-pointer rounded-full border px-3 py-1 text-[11px] transition-all duration-200",
+                    index === sceneIndex
+                      ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
+                      : "border-border bg-background text-muted-foreground hover:border-[#AFA9EC] hover:text-[#534AB7]"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col">
               <span className="sr-only">
                 Animated demonstration of how favpoll works, showing a{" "}
                 {scene.occasion.toLowerCase()} event. The demonstration cycles
@@ -444,7 +460,7 @@ export function HeroDemoPanel() {
                         prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0 }
                       }
                     >
-                      <OccasionTag label={scene.occasion} />
+                      <OccasionTag label={scene.occasionTag} />
                     </motion.div>
 
                     {/* Protagonist avatar + name — fades in just after eyebrow */}
