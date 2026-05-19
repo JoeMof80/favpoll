@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { OccasionTag } from "@/components/ui/occasion-tag"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
-const MotionEyebrow = motion(SectionEyebrow)
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { RevealQuote } from "@/components/ui/reveal-quote"
 
@@ -26,6 +25,9 @@ type Phase =
 
 type HeroScene = {
   occasion: string
+  protagonistName: string
+  protagonistInitials: string
+  avatarColor: string
   topicTitle: string
   question: string
   options: { label: string }[]
@@ -44,6 +46,9 @@ type HeroScene = {
 const SCENES: HeroScene[] = [
   {
     occasion: "Memorial",
+    protagonistName: "Belinda Hartley",
+    protagonistInitials: "BH",
+    avatarColor: "#7F77DD",
     topicTitle: "Colour",
     question:
       "Belinda had a colour she returned to all her life — what's yours?",
@@ -68,6 +73,9 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Birthday",
+    protagonistName: "Poppy Chen",
+    protagonistInitials: "PC",
+    avatarColor: "#E87D6A",
     topicTitle: "Ice cream",
     question: "Tell us your favourite ice cream to find out Poppy's.",
     options: [
@@ -92,6 +100,9 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Retirement",
+    protagonistName: "Margaret Osei",
+    protagonistInitials: "MO",
+    avatarColor: "#4AAB8A",
     topicTitle: "Season",
     question: "Margaret had a season she always loved most — which is yours?",
     options: [
@@ -114,6 +125,9 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Engagement",
+    protagonistName: "Alex & Jordan",
+    protagonistInitials: "AJ",
+    avatarColor: "#D4936B",
     topicTitle: "Season",
     question: "Alex & Jordan have a favourite season — which is yours?",
     options: [
@@ -136,6 +150,9 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Wedding",
+    protagonistName: "Sarah & Tom",
+    protagonistInitials: "ST",
+    avatarColor: "#534AB7",
     topicTitle: "Season",
     question: "Sarah & Tom have a favourite season — which is yours?",
     options: [
@@ -157,6 +174,9 @@ const SCENES: HeroScene[] = [
   },
   {
     occasion: "Graduation",
+    protagonistName: "James Okafor",
+    protagonistInitials: "JO",
+    avatarColor: "#5B9BD5",
     topicTitle: "Film",
     question:
       "James has a favourite film he could watch again and again — what's yours?",
@@ -195,13 +215,6 @@ const SCENE_EYEBROWS = [
   "On the day they say yes",
   "As they take their next step",
 ]
-
-const TEXT_FADE = {
-  initial: { opacity: 0, y: 4 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -3 },
-  transition: { duration: 0.3, ease: "easeInOut" as const },
-}
 
 const fadeUp = {
   initial: { opacity: 0, y: 6 },
@@ -358,7 +371,7 @@ export function HeroDemoPanel() {
         </div>
 
         {/* Split — pitch left, demo right */}
-        <div className="mx-auto flex h-125 w-full max-w-330">
+        <div className="mx-auto flex h-158 w-full max-w-330">
           {/* Left — pitch copy */}
           <div
             className="flex flex-col justify-center px-9 py-11"
@@ -367,12 +380,15 @@ export function HeroDemoPanel() {
             {/* Eyebrow — updates with scene */}
             <div className="mb-2 h-3.5">
               <AnimatePresence mode="wait">
-                <MotionEyebrow
+                <motion.div
                   key={`eyebrow-${sceneIndex}`}
-                  {...TEXT_FADE}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -3 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
-                  {eyebrow}
-                </MotionEyebrow>
+                  <SectionEyebrow>{eyebrow}</SectionEyebrow>
+                </motion.div>
               </AnimatePresence>
             </div>
 
@@ -420,13 +436,46 @@ export function HeroDemoPanel() {
               >
                 <div className="relative flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
                   <div className="space-y-4">
-                    {/* Title — always visible once arrived */}
+                    {/* Occasion tag — fades in first */}
+                    <motion.div
+                      key={`card-occasion-${sceneIndex}`}
+                      {...fadeUp}
+                      transition={
+                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0 }
+                      }
+                    >
+                      <OccasionTag label={scene.occasion} />
+                    </motion.div>
+
+                    {/* Protagonist avatar + name — fades in just after eyebrow */}
+                    <motion.div
+                      key={`protagonist-${sceneIndex}`}
+                      {...fadeUp}
+                      transition={
+                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.08 }
+                      }
+                      className="flex items-center gap-4 border-b pb-4"
+                    >
+                      <div
+                        className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full text-xl font-medium text-white"
+                        style={{ backgroundColor: scene.avatarColor }}
+                        aria-hidden="true"
+                      >
+                        {scene.protagonistInitials}
+                      </div>
+                      <span className="text-4xl leading-tight font-medium tracking-tight text-foreground">
+                        {scene.protagonistName}
+                      </span>
+                    </motion.div>
+
+                    {/* Title — arrives slightly later */}
                     <motion.div
                       key={`title-${sceneIndex}`}
                       {...fadeUp}
-                      transition={prefersReducedMotion ? FAST : MEDIUM}
+                      transition={
+                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.2 }
+                      }
                     >
-                      <OccasionTag label={scene.occasion} className="mb-1" />
                       <h2 className="text-3xl font-medium tracking-tight text-foreground">
                         Favourite {scene.topicTitle}
                       </h2>
@@ -437,7 +486,7 @@ export function HeroDemoPanel() {
                       key={`framing-${sceneIndex}`}
                       {...fadeUp}
                       transition={
-                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.15 }
+                        prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.32 }
                       }
                       className="text-lg leading-7 text-muted-foreground"
                     >
