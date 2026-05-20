@@ -44,30 +44,31 @@ significant feature:
 Use this table when naming variables, functions, types, and UI copy.
 Full definitions in `references/GLOSSARY.md`.
 
-| Domain concept           | Code name             | UI label                    |
-|--------------------------|-----------------------|-----------------------------|
-| Individual/couple/group honoured | `protagonist`  | shown by name only          |
-| Top-level occasion       | `event`               | "event"                     |
-| Question category        | `topic`               | "favpoll" (picker UI)       |
-| Topic in an event        | `event_poll`          | shown by topic title        |
-| Answer option            | `topic_item`          | shown as pill               |
-| Item in event poll       | `event_poll_item`     | not labelled                |
-| Financial commitment     | `pledge`              | "pledge"                    |
-| Pledge split             | `pledge_allocation`   | not shown                   |
-| Organiser's question     | `personal_framing`    | "Question"                  |
-| Post-pledge secret       | `personal_reveal`     | "The reveal"                |
-| Communal pot             | `event_pot`           | "shared fund"               |
-| Fund draw                | `pot_allocation`      | not shown                   |
-| Projector screen         | `live_display`        | "Live display"              |
-| Fixed item list          | `finite` (topic)      | "Finite" (filter)           |
-| Open item list           | `infinite` (topic)    | "Infinite" (filter)         |
-| Item joins canonical list | `inclusion`          | not shown                   |
-| Whether item is canonical | `is_canonical`       | not shown                   |
-| Max closure date         | `hard_close`          | not shown directly          |
-| Scheduled closure        | `auto_close`          | "Poll closes in…"           |
-| Aggregate pledge data    | `all_time_pledged` / `all_time_count` | "the record" |
+| Domain concept                   | Code name                             | UI label              |
+| -------------------------------- | ------------------------------------- | --------------------- |
+| Individual/couple/group honoured | `protagonist`                         | shown by name only    |
+| Top-level occasion               | `event`                               | "event"               |
+| Question category                | `topic`                               | "favpoll" (picker UI) |
+| Topic in an event                | `event_poll`                          | shown by topic title  |
+| Answer option                    | `topic_item`                          | shown as pill         |
+| Item in event poll               | `event_poll_item`                     | not labelled          |
+| Financial commitment             | `pledge`                              | "pledge"              |
+| Pledge split                     | `pledge_allocation`                   | not shown             |
+| Organiser's question             | `personal_framing`                    | "Question"            |
+| Post-pledge secret               | `personal_reveal`                     | "The reveal"          |
+| Communal pot                     | `event_pot`                           | "shared fund"         |
+| Fund draw                        | `pot_allocation`                      | not shown             |
+| Projector screen                 | `live_display`                        | "Live display"        |
+| Fixed item list                  | `finite` (topic)                      | "Finite" (filter)     |
+| Open item list                   | `infinite` (topic)                    | "Infinite" (filter)   |
+| Item joins canonical list        | `inclusion`                           | not shown             |
+| Whether item is canonical        | `is_canonical`                        | not shown             |
+| Max closure date                 | `hard_close`                          | not shown directly    |
+| Scheduled closure                | `auto_close`                          | "Poll closes in…"     |
+| Aggregate pledge data            | `all_time_pledged` / `all_time_count` | "the record"          |
 
 ### Critical naming rules
+
 - `persons` table renamed to `protagonists` — never use `persons` or `person`
 - `event_polls.personal_quote` renamed to `personal_reveal` — never use `personal_quote`
 - `graduate_topic_items()` renamed to `include_topic_items()`
@@ -78,6 +79,7 @@ Full definitions in `references/GLOSSARY.md`.
 - "the record" not "all-time ranking" in all UI copy
 
 ### Terms that must never appear in UI copy
+
 `topic`, `event_poll`, `topic_item`, `pledge_allocation`, `pot_allocation`,
 `event_pot`, `hard_close`, `inclusion`, `is_canonical`, `is_finite`,
 `all_time_pledged`, `clerk_user_id`, `guest_token`, `protagonist`
@@ -96,6 +98,72 @@ Full definitions in `references/GLOSSARY.md`.
 - pnpm only, never npm or yarn
 - American spelling in code (color, organize), UK English in UI copy strings
 
+## Component conventions
+
+### File and component naming
+
+- Component files: kebab-case — `favpoll-card.tsx`, `poll-reveal.tsx`
+- Component display names: PascalCase in the function definition —
+  `export function FavpollCard` — but the file is kebab-case
+- Story files: `favpoll-card.stories.tsx` alongside the component
+- Never use PascalCase filenames
+
+### Styling
+
+- Use Tailwind 4 utility classes for all layout, spacing, and typography
+- Use `className` with bracket notation for brand colour values that have no
+  Tailwind equivalent: `bg-[#EEEDFE]`, `border-[#AFA9EC]`, `text-[#534AB7]`
+- Never write a CSS-in-JS style block or a `.css` file for a new component
+  unless there is genuinely no Tailwind alternative
+- Use `cn()` from `@/lib/utils` to compose conditional classNames
+
+### shadcn/ui — reuse before building
+
+Before building any interactive element, check whether a shadcn component
+already covers it. Confirmed available in this project:
+
+- `Button` — all clickable actions, never raw `<button>`
+- `Separator` — dividers between sections, never a raw `<hr>` or a div
+- `Badge` — pills, labels, status indicators
+- `Card`, `CardHeader`, `CardContent` — card containers where appropriate
+
+Import from `@/components/ui/...` as usual.
+
+### Existing components — check before creating
+
+Read `src/components/` before building anything new. Components that already
+exist must be composed rather than reimplemented:
+
+- `event-card.tsx` — event listing card
+- `hero-demo-panel.tsx` — animated hero demo
+
+### Accessibility
+
+Every interactive and dynamic element must have appropriate aria attributes.
+Specific requirements:
+
+- **Live values** (pledge totals, bar chart amounts, countdown): `aria-live="polite"`
+- **Option pills** (topic item selection): use `role="radio"` and `aria-checked`,
+  grouped in a `role="radiogroup"` with `aria-label` naming the poll topic,
+  e.g. `aria-label="Choose your favourite colour"`
+- **Amount buttons** (pledge selector): same pattern — `role="radio"` +
+  `aria-checked` in a `role="radiogroup" aria-label="Pledge amount"`
+- **Reveal card**: `aria-label="[Protagonist]'s reveal"` on the container
+- **Avatar**: `alt="[Protagonist name]"` on `<img>`; initials circle gets
+  `aria-label="[Protagonist name]"` and `aria-hidden="true"` on the initials span
+- **Step indicators**: `role="list"`, each dot `role="listitem"` with
+  `aria-label="Step [n] of [total]"` and `aria-current="step"` on the active dot
+- **Result bars**: each bar row should be a `<li>` inside `role="list"
+aria-label="Results"`, with the label and amount readable by screen readers —
+  do not rely on the visual bar width alone to convey ranking
+- **Confirm strip**: `role="status"` so it is announced on appearance
+
+### Props
+
+- Boolean props: camelCase — `showSteps`, `isEditing`, `hasReveal`
+- Size variants: `size: 'full' | 'demo' | 'embed'`
+- Step state: `step: 'choose' | 'pledge' | 'pledged'`
+
 ## Seed script
 
 Run with `pnpm seed` → `scripts/seed.ts`
@@ -106,6 +174,7 @@ Never delete data — the script is additive and idempotent.
 Run tests with `pnpm test:run`. All 261 tests must pass before committing.
 
 **When to write tests:**
+
 - Every new pure function in `lib/` → add a case to the relevant `lib/__tests__/*.test.ts`
 - Every new custom hook → new `__tests__/use-*.test.ts` alongside it
 - Every new server action or API route → new `__tests__/actions.test.ts` or `__tests__/route.test.ts` with `// @vitest-environment node`
@@ -113,6 +182,7 @@ Run tests with `pnpm test:run`. All 261 tests must pass before committing.
 **File placement:** co-located `__tests__/` directory next to the file under test.
 
 **Environments:**
+
 - Default (jsdom): pure functions, React hooks
 - `// @vitest-environment node` (first line): server actions (`'use server'`), API route handlers
 
