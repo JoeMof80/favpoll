@@ -347,7 +347,12 @@ components/
 ├── poll-section/
 │   ├── index.tsx                     -- Poll UI (item selection + reveal)
 │   └── use-poll-section.ts
-├── hero-demo-panel.tsx               -- Animated homepage demo (no props, self-contained). Occasion chips in right column; protagonist avatar + name shown in card; poll options styled as Chip; amounts styled as AmountPresets
+├── hero-demo-panel/                  -- Animated homepage demo (no props, self-contained)
+│   ├── index.tsx                     -- Orchestrator: state, effects, section layout, occasion chips
+│   ├── scenes.ts                     -- HeroScene type, Phase type, SCENES data, OCCASION_CHIPS, PLEDGE_AMOUNTS, SCENE_EYEBROWS
+│   ├── variants.ts                   -- Framer Motion variants (fadeUp, fadeIn, revealVariant) and timing constants (FAST, MEDIUM, SLOW)
+│   ├── hero-pitch-column.tsx         -- Left column: animated eyebrow, headline, supporting text, CTA buttons
+│   └── demo-card.tsx                 -- Card: protagonist header, topic title, poll options, pledge panel, reveal quote, rankings, charity total, toast
 ├── event-hero.tsx                    -- Event header with protagonist info
 ├── event-card.tsx                    -- Card for live events listings
 ├── event-card-empty.tsx              -- Empty state card
