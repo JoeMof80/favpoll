@@ -334,7 +334,7 @@ Heading 3:        17px / 500
 Body:             15px / 400 / line-height: 1.7
 Small:            13px / 400 / line-height: 1.5 / color: gray-600
 Label:            11px / 500 / letter-spacing: 0.08em / UPPERCASE / color: purple-600
-Quote/Reveal:     14px / 400 / italic / color: #3C3489 / border-left: 3px solid #AFA9EC
+Quote/Reveal:     18px / 400 / italic / leading-relaxed / color: #26215C / border-left: 2.5px solid #7F77DD
 ```
 
 ### Borders and surfaces
@@ -342,7 +342,7 @@ Quote/Reveal:     14px / 400 / italic / color: #3C3489 / border-left: 3px solid 
 ```
 Cards:            background white, border 0.5px solid #D3D1C7, border-radius 10px
 Dividers:         0.5px solid #D3D1C7 — never thicker
-Edit fields:      border-bottom 1.5px solid #AFA9EC, turns #534AB7 on focus
+Edit fields:      absolute border-b-2 border-dotted div below input/textarea (peer pattern); resting: border-border; focus: border-primary/40. Zero layout height impact.
 Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
 ```
 

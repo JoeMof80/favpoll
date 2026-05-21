@@ -12,7 +12,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 - **Events** honour a person (protagonist) on a specific occasion
 - **Topics** are canonical questions — Colour, Season, Biscuit, Film, etc.
-- **Event polls** activate a topic within an event, with a personal framing ("Belinda had a colour she returned to all her life — what's yours?") and an optional personal reveal (shown after pledging)
+- **Event polls** activate a topic within an event, with an optional personal reveal (shown after pledging). A hint line — "Is it the same as [Name]'s?" — is shown to guests before pledging, derived automatically from the protagonist's name.
 - **Pledges** are financial commitments against specific topic items, contributing to both the event ranking and the all-time universal ranking
 - **Pledge allocations** split a single pledge across multiple items (e.g. 60% Purple, 40% Blue)
 - **Shared fund** allows generous donors to top up a communal pot so others (e.g. children) can participate without paying
@@ -131,7 +131,7 @@ event_polls (
   id uuid primary key,
   event_id uuid references events(id) on delete cascade,
   topic_id uuid references topics(id),
-  personal_framing text,            -- The question shown before pledging
+  personal_framing text,            -- Retired; column kept but app no longer reads or writes it
   personal_reveal text,             -- Disclosed after pledging
   created_at timestamptz
 )
@@ -344,8 +344,15 @@ components/
 │   ├── index.tsx                     -- Realtime ranking list
 │   ├── use-ranking-items.ts          -- Supabase realtime subscription
 │   └── utils.ts
+├── favpoll-card/                     -- Shared poll rendering primitives (not a self-contained card)
+│   ├── poll-title.tsx                -- Topic eyebrow label (11px uppercase purple, no built-in margin)
+│   ├── poll-framing.tsx              -- Framing paragraph (15px leading-relaxed #5F5E5A) — unused in production; personal_framing retired
+│   ├── poll-reveal.tsx               -- Post-pledge reveal blockquote (18px italic #26215C, left border)
+│   ├── poll-options.tsx              -- Item selection UI
+│   ├── poll-results.tsx              -- Results display
+│   └── favpoll-card.tsx              -- Assembled card (stories only — not used in production)
 ├── poll-section/
-│   ├── index.tsx                     -- Poll UI (item selection + reveal)
+│   ├── index.tsx                     -- Poll UI: PollHeading + pledge/results views
 │   └── use-poll-section.ts
 ├── hero-demo-panel/                  -- Animated homepage demo (no props, self-contained)
 │   ├── index.tsx                     -- Orchestrator: state, effects, section layout, occasion chips
@@ -360,13 +367,13 @@ components/
 ├── charity-banner.tsx                -- Charity names + logos
 ├── countdown.tsx                     -- Closing countdown display
 ├── header.tsx                        -- App header (nav + auth)
-├── poll-heading.tsx                  -- Poll topic heading + framing
+├── poll-heading.tsx                  -- Poll topic heading: view mode shows PollTitle + hint ("– Is it the same as [Name]'s?" inline, hidden after pledging) + PollReveal; edit mode mirrors same styles with editable inputs. Dual-mode pattern matching event-hero.
 ├── stripe-checkout.tsx               -- Stripe Elements checkout wrapper
 └── pot-banner.tsx                    -- Shared fund banner
 
 lib/
-├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders
-├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline
+├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders (reveal only; framing retired)
+├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline, getPollHint
 ├── email.ts                          -- Resend email helpers
 ├── edit-mode-context.tsx             -- React context for organiser edit mode
 ├── utils.ts                          -- cn(), misc helpers
@@ -404,11 +411,14 @@ Shared atoms in `components/ui/` extracted from duplicated inline patterns:
 
 ## Storybook
 
-Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. 17 story files co-located alongside components:
+Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. Story files co-located alongside components:
 
 - **UI atoms:** button, card, input, field, occasion-tag, section-eyebrow, ranking-bar, reveal-quote, chip
-- **Feature components:** event-card, event-card-empty, countdown, charity-banner
+- **Feature components:** event-card, event-card-empty, countdown, charity-banner, event-hero, poll-heading, poll-section, display-screen
 - **Pledge form:** amount-input, amount-presets, pledge-breakdown
+- **FavpollCard primitives:** favpoll-card, favpoll-header, poll-reveal, event-page
+
+See `references/COMPONENT_TREE.md` for the full component hierarchy, which components are used where, and which are unused in production.
 
 Font fix: `.storybook/preview-head.html` loads Plus Jakarta Sans from Google Fonts and sets `--font-sans` — required because `next/font` only runs through the Next.js layout, not Storybook. `@storybook/react` is a direct devDependency (required for TypeScript to resolve `Meta`/`StoryObj` types with pnpm's strict node_modules).
 
@@ -431,14 +441,13 @@ Gray 100:  #D3D1C7   — borders, dividers
 ### Typography
 - Typeface: Plus Jakarta Sans
 - Weights: 400 regular, 500 medium only (never 600/700)
-- Reveal/quote: 14px, italic, `text-primary/80`, `border-l-4 border-primary/40`
+- Reveal/quote: 18px, italic, `leading-relaxed`, `text-[#26215C]`, `border-l-[2.5px] border-[#7F77DD]` (see `PollReveal`)
 - Section eyebrow (brand): 11px, medium, `tracking-widest`, uppercase, `text-[#534AB7]`
 - Section eyebrow (muted): `text-xs`, medium, `tracking-widest`, uppercase, `text-muted-foreground`
 
 ### Edit mode field treatment
-- Editable field: `border-b border-[#AFA9EC]` persistent underline
-- Focused: border turns `#534AB7`
-- Placeholder: `text-muted-foreground italic`
+- Editable field: **absolute underline pattern** — add `peer` to the input/textarea, then a zero-height sibling `<div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />`. This keeps borders out of layout flow so heights match between edit/view modes.
+- Placeholder: `placeholder:text-muted-foreground/40`
 - Guest view: no underlines, no placeholders, no edit controls
 
 ### Button conventions
@@ -481,7 +490,7 @@ Gray 100:  #D3D1C7   — borders, dividers
 
 ## Testing
 
-Run with `pnpm test:run`. **356 tests must pass** before committing.
+Run with `pnpm test:run`. **406 tests must pass** before committing.
 
 Tests are co-located in `__tests__/` directories alongside their subjects:
 
@@ -498,6 +507,8 @@ Tests are co-located in `__tests__/` directories alongside their subjects:
 | event actions | `app/events/[id]/__tests__/actions.test.ts` |
 | pledge withdraw | `app/pledges/withdraw/__tests__/actions.test.ts` |
 | Storybook smoke | auto-generated via `@storybook/addon-vitest` (chromium) |
+
+`vitest.config.ts` uses **array alias format** — the specific `@/app/events/new/actions` mock alias must come before the generic `@` alias, or Vite's prefix matching swallows it before Storybook's pre-bundler can resolve it.
 
 ---
 
