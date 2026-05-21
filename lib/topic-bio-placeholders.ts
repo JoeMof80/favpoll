@@ -1109,4 +1109,76 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A favourite school subject — or the one that shaped them most — is a small detail that opens up a conversation.",
   },
+
+  // ── Category 9: Literature ────────────────────────────────────────────────
+
+  "Type of book": {
+    memorial:
+      "A beloved mother and teacher who read steadily throughout her life and was never without a book. She preferred novels to almost everything else, and particularly novels where things happened slowly. She said the slow ones were the honest ones.",
+    tribute:
+      "A mentor who read widely and recommended precisely. He once gave a colleague a book of African history at a moment when the colleague needed it and has never explained how he knew. The colleague has never forgotten it.",
+    birthday:
+      "Sarah is turning 40 with a reading pile that is, by her own estimate, three years deep. She manages it without guilt. She reads whatever she wants, when she wants, and considers this the correct approach to all reading.",
+    retirement:
+      "David read engineering texts throughout his working life and is retiring with a plan to read everything else. He has a list. The list is organised by category, then by priority within each category. He started on Monday.",
+    wedding:
+      "Emma reads fiction. James reads non-fiction. They have never read the same thing at the same time and have been exchanging the results of this arrangement for five years. Both are better-read as a result.",
+    engagement:
+      "Callum reads maps and route guides the way other people read novels — hungrily, at pace, making notes in the margins. Sophie reads actual novels. They have agreed these are not competing activities.",
+    anniversary:
+      "Forty years, and there has always been a book on each bedside table — different books, different tastes, no obligation to share. They recommend things to each other sometimes. They don't always agree. This is fine.",
+    leaving:
+      "Priya had a book at her desk at all times and was known to read during every lunch break she took. She was protective of this habit and the team was protective of her lunch breaks. This was a mutually beneficial arrangement.",
+    graduation:
+      "Tom spent four years reading about buildings and is now reading about everything else. He is making up for lost time with the specific urgency of someone who has just realised how much there is.",
+    christening:
+      "Lily's shelves are already full. She has books from four grandparents, two godparents, several family friends, and a pile from her parents that they bought before she arrived. The reading programme has already been debated.",
+    achievement:
+      "Marcus read extensively about marathon running before he started training — the physiology, the psychology, the stories of people who had done it badly and then done it right. He raised over £4,000 for the RNLI. He considered the reading preparation.",
+    recovery:
+      "During her treatment, Claire read slowly, sometimes the same pages twice, occasionally not at all. She found that what she could read shifted as the weeks went on, and that tracking this was, unexpectedly, a way of measuring how she was doing.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has been reading fiction aloud to her class for eleven years — one chapter at a time, after lunch on Fridays. She says it is the most useful thing she does. Several ex-students have told her they remember every book.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He reads one book at a time, always finishes it, and does not begin the next one until he has thought about the previous one for at least a week. His team finds this disciplined. He finds it natural.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of book says something true about them. A reading habit is always a window into something.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite type of book — or the kind they always come back to — is a detail worth including.",
+  },
+
+  Poet: {
+    memorial:
+      "A beloved mother and teacher who could recite poetry from memory across six decades. She didn't announce it. She just produced the lines when they were needed. People learned to recognise when they were needed.",
+    tribute:
+      "A mentor who loved poetry and said so without apology. He kept a collection on his desk — not for show — and used it in the same way other people use conversations: to see if you were paying attention.",
+    birthday:
+      "Sarah is turning 40 with exactly one poet she actively recommends and approximately forty she's been meaning to read. She is working through the list. She says she's in no hurry. She is in a hurry.",
+    retirement:
+      "David would not have described himself as a poetry person until he read something his daughter gave him at sixty-two that he has not been able to get out of his head since. He now has three collections on his bedside table. He is not sure what to do with this.",
+    wedding:
+      "Emma read a poem at their ceremony that she had written herself, which James only found out about the night before. He considered this the best possible surprise. He still does.",
+    engagement:
+      "Callum carries a small anthology of walking poetry in his rucksack — not every walk, but enough that Sophie has stopped finding it surprising. She read one once. She asked to read another. She has said nothing further about this.",
+    anniversary:
+      "Forty years together, and Mum reads poetry. Dad reads it with her, sometimes, and does not tell her how much he gets from it. She knows. He knows she knows.",
+    leaving:
+      "Priya left a printed poem on each desk on her last morning. No explanation, no note. People found them when they arrived. Everyone remembered which one they got. Several have kept them.",
+    graduation:
+      "Tom's architecture tutor told his class that all architects should read more poetry because poetry does in six lines what architecture tries to do in six storeys. Tom has been thinking about this for four years.",
+    christening:
+      "Lily's parents have memorised exactly one poem for the christening, which they will recite at an appropriate moment. They are not sure when the appropriate moment is. They have been practising.",
+    achievement:
+      "Marcus says the experience of running alone for hours changes your relationship to language — things that would otherwise be sentimental become simply accurate. He raised over £4,000 for the RNLI. He has since read more poetry than he expected to.",
+    recovery:
+      "During her recovery, Claire found that short things worked better than long things. Poetry, particularly. She read a great deal of it, slowly, in the middle of the night, and found it sufficient. She still reads it.",
+    award:
+      "Amelia has just been named Teacher of the Year. She begins every academic year with a poem and has done so for eleven years. The poem changes. The reason for doing it doesn't.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He read extensively at university and has maintained the habit, including poetry, which he reads for the same reason he reads everything: to understand how people think.",
+    celebration:
+      "Tell their story — who they are, what they love, and whether there's a poet who says something true about them. A favourite poet is rarely just a preference.",
+    other:
+      "Tell us who this person is and why you're gathering. A poet they love, or a poem that mattered at a particular moment, is always worth including.",
+  },
 }
