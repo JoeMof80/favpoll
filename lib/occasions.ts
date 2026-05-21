@@ -118,7 +118,6 @@ export const CLOSING_DEFAULTS: Record<string, number> = {
 export type OccasionPlaceholders = {
   name: string
   bio: string
-  framing: string
   reveal: string
 }
 
@@ -126,123 +125,93 @@ export const OCCASION_PLACEHOLDERS: Record<string, OccasionPlaceholders> = {
   memorial: {
     name: "Belinda Johnson",
     bio: "A beloved mother, teacher, and friend who spent her life bringing people together and always had time for a long conversation over tea…",
-    framing:
-      "e.g. Belinda had a colour she returned to all her life — what's yours?",
     reveal:
       "e.g. Belinda's was purple. She wore it to every important occasion.",
   },
   tribute: {
     name: "David Osei",
     bio: "A mentor to dozens, a friend to hundreds, and the person who always knew exactly what to say…",
-    framing:
-      "e.g. There was a song that always stopped David in his tracks — what's yours?",
     reveal:
       "e.g. David's was Waterloo Sunset. He said it made him feel London was beautiful.",
   },
   birthday: {
     name: "Sarah Mitchell",
     bio: "Sarah is turning 40 and has never met a cheese she didn't like. She spends her weekends hiking, hosting elaborate dinner parties, and planning trips she may or may not actually take…",
-    framing:
-      "e.g. Sarah has strong opinions about biscuits — what's your favourite?",
     reveal:
       "e.g. Sarah's is the Bourbon. She once ate four packets in one sitting.",
   },
   retirement: {
     name: "David Clarke",
     bio: "After 35 years building the engineering team from four people to four hundred, David is finally putting down his laptop, ignoring his email, and picking up his golf clubs for good…",
-    framing:
-      "e.g. David had a place he always talked about going back to — where would you send him?",
     reveal:
       "e.g. David's was the Dordogne. He kept a photo of it on his desk for thirty years.",
   },
   wedding: {
     name: "Emma & James",
     bio: "Emma and James met at a rainy music festival in 2019 and haven't been apart since. They share a love of travel, strong coffee, and an ongoing argument about the best pizza in Naples…",
-    framing:
-      "e.g. Emma & James have strong opinions about food — what cuisine should they discover on honeymoon?",
     reveal:
       "e.g. Theirs was Italian. They've been arguing about the best pizza in Naples since 2019.",
   },
   engagement: {
     name: "Sophie & Callum",
     bio: "Callum proposed at the top of Arthur's Seat on New Year's Day. Sophie said yes before he'd finished the question…",
-    framing:
-      "e.g. Sophie & Callum have a song that's entirely theirs — what's yours?",
     reveal:
       "e.g. Theirs was Perfect. It played when they weren't trying to be romantic, and that was the point.",
   },
   anniversary: {
     name: "Mum & Dad",
     bio: "Forty years of adventures, arguments, laughter, and love — still each other's favourite person to share a pot of tea with…",
-    framing:
-      "e.g. There's something Mum & Dad have always come back to — what's yours?",
     reveal:
       "e.g. Theirs was a pot of tea and a good biscuit. Same time every morning for forty years.",
   },
   leaving: {
     name: "Priya Sharma",
     bio: "Priya's heading off to start her own studio after six brilliant years. She leaves a trail of good work, better jokes, and a coffee machine that finally gets used properly…",
-    framing:
-      "e.g. Priya had a comfort food she always came back to — what's yours?",
     reveal: "e.g. Priya's was dal. She said it made any flat feel like home.",
   },
   graduation: {
     name: "Tom Ellis",
     bio: "Tom just finished four years of architecture at Manchester — somehow managing to graduate with a first, a collection of impressive scale models, and zero sleep debt…",
-    framing:
-      "e.g. Tom had a film he watched through every deadline — what's yours?",
     reveal:
       "e.g. Tom's was Spirited Away. He said it reminded him why things worth doing take time.",
   },
   christening: {
     name: "Lily Rose",
     bio: "Born on a Tuesday in March, already an expert at looking unimpressed. We couldn't be happier to have her…",
-    framing:
-      "e.g. Everyone has a favourite from childhood — what should Lily Rose discover first?",
     reveal: "e.g. We'll tell her one day. For now, we're just glad she's here.",
   },
   achievement: {
     name: "Marcus Webb",
     bio: "Marcus just ran his first marathon — raising over £4,000 for the RNLI along the way. He trained for eight months, mostly in the dark, mostly in the rain…",
-    framing: "e.g. Marcus had a song he trained to — what's yours?",
     reveal:
       "e.g. Marcus's was Mr. Brightside. Apparently it got him through mile 18.",
   },
   recovery: {
     name: "Claire Hennessy",
     bio: "Claire completed her treatment last month and is celebrating one year of recovery. She's been braver than most of us will ever need to be…",
-    framing:
-      "e.g. There was a song Claire always said got her through — what's yours?",
     reveal:
       "e.g. Claire's was Vienna by Ultravox. She played it on repeat for months.",
   },
   award: {
     name: "Dr. Amelia Grant",
     bio: "Amelia has just been named Teacher of the Year — recognised for turning her classroom into one of the most inspiring places in the county…",
-    framing:
-      "e.g. Dr. Grant had a book she recommended to every student she taught — what's yours?",
     reveal:
       "e.g. Dr. Grant's was The Lion, the Witch and the Wardrobe. She said it taught her how to teach.",
   },
   promotion: {
     name: "Kwame Asante",
     bio: "After three years of going above and beyond, Kwame has been promoted to Head of Product. Nobody deserves it more…",
-    framing: "e.g. Kwame had a coffee order that never changed — what's yours?",
     reveal: "e.g. Kwame's was a flat white. Two sugars. Never wavered once.",
   },
   celebration: {
     name: "The guest of honour",
     bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
-    framing:
-      "e.g. There was something they always came back to — what's yours?",
     reveal:
       "e.g. Theirs was something they never tired of. Ask them about it some time.",
   },
   other: {
     name: "The guest of honour",
     bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
-    framing:
-      "e.g. There was something they always came back to — what's yours?",
     reveal:
       "e.g. Theirs was something they never tired of. Ask them about it some time.",
   },
@@ -253,63 +222,43 @@ export const OCCASION_PLACEHOLDERS: Record<string, OccasionPlaceholders> = {
  * Used in PollEditor as a fallback when no topic JSONB placeholder exists.
  * {name} is substituted with the first name of the occasion persona at render time.
  */
-export const TOPIC_REVEAL_PLACEHOLDERS: Record<
-  string,
-  { framing: string; reveal: string }
-> = {
+export const TOPIC_REVEAL_PLACEHOLDERS: Record<string, { reveal: string }> = {
   Colour: {
-    framing:
-      "e.g. Belinda had a colour she returned to all her life — what's yours?",
     reveal:
       "e.g. Belinda's was purple. She wore it to every important occasion.",
   },
   Season: {
-    framing:
-      "e.g. There was a season {name} always loved most — which is yours?",
     reveal:
       "e.g. {name}'s was autumn. She said it always felt like coming home.",
   },
   Film: {
-    framing:
-      "e.g. {name} had a film she could watch again and again — what's yours?",
     reveal: "e.g. {name}'s was It's a Wonderful Life. She cried every time.",
   },
   Song: {
-    framing:
-      "e.g. There was a song that always stopped {name} in her tracks — what's yours?",
     reveal:
       "e.g. {name}'s was Waterloo Sunset. She said it made London feel beautiful.",
   },
   Flower: {
-    framing: "e.g. {name} had a flower she never tired of — what's yours?",
     reveal:
       "e.g. {name}'s was lavender. She grew it in every garden she ever had.",
   },
   Animal: {
-    framing:
-      "e.g. {name} felt closest to one animal above all others — which is yours?",
     reveal:
       "e.g. {name}'s was the robin. She said they were the bravest small thing.",
   },
   "Comfort food": {
-    framing: "e.g. There was a meal {name} always came back to — what's yours?",
     reveal:
       "e.g. {name}'s was beans on toast. She said nothing else did the job.",
   },
   Drink: {
-    framing:
-      "e.g. {name} had a drink that was entirely her own — what's yours?",
     reveal:
       "e.g. {name}'s was tea. Builders brew, milk no sugar, never negotiable.",
   },
   "Way to spend Sunday": {
-    framing: "e.g. {name} had a perfect Sunday — what does yours look like?",
     reveal:
       "e.g. {name}'s was a long walk followed by a roast. Every week without fail.",
   },
   Biscuit: {
-    framing:
-      "e.g. {name} had strong opinions about biscuits — what's your favourite?",
     reveal:
       "e.g. {name}'s was the Bourbon. She once ate four packets in one sitting.",
   },
@@ -318,8 +267,6 @@ export const TOPIC_REVEAL_PLACEHOLDERS: Record<
 export const DEFAULT_PLACEHOLDERS: OccasionPlaceholders = {
   name: "Name",
   bio: "A short bio…",
-  framing:
-    "e.g. Belinda had a colour she returned to all her life — what's yours?",
   reveal: "e.g. Belinda's was purple. She wore it to every important occasion.",
 }
 

@@ -1,5 +1,4 @@
 import { PollTitle } from "./poll-title"
-import { PollFraming } from "./poll-framing"
 import { PollOptions } from "./poll-options"
 import { PollReveal } from "./poll-reveal"
 import { PollResults } from "./poll-results"
@@ -28,7 +27,6 @@ export function FavpollPoll({
 
       {step === "choose" && (
         <>
-          {poll.framing && <PollFraming framing={poll.framing} />}
           <PollOptions
             options={poll.options}
             selectedLabel={poll.selectedOptionLabel}

@@ -65,7 +65,6 @@ function makePoll(
     id,
     event_id: "event-1",
     topic_id: "topic-1",
-    personal_framing: null,
     personal_reveal: null,
     created_at: "2024-01-01T00:00:00Z",
     topics: {

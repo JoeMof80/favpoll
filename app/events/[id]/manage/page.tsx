@@ -138,7 +138,7 @@ export default async function ManageEventPage({ params }: Props) {
                 className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3"
               >
                 <p className="text-sm text-foreground">
-                  {poll.personal_framing ?? poll.topics?.title ?? "—"}
+                  {poll.topics?.title ?? "—"}
                 </p>
                 <p className="text-sm text-muted-foreground tabular-nums">
                   {formatCurrency(pledgeTotalsByPoll[poll.id] ?? 0)}

@@ -27,7 +27,6 @@ function makeItems(scene: (typeof SCENES)[0], topicId: string): TopicItem[] {
 
 const MEMORIAL_POLL = {
   id: 'poll-memorial',
-  personal_framing: SCENES[0].question,
   personal_reveal: SCENES[0].revealText,
   topic: { id: 'topic-colour', title: SCENES[0].topicTitle },
   items: makeItems(SCENES[0], 'topic-colour'),
@@ -35,7 +34,6 @@ const MEMORIAL_POLL = {
 
 const BIRTHDAY_POLL = {
   id: 'poll-birthday',
-  personal_framing: SCENES[1].question,
   personal_reveal: SCENES[1].revealText,
   topic: { id: 'topic-ice-cream', title: SCENES[1].topicTitle },
   items: makeItems(SCENES[1], 'topic-ice-cream'),
@@ -43,7 +41,6 @@ const BIRTHDAY_POLL = {
 
 const RETIREMENT_POLL = {
   id: 'poll-retirement',
-  personal_framing: SCENES[2].question,
   personal_reveal: SCENES[2].revealText,
   topic: { id: 'topic-season', title: SCENES[2].topicTitle },
   items: makeItems(SCENES[2], 'topic-season'),
@@ -51,7 +48,6 @@ const RETIREMENT_POLL = {
 
 const GRADUATION_POLL = {
   id: 'poll-graduation',
-  personal_framing: SCENES[5].question,
   personal_reveal: SCENES[5].revealText,
   topic: { id: 'topic-film', title: SCENES[5].topicTitle },
   items: makeItems(SCENES[5], 'topic-film'),

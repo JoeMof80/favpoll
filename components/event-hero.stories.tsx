@@ -135,7 +135,6 @@ export const EditMode: Story = {
     const placeholders = OCCASION_PLACEHOLDERS["memorial"] ?? {
       name: "Name",
       bio: "Bio",
-      framing: "",
       reveal: "",
     }
     const [occasionLabel, setOccasionLabel] = useState("In memory of")

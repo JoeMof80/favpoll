@@ -6,7 +6,6 @@ export type CharityData = { name: string; amountRaised?: string }
 
 export type PollData = {
   topicTitle: string
-  framing?: string | null
   options: { label: string }[]
   selectedOptionLabel?: string
   personalReveal?: string | null

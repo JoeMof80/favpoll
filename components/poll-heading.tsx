@@ -3,15 +3,14 @@
 import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PollTitle } from "@/components/favpoll-card/poll-title"
-import { PollFraming } from "@/components/favpoll-card/poll-framing"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { getPollHint } from "@/lib/display"
 import type { OccasionPlaceholders } from "@/lib/occasions"
 
 type ViewProps = {
   mode?: "view"
   pollId: string
   topicTitle: string
-  framing: string | null
   reveal: string | null
   protagonistFirstName?: string
   pledged?: boolean
@@ -22,10 +21,8 @@ type EditProps = {
   topicTitle: string
   hasTopicSelected: boolean
   topicIsCustom?: boolean
-  framing: string
   reveal: string
-  placeholders: Pick<OccasionPlaceholders, "framing" | "reveal">
-  onFramingChange: (v: string) => void
+  placeholders: Pick<OccasionPlaceholders, "reveal">
   onRevealChange: (v: string) => void
   onTopicTitleChange?: (v: string) => void
   onChangeTopic: () => void
@@ -96,39 +93,23 @@ export function PollHeading(props: Props) {
           )}
         </>
       ) : (
-        <PollTitle
-          title={props.topicTitle}
-          protagonistFirstName={props.protagonistFirstName}
-          pledged={props.pledged}
-        />
-      )}
-
-      {/* Framing */}
-      {isEdit && props.hasTopicSelected ? (
-        <div className="relative">
-          <input
-            type="text"
-            value={props.framing}
-            onChange={(e) => props.onFramingChange(e.target.value)}
-            placeholder={props.placeholders.framing}
-            className="peer w-full appearance-none bg-transparent py-0 pr-5 text-[15px] leading-relaxed text-[#5F5E5A] outline-none placeholder:text-muted-foreground/40"
+        <div className="flex items-baseline gap-3">
+          <PollTitle
+            title={props.topicTitle}
+            protagonistFirstName={props.protagonistFirstName}
+            pledged={props.pledged}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />
-          <Pencil
-            className="pointer-events-none absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25"
-            aria-hidden
-          />
+          {props.protagonistFirstName && !props.pledged && (
+            <p className="text-sm text-[#888780] italic">
+              &ndash; {getPollHint(props.protagonistFirstName)}
+            </p>
+          )}
         </div>
-      ) : !isEdit && props.framing ? (
-        <PollFraming framing={props.framing} />
-      ) : null}
+      )}
 
       {/* Reveal */}
       {isEdit && props.hasTopicSelected ? (
         <div className="border-l-[2.5px] border-[#7F77DD] pl-3">
-          {/* <p className="mb-1.5 text-[11px] text-muted-foreground">
-            The reveal (optional)
-          </p> */}
           <div className="relative">
             <p
               aria-hidden
@@ -148,10 +129,6 @@ export function PollHeading(props: Props) {
               aria-hidden
             />
           </div>
-          {/* <p className="mt-1.5 text-[11px] text-muted-foreground">
-            Shown to each guest after they pledge — write it as if speaking to
-            them directly.
-          </p> */}
         </div>
       ) : !isEdit && props.reveal ? (
         <PollReveal

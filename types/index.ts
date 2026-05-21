@@ -90,7 +90,6 @@ export type EventPoll = {
   id: string
   event_id: string
   topic_id: string
-  personal_framing: string | null
   personal_reveal: string | null
   created_at: string
 }
@@ -175,7 +174,7 @@ export type PledgeWithAllocations = Pledge & {
 }
 
 // Canvas types — shared between EventCanvas sub-components and server pages
-export type TopicPlaceholders = Record<string, { framing: string; reveal: string }>
+export type TopicPlaceholders = Record<string, { reveal: string }>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[]
@@ -190,7 +189,6 @@ export type CanvasPoll = {
   topicIsCustom: boolean
   customTopicTitle: string
   customTopicItems: string[]
-  framing: string
   reveal: string
   prioritizedItemIds: string[]
   prioritizedCustomLabels: string[]
@@ -216,7 +214,6 @@ export type CanvasSubmitData = {
     topicIsCustom: boolean
     customTopicTitle: string
     customTopicItems: string[]
-    framing: string | null
     reveal: string | null
     infiniteItems: { prioritizedItemIds: string[]; canonicalItemIds: string[]; customLabels: string[] } | null
   }[]

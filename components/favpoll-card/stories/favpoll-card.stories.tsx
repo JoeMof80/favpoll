@@ -23,7 +23,6 @@ function sceneToProps(index: number): FavpollCardProps {
     charities: [{ name: scene.charity, amountRaised: scene.total }],
     poll: {
       topicTitle: scene.topicTitle,
-      framing: scene.question,
       options: scene.options,
       selectedOptionLabel: scene.options[scene.selectedIndex]?.label,
       personalReveal: scene.revealText,

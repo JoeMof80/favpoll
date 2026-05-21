@@ -11,7 +11,7 @@ type EventCardEvent = {
   total_raised: number
   protagonist: { name: string }
   charities: { charity: { name: string } }[]
-  polls: { personal_framing: string | null; topic: { title: string } | null }[]
+  polls: { topic: { title: string } | null }[]
 }
 
 type Props = {
@@ -22,7 +22,6 @@ type Props = {
 export function EventCard({ event, className }: Props) {
   const firstPoll = event.polls?.[0]
   const topicTitle = firstPoll?.topic?.title
-  const framing = firstPoll?.personal_framing
 
   return (
     <li className={cn("list-none", className)}>
@@ -37,10 +36,10 @@ export function EventCard({ event, className }: Props) {
             {topicTitle ? `Favourite ${topicTitle}` : event.protagonist.name}
           </h2>
 
-          {/* Framing question or description */}
-          {(framing ?? event.description) && (
+          {/* Description */}
+          {event.description && (
             <p className="mb-4 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-              {framing ?? event.description}
+              {event.description}
             </p>
           )}
 

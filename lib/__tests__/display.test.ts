@@ -7,6 +7,7 @@ import {
   charityNames,
   formatAmount,
   formatRelativeDate,
+  getPollHint,
 } from "@/lib/display"
 
 describe("ordinal", () => {
@@ -192,6 +193,20 @@ describe("formatAmount", () => {
 
   it("rounds to nearest pound", () => {
     expect(formatAmount(99.7)).toBe("£100")
+  })
+})
+
+describe("getPollHint", () => {
+  it("returns the hint with a regular first name", () => {
+    expect(getPollHint("Belinda")).toBe("Is it the same as Belinda's?")
+  })
+
+  it("works with informal single names", () => {
+    expect(getPollHint("Mum")).toBe("Is it the same as Mum's?")
+  })
+
+  it("works with compound informal names", () => {
+    expect(getPollHint("Nana")).toBe("Is it the same as Nana's?")
   })
 })
 

@@ -98,7 +98,6 @@ function makePoll(sceneIndex: number): EventPollWithItems {
     id: `poll-ep-${sceneIndex}`,
     event_id: "event-demo",
     topic_id: topicId,
-    personal_framing: scene.question,
     personal_reveal: scene.revealText,
     created_at: "2024-01-01T00:00:00Z",
     topics: {

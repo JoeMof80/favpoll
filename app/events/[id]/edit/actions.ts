@@ -16,7 +16,6 @@ async function upsertPollForEvent(
     await supabase
       .from('event_polls')
       .update({
-        personal_framing: poll.framing?.trim() || null,
         personal_reveal: poll.reveal?.trim() || null,
       })
       .eq('id', poll.id)
@@ -76,7 +75,6 @@ async function upsertPollForEvent(
     .insert({
       event_id: eventId,
       topic_id: topicId,
-      personal_framing: poll.framing?.trim() || null,
       personal_reveal: poll.reveal?.trim() || null,
     })
     .select('id')

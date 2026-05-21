@@ -10,10 +10,7 @@ const baseEvent = {
   protagonist: { name: "Belinda Johnson" },
   charities: [{ charity: { name: "Age UK" } }],
   polls: [
-    {
-      personal_framing: "Belinda had a colour she returned to all her life — what's yours?",
-      topic: { title: "Colour" },
-    },
+    { topic: { title: "Colour" } },
   ],
 }
 
@@ -48,10 +45,7 @@ export const Birthday: Story = {
       protagonist: { name: "Poppy Clarke" },
       charities: [{ charity: { name: "Comic Relief" } }],
       polls: [
-        {
-          personal_framing: "Tell us your favourite ice cream to find out Poppy's.",
-          topic: { title: "Ice cream" },
-        },
+        { topic: { title: "Ice cream" } },
       ],
     },
   },
@@ -68,10 +62,7 @@ export const Retirement: Story = {
       protagonist: { name: "David Clarke" },
       charities: [{ charity: { name: "Macmillan" } }, { charity: { name: "Dogs Trust" } }],
       polls: [
-        {
-          personal_framing: "Margaret had a season she always loved most — which is yours?",
-          topic: { title: "Season" },
-        },
+        { topic: { title: "Season" } },
       ],
     },
   },

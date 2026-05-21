@@ -64,6 +64,10 @@ export function formatEventDate(date: string | Date): string {
   })}`
 }
 
+export function getPollHint(protagonistName: string): string {
+  return `Is it the same as ${protagonistName}'s?`
+}
+
 export function getEventHeadline(params: {
   occasion: string
   name: string

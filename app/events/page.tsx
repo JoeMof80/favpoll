@@ -27,7 +27,6 @@ export default async function LiveEventsPage() {
         charity:charities ( name )
       ),
       polls:event_polls (
-        personal_framing,
         topic:topics ( title )
       )
     `

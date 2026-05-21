@@ -17,7 +17,6 @@ type InfiniteItems = {
 type PollInput = {
   topicId: string | null
   customTopic: CustomTopic | null
-  framing: string | null
   reveal: string | null
   infiniteItems: InfiniteItems | null
 }
@@ -113,7 +112,6 @@ async function createPollForEvent(
     .insert({
       event_id: eventId,
       topic_id: topicId,
-      personal_framing: poll.framing?.trim() || null,
       personal_reveal: poll.reveal?.trim() || null,
     })
     .select('id')

@@ -59,7 +59,6 @@ export default async function DisplayPage({ params }: Props) {
 
   const displayPolls = polls.map((poll) => ({
     id: poll.id,
-    personal_framing: poll.personal_framing ?? null,
     personal_reveal: poll.personal_reveal ?? null,
     topic: {
       id: poll.topics?.id ?? poll.topic_id,

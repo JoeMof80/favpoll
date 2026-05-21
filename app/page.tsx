@@ -22,7 +22,6 @@ export default async function HomePage() {
         charity:charities ( name )
       ),
       polls:event_polls (
-        personal_framing,
         topic:topics ( title )
       )
     `

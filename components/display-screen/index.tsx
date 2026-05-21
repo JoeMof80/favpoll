@@ -13,7 +13,6 @@ const ROW_HEIGHT = 72
 
 type DisplayPoll = {
   id: string
-  personal_framing: string | null
   personal_reveal: string | null
   topic: {
     id: string
@@ -108,7 +107,7 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
         id={`poll-${poll.id}-heading`}
         className="mb-1 text-lg font-medium text-foreground"
       >
-        {poll.personal_framing ?? poll.topic.title}
+        {poll.topic.title}
       </h2>
       {poll.personal_reveal && (
         <p className="mb-4 border-l-2 pl-3 text-sm italic text-muted-foreground"

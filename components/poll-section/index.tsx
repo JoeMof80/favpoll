@@ -55,7 +55,6 @@ export function PollSection({
         mode="view"
         pollId={poll.id}
         topicTitle={poll.topics.title}
-        framing={view === "results" ? null : (poll.personal_framing ?? null)}
         reveal={pledged ? (poll.personal_reveal ?? null) : null}
         protagonistFirstName={personFirstName}
         pledged={pledged}

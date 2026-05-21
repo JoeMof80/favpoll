@@ -51,9 +51,9 @@ export function PollEditor({
   const substituteNames = (s: string) => s.replace(/\{name\}/g, personFirstName)
   const topicReveal = TOPIC_REVEAL_PLACEHOLDERS[topicTitle]
   const topicRevealSubstituted = topicReveal
-    ? { framing: substituteNames(topicReveal.framing), reveal: substituteNames(topicReveal.reveal) }
+    ? { reveal: substituteNames(topicReveal.reveal) }
     : null
-  const occasionFallback = { framing: placeholders.framing, reveal: placeholders.reveal }
+  const occasionFallback = { reveal: placeholders.reveal }
   const pollPlaceholders = topicPlaceholders
     ? (topicPlaceholders[occasion] ?? topicPlaceholders["default"] ?? topicRevealSubstituted ?? occasionFallback)
     : (topicRevealSubstituted ?? occasionFallback)
@@ -67,10 +67,8 @@ export function PollEditor({
             topicTitle={topicTitle}
             hasTopicSelected={!!(poll.topicId || poll.topicIsCustom)}
             topicIsCustom={poll.topicIsCustom}
-            framing={poll.framing}
             reveal={poll.reveal}
             placeholders={pollPlaceholders}
-            onFramingChange={(v) => onUpdatePoll({ framing: v })}
             onRevealChange={(v) => onUpdatePoll({ reveal: v })}
             onTopicTitleChange={(v) => onUpdatePoll({ customTopicTitle: v })}
             onChangeTopic={() =>

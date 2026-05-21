@@ -4,7 +4,6 @@ import { PollHeading } from "./poll-heading"
 import { OCCASION_PLACEHOLDERS } from "@/lib/occasions"
 
 const MEMORIAL_PLACEHOLDERS = OCCASION_PLACEHOLDERS["memorial"] ?? {
-  framing: "",
   reveal: "",
   name: "",
   bio: "",
@@ -28,26 +27,24 @@ type Story = StoryObj<typeof meta>
 
 // ─── View mode ────────────────────────────────────────────────────────────────
 
-export const ViewWithFramingAndReveal: Story = {
-  name: "View — framing + reveal (pledged)",
+export const ViewWithReveal: Story = {
+  name: "View — hint + reveal (pledged)",
   args: {
     mode: "view",
     pollId: "poll-1",
     topicTitle: "Colour",
-    framing: "Belinda had a colour she returned to all her life — what's yours?",
     reveal: "Belinda's was purple. She wore it to every important occasion.",
     protagonistFirstName: "Belinda",
     pledged: true,
   },
 }
 
-export const ViewFramingOnly: Story = {
-  name: "View — framing only (not pledged)",
+export const ViewHintOnly: Story = {
+  name: "View — hint only (not pledged)",
   args: {
     mode: "view",
     pollId: "poll-2",
     topicTitle: "Season",
-    framing: "There was a season Margaret always loved most — which is yours?",
     reveal: null,
     protagonistFirstName: "Margaret",
     pledged: false,
@@ -55,12 +52,11 @@ export const ViewFramingOnly: Story = {
 }
 
 export const ViewTitleOnly: Story = {
-  name: "View — title only",
+  name: "View — title only (no protagonist)",
   args: {
     mode: "view",
     pollId: "poll-3",
     topicTitle: "Film",
-    framing: null,
     reveal: null,
   },
 }
@@ -70,17 +66,14 @@ export const ViewTitleOnly: Story = {
 export const EditNoTopic: Story = {
   name: "Edit — no topic selected",
   render: () => {
-    const [framing, setFraming] = useState("")
     const [reveal, setReveal] = useState("")
     return (
       <PollHeading
         mode="edit"
         topicTitle=""
         hasTopicSelected={false}
-        framing={framing}
         reveal={reveal}
         placeholders={MEMORIAL_PLACEHOLDERS}
-        onFramingChange={setFraming}
         onRevealChange={setReveal}
         onChangeTopic={() => {}}
       />
@@ -91,7 +84,6 @@ export const EditNoTopic: Story = {
 export const EditCanonicalTopic: Story = {
   name: "Edit — canonical topic selected",
   render: () => {
-    const [framing, setFraming] = useState("")
     const [reveal, setReveal] = useState("")
     return (
       <PollHeading
@@ -99,10 +91,8 @@ export const EditCanonicalTopic: Story = {
         topicTitle="Colour"
         hasTopicSelected={true}
         topicIsCustom={false}
-        framing={framing}
         reveal={reveal}
         placeholders={MEMORIAL_PLACEHOLDERS}
-        onFramingChange={setFraming}
         onRevealChange={setReveal}
         onChangeTopic={() => {}}
       />
@@ -114,7 +104,6 @@ export const EditCustomTopic: Story = {
   name: "Edit — custom topic (editable title)",
   render: () => {
     const [title, setTitle] = useState("")
-    const [framing, setFraming] = useState("")
     const [reveal, setReveal] = useState("")
     return (
       <PollHeading
@@ -122,10 +111,8 @@ export const EditCustomTopic: Story = {
         topicTitle={title}
         hasTopicSelected={true}
         topicIsCustom={true}
-        framing={framing}
         reveal={reveal}
         placeholders={MEMORIAL_PLACEHOLDERS}
-        onFramingChange={setFraming}
         onRevealChange={setReveal}
         onTopicTitleChange={setTitle}
         onChangeTopic={() => {}}
@@ -134,12 +121,9 @@ export const EditCustomTopic: Story = {
   },
 }
 
-export const EditWithContent: Story = {
-  name: "Edit — filled in",
+export const EditWithReveal: Story = {
+  name: "Edit — reveal filled in",
   render: () => {
-    const [framing, setFraming] = useState(
-      "Belinda had a colour she returned to all her life — what's yours?"
-    )
     const [reveal, setReveal] = useState(
       "Belinda's was purple. She wore it to every important occasion."
     )
@@ -149,10 +133,8 @@ export const EditWithContent: Story = {
         topicTitle="Colour"
         hasTopicSelected={true}
         topicIsCustom={false}
-        framing={framing}
         reveal={reveal}
         placeholders={MEMORIAL_PLACEHOLDERS}
-        onFramingChange={setFraming}
         onRevealChange={setReveal}
         onChangeTopic={() => {}}
       />

@@ -98,7 +98,6 @@ export default async function EditEventPage({ params }: Props) {
       topicIsCustom: false,
       customTopicTitle: '',
       customTopicItems: [],
-      framing: poll.personal_framing ?? '',
       reveal: poll.personal_reveal ?? '',
       prioritizedItemIds: isInfinite ? (epiByPollId[poll.id] ?? []) : [],
       prioritizedCustomLabels: [],
