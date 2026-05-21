@@ -823,4 +823,111 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. What kind of song belongs to this occasion — or to this person — is a good way to start.",
   },
+
+  // ── Category 6: Food & Drink ──────────────────────────────────────────────
+
+  Drink: {
+    memorial:
+      "A beloved mother and teacher who made tea the way she did everything — without ceremony, without asking what you wanted, and absolutely correctly. The kettle was always on. The cup was always right.",
+    tribute:
+      "A mentor who had a whisky he liked and did not apologise for knowing exactly which one it was. He kept it at home, served it to people who arrived for the right kind of conversation, and understood the difference between an occasion and a regular evening.",
+    birthday:
+      "Sarah is turning 40 with strong opinions about coffee that she has been developing, refining, and defending for most of her adult life. She is not a snob about it. She is simply right.",
+    retirement:
+      "Thirty-five years of bad office coffee, and David is retiring with a plan to finally use the coffee machine he has been ignoring since Christmas 2021. He has been told it is very good. He is prepared to find out.",
+    wedding:
+      "Emma and James met at a festival, where the coffee was inadequate. They have been compensating for this ever since. She has strong opinions about coffee. He has equally strong opinions about tea. The flat has both.",
+    engagement:
+      "Callum packed a thermos for the walk up Arthur's Seat on New Year's Day. Sophie, at the top, with the ring in her face, accepted a cup of hot coffee from a man who had planned everything correctly. She has not forgotten this.",
+    anniversary:
+      "Forty years, and the pot of tea after dinner has been the same ritual every evening of all of them. Whoever finishes first puts the kettle on. This is not a rule. It has never needed to be.",
+    leaving:
+      "Priya always had strong opinions about the coffee in the studio — specific, accurate, and entirely correct. Six years of getting it right, and she spent her last morning in the building making a round for everyone before she left.",
+    graduation:
+      "Tom graduated from four years of architecture school on approximately the same amount of caffeine it took to build the Sydney Opera House. He has since discovered the natural sleep cycle. He is in favour of it.",
+    christening:
+      "Lily's parents are running entirely on coffee at present. They are grateful for coffee. They are grateful for everyone who has made them coffee. Lily is, as yet, on a different programme.",
+    achievement:
+      "Marcus monitored his hydration with a seriousness that his training partner called excessive and that the sports science research validates entirely. He raised over £4,000 for the RNLI. He knows exactly what he drank at every mile marker.",
+    recovery:
+      "During her treatment, Claire's relationship with drinks simplified: whatever was warm, whatever stayed down, whatever felt like a small ordinary pleasure. Tea, mostly. She is now celebrating a year of recovery and has expanded the list considerably.",
+    award:
+      "Amelia has just been named Teacher of the Year. She runs on tea from approximately seven in the morning and has a specific mug she uses throughout the school day that her students have been told not to touch. Nobody has ever tested this.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He drinks a flat white, two sugars, every morning at precisely the same time. This has not wavered once in three years. He considers consistency a virtue.",
+    celebration:
+      "Tell their story — who they are, what they love, and what they drink. The drink someone has without thinking about it is always more revealing than the one they order to impress.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite drink — the everyday one, not the occasion one — is a small detail that often says a lot.",
+  },
+
+  "Comfort food": {
+    memorial:
+      "A beloved mother and teacher who cooked for people because feeding someone was how she showed she had been thinking about them. She had a soup she made in winter that people asked about for decades. Nobody has ever quite replicated it.",
+    tribute:
+      "A mentor who understood that the right food at the right moment was a form of care. He arrived with good bread and good cheese at every occasion that required it. He always knew which occasions those were.",
+    birthday:
+      "Sarah is turning 40 and has never met a cheese she didn't like. She describes this as a philosophy rather than a preference. Her dinner party cheese boards are the kind people talk about on the way home.",
+    retirement:
+      "David's comfort food is the fish and chips from a van on the seafront where he grew up — something he has been trying to explain to people for thirty-five years. They agree the description is compelling. They have not made the journey. They should.",
+    wedding:
+      "Emma and James have been arguing about the best pizza in Naples since 2019. They have, at this point, eaten their way through a reasonable portion of the city and have not resolved it. They consider the research ongoing.",
+    engagement:
+      "After every long walk, Callum makes soup. He has been doing this since the second date. Sophie did not know it was deliberate until the proposal. It was always deliberate.",
+    anniversary:
+      "Forty years, and the Sunday roast has never changed in recipe, method, or timing. Mum does the meat. Dad does the roasties. The vegetable question has been in negotiation since 1987 and shows no sign of resolution.",
+    leaving:
+      "Priya said dal made any flat feel like home — not fancy dal, the kind her mother made, the kind that didn't need explaining. She cooked a batch for the studio leaving do. People have been asking for the recipe for three months.",
+    graduation:
+      "Tom survived four years of architecture school on the contents of exactly two recipe books and considers himself a reasonable cook as a result. He has strong opinions about what constitutes a meal and what does not.",
+    christening:
+      "Lily's grandmothers have both offered to cook in the weeks ahead, and both have strong views about what a new mother should be eating. Lily's parents are grateful. They are also navigating this carefully.",
+    achievement:
+      "Marcus spent eight months thinking very carefully about what he ate and when, and raised over £4,000 for the RNLI. He says the carb-loading dinner the night before the marathon was the most he has ever enjoyed a bowl of pasta. He is not exaggerating.",
+    recovery:
+      "During her treatment, eating was sometimes difficult and sometimes fine and rarely predictable. Claire made a list of the food that worked. She is now celebrating a year of recovery and slowly cooking her way back through everything she missed.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has been known to bring homemade biscuits to parents' evenings and denies doing this strategically. She is strategic about everything. The biscuits work.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He cooks jollof rice and stew on Sundays — the things his grandmother made — and says this is the meal that holds the week together. Several colleagues have been invited and have not forgotten it.",
+    celebration:
+      "Tell their story — who they are, what they love, and what they reach for when they need feeding properly. Comfort food is always personal, always specific, always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite comfort food — the thing they make or order when they most need it — is a detail that says something real.",
+  },
+
+  Biscuit: {
+    memorial:
+      "A beloved mother and teacher who considered a Digestive the correct biscuit for almost every occasion and held this position with quiet authority. She didn't argue the point. She just put them on the plate.",
+    tribute:
+      "A mentor who had a biscuit he preferred, kept them at his desk, and offered them to people during difficult conversations. This was known to work. Nobody has been able to explain why.",
+    birthday:
+      "Sarah is turning 40 with very firm opinions about biscuits, formed over many years and not open to revision. She has been known to eat four packets of Bourbons in one sitting without apology. She considers this relevant context.",
+    retirement:
+      "Thirty-five years of biscuits at meetings, and David has eaten more Digestives in one building than he can reasonably account for. He is retiring. He says he will not miss them. He may be wrong about this.",
+    wedding:
+      "Emma and James have a biscuit disagreement that is purely theoretical because neither of them buys biscuits regularly enough to test it. They agree they should do more testing. They have not yet managed this.",
+    engagement:
+      "Callum packed biscuits for the New Year's Day walk — the same ones, every long walk, for as long as they've been walking together. Sophie knows the brand. She would not accept a substitution.",
+    anniversary:
+      "Forty years, and the biscuit tin has always been in the same cupboard with the same contents. Mum puts them on the plate. Dad eats them. This is not in question.",
+    leaving:
+      "Priya was very clear about biscuits. She had a preferred brand, knew her reasons, and kept them at her desk not as a statement but as a fact. The desk is empty. The preferred brand is still correct.",
+    graduation:
+      "Tom survived architecture school partly on biscuits and caffeine, and is only now appreciating that this was not a sustainable strategy. He has not given up biscuits. He has merely contextualised them.",
+    christening:
+      "Lily's parents have been sustained, in part, by the biscuits that have appeared on their doorstep from various family members over the past three months. They are grateful for all of them. All biscuits are welcome.",
+    achievement:
+      "Marcus says a biscuit at mile twenty-two is a more complex emotional experience than it sounds. He raised over £4,000 for the RNLI. He had a specific biscuit in mind for the finish line. He has not named it publicly. He chose correctly.",
+    recovery:
+      "During her treatment, there were things Claire could eat and things she couldn't. Biscuits were almost always on the right side of the line. She has strong feelings about this category as a result.",
+    award:
+      "Amelia has just been named Teacher of the Year and has been bringing biscuits to parents' evenings since 2017. She denies doing this strategically. This is not credible. The biscuits work every time.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He does not eat biscuits at his desk. He has strong opinions about which ones he would eat if he did. His team has found this information more useful than expected.",
+    celebration:
+      "Tell their story — who they are, what they love, and which biscuit, if any, says something true about them. Biscuit opinions are always more revealing than they appear.",
+    other:
+      "Tell us who this person is and why you're gathering. A biscuit preference — or the complete absence of one — is a small detail that always gets a response.",
+  },
 }
