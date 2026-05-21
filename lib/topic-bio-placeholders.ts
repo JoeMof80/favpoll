@@ -1181,4 +1181,146 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A poet they love, or a poem that mattered at a particular moment, is always worth including.",
   },
+
+  // ── Category 10: Everyday life ────────────────────────────────────────────
+
+  Hobby: {
+    memorial:
+      "A beloved mother and teacher whose hobby was her garden — not casually, but seriously, with notebooks and seed catalogues and a working knowledge of soil pH. She said it was the only thing she did that was entirely for herself.",
+    tribute:
+      "A mentor who read as a hobby, walked as a hobby, and cooked as a hobby — all of them pursued with the same precision he brought to his work. He said the distinction between work and leisure was a useful fiction.",
+    birthday:
+      "Sarah is turning 40 with an elaborate dinner-party habit that her friends describe as a hobby and she describes as a passion. She plans menus weeks in advance and considers no detail too small to think about. The food is always excellent.",
+    retirement:
+      "David is retiring and picking up his golf clubs for good. He has also been intending to build a model railway in the garage since approximately 2015. He now has time for both. He is starting with the golf.",
+    wedding:
+      "Emma and James both have hobbies they pursue alone — she runs, he plays guitar — and consider this excellent infrastructure for a relationship. Neither has ever suggested the other's hobby is less important. This has been noticed.",
+    engagement:
+      "Their shared hobby is walking, though they would both resist this word — it's less a leisure activity and more the frame through which they see the world. They plan routes. They argue about routes. They walk anyway.",
+    anniversary:
+      "Forty years, and both of them have had hobbies the other has supported without particularly sharing. Dad's garden has always been his. Mum's reading group has always been hers. Neither fact has ever been a problem.",
+    leaving:
+      "Priya's hobby — outside of design, which she would not have called a hobby — was cooking, specifically the kind that took most of a Sunday. She brought the results into the studio periodically. This was appreciated more than she knew.",
+    graduation:
+      "Tom's hobby is architecture — not the job version, but the looking-at-buildings-for-no-reason version. He walks new cities and maps them in his head. His friends have learned to allow extra time for this.",
+    christening:
+      "Lily's parents have recently discovered that their hobbies, as previously understood, are temporarily unavailable to them. They are in the process of developing new ones that can be done in twenty-minute windows. Progress is ongoing.",
+    achievement:
+      "Marcus's hobby — if you can call it that — was running before the marathon. It is now something else: a thing he did that changed what he thought he was capable of. He raised over £4,000 for the RNLI. He is working out what comes next.",
+    recovery:
+      "During her recovery, Claire started hobbies she had been meaning to start for years — bird identification, crosswords, a garden she actually tended. She says she didn't have time for them before. She suspects this was an excuse.",
+    award:
+      "Amelia has just been named Teacher of the Year. Her hobby is reading, but specifically reading while walking, which she considers an efficient use of time and which her colleagues consider mildly dangerous. She has not fallen over.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He plays bass guitar twice a week and considers this the most important two hours of his week. He has not explained why to anyone. He doesn't need to.",
+    celebration:
+      "Tell their story — who they are, what they love, and which hobby they've made their own. A hobby someone has kept for years, or picked up late, says something specific about them.",
+    other:
+      "Tell us who this person is and why you're gathering. A hobby — the thing they do that is entirely for themselves — is always worth including.",
+  },
+
+  "Way to spend Sunday": {
+    memorial:
+      "A beloved mother and teacher who had made Sunday non-negotiable. Long lunch, garden, Radio 4 — in that order, without variation. If you wanted her on a Sunday, you had to know the schedule.",
+    tribute:
+      "A mentor whose Sunday belonged to no one in particular — not a schedule exactly, but a particular quality of pace. He walked, he cooked, he read. He answered no emails. His colleagues respected this in the way people respect a rule that is clearly working.",
+    birthday:
+      "Sarah is turning 40 and her ideal Sunday involves a long morning, a late breakfast that becomes lunch, and an afternoon where nothing is decided in advance. She has not always managed this. She is working on it.",
+    retirement:
+      "David spent thirty-five years arriving at the office on a Monday. He is retiring and is now discovering what Sunday can be when it isn't mostly about Monday. He says this is going well. He says it every Sunday.",
+    wedding:
+      "Emma and James have Sunday down to an art — she runs in the morning, he makes the coffee, they eat something elaborate by noon, and the afternoon is unscheduled. This arrangement was achieved in year two and has not been renegotiated.",
+    engagement:
+      "Their Sunday usually involves a long walk and ends with Callum making soup. It has never once been cancelled for convenience. This is not a rule. It has never needed to be.",
+    anniversary:
+      "Forty years of Sundays together — same cup of tea, same walk, same argument about what to have for lunch. The afternoon settles by two o'clock. The evening follows naturally from there.",
+    leaving:
+      "Priya's Sunday involved cooking — not quickly, not for efficiency, but at the pace that produces something worth eating at the end. She brought the results in on Monday sometimes. People were always glad when she did.",
+    graduation:
+      "Tom spent four years barely distinguishing Sunday from any other day, which he now recognises as a design flaw. He is correcting this. Sunday now involves daylight and at least one meal that required effort.",
+    christening:
+      "Lily's parents' Sundays have been reorganised entirely. They are adapting. They say it is fine. They are adapting.",
+    achievement:
+      "Marcus's Sunday, for eight months, involved a long training run before anyone was awake. He ran his marathon on a Sunday and raised over £4,000 for the RNLI. He now uses Sundays for other things. He is still working out which things.",
+    recovery:
+      "During her recovery, Claire started paying close attention to Sundays — not to fill them, but to let them be what they were. A walk. A book. Something warm to drink. She says Sunday became the best day of the week. She is not entirely sure when this happened.",
+    award:
+      "Amelia has just been named Teacher of the Year. Her Sunday involves marking, reading, and exactly one hour where she does neither. She guards that hour with a professionalism her students would recognise.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. His Sunday involves basketball in the morning, cooking in the afternoon, and the next week's thinking done by Sunday evening. He says this is leisure. It looks like leisure.",
+    celebration:
+      "Tell their story — who they are, what they love, and how they spend a Sunday. The Sunday someone has made their own is always a revealing detail.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite way to spend Sunday — the ritual they've made their own — is a small detail that says a lot.",
+  },
+
+  Smell: {
+    memorial:
+      "A beloved mother and teacher whose smell was lavender — from the garden, from the soap she liked, from something altogether harder to name. It is the smell of her house, still.",
+    tribute:
+      "A mentor whose office had a particular smell — good coffee, paperbacks, and something herbal he couldn't have named — that his colleagues associate with every decent conversation they ever had in that room.",
+    birthday:
+      "Sarah is turning 40 with strong opinions about scent the way she has strong opinions about most things: specific, considered, and not open to revision. She has been wearing the same perfume since she was twenty-seven. She is right about it.",
+    retirement:
+      "David associates a specific smell with the end of a good week — not cologne, not cleaning products, but the particular combination of fresh air and a properly made coffee on a Friday morning. He has been trying to pin it down for thirty-five years.",
+    wedding:
+      "Emma and James — in a conversation they discovered they'd been having separately — both associate the smell of cut grass with their wedding afternoon. Neither of them had expected this.",
+    engagement:
+      "The Lake District in October has a particular smell — bracken, cold air, wet stone — that Callum has tried to explain on multiple occasions. Sophie says she knows exactly what he means and doesn't need the explanation. She is right.",
+    anniversary:
+      "Forty years together and there is a smell — the particular combination of a Sunday lunch in that specific kitchen — that their children associate with every good Sunday of their childhoods. Mum has been making it since 1986.",
+    leaving:
+      "Priya's studio smelled like good coffee and a specific candle she kept on her desk. Her colleagues noticed when the candle wasn't there. They noticed again when she took it with her.",
+    graduation:
+      "Tom has a specific theory about the smell of architecture — wet concrete, cut timber, fresh plaster — which he developed by spending an unusual amount of time in buildings under construction. He considers it research. It was research.",
+    christening:
+      "The smell of Lily's room, her parents say, is the best smell in the house. They say this with the certainty of people who have not slept for three months and are not currently in a position to be objective.",
+    achievement:
+      "Marcus says the most vivid memory of the marathon is not the crowd or the finish line but the smell of the city at six in the morning, before anyone was awake, at the start. He raised over £4,000 for the RNLI. He has been back to that street once since.",
+    recovery:
+      "During her recovery, Claire's sense of smell changed — things that had been neutral became unbearable, and some things she'd never noticed became important. She made a list of the good ones. It is a very specific list.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has worn the same scent to school for eleven years. Several former students have said they can't smell it without thinking of her. She considers this a reasonable legacy.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up in Accra and says the smell that most consistently transports him is the smell of rain on hot dust — something that only exists there. He has not tried to explain this to most people.",
+    celebration:
+      "Tell their story — who they are, what they love, and whether there's a smell that says something true about them. Smell is the detail that lands last and lasts longest.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite smell — the one that takes them somewhere — is always a revealing and unexpected detail.",
+  },
+
+  "Weather for walk": {
+    memorial:
+      "A beloved mother and teacher who walked in all weathers and considered the weather irrelevant to the decision to walk. She had a waterproof for the rain, warm layers for the cold, and a cup of tea waiting at the end. The weather was not the point.",
+    tribute:
+      "A mentor who preferred to walk in weather that required some effort — overcast, cool, perhaps a light rain. He said good weather was for other people. His colleagues learned not to feel sorry for him on grey mornings.",
+    birthday:
+      "Sarah is turning 40 with a hiking habit that has taken her through conditions her friends would not describe as welcoming. She describes them as bracing. She has specific views on good walking weather. They are not widely shared.",
+    retirement:
+      "David commuted through thirty-five British winters and has developed what he calls a working relationship with weather. He will now be walking in it, rather than arriving in it. He considers this an improvement.",
+    wedding:
+      "Emma and James met at a festival in the rain and consider rain a fact about Britain that they have accommodated. Their wedding was technically overcast and is remembered by everyone present as a beautiful day. They consider this the appropriate attitude.",
+    engagement:
+      "Callum proposed on Arthur's Seat on New Year's Day in weather that was cold, clear, and still. He had been waiting for that specific forecast. Sophie thought they were going for a walk. The weather cooperated completely.",
+    anniversary:
+      "Forty years of walks in all conditions, and they have never cancelled one for the weather. Not once. The appropriate gear is in the cupboard under the stairs. This has been the position for forty years.",
+    leaving:
+      "Priya cycled to work in every weather Manchester produced for six years and never, that her colleagues witnessed, arrived looking as though the journey had been difficult. Nobody has been able to explain this.",
+    graduation:
+      "Tom studied in Manchester for four years and emerged with a detailed knowledge of what it is like to try to build things in a range of difficult weather conditions. He considers this excellent preparation. He is probably right.",
+    christening:
+      "Lily's parents have discovered that weather is not an obstacle when you have a pram and a good waterproof and nowhere specific to be. They walk in whatever is happening. Lily appears unbothered by this.",
+    achievement:
+      "Marcus trained in every kind of weather over eight months — dawn frost in November, driving rain in February, and what passed for a warm morning in April. He raised over £4,000 for the RNLI. He says he genuinely doesn't mind any of it now. We believe him.",
+    recovery:
+      "During her recovery, Claire walked every day regardless of the weather. She says the rain, specifically, was useful — it demanded just enough attention that she couldn't think about anything else. She still walks in the rain.",
+    award:
+      "Amelia has just been named Teacher of the Year. She walks to school every day and has a personal taxonomy of walking weather that she applies to the twenty-five minutes between her house and the school gate. She has opinions about each type.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up in Accra and says the British habit of walking in bad weather is one of the things he finds most genuinely admirable about this country. He has since joined them.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of weather they prefer for a walk. The weather someone walks in says something specific about them.",
+    other:
+      "Tell us who this person is and why you're gathering. A preference for walking weather — however specific or surprising — is always a good detail.",
+  },
 }
