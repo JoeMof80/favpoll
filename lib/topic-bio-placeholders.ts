@@ -539,4 +539,111 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. How they prefer to travel — unhurried train, early flight, long walk — is always a revealing detail.",
   },
+
+  // ── Category 4: Film & TV ─────────────────────────────────────────────────
+
+  Film: {
+    memorial:
+      "A beloved mother and teacher who went to the cinema every birthday, alone, as a treat she gave herself for thirty years. She preferred black-and-white films and had strong views about soundtracks. She was usually right.",
+    tribute:
+      "A mentor who had a film he recommended to everyone he mentored — not always the same one, always the right one. He chose them carefully and never explained his reasoning. Nobody ever needed him to.",
+    birthday:
+      "Sarah is turning 40 and has a list of films she insists people see before claiming to have opinions about cinema. The list is longer than most people expect and shorter than it was before she curated it.",
+    retirement:
+      "Thirty-five years of engineering, and David has sat through approximately six hundred films he did not choose. He is retiring with a plan to spend time watching the ones he actually wants to see, without compromise.",
+    wedding:
+      "Emma and James once spent a full weekend watching their respective top five films in a mutually agreed running order. The weekend settled nothing but produced a very good list. They have updated it twice since then.",
+    engagement:
+      "They have a film they watch at the end of every long walk — the same one, every time, regardless of what else is on. Callum can quote most of it. Sophie pretends she can't. She can.",
+    anniversary:
+      "Forty years together, and the television after nine o'clock on a weeknight has always been Mum's domain. Dad watches cricket when she's not looking. She has always known about the cricket.",
+    leaving:
+      "Priya organised the office film nights for four of her six years and kept the ratings spreadsheet running long after anyone else remembered it existed. The data still lives somewhere in the shared drive.",
+    graduation:
+      "Tom wrote 400 words in his final-year portfolio about the city in Blade Runner — the rain, the neon, the layering of time in space. His tutor left a note that said 'stay in architecture'. He took it as encouragement.",
+    christening:
+      "Lily's parents have a list of films they're planning to show her in roughly the right order as she grows up. They've been arguing about the order for months. The list is excellent.",
+    achievement:
+      "Marcus rewatched Chariots of Fire the night before his marathon, which he has told very few people. He raised over £4,000 for the RNLI. He maintains the film was relevant. He is not wrong.",
+    recovery:
+      "During her recovery, Claire watched films she had already seen before — not out of nostalgia, but because she didn't have the energy for stories she didn't already know the ending of. She has a list of the ones she went back to.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has shown the same film to her class on the last day of every year she has taught. She says it is about what to do with your life. Her students believe her.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He has strong views about film structure that he applies openly to product decisions and has stopped pretending they are unrelated.",
+    celebration:
+      "Tell their story — who they are, what they love, and whether there's a film that says something true about them. A favourite film is never just a film.",
+    other:
+      "Tell us who this person is and why you're gathering. A film they return to, or one that meant something at a particular moment, is always worth including.",
+  },
+
+  "Film genre": {
+    memorial:
+      "A beloved mother and teacher who loved a film she could predict — not because she lacked imagination, but because she'd earned the right to an untroubled evening by the time she sat down for one. Anything too frightening was not permitted after dark.",
+    tribute:
+      "A mentor who took documentaries seriously enough to recommend them to colleagues who had not asked. He had a gift for choosing exactly the right one for exactly the right person. Nobody ever complained.",
+    birthday:
+      "Sarah is turning 40 with a well-established position on horror films: not under any circumstances, not for any reason, not after a conversation about something else she's misread as a thriller. She has strong views.",
+    retirement:
+      "Thirty-five years of engineering decisions, and David's preferred genre has always been the thriller — the pleasure of a problem being solved correctly, with authority, in under two hours. He applies similar criteria to his reading.",
+    wedding:
+      "Emma is a documentary person. James is a thriller person. They find common ground in heist films, which they both believe combine the best of both positions. They have watched every Soderbergh film together.",
+    engagement:
+      "They agree on almost everything to do with film except genre — he prefers something tense, she prefers something that makes her laugh. They have spent several years in productive negotiation. The results are usually good.",
+    anniversary:
+      "Forty years, and the genre question was resolved long ago: nothing too violent after nine, nothing with a sad ending if Mum's had a difficult week, and no sci-fi in general. Dad says this was a reasonable compromise. Mum says she just told him what she liked.",
+    leaving:
+      "Priya's film taste was something the team debated for six years without consensus. She liked experimental cinema and anything with a good heist in it, and had opinions about Indian cinema that she rarely volunteered but were always worth hearing.",
+    graduation:
+      "Tom studied architecture and has a corresponding position on films set in significant buildings. The Shining, he says, would be nothing without the Overlook Hotel. His housemates have learned to accept this as a conversation opener.",
+    christening:
+      "Lily's parents have decided, with some deliberation, to begin her film education with animation and let her lead from there. Her father has a hidden agenda involving Jurassic Park at approximately age seven. Her mother is aware of this.",
+    achievement:
+      "Marcus's film taste runs to sports documentaries — the kind that explain, in detail, what people are actually doing when they push through mile eighteen. He raised over £4,000 for the RNLI. He found the research useful.",
+    recovery:
+      "During her recovery, Claire discovered she had a greater appetite for comedy than she'd previously admitted to herself. She made a list, worked through it, and has since recommended it to other people in similar situations.",
+    award:
+      "Amelia has just been named Teacher of the Year and has a particular affection for films where a teacher changes a life — not because she thinks teaching is heroic, but because she knows the small version of what those films show is real.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up watching Nigerian films alongside British ones and has strong views about genre that draw from both traditions. He gives a very good recommendation when asked.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of film says something true about them. Genre is always more revealing than it seems.",
+    other:
+      "Tell us who this person is and why you're gathering. What kind of film they reach for — and why — is a detail worth including.",
+  },
+
+  "TV show": {
+    memorial:
+      "A beloved mother and teacher who organised her week around two things: the garden, and the television on a Sunday evening. She considered a good drama series a serious commitment and did not take it lightly.",
+    tribute:
+      "A mentor who had opinions about television that he rarely shared until asked, at which point they were extensive and almost entirely correct. He had watched everything worth watching and remembered all of it.",
+    birthday:
+      "Sarah is turning 40 and is a reliable source of television recommendations that always arrive slightly ahead of the conversation. She has a gift for watching the right thing at exactly the right time.",
+    retirement:
+      "Thirty-five years of early starts meant David missed most of what happened after nine o'clock on a weeknight. He is retiring with a genuine backlog of television he is looking forward to working through.",
+    wedding:
+      "Emma and James have a shared list and a private list, and the distinction between them is taken seriously. Anything on the shared list requires agreement. Anything on the private list is watched in the bath or on the commute, alone, without discussion.",
+    engagement:
+      "They started watching a series together on the second date and it became the format for their relationship — ongoing, episodic, with occasional cliffhangers. They are now engaged. The series has been renewed.",
+    anniversary:
+      "Forty years, and the television in the sitting room has been the backdrop to most of their evenings. They have strong and entirely compatible views about what they like. This is, they say, the secret.",
+    leaving:
+      "Priya's television recommendations were always worth taking — she watched selectively, remembered everything she'd seen, and had a particular gift for knowing which series a specific person would love. The team benefited from this for six years.",
+    graduation:
+      "Tom has a complicated relationship with television — too busy during term, then watching four episodes at a time during the holidays. He has seen approximately half of everything he's started. He is sanguine about this.",
+    christening:
+      "Lily's parents have strong views about how much television is appropriate for a small child. They have agreed on a position. They reserve the right to revise it when they are more tired.",
+    achievement:
+      "Marcus watched a documentary about marathon running in week two of training and spent forty minutes pausing it to look things up. He raised over £4,000 for the RNLI. The documentary was, he says, part of the preparation.",
+    recovery:
+      "During her recovery, Claire worked through a television series she'd been putting off for three years. She watched it slowly, an episode at a time, and says it was one of the most reliable pleasures of a difficult period.",
+    award:
+      "Amelia has just been named Teacher of the Year. She watches documentaries about education with the specific interest of someone looking for things to disagree with. She usually finds them, and finds the disagreement useful.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He watches television strategically — one series at a time, finished before starting another — and applies the same logic to product decisions. His team has noticed.",
+    celebration:
+      "Tell their story — who they are, what they love, and which television programme says something true about them. A series someone returns to is always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite television programme — the one they always recommend, or the one they've watched three times — is a detail that opens up a conversation.",
+  },
 }
