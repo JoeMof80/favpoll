@@ -1,3 +1,5 @@
+import { TOPIC_BIO_PLACEHOLDERS } from "./topic-bio-placeholders"
+
 export const OCCASION_LIST = [
   { value: "memorial", label: "Memorial" },
   { value: "tribute", label: "Tribute" },
@@ -268,6 +270,16 @@ export const DEFAULT_PLACEHOLDERS: OccasionPlaceholders = {
   name: "Name",
   bio: "A short bio…",
   reveal: "e.g. Belinda's was purple. She wore it to every important occasion.",
+}
+
+export function getBioPlaceholder(
+  occasion: string,
+  topicTitle?: string
+): string {
+  if (topicTitle && TOPIC_BIO_PLACEHOLDERS[topicTitle]?.[occasion]) {
+    return TOPIC_BIO_PLACEHOLDERS[topicTitle][occasion]
+  }
+  return OCCASION_PLACEHOLDERS[occasion]?.bio ?? DEFAULT_PLACEHOLDERS.bio
 }
 
 export function shortTopicLabel(title: string): string {
