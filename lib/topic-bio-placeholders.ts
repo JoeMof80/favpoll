@@ -930,4 +930,111 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A biscuit preference — or the complete absence of one — is a small detail that always gets a response.",
   },
+
+  // ── Category 7: Sport ─────────────────────────────────────────────────────
+
+  "Sport to watch": {
+    memorial:
+      "A beloved mother and teacher who watched cricket on the radio, not the television, and considered this perfectly normal. She followed every ball of a Test match and could discuss the day's play with authority. Her colleagues at school found this surprising. It was not.",
+    tribute:
+      "A mentor who had been to every major football ground in England by the time he was thirty and had strong views about each one. He was not a stadiums person. He was a football person. The distinction mattered to him.",
+    birthday:
+      "Sarah is turning 40 and watches tennis every summer with the seriousness of someone who knows exactly what's happening and feels no need to explain it. She has opinions about most players. She shares them selectively.",
+    retirement:
+      "David has followed the same football club since he was seven years old and spent thirty-five years listening to commentary on the motorway. He is retiring. He now has time. He has not worked out what to do with this.",
+    wedding:
+      "Emma and James have exactly one sport they both watch, discovered on their second holiday, at the back of a pub in rural Portugal, watching a match neither of them could have predicted they would care about. They have watched it together ever since.",
+    engagement:
+      "Callum watches rugby. Sophie watches athletics. They are both extremely invested in these positions and show no signs of converging. This is considered a feature of the relationship.",
+    anniversary:
+      "Forty years, and the sport on the television has always been Dad's department. Mum reads on the other sofa and is more informed than anyone expects when the conversation turns to it.",
+    leaving:
+      "Priya's desk had a printed IPL fixture list pinned to it every season, and she defended this scheduling choice without apology. The office became, during those weeks, slightly more familiar with cricket. She considered this an improvement.",
+    graduation:
+      "Tom followed his home football club from two hundred miles away throughout his degree and considers this a form of loyalty that architecture school did nothing to test. He made it to three away games in four years. He is proud of this.",
+    christening:
+      "Lily's parents have agreed that they will not impose their sporting loyalties on her — she will be free to choose. Lily's grandfather has noted this agreement and is acting accordingly.",
+    achievement:
+      "Marcus watched the London Marathon as a spectator three times before running it himself. He said watching it is completely different once you've done it. He raised over £4,000 for the RNLI. He now says both things are true.",
+    recovery:
+      "During her recovery, Claire started watching sport in a way she never had before — not obsessively, but gratefully. The rhythm of a game, the time it took, the fact that it demanded nothing of her. She found this more useful than she expected.",
+    award:
+      "Amelia has just been named Teacher of the Year. She coaches netball on Thursday afternoons and considers this entirely unrelated to her teaching award, even though it is not.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He follows Ghanaian football and the Premier League with equal seriousness and has strong views about both. He is usually right.",
+    celebration:
+      "Tell their story — who they are, what they love, and which sport they follow. The sport tells you something about the person; the team tells you everything else.",
+    other:
+      "Tell us who this person is and why you're gathering. A sport they follow — and how they follow it — is always worth knowing.",
+  },
+
+  "Sport to play": {
+    memorial:
+      "A beloved mother and teacher who played tennis until she was sixty-two and stopped only when her knees decided for her. She was competitive in the way that people who insist they play purely for the enjoyment of it always are.",
+    tribute:
+      "A mentor who played squash for thirty years, stopped, and immediately became evangelical about walking. He brought the same intensity to both. His colleagues enjoyed the transition.",
+    birthday:
+      "Sarah is turning 40 with a hiking habit that she does not describe as a sport but which involves specialist gear, carefully planned routes, and a level of commitment that suggests otherwise.",
+    retirement:
+      "David is retiring and picking up his golf clubs for good. He has played off twelve for fifteen years and has never once been satisfied with a round. He is looking forward to having more time to be unsatisfied in better locations.",
+    wedding:
+      "Emma plays in a five-a-side team on Tuesday evenings and will not reorganise her schedule for anything that is not a wedding, a flight, or a family emergency. James considers this admirable. The team agrees.",
+    engagement:
+      "They walk together every weekend, with a very clear division of responsibility: Callum plans the route and pace, Sophie decides when to stop for lunch. This has never caused an argument. It has prevented several.",
+    anniversary:
+      "Forty years together and they've always taken a walk on a Sunday — not quite a sport, just a walk. They've kept it up through every kind of weather and every kind of year.",
+    leaving:
+      "Priya ran three mornings a week, quietly, without telling anyone about it, for most of her time at the studio. Her colleagues found out when her Strava appeared in someone's contacts and were uniformly unsurprised.",
+    graduation:
+      "Tom plays five-a-side with the same group he met in freshers' week and considers this one of the more useful things university gave him. He is not a natural athlete. He is very committed. His team appreciates the distinction.",
+    christening:
+      "Lily's father was a decent county-level rower in his twenties and has spent three months telling himself this qualifies him for parenthood. It does not. He is discovering this. He remains in good physical shape.",
+    achievement:
+      "Marcus ran his first marathon in October after eight months of training — mostly before dawn, mostly in the rain — and raised over £4,000 for the RNLI. He says he is now a runner. He was always a runner. He just needed the marathon to confirm it.",
+    recovery:
+      "During her recovery, Claire started with short walks and built from there. By spring she was doing a weekly yoga class. She describes this as discovering the whole category of sport she had not previously been interested in. She is now interested.",
+    award:
+      "Amelia has just been named Teacher of the Year. She plays netball on Thursday afternoons and runs the lunchtime table tennis club, both of which she takes seriously and neither of which she considers sport so much as infrastructure.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He plays basketball on Sunday mornings with a group he has played with for four years. He says it is the only time of the week he is not thinking about product. This is probably not true.",
+    celebration:
+      "Tell their story — who they are, what they love, and which sport says something true about them. The sport someone plays is always more revealing than the sport they watch.",
+    other:
+      "Tell us who this person is and why you're gathering. A sport they play — or played, or wish they'd taken further — is a detail worth including.",
+  },
+
+  "Form of exercise": {
+    memorial:
+      "A beloved mother and teacher who walked everywhere and did not consider this exercise. She considered it transport and fresh air. The effect was the same. She was, in her eighties, still outpacing most people on a footpath.",
+    tribute:
+      "A mentor who walked the full length of the South Downs Way alone every summer and arrived back to work on Monday as if he had merely had a reasonable weekend. His colleagues eventually stopped pretending not to be impressed.",
+    birthday:
+      "Sarah is turning 40 and hikes with a dedication that her friends describe as admirable and her joints describe as optimistic. She considers this a false distinction and sees no reason to slow down.",
+    retirement:
+      "David is retiring with a plan to walk the golf course rather than take the buggy. He has thought about this for a long time. He says golf played properly is simply walking with objectives. This is not wrong.",
+    wedding:
+      "Emma runs. James cycles. They have had this conversation many times and have agreed they are both right and both wrong in approximately equal measure. The commitment to each activity is not in question.",
+    engagement:
+      "They have been walking together since the second date and have never once discussed whether walking counts as exercise. It counts as the point. The fitness is incidental and welcome.",
+    anniversary:
+      "Forty years, and the Sunday walk has never been cancelled. Not for weather, not for illness. The walk is the walk. It has been the walk for forty years.",
+    leaving:
+      "Priya cycled to the studio every day for six years regardless of what the Manchester weather was doing. Several colleagues tried it after her leaving do. Several are still going.",
+    graduation:
+      "Tom walked everywhere at university — partly because he had no money for anything else, partly because he was studying the built environment and walking was, he maintains, research. He still walks wherever he can.",
+    christening:
+      "Lily's parents have been informed that pushing a pram is excellent cardiovascular exercise. They are grateful for this framing. They are also very tired.",
+    achievement:
+      "Marcus ran eight months of early-morning training in preparation for the marathon and raised over £4,000 for the RNLI. He says running is the closest thing he's found to thinking. He is not the first person to have discovered this.",
+    recovery:
+      "During her recovery, Claire built her way back to exercise slowly and deliberately — short walks first, then longer ones, then swimming once a week. She describes this as discovering what her body could do again. She is still finding out.",
+    award:
+      "Amelia has just been named Teacher of the Year. She walks to school every day, has always walked to school, and considers the twenty-five minutes each way the best preparation for teaching she has found.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He plays basketball on Sunday mornings, walks to work when the weather allows, and considers both forms of exercise necessary rather than optional.",
+    celebration:
+      "Tell their story — who they are, what they love, and how they move. The form of exercise someone chooses — or refuses to call exercise — is always specific.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite form of exercise — the one they actually do, not the one they say they're going to start — is always a revealing detail.",
+  },
 }
