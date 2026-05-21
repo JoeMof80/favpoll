@@ -646,4 +646,181 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A favourite television programme — the one they always recommend, or the one they've watched three times — is a detail that opens up a conversation.",
   },
+
+  // ── Category 5: Music ─────────────────────────────────────────────────────
+
+  Song: {
+    memorial:
+      "A beloved mother and teacher who kept a small selection of records she played when she thought no one could hear. She knew every word to songs she wouldn't have admitted to liking. Her children knew the playlist.",
+    tribute:
+      "A mentor who had a song for every occasion — he said it as a joke and meant it entirely. His team learned that Waterloo Sunset meant he was thinking about London, and that London meant something was being decided.",
+    birthday:
+      "Sarah is turning 40 with a carefully maintained playlist she updates monthly and would share with anyone who asks. She has strong feelings about which songs go where. The order is non-negotiable.",
+    retirement:
+      "David has played the same three albums on the drive home every Friday night for thirty-five years. He is retiring. The drive home is becoming the drive to the course. The music is staying.",
+    wedding:
+      "Emma and James spent an entire evening arguing about which song to play first at their wedding and compromised on something that was neither of their first choices and turned out to be perfect. They are both very good at this.",
+    engagement:
+      "There is a song that came on in a coffee shop in the second week of their relationship that they have both, independently, admitted is theirs. They did not tell each other this for over a year. They found out at a wedding.",
+    anniversary:
+      "Forty years, and there is a song from 1984 that still comes on and makes them both stop what they're doing. They have never discussed this. They don't need to.",
+    leaving:
+      "Priya put together a leaving playlist for herself and shared it with exactly no one until the party, at which point it turned out to be the best thing anyone had heard at a work do. Several people asked for the list. She sent it.",
+    graduation:
+      "Tom graduated from four years of architecture school with a playlist that functioned as a complete autobiography of the degree. He played it on the train home. He has played it three times since.",
+    christening:
+      "Lily's parents have been singing to her since she was born — different songs, different voices, no particular consensus on what counts as appropriate. She seems, as far as anyone can tell, unbothered by the selection.",
+    achievement:
+      "Marcus trained to music for eight months, and the playlist got him through the worst mornings. He raised over £4,000 for the RNLI and stands by every track on it.",
+    recovery:
+      "Vienna by Ultravox played on repeat for months during Claire's treatment — not at full volume, not constantly, but reliably. It did something she couldn't quite explain. She is not embarrassed about the choice. She shouldn't be.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has a song she plays at the end of the last lesson of every term that she has never named to her students. They now associate it with the moment the holidays begin.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He listens to music when he's thinking at his desk and has a playlist for each kind of problem. The playlists are colour-coded. This is not metaphorical.",
+    celebration:
+      "Tell their story — who they are, what they love, and which song says something true about this moment. The right song at the right time is always specific.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite song — or the one that means something particular to them — is a good way to start.",
+  },
+
+  "Music genre": {
+    memorial:
+      "A beloved mother and teacher who had opinions about music that surprised people who didn't know her well. She tolerated a great deal of Radio 2 cheerfully and drew a firm line at anything after the mid-90s. Both positions were deeply held.",
+    tribute:
+      "A mentor who could talk about jazz with the same precision he brought to everything else — where it had come from, where it had gone wrong, and why it had always been better than people who didn't know it thought.",
+    birthday:
+      "Sarah is turning 40 with a music taste that doesn't resolve into a single genre and never has. She knows exactly what she likes and is difficult to surprise, which is the way she prefers it.",
+    retirement:
+      "Thirty-five years of morning radio and David's musical opinions are largely a product of the M62 at seven in the morning. He knows more about 80s soft rock than he intended to, and has stopped being embarrassed about this.",
+    wedding:
+      "Emma and James had a long conversation on their third date about whether folk counts as a genre or a sensibility. Neither of them can remember how it started. They agreed to disagree and consider it a good sign.",
+    engagement:
+      "Callum's music taste is extremely specific. Sophie has expanded it by approximately 40% in the time they have been together, and he is grateful for this without being willing to say so directly.",
+    anniversary:
+      "Forty years, and the radio in the kitchen has always been on Radio 2. The music does not need to be good. It needs to be there. This is a position they share entirely.",
+    leaving:
+      "Priya listened to classical Indian music when she was working alone and kept this private for most of her time at the studio. She put one track on at her leaving do, very quietly, for about forty-five seconds. Several people asked what it was.",
+    graduation:
+      "Tom's music taste was formed almost entirely in the studio at two in the morning, when the default playlist ran out and someone had to make a decision. He made a lot of decisions and has strong opinions as a result.",
+    christening:
+      "Lily's parents disagree about what to play in the house. Her father says the baby can't tell. Her mother says that's exactly why it matters. This argument has not been resolved.",
+    achievement:
+      "Marcus trained to a very specific rotation of music — rock for the long runs, electronic for the intervals, and nothing at all for the hills, because he needed to hear himself breathe. He raised over £4,000 for the RNLI. The system worked.",
+    recovery:
+      "During her recovery, Claire's relationship with music changed. She stopped being able to listen to some things she had always liked and found others she'd dismissed suddenly working. She does not overthink this. She just follows it.",
+    award:
+      "Amelia has just been named Teacher of the Year. She teaches the history of popular music as part of a unit on postwar Britain that is technically about something else. The music section is always the longest. No one complains.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up with highlife, comes from a musical family, and plays bass in a band that performs exactly twice a year at venues that seat fifty people. He loves it.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of music they gravitate towards. Genre is always more personal than it appears.",
+    other:
+      "Tell us who this person is and why you're gathering. The kind of music they listen to — or can't stand — is always worth knowing.",
+  },
+
+  "Music era": {
+    memorial:
+      "A beloved mother and teacher who came of age listening to the radio in the 1960s and never fully left that decade behind. She kept her records through every house move and played them without apology.",
+    tribute:
+      "A mentor who believed the 1970s produced the most interesting music anyone had made and was prepared to argue this at considerable length. He was consistently good company when doing so.",
+    birthday:
+      "Sarah is turning 40 and her relationship with music eras is practical: she knows what she liked then and she knows what she likes now, and she sees no reason to resolve them into a hierarchy.",
+    retirement:
+      "David spent the 1980s working too hard to pay proper attention to what was playing, and is now, in retirement, going back through it. He says it's better than he remembered. It is.",
+    wedding:
+      "Emma and James have a music era argument that has run for the length of their relationship. It is warm, recurring, and neither of them expects to win. This is the arrangement.",
+    engagement:
+      "Callum has strong opinions about 90s Britpop that he delivers with complete conviction. Sophie has let this run and only occasionally intervenes. When she does, she is always right.",
+    anniversary:
+      "Forty years together began in the early 1980s, and they met to the music of that decade. It still plays sometimes and makes them both stop. They have never discussed which era is their favourite. They don't need to.",
+    leaving:
+      "Priya's relationship to music eras was genuinely complicated — she'd grown up between two musical traditions, two decades, and two very different ideas about what pop music was supposed to do. She had opinions about all of it.",
+    graduation:
+      "Tom graduated from architecture school with the conviction that nothing musically interesting had happened in the years he was studying. He has since been corrected. He is catching up.",
+    christening:
+      "Lily's parents have agreed that she will be raised in a house that plays music from a wide range of eras, so she can form her own opinions. They have agreed to disagree about which era gets the most airtime.",
+    achievement:
+      "Marcus's training playlist was largely formed in a particular era — the kind of anthems that were made to be played at high volume while doing something difficult. He raised over £4,000 for the RNLI. The era chose him.",
+    recovery:
+      "During her recovery, Claire went back to the music she had loved at a specific point in her life — the era when everything felt urgent. She played it quietly. It did what it was supposed to do.",
+    award:
+      "Amelia has just been named Teacher of the Year. She teaches a unit on the music of the 1960s that is the most requested lesson of the year. She says the era matters because it was the first time teenagers understood they were a generation. Her students always feel this applies to them.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He has a map of musical eras he can walk you through from highlife in the 60s to Afrobeats now, and finds it genuinely useful for understanding how culture changes.",
+    celebration:
+      "Tell their story — who they are, what they love, and which musical era they feel most themselves in. The era someone returns to is always the one that shaped them.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite musical era — and what it gave them — is always worth including.",
+  },
+
+  Instrument: {
+    memorial:
+      "A beloved mother and teacher who played the piano badly and with great enjoyment for fifty years. She said she had never been good and had never needed to be. Her children learned to ignore the wrong notes.",
+    tribute:
+      "A mentor who played guitar — nothing impressive, always enough. He kept one at the office for twelve years and used it to end difficult meetings by changing the subject abruptly. This worked more often than it should have.",
+    birthday:
+      "Sarah is turning 40 and plays the violin with more ambition than the neighbours would describe as appropriate for a Tuesday evening. She has been doing so since she was eight. She has no plans to stop.",
+    retirement:
+      "David is retiring with a plan to return to the piano he played until he was twenty-two, put down, and never properly picked up again. The piano is still in the sitting room. It has been waiting.",
+    wedding:
+      "Emma plays piano. James does not play anything, but has been known to provide backing vocals at sufficient volume that neighbours have knocked. This is their domestic arrangement and both of them are happy with it.",
+    engagement:
+      "Neither of them plays an instrument, which they have decided is fine. Callum has discussed learning the guitar on approximately six occasions. Sophie has been supportive. No guitar has yet been purchased.",
+    anniversary:
+      "Mum played piano until she was twenty-five. She says she doesn't miss it. She has said this for forty years. The sheet music is still in the box under the spare room bed.",
+    leaving:
+      "Priya played tabla as a child and says she never got good enough for it to matter. Her colleagues who heard her play at the studio's summer do disagree. She says they're being polite. They are not.",
+    graduation:
+      "Tom played French horn in his school orchestra for six years and considers this the thing he most regrets giving up. He is not sure what he would do with it now. He thinks about it occasionally.",
+    christening:
+      "Lily's grandmother has already suggested piano lessons. Her parents have said they'll wait and see what Lily gravitates towards. Her grandmother has said this is a reasonable position and also that the piano is available.",
+    achievement:
+      "Marcus can play the piano to a basic standard — enough to play one song well at a party and then politely decline to play more. He raised over £4,000 for the RNLI. The piano was not part of the training plan.",
+    recovery:
+      "During her recovery, Claire started playing the piano again for the first time since her twenties — slowly, quietly, from memory. She says it was not for anyone else to hear. She says this is why it helped.",
+    award:
+      "Amelia has just been named Teacher of the Year and once arranged for a string quartet to play in her classroom on the last day of term, funded by arts budget she'd been quietly not spending for three years. Her students still mention it.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He plays bass guitar in a band that gigs twice a year in small venues and takes it seriously enough that he practises twice a week without fail.",
+    celebration:
+      "Tell their story — who they are, what they love, and whether there's an instrument that says something true about them. Played, given up, or just admired — it's always a good detail.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite instrument — or one they play, or wish they'd learned — is a detail that opens up something interesting.",
+  },
+
+  "Type of song": {
+    memorial:
+      "A beloved mother and teacher who knew every lullaby and every hymn and could move between them without transition. She sang in the kitchen without noticing she was doing it. Her children knew every word before they knew they did.",
+    tribute:
+      "A mentor who could always choose the right song for a moment — the send-off, the celebration, the leaving do. He had an instinct for the anthemic that nobody could quite explain. He would have been modest about this.",
+    birthday:
+      "Sarah is turning 40 and has a clear position on birthday songs: they must be in the right key, sung with conviction, and not ended awkwardly. She has attended enough birthday dinners to have strong opinions about all three.",
+    retirement:
+      "Thirty-five years in the same company, and David sat through the send-off they gave him with the composure of someone who had been quietly dreading the singing part. He was wrong to worry. They got it right.",
+    wedding:
+      "Emma and James discussed their first dance song for six months and landed on something nobody expected, that turned out to be perfect, and that is now their answer to every question about what makes a good song.",
+    engagement:
+      "Callum proposed with no song playing — just wind on Arthur's Seat and two red grouse in the heather. Sophie has since decided this was the right call. Callum had not planned for ambient sound. It worked anyway.",
+    anniversary:
+      "Forty years, and the song from their wedding still plays sometimes and makes them both stop what they're doing. They have never agreed on what type of song it is. They agree it's still theirs.",
+    leaving:
+      "Priya put together her own leaving playlist and nobody was surprised that it was excellent or that it mixed genres in ways that shouldn't work and did. She sent it to the group chat. Several people still listen to it.",
+    graduation:
+      "Tom's graduation playlist was built for the train home and consisted almost entirely of songs that felt like endings. He was very happy that day. He says this is not a contradiction.",
+    christening:
+      "Lily's parents have been debating which songs to sing to her. They've landed on a combination of pop songs, traditional hymns, and at least one from a film they both love. She seems, as far as anyone can tell, content with the selection.",
+    achievement:
+      "Marcus has a very specific relationship with anthems — the kind of song that, heard at the right moment, at the right volume, makes you believe you can do it. He raised over £4,000 for the RNLI. He knows exactly which songs those are.",
+    recovery:
+      "During her recovery, Claire found herself unable to listen to sad songs and unable to listen to aggressively cheerful ones either. She found a third category she hadn't previously named, and it got her through.",
+    award:
+      "Amelia has just been named Teacher of the Year. She has a song she plays at the end of the last lesson of every term that she has never named to her students. They have been Shazaming it for years. She knows. They know she knows.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He plays bass, which means he has views on songs that most people don't have — what makes a line work, what makes a song hold. He applies this to presentations. It shows.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of song this occasion calls for. The type of song that fits a moment is always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. What kind of song belongs to this occasion — or to this person — is a good way to start.",
+  },
 }
