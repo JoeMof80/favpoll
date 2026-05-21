@@ -2,7 +2,7 @@
 
 ## What is favpoll?
 
-favpoll is a charitable polling platform for life events — memorials, funerals, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks poll topics (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
+favpoll is a charitable polling platform for life events — memorials, funerals, birthdays, retirements, weddings, and more. An organiser creates an event honouring a person, selects one or more charities, picks a poll topic (favourite colour, favourite biscuit, etc.), and shares a link with guests. Guests pledge real money against their favourite options. The rankings update in real time. All proceeds go to the chosen charities.
 
 Every pledge also feeds a permanent all-time universal ranking of human favourites — a collectively funded, financially weighted record of what people love most, built through acts of generosity.
 
@@ -31,6 +31,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **Package manager:** pnpm
 - **Hosting:** Vercel
 - **Domain:** favpoll.com
+- **Localisation:** UK-first (`en-GB`). `messages/en-GB.json` holds UI strings. `lib/i18n.ts` provides `formatCurrency()`, `t()`, and `MARKET_DEFAULTS`. `next-intl` planned when a second market launches.
 
 ---
 
@@ -68,7 +69,7 @@ topics (
   description text,
   is_finite boolean default false,
   is_active boolean not null default true,
-  placeholders jsonb default '{}',  -- Keyed framing/reveal pairs by topic title
+  placeholders jsonb default '{}',  -- Keyed framing/reveal pairs by occasion
   created_by text references users(id),
   created_at timestamptz
 )
@@ -87,6 +88,7 @@ topic_items (
   all_time_count integer default 0,
   is_canonical boolean default true,
   source text default 'seed',       -- 'seed' | 'organiser' | 'guest'
+  markets text[] not null default array['en-GB'],  -- Market filter
   event_count integer default 0,
   total_pledge_count integer default 0,
   created_at timestamptz
@@ -107,6 +109,7 @@ events (
   protagonist_id uuid references protagonists(id),
   occasion text not null,           -- OccasionType value
   occasion_label text,              -- Optional organiser override of display label
+  market text not null default 'en-GB',  -- Market identifier
   created_by text references users(id),
   description text,
   closes_at timestamptz not null,
@@ -320,7 +323,7 @@ components/
 │   ├── occasion-tag.tsx              -- Small uppercase occasion label (brand purple)
 │   ├── section-eyebrow.tsx           -- Small uppercase section label (brand | muted variants)
 │   ├── ranking-bar.tsx               -- Label + amount + progress bar row
-│   └── reveal-quote.tsx             -- Left-bordered italic blockquote
+│   └── reveal-quote.tsx              -- Left-bordered italic blockquote
 ├── canvas/                           -- Event creation/editing UI
 │   ├── poll-editor.tsx
 │   ├── topic-picker.tsx
@@ -346,7 +349,7 @@ components/
 │   └── utils.ts
 ├── favpoll-card/                     -- Shared poll rendering primitives (not a self-contained card)
 │   ├── poll-title.tsx                -- Topic eyebrow label (11px uppercase purple, no built-in margin)
-│   ├── poll-framing.tsx              -- Framing paragraph (15px leading-relaxed #5F5E5A) — unused in production; personal_framing retired
+│   ├── poll-framing.tsx              -- Framing paragraph — unused in production; personal_framing retired
 │   ├── poll-reveal.tsx               -- Post-pledge reveal blockquote (18px italic #26215C, left border)
 │   ├── poll-options.tsx              -- Item selection UI
 │   ├── poll-results.tsx              -- Results display
@@ -357,9 +360,11 @@ components/
 ├── hero-demo-panel/                  -- Animated homepage demo (no props, self-contained)
 │   ├── index.tsx                     -- Orchestrator: state, effects, section layout, occasion chips
 │   ├── scenes.ts                     -- HeroScene type, Phase type, SCENES data, OCCASION_CHIPS, PLEDGE_AMOUNTS, SCENE_EYEBROWS
-│   ├── variants.ts                   -- Framer Motion variants (fadeUp, fadeIn, revealVariant) and timing constants (FAST, MEDIUM, SLOW)
+│   ├── variants.ts                   -- Framer Motion variants and timing constants
 │   ├── hero-pitch-column.tsx         -- Left column: animated eyebrow, headline, supporting text, CTA buttons
 │   └── demo-card.tsx                 -- Card: protagonist header, topic title, poll options, pledge panel, reveal quote, rankings, charity total, toast
+├── event-canvas/                     -- Event creation/editing canvas
+│   └── use-canvas.ts                 -- Canvas state — uses getBioPlaceholder(occasion, firstTopicTitle) for topic-aware bio placeholder
 ├── event-hero.tsx                    -- Event header with protagonist info
 ├── event-card.tsx                    -- Card for live events listings
 ├── event-card-empty.tsx              -- Empty state card
@@ -367,13 +372,15 @@ components/
 ├── charity-banner.tsx                -- Charity names + logos
 ├── countdown.tsx                     -- Closing countdown display
 ├── header.tsx                        -- App header (nav + auth)
-├── poll-heading.tsx                  -- Poll topic heading: view mode shows PollTitle + hint ("– Is it the same as [Name]'s?" inline, hidden after pledging) + PollReveal; edit mode mirrors same styles with editable inputs. Dual-mode pattern matching event-hero.
+├── poll-heading.tsx                  -- Poll topic heading with hint line and reveal
 ├── stripe-checkout.tsx               -- Stripe Elements checkout wrapper
 └── pot-banner.tsx                    -- Shared fund banner
 
 lib/
-├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders (reveal only; framing retired)
+├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders; exports getBioPlaceholder(occasion, topicTitle?)
+├── topic-bio-placeholders.ts         -- TOPIC_BIO_PLACEHOLDERS — 560 bios keyed by topic title × occasion
 ├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline, getPollHint
+├── i18n.ts                           -- formatCurrency(), t(), MARKET_DEFAULTS, Market type (to be created — localisation task)
 ├── email.ts                          -- Resend email helpers
 ├── edit-mode-context.tsx             -- React context for organiser edit mode
 ├── utils.ts                          -- cn(), misc helpers
@@ -381,6 +388,9 @@ lib/
     ├── client.ts                     -- Browser client
     ├── server.ts                     -- Server component client (SSR)
     └── admin.ts                      -- Service role client for webhooks/cron
+
+messages/
+└── en-GB.json                        -- UI strings for en-GB market (to be created — localisation task)
 
 types/index.ts                        -- All domain types + composite query types
 scripts/seed.ts                       -- pnpm seed — additive, idempotent
@@ -403,24 +413,17 @@ Shared atoms in `components/ui/` extracted from duplicated inline patterns:
 | `RevealQuote` | `text, className?, role?, aria-label?, aria-live?` | Left-bordered italic blockquote for reveal text |
 | `Chip` | `selected?, className?, ...buttonProps` | Selectable pill — border-based toggle; selected: brand purple fill; unselected: `border-border bg-background` |
 
-`Chip` is used for occasion selectors, topic pickers, category filters, and charity selection. Built on `Button`; accepts all button props. Use `className` for size overrides (e.g. `py-1 text-[11px]` for compact). Do not use for amount presets (those are input shortcuts, not filters — use `Button` directly).
+`Chip` is used for occasion selectors, topic pickers, category filters, and charity selection. Built on `Button`; accepts all button props. Use `className` for size overrides. Do not use for amount presets — use `Button` directly.
 
-`SectionEyebrow` with framer-motion: wrap with `motion()` as needed — see `hero-demo-panel.tsx`.
+`SectionEyebrow` with framer-motion: wrap with `motion()` as needed — see `hero-demo-panel/index.tsx`.
 
 ---
 
 ## Storybook
 
-Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. Story files co-located alongside components:
+Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. Story files co-located alongside components.
 
-- **UI atoms:** button, card, input, field, occasion-tag, section-eyebrow, ranking-bar, reveal-quote, chip
-- **Feature components:** event-card, event-card-empty, countdown, charity-banner, event-hero, poll-heading, poll-section, display-screen
-- **Pledge form:** amount-input, amount-presets, pledge-breakdown
-- **FavpollCard primitives:** favpoll-card, favpoll-header, poll-reveal, event-page
-
-See `references/COMPONENT_TREE.md` for the full component hierarchy, which components are used where, and which are unused in production.
-
-Font fix: `.storybook/preview-head.html` loads Plus Jakarta Sans from Google Fonts and sets `--font-sans` — required because `next/font` only runs through the Next.js layout, not Storybook. `@storybook/react` is a direct devDependency (required for TypeScript to resolve `Meta`/`StoryObj` types with pnpm's strict node_modules).
+Font fix: `.storybook/preview-head.html` loads Plus Jakarta Sans from Google Fonts and sets `--font-sans` — required because `next/font` only runs through the Next.js layout, not Storybook.
 
 ---
 
@@ -441,12 +444,12 @@ Gray 100:  #D3D1C7   — borders, dividers
 ### Typography
 - Typeface: Plus Jakarta Sans
 - Weights: 400 regular, 500 medium only (never 600/700)
-- Reveal/quote: 18px, italic, `leading-relaxed`, `text-[#26215C]`, `border-l-[2.5px] border-[#7F77DD]` (see `PollReveal`)
+- Reveal/quote: 18px, italic, `leading-relaxed`, `text-[#26215C]`, `border-l-[2.5px] border-[#7F77DD]`
 - Section eyebrow (brand): 11px, medium, `tracking-widest`, uppercase, `text-[#534AB7]`
 - Section eyebrow (muted): `text-xs`, medium, `tracking-widest`, uppercase, `text-muted-foreground`
 
 ### Edit mode field treatment
-- Editable field: **absolute underline pattern** — add `peer` to the input/textarea, then a zero-height sibling `<div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />`. This keeps borders out of layout flow so heights match between edit/view modes.
+- Editable field: absolute underline pattern — `peer` on input/textarea, zero-height sibling div with `border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40`
 - Placeholder: `placeholder:text-muted-foreground/40`
 - Guest view: no underlines, no placeholders, no edit controls
 
@@ -508,7 +511,7 @@ Tests are co-located in `__tests__/` directories alongside their subjects:
 | pledge withdraw | `app/pledges/withdraw/__tests__/actions.test.ts` |
 | Storybook smoke | auto-generated via `@storybook/addon-vitest` (chromium) |
 
-`vitest.config.ts` uses **array alias format** — the specific `@/app/events/new/actions` mock alias must come before the generic `@` alias, or Vite's prefix matching swallows it before Storybook's pre-bundler can resolve it.
+`vitest.config.ts` uses array alias format — the specific `@/app/events/new/actions` mock alias must come before the generic `@` alias.
 
 ---
 
@@ -540,8 +543,17 @@ CRON_SECRET
 
 - **One poll per event — enforced.** Each event has exactly one poll. The data model uses a `polls` array internally but the UI deliberately allows only one. Do not build multi-poll support without explicit instruction. `state.polls[0]` is always the poll.
 
+- **`personal_framing` retired.** Column kept in database but app no longer reads or writes it. The auto-generated hint line `"Is it the same as [Name]'s?"` replaces it in all guest-facing views.
+
+- **Topic-aware bio placeholders.** `getBioPlaceholder(occasion, topicTitle?)` in `lib/occasions.ts` returns a placeholder from `TOPIC_BIO_PLACEHOLDERS` (560 bios keyed by topic × occasion) when a topic is selected, falling back to the occasion-only placeholder. Wired into `use-canvas.ts` — updates live as the organiser picks a topic.
+
+- **Localisation foundations in place.** Market field on `events` (default `'en-GB'`), markets array on `topic_items` (default `['en-GB']`). Currency rendering via `formatCurrency()` in `lib/i18n.ts`. UI strings in `messages/en-GB.json` via `t()` helper. Full `next-intl` migration deferred until a second market launches. See `references/LOCALISATION.md`.
+
+---
+
 ## Outstanding TODO
 
+- **Localisation next steps:** install `next-intl`, complete string extraction, add `country_code` and `tax_deductible` to `charities`, seed US-market topic items, write US tone guidance in brand skill, add market-aware topic filtering, Gift Aid (UK) and 501(c)(3) copy (US)
 - Stripe Connect — charity disbursement (cron has placeholder; `api/stripe/payment-intent` creates PaymentIntents but Connect payout not wired)
 - All-time rankings browse page (`/rankings` exists but needs data threshold logic)
 - User profile / donor history page
