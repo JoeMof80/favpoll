@@ -432,4 +432,111 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A favourite decade — for its music, its culture, or just what it felt like — is a good way in.",
   },
+
+  // ── Category 3: Places ────────────────────────────────────────────────────
+
+  Place: {
+    memorial:
+      "A beloved mother and teacher who returned to the same stretch of Shropshire countryside for thirty years and found it sufficient. She walked the same paths in different weathers and said there was always something new. There was always something new.",
+    tribute:
+      "A mentor who believed that the quality of a conversation had something to do with the quality of the place it happened in. He was most himself in London, on foot, with no particular destination. He walked faster when he had something to say.",
+    birthday:
+      "Sarah is turning 40 with a long list of places she has been meaning to visit and a shorter list of places she keeps going back to instead. She is not embarrassed about either list. She says the return visits win on quality.",
+    retirement:
+      "David grew up in the Yorkshire Dales and spent thirty-five years getting back there as often as he could manage. He is now retired, and the question of how often is manageable has become the most interesting one he has.",
+    wedding:
+      "Emma and James have been arguing about where to go next since the festival they met at in 2019. She wants Scotland. He wants Italy. They have been to both and have not resolved it. They consider this a feature of the relationship.",
+    engagement:
+      "Callum had visited Arthur's Seat in December, in January, and on several other occasions before he was satisfied with the view. Sophie did not know this. She does now, and considers it a very specific kind of love.",
+    anniversary:
+      "Forty years together and the same cottage in the same village every August. They tried other places twice. Both times they agreed, quietly, that they'd been right about the cottage all along.",
+    leaving:
+      "Priya grew up in Tamil Nadu, spent six years in Manchester, and says she still can't quite decide which landscape belongs to her more. She is starting her own studio. The question of where has not yet been answered.",
+    graduation:
+      "Tom studied architecture in Manchester and knows the city building by building, street by street — partly from his course, partly from walking it obsessively on weekends. He says knowing a place that well is its own kind of qualification.",
+    christening:
+      "Lily has arrived in the world with an address, a family, and a village churchyard that has been in her family for three generations. She will form her own opinions about all of this in due course.",
+    achievement:
+      "Marcus grew up near the Norfolk coast and has been giving to the RNLI since he was eleven — the year he watched a shout launch from Sheringham beach in a January storm. He raised over £4,000 for them when he ran his marathon. The connection is not coincidental.",
+    recovery:
+      "During her recovery, Claire started visiting a particular estuary near her house that she had driven past for years without stopping. She went at the same time each week. It became, she says, the most reliable thing in her diary.",
+    award:
+      "Amelia has just been named Teacher of the Year. She grew up in Herefordshire and took her students to the Malvern Hills on a day that was officially unscheduled and is now — unofficially — on the school calendar every year.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up in Accra, came to the UK for university, and has spent five years building a map of Britain in his head, one weekend trip at a time. The Cairngorms, he says, were the most surprising.",
+    celebration:
+      "Tell their story — who they are, what matters to them, and whether there's a place that says something true about them. A place someone returns to, or has been meaning to go, is always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite place — or a place that shaped them — is a good way to start.",
+  },
+
+  "Type of holiday": {
+    memorial:
+      "A beloved mother and teacher who took the same kind of holiday for thirty years — a cottage in the countryside, a good book, and no particular plans. She said the absence of an itinerary was the point. She was right.",
+    tribute:
+      "A mentor who walked long-distance paths on his own every summer and came back from each one with something worked out. He said walking holidays were for thinking, and thinking was what he was for. Both were true.",
+    birthday:
+      "Sarah is turning 40 with a list of holidays she has planned and not quite taken — not because she doesn't travel, but because the planning is, she admits, part of what she enjoys. She will get to all of them eventually.",
+    retirement:
+      "Thirty-five years of commuting, and David is retiring with a clear plan: the things he has been meaning to do on holiday but always talked himself out of. He has a notebook. The list is longer than he expected.",
+    wedding:
+      "Emma and James have spent their entire relationship in a friendly disagreement about what a holiday should be. She wants to walk in Scotland. He wants to eat in Italy. They have done both. The argument has not been resolved.",
+    engagement:
+      "They have been taking walking holidays together since the second date. Callum plans the routes. Sophie approves or adjusts them. The proposal was, in retrospect, the logical conclusion of this arrangement.",
+    anniversary:
+      "Forty years together and a very clear position on holidays: the same cottage, the same week in August, the same walk on the Tuesday. They have tried other arrangements twice. Both times they regretted it.",
+    leaving:
+      "Priya took one proper holiday in six years — a week back in Chennai that she described as restorative in ways she couldn't quite articulate. She is starting her own studio. A holiday is somewhere in the near future. She has earned it.",
+    graduation:
+      "Tom used his graduation summer to take a cheap flight to Portugal and walk slowly through every piece of modernist architecture he could find. He describes this as a holiday. His friends are not sure it counts.",
+    christening:
+      "Lily's parents have not taken a proper holiday in fourteen months. They are planning something modest for the autumn. Lily's views on travel are as yet unknown, though she has opinions about car journeys.",
+    achievement:
+      "Marcus spent the weeks before his marathon in a rented flat near the course, training the route section by section. He raised over £4,000 for the RNLI. He has already downloaded a trail map for the Norfolk coast. He says this is a holiday.",
+    recovery:
+      "During her recovery, Claire's version of a holiday was a week in a borrowed cottage in the Wye Valley with no plans and no schedule. She describes it as the best holiday she has ever taken. We believe her.",
+    award:
+      "Amelia has just been named Teacher of the Year. Her ideal holiday involves a walking route, a good secondhand bookshop at some point along the way, and no mobile signal. She has not always found all three at once.",
+    promotion:
+      "Kwame has been to Ghana every Christmas since arriving in the UK, which he calls the only holiday that is genuinely non-negotiable. He celebrated his promotion with a weekend in the Cairngorms. He is now planning his next one.",
+    celebration:
+      "Tell their story — who they are, what they love, and what kind of holiday brings the best of them out. Whether they need an adventure or just a good book and a quiet view, it's always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite kind of holiday — or the one they're always planning but haven't quite taken — is always a revealing detail.",
+  },
+
+  "Way to travel": {
+    memorial:
+      "A beloved mother and teacher who did not drive and never learned — she said the bus gave her time to think, and trains gave her time to read. She was never in a hurry to get anywhere, and she always arrived at the right moment.",
+    tribute:
+      "A mentor who walked wherever he possibly could and arrived at meetings slightly warm for it. He said the walk was part of the preparation. His colleagues suspected this was true.",
+    birthday:
+      "Sarah is turning 40 and considers a long train journey one of the finer things in life — the enforced stillness, the countryside at speed, the guilt-free hours with a book and nobody needing anything from her.",
+    retirement:
+      "Thirty-five years of motorway commuting, and David is retiring with a clear plan to use the car significantly less. He has a rail pass. He is starting with the Dales and working outward.",
+    wedding:
+      "Emma and James spent their first holiday together on a Eurostar they nearly missed and have been early for trains ever since. She prefers the train. He prefers to drive. They take the train.",
+    engagement:
+      "They get everywhere on foot when they can, and by train when they can't. Callum does the route planning. Sophie carries the snacks. This is a fair division and both of them know it.",
+    anniversary:
+      "Forty years, and Dad has always done the driving. Mum navigates. This arrangement was established in 1985 and has not been renegotiated. The sat-nav has not resolved the dynamic.",
+    leaving:
+      "Priya cycled to the studio for six years through everything the Manchester weather could produce. She said it was the best part of the day — the twenty minutes between home and work when nobody could reach her.",
+    graduation:
+      "Tom is a train person by conviction — he says the journey is part of the design, and that travelling at ground level teaches you things about cities that you can't learn any other way. He is not wrong.",
+    christening:
+      "Lily's parents have done a great deal of travelling in the last six months — to hospitals, to clinics, to family. They are now ready to travel somewhere of their own choosing. They haven't decided where yet.",
+    achievement:
+      "Marcus ran his training routes on foot and cycled to work — part habit, part discipline, part preparation. He raised over £4,000 for the RNLI. He says the marathon felt like the longest commute he'd ever done. He means this as a compliment.",
+    recovery:
+      "During her recovery, Claire started walking places she had previously driven — to the shops, to the park, to the canal. She said the change in pace changed what she noticed. She has kept it up.",
+    award:
+      "Amelia has just been named Teacher of the Year. She takes the bus, has always taken the bus, and considers the morning route part of her preparation for the day. She has read most of the great novels on the upper deck of the 47.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He walks to work when the weather allows it and says the thirty minutes are the most useful part of his day. He is known to arrive with product decisions already made.",
+    celebration:
+      "Tell their story — who they are, what they love, and how they prefer to get from one place to another. The way someone travels often says something true about them.",
+    other:
+      "Tell us who this person is and why you're gathering. How they prefer to travel — unhurried train, early flight, long walk — is always a revealing detail.",
+  },
 }
