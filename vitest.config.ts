@@ -11,9 +11,11 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      "@": resolve(__dirname, ".")
-    }
+    alias: [
+      // Must come before the "@" catch-all so the specific path wins
+      { find: "@/app/events/new/actions", replacement: resolve(dirname, ".storybook/__mocks__/actions.ts") },
+      { find: "@", replacement: resolve(dirname, ".") },
+    ],
   },
   test: {
     projects: [{

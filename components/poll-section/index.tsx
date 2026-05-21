@@ -6,7 +6,6 @@ import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@/types"
 import { Button } from "@/components/ui/button"
-import { RevealQuote } from "@/components/ui/reveal-quote"
 import { usePollSection } from "./use-poll-section"
 
 type Props = {
@@ -39,39 +38,41 @@ export function PollSection({
     pledgeConfirmed,
     showRankings,
     handleSelectionsChange,
-  } = usePollSection({ pollId: poll.id, hasPledged, isClosed, pledgeJustConfirmed, onSelectionsChange })
+  } = usePollSection({
+    pollId: poll.id,
+    hasPledged,
+    isClosed,
+    pledgeJustConfirmed,
+    onSelectionsChange,
+  })
 
-  const personFirstName = protagonistName.split(" ")[0]
-  const reveal = poll.personal_reveal ?? null
+  const personFirstName = protagonistName.split(/[\s&]+/)[0]
+  const pledged = view === "results" && pledgeConfirmed
 
   return (
-    <section aria-labelledby={`poll-heading-${poll.id}`} className="space-y-4">
+    <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
       <PollHeading
+        mode="view"
         pollId={poll.id}
         topicTitle={poll.topics.title}
-        framing={poll.personal_framing ?? null}
-        reveal={null}
+        framing={view === "results" ? null : (poll.personal_framing ?? null)}
+        reveal={pledged ? (poll.personal_reveal ?? null) : null}
+        protagonistFirstName={personFirstName}
+        pledged={pledged}
       />
 
       {/* Results view */}
       {view === "results" && (
         <>
-          {/* Reveal — shown immediately after pledging, before rankings */}
-          {pledgeConfirmed && reveal && (
-            <RevealQuote
-              text={reveal}
-              role="status"
-              aria-label={`${personFirstName}'s reveal`}
-              aria-live="polite"
-            />
-          )}
 
           {showRankings && (
             <>
               <div className="flex items-center justify-end">
                 <Tabs
                   value={rankingView}
-                  onValueChange={(v) => setRankingView(v as "amount" | "count")}
+                  onValueChange={(v: string) =>
+                    setRankingView(v as "amount" | "count")
+                  }
                 >
                   <TabsList className="h-7">
                     <TabsTrigger value="amount" className="px-3 text-xs">
@@ -112,23 +113,13 @@ export function PollSection({
               This poll has closed.
             </p>
           ) : (
-            <>
-              <PledgePanel
-                items={poll.topics.topic_items}
-                totalAmount={pledgeAmount}
-                onSelectionsChange={handleSelectionsChange}
-                isInfinite={!poll.topics.is_finite}
-                onAddItem={onAddItem}
-              />
-              {reveal && !hasPledged && !pledgeConfirmed && (
-                <p
-                  className="text-center text-xs text-muted-foreground"
-                  aria-live="polite"
-                >
-                  After pledging, {personFirstName} has something to share with you.
-                </p>
-              )}
-            </>
+            <PledgePanel
+              items={poll.topics.topic_items}
+              totalAmount={pledgeAmount}
+              onSelectionsChange={handleSelectionsChange}
+              isInfinite={!poll.topics.is_finite}
+              onAddItem={onAddItem}
+            />
           )}
           {(hasPledged || isClosed) && (
             <Button

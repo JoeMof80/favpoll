@@ -92,9 +92,7 @@ export function PledgePanel({
 
   return (
     <fieldset>
-      <legend className="mb-3 text-sm text-foreground">
-        Choose your favourites
-      </legend>
+      <legend className="sr-only">Choose your favourites</legend>
 
       {isInfinite && (
         <input

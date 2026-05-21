@@ -1,19 +1,38 @@
-import type { StorybookConfig } from '@storybook/nextjs-vite';
+import path from 'path'
+import { fileURLToPath } from 'url'
+import type { StorybookConfig } from '@storybook/nextjs-vite'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const config: StorybookConfig = {
-  "stories": [
+  stories: [
     "../components/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
-  "addons": [
+  addons: [
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
     "@storybook/addon-mcp"
   ],
-  "framework": "@storybook/nextjs-vite",
-  "staticDirs": [
+  framework: "@storybook/nextjs-vite",
+  staticDirs: [
     "../public"
-  ]
-};
-export default config;
+  ],
+  viteFinal: async (config) => {
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...(config.resolve?.alias ?? {}),
+        // Prevent Clerk server-side modules from being bundled in the browser
+        // environment. uploadPersonPhoto is edit-mode only; stories use view mode.
+        "@/app/events/new/actions": path.resolve(
+          __dirname,
+          "./__mocks__/actions.ts"
+        ),
+      },
+    }
+    return config
+  },
+}
+export default config

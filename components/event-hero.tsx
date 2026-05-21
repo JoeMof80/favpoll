@@ -15,6 +15,7 @@ import type { Event, Protagonist } from "@/types"
 type ViewProps = {
   mode?: "view"
   event: Event
+
   protagonist: Protagonist
 }
 
@@ -90,6 +91,105 @@ export function EventHero(props: Props) {
   return (
     <div className="mb-10">
       <div className="flex items-start gap-6">
+        {/* Text */}
+        <div className="min-w-0 flex-1">
+          {/* Occasion label */}
+          {isEdit ? (
+            <div className="relative mb-2">
+              <input
+                type="text"
+                value={props.occasionLabel}
+                onChange={(e) => props.onOccasionLabelChange(e.target.value)}
+                placeholder={label || "In memory of"}
+                className="peer w-full appearance-none bg-transparent py-0 pr-5 text-xs font-medium tracking-widest text-muted-foreground uppercase outline-none placeholder:text-muted-foreground/30"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />
+              <Pencil
+                className="pointer-events-none absolute top-1/2 right-0 h-3 w-3 -translate-y-1/2 text-muted-foreground/25"
+                aria-hidden
+              />
+            </div>
+          ) : (
+            <SectionEyebrow variant="muted" className="mb-2">
+              {headline?.prefix ?? label}
+            </SectionEyebrow>
+          )}
+
+          {/* Name */}
+          {isEdit ? (
+            <div className="relative">
+              <input
+                type="text"
+                value={props.protagonistName}
+                onChange={(e) => props.onProtagonistNameChange(e.target.value)}
+                placeholder={props.placeholders.name}
+                className="peer w-full appearance-none bg-transparent py-0 pr-6 text-4xl leading-tight font-medium tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40 sm:text-5xl"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />
+              <Pencil
+                className="pointer-events-none absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25"
+                aria-hidden
+              />
+            </div>
+          ) : (
+            <h1 className="text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A] sm:text-5xl">
+              {protagonist?.name}
+            </h1>
+          )}
+
+          {/* Dates — edit mode: free text; view mode: rendered from date_label */}
+          {isEdit ? (
+            <div className="relative mt-2">
+              <input
+                type="text"
+                value={props.dateLabel}
+                onChange={(e) => props.onDateLabelChange(e.target.value)}
+                placeholder={
+                  DATE_LABEL_PLACEHOLDERS[occasion] ?? "Dates (optional)"
+                }
+                className="peer w-full appearance-none bg-transparent py-0 pr-5 text-2xl font-normal text-primary outline-none placeholder:text-muted-foreground/40"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />
+              <Pencil
+                className="pointer-events-none absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25"
+                aria-hidden
+              />
+            </div>
+          ) : headline?.suffix ? (
+            <p className="mt-2 text-2xl font-normal text-[#534AB7]">
+              {headline.suffix}
+            </p>
+          ) : null}
+
+          {/* Bio (edit mode) / Description (view mode) */}
+          {isEdit ? (
+            <div className="relative mt-4 w-full">
+              {/* Mirror p drives the height — textarea is absolutely positioned over it */}
+              <p
+                aria-hidden="true"
+                className="invisible min-h-13 w-full text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
+              >
+                {(props as EditProps).protagonistBio || "\u00A0"}
+              </p>
+              <textarea
+                value={(props as EditProps).protagonistBio}
+                onChange={(e) => props.onProtagonistBioChange(e.target.value)}
+                placeholder={props.placeholders.bio}
+                className="peer absolute inset-0 h-full w-full resize-none appearance-none bg-transparent py-0 pr-5 text-base leading-relaxed text-muted-foreground outline-none placeholder:text-muted-foreground/40"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40" />
+              <Pencil
+                className="pointer-events-none absolute top-2 right-0 h-3.5 w-3.5 text-muted-foreground/25"
+                aria-hidden
+              />
+            </div>
+          ) : protagonist?.bio ? (
+            <p className="mt-4 text-base leading-relaxed text-[#5F5E5A]">
+              {protagonist.bio}
+            </p>
+          ) : null}
+        </div>
+
         {/* Photo */}
         {isEdit ? (
           <label
@@ -149,7 +249,7 @@ export function EventHero(props: Props) {
             />
           </label>
         ) : (
-          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-border">
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-[#D3D1C7]">
             {protagonist?.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -160,7 +260,7 @@ export function EventHero(props: Props) {
             ) : (
               <>
                 <svg
-                  className="absolute inset-0 h-full w-full text-border"
+                  className="absolute inset-0 h-full w-full text-[#D3D1C7]"
                   aria-hidden="true"
                 >
                   <defs>
@@ -183,7 +283,7 @@ export function EventHero(props: Props) {
                   </defs>
                   <rect width="100%" height="100%" fill="url(#hatch)" />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-muted-foreground">
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-[#888780]">
                   {protagonist?.name
                     .split(" ")
                     .filter(Boolean)
@@ -196,92 +296,9 @@ export function EventHero(props: Props) {
             )}
           </div>
         )}
-
-        {/* Text */}
-        <div className="min-w-0 flex-1">
-          {/* Occasion label */}
-          {isEdit ? (
-            <div className="relative mb-4">
-              <input
-                type="text"
-                value={props.occasionLabel}
-                onChange={(e) => props.onOccasionLabelChange(e.target.value)}
-                placeholder={label || "In memory of"}
-                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-xs font-medium tracking-widest text-muted-foreground uppercase outline-none transition-colors placeholder:text-muted-foreground/30 focus:border-primary/40"
-              />
-              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
-            </div>
-          ) : (
-            <SectionEyebrow variant="muted" className="mb-4">
-              {headline?.prefix ?? label}
-            </SectionEyebrow>
-          )}
-
-          {/* Name */}
-          {isEdit ? (
-            <div className="relative">
-              <input
-                type="text"
-                value={props.protagonistName}
-                onChange={(e) => props.onProtagonistNameChange(e.target.value)}
-                placeholder={props.placeholders.name}
-                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-6 text-4xl leading-tight font-medium tracking-tight text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40 sm:text-5xl"
-              />
-              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
-            </div>
-          ) : (
-            <h1 className="border-b border-transparent text-4xl leading-tight font-medium tracking-tight text-foreground sm:text-5xl">
-              {protagonist?.name}
-            </h1>
-          )}
-
-          {/* Dates — edit mode: free text; view mode: rendered from date_label */}
-          {isEdit ? (
-            <div className="relative mt-2">
-              <input
-                type="text"
-                value={props.dateLabel}
-                onChange={(e) => props.onDateLabelChange(e.target.value)}
-                placeholder={
-                  DATE_LABEL_PLACEHOLDERS[occasion] ?? "Dates (optional)"
-                }
-                className="w-full appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-2xl font-normal text-primary outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
-              />
-              <Pencil className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/25" aria-hidden />
-            </div>
-          ) : headline?.suffix ? (
-            <p className="mt-2 text-2xl font-normal text-primary">
-              {headline.suffix}
-            </p>
-          ) : null}
-
-          {/* Bio (edit mode) / Description (view mode) */}
-          {isEdit ? (
-            <div className="relative mt-4 w-full max-w-prose">
-              {/* Mirror p drives the height — textarea is absolutely positioned over it */}
-              <p
-                aria-hidden="true"
-                className="invisible min-h-13 w-full border-b-2 border-dotted border-border text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
-              >
-                {(props as EditProps).protagonistBio || "\u00A0"}
-              </p>
-              <textarea
-                value={(props as EditProps).protagonistBio}
-                onChange={(e) => props.onProtagonistBioChange(e.target.value)}
-                placeholder={props.placeholders.bio}
-                className="absolute inset-0 h-full w-full resize-none appearance-none border-0 border-b-2 border-dotted border-border bg-transparent py-0 pr-5 text-base leading-relaxed text-muted-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
-              />
-              <Pencil className="pointer-events-none absolute right-0 top-2 h-3.5 w-3.5 text-muted-foreground/25" aria-hidden />
-            </div>
-          ) : props.protagonist.bio ? (
-            <p className="mt-4 w-full max-w-prose border-b border-transparent text-base leading-relaxed text-muted-foreground">
-              {props.protagonist.bio}
-            </p>
-          ) : null}
-        </div>
       </div>
 
-      <hr className="mt-8 border-border" />
+      <hr className="mt-8 border-[#D3D1C7]" />
     </div>
   )
 }
