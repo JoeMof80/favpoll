@@ -4703,6 +4703,7 @@ async function seedTopicItems() {
         label,
         is_canonical: true,
         source: "seed",
+        markets: ["en-GB"],
       }))
 
     if (toInsert.length === 0) continue

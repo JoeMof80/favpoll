@@ -56,6 +56,7 @@ function makeViewProps(sceneIndex: number): {
     protagonist_id: protagonist.id,
     occasion,
     occasion_label: SCENE_EYEBROWS[sceneIndex],
+    market: "en-GB",
     created_by: "user-1",
     closes_at: "2026-12-31T00:00:00Z",
     original_closes_at: null,
@@ -84,7 +85,9 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof EventHero>
+// EventHero uses a discriminated union prop — Meta<typeof EventHero> produces
+// 'never' for args in StoryObj. Use Meta without the generic to avoid that.
+} satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -129,7 +132,7 @@ export const WithPhoto: Story = {
 
 // ─── Edit mode story ──────────────────────────────────────────────────────────
 
-export const EditMode: Story = {
+export const EditMode = {
   name: "Edit mode (interactive)",
   render: () => {
     const placeholders = OCCASION_PLACEHOLDERS["memorial"] ?? {

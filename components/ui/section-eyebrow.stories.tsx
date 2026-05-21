@@ -14,7 +14,7 @@ export const Default: Story = {
   args: { children: "Live events" },
 }
 
-export const WithHeading: Story = {
+export const WithHeading = {
   render: () => (
     <div>
       <SectionEyebrow className="mb-2">Live events</SectionEyebrow>
@@ -29,7 +29,7 @@ export const Muted: Story = {
   args: { children: "Poll closed", variant: "muted" },
 }
 
-export const BothVariants: Story = {
+export const BothVariants = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

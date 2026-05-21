@@ -369,10 +369,13 @@ Text:      no border, no background, gray-400 text — quiet actions (cancel, sk
 
 ```
 Product name:   favpoll (always lowercase, never favpoll)
-Spelling:       UK English in UI copy (favourite, honour, colour)
-               American spelling in code only (color, organize)
+Spelling:       UK English in messages/en-GB.json and all en-GB copy strings (favourite, honour, colour).
+               US English copy will live in messages/en-US.json when that market launches —
+               it will need a dedicated tone pass, not just spelling substitution. The register differs.
+               American spelling in code only (color, organize).
 Dates:          13th May 2026 — ordinal, never ISO or US format
-Currency:       £10.30 in summaries, £340 in rankings (no pence in headlines)
+Currency:       Rendered via formatCurrency() — never hardcoded. en-GB displays as £10.30 / £340.
+               en-US will display as $10.30 / $340.
 Case:           Sentence case everywhere — never Title Case or ALL CAPS in UI
 ```
 

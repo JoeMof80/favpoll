@@ -98,6 +98,14 @@ Full definitions in `references/GLOSSARY.md`.
 - pnpm only, never npm or yarn
 - American spelling in code (color, organize), UK English in UI copy strings
 
+### Localisation
+
+- Never hardcode `£` or currency symbols — use `formatCurrency()` from `@/lib/i18n`
+- Never hardcode locale-specific date strings — use `formatEventDate()` from `@/lib/display`
+- UI strings in new components go in `messages/en-GB.json` and are accessed via `t()` from `@/lib/i18n`
+- `events.market` defaults to `'en-GB'` — pass it through to any formatting functions that accept a locale
+- American spelling in code, UK English in `messages/en-GB.json` copy strings
+
 ## Component conventions
 
 ### File and component naming

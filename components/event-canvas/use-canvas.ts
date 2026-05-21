@@ -139,7 +139,6 @@ export function useCanvas({
             topicIsCustom: poll.topicIsCustom,
             customTopicTitle: poll.customTopicTitle,
             customTopicItems: poll.customTopicItems,
-            framing: poll.framing || null,
             reveal: poll.reveal || null,
             infiniteItems:
               !poll.topicIsCustom && topic && !topic.is_finite
@@ -187,7 +186,6 @@ export function useCanvas({
                   items: p.customTopicItems.filter((i) => i.trim()),
                 }
               : null,
-            framing: p.framing,
             reveal: p.reveal,
             infiniteItems: p.infiniteItems,
           })),

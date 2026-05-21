@@ -41,6 +41,7 @@ function makeEvent(overrides: Partial<EventWithDetails> = {}): EventWithDetails 
     protagonist_id: "prot-1",
     occasion: "birthday",
     occasion_label: null,
+    market: "en-GB",
     created_by: "user-1",
     closes_at: "2025-12-01T23:59:00Z",
     original_closes_at: null,

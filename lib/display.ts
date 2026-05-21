@@ -1,3 +1,5 @@
+import { formatCurrency } from './i18n'
+
 export function occasionLabel(occasion: string): string {
   const labels: Record<string, string> = {
     memorial:           "In memory of",
@@ -31,14 +33,21 @@ export function charityNames(
 }
 
 export function formatAmount(amount: number): string {
-  if (!amount) return "£0"
-  return `£${amount.toLocaleString("en-GB", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`
+  return formatCurrency(Math.round(amount) * 100)
 }
 
-export function formatRelativeDate(dateStr: string): string {
+export function ordinal(n: number, locale: string = 'en-GB'): string {
+  const rules = new Intl.PluralRules(locale, { type: 'ordinal' })
+  const suffixes: Record<string, string> = {
+    one: 'st',
+    two: 'nd',
+    few: 'rd',
+    other: 'th',
+  }
+  return `${n}${suffixes[rules.select(n)] ?? 'th'}`
+}
+
+export function formatRelativeDate(dateStr: string, locale: string = 'en-GB'): string {
   const date = new Date(dateStr)
   const now = new Date()
   const days = Math.ceil((date.getTime() - now.getTime()) / 86400000)
@@ -47,18 +56,12 @@ export function formatRelativeDate(dateStr: string): string {
   if (days === 1) return "tomorrow"
   if (days < 7) return `in ${days} days`
   if (days < 14) return "next week"
-  return `${ordinal(date.getDate())} ${date.toLocaleString("en-GB", { month: "long" })}`
+  return `${ordinal(date.getDate(), locale)} ${date.toLocaleString(locale, { month: "long" })}`
 }
 
-export function ordinal(n: number): string {
-  const s = ["th", "st", "nd", "rd"]
-  const v = n % 100
-  return n + (s[(v - 20) % 10] || s[v] || s[0])
-}
-
-export function formatEventDate(date: string | Date): string {
+export function formatEventDate(date: string | Date, locale: string = 'en-GB'): string {
   const d = typeof date === "string" ? new Date(date + "T12:00:00") : date
-  return `${ordinal(d.getDate())} ${d.toLocaleString("en-GB", {
+  return `${ordinal(d.getDate(), locale)} ${d.toLocaleString(locale, {
     month: "long",
     year: "numeric",
   })}`

@@ -18,6 +18,7 @@ function makeItems(scene: (typeof SCENES)[0], topicId: string): TopicItem[] {
       all_time_count: Math.max(1, Math.round(pledged / 15)),
       is_canonical: true,
       source: 'seed' as const,
+      markets: ['en-GB'],
       event_count: 1,
       total_pledge_count: Math.max(1, Math.round(pledged / 15)),
       created_at: '2024-01-01T00:00:00Z',

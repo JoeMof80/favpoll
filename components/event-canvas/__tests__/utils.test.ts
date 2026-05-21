@@ -9,7 +9,6 @@ describe("newPoll", () => {
       topicIsCustom: false,
       customTopicTitle: "",
       customTopicItems: [],
-      framing: "",
       reveal: "",
       prioritizedItemIds: [],
       prioritizedCustomLabels: [],

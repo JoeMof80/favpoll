@@ -43,7 +43,7 @@ export const Empty: Story = {
   },
 }
 
-export const FullRankings: Story = {
+export const FullRankings = {
   render: () => (
     <ol className="w-80 space-y-2.5">
       {[

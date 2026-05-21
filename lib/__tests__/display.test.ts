@@ -196,6 +196,32 @@ describe("formatAmount", () => {
   })
 })
 
+describe("ordinal — locale parameter", () => {
+  it("defaults to en-GB behaviour", () => {
+    expect(ordinal(1)).toBe("1st")
+    expect(ordinal(11)).toBe("11th")
+    expect(ordinal(21)).toBe("21st")
+  })
+
+  it("accepts an explicit locale", () => {
+    // en-US ordinals are identical to en-GB
+    expect(ordinal(1, "en-US")).toBe("1st")
+    expect(ordinal(2, "en-US")).toBe("2nd")
+    expect(ordinal(3, "en-US")).toBe("3rd")
+    expect(ordinal(4, "en-US")).toBe("4th")
+  })
+})
+
+describe("formatEventDate — locale parameter", () => {
+  it("defaults to en-GB output", () => {
+    expect(formatEventDate("2025-06-15")).toBe("15th June 2025")
+  })
+
+  it("accepts an explicit locale matching en-GB output", () => {
+    expect(formatEventDate("2025-06-15", "en-GB")).toBe("15th June 2025")
+  })
+})
+
 describe("getPollHint", () => {
   it("returns the hint with a regular first name", () => {
     expect(getPollHint("Belinda")).toBe("Is it the same as Belinda's?")

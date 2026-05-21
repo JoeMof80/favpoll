@@ -4,6 +4,7 @@ import { EventCard } from "@/components/event-card"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { createClient } from "@/lib/supabase/server"
+import { t } from "@/lib/i18n"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -68,7 +69,7 @@ export default async function HomePage() {
                 Create the first favpoll event and it will appear here.
               </p>
               <Button asChild size="lg">
-                <Link href="/events/new">Create an event</Link>
+                <Link href="/events/new">{t("landing.cta.primary")}</Link>
               </Button>
             </div>
           )}
@@ -79,12 +80,10 @@ export default async function HomePage() {
       <section className="border-t border-border py-20 text-center">
         <div className="mx-auto max-w-lg px-6">
           <p className="mb-6 text-[13px] leading-relaxed text-muted-foreground italic">
-            Expressions of joy, for charitable causes,
-            <br />
-            in the name of those we love.
+            {t("landing.subheader")}
           </p>
           <Button asChild size="lg">
-            <Link href="/events/new">Create an event</Link>
+            <Link href="/events/new">{t("landing.cta.primary")}</Link>
           </Button>
         </div>
       </section>

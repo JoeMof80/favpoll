@@ -380,7 +380,7 @@ lib/
 ├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders; exports getBioPlaceholder(occasion, topicTitle?)
 ├── topic-bio-placeholders.ts         -- TOPIC_BIO_PLACEHOLDERS — 560 bios keyed by topic title × occasion
 ├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline, getPollHint
-├── i18n.ts                           -- formatCurrency(), t(), MARKET_DEFAULTS, Market type (to be created — localisation task)
+├── i18n.ts                           -- formatCurrency(), t(), MARKET_DEFAULTS, Market type
 ├── email.ts                          -- Resend email helpers
 ├── edit-mode-context.tsx             -- React context for organiser edit mode
 ├── utils.ts                          -- cn(), misc helpers
@@ -390,7 +390,7 @@ lib/
     └── admin.ts                      -- Service role client for webhooks/cron
 
 messages/
-└── en-GB.json                        -- UI strings for en-GB market (to be created — localisation task)
+└── en-GB.json                        -- UI strings for en-GB market
 
 types/index.ts                        -- All domain types + composite query types
 scripts/seed.ts                       -- pnpm seed — additive, idempotent
@@ -493,7 +493,7 @@ Gray 100:  #D3D1C7   — borders, dividers
 
 ## Testing
 
-Run with `pnpm test:run`. **406 tests must pass** before committing.
+Run with `pnpm test:run`. **421 tests must pass** before committing.
 
 Tests are co-located in `__tests__/` directories alongside their subjects:
 

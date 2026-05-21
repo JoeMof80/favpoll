@@ -20,7 +20,9 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof PollHeading>
+// PollHeading uses a discriminated union prop — Meta<typeof PollHeading> produces
+// 'never' for args in StoryObj. Use Meta without the generic to avoid that.
+} satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -63,7 +65,7 @@ export const ViewTitleOnly: Story = {
 
 // ─── Edit mode ────────────────────────────────────────────────────────────────
 
-export const EditNoTopic: Story = {
+export const EditNoTopic = {
   name: "Edit — no topic selected",
   render: () => {
     const [reveal, setReveal] = useState("")
@@ -81,7 +83,7 @@ export const EditNoTopic: Story = {
   },
 }
 
-export const EditCanonicalTopic: Story = {
+export const EditCanonicalTopic = {
   name: "Edit — canonical topic selected",
   render: () => {
     const [reveal, setReveal] = useState("")
@@ -100,7 +102,7 @@ export const EditCanonicalTopic: Story = {
   },
 }
 
-export const EditCustomTopic: Story = {
+export const EditCustomTopic = {
   name: "Edit — custom topic (editable title)",
   render: () => {
     const [title, setTitle] = useState("")
@@ -121,7 +123,7 @@ export const EditCustomTopic: Story = {
   },
 }
 
-export const EditWithReveal: Story = {
+export const EditWithReveal = {
   name: "Edit — reveal filled in",
   render: () => {
     const [reveal, setReveal] = useState(

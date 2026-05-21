@@ -34,6 +34,7 @@ export type TopicItem = {
   all_time_count: number
   is_canonical: boolean
   source: 'seed' | 'organiser' | 'guest'
+  markets: string[]
   event_count: number
   total_pledge_count: number
   created_at: string
@@ -74,6 +75,7 @@ export type Event = {
   protagonist_id: string
   occasion: OccasionType
   occasion_label: string | null
+  market: string
   created_by: string
   closes_at: string
   original_closes_at: string | null

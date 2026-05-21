@@ -37,7 +37,7 @@ export const Graduation: Story = {
   args: { label: "Graduation" },
 }
 
-export const AllOccasions: Story = {
+export const AllOccasions = {
   render: () => (
     <div className="flex flex-col gap-3">
       {[

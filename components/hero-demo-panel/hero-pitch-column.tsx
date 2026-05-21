@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { SCENE_EYEBROWS } from "./scenes"
+import { t } from "@/lib/i18n"
 
 type Props = {
   sceneIndex: number
@@ -34,19 +35,16 @@ export function HeroPitchColumn({ sceneIndex }: Props) {
       </div>
 
       <h1 className="mb-[1.1rem] text-5xl leading-[1.15] font-light tracking-tight text-foreground">
-        Introducing a new way to
-        <br />
-        <span className="font-medium">honour them.</span>
+        {t("landing.headline")}
       </h1>
 
       <p className="mb-7 max-w-[320px] text-xl leading-relaxed text-muted-foreground">
-        Expressions of joy, for charitable causes, in the name of those we
-        love.
+        {t("landing.subheader")}
       </p>
 
       <div className="flex items-center gap-3.5">
         <Button asChild size="lg">
-          <Link href="/events/new">Create an event</Link>
+          <Link href="/events/new">{t("landing.cta.primary")}</Link>
         </Button>
         <Button variant="ghost" asChild>
           <Link href="/events">See live events →</Link>
