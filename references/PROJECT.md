@@ -536,6 +536,10 @@ CRON_SECRET
 
 ---
 
+## Decisions locked in
+
+- **One poll per event — enforced.** Each event has exactly one poll. The data model uses a `polls` array internally but the UI deliberately allows only one. Do not build multi-poll support without explicit instruction. `state.polls[0]` is always the poll.
+
 ## Outstanding TODO
 
 - Stripe Connect — charity disbursement (cron has placeholder; `api/stripe/payment-intent` creates PaymentIntents but Connect payout not wired)

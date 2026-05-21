@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createEvent } from "@/app/events/new/actions"
-import { OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS } from "@/lib/occasions"
+import { OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS, getBioPlaceholder } from "@/lib/occasions"
 import type {
   Category,
   Charity,
@@ -203,8 +203,11 @@ export function useCanvas({
     }
   }
 
-  const placeholders =
-    OCCASION_PLACEHOLDERS[state.occasion] ?? DEFAULT_PLACEHOLDERS
+  const firstTopicTitle = topics.find(t => t.id === state.polls[0]?.topicId)?.title
+  const placeholders = {
+    ...(OCCASION_PLACEHOLDERS[state.occasion] ?? DEFAULT_PLACEHOLDERS),
+    bio: getBioPlaceholder(state.occasion, firstTopicTitle),
+  }
 
   return {
     state,
