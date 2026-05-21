@@ -36,7 +36,7 @@ const charities = [
     registered_number: "1128267",
   },
   {
-    name: "Alzheimer's Society",
+    name: "Alzheimer\'s Society",
     description: "Support and research for people affected by dementia",
     registered_number: "296645",
   },
@@ -57,7 +57,7 @@ const charities = [
   },
   {
     name: "Dogs Trust",
-    description: "UK's largest dog welfare charity",
+    description: "UK\'s largest dog welfare charity",
     registered_number: "227523",
   },
   {
@@ -66,7 +66,7 @@ const charities = [
     registered_number: "219099",
   },
   {
-    name: "St Mungo's",
+    name: "St Mungo\'s",
     description: "Helping people to recover from homelessness",
     registered_number: "1079126",
   },
@@ -122,7 +122,7 @@ const charities = [
     registered_number: "208231",
   },
   {
-    name: "St Richard's Hospice",
+    name: "St Richard\'s Hospice",
     description: "Specialist palliative care in Worcestershire",
     registered_number: "515668",
   },
@@ -137,7 +137,7 @@ const charities = [
     registered_number: "326568",
   },
   {
-    name: "Children's Society",
+    name: "Children\'s Society",
     description: "Fighting for children who are ignored, abused and forgotten",
     registered_number: "221124",
   },
@@ -182,8 +182,22 @@ const categories = [
   { label: "Time", description: "Seasons, moments, and the rhythm of days" },
 ]
 
+// ---------------------------------------------------------------------------
+// Placeholder writing discipline
+//
+// Every occasion entry has: about, reveal.  (framing removed entirely)
+//
+// Writing order:
+//   1. Reveal first — specific named answer, one concrete detail
+//   2. About second — topic area without naming the answer
+//   3. Check: does about leak the reveal? If yes, rewrite.
+//
+// All reveal answers must exist in the topic_items list.
+// Marcus Webb (achievement) raises RNLI money via favpoll itself.
+// ---------------------------------------------------------------------------
+
 type TopicPlaceholders = {
-  [occasion: string]: { framing: string; reveal: string }
+  [occasion: string]: { about: string; reveal: string }
 }
 
 type TopicSeed = {
@@ -203,101 +217,104 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a colour she came back to all her life — which colour do you love?",
+        about:
+          "A retired teacher and mother who gave forty years to her pupils and her garden. She had a precise eye for what belonged where — in a room, in a border, on a person. Marie Curie nurses cared for her at home in her final weeks.",
         reveal:
-          "Hers was purple. She grew lavender in every garden she ever had, and wore it to every occasion that mattered.",
+          "Hers was purple. She wore it to every occasion that mattered, and grew lavender in every garden she ever had.",
       },
       tribute: {
-        framing:
-          "David always came back to the same one — which colour do you love?",
+        about:
+          "A mentor, colleague, and friend who spent decades shaping careers and conversations in equal measure. He was not a man who did anything by accident — not a meeting, not a word, not an outfit. His colleagues noticed the consistency long before they understood it.",
         reveal:
-          "His was a particular shade of deep blue. The pocket square, always the same, at every meeting that counted. Nobody ever asked why.",
+          "His was blue. The same shade, the same pocket square, every meeting that counted. Nobody ever asked why.",
       },
       birthday: {
-        framing:
-          "Sarah has been known to redecorate entire rooms around a single colour — which colour do you love?",
+        about:
+          "Sarah is turning 40 and has never made a neutral choice in her life. Three weekends of deliberation for a single wall, two trips to the paint shop, and complete conviction about the result. She has not once looked back.",
         reveal:
-          "Hers is sage. Three weekends of deliberation, two trips to the paint shop, and no regrets. She still brings it up.",
+          "Hers is green. Three weekends, two trips to the paint shop, no regrets. She still brings it up.",
       },
       retirement: {
-        framing:
-          "David had a colour he trusted above all others — which colour do you love?",
+        about:
+          "Thirty-five years building engineering teams, and David arrived at every important occasion dressed as a man who had made a decision and stuck to it. His team knew exactly what to expect. They found this more comforting than they expected.",
         reveal:
-          "His was navy. Same tie, every important meeting, thirty-five years. He never wavered once.",
+          "His was black. Every important meeting, for thirty-five years. He said it was practical. It was also completely him.",
       },
       wedding: {
-        framing:
-          "They have one wall they still can't agree on — which colour do you love?",
+        about:
+          "Emma and James met at a rainy festival in 2019 and have been disagreeing about interior design ever since. Their flat has one wall that remains unpainted after two years. Neither of them is in a hurry to resolve it.",
         reveal:
-          "Hers is blue. His is green. The wall remains unpainted. This is not a problem they're in any hurry to solve.",
+          "Hers is blue. His is green. The wall remains unpainted. This is not a problem they are in any hurry to solve.",
       },
       engagement: {
-        framing: "Tell us your favourite colour to find out Sophie & Callum's.",
+        about:
+          "Callum proposed on Arthur\'s Seat on New Year\'s Day. He had been planning it around a specific walk at a specific time of year for months. Sophie thought they were just going for a walk. The hillside looked exactly as he\'d hoped.",
         reveal:
-          "Theirs is the green of the Lake District fells in October — the exact shade of the hillside where Callum proposed.",
+          "Theirs is green — the exact shade of the hillside on the morning Callum proposed. Sophie said she hadn\'t noticed. She had.",
       },
       anniversary: {
-        framing:
-          "They've repainted the sitting room twice and it's still not quite right — which colour do you love?",
+        about:
+          "Forty years, three houses, and a sitting room that has been repainted twice and still isn\'t quite right. They disagree on almost everything domestic. It has never once been a problem worth solving.",
         reveal:
-          "Theirs keeps changing. The sitting room has been repainted twice. The colour is still not quite right, apparently.",
+          "Theirs keeps changing. The sitting room has been repainted twice and still isn\'t right. They consider this a feature, not a flaw.",
       },
       leaving: {
-        framing:
-          "Priya wore colour like she meant it — which colour do you love?",
+        about:
+          "Priya dressed with the conviction of someone who had worked herself out years ago and never needed to revisit the question. Six years in the studio and every choice was deliberate — not a statement, just a very precise self-knowledge.",
         reveal:
-          "Hers was coral — worn deliberately, always exactly right. The office felt greyer the day she left.",
+          "Hers was orange — worn deliberately, always exactly right. The office felt greyer the day she left.",
       },
       graduation: {
-        framing:
-          "Tom had a colour palette he'd been refining for three years — which colour do you love?",
+        about:
+          "Tom spent four years at architecture school developing opinions about proportion, light, and the relationship between material and meaning. His tutors said his instincts were good. He agreed, but would have preferred to think they were rational.",
         reveal:
-          "His was terracotta. He said he chose it logically. It was clearly entirely instinctive.",
+          "His was brown — terracotta specifically, he would tell you. He said he chose it logically. His tutors said otherwise.",
       },
       christening: {
-        framing:
-          "Lily has just arrived in a world full of colour — which colour do you love?",
+        about:
+          "Lily arrived in March and immediately attracted strong opinions about what her room should look like. Everyone in the family has a view. We are saving them for when she is old enough to disagree with all of us.",
         reveal:
-          "We've all got opinions on what her room should be. We're saving them for the right moment.",
+          "We\'ve all got opinions on what her room should be. We\'re saving them for the right moment.",
       },
       achievement: {
-        framing:
-          "Marcus wore the same colour for every training run — which colour do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained on every morning for eight months. He has strong views about kit. His supporters know which ones.",
         reveal:
-          "His was orange. Hi-vis, visible to the cars, worn for eight months of dark early mornings. It's earned its place.",
+          "His is yellow. He said it was for visibility on the early morning runs. It was also, clearly, just his colour.",
       },
       recovery: {
-        framing:
-          "Claire found a colour that helped when everything felt grey — which colour do you love?",
+        about:
+          "Claire finished her treatment last month and made deliberate choices about what surrounded her while she recovered — nothing dramatic, just enough of the right things in the right places. She said it helped in ways she couldn\'t quite explain.",
         reveal:
-          "Hers was yellow. She surrounded herself with it — not aggressively, just enough. It did something.",
+          "Hers was white. She said she needed space around her — clean, open, uncluttered. It turned out to be exactly right.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a colour she believes changes how students think — which colour do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year, and anyone who has spent time in her classroom would not be surprised. She made choices about that room with intention — read the research afterwards, and watched it work exactly as she\'d expected.",
         reveal:
-          "Hers is yellow. She chose it deliberately and watched it work. She knew it before the research backed her up.",
+          "Hers is yellow. She chose it deliberately and watched it work. She knew it before the research confirmed it.",
       },
       promotion: {
-        framing:
-          "Kwame always said design begins with colour — which colour do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He has applied the same thinking to every product he has ever shipped: that the visual decisions are never separate from the strategic ones.",
         reveal:
-          "His is indigo. He has a whole theory about it, applied to every product he's ever shipped.",
+          "His is red. He has a whole theory about it, applied to every product he has ever shipped. The promotion feels like the theory paying off.",
       },
       celebration: {
-        framing:
-          "Colour says something about a person — which colour do you love?",
-        reveal: "Tell us which colour, and what it says about you…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what the way they dress, decorate, or surround themselves says about them. Colour preference is more specific than it sounds.",
+        reveal: "Tell us which colour, and what it says about you.",
       },
       other: {
-        framing: "Everyone has a favourite colour. What's yours?",
-        reveal: "Name a colour and say what it means to you…",
+        about:
+          "Tell us who this person is and why you\'re gathering. How someone makes visual choices — deliberately, instinctively, or not at all — is always a worthwhile detail.",
+        reveal:
+          "Name a colour and tell the story behind it. The more specific, the better.",
       },
       default: {
-        framing: "Pick a colour. We're curious what it says.",
-        reveal:
-          "Name a colour and tell the story behind it. The more specific, the better…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite colour — the one someone always comes back to — makes a good starting point.",
+        reveal: "Name a colour and say what it means to you.",
       },
     },
   },
@@ -308,102 +325,104 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Time"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a season she came alive in — which season do you love?",
+        about:
+          "A beloved mother and teacher who measured the year in the garden. She knew exactly when things would come back and was always ready for them. The first signs of her favourite season were a private occasion she marked quietly, alone.",
         reveal:
-          "Hers was spring. She'd have seeds in the ground before anyone else had put away their winter coat.",
+          "Hers was spring. She\'d have seeds in the ground before anyone else had thought about it.",
       },
       tribute: {
-        framing:
-          "David had a time of year that suited him above all others — which season do you love?",
+        about:
+          "A mentor whose best thinking always seemed to arrive at the same time of year. His colleagues noticed it without ever naming it — the meetings that mattered, the decisions that held. Something about the light in that season suited him.",
         reveal:
-          "His was autumn. He was the kind of person who suited October — something about the quality of the light.",
+          "His was autumn. He was the kind of person who suited October. Something about the quality of the light.",
       },
       birthday: {
-        framing:
-          "Sarah says she loves autumn, but her friends say she's actually a summer person — which season do you love?",
+        about:
+          "Sarah has a public position on her favourite season that her friends consider entirely incorrect. She plans her whole year around long evenings and warm weekends, then remembers in October that she\'s been claiming otherwise for years.",
         reveal:
           "Hers is summer, if you ask the people who know her. She plans her whole year around it, whatever she says.",
       },
       retirement: {
-        framing:
-          "David had a season when the best work always got done — which season do you love?",
+        about:
+          "Thirty-five years building an engineering team from four people to four hundred, and the best projects always found their rhythm at the same time of year. David is planning his first free twelve months. The pattern will probably reassert itself.",
         reveal:
           "His was autumn. The best project always came together in October. Every year, without fail.",
       },
       wedding: {
-        framing:
-          "Emma and James met at a rainy festival — but which season do you actually love?",
+        about:
+          "Emma and James met at a rainy festival in 2019, which has shaped their views on British weather in ways they are still working through. They have disagreed warmly about the best time of year since approximately their third date.",
         reveal:
-          "Hers is spring. His is summer. They've been at this for five years with no sign of resolution.",
+          "Hers is spring. His is summer. They\'ve been at this for five years with no sign of resolution.",
       },
       engagement: {
-        framing:
-          "Callum planned the proposal around a particular season. Which season do you love?",
+        about:
+          "Callum had been planning the proposal around a specific kind of day — a particular light, a particular temperature, the right part of the year. Sophie thought they were just going for a walk. The timing was, as he had intended, entirely the point.",
         reveal:
-          "Autumn. He'd been waiting for October in the Lakes. Sophie thought they were just going for a walk.",
+          "Autumn. He\'d been waiting for October in the Lakes. Sophie thought they were just going for a walk.",
       },
       anniversary: {
-        framing:
-          "They've had forty seasons together and still disagree about when to plant — which season do you love?",
+        about:
+          "Forty years of seasons together, and they still disagree about the garden at exactly the same moment every year. She says it\'s time. He says wait. This has been resolved the same way every year for four decades. Neither will say who wins.",
         reveal:
-          "Theirs is spring, though they can't agree on exactly when. She plants in March. He says April.",
+          "Theirs is spring, though they can\'t agree on exactly when. She plants in March. He says April. The argument is annual.",
       },
       leaving: {
-        framing:
-          "Priya felt most herself in a particular season — which season do you love?",
+        about:
+          "Priya arrived in January and had changed everything about how the studio worked by the time the first warm days came. She always said the dark months were when the real work got done. The team have been testing this theory since she left.",
         reveal:
-          "Hers was spring. She arrived in January and changed everything by March. That tracks.",
+          "Hers was winter. She said the dark gave you something the other seasons didn\'t. She was the only person who meant it.",
       },
       graduation: {
-        framing:
-          "Tom spent his whole final year in the studio and emerged, blinking, into a particular season — which season do you love?",
+        about:
+          "Tom spent his final year almost entirely in the studio and emerged, blinking, into natural light he had seen very little of since January. He has since developed strong views about daylight and what it is actually for.",
         reveal:
-          "His is summer. He saw very little daylight between January and May. Summer was particularly welcome.",
+          "His is summer. He saw very little daylight between January and May. It was particularly welcome.",
       },
       christening: {
-        framing:
-          "Lily arrived in a particular season — which season do you love?",
+        about:
+          "Lily arrived just as the garden was starting, and the timing felt right to everyone who was there. The most optimistic of all the seasons. She came in exactly on schedule.",
         reveal:
-          "She came in spring, just as the garden was starting. The timing felt perfect.",
+          "She came in spring, just as everything was beginning. The timing felt perfect.",
       },
       achievement: {
-        framing:
-          "Marcus trained through every season, but one morning changed how he thinks about them — which season do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained on every morning. Eight months of early starts, every season, to get to the start line.",
         reveal:
-          "His is autumn. The marathon was a crisp October morning, and he'll always associate it with finishing something.",
+          "His is autumn. The marathon was a crisp October morning. He\'ll always associate that season with finishing something hard.",
       },
       recovery: {
-        framing:
-          "Claire said one season felt different this year — which season do you love?",
+        about:
+          "Claire came through her treatment and found that one season sat differently with her this year — the particular quality of it, what it asked of her, and what it gave back. She said it suited her better than she\'d expected.",
         reveal:
-          "Hers is spring. She noticed things she'd never noticed before — the season felt like it was specifically for her.",
+          "Hers is winter. She said the quiet suited her — the permission to stay still. She found it more restoring than she expected.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a season when her students are hungriest — which season do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year, and the people who nominated her will tell you she is at her absolute best at one particular moment in the school calendar. She plans the whole year around it.",
         reveal:
-          "Hers is autumn. September energy, first week back. She plans her whole year around that feeling.",
+          "Hers is autumn. September energy, first week back. She builds the whole year around that feeling.",
       },
       promotion: {
-        framing:
-          "Kwame chose the exact right moment to mark his promotion — which season do you love?",
+        about:
+          "Three years of patient, excellent work, and Kwame waited for exactly the right moment to mark his promotion properly. He said the timing was practical. Nobody who knows him believes this.",
         reveal:
-          "His is spring. He waited for the first warm day of the year, and it happened to be perfect.",
+          "His is spring. He waited for the first warm day of the year. It happened to be perfect.",
       },
       celebration: {
-        framing: "What's your favourite season?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which time of year brings the best of them out. The season someone always comes alive in is more specific than it sounds.",
         reveal:
-          "Tell us which season and what it gives you that the others can't…",
+          "Tell us which season and what it gives you that the others can\'t.",
       },
       other: {
-        framing:
-          "Season is one of those things everyone has a take on — which is yours?",
-        reveal: "Pick a season and say what makes it yours…",
+        about:
+          "Tell us who this person is and why you\'re gathering. Which time of year brings the best of them out — and why — is always worth including.",
+        reveal: "Pick a season and say what makes it yours.",
       },
       default: {
-        framing: "We want to know your favourite season.",
-        reveal: "Pick a season and say what it gives you that no other can…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite season — and what it gives them that the others don\'t — is a good place to start.",
+        reveal: "Pick a season and say what it gives you that no other can.",
       },
     },
   },
@@ -414,101 +433,103 @@ const topics: TopicSeed[] = [
     categories: ["Time", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a day of the week that was entirely hers — which day do you love?",
+        about:
+          "A beloved mother and teacher who had made one day of the week entirely her own. The schedule was long-established and non-negotiable — family knew it, friends knew it, and it was treated with appropriate respect.",
         reveal:
-          "Hers was Sunday. Long lunch, garden, Radio 4 — in that order. If you wanted her, you had to know the schedule.",
+          "Hers was Sunday. Long lunch, garden, Radio 4 — in that order, without variation. If you wanted her, you had to know the schedule.",
       },
       tribute: {
-        framing:
-          "David had a day he returned to, reliably — which day do you love?",
+        about:
+          "A mentor who had a particular evening of the week he kept for conversations worth having. His colleagues built their weeks around it without quite realising they\'d done so. The calendar has been different since he stopped holding it.",
         reveal:
-          "His was Thursday. He held court on Thursday evenings, and everyone knew that was the night for a proper conversation.",
+          "His was Thursday. He held court on Thursday evenings — that was the night for a proper conversation. Everyone knew it.",
       },
       birthday: {
-        framing:
-          "Sarah has a day she insists has the best energy — which day do you love?",
+        about:
+          "Sarah is turning 40 with a consistent theory about which day of the week has the best energy. Her colleagues have been unable to disprove it. She has held this position for years.",
         reveal:
-          "Hers is Thursday. She makes it feel like the weekend starts early. No one has ever been able to explain how.",
+          "Hers is Friday. She makes the whole office feel like the weekend starts at lunch. Nobody has been able to explain how.",
       },
       retirement: {
-        framing:
-          "David had a day he'd spent thirty-five years perfecting — which day do you love?",
+        about:
+          "Thirty-five years of the same working week, and David had a particular relationship with one day of it that his team found genuinely puzzling. He is retiring. His theory about that day is about to be tested in full.",
         reveal:
-          "His was Monday. He always said weekends were just Mondays with better lighting. He believed this sincerely.",
+          "His was Monday. He always said weekends were just Mondays with better lighting. He believed this sincerely. His team did not.",
       },
       wedding: {
-        framing:
-          "Emma and James have never quite agreed on a favourite day — which day do you love?",
+        about:
+          "Emma and James have never quite agreed on a favourite day, which is appropriate given that they\'ve never quite agreed on most things and it has never once been a problem.",
         reveal:
-          "Hers is Sunday. His is Friday. They met on a Friday, got engaged on a Sunday, and haven't resolved it since.",
+          "Hers is Sunday. His is Friday. They met on a Friday, got engaged on a Sunday, and haven\'t resolved it since.",
       },
       engagement: {
-        framing:
-          "Sophie's answer to this one isn't hard to guess — which day of the week do you love?",
+        about:
+          "Callum proposed on Arthur\'s Seat on New Year\'s Day — a day he\'d been planning around for months. Sophie thought they were just going for a walk. She has since reassessed several other walks in the relationship with new information.",
         reveal:
-          "Saturday. Long walk, the Lakes, the proposal. She'll never think of it as just a day again.",
+          "It was a Sunday. Long walk, the proposal, the view. Sophie will never think of it as just a day again.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have built forty years around the same day — which day do you love?",
+        about:
+          "Forty years together, and they have spent most of those years disagreeing about which day of the week is best. They have not resolved it. They are not trying to. This is the arrangement.",
         reveal:
-          "Theirs is Sunday. Same routine, same cup of tea, same order of things. It has never needed to change.",
+          "Theirs is Saturday. They\'ve been arguing about it for forty years and Saturday keeps winning. Neither of them fully admits this.",
       },
       leaving: {
-        framing:
-          "Priya had a way of making one day of the week feel like an event — which day do you love?",
+        about:
+          "Priya had a way of making one particular day of the week feel like something worth turning up for. The rest of the week was fine. That day was different. The team noticed it most in the weeks after she left.",
         reveal:
-          "Hers was Tuesday. She made Tuesday lunches feel like the best part of the week. We're still not sure how.",
+          "Hers was Tuesday. She made Tuesday lunches feel like the best part of the week. We\'re still not sure how.",
       },
       graduation: {
-        framing:
-          "Tom had a day that felt earned at university — which day do you love?",
+        about:
+          "Tom spent four years at architecture school with a timetable that taught him a great deal about which day of the week felt earned and which felt like it arrived too easily. He has strong views about this. They are probably correct.",
         reveal:
-          "His was Friday. Five days in the studio, then Friday arrived like a reward he'd worked for.",
+          "His was Wednesday. Crit day — the work either held up or it didn\'t. By the end of four years he\'d learned to love that feeling.",
       },
       christening: {
-        framing: "Lily was born on a Tuesday — which day do you love?",
+        about:
+          "Lily arrived on a Tuesday, which her parents are treating as a meaningful coincidence. It was, they say, a very Tuesday kind of arrival — quiet, unhurried, completely her own.",
         reveal:
-          "She arrived on a Tuesday and immediately made it feel significant.",
+          "She arrived on a Tuesday. Her parents have decided this is exactly right for her. The rest of us are going along with it.",
       },
       achievement: {
-        framing:
-          "Marcus ran the marathon on one particular day — which day do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained on for eight months. He has permanently reordered the week in his mind since crossing the finish line.",
         reveal:
-          "His is Sunday now. He finished 26.2 miles before the papers were read. Sundays will never feel the same.",
+          "His is Sunday now. He finished 26.2 miles before the papers were read. Sundays will never feel ordinary again.",
       },
       recovery: {
-        framing:
-          "Claire started counting a particular day differently this year — which day do you love?",
+        about:
+          "Claire finished her treatment and found herself counting one day of the week differently — not marking it, exactly, just noticing it more than before. She says it changed what that day means to her.",
         reveal:
-          "Hers became Monday. Each one a milestone, each one its own small arrival.",
+          "Hers became Monday. Each one a milestone, each one its own small arrival. She started looking forward to them.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a day when everything clicks — which day do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year, and anyone who has taught alongside her will know which day of the week she considers the best one. She has structured her whole approach around it.",
         reveal:
-          "Hers is Thursday. By then the class has found its rhythm and she has theirs. She wouldn't swap it.",
+          "Hers is Wednesday. By then the class has found its rhythm. She has theirs. She wouldn\'t swap that day for anything.",
       },
       promotion: {
-        framing:
-          "Kwame had a day he couldn't wait to arrive — which day do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He got the news midweek and spent two days waiting to tell the team properly. The day he chose was very deliberate.",
         reveal:
-          "His is Monday. He got the news on a Wednesday and spent Thursday and Friday waiting to tell the team. Worth every minute.",
+          "His is Friday. He got the news on a Wednesday and spent Thursday waiting to tell the team. Worth every minute.",
       },
       celebration: {
-        framing:
-          "Someone here has a strong favourite day of the week — what's yours?",
-        reveal: "Tell us which day is yours and what makes it the best one…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which day of the week is most like them. The day someone considers their best says something specific.",
+        reveal: "Tell us which day is yours and what makes it the best one.",
       },
       other: {
-        framing: "Pick a day of the week. We're curious what it says.",
-        reveal: "Pick a day and say what it gives you that no other can…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite day of the week — and what makes it theirs — is a small detail that opens up something larger.",
+        reveal: "Pick a day and say what it gives you that no other can.",
       },
       default: {
-        framing:
-          "Day of the week is one of those things everyone has a take on — which is yours?",
-        reveal: "Pick a day and tell us what makes it the best…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite day of the week is one of those things everyone has a position on.",
+        reveal: "Pick a day and tell us what makes it the best.",
       },
     },
   },
@@ -519,102 +540,104 @@ const topics: TopicSeed[] = [
     categories: ["Food & Drink", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a meal she never rushed and never skipped — which meal do you love?",
+        about:
+          "A beloved mother and teacher who treated one meal of the day as a serious commitment. It was the meal where the real conversations happened — the ones that lasted two hours after the plates were cleared. People always stayed.",
         reveal:
-          "Hers was Sunday lunch. Still at the table at three, every week without fail. That was the whole point of the day.",
+          "Hers was dinner. Still at the table at nine, most nights. That was when the day\'s conversations properly started.",
       },
       tribute: {
-        framing:
-          "David had a meal he treated as something worth doing properly — which meal do you love?",
+        about:
+          "A mentor who never ate at his desk. Not once, in thirty years. He said the midday meal was for people, not screens, and he organised his entire working day around this principle. His colleagues eventually understood he was right.",
         reveal:
-          "His was lunch. Never at a desk, always with someone. He believed no important conversation should happen on an empty stomach.",
+          "His was lunch. Never at his desk, always with someone. He said no important conversation should happen on an empty stomach.",
       },
       birthday: {
-        framing:
-          "Sarah treats one meal like a performance — which meal do you love?",
+        about:
+          "Sarah is turning 40 and has strong opinions about every meal, but reserves her highest regard for the one that sits between morning and the rest of the day. She approaches it with an enthusiasm her friends find both baffling and infectious.",
         reveal:
-          "Hers is dinner. She once cancelled a lunch to spend the afternoon making proper stock. No regrets.",
+          "Hers is brunch. Two hours minimum, good coffee, no rushing. She considers this a moral position.",
       },
       retirement: {
-        framing:
-          "David spent thirty-five years treating one meal as an afterthought — which meal do you love?",
+        about:
+          "Thirty-five years of the same commute, the same desk, and the same meal eaten in the same twenty minutes because there was never enough time. David is retiring. The time has arrived. The meal will finally be done properly.",
         reveal:
-          "His was lunch — eaten at his desk for thirty-five years. He's already planning the standing reservation.",
+          "His is breakfast. He ate it standing at the kitchen counter for thirty-five years. He is now planning to sit down. For as long as he likes.",
       },
       wedding: {
-        framing:
-          "Emma and James have strong opinions about one meal in particular — which meal do you love?",
+        about:
+          "Emma and James spent their first proper date arguing about where to eat and ended up somewhere neither of them had suggested and both of them loved. This remains the template for all subsequent decisions about food.",
         reveal:
-          "Theirs is brunch — though they've argued for three years about whether it counts as a meal. It does, obviously.",
+          "Theirs is dinner. The longer and later the better. They\'ve been known to still be at the table at midnight. This is considered a good evening.",
       },
       engagement: {
-        framing:
-          "Ask Sophie & Callum about their favourite meal and you'll be there a while — which meal do you love?",
+        about:
+          "Sophie and Callum have a division of labour around food that works perfectly. Callum cooks. Sophie judges. The system was established on their second date and has not been revised since.",
         reveal:
-          "Sunday dinner, four years running. Callum makes the pasta. Sophie insists on doing everything else. The division is non-negotiable.",
+          "Theirs is supper. Callum makes pasta at nine, Sophie critiques it, they eat it together. This has been the arrangement for four years.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had the same meal every Sunday for forty years — which meal do you love?",
+        about:
+          "Forty years of eating together, and there is one meal of the day they have always treated as the important one — the one that doesn\'t get cancelled, doesn\'t get rushed, and doesn\'t get eaten in front of the television.",
         reveal:
-          "Theirs is Sunday lunch. The gravy debate is ongoing. Everything else about Sunday lunch is completely settled.",
+          "Theirs is lunch. Proper lunch, every day when they can manage it. That was always the meal they protected.",
       },
       leaving: {
-        framing:
-          "Priya made one meal feel like the best part of the working day — which meal do you love?",
+        about:
+          "Priya was always in before everyone else. The coffee was already made when the rest of the team arrived, and the early morning was when she did the thinking that the rest of the day ran on. Nobody else knew this at first.",
         reveal:
-          "Hers was lunch. She had a way of turning a lunch break into something worth looking forward to.",
+          "Hers was breakfast. She arrived early, ate at her desk before anyone else arrived, and had solved the day\'s hardest problem before nine. She never mentioned this.",
       },
       graduation: {
-        framing:
-          "Tom survived on questionable late-night food and now holds one meal sacred — which meal do you love?",
+        about:
+          "Tom graduated from four years of architecture school with strong opinions about many things, including which meal of the day deserved the most ceremony. His parents came to the degree show and brought food. He cried, which surprised everyone including him.",
         reveal:
-          "His is dinner. Three years of toast and reheated pasta. The world is full of better options now.",
+          "His was afternoon tea. His mum brought a cake to the degree show. He said she shouldn\'t have. He was wrong.",
       },
       christening: {
-        framing:
-          "The family gathered for a meal to welcome Lily — which meal do you love?",
-        reveal: "Some meals are just meals. This one was for something bigger.",
+        about:
+          "The family gathered for Lily\'s christening and fed each other in the way that families do — slightly chaotically, with too much of some things and not enough of others, and completely perfectly.",
+        reveal:
+          "They gathered for lunch. The table was too small and nobody minded.",
       },
       achievement: {
-        framing:
-          "Marcus had one meal in mind from mile fourteen onwards — which meal do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained along for eight months. He had one meal planned from mile fourteen onwards.",
         reveal:
-          "His was a roast dinner. 26.2 miles and he'd been planning it since Deptford. He earned every bite.",
+          "His was breakfast. A full cooked breakfast at mile fourteen in his head, in reality at eleven-thirty after the finish line. He earned every part of it.",
       },
       recovery: {
-        framing:
-          "Claire says one meal tastes different now — in the best possible way — which meal do you love?",
+        about:
+          "Claire finished her treatment and found that the evening meal became something different this year — quieter, more deliberate, more noticed. She said food tasted different when you stopped taking it for granted.",
         reveal:
-          "Hers is breakfast. Some meals become something more than food. That one did.",
+          "Hers is supper. Late, quiet, properly cooked. She said learning to take her time over it was one of the better things the year taught her.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant takes one meal seriously and says it sets the tone for everything — which meal do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and has firm views about the meal of the day that keeps everything running. She eats it at the same time every day. Her colleagues have learned to leave her to it.",
         reveal:
-          "Hers is lunch. She's been known to collect a colleague from their desk and insist they come too.",
+          "Hers is afternoon tea. Three o\'clock, without fail. She says it\'s where the second half of the day starts. She\'s not wrong.",
       },
       promotion: {
-        framing:
-          "Kwame chose one meal to mark the moment — which meal do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He celebrated with exactly the kind of meal he thinks a promotion deserves — unhurried, good company, the right time of day.",
         reveal:
-          "His was dinner. He chose the restaurant, he chose the table. It was exactly right.",
+          "His is brunch. He said the promotion deserved the meal that has the least respect for what time it is. He was right.",
       },
       celebration: {
-        framing:
-          "Gather everyone around food — which meal of the day do you love?",
-        reveal: "Tell us which one and why it beats all the others…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which meal of the day they treat as the serious one. The meal someone protects says something about how they organise their life.",
+        reveal: "Tell us which meal is yours and why it beats all the others.",
       },
       other: {
-        framing: "What's your favourite meal of the day?",
-        reveal: "Pick a meal and make the case for it…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite meal of the day — and what they do with it — is a detail that says more than you\'d expect.",
+        reveal: "Pick a meal and make the case for it.",
       },
       default: {
-        framing:
-          "Meal of the day is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite meal of the day is one of those things everyone has a take on.",
         reveal:
-          "Tell us which meal and why. It says more about a person than you'd think…",
+          "Tell us which meal and why. It says more about a person than you\'d think.",
       },
     },
   },
@@ -625,99 +648,102 @@ const topics: TopicSeed[] = [
     categories: ["Time", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a time of day that was entirely hers — which time do you love?",
+        about:
+          "A beloved mother and teacher who had claimed one hour of the day as entirely her own long before anyone else in the house was awake. Her family knew the shape of her morning. It was not to be interrupted.",
         reveal:
-          "Hers was early morning. Half the garden done before the world woke up. She said the best thinking happened before anyone else was awake.",
+          "Hers was early morning. The garden done, the thinking done, the tea made — all before the world woke up. She said it was when everything was possible.",
       },
       tribute: {
-        framing:
-          "David had an hour of the day when he was most himself — which time of day do you love?",
+        about:
+          "A mentor who was at his most precise and most generous at one specific hour of the day. His colleagues knew when to find him with a question, and when to leave him to it. The timing was always reliable.",
         reveal:
-          "His was late afternoon. He'd always be there at five with something worth saying. The timing was never an accident.",
+          "His was late afternoon. He\'d always be there at five with something worth saying. The timing was never accidental.",
       },
       birthday: {
-        framing:
-          "Sarah has a time of day when she properly comes alive — which time of day do you love?",
+        about:
+          "Sarah is turning 40 and is at her most vivid in the hours when most people are winding down. She has been known to start elaborate dinners at ten o\'clock. Nobody has ever complained about the timing.",
         reveal:
-          "Hers is late evening. She's been known to start an elaborate dinner at ten. No one has ever complained.",
+          "Hers is evening. The later the better. She says everything gets more interesting after nine. Most of her friends agree.",
       },
       retirement: {
-        framing:
-          "David had an hour of the day when his best thinking happened — which time of day do you love?",
+        about:
+          "Thirty-five years of the same alarm, the same drive, the same desk by eight-fifteen. David is retiring. The alarm is the first thing going. The hour it used to ring is the one he\'s most looking forward to reclaiming.",
         reveal:
-          "His was 7am. Fresh coffee, full focus. He'd solved the hardest problems before the rest of the team had parked their cars.",
+          "His was mid morning. Best coffee, full focus, the work done before anyone had called a meeting. He\'s keeping the hour. Just not the commute.",
       },
       wedding: {
-        framing:
-          "Emma and James each have a favourite time of day and haven't agreed on it yet — which time do you love?",
+        about:
+          "Emma and James got married at a time of day they both agreed on, which their friends consider the most romantic detail of the whole event. Everything after that has been a negotiation. The wedding hour was unanimous.",
         reveal:
-          "Hers is golden hour. His is late evening. They're happiest when neither of them thinks to check the time.",
+          "Theirs is dusk. Golden light, the day done, the evening starting. They said it was the only moment the photographs could possibly be right. They were correct.",
       },
       engagement: {
-        framing:
-          "Callum timed the proposal to the hour. Which time of day do you love?",
+        about:
+          "Callum chose the hour of the proposal with as much care as the location. Sophie thought they were just stopping to rest. She has since reviewed the rest of the walk with new understanding.",
         reveal:
-          "Late afternoon — the light on the fells turns gold. Sophie thought they were just stopping to look at the view.",
+          "Late afternoon — the light on the fells turning gold. He\'d been waiting for that specific hour on that specific hillside. Sophie thought they\'d just stopped to look at the view.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad share a time of day that has held forty years together — which time of day do you love?",
+        about:
+          "Forty years together, and there is one hour of the day they have always protected — the one that belongs to nobody else and has no agenda. It has never been cancelled. It has never needed to be.",
         reveal:
-          "Theirs is early morning. Tea, no phones, no plans. That's been the whole foundation of it.",
+          "Theirs is lunchtime. Same time, same table, same lack of phones. That hour has held forty years together.",
       },
       leaving: {
-        framing:
-          "Priya had a way of making one hour feel like the beginning of something — which time of day do you love?",
+        about:
+          "Priya\'s presence in the studio had a particular quality at one time of day — a sharpness and a warmth simultaneously. Her colleagues found themselves doing their best thinking in that hour. They still do. It just feels different now.",
         reveal:
-          "Hers was 3pm. That hour belonged to her. The office felt it most around then.",
+          "Hers was the afternoon — specifically, the three o\'clock hour. Something shifted in the studio at that time when she was there. It has not quite shifted back.",
       },
       graduation: {
-        framing:
-          "Tom had a time of day when the best work always happened — which time of day do you love?",
+        about:
+          "Tom graduated from architecture school having spent more hours of the night working than most people would consider sustainable. He is sanguine about this. He says the late hours gave him something the daylight hours didn\'t.",
         reveal:
-          "His was midnight. Three years of 2am renders and decisions that looked different in the morning. All worth it.",
+          "His was late night. The studio emptied, the work got clearer, the decisions became obvious. He learned things about himself between midnight and three that he couldn\'t have learned any other way.",
       },
       christening: {
-        framing:
-          "Lily has strong opinions about what time of day matters — which time do you love?",
-        reveal: "She's made her views very clear, mostly between 2am and 4am.",
+        about:
+          "Lily has, in her brief time so far, established a strong position on the hours of the day. Her parents are adapting. They now know more about early mornings than they did before.",
+        reveal:
+          "She arrived in the early morning and has been loudly in favour of that hour ever since. Her parents are learning to appreciate it.",
       },
       achievement: {
-        framing:
-          "Marcus set off at a particular hour and it changed how he thinks about time — which time of day do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained along. Eight months of the same hour, the same route, the same determination.",
         reveal:
-          "His is 8am. He was on mile twelve before most people had checked their phones. There's something in that.",
+          "His is mid morning. He was on mile twelve before most people had checked their phones. He says something happens in that hour that doesn\'t happen any other time.",
       },
       recovery: {
-        framing:
-          "Claire found a particular time of day felt different this year — which time of day do you love?",
+        about:
+          "Claire finished her treatment and found that one hour of the day became important to her in a way it hadn\'t been before — unhurried, unscheduled, entirely her own. She says it was a small thing that turned out to be a large one.",
         reveal:
-          "Hers became morning. Lighter, quieter, more noticed. She started paying attention properly.",
+          "Hers is the afternoon. Two o\'clock, slow, no plans. She said it was the hour she learned to stop moving through and start being in.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a lesson slot she plans everything around — which time of day do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and has a lesson slot she considers the best one in the week. She has never taught it any other way and would not move it for anything.",
         reveal:
-          "Hers is 9am. Everyone awake, everyone up for it. She builds the whole day from that first hour.",
+          "Hers is lunchtime — a class that runs through the lunch hour by mutual agreement. Everyone stays. No one mentions the time.",
       },
       promotion: {
-        framing:
-          "Kwame has found the hours that are entirely his — which time of day do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He told his partner the news at a particular hour of the evening. He said it was the only time that felt right for it.",
         reveal:
-          "His best thinking is at 6am. His best presenting is at 10. Everything else is scheduled around those two hours.",
+          "His is evening. That\'s when the day makes sense to him — what worked, what didn\'t, what comes next. He does his best thinking then.",
       },
       celebration: {
-        framing: "We want to know your favourite time of day.",
-        reveal: "Tell us your time, and what it gives you…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which hour of the day they are most themselves. The time someone is at their best says something true.",
+        reveal: "Tell us your time, and what it gives you.",
       },
       other: {
-        framing:
-          "Everyone has an hour that feels most like theirs. Which time of day do you love?",
-        reveal: "Pick your time and say why it's yours…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite time of day — the hour someone is most themselves — is always worth including.",
+        reveal: "Pick your time and say why it\'s yours.",
       },
       default: {
-        framing: "Pick a time of day. We're curious what it says.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite time of day is one of those things everyone has strong feelings about.",
         reveal:
           "Early morning energy, or the kind of person who gets better as the day goes on?",
       },
@@ -730,107 +756,109 @@ const topics: TopicSeed[] = [
     categories: ["Time", "Music", "Film & TV"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a decade she always said changed everything — which decade do you love?",
+        about:
+          "A retired teacher and mother who came of age in a decade she always said had changed everything. She kept a box of photographs from that time she\'d show to anyone who asked, and several who hadn\'t.",
         reveal:
-          "Hers was the sixties. She kept a box of photos from 1968 that she'd show anyone who asked. And many who didn't.",
+          "Hers was the 1960s. She could tell you exactly where she was when things happened. The box of photographs from 1968 was the evidence.",
       },
       tribute: {
-        framing:
-          "David had an era he always returned to — which decade do you love?",
+        about:
+          "A mentor who had a decade he returned to in conversation as naturally as other people quote poetry. He said it was when everything became clear. His colleagues eventually understood what he meant.",
         reveal:
-          "His was the nineties. That was when he found his voice, he said. His theory ran from Coltrane to Radiohead.",
+          "His was the 1970s. He had a theory that ran from Coltrane to Thatcher that explained the whole decade. It took an hour to hear properly. It was worth it.",
       },
       birthday: {
-        framing:
-          "Sarah has an era she's rooted in and makes no apology for — which decade do you love?",
+        about:
+          "Sarah is turning 40 and has never pretended to be neutral about the decade that shaped her. She has strong views about the music, the films, and the fashion, and she delivers them with conviction.",
         reveal:
-          "Hers is the eighties. She knows every word to every song from 1986. Don't test her on this.",
+          "Hers is the 1980s. She knows every word to every song from 1986. She considers this useful knowledge. She is not wrong.",
       },
       retirement: {
-        framing:
-          "David had a decade he always said was when the real work got done — which decade do you love?",
+        about:
+          "David joined the firm the year the decade turned and spent the next ten years building something that still holds. He considers the nineties the decade when engineering got interesting. His colleagues from that era agree.",
         reveal:
-          "His was the nineties. He joined the firm in 1989. The engineers who were there would agree.",
+          "His was the 1990s. He joined the firm in 1989. The decade that followed was when the real work happened.",
       },
       wedding: {
-        framing:
-          "Emma and James are both shaped by one decade and neither would admit it — which decade do you love?",
+        about:
+          "Emma and James share a decade they grew up in, which they discovered on their second date and found more significant than they expected. The playlist for their wedding covered it extensively.",
         reveal:
-          "Theirs is the nineties. Their first date playlist covered entirely the wrong decade for both of them. It worked anyway.",
+          "Theirs is the 2000s. They grew up to the same music without knowing each other existed. The wedding playlist made this plain.",
       },
       engagement: {
-        framing:
-          "Sophie & Callum grew up in parallel and didn't know it — which decade do you love?",
+        about:
+          "Sophie and Callum grew up in parallel decades without knowing it — same music, same television, same slightly bewildering cultural references. They only found this out a year into the relationship.",
         reveal:
-          "The nineties. Both born in 1996, same music, same Saturday morning TV. They only found each other four years ago.",
+          "The 1990s. They were born the same year and discovered this at the worst possible moment — on their third date, with no way to recover.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad got married in a particular decade and have been adding to the story ever since — which decade do you love?",
+        about:
+          "They got married in a decade they still consider the best one, and have spent forty years building an argument for this position that has only got stronger.",
         reveal:
-          "Theirs was the seventies. Forty years makes you a time traveller. Ask them about every decade since.",
+          "Theirs was the 1970s. They met in 1974 and have been making the case for it ever since. They are still right.",
       },
       leaving: {
-        framing:
-          "Priya had a decade she always said was underrated — which decade do you love?",
+        about:
+          "Priya grew up between two musical traditions and two different ideas about what a decade meant. She had a decade she claimed as her own and defended it with more evidence than most people bring to the argument.",
         reveal:
-          "Hers was the noughties. She arrived already shaped by it. We just got lucky with the timing.",
+          "Hers was the 2000s. She arrived already shaped by it. The studio benefited for six years.",
       },
       graduation: {
-        framing:
-          "Tom has strong opinions about which decade matters — which decade do you love?",
+        about:
+          "Tom spent four years at architecture school developing a theory about how buildings reflect the decade they were built in. He applied this to everything. His tutors found it useful. His housemates found it a great deal.",
         reveal:
-          "His is the noughties. He has views on architecture's relationship with each decade. It's a long but worthwhile conversation.",
+          "His is the 2010s. He has views about what happened architecturally in that decade. They are extensive and probably correct.",
       },
       christening: {
-        framing:
-          "Lily is the first person in this family born in the 2020s — which decade do you love?",
+        about:
+          "Lily is the first person in her family to be born in this decade, which everyone agrees is significant. She starts her story in new territory. The rest of us are catching up.",
         reveal:
-          "She starts her story in a new decade. The rest of us have our own.",
+          "She arrived in the 2020s. Her story starts here. The decade is still deciding what it is.",
       },
       achievement: {
-        framing:
-          "Marcus found one decade's energy got him through the training — which decade do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained to music from one decade almost exclusively and says it got him through the worst mornings. His supporters will recognise the playlist.",
         reveal:
-          "His is the 2000s. Something about getting up before dawn in the cold felt specifically like that era.",
+          "His is the 2000s. The anthems that got him through mile eighteen belong to that decade. He chose them deliberately.",
       },
       recovery: {
-        framing:
-          "Claire said one decade already felt different — in the best sense — which decade do you love?",
+        about:
+          "Claire went back to the music of a specific period during her recovery — the decade when everything felt urgent and important and full of possibility. She played it quietly. It did what she needed it to do.",
         reveal:
-          "Hers is this one. It's still early, and it's already earning its place.",
+          "Hers is the 2010s. She said it was the decade that gave her the language she needed. She went back to it and found it was still there.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a decade she believes was when education got interesting — which decade do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and teaches a unit on a particular decade she considers the most important one for understanding what came after. Her students always feel it applies to them.",
         reveal:
-          "Hers is the nineties. She has very specific reasons. They're worth asking her about.",
+          "Hers is the 1960s. She says it was the first decade that understood what young people were. Her students find this strangely moving.",
       },
       promotion: {
-        framing:
-          "Kwame has a decade he argues was when product thinking finally grew up — which decade do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He has a map of how culture and technology moved through one particular decade that he finds genuinely useful for thinking about product. He has given this talk in three different companies.",
         reveal:
-          "His is the 2010s. He'll defend this position. He's also probably right.",
+          "His is the 2010s. He says it was when product thinking finally grew up. He has evidence. He\'s probably right.",
       },
       celebration: {
-        framing: "Which decade do you love?",
-        reveal: "Pick the one that gave you something no other could…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which decade shaped them most. The era someone returns to is always the one that formed them.",
+        reveal:
+          "Pick the decade and say what it gave you that nothing else could.",
       },
       other: {
-        framing:
-          "Someone here has strong opinions about which decade matters — what's yours?",
-        reveal: "Name the decade and say what it gave you…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite decade — and what it gave them — is always worth including.",
+        reveal: "Name the decade and say what it gave you.",
       },
       default: {
-        framing: "Everyone has a decade that shaped them. Which one is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. Everyone has a decade that shaped them.",
         reveal:
-          "Pick a decade and say what it gave you that nothing else could…",
+          "Pick a decade and say what it gave you that nothing else could.",
       },
     },
   },
-
-  // ── Infinite ─────────────────────────────────────────────────────────────────
+  // ── Infinite — Nature ────────────────────────────────────────────────────────
   {
     title: "Animal",
     description: "Creature they felt closest to",
@@ -838,101 +866,104 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Childhood"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had an animal she always felt something for — which animal do you love?",
+        about:
+          "A beloved mother and teacher whose garden was as much for the creatures as for herself. She had strong opinions about which animals deserved more attention than they got. Her family learned early which ones those were.",
         reveal:
-          "Hers was the fox. They'd always turn up in her garden, and she always stopped to watch. She said animals knew things people didn't.",
+          "Hers was the fox. They came to her garden reliably and she always stopped to watch. She said animals knew things people didn\'t.",
       },
       tribute: {
-        framing:
-          "David had an animal quality people noticed and admired — which animal do you love?",
+        about:
+          "A mentor who paid attention to things most people walked past. He had a quality — patience, watchfulness, precision — that his colleagues associated with one particular creature they saw him stop for once on a riverside walk.",
         reveal:
-          "His was the heron. Patient, watchful, always in exactly the right place. He knew when to stay still and when to move.",
+          "His was the heron. Patient, watchful, always in exactly the right place at the right moment. His colleagues said the comparison was inevitable.",
       },
       birthday: {
-        framing:
-          "Sarah has always said she's one animal, but behaves like another — which animal do you love?",
+        about:
+          "Sarah is turning 40 with a dog named Pepper who attends every dinner party and is, she will tell you, her most consistent relationship. She claims to be a cat person. Everyone who has met Pepper knows this is not true.",
         reveal:
-          "Hers is the dog, if you ask anyone who knows her. She claims cat person. Her behaviour says otherwise.",
+          "Hers is the dog, if you ask anyone who knows her. She says cat person. Pepper says otherwise.",
       },
       retirement: {
-        framing:
-          "David had an animal quality his colleagues always recognised — which animal do you love?",
+        about:
+          "Thirty-five years building an engineering team and David was known for one quality above all others: steadiness. He was always there, always reliable, always the same. His team built their confidence around it.",
         reveal:
-          "His was the old labrador. Steady, loyal, never fussed. You always knew where you stood.",
+          "His was the horse. Steady, dependable, built for the long effort. His team said the comparison was a compliment. He accepted it as one.",
       },
       wedding: {
-        framing:
-          "Emma and James each love a different animal and have never agreed on it — which animal do you love?",
+        about:
+          "Emma and James have been debating which animal best represents their relationship since approximately their second date. They have not reached a conclusion. The debate is considered one of their better ongoing conversations.",
         reveal:
-          "Hers is the otter. His is the dog. They haven't resolved it. We don't think they intend to.",
+          "Hers is the otter. His is the dog. They haven\'t resolved it. Neither of them particularly wants to.",
       },
       engagement: {
-        framing:
-          "Sophie carries a detail from the proposal walk that Callum didn't plan. Which animal do you love?",
+        about:
+          "They got engaged on Arthur\'s Seat at New Year, on a walk that Sophie had been led to believe was just a walk. There was a moment — an unexpected one — that she now considers part of the story.",
         reveal:
-          "The robin. It landed on the path just before he proposed. Sophie took it as a sign. Callum says he just had good timing.",
+          "The robin. It landed on the path just before Callum proposed. Sophie took it as a sign. Callum says the timing was coincidental. Sophie does not accept this.",
       },
       anniversary: {
-        framing:
-          "After forty years Mum and Dad have agreed on some things but not on their favourite animal — which animal do you love?",
+        about:
+          "Forty years together, and they have had exactly the same argument about pets for most of them. The argument has a resolution that neither of them fully accepts. This is fine. The argument is the point.",
         reveal:
-          "Theirs is dogs — that much is settled. The breed question remains open. Everything else has been resolved.",
+          "Theirs is the dog — that much is settled. The breed question has been open for forty years. Everything else has been resolved.",
       },
       leaving: {
-        framing:
-          "Priya always described herself as a particular kind of animal in a house of quite different ones — which animal do you love?",
+        about:
+          "Priya\'s desk was the one with the small ceramic elephant on it — a gift from her first day that survived six years and three desk moves. The symbolism was not lost on anyone.",
         reveal:
-          "Hers was the fox. She said it as a compliment to everyone involved. Knowing her, it was.",
+          "Hers was the elephant. The ceramic one on her desk arrived on her first day and left on her last. Patient, steady, impossible to overlook.",
       },
       graduation: {
-        framing:
-          "Tom's tutors always compared him to a particular kind of creature — which animal do you love?",
+        about:
+          "Tom spent four years at architecture school drawing the same bird in the margins of his lecture notes. He has not explained why. The drawings got progressively better. His tutors noticed.",
         reveal:
-          "His was the migratory bird. First-class degree, immediately wanted to be somewhere else. Classic.",
+          "His was the owl. He said it was about the patience — watching until you understood something properly. His tutors found this accurate.",
       },
       christening: {
-        framing:
-          "Everyone has an animal they think Lily will love — which animal do you love?",
+        about:
+          "Lily\'s room currently features approximately seven different animal prints, a mobile with sheep on it, and a rabbit from her grandmother that is larger than Lily is. She seems, as far as anyone can tell, unbothered.",
         reveal:
-          "She'll make up her own mind. But it's worth starting the conversation now.",
+          "Hers is the rabbit — specifically the enormous one from her grandmother that takes up a third of her cot. She has no complaints.",
       },
       achievement: {
-        framing:
-          "Marcus found an animal he identified with around mile twenty — which animal do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He passed the same two birds at the two-mile mark every morning for eight months. He named them. They were unmoved.",
         reveal:
-          "His was the horse. Just keeping going, just the rhythm. He'll look back on that and know something true.",
+          "His is the robin. He saw the same two at mile two every morning for eight months. He considered them colleagues.",
       },
       recovery: {
-        framing:
-          "Claire found one animal started to mean something to her this year — which animal do you love?",
+        about:
+          "During her recovery, Claire started doing things she had been meaning to do for years. One of them was small and consistent and turned out to matter more than she expected.",
         reveal:
-          "Hers was the bird. She started noticing them everywhere. Noticing them properly.",
+          "Hers is the hedgehog. She started leaving food out for them during her recovery. They came every evening. The regularity helped more than she expected.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant's classroom has always had a particular creature on the wall — which animal do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year, and anyone who has been in her classroom will have noticed the corner with the working hive of bees behind glass. It is, she says, the best teaching aid she has ever used.",
         reveal:
-          "Hers is the owl. Patient, wide-eyed, good with the dark. She says it makes students think about instinct.",
+          "Hers is the owl. Patient, wide-eyed, comfortable in the dark. She says it makes students think about the value of instinct.",
       },
       promotion: {
-        framing:
-          "Kwame has a particular animal he thinks the best teams resemble — which animal do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He would like it noted that he is a dog person, has always been a dog person, and considers this relevant background information for anyone working with him.",
         reveal:
-          "His is the border collie. Focused, energetic, excellent at herding things that need herding. A compliment to everyone involved.",
+          "His is the dog. Loyal, energetic, excellent at reading a room. He means this as a self-description. His team agrees.",
       },
       celebration: {
-        framing: "Everyone picks an animal — which one is yours?",
-        reveal: "Pick the one that says something true about who you are…",
+        about:
+          "Tell their story — who they are, what matters to them, and whether there\'s an animal that says something true about them. The specific choice is always more revealing than the general one.",
+        reveal: "Pick the animal that says something true about who you are.",
       },
       other: {
-        framing: "We want to know your favourite animal.",
-        reveal: "Pick an animal that captures something true…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite animal — and the reason behind it — is often more revealing than expected.",
+        reveal: "Pick an animal and say what it says about you.",
       },
       default: {
-        framing: "Pick an animal. We're curious what it says.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite animal is one of those choices that always means something.",
         reveal:
-          "Pick the animal that captures something true about who you are…",
+          "Pick the animal that captures something true about who you are.",
       },
     },
   },
@@ -943,101 +974,104 @@ const topics: TopicSeed[] = [
     categories: ["Nature"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a bird she always stopped for — which bird do you love?",
+        about:
+          "A beloved mother and teacher who kept a garden that was largely for other creatures. She logged every bird that visited over the years, and her notebooks — decades of them — are still in the shed.",
         reveal:
-          "Hers was the robin. She could identify a bird by its song before it appeared. It seemed impossible, until you knew her.",
+          "Hers was the robin. She could identify a bird by its song before it appeared. The notebooks have forty years of arrivals recorded in them.",
       },
       tribute: {
-        framing:
-          "David had a bird quality people always noticed — which bird do you love?",
+        about:
+          "A mentor with a clear, unhurried voice who filled a room without raising it. His colleagues associated him with one bird in particular — not for any obvious reason, but with the certainty that comes from knowing someone well.",
         reveal:
-          "His was the blackbird. Clear voice, unhurried. He could fill a room without raising his volume.",
+          "His was the blackbird. Clear voice, unhurried, completely itself. His colleagues said the comparison was obvious once you\'d thought of it.",
       },
       birthday: {
-        framing:
-          "Sarah has a bird she'd spot anywhere and tell everyone about — which bird do you love?",
+        about:
+          "Sarah is turning 40 and has been accumulating opinions about birds on her weekend hikes for years. She has a list she claims not to take seriously. Everyone who has hiked with her knows this is not true.",
         reveal:
-          "Hers is the puffin. She spotted one from a moving ferry and talked about it for an hour. She has a list she claims not to take seriously.",
+          "Hers is the puffin. She spotted one from a moving ferry and talked about it for an hour. She says she\'s not a birdwatcher. Her list says otherwise.",
       },
       retirement: {
-        framing:
-          "David had a bird quality his colleagues always recognised — which bird do you love?",
+        about:
+          "Thirty-five years in engineering and David\'s colleagues described him the same way: patient, watchful, precise, and always in the right place at the right moment. The bird feeders that have been in his garage since 2009 are coming out this week.",
         reveal:
-          "His was the heron. Patient, watchful, then exactly right. You'd hear him described the same way by everyone who worked with him.",
+          "His is the heron. Patient, watchful, then exactly right. His team used this word about him for years before realising they were describing the same bird.",
       },
       wedding: {
-        framing:
-          "Emma and James are each a different kind of bird and somehow it makes perfect sense — which bird do you love?",
+        about:
+          "Emma and James have strong and opposing views about birds — a disagreement that began on a trip they took specifically to settle it and succeeded only in making both positions more entrenched.",
         reveal:
-          "Hers is the swallow. His is the heron. Separately they're completely different. Together it works.",
+          "Hers is the kingfisher. His is the puffin. They went to Skomer to settle it in 2022. They came back exactly as divided.",
       },
       engagement: {
-        framing: "Tell us your favourite bird to find out Sophie & Callum's.",
+        about:
+          "They got engaged on Arthur\'s Seat at New Year — a walk Callum had been planning for months. Sophie thought it was just a walk. There was a moment, just before the question, that both of them remember.",
         reveal:
-          "The robin. It landed on the path just before Callum proposed. Sophie took it as a sign.",
+          "The robin. It landed on the path just before he proposed. Sophie took it as a sign. Callum takes credit for the timing.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have watched the same birds in the same garden for forty years — which bird do you love?",
+        about:
+          "Forty years of mornings together, and one corner of the garden has been managed specifically for one kind of visitor — the same visitor, every year, without fail. Neither of them has ever questioned this arrangement.",
         reveal:
           "Theirs is the robin. It comes back every year. They leave crumbs on the same wall. It has never not returned.",
       },
       leaving: {
-        framing:
-          "Priya always had a bird she identified with — which bird do you love?",
+        about:
+          "Priya once stopped a team meeting to point out something on the office roof. She was right, she was confident, and she was the only person in the room who knew what she was looking at. That tells you most of what you need to know.",
         reveal:
-          "Hers was the swift. Always moving, hard to pin down. The kind of bird that makes you notice the sky more when they're gone.",
+          "Hers was the barn owl. She spotted it on the office roof on a Tuesday in December and nobody believed her until she showed them the photograph.",
       },
       graduation: {
-        framing:
-          "Tom's tutors always compared him to a particular bird — which bird do you love?",
+        about:
+          "Tom studied architecture with a tutor who had a particular interest in how buildings and birds share space — nest sites, flight paths, acoustic change. Tom now notices things that other architects walk straight past.",
         reveal:
-          "His was the hawk. Detail, precision, always scanning. Three years of training that eye. It's now very, very sharp.",
+          "His is the blackbird. His tutor said the best architects listened to what a building did to sound before they looked at what it did to light. The blackbird was always the test.",
       },
       christening: {
-        framing:
-          "Lily came into a world full of birdsong — which bird do you love?",
+        about:
+          "Lily\'s parents are already arguing about whether the birds nesting in the garden box are a good omen. Her father says yes. Her mother says it\'s a coincidence. Both are enjoying the argument.",
         reveal:
-          "The garden was loud the morning she arrived. A good sign, from a particularly vocal robin.",
+          "The blue tits nested in the garden box the week Lily arrived. Her father considers this significant. Her mother is coming around.",
       },
       achievement: {
-        framing:
-          "Marcus found a bird he identified with around mile eighteen — which bird do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He ran the same coastal route every morning and noted the birds in his training log. His supporters will know the ones.",
         reveal:
-          "His was the swift. Just instinct and movement. He didn't think. He just ran.",
+          "His is the heron. He passed the same two at the two-mile mark every morning for eight months. He credits them with getting him through the worst runs.",
       },
       recovery: {
-        framing:
-          "Claire started paying attention to a particular bird this year — which bird do you love?",
+        about:
+          "During her recovery, Claire started learning something she had always meant to learn and never had time for. She found a secondhand field guide in a charity shop. She has now filled two notebooks.",
         reveal:
-          "Hers is the robin. She started birdwatching. She says it teaches you to be where you are. She's not wrong.",
+          "Hers is the robin. She took up birdwatching during her recovery. She says it teaches you to be where you are. She\'s not wrong.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a bird she compares herself to — which bird do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. Her classroom has a bird feeder visible through the window and a running list on the wall of every species her students have identified since 2019. The list is now longer than several sections of the curriculum.",
         reveal:
-          "Hers is the owl. Patient, wide-eyed, good with the dark. She means it as a compliment to owls.",
+          "Hers is the barn owl. Patient, wide-eyed, good with the dark. She means it as a teaching philosophy.",
       },
       promotion: {
-        framing:
-          "Kwame has a bird he uses as a metaphor for good thinking — which bird do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He celebrated with a long weekend in the Cairngorms — his first time in Scotland and the first time in three years he had fully switched off. He came back with strong opinions.",
         reveal:
-          "His is the red kite. The big view, the wide circle, nothing missed. He's used it in three job interviews. It always landed.",
+          "His is the goldfinch. He saw his first one in the Cairngorms. He said it was the best thing he\'d seen in years, which surprised him.",
       },
       celebration: {
-        framing: "What's your favourite bird?",
-        reveal: "Pick your bird. It says something…",
+        about:
+          "Tell their story — who they are, what they love, and whether there\'s a bird that says something true about them. Small specific details are always the ones that land.",
+        reveal: "Pick your bird. It says something.",
       },
       other: {
-        framing:
-          "Bird is one of those things everyone has a take on — which is yours?",
-        reveal: "Tell us the bird and what it gives you…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite bird — and a reason behind it — often opens up an unexpected conversation.",
+        reveal: "Tell us the bird and what it gives you.",
       },
       default: {
-        framing: "Everyone has a favourite bird. Which one is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite bird is one of those choices that always says something.",
         reveal:
-          "Pick a bird that captures something about the way you see the world…",
+          "Pick a bird that captures something about the way you see the world.",
       },
     },
   },
@@ -1048,102 +1082,105 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a flower she grew every year without exception — which flower do you love?",
+        about:
+          "A beloved mother and teacher who grew something in every garden she ever had — the same plant, the same spot if possible, the same care every year. The garden is still there. It came back this spring.",
         reveal:
-          "Hers was lavender. She grew it in every garden she ever had, and she'd fill the house with it every summer. The smell is still entirely hers.",
+          "Hers was lavender. She grew it in every garden she ever had. The smell is still entirely hers.",
       },
       tribute: {
-        framing:
-          "David always arrived with flowers — which flower do you love?",
+        about:
+          "A mentor who always arrived with flowers — not every time, but always at the moments when most people would have arrived empty-handed. He had a florist he trusted completely and never explained his choices. They were always exactly right.",
         reveal:
-          "His was the anemone. Nothing flashy, always exactly right. He had a florist he trusted completely.",
+          "His was the sweet pea. In season, always exactly right. He never explained why. Everyone came to understand anyway.",
       },
       birthday: {
-        framing:
-          "Sarah grew a whole windowsill of one flower just to prove she could — which flower do you love?",
+        about:
+          "Sarah is turning 40 with a flat she keeps stocked with one particular flower from April to June, because she decided some years ago that there was no reasonable argument against this. Her guests have never disagreed.",
         reveal:
-          "Hers is lavender. She could. She was very casual about telling everyone about it.",
+          "Hers is the peony. She decided some years ago that April to June without them was a waste of April to June. Nobody has challenged this.",
       },
       retirement: {
-        framing:
-          "David had a flower on his desk for fifteen years — which flower do you love?",
+        about:
+          "David spent thirty-five years in an engineering company and is retiring with a plan to do something about the garden. Specifically: one flower his mother grew, which he has been meaning to grow for decades. The seeds are already ordered.",
         reveal:
-          "His was the peace lily. He kept the same pot plant for the whole career. It outlasted most colleagues.",
+          "His is the foxglove. His mother grew them along the back wall every year. He\'s been meaning to do the same for thirty years. The time has arrived.",
       },
       wedding: {
-        framing:
-          "Emma had a flower she'd chosen years before she met James — which flower do you love?",
+        about:
+          "Emma had a flower she\'d chosen years before she met James. She knew what she wanted at her wedding long before she knew who she\'d be marrying. James had strong views about this choice from the start, and he was right.",
         reveal:
-          "Hers was wildflowers. She'd known since long before the wedding. That tells you everything.",
+          "Hers was wisteria. She\'d known since long before the wedding. James agreed immediately. That tells you something.",
       },
       engagement: {
-        framing:
-          "Sophie pressed a flower from the day Callum proposed. Which flower do you love?",
+        about:
+          "Sophie has a list of things she loves about the Lake District that gets longer every time they go. Callum adds to it deliberately. He proposed in October — too late for most things, exactly right for others.",
         reveal:
-          "Heather. It was in bloom across the fellside. The pressed piece is still on the windowsill.",
+          "Hers is the bluebell. Too early for October, she knows, but they\'re what she loves. Callum chose a hillside that would have them in spring. He is already planning the return.",
       },
       anniversary: {
-        framing:
-          "There's a flower that arrives at Mum and Dad's every anniversary, same as always — which flower do you love?",
+        about:
+          "Forty years, and Dad has bought Mum flowers every anniversary without variation. She has been calling this predictable for forty years. She has never, not once, said she was disappointed.",
         reveal:
-          "Theirs is the rose. Same flower, same vase, forty years running. The order never changes. It doesn't need to.",
+          "Theirs is the rose. Same every year for forty years. She calls it predictable. He calls it correct. Neither of them is wrong.",
       },
       leaving: {
-        framing:
-          "Priya always brought flowers when something was worth celebrating — which flower do you love?",
+        about:
+          "Priya always brought flowers when something was worth celebrating. Not supermarket bunches — whatever was in season at the market on the corner, chosen specifically. The desk has been empty since she left.",
         reveal:
-          "Hers was freesia. The office had flowers the day she arrived. It still does. That's her legacy.",
+          "Hers was the daisy. She brought them whenever something good had happened. The office has been short of daisies since she left.",
       },
       graduation: {
-        framing:
-          "Tom's mum brought flowers to the degree show — which flower do you love?",
+        about:
+          "Tom graduated from architecture school on a warm June morning. His mother came to the degree show. She brought flowers. He said she shouldn\'t have. He was wrong, and she knew it.",
         reveal:
-          "Hers were tulips. He said she shouldn't have apologised. He was right. The flowers were exactly the thing.",
+          "His mum brought daffodils to the degree show in June, out of season and exactly right. He said she shouldn\'t have. He cried.",
       },
       christening: {
-        framing:
-          "Lily arrived to a room full of flowers — which flower do you love?",
+        about:
+          "Lily arrived in spring and the garden was already full of things coming back. Her parents said the timing was perfect. Everyone agreed it was. It was.",
         reveal:
-          "Everyone had brought something. It always should be that way, for an arrival like this.",
+          "The primroses were out the week she arrived. Her parents took this as a sign. They are probably right.",
       },
       achievement: {
-        framing:
-          "Marcus crossed the finish line to flowers from his sister — which flower do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He crossed the finish line to flowers from his sister. He said she shouldn\'t have. He didn\'t mean it.",
         reveal:
-          "Hers were sunflowers. 26.2 miles and they were waiting. He said nothing had ever looked better.",
+          "His sister brought sunflowers to the finish line. 26.2 miles and they were waiting. He said nothing had ever looked better.",
       },
       recovery: {
-        framing:
-          "Claire had one flower she kept on the windowsill all year — which flower do you love?",
+        about:
+          "Claire finished her treatment and kept one particular flower on her windowsill for the whole year — through the difficult months and the easier ones. She said it was small and it helped.",
         reveal:
-          "Hers was the sunflower. All that height, all that reaching. She never let the window go without one.",
+          "Hers was the poppy. She kept them on the windowsill through the whole year. She said they had the right quality of colour for the situation.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant's students left flowers on her desk the morning the award was announced — which flower do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. Her students left flowers on her desk the morning the announcement was made. Nobody had organised it. It just happened.",
         reveal:
-          "Theirs were daffodils. Nobody organised it. It just happened. That's who they are.",
+          "They brought primroses. Nobody organised it. It just happened. That\'s who they are.",
       },
       promotion: {
-        framing:
-          "Kwame's team sent flowers and he didn't quite know what to do with himself — which flower do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. His team sent flowers. He put them on his desk and left them there all week. Several people noticed.",
         reveal:
-          "His were peonies. He put them on his desk. They were there all week. We noticed.",
+          "His team sent peonies. He put them on the desk and didn\'t move them for a week. He said he didn\'t know what to do with them. He did exactly the right thing.",
       },
       celebration: {
-        framing: "Good occasions have a flower — which do you love?",
-        reveal: "Tell us which one and why it's yours…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which flower says something true about them. A bloom someone returns to is always worth knowing.",
+        reveal: "Tell us which one and why it\'s yours.",
       },
       other: {
-        framing: "What's your favourite flower?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite flower — the one they always grow, always buy, or always stop for — is a detail worth including.",
         reveal:
-          "A bloom that takes you somewhere, or one that just makes you stop…",
+          "A bloom that takes you somewhere, or one that just makes you stop.",
       },
       default: {
-        framing: "We want to know your favourite flower.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite flower is one of those details that always means something.",
         reveal:
-          "A bloom that takes you somewhere, or one that just makes you stop…",
+          "A bloom that takes you somewhere, or one that just makes you stop.",
       },
     },
   },
@@ -1154,100 +1191,103 @@ const topics: TopicSeed[] = [
     categories: ["Nature"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda planted a tree as a sapling and watched it grow — which tree do you love?",
+        about:
+          "A beloved mother and teacher who planted a sapling in her garden decades ago and watched it grow into something that gave shade to an entire lawn. She used to say a garden without a proper tree was just a lawn with ambitions.",
         reveal:
-          "Hers was the oak. She planted it in her garden decades ago and it's still there. She used to say a garden without a proper tree is just a lawn with ambitions.",
+          "Hers was the oak. She planted it as a sapling. It is now older than most of the people who knew her.",
       },
       tribute: {
-        framing:
-          "David had something of the oak about him — which tree do you love?",
+        about:
+          "A mentor who had something of the deep-rooted about him — patient, extensive, quietly providing shade for everyone around him. His colleagues were in his shadow in the best possible sense for years before they fully understood it.",
         reveal:
-          "His was the oak. Everybody's shade, nobody's obstacle. That was the tree, and that was the man.",
+          "His was the beech. He used to say the beech was the most generous tree — all that canopy, all that shade, nothing asked for in return.",
       },
       birthday: {
-        framing:
-          "Sarah planted a rowan in her first garden and said she needed something with structure — which tree do you love?",
+        about:
+          "Sarah planted a rowan in her first garden because she said she needed something with structure and berries in autumn. She has been talking about it at dinner parties ever since. Her guests are always glad she did.",
         reveal:
-          "Hers is the rowan. She planted it herself, watched it take hold, and tells people about it at parties. They're always glad she did.",
+          "Hers is the rowan. She planted it herself, watched it take hold, and considers this one of her better decisions. The berries in autumn are vindication.",
       },
       retirement: {
-        framing:
-          "David was always oak — deep-rooted, reliable, shelter for everyone — which tree do you love?",
+        about:
+          "David spent thirty-five years in an engineering company and retired to a garden with an old apple tree that had been there when they moved in. He has a plan for it. The plan involves leaving it largely alone.",
         reveal:
-          "His was the oak. He never took up much space but the whole team was in his shade. That's the tree.",
+          "His is the apple tree. It was there when they arrived and has been asking nothing of anyone for thirty years. He considers this an admirable approach.",
       },
       wedding: {
-        framing:
-          "Emma and James planted a tree together on their first anniversary — which tree do you love?",
+        about:
+          "Emma and James planted a tree together on their first anniversary. They chose it carefully and planted it in the wrong place. They have been arguing about this ever since and have no plans to move it.",
         reveal:
-          "Theirs is a silver birch. Two saplings that found the same patch of light. Watch them grow.",
+          "Theirs is the silver birch. Two saplings in the wrong spot in a rented garden, still there. They check on it when they drive past.",
       },
       engagement: {
-        framing:
-          "There's a row of trees on a ridge above Coniston that Sophie & Callum know well — which tree do you love?",
+        about:
+          "Callum and Sophie have walked the same ridge above Coniston every autumn for four years. Callum proposed there. Sophie says she knew something was different about that particular walk from the first mile.",
         reveal:
-          "Rowan. That's where Callum stopped walking. Sophie realised this wasn't just a walk.",
+          "The yew. There is a line of them on the ridge above Coniston where Callum stopped walking. Sophie says she understood as soon as she saw it.",
       },
       anniversary: {
-        framing:
-          "There's a tree in Mum and Dad's garden they planted the year they got married — which tree do you love?",
+        about:
+          "They planted a tree the year they got married. Forty years later it is enormous and in entirely the wrong place in the garden. Neither of them will suggest moving it.",
         reveal:
-          "Theirs is an apple tree. Forty years. It's enormous now. They still argue about whether they planted it in the right place.",
+          "Theirs is the horse chestnut. They planted it in 1984 and it has taken over a corner of the garden they now consider its. The argument about whether it\'s in the right spot has been running for thirty years.",
       },
       leaving: {
-        framing:
-          "Priya was always the tree in the room that made everything feel calmer — which tree do you love?",
+        about:
+          "Priya had a quality — not loudness, not drama, just presence — that the studio felt and couldn\'t name until she left. Then they knew exactly what it was.",
         reveal:
-          "Hers is the willow. You don't notice how much shade they gave until they're gone. We're noticing.",
+          "Hers was the willow. You don\'t notice how much shade they give until they\'re gone. The studio has noticed.",
       },
       graduation: {
-        framing:
-          "Tom designed his final-year project around a particular tree — which tree do you love?",
+        about:
+          "Tom\'s final-year project was built around a single tree on the site. His tutors said it was either very brave or very risky. It turned out to be neither — it was just right.",
         reveal:
-          "His was the silver birch. It was in the brief. He made it the whole piece. His tutors still mention it.",
+          "His was the beech. The final project grew entirely from one beech tree on the site. His tutors still mention it.",
       },
       christening: {
-        framing:
-          "Every family needs a tree to grow alongside — which tree do you love?",
+        about:
+          "Lily\'s parents are already talking about planting something to mark the year she arrived. They have not agreed on what. The discussion has been productive.",
         reveal:
-          "Lily has her whole life to find hers. She might already have one.",
+          "They\'re planting a cherry blossom. They agreed on it immediately, which surprised them both.",
       },
       achievement: {
-        framing:
-          "Marcus ran past the same tree at mile three every training morning — which tree do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained along the same coastal path every morning and passed the same oak at the three-mile mark for eight months. It became a landmark.",
         reveal:
-          "His was the oak. It became the landmark the run was organised around. He has very strong feelings about that oak.",
+          "His is the oak. It was at the three-mile mark on his training route. He has strong feelings about that oak.",
       },
       recovery: {
-        framing:
-          "Claire said she noticed trees differently this year — their patience, their permanence — which tree do you love?",
+        about:
+          "During her recovery, Claire started noticing trees differently — their patience, their permanence, the fact that they had been there long before and would be there long after. She found this more useful than she expected.",
         reveal:
-          "Hers is the beech. Something about knowing it had been there before and would be there after. She found that useful.",
+          "Hers is the elm. She said something about knowing it had been there before and would be there after. She found that steady.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant uses trees as a metaphor in every year group — which tree do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She uses trees as a metaphor in every year group — roots, reach, the long game. She has been making this case for thirty years.",
         reveal:
-          "Hers is the oak. The lesson is always about roots, reach, and the long game. She means it for the students. Also for herself.",
+          "Hers is the Scots pine. She says it is the tree that knows how to be in difficult conditions and still reach. She applies this to education. Also to herself.",
       },
       promotion: {
-        framing:
-          "Kwame said great product teams are like a tree — deep roots, visible canopy — which tree do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He says great teams are like trees — deep roots, long growth, visible from a distance. His team has heard this speech. They consider it accurate.",
         reveal:
-          "His is the cedar. He uses this metaphor at least once a month. It holds up.",
+          "His is the pine. He has a whole metaphor built around it. His team has heard it. They find it works.",
       },
       celebration: {
-        framing: "Trees outlast everything. Which one do you love?",
-        reveal: "Name yours and say what it gives you…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which tree says something true about them. Trees outlast almost everything. The right one is worth knowing.",
+        reveal: "Name yours and say what it gives you.",
       },
       other: {
-        framing: "Pick a tree. We're curious what it says.",
-        reveal: "Pick the tree that feels like yours…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite tree — or the kind of place where they feel most themselves — is always worth including.",
+        reveal: "Pick the tree that feels like yours.",
       },
       default: {
-        framing: "Everyone has a tree they feel something for. Which one is yours?",
-        reveal: "Pick the tree that means something. They usually do…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite tree is one of those choices that always means something.",
+        reveal: "Pick the tree that means something. They usually do.",
       },
     },
   },
@@ -1258,101 +1298,104 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a kind of weather she always came alive in — which weather do you love?",
+        about:
+          "A beloved mother and teacher who had a particular relationship with cold, clear mornings. Her family knew that certain weather belonged to her — the kind of day she was most herself in.",
         reveal:
-          "Hers was a crisp winter morning — clear sky, cold air. She always said the best thinking happened before anyone else was awake.",
+          "Hers was crisp frost. Clear sky, cold air, the garden white. She said the best thinking happened before anyone else was awake.",
       },
       tribute: {
-        framing:
-          "David had a kind of weather he always said suited him — which weather do you love?",
+        about:
+          "A mentor whose thinking always seemed clearest at one particular time of year, in one particular quality of light. His colleagues noticed it without being able to name it until they saw him stop on an October afternoon and understood.",
         reveal:
-          "His was the rain. He didn't mind it at all. He had the quality of someone who simply didn't notice bad weather.",
+          "His was golden autumn light. He said it was the only light that made the world look finished.",
       },
       birthday: {
-        framing:
-          "Sarah has a kind of weather she always says is her weather — which weather do you love?",
+        about:
+          "Sarah has a favourite kind of weather that most people would not choose, and she will explain at length why they are wrong. She finds warm rain, unexpected sunshine, weather that doesn\'t do what it promised — these are her conditions.",
         reveal:
-          "Hers is warm rain — unexpected but always right. She has the quality of a day that starts overcast and turns into the best of summer.",
+          "Hers is warm rain. Unexpected, brief, the sky doing something it hadn\'t planned. She says it has the best quality of light. She\'s not wrong.",
       },
       retirement: {
-        framing:
-          "David was steady weather — the kind you could rely on — which weather do you love?",
+        about:
+          "Thirty-five years of the same commute in every kind of weather, and David has developed a taxonomy of British skies that his family finds more detailed than necessary. He is now home, and the garden is waiting.",
         reveal:
-          "His was a long golden autumn. Retirement might be the first one after a very long, dependable summer.",
+          "His is bright sunshine. He spent thirty-five years commuting through everything else. He\'s done his time.",
       },
       wedding: {
-        framing:
-          "It rained at Emma and James's wedding — which weather do you love?",
+        about:
+          "Emma and James got married on a day that the forecast had said was uncertain, and which turned out to be exactly right. They both consider this typical of their relationship.",
         reveal:
-          "Theirs was rain, that day. It lasted ten minutes and they didn't notice. That's what you need to know about them.",
+          "It was overcast and mild. Not the day the forecast promised. Exactly the day it turned out to be. They consider this perfect.",
       },
       engagement: {
-        framing:
-          "Callum checked the forecast three times before the proposal walk. Which weather do you love?",
+        about:
+          "Callum checked the forecast three times before the proposal walk and arrived at Arthur\'s Seat with conditions that were exactly what he had hoped for. Sophie thought they were going for a walk. She did not check the forecast.",
         reveal:
-          "Crisp, cold, clear October air — still enough to hear the water. Sophie said yes and the wind picked up.",
+          "It was a dewy spring morning — still, clear, the city below them just waking up. He had been waiting for that specific kind of morning.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had every kind of weather together in forty years — which do you love?",
+        about:
+          "Forty years together and they have walked in most kinds of British weather — not because they like it, but because the walk was always the walk and the weather was just what was happening.",
         reveal:
-          "Theirs is sunshine — the kind that comes back reliably. The storms passed. Same as ever.",
+          "Theirs is blustery wind. They\'ve been walking in it for forty years. Neither of them has ever suggested waiting for a better day.",
       },
       leaving: {
-        framing:
-          "Priya had the quality of a bright cold morning — you felt more awake when she walked in — which weather do you love?",
+        about:
+          "Priya arrived in the dark and left in the light, and she told anyone who would listen that she preferred arriving in January — she said it made the good days count.",
         reveal:
-          "Hers was a bright, cold morning. The office had her particular weather for six years. We'll notice the change.",
+          "Hers was bright sunshine. She said it was the weather that reminded you why you were doing it. She was right. The office has been dimmer since.",
       },
       graduation: {
-        framing:
-          "Tom walked out of his degree show into a particular Manchester sky — which weather do you love?",
+        about:
+          "Tom spent four years in Manchester, which means he has a detailed personal taxonomy of grey. He has made his peace with it. He considers it an architectural education.",
         reveal:
-          "His was overcast. He said the grey suited the city. The city agreed.",
+          "His is the misty morning. He said Manchester taught him to find the quality in it. He is now genuinely not complaining.",
       },
       christening: {
-        framing:
-          "The weather the day Lily arrived was entirely irrelevant — which weather do you love?",
+        about:
+          "Lily arrived in March to weather that nobody had predicted. Her parents say the day was exactly right. The photographs confirm this.",
         reveal:
-          "She arrived. That was the weather. Everything else was background.",
+          "It snowed lightly the morning of her christening — brief, unexpected, gone by lunch. Her parents consider this significant.",
       },
       achievement: {
-        framing:
-          "Marcus ran the marathon and says the weather made it — which weather do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained in all weathers for eight months. The race morning was the weather he would have chosen.",
         reveal:
-          "His was cool and overcast. Not too hot, not too cold. He'd trained in worse. It was exactly right.",
+          "The marathon was overcast and mild. Not too hot, not too cold, not too bright. He\'d trained in worse. It was exactly right.",
       },
       recovery: {
-        framing:
-          "Claire said she started noticing the weather more this year — like seeing it properly for the first time — which weather do you love?",
+        about:
+          "Claire went for a walk every day during her recovery regardless of what the weather was doing. She says she started to notice it properly — the specific quality of each kind of morning — for the first time.",
         reveal:
-          "Hers became clear winter light. Something about the specific quality of cold morning air. She noticed it all.",
+          "Hers is the dewy spring morning. She started noticing them during her recovery. She says they have the best quality of beginning.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant says the best lessons happen in the worst weather — which weather do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She has strong views about weather and learning — specifically that certain kinds of day produce better thinking than others, and that this is worth paying attention to.",
         reveal:
-          "Hers is November rain on school windows. Central heating on, everyone in. Perfect conditions.",
+          "Hers is golden autumn light. She says it makes students more curious. She has no scientific evidence for this. She doesn\'t need any.",
       },
       promotion: {
-        framing:
-          "Kwame walked home in a particular kind of weather after the promotion news — which weather do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He walked home in a particular kind of weather after hearing the news and says the walk was exactly right for the moment.",
         reveal:
-          "His was light rain. Not dramatic. Just right. That's what the moment needed.",
+          "Warm rain. Light, unexpected, not dramatic. He said it was the right kind of weather for news you needed time to take in.",
       },
       celebration: {
-        framing: "We want to know your favourite kind of weather.",
-        reveal: "Tell us which sky belongs to you…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what kind of sky belongs to them. The weather someone loves is always more specific than it seems.",
+        reveal: "Tell us which sky belongs to you.",
       },
       other: {
-        framing: "What's your favourite weather?",
-        reveal: "The sky that changes how you feel — which one is it?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite kind of weather — the sky that changes how they feel — is always worth including.",
+        reveal: "The sky that gets you out of the house and into the world.",
       },
       default: {
-        framing: "Weather is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite kind of weather is one of those things everyone has a take on.",
         reveal:
-          "The weather that instantly lifts something in you — which one is it, and why?",
+          "The weather that instantly lifts something in you — which one is it?",
       },
     },
   },
@@ -1363,104 +1406,108 @@ const topics: TopicSeed[] = [
     categories: ["Nature", "Places"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda always went back to the same landscape — which landscape do you love?",
+        about:
+          "A beloved mother and teacher who loved the English countryside with the quiet certainty of someone who had never felt the need to say so. She walked the same hills in Shropshire for thirty years and knew every view by name.",
         reveal:
-          "Hers was the Lake District fells. She said they reminded her to be patient. She walked them every year for fifty years.",
+          "Hers was rolling hills. She walked the same stretch for thirty years and still found new things to notice every time.",
       },
       tribute: {
-        framing:
-          "David had a landscape he always returned to in conversation — which landscape do you love?",
+        about:
+          "A mentor who believed that where you think best is worth paying attention to. He walked alone every autumn and came back with decisions made. His colleagues knew not to schedule important meetings the Monday after a walking weekend.",
         reveal:
-          "His was the West African coast. He'd quote geography the way other people quote poetry. It meant just as much to him.",
+          "His was open moorland. He said it was the only landscape that gave you space to think without telling you what to think.",
       },
       birthday: {
-        framing:
-          "Sarah dreams of one landscape but lives in the city — which landscape do you love?",
+        about:
+          "Sarah is turning 40 with strong opinions about landscape formed almost entirely on weekend hikes. She does not trust anyone who says mountains are overrated and is suspicious of people who prefer the flat.",
         reveal:
-          "Hers is the Scottish Highlands. She has moorland in her soul and no particular plans to act on it. The moors can wait.",
+          "Hers is mountains. She says they are the only landscape that asks something of you. She considers this their best quality.",
       },
       retirement: {
-        framing:
-          "David kept a photo on his desk for thirty-five years of a landscape he meant to visit — which landscape do you love?",
+        about:
+          "David spent thirty-five years commuting into an industrial estate and is retiring with a plan to spend more time in the Dales, where he grew up. He bought new walking boots last week. They are already broken in.",
         reveal:
-          "His was the Dordogne. Thirty-five years of the same commute. Now the world is landscape-shaped and waiting.",
+          "His is river valleys. He grew up in one and has been meaning to get back to them properly for thirty years. The time has arrived.",
       },
       wedding: {
-        framing:
-          "Emma and James are happiest near water — which landscape do you love?",
+        about:
+          "Emma and James have been arguing about Scotland versus the Mediterranean since 2020 and have not resolved it. They got married on the English coast and chose it specifically because it sat, diplomatically, between both positions.",
         reveal:
-          "They've been arguing about coast versus mountains since their second date. Both are still winning.",
+          "Theirs is the coastline. They argued about where to get married for a year. The coast was the one answer neither of them could argue with.",
       },
       engagement: {
-        framing:
-          "Sophie now knows exactly why Callum kept taking her to the same landscape every autumn — which landscape do you love?",
+        about:
+          "Callum chose Arthur\'s Seat for the proposal because of the specific view from the top on a clear January morning. Sophie thought they were going for a walk. She had not expected the landscape to be the point.",
         reveal:
-          "The Lake District fells in October. He'd been planning it for a year. She'd suspected for three weeks.",
+          "Theirs is woodland — the specific kind, the path above Coniston before the fell opens out. Sophie now understands why Callum kept going back to that walk.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have walked the same stretch of coast every anniversary — which landscape do you love?",
+        about:
+          "Forty years together and they have walked some version of the same landscape every anniversary — not always the same place, but always the same kind of open, quiet view at the top. They don\'t talk much on the way up.",
         reveal:
-          "Theirs is the coastal path. Forty years of the same route. Still finding new things to notice.",
+          "Theirs is chalk downs. Open, pale, immense. They\'ve been walking the same kind of country for forty years and haven\'t tired of it.",
       },
       leaving: {
-        framing:
-          "Priya always said wide open spaces were where she thought most clearly — which landscape do you love?",
+        about:
+          "Priya grew up in Tamil Nadu and spent six years designing in Manchester, and the thing that surprised her most about Britain was how many kinds of landscape it contained in such a small space. She wrote about it once. Her team didn\'t know she wrote.",
         reveal:
-          "Hers was open moorland. She brought something expansive to everything she did. There's a landscape for that.",
+          "Hers was the city skyline — specifically Manchester at dusk from the top of the Beetham Tower. She said she hadn\'t expected to love it. She did.",
       },
       graduation: {
-        framing:
-          "Tom said architecture only makes sense in relation to landscape — which landscape do you love?",
+        about:
+          "Tom studied architecture and spent four years writing about how landscape shapes buildings — the way a harbour site produces different decisions to a valley one. His tutor said he thought like a geographer. He took it as a compliment.",
         reveal:
-          "His is the urban landscape. He believes this profoundly. His degree show was partly about proving it.",
+          "His is the harbour. He wrote about it extensively in his final year. The relationship between water, edge, and building. He was right about most of it.",
       },
       christening: {
-        framing:
-          "The landscape Lily grows up in will shape her — which landscape do you love?",
-        reveal: "We each have one. She'll find hers. What's yours?",
+        about:
+          "Lily\'s parents chose a church in the village where her grandfather grew up — partly for the tradition, partly for the view from the churchyard on a clear day, which is one of the better views in the county.",
+        reveal:
+          "Theirs is the village green — the specific one beside the church, the view across it unchanged for a century. They chose it for Lily\'s day.",
       },
       achievement: {
-        framing:
-          "Marcus ran a particular landscape and says it changed him — which landscape do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He grew up near the coast and chose the charity because the sea was never background for him — it was always the point.",
         reveal:
-          "His is parkland and river paths. He noticed none of it during the race, and then noticed everything after.",
+          "His is farmland — specifically the stretch of it on his training route at the five-mile mark where the path opened out. He ran it two hundred times.",
       },
       recovery: {
-        framing:
-          "Claire says open landscape helped — the space, the horizon — which landscape do you love?",
+        about:
+          "During her recovery, Claire started spending time in places she had driven past for years without stopping. She began making notes. The places that kept her longest were always the same kind.",
         reveal:
-          "Hers is open countryside. She walked somewhere new every week. The landscape was doing something the walls couldn't.",
+          "Hers is woodland. She said the light in it was different — the way it moved, the way it changed. She went back to the same wood every week.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant takes her class outside whenever the weather allows — she says landscape is the best classroom — which landscape do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and once took her whole year group to a loch in the Highlands for a day that was technically unrelated to the curriculum. Several students cited it as a turning point. She has never fully explained what she was trying to do.",
         reveal:
-          "Hers is the field behind the school. The class has learned a great deal in that field.",
+          "Hers is the loch. She says it is the landscape that makes you feel properly small. She considers this useful for a Year 9.",
       },
       promotion: {
-        framing:
-          "Kwame grew up near the sea and says it's still where he thinks best — which landscape do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up in Accra and came to the UK for university, and the thing he found most startling — and now loves — is the English countryside in October.",
         reveal:
-          "His is the coast. He hasn't lived near it in years. Doesn't matter. It's still the one.",
+          "His is farmland. He said it looks like the world made up its mind about what it was and just kept going. He finds this admirable.",
       },
       celebration: {
-        framing:
-          "Landscape is the thing everyone has strong feelings about — which do you love?",
-        reveal: "The view that's entirely yours — which one is it?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and whether there\'s a landscape that says something true about them. The place someone keeps going back to is always worth knowing.",
+        reveal: "The view that brings you back to yourself — which one is it?",
       },
       other: {
-        framing: "Which landscape do you love?",
-        reveal: "The view that brings you back to yourself…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite landscape — the kind of place where they feel most themselves — is always worth including.",
+        reveal: "The view that brings you back to yourself.",
       },
       default: {
-        framing: "Landscape is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite landscape is one of those things everyone has a strong feeling about.",
         reveal:
           "The view that brings you back to yourself — which one is it, and what does it give you?",
       },
     },
   },
+  // ── Infinite — Places ────────────────────────────────────────────────────────
   {
     title: "Place",
     description: "Where they were happiest",
@@ -1468,102 +1515,106 @@ const topics: TopicSeed[] = [
     categories: ["Places"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda was happiest in a particular place — which place do you love?",
+        about:
+          "A beloved mother and teacher whose house was the place everyone came back to — for Sunday lunch, for difficult news, for no particular reason. The kitchen table was where the conversations happened. People still go back to it.",
         reveal:
-          "Hers was her kitchen table. Every conversation worth having happened there. We all still come back to it.",
+          "Hers was home. Specifically, her kitchen table. Every conversation worth having happened there.",
       },
       tribute: {
-        framing:
-          "David was a person of particular places — which place do you love?",
+        about:
+          "A mentor who had a corner table in a particular pub he treated as an informal office. His colleagues knew to find him there on a Thursday evening. The conversation was always worth whatever you\'d been putting off.",
         reveal:
-          "His was a corner table in a particular pub. You'd always find him there. He was extremely consistent about this.",
+          "His was the pub — one specific one, one specific table. He was there every Thursday. The conversation was always worth turning up for.",
       },
       birthday: {
-        framing:
-          "Sarah has been to thirty countries and still has one place she says nothing beats — which place do you love?",
+        about:
+          "Sarah is turning 40 and has been to thirty countries and still has one kind of place she says nothing else compares to. She plans her trips around it. She always finds it.",
         reveal:
-          "Hers is her grandmother's kitchen in Cork. She plans every trip carefully. That one she'd never planned at all.",
+          "Hers is abroad — specifically her grandmother\'s kitchen in Cork, which she did not plan and which has beaten every destination she\'s planned since.",
       },
       retirement: {
-        framing:
-          "David had a map on his office wall for thirty-five years — which place do you love?",
+        about:
+          "David spent thirty-five years commuting into the city and is retiring with a plan to spend the majority of the next chapter in the Dales, where he grew up and where his best thinking has always happened.",
         reveal:
-          "His was the Dordogne. He'd look at the map every year and go back to his desk. Not anymore.",
+          "His is the countryside — specifically the Dales, where he grew up. He kept a photograph of it on his office wall for thirty-five years.",
       },
       wedding: {
-        framing:
-          "Emma and James keep going back to the field where they met — which place do you love?",
+        about:
+          "Emma and James have been arguing about Scotland versus Italy since 2020. They got married on the English coast and chose it specifically because it sat, diplomatically, between all outstanding positions.",
         reveal:
-          "Theirs is a field in Somerset. Not for the festival anymore. Just because it's theirs now.",
+          "Theirs is the seaside. They argued about where to get married for a year. The coast was the one answer neither could argue with.",
       },
       engagement: {
-        framing:
-          "Sophie & Callum have tried to describe their place to everyone who's asked and never quite managed it — which place do you love?",
+        about:
+          "Callum and Sophie have been returning to the same stretch of the Lake District since their second year together. Callum proposed there. Sophie says she understood the moment they parked.",
         reveal:
-          "A bend in the path above Coniston Water. You'd know it when you saw it. They're going back in October.",
+          "Theirs is the mountains — specifically the fells above Coniston, where Callum proposed on a January morning with no wind and perfect visibility.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad went back to the place they got married for their fortieth — which place do you love?",
+        about:
+          "Forty years together and the garden has been the constant — three different houses, always a garden, always the place they end up at the end of the day when there\'s nothing that needs doing.",
         reveal:
-          "Theirs is the village church in Shropshire. Same place, different people. In all the best ways.",
+          "Theirs is the garden. Any garden they\'ve ever had. That\'s where the day ends properly.",
       },
       leaving: {
-        framing:
-          "Priya has had the same flight saved in her browser for two years — which place do you love?",
-        reveal: "Hers is Kerala. We think it's time. We're holding her to it.",
+        about:
+          "Priya has had the same flight saved in her browser for two years. She grew up moving between cities and has a particular relationship with urban life that people who grew up in one place tend not to.",
+        reveal:
+          "Hers is the city — specifically, a city that isn\'t this one. She\'s been planning the move for two years. The time has arrived.",
       },
       graduation: {
-        framing:
-          "Tom has a building in Manchester he calls his — which place do you love?",
+        about:
+          "Tom has a building in Manchester he considers his — not his, obviously, but the one that taught him what he was trying to understand. He visits it occasionally for reasons he struggles to explain.",
         reveal:
-          "His is the John Rylands Library. It's not his. He just knows exactly why it's good. He could explain it for an hour.",
+          "His is the childhood home — the one he grew up in, back in Wales. He says he thinks about it differently now that he studies buildings for a living.",
       },
       christening: {
-        framing:
-          "Lily will grow up learning what it means to love a place — which place do you love?",
-        reveal: "We each have one. We're curious about hers already.",
+        about:
+          "Lily\'s parents chose a church beside a river in the village where her grandfather grew up. The setting was part of the point. The river was there before the church.",
+        reveal:
+          "Hers is by a river — specifically the one that runs through the village where she was christened. She doesn\'t know this yet. She will.",
       },
       achievement: {
-        framing:
-          "The finish line of the marathon is now a place Marcus considers his — which place do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. The coastline he trained along every morning is not background for him — it is the reason he chose the charity he chose.",
         reveal:
-          "His is the Mall in London. He'll go back. He might not run again. But he'll go back to that place.",
+          "His is the seaside. He trained along the coast for eight months. He says he can\'t think clearly anywhere else now.",
       },
       recovery: {
-        framing:
-          "Claire found a place she went to every day this year — which place do you love?",
+        about:
+          "Claire found a bench in a park she visited every day during her recovery — same bench, same view, whatever the weather. She said the sameness was the point.",
         reveal:
-          "Hers is a bench in the park. The same view. Twenty minutes. Whatever the weather.",
+          "Hers is home. Not the house — the specific feeling of being somewhere that asks nothing of you. She spent a year finding it again.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant's classroom is a place her students describe long after they've left — which place do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. Thirty-seven cards from former students, all mentioning the same room. Room 14 is the place that made the difference for more students than she will ever know.",
         reveal:
-          "Hers is Room 14. Thirty-seven cards from former students. All mention the room.",
+          "Hers is her childhood home — the kitchen in it specifically, where her mother read to her. She says everything she became as a teacher started there.",
       },
       promotion: {
-        framing:
-          "Kwame keeps going back to the coffee shop where he said yes to this job three years ago — which place do you love?",
+        about:
+          "After three years of excellent work, Kwame keeps going back to the coffee shop where he said yes to this job three years ago. Same table, same order, slightly different person. He says he owes it something.",
         reveal:
-          "His is that corner table by the window. Same order. He owes that table something.",
+          "His is the pub — the one near the office where the team goes after a hard week. He said the promotion only felt real when they raised a glass there.",
       },
       celebration: {
-        framing:
-          "Everyone has a place they keep coming back to. Which is yours?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and where they are happiest. The place someone keeps coming back to is always worth knowing.",
         reveal:
-          "Somewhere you always come back to, or somewhere you've always meant to go…",
+          "Somewhere you always come back to, or somewhere you\'ve always meant to go.",
       },
       other: {
-        framing: "We want to know your favourite place.",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite place — where they feel most themselves — is always worth including.",
         reveal:
-          "Somewhere you always come back to, or somewhere you've always meant to go…",
+          "Somewhere you always come back to, or somewhere you\'ve always meant to go.",
       },
       default: {
-        framing: "What's your favourite place?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite place is one of those things that always says something.",
         reveal:
-          "Somewhere you always come back to, or somewhere you've always meant to go…",
+          "Somewhere you always come back to, or somewhere you\'ve always meant to go.",
       },
     },
   },
@@ -1574,104 +1625,106 @@ const topics: TopicSeed[] = [
     categories: ["Places", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a kind of holiday she always came back to — which kind of holiday do you love?",
+        about:
+          "A beloved mother and teacher who took exactly one kind of holiday for thirty years and never considered another. Maps, proper boots, no signal, long days, good evenings. She once turned a week in the Lakes into a navigation exercise. Everyone said it was the best holiday they\'d had.",
         reveal:
-          "Hers was a walking holiday — maps, no signal, proper boots. She once turned a week in the Lakes into a navigation exercise. Best holiday anyone had ever had.",
+          "Hers was the walking holiday. Maps, boots, no signal. She said everything else was just going somewhere.",
       },
       tribute: {
-        framing:
-          "David introduced a whole circle of friends to one kind of holiday — which kind of holiday do you love?",
+        about:
+          "A mentor who introduced a whole circle of friends to one kind of holiday they\'d never tried and couldn\'t subsequently do without. He planned them badly, navigated confidently, and stopped at everything interesting. He was perfect company.",
         reveal:
-          "His was the road trip. He'd pack badly, navigate confidently, and stop at everything interesting. Perfect company.",
+          "His was the city break. He\'d arrive with no plan and come back having seen everything worth seeing. Everyone wanted to go with him.",
       },
       birthday: {
-        framing:
-          "Sarah books one kind of holiday with military precision — which kind of holiday do you love?",
+        about:
+          "Sarah is turning 40 and has a strong position on the best kind of holiday that her friends describe as surprising. She says it is the only genuine holiday. They have tested this claim. She may be right.",
         reveal:
-          "Hers is the city break. She has seventeen open tabs about her next trip at any given moment. This is not an exaggeration.",
+          "Hers is camping. She says it is the only holiday where you actually stop. Her friends were sceptical. They are less sceptical now.",
       },
       retirement: {
-        framing:
-          "David has always said he'd do one particular kind of holiday when he retired — which holiday do you love?",
+        about:
+          "David spent thirty-five years with a map on his wall showing a valley he meant to visit properly. He is retiring. The map is coming down. The boots are going on.",
         reveal:
-          "His is the long slow train journey. Somewhere enormous, with nothing booked past the first night. He's known it for years.",
+          "His is the countryside retreat. Slow roads, no agenda, one valley he has been saving for this exact moment.",
       },
       wedding: {
-        framing:
-          "Emma wanted adventure and James wanted good food — which kind of holiday do you love?",
+        about:
+          "Emma and James went on their honeymoon to a place neither of them had been to before, by mutual agreement, which is how they make most decisions and why most of them work out.",
         reveal:
-          "Theirs is always both. They've never been somewhere that didn't deliver on both counts. Somehow.",
+          "Theirs is the beach holiday. They said they\'d earned it. They had.",
       },
       engagement: {
-        framing:
-          "Sophie carries the snacks. Callum does the route. Which kind of holiday do you love?",
+        about:
+          "Callum and Sophie have a tradition of going somewhere that requires proper kit and some planning, every winter. The trip that matters most to them happened on one of those.",
         reveal:
-          "The walking holiday. Same Lakes, every autumn, different weather. One of them was particularly memorable.",
+          "Theirs is skiing. They started going in their second year together. Callum proposed on a different kind of mountain, but the principle was the same.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had forty years of holidays, most of them compromises, all of them memorable — which kind do you love?",
+        about:
+          "Forty years together and they go back to where the family is every few years — not out of obligation, out of genuine preference. They say the best holidays are the ones where you know where everything is.",
         reveal:
-          "Theirs tends toward the cultural city break. She wanted culture. He wanted beach. They always found a way.",
+          "Theirs is visiting family. They say the best holidays are the ones where you don\'t have to decide anything. The family decides everything.",
       },
       leaving: {
-        framing:
-          "Priya has been talking about a proper long trip for six years — which kind of holiday do you love?",
+        about:
+          "Priya has been talking about a proper long trip for years. The excuses have run out. The diary is her own now. The only thing left is deciding where.",
         reveal:
-          "Hers is the slow extended trip with no fixed itinerary. The excuses have finally run out. The trip can finally happen.",
+          "Hers is a staycation — properly done, for the first time. She said she wanted to see the country she\'s been living in. She has a list.",
       },
       graduation: {
-        framing:
-          "Tom is planning something long and unstructured now that the degree is done — which holiday do you love?",
+        about:
+          "Tom has not had a proper holiday since starting architecture school. This is about to change significantly. He has been planning it in some detail.",
         reveal:
-          "His is the slow backpacking trip. No brief. No deadline. No one to present to. He's figuring out what that feels like.",
+          "His is winter sun. Four years of grey. He says he has earned direct sunlight and he intends to collect.",
       },
       christening: {
-        framing:
-          "The family holiday is now a completely different proposition — which kind of holiday do you love?",
+        about:
+          "Lily\'s first holiday will be decided in due course, by committee. Her parents have already started the conversation. It is going well.",
         reveal:
-          "Lily has joined the itinerary. The itinerary has changed significantly…",
+          "Her parents are planning a staycation for her first summer. They say she is not ready for airports. She agrees by not having an opinion.",
       },
       achievement: {
-        framing:
-          "Marcus has promised himself a proper holiday as a reward — which kind do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He has promised himself a holiday that involves no running whatsoever. He has been specific about this.",
         reveal:
-          "His is the complete rest holiday — beach, nothing booked, no running. He's earned it. Eight months of dark early mornings.",
+          "His is the beach holiday. No training plan, no alarm, no route. He has earned this completely.",
       },
       recovery: {
-        framing:
-          "Claire has been planning a trip since January — which kind of holiday do you love?",
+        about:
+          "Claire has been planning a trip since January — not a specific trip, just the idea of one, somewhere slow, somewhere entirely her own. She is now ready to plan the specific version.",
         reveal:
-          "Hers is the solo trip somewhere quiet. No deadlines, no itinerary. Just somewhere, and time, and herself.",
+          "Hers is a cruise. Slow, contained, no decisions about where to go next. She said she needed someone else to handle the itinerary for once.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant takes exactly one holiday a year and plans it in complete detail — which kind do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and takes exactly one holiday a year, planned in detail and executed precisely. Her colleagues find this typical. She finds their surprise typical.",
         reveal:
-          "Hers is the cultural city break. Teachers who plan. We shouldn't be surprised. The holidays are apparently excellent.",
+          "Hers is the walking holiday. She plans the route in February, packs in April, and leaves on the same weekend every July. The route changes. The rest does not.",
       },
       promotion: {
-        framing:
-          "Kwame's first act after the promotion news was to book a long weekend — which kind of holiday do you love?",
+        about:
+          "After three years of excellent work, Kwame booked a long weekend within thirty minutes of hearing the news. He did not overthink it. This is, his team will tell you, characteristic.",
         reveal:
-          "His is the city long weekend. Decision made in thirty minutes. No overthinking. Good instinct.",
+          "His is the city break. Decision made in thirty minutes, bags packed by Thursday. He says good decisions shouldn\'t take longer than that.",
       },
       celebration: {
-        framing: "What's your favourite kind of holiday?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what kind of holiday says something true about them. How someone chooses to get away tells you most of what you need to know.",
         reveal:
-          "Tell us the holiday you'd take if time and money were no object…",
+          "Tell us the holiday you\'d take if time and money were no object.",
       },
       other: {
-        framing:
-          "Type of holiday is one of those things everyone has a take on — which is yours?",
-        reveal: "The kind of traveller you are tells you everything…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite kind of holiday — and what it says about how they want to spend their time — is always worth including.",
+        reveal:
+          "The kind of traveller you are tells you everything you need to know about yourself.",
       },
       default: {
-        framing:
-          "Someone here has strong opinions about what makes a perfect holiday — what's yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite kind of holiday is one of those things everyone has strong opinions about.",
         reveal:
-          "The kind of traveller you are tells you everything you need to know about yourself…",
+          "The kind of traveller you are tells you everything you need to know.",
       },
     },
   },
@@ -1682,106 +1735,108 @@ const topics: TopicSeed[] = [
     categories: ["Places", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a way of travelling she never questioned — which way do you love to travel?",
+        about:
+          "A beloved mother and teacher who always took the train. She said you missed everything if you were in a hurry. She was right about that too — the journey was always part of the point.",
         reveal:
-          "Hers was the train. She always said you miss everything if you're in a hurry. She was right about that too.",
+          "Hers was the train. She always said you miss everything if you\'re in a hurry. The journey was part of the point.",
       },
       tribute: {
-        framing:
-          "David had a way of travelling he always insisted on — which way do you love to travel?",
+        about:
+          "A mentor who walked everywhere and knew every route. He could tell you the best way between any two points in the city. Every route had been considered. He arrived having noticed things most people drive past.",
         reveal:
-          "His was the train. He'd be in the quiet carriage, reading, completely at ease with the journey taking as long as it took.",
+          "His was on foot. He could tell you the best way between any two points in the city. Every route considered, every shortcut earned.",
       },
       birthday: {
-        framing:
-          "Sarah once walked fourteen miles to a restaurant rather than take the bus — how do you love to travel?",
+        about:
+          "Sarah once walked fourteen miles to a restaurant rather than take the bus. She said this was reasonable. The restaurant was worth it. Both statements are true, and both tell you what you need to know.",
         reveal:
-          "Hers is on foot. She says this was reasonable. The restaurant was worth it. Both may be true.",
+          "Hers is by bicycle. She says it is the only way to arrive somewhere having actually been there. Her friends are starting to agree.",
       },
       retirement: {
-        framing:
-          "David drove to work for thirty-five years — how do you love to travel?",
+        about:
+          "David drove the same route to work for thirty-five years. He is retiring. The car stays. The motorway can go.",
         reveal:
-          "His is now slow roads and no motorways. The car stays. The rushing can go.",
+          "His is by car — slow roads only, now. No motorways. He says the motorway was the part of the commute he was doing for someone else.",
       },
       wedding: {
-        framing:
-          "Emma likes the journey and James likes arriving — how do you love to travel?",
+        about:
+          "Emma and James got married abroad, which required a conversation about travel that they handled with their usual combination of disagreement and eventual complete agreement.",
         reveal:
-          "Theirs is by car — she reads, he drives, then they swap. Somehow they've always agreed on this.",
+          "Theirs is by plane. Emma said it was the only way to arrive somewhere feeling like you\'ve actually left. James agreed immediately.",
       },
       engagement: {
-        framing:
-          "Callum says it's the only way to properly arrive somewhere. Sophie says he just didn't want to drive. How do you love to travel?",
+        about:
+          "Callum and Sophie walk everywhere when they\'re in the Lake District — not as exercise, just as the natural way to be there. Every significant moment in their relationship has happened on foot.",
         reveal:
-          "On foot. Boots on, phone away, miles ahead — every visit to the Lakes, without exception.",
+          "Theirs is on foot. Boots on, phone away, miles ahead. Every important thing that has happened between them has happened while walking.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have driven to the same place every year — which way do you love to travel?",
+        about:
+          "They had a motorbike when they first got together in the 1980s and sold it when the children arrived. They have discussed getting another one every few years for forty years. They haven\'t yet.",
         reveal:
-          "Theirs is by car. Same road. Same songs on the radio. Slightly different speed.",
+          "Theirs was the motorbike. They had one for the first three years. They still talk about it. They are probably going to get another one.",
       },
       leaving: {
-        framing:
-          "Priya said she'd learn to cycle properly once she left — how do you love to travel?",
+        about:
+          "Priya cycled to the studio every day for six years and arrived with energy that the team found both useful and slightly exhausting. She says she learned the city from a bicycle. She probably knows it better than anyone.",
         reveal:
-          "Hers will be by bike. We're holding her to it. The bike is already on her list.",
+          "Hers is by bicycle. She says you only know a city when you\'ve cycled it. Six years of cycling Manchester. She knows it.",
       },
       graduation: {
-        framing:
-          "Tom cycled across Manchester every day for three years — which way do you love to travel?",
+        about:
+          "Tom walked home from his last exam in Manchester rain and says it felt exactly right. He has walked most of the significant distances of the last four years. He has strong views about the thinking you do on foot.",
         reveal:
-          "His is by bike. He timed every route. He knows exactly which roads to avoid and at what time.",
+          "His is on foot. He says the thinking he did walking to and from the studio was at least as useful as the thinking he did in it.",
       },
       christening: {
-        framing:
-          "Lily's world is small right now, but it will expand — which way do you love to travel?",
+        about:
+          "The family drove to the church together, in too many cars, with too much stuff, which is how the family does most things and which is, they will tell you, the right way to do them.",
         reveal:
-          "For now she goes everywhere in someone's arms. This will not last long.",
+          "Theirs is by car. The whole family, too many cars, absolutely fine. That\'s the way it\'s always been done.",
       },
       achievement: {
-        framing:
-          "Marcus has run so many miles that running still feels like a natural way to get places — how do you love to travel?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He has been known to run to places most people drive to. His colleagues consider this extreme. He considers it normal.",
         reveal:
-          "His is on foot. He's been known to run to places most people drive to. This is a choice he makes freely.",
+          "His is on foot. He runs to places people drive to. He says arriving having covered the ground yourself is the only way to earn being somewhere.",
       },
       recovery: {
-        framing:
-          "Claire started walking places she used to drive — not for the exercise, just for the different quality of arrival — how do you love to travel?",
+        about:
+          "Claire started walking places she used to drive during her recovery — not for the exercise, but for the different quality of arrival. She says she\'s been walking to things ever since.",
         reveal:
-          "Hers is on foot now. Something about arriving having covered the ground yourself.",
+          "Hers is on foot. She started walking places she used to drive. She says arriving having covered the ground changes what you think about the journey.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant cycles to school — she says it's the right way to arrive — which way do you love to travel?",
+        about:
+          "Amelia cycles to school and says it sets the tone for the day. She has been doing so for twelve years. She has a theory about the connection between how you arrive somewhere and what you do when you get there.",
         reveal:
-          "Hers is by bike. It sets the tone for the day. She's noticed the difference.",
+          "Hers is by bicycle. She says how you arrive somewhere determines what you do when you get there. Twelve years of evidence suggests she\'s right.",
       },
       promotion: {
-        framing:
-          "Kwame upgraded his travel for the first time after the promotion news — which way do you love to travel?",
+        about:
+          "After three years of excellent work, Kwame took the train home after hearing the news and says the hour on the train was when it properly landed. He needed the time. The train gave it to him.",
         reveal:
-          "His is first class on the train. He'll say it was just an upgrade. It was also a small moment of arrival.",
+          "His is by train. He said the promotion needed time to become real. The train gave him exactly the right amount.",
       },
       celebration: {
-        framing: "Pick a way to travel. We're curious what it says.",
-        reveal: "How someone gets from A to B is a whole character portrait…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and how they get from A to B. The way someone travels is a whole character portrait.",
+        reveal:
+          "How someone gets from A to B says everything you need to know.",
       },
       other: {
-        framing:
-          "Someone here has strong opinions about how to travel — what's yours?",
-        reveal:
-          "The way someone gets from A to B is a whole character portrait…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite way to travel — and what it says about how they move through the world — is always worth including.",
+        reveal: "How someone gets from A to B is a whole character portrait.",
       },
       default: {
-        framing: "Which way do you love to travel?",
-        reveal:
-          "The way someone gets from A to B is a whole character portrait…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite way to travel is one of those things everyone has a position on.",
+        reveal: "How someone gets from A to B is a whole character portrait.",
       },
     },
   },
+  // ── Infinite — Film & TV ─────────────────────────────────────────────────────
   {
     title: "Film",
     description: "Film they could watch again and again",
@@ -1789,102 +1844,103 @@ const topics: TopicSeed[] = [
     categories: ["Film & TV"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a film she came back to every year — which film do you love?",
+        about:
+          "A beloved mother and teacher who came back to the same film every year without fail. Her children learned the lines before they understood what they meant. They understand them now.",
         reveal:
           "Hers was Brief Encounter. She could quote it entirely from memory. It never seemed to get less affecting.",
       },
       tribute: {
-        framing:
-          "David once watched the same film seven times in one month to understand why it worked — which film do you love?",
+        about:
+          "A mentor who watched films with the same attention he brought to everything else — completely, once, in silence. He had a list of films he considered essential. It was not a short list.",
         reveal:
-          "His was Tokyo Story. He eventually explained it. The explanation was better than the film.",
+          "His was Lawrence of Arabia. He watched it once a decade and said it was different every time. He was always right about it.",
       },
       birthday: {
-        framing:
-          "Sarah has a film she's watched so many times she knows every line — which film do you love?",
+        about:
+          "Sarah is turning 40 and has a film she has watched so many times she now watches other people watch it for the first time instead. She considers this a reasonable development.",
         reveal:
-          "Hers is When Harry Met Sally. She watches it whenever she needs reminding that some decisions are worth making.",
+          "Hers is Four Weddings and a Funeral. She\'s watched it so many times she now watches other people watching it. She prefers it this way.",
       },
       retirement: {
-        framing:
-          "David always said the best projects had the structure of a good heist film — which film do you love?",
+        about:
+          "David always said the best projects had the structure of a good heist film. His team learned not to question this analogy. It turned out to be useful.",
         reveal:
-          "His was The Italian Job. He still believes this. He has evidence. It's a long conversation.",
+          "His was The Italian Job. He still believes the best projects work like a well-run heist. He has evidence.",
       },
       wedding: {
-        framing:
-          "Emma and James argued about a film for an hour before they'd even introduced themselves — which film do you love?",
+        about:
+          "Emma and James had a long debate about which film best explained their relationship before they realised they\'d been arguing about the same film from different angles. They got married shortly after this.",
         reveal:
-          "Hers was right, he eventually admitted. Three years later. It was Before Sunrise.",
+          "Theirs was Local Hero. They argued about it for an hour before they\'d introduced themselves. He came around eventually.",
       },
       engagement: {
-        framing:
-          "Local Hero was their second date film. Sophie thinks it had something to do with everything that followed — which film do you love?",
+        about:
+          "Sophie and Callum watched a film on their second date that they both, without discussing it, consider theirs. They didn\'t tell each other for over a year. They found out at a wedding.",
         reveal:
-          "They barely spoke for an hour watching it, then talked until midnight. Callum proposed four years later.",
+          "Theirs is Gregory\'s Girl. Their second date film. Neither of them mentioned it for a year. They found out at a wedding.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have a film they watch on every anniversary — which film do you love?",
+        about:
+          "Forty years together and there is one film they watch on every anniversary, same as they have for as long as either of them can remember. Different things noticed each time. Same feeling at the end.",
         reveal:
-          "Theirs is Casablanca. Forty viewings. Different things noticed each time. Still the same feeling at the end.",
+          "Theirs is It\'s a Wonderful Life. Every anniversary. Different things noticed each time. Same feeling at the end.",
       },
       leaving: {
-        framing:
-          "Someone said Priya's leaving felt like the end of a great arc in a brilliant film — which film do you love?",
+        about:
+          "Priya has a film she considers a test. If someone loves it, she knows what she needs to know about them. She applied this logic at the studio for six years. Her track record is good.",
         reveal:
-          "Not the ending. Just that particular chapter. We're still watching.",
+          "Hers was Some Like It Hot. She used it as a character test. Nobody who failed it lasted long.",
       },
       graduation: {
-        framing:
-          "Tom says architecture school ruined certain films for him in the best possible way — which film do you love?",
+        about:
+          "Tom graduated from architecture school with a film he has watched at every major turning point of his life. He says he doesn\'t know why. The film says otherwise.",
         reveal:
-          "His is Blade Runner. He can't watch a building on screen without having opinions. This is both a gift and a burden.",
+          "His is The Shawshank Redemption. He has watched it at every turning point. He says it\'s about persistence. His tutors say it\'s about hope. Both are probably right.",
       },
       christening: {
-        framing:
-          "There'll come a day when Lily has a favourite film — which film do you love?",
+        about:
+          "Lily\'s parents have a plan for her film education. Her father has a hidden agenda involving one specific film at approximately age seven. Her mother is aware of this.",
         reveal:
-          "We all have one. It always says something truer than we'd want to admit…",
+          "Her parents have not decided yet. Her father has. He is keeping it to himself for now.",
       },
       achievement: {
-        framing:
-          "Marcus watched a film the night before the marathon and ran a mile faster than ever — which film do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He has views about films that involve running and has been known to pause them to explain what they\'re getting wrong about the physiology.",
         reveal:
-          "His was Chariots of Fire. He'll tell you it was coincidence. It wasn't.",
+          "His is Paddington 2. He says it is the most technically correct film about being kind under pressure. This is not a running film. He considers this irrelevant.",
       },
       recovery: {
-        framing:
-          "Claire watched films she'd been avoiding for years this year — which film do you love?",
+        about:
+          "Claire worked through a list of films she\'d been meaning to watch for years during her recovery — an episode a day, no rushing. She found one she will keep coming back to.",
         reveal:
-          "Hers was Amélie. She worked through the whole list. Some were worth the wait. That one in particular.",
+          "Hers is Casablanca. She watched it for the first time during her recovery. She said she understood immediately why people kept watching it.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant uses films in class regularly — says the best ones teach without feeling like teaching — which film do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and uses films in class whenever she can. She has a list, organised by theme and year. She will tell you it is not a personal preference list. It is. It\'s excellent.",
         reveal:
-          "Hers is Dead Poets Society. She's got a list. It's organised by theme, then year. It's a very good list.",
+          "Hers is The Sound of Music. She says it is about what happens when someone with convictions meets a system that doesn\'t share them. Her students find this interesting.",
       },
       promotion: {
-        framing:
-          "Kwame said the best product launches feel like the third act of a well-made film — which film do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up watching films from two different traditions and has strong views about genre that draw from both. He gives a very good recommendation when asked.",
         reveal:
-          "His is The Social Network. He means it as a design principle. The films he uses as examples are always perfect choices.",
+          "His is Whisky Galore. He says it is the best film about what happens when a community decides to solve its own problem. He applies this principle to product.",
       },
       celebration: {
-        framing:
-          "Film is one of those things everyone has a take on — which is yours?",
-        reveal: "The film that's just entirely yours — which one, and why?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which film is entirely theirs. Genre is always more revealing than it seems.",
+        reveal: "The film that\'s just entirely yours — which one, and why?",
       },
       other: {
-        framing: "We want to know your favourite film.",
-        reveal: "The film that's yours — which one is it?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite film — the one they always recommend, or the one they\'ve watched three times — is a detail that opens up a conversation.",
+        reveal: "The film that\'s yours — which one is it?",
       },
       default: {
-        framing:
-          "Someone here has strong opinions about film — which do you love?",
-        reveal: "The film that's just entirely yours — which one, and why?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite film is one of those things everyone has strong feelings about.",
+        reveal: "The film that\'s just entirely yours — which one, and why?",
       },
     },
   },
@@ -1895,100 +1951,103 @@ const topics: TopicSeed[] = [
     categories: ["Film & TV"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a film genre she always came back to — which genre do you love?",
+        about:
+          "A beloved mother and teacher who considered a good documentary a serious commitment and watched them with the full attention they deserved. She said they were the only honest films. Her children inherited the habit.",
         reveal:
-          "Hers was the documentary. She said they were the only honest films. She lived in fine detail. The kind that makes the best ones.",
+          "Hers was the documentary. She said they were the only honest films. Her notebooks had recommendations going back thirty years.",
       },
       tribute: {
-        framing:
-          "David had a film genre he always said was the most honest — which genre do you love?",
+        about:
+          "A mentor who watched films with the same rigour he brought to everything else. He had a genre he returned to above all others and could always name three examples you hadn\'t seen that were exactly right.",
         reveal:
-          "His was the biographical drama. He'd always name three you'd never seen and somehow they were all exactly right.",
+          "His was drama. He\'d name three films you\'d never seen and somehow they were always exactly right for the moment.",
       },
       birthday: {
-        framing:
-          "Sarah's life is clearly a caper film — charming, one step ahead, always — which genre do you love?",
+        about:
+          "Sarah is turning 40 and has strong views about what comedy is and what it isn\'t, which she will share at some length if invited. She is not wrong about any of it.",
         reveal:
-          "Hers is the romantic comedy, if you ask anyone who knows her. She'd say drama. Her friends say otherwise.",
+          "Hers is comedy. She has a very specific view of what qualifies. The list is long and well-defended.",
       },
       retirement: {
-        framing:
-          "David always said his career had the structure of a good thriller — which genre do you love?",
+        about:
+          "David always said his career had the structure of a good thriller — procedural, with occasional moments of genuine tension. His team found this more accurate than he intended.",
         reveal:
-          "His was the thriller. Procedural with occasional moments of genuine horror. His words. Probably right.",
+          "His was the thriller. He said his career was one. His team agreed and didn\'t mention it.",
       },
       wedding: {
-        framing:
-          "Emma says romance, James says adventure — which genre do you love?",
+        about:
+          "Emma and James argued about film on their first date and have been arguing about it since. They agree on one genre absolutely. Everything else is still in dispute.",
         reveal:
-          "Hers is romance. His is adventure. They've been arguing about this since the second date. They're both right.",
+          "Theirs is romance. They\'ve agreed on this since their first date. Everything else is still in dispute.",
       },
       engagement: {
-        framing:
-          "Sophie says drama. Callum says comedy. Which film genre do you love?",
+        about:
+          "Sophie and Callum have one kind of film they always agree on and everything else is a negotiation. The one they agree on is not the one most people would guess.",
         reveal:
-          "The proposal was unmistakably the former — until Sophie started laughing through happy tears. Callum counts that as a win for both.",
+          "Theirs is the musical. Neither of them admits this first. It always comes out eventually.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have watched every genre together over forty years and still haven't agreed — which genre do you love?",
+        about:
+          "Forty years together and they have watched every kind of film at least once. They have a genre they share completely and have never needed to explain to each other. It has been this way since the beginning.",
         reveal:
-          "Hers is romance. His is thriller. They watch both. This is the system.",
+          "Theirs is the western. They\'ve never needed to explain it to each other. It\'s just been their genre.",
       },
       leaving: {
-        framing:
-          "Priya's time here was fast-paced, warm, and had a few genuinely brilliant set pieces — which genre do you love?",
+        about:
+          "Priya has a genre she considers underrated and has been making the case for it since she arrived at the studio. Several people have come around. Nobody admits it.",
         reveal:
-          "Hers was comedy-drama. We know the genre. The question is what comes next in the series.",
+          "Hers was science fiction. She said it was the only genre that took ideas seriously. She was right and she knew it.",
       },
       graduation: {
-        framing:
-          "Tom's architecture thesis included a chapter on film and space — which genre do you love?",
+        about:
+          "Tom spent four years at architecture school developing a theory about the relationship between crime fiction and urban planning. His tutors found it more convincing than they\'d expected.",
         reveal:
-          "His is noir. He's written 4,000 words about the relationship between noir and brutalism. He'll tell you about it.",
+          "His is crime. He has a thesis about crime fiction and how cities are designed. It is more persuasive than it sounds.",
       },
       christening: {
-        framing:
-          "We'll recommend genres to Lily for years — which genre do you love?",
-        reveal: "Start them young on the right ones. That's the task.",
+        about:
+          "Lily\'s parents have been discussing her film education since before she arrived. They disagree about where to start. They are going to start with animation. This is settled.",
+        reveal:
+          "Her parents have agreed on animation. This is the one thing they\'ve agreed on. They\'re starting there.",
       },
       achievement: {
-        framing:
-          "Marcus says a good sports documentary is in a genre of its own — which genre do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He has strong views about sports films and finds most of them technically incorrect. Animation, he says, is more honest about the human experience.",
         reveal:
-          "His is the sports documentary. He's watched every marathon one in existence. Some twice.",
+          "His is animation. He says it is the only genre that doesn\'t pretend things are simpler than they are. His friends find this surprising. He doesn\'t.",
       },
       recovery: {
-        framing:
-          "Claire says one genre got her through as much as anything — which genre do you love?",
+        about:
+          "Claire watched films she\'d been meaning to watch for years during her recovery. She found one genre worked better than anything else during that time. She chose it deliberately.",
         reveal:
-          "Hers was comedy. Not escapism. Just genuine laughter. She chose it deliberately.",
+          "Hers is comedy. Not escapism — just genuine laughter. She chose it deliberately and it worked.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant says the best genre for teaching empathy is drama — which genre do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She uses films in class whenever she can justify it. Her students have come to understand that documentary day is a serious day.",
         reveal:
-          "Hers is drama. She uses drama films like some teachers use textbooks. The results speak for themselves.",
+          "Hers is the documentary. She uses them like other teachers use textbooks. The results speak for themselves.",
       },
       promotion: {
-        framing:
-          "Kwame only watches things he calls 'structurally interesting' — which genre do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He watches films with the same structural interest he brings to products and finds crime the most instructive genre for understanding how systems work.",
         reveal:
-          "His is the heist film. This is somehow not as narrow as it sounds. His taste is excellent.",
+          "His is crime. He says it\'s the genre most interested in how systems fail. He applies this to product. It works.",
       },
       celebration: {
-        framing:
-          "A good film genre tells you everything about a person — which do you love?",
-        reveal: "Pick the genre and make the case for it…",
-      },
-      other: {
-        framing: "Pick a film genre. We're curious what it says.",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which film genre says something true about them. Genre is always more revealing than it seems.",
         reveal:
           "Some people are epics. Some are comedies. Which genre are you?",
       },
+      other: {
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite film genre — and what it says about how they see the world — is always worth including.",
+        reveal: "Taste in genre is a portrait. Which one is yours?",
+      },
       default: {
-        framing: "What's your favourite film genre?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite film genre is one of those things everyone has a strong position on.",
         reveal:
           "Some people are epics. Some are comedies. Some are both. Which genre are you?",
       },
@@ -2001,104 +2060,107 @@ const topics: TopicSeed[] = [
     categories: ["Film & TV", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a TV show she watched with total commitment — which TV show do you love?",
+        about:
+          "A beloved mother and teacher who organised her Sunday evenings around television the way she organised everything else — with clear priorities and no tolerance for interruption. She watched dramas with complete commitment and remembered everything.",
         reveal:
-          "Hers was Midsomer Murders. She could identify the murderer inside fifteen minutes. It was impressive and slightly alarming.",
+          "Hers was a drama series. She watched with total commitment and took notes. Her children thought she was joking. She was not.",
       },
       tribute: {
-        framing:
-          "David watched exactly one TV show at a time and watched it properly — which TV show do you love?",
+        about:
+          "A mentor who watched television selectively and seriously. He watched exactly one thing at a time and watched it with full attention. He said anything less was disrespectful to the people who made it.",
         reveal:
-          "His was The Wire. No multitasking. Fully present. He said it was the only respectful way to watch.",
+          "His was crime. No multitasking, full attention. He said it was the only respectful way to watch. He meant it.",
       },
       birthday: {
-        framing:
-          "Sarah rewatched a whole series to write one paragraph to a friend — which TV show do you love?",
+        about:
+          "Sarah is turning 40 and has rewatched one series in its entirety to explain it to a friend in enough detail to make the recommendation. She did not consider this excessive. It wasn\'t.",
         reveal:
-          "Hers is Schitt's Creek. She did not consider this excessive. It wasn't.",
+          "Hers is the sitcom. She has rewatched most of her favourites twice. She knows exactly which episodes to show people first.",
       },
       retirement: {
-        framing:
-          "David has a watch list that's been building for fifteen years — which TV show do you love?",
+        about:
+          "David spent thirty-five years of early starts and missed most of what happened on a weeknight after nine o\'clock. He has a watch list. It is significant. He is now free to start it.",
         reveal:
-          "His starts with The Sopranos. There's a list. It's long. The time has finally come.",
+          "His starts with period drama. Thirty-five years of missing the television everyone was talking about. He is starting from the beginning.",
       },
       wedding: {
-        framing:
-          "Emma picks one show, James picks one — which TV show do you love?",
+        about:
+          "Emma and James have a shared list and a private list. The distinction between them is taken seriously. The shared list requires agreement. The private list is watched on the commute, alone, without discussion.",
         reveal:
-          "They haven't argued about it once. This is the foundation of the marriage.",
+          "Theirs is nature documentary. The only thing they always agree to watch together without debate. Everything else is negotiated.",
       },
       engagement: {
-        framing:
-          "Sophie cried at a segment about geese. Callum says he knew then. Which TV show do you love?",
+        about:
+          "Sophie and Callum watch very different television and have developed a system for managing this that both of them consider fair. The one programme they have no system for is the one they both watch immediately.",
         reveal:
-          "Attenborough — any of it. It was the first thing they agreed on.",
+          "Theirs is the reality show — specifically one specific one they discovered by accident and have never explained to anyone. They don\'t intend to.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have a show they've been watching together since their first flat — which TV show do you love?",
+        about:
+          "Forty years of evenings together, and the television has been a constant in all of them. They have strong and completely compatible views about what they like to watch. They consider this one of the foundations.",
         reveal:
-          "Theirs started with Fawlty Towers. The show changed over the years. The routine hasn't. Same sofa. Same time.",
+          "Theirs is the quiz show. Same sofa, same time, same shouting at the television. Forty years of the same arrangement. It has never needed to change.",
       },
       leaving: {
-        framing:
-          "Priya got all the best lines in every meeting — which TV show do you love?",
+        about:
+          "Priya\'s television recommendations were always worth taking. She watched selectively, remembered everything, and had an uncanny sense of which series a specific person would love. The team benefited from this for six years.",
         reveal:
-          "Every team has the character who makes every scene better. That was her.",
+          "Hers was cooking shows. She said they were the most optimistic genre of television. She was right.",
       },
       graduation: {
-        framing:
-          "Tom watched a particular documentary series in his final week and called it revision — which TV show do you love?",
+        about:
+          "Tom has a complicated relationship with television — too busy during term, then watching four episodes at a time during the holidays. He has seen approximately half of everything he\'s started and is sanguine about it.",
         reveal:
-          "His was Abstract: The Art of Design. It was technically revision. He also just really liked the show.",
+          "His is the soap opera. He says he respects the ambition of something with no end. His tutors found this argument more convincing than they expected.",
       },
       christening: {
-        framing:
-          "One day Lily will have a favourite show — which TV show do you love?",
+        about:
+          "Lily\'s parents have strong views about how much television is appropriate for a small child. They have agreed on a position. They reserve the right to revise it as tiredness increases.",
         reveal:
-          "For now she has opinions about ceiling fans. This will evolve.",
+          "Her parents have agreed: no television until she\'s three. Both of them believe this. One of them will crack first.",
       },
       achievement: {
-        framing:
-          "Marcus watched nature documentaries on rest days because they required nothing — which TV show do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He watched sports documentaries on rest days as research, he says. His training log agrees.",
         reveal:
-          "His was Planet Earth. Rest days needed something genuinely restful. David Attenborough delivered.",
+          "His is sport. He watched every marathon documentary he could find during training. He says it was preparation. It was also just television he loved.",
       },
       recovery: {
-        framing:
-          "Claire says one particular show got her through the hardest weeks — which TV show do you love?",
+        about:
+          "Claire worked through a series she\'d been putting off for three years during her recovery — an episode at a time, no rushing. She says it was one of the most reliable pleasures of a difficult period.",
         reveal:
-          "Hers was Fleabag. She couldn't have said why. It just worked. Which show does that for you?",
+          "Hers was a drama series. She watched it slowly, an episode a day. She says the pacing was the point.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant recommends TV shows to her students the way other teachers recommend books — which TV show do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and recommends television to her students the way other teachers recommend books. She has not recommended a bad one. They have checked.",
         reveal:
-          "Hers is The Crown. She's never recommended a bad one. The students have checked.",
+          "Hers is the period drama. She says it is the form that takes character most seriously. Her students have learned to trust her on this.",
       },
       promotion: {
-        framing:
-          "Kwame started a show the night he got promoted and watched it through over the next month — which TV show do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He watches television with the structural interest he brings to products and finds the genre that most rewards close attention.",
         reveal:
-          "His was Succession. He hadn't let himself start it until then. Some things are worth saving.",
+          "His is crime. He saved a series for the promotion. He said some things deserve to be waited for.",
       },
       celebration: {
-        framing:
-          "Everyone has a TV show they'd watch with anyone, any time — which is yours?",
-        reveal: "The one you'd watch with anyone, any time. Which one is it?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which television programme says something true about them. A series someone returns to is always worth knowing.",
+        reveal: "The one you\'d watch with anyone, any time. Which one is it?",
       },
       other: {
-        framing: "TV show is one of those things everyone has a take on — which is yours?",
-        reveal: "Pick the show that captures something true about you…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite television programme — the one they always recommend — is a detail worth including.",
+        reveal: "Pick the show that captures something true about you.",
       },
       default: {
-        framing: "We want to know your favourite TV show.",
-        reveal: "Pick the show that captures something true about you…",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite television programme is one of those things everyone has strong feelings about.",
+        reveal: "Pick the show that captures something true about you.",
       },
     },
   },
+  // ── Infinite — Music ─────────────────────────────────────────────────────────
   {
     title: "Song",
     description: "Song that reminds you of them",
@@ -2106,101 +2168,105 @@ const topics: TopicSeed[] = [
     categories: ["Music"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a song she always played on Sunday mornings — which song do you love?",
+        about:
+          "A beloved mother and teacher who sang under her breath without noticing she was doing it. Her children knew every word to songs they hadn\'t consciously learned. She had a hymn for every occasion.",
         reveal:
-          "Hers was Jerusalem. She'd sing along under her breath. Every time. Always the same verse first.",
+          "Hers was Jerusalem. She\'d sing along under her breath. Every time. Always the same verse first.",
       },
       tribute: {
-        framing:
-          "David introduced so many people to a particular song — which song do you love?",
+        about:
+          "A mentor who had a song for every mood and occasion — he said this as a joke and meant it entirely. His team learned to pay attention to what he played at the end of a long week.",
         reveal:
-          "His was My Favourite Things. He'd play it without context and watch people react. It never failed to work.",
+          "His was Waterloo Sunset. He said it made London feel worth everything. He played it on Friday evenings and everyone understood.",
       },
       birthday: {
-        framing:
-          "Sarah turns the volume up every time a particular song comes on — which song do you love?",
+        about:
+          "Sarah is turning 40 with a playlist she updates monthly and would share with anyone who asks. She has strong views about which songs go where. The order is non-negotiable.",
         reveal:
-          "Hers is Dancing Queen. She has a playlist called The Big One. It has exactly one song. Now you know which.",
+          "Hers is Angels. She turns the volume up every time. She has never once apologised for this.",
       },
       retirement: {
-        framing:
-          "David always said good music should say what people can't — which song do you love?",
+        about:
+          "Thirty-five years in the same company and David\'s team knows exactly which song belongs to his leaving do. He will not have chosen it himself. He will not object.",
         reveal:
-          "His was Waterloo Sunset. There's a song that says thirty-five years better than any speech could. That's the one.",
+          "His is My Way. Not his choice. Entirely right. He will deny that he cried.",
       },
       wedding: {
-        framing:
-          "Emma had been saving a particular song for years — which song do you love?",
+        about:
+          "Emma and James spent an entire evening arguing about which song to play first at their wedding and compromised on something that was neither of their first choices and turned out to be perfect. They are both very good at this.",
         reveal:
-          "Hers was This Will Be. The moment it played, everyone at the wedding understood why. That was the one.",
+          "Theirs was What a Wonderful World. Not either of their first choices. Completely right. They haven\'t argued about it since.",
       },
       engagement: {
-        framing:
-          "Sophie says they haven't decided on their song yet. Callum says she already knows. Which song do you love?",
+        about:
+          "Sophie and Callum have a song that came on by accident at the wrong moment in their relationship and became, for reasons neither of them can fully explain, entirely theirs.",
         reveal:
-          "Sophie has declined to comment. Callum considers this confirmation.",
+          "Theirs is Don\'t Look Back in Anger. It came on in a pub on their third date. Nobody planned it. They haven\'t been able to hear it as someone else\'s song since.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad's song hasn't changed in forty years — which song do you love?",
+        about:
+          "Forty years together and there is a song from the early years that still comes on and makes them both stop what they\'re doing. They have never discussed this. They don\'t need to.",
         reveal:
-          "Theirs was Can't Help Falling in Love. First dance. Same song. They've never needed another.",
+          "Theirs is Wind Beneath My Wings. It came on at their wedding. It\'s been theirs ever since. Neither of them chose it to be. It just is.",
       },
       leaving: {
-        framing:
-          "There's a song that belongs to Priya now, irreversibly — which song do you love?",
+        about:
+          "Priya put together a leaving playlist for herself and shared it with no one until the party, at which point it turned out to be the best thing anyone had heard at a work event. Several people asked for the list. She sent it.",
         reveal:
-          "Hers is Gold by Spandau Ballet. Ask her why. The answer is worth hearing.",
+          "Hers was Bohemian Rhapsody. Nobody expected it. Everyone understood it immediately.",
       },
       graduation: {
-        framing:
-          "Tom played the same song on the morning of every deadline — which song do you love?",
+        about:
+          "Tom graduated from architecture school with a playlist that functions as a complete autobiography of the four years. He played it on the train home. He has played it three times since and will not be explaining why.",
         reveal:
-          "His was Pyramid Song by Radiohead. It started as superstition. It became ritual. It apparently always worked.",
+          "His is You\'ll Never Walk Alone. He didn\'t choose it for the obvious reasons. He chose it for his own reasons. He keeps those to himself.",
       },
       christening: {
-        framing:
-          "Every person in this room has a song they'd want Lily to know — which song do you love?",
-        reveal: "She'll find her own. But there's time to share yours.",
+        about:
+          "Everyone in this family has a song they want Lily to know when she\'s old enough. We are keeping the list. We will share it with her at the right moment.",
+        reveal:
+          "She\'ll find her own. For now, everyone here has one they\'d want her to know.",
       },
       achievement: {
-        framing:
-          "Marcus had a song he played in the final kilometre — which song do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that keeps the coastline he trained on safe. He had a song planned for the finish line from mile fourteen onwards.",
         reveal:
-          "His was Mr. Brightside. It belonged to the finish line before it belonged to anything else.",
+          "His was Abide With Me. He chose it for the coast, for the RNLI, for what the finish line meant. It was exactly right.",
       },
       recovery: {
-        framing:
-          "Claire says there was one song more than any other that got her through — which song do you love?",
+        about:
+          "Claire says there was one song more than any other that got her through — not because it was cheerful, but because it meant something that she needed it to mean at that particular time.",
         reveal:
-          "Hers was Vienna by Ultravox. She played it on repeat for months. It held up every time.",
+          "Hers was Danny Boy. She played it on repeat through the hardest months. She says she\'s not sure she can explain why. She doesn\'t have to.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant played a song at the start of every term for years — which song do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She played a song at the start of every term for years — same song, every September, without explanation. Her former students still remember it.",
         reveal:
-          "Hers was Here Comes the Sun. Year 7s who've since graduated still remember it. That song did something.",
+          "Hers is Angels. She played it every September. Year 7s who\'ve since graduated still mention it. The song did something she never fully explained.",
       },
       promotion: {
-        framing:
-          "Kwame played a song on the walk home after the promotion news — which song do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He played a song on the walk home after hearing the news and says it was the right song for the moment in every possible way.",
         reveal:
-          "His was Higher Ground by Stevie Wonder. He made the decision on that walk too. The song was present for both.",
+          "His is My Way. He played it on the walk home. He says he didn\'t choose it for the obvious reason. He said it was just the right tempo.",
       },
       celebration: {
-        framing: "A good occasion has a soundtrack — which song do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which song is entirely theirs. The song someone turns up every time is always worth knowing.",
         reveal: "The one that plays and takes you somewhere — which one is it?",
       },
       other: {
-        framing: "Everyone has a favourite song. What's yours?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite song — the one they turn up every time, or the one they play when nobody else is listening — is worth including.",
         reveal:
-          "The song that plays and instantly takes you somewhere — what is it and where does it go?",
+          "The song that plays and instantly takes you somewhere — what is it?",
       },
       default: {
-        framing: "We want to know your favourite song.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite song is one of the most personal things there is.",
         reveal:
-          "The song that plays and instantly takes you somewhere — what is it and where does it go?",
+          "The song that plays and instantly takes you somewhere — what is it?",
       },
     },
   },
@@ -2211,100 +2277,103 @@ const topics: TopicSeed[] = [
     categories: ["Music"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a music genre she always came back to — which genre do you love?",
+        about:
+          "A beloved mother and teacher who had strong views about what made a good song. She listened to one kind of music above all others and could explain exactly why it was the best. Her children eventually agreed.",
         reveal:
-          "Hers was folk. She said it was the only genre that told the truth. She had strong opinions about what made a good song. Folk always won.",
+          "Hers was folk. She said it was the only music that told the truth. She knew every word to every song she loved.",
       },
       tribute: {
-        framing:
-          "David had a music genre he lived in and thought everyone should — which genre do you love?",
+        about:
+          "A mentor who lived in one kind of music and thought everyone should. He wasn\'t evangelical about it — he just quietly played the right things at the right moments until you understood.",
         reveal:
-          "His was jazz. He wasn't evangelical about it. He just quietly played the right things until you understood.",
+          "His was jazz. He wasn\'t evangelical. He just kept playing the right things until everyone around him understood.",
       },
       birthday: {
-        framing:
-          "Sarah's taste is eclectic but there's always a gravitational centre — which genre do you love?",
+        about:
+          "Sarah is turning 40 and her taste is wide and eclectic, which is what she will tell you. Her Spotify Wrapped tells a different story, consistently, every year. She accepts this with good grace.",
         reveal:
-          "Hers is nineties pop, if you ask the playlist. She'll tell you she listens to everything. Her Spotify says otherwise. In the best way.",
+          "Hers is pop — specifically nineties pop, if you ask her Spotify. She\'ll tell you she listens to everything. She does. Pop wins anyway.",
       },
       retirement: {
-        framing:
-          "David had the same CDs in the car for twenty years — which genre do you love?",
+        about:
+          "David had the same CDs in the car for twenty years and considered this perfectly normal. His team found it consistent. His family found it predictable. He found it correct.",
         reveal:
-          "His was classic rock. Twenty years and not once did it change. That's the genre.",
+          "His was rock. Twenty years of the same CDs in the same car. He never wavered once.",
       },
       wedding: {
-        framing:
-          "Emma and James are each a different genre and together something without a name — which genre do you love?",
+        about:
+          "Emma and James each come from different musical traditions and together they make something without a name that works perfectly. Their wedding playlist was, by general agreement, the best part of the evening.",
         reveal:
-          "Hers is jazz. His is indie. Together it sounds exactly right, whatever it's called.",
+          "Theirs is soul. She brought it to the relationship. He agreed immediately. The wedding playlist reflected this.",
       },
       engagement: {
-        framing:
-          "Callum calls their shared playlist extremely eclectic. Sophie calls it well-rounded. Which music genre do you love?",
+        about:
+          "Sophie and Callum discovered, on their third date, that they had been listening to the same music for years from entirely different backgrounds and for entirely different reasons. They have been unable to fully explain this.",
         reveal:
-          "Sophie's is folk. Callum's is rock. Sophie is not wrong about the playlist.",
+          "Theirs is country. Neither of them was expecting this. Both of them accept it.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have forty years of shared music — which genre do you love?",
+        about:
+          "Forty years of shared music, and they have never quite agreed on a genre — except one. That one has been theirs since the beginning and has never required discussion.",
         reveal:
-          "Hers is soul. His is folk. Together it sounds like something entirely different and entirely theirs.",
+          "Theirs is blues. They found it together in 1984 and it has never belonged to anyone else.",
       },
       leaving: {
-        framing:
-          "Priya had the quality of a genre you didn't know you needed until it started playing — which genre do you love?",
+        about:
+          "Priya\'s music taste was, like everything else about her, specific and confident. The studio\'s shared playlist changed character the day she arrived and has been quieter since she left.",
         reveal:
-          "Hers was Afrobeats. We know the genre now. We'll miss the sound.",
+          "Hers was electronic. She played it at the right volume and the right time. The playlist hasn\'t been the same since.",
       },
       graduation: {
-        framing:
-          "Tom's playlist from final year tells the whole story — which genre do you love?",
+        about:
+          "Tom graduated from architecture school having spent most of the last year in the studio with one kind of music playing in the background. He says it was for the focus. His studio-mates found it calming. Everyone agrees it worked.",
         reveal:
-          "His is post-rock. It carries the whole degree. Three years in one playlist.",
+          "His is classical. He came to it in his final year and hasn\'t left. He says it\'s the music that gets out of the way and lets you work.",
       },
       christening: {
-        framing: "Music will fill Lily's life — which genre do you love?",
-        reveal: "Every person here has one they'd want her to discover.",
+        about:
+          "Lily will grow up in a house full of music. Her parents have very different views about which kind. She will have access to all of it and will form her own opinion.",
+        reveal:
+          "She\'ll find her own genre. Both her parents have strong views about which one it should be. She\'ll ignore both of them.",
       },
       achievement: {
-        framing:
-          "Marcus ran to one genre for eight months — which genre do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained to one kind of music for eight months and says it carried him through every difficult mile.",
         reveal:
-          "His was drum and bass. It carried every kilometre. He can't listen to it now without feeling like he's moving.",
+          "His is hip-hop. Eight months of training, same playlist, same genre. He says it\'s the music that knows what effort feels like.",
       },
       recovery: {
-        framing:
-          "Claire found one genre worked better than anything else — which genre do you love?",
+        about:
+          "Claire found one kind of music worked better than anything else during her recovery. She couldn\'t explain it logically. She didn\'t need to.",
         reveal:
-          "Hers was classical. She couldn't say why logically. She just knew it was the one.",
+          "Hers is musical theatre. She couldn\'t say why it helped. It just kept the room from being quiet in the wrong way.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant believes music education is the most important kind — which genre do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She teaches a music unit that her students consider the best week of the year. She plays one genre and defends it rigorously. She is always right.",
         reveal:
-          "Hers is folk. She has strong feelings about this. Backed by thirty years of watching students.",
+          "Hers is soul. She says it is the only genre that has never been dishonest. Her students find this argument convincing.",
       },
       promotion: {
-        framing:
-          "Kwame says jazz and product thinking have more in common than people realise — which genre do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He has a theory about jazz and product thinking that he has given as a talk three times. It always lands.",
         reveal:
-          "His is jazz. He's given a version of this talk at three different companies. It's always well received.",
+          "His is jazz. He says it is the music that understands iteration. He has given a talk about this. It\'s a good talk.",
       },
       celebration: {
-        framing: "Which music genre do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which kind of music is most theirs. Taste in music is a portrait.",
         reveal: "Taste in music is a portrait. Which genre is yours?",
       },
       other: {
-        framing:
-          "Music genre is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite music genre — and what it gives them — is always worth including.",
         reveal:
           "Taste in music is a portrait. Which genre is yours, and what does it reveal?",
       },
       default: {
-        framing:
-          "Someone here has strong opinions about music — which genre do you love?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite music genre is one of those things everyone has strong feelings about.",
         reveal:
           "Taste in music is a portrait. Which genre is yours, and what does it reveal?",
       },
@@ -2317,99 +2386,104 @@ const topics: TopicSeed[] = [
     categories: ["Music", "Time"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a music era she always said was the one — which era do you love?",
+        about:
+          "A beloved mother and teacher who could tell you where she was when she heard every important record of one particular decade. She kept the albums. Her children have them now.",
         reveal:
-          "Hers was the seventies. She could tell you where she was when she heard every important record from 1971 to 1979.",
+          "Hers was the seventies. Soul and funk, specifically. She said it was the decade that understood what music was for.",
       },
       tribute: {
-        framing:
-          "David had a music era he always said was his — which era do you love?",
+        about:
+          "A mentor whose cultural reference points were all rooted in one era, and who made this feel like a gift rather than a limitation. He brought everything back to one decade and made it seem relevant every time.",
         reveal:
-          "His was the mid-seventies — specifically 1975. He had evidence for this. The evidence was compelling.",
+          "His was the swinging sixties. He had evidence for this position going back thirty years. The evidence was compelling.",
       },
       birthday: {
-        framing:
-          "Sarah has nineties in her bones and she's not remotely sorry — which era do you love?",
+        about:
+          "Sarah is turning 40 and has one decade rooted in her bones that she would not trade for anything. She knows every B-side and every album track. She does not consider this a niche interest.",
         reveal:
-          "Hers is the nineties. She knows every B-side from 1994. Don't test her on this either.",
+          "Hers is the eighties. She knows every B-side from 1984 to 1989. She considers this a reasonable amount of knowledge.",
       },
       retirement: {
-        framing:
-          "David has a theory about how one era of music predicted modern engineering — which era do you love?",
+        about:
+          "David has a theory about rock and roll and engineering — about how one kind of ambition produces another — that his team has heard in several forms over thirty-five years. He has retired. The theory remains.",
         reveal:
-          "His is the eighties. It's a long theory. It's also kind of right.",
+          "His was rock and roll. He has a theory about what it and engineering have in common. He\'s been refining it for thirty-five years.",
       },
       wedding: {
-        framing:
-          "Emma and James made a playlist on their first anniversary that covered six decades without effort — which era do you love?",
+        about:
+          "Emma and James grew up in parallel musical worlds and discovered, on their first date, that they had been listening to the same things without knowing. The wedding playlist covered it extensively.",
         reveal:
-          "That playlist is still the best one either of them has ever made.",
+          "Theirs is nineties indie and dance. They grew up to the same music without knowing each other. The wedding playlist made this plain.",
       },
       engagement: {
-        framing:
-          "Sophie & Callum were listening to the same songs at twelve without knowing it — which music era do you love?",
+        about:
+          "Sophie and Callum were born the same year and discovered they\'d been listening to the same music since they were teenagers. They found this out in their second year together. It changed how they thought about the relationship.",
         reveal:
-          "The early 2000s. They only discovered this on their third date.",
+          "Theirs is the noughties. Same music, same age, different cities. They found out on their third date.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad danced to the same music at their wedding and still put it on now — which era do you love?",
+        about:
+          "They got together to music they still play, and the era it came from is still theirs in a way that nothing since has managed to be. Forty years and that decade remains the one they share most completely.",
         reveal:
-          "Theirs is the late seventies. The era that was theirs first is still theirs. Some things don't change.",
+          "Theirs is the jazz age — not because they lived through it, but because they found it together as students and it has belonged to them since.",
       },
       leaving: {
-        framing:
-          "Priya had the energy of a particular musical era — which era do you love?",
+        about:
+          "Priya grew up between two musical traditions and had a decade she claimed as entirely her own — a decade that explained who she was and where she came from simultaneously.",
         reveal:
-          "Hers was the early 2000s. Some people belong to a particular musical moment. She was one of them.",
+          "Hers was the noughties. She arrived already shaped by it. The studio understood her better once they knew this.",
       },
       graduation: {
-        framing:
-          "Tom spent three years surrounded by the same era of music — which era do you love?",
+        about:
+          "Tom graduated from architecture school having spent four years studying buildings that belong to one era and music that belongs to another. The two things are connected, he says. His tutors now agree.",
         reveal:
-          "His is the early 2000s indie era. It's filed under 'final year' now. He can't hear it without thinking about structural drawings.",
+          "His is nineties indie and dance. He says it was the era when things were being built and broken at the same time. He applies this to architecture.",
       },
       christening: {
-        framing: "Lily will have her own golden era — which era do you love?",
-        reveal: "She's yet to discover it. Tell her what yours was.",
+        about:
+          "Lily arrives in an era that hasn\'t finished deciding what it is. She\'ll grow up in it and it will be hers in ways none of us can predict. That\'s the point.",
+        reveal:
+          "She\'ll have the streaming era. All of it, all at once. She\'ll find her own decade within it.",
       },
       achievement: {
-        framing:
-          "Marcus trained through one era of music and finished the race to another — which era do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained to music from one era almost exclusively and says it was the only thing that got him through the difficult miles.",
         reveal:
-          "His training era was the nineties — chosen for rhythm. The finish line era chose itself.",
+          "His is seventies soul and funk. He says it is the music that knows what hard work feels like from the inside.",
       },
       recovery: {
-        framing:
-          "Claire found one era particularly useful this year — which era do you love?",
+        about:
+          "Claire went back to the music of a specific era during her recovery — the one that had felt most like itself when she first heard it, and which still did.",
         reveal:
-          "Hers was the seventies. Old music. Familiar. Known. It felt like the right steady ground.",
+          "Hers is the swinging sixties. She said it was the era that believed things could change. She needed that.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant believes every generation deserves to understand every era — which era do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She teaches a music history unit on one era that her students consider the best lesson of the year. She says the era matters because it was when music became something young people owned.",
         reveal:
-          "Hers is the sixties. She teaches music history alongside the curriculum. Not officially. She just does it.",
+          "Hers is the jazz age. She says it was the first era that understood that music could be both serious and joyful simultaneously. Her students find this interesting.",
       },
       promotion: {
-        framing:
-          "Kwame believes the music era you love most tells you everything about your working style — which era do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He has a map of how music has changed from one era to the next that he uses as a model for thinking about product evolution.",
         reveal:
-          "His is the late nineties. He's got a theory. He'll tell you about it in the right setting.",
+          "His is the streaming era. He says it\'s the era that made everything available and forced people to choose properly. He applies this to product every day.",
       },
       celebration: {
-        framing: "Pick a music era. We're curious what it says.",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which music era they feel most themselves in. The era someone returns to is always the one that formed them.",
         reveal:
-          "An era of music that seems to have been made exactly for you — which one, and why?",
+          "An era that seems to have been made exactly for you — which one?",
       },
       other: {
-        framing: "Everyone has a music era that shaped them. Which one is yours?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite music era — and what it gave them — is always worth including.",
         reveal:
           "An era of music that seems to have been made exactly for you — which one, and why?",
       },
       default: {
-        framing: "What's your favourite music era?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite music era is one of those things everyone has a strong position on.",
         reveal:
           "An era of music that seems to have been made exactly for you — which one, and why?",
       },
@@ -2422,100 +2496,104 @@ const topics: TopicSeed[] = [
     categories: ["Music"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had an instrument she played quietly, just for herself — which instrument do you love?",
+        about:
+          "A beloved mother and teacher who played the piano quietly, for herself, for fifty years. She never performed. She just played. Her children heard it through the walls.",
         reveal:
-          "Hers was the piano. She never performed. She just played. That was the whole point.",
+          "Hers was the piano. She played it every evening. Never for anyone else. That was the whole point.",
       },
       tribute: {
-        framing:
-          "David had an instrument he loved above all others — which instrument do you love?",
+        about:
+          "A mentor who kept a guitar in his office for twelve years and used it to end difficult meetings by changing the subject abruptly. This worked more often than it should have. Nobody questioned it.",
         reveal:
-          "His was the piano. He couldn't play a note. He was still completely right about it.",
+          "His was the guitar. Nothing impressive, always enough. He kept one in the office for twelve years. It ended more meetings than any agenda.",
       },
       birthday: {
-        framing:
-          "Sarah plays one instrument badly and with tremendous enthusiasm — which instrument do you love?",
+        about:
+          "Sarah is turning 40 and has been playing the violin since she was eight with more ambition than technical precision. Her neighbours have opinions about the Tuesday evening sessions. She does not solicit these opinions.",
         reveal:
-          "Hers is the guitar. She'd tell you she's getting better. Her friends would say she's consistent. Both are true.",
+          "Hers is the violin. She\'s been playing since she was eight. The ambition has always exceeded the execution. This has never once put her off.",
       },
       retirement: {
-        framing:
-          "David was the instrument in the firm that everything else was built around — which instrument do you love?",
+        about:
+          "David is retiring with a plan to return to the cello he put down at twenty-two when work became more important. The cello is still there. It has been waiting.",
         reveal:
-          "His was the bass guitar. You only notice some instruments when they stop. The whole band feels it.",
+          "His is the cello. He played until he was twenty-two and then didn\'t. It has been in the sitting room for thirty-five years. He is going back to it.",
       },
       wedding: {
-        framing:
-          "Emma is the melody and James is the chord structure beneath it — which instrument do you love?",
+        about:
+          "Emma had a specific vision for the music at her wedding that she had held for years before she met James. He heard it described and agreed immediately. This remains one of the things she holds against him.",
         reveal:
-          "Together it's a complete piece. Separately it's still good, but not quite right.",
+          "Theirs was the harp. She\'d known for years. He agreed without hesitation. She found this suspicious.",
       },
       engagement: {
-        framing:
-          "Sophie plays guitar — three songs, badly, with great enthusiasm. Which instrument do you love?",
+        about:
+          "Sophie and Callum discovered a shared musical enthusiasm on their second date that neither of them had mentioned before. It is not the obvious one. They find this part of the story.",
         reveal:
-          "Callum has heard those three songs for four years and has never once complained.",
+          "Theirs is the accordion. Neither of them can explain it. Both of them are certain.",
       },
       anniversary: {
-        framing:
-          "There's been a piano in Mum and Dad's house for the whole forty years — which instrument do you love?",
+        about:
+          "There has been a keyboard in their house for forty years. She plays it occasionally. He never has. Neither of them has ever suggested removing it.",
         reveal:
-          "Theirs is the piano. Neither of them plays. It stays because it's always stayed. Some things are like that.",
+          "Theirs is the organ. The keyboard in the sitting room has been there since they moved in. She plays it. He listens. This has been the arrangement for forty years.",
       },
       leaving: {
-        framing:
-          "Priya was the instrument in the team you don't notice until the song starts again — which instrument do you love?",
+        about:
+          "Priya played tabla as a child and says she never got good enough for it to matter. Her colleagues who heard her play at the studio summer event disagree. She says they\'re being polite. They are not.",
         reveal:
-          "Hers was the cello. Something is missing in the arrangement. We all know which part.",
+          "Hers was the drums — tabla specifically. She says she was never good enough. She is wrong.",
       },
       graduation: {
-        framing:
-          "Tom's studio had one instrument playing in the background for three years — which instrument do you love?",
+        about:
+          "Tom played French horn in his school orchestra for six years and considers it the thing he most regrets giving up. He is not sure what he would do with it now. He thinks about it regularly.",
         reveal:
-          "His is the guitar. Someone always had one. It became the ambient sound of the degree. He misses it.",
+          "His was the trumpet. He played through school and gave it up for architecture. He still hasn\'t forgiven himself.",
       },
       christening: {
-        framing:
-          "One day Lily might play something — which instrument do you love?",
-        reveal: "Which one would you want her to discover?",
+        about:
+          "Lily\'s grandmother has already suggested piano lessons. Her parents have said they\'ll wait and see what she gravitates towards. The piano is available. The grandmother has made this clear.",
+        reveal:
+          "Her grandmother has opinions. Her parents are keeping an open mind. The piano is waiting in the background.",
       },
       achievement: {
-        framing:
-          "Marcus says running is its own instrument — rhythm, tempo, endurance — which instrument do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He plays one instrument badly and considers this the correct relationship to have with music.",
         reveal:
-          "His is the drum. He's thought about this more than you'd expect. He has a case to make.",
+          "His is the banjo. He plays it to a basic standard, which he considers exactly right. He is not trying to get better. He is not trying to get worse.",
       },
       recovery: {
-        framing:
-          "Claire plays one instrument quietly, for herself — and says it helped more than she can explain — which instrument do you love?",
+        about:
+          "Claire started playing again during her recovery — slowly, quietly, from memory. She hadn\'t touched it since her twenties. She says it was not for anyone else to hear. That\'s why it helped.",
         reveal:
-          "Hers is the piano. She kept playing all the way through. The playing came back with everything else.",
+          "Hers is the flute. She played through school and put it away for twenty years. She found it again. She says it remembered her.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant taught music for five years before moving to English — the instrument never left her — which instrument do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and once arranged for a musician to play in her classroom on the last day of term, funded by arts budget she\'d been quietly not spending for three years. Her students still mention it.",
         reveal:
-          "Hers is the violin. She still plays. She doesn't mention it. The students who've heard her do.",
+          "Hers is the saxophone. She arranged for one to play in her classroom once. The students still mention it. She has never explained where the budget came from.",
       },
       promotion: {
-        framing:
-          "Kwame says he listens to one instrument when he needs to think — which instrument do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He sings — not casually, properly, in a choir he has attended every Thursday for four years without telling anyone at work.",
         reveal:
-          "His is the piano. Specifically piano. Specifically certain kinds. Very specific indeed.",
+          "His is the voice. He\'s been in a choir for four years. He told his team after the promotion. They found this completely typical.",
       },
       celebration: {
-        framing: "A good occasion has an instrument — which do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and whether there\'s an instrument that says something true about them. Played, given up, or just admired — it\'s always a good detail.",
         reveal:
           "The sound that moves something in you — which instrument, and what does it do?",
       },
       other: {
-        framing: "What's your favourite instrument?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite instrument — or one they play, or wish they\'d learned — is a detail that opens up something interesting.",
         reveal:
           "The sound that moves something in you — which instrument, and what does it do?",
       },
       default: {
-        framing: "Which instrument do you love?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite instrument is one of those choices that always says something.",
         reveal:
           "The sound that moves something in you — which instrument, and what does it do?",
       },
@@ -2528,105 +2606,109 @@ const topics: TopicSeed[] = [
     categories: ["Music", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a type of song she always came back to — which type of song do you love?",
+        about:
+          "A beloved mother and teacher who knew every hymn and every lullaby and could move between them without thinking. She sang in the kitchen without noticing she was doing it. Her children knew every word before they knew they\'d learned them.",
         reveal:
-          "Hers was the hymn. She said they were just the best folk songs. She knew every word to every one. Never missed a verse.",
+          "Hers was the hymn. She said they were just the best folk songs. She knew every verse of every one she loved.",
       },
       tribute: {
-        framing:
-          "David had a type of song he always said was the only kind worth singing — which type of song do you love?",
+        about:
+          "A mentor who could always find the right song for the right moment — a leaving do, a celebration, a difficult afternoon. He had an instinct for the song that contained the whole situation. It was, everyone agreed, a gift.",
         reveal:
-          "His was the jazz standard. He meant it as a principle about form. It applies more broadly than jazz.",
+          "His was the song that tells a story. He said the best songs were the ones that went somewhere. He was right.",
       },
       birthday: {
-        framing:
-          "Sarah has a type of song she returns to every year — it's always unmistakably hers — which type of song do you love?",
+        about:
+          "Sarah is turning 40 and has a very clear position on birthday songs: they must be in the right key, sung with conviction, and not ended awkwardly. She has been to enough birthday dinners to have strong views on all three.",
         reveal:
-          "Hers is the anthem. She's been working on a karaoke setlist for years. It's ambitious. It suits her completely.",
+          "Hers is the anthem. She has a karaoke setlist that has been in development for years. It is ambitious. It suits her completely.",
       },
       retirement: {
-        framing:
-          "David always said the best songs knew how to end — which type of song do you love?",
+        about:
+          "Thirty-five years in the same company and David sat through his send-off with the composure of someone who had been quietly dreading the singing part. He was wrong to worry. They got it exactly right.",
         reveal:
-          "His was the ballad. He's right about the ending. The right kind takes its time and earns it.",
+          "His is the song that makes you cry. He sat through his send-off with complete composure until the song. Then he didn\'t.",
       },
       wedding: {
-        framing:
-          "Emma and James's story started as a love song and became something else — which type of song do you love?",
+        about:
+          "Emma and James\'s story started as a love song and has had the texture of something more complicated and more true ever since. They chose the music for their wedding very carefully. It was right.",
         reveal:
-          "Theirs is the love song. It started there and it's stayed there. The best ones do.",
+          "Theirs is the love song. It started there and stayed there. The best ones do.",
       },
       engagement: {
-        framing:
-          "Sophie has a theory about the best songs. Callum wrote it down. Which type of song do you love?",
+        about:
+          "Sophie and Callum share a musical tradition they discovered together on their second date, at a gig neither of them was particularly expecting to be at. It has been theirs ever since.",
         reveal:
-          "Folk. Sophie says the best songs are the ones you already know the second time you hear them.",
+          "Theirs is folk. Sophie says the best songs are the ones you already know the second time you hear them. Callum wrote this down.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad's song was a love song that became a hymn — which type of song do you love?",
+        about:
+          "Forty years together and there are songs they share from before they knew each other that have become part of the story — songs from before they met that feel, now, like they belong to both of them.",
         reveal:
-          "Theirs is the love song. It changed over the years. The feeling underneath it didn't.",
+          "Theirs is the song from childhood. Songs they knew before they met each other that now belong to both of them. They have never agreed on which ones qualify. The argument is part of it.",
       },
       leaving: {
-        framing:
-          "Priya deserves exactly the right type of song for this moment — which type of song do you love?",
+        about:
+          "Priya\'s leaving playlist was, by general agreement, the best thing anyone had heard at a work event. Nobody had known she had strong opinions about show tunes. She had kept this extremely well-hidden.",
         reveal:
-          "Hers is the anthem. Pick the type that fits the moment. This one earns it.",
+          "Hers was the show tune. Nobody knew. The leaving do revealed it. The studio is still talking about the playlist.",
       },
       graduation: {
-        framing:
-          "Tom played a particular type of song at the end of every all-nighter to tell himself it was done — which type of song do you love?",
+        about:
+          "Tom graduated from architecture school and immediately put on a playlist that had nothing to do with anything he\'d studied and everything to do with how he felt. His housemates joined in. The neighbours did not.",
         reveal:
-          "His was the anthem. One specific one, earned three years running. It always worked.",
+          "His is the song that makes you dance. The graduation playlist had one function. It performed that function completely.",
       },
       christening: {
-        framing: "Lily will need a lullaby — which type of song do you love?",
+        about:
+          "Lily\'s parents have been singing to her since she was born — different songs, different voices, no consensus on what constitutes appropriate. She has opinions about this already. They are non-verbal but clear.",
         reveal:
-          "And an anthem. And a hymn. And eventually, a love song. Start with the lullaby.",
+          "She has very clear feelings about lullabies. Specifically, she has rejected three so far. The search continues.",
       },
       achievement: {
-        framing:
-          "Marcus's finish line song was a particular type — he'd planned it that way — which type of song do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He had a song planned for the final mile from the beginning of training. He says it was part of the preparation.",
         reveal:
-          "His was the anthem. He knew exactly which one he wanted playing in his head at mile 26. It was the right one.",
+          "His is the anthem. He knew which one before he started training. He played it at mile twenty-five. It did exactly what it was supposed to do.",
       },
       recovery: {
-        framing:
-          "Claire says she needed a particular type of song this year — which type of song do you love?",
+        about:
+          "Claire says there was a type of song that worked during her recovery when other kinds didn\'t — not because it was cheerful, but because it meant something specific that she needed it to mean.",
         reveal:
-          "Hers was the ballad. Not escapism. Not distraction. Something with a narrative she could follow.",
+          "Hers is the song that makes you cry. She chose it deliberately. She says crying about the right thing is entirely different from crying about everything.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant has a type of song she comes back to — says it's about the long game — which type of song do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She plays one type of song at the start of every term. She has been doing this for twenty years. Her students across those years remember it.",
         reveal:
-          "Hers is the hymn. She means it literally and also as a metaphor for teaching. Both interpretations hold.",
+          "Hers is the hymn. She means it literally and as a metaphor for teaching. Both interpretations hold.",
       },
       promotion: {
-        framing:
-          "Kwame celebrated with a particular type of song that needed no explanation — which type of song do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He celebrated with a specific kind of song and says there was no other kind that would have been right for the moment.",
         reveal:
-          "His was the anthem. Not a ballad. Not a love song. Something with propulsion. Exactly right.",
+          "His is the anthem. Not a ballad, not a love song — something with propulsion. He was right about this.",
       },
       celebration: {
-        framing:
-          "Someone here has strong opinions about what kind of song matters — what's yours?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which kind of song is most theirs. Love song, anthem, hymn, lullaby — they all say different things.",
         reveal: "Love song, anthem, hymn, lullaby — which type is yours?",
       },
       other: {
-        framing: "Which type of song do you love?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite type of song — and what it gives them — is worth including.",
         reveal:
           "Love song, anthem, hymn, lullaby — which type is yours, and what does it give you?",
       },
       default: {
-        framing: "Pick a type of song. We're curious what it says.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite type of song is one of those things everyone has a position on.",
         reveal:
           "Love song, anthem, hymn, lullaby — which type is yours, and what does it give you?",
       },
     },
   },
+  // ── Infinite — Food & Drink ──────────────────────────────────────────────────
   {
     title: "Drink",
     description: "Their go-to cup or glass",
@@ -2634,100 +2716,103 @@ const topics: TopicSeed[] = [
     categories: ["Food & Drink", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a drink she always came back to — which drink do you love?",
+        about:
+          "A beloved mother and teacher who made tea for everyone who came through her door, without asking whether they wanted any. The kettle was the first thing on. The pot came second. That was the order of things.",
         reveal:
-          "Hers was tea — proper loose leaf, pot on the table. She said everything worth talking about happened over tea. She had a point.",
+          "Hers was tea. Proper loose leaf, pot on the table. She said everything worth talking about happened over tea. She had a point.",
       },
       tribute: {
-        framing:
-          "David always had a glass of something interesting to offer — which drink do you love?",
+        about:
+          "A mentor who never drank alone. He had something good in the cabinet and he opened it for the right conversations. His colleagues learned that a particular invitation meant something important was about to be decided.",
         reveal:
-          "His was a good single malt. He never drank alone. The drink was always the beginning of a conversation.",
+          "His was whisky. He never drank alone. The bottle came out when something mattered. Everyone understood this.",
       },
       birthday: {
-        framing:
-          "Sarah has opinions about one drink that are not appropriate for this level of conversation — which drink do you love?",
+        about:
+          "Sarah is turning 40 with opinions about coffee that have grown more specific every year. She has opinions about brewing methods, bean origins, and milk temperatures. Her friends have stopped arguing. She is always right.",
         reveal:
-          "Hers is coffee. She has opinions about brewing methods too. The opinions are extensive and correct.",
+          "Hers is coffee. The opinions are extensive and correct. She has never ordered the wrong thing.",
       },
       retirement: {
-        framing:
-          "David kept a good drink for significant moments — which drink do you love?",
+        about:
+          "David spent thirty-five years drinking bad coffee in the office and good wine at home on Fridays. He is retiring. The ratio is about to change significantly in favour of the wine.",
         reveal:
-          "His was whisky. He always said a project was finished when he poured the good stuff. There's a lot due.",
+          "His is red wine. He kept it for Fridays for thirty-five years. He is now planning to reconsider the schedule.",
       },
       wedding: {
-        framing:
-          "Emma and James fell in love over terrible festival beer and have significantly upgraded since — which drink do you love?",
+        about:
+          "Emma and James chose the drinks for their wedding with the same combination of disagreement and final complete agreement that characterises most of their decisions. The result was correct.",
         reveal:
-          "Theirs is now good wine, mostly. There's still an ongoing argument about the exact moment it improved. Probably 2021.",
+          "Theirs was champagne. They said it was for the occasion. It was also just the right drink for them.",
       },
       engagement: {
-        framing:
-          "Callum makes the tea at the top of every fell. Same flask, every time. Which drink do you love?",
+        about:
+          "Sophie and Callum have a drink they associate with good evenings — which is most evenings — and a drink they associate with evenings that have turned into something important. These are not always the same drink.",
         reveal:
-          "Tea. Sophie says it tastes better up there. Callum has been making it since the first walk.",
+          "Theirs is gin and tonic. The engagement was celebrated with one. It was, they say, the correct drink for the occasion and the person.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had the same drink every morning for forty years — which drink do you love?",
+        about:
+          "Forty years of evenings together, and there is a drink they share at the end of certain days that has no agenda and no occasion. It just means the day is done and they are still here.",
         reveal:
-          "Theirs is tea. The brand, the mug, the time — all the same. All exactly right.",
+          "Theirs is hot chocolate. Same mugs, same time, same lack of conversation required. That\'s the drink.",
       },
       leaving: {
-        framing:
-          "Priya has a drink she orders every time something good happens — which drink do you love?",
+        about:
+          "Priya has a drink she orders every time something good happens. Her colleagues learned to read this as a signal. Tonight qualifies by any standard.",
         reveal:
-          "Hers is a negroni. Tonight qualifies. We know which one it is.",
+          "Hers is stout. She said it was the only drink that tasted like it meant it. She ordered it every time something was worth celebrating.",
       },
       graduation: {
-        framing:
-          "Tom says he'll drink something better than student flat coffee now — which drink do you love?",
+        about:
+          "Tom graduated from architecture school and went to the pub with his housemates. This was the plan from the beginning of first year. The drink was decided four years ago.",
         reveal:
-          "His will be a proper flat white. He has spent three years subsisting. The upgrade is overdue.",
+          "His was beer. He\'d been planning the first pint after the final submission since year one. It was exactly right.",
       },
       christening: {
-        framing: "We raise a glass for Lily — which drink do you love?",
+        about:
+          "The family raised a glass for Lily. Some of those glasses had juice in them. This was considered appropriate. Nobody mentioned it.",
         reveal:
-          "She'll form her own preferences eventually. For now, we drink on her behalf.",
+          "Everyone raised something. Lily\'s was juice. She seemed satisfied.",
       },
       achievement: {
-        framing:
-          "Marcus crossed the finish line and someone handed him a drink that tasted better than anything — which drink do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He crossed the finish line and someone handed him something that tasted better than anything he\'d had in eight months of training.",
         reveal:
-          "His was water. Just water. 26.2 miles. The first sip. Nothing has ever tasted better.",
+          "His was beer. The first pint after the finish line. 26.2 miles. He says nothing has ever tasted better. He is right.",
       },
       recovery: {
-        framing:
-          "Claire says a particular drink became a ritual that held the day together — which drink do you love?",
+        about:
+          "Claire found that one drink became a ritual during her recovery — same time, same mug, same routine. She says it was a small thing that held the day together.",
         reveal:
-          "Hers is tea. Same mug, same time, same routine. The drink held the day together.",
+          "Hers is tea. Same mug, same time, every day. She said the routine was the point.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant's staffroom tea is apparently legendary — which drink do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. Her staffroom tea is apparently legendary. She makes it once a day at exactly the same time and the staff know to be there.",
         reveal:
-          "Hers is tea — made once a day at exactly 11am. The staff know to be there.",
+          "Hers is tea. Made at eleven, every day, for thirty years. The staff know the time.",
       },
       promotion: {
-        framing:
-          "Kwame poured a specific drink to mark the moment — which drink do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He made himself a specific drink on the evening he heard the news and says the ritual of making it was the moment it became real.",
         reveal:
-          "His was a flat white, two sugars. He'd been making it that way since year one. That night he made it extra slowly. He'd earned the time.",
+          "His is coffee. Two sugars, made slowly. He\'d been making it the same way since year one. That night he made it like it mattered. It did.",
       },
       celebration: {
-        framing:
-          "Every gathering deserves the right drink — which do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what they drink when something is worth celebrating. The cup or glass says something.",
         reveal:
-          "The cup or glass that belongs to you more than any other — which one, and why?",
+          "The cup or glass that belongs to you more than any other — which one?",
       },
       other: {
-        framing: "We want to know your favourite drink.",
-        reveal: "The cup or glass that belongs to you more than any other…",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite drink — what they make when they need to think, or order when something is worth marking — is always a worthwhile detail.",
+        reveal: "The cup or glass that belongs to you more than any other.",
       },
       default: {
-        framing: "Everyone has a drink they keep coming back to. Which is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite drink is one of those things everyone keeps coming back to.",
         reveal:
           "The cup or glass that belongs to you more than any other — which one, and why?",
       },
@@ -2740,101 +2825,105 @@ const topics: TopicSeed[] = [
     categories: ["Food & Drink", "Childhood"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a comfort food she always made for anyone who needed it — which comfort food do you love?",
+        about:
+          "A beloved mother and teacher who had a dish she made for anyone who needed it — not a grand gesture, just the thing that arrived when it was needed. She\'d leave it on the doorstep with a note. The note was always short.",
         reveal:
-          "Hers was shepherd's pie. She'd leave it in the oven and say she'd barely done anything. Lies, but kind ones.",
+          "Hers was shepherd\'s pie. She\'d leave it in the oven and say she\'d barely done anything. She had done everything.",
       },
       tribute: {
-        framing:
-          "David made exactly one dish but made it perfectly — which comfort food do you love?",
+        about:
+          "A mentor who made exactly one dish and made it perfectly. His colleagues were invited to eat it at key moments — a project finished, a difficult period ended, a reason to gather. Nobody knew what was in it.",
         reveal:
-          "His was a jollof rice that nobody else could replicate. He wouldn't tell anyone what was in it. The recipe died with him. The memory didn't.",
+          "His was soup — one specific soup, his recipe, which he never wrote down. His colleagues have been trying to recreate it ever since. They haven\'t.",
       },
       birthday: {
-        framing:
-          "Sarah makes no apologies for her relationship with one comfort food — which comfort food do you love?",
+        about:
+          "Sarah is turning 40 and makes no apologies for her relationship with one comfort food that she considers both a treat and a right. Her friends have stopped pretending they feel differently.",
         reveal:
-          "Hers is cheese. She once paused a holiday to find the right local one. No one complained. It was worth it.",
+          "Hers is fish and chips. She says they are the only food that cannot be improved upon. She has been making this argument for twenty years.",
       },
       retirement: {
-        framing:
-          "David ate lunch at his desk for thirty-five years — which comfort food do you love?",
+        about:
+          "Thirty-five years of desk lunches and David is retiring with a specific plan for Sundays. The plan involves a table, a proper meal, and no emails. He has been planning it since 2017.",
         reveal:
-          "His was a proper ploughman's. He can eat it now. In a chair. With a view. With no emails.",
+          "His is a roast dinner. He ate at his desk for thirty-five years. He is now planning the standing Sunday table. Everything else is detail.",
       },
       wedding: {
-        framing:
-          "Emma and James argue about pizza but always agree on one comfort food — which comfort food do you love?",
+        about:
+          "Emma and James have strong opinions about pasta and have been arguing about the best kind since their first meal together. The argument has produced useful research. They are both better cooks for it.",
         reveal:
-          "Theirs is Neapolitan pizza — the best they had in Naples. The argument is about which place was better. The pizza is not in question.",
+          "Theirs is pasta. Specifically, one of his recipes and one of hers. They\'ve been arguing about which is better for five years. Both are good.",
       },
       engagement: {
-        framing:
-          "Sophie asked for the recipe once. Callum said he'd just make it whenever she wanted. Which comfort food do you love?",
+        about:
+          "Sophie and Callum have a Sunday evening ritual that has been part of the relationship since the second month. It involves the same ingredients in a slightly different arrangement every time. Neither of them has ever suggested changing it.",
         reveal:
-          "Pasta at 9pm — Callum's, no measurements, always slightly different, always exactly right.",
+          "Theirs is scrambled eggs. Sunday evening, simple, always exactly right. The specific recipe is disputed. The outcome never is.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had the same comfort food on Sundays for forty years — which comfort food do you love?",
+        about:
+          "Forty years of Sundays together and there is a pudding that has appeared on the table at the end of enough of them to constitute a tradition. Neither of them decided this. It just became the thing.",
         reveal:
-          "Theirs is the Sunday roast. The recipe is the same as her mother's. The method takes all afternoon. Worth every minute.",
+          "Theirs is bread and butter pudding. Her mother\'s recipe, unchanged for forty years. It appears at the right moments. Nobody decides when those are.",
       },
       leaving: {
-        framing:
-          "Priya once brought something in for no reason and transformed the mood in the office — which comfort food do you love?",
+        about:
+          "Priya once brought something in for no reason and transformed the mood of the whole studio. Nobody had asked. She had just decided the moment called for it. It called for it more than anyone had realised.",
         reveal:
-          "Hers was dal. No occasion. No explanation. Just the right thing at the right time. It made any flat feel like home.",
+          "Hers was cottage pie. No occasion, no explanation. Just the right thing at the right time. The studio has missed it.",
       },
       graduation: {
-        framing:
-          "Tom ate nothing but toast for the last week of finals — which comfort food do you love?",
+        about:
+          "Tom survived four years of architecture school on approximately three ingredients and has strong opinions about all of them. He is now free to eat differently. He is starting slowly.",
         reveal:
-          "His is toast. He has strong opinions about it now. Strong, specific, very particular opinions.",
+          "His is toast. He has very strong opinions about it after four years of living on it. The opinions are specific and probably correct.",
       },
       christening: {
-        framing: "The family laid on food — which comfort food do you love?",
-        reveal: "Every family has its dishes. Today was no exception.",
+        about:
+          "The family gathered after the christening and fed each other in the way that families do at these occasions — generously, slightly chaotically, and with complete satisfaction.",
+        reveal:
+          "There was porridge the next morning. Her grandmother made it. That felt right.",
       },
       achievement: {
-        framing:
-          "Marcus had a post-marathon comfort food planned from mile fourteen — which comfort food do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He had one meal planned from mile fourteen onwards. It was specific. He had earned it completely.",
         reveal:
-          "His was a roast dinner. He'd been thinking about it since mile 14. He earned every bite.",
+          "His was a bacon sandwich. He planned it from mile fourteen. It was the best thing he\'d eaten in eight months.",
       },
       recovery: {
-        framing:
-          "Claire's friend always brought one particular comfort food — which comfort food do you love?",
+        about:
+          "Claire had a friend who brought the same thing every time she visited during the recovery — not because it had been discussed, but because the friend understood what was needed without being told.",
         reveal:
-          "Hers was soup. Her friend brought it every time, without being asked. That's the friend, and that's the soup.",
+          "Hers is soup. Her friend brought it every visit without being asked. That is the friend, and that is the soup.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant celebrates wins with specific food — which comfort food do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and celebrates every win of any kind with the same food she has celebrated with since she was a child. The scale of the occasion does not change the choice.",
         reveal:
-          "Hers is a proper Victoria sponge. The bigger the win, the better the cake. This win calls for the best version.",
+          "Hers is shepherd\'s pie. Her mother made it for every good thing that happened. She has continued this practice. It always works.",
       },
       promotion: {
-        framing:
-          "Kwame and his partner cooked together to celebrate — which comfort food do you love?",
+        about:
+          "After three years of excellent work, Kwame and his partner cooked together to celebrate the promotion. They didn\'t go out. They stayed in, made the thing they always make together, and it was exactly right.",
         reveal:
-          "His was jollof rice. Nothing fancy. Just the thing they always made together. Which is the whole point.",
+          "His is pasta — one specific recipe, made together, on the evenings that matter. The promotion earned it.",
       },
       celebration: {
-        framing: "Comfort food tells you something about a person — which do you love?",
-        reveal:
-          "The food that brings you back somewhere — what is it and what does it remind you of?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which comfort food is entirely theirs. The food someone reaches for says something true.",
+        reveal: "The food that brings you back somewhere — what is it?",
       },
       other: {
-        framing: "Which comfort food do you love?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite comfort food — the one they make when they need it most — is always worth including.",
         reveal:
-          "The food that's entirely yours — what is it and what does it remind you of?",
+          "The food that\'s entirely yours — what is it and what does it remind you of?",
       },
       default: {
-        framing: "Someone here has strong opinions about comfort food — what's yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite comfort food is one of those things everyone has strong feelings about.",
         reveal:
-          "The food that's entirely yours — what is it and what does it remind you of?",
+          "The food that\'s entirely yours — what is it and what does it remind you of?",
       },
     },
   },
@@ -2845,106 +2934,110 @@ const topics: TopicSeed[] = [
     categories: ["Food & Drink", "Childhood"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda always had a tin of biscuits on the table for visitors — which biscuit do you love?",
+        about:
+          "A beloved mother and teacher who always had a tin of biscuits on the table for visitors. The tin appeared the moment anyone came through the door. That was the signal everything was fine.",
         reveal:
-          "Hers were hobnobs. She'd put the tin down the moment anyone came round. That was the signal everything was fine.",
+          "Hers were hobnobs. She put the tin down the moment anyone arrived. That was the signal everything was going to be fine.",
       },
       tribute: {
-        framing:
-          "David's office always had a good tin — which biscuit do you love?",
+        about:
+          "A mentor whose office always had a good tin. He had views about biscuits that his colleagues had not expected and could not subsequently forget. The right biscuit for the right conversation.",
         reveal:
-          "His was the digestive. Not just any biscuit. The right biscuit, for the right conversation. He had a system.",
+          "His was the digestive. Plain, exactly right for every serious conversation. He had a theory about this. It held up.",
       },
       birthday: {
-        framing:
-          "Sarah says she doesn't have a favourite biscuit — which biscuit do you love?",
+        about:
+          "Sarah is turning 40 and has a position on biscuits that she will not be changing. She delivers it with conviction. Her friends have stopped testing it.",
         reveal:
-          "Hers is the Bourbon. Everyone who knows her knows the answer. She just won't admit it.",
+          "Hers is the Bourbon. She has held this position since she was seven. It has never wavered.",
       },
       retirement: {
-        framing:
-          "David has earned something better than a Rich Tea — which biscuit do you love?",
+        about:
+          "David spent thirty-five years eating the wrong biscuits in the wrong meeting rooms. He is retiring with very specific plans about this. The plans begin immediately.",
         reveal:
-          "His will be a proper shortbread. He's earned it. The question is just which one.",
+          "His is shortbread. He spent thirty-five years with a Rich Tea in hand. He has known for years what he actually wanted. The time has come.",
       },
       wedding: {
-        framing:
-          "Emma and James have incompatible biscuit preferences — which biscuit do you love?",
+        about:
+          "Emma and James discovered early in the relationship that their biscuit preferences were completely incompatible and have spent five years finding this amusing rather than concerning.",
         reveal:
-          "Hers is the chocolate digestive. His is the shortbread. Somehow this works. Completely compatible in every other way.",
+          "Hers is the chocolate digestive. His is something different. They\'ve agreed to disagree. The tin has both.",
       },
       engagement: {
-        framing:
-          "Sophie & Callum's answer to this one isn't hard to guess — which biscuit do you love?",
+        about:
+          "Sophie and Callum have a biscuit they eat on every walk in the Lake District. It is non-negotiable. It is in the bag before anything else. It has been this way since their second walk together.",
         reveal:
-          "Hobnobs. One on every walk, without fail. Sophie says she could identify one blindfolded at 600 metres.",
+          "Theirs is the ginger nut. Every walk, without fail. Sophie says it was her idea. Callum says it was his. Both are claiming credit for a good decision.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have had the same biscuit in the tin for forty years — which biscuit do you love?",
+        about:
+          "Forty years together and the biscuit tin has always had the same biscuits in it. She buys them. He refills them. This has been the arrangement for forty years. Neither of them has ever questioned it.",
         reveal:
-          "Theirs is the custard cream. She buys the tin. He refills it. This is the division of labour that has sustained forty years.",
+          "Theirs is the custard cream. She buys the tin. He refills it. This has been the division of labour that has sustained forty years.",
       },
       leaving: {
-        framing:
-          "Priya always brought the right biscuit without explaining why — which biscuit do you love?",
+        about:
+          "Priya always brought the right biscuit without explaining why. Not the obvious choice, not the crowd-pleaser — the one that was right for the moment. The team have missed this more than they expected.",
         reveal:
-          "Hers was the cardamom biscuit from the bakery down the road. You'd understand the moment you ate one. That was the genius of it.",
+          "Hers was the Viennese Whirl. Nobody else in the office bought them. Nobody asked her to. They were always exactly right.",
       },
       graduation: {
-        framing:
-          "Tom says biscuits got him through finals — which biscuit do you love?",
+        about:
+          "Tom got through finals on a specific biscuit chosen for its properties — he has strong views about what a biscuit should do at eleven o\'clock on a deadline night. His views are specific and correct.",
         reveal:
-          "His was the rich tea. He was specific about this. The wrong biscuit in the wrong hour was genuinely not an option.",
+          "His was the Rich Tea. He has strong views about why. They involve structural integrity and dunking properties. The degree agrees with him.",
       },
       christening: {
-        framing: "Someone brought biscuits — which biscuit do you love?",
+        about:
+          "Someone brought biscuits to the christening. This was the right call. Everything was better for it.",
         reveal:
-          "The biscuit question matters more than people admit. This is just true.",
+          "The right biscuits appeared at the right moment. This is all that needs to be said.",
       },
       achievement: {
-        framing:
-          "Marcus had one particular biscuit at every post-long-run breakfast — which biscuit do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He had a specific post-marathon breakfast planned. The biscuit was part of it. He had thought about this since mile nine.",
         reveal:
-          "His was the hobnob. He's very clear about which one. Don't suggest alternatives.",
+          "His was the hobnob. Part of the post-marathon breakfast he\'d planned since mile nine. He ate three. He had earned them.",
       },
       recovery: {
-        framing:
-          "Claire's sister always brought the right biscuit — which biscuit do you love?",
+        about:
+          "Claire\'s sister always brought biscuits when she visited during the recovery — not the obvious ones, exactly the right ones. She knew without being told. This is the kind of sister she is.",
         reveal:
-          "Hers were Bourbons. Not the expensive ones. Not the obvious ones. Exactly the right one. She knew.",
+          "Hers is the Bourbon. Her sister brought them every time. Not because anyone asked. Because she knew.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant's classroom biscuit tin is a well-known institution — which biscuit do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. Her classroom biscuit tin is an institution. It has never been empty. She has never explained how. The students have long since stopped asking.",
         reveal:
-          "Hers is the ginger nut. It's never empty. She's never explained how. The students have long since stopped asking.",
+          "Hers is the ginger nut. It\'s never empty. She\'s never explained how. The students accept this.",
       },
       promotion: {
-        framing:
-          "Kwame brought biscuits to the team on his first day as Head of Product — which biscuit do you love?",
+        about:
+          "After three years of excellent work, Kwame brought biscuits to the team on his first day as Head of Product. He chose them carefully. His team consider this characteristic.",
         reveal:
-          "His were chocolate hobnobs. He chose them carefully. He's that kind of person.",
+          "His are chocolate hobnobs. He chose them deliberately. That\'s the kind of Head of Product he is.",
       },
       celebration: {
-        framing: "Pick a biscuit. We're curious what it says.",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which biscuit is entirely theirs. There is always a right biscuit for the right person.",
         reveal:
-          "There's always a right biscuit for the right person. Which one is entirely yours?",
+          "There\'s always a right biscuit for the right person. Which one is entirely yours?",
       },
       other: {
-        framing: "What's your favourite biscuit?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite biscuit — the one they always reach for — is a small detail that says something larger.",
         reveal:
-          "There's always a right biscuit for the right person. Which one is entirely yours?",
+          "There\'s always a right biscuit for the right person. Which one is entirely yours?",
       },
       default: {
-        framing:
-          "Someone here has strong opinions about biscuits — what's yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite biscuit is one of those things everyone has a strong position on.",
         reveal:
-          "There's always a right biscuit for the right person. Which one is entirely yours?",
+          "There\'s always a right biscuit for the right person. Which one is entirely yours?",
       },
     },
   },
+  // ── Infinite — Sport ─────────────────────────────────────────────────────────
   {
     title: "Sport to watch",
     description: "Game they never missed",
@@ -2952,101 +3045,104 @@ const topics: TopicSeed[] = [
     categories: ["Sport", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a sport she followed with total devotion — which sport do you love to watch?",
+        about:
+          "A beloved mother and teacher who followed one sport with total devotion for forty years. She listened to the radio rather than watching — she said it required more attention, and attention was what it deserved.",
         reveal:
-          "Hers was cricket — on the radio, never the TV. She could tell you the score of any Test match from 1987. It was a gift.",
+          "Hers was cricket. On the radio, never the television. She could tell you the score of any Test match from 1972. It was a considerable gift.",
       },
       tribute: {
-        framing:
-          "David was quietly devoted to one sport and never needed to explain why — which sport do you love to watch?",
+        about:
+          "A mentor who watched one sport alone, on his terms, with complete concentration. He didn\'t need company for it. He didn\'t discuss it afterwards. It was his and that was the whole point.",
         reveal:
-          "His was football. He watched alone, on his terms, with complete concentration. He didn't need company for it.",
+          "His was football. He watched alone, in his own time, with full attention. He never needed to explain this. Everyone respected it.",
       },
       birthday: {
-        framing:
-          "Sarah watches one sport with a level of engagement that concerns her friends — which sport do you love to watch?",
+        about:
+          "Sarah watches one sport with a level of intensity her friends find both impressive and slightly alarming. She once lost her voice at a major tournament and didn\'t notice until the next morning.",
         reveal:
-          "Hers is tennis. She once lost her voice during Wimbledon and didn't notice until the next morning.",
+          "Hers is tennis. She once lost her voice during Wimbledon. She noticed the following day. She had no regrets.",
       },
       retirement: {
-        framing:
-          "David missed the second half of a match he'll never forgive himself for — which sport do you love to watch?",
+        about:
+          "David made one considerable sacrifice over thirty-five years that he has never forgiven himself for. He is retiring. The sacrifice will not be repeated.",
         reveal:
-          "His is cricket. He missed the 2005 Ashes for a board meeting. He hasn't forgiven anyone. Now he'll never miss another ball.",
+          "His is golf. He missed the 2005 Ryder Cup for a board meeting. He has not forgiven anyone. Now he\'ll never miss another round.",
       },
       wedding: {
-        framing:
-          "Emma and James haven't agreed on a sport in five years — which sport do you love to watch?",
+        about:
+          "Emma and James have not agreed on a sport in five years of trying and consider this a healthy arrangement. They go to different things. They are both happier for it.",
         reveal:
-          "Hers is cricket. His is football. No sign of resolution. We think it might be the point.",
+          "Theirs is rugby. They haven\'t agreed on anything else. They both turned up to the same game independently before they\'d met.",
       },
       engagement: {
-        framing:
-          "Sophie always wins at rugby opinions. Which sport do you love to watch?",
+        about:
+          "Sophie has strong opinions about athletics that she delivers with complete conviction. Callum has opinions about rugby. Sophie says athletics is better. Callum admires her for this. He also disagrees.",
         reveal:
-          "Rugby — England away matches, Saturday afternoons, very strong views. Callum says Sophie's were stronger. He admired her for it.",
+          "Hers is athletics. Track and field, specifically. She has strong views about which events matter. Callum disagrees about all of them. She is probably right.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have watched the same sport from the same seats for forty years — which sport do you love to watch?",
-        reveal: "Theirs is rugby. The seats changed once. The sport never did.",
+        about:
+          "Forty years together and they have watched the same sport from the same seats on the same weekend every year for most of them. The seats have changed once. The sport hasn\'t.",
+        reveal:
+          "Theirs is snooker. The same tournament, same weekend, forty years. They don\'t miss it. They never have.",
       },
       leaving: {
-        framing:
-          "Priya had three half-finished seasons in her queue — which sport do you love to watch?",
+        about:
+          "Priya has three half-finished sporting seasons saved in her browser. The time has finally arrived to give them the attention they deserve. She has been specific about the order.",
         reveal:
-          "Hers is Formula 1. The time has officially arrived. The queue can finally be cleared.",
+          "Hers is cycling. She\'s had three seasons saved for two years. The time has come. The list is ready.",
       },
       graduation: {
-        framing:
-          "Tom once watched an entire cricket Test between dissertation drafts — which sport do you love to watch?",
+        about:
+          "Tom watched an entire cricket Test between dissertation drafts and says it helped with the pacing. His tutors may not have agreed with the timing. The dissertation was excellent.",
         reveal:
-          "His is cricket. He says it helped with pacing. This is possibly correct. Certainly committed.",
+          "His is cricket. He watched it between drafts. He says it helped. The first is complete.",
       },
       christening: {
-        framing:
-          "Lily will one day have a sport she watches religiously — which sport do you love to watch?",
+        about:
+          "Lily will one day have a sport she follows with complete devotion. The family have strong views about which one it should be. She will make her own decision. They are already preparing for this.",
         reveal:
-          "She'll come to it herself. But it's not too early to introduce the options.",
+          "She\'ll come to it herself. The family have opinions. She will ignore them. This is as it should be.",
       },
       achievement: {
-        framing:
-          "Marcus has watched every marathon broadcast he can find since completing his — which sport do you love to watch?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He now watches marathons on television with the specific attention of someone who has done it. He notices different things now.",
         reveal:
-          "His is marathon running now. He notices completely different things. The sport looks different from inside it.",
+          "His is athletics — marathon running specifically. He watches it completely differently now. He knows what mile eighteen looks like from the inside.",
       },
       recovery: {
-        framing:
-          "Claire says watching sport helped — the routine of it, the rhythm — which sport do you love to watch?",
+        about:
+          "Claire says watching one sport helped during her recovery — the rhythm of it, the routine, the world continuing in an expected way. She found this more useful than she\'d anticipated.",
         reveal:
-          "Hers is swimming. Something about sport going on regardless. The world continuing in the expected way.",
+          "Hers is bowls. She started watching during her recovery. She says it has exactly the right pace. She has not stopped watching.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant uses sport as a classroom metaphor regularly — which sport do you love to watch?",
+        about:
+          "Amelia has just been named Teacher of the Year and uses one sport as a classroom metaphor so regularly that her students have developed views about it. She considers their views incorrect but useful.",
         reveal:
-          "Hers is cricket. She means team, strategy, the long season. She applies it to everything.",
+          "Hers is darts. She uses it to explain precision under pressure. Her students find this argument more convincing than they expected.",
       },
       promotion: {
-        framing:
-          "Kwame says watching sport taught him about team structure — which sport do you love to watch?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He says watching one sport taught him more about team structure and pressure than any management book.",
         reveal:
-          "His is basketball. Not the strategy. The culture. How teams actually function under pressure.",
+          "His is football. He says teams reveal themselves under pressure in ways that nothing else replicates. He watches closely for this reason.",
       },
       celebration: {
-        framing:
-          "Sport is one of those things everyone has a take on — which do you love to watch?",
-        reveal: "The sport you'd never miss, whatever else was happening…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which sport they\'d never miss. The one someone follows regardless of what else is happening.",
+        reveal: "The sport you\'d never miss, whatever else was happening.",
       },
       other: {
-        framing: "Someone here has strong opinions about sport — which do you love to watch?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite sport to watch — the one they organise their weekend around — is always worth including.",
         reveal: "The sport that takes you somewhere — which one?",
       },
       default: {
-        framing: "Sport to watch is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite sport to watch is one of those things everyone has a strong position on.",
         reveal:
-          "The sport you'd never miss, whatever else was happening — which one is it?",
+          "The sport you\'d never miss, whatever else was happening — which one is it?",
       },
     },
   },
@@ -3057,98 +3153,102 @@ const topics: TopicSeed[] = [
     categories: ["Sport", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a sport she played every morning until her seventies — which sport do you love to play?",
+        about:
+          "A beloved mother and teacher who swam every morning until her seventies without exception. She said it was the only sport where you couldn\'t have your phone. She loved it for exactly this reason.",
         reveal:
-          "Hers was swimming. She said it was the only sport where you couldn't have your phone. She loved it for exactly that reason.",
+          "Hers was swimming. Every morning, without fail, until her seventies. She said it was the only sport that asked for your complete attention.",
       },
       tribute: {
-        framing:
-          "David played one sport until his eighties and never admitted it was competitive — which sport do you love to play?",
+        about:
+          "A mentor who played one sport until his eighties and never admitted to anyone that he was competitive. He was very competitive. Everyone knew this. Nobody said anything.",
         reveal:
-          "His was bowls. It was extremely competitive. Everyone knew. Nobody said anything.",
+          "His was bowls. He said it was a social game. He played it to win. Everyone understood the distinction.",
       },
       birthday: {
-        framing:
-          "Sarah plays one sport like her life depends on it — which sport do you love to play?",
+        about:
+          "Sarah plays one sport with more ambition than her ranking suggests is warranted and makes no apologies for this. She has beaten people half her age and spent the following week describing it to her friends.",
         reveal:
-          "Hers is tennis. She once beat someone half her age and spent the following week telling people.",
+          "Hers is tennis. She once beat someone half her age and spent a week telling people. Nobody blamed her.",
       },
       retirement: {
-        framing:
-          "David's golf clubs have been in the car for three years — which sport do you love to play?",
+        about:
+          "David\'s golf clubs have been in the boot of the car for three years. He has been ready for some time. The moment has arrived.",
         reveal:
-          "His is golf. The tee times start this month. He's been ready for a while.",
+          "His is golf. The clubs have been ready since 2021. He is now free to use them.",
       },
       wedding: {
-        framing:
-          "Emma and James tried playing against each other once — which sport do you love to play?",
-        reveal: "They play doubles now. This was the right decision.",
+        about:
+          "Emma and James tried playing against each other once, in the first year of the relationship. They have played doubles ever since. This was a good decision by both of them.",
+        reveal:
+          "They play doubles now. They tried singles once. They have never discussed what happened. Doubles is better.",
       },
       engagement: {
-        framing:
-          "Four years, every autumn, the Lakes — always a bit further than last time. Which sport do you love to play?",
+        about:
+          "Callum runs. Sophie hikes. They discovered in year two that these were essentially the same activity at different speeds and have been doing them together on the same routes ever since.",
         reveal:
-          "Hiking, if that counts. They'd both say it does. One of those walks ended with a ring.",
+          "His is running. He runs every route they walk together, but faster. They start together, arrive separately, and this is the arrangement.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad played one sport together for years until they didn't — which sport do you love to play?",
+        about:
+          "They played one sport together for twenty years and stopped when it became inconvenient and have been saying they\'ll go back to it ever since. The argument about whether it matters has been running for twenty years.",
         reveal:
-          "Theirs was badminton. Forty years of pretending the score didn't matter. It mattered.",
+          "Theirs was badminton. They played for twenty years. They\'ve been meaning to go back since 2008. The argument about whether they need to is ongoing.",
       },
       leaving: {
-        framing:
-          "Priya mentioned once that she used to run — which sport do you love to play?",
+        about:
+          "Priya has been talking about cycling properly since year two at the studio. The diary is now entirely hers. The training plan is already written. There are no more excuses.",
         reveal:
-          "Hers is running. Nothing stops her now. That's the whole point.",
+          "Hers is cycling. The bike has been ready for a year. The excuses have run out. She is going.",
       },
       graduation: {
-        framing:
-          "Tom played five-a-side throughout university and said it was where he did his best thinking — which sport do you love to play?",
+        about:
+          "Tom played five-a-side every week throughout university and says it was where he did his best thinking. His teammates have opinions about whether his concentration during matches supports this theory.",
         reveal:
-          "His is five-a-side. He claims this. His teammates have opinions about whether this is accurate.",
+          "His is football — specifically five-a-side, specifically Tuesday evenings. He says he did his best thinking there. His teammates have strong views about this claim.",
       },
       christening: {
-        framing:
-          "One day Lily will play something and love it — which sport do you love to play?",
+        about:
+          "Lily will find the sport that belongs to her. The family have suggestions. She will ignore most of them. One of them will turn out to be right.",
         reveal:
-          "The sport she finds at eight or ten or fourteen. We're curious already.",
+          "She\'ll find her sport. The family have opinions. Some of them are correct.",
       },
       achievement: {
-        framing:
-          "Marcus will always be a runner now — which sport do you love to play?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll — the charity that patrols the coastline he trained on for eight months. He came back from the marathon different. The running is permanent now.",
         reveal:
-          "His is running. The marathon made it permanent. He came back from it different.",
+          "His is running. The marathon made it permanent. He ran the coastline every morning for eight months. He will keep running it.",
       },
       recovery: {
-        framing:
-          "Claire got back into a sport she'd stopped for a while — which sport do you love to play?",
+        about:
+          "Claire returned to a sport she had stopped during the difficult period. Coming back was harder than starting had been. She is glad she did.",
         reveal:
-          "Hers is swimming. Coming back was harder than starting. She's very glad she did.",
+          "Hers is swimming. She stopped for a year. Coming back was hard. She is very glad she came back.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant coached the school netball team for fifteen years while teaching — which sport do you love to play?",
+        about:
+          "Amelia has just been named Teacher of the Year and coached the school netball team for fifteen years alongside her teaching. She says the two things used the same part of her. Her players agree.",
         reveal:
-          "Hers is netball. She says the two weren't unrelated. Teaching and coaching use the same part of her.",
+          "Hers is cricket. She\'s been playing since she was nine. She says it teaches the same patience as teaching. She has evidence for this.",
       },
       promotion: {
-        framing:
-          "Kwame says five-a-side is the team exercise that makes everything else clearer — which sport do you love to play?",
+        about:
+          "After three years of excellent work, Kwame plays five-a-side every week and says it tells him everything he needs to know about how a team is working. His team at work have learned to check the Monday morning mood.",
         reveal:
-          "His is five-a-side. Every team problem he's encountered has a five-a-side equivalent. He uses both.",
+          "His is football. Five-a-side, every week. He says every problem he\'s encountered at work has a five-a-side equivalent. He uses both.",
       },
       celebration: {
-        framing: "We want to know your favourite sport to play.",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which sport is theirs to play. The one someone plays with real feeling — not to win, just because it\'s theirs.",
         reveal: "The sport you played with real feeling — which one was yours?",
       },
       other: {
-        framing: "Which sport do you love to play?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite sport to play — the one they return to — is always worth including.",
         reveal: "The sport you played with real feeling — which one was yours?",
       },
       default: {
-        framing: "What's your favourite sport to play?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite sport to play is one of those things everyone has a position on.",
         reveal: "The sport you played with real feeling — which one was yours?",
       },
     },
@@ -3160,107 +3260,110 @@ const topics: TopicSeed[] = [
     categories: ["Sport", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda had a form of exercise she never skipped — which form of exercise do you love?",
+        about:
+          "A beloved mother and teacher who walked every morning — same route, same pace — for thirty years. Her family knew the route. They knew the timing. They knew it was not for company.",
         reveal:
-          "Hers was the daily walk — same route, same pace. She said the walk was where she did her best thinking. The lane still feels like hers.",
+          "Hers was walking. Same route, every morning. She said it was where she did her best thinking. The lane still feels like hers.",
       },
       tribute: {
-        framing:
-          "David walked everywhere and knew every route — which form of exercise do you love?",
+        about:
+          "A mentor who spent his retirement doing the one thing he had always said was more useful than exercise. He was in the garden every morning. He was right that it was better than a gym.",
         reveal:
-          "His was walking. He could tell you the best way between any two points in the city. Every route considered.",
+          "His was gardening. He said it was the only exercise that produced something. He was in the garden by seven every morning.",
       },
       birthday: {
-        framing:
-          "Sarah talks about swimming but actually does something else entirely — which form of exercise do you love?",
+        about:
+          "Sarah has downloaded seventeen fitness apps and uses exactly one of them consistently. She found it in year two of looking. She has not looked elsewhere since.",
         reveal:
-          "Hers is running. She downloaded seventeen fitness apps and uses exactly one of them. The right one.",
+          "Hers is running. One app, one route, consistent for three years. She says everything else was just looking for this.",
       },
       retirement: {
-        framing:
-          "David has been saying he'll take up one form of exercise since 2017 — which form of exercise do you love?",
+        about:
+          "David has been saying he\'ll take up cycling properly since 2017. The bike is in the garage. The time is now. The excuses have run out.",
         reveal:
-          "His will be cycling. The bike is in the garage. The time is now. No more excuses.",
+          "His is cycling. The bike has been in the garage for five years. He has retired. The excuses are gone.",
       },
       wedding: {
-        framing:
-          "Emma and James have never had an argument that a long walk didn't fix — which form of exercise do you love?",
+        about:
+          "Emma and James have never had an argument that a long walk didn\'t resolve. This is a well-documented fact about their relationship. The walks are excellent.",
         reveal:
-          "Theirs is walking. This is a well-established fact. The walks are very good.",
+          "Theirs is walking. This is a well-established fact. The walks are the solution to most things.",
       },
       engagement: {
-        framing:
-          "Callum started joining Sophie's Mind charity walks. It went from there. Which form of exercise do you love?",
+        about:
+          "Callum started joining Sophie on her walks in year two of the relationship, which became hikes, which became the Lake District every autumn, which became the proposal.",
         reveal:
-          "Walking — the long, steep, slightly too ambitious kind. He proposed on one of those walks.",
+          "Theirs is walking — the long, steep, sometimes inadvisable kind. Every significant moment in their relationship has happened on one.",
       },
       anniversary: {
-        framing:
-          "Mum and Dad have walked every anniversary — a tradition that started on their first date — which form of exercise do you love?",
+        about:
+          "They started walking together on their first anniversary and have walked on every one since — not always the same place, but always the same kind of effort, the same kind of view at the end.",
         reveal:
-          "Theirs is walking. It's still the walk that matters most. It's never changed its purpose.",
+          "Theirs is walking. Every anniversary, the same effort, a different view. Forty years of this arrangement.",
       },
       leaving: {
-        framing:
-          "Priya has been talking about training for something for years — which form of exercise do you love?",
+        about:
+          "Priya has been planning to take up yoga properly since year three at the studio. The diary is now hers. The mat is ready. The planning is done.",
         reveal:
-          "Hers will be running. The diary is now entirely hers. The training can begin.",
+          "Hers is yoga. She\'s been meaning to do it properly for three years. The time is now.",
       },
       graduation: {
-        framing:
-          "Tom cycled everywhere in Manchester and arrived at everything slightly out of breath — which form of exercise do you love?",
+        about:
+          "Tom cycled everywhere in Manchester for four years and arrived at everything slightly out of breath, which he considered a reasonable trade for the independence and the time to think.",
         reveal:
-          "His is cycling. It was a feature, not a bug. He always arrived with energy.",
+          "His is swimming. He picked it up in year three as a way to think without cycling. He found it worked better.",
       },
       christening: {
-        framing:
-          "Lily will discover how she likes to move — which form of exercise do you love?",
+        about:
+          "Lily will discover how she likes to move. The family have suggestions. She will find her own answer. Probably quite soon.",
         reveal:
-          "Walking, running, swimming — she'll find her thing. Which one is yours?",
+          "Walking, running, swimming — she\'ll find her thing. It\'s early days.",
       },
       achievement: {
-        framing:
-          "Marcus ran eight months to build for one morning — which form of exercise do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. Eight months of training along the same coastal route. The running is not finished.",
         reveal:
-          "His is running. Not for the race alone. For what the running gave him all the way through.",
+          "His is running. Eight months of it, the same route, the same coastline. The marathon was not the end.",
       },
       recovery: {
-        framing:
-          "Claire walked every day this year — which form of exercise do you love?",
+        about:
+          "Claire swam during her recovery — not for fitness, just for the water. She said it was the exercise that asked least of her and gave most back. She has not stopped going.",
         reveal:
-          "Hers is walking. Not for fitness. For the forward motion. For the being outside in the world.",
+          "Hers is swimming. She went back to it during recovery. She says the water was the point. She hasn\'t stopped going.",
       },
       award: {
-        framing:
-          "Dr. Amelia Grant swims before school on Tuesdays — which form of exercise do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and swims before school on Tuesdays. She has been doing this for twelve years. She says it sets everything up. The twelve years suggest she is right.",
         reveal:
-          "Hers is swimming. She's done it for twelve years. She says it sets everything else up.",
+          "Hers is Pilates. She took it up the year she got the teaching post and has not missed a week. She says it is the exercise that requires the most honesty.",
       },
       promotion: {
-        framing:
-          "Kwame runs when he needs to think clearly — which form of exercise do you love?",
+        about:
+          "After three years of excellent work, Kwame runs when he needs to think. He doesn\'t track it. He doesn\'t time it. He says that\'s the whole point — just movement, no data.",
         reveal:
-          "His is running. He doesn't track it. He doesn't time it. That's the whole point. Just movement.",
+          "His is golf. He took it up after the first promotion. He says it is the only sport that punishes thinking too much. He finds this useful.",
       },
       celebration: {
-        framing:
-          "Form of exercise is one of those things everyone has a take on — which is yours?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and how they keep moving. The exercise someone returns to says something true.",
         reveal:
-          "How someone moves through the world says something true about them…",
+          "How someone moves through the world says something true about them.",
       },
       other: {
-        framing: "Everyone has a form of exercise they love. Which is yours?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite form of exercise — how they keep moving — is always worth including.",
         reveal:
-          "How someone moves through the world says something true about them…",
+          "How someone moves through the world says something true about them.",
       },
       default: {
-        framing: "What's your favourite form of exercise?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite form of exercise is one of those things everyone has a position on.",
         reveal:
-          "How someone moves through the world says something true about them…",
+          "How someone moves through the world says something true about them.",
       },
     },
   },
+  // ── Infinite — Childhood ─────────────────────────────────────────────────────
   {
     title: "Childhood game",
     description: "What they played until dark",
@@ -3268,100 +3371,104 @@ const topics: TopicSeed[] = [
     categories: ["Childhood", "Sport"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda played conkers every autumn without fail — which childhood game do you love?",
+        about:
+          "A beloved mother and teacher who had strong views about the rules of conkers that she passed on to her children with the same precision she brought to everything else. The rules are still observed.",
         reveal:
-          "She had very strong feelings about the rules of conkers. Very strong…",
+          "Hers was conkers. She had very strong feelings about the correct rules. Her children inherited this. So did their children.",
       },
       tribute: {
-        framing:
-          "David said the only game that mattered was the one you played with complete focus — which childhood game do you love?",
-        reveal: "He was referring to chess. He said this about chess…",
+        about:
+          "A mentor who said the only game worth playing was one that required complete focus. He applied this principle to card games with an intensity that surprised people who hadn\'t played with him before.",
+        reveal:
+          "His was card games. He played them with complete focus and no mercy. He said this was a compliment to the other players.",
       },
       birthday: {
-        framing:
-          "Sarah would still play rounders tomorrow if someone organised it — which childhood game do you love?",
+        about:
+          "Sarah would play rounders tomorrow if someone organised it. She has been saying this for ten years. Nobody has organised it. She would not let the competition go if they did.",
         reveal:
-          "She can still throw. She is not subtle about this. Nor should she be…",
+          "Hers is rounders. She still has the arm. She is not subtle about this.",
       },
       retirement: {
-        framing:
-          "David always said he wanted to learn proper cricket — which childhood game do you love?",
+        about:
+          "David spent his childhood summers on a cricket pitch and spent thirty-five years saying he\'d get back to it properly. There are thirty summers ahead. The whites are in the back of the wardrobe.",
         reveal:
-          "There are thirty years of free Saturday mornings ahead. Plenty of time…",
+          "His is French cricket. He says it was better than the real thing because it required less equipment. His grandchildren will be finding this out shortly.",
       },
       wedding: {
-        framing:
-          "Emma hustles at Snap. James has been trying to beat her since 2020 — which childhood game do you love?",
-        reveal: "He hasn't. He won't. We respect it…",
+        about:
+          "Emma and James spent their first summer together in a garden playing something that seemed to involve increasingly arbitrary rules. Neither of them could explain the rules afterwards. Both of them remember it as the best afternoon.",
+        reveal:
+          "Theirs is hide and seek. The rules got more elaborate as the afternoon went on. Nobody won. Both of them consider it the best afternoon of that year.",
       },
       engagement: {
-        framing:
-          "Sophie always wins at Twenty Questions. Callum says she cheats. Which childhood game do you love?",
+        about:
+          "Callum and Sophie are both competitive in ways they do not advertise. They found this out playing something very simple on their third date. It has been part of the relationship ever since.",
         reveal:
-          "Every long drive to the Lakes, without fail. Sophie says she is simply better at asking questions.",
+          "Theirs is tag. Simple, fast, completely revealing. They found out more about each other in twenty minutes than in the two dates before it.",
       },
       anniversary: {
-        framing:
-          "They played card games on their honeymoon and still do — which childhood game do you love?",
+        about:
+          "Forty years together and they have played board games on more evenings than either of them can count. The investment in winning has never decreased. The enjoyment has never depended on it.",
         reveal:
-          "Different cards. Same energy. Same completely disproportionate investment in winning…",
+          "Theirs is board games. Forty years of them, same amount of investment, same enjoyment. They play every Christmas. It always ends the same way.",
       },
       leaving: {
-        framing:
-          "Priya always won at whatever game was being played without making anyone feel bad about it — which childhood game do you love?",
+        about:
+          "Priya was the person at the studio who knew how to make something out of nothing — a lunch break, an afternoon, a project with no clear brief. She had that since childhood. It never went anywhere.",
         reveal:
-          "That's a very specific and rare skill. We're going to miss it…",
+          "Hers was building dens. She was the one who organised it, specified the structure, and made sure it held up. Some things don\'t change.",
       },
       graduation: {
-        framing:
-          "Tom played hide and seek in the architecture faculty late at night and doesn't regret it — which childhood game do you love?",
+        about:
+          "Tom played hide and seek in the architecture faculty late at night during finals week and does not regret it. The building had excellent hiding places. He knows this professionally now.",
         reveal:
-          "The building had excellent hiding places. He knows this for professional reasons too…",
+          "His was marbles. He played with the same intensity he brings to everything. He still has them. He says this is irrelevant. It isn\'t.",
       },
       christening: {
-        framing:
-          "Lily will learn the games — which childhood game do you love?",
-        reveal:
-          "The one she'll play until called in. The one she'll teach her own children someday…",
+        about:
+          "Lily will learn the games in due course. The family have strong views about which ones matter. She will make her own list.",
+        reveal: "She\'ll find her game. The family are ready to play.",
       },
       achievement: {
-        framing:
-          "Marcus says long training runs had the quality of a childhood game — just movement, just the world — which do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He says the marathon had the same quality as one particular game from his childhood — pure effort, no strategy, just getting to the other side.",
         reveal:
-          "He hadn't thought of it that way until someone pointed it out. Now he can't unthink it…",
+          "His was British bulldogs. He says running a marathon had the same feeling. Just get across. Nothing else matters.",
       },
       recovery: {
-        framing:
-          "Claire played card games with her family all year — which childhood game do you love?",
-        reveal: "They didn't talk much. They just played. Which game is yours?",
+        about:
+          "Claire played card games with her family all through the difficult period — not talking much, just playing. She says it was the right thing to be doing. The game was the point.",
+        reveal:
+          "Hers was card games. They didn\'t talk much. They just played. She says it was exactly what she needed.",
       },
       award: {
-        framing:
-          "Amelia says the best classrooms have the energy of a playground — which childhood game do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and says the best classrooms have the energy of a good playground. She means this literally. She knows which games produce which energy.",
         reveal:
-          "She means it as a teaching philosophy. She also means it literally. She still knows the rules…",
+          "Hers is skipping. She still knows the rhymes. She uses them in primary school sessions. The children find this extremely surprising.",
       },
       promotion: {
-        framing:
-          "Kwame says product launches are basically the same as British bulldogs — which childhood game do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He says product launches are essentially the same as stuck in the mud — everyone running, certain collisions inevitable, somehow you get to the other side.",
         reveal:
-          "Everyone running, certain collisions inevitable, somehow you get to the other side. He's right…",
+          "His was stuck in the mud. He has used this analogy in three product reviews. It always lands.",
       },
       celebration: {
-        framing: "Which childhood game do you love?",
-        reveal: "The game you'd play tomorrow if someone let you…",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which game they\'d play tomorrow if someone let them. The game someone returns to in memory says something true.",
+        reveal: "The game you\'d play tomorrow if someone let you.",
       },
       other: {
-        framing: "Pick a childhood game. We're curious what it says.",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite childhood game — the one they played until it was dark — is a detail worth including.",
         reveal:
-          "The game that says something true about who you were and probably still are…",
+          "The game that says something true about who you were and probably still are.",
       },
       default: {
-        framing:
-          "Someone here has strong opinions about childhood games — what's yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite childhood game is one of those things everyone remembers clearly.",
         reveal:
-          "The game that says something true about who you were and probably still are…",
+          "The game that says something true about who you were and probably still are.",
       },
     },
   },
@@ -3372,101 +3479,110 @@ const topics: TopicSeed[] = [
     categories: ["Childhood", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda was an English teacher — but which subject do you love?",
+        about:
+          "A beloved mother and teacher who taught English for forty years and could find a metaphor in anything. Her notebooks are full of lines she was saving for the right moment.",
         reveal:
-          "She could find a metaphor in anything. Probably Geography's fault…",
+          "Hers was English. She said every other subject was English if you looked at it properly. Most of her colleagues came to agree.",
       },
       tribute: {
-        framing:
-          "David always said his real education happened after school — which subject do you love?",
+        about:
+          "A mentor who read history the way other people read novels — for the story, for what it explained about now. He thought everyone should know more of it and spent thirty years quietly making this argument.",
         reveal:
-          "He didn't mean this critically. He just kept reading, kept learning, never stopped…",
+          "His was history. He said it was the only subject that told you where you were. He had been making this argument since school.",
       },
       birthday: {
-        framing:
-          "Sarah got detention in History for arguing with the textbook. She was right — which subject do you love?",
+        about:
+          "Sarah got detention in a science lesson at fourteen for arguing with the textbook. She was right. She has never stopped arguing with things she finds incorrect. Her colleagues consider this one of her better qualities.",
         reveal:
-          "She was always the student who asked too many questions. Still is…",
+          "Hers is science. She argues with the textbook when it\'s wrong. It\'s usually wrong. She\'s usually right.",
       },
       retirement: {
-        framing:
-          "David's team say it was Drama all along, not Maths — which school subject do you love?",
-        reveal: "He says Maths. His team say Drama. Both are probably right…",
+        about:
+          "David\'s team will tell you it was drama all along, not maths. David will tell you it was maths. Both are probably right, which is what made him such a good engineer.",
+        reveal:
+          "His was maths. He says it taught him how to be certain about things. His team says that was the drama.",
       },
       wedding: {
-        framing:
-          "Emma got a D in Chemistry. James got a C. They've been arguing about why ever since — which subject do you love?",
+        about:
+          "Emma and James met in a class — not the romantic kind, an actual class, a foreign language class they both enrolled in for different reasons. The language didn\'t stick. The relationship did.",
         reveal:
-          "They met in a lab, metaphorically speaking. The chemistry was fine…",
+          "Theirs is languages. They met in a French class in 2018. They speak no French. They consider this irrelevant.",
       },
       engagement: {
-        framing:
-          "Sophie studied landscape poetry. Callum studied geography. The Lake District was inevitable. Which school subject do you love?",
+        about:
+          "Callum studied geography for two years longer than was strictly required, because he said it was the subject that made sense of everywhere. Sophie studied landscape poetry. The Lake District was, in retrospect, inevitable.",
         reveal:
-          "Sophie's is English. Callum's is Geography. She has strong opinions about Ted Hughes and the Pennines.",
+          "His is geography. He says it is the subject that explains where you are and why it matters. He applied this to the proposal.",
       },
       anniversary: {
-        framing: "They met at the same school — which subject do you love?",
+        about:
+          "Forty years together and the question of which subject was most formative has never been resolved. She says drama. He says science. They\'ve been at this since the first month.",
         reveal:
-          "She was Science. He was History. They've been explaining things to each other ever since…",
+          "Theirs is drama. They don\'t agree on this. She says drama. He says science. Drama wins because she is more convincing about it.",
       },
       leaving: {
-        framing:
-          "Priya ran every project like the best teacher runs a class — which school subject do you love?",
-        reveal: "Everyone learned. No one felt it happening. That's the skill…",
+        about:
+          "Priya ran every project at the studio with the instincts of the best art teacher — materials, space, iteration, trust. Her colleagues only realised this when she left.",
+        reveal:
+          "Hers was art. She ran projects the way good art teachers run studios. Her colleagues only understood this afterwards.",
       },
       graduation: {
-        framing:
-          "Tom's love of architecture started in a school drawing lesson — which subject do you love?",
+        about:
+          "Tom\'s love of architecture started in a drawing lesson when he was eleven and never stopped. His teacher kept a good stack of paper. Tom drew until it ran out.",
         reveal:
-          "The teacher kept a good stack of paper. Tom kept going after everyone else had stopped…",
+          "His was PE. His tutors were surprised. He said it was the subject that taught him about how bodies move through space. He applied this to architecture. His tutors revised their position.",
       },
       christening: {
-        framing:
-          "The subjects Lily loves will shape her whole world — which subject do you love?",
-        reveal: "Too early to know hers. Not too early to share yours…",
+        about:
+          "The subjects Lily will love are still to be discovered. The family have strong views about which ones should win. She will come to her own conclusions.",
+        reveal:
+          "Too early to know. The family have opinions. She\'ll have better ones.",
       },
       achievement: {
-        framing:
-          "Marcus says the maths he used to estimate his finish time was the most useful he'd ever done — which subject do you love?",
-        reveal: "He's always underestimated maths. He's revising that view…",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He says the maths he used to estimate his finish time was the most useful he had ever done. He is revising his view of the subject.",
+        reveal:
+          "His is PE. He says nothing in his education was as useful as what PE taught him about effort. He stands by this.",
       },
       recovery: {
-        framing:
-          "Claire read more this year than any year since school — which subject do you love?",
+        about:
+          "Claire read more this year than in any year since school — going back to the books she had loved and then the ones she had missed. She says reading was the best thing she did.",
         reveal:
-          "She went back to the books she loved. Then the ones she'd missed…",
+          "Hers is English. She went back to the books she\'d loved at school and found they\'d been waiting for her. They had.",
       },
       award: {
-        framing:
-          "Amelia teaches English but says every subject is really just English if you look at it right — which subject do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She teaches English alongside everything else she does — the book club, the evening sessions, the conversations that run ten minutes over. She says every subject is English if you teach it properly.",
         reveal:
-          "She makes this case persuasively. Her colleagues mostly agree…",
+          "Hers is English. She says it is the subject that teaches you how to think about everything else. Thirty years of evidence support this.",
       },
       promotion: {
-        framing:
-          "Kwame says everything he needed to know about shipping products he learned in GCSE Physics — which subject do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He says everything he needed to know about shipping products he learned in GCSE physics — force, friction, velocity, the cost of resistance.",
         reveal:
-          "He means force, friction, velocity. Also he means it metaphorically. Both are true…",
+          "His is maths. He says it taught him to be precise when precision matters and approximate when it doesn\'t. He applies this daily.",
       },
       celebration: {
-        framing: "Everyone has a school subject that shaped them — which one did you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which school subject shaped them most. The lesson someone loved is always worth knowing.",
         reveal:
           "The lesson that actually shaped you — which one, and what did it give you?",
       },
       other: {
-        framing: "We want to know your favourite school subject.",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite school subject — the one they were made for — is a detail worth including.",
         reveal:
           "The subject you were made for — which one, and what did it give you?",
       },
       default: {
-        framing: "Which school subject do you love?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite school subject is one of those things everyone has a strong feeling about.",
         reveal:
           "The subject you were made for — which one, and what did it give you?",
       },
     },
   },
+  // ── Infinite — Literature ────────────────────────────────────────────────────
   {
     title: "Type of book",
     description: "What they loved to read",
@@ -3474,99 +3590,103 @@ const topics: TopicSeed[] = [
     categories: ["Literature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda read biography — proper long ones, nothing abridged — which type of book do you love?",
+        about:
+          "A beloved mother and teacher who read proper biographies — long ones, nothing abridged. She always had three on the go and could tell you where each one was up to without consulting any of them.",
         reveal:
-          "She always had three on the go. Never confused a word from any of them…",
+          "Hers was biography. Long ones, never abridged. She said a life well documented was a gift worth giving.",
       },
       tribute: {
-        framing:
-          "David read widely but came back to biography every time — which type of book do you love?",
+        about:
+          "A mentor who read history the way other people read thrillers — for the pace of it, the reversals, the moments where everything could have gone differently. He thought everyone should read more of it.",
         reveal:
-          "He believed a life well documented was a gift. He tried to live that way himself…",
+          "His was history. He said it was the only honest narrative. He recommended three books to everyone he liked.",
       },
       birthday: {
-        framing:
-          "Sarah reads everything but always comes back to travel writing — which type of book do you love?",
+        about:
+          "Sarah reads everything but comes back to one kind above all others — the kind with a journey in it, real or imagined. She marks passages and tells people about them at dinner. Her friends have started doing the same.",
         reveal:
-          "She marks passages and tells people about them at dinner. This is as wonderful as it sounds…",
+          "Hers is travel writing. She reads it wherever she goes and wherever she doesn\'t. She marks passages. She tells everyone about them.",
       },
       retirement: {
-        framing:
-          "David's reading pile has been growing for a decade — which type of book do you love?",
+        about:
+          "David has a bookshelf that tells the story of thirty-five years more clearly than any CV. He is retiring. He is going to write the next chapter himself.",
         reveal:
-          "The biography section alone takes up two shelves. Time to make a start…",
+          "His is memoir. He reads them for the honesty. He says he\'s been keeping notes for years. He probably has.",
       },
       wedding: {
-        framing:
-          "She reads novels. He reads history. They read each other's out loud anyway — which type of book do you love?",
-        reveal: "Neither of them considers this unusual. It isn't…",
+        about:
+          "Emma and James share books with each other — not because they have to, but because they always have something to say about what they\'ve read and the other person is always interested. This has been true since the second month.",
+        reveal:
+          "Theirs is the novel. She reads, he reads, they discuss. They haven\'t agreed on a book yet. They\'re always going to have the conversation.",
       },
       engagement: {
-        framing:
-          "Between them, Sophie & Callum have an excellent library and never argue about what to read next — which type of book do you love?",
+        about:
+          "Sophie studied landscape poetry at university and never quite stopped reading it. Callum studied geography. They discovered these were not as different as they seemed, on their second date, in a pub, for an hour.",
         reveal:
-          "Sophie reads poetry and contemporary fiction. Callum reads history and walking guidebooks. They both know how unusual this is.",
+          "Hers is short stories. She says they are the form that respects the reader\'s time. Callum has been working through her recommendations for two years.",
       },
       anniversary: {
-        framing:
-          "They've shared books for forty years — some arguments, mostly recommendations — which type do you love?",
+        about:
+          "Forty years of reading together — not always the same books, always books. She annotates. He doesn\'t. They have made peace with this. Mostly.",
         reveal:
-          "She annotates. He doesn't. They've made peace with this. Mostly…",
+          "Theirs is crime fiction. They\'ve read it together for years. She solves it first. He disputes this. She is usually right.",
       },
       leaving: {
-        framing:
-          "Priya would write a book about her time here that you'd recommend to people you like — which type of book do you love?",
-        reveal: "Fast, warm, ends well. That's the book. Which type is yours?",
+        about:
+          "Priya would write a book about her time at the studio that you\'d recommend to people you liked. She knows this. She has been taking notes since year one.",
+        reveal:
+          "Hers is children\'s books. She says they are the ones that tell the truth clearly. She reads them for the clarity.",
       },
       graduation: {
-        framing:
-          "Tom spent three years reading technical manuals and says he now craves something different — which type do you love?",
+        about:
+          "Tom spent four years reading technical literature and has a list of everything else he\'s been meaning to read since the first year. The list is long. He is starting from the top.",
         reveal:
-          "His reading list now contains approximately zero structural calculations. The switch is complete…",
+          "His is science fiction. He says it is the only genre that takes the future seriously. His tutors say this explains a great deal about his work.",
       },
       christening: {
-        framing:
-          "Lily's first books are already being chosen — which type do you love?",
+        about:
+          "Lily\'s parents are already building her library. They have very different views about where to start. They have agreed on the first shelf. The rest is under discussion.",
         reveal:
-          "She'll grow into every kind. Tell us which one is yours and why…",
+          "Her library is starting. The first shelf has been decided. It is mostly picture books. This is correct.",
       },
       achievement: {
-        framing:
-          "Marcus read a running memoir during training — which type of book do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He picked up one kind of book during training that he hadn\'t expected to read and found he couldn\'t stop.",
         reveal:
-          "He found the genre late. He's now in it completely. Highly recommended…",
+          "His is nature writing. He started reading it during training. He says it taught him to pay attention to the coastline he was running along. He is still reading it.",
       },
       recovery: {
-        framing:
-          "Claire read poetry this year — said it worked because it didn't demand too much — which type do you love?",
+        about:
+          "Claire read poetry during her recovery because it didn\'t ask too much of her — each poem was complete in itself, small and whole. She has continued reading it. The poems are no longer small to her.",
         reveal:
-          "Short, true, done in five minutes. She needed that. The poetry delivered…",
+          "Hers is poetry. Short, complete, honest. She needed that. She kept reading it after she didn\'t need it that way any more.",
       },
       award: {
-        framing:
-          "Amelia assigns books that change how students see themselves — which type do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She has a list of books she gives to different students at different moments. The list has been growing for twenty years. She never gives the same one twice.",
         reveal:
-          "She has a list. It changes every year. The principle never does…",
+          "Hers is history. She says it is the subject that teaches you what is actually difficult. She assigns it whenever she thinks a student is ready.",
       },
       promotion: {
-        framing:
-          "Kwame reads only one type of business book but reads everything else — which type do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He is very specific about which books in one genre earn the distinction. Not many do. The ones that do, he reads twice.",
         reveal:
-          "He's very specific about which business books earn the distinction. Not many do…",
+          "His is self-help — the good kind. He reads it rigorously and discards most of it. What remains, he uses. His team has noticed.",
       },
       celebration: {
-        framing: "What's your favourite type of book?",
-        reveal:
-          "A bookshelf is a portrait. Which type is yours, and what does it say?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which type of book says something true about them. A bookshelf is a portrait.",
+        reveal: "A bookshelf is a portrait. Which type of book is yours?",
       },
       other: {
-        framing: "We want to know your favourite type of book.",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite type of book — the one they always come back to — is a detail worth including.",
         reveal:
           "A bookshelf is a portrait. Which type of book is yours, and what does it say?",
       },
       default: {
-        framing: "Pick a type of book. We're curious what it says.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite type of book is one of those things everyone has strong feelings about.",
         reveal:
           "A bookshelf is a portrait. Which type of book is yours, and what does it say?",
       },
@@ -3579,103 +3699,110 @@ const topics: TopicSeed[] = [
     categories: ["Literature"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda always had a Mary Oliver line ready for exactly the right moment — which poet do you love?",
+        about:
+          "A beloved mother and teacher who always had the right line for the right moment. She wrote them on cards and left them for people to find. You\'d come across one months later and understand why she\'d chosen it.",
         reveal:
-          "She'd write lines on cards and leave them for people to find. You'd come across one months later…",
+          "Hers was Mary Oliver. She could find the line that applied to exactly where you were. She left them for people.",
       },
       tribute: {
-        framing:
-          "David always had the right poem for the right moment — which poet do you love?",
+        about:
+          "A mentor who produced poems without making it feel like a performance — the right one, at the right moment, without explanation. His colleagues came to understand that this was a skill he had been practising for decades.",
         reveal:
-          "He'd produce it without making it feel like a performance. That's the hardest thing to do…",
+          "His was Philip Larkin. He\'d produce a line without context and it was always exactly right. He never needed to explain why.",
       },
       birthday: {
-        framing:
-          "Sarah quoted Seamus Heaney in a birthday speech once and made someone cry — which poet do you love?",
+        about:
+          "Sarah quoted a poem at a dinner party once and made someone cry. She says she doesn\'t read poetry. There are four collections on her bedside table. Both things are true.",
         reveal:
-          "She says she doesn't read poetry. There are three collections on her bedside table…",
+          "Hers is Pam Ayres. She says this without apology. She is entirely right to.",
       },
       retirement: {
-        framing:
-          "A career like David's deserves the right poem — which poet do you love?",
+        about:
+          "David\'s leaving do deserves the right poem — not the obvious one, the one that says thirty-five years of one thing better than any speech could. Whoever gives the speech will need to have done their reading.",
         reveal:
-          "Whose voice says thirty-five years better than any speech could?",
+          "His is John Betjeman. He says Betjeman understood what England actually looked like. Thirty-five years of engineering confirms this.",
       },
       wedding: {
-        framing:
-          "Emma had chosen the poem years before she met James — which poet do you love?",
+        about:
+          "Emma had chosen the poem for her wedding years before she met James. She hadn\'t told him this when they got together. She told him on the train to the venue. He said it was exactly the right poem. It was.",
         reveal:
-          "She never told him that. Until she did. It was the right poem…",
+          "Hers is W.B. Yeats. She\'d known the poem since she was nineteen. James agreed immediately. That settled it.",
       },
       engagement: {
-        framing:
-          "Callum read a MacCaig poem Sophie left open on the kitchen table. He's never said which one. Sophie has never asked. Which poet do you love?",
+        about:
+          "Sophie left a poetry collection on the kitchen table once. Callum read it without mentioning this for three weeks. He has since read everything else by the same poet. Sophie found this out by accident. She considers it one of the better things she knows about him.",
         reveal:
-          "Norman MacCaig. Sophie keeps the collection in her bag on every walk.",
+          "His is Seamus Heaney. Sophie left the collection on the table. He read it without saying so for three weeks.",
       },
       anniversary: {
-        framing:
-          "Their wedding had a poem — they still read it every year — which poet do you love?",
+        about:
+          "Their wedding had a poem. They read it every anniversary. The same words mean something different every year and something entirely the same.",
         reveal:
-          "The same poem. The same words. Forty years later they mean something different and exactly the same…",
+          "Theirs is Dylan Thomas. The wedding poem. Every anniversary. Different understanding, same feeling.",
       },
       leaving: {
-        framing:
-          "Priya deserves the right poem — not the obvious one — which poet do you love?",
+        about:
+          "Priya deserves the right poem for this moment. Not the obvious one. The one that says what everyone actually means when they say they\'ll miss her.",
         reveal:
-          "The one that says what everyone actually means. Whose voice is that?",
+          "Hers is Maya Angelou. She\'d say she doesn\'t need a poem. She\'s wrong.",
       },
       graduation: {
-        framing:
-          "Tom's graduation speech included a poem and nobody was embarrassed — which poet do you love?",
-        reveal: "He chose it well. The room was very quiet. That's the test…",
+        about:
+          "Tom\'s graduation speech included a poem nobody was embarrassed by. He chose it himself. The room was very quiet. That is the test.",
+        reveal:
+          "His is Ted Hughes. He chose it for the graduation speech and the room was quiet. He considers this the standard.",
       },
       christening: {
-        framing: "Every child should inherit a poem — which poet do you love?",
+        about:
+          "Every child should have a poem that belongs to them. Lily\'s is still to be decided. The family have suggestions. She will choose her own in time.",
         reveal:
-          "One line that's just for her. Which poet would you want Lily to love?",
+          "Theirs is Roger McGough. They want her to have a poet who is funny and true at the same time. They\'ve started there.",
       },
       achievement: {
-        framing:
-          "Marcus says there's a poem that describes running a marathon better than anything written about sport — which poet do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He says there is a poem that describes running a marathon better than anything written about sport. He has found several candidates.",
         reveal:
-          "He's looked for it. He's found several candidates. He'll tell you which ones…",
+          "His is Wilfred Owen. He says the poems are about effort and endurance in conditions that shouldn\'t be endured. He ran the marathon with one line in his head.",
       },
       recovery: {
-        framing:
-          "Claire found a poet who seemed to understand exactly what the year had been like — which poet do you love?",
-        reveal: "She read the same poem many times. It held up every time…",
+        about:
+          "Claire found a poet during her recovery who seemed to understand exactly what the year had been like — not to make it better, just to name it. She reread the same poems many times. They held up.",
+        reveal:
+          "Hers is Emily Dickinson. She said the poems were written for exactly this. She was right.",
       },
       award: {
-        framing:
-          "Amelia believes a good teacher should be able to name three poets — which poet do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She believes every teacher should be able to name three poets. She has more than three. She can recite from all of them. She doesn\'t advertise this.",
         reveal:
-          "She has more than three. She can recite from memory. She doesn't advertise this…",
+          "Hers is William Shakespeare. She says he understood every kind of person. She tests her students on this. They tend to agree.",
       },
       promotion: {
-        framing:
-          "Kwame says he reads poetry for the compression — which poet do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He reads poetry for the compression — the way good lines do more with less. He has applied this to every product description he has ever written.",
         reveal:
-          "He means the way good lines do more with less. He's applied this to product copy ever since…",
+          "His is R.S. Thomas. He says the poems understand that some things are worth doing slowly. He applies this to product.",
       },
       celebration: {
-        framing: "Poetry belongs at good occasions — which poet do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which poet speaks for them. Some poets just speak for particular people.",
         reveal:
           "Some poets just speak for particular people. Which voice is yours?",
       },
       other: {
-        framing: "Someone here has strong opinions about poetry — which poet do you love?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite poet — the voice that says what they can\'t always say themselves — is worth including.",
         reveal:
           "Some poets just speak for particular people. Which voice is yours?",
       },
       default: {
-        framing: "Pick a poet. We're curious what it says.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite poet is one of those choices that always says something.",
         reveal:
           "Some poets just speak for particular people. Which voice is yours?",
       },
     },
   },
+  // ── Infinite — Everyday life ─────────────────────────────────────────────────
   {
     title: "Hobby",
     description: "What they did just for love of it",
@@ -3683,205 +3810,214 @@ const topics: TopicSeed[] = [
     categories: ["Everyday life", "Nature"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda gardened like it was a form of prayer — which hobby do you love?",
+        about:
+          "A beloved mother and teacher who gardened like it was a form of prayer. She said once that the garden taught her everything she knew about patience. Her children think this is exactly right.",
         reveal:
-          "The garden is still there. Someone else is tending it now. They're doing their best…",
+          "Hers was gardening. She said it taught her everything she knew about patience. The garden is still there. Someone else is tending it now.",
       },
       tribute: {
-        framing:
-          "David made furniture as a young man and gave a piece to everyone he loved — which hobby do you love?",
+        about:
+          "A mentor who made furniture as a young man and gave a piece to everyone he loved. His colleagues didn\'t know this until the leaving do, when the pieces were mentioned. Every house in the room had one.",
         reveal:
-          "Every house he knew had something he'd made. He never mentioned it. They always knew…",
+          "His was woodwork. He gave something he\'d made to everyone he cared about. He never mentioned it. They always knew.",
       },
       birthday: {
-        framing:
-          "Sarah took up photography three years ago and now sees everything differently — which hobby do you love?",
+        about:
+          "Sarah took up photography three years ago and now sees everything differently. She\'d be horrified if you called it a hobby. She considers it a discipline. The photographs agree.",
         reveal:
-          "She'd be horrified if you called it a hobby. It's a discipline, she'd say…",
+          "Hers is photography. She took it up three years ago and sees everything differently now. She does not call it a hobby. She is right not to.",
       },
       retirement: {
-        framing:
-          "David mentioned woodwork once in passing and the team have been thinking about it ever since — which hobby do you love?",
+        about:
+          "David mentioned fishing once in passing eight years ago and his team have thought about it ever since. He is retiring. The rod has been in the garage since 2004.",
         reveal:
-          "Thirty-five years of work. Now time for the thing done purely for love of it…",
+          "His is fishing. The rod has been in the garage since 2004. He has retired. He is going.",
       },
       wedding: {
-        framing:
-          "Emma and James started cooking properly together and now have serious opinions about knives — which hobby do you love?",
-        reveal: "They found the shared thing. It feeds them in every sense…",
+        about:
+          "Emma and James started cooking properly together in year two of the relationship and now have opinions about knives that their friends find amusing and their kitchen confirms are correct.",
+        reveal:
+          "Theirs is cooking. They found the shared thing. It feeds them in every sense. The knives are, yes, excessive.",
       },
       engagement: {
-        framing:
-          "Sophie volunteers for Mind. Callum fundraises alongside her. They've found a way to share it without it being the same thing. Which hobby do you love?",
+        about:
+          "Sophie volunteers at a community garden every Saturday morning and has done since university. Callum joined her in year two of the relationship. He has opinions about soil now. He considers this a development.",
         reveal:
-          "Walking, and separately: Sophie started with Mind at university and hasn't stopped. Callum joined her.",
+          "Hers is volunteering. Same community garden, every Saturday, for eight years. Callum now comes. He has opinions about soil. She considers this a success.",
       },
       anniversary: {
-        framing:
-          "They both garden, separately, in different ways, without ever overlapping — which hobby do you love?",
+        about:
+          "Forty years together and she has knitted through every conversation, every film, every evening worth having. He says it is meditative. She says she just likes something to do with her hands.",
         reveal:
-          "She does the flowers. He does the vegetables. They've never once trespassed. It works perfectly…",
+          "Hers is knitting. She has knitted through forty years of evenings. The grandchildren are all wearing evidence of this.",
       },
       leaving: {
-        framing:
-          "Priya once mentioned she used to paint. Three years ago. She hasn't mentioned it since — which hobby do you love?",
-        reveal: "The days are her own now. Maybe this is the time…",
+        about:
+          "Priya drew things obsessively as a child, studied something more practical, and never quite stopped drawing. The margins of her notebooks are full of it. Nobody at the studio saw this coming.",
+        reveal:
+          "Hers was painting and drawing. The notebooks have been full of it for years. She never stopped. She just didn\'t tell anyone.",
       },
       graduation: {
-        framing:
-          "Tom has three hobbies he abandoned during finals and plans to return to all of them — which hobby do you love?",
+        about:
+          "Tom played in bands at school, studied architecture, and has been saying he\'ll play properly again since year one. He has graduated. The guitar is available.",
         reveal:
-          "The list is specific. The intention is real. He's written it down…",
+          "His is playing music. He has played in bands since he was fifteen. He stopped for architecture. He is starting again.",
       },
       christening: {
-        framing:
-          "One day Lily will have a hobby she can't live without — which hobby do you love?",
+        about:
+          "Lily will find the thing she loves doing for its own sake. The family have views on which direction to point her. She will find the thing herself.",
         reveal:
-          "The thing she does purely for love of it. Tell us yours while we wait for hers…",
+          "She\'ll find her thing. The family are ready to make room for it.",
       },
       achievement: {
-        framing:
-          "Marcus says running went from exercise to hobby to vocation in eight months — which hobby do you love?",
-        reveal: "He didn't plan that. He's not complaining…",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He walks — really walks, not as training — on the days he doesn\'t run. He says it is completely different and he needs both.",
+        reveal:
+          "His is walking. Different from running, different purpose. He says you think different things. He needs both.",
       },
       recovery: {
-        framing:
-          "Claire went back to a hobby she'd stopped years ago — which hobby do you love?",
+        about:
+          "Claire read more this year than in any year she can remember — slowly, without agenda, just the book and the afternoon. She says it was the hobby that cost her nothing and gave back the most.",
         reveal:
-          "She was surprised how easily it came back. Some things wait for you…",
+          "Hers is reading. She always read. This year she read properly. She says the difference is significant.",
       },
       award: {
-        framing:
-          "Amelia runs a book club outside school hours and says it's the best use of a Tuesday evening — which hobby do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She birdwatches on Saturday mornings and has done for twenty years. Her students don\'t know this. She has never explained the connection between birdwatching and teaching. It is, they would find, exact.",
         reveal:
-          "Not an extension of work. Genuinely separate. She's clear about the distinction…",
+          "Hers is birdwatching. Saturday mornings, notebook, same hedgerow for twenty years. She says it teaches the same attention as teaching. It does.",
       },
       promotion: {
-        framing:
-          "Kwame took up cooking properly when the promotion gave him more financial room — which hobby do you love?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He does the crossword every morning without looking anything up, which his partner finds impressive and his colleagues find entirely predictable.",
         reveal:
-          "He's been systematic about it. He has a list of techniques. He's working through them…",
+          "His is crosswords. Every morning, no looking things up. He says it sets the brain up. His team suspects he\'s right.",
       },
       celebration: {
-        framing:
-          "Hobby is one of those things everyone has a take on — which do you love?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what they do purely for love of it. The hobby someone returns to says something true.",
         reveal:
-          "Not a job, not an obligation. The thing that's entirely yours…",
+          "What do you do purely for love of it? Not for fitness, not for work — just because it\'s yours.",
       },
       other: {
-        framing: "Pick a hobby. We're curious what it says.",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite hobby — the thing they do purely for love of it — is worth including.",
         reveal:
-          "Not a job, not an obligation. The thing that's entirely yours…",
+          "What do you do purely for love of it? Not for fitness, not for work — just because it\'s yours.",
       },
       default: {
-        framing: "We want to know your favourite hobby.",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite hobby is one of those things everyone has strong feelings about.",
         reveal:
-          "Not a job, not an obligation. The thing that's entirely yours…",
+          "What do you do purely for love of it? Not for fitness, not for work — just because it\'s yours.",
       },
     },
   },
   {
     title: "Way to spend Sunday",
-    description: "Their perfect day of rest",
+    description: "Their idea of a perfect day off",
     is_finite: false,
-    categories: ["Everyday life", "Time"],
+    categories: ["Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda's Sunday was church, garden, long lunch, Radio 4 — which is your ideal way to spend Sunday?",
+        about:
+          "A beloved mother and teacher who made Sundays the most important day of the week. The schedule was long-established and defended by everyone who loved her. It was the best day of the week.",
         reveal:
-          "If you wanted her on a Sunday, you had to know the schedule. It was sacred…",
+          "Hers was roast dinner with family. Noon arrival, table set, radio on. Nobody left before four. That was the point.",
       },
       tribute: {
-        framing:
-          "David's Sunday was a long lunch, a long walk, and whatever he was reading — which is your ideal way to spend Sunday?",
+        about:
+          "A mentor who kept Sundays for walking. Nobody was invited, nobody was excluded. He walked until he had thought through whatever needed thinking through and then went home. Everyone knew not to call on a Sunday.",
         reveal:
-          "He was unavailable on Sundays. It wasn't rudeness. It was a system…",
+          "His was the long walk. Every Sunday. He came back having decided whatever needed deciding. Nobody called on a Sunday. Everyone understood this.",
       },
       birthday: {
-        framing:
-          "Sarah's ideal Sunday involves brunch, a long walk, and dinner she starts at 4pm — what's yours?",
+        about:
+          "Sarah has very clear views about what Sunday mornings are for and will not be persuaded that any other position is reasonable. She holds this view with conviction and without apology.",
         reveal:
-          "She has a Sunday playlist that lasts all day. Exactly as long as it should…",
+          "Hers is the lie in. She is not negotiating on this. Sunday mornings are not for early starts. That is the rule.",
       },
       retirement: {
-        framing:
-          "David has been planning his first free Sunday for thirty-five years — what's your ideal Sunday?",
-        reveal: "The garden is ready. The coffee is on. The plan is: no plan…",
+        about:
+          "David has known for years exactly what he would do with Sundays when he retired. The plan is specific. The garden is waiting.",
+        reveal:
+          "His is pottering in the garden. No plan, no goal. Just the garden and whatever it needs. He has been saving this for thirty-five years.",
       },
       wedding: {
-        framing:
-          "She wants stillness. He wants activity. They found the midpoint — what's your ideal Sunday?",
+        about:
+          "Emma and James spend their Sundays cooking something with more components than a weeknight can accommodate. They have a system. It involves several hours, at least one argument, and a very good result.",
         reveal:
-          "The midpoint involves cooking. Long cooking. It works for both of them…",
+          "Theirs is cooking something special. Long recipe, several hours, at least one disagreement. Always worth it.",
       },
       engagement: {
-        framing:
-          "Long walk in the morning, Callum's pasta in the evening — Sophie & Callum's Sunday hasn't changed in four years. What's your ideal way to spend Sunday?",
-        reveal: "Everything else negotiable. It's the Sunday they'll keep.",
+        about:
+          "Sophie and Callum drive somewhere different every few Sundays — not very far, not very planned. Callum has a list. Sophie has different preferences. The list serves as a starting point.",
+        reveal:
+          "Theirs is a drive in the countryside. Callum has a list. Sophie has opinions about the list. They always find somewhere good.",
       },
       anniversary: {
-        framing:
-          "Forty years of Sundays and the format has never really changed — what's your ideal Sunday?",
+        about:
+          "Forty years together and the pub lunch has been the Sunday structure for most of them. Same pub for twenty years, different pub before that, the arrangement always the same.",
         reveal:
-          "The morning is theirs. The afternoon is theirs. The evening is theirs. Same as always…",
+          "Theirs is the pub lunch. Same table, same order, forty years. They say it is the most reliable thing they have. They mean it as a compliment.",
       },
       leaving: {
-        framing:
-          "Priya described the perfect Sunday in a meeting once. It starts with a proper lie-in — what's yours?",
+        about:
+          "Priya always had somewhere new she was meaning to get to. The list was long and she worked through it methodically. She is leaving with a long list and no more excuses. The timing is finally right.",
         reveal:
-          "No alarms. No plans until noon. That's the Sunday she's earned…",
+          "Hers is visiting somewhere new. She had a list. She worked through it. She\'s leaving with the next chapter of the list ready.",
       },
       graduation: {
-        framing:
-          "Tom says the first Sunday after graduating felt like a gift he didn't know what to do with — what's your ideal Sunday?",
+        about:
+          "Tom has not done nothing on a Sunday since he started architecture school four years ago. He has strong plans for the Sunday after graduation. They involve the absolute absence of plans.",
         reveal:
-          "He eventually figured it out. It involved sleeping past 9am for the first time in three years…",
+          "His is doing absolutely nothing. He has been planning this Sunday since year one. No sketchbook, no laptop, no ambition. He has earned this.",
       },
       christening: {
-        framing:
-          "Lily is currently making Sunday a very specific kind of adventure — what's your ideal Sunday?",
+        about:
+          "Lily has reorganised Sunday mornings entirely and without apology. Her parents have adapted. They are enjoying this more than they expected.",
         reveal:
-          "It involves very early mornings. This is, apparently, fine. We're adjusting…",
+          "Her parents are discovering new shapes for Sundays. She is the one deciding the shape. Everyone agrees it\'s better.",
       },
       achievement: {
-        framing:
-          "Marcus's first Sunday after the marathon was the most complete rest he'd had in eight months — what's your ideal Sunday?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He trained on Sunday mornings for eight months. His Sunday is about to change significantly.",
         reveal:
-          "He did absolutely nothing. He has strong feelings about how well it worked…",
+          "His is the long walk. Post-marathon, no running, no target. Just moving because he can. He says the walk is earned.",
       },
       recovery: {
-        framing:
-          "Claire found a Sunday routine this year and says it held everything together — what's your ideal Sunday?",
+        about:
+          "Claire spent many Sundays this year reading. Not catching up, not research — just reading, with no obligations attached. She says she is keeping this arrangement.",
         reveal:
-          "Small, dependable, exactly the same each week. Which is why it worked…",
+          "Hers is reading all day. She kept Sundays for it this year and is not giving them back.",
       },
       award: {
-        framing:
-          "Amelia says Sunday exists to make Monday possible — what's your ideal Sunday?",
+        about:
+          "Amelia has just been named Teacher of the Year. Her Sundays involve watching sport with a level of commitment her colleagues find surprising and consistent.",
         reveal:
-          "She means this practically and philosophically. Both are correct…",
+          "Hers is watching sport. The same Sunday fixture, same level of investment, since approximately 1998. She has never considered changing this.",
       },
       promotion: {
-        framing:
-          "Kwame has been building his ideal Sunday for years and recently had the time to actually do it — what's your ideal Sunday?",
+        about:
+          "After three years of excellent work, Kwame has been promoted to Head of Product. He celebrates every significant moment at the same pub with the same people in the same way.",
         reveal:
-          "He doesn't share the details. Whatever it involves, it's clearly working…",
+          "His is the pub lunch. Same people, same pub, same Sunday. He says continuity is underrated.",
       },
       celebration: {
-        framing: "What's your ideal way to spend Sunday?",
-        reveal: "Sunday is a portrait of a person. What does yours say?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what their ideal Sunday looks like. How someone spends their best free day is always worth knowing.",
+        reveal: "The ideal Sunday — what does yours look like?",
       },
       other: {
-        framing:
-          "Someone here has strong opinions about how Sunday should be spent — what's yours?",
-        reveal: "Sunday is a portrait of a person. What does yours say?",
+        about:
+          "Tell us who this person is and why you\'re gathering. How someone spends their Sunday says a great deal about them.",
+        reveal: "The ideal Sunday — what does yours look like?",
       },
       default: {
-        framing:
-          "Sunday is one of those things everyone has a take on — what's your ideal?",
-        reveal: "Sunday is a portrait of a person. What does yours say?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite way to spend Sunday is one of those things everyone has strong feelings about.",
+        reveal:
+          "The ideal Sunday — what does yours look like, and what does it tell you?",
       },
     },
   },
@@ -3889,258 +4025,248 @@ const topics: TopicSeed[] = [
     title: "Smell",
     description: "Scent that took them somewhere",
     is_finite: false,
-    categories: ["Nature", "Childhood", "Everyday life"],
+    categories: ["Everyday life", "Nature"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda's house always smelled of bread baking and lavender — which smell do you love?",
+        about:
+          "A beloved mother and teacher who grew lavender in every garden she ever had. The smell attached itself to the rooms she\'d been in and the people who\'d been close to her. It doesn\'t require explanation.",
         reveal:
-          "You could tell what day of the week it was by what was coming from her kitchen. Wednesday was always bread…",
+          "Hers was lavender. It grew in every garden she ever had. It attached itself to everything she touched.",
       },
       tribute: {
-        framing:
-          "David's study always smelled of books and something from the kitchen — which smell do you love?",
+        about:
+          "A mentor who had more books than shelves and had arranged them according to a system only he fully understood. His office smelled of them before you noticed anything else. His colleagues associate the smell with good thinking.",
         reveal:
-          "It was entirely him. Nobody went in there and didn't notice it…",
+          "His was old books. The office smelled of them. His colleagues associate it with every conversation worth having.",
       },
       birthday: {
-        framing:
-          "Sarah bought a candle that smelled of old library and burned it every evening for a month — which smell do you love?",
+        about:
+          "Sarah has strong opinions about the morning and what it should smell like. She has a coffee machine with specific settings that she defends with conviction. Her guests always agree it was worth it.",
         reveal:
-          "She claims to be immune to nostalgia. The candle tells a different story…",
+          "Hers is coffee in the morning. Specific coffee, specific machine, non-negotiable settings. She says it sets everything up. It does.",
       },
       retirement: {
-        framing:
-          "David's office smelled of coffee and something indefinably calm for thirty-five years — which smell do you love?",
+        about:
+          "David is retiring with plans to spend more time outdoors, in conditions that most people describe as unsuitable, at a time of year most people prefer to observe from inside. He will be very happy.",
         reveal:
-          "Whoever moves in there next will notice immediately. Some smells belong to someone…",
+          "His is bonfire. Autumn, outdoor fire, the day done. He has been planning this since the eighties.",
       },
       wedding: {
-        framing:
-          "The wedding field smelled of cut grass, something floral, and a distant bonfire — which smell do you love?",
+        about:
+          "Emma and James got married in a garden that had been rained on the previous night. Everyone commented on the smell. It was, they both agreed afterwards, the best thing about the venue.",
         reveal:
-          "Everyone who was there still remembers it. That's the smell of the day…",
+          "Theirs is garden after rain. The morning of the wedding. They both noticed it immediately. Nobody had planned it.",
       },
       engagement: {
-        framing:
-          "Callum says Sophie looked up when the breeze changed and that was when he knew the moment was right. Which smell do you love?",
+        about:
+          "Sophie has a smell she associates with safety and arrival — one specific and domestic smell that means everything is fine. Callum worked this out without being told. He is proud of this.",
         reveal:
-          "Damp bracken and cold air — a high fell path in October. She still doesn't know what gave it away.",
+          "Hers is fresh laundry. Specifically the smell of sheets dried outside in summer. She said once that it meant everything was fine. Callum remembered.",
       },
       anniversary: {
-        framing:
-          "Their house has smelled the same for forty years — which smell do you love?",
+        about:
+          "Forty years together and the kitchen on a Sunday morning still smells the same way it has for forty years. Neither of them has commented on this. Neither of them needs to.",
         reveal:
-          "You can't identify it exactly. You'd know it anywhere. Some smells are just a home…",
+          "Theirs is bread baking. Sunday mornings, forty years. The smell means the day is exactly what it should be.",
       },
       leaving: {
-        framing:
-          "Priya wore the same perfume for six years — which smell do you love?",
+        about:
+          "Priya grew up near the coast and says the sea air is the smell she missed most when she came inland. She is going somewhere where she won\'t have to miss it any more.",
         reveal:
-          "The office will smell different without her. We're not quite ready to say it yet…",
+          "Hers is sea air. She missed it every year she was away from the coast. She is going back.",
       },
       graduation: {
-        framing:
-          "Tom says architecture studios have a specific smell he'll always find moving — which smell do you love?",
+        about:
+          "Tom has a specific smell he associates with the best thinking — stone, candle wax, cold air, centuries of quiet concentration. He has been pursuing this smell since his first tutorial.",
         reveal:
-          "Pencil shavings, model glue, cold coffee, paper. That's three years, right there…",
+          "His is old churches. Stone, cold, quiet. He says it is the smell of thinking that has been happening for a long time. He finds this useful.",
       },
       christening: {
-        framing:
-          "Lily has the very specific smell of being completely new — which smell do you love?",
+        about:
+          "The christening was in June and the village green had just been cut. The family were outside for the photographs. The smell was exactly right.",
         reveal:
-          "She'll have her own eventually. For now she has the one that belongs only to the very start…",
+          "Freshly cut grass. The village green, June, just after the photographs. The smell of the right day at the right time.",
       },
       achievement: {
-        framing:
-          "Marcus says he'll always love the smell of rain on pavements now — which smell do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He ran the same coastal route for eight months and says the sea air on cold mornings will always mean something specific to him now.",
         reveal:
-          "Eight months of early mornings. Mostly cold. Mostly rain on the pavement. Mostly perfect…",
+          "His is sea air. Cold morning, coast, wind off the water. He says it will always mean the same thing now.",
       },
       recovery: {
-        framing:
-          "Claire said certain smells helped — grounding, familiar, specifically comforting — which smell do you love?",
+        about:
+          "Claire walked in the same park every day during her recovery. When it rained and then stopped, she would stay a little longer. She says she was looking for something and that smell was part of finding it.",
         reveal:
-          "She couldn't have explained why. The smells knew what they were doing…",
+          "Hers is garden after rain. She walked every day. After rain, she stayed longer. She says it smelled like things were still growing.",
       },
       award: {
-        framing:
-          "Amelia says every classroom has its own smell and she can identify the good ones — which smell do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year and has been in libraries and school halls and old buildings her whole adult life. There is one smell she would not swap for any other.",
         reveal:
-          "Chalk dust, old paper, a specific kind of concentration. She could describe it exactly…",
+          "Hers is old books. Libraries, school halls, the smell of knowledge that has been handled. She says it tells you something good is about to happen.",
       },
       promotion: {
-        framing:
-          "Kwame associates the smell of good coffee with decisions well made — which smell do you love?",
+        about:
+          "After three years of excellent work, Kwame walked home in the rain after hearing the news. He says the smell of the wet city was entirely right for the moment. It smelled like arrival.",
         reveal:
-          "He's specific about the coffee and about the decisions. Both have high standards…",
+          "His is rain on dry earth — petrichor, specifically. He walked home in it after hearing the news. He says it smelled like things starting.",
       },
       celebration: {
-        framing: "Pick a smell. We're curious where it takes you.",
-        reveal:
-          "Scent is the most honest memory. Which smell is yours, and where does it take you?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which smell takes them somewhere specific. Scent is always the most direct route.",
+        reveal: "The smell that takes you somewhere immediately — which one?",
       },
       other: {
-        framing: "Which smell do you love?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite smell — the one that takes them somewhere in an instant — is always worth including.",
         reveal:
-          "Scent is the most honest memory. Which smell is yours, and where does it take you?",
+          "The smell that takes you somewhere immediately — which one, and where?",
       },
       default: {
-        framing: "Everyone has a smell that takes them somewhere. Which one is yours?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite smell is one of the most direct things there is.",
         reveal:
-          "Scent is the most honest memory. Which smell is yours, and where does it take you?",
+          "The smell that takes you somewhere immediately — which one, and where?",
       },
     },
   },
   {
     title: "Weather for walk",
-    description: "Conditions that got them outside",
+    description: "The sky that made them pull on their boots",
     is_finite: false,
     categories: ["Nature", "Everyday life"],
     placeholders: {
       memorial: {
-        framing:
-          "Belinda loved a crisp winter morning walk — which weather do you love for a walk?",
+        about:
+          "A beloved mother and teacher who walked every morning without exception, in every kind of weather. Her children knew which weather was her weather — the one she smiled at through the window before she put her coat on.",
         reveal:
-          "She came back different from a cold clear morning. More herself, somehow…",
+          "Hers was the crisp winter morning. Cold air, clear sky, the garden white. She said it was the weather that made everything possible.",
       },
       tribute: {
-        framing:
-          "David walked in all weathers and said the worst weather made the best walks — which walking weather do you love?",
+        about:
+          "A mentor who walked in weather that other people stayed indoors for, and came back having made his best decisions. His colleagues eventually understood this was not a coincidence.",
         reveal:
-          "He went out in everything. He came back from all of it looking like someone who'd had a good walk…",
+          "His was autumn drizzle. He said it was the weather that made you concentrate. He did his best thinking in it.",
       },
       birthday: {
-        framing:
-          "Sarah once walked twelve miles in light drizzle and called it refreshing — which walking weather do you love?",
+        about:
+          "Sarah has very strong opinions about the best conditions for a walk. She is not interested in compromise on this point. The conditions she requires are specific and she will wait for them.",
         reveal:
-          "She described horizontal rain as bracing once. This is technically a matter of perspective…",
+          "Hers is a bright spring day — cool enough to walk properly, warm enough to stop. She says it is the only weather that earns the view.",
       },
       retirement: {
-        framing:
-          "David walked to work in the dark for thirty-five years. Golden hour is finally on the table — which walking weather do you love?",
+        about:
+          "David has been saying he\'ll walk properly when he has the time. He has the time. He is going at the hour he\'s been waiting for all year.",
         reveal:
-          "The right walk in the right light. That's all it takes. He's known this for years…",
+          "His is golden hour. He waited for it all year, every year, working. He is now free to walk in it.",
       },
       wedding: {
-        framing:
-          "Emma talks. James listens. Then they swap. They've solved everything this way — which walking weather do you love?",
+        about:
+          "Emma and James had their first proper walk together in weather that neither of them would have chosen. They have been going back to similar weather ever since, on purpose.",
         reveal:
-          "Any weather works. They've never had a bad one. The weather isn't really the point…",
+          "Theirs is after rain. The light, the smell, the path empty. They found it by accident and have been choosing it since.",
       },
       engagement: {
-        framing:
-          "Sophie says the weather on the day of the proposal was suspiciously perfect. Which weather do you love for a walk?",
+        about:
+          "Callum chose the morning of the proposal in part because of the weather. The fells were in mist. The visibility was poor. The view was entirely the point.",
         reveal:
-          "Crisp, clear, cold — the fells sharp against the sky. Callum checked the forecast three times.",
+          "Theirs is misty and still. The morning of the proposal. The fells half-visible. Sophie says she understood as soon as they started walking.",
       },
       anniversary: {
-        framing:
-          "Forty years of anniversary walks — in every weather — which walking weather do you love?",
+        about:
+          "Forty years of walking together in all kinds of weather, and they have agreed on exactly one kind as the best. They have walked in it every anniversary where possible. It is the right weather for the occasion.",
         reveal:
-          "They've walked in sunshine, rain, mist, and once in a light snowfall. All of them are remembered…",
+          "Theirs is blustery and wild. They\'ve been walking in it for forty years. Neither of them has ever suggested waiting for a nicer day.",
       },
       leaving: {
-        framing:
-          "Priya always said a good walk could sort anything out — which weather do you love for a walk?",
+        about:
+          "Priya\'s last walk in this city will be in the best weather for it. She has been planning which route and which conditions since she decided to go. The conditions are specific.",
         reveal:
-          "The kind of weather that makes everything feel possible. Which one is that for you?",
+          "Hers is a warm summer evening. She says it is the weather that makes a city feel worth leaving properly.",
       },
       graduation: {
-        framing:
-          "Tom walked home from his last exam in Manchester rain — which walking weather do you love?",
-        reveal: "He said it felt exactly right. He wasn't wrong…",
+        about:
+          "Tom graduated in June and walked the long way home. He says the weather was right for the day. His housemates found him on a bench two hours later. He was not lost. He was just walking.",
+        reveal:
+          "His is blustery and wild. He says it is the weather that clears things out. He walked three miles on graduation day without deciding to.",
       },
       christening: {
-        framing:
-          "Lily will eventually have a weather she walks best in — which walking weather do you love?",
+        about:
+          "Lily will one day be old enough to have opinions about which weather to walk in. The family will have strong views. She will overrule them.",
         reveal:
-          "Too young for opinions on this. All the adults have them, though…",
+          "She\'ll have opinions soon. The family are ready to walk in whatever she decides.",
       },
       achievement: {
-        framing:
-          "Marcus trained in every weather but says cool and overcast was when running felt easiest — which walking weather do you love?",
+        about:
+          "Marcus just ran his first marathon and is raising money for the RNLI through favpoll. He ran in all weathers for eight months and has decided which one he prefers. The preference is specific and earned.",
         reveal:
-          "Not too hot, not too cold, not too bright. Just the right sky for just the right pace…",
+          "His is the crisp winter morning. Cold, clear, the coast empty. He trained in it for eight months. He says it is the best weather there is.",
       },
       recovery: {
-        framing:
-          "Claire walked every day whatever the weather — which walking weather do you love?",
+        about:
+          "Claire walked every day during her recovery regardless of weather. She came to prefer one kind above all others — not for any reason she could name, but for the quality of attention it asked of her.",
         reveal:
-          "Some mornings the weather was terrible. She went anyway. The going anyway was the whole thing…",
+          "Hers is misty and still. She says it is the weather that asks you to look closer. She walked in it every chance she had.",
       },
       award: {
-        framing:
-          "Amelia says the best walks are in October — which walking weather do you love?",
+        about:
+          "Amelia has just been named Teacher of the Year. She walks every Sunday in the same landscape and at the same time of year considers one kind of day the best day for it.",
         reveal:
-          "Low sun, fallen leaves, enough cold to feel real. She plans her year around this walk…",
+          "Hers is a bright spring day. She says it is the weather of beginning. She plans her whole spring around the first one.",
       },
       promotion: {
-        framing:
-          "Kwame walked to clear his head after the promotion news — which walking weather do you love?",
+        about:
+          "After three years of excellent work, Kwame walked home after hearing the news about the promotion in weather that he says was exactly right for how the day felt.",
         reveal:
-          "It was early evening. Mild. He walked for an hour. Everything became clear…",
+          "His is after rain. He walked home in it. He says it smelled like things had been cleaned up ready for the next thing.",
       },
       celebration: {
-        framing: "Everyone has a weather they love for a walk — what's yours?",
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which weather gets them out the door. The sky someone walks in says something true.",
         reveal:
-          "The sky that gets you out of the house and into the world — which one is yours?",
+          "The weather that gets you out the door and into the world — which one?",
       },
       other: {
-        framing: "Pick a walking weather. We're curious what it says.",
-        reveal:
-          "The sky that gets you out of the house and into the world — which one is yours?",
+        about:
+          "Tell us who this person is and why you\'re gathering. A favourite walking weather — the sky that makes them pull on their boots — is always worth including.",
+        reveal: "The sky that gets you out the door — which one is it?",
       },
       default: {
-        framing: "What's your favourite weather for a walk?",
+        about:
+          "Tell us who this is for and what the occasion is. A favourite walking weather is one of those things everyone has a strong position on.",
         reveal:
-          "The sky that gets you out of the house and into the world — which one is yours?",
+          "The weather that gets you out the door — which one is it, and what does it give you?",
       },
     },
   },
 ]
 
+// ---------------------------------------------------------------------------
+// Topic items
+// ---------------------------------------------------------------------------
+
 const topicItems: Record<string, string[]> = {
   Colour: [
-    "Red",
-    "Orange",
-    "Yellow",
-    "Green",
-    "Blue",
-    "Purple",
-    "Pink",
-    "Brown",
     "Black",
-    "White",
+    "Blue",
+    "Brown",
+    "Green",
     "Grey",
+    "Orange",
+    "Pink",
+    "Purple",
+    "Red",
+    "White",
+    "Yellow",
   ],
-  Season: ["Spring", "Summer", "Autumn", "Winter"],
   "Day of the week": [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
     "Friday",
+    "Monday",
     "Saturday",
     "Sunday",
-  ],
-  "Meal of the day": [
-    "Breakfast",
-    "Brunch",
-    "Lunch",
-    "Afternoon tea",
-    "Dinner",
-    "Supper",
-  ],
-  "Time of day": [
-    "Early morning",
-    "Mid morning",
-    "Lunchtime",
-    "Afternoon",
-    "Late afternoon",
-    "Dusk",
-    "Evening",
-    "Late night",
+    "Thursday",
+    "Tuesday",
+    "Wednesday",
   ],
   Decade: [
     "1920s",
@@ -4155,443 +4281,462 @@ const topicItems: Record<string, string[]> = {
     "2010s",
     "2020s",
   ],
+  "Meal of the day": [
+    "Afternoon tea",
+    "Breakfast",
+    "Brunch",
+    "Dinner",
+    "Lunch",
+    "Supper",
+  ],
+  Season: ["Autumn", "Spring", "Summer", "Winter"],
+  "Time of day": [
+    "Afternoon",
+    "Dusk",
+    "Early morning",
+    "Evening",
+    "Late afternoon",
+    "Late night",
+    "Lunchtime",
+    "Mid morning",
+  ],
   Animal: [
-    "Dog",
-    "Cat",
-    "Horse",
-    "Robin",
-    "Owl",
-    "Fox",
-    "Elephant",
-    "Dolphin",
-    "Deer",
-    "Hedgehog",
-    "Duck",
-    "Swan",
-    "Rabbit",
     "Badger",
+    "Cat",
+    "Deer",
+    "Dog",
+    "Dolphin",
+    "Duck",
+    "Elephant",
+    "Fox",
+    "Hedgehog",
+    "Horse",
+    "Owl",
+    "Rabbit",
+    "Robin",
+    "Swan",
   ],
   Bird: [
-    "Robin",
+    "Barn owl",
     "Blackbird",
     "Blue tit",
-    "Kingfisher",
-    "Puffin",
-    "Barn owl",
-    "Heron",
-    "Wren",
-    "Sparrow",
     "Goldfinch",
-    "Swan",
+    "Heron",
+    "Kingfisher",
     "Pheasant",
-  ],
-  Flower: [
-    "Rose",
-    "Lavender",
-    "Sunflower",
-    "Bluebell",
-    "Daisy",
-    "Poppy",
-    "Sweet pea",
-    "Daffodil",
-    "Lily",
-    "Wisteria",
-    "Magnolia",
-    "Peony",
-    "Foxglove",
-    "Primrose",
-  ],
-  Tree: [
-    "Oak",
-    "Willow",
-    "Cherry blossom",
-    "Silver birch",
-    "Beech",
-    "Horse chestnut",
-    "Apple",
-    "Yew",
-    "Rowan",
-    "Pine",
-    "Elm",
-    "Scots pine",
-  ],
-  Weather: [
-    "Bright sunshine",
-    "Warm rain",
-    "Crisp frost",
-    "Overcast and mild",
-    "Thunderstorm",
-    "Light snow",
-    "Misty morning",
-    "Blustery wind",
-    "Golden autumn light",
-    "Dewy spring morning",
-  ],
-  Landscape: [
-    "Rolling hills",
-    "Coastline",
-    "Open moorland",
-    "River valley",
-    "City skyline",
-    "Woodland",
-    "Mountains",
-    "Village green",
-    "Farmland",
-    "Harbour",
-    "Loch",
-    "Chalk downs",
-  ],
-  Place: [
-    "Seaside",
-    "Countryside",
-    "Garden",
-    "Pub",
-    "Mountains",
-    "Home",
-    "Childhood home",
-    "Abroad",
-    "City",
-    "By river",
-  ],
-  "Type of holiday": [
-    "Beach holiday",
-    "City break",
-    "Countryside retreat",
-    "Walking holiday",
-    "Cruise",
-    "Camping",
-    "Staycation",
-    "Winter sun",
-    "Skiing",
-    "Visiting family",
-  ],
-  "Way to travel": [
-    "By train",
-    "By car",
-    "On foot",
-    "By bicycle",
-    "By boat",
-    "By plane",
-    "By bus",
-    "On motorbike",
-  ],
-  Film: [
-    "The Shawshank Redemption",
-    "Casablanca",
-    "Schindler's List",
-    "It's a Wonderful Life",
-    "The Sound of Music",
-    "Lawrence of Arabia",
-    "Brief Encounter",
-    "Some Like It Hot",
-    "Gone with the Wind",
-    "Four Weddings and a Funeral",
-    "Paddington 2",
-    "Local Hero",
-    "Whisky Galore",
-    "The Italian Job",
-    "Gregory's Girl",
-  ],
-  "Film genre": [
-    "Comedy",
-    "Drama",
-    "Romance",
-    "Thriller",
-    "Documentary",
-    "Musical",
-    "Animation",
-    "Science fiction",
-    "War film",
-    "Western",
-    "Horror",
-    "Crime",
-  ],
-  "TV show": [
-    "Drama series",
-    "Sitcom",
-    "Nature documentary",
-    "Quiz show",
-    "Chat show",
-    "Cooking show",
-    "Crime thriller",
-    "Soap opera",
-    "News programme",
-    "Sport",
-    "Reality show",
-    "Period drama",
-  ],
-  Song: [
-    "My Way — Frank Sinatra",
-    "Bohemian Rhapsody — Queen",
-    "Angels — Robbie Williams",
-    "Don't Look Back in Anger — Oasis",
-    "Waterloo Sunset — The Kinks",
-    "What a Wonderful World — Louis Armstrong",
-    "Jerusalem — Parry",
-    "Abide With Me — traditional",
-    "Over the Rainbow — Judy Garland",
-    "Wind Beneath My Wings — Bette Midler",
-    "You'll Never Walk Alone — traditional",
-    "Danny Boy — traditional",
-  ],
-  "Music genre": [
-    "Classical",
-    "Jazz",
-    "Rock",
-    "Pop",
-    "Soul",
-    "Folk",
-    "Blues",
-    "Electronic",
-    "Hip-Hop",
-    "Country",
-    "Reggae",
-    "Musical theatre",
-  ],
-  "Music era": [
-    "Jazz age",
-    "Rock and roll",
-    "Swinging sixties",
-    "Seventies soul and funk",
-    "Eighties pop",
-    "Nineties indie and dance",
-    "Noughties",
-    "Streaming era",
-  ],
-  Instrument: [
-    "Piano",
-    "Guitar",
-    "Violin",
-    "Cello",
-    "Trumpet",
-    "Saxophone",
-    "Drums",
-    "Voice",
-    "Flute",
-    "Accordion",
-    "Harp",
-    "Organ",
-    "Banjo",
-  ],
-  "Type of song": [
-    "Love song",
-    "Song from childhood",
-    "Hymn or spiritual",
-    "Song that makes you dance",
-    "Song that makes you cry",
-    "Song that tells story",
-    "Anthem",
-    "Lullaby",
-    "Folk song",
-    "Show tune",
-  ],
-  Drink: [
-    "Tea",
-    "Coffee",
-    "Beer",
-    "Red wine",
-    "White wine",
-    "Whisky",
-    "Gin & tonic",
-    "Soft drink",
-    "Champagne",
-    "Hot chocolate",
-    "Juice",
-    "Stout",
-    "Cider",
-  ],
-  "Comfort food": [
-    "Soup",
-    "Toast",
-    "Roast dinner",
-    "Fish and chips",
-    "Pasta",
-    "Beans on toast",
-    "Porridge",
-    "Shepherd's pie",
-    "Rice pudding",
-    "Bacon sandwich",
-    "Scrambled eggs",
-    "Cheese on toast",
-    "Cottage pie",
-    "Bread and butter pudding",
+    "Puffin",
+    "Robin",
+    "Sparrow",
+    "Swan",
+    "Wren",
   ],
   Biscuit: [
-    "Digestive",
-    "Rich Tea",
-    "Hobnob",
     "Bourbon",
-    "Custard cream",
     "Chocolate digestive",
-    "Shortbread",
-    "Jammie Dodger",
-    "Ginger nut",
-    "Malted milk",
-    "Tunnock's Caramel Wafer",
-    "Wagon Wheel",
-    "Viennese Whirl",
-    "Pink Wafer",
+    "Custard cream",
+    "Digestive",
     "Garibaldi",
-  ],
-  "Sport to watch": [
-    "Football",
-    "Cricket",
-    "Tennis",
-    "Rugby",
-    "Athletics",
-    "Cycling",
-    "Swimming",
-    "Horse racing",
-    "Golf",
-    "Snooker",
-    "Bowls",
-    "Darts",
-  ],
-  "Sport to play": [
-    "Football",
-    "Tennis",
-    "Golf",
-    "Swimming",
-    "Running",
-    "Cricket",
-    "Cycling",
-    "Badminton",
-    "Bowls",
-    "Walking",
-    "Darts",
-    "Table tennis",
-  ],
-  "Form of exercise": [
-    "Walking",
-    "Running",
-    "Swimming",
-    "Cycling",
-    "Yoga",
-    "Dancing",
-    "Football",
-    "Tennis",
-    "Gardening",
-    "Golf",
-    "Pilates",
-    "Tai chi",
+    "Ginger nut",
+    "Hobnob",
+    "Jammie Dodger",
+    "Malted milk",
+    "Pink Wafer",
+    "Rich Tea",
+    "Shortbread",
+    "Tunnock\'s Caramel Wafer",
+    "Viennese Whirl",
+    "Wagon Wheel",
   ],
   "Childhood game": [
-    "Hide and seek",
-    "Tag",
+    "Board games",
+    "British bulldogs",
+    "Building dens",
+    "Card games",
     "Conkers",
+    "Elastics",
+    "French cricket",
+    "Hide and seek",
     "Hopscotch",
     "Marbles",
-    "British bulldogs",
     "Rounders",
     "Skipping",
     "Stuck in the mud",
-    "Card games",
-    "Board games",
-    "Building dens",
-    "Elastics",
-    "French cricket",
+    "Tag",
   ],
-  "School subject": [
-    "English",
-    "Maths",
-    "History",
-    "Geography",
-    "Science",
-    "Art",
-    "Music",
-    "PE",
+  "Comfort food": [
+    "Bacon sandwich",
+    "Beans on toast",
+    "Bread and butter pudding",
+    "Cheese on toast",
+    "Cottage pie",
+    "Fish and chips",
+    "Pasta",
+    "Porridge",
+    "Rice pudding",
+    "Roast dinner",
+    "Scrambled eggs",
+    "Shepherd\'s pie",
+    "Soup",
+    "Toast",
+  ],
+  Drink: [
+    "Beer",
+    "Champagne",
+    "Cider",
+    "Coffee",
+    "Gin & tonic",
+    "Hot chocolate",
+    "Juice",
+    "Red wine",
+    "Soft drink",
+    "Stout",
+    "Tea",
+    "Whisky",
+    "White wine",
+  ],
+  Film: [
+    "Brief Encounter",
+    "Casablanca",
+    "Four Weddings and a Funeral",
+    "Gone with the Wind",
+    "Gregory\'s Girl",
+    "It\'s a Wonderful Life",
+    "Lawrence of Arabia",
+    "Local Hero",
+    "Paddington 2",
+    "Schindler\'s List",
+    "Some Like It Hot",
+    "The Italian Job",
+    "The Shawshank Redemption",
+    "The Sound of Music",
+    "Whisky Galore",
+  ],
+  "Film genre": [
+    "Animation",
+    "Comedy",
+    "Crime",
+    "Documentary",
     "Drama",
-    "Languages",
-    "Woodwork or cookery",
-    "RE",
-  ],
-  "Type of book": [
-    "Novel",
-    "Biography",
-    "History",
-    "Poetry",
-    "Travel writing",
-    "Crime fiction",
+    "Horror",
+    "Musical",
+    "Romance",
     "Science fiction",
-    "Nature writing",
-    "Self-help",
-    "Short stories",
-    "Children's books",
-    "Memoir",
+    "Thriller",
+    "War film",
+    "Western",
   ],
-  Poet: [
-    "William Shakespeare",
-    "John Keats",
-    "Emily Dickinson",
-    "W.B. Yeats",
-    "Seamus Heaney",
-    "Philip Larkin",
-    "Maya Angelou",
-    "Dylan Thomas",
-    "Wilfred Owen",
-    "Mary Oliver",
-    "Ted Hughes",
-    "Roger McGough",
-    "John Betjeman",
-    "R.S. Thomas",
-    "Pam Ayres",
+  Flower: [
+    "Bluebell",
+    "Daffodil",
+    "Daisy",
+    "Foxglove",
+    "Lavender",
+    "Lily",
+    "Magnolia",
+    "Peony",
+    "Poppy",
+    "Primrose",
+    "Rose",
+    "Sunflower",
+    "Sweet pea",
+    "Wisteria",
+  ],
+  "Form of exercise": [
+    "Cycling",
+    "Dancing",
+    "Football",
+    "Gardening",
+    "Golf",
+    "Pilates",
+    "Running",
+    "Swimming",
+    "Tai chi",
+    "Tennis",
+    "Walking",
+    "Yoga",
   ],
   Hobby: [
-    "Gardening",
-    "Reading",
-    "Cooking",
-    "Walking",
-    "Photography",
-    "Knitting or sewing",
-    "Painting or drawing",
-    "Playing music",
-    "Woodwork",
     "Birdwatching",
-    "Crosswords or puzzles",
     "Collecting",
-    "Volunteering",
+    "Cooking",
+    "Crosswords or puzzles",
     "Fishing",
+    "Gardening",
+    "Knitting or sewing",
     "Model making",
+    "Painting or drawing",
+    "Photography",
+    "Playing music",
+    "Reading",
+    "Volunteering",
+    "Walking",
+    "Woodwork",
   ],
-  "Way to spend Sunday": [
-    "Long walk",
-    "Roast dinner with family",
-    "Reading all day",
-    "Pottering in garden",
-    "Watching sport",
-    "Going to church",
-    "Lie in",
-    "Visiting somewhere new",
-    "Cooking something special",
-    "Doing absolutely nothing",
-    "Pub lunch",
-    "Drive in countryside",
+  Instrument: [
+    "Accordion",
+    "Banjo",
+    "Cello",
+    "Drums",
+    "Flute",
+    "Guitar",
+    "Harp",
+    "Organ",
+    "Piano",
+    "Saxophone",
+    "Trumpet",
+    "Violin",
+    "Voice",
+  ],
+  Landscape: [
+    "Chalk downs",
+    "City skyline",
+    "Coastline",
+    "Farmland",
+    "Harbour",
+    "Loch",
+    "Mountains",
+    "Open moorland",
+    "River valley",
+    "Rolling hills",
+    "Village green",
+    "Woodland",
+  ],
+  "Music era": [
+    "Eighties pop",
+    "Jazz age",
+    "Nineties indie and dance",
+    "Noughties",
+    "Rock and roll",
+    "Seventies soul and funk",
+    "Streaming era",
+    "Swinging sixties",
+  ],
+  "Music genre": [
+    "Blues",
+    "Classical",
+    "Country",
+    "Electronic",
+    "Folk",
+    "Hip-Hop",
+    "Jazz",
+    "Musical theatre",
+    "Pop",
+    "Reggae",
+    "Rock",
+    "Soul",
+  ],
+  Place: [
+    "Abroad",
+    "By river",
+    "Childhood home",
+    "City",
+    "Countryside",
+    "Garden",
+    "Home",
+    "Mountains",
+    "Pub",
+    "Seaside",
+  ],
+  Poet: [
+    "Dylan Thomas",
+    "Emily Dickinson",
+    "John Betjeman",
+    "John Keats",
+    "Mary Oliver",
+    "Maya Angelou",
+    "Pam Ayres",
+    "Philip Larkin",
+    "R.S. Thomas",
+    "Roger McGough",
+    "Seamus Heaney",
+    "Ted Hughes",
+    "W.B. Yeats",
+    "Wilfred Owen",
+    "William Shakespeare",
+  ],
+  "School subject": [
+    "Art",
+    "Drama",
+    "English",
+    "Geography",
+    "History",
+    "Languages",
+    "Maths",
+    "Music",
+    "PE",
+    "RE",
+    "Science",
+    "Woodwork or cookery",
   ],
   Smell: [
-    "Freshly cut grass",
-    "Rain on dry earth",
-    "Bread baking",
-    "Sea air",
     "Bonfire",
-    "Old books",
+    "Bread baking",
     "Coffee in morning",
+    "Fresh laundry",
+    "Freshly cut grass",
     "Garden after rain",
     "Lavender",
-    "Woodsmoke",
-    "Sunscreen",
-    "Fresh laundry",
-    "Petrol",
+    "Old books",
     "Old churches",
+    "Petrol",
+    "Rain on dry earth",
+    "Sea air",
+    "Sunscreen",
+    "Woodsmoke",
+  ],
+  Song: [
+    "Abide With Me — traditional",
+    "Angels — Robbie Williams",
+    "Bohemian Rhapsody — Queen",
+    "Danny Boy — traditional",
+    "Don\'t Look Back in Anger — Oasis",
+    "Jerusalem — Parry",
+    "My Way — Frank Sinatra",
+    "Over the Rainbow — Judy Garland",
+    "Waterloo Sunset — The Kinks",
+    "What a Wonderful World — Louis Armstrong",
+    "Wind Beneath My Wings — Bette Midler",
+    "You\'ll Never Walk Alone — traditional",
+  ],
+  "Sport to play": [
+    "Badminton",
+    "Bowls",
+    "Cricket",
+    "Cycling",
+    "Darts",
+    "Football",
+    "Golf",
+    "Running",
+    "Swimming",
+    "Table tennis",
+    "Tennis",
+    "Walking",
+  ],
+  "Sport to watch": [
+    "Athletics",
+    "Bowls",
+    "Cricket",
+    "Cycling",
+    "Darts",
+    "Football",
+    "Golf",
+    "Horse racing",
+    "Rugby",
+    "Snooker",
+    "Swimming",
+    "Tennis",
+  ],
+  Tree: [
+    "Apple",
+    "Beech",
+    "Cherry blossom",
+    "Elm",
+    "Horse chestnut",
+    "Oak",
+    "Pine",
+    "Rowan",
+    "Scots pine",
+    "Silver birch",
+    "Willow",
+    "Yew",
+  ],
+  "TV show": [
+    "Chat show",
+    "Cooking show",
+    "Crime thriller",
+    "Drama series",
+    "Nature documentary",
+    "News programme",
+    "Period drama",
+    "Quiz show",
+    "Reality show",
+    "Sitcom",
+    "Soap opera",
+    "Sport",
+  ],
+  "Type of book": [
+    "Biography",
+    "Children\'s books",
+    "Crime fiction",
+    "History",
+    "Memoir",
+    "Nature writing",
+    "Novel",
+    "Poetry",
+    "Science fiction",
+    "Self-help",
+    "Short stories",
+    "Travel writing",
+  ],
+  "Type of holiday": [
+    "Beach holiday",
+    "Camping",
+    "City break",
+    "Countryside retreat",
+    "Cruise",
+    "Skiing",
+    "Staycation",
+    "Visiting family",
+    "Walking holiday",
+    "Winter sun",
+  ],
+  "Type of song": [
+    "Anthem",
+    "Folk song",
+    "Hymn or spiritual",
+    "Love song",
+    "Lullaby",
+    "Show tune",
+    "Song from childhood",
+    "Song that makes you cry",
+    "Song that makes you dance",
+    "Song that tells story",
+  ],
+  "Way to spend Sunday": [
+    "Cooking something special",
+    "Doing absolutely nothing",
+    "Drive in countryside",
+    "Going to church",
+    "Lie in",
+    "Long walk",
+    "Pottering in garden",
+    "Pub lunch",
+    "Reading all day",
+    "Roast dinner with family",
+    "Visiting somewhere new",
+    "Watching sport",
+  ],
+  "Way to travel": [
+    "By bicycle",
+    "By boat",
+    "By bus",
+    "By car",
+    "By plane",
+    "By train",
+    "On foot",
+    "On motorbike",
+  ],
+  Weather: [
+    "Blustery wind",
+    "Bright sunshine",
+    "Crisp frost",
+    "Dewy spring morning",
+    "Golden autumn light",
+    "Light snow",
+    "Misty morning",
+    "Overcast and mild",
+    "Thunderstorm",
+    "Warm rain",
   ],
   "Weather for walk": [
-    "Crisp winter morning",
-    "Warm summer evening",
-    "Autumn drizzle",
-    "Bright spring day",
     "After rain",
-    "Misty and still",
+    "Autumn drizzle",
     "Blustery and wild",
+    "Bright spring day",
+    "Crisp winter morning",
     "Golden hour",
+    "Misty and still",
+    "Warm summer evening",
   ],
 }
 
