@@ -46,7 +46,7 @@ export type Protagonist = {
   id: string
   name: string
   date_label: string | null
-  bio: string | null
+  about: string | null
   photo_url: string | null
   created_by: string | null
   created_at: string

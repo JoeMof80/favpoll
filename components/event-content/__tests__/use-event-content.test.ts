@@ -20,7 +20,7 @@ const protagonist: Protagonist = {
   id: "prot-1",
   name: "Alice",
   date_label: null,
-  bio: null,
+  about: null,
   photo_url: null,
   created_by: "user-1",
   created_at: "2024-01-01T00:00:00Z",

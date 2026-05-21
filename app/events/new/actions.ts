@@ -173,7 +173,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
 
   const protagonistRow: Record<string, unknown> = {
     name: input.protagonistName.trim(),
-    bio: input.protagonistBio || null,
+    about: input.protagonistBio || null,
     photo_url: input.photoUrl || null,
     date_label: input.dateLabel || null,
     created_by: userId,

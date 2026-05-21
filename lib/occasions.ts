@@ -1,4 +1,3 @@
-import { TOPIC_BIO_PLACEHOLDERS } from "./topic-bio-placeholders"
 
 export const OCCASION_LIST = [
   { value: "memorial", label: "Memorial" },
@@ -119,101 +118,101 @@ export const CLOSING_DEFAULTS: Record<string, number> = {
 
 export type OccasionPlaceholders = {
   name: string
-  bio: string
+  about: string
   reveal: string
 }
 
 export const OCCASION_PLACEHOLDERS: Record<string, OccasionPlaceholders> = {
   memorial: {
     name: "Belinda Johnson",
-    bio: "A beloved mother, teacher, and friend who spent her life bringing people together and always had time for a long conversation over tea…",
+    about: "A beloved mother, teacher, and friend who spent her life bringing people together and always had time for a long conversation over tea…",
     reveal:
       "e.g. Belinda's was purple. She wore it to every important occasion.",
   },
   tribute: {
     name: "David Osei",
-    bio: "A mentor to dozens, a friend to hundreds, and the person who always knew exactly what to say…",
+    about: "A mentor to dozens, a friend to hundreds, and the person who always knew exactly what to say…",
     reveal:
       "e.g. David's was Waterloo Sunset. He said it made him feel London was beautiful.",
   },
   birthday: {
     name: "Sarah Mitchell",
-    bio: "Sarah is turning 40 and has never met a cheese she didn't like. She spends her weekends hiking, hosting elaborate dinner parties, and planning trips she may or may not actually take…",
+    about: "Sarah is turning 40 and has never met a cheese she didn't like. She spends her weekends hiking, hosting elaborate dinner parties, and planning trips she may or may not actually take…",
     reveal:
       "e.g. Sarah's is the Bourbon. She once ate four packets in one sitting.",
   },
   retirement: {
     name: "David Clarke",
-    bio: "After 35 years building the engineering team from four people to four hundred, David is finally putting down his laptop, ignoring his email, and picking up his golf clubs for good…",
+    about: "After 35 years building the engineering team from four people to four hundred, David is finally putting down his laptop, ignoring his email, and picking up his golf clubs for good…",
     reveal:
       "e.g. David's was the Dordogne. He kept a photo of it on his desk for thirty years.",
   },
   wedding: {
     name: "Emma & James",
-    bio: "Emma and James met at a rainy music festival in 2019 and haven't been apart since. They share a love of travel, strong coffee, and an ongoing argument about the best pizza in Naples…",
+    about: "Emma and James met at a rainy music festival in 2019 and haven't been apart since. They share a love of travel, strong coffee, and an ongoing argument about the best pizza in Naples…",
     reveal:
       "e.g. Theirs was Italian. They've been arguing about the best pizza in Naples since 2019.",
   },
   engagement: {
     name: "Sophie & Callum",
-    bio: "Callum proposed at the top of Arthur's Seat on New Year's Day. Sophie said yes before he'd finished the question…",
+    about: "Callum proposed at the top of Arthur's Seat on New Year's Day. Sophie said yes before he'd finished the question…",
     reveal:
       "e.g. Theirs was Perfect. It played when they weren't trying to be romantic, and that was the point.",
   },
   anniversary: {
     name: "Mum & Dad",
-    bio: "Forty years of adventures, arguments, laughter, and love — still each other's favourite person to share a pot of tea with…",
+    about: "Forty years of adventures, arguments, laughter, and love — still each other's favourite person to share a pot of tea with…",
     reveal:
       "e.g. Theirs was a pot of tea and a good biscuit. Same time every morning for forty years.",
   },
   leaving: {
     name: "Priya Sharma",
-    bio: "Priya's heading off to start her own studio after six brilliant years. She leaves a trail of good work, better jokes, and a coffee machine that finally gets used properly…",
+    about: "Priya's heading off to start her own studio after six brilliant years. She leaves a trail of good work, better jokes, and a coffee machine that finally gets used properly…",
     reveal: "e.g. Priya's was dal. She said it made any flat feel like home.",
   },
   graduation: {
     name: "Tom Ellis",
-    bio: "Tom just finished four years of architecture at Manchester — somehow managing to graduate with a first, a collection of impressive scale models, and zero sleep debt…",
+    about: "Tom just finished four years of architecture at Manchester — somehow managing to graduate with a first, a collection of impressive scale models, and zero sleep debt…",
     reveal:
       "e.g. Tom's was Spirited Away. He said it reminded him why things worth doing take time.",
   },
   christening: {
     name: "Lily Rose",
-    bio: "Born on a Tuesday in March, already an expert at looking unimpressed. We couldn't be happier to have her…",
+    about: "Born on a Tuesday in March, already an expert at looking unimpressed. We couldn't be happier to have her…",
     reveal: "e.g. We'll tell her one day. For now, we're just glad she's here.",
   },
   achievement: {
     name: "Marcus Webb",
-    bio: "Marcus just ran his first marathon — raising over £4,000 for the RNLI along the way. He trained for eight months, mostly in the dark, mostly in the rain…",
+    about: "Marcus just ran his first marathon — raising over £4,000 for the RNLI along the way. He trained for eight months, mostly in the dark, mostly in the rain…",
     reveal:
       "e.g. Marcus's was Mr. Brightside. Apparently it got him through mile 18.",
   },
   recovery: {
     name: "Claire Hennessy",
-    bio: "Claire completed her treatment last month and is celebrating one year of recovery. She's been braver than most of us will ever need to be…",
+    about: "Claire completed her treatment last month and is celebrating one year of recovery. She's been braver than most of us will ever need to be…",
     reveal:
       "e.g. Claire's was Vienna by Ultravox. She played it on repeat for months.",
   },
   award: {
     name: "Dr. Amelia Grant",
-    bio: "Amelia has just been named Teacher of the Year — recognised for turning her classroom into one of the most inspiring places in the county…",
+    about: "Amelia has just been named Teacher of the Year — recognised for turning her classroom into one of the most inspiring places in the county…",
     reveal:
       "e.g. Dr. Grant's was The Lion, the Witch and the Wardrobe. She said it taught her how to teach.",
   },
   promotion: {
     name: "Kwame Asante",
-    bio: "After three years of going above and beyond, Kwame has been promoted to Head of Product. Nobody deserves it more…",
+    about: "After three years of going above and beyond, Kwame has been promoted to Head of Product. Nobody deserves it more…",
     reveal: "e.g. Kwame's was a flat white. Two sugars. Never wavered once.",
   },
   celebration: {
     name: "The guest of honour",
-    bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
+    about: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
     reveal:
       "e.g. Theirs was something they never tired of. Ask them about it some time.",
   },
   other: {
     name: "The guest of honour",
-    bio: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
+    about: "Tell their story — who they are, what makes them worth celebrating, why people are gathering…",
     reveal:
       "e.g. Theirs was something they never tired of. Ask them about it some time.",
   },
@@ -268,18 +267,12 @@ export const TOPIC_REVEAL_PLACEHOLDERS: Record<string, { reveal: string }> = {
 
 export const DEFAULT_PLACEHOLDERS: OccasionPlaceholders = {
   name: "Name",
-  bio: "A short bio…",
+  about: "A short bio…",
   reveal: "e.g. Belinda's was purple. She wore it to every important occasion.",
 }
 
-export function getBioPlaceholder(
-  occasion: string,
-  topicTitle?: string
-): string {
-  if (topicTitle && TOPIC_BIO_PLACEHOLDERS[topicTitle]?.[occasion]) {
-    return TOPIC_BIO_PLACEHOLDERS[topicTitle][occasion]
-  }
-  return OCCASION_PLACEHOLDERS[occasion]?.bio ?? DEFAULT_PLACEHOLDERS.bio
+export function getAboutPlaceholder(occasion: string): string {
+  return OCCASION_PLACEHOLDERS[occasion]?.about ?? DEFAULT_PLACEHOLDERS.about
 }
 
 export function shortTopicLabel(title: string): string {

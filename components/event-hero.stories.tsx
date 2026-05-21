@@ -45,7 +45,7 @@ function makeViewProps(sceneIndex: number): {
     id: `p-${sceneIndex}`,
     name: scene.protagonistName,
     date_label: DATE_LABELS[sceneIndex],
-    bio: BIOS[sceneIndex],
+    about: BIOS[sceneIndex],
     photo_url: null,
     created_by: null,
     created_at: "2024-01-01T00:00:00Z",
@@ -137,7 +137,7 @@ export const EditMode = {
   render: () => {
     const placeholders = OCCASION_PLACEHOLDERS["memorial"] ?? {
       name: "Name",
-      bio: "Bio",
+      about: "Bio",
       reveal: "",
     }
     const [occasionLabel, setOccasionLabel] = useState("In memory of")

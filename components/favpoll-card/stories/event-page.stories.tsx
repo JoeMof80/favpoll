@@ -46,7 +46,7 @@ function makeHeroProps(sceneIndex: number): { event: Event; protagonist: Protago
     id: `p-ep-${sceneIndex}`,
     name: scene.protagonistName,
     date_label: DATE_LABELS[sceneIndex],
-    bio: BIOS[sceneIndex],
+    about: BIOS[sceneIndex],
     photo_url: null,
     created_by: null,
     created_at: "2024-01-01T00:00:00Z",

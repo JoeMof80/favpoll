@@ -6,7 +6,7 @@ import { OCCASION_PLACEHOLDERS } from "@/lib/occasions"
 const MEMORIAL_PLACEHOLDERS = OCCASION_PLACEHOLDERS["memorial"] ?? {
   reveal: "",
   name: "",
-  bio: "",
+  about: "",
 }
 
 const meta = {

@@ -169,7 +169,7 @@ export async function updateEvent(
     .update({
       name: input.protagonistName.trim(),
       date_label: input.dateLabel,
-      bio: input.protagonistBio ?? null,
+      about: input.protagonistBio ?? null,
       photo_url: input.photoUrl ?? null,
     })
     .eq('id', protagonistId)

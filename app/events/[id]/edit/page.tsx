@@ -108,7 +108,7 @@ export default async function EditEventPage({ params }: Props) {
 
   const initialData: CanvasInitialData = {
     protagonistName: event.protagonists.name,
-    protagonistBio: event.protagonists.bio ?? '',
+    protagonistBio: event.protagonists.about ?? '',
     photoUrl: event.protagonists.photo_url ?? null,
     dateLabel: event.protagonists.date_label ?? '',
     occasion: event.occasion,

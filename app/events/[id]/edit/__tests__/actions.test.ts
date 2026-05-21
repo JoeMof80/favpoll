@@ -166,7 +166,7 @@ describe("updateEvent — DB writes", () => {
     expect(protUpdate.args[0]).toMatchObject({
       name: "Bob",
       date_label: "1990–2025",
-      bio: "Bio text",
+      about: "Bio text",
     })
   })
 
