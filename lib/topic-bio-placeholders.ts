@@ -1037,4 +1037,76 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A favourite form of exercise — the one they actually do, not the one they say they're going to start — is always a revealing detail.",
   },
+
+  // ── Category 8: Childhood ─────────────────────────────────────────────────
+
+  "Childhood game": {
+    memorial:
+      "A beloved mother and teacher who remembered every playground game she had ever played and could be persuaded to explain the rules of conkers to anyone who asked. She had been a formidable conkers player. She admitted this freely.",
+    tribute:
+      "A mentor who talked about childhood games with the authority of someone who had thought carefully about what they were teaching. He had strong opinions about hide and seek. The opinions were, on reflection, about leadership.",
+    birthday:
+      "Sarah is turning 40 and is the kind of adult who gets genuinely invested in board games at Christmas and has never once let anyone win. Her family has described this variously. She considers it consistency.",
+    retirement:
+      "David grew up in an era when the street itself was the playground, and is fond of describing games that his children's generation has never heard of. His grandchildren have become more interested in this than he expected.",
+    wedding:
+      "Emma and James discovered on their first Christmas together that they have entirely different relationships to competitive games. He wins quietly. She wins loudly. Both of them enjoy this more than they expected.",
+    engagement:
+      "Sophie was particularly good at orienteering as a child, which, she says, is exactly the kind of preparation for life that it sounds like. Callum has since learned to read a topographic map. He agrees with her assessment.",
+    anniversary:
+      "Forty years, and they still play cards on long evenings — the same games, the same pack. The score has never been formally tracked. Both of them have a number in their head.",
+    leaving:
+      "Priya once organised a team game for an away day that involved clues, a map of Manchester, and a level of logistical complexity she executed entirely from a spreadsheet. It was the best away day anyone could remember. She never explained how she did it.",
+    graduation:
+      "Tom played cricket in the summer and football in the winter for most of his childhood and says both taught him something about how a team should work. He applied this to group projects throughout his degree with mixed results.",
+    christening:
+      "Lily's room is already full of the toys her parents have decided she will love. She will probably love none of them and develop a strong opinion about a toy no one expected. This is considered a feature of childhood.",
+    achievement:
+      "Marcus grew up near the coast and spent much of his childhood in informal swimming races and waterside games that required no equipment and produced no record. He gave to the RNLI because the sea was always the point. He raised over £4,000 for them when he ran his marathon.",
+    recovery:
+      "During her recovery, Claire started thinking about games she had played as a child — not playing them, just thinking about them. She said it was useful to remember what it felt like to be fully absorbed in something that didn't matter.",
+    award:
+      "Amelia has just been named Teacher of the Year. She uses games in her classroom with intention and has a theory about which childhood games produce better collaboration than others. The theory is correct. She has tested it.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up playing oware — a Ghanaian strategy game — and says it taught him more about product thinking than any course he has taken. He is not wrong.",
+    celebration:
+      "Tell their story — who they are, what they love, and which childhood game says something true about them. The games we played earliest are often the ones that show us most.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite childhood game — and what it says about how they think — is a detail worth including.",
+  },
+
+  "School subject": {
+    memorial:
+      "A beloved mother and teacher who loved English — not because she taught it, but because she had loved it since she was nine years old and never stopped. She could recite whole poems from memory until the end. She was never asked to prove this. She always did.",
+    tribute:
+      "A mentor who had been best at history, which everyone who knew him would have guessed immediately. He believed that understanding the past was the only honest preparation for the future. He applied this to everything.",
+    birthday:
+      "Sarah is turning 40 and maintains that geography was the only school subject that ever made her feel like she was learning something useful. She has since taken this position on a great many hiking routes. It has proved correct.",
+    retirement:
+      "David loved mathematics from the first lesson and has never stopped loving it. Thirty-five years of engineering was, he says, just applied maths. He is correct, and he always knew it.",
+    wedding:
+      "Emma was best at English. James was best at physics. They have since agreed that this explains most things about their relationship, and cannot agree on which is which.",
+    engagement:
+      "Callum was best at geography, which Sophie says explains the meticulous route planning, the topographic map reading, and the fact that he chose the exact right hillside in October. He accepts this analysis.",
+    anniversary:
+      "Forty years together, and it turns out they were best at entirely different things at school — a fact they discovered on about the third date and found, and continue to find, quite interesting.",
+    leaving:
+      "Priya was best at art, which anyone who has worked with her would immediately recognise. She spent six years applying this at the studio in ways that made the building feel different. The building feels different now that she's gone.",
+    graduation:
+      "Tom was best at art and maths at school and considers this entirely consistent with going into architecture. He has explained this to anyone who has asked. Several people have found it illuminating.",
+    christening:
+      "Lily's parents have strong and conflicting views about which school subjects matter most. They plan to let her decide for herself. They are, in practice, already preparing arguments for their respective positions.",
+    achievement:
+      "Marcus was best at biology at school, which is the only subject he will tell you prepared him for the marathon — eight months of understanding exactly what his body was doing. He raised over £4,000 for the RNLI. He considers this relevant.",
+    recovery:
+      "During her recovery, Claire found herself reading things she hadn't read since school — not out of nostalgia, exactly, but because they required a level of effort she could control. She made her way through several poets. She says she should have paid more attention the first time.",
+    award:
+      "Amelia has just been named Teacher of the Year. She loved English at school and says she became a teacher because of one English lesson, aged fourteen, that she still remembers word for word. She has tried to give the same lesson to her own students. Several of them remember it.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He was best at maths at school and says this is the least interesting thing about him. He is probably right. He is also very good at maths.",
+    celebration:
+      "Tell their story — who they are, what they love, and which school subject said something true about them. The subject someone was best at is rarely the one they expected.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite school subject — or the one that shaped them most — is a small detail that opens up a conversation.",
+  },
 }
