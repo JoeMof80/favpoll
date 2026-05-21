@@ -290,4 +290,146 @@ export const TOPIC_BIO_PLACEHOLDERS: Record<string, Record<string, string>> = {
     other:
       "Tell us who this person is and why you're gathering. A favourite landscape — or the kind of place where they feel most themselves — is always worth putting in.",
   },
+
+  // ── Category 2: Time ──────────────────────────────────────────────────────
+
+  "Day of the week": {
+    memorial:
+      "A beloved mother and teacher who had made Sunday non-negotiable. Long lunch, garden, Radio 4 — in that order, without variation. If you wanted her on a Sunday, you had to know the schedule.",
+    tribute:
+      "A mentor who held court on Thursday evenings — those were the meetings worth attending, the conversations worth having. His colleagues built their weeks around knowing Thursday was when David was at his best.",
+    birthday:
+      "Sarah is turning 40 with a well-developed theory that Thursday has a better energy than any other day of the week. She makes it feel like the weekend starts early, and nobody has ever been able to explain how.",
+    retirement:
+      "Thirty-five years building engineering teams, and David made one counter-intuitive claim throughout: Monday was the best day. He said weekends were just Mondays with better lighting. He believed this sincerely. He is now testing the theory in retirement.",
+    wedding:
+      "Emma and James met on a Friday, got engaged on a Sunday, and have not resolved which day is their favourite in five years of marriage. She says Sunday. He says Friday. This argument is ongoing and enjoyed by everyone involved.",
+    engagement:
+      "Callum chose a Saturday deliberately — the long walk, the Lakes, the proposal. Sophie will never think of Saturday as just a day again. Callum had been planning it around the right Saturday for months.",
+    anniversary:
+      "Forty years of Sundays together — same cup of tea, same order of things, same argument about what to have for lunch. It has never needed to change, and neither of them has ever suggested changing it.",
+    leaving:
+      "Priya made Tuesday lunches feel like the best part of the week, and no one has been able to explain how she did it. Six years of Tuesdays, and the team still hasn't worked out what she was doing that they aren't.",
+    graduation:
+      "Tom spent four years in the studio at architecture school and emerged, reliably, every Friday with the specific satisfaction of someone who has earned the weekend. Friday meant something at university. He is now in a job where it mostly still does.",
+    christening:
+      "Lily arrived on a Tuesday in March, which is not anyone's first choice for a significant day. She has already made it feel significant. We are updating our opinions on Tuesdays accordingly.",
+    achievement:
+      "Marcus ran his marathon on a Sunday morning and finished 26.2 miles before most people had read the papers. He raised over £4,000 for the RNLI. Sundays will never feel the same to him, and he doesn't want them to.",
+    recovery:
+      "During her recovery, Claire started marking Mondays differently — not with dread, but as milestones. Each one a small arrival, each one its own kind of progress. She says this sounds more deliberate than it was. We think she's being modest.",
+    award:
+      "Amelia has just been named Teacher of the Year and has a clear view on which day a classroom works best. Thursday is when the class finds its rhythm, she says — by then they have each other's measure, and the work becomes something different.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He celebrates quietly: a good coffee, the right playlist, and the knowledge that Monday mornings feel genuinely different now.",
+    celebration:
+      "Tell their story — who they are, what they love, and which day of the week they've made their own. The day someone insists on being a certain way is always worth knowing.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite day of the week — and what they do with it — is a small detail that says a lot.",
+  },
+
+  "Meal of the day": {
+    memorial:
+      "A beloved mother and teacher who took lunch seriously — not just the food but the hour, the setting, the company. Sunday lunch was a production. Everyone arrived. Nobody hurried.",
+    tribute:
+      "A mentor who believed dinner was the meal for the conversations that mattered. He hosted dinners, convened dinners, and used dinner as the frame for his best thinking. The food was always good. The conversation was always better.",
+    birthday:
+      "Sarah is turning 40 with an opinion on brunch that she has been refining since 2014. She has strong views on the egg: what it should be, how it should arrive, and what should be on the table alongside it.",
+    retirement:
+      "Thirty-five years of working lunches, desk sandwiches, and canteen chips, and David is retiring with a plan to have a proper breakfast every morning — at the table, with the paper, without being in a hurry.",
+    wedding:
+      "Emma and James met at a festival, which means their relationship began in the medium of overpriced chips. They have been making up for it ever since. She makes the Sunday lunches. He makes the midweek suppers. The arrangement suits everyone.",
+    engagement:
+      "Callum had packed a flask and something to eat for the walk — practical, prepared, entirely him. Sophie still claims the proposal came out of nowhere. Callum points out he had planned the picnic first. She concedes the point.",
+    anniversary:
+      "Forty years, and breakfast has never changed — tea, toast, and whoever gets to the kitchen first puts the kettle on. The routine has outlasted three houses, four cars, and every disagreement they have ever had about anything else.",
+    leaving:
+      "Priya made lunch a thing the team looked forward to — not just what was ordered, but when, and with whom, and why it mattered to pause. The studio is still adjusting to lunches that are just lunch.",
+    graduation:
+      "Tom graduated from four years of architecture school during which he skipped more breakfasts than he can count and had dinner at times that don't technically constitute dinner. He has since made his peace with breakfast. It was a significant improvement.",
+    christening:
+      "Lily has arrived with strong and entirely unpredictable opinions about feeding times. Her parents are learning to be flexible about most things, including what constitutes a reasonable hour for breakfast.",
+    achievement:
+      "Marcus trained for eight months during which breakfast was not optional, not rushed, and not small. He raised over £4,000 for the RNLI. His post-marathon brunch was, he says, the best meal he has ever had.",
+    recovery:
+      "During her treatment, breakfast was the meal Claire focused on — simple, manageable, something she could control. She is now celebrating a year of recovery, and breakfast has become, quietly, her favourite part of the day.",
+    award:
+      "Amelia has just been named Teacher of the Year. She teaches on adrenaline until lunchtime and has strong views about what makes a good school dinner. Several of them have now been acted on.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He is a breakfast person — not because he is disciplined about mornings, but because his best thinking happens before nine and he has learned to feed it accordingly.",
+    celebration:
+      "Tell their story — who they are, what they love, and which meal they've made their own. Whether it's the breakfast they take seriously or the dinner they never rush, there's always something specific to say.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite meal of the day — and what they do with it — is a small, specific detail that often says more than expected.",
+  },
+
+  "Time of day": {
+    memorial:
+      "A beloved mother and teacher who was at her best in the early morning — up before anyone else, pot of tea made, garden checked. She said the first hour of the day was hers. She guarded it accordingly.",
+    tribute:
+      "A mentor who came alive in the evenings. His thinking was sharper, his conversations longer, his hospitality more generous. He was not a morning person, and he never pretended to be.",
+    birthday:
+      "Sarah is turning 40 with a clear position: she is a late-evening person and has made her peace with this. Her dinner parties start at eight and finish at midnight, and she considers both of these correct.",
+    retirement:
+      "Thirty-five years of early starts and David is retiring with a plan to stop setting his alarm. He has not yet done this. He suspects he may still wake up at six regardless. He is prepared to test the hypothesis.",
+    wedding:
+      "Emma is a morning person. James is not. They have made this work for five years through what she calls practical division of the day. It involves a lot of coffee and a clear understanding of what to expect before nine.",
+    engagement:
+      "Callum proposed on Arthur's Seat on New Year's Day morning — he had been planning the time of day as carefully as the place. Sophie would not describe herself as a morning person, but that particular morning she did not mind at all.",
+    anniversary:
+      "Forty years of evenings together — the same time, the same chairs, the same programme. The arrangement was made early and has never been renegotiated. It is, they say, one of the better decisions they made.",
+    leaving:
+      "Priya was the last to leave most evenings and did her best work between five and seven, once the office had quietened down. The studio will miss that particular rhythm.",
+    graduation:
+      "Tom spent four years discovering, at considerable cost to his health, that he works best late at night. He graduated with a first. He considers these facts related. His tutors have not confirmed this.",
+    christening:
+      "Lily has arrived with no discernible pattern and extremely firm opinions about which times of day are acceptable for sleep. Her parents are keeping notes and hoping for convergence.",
+    achievement:
+      "Marcus trained in the dark, before work, for eight months — the kind of early-morning routine that most people admire from a distance. He raised over £4,000 for the RNLI. He says he will sleep in now. He has not yet managed it.",
+    recovery:
+      "During her recovery, Claire started paying attention to the early evening — the particular quality of light, the way things quieted down. She said she had never really noticed it before. She notices it now.",
+    award:
+      "Amelia has just been named Teacher of the Year. She will tell you the best learning in her classroom happens in the mid-morning — when everyone has arrived but the day hasn't quite settled. She plans for it specifically.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He is a morning person — not performatively, just genuinely — and has been known to send messages at six that arrive with fully formed ideas inside them.",
+    celebration:
+      "Tell their story — who they are, what they love, and which time of day brings the best of them out. Morning people and evening people always have a reason.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite time of day — and what they do with it — is a small detail that often says a great deal.",
+  },
+
+  Decade: {
+    memorial:
+      "A beloved mother and teacher who came of age in the 1960s and carried something of that decade with her — a certain optimism about what could be changed, and a refusal to be entirely serious about any of it. She played her records until she couldn't.",
+    tribute:
+      "A mentor who said the 1970s got a bad press and was willing to argue the point at length. He had opinions about Afrobeat, about soul, about what British television was doing — and he was never wrong in a way that was easy to dismiss.",
+    birthday:
+      "Sarah is turning 40 and her favourite decade is the one she came of age in — though she will not tell you which one without some encouragement. She says the music was better then. She has evidence.",
+    retirement:
+      "David built his engineering career through the 1980s and remembers them with the selective affection of someone who was, for most of that decade, too busy to notice what was going on. He has opinions in retrospect.",
+    wedding:
+      "Emma and James have been arguing about which decade had the best music since approximately the third date. The argument has not been resolved. It has, however, generated a very good shared playlist.",
+    engagement:
+      "Sophie says the 90s. Callum says the 80s. They have agreed to disagree, which has been their policy on most things since Arthur's Seat. The playlist is a compromise and better for it.",
+    anniversary:
+      "Forty years together began in the early 1980s, and they have never quite left that decade — the music still plays, the references still land, and neither of them thinks this is a problem.",
+    leaving:
+      "Priya arrived at the studio with a position on the 1990s that she maintained for six years: it was the last decade to get popular culture completely right. The argument is still going on, even now that she's left.",
+    graduation:
+      "Tom studied architecture and developed an unexpectedly strong position on the built environment of the 1960s — not in spite of its failures, but because of what it was trying to do. He gives a good lecture on this if you ask him. Several people have.",
+    christening:
+      "Lily has arrived into a decade she will one day look back on as hers. Her parents already have opinions about what she'll love. They are probably wrong and they know it.",
+    achievement:
+      "Marcus built his marathon playlist almost entirely from one decade — the one with the songs that got him out of bed on the worst mornings. He raised over £4,000 for the RNLI. He has not been embarrassed about the playlist. He should not be.",
+    recovery:
+      "During her recovery, Claire went back to the music of a particular decade — not out of nostalgia, exactly, but because it was familiar and reliable in the way she needed. It did its job. She is grateful to the decade for that.",
+    award:
+      "Amelia has just been named Teacher of the Year. She teaches a unit on the music of the 1960s that is not on the curriculum and is the most requested lesson of the year. She has been doing it for eight years and it has never once gone the same way twice.",
+    promotion:
+      "After three years of excellent work, Kwame has been promoted to Head of Product. He grew up with Ghanaian highlife from the 1970s alongside British pop of the same era, and has strong views about both that he considers relevant to his work. They are.",
+    celebration:
+      "Tell their story — who they are, what they love, and which decade they feel most themselves in. The decade someone returns to always says something about who they are.",
+    other:
+      "Tell us who this person is and why you're gathering. A favourite decade — for its music, its culture, or just what it felt like — is a good way in.",
+  },
 }
