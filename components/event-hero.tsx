@@ -24,13 +24,13 @@ type EditProps = {
   occasion: string
   occasionLabel: string
   protagonistName: string
-  protagonistBio: string
+  protagonistAbout: string
   dateLabel: string
   initialPhotoUrl?: string | null
   placeholders: Pick<OccasionPlaceholders, "name" | "about">
   onOccasionLabelChange: (v: string) => void
   onProtagonistNameChange: (v: string) => void
-  onProtagonistBioChange: (v: string) => void
+  onProtagonistAboutChange: (v: string) => void
   onDateLabelChange: (v: string) => void
   onPhotoUrlChange: (url: string) => void
 }
@@ -169,11 +169,11 @@ export function EventHero(props: Props) {
                 aria-hidden="true"
                 className="invisible min-h-13 w-full text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
               >
-                {(props as EditProps).protagonistBio || "\u00A0"}
+                {(props as EditProps).protagonistAbout || "\u00A0"}
               </p>
               <textarea
-                value={(props as EditProps).protagonistBio}
-                onChange={(e) => props.onProtagonistBioChange(e.target.value)}
+                value={(props as EditProps).protagonistAbout}
+                onChange={(e) => props.onProtagonistAboutChange(e.target.value)}
                 placeholder={props.placeholders.about}
                 className="peer absolute inset-0 h-full w-full resize-none appearance-none bg-transparent py-0 pr-5 text-base leading-relaxed text-muted-foreground outline-none placeholder:text-muted-foreground/40"
               />

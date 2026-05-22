@@ -176,7 +176,7 @@ export type PledgeWithAllocations = Pledge & {
 }
 
 // Canvas types — shared between EventCanvas sub-components and server pages
-export type TopicPlaceholders = Record<string, { reveal: string }>
+export type TopicPlaceholders = Record<string, { about?: string; reveal: string }>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[]
@@ -200,7 +200,7 @@ export type CanvasPoll = {
 
 export type CanvasSubmitData = {
   protagonistName: string
-  protagonistBio?: string | null
+  protagonistAbout?: string | null
   dateLabel: string | null
   photoUrl?: string | null
   occasion: string
@@ -223,7 +223,7 @@ export type CanvasSubmitData = {
 
 export type CanvasInitialData = {
   protagonistName?: string
-  protagonistBio?: string
+  protagonistAbout?: string
   dateLabel?: string
   occasion?: string
   occasionLabel?: string

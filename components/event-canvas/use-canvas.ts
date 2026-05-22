@@ -32,7 +32,7 @@ export function useCanvas({
 
   const [state, setState] = useState<CanvasState>({
     protagonistName: "",
-    protagonistBio: "",
+    protagonistAbout: "",
     dateLabel: "",
     occasion: "",
     occasionLabel: "",
@@ -121,7 +121,7 @@ export function useCanvas({
     try {
       const submitData: CanvasSubmitData = {
         protagonistName: state.protagonistName,
-        protagonistBio: state.protagonistBio || null,
+        protagonistAbout: state.protagonistAbout || null,
         dateLabel: state.dateLabel || null,
         photoUrl,
         occasionLabel: state.occasionLabel || null,
@@ -168,7 +168,7 @@ export function useCanvas({
       } else {
         const { eventId: newId } = await createEvent({
           protagonistName: submitData.protagonistName,
-          protagonistBio: submitData.protagonistBio ?? null,
+          protagonistAbout: submitData.protagonistAbout ?? null,
           photoUrl: submitData.photoUrl ?? null,
           dateLabel: submitData.dateLabel,
           occasion: submitData.occasion,
@@ -201,10 +201,12 @@ export function useCanvas({
     }
   }
 
-  const firstTopicTitle = topics.find(t => t.id === state.polls[0]?.topicId)?.title
+  const firstTopic = topics.find(t => t.id === state.polls[0]?.topicId)
+  const topicAbout = firstTopic?.placeholders?.[state.occasion]?.about
+    ?? firstTopic?.placeholders?.["default"]?.about
   const placeholders = {
     ...(OCCASION_PLACEHOLDERS[state.occasion] ?? DEFAULT_PLACEHOLDERS),
-    about: getAboutPlaceholder(state.occasion, firstTopicTitle),
+    about: topicAbout ?? getAboutPlaceholder(state.occasion),
   }
 
   return {

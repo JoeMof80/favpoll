@@ -105,13 +105,13 @@ export function EventCanvas(props: Props) {
               occasion={state.occasion}
               occasionLabel={state.occasionLabel}
               protagonistName={state.protagonistName}
-              protagonistBio={state.protagonistBio}
+              protagonistAbout={state.protagonistAbout}
               dateLabel={state.dateLabel}
               initialPhotoUrl={props.initialData?.photoUrl}
               placeholders={placeholders}
               onOccasionLabelChange={(v) => set("occasionLabel", v)}
               onProtagonistNameChange={(v) => set("protagonistName", v)}
-              onProtagonistBioChange={(v) => set("protagonistBio", v)}
+              onProtagonistAboutChange={(v) => set("protagonistAbout", v)}
               onDateLabelChange={(v) => set("dateLabel", v)}
               onPhotoUrlChange={setPhotoUrl}
             />

@@ -15,7 +15,7 @@ import type { CanvasSubmitData } from "@/types"
 function makeInput(overrides: Partial<CanvasSubmitData> = {}): CanvasSubmitData {
   return {
     protagonistName: "Alice",
-    protagonistBio: "A bio",
+    protagonistAbout: "A bio",
     dateLabel: null,
     photoUrl: null,
     occasion: "birthday",
@@ -159,7 +159,7 @@ describe("updateEvent — DB writes", () => {
     await updateEvent(
       "event-1",
       "prot-1",
-      makeInput({ protagonistName: "  Bob  ", dateLabel: "1990–2025", protagonistBio: "Bio text" })
+      makeInput({ protagonistName: "  Bob  ", dateLabel: "1990–2025", protagonistAbout: "Bio text" })
     )
 
     const protUpdate = mock.callsFor("protagonists").find((c) => c.method === "update")!

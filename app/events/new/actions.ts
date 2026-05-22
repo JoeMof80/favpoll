@@ -23,7 +23,7 @@ type PollInput = {
 
 type CreateEventInput = {
   protagonistName: string
-  protagonistBio: string | null
+  protagonistAbout: string | null
   photoUrl: string | null
   dateLabel: string | null
   occasion: string
@@ -173,7 +173,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
 
   const protagonistRow: Record<string, unknown> = {
     name: input.protagonistName.trim(),
-    about: input.protagonistBio || null,
+    about: input.protagonistAbout || null,
     photo_url: input.photoUrl || null,
     date_label: input.dateLabel || null,
     created_by: userId,

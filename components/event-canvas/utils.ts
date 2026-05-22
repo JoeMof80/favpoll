@@ -4,7 +4,7 @@ export const MAX_CHARITIES = 3
 
 export type CanvasState = {
   protagonistName: string
-  protagonistBio: string
+  protagonistAbout: string
   dateLabel: string
   occasion: string
   occasionLabel: string

@@ -142,7 +142,7 @@ export const EditMode = {
     }
     const [occasionLabel, setOccasionLabel] = useState("In memory of")
     const [protagonistName, setProtagonistName] = useState("")
-    const [protagonistBio, setProtagonistBio] = useState("")
+    const [protagonistAbout, setProtagonistAbout] = useState("")
     const [dateLabel, setDateLabel] = useState("")
     return (
       <EventHero
@@ -150,13 +150,13 @@ export const EditMode = {
         occasion="memorial"
         occasionLabel={occasionLabel}
         protagonistName={protagonistName}
-        protagonistBio={protagonistBio}
+        protagonistAbout={protagonistAbout}
         dateLabel={dateLabel}
         initialPhotoUrl={null}
         placeholders={placeholders}
         onOccasionLabelChange={setOccasionLabel}
         onProtagonistNameChange={setProtagonistName}
-        onProtagonistBioChange={setProtagonistBio}
+        onProtagonistAboutChange={setProtagonistAbout}
         onDateLabelChange={setDateLabel}
         onPhotoUrlChange={() => {}}
       />
