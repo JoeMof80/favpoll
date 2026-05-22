@@ -69,7 +69,7 @@ topics (
   description text,
   is_finite boolean default false,
   is_active boolean not null default true,
-  placeholders jsonb default '{}',  -- Keyed framing/reveal pairs by occasion
+  placeholders jsonb default '{}',  -- Keyed about+reveal pairs by occasion, used for canvas placeholders
   created_by text references users(id),
   created_at timestamptz
 )
@@ -98,7 +98,7 @@ protagonists (
   id uuid primary key,
   name text not null,
   date_label text,                  -- e.g. "1940 – 2024", "Turning 35"
-  bio text,
+  about text,
   photo_url text,
   created_by text references users(id),
   created_at timestamptz
@@ -364,7 +364,7 @@ components/
 │   ├── hero-pitch-column.tsx         -- Left column: animated eyebrow, headline, supporting text, CTA buttons
 │   └── demo-card.tsx                 -- Card: protagonist header, topic title, poll options, pledge panel, reveal quote, rankings, charity total, toast
 ├── event-canvas/                     -- Event creation/editing canvas
-│   └── use-canvas.ts                 -- Canvas state — uses getBioPlaceholder(occasion, firstTopicTitle) for topic-aware bio placeholder
+│   └── use-canvas.ts                 -- Canvas state — reads topic.placeholders[occasion].about for topic-aware about placeholder; falls back to getAboutPlaceholder(occasion)
 ├── event-hero.tsx                    -- Event header with protagonist info
 ├── event-card.tsx                    -- Card for live events listings
 ├── event-card-empty.tsx              -- Empty state card
@@ -377,8 +377,7 @@ components/
 └── pot-banner.tsx                    -- Shared fund banner
 
 lib/
-├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders; exports getBioPlaceholder(occasion, topicTitle?)
-├── topic-bio-placeholders.ts         -- TOPIC_BIO_PLACEHOLDERS — 560 bios keyed by topic title × occasion
+├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders; exports getAboutPlaceholder(occasion) — occasion-level fallback only
 ├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline, getPollHint
 ├── i18n.ts                           -- formatCurrency(), t(), MARKET_DEFAULTS, Market type
 ├── email.ts                          -- Resend email helpers
@@ -545,7 +544,7 @@ CRON_SECRET
 
 - **`personal_framing` retired.** Column kept in database but app no longer reads or writes it. The auto-generated hint line `"Is it the same as [Name]'s?"` replaces it in all guest-facing views.
 
-- **Topic-aware bio placeholders.** `getBioPlaceholder(occasion, topicTitle?)` in `lib/occasions.ts` returns a placeholder from `TOPIC_BIO_PLACEHOLDERS` (560 bios keyed by topic × occasion) when a topic is selected, falling back to the occasion-only placeholder. Wired into `use-canvas.ts` — updates live as the organiser picks a topic.
+- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). The canvas `protagonistAbout` textarea shows a placeholder from the selected topic's `placeholders` JSONB (`topic.placeholders[occasion].about`), falling back to `getAboutPlaceholder(occasion)` from `lib/occasions.ts`. The per-topic placeholder data lives in the seed and is stored in the DB — `lib/topic-bio-placeholders.ts` has been deleted. Placeholder updates live as the organiser picks a topic.
 
 - **Localisation foundations in place.** Market field on `events` (default `'en-GB'`), markets array on `topic_items` (default `['en-GB']`). Currency rendering via `formatCurrency()` in `lib/i18n.ts`. UI strings in `messages/en-GB.json` via `t()` helper. Full `next-intl` migration deferred until a second market launches. See `references/LOCALISATION.md`.
 
