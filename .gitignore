@@ -1,5 +1,7 @@
 # dependencies
 /node_modules
+apps/web/node_modules
+packages/*/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -14,6 +16,8 @@
 # next.js
 /.next/
 /out/
+apps/web/.next/
+apps/web/out/
 
 # production
 /build
@@ -37,3 +41,4 @@ next-env.d.ts
 
 *storybook.log
 storybook-static
+apps/web/storybook-static
