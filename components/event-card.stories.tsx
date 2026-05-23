@@ -1,17 +1,34 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { EventCard } from "./event-card"
 
+const COLOUR_ITEMS = [
+  { id: "item-1", label: "Purple" },
+  { id: "item-2", label: "Blue" },
+  { id: "item-3", label: "Green" },
+  { id: "item-4", label: "Red" },
+  { id: "item-5", label: "Yellow" },
+]
+
+const ICE_CREAM_ITEMS = [
+  { id: "item-1", label: "Chocolate" },
+  { id: "item-2", label: "Vanilla" },
+  { id: "item-3", label: "Strawberry" },
+  { id: "item-4", label: "Mint choc chip" },
+]
+
 const baseEvent = {
   id: "1",
-  occasion: "memorial",
+  occasion_label: "In memory of",
   description: "A beloved mother, teacher, and friend who spent her life bringing people together.",
   closes_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   total_raised: 750,
   protagonist: { name: "Belinda Johnson" },
-  charities: [{ charity: { name: "Age UK" } }],
-  polls: [
-    { topic: { title: "Colour" } },
-  ],
+  charities: [{ charity: { id: "c1", name: "Age UK", logo_url: null, registered_number: "1128267", description: null, created_at: "" } }],
+  poll: {
+    id: "poll-1",
+    topic_id: "topic-1",
+    topic: { title: "Colour", topic_items: COLOUR_ITEMS },
+  },
 }
 
 const meta = {
@@ -20,7 +37,7 @@ const meta = {
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
-      <ul className="w-72">
+      <ul className="w-80">
         <Story />
       </ul>
     ),
@@ -39,14 +56,16 @@ export const Birthday: Story = {
     event: {
       ...baseEvent,
       id: "2",
-      occasion: "birthday",
+      occasion_label: "Birthday",
       description: null,
       total_raised: 480,
       protagonist: { name: "Poppy Clarke" },
-      charities: [{ charity: { name: "Comic Relief" } }],
-      polls: [
-        { topic: { title: "Ice cream" } },
-      ],
+      charities: [{ charity: { id: "c2", name: "Comic Relief", logo_url: null, registered_number: null, description: null, created_at: "" } }],
+      poll: {
+        id: "poll-2",
+        topic_id: "topic-2",
+        topic: { title: "Ice cream", topic_items: ICE_CREAM_ITEMS },
+      },
     },
   },
 }
@@ -56,38 +75,21 @@ export const Retirement: Story = {
     event: {
       ...baseEvent,
       id: "3",
-      occasion: "retirement",
+      occasion_label: "After a lifetime of good work",
       description: "After 35 years building the engineering team, David is finally putting down his laptop.",
       total_raised: 1250,
       protagonist: { name: "David Clarke" },
-      charities: [{ charity: { name: "Macmillan" } }, { charity: { name: "Dogs Trust" } }],
-      polls: [
-        { topic: { title: "Season" } },
-      ],
-    },
-  },
-}
-
-export const HighAmount: Story = {
-  args: {
-    event: {
-      ...baseEvent,
-      total_raised: 12500,
       charities: [
-        { charity: { name: "Age UK" } },
-        { charity: { name: "Macmillan" } },
-        { charity: { name: "RNLI" } },
+        { charity: { id: "c3", name: "Macmillan", logo_url: null, registered_number: null, description: null, created_at: "" } },
+        { charity: { id: "c4", name: "Dogs Trust", logo_url: null, registered_number: null, description: null, created_at: "" } },
       ],
     },
   },
 }
 
-export const NoPollData: Story = {
+export const NoPoll: Story = {
   args: {
-    event: {
-      ...baseEvent,
-      polls: [],
-    },
+    event: { ...baseEvent, poll: null },
   },
 }
 

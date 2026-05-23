@@ -73,9 +73,9 @@ export const Memorial: Story = {
       "Belinda was a school librarian for forty years at St Catherine's. She is remembered for her warmth, her impossible memory for every pupil's name, and her lifelong love of purple.",
     occasion: 'memorial',
     charityName: SCENES[0].charity,
-    polls: [MEMORIAL_POLL],
+    poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
-    pollIds: ['poll-memorial'],
+    pollId: 'poll-memorial',
     eventUrl: 'https://favpoll.com/events/demo-memorial',
   },
 }
@@ -89,9 +89,9 @@ export const Birthday: Story = {
     description: null,
     occasion: 'birthday',
     charityName: SCENES[1].charity,
-    polls: [BIRTHDAY_POLL],
+    poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
-    pollIds: ['poll-birthday'],
+    pollId: 'poll-birthday',
     eventUrl: 'https://favpoll.com/events/demo-birthday',
   },
 }
@@ -106,26 +106,26 @@ export const Retirement: Story = {
       'Ros spent thirty-one years teaching secondary science. She never once took a sick day.',
     occasion: 'retirement',
     charityName: SCENES[2].charity,
-    polls: [RETIREMENT_POLL],
+    poll: RETIREMENT_POLL,
     initialTotalRaised: 700,
-    pollIds: ['poll-retirement'],
+    pollId: 'poll-retirement',
     eventUrl: 'https://favpoll.com/events/demo-retirement',
   },
 }
 
-export const MultiPoll: Story = {
+export const Graduation: Story = {
   args: {
-    eventId: 'demo-multi',
-    protagonistName: 'James Okafor',
+    eventId: 'demo-graduation',
+    protagonistName: SCENES[5].protagonistName,
     dateLabel: '13th June 2026',
     occasionLabel: 'Congratulations',
     description:
       "James graduated last week with a first in mechanical engineering. He's already accepted a job offer.",
     occasion: 'graduation',
     charityName: "The Prince's Trust",
-    polls: [GRADUATION_POLL, RETIREMENT_POLL],
+    poll: GRADUATION_POLL,
     initialTotalRaised: 1730,
-    pollIds: ['poll-graduation', 'poll-retirement'],
-    eventUrl: 'https://favpoll.com/events/demo-multi',
+    pollId: 'poll-graduation',
+    eventUrl: 'https://favpoll.com/events/demo-graduation',
   },
 }

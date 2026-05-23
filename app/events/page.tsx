@@ -27,7 +27,12 @@ export default async function LiveEventsPage() {
         charity:charities ( id, name, logo_url, registered_number )
       ),
       event_polls (
-        topic:topics ( title )
+        id,
+        topic_id,
+        topic:topics (
+          title,
+          topic_items ( id, label )
+        )
       )
     `
     )
@@ -70,7 +75,14 @@ export default async function LiveEventsPage() {
               total_raised: number
               protagonist: { name: string }
               charities: { charity: import("@/types").Charity }[]
-              event_polls: { topic: { title: string; topic_items: string[] } | null }[]
+              event_polls: {
+                id: string
+                topic_id: string | null
+                topic: {
+                  title: string
+                  topic_items: { id: string; label: string }[]
+                } | null
+              }[]
             }
             const eventCardProps = {
               ...rawEvent,

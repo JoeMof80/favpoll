@@ -30,6 +30,10 @@ const config: StorybookConfig = {
           __dirname,
           "./__mocks__/actions.ts"
         ),
+        "@/app/events/[id]/actions": path.resolve(
+          __dirname,
+          "./__mocks__/event-actions.ts"
+        ),
       },
     }
     return config

@@ -31,6 +31,10 @@ export function useCanvas({
 }: UseCanvasOptions) {
   const router = useRouter()
 
+  // Merge initial poll data safely — avoids spreading Partial<CanvasPoll> into CanvasState
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const initialPoll = { ...newPoll(preselectedTopicId ?? ""), ...(initialData?.poll ?? {}) } as CanvasPoll
+
   const [state, setState] = useState<CanvasState>({
     protagonistName: "",
     protagonistAbout: "",
@@ -43,8 +47,8 @@ export function useCanvas({
     closesAt: "",
     isPrivate: false,
     potAmount: "",
-    poll: { ...newPoll(preselectedTopicId ?? ""), ...(initialData?.poll ?? {}) },
     ...initialData,
+    poll: initialPoll,
   })
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(
