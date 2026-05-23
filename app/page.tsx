@@ -13,19 +13,19 @@ export default async function HomePage() {
     .from("events")
     .select(
       `
-      id,
-      occasion,
-      description,
-      closes_at,
-      total_raised,
-      protagonist:protagonists ( name ),
-      charities:event_charities (
-        charity:charities ( name )
-      ),
-      polls:event_polls (
-        topic:topics ( title )
-      )
-    `
+    id,
+    occasion_label,
+    description,
+    closes_at,
+    total_raised,
+    protagonist:protagonists ( name ),
+    charities:event_charities (
+      charity:charities ( id, name, logo_url, registered_number )
+    ),
+    polls:event_polls (
+      topic:topics ( title )
+    )
+  `
     )
     .eq("is_private", false)
     .is("closed_at", null)

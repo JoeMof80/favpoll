@@ -1,70 +1,112 @@
+"use client"
+
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { occasionLabel, charityNames, formatAmount, formatRelativeDate } from "@/lib/display"
+import {
+  occasionLabel,
+  charityNames,
+  formatAmount,
+  formatRelativeDate,
+} from "@/lib/display"
 import { OccasionTag } from "@/components/ui/occasion-tag"
+import { FavpollHeader } from "./favpoll-card/favpoll-header"
+import { FavpollCardProvider } from "./favpoll-card/favpoll-card-context"
+import { FavpollCardSize } from "./favpoll-card/types"
+import { PollTitle } from "./favpoll-card/poll-title"
+import { FavpollCharityRow } from "./favpoll-card/favpoll-charity-row"
+import { CharityBanner } from "./charity-banner"
+import { Charity } from "@/types"
+import { CharityRow } from "./charity-row"
+import { AmountInput } from "./pledge-card/amount-input"
+import { AmountPresets } from "./pledge-card/amount-presets"
+import { usePledge } from "./pledge-card/use-pledge"
+import { Button } from "./ui/button"
+import { FavpollPledgePanel } from "./favpoll-card/favpoll-pledge-panel"
 
 type EventCardEvent = {
   id: string
-  occasion: string
+  occasion_label: string
   description: string | null
   closes_at: string
   total_raised: number
   protagonist: { name: string }
-  charities: { charity: { name: string } }[]
-  polls: { topic: { title: string } | null }[]
+  charities: { charity: Charity }[]
+  polls: { topic: { title: string; topic_items: string[] } | null }[]
 }
 
 type Props = {
+  size?: FavpollCardSize | undefined
   event: EventCardEvent
   className?: string
 }
 
-export function EventCard({ event, className }: Props) {
+export function EventCard({ size = "full", event, className }: Props) {
   const firstPoll = event.polls?.[0]
   const topicTitle = firstPoll?.topic?.title
+  const perCharity =
+    event.charities.length > 0 ? event.total_raised / event.charities.length : 0
 
   return (
-    <li className={cn("list-none", className)}>
-      <Link href={`/events/${event.id}`}>
-        <div className="group flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background p-5 transition-colors duration-200 hover:border-[#AFA9EC]">
+    <FavpollCardProvider value={{ size }}>
+      <li className={cn("list-none", className)}>
+        <Link href={`/events/${event.id}`}>
+          <div className="group flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
+            <div className="p-5">
+              {/* Occasion tag */}
+              {/* <OccasionTag
+              label={occasionLabel(event.occasion_label)}
+              className="mb-2"
+            /> */}
 
-          {/* Occasion tag */}
-          <OccasionTag label={occasionLabel(event.occasion)} className="mb-2" />
+              <FavpollHeader
+                protagonistName={event.protagonist.name}
+                protagonistInitials="??"
+                protagonistAvatarSrc="https://i.pravatar.cc/150?img=47"
+                eyebrow={event.occasion_label}
+                dateLabel={event.closes_at}
+              />
 
-          {/* Heading — topic if available, else protagonist name */}
-          <h2 className="mb-2 text-[20px] font-medium tracking-tight text-foreground transition-colors duration-200 group-hover:text-[#534AB7]">
-            {topicTitle ? `Favourite ${topicTitle}` : event.protagonist.name}
-          </h2>
+              {/* Heading — topic if available, else protagonist name */}
+              <PollTitle title={topicTitle} />
 
-          {/* Description */}
-          {event.description && (
-            <p className="mb-4 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-              {event.description}
-            </p>
-          )}
+              {/* Description */}
+              {event.description && (
+                <p className="mb-4 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+                  {event.description}
+                </p>
+              )}
 
-          {/* Footer */}
-          <div className="mt-auto flex items-end justify-between border-t border-border pt-3">
-            <div>
-              <p className="text-[12px] font-medium text-foreground">
-                {event.protagonist.name}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {charityNames(event.charities)}
-              </p>
+              <div className="space-y-3">
+                <AmountInput
+                  id="pledge-amount"
+                  value="100"
+                  onChange={() => {}}
+                />
+                <FavpollPledgePanel />
+              </div>
+              {/* <RankingList
+                initialItems={event.polls[0]?.topic?.topic_items}
+                eventPollId={event.polls[0]?.id}
+                topicId={event.polls[0]?.topic_id}
+                rankingView={rankingView}
+              /> */}
             </div>
-            <div className="text-right">
-              <p className="text-[13px] font-medium text-[#534AB7]">
-                {formatAmount(event.total_raised)}
-              </p>
-              <p className="text-[10px] text-muted-foreground">
-                raised · closes {formatRelativeDate(event.closes_at)}
-              </p>
+
+            {/* Footer */}
+            <div className="mt-auto border-t border-border px-4 py-3">
+              <div className="space-y-3">
+                {event.charities.map((charity) => (
+                  <CharityRow
+                    key={charity.charity.id}
+                    charity={charity.charity}
+                    amountRaised={perCharity}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-
-        </div>
-      </Link>
-    </li>
+        </Link>
+      </li>
+    </FavpollCardProvider>
   )
 }

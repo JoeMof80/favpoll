@@ -13,18 +13,18 @@ export const metadata = {
 export default async function LiveEventsPage() {
   const supabase = await createClient()
 
-  const { data: events } = await supabase
+  const { data: events, error } = await supabase
     .from("events")
     .select(
       `
       id,
-      occasion,
+      occasion_label,
       description,
       closes_at,
       total_raised,
       protagonist:protagonists ( name ),
       charities:event_charities (
-        charity:charities ( name )
+        charity:charities ( id, name, logo_url, registered_number )
       ),
       polls:event_polls (
         topic:topics ( title )
@@ -35,6 +35,9 @@ export default async function LiveEventsPage() {
     .is("closed_at", null)
     .order("created_at", { ascending: false })
     .limit(24)
+
+  console.log("ERROR DETAILS:", error)
+  console.log("EVENTS DATA:", events)
 
   return (
     <main className="mx-auto max-w-330 px-6 py-12">

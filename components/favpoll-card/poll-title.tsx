@@ -6,11 +6,7 @@ type PollTitleProps = {
   pledged?: boolean
 }
 
-export function PollTitle({
-  title,
-  protagonistFirstName,
-  pledged = false,
-}: PollTitleProps) {
+export function PollTitle({ title }: PollTitleProps) {
   const { size } = useFavpollCard()
 
   const textClass =
@@ -20,10 +16,7 @@ export function PollTitle({
         ? "text-[15px]"
         : "text-[11px]"
 
-  const label =
-    pledged && protagonistFirstName
-      ? `${protagonistFirstName}'s favourite ${title}`
-      : `Favourite ${title}`
+  const label = `Favourite ${title}`
 
   return (
     <h3
