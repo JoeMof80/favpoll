@@ -14,6 +14,9 @@ importers:
       '@clerk/ui':
         specifier: ^1.9.1
         version: 1.9.1(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@19.2.14)(bs58@6.0.0)(react-dom@19.2.6(react@19.2.6))(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.6)(utf-8-validate@6.0.6))(react@19.2.6)(typescript@5.9.3)
+      '@radix-ui/react-tooltip':
+        specifier: ^1.2.8
+        version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@stripe/react-stripe-js':
         specifier: ^6.3.0
         version: 6.3.0(@stripe/stripe-js@9.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)

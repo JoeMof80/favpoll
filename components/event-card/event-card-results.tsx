@@ -9,9 +9,6 @@ type Props = {
 export function EventCardResults({ results }: Props) {
   return (
     <div className="space-y-2.5">
-      <p className="text-xs font-medium text-[#1D9E75]">
-        Pledge confirmed — here&apos;s how it&apos;s looking
-      </p>
       <ol role="list" aria-label="Results" className="space-y-2">
         {results.map((item, i) => (
           <li key={item.label}>

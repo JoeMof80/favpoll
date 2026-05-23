@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { createPledge } from "@/app/events/[id]/actions"
 
-export type CardStep = "idle" | "picking" | "ready" | "paying" | "pledged"
+export type CardStep = "idle" | "ready" | "paying" | "pledged"
 
 export type CardResultItem = {
   label: string
@@ -14,25 +13,17 @@ export type CardResultItem = {
 
 type Options = {
   pollId: string
-  topicId: string | null
+  initialResults?: CardResultItem[]
 }
 
-export function useEventCardPledge({ pollId, topicId }: Options) {
+export function useEventCardPledge({ pollId, initialResults }: Options) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [selectedItemLabel, setSelectedItemLabel] = useState<string | null>(null)
   const [amount, setAmount] = useState<number | null>(null) // pounds
-  const [step, setStep] = useState<CardStep>("idle")
+  const [step, setStep] = useState<CardStep>(initialResults ? "pledged" : "idle")
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [results, setResults] = useState<CardResultItem[] | null>(null)
+  const [results, setResults] = useState<CardResultItem[] | null>(initialResults ?? null)
   const [error, setError] = useState<string | null>(null)
-
-  function openPicker() {
-    setStep("picking")
-  }
-
-  function closePicker() {
-    setStep(selectedItemId !== null ? "ready" : "idle")
-  }
 
   function selectItem(id: string, label: string) {
     setSelectedItemId(id)
@@ -84,29 +75,17 @@ export function useEventCardPledge({ pollId, topicId }: Options) {
       return
     }
 
-    // Fetch results snapshot for the topic
-    if (topicId) {
-      const supabase = createClient()
-      const { data: items } = await supabase
-        .from("topic_items")
-        .select("label, all_time_pledged")
-        .eq("topic_id", topicId)
-        .order("all_time_pledged", { ascending: false })
-        .limit(5)
-
-      if (items && items.length > 0) {
-        const max = (items[0].all_time_pledged as number) ?? 1
-        setResults(
-          items.map((item) => {
-            const pledged = (item.all_time_pledged as number) ?? 0
-            return {
-              label: item.label as string,
-              amountPence: Math.round(pledged * 100),
-              widthPercent: max > 0 ? Math.round((pledged / max) * 100) : 0,
-            }
-          })
-        )
+    // Fetch results snapshot for this poll
+    try {
+      const res = await fetch(`/api/polls/${pollId}/results`)
+      if (res.ok) {
+        const { results: fetched } = (await res.json()) as {
+          results: CardResultItem[]
+        }
+        if (fetched.length > 0) setResults(fetched)
       }
+    } catch {
+      // Non-fatal — show pledged state without results
     }
 
     setClientSecret(null)
@@ -118,6 +97,19 @@ export function useEventCardPledge({ pollId, topicId }: Options) {
     setStep("ready")
   }
 
+  function viewResults() {
+    setStep("pledged")
+  }
+
+  function resetPledge() {
+    setSelectedItemId(null)
+    setSelectedItemLabel(null)
+    setAmount(null)
+    setStep("idle")
+    setClientSecret(null)
+    setError(null)
+  }
+
   return {
     selectedItemId,
     selectedItemLabel,
@@ -126,12 +118,12 @@ export function useEventCardPledge({ pollId, topicId }: Options) {
     clientSecret,
     results,
     error,
-    openPicker,
-    closePicker,
     selectItem,
     selectAmount,
     initPayment,
     onPaymentSuccess,
     closePayment,
+    resetPledge,
+    viewResults,
   }
 }

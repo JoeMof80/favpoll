@@ -20,6 +20,7 @@
   "dependencies": {
     "@clerk/nextjs": "^7.3.3",
     "@clerk/ui": "^1.9.1",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@stripe/react-stripe-js": "^6.3.0",
     "@stripe/stripe-js": "^9.4.0",
     "@supabase/ssr": "^0.10.3",
