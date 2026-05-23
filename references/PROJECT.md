@@ -286,6 +286,7 @@ API:
 /api/stripe/payment-intent     -- Creates Stripe PaymentIntent for pledge checkout
 /api/webhooks/clerk            -- Clerk user sync webhook
 /api/events/[id]/request-extension -- Sends extension request email to admin
+/api/polls/[pollId]/results  -- Returns ranked pledge totals for a specific event poll (admin client, bypasses RLS)
 ```
 
 ---
@@ -311,7 +312,8 @@ app/
 │       └── manage/page.tsx           -- Organiser management
 ├── my-events/page.tsx
 ├── rankings/page.tsx
-└── topics/[id]/page.tsx
+├── topics/[id]/page.tsx
+└── api/polls/[id]/results/route.ts   -- Ranked pledge results for a poll (admin client)
 
 components/
 ├── ui/                               -- Atoms (shadcn + custom)
@@ -323,7 +325,9 @@ components/
 │   ├── occasion-tag.tsx              -- Small uppercase occasion label (brand purple)
 │   ├── section-eyebrow.tsx           -- Small uppercase section label (brand | muted variants)
 │   ├── ranking-bar.tsx               -- Label + amount + progress bar row
-│   └── reveal-quote.tsx              -- Left-bordered italic blockquote
+│   ├── reveal-quote.tsx              -- Left-bordered italic blockquote
+│   ├── picker-field.tsx              -- Reusable input+Popover+Chip grid (searchable or read-only display mode)
+│   └── tooltip.tsx                   -- Radix tooltip wrapper (content, side props)
 ├── canvas/                           -- Event creation/editing UI
 │   ├── poll-editor.tsx
 │   ├── topic-picker.tsx
@@ -332,7 +336,7 @@ components/
 │   ├── share-screen.tsx
 │   └── canvas-sidebar/
 │       ├── index.tsx
-│       ├── charity-picker.tsx
+│       ├── charity-picker.tsx        -- Multi-select charity input; delegates input+popover to PickerField
 │       ├── closing-date.tsx
 │       ├── privacy-toggle.tsx
 │       └── shared-fund.tsx
@@ -366,9 +370,14 @@ components/
 ├── event-canvas/                     -- Event creation/editing canvas
 │   └── use-canvas.ts                 -- Canvas state — reads topic.placeholders[occasion].about for topic-aware about placeholder; falls back to getAboutPlaceholder(occasion)
 ├── event-hero.tsx                    -- Event header with protagonist info
-├── event-card.tsx                    -- Card for live events listings
+├── event-card.tsx                    -- Fully interactive card for live events listings (5-stage pledge flow)
+├── event-card/                       -- EventCard sub-components and hook
+│   ├── use-event-card-pledge.ts      -- State machine hook: idle→ready→paying→pledged + resetPledge/viewResults
+│   ├── event-card-results.tsx        -- Post-pledge ranking bars (RankingBar list)
+│   └── event-card-charity-carousel.tsx -- Embla y-axis auto-rotating charity footer (1 charity = static)
 ├── event-card-empty.tsx              -- Empty state card
-├── home-carousel.tsx                 -- Embla carousel for all-time data
+├── home-carousel.tsx                 -- Embla carousel for all-time data (unused — see live-events-carousel)
+├── live-events-carousel.tsx          -- Embla carousel for homepage live events (client component, loop + autoplay)
 ├── charity-banner.tsx                -- Charity names + logos
 ├── countdown.tsx                     -- Closing countdown display
 ├── header.tsx                        -- App header (nav + auth)
@@ -492,7 +501,7 @@ Gray 100:  #D3D1C7   — borders, dividers
 
 ## Testing
 
-Run with `pnpm test:run`. **421 tests must pass** before committing.
+Run with `pnpm test:run`. **419 tests must pass** before committing.
 
 Tests are co-located in `__tests__/` directories alongside their subjects:
 
@@ -540,7 +549,7 @@ CRON_SECRET
 
 ## Decisions locked in
 
-- **One poll per event — enforced.** Each event has exactly one poll. The data model uses a `polls` array internally but the UI deliberately allows only one. Do not build multi-poll support without explicit instruction. `state.polls[0]` is always the poll.
+- **One poll per event — enforced at DB level.** `event_polls` has a `UNIQUE(event_id)` constraint (migration `20260523000000_enforce_single_poll_per_event.sql`). All types, hooks, and server actions use singular `poll` (not `polls[]`). Do not build multi-poll support without explicit instruction.
 
 - **`personal_framing` retired.** Column kept in database but app no longer reads or writes it. The auto-generated hint line `"Is it the same as [Name]'s?"` replaces it in all guest-facing views.
 
@@ -553,6 +562,8 @@ CRON_SECRET
 ## Outstanding TODO
 
 - **Localisation next steps:** install `next-intl`, complete string extraction, add `country_code` and `tax_deductible` to `charities`, seed US-market topic items, write US tone guidance in brand skill, add market-aware topic filtering, Gift Aid (UK) and 501(c)(3) copy (US)
+- `EventCard initialResults` only pre-populated for authenticated users — guest returning-visitor pledge detection not yet implemented
+- `home-carousel.tsx` is unused — remove or repurpose for all-time rankings browse
 - Stripe Connect — charity disbursement (cron has placeholder; `api/stripe/payment-intent` creates PaymentIntents but Connect payout not wired)
 - All-time rankings browse page (`/rankings` exists but needs data threshold logic)
 - User profile / donor history page

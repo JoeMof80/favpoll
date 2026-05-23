@@ -26,27 +26,52 @@ app/layout.tsx
 
 ### `app/page.tsx` — Home
 ```
-app/page.tsx
+app/page.tsx  (server component, createAdminClient, full event query)
   → hero-demo-panel *
       → hero-demo-panel/hero-pitch-column
       → hero-demo-panel/demo-card
+          → favpoll-card/favpoll-card-context  (FavpollCardProvider, size="demo")
+          → favpoll-card/favpoll-header
+          → favpoll-card/poll-title
           → ui/button
           → ui/ranking-bar *
           → ui/reveal-quote *
       → ui/chip *
-  → event-card *
-      → ui/occasion-tag *
+  → live-events-carousel  (client component)
+      → event-card  (see event-card tree)
   → ui/button *
   → ui/section-eyebrow *
 ```
 
 ### `app/events/page.tsx` — Events list
 ```
-app/events/page.tsx
-  → event-card *
+app/events/page.tsx  (server component, createAdminClient, auth() for pledge detection)
+  → event-card  (see event-card tree; passes initialResults for previously pledged polls)
   → event-card-empty
       → ui/button
   → ui/section-eyebrow
+```
+
+### `event-card` — Interactive pledge card
+```
+event-card  (client component)
+  → favpoll-card/favpoll-card-context  (FavpollCardProvider)
+  → favpoll-card/favpoll-header
+  → favpoll-card/poll-title
+  → event-card/use-event-card-pledge  (hook: idle→ready→paying→pledged)
+  → ui/picker-field
+      → ui/popover
+      → ui/chip
+  → pledge-card/amount-presets
+  → event-card/event-card-results
+      → ui/ranking-bar
+  → event-card/event-card-charity-carousel
+      → charity-row
+          → favpoll-card/favpoll-card-context  (useFavpollCard, size-aware)
+  → stripe-checkout
+  → ui/button
+  → ui/tooltip
+      → @radix-ui/react-tooltip
 ```
 
 ### `app/events/new/page.tsx` — Create event
@@ -75,10 +100,11 @@ app/events/new/page.tsx
               → ui/button
               → ui/textarea
           → canvas/canvas-sidebar/charity-picker
+              → ui/picker-field
+                  → ui/popover
+                  → ui/chip
               → ui/button
-              → ui/chip
               → ui/section-eyebrow
-              → ui/popover
           → canvas/canvas-sidebar/shared-fund
           → canvas/canvas-sidebar/privacy-toggle
               → ui/switch
@@ -182,7 +208,9 @@ app/pledges/withdraw/page.tsx
 | `reveal-quote` | demo-card | ✓ |
 | `occasion-tag` | event-card | ✓ |
 | `tabs` | poll-section, topic-rankings | — |
-| `popover` | charity-picker | — |
+| `popover` | charity-picker, picker-field | — |
+| `picker-field` | charity-picker, event-card | — |
+| `tooltip` | event-card | — |
 | `calendar` | closing-date | — |
 | `card` | closing-date | — |
 | `field` | closing-date | — |
@@ -204,15 +232,15 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 | Component | Used in production by |
 |-----------|----------------------|
-| `poll-title` | poll-heading |
+| `poll-title` | poll-heading, event-card |
 | `poll-framing` | nobody ⚠ |
 | `poll-reveal` | poll-heading |
 | `poll-options` | favpoll-poll only |
 | `poll-results` | favpoll-poll only |
-| `favpoll-card-context` | favpoll-card internals |
+| `favpoll-card-context` | event-card, demo-card, charity-row |
 | `favpoll-card` | stories only ⚠ |
 | `favpoll-poll` | favpoll-card only |
-| `favpoll-header` | favpoll-card only |
+| `favpoll-header` | event-card, demo-card |
 | `favpoll-pledge-panel` | favpoll-card only |
 | `favpoll-shared-fund` | favpoll-poll only |
 | `favpoll-charity-row` | event-page story only |
@@ -225,7 +253,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 | Component | File | Notes |
 |-----------|------|-------|
-| `home-carousel` | `components/home-carousel.tsx` | No imports anywhere |
+| `home-carousel` | `components/home-carousel.tsx` | Not imported by production code — live-events-carousel is used for homepage |
 | `pot-banner` | `components/pot-banner.tsx` | No imports anywhere |
 | `poll-framing` | `components/favpoll-card/poll-framing.tsx` | No imports anywhere — `personal_framing` retired |
 | `favpoll-card` | `components/favpoll-card/favpoll-card.tsx` | Stories only |
