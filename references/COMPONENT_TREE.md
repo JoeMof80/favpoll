@@ -56,9 +56,8 @@ app/events/new/page.tsx
       → event-hero
       → canvas/poll-editor
           → poll-heading
-              → favpoll-card/poll-title  (view mode)
-              → favpoll-card/poll-framing  (view mode)
-              → favpoll-card/poll-reveal  (view mode)
+              → favpoll-card/poll-title
+              → favpoll-card/poll-reveal
           → canvas/topic-picker
               → canvas/removable-pill
           → canvas/custom-topic-options
@@ -99,7 +98,6 @@ app/events/[id]/page.tsx
       → poll-section *
           → poll-heading
               → favpoll-card/poll-title
-              → favpoll-card/poll-framing
               → favpoll-card/poll-reveal
           → pledge-panel
               → ui/button
@@ -206,9 +204,9 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 | Component | Used in production by |
 |-----------|----------------------|
-| `poll-title` | poll-heading (view mode), favpoll-poll |
-| `poll-framing` | poll-heading (view mode), favpoll-poll |
-| `poll-reveal` | poll-heading (view mode), favpoll-poll |
+| `poll-title` | poll-heading |
+| `poll-framing` | nobody ⚠ |
+| `poll-reveal` | poll-heading |
 | `poll-options` | favpoll-poll only |
 | `poll-results` | favpoll-poll only |
 | `favpoll-card-context` | favpoll-card internals |
@@ -219,7 +217,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 | `favpoll-shared-fund` | favpoll-poll only |
 | `favpoll-charity-row` | event-page story only |
 
-> `favpoll-card` (the assembled card component) has stories but is not rendered anywhere in the app. Its sub-primitives (`poll-title`, `poll-framing`, `poll-reveal`) are consumed via `poll-heading` in both the canvas editor and the event page.
+> `favpoll-card` (the assembled card component) has stories but is not rendered anywhere in the app. Its sub-primitives (`poll-title`, `poll-reveal`) are consumed via `poll-heading` in both the canvas editor and the event page. `poll-framing` is entirely unused — `personal_framing` was retired.
 
 ---
 
@@ -229,6 +227,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 |-----------|------|-------|
 | `home-carousel` | `components/home-carousel.tsx` | No imports anywhere |
 | `pot-banner` | `components/pot-banner.tsx` | No imports anywhere |
+| `poll-framing` | `components/favpoll-card/poll-framing.tsx` | No imports anywhere — `personal_framing` retired |
 | `favpoll-card` | `components/favpoll-card/favpoll-card.tsx` | Stories only |
 | `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No imports found |
 | `ui/separator` | `components/ui/separator.tsx` | No imports found |
