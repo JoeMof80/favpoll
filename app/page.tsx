@@ -1,36 +1,93 @@
 import Link from "next/link"
 import { HeroDemoPanel } from "@/components/hero-demo-panel"
-import { EventCard } from "@/components/event-card"
+import { LiveEventsCarousel } from "@/components/live-events-carousel"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { t } from "@/lib/i18n"
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data: events } = await supabase
     .from("events")
     .select(
       `
-    id,
-    occasion_label,
-    description,
-    closes_at,
-    total_raised,
-    protagonist:protagonists ( name ),
-    charities:event_charities (
-      charity:charities ( id, name, logo_url, registered_number )
-    ),
-    polls:event_polls (
-      topic:topics ( title )
-    )
-  `
+      id,
+      occasion_label,
+      description,
+      closes_at,
+      total_raised,
+      protagonist:protagonists ( name ),
+      charities:event_charities (
+        charity:charities ( id, name, logo_url, registered_number )
+      ),
+      event_polls (
+        id,
+        topic_id,
+        topics (
+          title,
+          is_finite,
+          topic_items ( id, label )
+        ),
+        event_poll_items (
+          topic_items ( id, label )
+        )
+      )
+    `
     )
     .eq("is_private", false)
     .is("closed_at", null)
     .order("created_at", { ascending: false })
     .limit(6)
+
+  type RawTopicItem = { id: string; label: string }
+  type RawEpi = { topic_items: RawTopicItem }
+  type RawPoll = {
+    id: string
+    topic_id: string | null
+    topics: {
+      title: string
+      is_finite: boolean
+      topic_items: RawTopicItem[]
+    } | null
+    event_poll_items: RawEpi[]
+  }
+  type RawEvent = {
+    id: string
+    occasion_label: string
+    description: string | null
+    closes_at: string
+    total_raised: number
+    protagonist: { name: string }
+    charities: { charity: import("@/types").Charity }[]
+    event_polls: RawPoll | null
+  }
+
+  const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => {
+    const rawPoll = ev.event_polls ?? null
+    let poll: {
+      id: string
+      topic_id: string | null
+      topic: { title: string; topic_items: RawTopicItem[] } | null
+    } | null = null
+    if (rawPoll) {
+      const isFinite = rawPoll.topics?.is_finite ?? false
+      const topicItems = isFinite
+        ? (rawPoll.topics?.topic_items ?? [])
+        : (rawPoll.event_poll_items ?? [])
+            .map((epi) => epi.topic_items)
+            .filter(Boolean)
+      poll = {
+        id: rawPoll.id,
+        topic_id: rawPoll.topic_id,
+        topic: rawPoll.topics
+          ? { title: rawPoll.topics.title, topic_items: topicItems }
+          : null,
+      }
+    }
+    return { ...ev, poll }
+  })
 
   return (
     <main className="flex flex-col">
@@ -48,18 +105,8 @@ export default async function HomePage() {
             </Button>
           </div>
 
-          {events && events.length > 0 ? (
-            <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
-              {(
-                events as unknown as Parameters<typeof EventCard>[0]["event"][]
-              )?.map((event) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  className="w-72 shrink-0 snap-start"
-                />
-              ))}
-            </ul>
+          {normalised.length > 0 ? (
+            <LiveEventsCarousel events={normalised} />
           ) : (
             <div className="py-16 text-center">
               <p className="mb-2 text-[15px] font-medium text-foreground">

@@ -82,7 +82,9 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
 
       <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
         <div className="mb-8">
-          <h1 className="text-2xl font-medium text-foreground">The record</h1>
+          <h1 className="text-2xl font-medium text-foreground">
+            The record TODO: Sorting and filtering
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Every pledge ever made, across every event.
             {totalPledged > 0 && (
