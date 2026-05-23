@@ -17,7 +17,6 @@ type Props = {
   placeholders: OccasionPlaceholders
   onUpdatePoll: (updates: Partial<CanvasPoll>) => void
   onSelectTopic: (topic: TopicWithMeta) => void
-  onRemoveCustomPoll?: (topicId: string) => void
 }
 
 export function PollEditor({
@@ -28,7 +27,6 @@ export function PollEditor({
   placeholders,
   onUpdatePoll,
   onSelectTopic,
-  onRemoveCustomPoll,
 }: Props) {
   const [topicCategory, setTopicCategory] = useState<string | null>(null)
   const [topicFinite, setTopicFinite] = useState<"finite" | "infinite" | "custom" | null>(
@@ -110,7 +108,6 @@ export function PollEditor({
             setTopicFinite(val)
           }}
           onTopicSearchChange={setTopicSearch}
-          onRemoveCustomPoll={onRemoveCustomPoll}
         />
       )}
 

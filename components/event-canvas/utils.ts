@@ -14,12 +14,11 @@ export type CanvasState = {
   closesAt: string
   isPrivate: boolean
   potAmount: string
-  polls: CanvasPoll[]
+  poll: CanvasPoll
 }
 
 export function newPoll(topicId = ""): CanvasPoll {
   return {
-    key: Math.random().toString(36).slice(2),
     topicId,
     topicIsCustom: false,
     customTopicTitle: "",

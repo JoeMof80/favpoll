@@ -20,12 +20,12 @@ type Props = {
   eventId: string
   clerkUserId: string | null
   charityNames: string[]
-  pollsWithItems: EventPollWithItems[]
+  pollWithItems: EventPollWithItems
   pot: EventPot | null
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
-  onPledgeSuccess?: (pollIds: string[]) => void
+  onPledgeSuccess?: () => void
 }
 
 export function PledgeCard(props: Props) {

@@ -38,31 +38,23 @@ export default async function ManageEventPage({ params }: Props) {
 
   const typedEvent = event as EventWithDetails
 
-  // Fetch polls
-  const { data: polls } = await supabase
+  // Fetch poll
+  const { data: poll } = await supabase
     .from("event_polls")
     .select("*, topics(*)")
     .eq("event_id", id)
-    .order("created_at")
+    .maybeSingle()
 
-  // Fetch pledge totals per poll
-  const pollIds = (polls ?? []).map((p) => p.id)
-  const { data: pledges } = await supabase
-    .from("pledges")
-    .select("event_poll_id, total_amount")
-    .in("event_poll_id", pollIds)
-    .is("withdrawn_at", null)
+  // Fetch pledge total
+  const { data: pledges } = poll
+    ? await supabase
+        .from("pledges")
+        .select("total_amount")
+        .eq("event_poll_id", poll.id)
+        .is("withdrawn_at", null)
+    : { data: null }
 
-  const pledgeTotalsByPoll: Record<string, number> = {}
-  pledges?.forEach((p) => {
-    pledgeTotalsByPoll[p.event_poll_id] =
-      (pledgeTotalsByPoll[p.event_poll_id] ?? 0) + p.total_amount
-  })
-
-  const totalRaised = Object.values(pledgeTotalsByPoll).reduce(
-    (s, v) => s + v,
-    0
-  )
+  const totalRaised = (pledges ?? []).reduce((s, p) => s + p.total_amount, 0)
   const isClosed = !!event.closed_at || new Date(event.closes_at) < new Date()
 
   // Fetch pot info
@@ -116,38 +108,31 @@ export default async function ManageEventPage({ params }: Props) {
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card px-4 py-4">
-          <p className="text-xs text-muted-foreground">Polls</p>
+          <p className="text-xs text-muted-foreground">Poll</p>
           <p className="mt-1 text-xl font-medium text-foreground">
-            {polls?.length ?? 0}
+            {poll ? "1" : "0"}
           </p>
         </div>
       </div>
 
-      <section className="mt-8" aria-labelledby="polls-heading">
+      <section className="mt-8" aria-labelledby="poll-heading">
         <h2
-          id="polls-heading"
+          id="poll-heading"
           className="mb-3 text-base font-medium text-foreground"
         >
-          Polls
+          Poll
         </h2>
-        {polls && polls.length > 0 ? (
-          <ul className="space-y-2" role="list">
-            {polls.map((poll) => (
-              <li
-                key={poll.id}
-                className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3"
-              >
-                <p className="text-sm text-foreground">
-                  {poll.topics?.title ?? "—"}
-                </p>
-                <p className="text-sm text-muted-foreground tabular-nums">
-                  {formatCurrency(pledgeTotalsByPoll[poll.id] ?? 0)}
-                </p>
-              </li>
-            ))}
-          </ul>
+        {poll ? (
+          <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+            <p className="text-sm text-foreground">
+              {(poll.topics as { title: string } | null)?.title ?? "—"}
+            </p>
+            <p className="text-sm text-muted-foreground tabular-nums">
+              {formatCurrency(totalRaised)}
+            </p>
+          </div>
         ) : (
-          <p className="text-sm text-muted-foreground">No polls set up.</p>
+          <p className="text-sm text-muted-foreground">No poll set up.</p>
         )}
       </section>
 

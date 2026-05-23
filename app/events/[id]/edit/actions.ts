@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { CanvasSubmitData } from '@/types'
 
-type PollInput = CanvasSubmitData['polls'][number]
+type PollInput = CanvasSubmitData['poll']
 
 async function upsertPollForEvent(
   supabase: ReturnType<typeof createAdminClient>,
@@ -199,30 +199,6 @@ export async function updateEvent(
     )
   }
 
-  // Handle polls: upsert existing, create new, delete removed (only if no pledges)
-  const submittedIds = input.polls.map((p) => p.id).filter(Boolean) as string[]
-
-  const { data: existingPolls } = await supabase
-    .from('event_polls')
-    .select('id')
-    .eq('event_id', eventId)
-
-  const toDelete = (existingPolls ?? [])
-    .map((p) => p.id)
-    .filter((id) => !submittedIds.includes(id))
-
-  for (const id of toDelete) {
-    const { data: pledges } = await supabase
-      .from('pledges')
-      .select('id')
-      .eq('event_poll_id', id)
-      .limit(1)
-    if (!pledges || pledges.length === 0) {
-      await supabase.from('event_polls').delete().eq('id', id)
-    }
-  }
-
-  for (const poll of input.polls) {
-    await upsertPollForEvent(supabase, eventId, userId, poll)
-  }
+  // Upsert the single event poll
+  await upsertPollForEvent(supabase, eventId, userId, input.poll)
 }

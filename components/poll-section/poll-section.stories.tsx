@@ -31,7 +31,7 @@ function makePoll(sceneIndex: number): EventPollWithItems {
     ])
   )
 
-  const topic_items: TopicItem[] = scene.options.map((opt, i) => ({
+  const topic_items: TopicItem[] = scene.topic_items.map((opt, i) => ({
     id: `item-${sceneIndex}-${i}`,
     topic_id: topicId,
     label: opt.label,

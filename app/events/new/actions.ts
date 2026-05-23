@@ -33,7 +33,7 @@ type CreateEventInput = {
   closesAt: string
   isPrivate: boolean
   potAmount: number | null
-  polls: PollInput[]
+  poll: PollInput
 }
 
 async function ensureUser(supabase: ReturnType<typeof createAdminClient>, userId: string) {
@@ -220,9 +220,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
     )
   }
 
-  for (const poll of input.polls) {
-    await createPollForEvent(supabase, event.id, userId, poll)
-  }
+  await createPollForEvent(supabase, event.id, userId, input.poll)
 
   if (input.potAmount && input.potAmount > 0) {
     const { error: potErr } = await supabase.from('event_pots').insert({

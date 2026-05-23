@@ -15,19 +15,19 @@ export type UsePledgeOptions = {
   eventId: string
   clerkUserId: string | null
   charityNames: string[]
-  pollsWithItems: EventPollWithItems[]
+  pollWithItems: EventPollWithItems
   pot: EventPot | null
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
-  onPledgeSuccess?: (pollIds: string[]) => void
+  onPledgeSuccess?: () => void
 }
 
 export function usePledge({
   eventId,
   clerkUserId,
   charityNames,
-  pollsWithItems,
+  pollWithItems,
   pot,
   userPotAllocation,
   pollSelections,
@@ -82,9 +82,7 @@ export function usePledge({
     ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)
     : true
 
-  const hasAnySelection = Object.values(pollSelections).some(
-    (ids) => ids.length > 0
-  )
+  const hasAnySelection = (pollSelections[pollWithItems.id]?.length ?? 0) > 0
   const baseCanConfirm = isPledgeValid && hasAnySelection && !submitting
   const canOwnConfirm = baseCanConfirm && (!clerkUserId ? isGuestEmailValid : true)
   const canFundConfirm = baseCanConfirm && !fundOverAvailable
@@ -122,47 +120,31 @@ export function usePledge({
         }
       : null
 
-  function pledgedPollIds() {
-    return pollsWithItems
-      .filter((p) => (pollSelections[p.id]?.length ?? 0) > 0)
-      .map((p) => p.id)
-  }
-
   async function savePledge(guestEmailParam?: string) {
-    const pollsToSubmit = pollsWithItems.filter(
-      (p) => (pollSelections[p.id]?.length ?? 0) > 0
-    )
+    const selections = pollSelections[pollWithItems.id] ?? []
     if (clerkUserId) {
-      await Promise.all(
-        pollsToSubmit.map((poll) =>
-          createPledge({
-            eventPollId: poll.id,
-            potAllocationId: userPotAllocation?.id ?? null,
-            totalAmount: numericPledge,
-            allocations: computePledgeAllocations(
-              pollSelections[poll.id],
-              poll.topics.topic_items,
-              numericPledge
-            ),
-          })
-        )
-      )
+      await createPledge({
+        eventPollId: pollWithItems.id,
+        potAllocationId: userPotAllocation?.id ?? null,
+        totalAmount: numericPledge,
+        allocations: computePledgeAllocations(
+          selections,
+          pollWithItems.topics.topic_items,
+          numericPledge
+        ),
+      })
     } else {
       const email = guestEmailParam ?? guestEmail
-      await Promise.all(
-        pollsToSubmit.map((poll) =>
-          createGuestPledge({
-            eventPollId: poll.id,
-            guestEmail: email,
-            totalAmount: numericPledge,
-            allocations: computePledgeAllocations(
-              pollSelections[poll.id],
-              poll.topics.topic_items,
-              numericPledge
-            ),
-          })
-        )
-      )
+      await createGuestPledge({
+        eventPollId: pollWithItems.id,
+        guestEmail: email,
+        totalAmount: numericPledge,
+        allocations: computePledgeAllocations(
+          selections,
+          pollWithItems.topics.topic_items,
+          numericPledge
+        ),
+      })
     }
   }
 
@@ -191,26 +173,18 @@ export function usePledge({
     setError(null)
     setSubmitting(true)
     try {
-      const pollsToSubmit = pollsWithItems.filter(
-        (p) => (pollSelections[p.id]?.length ?? 0) > 0
-      )
-      let potAllocated = pot.total_allocated
-      const ids = pollsToSubmit.map((p) => p.id)
-      for (const poll of pollsToSubmit) {
-        await pledgeFromFund({
-          eventPollId: poll.id,
-          potId: pot.id,
-          potCurrentAllocated: potAllocated,
-          totalAmount: numericPledge,
-          allocations: computePledgeAllocations(
-            pollSelections[poll.id],
-            poll.topics.topic_items,
-            numericPledge
-          ),
-        })
-        potAllocated += numericPledge
-      }
-      onPledgeSuccess?.(ids)
+      await pledgeFromFund({
+        eventPollId: pollWithItems.id,
+        potId: pot.id,
+        potCurrentAllocated: pot.total_allocated,
+        totalAmount: numericPledge,
+        allocations: computePledgeAllocations(
+          pollSelections[pollWithItems.id] ?? [],
+          pollWithItems.topics.topic_items,
+          numericPledge
+        ),
+      })
+      onPledgeSuccess?.()
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -222,11 +196,10 @@ export function usePledge({
   async function handlePledgePaymentSuccess() {
     setPledgeClientSecret(null)
     try {
-      const ids = pledgedPollIds()
       await savePledge(guestEmail)
       if (pendingTopUp) await topUpFund(eventId, numericTopUp)
       setPendingTopUp(false)
-      onPledgeSuccess?.(ids)
+      onPledgeSuccess?.()
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")

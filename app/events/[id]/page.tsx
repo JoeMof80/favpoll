@@ -33,93 +33,63 @@ export default async function EventPage({ params }: Props) {
     redirect(`/sign-in?redirect_url=/events/${id}`)
   }
 
-  const { data: rawPolls } = await supabase
+  const { data: rawPoll } = await supabase
     .from("event_polls")
     .select("*")
     .eq("event_id", id)
-    .order("created_at")
+    .maybeSingle()
 
-  const polls = rawPolls ?? []
+  let pollWithItems: EventPollWithItems | null = null
 
-  let pollsWithItems: EventPollWithItems[] = []
+  if (rawPoll) {
+    const topicId = rawPoll.topic_id as string
 
-  if (polls.length > 0) {
-    const topicIds = [...new Set(polls.map((p) => p.topic_id as string))]
-
-    const { data: topicsData } = await supabase
+    const { data: topicData } = await supabase
       .from("topics")
       .select("*")
-      .in("id", topicIds)
-    const topicsById = Object.fromEntries(
-      (topicsData ?? []).map((t) => [t.id, t as Topic])
-    )
+      .eq("id", topicId)
+      .single()
 
-    const finiteTopicIds = topicIds.filter((id) => topicsById[id]?.is_finite)
-    const infiniteTopicIds = topicIds.filter((id) => !topicsById[id]?.is_finite)
-    const infinitePollIds = polls
-      .filter((p) => infiniteTopicIds.includes(p.topic_id as string))
-      .map((p) => p.id)
+    const topic = topicData as Topic | null
 
-    const finiteItemsPromise =
-      finiteTopicIds.length > 0
-        ? supabase
-            .from("topic_items")
-            .select("*")
-            .in("topic_id", finiteTopicIds)
-        : Promise.resolve({ data: null })
+    let items: TopicItem[] = []
 
-    const epiPromise =
-      infinitePollIds.length > 0
-        ? supabase
-            .from("event_poll_items")
-            .select("id, event_poll_id, topic_item_id, display_order, topic_items(*)")
-            .in("event_poll_id", infinitePollIds)
-            .order("display_order", { ascending: true })
-        : Promise.resolve({ data: null })
-
-    const [{ data: finiteItemsData }, { data: epiData }] = await Promise.all([
-      finiteItemsPromise,
-      epiPromise,
-    ])
-
-    const finiteItemsByTopicId: Record<string, TopicItem[]> = {}
-    for (const item of (finiteItemsData ?? []) as TopicItem[]) {
-      ;(finiteItemsByTopicId[item.topic_id] ??= []).push(item)
-    }
-
-    type EpiRow = {
-      id: string
-      event_poll_id: string
-      topic_item_id: string
-      display_order: number
-      topic_items: TopicItem
-    }
-    const epiByPollId: Record<string, EpiRow[]> = {}
-    for (const epi of (epiData ?? []) as unknown as EpiRow[]) {
-      ;(epiByPollId[epi.event_poll_id] ??= []).push(epi)
-    }
-
-    pollsWithItems = polls.map((poll) => {
-      const topic = topicsById[poll.topic_id] as Topic
-      let items: TopicItem[]
-
-      if (topic?.is_finite) {
-        items = (finiteItemsByTopicId[poll.topic_id] ?? []).sort(
-          (a, b) => b.all_time_pledged - a.all_time_pledged
-        )
-      } else {
-        items = (epiByPollId[poll.id] ?? [])
-          .map((epi) => ({ ...epi.topic_items, event_poll_item_id: epi.id, _ord: epi.display_order }))
-          .sort((a, b) => {
-            if (b.all_time_pledged !== a.all_time_pledged) return b.all_time_pledged - a.all_time_pledged
-            return (a._ord ?? 0) - (b._ord ?? 0)
-          })
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          .map(({ _ord, ...item }) => item)
+    if (topic?.is_finite) {
+      const { data: finiteItemsData } = await supabase
+        .from("topic_items")
+        .select("*")
+        .eq("topic_id", topicId)
+      items = ((finiteItemsData ?? []) as TopicItem[]).sort(
+        (a, b) => b.all_time_pledged - a.all_time_pledged
+      )
+    } else {
+      type EpiRow = {
+        id: string
+        event_poll_id: string
+        topic_item_id: string
+        display_order: number
+        topic_items: TopicItem
       }
+      const { data: epiData } = await supabase
+        .from("event_poll_items")
+        .select("id, event_poll_id, topic_item_id, display_order, topic_items(*)")
+        .eq("event_poll_id", rawPoll.id)
+        .order("display_order", { ascending: true })
 
-      return { ...poll, topics: { ...topic, topic_items: items } }
-    }) as EventPollWithItems[]
+      items = ((epiData ?? []) as unknown as EpiRow[])
+        .map((epi) => ({ ...epi.topic_items, event_poll_item_id: epi.id, _ord: epi.display_order }))
+        .sort((a, b) => {
+          if (b.all_time_pledged !== a.all_time_pledged) return b.all_time_pledged - a.all_time_pledged
+          return (a._ord ?? 0) - (b._ord ?? 0)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .map(({ _ord, ...item }) => item)
+    }
+
+    pollWithItems = {
+      ...rawPoll,
+      topics: { ...(topic as Topic), topic_items: items },
+    } as EventPollWithItems
   }
 
   const { data: pot } = await supabase
@@ -139,28 +109,22 @@ export default async function EventPage({ params }: Props) {
     userPotAllocation = data
   }
 
-  const existingPledgesByPollId: string[] = []
-  if (userId && pollsWithItems.length > 0) {
-    const { data: userPledges } = await supabase
-      .from("pledges")
-      .select("event_poll_id")
-      .in(
-        "event_poll_id",
-        pollsWithItems.map((p) => p.id)
-      )
-      .eq("clerk_user_id", userId)
-      .is("withdrawn_at", null)
-
-    userPledges?.forEach((p) => existingPledgesByPollId.push(p.event_poll_id))
-  }
+  const hasPledged =
+    userId && pollWithItems
+      ? await supabase
+          .from("pledges")
+          .select("id")
+          .eq("event_poll_id", pollWithItems.id)
+          .eq("clerk_user_id", userId)
+          .is("withdrawn_at", null)
+          .limit(1)
+          .then(({ data }) => (data?.length ?? 0) > 0)
+      : false
 
   const { data: totalData } = await supabase
     .from("pledges")
     .select("total_amount")
-    .in(
-      "event_poll_id",
-      pollsWithItems.length > 0 ? pollsWithItems.map((p) => p.id) : [""]
-    )
+    .eq("event_poll_id", pollWithItems?.id ?? "")
     .is("withdrawn_at", null)
 
   const totalRaised = (totalData ?? []).reduce(
@@ -173,10 +137,11 @@ export default async function EventPage({ params }: Props) {
 
   const isOrganiser = userId === event.created_by
 
-  // Hide polls with unvetted custom topics from non-organisers
-  const visiblePolls = isOrganiser
-    ? pollsWithItems
-    : pollsWithItems.filter((p) => p.topics.is_active !== false)
+  // Hide poll with unvetted custom topic from non-organisers
+  const visiblePoll =
+    isOrganiser || pollWithItems?.topics.is_active !== false
+      ? pollWithItems
+      : null
 
   return (
     <>
@@ -184,10 +149,10 @@ export default async function EventPage({ params }: Props) {
       <main className={`mx-auto max-w-330 px-6 pt-8 ${isOrganiser ? "pb-28" : "pb-16"}`}>
         <EventContent
           event={typedEvent}
-          pollsWithItems={visiblePolls}
+          pollWithItems={visiblePoll}
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
-          existingPledgesByPollId={existingPledgesByPollId}
+          hasPledged={!!hasPledged}
           totalRaised={totalRaised}
           isClosed={isClosed}
           clerkUserId={userId}

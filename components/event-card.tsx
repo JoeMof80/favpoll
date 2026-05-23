@@ -31,7 +31,7 @@ type EventCardEvent = {
   total_raised: number
   protagonist: { name: string }
   charities: { charity: Charity }[]
-  polls: { topic: { title: string; topic_items: string[] } | null }[]
+  poll: { topic: { title: string; topic_items: string[] } | null } | null
 }
 
 type Props = {
@@ -41,8 +41,7 @@ type Props = {
 }
 
 export function EventCard({ size = "full", event, className }: Props) {
-  const firstPoll = event.polls?.[0]
-  const topicTitle = firstPoll?.topic?.title
+  const topicTitle = event.poll?.topic?.title ?? ""
   const perCharity =
     event.charities.length > 0 ? event.total_raised / event.charities.length : 0
 
@@ -67,7 +66,7 @@ export function EventCard({ size = "full", event, className }: Props) {
               />
 
               {/* Heading — topic if available, else protagonist name */}
-              <PollTitle title={topicTitle} />
+              {topicTitle && <PollTitle title={topicTitle} />}
 
               {/* Description */}
               {event.description && (

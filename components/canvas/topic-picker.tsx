@@ -3,7 +3,6 @@
 import { shortTopicLabel } from "@/lib/occasions"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
-import { RemovablePill } from "./removable-pill"
 import type { Category, CanvasPoll, TopicWithMeta } from "@/types"
 
 type Props = {
@@ -19,7 +18,6 @@ type Props = {
   onTopicCategoryChange: (cat: string | null) => void
   onTopicFiniteChange: (val: "finite" | "infinite" | "custom" | null) => void
   onTopicSearchChange: (v: string) => void
-  onRemoveCustomPoll?: (topicId: string) => void
 }
 
 export function TopicPicker({
@@ -35,7 +33,6 @@ export function TopicPicker({
   onTopicCategoryChange,
   onTopicFiniteChange,
   onTopicSearchChange,
-  onRemoveCustomPoll,
 }: Props) {
   const activeTopics = topics.filter((t) => t.is_active !== false)
   const customTopics = topics.filter((t) => t.is_active === false)
@@ -157,25 +154,15 @@ export function TopicPicker({
 
       {/* Topic pills */}
       <div className="flex flex-wrap gap-2">
-        {visibleTopics.map((t) =>
-          showingCustom ? (
-            <RemovablePill
-              key={t.id}
-              label={shortTopicLabel(t.title)}
-              onClick={() => onSelectTopic(t)}
-              onRemove={() => onRemoveCustomPoll?.(t.id)}
-              selected={poll.topicId === t.id}
-            />
-          ) : (
-            <Chip
-              key={t.id}
-              selected={poll.topicId === t.id}
-              onClick={() => onSelectTopic(t)}
-            >
-              {shortTopicLabel(t.title)}
-            </Chip>
-          )
-        )}
+        {visibleTopics.map((t) => (
+          <Chip
+            key={t.id}
+            selected={poll.topicId === t.id}
+            onClick={() => onSelectTopic(t)}
+          >
+            {shortTopicLabel(t.title)}
+          </Chip>
+        ))}
       </div>
 
       <div className="flex items-center justify-between">

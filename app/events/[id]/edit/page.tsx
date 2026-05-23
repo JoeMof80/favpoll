@@ -36,13 +36,13 @@ export default async function EditEventPage({ params }: Props) {
   if (event.created_by !== userId) redirect(`/events/${id}`)
 
   const [
-    { data: rawPolls },
+    { data: rawPoll },
     { data: charities },
     { data: topicsAll },
     { data: categories },
     { data: pot },
   ] = await Promise.all([
-    supabase.from('event_polls').select('*').eq('event_id', id).order('created_at'),
+    supabase.from('event_polls').select('*').eq('event_id', id).maybeSingle(),
     supabase.from('charities').select('*').order('name'),
     supabase
       .from('topics')
@@ -51,8 +51,6 @@ export default async function EditEventPage({ params }: Props) {
     supabase.from('categories').select('*').order('label'),
     supabase.from('event_pots').select('*').eq('event_id', id).maybeSingle(),
   ])
-
-  const polls = rawPolls ?? []
 
   const enrichedTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
@@ -63,48 +61,40 @@ export default async function EditEventPage({ params }: Props) {
   }))
 
   // For infinite topics, fetch the curated event_poll_items
-  const infinitePollIds = polls
-    .filter((p) => {
-      const topic = enrichedTopics.find((t) => t.id === p.topic_id)
-      return topic && !topic.is_finite
-    })
-    .map((p) => p.id)
+  let prioritizedItemIds: string[] = []
+  if (rawPoll) {
+    const topic = enrichedTopics.find((t) => t.id === rawPoll.topic_id)
+    const isInfinite = topic && !topic.is_finite
+    if (isInfinite) {
+      const { data: epiData } = await supabase
+        .from('event_poll_items')
+        .select('topic_item_id, is_prioritized')
+        .eq('event_poll_id', rawPoll.id)
+        .eq('is_guest_added', false)
+        .order('display_order', { ascending: true })
 
-  const epiByPollId: Record<string, string[]> = {}
-  if (infinitePollIds.length > 0) {
-    const { data: epiData } = await supabase
-      .from('event_poll_items')
-      .select('event_poll_id, topic_item_id, is_prioritized')
-      .in('event_poll_id', infinitePollIds)
-      .eq('is_guest_added', false)
-      .order('display_order', { ascending: true })
-
-    for (const epi of epiData ?? []) {
-      if (epi.is_prioritized) {
-        ;(epiByPollId[epi.event_poll_id] ??= []).push(epi.topic_item_id)
-      }
+      prioritizedItemIds = (epiData ?? [])
+        .filter((epi) => epi.is_prioritized)
+        .map((epi) => epi.topic_item_id)
     }
   }
 
   const closesAtLocal = new Date(event.closes_at).toISOString().slice(0, 16)
 
-  const initialPolls: CanvasPoll[] = polls.map((poll) => {
-    const topic = enrichedTopics.find((t) => t.id === poll.topic_id)
-    const isInfinite = topic && !topic.is_finite
-    return {
-      key: poll.id,
-      id: poll.id,
-      topicId: poll.topic_id as string,
-      topicIsCustom: false,
-      customTopicTitle: '',
-      customTopicItems: [],
-      reveal: poll.personal_reveal ?? '',
-      prioritizedItemIds: isInfinite ? (epiByPollId[poll.id] ?? []) : [],
-      prioritizedCustomLabels: [],
-      curatedCustomLabels: [],
-      pickingTopic: false,
-    }
-  })
+  const initialPoll: CanvasPoll | undefined = rawPoll
+    ? {
+        id: rawPoll.id,
+        topicId: rawPoll.topic_id as string,
+        topicIsCustom: false,
+        customTopicTitle: '',
+        customTopicItems: [],
+        reveal: rawPoll.personal_reveal ?? '',
+        prioritizedItemIds,
+        prioritizedCustomLabels: [],
+        curatedCustomLabels: [],
+        pickingTopic: false,
+      }
+    : undefined
 
   const initialData: CanvasInitialData = {
     protagonistName: event.protagonists.name,
@@ -120,7 +110,7 @@ export default async function EditEventPage({ params }: Props) {
     closesAt: closesAtLocal,
     isPrivate: event.is_private,
     potAmount: pot?.total_deposited?.toString() ?? '',
-    polls: initialPolls,
+    poll: initialPoll,
   }
 
   async function handleSave(data: CanvasSubmitData) {

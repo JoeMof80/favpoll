@@ -88,30 +88,30 @@ const finitePoll = makePoll("finite-poll", true)
 describe("useEventContent — initial state", () => {
   it("starts with empty pledgeAmount", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     expect(result.current.pledgeAmount).toBe("")
   })
 
   it("starts with empty pollSelections", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     expect(result.current.pollSelections).toEqual({})
   })
 
-  it("starts with empty confirmedPollIds", () => {
+  it("starts with pledgeConfirmed as false", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
-    expect(result.current.confirmedPollIds.size).toBe(0)
+    expect(result.current.pledgeConfirmed).toBe(false)
   })
 })
 
 describe("useEventContent — handleSelectionsChange", () => {
   it("updates pollSelections for a given pollId", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     act(() => {
       result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
@@ -119,43 +119,34 @@ describe("useEventContent — handleSelectionsChange", () => {
     expect(result.current.pollSelections["poll-1"]).toEqual(["item-a", "item-b"])
   })
 
-  it("preserves other polls' selections when updating one", () => {
+  it("allows updating the poll's selections multiple times", () => {
     const { result } = renderHook(() =>
       useEventContent({
         event,
-        pollsWithItems: [poll, makePoll("poll-2")],
+        pollWithItems: poll,
         isClosed: false,
         clerkUserId: "user-1",
       })
     )
     act(() => {
       result.current.handleSelectionsChange("poll-1", ["item-a"])
-      result.current.handleSelectionsChange("poll-2", ["item-b"])
     })
-    expect(result.current.pollSelections["poll-1"]).toEqual(["item-a"])
-    expect(result.current.pollSelections["poll-2"]).toEqual(["item-b"])
+    act(() => {
+      result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
+    })
+    expect(result.current.pollSelections["poll-1"]).toEqual(["item-a", "item-b"])
   })
 })
 
 describe("useEventContent — handlePledgeSuccess", () => {
-  it("adds confirmed poll IDs to the set", () => {
+  it("sets pledgeConfirmed to true", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     act(() => {
-      result.current.handlePledgeSuccess(["poll-1", "poll-2"])
+      result.current.handlePledgeSuccess()
     })
-    expect(result.current.confirmedPollIds.has("poll-1")).toBe(true)
-    expect(result.current.confirmedPollIds.has("poll-2")).toBe(true)
-  })
-
-  it("accumulates IDs across multiple calls", () => {
-    const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
-    )
-    act(() => { result.current.handlePledgeSuccess(["poll-1"]) })
-    act(() => { result.current.handlePledgeSuccess(["poll-2"]) })
-    expect(result.current.confirmedPollIds.size).toBe(2)
+    expect(result.current.pledgeConfirmed).toBe(true)
   })
 })
 
@@ -164,7 +155,7 @@ describe("useEventContent — addItemHandler", () => {
     const { result } = renderHook(() =>
       useEventContent({
         event,
-        pollsWithItems: [finitePoll],
+        pollWithItems: finitePoll,
         isClosed: false,
         clerkUserId: "user-1",
       })
@@ -174,21 +165,21 @@ describe("useEventContent — addItemHandler", () => {
 
   it("returns undefined when event is closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: true, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: true, clerkUserId: "user-1" })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
   it("returns undefined when clerkUserId is null (guest)", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: null })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: null })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
   it("returns a function for an infinite, open poll with logged-in user", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     expect(typeof result.current.addItemHandler(poll)).toBe("function")
   })
@@ -198,7 +189,7 @@ describe("useEventContent — addItemHandler", () => {
     mockActions.addGuestItem.mockClear()
 
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     const handler = result.current.addItemHandler(poll)!
     await act(async () => { await handler("Mauve") })
@@ -209,37 +200,44 @@ describe("useEventContent — addItemHandler", () => {
 })
 
 describe("useEventContent — derived values", () => {
-  it("showPledgeCard is true when not closed", () => {
+  it("showPledgeCard is true when not closed and poll is set", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     expect(result.current.showPledgeCard).toBe(true)
   })
 
   it("showPledgeCard is false when closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: true, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: true, clerkUserId: "user-1" })
+    )
+    expect(result.current.showPledgeCard).toBe(false)
+  })
+
+  it("showPledgeCard is false when pollWithItems is null", () => {
+    const { result } = renderHook(() =>
+      useEventContent({ event, pollWithItems: null, isClosed: false, clerkUserId: "user-1" })
     )
     expect(result.current.showPledgeCard).toBe(false)
   })
 
   it("isOrganiser is true when clerkUserId matches event.created_by", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-1" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
     )
     expect(result.current.isOrganiser).toBe(true)
   })
 
   it("isOrganiser is false for a different user", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: "user-2" })
+      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-2" })
     )
     expect(result.current.isOrganiser).toBe(false)
   })
 
   it("isOrganiser is false when clerkUserId is null", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollsWithItems: [poll], isClosed: false, clerkUserId: null })
+      useEventContent({ event, pollWithItems: null, isClosed: false, clerkUserId: null })
     )
     expect(result.current.isOrganiser).toBe(false)
   })

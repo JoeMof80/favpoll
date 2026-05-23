@@ -185,7 +185,6 @@ export type TopicWithMeta = Topic & {
 }
 
 export type CanvasPoll = {
-  key: string
   id?: string
   topicId: string
   topicIsCustom: boolean
@@ -196,6 +195,16 @@ export type CanvasPoll = {
   prioritizedCustomLabels: string[]
   curatedCustomLabels: string[]
   pickingTopic: boolean
+}
+
+export type CanvasPollInput = {
+  id?: string
+  topicId: string | null
+  topicIsCustom: boolean
+  customTopicTitle: string
+  customTopicItems: string[]
+  reveal: string | null
+  infiniteItems: { prioritizedItemIds: string[]; canonicalItemIds: string[]; customLabels: string[] } | null
 }
 
 export type CanvasSubmitData = {
@@ -210,15 +219,7 @@ export type CanvasSubmitData = {
   closesAt: string
   isPrivate: boolean
   potAmount: number | null
-  polls: {
-    id?: string
-    topicId: string | null
-    topicIsCustom: boolean
-    customTopicTitle: string
-    customTopicItems: string[]
-    reveal: string | null
-    infiniteItems: { prioritizedItemIds: string[]; canonicalItemIds: string[]; customLabels: string[] } | null
-  }[]
+  poll: CanvasPollInput
 }
 
 export type CanvasInitialData = {
@@ -232,6 +233,6 @@ export type CanvasInitialData = {
   closesAt?: string
   isPrivate?: boolean
   potAmount?: string
-  polls?: CanvasPoll[]
+  poll?: Partial<CanvasPoll>
   photoUrl?: string | null
 }

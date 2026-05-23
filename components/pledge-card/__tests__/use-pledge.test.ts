@@ -73,7 +73,7 @@ const baseOptions = {
   eventId: "event-1",
   clerkUserId: "user-1",
   charityNames: ["Oxfam"],
-  pollsWithItems: [poll],
+  pollWithItems: poll,
   pot: null as EventPot | null,
   userPotAllocation: null as PotAllocation | null,
   pollSelections: {} as Record<string, string[]>,
@@ -649,7 +649,7 @@ describe("usePledge — handleFundConfirm", () => {
 
     await act(async () => { await result.current.handleFundConfirm() })
 
-    expect(onPledgeSuccess).toHaveBeenCalledWith(["poll-1"])
+    expect(onPledgeSuccess).toHaveBeenCalled()
     expect(mockRouter.refresh).toHaveBeenCalled()
   })
 
@@ -695,7 +695,7 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     expect(mockActions.createPledge).toHaveBeenCalledWith(
       expect.objectContaining({ eventPollId: "poll-1", totalAmount: 10 })
     )
-    expect(onPledgeSuccess).toHaveBeenCalledWith(["poll-1"])
+    expect(onPledgeSuccess).toHaveBeenCalled()
     expect(mockRouter.refresh).toHaveBeenCalled()
   })
 

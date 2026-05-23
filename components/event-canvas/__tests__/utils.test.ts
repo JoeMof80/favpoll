@@ -28,15 +28,4 @@ describe("newPoll", () => {
     expect(newPoll("").pickingTopic).toBe(true)
   })
 
-  it("generates a non-empty string key", () => {
-    const poll = newPoll("topic-1")
-    expect(typeof poll.key).toBe("string")
-    expect(poll.key.length).toBeGreaterThan(0)
-  })
-
-  it("generates a unique key each call", () => {
-    const keys = Array.from({ length: 20 }, () => newPoll().key)
-    const unique = new Set(keys)
-    expect(unique.size).toBe(20)
-  })
 })

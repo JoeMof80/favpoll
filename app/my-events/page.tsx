@@ -59,13 +59,12 @@ export default async function EventsPage() {
           {(events as EventWithDetails[]).map((event) => {
             const closed = isClosed(event.closes_at)
             const days = daysUntilClose(event.closes_at)
-            const polls =
-              (
-                event as unknown as {
-                  event_polls: { topics: { title: string } }[]
-                }
-              ).event_polls ?? []
-            const topicTitle = polls[0]?.topics?.title ?? null
+            const eventPolls = (
+              event as unknown as {
+                event_polls: { topics: { title: string } | null }[]
+              }
+            ).event_polls ?? []
+            const topicTitle = eventPolls[0]?.topics?.title ?? null
 
             return (
               <li

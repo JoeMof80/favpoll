@@ -25,7 +25,15 @@ function makeInput(overrides: Partial<CanvasSubmitData> = {}): CanvasSubmitData 
     closesAt: "2028-01-01T00:00",
     isPrivate: false,
     potAmount: null,
-    polls: [],
+    poll: {
+      id: "poll-1",
+      topicId: "topic-1",
+      topicIsCustom: false,
+      customTopicTitle: "",
+      customTopicItems: [],
+      reveal: null,
+      infiniteItems: null,
+    },
     ...overrides,
   }
 }
@@ -40,14 +48,14 @@ function makeEventRow(overrides: Record<string, any> = {}) {
   }
 }
 
-/** Queue all responses for a minimal happy-path updateEvent (no polls, 1 charity) */
+/** Queue all responses for a minimal happy-path updateEvent (1 poll with id, 1 charity) */
 function queueHappyPath(eventRow = makeEventRow()) {
   mock.queue(eventRow)    // events select → single
   mock.queue(null)        // protagonists update → await
   mock.queue(null)        // events update → await
   mock.queue(null)        // event_charities delete → await
   mock.queue(null)        // event_charities insert → await
-  mock.queue([])          // event_polls select → await (existingPolls)
+  mock.queue(null)        // event_polls update → await (single poll upsert)
 }
 
 beforeEach(() => {

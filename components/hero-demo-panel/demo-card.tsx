@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { RevealQuote } from "@/components/ui/reveal-quote"
+import { FavpollCardProvider } from "@/components/favpoll-card/favpoll-card-context"
 import type { HeroScene, Phase } from "./scenes"
 import { PLEDGE_AMOUNTS } from "./scenes"
 import { fadeUp, fadeIn, revealVariant, FAST, MEDIUM, SLOW } from "./variants"
@@ -32,6 +33,7 @@ export function DemoCard({
   showReveal,
 }: Props) {
   return (
+    <FavpollCardProvider value={{ size: "demo" }}>
     <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
       <div className="space-y-4">
         {/* Protagonist avatar + name */}
@@ -281,5 +283,6 @@ export function DemoCard({
         )}
       </AnimatePresence>
     </div>
+    </FavpollCardProvider>
   )
 }

@@ -16,10 +16,10 @@ import { useEventContent } from "./use-event-content"
 
 type Props = {
   event: EventWithDetails
-  pollsWithItems: EventPollWithItems[]
+  pollWithItems: EventPollWithItems | null
   pot: EventPot | null
   userPotAllocation: PotAllocation | null
-  existingPledgesByPollId: string[]
+  hasPledged: boolean
   totalRaised: number
   isClosed: boolean
   clerkUserId: string | null
@@ -27,10 +27,10 @@ type Props = {
 
 export function EventContent({
   event,
-  pollsWithItems,
+  pollWithItems,
   pot,
   userPotAllocation,
-  existingPledgesByPollId,
+  hasPledged,
   totalRaised,
   isClosed,
   clerkUserId,
@@ -41,13 +41,12 @@ export function EventContent({
     pollSelections,
     handleSelectionsChange,
     handlePledgeSuccess,
-    confirmedPollIds,
+    pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
     isOrganiser,
-  } = useEventContent({ event, pollsWithItems, isClosed, clerkUserId })
+  } = useEventContent({ event, pollWithItems, isClosed, clerkUserId })
 
-  const existingSet = new Set(existingPledgesByPollId)
   const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" })
   const closedAt = event.closed_at
     ? new Date(event.closed_at).toLocaleDateString("en-GB", {
@@ -63,26 +62,21 @@ export function EventContent({
       <div>
         <EventHero event={event} protagonist={event.protagonists} />
 
-        {pollsWithItems.length > 0 ? (
-          <div className="space-y-12">
-            {pollsWithItems.map((poll) => (
-              <PollSection
-                key={poll.id}
-                poll={poll}
-                clerkUserId={clerkUserId}
-                pledgeAmount={pledgeAmount}
-                isClosed={isClosed}
-                hasPledged={existingSet.has(poll.id)}
-                pledgeJustConfirmed={confirmedPollIds.has(poll.id)}
-                protagonistName={event.protagonists.name}
-                onSelectionsChange={handleSelectionsChange}
-                onAddItem={addItemHandler(poll)}
-              />
-            ))}
-          </div>
+        {pollWithItems ? (
+          <PollSection
+            poll={pollWithItems}
+            clerkUserId={clerkUserId}
+            pledgeAmount={pledgeAmount}
+            isClosed={isClosed}
+            hasPledged={hasPledged}
+            pledgeJustConfirmed={pledgeConfirmed}
+            protagonistName={event.protagonists.name}
+            onSelectionsChange={handleSelectionsChange}
+            onAddItem={addItemHandler(pollWithItems)}
+          />
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">
-            No polls have been set up for this event yet.
+            No poll has been set up for this event yet.
           </p>
         )}
       </div>
@@ -109,12 +103,12 @@ export function EventContent({
           charities={event.event_charities.map((ec) => ec.charities)}
           totalRaised={totalRaised}
         />
-        {!isClosed && showPledgeCard && (
+        {!isClosed && showPledgeCard && pollWithItems && (
           <PledgeCard
             eventId={event.id}
             clerkUserId={clerkUserId}
             charityNames={event.event_charities.map((ec) => ec.charities.name)}
-            pollsWithItems={pollsWithItems}
+            pollWithItems={pollWithItems}
             pot={pot}
             userPotAllocation={userPotAllocation}
             pollSelections={pollSelections}

@@ -5,21 +5,21 @@ import type { EventWithDetails, EventPollWithItems } from "@/types"
 
 type UseEventContentOptions = {
   event: EventWithDetails
-  pollsWithItems: EventPollWithItems[]
+  pollWithItems: EventPollWithItems | null
   isClosed: boolean
   clerkUserId: string | null
 }
 
 export function useEventContent({
   event,
-  pollsWithItems,
+  pollWithItems,
   isClosed,
   clerkUserId,
 }: UseEventContentOptions) {
   const router = useRouter()
   const [pledgeAmount, setPledgeAmount] = useState("")
   const [pollSelections, setPollSelections] = useState<Record<string, string[]>>({})
-  const [confirmedPollIds, setConfirmedPollIds] = useState<Set<string>>(new Set())
+  const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
 
   const handleSelectionsChange = useCallback(
     (pollId: string, selectedIds: string[]) =>
@@ -27,8 +27,8 @@ export function useEventContent({
     []
   )
 
-  const handlePledgeSuccess = useCallback((pollIds: string[]) => {
-    setConfirmedPollIds((prev) => new Set([...prev, ...pollIds]))
+  const handlePledgeSuccess = useCallback(() => {
+    setPledgeConfirmed(true)
   }, [])
 
   // Returns an addItem handler for infinite, open polls — undefined otherwise
@@ -40,7 +40,7 @@ export function useEventContent({
     }
   }
 
-  const showPledgeCard = !isClosed
+  const showPledgeCard = !isClosed && !!pollWithItems
   const isOrganiser = !!clerkUserId && clerkUserId === event.created_by
 
   return {
@@ -49,7 +49,7 @@ export function useEventContent({
     pollSelections,
     handleSelectionsChange,
     handlePledgeSuccess,
-    confirmedPollIds,
+    pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
     isOrganiser,

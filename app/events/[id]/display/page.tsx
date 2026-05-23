@@ -20,32 +20,23 @@ export default async function DisplayPage({ params }: Props) {
 
   if (!event) notFound()
 
-  const { data: rawPolls } = await supabase
+  const { data: rawPoll } = await supabase
     .from("event_polls")
     .select("*, topics(id, title)")
     .eq("event_id", id)
-    .order("created_at")
+    .maybeSingle()
 
-  const polls = rawPolls ?? []
-  const pollIds = polls.map((p) => p.id)
+  const pollId = rawPoll?.id ?? null
 
-  // Fetch items for each poll's topic
-  const topicIds = [...new Set(polls.map((p) => p.topic_id).filter(Boolean))]
-  const { data: allItems } = await supabase
-    .from("topic_items")
-    .select("*")
-    .in("topic_id", topicIds)
-
-  const itemsByTopic: Record<string, TopicItem[]> = {}
-  for (const item of allItems ?? []) {
-    ;(itemsByTopic[item.topic_id] ??= []).push(item as TopicItem)
-  }
+  const { data: allItems } = rawPoll?.topic_id
+    ? await supabase.from("topic_items").select("*").eq("topic_id", rawPoll.topic_id)
+    : { data: null }
 
   // Total raised
   const { data: pledges } = await supabase
     .from("pledges")
     .select("total_amount")
-    .in("event_poll_id", pollIds)
+    .eq("event_poll_id", pollId ?? "")
     .is("withdrawn_at", null)
 
   const initialTotalRaised = (pledges ?? []).reduce(
@@ -57,15 +48,17 @@ export default async function DisplayPage({ params }: Props) {
     (event.event_charities as { charities: { name: string } }[])?.[0]
       ?.charities?.name ?? null
 
-  const displayPolls = polls.map((poll) => ({
-    id: poll.id,
-    personal_reveal: poll.personal_reveal ?? null,
-    topic: {
-      id: poll.topics?.id ?? poll.topic_id,
-      title: poll.topics?.title ?? "",
-    },
-    items: itemsByTopic[poll.topic_id ?? ""] ?? [],
-  }))
+  const displayPoll = rawPoll
+    ? {
+        id: rawPoll.id,
+        personal_reveal: rawPoll.personal_reveal ?? null,
+        topic: {
+          id: (rawPoll.topics as { id: string; title: string } | null)?.id ?? rawPoll.topic_id,
+          title: (rawPoll.topics as { id: string; title: string } | null)?.title ?? "",
+        },
+        items: (allItems ?? []) as TopicItem[],
+      }
+    : null
 
   // Derive base URL for QR code
   const headersList = await headers()
@@ -83,9 +76,9 @@ export default async function DisplayPage({ params }: Props) {
       description={event.description ?? null}
       occasion={event.occasion}
       charityName={charityName}
-      polls={displayPolls}
+      poll={displayPoll}
       initialTotalRaised={initialTotalRaised}
-      pollIds={pollIds}
+      pollId={pollId}
       eventUrl={`${baseUrl}/events/${id}`}
     />
   )

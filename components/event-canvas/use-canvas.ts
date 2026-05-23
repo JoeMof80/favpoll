@@ -6,6 +6,7 @@ import type {
   Category,
   Charity,
   CanvasPoll,
+  CanvasPollInput,
   CanvasSubmitData,
   CanvasInitialData,
   TopicWithMeta,
@@ -42,7 +43,7 @@ export function useCanvas({
     closesAt: "",
     isPrivate: false,
     potAmount: "",
-    polls: [newPoll(preselectedTopicId ?? "")],
+    poll: { ...newPoll(preselectedTopicId ?? ""), ...(initialData?.poll ?? {}) },
     ...initialData,
   })
 
@@ -57,23 +58,12 @@ export function useCanvas({
     setState((s) => ({ ...s, [key]: value }))
   }
 
-  function updatePoll(key: string, updates: Partial<CanvasPoll>) {
-    setState((s) => ({
-      ...s,
-      polls: s.polls.map((p) => (p.key === key ? { ...p, ...updates } : p)),
-    }))
+  function updatePoll(updates: Partial<CanvasPoll>) {
+    setState((s) => ({ ...s, poll: { ...s.poll, ...updates } }))
   }
 
-  function removePoll(key: string) {
-    setState((s) => ({ ...s, polls: s.polls.filter((p) => p.key !== key) }))
-  }
-
-  function removePollByTopicId(topicId: string) {
-    setState((s) => ({ ...s, polls: s.polls.filter((p) => p.topicId !== topicId) }))
-  }
-
-  function selectTopic(pollKey: string, topic: TopicWithMeta) {
-    updatePoll(pollKey, {
+  function selectTopic(topic: TopicWithMeta) {
+    updatePoll({
       topicId: topic.id,
       topicIsCustom: false,
       pickingTopic: false,
@@ -102,23 +92,48 @@ export function useCanvas({
     if (!state.occasion) return setError("Please select an occasion")
     if (state.charityIds.length === 0)
       return setError("Please select at least one charity")
-    if (state.polls.length === 0)
-      return setError("Please add at least one poll")
     if (!state.closesAt) return setError("Please set a closing date")
 
-    for (const poll of state.polls) {
-      if (!poll.topicId && !poll.topicIsCustom)
-        return setError("All polls need a topic selected")
-      if (poll.topicIsCustom) {
-        if (!poll.customTopicTitle.trim())
-          return setError("Custom poll needs a title")
-        if (poll.customTopicItems.filter((i) => i.trim()).length < 2)
-          return setError("Custom poll needs at least 2 options")
-      }
+    const poll = state.poll
+    if (!poll.topicId && !poll.topicIsCustom)
+      return setError("Please select a favpoll topic")
+    if (poll.topicIsCustom) {
+      if (!poll.customTopicTitle.trim())
+        return setError("Custom poll needs a title")
+      if (poll.customTopicItems.filter((i) => i.trim()).length < 2)
+        return setError("Custom poll needs at least 2 options")
     }
 
     setSubmitting(true)
     try {
+      const { poll } = state
+      const topic = topics.find((t) => t.id === poll.topicId)
+      const pollInput: CanvasPollInput = {
+        id: poll.id,
+        topicId: poll.topicIsCustom ? null : poll.topicId || null,
+        topicIsCustom: poll.topicIsCustom,
+        customTopicTitle: poll.customTopicTitle,
+        customTopicItems: poll.customTopicItems,
+        reveal: poll.reveal || null,
+        infiniteItems:
+          !poll.topicIsCustom && topic && !topic.is_finite
+            ? {
+                prioritizedItemIds: poll.prioritizedItemIds,
+                canonicalItemIds: [
+                  ...poll.prioritizedItemIds,
+                  ...topic.topic_items
+                    .filter(
+                      (i) =>
+                        (topic.is_active === false || i.is_canonical) &&
+                        !poll.prioritizedItemIds.includes(i.id)
+                    )
+                    .map((i) => i.id),
+                ],
+                customLabels: poll.curatedCustomLabels.filter((l) => l.trim()),
+              }
+            : null,
+      }
+
       const submitData: CanvasSubmitData = {
         protagonistName: state.protagonistName,
         protagonistAbout: state.protagonistAbout || null,
@@ -131,41 +146,13 @@ export function useCanvas({
         closesAt: state.closesAt,
         isPrivate: state.isPrivate,
         potAmount: state.potAmount ? parseFloat(state.potAmount) : null,
-        polls: state.polls.map((poll) => {
-          const topic = topics.find((t) => t.id === poll.topicId)
-          return {
-            id: poll.id,
-            topicId: poll.topicIsCustom ? null : poll.topicId || null,
-            topicIsCustom: poll.topicIsCustom,
-            customTopicTitle: poll.customTopicTitle,
-            customTopicItems: poll.customTopicItems,
-            reveal: poll.reveal || null,
-            infiniteItems:
-              !poll.topicIsCustom && topic && !topic.is_finite
-                ? {
-                    prioritizedItemIds: poll.prioritizedItemIds,
-                    canonicalItemIds: [
-                      ...poll.prioritizedItemIds,
-                      ...topic.topic_items
-                        .filter(
-                          (i) =>
-                            (topic.is_active === false || i.is_canonical) &&
-                            !poll.prioritizedItemIds.includes(i.id)
-                        )
-                        .map((i) => i.id),
-                    ],
-                    customLabels: poll.curatedCustomLabels.filter((l) =>
-                      l.trim()
-                    ),
-                  }
-                : null,
-          }
-        }),
+        poll: pollInput,
       }
 
       if (onSave) {
         await onSave(submitData)
       } else {
+        const p = submitData.poll
         const { eventId: newId } = await createEvent({
           protagonistName: submitData.protagonistName,
           protagonistAbout: submitData.protagonistAbout ?? null,
@@ -178,7 +165,7 @@ export function useCanvas({
           closesAt: submitData.closesAt,
           isPrivate: submitData.isPrivate,
           potAmount: submitData.potAmount,
-          polls: submitData.polls.map((p) => ({
+          poll: {
             topicId: p.topicId,
             customTopic: p.topicIsCustom
               ? {
@@ -188,7 +175,7 @@ export function useCanvas({
               : null,
             reveal: p.reveal,
             infiniteItems: p.infiniteItems,
-          })),
+          },
         })
         setShareLink(`/events/${newId}`)
       }
@@ -201,7 +188,7 @@ export function useCanvas({
     }
   }
 
-  const firstTopic = topics.find(t => t.id === state.polls[0]?.topicId)
+  const firstTopic = topics.find(t => t.id === state.poll.topicId)
   const topicAbout = firstTopic?.placeholders?.[state.occasion]?.about
     ?? firstTopic?.placeholders?.["default"]?.about
   const placeholders = {
@@ -221,7 +208,6 @@ export function useCanvas({
     router,
     set,
     updatePoll,
-    removePollByTopicId,
     selectTopic,
     toggleCharity,
     handleSubmit,

@@ -26,7 +26,7 @@ export default async function LiveEventsPage() {
       charities:event_charities (
         charity:charities ( id, name, logo_url, registered_number )
       ),
-      polls:event_polls (
+      event_polls (
         topic:topics ( title )
       )
     `
@@ -61,11 +61,23 @@ export default async function LiveEventsPage() {
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
           role="list"
         >
-          {(
-            events as unknown as Parameters<typeof EventCard>[0]["event"][]
-          )?.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
+          {(events ?? []).map((ev) => {
+            const rawEvent = ev as unknown as {
+              id: string
+              occasion_label: string
+              description: string | null
+              closes_at: string
+              total_raised: number
+              protagonist: { name: string }
+              charities: { charity: import("@/types").Charity }[]
+              event_polls: { topic: { title: string; topic_items: string[] } | null }[]
+            }
+            const eventCardProps = {
+              ...rawEvent,
+              poll: rawEvent.event_polls?.[0] ?? null,
+            }
+            return <EventCard key={ev.id} event={eventCardProps} />
+          })}
         </ul>
       )}
     </main>

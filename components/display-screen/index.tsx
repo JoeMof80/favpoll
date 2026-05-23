@@ -29,9 +29,9 @@ type Props = {
   description: string | null
   occasion: string
   charityName: string | null
-  polls: DisplayPoll[]
+  poll: DisplayPoll | null
   initialTotalRaised: number
-  pollIds: string[]
+  pollId: string | null
   eventUrl: string
 }
 
@@ -147,9 +147,9 @@ export function DisplayScreen({
   description,
   occasion,
   charityName,
-  polls,
+  poll,
   initialTotalRaised,
-  pollIds,
+  pollId,
   eventUrl,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
@@ -162,11 +162,11 @@ export function DisplayScreen({
         "postgres_changes",
         { event: "*", schema: "public", table: "pledges" },
         async () => {
-          if (pollIds.length === 0) return
+          if (!pollId) return
           const { data } = await supabase
             .from("pledges")
             .select("total_amount")
-            .in("event_poll_id", pollIds)
+            .eq("event_poll_id", pollId)
             .is("withdrawn_at", null)
           const total = (data ?? []).reduce(
             (s: number, p: { total_amount: number }) => s + p.total_amount,
@@ -179,7 +179,7 @@ export function DisplayScreen({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [eventId, pollIds, supabase])
+  }, [eventId, pollId, supabase])
 
   const headline = getEventHeadline({
     occasion,
@@ -217,9 +217,7 @@ export function DisplayScreen({
         </div>
 
         {/* Rankings */}
-        {polls.map((poll) => (
-          <DisplayPollSection key={poll.id} poll={poll} />
-        ))}
+        {poll && <DisplayPollSection poll={poll} />}
 
         {/* Charity total */}
         {charityName && (

@@ -48,7 +48,6 @@ export function EventCanvas(props: Props) {
     router,
     set,
     updatePoll,
-    removePollByTopicId,
     selectTopic,
     toggleCharity,
     handleSubmit,
@@ -115,19 +114,15 @@ export function EventCanvas(props: Props) {
               onDateLabelChange={(v) => set("dateLabel", v)}
               onPhotoUrlChange={setPhotoUrl}
             />
-            {state.polls.map((poll) => (
-              <PollEditor
-                key={poll.key}
-                poll={poll}
-                topics={props.topics}
-                categories={props.categories}
-                occasion={state.occasion}
-                placeholders={placeholders}
-                onUpdatePoll={(updates) => updatePoll(poll.key, updates)}
-                onSelectTopic={(topic) => selectTopic(poll.key, topic)}
-                onRemoveCustomPoll={removePollByTopicId}
-              />
-            ))}
+            <PollEditor
+              poll={state.poll}
+              topics={props.topics}
+              categories={props.categories}
+              occasion={state.occasion}
+              placeholders={placeholders}
+              onUpdatePoll={updatePoll}
+              onSelectTopic={selectTopic}
+            />
           </div>
 
           {/* Sidebar */}
