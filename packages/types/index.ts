@@ -34,12 +34,19 @@ export type TopicItem = {
   all_time_count: number
   is_canonical: boolean
   source: 'seed' | 'organiser' | 'guest'
+  review_status?: 'pending' | 'accepted' | 'rejected'
+  rejection_reason?: string | null
+  reviewed_at?: string | null
+  reviewed_by?: string | null
   markets: string[]
   event_count: number
   total_pledge_count: number
   created_at: string
   // Present when fetched via event_poll_items (infinite topics in event context)
   event_poll_item_id?: string
+  // Visibility state per event poll — set when fetched via event_poll_items join
+  is_hidden?: boolean
+  is_guest_added?: boolean
 }
 
 export type Protagonist = {
@@ -146,6 +153,11 @@ export type EventPollItem = {
   topic_item_id: string
   is_guest_added: boolean
   added_by: string | null
+  display_order: number
+  is_prioritized: boolean
+  is_hidden: boolean
+  hidden_at: string | null
+  hidden_by: string | null
   created_at: string
 }
 

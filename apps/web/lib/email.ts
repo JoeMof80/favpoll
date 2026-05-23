@@ -62,6 +62,30 @@ export async function sendEventClosed(params: EventClosedParams) {
   })
 }
 
+type GuestItemAddedParams = {
+  to: string
+  itemLabel: string
+  topicTitle: string
+  occasionLabel: string
+  protagonistName: string
+  eventId: string
+}
+
+export async function sendGuestItemAdded(params: GuestItemAddedParams) {
+  const { to, itemLabel, topicTitle, occasionLabel, protagonistName, eventId } = params
+  const eventUrl = `${BASE_URL}/events/${eventId}`
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `New item added to your ${topicTitle} poll`,
+    html: `
+      <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${occasionLabel} for ${protagonistName}.</p>
+      <p><a href="${eventUrl}">View your event</a></p>
+    `,
+  })
+}
+
 export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
   const { to, protagonistName, charityNames, amount, closesAt, guestToken } = params
   const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })

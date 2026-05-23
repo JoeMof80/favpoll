@@ -7,16 +7,19 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
+// Aliases shared by all test projects
+const sharedAliases = [
+  // Must come before the "@" catch-all so specific paths win
+  { find: "@/app/events/new/actions", replacement: resolve(dirname, ".storybook/__mocks__/actions.ts") },
+  { find: "@favpoll/types", replacement: resolve(dirname, "../../packages/types/index.ts") },
+  { find: "@", replacement: resolve(dirname, ".") },
+]
+
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: [
-      // Must come before the "@" catch-all so the specific path wins
-      { find: "@/app/events/new/actions", replacement: resolve(dirname, ".storybook/__mocks__/actions.ts") },
-      { find: "@favpoll/types", replacement: resolve(dirname, "../../packages/types/index.ts") },
-      { find: "@", replacement: resolve(dirname, ".") },
-    ],
+    alias: sharedAliases,
   },
   test: {
     projects: [{
@@ -36,6 +39,13 @@ export default defineConfig({
       storybookTest({
         configDir: path.join(dirname, '.storybook')
       })],
+      resolve: {
+        alias: [
+          // Stub server-only modules for the browser environment
+          { find: "@/lib/actions/event-poll-items", replacement: resolve(dirname, ".storybook/__mocks__/event-poll-items.ts") },
+          ...sharedAliases,
+        ],
+      },
       test: {
         name: 'storybook',
         browser: {

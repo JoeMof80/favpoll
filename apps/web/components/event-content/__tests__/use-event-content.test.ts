@@ -221,24 +221,4 @@ describe("useEventContent — derived values", () => {
     expect(result.current.showPledgeCard).toBe(false)
   })
 
-  it("isOrganiser is true when clerkUserId matches event.created_by", () => {
-    const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
-    )
-    expect(result.current.isOrganiser).toBe(true)
-  })
-
-  it("isOrganiser is false for a different user", () => {
-    const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-2" })
-    )
-    expect(result.current.isOrganiser).toBe(false)
-  })
-
-  it("isOrganiser is false when clerkUserId is null", () => {
-    const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: null, isClosed: false, clerkUserId: null })
-    )
-    expect(result.current.isOrganiser).toBe(false)
-  })
 })

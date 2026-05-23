@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendPledgeConfirmation } from '@/lib/email'
+import { sendPledgeConfirmation, sendGuestItemAdded } from '@/lib/email'
 
 type PledgeAllocationInput = {
   topicItemId: string
@@ -165,7 +165,7 @@ export async function addGuestItem(eventPollId: string, topicId: string, label: 
   } else {
     const { data: newItem, error } = await supabase
       .from('topic_items')
-      .insert({ topic_id: topicId, label: trimmed, source: 'guest', is_canonical: false })
+      .insert({ topic_id: topicId, label: trimmed, source: 'guest', is_canonical: false, review_status: 'pending' })
       .select('id')
       .single()
     if (error || !newItem) throw new Error(error?.message ?? 'Failed to create item')
@@ -179,6 +179,42 @@ export async function addGuestItem(eventPollId: string, topicId: string, label: 
     added_by: userId,
   })
   if (epiErr) throw new Error(epiErr.message)
+
+  // Notify the organiser — fire and forget, never fail the main action
+  try {
+    const { data: pollData } = await supabase
+      .from('event_polls')
+      .select('event_id, events(id, occasion, created_by, protagonists(name)), topics(title)')
+      .eq('id', eventPollId)
+      .single()
+
+    const eventData = (pollData?.events as any)
+    const topicData = (pollData?.topics as any)
+    const organizerUserId: string | null = eventData?.created_by ?? null
+
+    if (organizerUserId) {
+      const { data: organizer } = await supabase
+        .from('users')
+        .select('email')
+        .eq('id', organizerUserId)
+        .single()
+
+      if (organizer?.email) {
+        await sendGuestItemAdded({
+          to: organizer.email,
+          itemLabel: trimmed,
+          topicTitle: topicData?.title ?? 'poll',
+          occasionLabel: eventData?.occasion ?? 'event',
+          protagonistName: eventData?.protagonists?.name ?? 'your event',
+          eventId: pollData?.event_id ?? '',
+        })
+      } else {
+        console.warn('[addGuestItem] organiser has no email on record, skipping notification')
+      }
+    }
+  } catch (emailErr) {
+    console.error('[addGuestItem] failed to send organiser notification:', emailErr)
+  }
 }
 
 export async function removeEventPollItem(id: string) {

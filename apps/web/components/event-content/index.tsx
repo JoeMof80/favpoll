@@ -23,6 +23,7 @@ type Props = {
   totalRaised: number
   isClosed: boolean
   clerkUserId: string | null
+  isOrganiser: boolean
 }
 
 export function EventContent({
@@ -34,6 +35,7 @@ export function EventContent({
   totalRaised,
   isClosed,
   clerkUserId,
+  isOrganiser,
 }: Props) {
   const {
     pledgeAmount,
@@ -44,7 +46,6 @@ export function EventContent({
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    isOrganiser,
   } = useEventContent({ event, pollWithItems, isClosed, clerkUserId })
 
   const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" })
@@ -71,6 +72,7 @@ export function EventContent({
             hasPledged={hasPledged}
             pledgeJustConfirmed={pledgeConfirmed}
             protagonistName={event.protagonists.name}
+            isOrganiser={isOrganiser}
             onSelectionsChange={handleSelectionsChange}
             onAddItem={addItemHandler(pollWithItems)}
           />

@@ -41,7 +41,6 @@ export function useEventContent({
   }
 
   const showPledgeCard = !isClosed && !!pollWithItems
-  const isOrganiser = !!clerkUserId && clerkUserId === event.created_by
 
   return {
     pledgeAmount,
@@ -52,6 +51,5 @@ export function useEventContent({
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    isOrganiser,
   }
 }

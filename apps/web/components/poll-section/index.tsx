@@ -16,6 +16,7 @@ type Props = {
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
   protagonistName: string
+  isOrganiser: boolean
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
   onAddItem?: (label: string) => Promise<void>
 }
@@ -27,6 +28,7 @@ export function PollSection({
   hasPledged,
   pledgeJustConfirmed,
   protagonistName,
+  isOrganiser,
   onSelectionsChange,
   onAddItem,
 }: Props) {
@@ -88,6 +90,7 @@ export function PollSection({
                 eventPollId={poll.id}
                 topicId={poll.topic_id}
                 rankingView={rankingView}
+                isOrganiser={isOrganiser}
               />
               {!isClosed && (
                 <Button
