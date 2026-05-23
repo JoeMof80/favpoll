@@ -1,17 +1,17 @@
 ---
 name: favpoll-placeholders
 description: >
-  Use this skill whenever generating, reviewing, or improving personal_framing
-  and personal_reveal copy for favpoll topic-occasion combinations — whether
+  Use this skill whenever generating, reviewing, or improving about and
+  personal_reveal copy for favpoll topic-occasion combinations — whether
   for the seed script, demo scenes, or placeholder copy in lib/occasions.ts.
-  Trigger on any request to write framing, reveal, or placeholder copy, or to
+  Trigger on any request to write about placeholders, reveal copy, or to
   populate seed data with example events.
 ---
 
 # favpoll Placeholder Copy
 
-This skill governs the generation of high-quality `personal_framing` and
-`personal_reveal` pairs. These are the most important copy in the product.
+This skill governs the generation of high-quality `about` placeholder copy
+and `personal_reveal` pairs. These are the most important copy in the product.
 Get them right.
 
 Read `references/EXAMPLES.md` for worked examples before writing any copy.
@@ -20,25 +20,32 @@ Read `references/EXAMPLES.md` for worked examples before writing any copy.
 
 ## The mechanic
 
-The framing is shown before pledging. It withholds the protagonist's favourite
-and invites the guest to share their own.
+The `about` placeholder is shown in the canvas textarea while the organiser is
+writing the protagonist description. It introduces the person and references
+the topic area without disclosing their answer.
 
-The reveal is shown after pledging. It discloses the protagonist's favourite.
+The `personal_reveal` is shown to guests only after they have pledged. It
+discloses the protagonist's favourite.
 
 The pledge is the threshold. The guest gives something; the protagonist gives
 something back.
 
-**The reveal must never appear in the framing.** If the framing says "Belinda
-loved purple — what's yours?", there is no reveal moment. The withholding
-pattern is the mechanic. The disclosed pattern (answer already given in the
-framing) is also valid but serves a different purpose — a memory or anecdote
-rather than a reveal. Be intentional about which you are writing.
+**`personal_framing` is retired.** The column still exists in the database but
+the app no longer reads or writes it. The guest-facing hint line —
+"Is it the same as [Name]'s?" — is auto-generated from the protagonist's name.
+Do not write framing copy. Do not add a `framing` field to seed data.
+
+**The reveal must never appear in the about.** If the about describes lavender
+in the garden, it leaks a Flower reveal of Lavender. If it describes spring
+gardening behaviour, it leaks a Season reveal of Spring. The about must
+introduce the person and reference the topic area without pointing at the
+answer.
 
 ---
 
 ## The character brief
 
-Before writing any framing or reveal, establish a character brief for the
+Before writing any about or reveal, establish a character brief for the
 protagonist. Every element of the copy should be traceable back to it.
 
 ```
@@ -64,6 +71,7 @@ The charity is not a default. It is not "a good cause." It belongs to this
 person, on this occasion, for a named reason.
 
 **Good charity connections:**
+
 - Marie Curie for Belinda's memorial — their nurses visited her at the end
 - The Woodland Trust for Ros's retirement — she's been a member for twenty
   years and once organised a school trip to plant trees
@@ -82,25 +90,35 @@ they are.
 
 ---
 
-## Framing patterns — vary across examples
+## About placeholder patterns — vary across examples
 
 Three valid structures. No two adjacent examples should use the same one.
 
-**Withheld invitation** — protagonist's favourite is hidden, guest invited to share:
-> "Belinda had a colour she always wore — do you?"
-> "Margaret had a season she always loved most — which is yours?"
-> "James has a favourite film he could watch again and again — do you?"
+**Topic-forward** — leads with the protagonist's relationship to the topic area:
 
-**Direct tease** — protagonist's favourite is implied but not stated:
-> "What's your favourite animal? Alex & Jordan have one..."
-> "Dave has had strong opinions about biscuits for eight years — what's your opinion?"
+> "A retired teacher and mother who had a colour she returned to for forty
+> years — in her wardrobe, in her garden, in every room she made her own."
+> "David had strong views about biscuits that his team found both surprising
+> and entirely consistent."
 
-**Withheld reveal** — guest must answer to find out:
-> "Tell us your favourite ice cream to find out Poppy's."
-> "Which time of year do you love? Is it the same as Ros's?"
+**Backstory-forward** — leads with who the person is, lets the topic emerge:
 
-Mix these. If you write three examples and all three use the withheld
-invitation pattern, rewrite at least one.
+> "Belinda gave forty years to teaching and twenty to her garden. She had very
+> strong opinions about most things, and very precise taste in others."
+> "After thirty-five years building his team from four people to four hundred,
+> David is finally retiring. Ask anyone who worked with him what kind of music
+> was always playing."
+
+**Occasion-forward** — grounds the about in the event before reaching the topic:
+
+> "Sarah is turning 40 and has never made a neutral choice about anything. The
+> flat has one wall that's been repainted twice and still isn't right."
+> "Tom has just finished four years at architecture school. He spent most of
+> them in the studio with one kind of music on. His housemates have opinions
+> about this."
+
+Mix these. If you write three entries and all three use the same approach,
+rewrite at least one.
 
 ---
 
@@ -129,14 +147,14 @@ can have a voice that sounds like the person talking.
 weight than a birthday but shouldn't be elegiac.
 
 > ✓ "Jurassic Park. He said it was the reason he applied to study engineering.
->    His housemates were not surprised."
+> His housemates were not surprised."
 > ✗ "Jurassic Park — a film about wonder and possibility, just like James's future."
 
 **Engagement / wedding** — can be a story in miniature if the couple have one.
 Third person, warm, earns the emotion.
 
 > ✓ "The giant panda. They met at a conservation centre in Chengdu.
->    Did you really need to ask?"
+> Did you really need to ask?"
 > ✗ "The giant panda — their favourite animal and a symbol of their love."
 
 ---
@@ -153,21 +171,23 @@ true of this person.
 > ✗ "It meant the world to him."
 
 If you find yourself writing a sentiment instead of a detail, stop and ask:
-*what specifically did this person do, say, or own that proves this was their
-favourite?*
+_what specifically did this person do, say, or own that proves this was their
+favourite?_
 
 ---
 
 ## Topic variety — check before finalising
 
 Across any set of examples (demo scenes, seed data, placeholder sets), verify:
+
 - No topic appears more than once
 - Finite topics (Colour, Season, Day of the week, Meal of the day, Time of day,
   Decade) are used sparingly — infinite topics show the product's range better
 - The mix includes at least one clearly light occasion (leaving do, birthday,
   sports achievement) and at least one solemn one (memorial, tribute)
 
-**Finite topics** have fixed option lists. Do not invent options for them.
+**Finite topics** have fixed option lists. The reveal answer must be from that
+list exactly. Do not invent options.
 **Infinite topics** should have exhaustive or near-exhaustive option lists —
 the point is that choosing from 35 films means something precisely because
 the list is vast.
@@ -176,13 +196,17 @@ the list is vast.
 
 ## Failure modes — never do these
 
+- **Reveal in the about**: if the about references lavender, it leaks a Flower
+  reveal of Lavender. If it describes spring gardening behaviour, it leaks a
+  Season reveal of Spring. Write the reveal first, then check the about
+  against it word by word.
+- **Writing about first**: always write the reveal before the about. The
+  opposite order produces abouts that unconsciously point toward the answer.
 - **Repeated topics**: three "favourite season" examples in six scenes is not
   variety. It is a failure of imagination.
 - **Arbitrary charity**: if you cannot name a reason, the charity is wrong.
 - **Elegiac register for non-memorial occasions**: "one last time" implies
   finality. Do not use it for a retirement, a birthday, or a graduation.
-- **Reveal in the framing**: "Belinda loved purple — what's yours?" has no
-  reveal. Either withhold or be intentional about the disclosed pattern.
 - **Generic sentiment in the reveal**: "it meant everything to her" tells the
   guest nothing. Give them a detail.
 - **Overly constructed reveals**: "She said it was the only season that kept
@@ -197,15 +221,30 @@ the list is vast.
 
 ## Working with seed data
 
-When populating `scripts/seed.ts` with placeholder events:
+When populating `scripts/seed.ts` with placeholder copy:
 
 1. Write a character brief for each protagonist before touching the code
-2. Confirm the charity connection before writing the framing
+2. Confirm the charity connection before writing anything else
 3. Write the reveal first — if you cannot make it specific, the topic is wrong
-4. Write the framing second, ensuring it withholds the reveal
+4. Write the about second, ensuring it withholds the reveal
 5. Check topic variety across the full set before committing
 6. Use different protagonists from the demo scenes — the seed data should feel
    like a different set of real events, not the same six people again
+
+The `TopicPlaceholders` type in `scripts/seed.ts` is:
+
+```typescript
+type TopicPlaceholders = {
+  [occasion: string]: { about: string; reveal: string }
+}
+```
+
+There is no `framing` field. Do not add one.
+
+The seed occasions are: `memorial`, `tribute`, `birthday`, `retirement`,
+`wedding`, `engagement`, `anniversary`, `leaving`, `graduation`, `christening`,
+`achievement`, `recovery`, `award`, `promotion`, `celebration`, `other`,
+`default`.
 
 Seed protagonists should be as diverse as the demo set in name, age, occasion,
 and background. The demo characters have their own backstories

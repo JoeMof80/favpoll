@@ -8,49 +8,55 @@ function parseGBP(s: string): number {
 }
 
 function makeItems(scene: (typeof SCENES)[0], topicId: string): TopicItem[] {
-  return scene.barLabels.map((label, i) => {
-    const pledged = parseGBP(scene.barAmounts[i])
-    return {
-      id: `${topicId}-item-${i}`,
-      topic_id: topicId,
-      label,
-      all_time_pledged: pledged,
-      all_time_count: Math.max(1, Math.round(pledged / 15)),
-      is_canonical: true,
-      source: 'seed' as const,
-      markets: ['en-GB'],
-      event_count: 1,
-      total_pledge_count: Math.max(1, Math.round(pledged / 15)),
-      created_at: '2024-01-01T00:00:00Z',
-    }
-  })
+  const pledgeByLabel = Object.fromEntries(
+    scene.results.map((r) => [
+      r.label,
+      {
+        all_time_pledged: parseGBP(r.amount),
+        all_time_count: Math.max(1, Math.round(parseGBP(r.amount) / 15)),
+      },
+    ])
+  )
+  return scene.poll.topic.topic_items.map((item, i) => ({
+    id: `${topicId}-item-${i}`,
+    topic_id: topicId,
+    label: item.label,
+    all_time_pledged: pledgeByLabel[item.label]?.all_time_pledged ?? 0,
+    all_time_count: pledgeByLabel[item.label]?.all_time_count ?? 0,
+    is_canonical: true,
+    source: 'seed' as const,
+    markets: ['en-GB'],
+    event_count: 1,
+    total_pledge_count: pledgeByLabel[item.label]?.all_time_count ?? 0,
+    created_at: '2024-01-01T00:00:00Z',
+  }))
 }
 
 const MEMORIAL_POLL = {
   id: 'poll-memorial',
-  personal_reveal: SCENES[0].revealText,
-  topic: { id: 'topic-colour', title: SCENES[0].topicTitle },
+  personal_reveal: SCENES[0].poll.personal_reveal,
+  topic: { id: 'topic-colour', title: SCENES[0].poll.topic.title },
   items: makeItems(SCENES[0], 'topic-colour'),
 }
 
 const BIRTHDAY_POLL = {
   id: 'poll-birthday',
-  personal_reveal: SCENES[1].revealText,
-  topic: { id: 'topic-ice-cream', title: SCENES[1].topicTitle },
+  personal_reveal: SCENES[1].poll.personal_reveal,
+  topic: { id: 'topic-ice-cream', title: SCENES[1].poll.topic.title },
   items: makeItems(SCENES[1], 'topic-ice-cream'),
 }
 
 const RETIREMENT_POLL = {
   id: 'poll-retirement',
-  personal_reveal: SCENES[2].revealText,
-  topic: { id: 'topic-season', title: SCENES[2].topicTitle },
+  personal_reveal: SCENES[2].poll.personal_reveal,
+  topic: { id: 'topic-season', title: SCENES[2].poll.topic.title },
   items: makeItems(SCENES[2], 'topic-season'),
 }
 
 const GRADUATION_POLL = {
   id: 'poll-graduation',
-  personal_reveal: SCENES[5].revealText,
-  topic: { id: 'topic-film', title: SCENES[5].topicTitle },
+  personal_reveal: SCENES[5].poll.personal_reveal,
+  topic: { id: 'topic-film', title: SCENES[5].poll.topic.title },
   items: makeItems(SCENES[5], 'topic-film'),
 }
 
@@ -66,13 +72,13 @@ type Story = StoryObj<typeof meta>
 export const Memorial: Story = {
   args: {
     eventId: 'demo-memorial',
-    protagonistName: SCENES[0].protagonistName,
+    protagonistName: SCENES[0].protagonist.name,
     dateLabel: '1943–2024',
     occasionLabel: 'In memory of',
     description:
       "Belinda was a school librarian for forty years at St Catherine's. She is remembered for her warmth, her impossible memory for every pupil's name, and her lifelong love of purple.",
     occasion: 'memorial',
-    charityName: SCENES[0].charity,
+    charityName: SCENES[0].charities[0].name,
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
     pollId: 'poll-memorial',
@@ -83,12 +89,12 @@ export const Memorial: Story = {
 export const Birthday: Story = {
   args: {
     eventId: 'demo-birthday',
-    protagonistName: SCENES[1].protagonistName,
+    protagonistName: SCENES[1].protagonist.name,
     dateLabel: '30th May 2026',
     occasionLabel: 'Birthday',
     description: null,
     occasion: 'birthday',
-    charityName: SCENES[1].charity,
+    charityName: SCENES[1].charities[0].name,
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
     pollId: 'poll-birthday',
@@ -99,13 +105,13 @@ export const Birthday: Story = {
 export const Retirement: Story = {
   args: {
     eventId: 'demo-retirement',
-    protagonistName: SCENES[2].protagonistName,
+    protagonistName: SCENES[2].protagonist.name,
     dateLabel: null,
     occasionLabel: 'After a lifetime of good work',
     description:
       'Ros spent thirty-one years teaching secondary science. She never once took a sick day.',
     occasion: 'retirement',
-    charityName: SCENES[2].charity,
+    charityName: SCENES[2].charities[0].name,
     poll: RETIREMENT_POLL,
     initialTotalRaised: 700,
     pollId: 'poll-retirement',
@@ -116,7 +122,7 @@ export const Retirement: Story = {
 export const Graduation: Story = {
   args: {
     eventId: 'demo-graduation',
-    protagonistName: SCENES[5].protagonistName,
+    protagonistName: SCENES[5].protagonist.name,
     dateLabel: '13th June 2026',
     occasionLabel: 'Congratulations',
     description:

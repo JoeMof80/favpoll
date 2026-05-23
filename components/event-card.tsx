@@ -101,9 +101,8 @@ export function EventCard({
           {/* Navigable header — links to event page */}
           <Link href={`/events/${event.id}`} className="block px-5 pt-5">
             <FavpollHeader
-              protagonistName={event.protagonist.name}
+              protagonist={{ name: event.protagonist.name }}
               eyebrow={event.occasion_label}
-              dateLabel={event.closes_at}
             />
           </Link>
 

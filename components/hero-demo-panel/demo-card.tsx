@@ -11,6 +11,16 @@ import type { HeroScene, Phase } from "./scenes"
 import { PLEDGE_AMOUNTS } from "./scenes"
 import { fadeUp, fadeIn, revealVariant, FAST, MEDIUM, SLOW } from "./variants"
 
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+}
+
 type Props = {
   scene: HeroScene
   phase: Phase
@@ -32,13 +42,16 @@ export function DemoCard({
   showToast,
   showReveal,
 }: Props) {
+  const topicItems = scene.poll.topic.topic_items
+  const topicTitle = scene.poll.topic.title
+
   return (
     <FavpollCardProvider value={{ size: "demo" }}>
     <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
       <div className="space-y-4">
         {/* Protagonist avatar + name */}
         <motion.div
-          key={`protagonist-${scene.protagonistName}`}
+          key={`protagonist-${scene.protagonist.name}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.08 }}
           className="flex items-center gap-4 border-b pb-4"
@@ -48,32 +61,32 @@ export function DemoCard({
             style={{ backgroundColor: scene.avatarColor }}
             aria-hidden="true"
           >
-            {scene.protagonistInitials}
+            {getInitials(scene.protagonist.name)}
           </div>
           <span className="text-4xl leading-tight font-medium tracking-tight text-foreground">
-            {scene.protagonistName}
+            {scene.protagonist.name}
           </span>
         </motion.div>
 
         {/* Topic title */}
         <motion.div
-          key={`title-${scene.topicTitle}`}
+          key={`title-${topicTitle}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.2 }}
         >
           <h2 className="text-3xl font-medium tracking-tight text-foreground">
-            Favourite {scene.topicTitle}
+            Favourite {topicTitle}
           </h2>
         </motion.div>
 
         {/* Framing question */}
         <motion.p
-          key={`framing-${scene.protagonistName}`}
+          key={`framing-${scene.protagonist.name}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.32 }}
           className="text-lg leading-7 text-muted-foreground"
         >
-          {scene.question}
+          {scene.tagline}
         </motion.p>
 
         {/* Poll options */}
@@ -86,9 +99,9 @@ export function DemoCard({
               transition={prefersReducedMotion ? FAST : MEDIUM}
               className="flex flex-wrap gap-1.5"
             >
-              {scene.topic_items.map((opt, i) => (
+              {topicItems.map((opt, i) => (
                 <motion.div
-                  key={opt.label}
+                  key={opt.id}
                   initial={{ opacity: 0, y: 4 }}
                   animate={{
                     opacity: 1,
@@ -194,7 +207,7 @@ export function DemoCard({
               transition={prefersReducedMotion ? FAST : SLOW}
             >
               <RevealQuote
-                text={scene.revealText}
+                text={scene.poll.personal_reveal}
                 aria-live="polite"
                 role="status"
               />
@@ -214,11 +227,11 @@ export function DemoCard({
               }
             >
               <ol className="space-y-2.5" aria-label="Current rankings">
-                {scene.barLabels.map((label, i) => (
-                  <li key={label}>
+                {scene.results.map((result, i) => (
+                  <li key={result.label}>
                     <RankingBar
-                      label={label}
-                      amount={scene.barAmounts[i]}
+                      label={result.label}
+                      amount={result.amount}
                       widthPercent={barWidths[i] ?? 0}
                       barStyle={{
                         background: i === 0 ? "#534AB7" : "#AFA9EC",
@@ -252,7 +265,7 @@ export function DemoCard({
             className="absolute inset-x-5 bottom-5 flex items-baseline justify-between bg-background pt-2"
           >
             <span className="text-[11px] text-muted-foreground">
-              {scene.totalLabel}
+              Total raised
             </span>
             <span className="text-[14px] font-medium text-[#534AB7]">
               {scene.total}
@@ -277,7 +290,7 @@ export function DemoCard({
             </div>
             <p className="text-[12px] text-[#1D9E75]">
               <strong>Pledge confirmed</strong> · {scene.pledgeAmount} for{" "}
-              {scene.charity}
+              {scene.charities[0].name}
             </p>
           </motion.div>
         )}

@@ -94,11 +94,7 @@ export function PollHeading(props: Props) {
         </>
       ) : (
         <div className="flex items-baseline gap-3">
-          <PollTitle
-            title={props.topicTitle}
-            protagonistFirstName={props.protagonistFirstName}
-            pledged={props.pledged}
-          />
+          <PollTitle title={props.topicTitle} />
           {props.protagonistFirstName && !props.pledged && (
             <p className="text-sm text-[#888780] italic">
               &ndash; {getPollHint(props.protagonistFirstName)}

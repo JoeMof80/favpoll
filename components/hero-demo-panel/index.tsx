@@ -17,7 +17,7 @@ export function HeroDemoPanel() {
     prefersReducedMotion ? "reveal" : "arriving"
   )
   const [barWidths, setBarWidths] = useState<number[]>(
-    prefersReducedMotion ? SCENES[0].barWidths : [0, 0, 0, 0]
+    prefersReducedMotion ? SCENES[0].results.map((r) => r.widthPercent) : SCENES[0].results.map(() => 0)
   )
   const [fading, setFading] = useState(false)
 
@@ -36,7 +36,7 @@ export function HeroDemoPanel() {
     const scene = SCENES[sceneIndex]
     // Wait for all options to stagger in (300ms start + 80ms per item) then give
     // 1.5s viewing time before auto-selecting, so long lists don't feel rushed.
-    const optionStaggerMs = 300 + (scene.topic_items.length - 1) * 80
+    const optionStaggerMs = 300 + (scene.poll.topic.topic_items.length - 1) * 80
     const selectedAt = optionStaggerMs + 1500
 
     addT(() => setPhase("selected"), selectedAt)
@@ -47,12 +47,12 @@ export function HeroDemoPanel() {
     addT(() => setPhase("clearing"), selectedAt + 6800)
     addT(() => setPhase("reveal"), selectedAt + 7400)
 
-    scene.barWidths.forEach((w, i) => {
+    scene.results.forEach((result, i) => {
       addT(
         () =>
           setBarWidths((prev) => {
             const next = [...prev]
-            next[i] = w
+            next[i] = result.widthPercent
             return next
           }),
         selectedAt + 8000 + i * 200
@@ -61,10 +61,11 @@ export function HeroDemoPanel() {
 
     addT(() => setFading(true), selectedAt + 16000)
     addT(() => {
+      const nextIndex = (sceneIndex + 1) % SCENES.length
       setPhase("arriving")
-      setBarWidths([0, 0, 0, 0])
+      setBarWidths(SCENES[nextIndex].results.map(() => 0))
       setFading(false)
-      setSceneIndex((i) => (i + 1) % SCENES.length)
+      setSceneIndex(nextIndex)
     }, selectedAt + 16500)
 
     return clearAll
@@ -77,7 +78,7 @@ export function HeroDemoPanel() {
     setFading(true)
     setTimeout(() => {
       setPhase("arriving")
-      setBarWidths([0, 0, 0, 0])
+      setBarWidths(SCENES[index].results.map(() => 0))
       setFading(false)
       setSceneIndex(index)
     }, 400)
@@ -102,7 +103,7 @@ export function HeroDemoPanel() {
     pledging: "Pledging…",
     confirmed: "Pledged ✓",
     clearing: "",
-    reveal: scene.revealLabel,
+    reveal: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
   }
 
   return (
@@ -133,7 +134,7 @@ export function HeroDemoPanel() {
 
             <span className="sr-only">
               Animated demonstration of how favpoll works, showing a{" "}
-              {scene.occasion.toLowerCase()} event. The demonstration cycles
+              {scene.occasion_label.toLowerCase()} event. The demonstration cycles
               through occasion types automatically. Use the buttons above to
               jump to a specific occasion.
             </span>

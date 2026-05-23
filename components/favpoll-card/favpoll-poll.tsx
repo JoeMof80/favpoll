@@ -9,38 +9,39 @@ import type { PollData, PollStep } from "./types"
 type FavpollPollProps = {
   poll: PollData
   step: PollStep
+  protagonistName?: string
   showSharedFund?: boolean
 }
 
 export function FavpollPoll({
   poll,
   step,
+  protagonistName,
   showSharedFund = false,
 }: FavpollPollProps) {
+  const topicTitle = poll.topic?.title ?? ""
+  const topicItems = poll.topic?.topic_items ?? []
+
   return (
     <div className="space-y-3">
-      <PollTitle
-        title={poll.topicTitle}
-        protagonistFirstName={poll.protagonistFirstName}
-        pledged={step === "pledged"}
-      />
+      {topicTitle && <PollTitle title={topicTitle} />}
 
       {step === "choose" && (
         <PollOptions
-          options={poll.topic_items}
-          selectedLabel={poll.selectedOptionLabel}
+          options={topicItems}
+          selectedItemId={poll.selectedItemId}
           locked={false}
-          topicTitle={poll.topicTitle}
+          topicTitle={topicTitle}
         />
       )}
 
       {step === "pledge" && (
         <>
           <PollOptions
-            options={poll.topic_items}
-            selectedLabel={poll.selectedOptionLabel}
+            options={topicItems}
+            selectedItemId={poll.selectedItemId}
             locked={true}
-            topicTitle={poll.topicTitle}
+            topicTitle={topicTitle}
           />
           <FavpollPledgePanel />
           <FavpollSharedFund show={showSharedFund} />
@@ -49,10 +50,10 @@ export function FavpollPoll({
 
       {step === "pledged" && (
         <>
-          {poll.personalReveal && (
+          {poll.personal_reveal && (
             <PollReveal
-              personalReveal={poll.personalReveal}
-              protagonistFirstName={poll.protagonistFirstName}
+              personalReveal={poll.personal_reveal}
+              protagonistFirstName={protagonistName?.split(" ")[0]}
               role="status"
               aria-live="polite"
             />

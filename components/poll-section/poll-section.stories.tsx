@@ -12,7 +12,7 @@ function parseGBP(s: string): number {
 
 /**
  * Build a mock EventPollWithItems from a scene index.
- * Items with pledging data come from barLabels; all scene options are included
+ * Items with pledging data come from results; all scene options are included
  * so PledgePanel has a full list to select from.
  */
 function makePoll(sceneIndex: number): EventPollWithItems {
@@ -22,16 +22,16 @@ function makePoll(sceneIndex: number): EventPollWithItems {
 
   // Merge pledging data into the full options list
   const pledgeByLabel = Object.fromEntries(
-    scene.barLabels.map((label, i) => [
-      label,
+    scene.results.map((r) => [
+      r.label,
       {
-        all_time_pledged: parseGBP(scene.barAmounts[i]),
-        all_time_count: Math.max(1, Math.round(parseGBP(scene.barAmounts[i]) / 15)),
+        all_time_pledged: parseGBP(r.amount),
+        all_time_count: Math.max(1, Math.round(parseGBP(r.amount) / 15)),
       },
     ])
   )
 
-  const topic_items: TopicItem[] = scene.topic_items.map((opt, i) => ({
+  const topic_items: TopicItem[] = scene.poll.topic.topic_items.map((opt, i) => ({
     id: `item-${sceneIndex}-${i}`,
     topic_id: topicId,
     label: opt.label,
@@ -49,11 +49,11 @@ function makePoll(sceneIndex: number): EventPollWithItems {
     id: pollId,
     event_id: "event-demo",
     topic_id: topicId,
-    personal_reveal: scene.revealText,
+    personal_reveal: scene.poll.personal_reveal,
     created_at: "2024-01-01T00:00:00Z",
     topics: {
       id: topicId,
-      title: scene.topicTitle,
+      title: scene.poll.topic.title,
       description: null,
       is_finite: true,
       is_active: true,
@@ -87,7 +87,7 @@ const meta = {
     isClosed: false,
     hasPledged: false,
     pledgeJustConfirmed: false,
-    protagonistName: SCENES[0].protagonistName,
+    protagonistName: SCENES[0].protagonist.name,
     poll: MEMORIAL_POLL,
     onSelectionsChange: () => {},
     onAddItem: undefined,
@@ -103,7 +103,7 @@ export const PledgeView: Story = {
   name: "Pledge view — Colour (Memorial)",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonistName,
+    protagonistName: SCENES[0].protagonist.name,
     hasPledged: false,
   },
 }
@@ -112,7 +112,7 @@ export const PledgeViewBirthday: Story = {
   name: "Pledge view — Ice cream (Birthday)",
   args: {
     poll: BIRTHDAY_POLL,
-    protagonistName: SCENES[1].protagonistName,
+    protagonistName: SCENES[1].protagonist.name,
     hasPledged: false,
   },
 }
@@ -123,7 +123,7 @@ export const ResultsWithReveal: Story = {
   name: "Results view — reveal shown (Memorial)",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonistName,
+    protagonistName: SCENES[0].protagonist.name,
     hasPledged: true,
   },
 }
@@ -132,7 +132,7 @@ export const ResultsWithRevealRetirement: Story = {
   name: "Results view — reveal shown (Retirement)",
   args: {
     poll: RETIREMENT_POLL,
-    protagonistName: SCENES[2].protagonistName,
+    protagonistName: SCENES[2].protagonist.name,
     hasPledged: true,
   },
 }
@@ -143,7 +143,7 @@ export const Closed: Story = {
   name: "Closed poll",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonistName,
+    protagonistName: SCENES[0].protagonist.name,
     isClosed: true,
     hasPledged: false,
   },

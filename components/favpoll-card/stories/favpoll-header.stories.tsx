@@ -22,26 +22,31 @@ type Story = StoryObj<typeof meta>
 
 export const WithPhoto: Story = {
   args: {
-    protagonistAvatarSrc: 'https://i.pravatar.cc/150?img=47',
-    protagonistName: 'Belinda Hartley',
+    protagonist: {
+      name: 'Belinda Hartley',
+      photo_url: 'https://i.pravatar.cc/150?img=47',
+      date_label: '1942–2024',
+    },
     eyebrow: 'Memorial',
-    dateLabel: '1942–2024',
   },
 }
 
 export const InitialsOnly: Story = {
   args: {
-    protagonistName: 'Belinda Hartley',
+    protagonist: {
+      name: 'Belinda Hartley',
+      date_label: '1942–2024',
+    },
     eyebrow: 'Memorial',
-    dateLabel: '1942–2024',
   },
 }
 
 export const Couple: Story = {
   args: {
-    protagonistName: 'Alex & Jordan',
-    protagonistInitials: 'AJ',
+    protagonist: {
+      name: 'Alex & Jordan',
+      initials: 'AJ',
+    },
     eyebrow: 'Engagement',
-    dateLabel: 'Engaged 14th February 2025',
   },
 }

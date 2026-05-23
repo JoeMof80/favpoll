@@ -122,10 +122,10 @@ describe("useRankingItems — rankingView change", () => {
     const { result, rerender } = renderHook(
       ({ view }: { view: "amount" | "count" }) =>
         useRankingItems(initialItems, "topic-1", view),
-      { initialProps: { view: "amount" as const } }
+      { initialProps: { view: "amount" as "amount" | "count" } }
     )
 
-    act(() => { rerender({ view: "count" }) })
+    act(() => { rerender({ view: "count" as const }) })
 
     // blue (count 5) should still be #1, green (count 1) should be #3
     const ids = result.current.items.map((i) => i.id)
@@ -137,10 +137,10 @@ describe("useRankingItems — rankingView change", () => {
     const { result, rerender } = renderHook(
       ({ view }: { view: "amount" | "count" }) =>
         useRankingItems(initialItems, "topic-1", view),
-      { initialProps: { view: "amount" as const } }
+      { initialProps: { view: "amount" as "amount" | "count" } }
     )
 
-    act(() => { rerender({ view: "count" }) })
+    act(() => { rerender({ view: "count" as const }) })
 
     expect(result.current.announcement).toBe("Sorted by number of pledges")
   })
@@ -149,9 +149,9 @@ describe("useRankingItems — rankingView change", () => {
     const { result, rerender } = renderHook(
       ({ view }: { view: "amount" | "count" }) =>
         useRankingItems(initialItems, "topic-1", view),
-      { initialProps: { view: "count" as const } }
+      { initialProps: { view: "count" as "amount" | "count" } }
     )
-    act(() => { rerender({ view: "amount" }) })
+    act(() => { rerender({ view: "amount" as const }) })
     expect(result.current.announcement).toBe("Sorted by amount pledged")
   })
 })

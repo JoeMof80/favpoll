@@ -1,80 +1,72 @@
-import { useFavpollCard } from './favpoll-card-context'
+import { useFavpollCard } from "./favpoll-card-context"
+import type { CardProtagonist } from "./types"
 
 type FavpollHeaderProps = {
-  protagonistName: string
-  protagonistInitials?: string
-  protagonistAvatarSrc?: string
+  protagonist: CardProtagonist
   eyebrow?: string
-  dateLabel?: string
 }
 
-function getInitials(name: string, initials?: string): string {
-  if (initials) return initials.slice(0, 2)
+function getInitials(name: string, override?: string): string {
+  if (override) return override.slice(0, 2)
   return name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0])
-    .join('')
+    .join("")
     .toUpperCase()
 }
 
-export function FavpollHeader({
-  protagonistName,
-  protagonistInitials,
-  protagonistAvatarSrc,
-  eyebrow,
-  dateLabel,
-}: FavpollHeaderProps) {
+export function FavpollHeader({ protagonist, eyebrow }: FavpollHeaderProps) {
   const { size } = useFavpollCard()
 
-  const avatarSize = size === 'full' ? 56 : size === 'demo' ? 36 : 32
+  const avatarSize = size === "full" ? 56 : size === "demo" ? 36 : 32
   const nameClass =
-    size === 'full'
-      ? 'text-[22px] font-medium text-[#2C2C2A]'
-      : size === 'demo'
-        ? 'text-[16px] font-medium text-[#2C2C2A]'
-        : 'text-[14px] font-medium text-[#2C2C2A]'
-
+    size === "full"
+      ? "text-[22px] font-medium text-[#2C2C2A]"
+      : size === "demo"
+        ? "text-[16px] font-medium text-[#2C2C2A]"
+        : "text-[14px] font-medium text-[#2C2C2A]"
   const initialsTextClass =
-    size === 'full' ? 'text-sm' : size === 'demo' ? 'text-xs' : 'text-[10px]'
+    size === "full" ? "text-sm" : size === "demo" ? "text-xs" : "text-[10px]"
 
-  const derivedInitials = getInitials(protagonistName, protagonistInitials)
+  const initials = getInitials(protagonist.name, protagonist.initials)
 
   return (
     <div>
       <div className="flex items-start justify-between">
-        {/* Left rail */}
         <div className="flex flex-col">
           {eyebrow && (
             <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#888780]">
               {eyebrow}
             </span>
           )}
-          <span className={nameClass}>{protagonistName}</span>
-          {dateLabel && (
-            <span className="text-[12px] text-[#888780]">{dateLabel}</span>
+          <span className={nameClass}>{protagonist.name}</span>
+          {protagonist.date_label && (
+            <span className="text-[12px] text-[#888780]">
+              {protagonist.date_label}
+            </span>
           )}
         </div>
 
-        {/* Avatar */}
         <div className="shrink-0" style={{ width: avatarSize, height: avatarSize }}>
-          {protagonistAvatarSrc ? (
+          {protagonist.photo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={protagonistAvatarSrc}
-              alt={protagonistName}
+              src={protagonist.photo_url}
+              alt={protagonist.name}
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
             <div
               className="flex h-full w-full items-center justify-center rounded-full border border-[#AFA9EC] bg-[#EEEDFE]"
-              aria-label={protagonistName}
+              aria-label={protagonist.name}
             >
               <span
                 className={`font-medium text-[#534AB7] ${initialsTextClass}`}
                 aria-hidden="true"
               >
-                {derivedInitials}
+                {initials}
               </span>
             </div>
           )}

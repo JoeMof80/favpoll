@@ -1,18 +1,20 @@
 import { Chip } from "@/components/ui/chip"
 
 type PollOptionsProps = {
-  options: { label: string }[]
-  selectedLabel?: string
+  options: { id: string; label: string }[]
+  selectedItemId?: string | null
   locked?: boolean
   topicTitle?: string
 }
 
 export function PollOptions({
   options,
-  selectedLabel,
+  selectedItemId,
   locked = false,
   topicTitle,
 }: PollOptionsProps) {
+  const selectedLabel = options.find((o) => o.id === selectedItemId)?.label
+
   if (locked) {
     return (
       <div className="flex flex-wrap gap-2">
@@ -33,10 +35,10 @@ export function PollOptions({
     >
       {options.map((opt) => (
         <Chip
-          key={opt.label}
-          selected={opt.label === selectedLabel}
+          key={opt.id}
+          selected={opt.id === selectedItemId}
           role="radio"
-          aria-checked={opt.label === selectedLabel}
+          aria-checked={opt.id === selectedItemId}
         >
           {opt.label}
         </Chip>

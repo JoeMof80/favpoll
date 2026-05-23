@@ -2,32 +2,33 @@ import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { FavpollCard } from "../favpoll-card"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
-import type { FavpollCardProps, PollStep, PollResultItem } from "../types"
+import type { FavpollCardProps, PollStep } from "../types"
 
 function sceneToProps(index: number): FavpollCardProps {
   const scene = SCENES[index]
   const eyebrow = SCENE_EYEBROWS[index]
 
-  const results: PollResultItem[] = scene.barLabels.map((label, i) => ({
-    label,
-    amount: scene.barAmounts[i],
-    widthPercent: scene.barWidths[i],
-  }))
-
-  const protagonistFirstName = scene.protagonistName.split(/\s+/)[0]
-
   return {
-    protagonistName: scene.protagonistName,
-    protagonistInitials: scene.protagonistInitials,
+    protagonist: {
+      name: scene.protagonist.name,
+      photo_url: scene.protagonist.photo_url,
+    },
     eyebrow,
-    charities: [{ name: scene.charity, amountRaised: scene.total }],
+    charities: scene.charities.map((c) => ({
+      id: c.id,
+      name: c.name,
+      logo_url: c.logo_url,
+      registered_number: c.registered_number,
+    })),
     poll: {
-      topicTitle: scene.topicTitle,
-      topic_items: scene.topic_items,
-      selectedOptionLabel: scene.topic_items[scene.selectedIndex]?.label,
-      personalReveal: scene.revealText,
-      protagonistFirstName,
-      results,
+      id: scene.poll.id,
+      personal_reveal: scene.poll.personal_reveal,
+      topic: {
+        title: scene.poll.topic.title,
+        topic_items: scene.poll.topic.topic_items,
+      },
+      selectedItemId: scene.poll.topic.topic_items[scene.selectedIndex]?.id,
+      results: scene.results,
     },
   }
 }
@@ -87,7 +88,7 @@ export const NoReveal: Story = {
     size: "full",
     poll: {
       ...sceneToProps(0).poll,
-      personalReveal: null,
+      personal_reveal: null,
     },
   },
 }

@@ -43,7 +43,7 @@ function makeViewProps(sceneIndex: number): {
 
   const protagonist: Protagonist = {
     id: `p-${sceneIndex}`,
-    name: scene.protagonistName,
+    name: scene.protagonist.name,
     date_label: DATE_LABELS[sceneIndex],
     about: BIOS[sceneIndex],
     photo_url: null,

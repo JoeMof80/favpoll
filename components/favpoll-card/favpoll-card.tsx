@@ -23,12 +23,10 @@ export function FavpollCard({
   onStepChange,
   showSharedFund = false,
   charities,
+  charityAmounts,
   poll,
-  protagonistName,
-  protagonistInitials,
-  protagonistAvatarSrc,
+  protagonist,
   eyebrow,
-  dateLabel,
 }: FavpollCardProps) {
   const [internalStep, setInternalStep] = useState<PollStep>(step ?? "choose")
   const activeStep = step ?? internalStep
@@ -42,13 +40,7 @@ export function FavpollCard({
     <FavpollCardProvider value={{ size }}>
       <div className="overflow-hidden rounded-[10px] border border-[#D3D1C7] bg-white">
         <div className="px-4 pt-4">
-          <FavpollHeader
-            protagonistName={protagonistName}
-            protagonistInitials={protagonistInitials}
-            protagonistAvatarSrc={protagonistAvatarSrc}
-            eyebrow={eyebrow}
-            dateLabel={dateLabel}
-          />
+          <FavpollHeader protagonist={protagonist} eyebrow={eyebrow} />
         </div>
 
         {showSteps && (
@@ -83,6 +75,7 @@ export function FavpollCard({
           <FavpollPoll
             poll={poll}
             step={activeStep}
+            protagonistName={protagonist.name}
             showSharedFund={showSharedFund}
           />
         </div>
@@ -90,7 +83,11 @@ export function FavpollCard({
         {charities.length > 0 && (
           <div className="space-y-1.5 border-t border-[#D3D1C7] px-4 py-2.5">
             {charities.map((c) => (
-              <FavpollCharityRow key={c.name} {...c} />
+              <FavpollCharityRow
+                key={c.id}
+                charity={c}
+                amountRaised={charityAmounts?.[c.id]}
+              />
             ))}
           </div>
         )}

@@ -44,7 +44,7 @@ function makeHeroProps(sceneIndex: number): { event: Event; protagonist: Protago
   const scene = SCENES[sceneIndex]
   const protagonist: Protagonist = {
     id: `p-ep-${sceneIndex}`,
-    name: scene.protagonistName,
+    name: scene.protagonist.name,
     date_label: DATE_LABELS[sceneIndex],
     about: BIOS[sceneIndex],
     photo_url: null,
@@ -75,15 +75,15 @@ function makePoll(sceneIndex: number): EventPollWithItems {
   const scene = SCENES[sceneIndex]
   const topicId = `topic-ep-${sceneIndex}`
   const pledgeByLabel = Object.fromEntries(
-    scene.barLabels.map((label, i) => [
-      label,
+    scene.results.map((r) => [
+      r.label,
       {
-        all_time_pledged: parseGBP(scene.barAmounts[i]),
-        all_time_count: Math.max(1, Math.round(parseGBP(scene.barAmounts[i]) / 15)),
+        all_time_pledged: parseGBP(r.amount),
+        all_time_count: Math.max(1, Math.round(parseGBP(r.amount) / 15)),
       },
     ])
   )
-  const topic_items: TopicItem[] = scene.topic_items.map((opt, i) => ({
+  const topic_items: TopicItem[] = scene.poll.topic.topic_items.map((opt, i) => ({
     id: `item-ep-${sceneIndex}-${i}`,
     topic_id: topicId,
     label: opt.label,
@@ -100,11 +100,11 @@ function makePoll(sceneIndex: number): EventPollWithItems {
     id: `poll-ep-${sceneIndex}`,
     event_id: "event-demo",
     topic_id: topicId,
-    personal_reveal: scene.revealText,
+    personal_reveal: scene.poll.personal_reveal,
     created_at: "2024-01-01T00:00:00Z",
     topics: {
       id: topicId,
-      title: scene.topicTitle,
+      title: scene.poll.topic.title,
       description: null,
       is_finite: true,
       is_active: true,
@@ -134,12 +134,20 @@ function EventPageLayout({ sceneIndex }: PageArgs) {
         pledgeAmount="10"
         isClosed={false}
         hasPledged={false}
-        protagonistName={scene.protagonistName}
+        protagonistName={scene.protagonist.name}
         onSelectionsChange={() => {}}
       />
 
       <div className="mt-10 border-t border-[#D3D1C7] pt-6">
-        <FavpollCharityRow name={scene.charity} amountRaised={scene.total} />
+        <FavpollCharityRow
+          charity={{
+            id: scene.charities[0].id,
+            name: scene.charities[0].name,
+            logo_url: scene.charities[0].logo_url,
+            registered_number: scene.charities[0].registered_number,
+          }}
+          amountRaised={scene.total}
+        />
       </div>
     </div>
   )
