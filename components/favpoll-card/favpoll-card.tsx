@@ -1,23 +1,23 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { FavpollCardProvider } from './favpoll-card-context'
-import { FavpollHeader } from './favpoll-header'
-import { FavpollPoll } from './favpoll-poll'
-import { FavpollCharityRow } from './favpoll-charity-row'
-import type { FavpollCardProps, PollStep } from './types'
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { FavpollCardProvider } from "./favpoll-card-context"
+import { FavpollHeader } from "./favpoll-header"
+import { FavpollPoll } from "./favpoll-poll"
+import { FavpollCharityRow } from "./favpoll-charity-row"
+import type { FavpollCardProps, PollStep } from "./types"
 
-const STEPS: PollStep[] = ['choose', 'pledge', 'pledged']
+const STEPS: PollStep[] = ["choose", "pledge", "pledged"]
 const STEP_LABELS: Record<PollStep, string> = {
-  choose: 'Choose',
-  pledge: 'Pledge',
-  pledged: 'Pledged',
+  choose: "Choose",
+  pledge: "Pledge",
+  pledged: "Pledged",
 }
 
 export function FavpollCard({
-  size = 'full',
+  size = "full",
   step,
   showSteps = false,
   onStepChange,
@@ -30,7 +30,7 @@ export function FavpollCard({
   eyebrow,
   dateLabel,
 }: FavpollCardProps) {
-  const [internalStep, setInternalStep] = useState<PollStep>(step ?? 'choose')
+  const [internalStep, setInternalStep] = useState<PollStep>(step ?? "choose")
   const activeStep = step ?? internalStep
 
   const handleStepChange = (s: PollStep) => {
@@ -52,7 +52,11 @@ export function FavpollCard({
         </div>
 
         {showSteps && (
-          <div role="list" aria-label="Steps" className="flex items-center justify-center gap-2 py-3">
+          <div
+            role="list"
+            aria-label="Steps"
+            className="flex items-center justify-center gap-2 py-3"
+          >
             {STEPS.map((s, i) => {
               const isActive = activeStep === s
               return (
@@ -62,11 +66,11 @@ export function FavpollCard({
                   size="icon"
                   role="listitem"
                   aria-label={`${STEP_LABELS[s]}, step ${i + 1} of ${STEPS.length}`}
-                  aria-current={isActive ? 'step' : undefined}
+                  aria-current={isActive ? "step" : undefined}
                   onClick={() => handleStepChange(s)}
                   className={cn(
-                    'h-1.5 rounded-full p-0 transition-[width] duration-200',
-                    isActive ? 'bg-[#534AB7]' : 'bg-[#D3D1C7]'
+                    "h-1.5 rounded-full p-0 transition-[width] duration-200",
+                    isActive ? "bg-[#534AB7]" : "bg-[#D3D1C7]"
                   )}
                   style={{ width: isActive ? 20 : 6 }}
                 />

@@ -26,20 +26,18 @@ export function FavpollPoll({
       />
 
       {step === "choose" && (
-        <>
-          <PollOptions
-            options={poll.options}
-            selectedLabel={poll.selectedOptionLabel}
-            locked={false}
-            topicTitle={poll.topicTitle}
-          />
-        </>
+        <PollOptions
+          options={poll.topic_items}
+          selectedLabel={poll.selectedOptionLabel}
+          locked={false}
+          topicTitle={poll.topicTitle}
+        />
       )}
 
       {step === "pledge" && (
         <>
           <PollOptions
-            options={poll.options}
+            options={poll.topic_items}
             selectedLabel={poll.selectedOptionLabel}
             locked={true}
             topicTitle={poll.topicTitle}
@@ -51,12 +49,6 @@ export function FavpollPoll({
 
       {step === "pledged" && (
         <>
-          {/* <PollOptions
-            options={poll.options}
-            selectedLabel={poll.selectedOptionLabel}
-            locked={true}
-            topicTitle={poll.topicTitle}
-          /> */}
           {poll.personalReveal && (
             <PollReveal
               personalReveal={poll.personalReveal}

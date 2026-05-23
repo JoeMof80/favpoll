@@ -36,7 +36,7 @@ export function HeroDemoPanel() {
     const scene = SCENES[sceneIndex]
     // Wait for all options to stagger in (300ms start + 80ms per item) then give
     // 1.5s viewing time before auto-selecting, so long lists don't feel rushed.
-    const optionStaggerMs = 300 + (scene.options.length - 1) * 80
+    const optionStaggerMs = 300 + (scene.topic_items.length - 1) * 80
     const selectedAt = optionStaggerMs + 1500
 
     addT(() => setPhase("selected"), selectedAt)
@@ -113,9 +113,12 @@ export function HeroDemoPanel() {
           <HeroPitchColumn sceneIndex={sceneIndex} />
 
           {/* Right — demo card (desktop only) */}
-          <div className="hidden h-158 flex-col p-5 md:flex" style={{ flex: "0.95" }}>
+          <div
+            className="hidden h-158 flex-col p-5 md:flex"
+            style={{ flex: "0.95" }}
+          >
             {/* Occasion chips */}
-            <div className="mb-3 shrink-0 flex flex-wrap gap-1.25">
+            <div className="mb-3 flex shrink-0 flex-wrap gap-1.25">
               {OCCASION_CHIPS.map(({ label, index }) => (
                 <Chip
                   key={label}

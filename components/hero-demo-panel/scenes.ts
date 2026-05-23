@@ -15,7 +15,7 @@ export type HeroScene = {
   avatarColor: string
   topicTitle: string
   question: string
-  options: { label: string }[]
+  topic_items: { label: string }[]
   selectedIndex: number
   pledgeAmount: string
   charity: string
@@ -36,7 +36,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#7F77DD",
     topicTitle: "Colour",
     question: "Belinda had a colour she always wore — do you?",
-    options: [
+    topic_items: [
       { label: "Black" },
       { label: "Blue" },
       { label: "Brown" },
@@ -69,7 +69,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#E87D6A",
     topicTitle: "Ice cream",
     question: "Tell us your favourite ice cream to find out Poppy's.",
-    options: [
+    topic_items: [
       { label: "Banana" },
       { label: "Blackcurrant" },
       { label: "Brown bread" },
@@ -128,7 +128,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#4AAB8A",
     topicTitle: "Season",
     question: "Which time of year do you love? Is it the same as Ros's?",
-    options: [
+    topic_items: [
       { label: "Autumn" },
       { label: "Spring" },
       { label: "Summer" },
@@ -152,7 +152,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#D4936B",
     topicTitle: "Animal",
     question: "What's your favourite animal? Alex & Jordan have one...",
-    options: [
+    topic_items: [
       { label: "African elephant" },
       { label: "Arctic fox" },
       { label: "Barn owl" },
@@ -216,7 +216,7 @@ export const SCENES: HeroScene[] = [
     topicTitle: "Biscuit",
     question:
       "We've had eight years of Dave's opinions about biscuits, what about your opinion?",
-    options: [
+    topic_items: [
       { label: "Biscoff" },
       { label: "Bourbon" },
       { label: "Caramel wafer" },
@@ -276,7 +276,7 @@ export const SCENES: HeroScene[] = [
     topicTitle: "Film",
     question:
       "James' favourite film was the reason he applied to study engineering — what's yours?",
-    options: [
+    topic_items: [
       { label: "2001: A Space Odyssey" },
       { label: "Alien" },
       { label: "Amadeus" },

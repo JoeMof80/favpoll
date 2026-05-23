@@ -84,7 +84,7 @@ export function DemoCard({
               transition={prefersReducedMotion ? FAST : MEDIUM}
               className="flex flex-wrap gap-1.5"
             >
-              {scene.options.map((opt, i) => (
+              {scene.topic_items.map((opt, i) => (
                 <motion.div
                   key={opt.label}
                   initial={{ opacity: 0, y: 4 }}
@@ -169,7 +169,9 @@ export function DemoCard({
                   className={cn(
                     "w-full transition-all duration-150",
                     phase === "pledging" ? "scale-[0.97] opacity-80" : "",
-                    phase === "pledge-panel" ? "cursor-not-allowed opacity-50" : ""
+                    phase === "pledge-panel"
+                      ? "cursor-not-allowed opacity-50"
+                      : ""
                   )}
                   disabled={phase === "pledge-panel"}
                   aria-hidden="true"
@@ -272,8 +274,8 @@ export function DemoCard({
               <Check className="h-2.5 w-2.5 text-white" />
             </div>
             <p className="text-[12px] text-[#1D9E75]">
-              <strong>Pledge confirmed</strong> ·{" "}
-              {scene.pledgeAmount} for {scene.charity}
+              <strong>Pledge confirmed</strong> · {scene.pledgeAmount} for{" "}
+              {scene.charity}
             </p>
           </motion.div>
         )}
