@@ -81,6 +81,11 @@ export async function addOccasion(
   if (fetchError) return { error: fetchError.message }
 
   const current: PlaceholdersMap = (topic as any)?.placeholders ?? {}
+
+  if (Object.prototype.hasOwnProperty.call(current, occasion)) {
+    return { error: `Occasion "${occasion}" already exists. Use Save to update it.` }
+  }
+
   const merged: PlaceholdersMap = { ...current, [occasion]: { about, reveal } }
 
   const { error: updateError } = await supabase

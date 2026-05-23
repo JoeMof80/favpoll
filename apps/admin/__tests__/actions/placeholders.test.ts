@@ -110,6 +110,15 @@ describe('addOccasion', () => {
     }
   })
 
+  it('rejects an occasion that already exists', async () => {
+    const existing = { memorial: { about: 'M about', reveal: 'M reveal' } }
+    mock.queue({ placeholders: existing })
+    const { error } = await addOccasion('topic-1', 'memorial', 'New about', 'New reveal')
+    expect(error).toMatch(/already exists/i)
+    // should not have called update
+    expect(mock.callsFor('topics').find((c) => c.method === 'update')).toBeUndefined()
+  })
+
   it('merges the new occasion without overwriting existing ones', async () => {
     const existing = { birthday: { about: 'B about', reveal: 'B reveal' } }
     mock.queue({ placeholders: existing })
