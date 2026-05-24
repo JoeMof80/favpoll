@@ -35,6 +35,8 @@ pnpm-debug.log*
 
 # env files
 .env*.local
+.env.staging-web
+.env.staging-admin
 .env.production-web
 .env.production-admin
 
