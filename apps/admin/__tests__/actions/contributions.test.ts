@@ -109,7 +109,7 @@ describe('getReviewedContributions', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('acceptContribution', () => {
-  it('updates review_status to accepted', async () => {
+  it('updates review_status to accepted and sets is_canonical true', async () => {
     mock.queue(null) // update → await
 
     const { error } = await acceptContribution('item-1')
@@ -118,6 +118,7 @@ describe('acceptContribution', () => {
     const updateCall = mock.callsFor('topic_items').find((c) => c.method === 'update')!
     expect(updateCall.args[0]).toMatchObject({
       review_status: 'accepted',
+      is_canonical: true,
       rejection_reason: null,
     })
     expect(typeof updateCall.args[0].reviewed_at).toBe('string')

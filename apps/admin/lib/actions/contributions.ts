@@ -97,6 +97,7 @@ export async function acceptContribution(itemId: string): Promise<{ error: strin
     .from('topic_items')
     .update({
       review_status: 'accepted',
+      is_canonical: true,
       rejection_reason: null,
       reviewed_at: new Date().toISOString(),
     })
