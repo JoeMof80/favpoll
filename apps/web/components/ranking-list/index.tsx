@@ -82,6 +82,20 @@ export function RankingList({
           const isHidden = item.is_hidden ?? false
           const showToggle = isOrganiser && !!item.is_guest_added && !!item.event_poll_item_id
 
+          const labelSuffix = showToggle ? (
+            <>
+              {isHidden && (
+                <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                  Hidden
+                </span>
+              )}
+              <HideToggle
+                isHidden={isHidden}
+                eventPollItemId={item.event_poll_item_id!}
+              />
+            </>
+          ) : undefined
+
           return (
             <li
               key={item.id}
@@ -89,27 +103,13 @@ export function RankingList({
               aria-label={`${item.label}, ranked ${item.rank}, ${valueLabel}${isHidden ? ", hidden from guests" : ""}`}
               className={isHidden ? "opacity-40" : undefined}
             >
-              <div className="flex items-center gap-2">
-                <div className="flex-1 min-w-0">
-                  <RankingBar
-                    label={item.label}
-                    amount={valueLabel}
-                    widthPercent={barWidth}
-                    barClassName="transition-all duration-700 ease-out"
-                  />
-                </div>
-                {isOrganiser && isHidden && (
-                  <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                    Hidden
-                  </span>
-                )}
-                {showToggle && (
-                  <HideToggle
-                    isHidden={isHidden}
-                    eventPollItemId={item.event_poll_item_id!}
-                  />
-                )}
-              </div>
+              <RankingBar
+                label={item.label}
+                amount={valueLabel}
+                widthPercent={barWidth}
+                barClassName="transition-all duration-700 ease-out"
+                labelSuffix={labelSuffix}
+              />
             </li>
           )
         })}

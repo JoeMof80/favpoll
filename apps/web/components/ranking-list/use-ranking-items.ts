@@ -20,6 +20,13 @@ export function useRankingItems(
     items.forEach((item) => prevRanksRef.current.set(item.id, item.rank))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Re-initialize when server streams fresh initialItems (e.g. after router.refresh() post-pledge)
+  useEffect(() => {
+    const ranked = rankItems(initialItems, rankingView)
+    setItems(ranked)
+    ranked.forEach((item) => prevRanksRef.current.set(item.id, item.rank))
+  }, [initialItems]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Re-sort when rankingView changes
   useEffect(() => {
     setItems((prev) => {

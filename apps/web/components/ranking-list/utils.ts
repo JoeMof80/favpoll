@@ -6,11 +6,14 @@ export function rankItems(
   items: TopicItem[],
   view: "amount" | "count" = "amount"
 ): RankedItem[] {
-  const sorted = [...items].sort((a, b) =>
-    view === "amount"
-      ? b.all_time_pledged - a.all_time_pledged
-      : b.all_time_count - a.all_time_count
-  )
+  const sorted = [...items].sort((a, b) => {
+    const diff =
+      view === "amount"
+        ? b.all_time_pledged - a.all_time_pledged
+        : b.all_time_count - a.all_time_count
+    if (diff !== 0) return diff
+    return a.label.localeCompare(b.label)
+  })
   return sorted.map((item, i) => ({ ...item, rank: i + 1, prevRank: null }))
 }
 

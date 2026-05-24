@@ -29,7 +29,8 @@ export function useEventContent({
 
   const handlePledgeSuccess = useCallback(() => {
     setPledgeConfirmed(true)
-  }, [])
+    router.refresh()
+  }, [router])
 
   // Returns an addItem handler for infinite, open polls — undefined otherwise
   function addItemHandler(poll: EventPollWithItems) {

@@ -27,8 +27,8 @@ export function InlineOptionInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") onConfirm()
-          if (e.key === "Escape") onCancel()
+          if (e.key === "Enter") { e.preventDefault(); onConfirm() }
+          if (e.key === "Escape") { e.preventDefault(); onCancel() }
         }}
         placeholder={placeholder}
         className="min-w-0 w-28 bg-transparent text-xs outline-none placeholder:text-muted-foreground/40"

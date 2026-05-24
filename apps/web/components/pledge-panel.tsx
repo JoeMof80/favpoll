@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { InlineOptionInput } from "@/components/canvas/inline-option-input"
 import type { TopicItem } from "@favpoll/types"
 
 type Allocation = {
@@ -45,6 +46,8 @@ export function PledgePanel({
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [search, setSearch] = useState("")
+  const [addingCustom, setAddingCustom] = useState(false)
+  const [customDraft, setCustomDraft] = useState("")
   const [addingItem, setAddingItem] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
 
@@ -64,25 +67,21 @@ export function PledgePanel({
 
   const lowerSearch = search.toLowerCase().trim()
 
+  const sortedItems = [...items].sort((a, b) => a.label.localeCompare(b.label))
+
   const visibleItems =
     isInfinite && lowerSearch
-      ? items.filter((item) => item.label.toLowerCase().includes(lowerSearch))
-      : items
-
-  const exactMatch = lowerSearch
-    ? items.some((item) => item.label.toLowerCase() === lowerSearch)
-    : false
-
-  const showAddOption =
-    isInfinite && onAddItem && lowerSearch.length > 0 && !exactMatch
+      ? sortedItems.filter((item) => item.label.toLowerCase().includes(lowerSearch))
+      : sortedItems
 
   async function handleAdd() {
-    if (!onAddItem || !search.trim()) return
+    if (!onAddItem || !customDraft.trim()) return
     setAddingItem(true)
     setAddError(null)
     try {
-      await onAddItem(search.trim())
-      setSearch("")
+      await onAddItem(customDraft.trim())
+      setCustomDraft("")
+      setAddingCustom(false)
     } catch (err) {
       setAddError(err instanceof Error ? err.message : "Failed to add")
     } finally {
@@ -142,28 +141,36 @@ export function PledgePanel({
             </Button>
           )
         })}
+
+        {isInfinite && onAddItem && (
+          addingCustom ? (
+            <div className="flex flex-col gap-1">
+              <InlineOptionInput
+                value={customDraft}
+                onChange={(v) => { setCustomDraft(v); setAddError(null) }}
+                onConfirm={handleAdd}
+                onCancel={() => { setCustomDraft(""); setAddError(null); setAddingCustom(false) }}
+              />
+              {addError && <p className="pl-3 text-xs text-destructive">{addError}</p>}
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setAddingCustom(true)}
+              className="h-auto rounded-full border-dashed px-3 py-1.5 text-xs text-muted-foreground"
+            >
+              Add custom option
+            </Button>
+          )
+        )}
       </div>
 
       {isInfinite && lowerSearch && visibleItems.length === 0 && (
         <p className="mt-2 text-sm text-muted-foreground">
           No matches for &ldquo;{search}&rdquo;
         </p>
-      )}
-
-      {showAddOption && (
-        <div className="mt-3 space-y-1.5">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleAdd}
-            disabled={addingItem}
-            className="h-auto w-full justify-start gap-3 rounded-md border-dashed px-4 py-3 text-xs text-muted-foreground hover:border-primary/40 hover:bg-secondary/30 hover:text-foreground"
-          >
-            <span className="font-medium text-primary">+</span>
-            {addingItem ? "Adding…" : <>Add &ldquo;{search}&rdquo;</>}
-          </Button>
-          {addError && <p className="text-xs text-destructive">{addError}</p>}
-        </div>
       )}
     </fieldset>
   )

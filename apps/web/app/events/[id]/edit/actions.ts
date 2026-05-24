@@ -13,24 +13,45 @@ async function upsertPollForEvent(
   poll: PollInput,
 ) {
   if (poll.id) {
+    // Always sync topic_id in case the organiser switched topics
     await supabase
       .from('event_polls')
       .update({
+        topic_id: poll.topicId,
         personal_reveal: poll.reveal?.trim() || null,
       })
       .eq('id', poll.id)
 
     if (poll.infiniteItems) {
-      const { prioritizedItemIds, canonicalItemIds } = poll.infiniteItems
+      const { prioritizedItemIds, canonicalItemIds, customLabels } = poll.infiniteItems
+
+      // Delete all organiser-curated items; guest-added items are preserved
       await supabase
         .from('event_poll_items')
         .delete()
         .eq('event_poll_id', poll.id)
         .eq('is_guest_added', false)
 
-      if (canonicalItemIds.length > 0) {
+      // Create topic_item rows for any new organiser-curated labels
+      const allItemIds = [...canonicalItemIds]
+      if (customLabels.length > 0) {
+        const { data: newCustomItems } = await supabase
+          .from('topic_items')
+          .insert(
+            customLabels.map((label) => ({
+              topic_id: poll.topicId!,
+              label: label.trim(),
+              source: 'organiser' as const,
+              is_canonical: false,
+            })),
+          )
+          .select('id')
+        allItemIds.push(...(newCustomItems ?? []).map((i) => i.id))
+      }
+
+      if (allItemIds.length > 0) {
         await supabase.from('event_poll_items').insert(
-          canonicalItemIds.map((itemId, index) => ({
+          allItemIds.map((itemId, index) => ({
             event_poll_id: poll.id,
             topic_item_id: itemId,
             is_guest_added: false,

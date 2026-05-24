@@ -10,22 +10,32 @@ type Props = {
   selected?: boolean
 }
 
+const removeClassName =
+  "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+
 export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
-  const inner = (
-    <>
-      <span className={onClick ? "pl-3 pr-1" : "pl-3 pr-1"}>{label}</span>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          onRemove()
-        }}
-        aria-label={`Remove ${label}`}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
-      >
-        <X className="h-2.5 w-2.5" />
-      </button>
-    </>
+  // When the pill is itself a <button>, the remove control must not also be a
+  // <button> — HTML forbids nested interactive elements. Use a <span> instead.
+  const removeControl = onClick ? (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-label={`Remove ${label}`}
+      className={removeClassName}
+      onClick={(e) => { e.stopPropagation(); onRemove() }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onRemove() } }}
+    >
+      <X className="h-2.5 w-2.5" />
+    </span>
+  ) : (
+    <button
+      type="button"
+      aria-label={`Remove ${label}`}
+      className={removeClassName}
+      onClick={(e) => { e.stopPropagation(); onRemove() }}
+    >
+      <X className="h-2.5 w-2.5" />
+    </button>
   )
 
   if (onClick) {
@@ -39,14 +49,16 @@ export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
             : "border-input bg-background text-foreground hover:bg-muted/50"
         }`}
       >
-        {inner}
+        <span className="pl-3 pr-1">{label}</span>
+        {removeControl}
       </button>
     )
   }
 
   return (
     <span className="inline-flex items-center rounded-full border border-input bg-background py-1.5 pr-1 text-xs text-foreground">
-      {inner}
+      <span className="pl-3 pr-1">{label}</span>
+      {removeControl}
     </span>
   )
 }
