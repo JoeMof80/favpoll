@@ -18,7 +18,7 @@ beforeEach(() => {
   mock = makeSupabaseMock()
 })
 
-const makeRawItem = (overrides: Record<string, any> = {}) => ({
+const makeRawItem = (overrides: Record<string, unknown> = {}) => ({
   id: 'item-1',
   label: 'Pineapple',
   topic_id: 'topic-1',

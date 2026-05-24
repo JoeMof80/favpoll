@@ -89,6 +89,7 @@ const meta = {
     pledgeJustConfirmed: false,
     protagonistName: SCENES[0].protagonist.name,
     poll: MEMORIAL_POLL,
+    isOrganiser: false,
     onSelectionsChange: () => {},
     onAddItem: undefined,
   },

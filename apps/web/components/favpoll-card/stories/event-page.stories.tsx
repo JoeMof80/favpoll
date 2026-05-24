@@ -135,6 +135,7 @@ function EventPageLayout({ sceneIndex }: PageArgs) {
         isClosed={false}
         hasPledged={false}
         protagonistName={scene.protagonist.name}
+        isOrganiser={false}
         onSelectionsChange={() => {}}
       />
 

@@ -25,6 +25,7 @@ apps/web/out/
 # misc
 .DS_Store
 *.pem
+supabase/.temp/
 
 # debug
 npm-debug.log*
@@ -34,6 +35,8 @@ pnpm-debug.log*
 
 # env files
 .env*.local
+.env.production-web
+.env.production-admin
 
 # typescript
 *.tsbuildinfo

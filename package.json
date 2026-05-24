@@ -4,5 +4,8 @@
   "scripts": {
     "seed": "pnpm --filter @favpoll/web seed",
     "test": "pnpm --filter @favpoll/web test:run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4"
   }
 }
