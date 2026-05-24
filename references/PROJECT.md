@@ -21,6 +21,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## Stack
 
+- **Monorepo:** pnpm workspace — `apps/web` (Next.js), `apps/admin` (Next.js admin panel), `packages/types` (shared domain types as `@favpoll/types`)
 - **Framework:** Next.js 15, App Router, TypeScript
 - **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel
 - **Component catalogue:** Storybook (`@storybook/nextjs-vite`), co-located `.stories.tsx` files
@@ -28,7 +29,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **Database:** Supabase (Postgres + Realtime)
 - **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities)
 - **Email:** Resend
-- **Package manager:** pnpm
+- **Package manager:** pnpm (workspace root; run all commands from root or with `--filter`)
 - **Hosting:** Vercel
 - **Domain:** favpoll.com
 - **Localisation:** UK-first (`en-GB`). `messages/en-GB.json` holds UI strings. `lib/i18n.ts` provides `formatCurrency()`, `t()`, and `MARKET_DEFAULTS`. `next-intl` planned when a second market launches.
@@ -146,6 +147,7 @@ event_poll_items (
   display_order int not null default 0,
   is_prioritized boolean not null default false,
   is_guest_added boolean default false,
+  is_hidden boolean default false,   -- Organiser can hide guest-added items from results
   added_by text references users(id),
   created_at timestamptz
 )
@@ -417,7 +419,7 @@ Shared atoms in `components/ui/` extracted from duplicated inline patterns:
 |---|---|---|
 | `OccasionTag` | `label, className?` | Small uppercase occasion label, brand purple, opacity 70 |
 | `SectionEyebrow` | `children, className?, variant?` | Section label; `variant="brand"` (purple, default) or `variant="muted"` (gray) |
-| `RankingBar` | `label, amount, widthPercent, barClassName?, barStyle?, className?` | Label + amount + coloured progress bar |
+| `RankingBar` | `label, amount, widthPercent, barClassName?, barStyle?, className?, labelSuffix?` | Label + amount + coloured progress bar; `labelSuffix` renders inline after the label text (used for Hide/Show toggle) |
 | `RevealQuote` | `text, className?, role?, aria-label?, aria-live?` | Left-bordered italic blockquote for reveal text |
 | `Chip` | `selected?, className?, ...buttonProps` | Selectable pill — border-based toggle; selected: brand purple fill; unselected: `border-border bg-background` |
 
@@ -501,7 +503,7 @@ Gray 100:  #D3D1C7   — borders, dividers
 
 ## Testing
 
-Run with `pnpm test:run`. **419 tests must pass** before committing.
+Run with `pnpm test:run` from `apps/web`. **426 tests must pass** before committing (22 admin tests in `apps/admin`).
 
 Tests are co-located in `__tests__/` directories alongside their subjects:
 
@@ -556,6 +558,12 @@ CRON_SECRET
 - **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). The canvas `protagonistAbout` textarea shows a placeholder from the selected topic's `placeholders` JSONB (`topic.placeholders[occasion].about`), falling back to `getAboutPlaceholder(occasion)` from `lib/occasions.ts`. The per-topic placeholder data lives in the seed and is stored in the DB — `lib/topic-bio-placeholders.ts` has been deleted. Placeholder updates live as the organiser picks a topic.
 
 - **Localisation foundations in place.** Market field on `events` (default `'en-GB'`), markets array on `topic_items` (default `['en-GB']`). Currency rendering via `formatCurrency()` in `lib/i18n.ts`. UI strings in `messages/en-GB.json` via `t()` helper. Full `next-intl` migration deferred until a second market launches. See `references/LOCALISATION.md`.
+
+- **Guest item moderation.** Organisers can hide/show guest-added items from results using `event_poll_items.is_hidden`. The Hide/Show toggle appears only for `is_guest_added = true` items with a valid `event_poll_item_id`, rendered inline next to the label text via `RankingBar.labelSuffix`. Hidden items are shown at 40% opacity to the organiser and suppressed from the guest view. Admin review queue at `apps/admin/app/contributions/` — `pending_review` → `accepted` | `rejected` via `review_status` on `topic_items`. `topic_items` requires a `review_status` column (`pending_review | accepted | rejected | null`).
+
+- **Results ranking sort order.** Primary: `all_time_pledged` (or `all_time_count`) descending. Secondary: label alphabetical (`localeCompare`) for ties at £0. Pledge panel items are always shown in alphabetical order regardless of `display_order`.
+
+- **`events_occasion_check` DB constraint.** Must include all values in `OCCASION_LIST` from `lib/occasions.ts`. Currently: `memorial, tribute, birthday, retirement, wedding, engagement, anniversary, leaving, graduation, christening, achievement, recovery, award, promotion, celebration, other`. If adding a new occasion, update both `OCCASION_LIST` and the DB constraint.
 
 ---
 

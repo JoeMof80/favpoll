@@ -19,10 +19,15 @@ ALTER TABLE table_name ADD COLUMN IF NOT EXISTS column_name TYPE DEFAULT value;
 These have already been applied — do not re-suggest them:
 - `event_poll_items.display_order INT NOT NULL DEFAULT 0`
 - `event_poll_items.is_prioritized BOOLEAN NOT NULL DEFAULT FALSE`
+- `event_poll_items.is_hidden BOOLEAN DEFAULT FALSE`
 - `persons.date_label TEXT DEFAULT NULL`
 - `events.occasion_label TEXT DEFAULT NULL`
+- `events.market TEXT NOT NULL DEFAULT 'en-GB'`
 - `topics.is_active BOOLEAN NOT NULL DEFAULT TRUE`
 - `topics.placeholders JSONB DEFAULT '{}'`
+- `topic_items.markets TEXT[] NOT NULL DEFAULT ARRAY['en-GB']`
+- `topic_items.review_status TEXT DEFAULT NULL` — values: `pending_review`, `accepted`, `rejected`
+- `events_occasion_check` constraint updated to include: `memorial, tribute, birthday, retirement, wedding, engagement, anniversary, leaving, graduation, christening, achievement, recovery, award, promotion, celebration, other`
 
 ## Notes
 
