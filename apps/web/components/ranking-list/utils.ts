@@ -19,14 +19,8 @@ export function rankItems(
 
 export function formatAmount(amount: number): string {
   if (amount === 0) return "£0"
-  if (amount >= 1000) {
-    return new Intl.NumberFormat("en-GB", {
-      style: "currency",
-      currency: "GBP",
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(amount)
-  }
+  if (amount >= 1_000_000) return `£${(amount / 1_000_000).toFixed(1)}M`
+  if (amount >= 1_000) return `£${(amount / 1_000).toFixed(1)}K`
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
