@@ -34,6 +34,15 @@ const config: StorybookConfig = {
           __dirname,
           "./__mocks__/event-actions.ts"
         ),
+        // Prevent real Supabase/Stripe clients from running in Storybook (no env vars in CI)
+        "@/lib/supabase/client": path.resolve(
+          __dirname,
+          "../__mocks__/supabase-client.ts"
+        ),
+        "@stripe/stripe-js": path.resolve(
+          __dirname,
+          "../__mocks__/stripe.ts"
+        ),
       },
     }
     return config

@@ -21,18 +21,32 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## Stack
 
-- **Monorepo:** pnpm workspace — `apps/web` (Next.js), `apps/admin` (Next.js admin panel), `packages/types` (shared domain types as `@favpoll/types`)
+- **Monorepo:** pnpm workspace — `apps/web` (Next.js main app), `apps/admin` (Next.js admin panel), `packages/types` (shared domain types as `@favpoll/types`)
 - **Framework:** Next.js 15, App Router, TypeScript
 - **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel
 - **Component catalogue:** Storybook (`@storybook/nextjs-vite`), co-located `.stories.tsx` files
-- **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests
-- **Database:** Supabase (Postgres + Realtime)
-- **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities)
+- **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests. Admin app requires `publicMetadata.role === 'admin'` on the Clerk user.
+- **Database:** Supabase (Postgres + Realtime). Production and staging are separate projects.
+- **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities via Stripe Connect Express). Connect application submitted, pending approval.
 - **Email:** Resend
 - **Package manager:** pnpm (workspace root; run all commands from root or with `--filter`)
-- **Hosting:** Vercel
-- **Domain:** favpoll.com
+- **Hosting:** Vercel (Pro Trial team `favpoll`). Two projects: `favpoll-web` and `favpoll-admin`.
+- **Domain:** favpoll.com (holding page live; main app deployed at `favpoll-web-gamma.vercel.app` until domain is switched)
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) — Test and Typecheck jobs on push/PR to main
+- **Branch:** `main` (renamed from `master`)
 - **Localisation:** UK-first (`en-GB`). `messages/en-GB.json` holds UI strings. `lib/i18n.ts` provides `formatCurrency()`, `t()`, and `MARKET_DEFAULTS`. `next-intl` planned when a second market launches.
+
+---
+
+## Environments
+
+| Environment | Web URL | Admin URL | Supabase | Clerk |
+|---|---|---|---|---|
+| Production | favpoll-web-gamma.vercel.app | [admin vercel URL] | production project | pk_test_ keys until domain swap |
+| Preview (PRs) | auto-generated vercel URL | auto-generated vercel URL | staging (eotqyintgusvzidymumb) | pk_test_ keys |
+| Development | localhost:3000 | localhost:3001 | production or staging | pk_test_ keys |
+
+Production Clerk instance is configured with Google OAuth and ready — using dev keys temporarily until `favpoll.com` points at the app.
 
 ---
 
@@ -54,6 +68,8 @@ charities (
   description text,
   logo_url text,
   registered_number text,
+  is_active boolean not null default true,
+  market text not null default 'en-GB',
   created_at timestamptz
 )
 
@@ -70,7 +86,7 @@ topics (
   description text,
   is_finite boolean default false,
   is_active boolean not null default true,
-  placeholders jsonb default '{}',  -- Keyed about+reveal pairs by occasion, used for canvas placeholders
+  placeholders jsonb default '{}',  -- Keyed about+reveal pairs by occasion
   created_by text references users(id),
   created_at timestamptz
 )
@@ -89,9 +105,13 @@ topic_items (
   all_time_count integer default 0,
   is_canonical boolean default true,
   source text default 'seed',       -- 'seed' | 'organiser' | 'guest'
-  markets text[] not null default array['en-GB'],  -- Market filter
+  markets text[] not null default array['en-GB'],
   event_count integer default 0,
   total_pledge_count integer default 0,
+  review_status text,               -- 'pending_review' | 'accepted' | 'rejected' | null (null for seed items)
+  rejection_reason text,
+  reviewed_at timestamptz,
+  reviewed_by text,                 -- Clerk user ID of admin who reviewed
   created_at timestamptz
 )
 
@@ -109,8 +129,8 @@ events (
   id uuid primary key,
   protagonist_id uuid references protagonists(id),
   occasion text not null,           -- OccasionType value
-  occasion_label text,              -- Optional organiser override of display label
-  market text not null default 'en-GB',  -- Market identifier
+  occasion_label text,
+  market text not null default 'en-GB',
   created_by text references users(id),
   description text,
   closes_at timestamptz not null,
@@ -133,7 +153,7 @@ event_charities (
 
 event_polls (
   id uuid primary key,
-  event_id uuid references events(id) on delete cascade,
+  event_id uuid references events(id) on delete cascade,  -- UNIQUE(event_id) enforced
   topic_id uuid references topics(id),
   personal_framing text,            -- Retired; column kept but app no longer reads or writes it
   personal_reveal text,             -- Disclosed after pledging
@@ -148,6 +168,8 @@ event_poll_items (
   is_prioritized boolean not null default false,
   is_guest_added boolean default false,
   is_hidden boolean default false,   -- Organiser can hide guest-added items from results
+  hidden_at timestamptz,
+  hidden_by text,                    -- Clerk user ID of organiser who hid it
   added_by text references users(id),
   created_at timestamptz
 )
@@ -210,6 +232,18 @@ item_flags (
 
 ---
 
+## Migrations (applied)
+
+```
+20260518000000_ubiquitous_language.sql
+20260522000000_rename_protagonist_bio_to_about.sql
+20260523000000_enforce_single_poll_per_event.sql
+20260523120000_guest_item_moderation.sql
+20260524000000_charity_management.sql
+```
+
+---
+
 ## Occasion Types
 
 ```typescript
@@ -241,8 +275,6 @@ celebration → 'Celebrating'
 other       → 'Honouring'
 ```
 
-Full closing defaults and placeholder data in `lib/occasions.ts`.
-
 ### Default poll closing period by occasion
 
 | Occasion | Days until close |
@@ -260,14 +292,14 @@ Colour, Season, Day of the week, Meal of the day, Time of day, Decade
 
 ### Infinite (`is_finite = false`) — open list
 Organiser can pin/reorder (not remove) items. Guests can suggest additions.
-
-### Canonical colour list (CSS named colours, no hex stored)
-Red, Orange, Yellow, Green, Blue, Purple, Pink, Brown, Black, White, Grey
-Rendered as: `<div style={{ backgroundColor: item.label.toLowerCase() }} />`
+Guest-added items land with `source = 'guest'`, `is_canonical = false`,
+`review_status = 'pending_review'`. Admin reviews at `apps/admin/app/contributions/`.
 
 ---
 
 ## Application Routes
+
+### apps/web
 
 ```
 /                              -- Home: HeroDemoPanel + live events carousel + CTA
@@ -288,152 +320,147 @@ API:
 /api/stripe/payment-intent     -- Creates Stripe PaymentIntent for pledge checkout
 /api/webhooks/clerk            -- Clerk user sync webhook
 /api/events/[id]/request-extension -- Sends extension request email to admin
-/api/polls/[pollId]/results  -- Returns ranked pledge totals for a specific event poll (admin client, bypasses RLS)
+/api/polls/[pollId]/results    -- Ranked pledge totals for a poll (admin client)
+```
+
+### apps/admin
+
+```
+/placeholders                  -- Topic placeholder editor (about + reveal per occasion)
+/placeholders/[topicId]        -- Per-topic editor
+/contributions                 -- Guest item review queue (pending/accepted/rejected)
+/charities                     -- Charity management (add/edit/deactivate)
+/events                        -- Event oversight (shell only — not yet built)
+/access-denied                 -- Shown to authenticated non-admin users
 ```
 
 ---
 
 ## Key Files
 
+### apps/web
+
 ```
 app/
-├── layout.tsx                        -- Root layout (Clerk, theme, header)
-├── page.tsx                          -- Home page (server component)
+├── layout.tsx
+├── page.tsx
 ├── events/
-│   ├── page.tsx                      -- Live events listing
-│   ├── actions.ts                    -- Shared event server actions
-│   ├── new/
-│   │   ├── page.tsx                  -- EventCanvas (create)
-│   │   └── actions.ts
+│   ├── page.tsx
+│   ├── actions.ts
+│   ├── new/page.tsx, actions.ts
 │   └── [id]/
-│       ├── page.tsx                  -- Event view + pledge flow
-│       ├── actions.ts                -- Pledge/reveal/close actions
-│       ├── display/page.tsx          -- Live display
-│       ├── edit/page.tsx             -- EventCanvas (edit)
-│       ├── edit/actions.ts
-│       └── manage/page.tsx           -- Organiser management
+│       ├── page.tsx
+│       ├── actions.ts
+│       ├── display/page.tsx
+│       ├── edit/page.tsx, actions.ts
+│       └── manage/page.tsx
 ├── my-events/page.tsx
 ├── rankings/page.tsx
 ├── topics/[id]/page.tsx
-└── api/polls/[id]/results/route.ts   -- Ranked pledge results for a poll (admin client)
+└── api/
+    ├── cron/close-events/route.ts
+    ├── stripe/payment-intent/route.ts
+    ├── webhooks/clerk/route.ts
+    ├── events/[id]/request-extension/route.ts
+    └── polls/[id]/results/route.ts
 
 components/
-├── ui/                               -- Atoms (shadcn + custom)
-│   ├── button.tsx
-│   ├── card.tsx
-│   ├── input.tsx
-│   ├── field.tsx                     -- Form field wrapper (vertical/horizontal)
-│   ├── chip.tsx                      -- Selectable pill toggle (border-based, built on Button)
-│   ├── occasion-tag.tsx              -- Small uppercase occasion label (brand purple)
-│   ├── section-eyebrow.tsx           -- Small uppercase section label (brand | muted variants)
-│   ├── ranking-bar.tsx               -- Label + amount + progress bar row
-│   ├── reveal-quote.tsx              -- Left-bordered italic blockquote
-│   ├── picker-field.tsx              -- Reusable input+Popover+Chip grid (searchable or read-only display mode)
-│   └── tooltip.tsx                   -- Radix tooltip wrapper (content, side props)
-├── canvas/                           -- Event creation/editing UI
-│   ├── poll-editor.tsx
-│   ├── topic-picker.tsx
-│   ├── topic-priority-editor.tsx
-│   ├── custom-topic-options.tsx
-│   ├── share-screen.tsx
+├── ui/
+│   ├── button.tsx, card.tsx, input.tsx, field.tsx
+│   ├── chip.tsx                  -- Selectable pill toggle
+│   ├── occasion-tag.tsx
+│   ├── section-eyebrow.tsx
+│   ├── ranking-bar.tsx           -- labelSuffix prop for inline Hide/Show toggle
+│   ├── reveal-quote.tsx
+│   ├── picker-field.tsx
+│   └── tooltip.tsx
+├── canvas/
+│   ├── poll-editor.tsx, topic-picker.tsx, topic-priority-editor.tsx
+│   ├── custom-topic-options.tsx, share-screen.tsx
 │   └── canvas-sidebar/
-│       ├── index.tsx
-│       ├── charity-picker.tsx        -- Multi-select charity input; delegates input+popover to PickerField
-│       ├── closing-date.tsx
-│       ├── privacy-toggle.tsx
-│       └── shared-fund.tsx
-├── pledge-card/                      -- Pledge flow components
-│   ├── index.tsx                     -- Main pledge card (uses usePledge hook)
-│   ├── use-pledge.ts                 -- All pledge logic + Stripe state
-│   ├── amount-input.tsx              -- £-prefixed number input
-│   ├── amount-presets.tsx            -- Preset amount button row
-│   ├── pledge-breakdown.tsx          -- Line items + total row
-│   └── utils.ts                      -- GBP formatter
+│       ├── index.tsx, charity-picker.tsx, closing-date.tsx
+│       ├── privacy-toggle.tsx, shared-fund.tsx
+├── pledge-card/
+│   ├── index.tsx, use-pledge.ts, amount-input.tsx
+│   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
 ├── ranking-list/
-│   ├── index.tsx                     -- Realtime ranking list
-│   ├── use-ranking-items.ts          -- Supabase realtime subscription
-│   └── utils.ts
-├── favpoll-card/                     -- Shared poll rendering primitives (not a self-contained card)
-│   ├── poll-title.tsx                -- Topic eyebrow label (11px uppercase purple, no built-in margin)
-│   ├── poll-framing.tsx              -- Framing paragraph — unused in production; personal_framing retired
-│   ├── poll-reveal.tsx               -- Post-pledge reveal blockquote (18px italic #26215C, left border)
-│   ├── poll-options.tsx              -- Item selection UI
-│   ├── poll-results.tsx              -- Results display
-│   └── favpoll-card.tsx              -- Assembled card (stories only — not used in production)
+│   ├── index.tsx, use-ranking-items.ts, utils.ts
+├── favpoll-card/
+│   ├── poll-title.tsx, poll-framing.tsx (retired), poll-reveal.tsx
+│   ├── poll-options.tsx, poll-results.tsx, favpoll-card.tsx
 ├── poll-section/
-│   ├── index.tsx                     -- Poll UI: PollHeading + pledge/results views
-│   └── use-poll-section.ts
-├── hero-demo-panel/                  -- Animated homepage demo (no props, self-contained)
-│   ├── index.tsx                     -- Orchestrator: state, effects, section layout, occasion chips
-│   ├── scenes.ts                     -- HeroScene type, Phase type, SCENES data, OCCASION_CHIPS, PLEDGE_AMOUNTS, SCENE_EYEBROWS
-│   ├── variants.ts                   -- Framer Motion variants and timing constants
-│   ├── hero-pitch-column.tsx         -- Left column: animated eyebrow, headline, supporting text, CTA buttons
-│   └── demo-card.tsx                 -- Card: protagonist header, topic title, poll options, pledge panel, reveal quote, rankings, charity total, toast
-├── event-canvas/                     -- Event creation/editing canvas
-│   └── use-canvas.ts                 -- Canvas state — reads topic.placeholders[occasion].about for topic-aware about placeholder; falls back to getAboutPlaceholder(occasion)
-├── event-hero.tsx                    -- Event header with protagonist info
-├── event-card.tsx                    -- Fully interactive card for live events listings (5-stage pledge flow)
-├── event-card/                       -- EventCard sub-components and hook
-│   ├── use-event-card-pledge.ts      -- State machine hook: idle→ready→paying→pledged + resetPledge/viewResults
-│   ├── event-card-results.tsx        -- Post-pledge ranking bars (RankingBar list)
-│   └── event-card-charity-carousel.tsx -- Embla y-axis auto-rotating charity footer (1 charity = static)
-├── event-card-empty.tsx              -- Empty state card
-├── home-carousel.tsx                 -- Embla carousel for all-time data (unused — see live-events-carousel)
-├── live-events-carousel.tsx          -- Embla carousel for homepage live events (client component, loop + autoplay)
-├── charity-banner.tsx                -- Charity names + logos
-├── countdown.tsx                     -- Closing countdown display
-├── header.tsx                        -- App header (nav + auth)
-├── poll-heading.tsx                  -- Poll topic heading with hint line and reveal
-├── stripe-checkout.tsx               -- Stripe Elements checkout wrapper
-└── pot-banner.tsx                    -- Shared fund banner
+│   ├── index.tsx, use-poll-section.ts
+├── hero-demo-panel/
+│   ├── index.tsx, scenes.ts, variants.ts
+│   ├── hero-pitch-column.tsx, demo-card.tsx
+├── event-canvas/use-canvas.ts   -- reads topic.placeholders[occasion].about
+├── event-hero.tsx
+├── event-card.tsx
+├── event-card/
+│   ├── use-event-card-pledge.ts, event-card-results.tsx
+│   └── event-card-charity-carousel.tsx
+├── live-events-carousel.tsx
+├── charity-banner.tsx, countdown.tsx
+├── header.tsx, poll-heading.tsx
+├── stripe-checkout.tsx, pot-banner.tsx
+└── theme-provider.tsx, menu-button.tsx  -- TODO: move to packages/ui/
 
 lib/
-├── occasions.ts                      -- OccasionType list, labels, defaults, placeholders; exports getAboutPlaceholder(occasion) — occasion-level fallback only
-├── display.ts                        -- formatAmount, formatRelativeDate, getEventHeadline, getPollHint
-├── i18n.ts                           -- formatCurrency(), t(), MARKET_DEFAULTS, Market type
-├── email.ts                          -- Resend email helpers
-├── edit-mode-context.tsx             -- React context for organiser edit mode
-├── utils.ts                          -- cn(), misc helpers
-└── supabase/
-    ├── client.ts                     -- Browser client
-    ├── server.ts                     -- Server component client (SSR)
-    └── admin.ts                      -- Service role client for webhooks/cron
+├── occasions.ts                  -- getAboutPlaceholder(occasion) fallback
+├── display.ts                    -- formatAmount, formatRelativeDate, getEventHeadline
+├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
+├── email.ts                      -- Resend helpers
+├── edit-mode-context.tsx
+├── utils.ts                      -- cn()
+└── supabase/client.ts, server.ts, admin.ts
 
-messages/
-└── en-GB.json                        -- UI strings for en-GB market
+lib/actions/
+└── event-poll-items.ts           -- hideEventPollItem, showEventPollItem
 
-types/index.ts                        -- All domain types + composite query types
-scripts/seed.ts                       -- pnpm seed — additive, idempotent
-.storybook/
-├── main.ts                           -- Stories glob: components/**/*.stories.tsx
-└── preview.tsx                       -- globals.css, brand backgrounds, layout: centered
+messages/en-GB.json
+packages/types/index.ts           -- All domain types (@favpoll/types)
+scripts/seed.ts                   -- pnpm seed — additive, idempotent
+```
+
+### apps/admin
+
+```
+app/
+├── layout.tsx                    -- ThemeProvider, header (favpoll admin + theme toggle), sidebar
+├── placeholders/
+│   ├── page.tsx                  -- Topic list sidebar
+│   └── [topicId]/page.tsx        -- Occasion editor
+├── contributions/page.tsx        -- Guest item review queue
+├── charities/page.tsx            -- Charity management
+├── events/page.tsx               -- Shell only
+└── access-denied/page.tsx
+
+components/
+├── sidebar.tsx
+├── occasion-editor.tsx
+├── charity-list.tsx
+├── theme-provider.tsx            -- TODO: move to packages/ui/
+└── menu-button.tsx               -- TODO: move to packages/ui/
+
+lib/
+├── supabase/admin.ts             -- createAdminClient() — service role, bypasses RLS
+└── actions/
+    ├── placeholders.ts           -- getTopics, updatePlaceholder, addOccasion, deleteOccasion
+    ├── contributions.ts          -- getPendingContributions, acceptContribution, rejectContribution
+    └── charities.ts              -- getCharities, createCharity, updateCharity, deactivateCharity, reactivateCharity
 ```
 
 ---
 
 ## Atomic UI Components
 
-Shared atoms in `components/ui/` extracted from duplicated inline patterns:
-
 | Component | Props | Usage |
 |---|---|---|
-| `OccasionTag` | `label, className?` | Small uppercase occasion label, brand purple, opacity 70 |
-| `SectionEyebrow` | `children, className?, variant?` | Section label; `variant="brand"` (purple, default) or `variant="muted"` (gray) |
-| `RankingBar` | `label, amount, widthPercent, barClassName?, barStyle?, className?, labelSuffix?` | Label + amount + coloured progress bar; `labelSuffix` renders inline after the label text (used for Hide/Show toggle) |
-| `RevealQuote` | `text, className?, role?, aria-label?, aria-live?` | Left-bordered italic blockquote for reveal text |
-| `Chip` | `selected?, className?, ...buttonProps` | Selectable pill — border-based toggle; selected: brand purple fill; unselected: `border-border bg-background` |
-
-`Chip` is used for occasion selectors, topic pickers, category filters, and charity selection. Built on `Button`; accepts all button props. Use `className` for size overrides. Do not use for amount presets — use `Button` directly.
-
-`SectionEyebrow` with framer-motion: wrap with `motion()` as needed — see `hero-demo-panel/index.tsx`.
-
----
-
-## Storybook
-
-Configured with `@storybook/nextjs-vite`. Run with `pnpm storybook`. Story files co-located alongside components.
-
-Font fix: `.storybook/preview-head.html` loads Plus Jakarta Sans from Google Fonts and sets `--font-sans` — required because `next/font` only runs through the Next.js layout, not Storybook.
+| `OccasionTag` | `label, className?` | Small uppercase occasion label, brand purple |
+| `SectionEyebrow` | `children, className?, variant?` | `variant="brand"` or `variant="muted"` |
+| `RankingBar` | `label, amount, widthPercent, ..., labelSuffix?` | `labelSuffix` renders inline after label — used for Hide/Show toggle |
+| `RevealQuote` | `text, ...` | Left-bordered italic blockquote |
+| `Chip` | `selected?, ...buttonProps` | Selectable pill — never use for amount presets |
 
 ---
 
@@ -452,42 +479,22 @@ Gray 100:  #D3D1C7   — borders, dividers
 ```
 
 ### Typography
-- Typeface: Plus Jakarta Sans
-- Weights: 400 regular, 500 medium only (never 600/700)
-- Reveal/quote: 18px, italic, `leading-relaxed`, `text-[#26215C]`, `border-l-[2.5px] border-[#7F77DD]`
-- Section eyebrow (brand): 11px, medium, `tracking-widest`, uppercase, `text-[#534AB7]`
-- Section eyebrow (muted): `text-xs`, medium, `tracking-widest`, uppercase, `text-muted-foreground`
+- Typeface: Plus Jakarta Sans, weights 400/500 only (never 600/700)
+- Reveal/quote: 18px italic `leading-relaxed text-[#26215C] border-l-[2.5px] border-[#7F77DD]`
+- Section eyebrow (brand): 11px medium `tracking-widest uppercase text-[#534AB7]`
 
 ### Edit mode field treatment
-- Editable field: absolute underline pattern — `peer` on input/textarea, zero-height sibling div with `border-b-2 border-dotted border-border transition-colors peer-focus:border-primary/40`
-- Placeholder: `placeholder:text-muted-foreground/40`
+- `peer` on input/textarea + zero-height sibling div `border-b-2 border-dotted border-border peer-focus:border-primary/40`
 - Guest view: no underlines, no placeholders, no edit controls
-
-### Button conventions
-- Primary: `<Button>` — solid purple, one per panel
-- Ghost: `<Button variant="ghost">` — secondary actions
-- Never use raw `<button>` — always use shadcn `Button`
 
 ---
 
 ## Poll Close / Extension Rules
 
-- Required at creation, `lib/occasions.ts suggestClosingDate()` provides defaults
-- Max duration: 90 days from creation (`hard_close_at`, immutable)
-- 1st extension: free
-- 2nd extension: inline warning
-- 3rd extension: blocked — must request via form (emails `FAVPOLL_ADMIN_EMAIL`)
-- Auto-close: Vercel cron (hourly), closes events where `closes_at <= now`
-- Disbursement: Stripe TODO — placeholder in cron
-- Cannot reopen closed events
-
----
-
-## Multiple Charities
-
-- Up to 3 per event (enforced in `canvas-sidebar/charity-picker.tsx`)
-- Stored in `event_charities` join table with `display_order`
-- Proceeds split equally on disbursement
+- Max duration: 90 days (`hard_close_at`, immutable)
+- 1st extension: free; 2nd: inline warning; 3rd: blocked, request via form
+- Auto-close: Vercel cron (hourly)
+- Disbursement: Stripe Connect TODO — placeholder in cron
 
 ---
 
@@ -496,41 +503,37 @@ Gray 100:  #D3D1C7   — borders, dividers
 - Login optional for guests
 - Guest pledges: `clerk_user_id = null`, `guest_email` required
 - `guest_token`: UUID for withdrawal link, nulled after use
-- Signed-in users: withdraw from `/my-events`
-- Duplicate check: `guest_email + event_poll_id + withdrawn_at is null`
+- Admin app: requires `publicMetadata.role === 'admin'` on Clerk user
 
 ---
 
 ## Testing
 
-Run with `pnpm test:run` from `apps/web`. **426 tests must pass** before committing (22 admin tests in `apps/admin`).
+Run from repo root:
+```
+pnpm --filter @favpoll/web test:run     -- web tests
+pnpm --filter @favpoll/admin test:run   -- admin tests
+```
 
-Tests are co-located in `__tests__/` directories alongside their subjects:
+All tests must pass before committing. Current counts: ~426 web, ~22 admin.
 
-| Area | File |
-|---|---|
-| display helpers | `lib/__tests__/display.test.ts` |
-| occasions helpers | `lib/__tests__/occasions.test.ts` |
-| pledge utils | `components/pledge-card/__tests__/utils.test.ts` |
-| usePledge hook | `components/pledge-card/__tests__/use-pledge.test.ts` |
-| useRankingItems hook | `components/ranking-list/__tests__/use-ranking-items.test.ts` |
-| usePollSection hook | `components/poll-section/__tests__/use-poll-section.test.ts` |
-| cron route | `app/api/cron/close-events/__tests__/route.test.ts` |
-| Clerk webhook | `app/api/webhooks/clerk/__tests__/route.test.ts` |
-| event actions | `app/events/[id]/__tests__/actions.test.ts` |
-| pledge withdraw | `app/pledges/withdraw/__tests__/actions.test.ts` |
-| Storybook smoke | auto-generated via `@storybook/addon-vitest` (chromium) |
+Co-located `__tests__/` directories. Environments:
+- Default (jsdom): pure functions, hooks
+- `// @vitest-environment node`: server actions, API routes
 
-`vitest.config.ts` uses array alias format — the specific `@/app/events/new/actions` mock alias must come before the generic `@` alias.
+Supabase mock: `makeSupabaseMock()` from `@/tests/mocks/supabase-admin`.
+`vi.hoisted()` required for mock variables inside `vi.mock()` factories.
+`redirect()` must throw — mock as `vi.fn().mockImplementation((url) => { throw new Error(url) })`.
 
 ---
 
 ## Environment Variables
 
+### apps/web
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 CLERK_SECRET_KEY
-CLERK_WEBHOOK_SECRET
+CLERK_WEBHOOK_SECRET              -- configure at Clerk dashboard → Webhooks
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
@@ -539,43 +542,61 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET
+STRIPE_WEBHOOK_SECRET             -- configure at Stripe dashboard → Webhooks
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 RESEND_API_KEY
 NEXT_PUBLIC_BASE_URL
 FAVPOLL_ADMIN_EMAIL
-CRON_SECRET
+CRON_SECRET                       -- random hex, used to authenticate cron calls
+```
+
+### apps/admin
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_BASE_URL
 ```
 
 ---
 
 ## Decisions locked in
 
-- **One poll per event — enforced at DB level.** `event_polls` has a `UNIQUE(event_id)` constraint (migration `20260523000000_enforce_single_poll_per_event.sql`). All types, hooks, and server actions use singular `poll` (not `polls[]`). Do not build multi-poll support without explicit instruction.
+- **One poll per event.** `UNIQUE(event_id)` on `event_polls`. All types use singular `poll`. Do not build multi-poll support without explicit instruction.
 
-- **`personal_framing` retired.** Column kept in database but app no longer reads or writes it. The auto-generated hint line `"Is it the same as [Name]'s?"` replaces it in all guest-facing views.
+- **`personal_framing` retired.** Column kept but never read/written. Auto-generated hint line replaces it.
 
-- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). The canvas `protagonistAbout` textarea shows a placeholder from the selected topic's `placeholders` JSONB (`topic.placeholders[occasion].about`), falling back to `getAboutPlaceholder(occasion)` from `lib/occasions.ts`. The per-topic placeholder data lives in the seed and is stored in the DB — `lib/topic-bio-placeholders.ts` has been deleted. Placeholder updates live as the organiser picks a topic.
+- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). Canvas reads `topic.placeholders[occasion].about`, falls back to `getAboutPlaceholder(occasion)`. `lib/topic-bio-placeholders.ts` deleted.
 
-- **Localisation foundations in place.** Market field on `events` (default `'en-GB'`), markets array on `topic_items` (default `['en-GB']`). Currency rendering via `formatCurrency()` in `lib/i18n.ts`. UI strings in `messages/en-GB.json` via `t()` helper. Full `next-intl` migration deferred until a second market launches. See `references/LOCALISATION.md`.
+- **Localisation foundations.** `events.market` default `'en-GB'`, `topic_items.markets` default `['en-GB']`. `formatCurrency()` in `lib/i18n.ts`. `next-intl` deferred. See `references/LOCALISATION.md`.
 
-- **Guest item moderation.** Organisers can hide/show guest-added items from results using `event_poll_items.is_hidden`. The Hide/Show toggle appears only for `is_guest_added = true` items with a valid `event_poll_item_id`, rendered inline next to the label text via `RankingBar.labelSuffix`. Hidden items are shown at 40% opacity to the organiser and suppressed from the guest view. Admin review queue at `apps/admin/app/contributions/` — `pending_review` → `accepted` | `rejected` via `review_status` on `topic_items`. `topic_items` requires a `review_status` column (`pending_review | accepted | rejected | null`).
+- **Guest item moderation.** Guest items land immediately (pledge works without review). `review_status` on `topic_items` governs canonical promotion only. Organisers hide/show via `event_poll_items.is_hidden`. `acceptContribution` must set both `is_canonical = true` AND `review_status = 'accepted'`.
 
-- **Results ranking sort order.** Primary: `all_time_pledged` (or `all_time_count`) descending. Secondary: label alphabetical (`localeCompare`) for ties at £0. Pledge panel items are always shown in alphabetical order regardless of `display_order`.
+- **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `localeCompare` alphabetical for ties. Pledge panel always alphabetical regardless of `display_order`.
 
-- **`events_occasion_check` DB constraint.** Must include all values in `OCCASION_LIST` from `lib/occasions.ts`. Currently: `memorial, tribute, birthday, retirement, wedding, engagement, anniversary, leaving, graduation, christening, achievement, recovery, award, promotion, celebration, other`. If adding a new occasion, update both `OCCASION_LIST` and the DB constraint.
+- **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
+
+- **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
+
+- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`
 
 ---
 
 ## Outstanding TODO
 
-- **Localisation next steps:** install `next-intl`, complete string extraction, add `country_code` and `tax_deductible` to `charities`, seed US-market topic items, write US tone guidance in brand skill, add market-aware topic filtering, Gift Aid (UK) and 501(c)(3) copy (US)
-- `EventCard initialResults` only pre-populated for authenticated users — guest returning-visitor pledge detection not yet implemented
-- `home-carousel.tsx` is unused — remove or repurpose for all-time rankings browse
-- Stripe Connect — charity disbursement (cron has placeholder; `api/stripe/payment-intent` creates PaymentIntents but Connect payout not wired)
-- All-time rankings browse page (`/rankings` exists but needs data threshold logic)
-- User profile / donor history page
-- Email templates (currently plain text via Resend)
-- Rate limiting on API routes
-- Analytics
-- Mobile app
+- **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` are blank in Vercel. Configure endpoints at Clerk and Stripe dashboards.
+- **Clerk production keys** — using `pk_test_` on Vercel until `favpoll.com` points at the app. Swap to `pk_live_` when domain is switched.
+- **Branch rename** — `master` → `main` (may already be done by CI task). Verify with `git branch`.
+- **Preview env vars** — staging Supabase credentials not yet set in Vercel Preview environment.
+- **Branch protection status checks** — add `Test` and `Typecheck` to GitHub branch protection after first CI run.
+- **Stripe Connect** — disbursement not wired. Cron has placeholder. Connect application pending approval.
+- **All-time rankings** — `/rankings` exists but needs data threshold logic.
+- **Event oversight admin page** — `/events` in admin app is a shell only.
+- **Email templates** — currently plain text via Resend.
+- **Rate limiting** on API routes.
+- **`home-carousel.tsx`** — unused, remove or repurpose.
+- **`theme-provider.tsx` and `menu-button.tsx`** — duplicated in apps/web and apps/admin. TODO: extract to `packages/ui/`.
+- **Localisation next steps** — `next-intl`, string extraction, US market prep.
+- **Mobile app** — future.
