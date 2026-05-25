@@ -29,6 +29,8 @@ type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
   showReveal: boolean
+  previewSuffix: boolean
+  previewPhoto: boolean
 }
 
 // Static placeholder poll options when no topic is selected yet
@@ -137,7 +139,7 @@ function CountdownPlaceholder() {
   )
 }
 
-export function PreviewPanel({ charities, topics, showReveal }: Props) {
+export function PreviewPanel({ charities, topics, showReveal, previewSuffix, previewPhoto }: Props) {
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -183,8 +185,8 @@ export function PreviewPanel({ charities, topics, showReveal }: Props) {
     id: "preview",
     name: name || placeholders.name,
     about: about || aboutPlaceholder,
-    photo_url: resolvedPhotoUrl,
-    date_label: suffix || datePlaceholder || null,
+    photo_url: previewPhoto ? resolvedPhotoUrl : null,
+    date_label: previewSuffix ? (suffix || datePlaceholder || null) : null,
   } as unknown as Protagonist
 
   const fakeEvent = {
@@ -242,7 +244,7 @@ export function PreviewPanel({ charities, topics, showReveal }: Props) {
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Left — hero + poll */}
         <div>
-          <EventHero event={fakeEvent} protagonist={fakeProtagonist} />
+          <EventHero event={fakeEvent} protagonist={fakeProtagonist} hideAvatar={!previewPhoto} />
 
           <div className="space-y-4">
             <PollHeading

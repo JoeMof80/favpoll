@@ -45,6 +45,8 @@ export function EventFormV2({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showReveal, setShowReveal] = useState(false)
+  const [previewSuffix, setPreviewSuffix] = useState(false)
+  const [previewPhoto, setPreviewPhoto] = useState(false)
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
     resolver: zodResolver(eventFormSchema as never),
@@ -150,11 +152,21 @@ export function EventFormV2({
       <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
         {/* Left panel — scrollable form */}
         <div className="flex w-[420px] shrink-0 flex-col overflow-hidden border-r border-border bg-muted">
+          {/* Fixed header */}
+          <div className="shrink-0 border-b border-border px-5 py-3">
+            <h1 className="text-sm font-semibold text-foreground">
+              {mode === "create" ? "Create a New Event" : "Edit Event"}
+            </h1>
+          </div>
           <div className="flex-1 overflow-y-auto">
             <FormPanel
               charities={charities}
               topics={topics}
               categories={categories}
+              previewSuffix={previewSuffix}
+              onToggleSuffix={() => setPreviewSuffix((s) => !s)}
+              previewPhoto={previewPhoto}
+              onTogglePhoto={() => setPreviewPhoto((p) => !p)}
               onRevealFocus={() => setShowReveal(true)}
               onRevealBlur={() => setShowReveal(false)}
             />
@@ -199,7 +211,13 @@ export function EventFormV2({
 
         {/* Right panel — live preview */}
         <div className="flex-1 overflow-y-auto bg-white">
-          <PreviewPanel charities={charities} topics={topics} showReveal={showReveal} />
+          <PreviewPanel
+            charities={charities}
+            topics={topics}
+            showReveal={showReveal}
+            previewSuffix={previewSuffix}
+            previewPhoto={previewPhoto}
+          />
         </div>
       </div>
     </Form>

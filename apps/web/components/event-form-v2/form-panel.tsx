@@ -2,7 +2,14 @@
 
 import React, { useRef, useState } from "react"
 import { useFormContext } from "react-hook-form"
-import { CalendarIcon, Clock2Icon, X } from "lucide-react"
+import {
+  CalendarIcon,
+  CircleUserRound,
+  Clock2Icon,
+  Eye,
+  EyeOff,
+  X,
+} from "lucide-react"
 import {
   FormField,
   FormItem,
@@ -26,10 +33,16 @@ import {
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
 import {
   shortTopicLabel,
   OCCASION_LIST,
@@ -41,6 +54,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
+import { PhotoCropModal } from "./photo-crop-modal"
 
 const SECTION_LABEL =
   "text-[11px] font-medium uppercase tracking-[0.08em] text-[#534AB7]"
@@ -65,8 +79,8 @@ function StepSection({
         </span>
         {!isLast && <div className="mt-1.5 w-px flex-1 bg-[#AFA9EC]" />}
       </div>
-      <div className={cn("min-w-0 flex-1 space-y-2", !isLast && "pb-8")}>
-        <h2 className="flex h-5 items-center text-[11px] font-medium tracking-[0.09em] text-[#7F77DD] uppercase">
+      <div className={cn("min-w-0 flex-1 space-y-3", !isLast && "pb-8")}>
+        <h2 className="flex h-5 items-center text-xs font-medium tracking-widest text-[#7F77DD] uppercase">
           {title}
         </h2>
         {children}
@@ -79,6 +93,10 @@ type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
   categories: Category[]
+  previewSuffix: boolean
+  onToggleSuffix: () => void
+  previewPhoto: boolean
+  onTogglePhoto: () => void
   onRevealFocus: () => void
   onRevealBlur: () => void
 }
@@ -812,110 +830,31 @@ function ItemPriorityPicker({
   )
 }
 
-// ─── Avatar upload ──────────────────────────────────────────────────────────
-function AvatarUpload({
-  photoFile,
-  photoUrl,
-  name,
-  onFileChange,
-}: {
-  photoFile: File | undefined
-  photoUrl: string | undefined
-  name: string
-  onFileChange: (file: File, previewUrl: string) => void
-}) {
-  const preview = photoFile
-    ? URL.createObjectURL(photoFile)
-    : (photoUrl ?? null)
-
-  const initials = name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-
-  return (
-    <label
-      className="group inline-block cursor-pointer"
-      aria-label="Upload photo"
-    >
-      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-dashed border-border bg-background transition-colors group-hover:border-primary">
-        {preview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={preview}
-            alt={name || "Photo preview"}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <>
-            <svg
-              className="absolute inset-0 h-full w-full text-border"
-              aria-hidden="true"
-            >
-              <defs>
-                <pattern
-                  id="hatch-v2"
-                  patternUnits="userSpaceOnUse"
-                  width="8"
-                  height="8"
-                  patternTransform="rotate(45)"
-                >
-                  <line
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="8"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#hatch-v2)" />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-center text-xs text-muted-foreground">
-              {initials || (
-                <span>
-                  Photo <span className="text-[11px]">(optional)</span>
-                </span>
-              )}
-            </span>
-          </>
-        )}
-      </div>
-      <input
-        type="file"
-        accept="image/*"
-        className="sr-only"
-        onChange={(e) => {
-          const file = e.target.files?.[0]
-          if (!file) return
-          const url = URL.createObjectURL(file)
-          onFileChange(file, url)
-        }}
-      />
-    </label>
-  )
-}
-
 // ─── Main form panel ────────────────────────────────────────────────────────
 export function FormPanel({
   charities,
   topics,
   categories,
+  previewSuffix,
+  onToggleSuffix,
+  previewPhoto,
+  onTogglePhoto,
   onRevealFocus,
   onRevealBlur,
 }: Props) {
   const form = useFormContext<EventFormValues>()
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [photoFileName, setPhotoFileName] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
   const basePlaceholders = occasion
     ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
     : null
-  const datePlaceholder = occasion ? (DATE_LABEL_PLACEHOLDERS[occasion] ?? "") : ""
+  const datePlaceholder = occasion
+    ? (DATE_LABEL_PLACEHOLDERS[occasion] ?? "")
+    : ""
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
   const topicTitle = selectedTopics?.[0]?.title ?? ""
@@ -929,7 +868,8 @@ export function FormPanel({
   const revealPlaceholder = basePlaceholders
     ? topicTitle
       ? (
-          TOPIC_REVEAL_PLACEHOLDERS[topicTitle]?.reveal ?? basePlaceholders.reveal
+          TOPIC_REVEAL_PLACEHOLDERS[topicTitle]?.reveal ??
+          basePlaceholders.reveal
         ).replace("{name}", firstName)
       : basePlaceholders.reveal
     : ""
@@ -949,6 +889,10 @@ export function FormPanel({
                 onClear={() => form.reset()}
               />
               <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                We recommend looking through different occasion types to see
+                different profiles that might inspire your own event.
+              </FieldDescription>
             </FormItem>
           )}
         />
@@ -956,63 +900,123 @@ export function FormPanel({
 
       {/* Step 2 — Personal information */}
       <StepSection number={2} title="Profile">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 space-y-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      className="bg-background"
-                      placeholder={basePlaceholders?.name ?? ""}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  className="h-10 bg-background placeholder:text-muted-foreground/50"
+                  placeholder={basePlaceholders?.name ?? ""}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Use the name or nickname of the individual, couple, family or
+                group the event is for.
+              </FieldDescription>
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="suffix"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <InputGroup className="bg-background">
-                      <InputGroupInput
-                        placeholder={datePlaceholder}
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                      <InputGroupAddon
-                        align="inline-end"
-                        className="text-[10px] text-muted-foreground"
-                      >
-                        (optional)
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <FormField
+          control={form.control}
+          name="suffix"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <InputGroup className="h-10 bg-background">
+                  <InputGroupInput
+                    placeholder={datePlaceholder}
+                    className="placeholder:text-muted-foreground/50"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      onClick={onToggleSuffix}
+                      size="icon-xs"
+                      aria-label={
+                        previewSuffix
+                          ? "Hide date from preview"
+                          : "Show date in preview"
+                      }
+                    >
+                      {previewSuffix ? <Eye /> : <EyeOff />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+              <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Add important context to the occasion such as dates (optional).
+              </FieldDescription>
+            </FormItem>
+          )}
+        />
 
-          <FormItem>
-            <AvatarUpload
-              photoFile={form.watch("photo")}
-              photoUrl={form.watch("photoUrl")}
-              name={form.watch("name")}
-              onFileChange={(file) => {
-                form.setValue("photo", file, { shouldValidate: true })
-                form.setValue("photoUrl", undefined)
-              }}
-            />
-          </FormItem>
-        </div>
+        {/* Picture field */}
+        <FormItem>
+          <FormControl>
+            <div>
+              <InputGroup className="h-10 bg-background">
+                <InputGroupAddon
+                  align="inline-start"
+                  className="cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <CircleUserRound />
+                </InputGroupAddon>
+                <InputGroupInput
+                  readOnly
+                  value={photoFileName ?? "No file chosen"}
+                  className={
+                    photoFileName
+                      ? "cursor-pointer"
+                      : "cursor-pointer text-muted-foreground"
+                  }
+                  onClick={() => fileInputRef.current?.click()}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onTogglePhoto()
+                    }}
+                    size="icon-xs"
+                    aria-label={
+                      previewPhoto
+                        ? "Hide photo from preview"
+                        : "Show photo in preview"
+                    }
+                  >
+                    {previewPhoto ? <Eye /> : <EyeOff />}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setPhotoFileName(file.name)
+                  setCropSrc(URL.createObjectURL(file))
+                  e.target.value = ""
+                }}
+              />
+            </div>
+          </FormControl>
+          <FieldDescription className="mx-3 text-sm text-muted-foreground">
+            Upload a special photo and click{" "}
+            <Eye className="inline-block h-4 w-4" /> to show/hide it in your
+            event.
+          </FieldDescription>
+        </FormItem>
 
         <FormField
           control={form.control}
@@ -1025,18 +1029,36 @@ export function FormPanel({
                   rows={4}
                   {...field}
                   value={field.value ?? ""}
-                  className="bg-background"
+                  className="bg-background placeholder:text-muted-foreground/50"
                 />
               </FormControl>
               <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Use the name or nickname of the individual, couple, family or
+                group the event is for.
+              </FieldDescription>
             </FormItem>
           )}
         />
       </StepSection>
 
+      {cropSrc && (
+        <PhotoCropModal
+          open
+          imageSrc={cropSrc}
+          onClose={() => setCropSrc(null)}
+          onSave={(blob, previewUrl) => {
+            const file = new File([blob], "photo.jpg", { type: blob.type })
+            form.setValue("photo", file, { shouldValidate: true })
+            form.setValue("photoUrl", previewUrl)
+            setCropSrc(null)
+          }}
+        />
+      )}
+
       {/* Step 3 — favpoll */}
       <StepSection number={3} title="Topic">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <FormField
             control={form.control}
             name="topics"
@@ -1058,6 +1080,10 @@ export function FormPanel({
                   />
                 )}
                 <FormMessage />
+                <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                  Use the name or nickname of the individual, couple, family or
+                  group the event is for.
+                </FieldDescription>
               </FormItem>
             )}
           />
@@ -1076,7 +1102,7 @@ export function FormPanel({
               </FormDescription>
               <FormControl>
                 <Textarea
-                  className="bg-background"
+                  className="bg-background placeholder:text-muted-foreground/50"
                   placeholder={revealPlaceholder}
                   rows={5}
                   {...field}
@@ -1089,6 +1115,10 @@ export function FormPanel({
                 />
               </FormControl>
               <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Use the name or nickname of the individual, couple, family or
+                group the event is for.
+              </FieldDescription>
             </FormItem>
           )}
         />
@@ -1103,6 +1133,10 @@ export function FormPanel({
             <FormItem>
               <DateTimePicker value={field.value} onChange={field.onChange} />
               <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Use the name or nickname of the individual, couple, family or
+                group the event is for.
+              </FieldDescription>
             </FormItem>
           )}
         />
@@ -1142,6 +1176,10 @@ export function FormPanel({
                 </FormControl>
               </div>
               <FormMessage />
+              <FieldDescription className="mx-3 text-sm text-muted-foreground">
+                Use the name or nickname of the individual, couple, family or
+                group the event is for.
+              </FieldDescription>
             </FormItem>
           )}
         />

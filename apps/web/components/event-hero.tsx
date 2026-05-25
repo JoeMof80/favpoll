@@ -15,8 +15,8 @@ import type { Event, Protagonist } from "@favpoll/types"
 type ViewProps = {
   mode?: "view"
   event: Event
-
   protagonist: Protagonist
+  hideAvatar?: boolean
 }
 
 type EditProps = {
@@ -248,7 +248,7 @@ export function EventHero(props: Props) {
               disabled={photoUploading}
             />
           </label>
-        ) : (
+        ) : !props.hideAvatar ? (
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-[#D3D1C7]">
             {protagonist?.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -295,7 +295,7 @@ export function EventHero(props: Props) {
               </>
             )}
           </div>
-        )}
+        ) : null}
       </div>
 
       <hr className="mt-8 border-[#D3D1C7]" />
