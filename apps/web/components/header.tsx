@@ -8,7 +8,7 @@ import { FavpollLogo } from "@/components/favpoll-logo"
 export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-330 items-center justify-between px-6">
+      <div className="mx-auto flex h-14 items-center justify-between px-6">
         <Link href="/" aria-label="favpoll home">
           <FavpollLogo />
         </Link>
