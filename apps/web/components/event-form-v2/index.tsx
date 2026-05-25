@@ -47,7 +47,7 @@ export function EventFormV2({
   const [showReveal, setShowReveal] = useState(false)
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
-    resolver: zodResolver(eventFormSchema) as never,
+    resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       occasion: "",
       name: "",
