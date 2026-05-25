@@ -961,7 +961,6 @@ export function FormPanel({
             <FormField
               control={form.control}
               name="name"
-              className="space-y-0.5"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
