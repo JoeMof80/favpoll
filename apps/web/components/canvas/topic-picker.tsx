@@ -62,7 +62,9 @@ export function TopicPicker({
         type="text"
         value={topicSearch}
         onChange={(e) => onTopicSearchChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault() }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.preventDefault()
+        }}
         placeholder={
           showingCustom ? "Search your favpolls…" : "Search favpolls…"
         }

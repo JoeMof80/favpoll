@@ -20,7 +20,9 @@ export const eventFormSchema = z.object({
       z.object({
         topicId: z.string(),
         title: z.string(),
+        isCustom: z.boolean().default(false),
         items: z.array(z.object({ id: z.string(), label: z.string() })),
+        customLabels: z.array(z.string()).default([]),
       }),
     )
     .min(1, "At least one favpoll is required"),
