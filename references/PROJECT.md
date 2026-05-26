@@ -23,7 +23,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 - **Monorepo:** pnpm workspace — `apps/web` (Next.js main app), `apps/admin` (Next.js admin panel), `packages/types` (shared domain types as `@favpoll/types`)
 - **Framework:** Next.js 15, App Router, TypeScript
-- **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel
+- **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel, react-easy-crop (photo crop modal)
 - **Component catalogue:** Storybook (`@storybook/nextjs-vite`), co-located `.stories.tsx` files
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests. Admin app requires `publicMetadata.role === 'admin'` on the Clerk user.
 - **Database:** Supabase (Postgres + Realtime). Production and staging are separate projects.
@@ -304,9 +304,11 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ```
 /                              -- Home: HeroDemoPanel + live events carousel + CTA
 /events                        -- Live events grid (public, no auth)
-/events/new                    -- Create event (EventCanvas)
+/events/new                    -- Create event (EventCanvas — legacy)
+/events/new-v2                 -- Create event (EventFormV2 — split-panel, in progress)
 /events/[id]                   -- Event page — guest pledge view + edit mode toggle
-/events/[id]/edit              -- Edit event (EventCanvas edit mode)
+/events/[id]/edit              -- Edit event (EventCanvas edit mode — legacy)
+/events/[id]/edit-v2           -- Edit event (EventFormV2 — split-panel, in progress)
 /events/[id]/manage            -- Management panel (organiser only)
 /events/[id]/display           -- Live display for projector screen
 /my-events                     -- Organiser's created events (auth required)
@@ -368,6 +370,7 @@ components/
 ├── ui/
 │   ├── button.tsx, card.tsx, input.tsx, field.tsx
 │   ├── chip.tsx                  -- Selectable pill toggle
+│   ├── dialog.tsx                -- Radix Dialog (overlay, content, header, footer, title)
 │   ├── occasion-tag.tsx
 │   ├── section-eyebrow.tsx
 │   ├── ranking-bar.tsx           -- labelSuffix prop for inline Hide/Show toggle
@@ -393,8 +396,14 @@ components/
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
+├── event-form-v2/               -- Split-panel create/edit form (replaces EventCanvas)
+│   ├── index.tsx                -- EventFormV2 — outer shell, form state, submit
+│   ├── form-panel.tsx           -- Left 420px scrollable form (5 steps)
+│   ├── preview-panel.tsx        -- Right live preview (synced via useWatch)
+│   ├── photo-crop-modal.tsx     -- react-easy-crop in a Dialog; circular crop → JPEG blob
+│   └── schema.ts                -- Zod schema + EventFormValues type
 ├── event-canvas/use-canvas.ts   -- reads topic.placeholders[occasion].about
-├── event-hero.tsx
+├── event-hero.tsx               -- ViewProps accepts hideAvatar?: boolean to suppress avatar circle
 ├── event-card.tsx
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
@@ -584,6 +593,30 @@ NEXT_PUBLIC_BASE_URL
 
 ---
 
+## event-form-v2 Architecture
+
+Split-panel form replacing `EventCanvas`. Left panel (420 px) has a 5-step form; right panel is a live preview driven by `useWatch`.
+
+**Steps:**
+1. Occasion — chip picker; clearing resets the whole form
+2. Profile — Name, Suffix (Eye toggle → shows/hides in preview), Picture (file input → crop modal → preview avatar), About
+3. Topic — chip picker with Finite/Infinite/Category filters + ItemPriorityPicker for infinite topics
+4. Reveal — textarea; focus shows reveal/results view in preview, blur returns to pledge view
+5. Event — DateTimePicker, CharityField (multi-select chips, max 3), private toggle
+
+**Photo upload flow:**
+- Native `<input type="file">` hidden behind `InputGroup` (triggered by ref click)
+- On file select → `PhotoCropModal` opens (react-easy-crop, circular, 1:1 aspect)
+- On save → canvas crop → JPEG Blob → `File` stored in `form.photo`, preview URL in `form.photoUrl`
+- Eye toggle on input group controls `previewPhoto`; when false, `EventHero` renders with `hideAvatar` and shows no avatar circle at all
+
+**Preview panel:**
+- `previewSuffix` controls `fakeProtagonist.date_label`
+- `previewPhoto` controls `fakeProtagonist.photo_url` AND `EventHero hideAvatar`; false = no avatar rendered
+- `showReveal` (reveal field focus) swaps `PledgePanel` ↔ `PollResults`
+
+---
+
 ## Outstanding TODO
 
 - **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` are blank in Vercel. Configure endpoints at Clerk and Stripe dashboards.
@@ -596,6 +629,7 @@ NEXT_PUBLIC_BASE_URL
 - **Event oversight admin page** — `/events` in admin app is a shell only.
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
+- **event-form-v2 not yet wired to production routes** — `/events/new-v2` and `/events/[id]/edit-v2` exist but `/events/new` and `/events/[id]/edit` still use EventCanvas. Once v2 is ready, swap the routes.
 - **`home-carousel.tsx`** — unused, remove or repurpose.
 - **`theme-provider.tsx` and `menu-button.tsx`** — duplicated in apps/web and apps/admin. TODO: extract to `packages/ui/`.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep.
