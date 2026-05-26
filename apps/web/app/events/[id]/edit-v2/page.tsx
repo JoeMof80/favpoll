@@ -1,7 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { OCCASION_LABELS } from "@/lib/occasions"
 import { EventFormV2 } from "@/components/event-form-v2"
 import type {
   Category,
@@ -66,7 +65,9 @@ export default async function EditEventV2Page({ params }: Props) {
         {
           topicId: topic.id,
           title: topic.title,
+          isCustom: false,
           items: topic.topic_items.map((i) => ({ id: i.id, label: i.label })),
+          customLabels: [],
         },
       ]
     }

@@ -207,22 +207,38 @@ export function PreviewPanel({
   } as unknown as Event
 
   const firstTopic = selectedTopics[0]
+  const firstTopicCustomLabels = firstTopic?.customLabels ?? []
 
   const topicItems: TopicItem[] =
     firstTopic && (firstTopic.items ?? []).length > 0
-      ? ((firstTopic.items ?? []) as { id: string; label: string }[]).map(
-          (item) =>
-            ({
-              id: item.id,
-              label: item.label,
-              topic_id: firstTopic.topicId ?? "",
-              all_time_pledged: 0,
-              all_time_count: 0,
-              is_canonical: false,
-              is_active: true,
-              created_at: "",
-            }) as unknown as TopicItem
-        )
+      ? [
+          ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
+            (item) =>
+              ({
+                id: item.id,
+                label: item.label,
+                topic_id: firstTopic.topicId ?? "",
+                all_time_pledged: 0,
+                all_time_count: 0,
+                is_canonical: true,
+                is_active: true,
+                created_at: "",
+              }) as unknown as TopicItem
+          ),
+          ...firstTopicCustomLabels.map(
+            (label, i) =>
+              ({
+                id: `custom-preview-${i}`,
+                label,
+                topic_id: firstTopic.topicId ?? "",
+                all_time_pledged: 0,
+                all_time_count: 0,
+                is_canonical: false,
+                is_active: true,
+                created_at: "",
+              }) as unknown as TopicItem
+          ),
+        ]
       : PLACEHOLDER_ITEMS
 
   const selectedCharities = charities.filter((c) => charityIds.includes(c.id))

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { InlineOptionInput } from "@/components/canvas/inline-option-input"
 import type { TopicItem } from "@favpoll/types"
 
@@ -120,17 +120,10 @@ export function PledgePanel({
               : null
 
           return (
-            <Button
+            <Chip
               key={item.id}
-              type="button"
-              size="sm"
+              selected={isSelected}
               onClick={() => toggleItem(item.id)}
-              aria-pressed={isSelected}
-              className={`rounded-full px-3 py-1.5 text-xs ${
-                isSelected
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-muted text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              }`}
             >
               {item.label}
               {isSelected && pct > 0 && (
@@ -138,7 +131,7 @@ export function PledgePanel({
                   {pct}%{itemAmount ? ` · ${itemAmount}` : ""}
                 </span>
               )}
-            </Button>
+            </Chip>
           )
         })}
 
@@ -154,15 +147,12 @@ export function PledgePanel({
               {addError && <p className="pl-3 text-xs text-destructive">{addError}</p>}
             </div>
           ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
+            <Chip
               onClick={() => setAddingCustom(true)}
-              className="h-auto rounded-full border-dashed px-3 py-1.5 text-xs text-muted-foreground"
+              className="border-dashed"
             >
               Add custom option
-            </Button>
+            </Chip>
           )
         )}
       </div>

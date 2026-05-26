@@ -45,8 +45,9 @@ export function EventFormV2({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showReveal, setShowReveal] = useState(false)
-  const [previewSuffix, setPreviewSuffix] = useState(false)
-  const [previewPhoto, setPreviewPhoto] = useState(false)
+  const [previewSuffix, setPreviewSuffix] = useState(true)
+  const [previewPhoto, setPreviewPhoto] = useState(true)
+  const [photoFileName, setPhotoFileName] = useState<string | null>(null)
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
     resolver: zodResolver(eventFormSchema as never),
@@ -78,21 +79,24 @@ export function EventFormV2({
 
       const selectedTopic = values.topics[0]
       const topicMeta = topics.find((t) => t.id === selectedTopic.topicId)
+      const isCustomTopic = selectedTopic.isCustom ?? false
 
       const poll: CanvasPollInput = {
         id: existingPollId,
-        topicId: selectedTopic.topicId,
-        topicIsCustom: false,
-        customTopicTitle: "",
-        customTopicItems: [],
+        topicId: isCustomTopic ? "" : selectedTopic.topicId,
+        topicIsCustom: isCustomTopic,
+        customTopicTitle: isCustomTopic ? selectedTopic.title : "",
+        customTopicItems: isCustomTopic
+          ? (selectedTopic.customLabels ?? [])
+          : [],
         reveal: null,
         infiniteItems:
-          topicMeta && !topicMeta.is_finite
+          !isCustomTopic && topicMeta && !topicMeta.is_finite
             ? {
                 canonicalItemIds: topicMeta.topic_items
                   .filter((i) => i.is_canonical)
                   .map((i) => i.id),
-                customLabels: [],
+                customLabels: selectedTopic.customLabels ?? [],
               }
             : null,
       }
@@ -113,8 +117,13 @@ export function EventFormV2({
           isPrivate: values.isPrivate,
           potAmount: values.sharedFund > 0 ? values.sharedFund : null,
           poll: {
-            topicId: poll.topicId,
-            customTopic: null,
+            topicId: isCustomTopic ? null : poll.topicId,
+            customTopic: isCustomTopic
+              ? {
+                  title: selectedTopic.title,
+                  items: selectedTopic.customLabels ?? [],
+                }
+              : null,
             reveal: values.reveal || null,
             infiniteItems: poll.infiniteItems,
           },
@@ -150,13 +159,7 @@ export function EventFormV2({
     <Form {...form}>
       <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
         {/* Left panel — scrollable form */}
-        <div className="flex w-[420px] shrink-0 flex-col overflow-hidden border-r border-border bg-muted">
-          {/* Fixed header */}
-          <div className="shrink-0 border-b border-border px-5 py-3">
-            <h1 className="text-sm font-semibold text-foreground">
-              {mode === "create" ? "Create a New Event" : "Edit Event"}
-            </h1>
-          </div>
+        <div className="flex w-105 shrink-0 flex-col overflow-hidden border-r border-border bg-muted">
           <div className="flex-1 overflow-y-auto">
             <FormPanel
               charities={charities}
@@ -168,23 +171,41 @@ export function EventFormV2({
               onTogglePhoto={() => setPreviewPhoto((p) => !p)}
               onRevealFocus={() => setShowReveal(true)}
               onRevealBlur={() => setShowReveal(false)}
+              photoFileName={photoFileName}
+              onPhotoFileChange={setPhotoFileName}
+              size="md"
             />
           </div>
 
           {/* Fixed save button */}
-          <div className="shrink-0 border-t border-border px-5 py-4">
+          <div className="shrink-0 border-t border-border bg-background px-5 py-4">
             {error && (
               <p role="alert" className="mb-3 text-sm text-destructive">
                 {error}
               </p>
             )}
             <div className="flex items-center gap-2">
-              {mode === "edit" && (
+              {mode === "edit" ? (
                 <Button
                   type="button"
                   variant="ghost"
                   className="flex-1"
                   onClick={() => router.back()}
+                  disabled={submitting}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={() => {
+                    form.reset()
+                    setPhotoFileName(null)
+                    setPreviewSuffix(true)
+                    setPreviewPhoto(true)
+                  }}
                   disabled={submitting}
                 >
                   Cancel
@@ -209,7 +230,7 @@ export function EventFormV2({
         </div>
 
         {/* Right panel — live preview */}
-        <div className="flex-1 overflow-y-auto bg-primary/5">
+        <div className="flex-1 overflow-y-auto">
           <PreviewPanel
             charities={charities}
             topics={topics}
