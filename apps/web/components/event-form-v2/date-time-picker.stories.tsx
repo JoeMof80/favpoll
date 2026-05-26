@@ -15,6 +15,10 @@ const meta = {
       </div>
     ),
   ],
+  args: {
+    value: undefined,
+    onChange: () => {},
+  },
   argTypes: {
     size: { control: "radio", options: ["sm", "md", "lg"] },
   },

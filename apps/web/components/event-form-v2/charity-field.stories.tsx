@@ -25,6 +25,11 @@ const meta = {
       </div>
     ),
   ],
+  args: {
+    charities: MOCK_CHARITIES,
+    value: [],
+    onChange: () => {},
+  },
   argTypes: {
     size: { control: "radio", options: ["sm", "md", "lg"] },
   },

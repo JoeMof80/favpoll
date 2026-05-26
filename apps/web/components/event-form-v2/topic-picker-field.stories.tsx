@@ -83,6 +83,12 @@ const meta = {
       </div>
     ),
   ],
+  args: {
+    topics: MOCK_TOPICS,
+    categories: MOCK_CATEGORIES,
+    value: [],
+    onChange: () => {},
+  },
   argTypes: {
     size: { control: "radio", options: ["sm", "md", "lg"] },
   },
