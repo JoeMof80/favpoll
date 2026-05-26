@@ -89,7 +89,6 @@ export function EventFormV2({
         infiniteItems:
           topicMeta && !topicMeta.is_finite
             ? {
-                prioritizedItemIds: [],
                 canonicalItemIds: topicMeta.topic_items
                   .filter((i) => i.is_canonical)
                   .map((i) => i.id),
@@ -210,7 +209,7 @@ export function EventFormV2({
         </div>
 
         {/* Right panel — live preview */}
-        <div className="flex-1 overflow-y-auto bg-white">
+        <div className="flex-1 overflow-y-auto bg-primary/5">
           <PreviewPanel
             charities={charities}
             topics={topics}

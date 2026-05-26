@@ -153,8 +153,6 @@ export type EventPollItem = {
   topic_item_id: string
   is_guest_added: boolean
   added_by: string | null
-  display_order: number
-  is_prioritized: boolean
   is_hidden: boolean
   hidden_at: string | null
   hidden_by: string | null
@@ -203,8 +201,6 @@ export type CanvasPoll = {
   customTopicTitle: string
   customTopicItems: string[]
   reveal: string
-  prioritizedItemIds: string[]
-  prioritizedCustomLabels: string[]
   curatedCustomLabels: string[]
   pickingTopic: boolean
 }
@@ -216,7 +212,7 @@ export type CanvasPollInput = {
   customTopicTitle: string
   customTopicItems: string[]
   reveal: string | null
-  infiniteItems: { prioritizedItemIds: string[]; canonicalItemIds: string[]; customLabels: string[] } | null
+  infiniteItems: { canonicalItemIds: string[]; customLabels: string[] } | null
 }
 
 export type CanvasSubmitData = {

@@ -658,177 +658,6 @@ function TopicPickerField({
   )
 }
 
-// ─── Item priority picker ───────────────────────────────────────────────────
-function ItemPriorityPicker({
-  items,
-  onChange,
-}: {
-  items: { id: string; label: string }[]
-  onChange: (items: { id: string; label: string }[]) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const [popoverWidth, setPopoverWidth] = useState(0)
-  const [search, setSearch] = useState("")
-  const [prioritizedIds, setPrioritizedIds] = useState<string[]>([])
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  function reorder(pIds: string[]) {
-    const prioritized = pIds
-      .map((id) => items.find((i) => i.id === id))
-      .filter((i): i is { id: string; label: string } => !!i)
-    const unprioritized = items
-      .filter((i) => !pIds.includes(i.id))
-      .sort((a, b) => a.label.localeCompare(b.label))
-    onChange([...prioritized, ...unprioritized])
-  }
-
-  function toggle(id: string) {
-    const next = prioritizedIds.includes(id)
-      ? prioritizedIds.filter((x) => x !== id)
-      : [...prioritizedIds, id]
-    setPrioritizedIds(next)
-    reorder(next)
-    setSearch("")
-    inputRef.current?.focus()
-  }
-
-  function deprioritizeAll() {
-    setPrioritizedIds([])
-    onChange([...items].sort((a, b) => a.label.localeCompare(b.label)))
-  }
-
-  function openDropdown() {
-    if (anchorRef.current)
-      setPopoverWidth(anchorRef.current.getBoundingClientRect().width)
-    setOpen(true)
-  }
-
-  function handleBlur() {
-    setTimeout(() => {
-      setOpen(false)
-      setSearch("")
-    }, 150)
-  }
-
-  const prioritizedItems = prioritizedIds
-    .map((id) => items.find((i) => i.id === id))
-    .filter((i): i is { id: string; label: string } => !!i)
-
-  // All items: prioritised first (in order), then alphabetical
-  const unprioritizedItems = items
-    .filter((i) => !prioritizedIds.includes(i.id))
-    .sort((a, b) => a.label.localeCompare(b.label))
-  const allSorted = [...prioritizedItems, ...unprioritizedItems]
-  const visible = search
-    ? allSorted.filter((i) =>
-        i.label.toLowerCase().includes(search.toLowerCase())
-      )
-    : allSorted
-
-  return (
-    <div className="space-y-0.5">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">
-          Click an option to prioritise it — prioritised options appear first.
-        </p>
-        {prioritizedIds.length > 0 && (
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            onClick={deprioritizeAll}
-            className="h-auto shrink-0 p-0 text-xs text-muted-foreground"
-          >
-            Deprioritise all
-          </Button>
-        )}
-      </div>
-
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverAnchor asChild>
-          <div
-            ref={anchorRef}
-            className={CHIP_IN_INPUT}
-            onClick={() => inputRef.current?.focus()}
-          >
-            {prioritizedItems.map((item, i) => (
-              <span key={item.id} className={CHIP_PILL}>
-                <span className="mr-0.5 opacity-60">{i + 1}</span>
-                {item.label}
-                <button
-                  type="button"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    toggle(item.id)
-                  }}
-                  className="hover:text-[#534AB7]/70"
-                  aria-label={`Deprioritise ${item.label}`}
-                >
-                  <X className="h-2.5 w-2.5" />
-                </button>
-              </span>
-            ))}
-            <input
-              ref={inputRef}
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                openDropdown()
-              }}
-              onFocus={openDropdown}
-              onBlur={handleBlur}
-              placeholder={
-                prioritizedIds.length === 0
-                  ? "Search to prioritise options…"
-                  : "Add more…"
-              }
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50"
-            />
-          </div>
-        </PopoverAnchor>
-
-        <PopoverContent
-          style={{ width: popoverWidth || undefined }}
-          className="p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <div className="max-h-60 overflow-y-auto p-2">
-            {visible.length === 0 ? (
-              <p className="py-3 text-center text-sm text-muted-foreground">
-                No results.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {visible.map((item) => {
-                  const prioIdx = prioritizedIds.indexOf(item.id)
-                  const isPrioritized = prioIdx !== -1
-                  return (
-                    <Chip
-                      key={item.id}
-                      selected={isPrioritized}
-                      onMouseDown={(e) => {
-                        e.preventDefault()
-                        toggle(item.id)
-                      }}
-                    >
-                      {isPrioritized && (
-                        <span className="mr-0.5 opacity-60">{prioIdx + 1}</span>
-                      )}
-                      {item.label}
-                    </Chip>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
-  )
-}
 
 // ─── Main form panel ────────────────────────────────────────────────────────
 export function FormPanel({
@@ -1071,13 +900,13 @@ export function FormPanel({
                   onChange={field.onChange}
                 />
                 {field.value[0]?.items && field.value[0].items.length > 0 && (
-                  <ItemPriorityPicker
-                    key={field.value[0].topicId}
-                    items={field.value[0].items}
-                    onChange={(reordered) =>
-                      field.onChange([{ ...field.value[0], items: reordered }])
-                    }
-                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {[...field.value[0].items]
+                      .sort((a, b) => a.label.localeCompare(b.label))
+                      .map((item) => (
+                        <Chip key={item.id}>{item.label}</Chip>
+                      ))}
+                  </div>
                 )}
                 <FormMessage />
                 <FieldDescription className="mx-3 text-sm text-muted-foreground">

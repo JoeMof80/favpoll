@@ -73,8 +73,6 @@ export function PollEditor({
               onUpdatePoll({
                 topicId: "",
                 topicIsCustom: false,
-                prioritizedItemIds: [],
-                prioritizedCustomLabels: [],
                 curatedCustomLabels: [],
                 pickingTopic: true,
               })

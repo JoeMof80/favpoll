@@ -60,25 +60,6 @@ export default async function EditEventPage({ params }: Props) {
     ),
   }))
 
-  // For infinite topics, fetch the curated event_poll_items
-  let prioritizedItemIds: string[] = []
-  if (rawPoll) {
-    const topic = enrichedTopics.find((t) => t.id === rawPoll.topic_id)
-    const isInfinite = topic && !topic.is_finite
-    if (isInfinite) {
-      const { data: epiData } = await supabase
-        .from('event_poll_items')
-        .select('topic_item_id, is_prioritized')
-        .eq('event_poll_id', rawPoll.id)
-        .eq('is_guest_added', false)
-        .order('display_order', { ascending: true })
-
-      prioritizedItemIds = (epiData ?? [])
-        .filter((epi) => epi.is_prioritized)
-        .map((epi) => epi.topic_item_id)
-    }
-  }
-
   const closesAtLocal = new Date(event.closes_at).toISOString().slice(0, 16)
 
   const initialPoll: CanvasPoll | undefined = rawPoll
@@ -89,8 +70,6 @@ export default async function EditEventPage({ params }: Props) {
         customTopicTitle: '',
         customTopicItems: [],
         reveal: rawPoll.personal_reveal ?? '',
-        prioritizedItemIds,
-        prioritizedCustomLabels: [],
         curatedCustomLabels: [],
         pickingTopic: false,
       }
