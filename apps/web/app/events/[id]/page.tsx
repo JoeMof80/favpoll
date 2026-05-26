@@ -69,16 +69,15 @@ export default async function EventPage({ params }: Props) {
         id: string
         event_poll_id: string
         topic_item_id: string
-        display_order: number
         is_hidden: boolean
         is_guest_added: boolean
         topic_items: TopicItem
       }
       const { data: epiData } = await supabase
         .from("event_poll_items")
-        .select("id, event_poll_id, topic_item_id, display_order, is_hidden, is_guest_added, topic_items(*)")
+        .select("id, event_poll_id, topic_item_id, is_hidden, is_guest_added, topic_items(*)")
         .eq("event_poll_id", rawPoll.id)
-        .order("display_order", { ascending: true })
+        .order("label", { referencedTable: "topic_items", ascending: true })
 
       const allItems = ((epiData ?? []) as unknown as EpiRow[])
         .map((epi) => ({
@@ -86,14 +85,11 @@ export default async function EventPage({ params }: Props) {
           event_poll_item_id: epi.id,
           is_hidden: epi.is_hidden,
           is_guest_added: epi.is_guest_added,
-          _ord: epi.display_order,
         }))
         .sort((a, b) => {
           if (b.all_time_pledged !== a.all_time_pledged) return b.all_time_pledged - a.all_time_pledged
-          return (a._ord ?? 0) - (b._ord ?? 0)
+          return a.label.localeCompare(b.label)
         })
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .map(({ _ord, ...item }) => item)
 
       // Organiser sees all items (including hidden); guests see only visible ones
       items = isOrganiser ? allItems : allItems.filter((item) => !item.is_hidden)

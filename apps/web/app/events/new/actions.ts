@@ -9,7 +9,6 @@ type CustomTopic = {
 }
 
 type InfiniteItems = {
-  prioritizedItemIds: string[]
   canonicalItemIds: string[]
   customLabels: string[]
 }
@@ -131,7 +130,7 @@ async function createPollForEvent(
   }
 
   if (!poll.customTopic && poll.infiniteItems) {
-    const { prioritizedItemIds, canonicalItemIds, customLabels } = poll.infiniteItems
+    const { canonicalItemIds, customLabels } = poll.infiniteItems
     const allItemIds = [...canonicalItemIds]
 
     if (customLabels.length > 0) {
@@ -151,13 +150,11 @@ async function createPollForEvent(
 
     if (allItemIds.length > 0) {
       await supabase.from('event_poll_items').insert(
-        allItemIds.map((itemId, index) => ({
+        allItemIds.map((itemId) => ({
           event_poll_id: eventPoll.id,
           topic_item_id: itemId,
           is_guest_added: false,
           added_by: userId,
-          display_order: index,
-          is_prioritized: prioritizedItemIds.includes(itemId),
         })),
       )
     }

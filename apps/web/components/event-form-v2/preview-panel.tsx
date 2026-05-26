@@ -139,7 +139,13 @@ function CountdownPlaceholder() {
   )
 }
 
-export function PreviewPanel({ charities, topics, showReveal, previewSuffix, previewPhoto }: Props) {
+export function PreviewPanel({
+  charities,
+  topics,
+  showReveal,
+  previewSuffix,
+  previewPhoto,
+}: Props) {
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -186,7 +192,7 @@ export function PreviewPanel({ charities, topics, showReveal, previewSuffix, pre
     name: name || placeholders.name,
     about: about || aboutPlaceholder,
     photo_url: previewPhoto ? resolvedPhotoUrl : null,
-    date_label: previewSuffix ? (suffix || datePlaceholder || null) : null,
+    date_label: previewSuffix ? suffix || datePlaceholder || null : null,
   } as unknown as Protagonist
 
   const fakeEvent = {
@@ -244,7 +250,11 @@ export function PreviewPanel({ charities, topics, showReveal, previewSuffix, pre
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Left — hero + poll */}
         <div>
-          <EventHero event={fakeEvent} protagonist={fakeProtagonist} hideAvatar={!previewPhoto} />
+          <EventHero
+            event={fakeEvent}
+            protagonist={fakeProtagonist}
+            hideAvatar={!previewPhoto}
+          />
 
           <div className="space-y-4">
             <PollHeading

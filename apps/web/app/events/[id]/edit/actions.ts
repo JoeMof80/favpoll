@@ -23,7 +23,7 @@ async function upsertPollForEvent(
       .eq('id', poll.id)
 
     if (poll.infiniteItems) {
-      const { prioritizedItemIds, canonicalItemIds, customLabels } = poll.infiniteItems
+      const { canonicalItemIds, customLabels } = poll.infiniteItems
 
       // Delete all organiser-curated items; guest-added items are preserved
       await supabase
@@ -51,13 +51,11 @@ async function upsertPollForEvent(
 
       if (allItemIds.length > 0) {
         await supabase.from('event_poll_items').insert(
-          allItemIds.map((itemId, index) => ({
+          allItemIds.map((itemId) => ({
             event_poll_id: poll.id,
             topic_item_id: itemId,
             is_guest_added: false,
             added_by: userId,
-            display_order: index,
-            is_prioritized: prioritizedItemIds.includes(itemId),
           })),
         )
       }

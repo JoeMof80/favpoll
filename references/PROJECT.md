@@ -164,8 +164,6 @@ event_poll_items (
   id uuid primary key,
   event_poll_id uuid references event_polls(id) on delete cascade,
   topic_item_id uuid references topic_items(id),
-  display_order int not null default 0,
-  is_prioritized boolean not null default false,
   is_guest_added boolean default false,
   is_hidden boolean default false,   -- Organiser can hide guest-added items from results
   hidden_at timestamptz,
@@ -240,6 +238,7 @@ item_flags (
 20260523000000_enforce_single_poll_per_event.sql
 20260523120000_guest_item_moderation.sql
 20260524000000_charity_management.sql
+20260526000000_remove_event_poll_item_priority.sql
 ```
 
 ---
@@ -574,7 +573,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Guest item moderation.** Guest items land immediately (pledge works without review). `review_status` on `topic_items` governs canonical promotion only. Organisers hide/show via `event_poll_items.is_hidden`. `acceptContribution` must set both `is_canonical = true` AND `review_status = 'accepted'`.
 
-- **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `localeCompare` alphabetical for ties. Pledge panel always alphabetical regardless of `display_order`.
+- **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `localeCompare` alphabetical for ties. Items in all views sorted alphabetically — `display_order` and `is_prioritized` removed from `event_poll_items`.
 
 - **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
 

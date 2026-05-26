@@ -71,8 +71,6 @@ export function useCanvas({
       topicId: topic.id,
       topicIsCustom: false,
       pickingTopic: false,
-      prioritizedItemIds: [],
-      prioritizedCustomLabels: [],
       curatedCustomLabels: [],
     })
   }
@@ -122,17 +120,9 @@ export function useCanvas({
         infiniteItems:
           !poll.topicIsCustom && topic && !topic.is_finite
             ? {
-                prioritizedItemIds: poll.prioritizedItemIds,
-                canonicalItemIds: [
-                  ...poll.prioritizedItemIds,
-                  ...topic.topic_items
-                    .filter(
-                      (i) =>
-                        (topic.is_active === false || i.is_canonical) &&
-                        !poll.prioritizedItemIds.includes(i.id)
-                    )
-                    .map((i) => i.id),
-                ],
+                canonicalItemIds: topic.topic_items
+                  .filter((i) => topic.is_active === false || i.is_canonical)
+                  .map((i) => i.id),
                 customLabels: poll.curatedCustomLabels.filter((l) => l.trim()),
               }
             : null,

@@ -24,8 +24,6 @@ export function newPoll(topicId = ""): CanvasPoll {
     customTopicTitle: "",
     customTopicItems: [],
     reveal: "",
-    prioritizedItemIds: [],
-    prioritizedCustomLabels: [],
     curatedCustomLabels: [],
     pickingTopic: !topicId,
   }
