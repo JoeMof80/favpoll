@@ -12,6 +12,12 @@ export function rankItems(
         ? b.all_time_pledged - a.all_time_pledged
         : b.all_time_count - a.all_time_count
     if (diff !== 0) return diff
+    // Tiebreak: display_order asc nulls last, then alphabetical
+    const da = a.display_order ?? null
+    const db = b.display_order ?? null
+    if (da !== null && db !== null) return da - db
+    if (da !== null) return -1
+    if (db !== null) return 1
     return a.label.localeCompare(b.label)
   })
   return sorted.map((item, i) => ({ ...item, rank: i + 1, prevRank: null }))

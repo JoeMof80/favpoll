@@ -4245,6 +4245,56 @@ const topics: TopicSeed[] = [
 // Topic items
 // ---------------------------------------------------------------------------
 
+// display_order for finite topics — null/missing means sort alphabetically
+const topicItemDisplayOrder: Record<string, Record<string, number>> = {
+  "Day of the week": {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+    Sunday: 7,
+  },
+  "Meal of the day": {
+    Breakfast: 1,
+    Brunch: 2,
+    Lunch: 3,
+    "Afternoon tea": 4,
+    Dinner: 5,
+    Supper: 6,
+  },
+  "Time of day": {
+    "Early morning": 1,
+    "Mid morning": 2,
+    Lunchtime: 3,
+    Afternoon: 4,
+    "Late afternoon": 5,
+    Dusk: 6,
+    Evening: 7,
+    "Late night": 8,
+  },
+  Decade: {
+    "1920s": 1,
+    "1930s": 2,
+    "1940s": 3,
+    "1950s": 4,
+    "1960s": 5,
+    "1970s": 6,
+    "1980s": 7,
+    "1990s": 8,
+    "2000s": 9,
+    "2010s": 10,
+    "2020s": 11,
+  },
+  Season: {
+    Spring: 1,
+    Summer: 2,
+    Autumn: 3,
+    Winter: 4,
+  },
+}
+
 const topicItems: Record<string, string[]> = {
   Colour: [
     "Black",
@@ -4841,6 +4891,7 @@ async function seedTopicItems() {
       (existing ?? []).map((i: { label: string }) => i.label.toLowerCase())
     )
 
+    const orderMap = topicItemDisplayOrder[title]
     const toInsert = items
       .filter((label) => !existingLabels.has(label.toLowerCase()))
       .map((label) => ({
@@ -4849,6 +4900,9 @@ async function seedTopicItems() {
         is_canonical: true,
         source: "seed",
         markets: ["en-GB"],
+        ...(orderMap?.[label] !== undefined
+          ? { display_order: orderMap[label] }
+          : {}),
       }))
 
     if (toInsert.length === 0) continue

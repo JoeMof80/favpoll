@@ -1,15 +1,22 @@
-import { getPendingContributions, getReviewedContributions } from '@/lib/actions/contributions'
-import { ContributionRow } from '@/components/contribution-row'
+import {
+  getPendingContributions,
+  getReviewedContributions,
+} from "@/lib/actions/contributions";
+import { ContributionRow } from "@/components/contribution-row";
 
 export default async function ContributionsPage() {
   const [pending, reviewed] = await Promise.all([
     getPendingContributions(),
     getReviewedContributions(),
-  ])
+  ]);
 
-  const pendingItems = pending.data ?? []
-  const acceptedItems = (reviewed.data ?? []).filter((i) => i.review_status === 'accepted')
-  const rejectedItems = (reviewed.data ?? []).filter((i) => i.review_status === 'rejected')
+  const pendingItems = pending.data ?? [];
+  const acceptedItems = (reviewed.data ?? []).filter(
+    (i) => i.review_status === "accepted",
+  );
+  const rejectedItems = (reviewed.data ?? []).filter(
+    (i) => i.review_status === "rejected",
+  );
 
   return (
     <div className="space-y-8">
@@ -21,10 +28,14 @@ export default async function ContributionsPage() {
           Pending ({pendingItems.length})
         </h2>
         {pending.error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{pending.error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {pending.error}
+          </p>
         )}
         {pendingItems.length === 0 && !pending.error && (
-          <p className="text-sm text-muted-foreground">No pending contributions.</p>
+          <p className="text-sm text-muted-foreground">
+            No pending contributions.
+          </p>
         )}
         <div className="space-y-3">
           {pendingItems.map((item) => (
@@ -65,5 +76,5 @@ export default async function ContributionsPage() {
         )}
       </section>
     </div>
-  )
+  );
 }

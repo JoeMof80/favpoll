@@ -42,6 +42,7 @@ export type TopicItem = {
   event_count: number
   total_pledge_count: number
   created_at: string
+  display_order?: number | null
   // Present when fetched via event_poll_items (infinite topics in event context)
   event_poll_item_id?: string
   // Visibility state per event poll — set when fetched via event_poll_items join

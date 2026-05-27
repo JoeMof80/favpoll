@@ -63,9 +63,16 @@ export default async function EventPage({ params }: Props) {
         .from("topic_items")
         .select("*")
         .eq("topic_id", topicId)
-      items = ((finiteItemsData ?? []) as TopicItem[]).sort(
-        (a, b) => b.all_time_pledged - a.all_time_pledged
-      )
+      items = ((finiteItemsData ?? []) as TopicItem[]).sort((a, b) => {
+        const diff = b.all_time_pledged - a.all_time_pledged
+        if (diff !== 0) return diff
+        const da = a.display_order ?? null
+        const db = b.display_order ?? null
+        if (da !== null && db !== null) return da - db
+        if (da !== null) return -1
+        if (db !== null) return 1
+        return a.label.localeCompare(b.label)
+      })
     } else {
       type EpiRow = {
         id: string

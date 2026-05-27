@@ -36,6 +36,7 @@ export function ItemAddField({
   const [search, setSearch] = useState("")
   const anchorRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const wasOpenRef = useRef(false)
 
   const trimmed = search.trim()
   const lowerTrimmed = trimmed.toLowerCase()
@@ -59,13 +60,17 @@ export function ItemAddField({
   const showEmpty = allItems.length === 0 && !trimmed
 
   const placeholder = isFinite
-    ? `View ${topicTitle.toLowerCase()}…`
-    : `Type to add a missing ${topicTitle.toLowerCase()}…`
+    ? `View items for ${topicTitle}…`
+    : `Add ${topicTitle} items…`
 
   function openPopover() {
     if (anchorRef.current)
       setPopoverWidth(anchorRef.current.getBoundingClientRect().width)
     setOpen(true)
+  }
+
+  function handleFocus() {
+    if (!wasOpenRef.current) openPopover()
   }
 
   function handleBlur() {
@@ -108,6 +113,9 @@ export function ItemAddField({
         <div
           ref={anchorRef}
           className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
+          onMouseDown={() => {
+            wasOpenRef.current = open
+          }}
           onClick={() => inputRef.current?.focus()}
         >
           <input
@@ -121,7 +129,7 @@ export function ItemAddField({
                 handleCreate()
               }
             }}
-            onFocus={openPopover}
+            onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={placeholder}
             className={cn(
@@ -165,7 +173,7 @@ export function ItemAddField({
             <div className="flex flex-wrap gap-1.5">
               {filteredItems.map((item) =>
                 !isFinite && item.isCustom ? (
-                  <Chip key={item.id} selected size={size} className="gap-1">
+                  <Chip key={item.id} size={size} className="gap-1">
                     {item.label}
                     <span
                       role="button"

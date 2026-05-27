@@ -36,6 +36,7 @@ export function TopicPickerField({
   >(null)
   const anchorRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const wasOpenRef = useRef(false)
 
   const activeTopics = topics.filter((t) => t.is_active !== false)
   const hasSelection = value.length > 0
@@ -77,6 +78,10 @@ export function TopicPickerField({
       setPopoverWidth(anchorRef.current.getBoundingClientRect().width)
     }
     setOpen(true)
+  }
+
+  function handleFocus() {
+    if (!wasOpenRef.current) openDropdown()
   }
 
   function handleBlur() {
@@ -130,6 +135,9 @@ export function TopicPickerField({
         <div
           ref={anchorRef}
           className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
+          onMouseDown={() => {
+            wasOpenRef.current = open
+          }}
           onClick={() => inputRef.current?.focus()}
         >
           {hasSelection && (
@@ -160,8 +168,12 @@ export function TopicPickerField({
                 e.preventDefault()
                 handleCreateTopic()
               }
+              if (e.key === "Delete" && !search && hasSelection) {
+                e.preventDefault()
+                handleClear()
+              }
             }}
-            onFocus={openDropdown}
+            onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={hasSelection ? "" : "Search topics…"}
             className={cn(
