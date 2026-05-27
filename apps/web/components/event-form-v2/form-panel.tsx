@@ -37,12 +37,7 @@ import { OccasionPickerField } from "./occasion-picker-field"
 import { CharityField } from "./charity-field"
 import { TopicPickerField } from "./topic-picker-field"
 import { ItemAddField } from "./item-add-field"
-import {
-  SECTION_LABEL,
-  INPUT_SIZE,
-  TEXTAREA_SIZE,
-  type PickerSize,
-} from "./constants"
+import { INPUT_SIZE, TEXTAREA_SIZE, type PickerSize } from "./constants"
 
 const STEP_NUMBER: Record<PickerSize, string> = {
   sm: "h-5 w-5 text-[10px]",
@@ -291,7 +286,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"The name guests will see at the top of the event."}
+                The name or nickname to be used throughout the event
                 <CounterSpan
                   remaining={nameRemaining}
                   warning={8}
@@ -333,7 +328,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"Dates, years, or a short line of context. Optional."}
+                Dates, years, or a short line of context. Optional.
                 <CounterSpan
                   remaining={contextRemaining}
                   warning={8}
@@ -398,9 +393,6 @@ export function FormPanel({
               />
             </div>
           </FormControl>
-          <FieldDescription size={size} className="mb-2">
-            Optional photo. Can be added later.
-          </FieldDescription>
         </FormItem>
 
         <FormField
@@ -425,7 +417,6 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"A few words about them or what this occasion means."}
                 <CounterSpan
                   remaining={aboutRemaining}
                   warning={60}
@@ -468,8 +459,8 @@ export function FormPanel({
                 />
                 <FormMessage />
                 <FieldDescription size={size} className="mb-2">
-                  Filter and select the topic you want guests to vote on or
-                  create a topic of your own.
+                  Filter and select the topic for guests to vote on or create a
+                  topic of your own.
                 </FieldDescription>
               </FormItem>
             )}
@@ -553,9 +544,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {
-                  "Shown to guests only after they've pledged — the answer, in your words."
-                }
+                Shown to guests after they&apos;ve chosen and pledged.
                 <CounterSpan
                   remaining={revealRemaining}
                   warning={56}
@@ -581,8 +570,8 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Proceeds will go to your chosen cause(s) on this date and the
-                event will close.
+                The date for pledges to end and proceeds to go to the chosen
+                cause(s).
               </FieldDescription>
             </FormItem>
           )}
@@ -613,14 +602,11 @@ export function FormPanel({
           render={({ field }) => (
             <FormItem>
               <div className="items-top flex justify-between gap-3 rounded-md border bg-background p-3">
-                <div>
-                  <FormLabel className={SECTION_LABEL}>Private event</FormLabel>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {field.value
-                      ? "Only guests you invite can view this event."
-                      : "Anyone can find and pledge to this event. It will appear on the live events page."}
-                  </p>
-                </div>
+                <FormLabel className="text-xs text-muted-foreground">
+                  {field.value
+                    ? "Only guests you invite can view this event."
+                    : "Anyone can find and pledge to this event. It will appear on the live events page."}
+                </FormLabel>
                 <FormControl>
                   <Switch
                     checked={field.value}
