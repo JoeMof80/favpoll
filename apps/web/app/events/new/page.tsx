@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventCanvas } from "@/components/event-canvas"
+import { EventFormV2 } from "@/components/event-form-v2"
 import type {
   Category,
   Charity,
@@ -10,21 +10,19 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 
-export default async function NewEventPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ topic?: string }>
-}) {
+export default async function NewEventPage() {
   const { userId } = await auth()
   if (!userId) redirect("/sign-in")
-
-  const { topic: preselectedTopicId } = await searchParams
 
   const supabase = createAdminClient()
 
   const [{ data: charities }, { data: topics }, { data: categories }] =
     await Promise.all([
-      supabase.from("charities").select("*").order("name"),
+      supabase
+        .from("charities")
+        .select("*")
+        .eq("is_active", true)
+        .order("name"),
       supabase
         .from("topics")
         .select("*, topic_items(*), topic_categories(category_id)")
@@ -42,12 +40,11 @@ export default async function NewEventPage({
   }))
 
   return (
-    <EventCanvas
+    <EventFormV2
       mode="create"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
-      preselectedTopicId={preselectedTopicId ?? null}
     />
   )
 }

@@ -1,23 +1,17 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventCanvas } from "@/components/event-canvas"
-import { updateEvent } from "./actions"
-import { OCCASION_LABELS } from "@/lib/occasions"
+import { EventFormV2 } from "@/components/event-form-v2"
 import type {
   Category,
   Charity,
   Topic,
   TopicItem,
   TopicWithMeta,
-  CanvasSubmitData,
-  CanvasInitialData,
-  CanvasPoll,
 } from "@favpoll/types"
+import type { EventFormValues } from "@/components/event-form-v2/schema"
 
-type Props = {
-  params: Promise<{ id: string }>
-}
+type Props = { params: Promise<{ id: string }> }
 
 export default async function EditEventPage({ params }: Props) {
   const { id } = await params
@@ -45,7 +39,7 @@ export default async function EditEventPage({ params }: Props) {
     { data: pot },
   ] = await Promise.all([
     supabase.from("event_polls").select("*").eq("event_id", id).maybeSingle(),
-    supabase.from("charities").select("*").order("name"),
+    supabase.from("charities").select("*").eq("is_active", true).order("name"),
     supabase
       .from("topics")
       .select("*, topic_items(*), topic_categories(category_id)")
@@ -62,55 +56,50 @@ export default async function EditEventPage({ params }: Props) {
     ),
   }))
 
-  const closesAtLocal = new Date(event.closes_at).toISOString().slice(0, 16)
-
-  const initialPoll: CanvasPoll | undefined = rawPoll
-    ? {
-        id: rawPoll.id,
-        topicId: rawPoll.topic_id as string,
-        topicIsCustom: false,
-        customTopicTitle: "",
-        customTopicItems: [],
-        reveal: rawPoll.personal_reveal ?? "",
-        curatedCustomLabels: [],
-        pickingTopic: false,
-      }
-    : undefined
-
-  const initialData: CanvasInitialData = {
-    protagonistName: event.protagonists.name,
-    protagonistAbout: event.protagonists.about ?? "",
-    photoUrl: event.protagonists.photo_url ?? null,
-    dateLabel: event.protagonists.context ?? "",
-    occasion: event.occasion,
-    openingLine: event.opening_line ?? OCCASION_LABELS[event.occasion] ?? "",
-    description: event.description ?? "",
-    charityIds: (event.event_charities ?? []).map(
-      (ec: { charity_id: string }) => ec.charity_id
-    ),
-    closesAt: closesAtLocal,
-    isPrivate: event.is_private,
-    potAmount: pot?.total_deposited?.toString() ?? "",
-    poll: initialPoll,
+  // Build the pre-selected topic for the form
+  let preselectedTopics: EventFormValues["topics"] = []
+  if (rawPoll?.topic_id) {
+    const topic = enrichedTopics.find((t) => t.id === rawPoll.topic_id)
+    if (topic) {
+      preselectedTopics = [
+        {
+          topicId: topic.id,
+          title: topic.title,
+          isCustom: false,
+          items: topic.topic_items.map((i) => ({ id: i.id, label: i.label })),
+          customLabels: [],
+        },
+      ]
+    }
   }
 
-  async function handleSave(data: CanvasSubmitData) {
-    "use server"
-    await updateEvent(id, event.protagonist_id, data)
-    redirect(`/events/${id}`)
+  const defaultValues: Partial<EventFormValues> = {
+    occasion: event.occasion ?? "",
+    name: event.protagonists.name ?? "",
+    context: event.protagonists.context ?? "",
+    openingLine: event.opening_line ?? "",
+    about: event.protagonists.about ?? "",
+    photoUrl: event.protagonists.photo_url ?? undefined,
+    closesAt: new Date(event.closes_at),
+    charities: (event.event_charities ?? []).map(
+      (ec: { charity_id: string }) => ec.charity_id
+    ),
+    sharedFund: pot?.total_deposited ?? 0,
+    isPrivate: event.is_private ?? false,
+    reveal: rawPoll?.personal_reveal ?? "",
+    topics: preselectedTopics,
   }
 
   return (
-    <EventCanvas
+    <EventFormV2
       mode="edit"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
-      initialData={initialData}
-      onSave={handleSave}
       eventId={id}
-      extensionCount={event.extension_count ?? 0}
-      hardCloseAt={event.hard_close_at ?? null}
+      protagonistId={event.protagonist_id}
+      existingPollId={rawPoll?.id}
+      defaultValues={defaultValues}
     />
   )
 }

@@ -17,7 +17,6 @@ export const OCCASION_LIST = [
   { value: "other", label: "Other" },
 ] as const
 
-// Keep OCCASIONS alias — used by EventCanvas edit mode
 export const OCCASIONS = OCCASION_LIST
 
 export const OCCASION_LABELS: Record<string, string> = {
