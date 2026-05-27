@@ -147,6 +147,23 @@ export function FormPanel({
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
+  const suffixValue = form.watch("suffix") ?? ""
+  const aboutValue = form.watch("about") ?? ""
+  const revealValue = form.watch("reveal") ?? ""
+  const charitiesValue = form.watch("charities") ?? []
+
+  const nameRemaining = 80 - (name ?? "").length
+  const suffixRemaining = 60 - suffixValue.length
+  const aboutRemaining = 400 - aboutValue.length
+  const revealRemaining = 280 - revealValue.length
+
+  const charitiesCount = charitiesValue.length
+  const charitiesDescription =
+    charitiesCount === 0
+      ? "Select up to three charities."
+      : charitiesCount === 1
+        ? "1 of 3 selected."
+        : `${charitiesCount} of 3 selected — proceeds split equally.`
   const basePlaceholders = occasion
     ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
     : null
@@ -212,8 +229,8 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Use the name or nickname of the individual, couple, family or
-                group the event is for.
+                {"The name guests will see at the top of the event."}
+                {nameRemaining <= 16 && ` ${nameRemaining} characters remaining.`}
               </FieldDescription>
             </FormItem>
           )}
@@ -249,7 +266,8 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Add important context to the occasion such as dates (optional).
+                {"Dates, years, or a short line of context. Optional."}
+                {suffixRemaining <= 12 && ` ${suffixRemaining} characters remaining.`}
               </FieldDescription>
             </FormItem>
           )}
@@ -310,9 +328,7 @@ export function FormPanel({
             </div>
           </FormControl>
           <FieldDescription size={size} className="mb-2">
-            Upload a special photo and click{" "}
-            <Eye className="inline-block h-4 w-4" /> to show/hide it in your
-            event.
+            Optional photo. Can be added later.
           </FieldDescription>
         </FormItem>
 
@@ -337,7 +353,8 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Tell the story
+                {"A few words about them or what this occasion means."}
+                {aboutRemaining <= 80 && ` ${aboutRemaining} characters remaining.`}
               </FieldDescription>
             </FormItem>
           )}
@@ -358,7 +375,7 @@ export function FormPanel({
         />
       )}
 
-      {/* Step 3 — favpoll */}
+      {/* Step 3 — topic */}
       <StepSection number={3} title="Topic" size={size}>
         <div className="space-y-3">
           <FormField
@@ -375,7 +392,8 @@ export function FormPanel({
                 />
                 <FormMessage />
                 <FieldDescription size={size} className="mb-2">
-                  Select a topic that meant something to the honoree
+                  Filter and select the topic you want guests to vote on or
+                  create a topic of your own.
                 </FieldDescription>
               </FormItem>
             )}
@@ -422,8 +440,8 @@ export function FormPanel({
                     size={size}
                   />
                   <FieldDescription size={size} className="mb-2">
-                    View items for the selected topic, and add custom ones if
-                    needed.
+                    View items for the selected topic. Add missing items that
+                    guests might want.
                   </FieldDescription>
                 </FormItem>
               )
@@ -458,7 +476,8 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Shown to guests after they pledge.
+                {"Shown to guests only after they've pledged — the answer, in your words."}
+                {revealRemaining <= 56 && ` ${revealRemaining} characters remaining.`}
               </FieldDescription>
             </FormItem>
           )}
@@ -479,7 +498,8 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Pick a close date
+                Proceeds will go to your chosen cause(s) on this date and the
+                event will close.
               </FieldDescription>
             </FormItem>
           )}
@@ -498,7 +518,7 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Select a charity
+                {charitiesDescription}
               </FieldDescription>
             </FormItem>
           )}

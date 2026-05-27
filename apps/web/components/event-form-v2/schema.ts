@@ -2,9 +2,9 @@ import { z } from "zod"
 
 export const eventFormSchema = z.object({
   occasion: z.string().min(1, "Please select an occasion"),
-  name: z.string().min(1, "Name is required"),
-  suffix: z.string().optional(),
-  about: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(80, "Name must be 80 characters or fewer"),
+  suffix: z.string().max(60, "Must be 60 characters or fewer").optional(),
+  about: z.string().max(400, "Must be 400 characters or fewer").optional(),
   photo: z.instanceof(File).optional(),
   photoUrl: z.string().optional(),
   closesAt: z.date(),
@@ -14,7 +14,7 @@ export const eventFormSchema = z.object({
     .max(3, "Maximum 3 charities"),
   sharedFund: z.number().min(0),
   isPrivate: z.boolean(),
-  reveal: z.string().optional(),
+  reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
   topics: z
     .array(
       z.object({
@@ -22,7 +22,7 @@ export const eventFormSchema = z.object({
         title: z.string(),
         isCustom: z.boolean().default(false),
         items: z.array(z.object({ id: z.string(), label: z.string() })),
-        customLabels: z.array(z.string()).default([]),
+        customLabels: z.array(z.string().max(50)).default([]),
       }),
     )
     .min(1, "At least one favpoll is required"),
