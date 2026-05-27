@@ -119,7 +119,6 @@ export const Graduation: Story = {
 
 export const WithPhoto: Story = {
   args: {
-    mode: "view",
     ...makeViewProps(0),
     protagonist: {
       ...makeViewProps(0).protagonist,
