@@ -88,7 +88,7 @@ export function OccasionPickerField({
             }}
             onFocus={openDropdown}
             onBlur={handleBlur}
-            placeholder={selectedLabel ? "" : "Select an occasion…"}
+            placeholder={selectedLabel ? "" : "Select occasion"}
             className={cn(
               "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
               CHIP_IN_INPUT_TEXT[size]

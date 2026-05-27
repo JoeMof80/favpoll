@@ -247,7 +247,7 @@ export function FormPanel({
                     INPUT_SIZE[size],
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
-                  placeholder={occasion ? "" : "Select an occasion first"}
+                  placeholder={occasion ? "" : "Enter opening line"}
                   maxLength={60}
                   {...field}
                   value={field.value ?? ""}
@@ -279,14 +279,16 @@ export function FormPanel({
                     INPUT_SIZE[size],
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
-                  placeholder={basePlaceholders?.name ?? "Enter Name"}
+                  placeholder={
+                    basePlaceholders?.name ?? "Enter name or nickname"
+                  }
                   maxLength={40}
                   {...field}
                 />
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                The name or nickname to be used throughout the event
+                Name or nickname shown throughout the event
                 <CounterSpan
                   remaining={nameRemaining}
                   warning={8}
@@ -328,7 +330,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Dates, years, or a short line of context. Optional.
+                Dates, years, or other context. Optional.
                 <CounterSpan
                   remaining={contextRemaining}
                   warning={8}
@@ -459,8 +461,7 @@ export function FormPanel({
                 />
                 <FormMessage />
                 <FieldDescription size={size} className="mb-2">
-                  Filter and select the topic for guests to vote on or create a
-                  topic of your own.
+                  Find a topic for guests to vote on or create one of your own.
                 </FieldDescription>
               </FormItem>
             )}
@@ -507,8 +508,8 @@ export function FormPanel({
                     size={size}
                   />
                   <FieldDescription size={size} className="mb-2">
-                    View items for the selected topic. Add missing items that
-                    guests might want.
+                    View items for selected topic. Add missing items or let
+                    guests add them.
                   </FieldDescription>
                 </FormItem>
               )
@@ -570,8 +571,7 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                The date for pledges to end and proceeds to go to the chosen
-                cause(s).
+                No more pledges and proceeds go to chosen cause(s).
               </FieldDescription>
             </FormItem>
           )}

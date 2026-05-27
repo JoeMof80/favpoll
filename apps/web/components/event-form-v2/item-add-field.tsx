@@ -87,7 +87,7 @@ export function ItemAddField({
         className={cn(
           CHIP_IN_INPUT,
           CHIP_IN_INPUT_SIZE[size],
-          "pointer-events-none opacity-40"
+          "pointer-events-none bg-background/50"
         )}
       >
         <span
