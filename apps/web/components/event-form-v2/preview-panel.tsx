@@ -151,7 +151,8 @@ export function PreviewPanel({
 
   const occasion = values.occasion ?? ""
   const name = values.name ?? ""
-  const suffix = values.suffix ?? ""
+  const context = values.context ?? ""
+  const openingLine = values.openingLine ?? ""
   const about = values.about ?? ""
   const reveal = values.reveal ?? ""
   const photo = values.photo as File | undefined
@@ -178,9 +179,9 @@ export function PreviewPanel({
     firstTopicMeta?.placeholders?.[occasion]?.about ??
     firstTopicMeta?.placeholders?.["default"]?.about
   const aboutPlaceholder = topicAbout ?? placeholders.about
-  const occasionLabel = occasion
-    ? (OCCASION_LABELS[occasion] ?? "A tribute to")
-    : "A tribute to"
+  const resolvedOpeningLine =
+    openingLine ||
+    (occasion ? (OCCASION_LABELS[occasion] ?? "A tribute to") : "A tribute to")
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
@@ -192,13 +193,13 @@ export function PreviewPanel({
     name: name || placeholders.name,
     about: about || aboutPlaceholder,
     photo_url: previewPhoto ? resolvedPhotoUrl : null,
-    date_label: previewSuffix ? suffix || datePlaceholder || null : null,
+    context: previewSuffix ? context || datePlaceholder || null : null,
   } as unknown as Protagonist
 
   const fakeEvent = {
     id: "preview",
     occasion: occasion || "tribute",
-    occasion_label: occasionLabel,
+    opening_line: resolvedOpeningLine,
     closes_at:
       closesAt instanceof Date
         ? closesAt.toISOString()

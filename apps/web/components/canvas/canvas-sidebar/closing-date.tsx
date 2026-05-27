@@ -164,10 +164,14 @@ export function ClosingDate({
 }: Props) {
   const { date: closingDate, time: closingTime } = splitDateTime(closesAt)
   const today = new Date().toISOString().slice(0, 10)
-  const hardCloseDate = hardCloseAt ? new Date(hardCloseAt).toISOString().slice(0, 10) : undefined
+  const hardCloseDate = hardCloseAt
+    ? new Date(hardCloseAt).toISOString().slice(0, 10)
+    : undefined
 
   const [message, setMessage] = useState("")
-  const [requestState, setRequestState] = useState<"idle" | "sending" | "sent" | "error">("idle")
+  const [requestState, setRequestState] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle")
 
   const isBlocked = extensionCount >= 2
 

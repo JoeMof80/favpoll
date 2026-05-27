@@ -37,19 +37,22 @@ export function FavpollHeader({ protagonist, eyebrow }: FavpollHeaderProps) {
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
           {eyebrow && (
-            <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#888780]">
+            <span className="text-[11px] font-medium tracking-[0.08em] text-[#888780] uppercase">
               {eyebrow}
             </span>
           )}
           <span className={nameClass}>{protagonist.name}</span>
-          {protagonist.date_label && (
+          {protagonist.context && (
             <span className="text-[12px] text-[#888780]">
-              {protagonist.date_label}
+              {protagonist.context}
             </span>
           )}
         </div>
 
-        <div className="shrink-0" style={{ width: avatarSize, height: avatarSize }}>
+        <div
+          className="shrink-0"
+          style={{ width: avatarSize, height: avatarSize }}
+        >
           {protagonist.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -48,9 +48,9 @@ export const FullRankings = {
     <ol className="w-80 space-y-2.5">
       {[
         { label: "Purple", amount: "£350", width: 78, leader: true },
-        { label: "Blue",   amount: "£220", width: 51, leader: false },
-        { label: "Green",  amount: "£120", width: 28, leader: false },
-        { label: "Red",    amount: "£60",  width: 14, leader: false },
+        { label: "Blue", amount: "£220", width: 51, leader: false },
+        { label: "Green", amount: "£120", width: 28, leader: false },
+        { label: "Red", amount: "£60", width: 14, leader: false },
       ].map((item) => (
         <li key={item.label}>
           <RankingBar

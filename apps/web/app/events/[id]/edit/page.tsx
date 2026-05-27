@@ -1,9 +1,9 @@
-import { notFound, redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { EventCanvas } from '@/components/event-canvas'
-import { updateEvent } from './actions'
-import { OCCASION_LABELS } from '@/lib/occasions'
+import { notFound, redirect } from "next/navigation"
+import { auth } from "@clerk/nextjs/server"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { EventCanvas } from "@/components/event-canvas"
+import { updateEvent } from "./actions"
+import { OCCASION_LABELS } from "@/lib/occasions"
 import type {
   Category,
   Charity,
@@ -13,7 +13,7 @@ import type {
   CanvasSubmitData,
   CanvasInitialData,
   CanvasPoll,
-} from '@favpoll/types'
+} from "@favpoll/types"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -27,9 +27,11 @@ export default async function EditEventPage({ params }: Props) {
   const supabase = createAdminClient()
 
   const { data: event } = await supabase
-    .from('events')
-    .select('*, protagonists!events_protagonist_id_fkey(*), event_charities(charity_id)')
-    .eq('id', id)
+    .from("events")
+    .select(
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charity_id)"
+    )
+    .eq("id", id)
     .single()
 
   if (!event) notFound()
@@ -42,21 +44,21 @@ export default async function EditEventPage({ params }: Props) {
     { data: categories },
     { data: pot },
   ] = await Promise.all([
-    supabase.from('event_polls').select('*').eq('event_id', id).maybeSingle(),
-    supabase.from('charities').select('*').order('name'),
+    supabase.from("event_polls").select("*").eq("event_id", id).maybeSingle(),
+    supabase.from("charities").select("*").order("name"),
     supabase
-      .from('topics')
-      .select('*, topic_items(*), topic_categories(category_id)')
-      .order('title'),
-    supabase.from('categories').select('*').order('label'),
-    supabase.from('event_pots').select('*').eq('event_id', id).maybeSingle(),
+      .from("topics")
+      .select("*, topic_items(*), topic_categories(category_id)")
+      .order("title"),
+    supabase.from("categories").select("*").order("label"),
+    supabase.from("event_pots").select("*").eq("event_id", id).maybeSingle(),
   ])
 
   const enrichedTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
     topic_items: (t.topic_items ?? []) as TopicItem[],
     category_ids: (t.topic_categories ?? []).map(
-      (tc: { category_id: string }) => tc.category_id,
+      (tc: { category_id: string }) => tc.category_id
     ),
   }))
 
@@ -67,9 +69,9 @@ export default async function EditEventPage({ params }: Props) {
         id: rawPoll.id,
         topicId: rawPoll.topic_id as string,
         topicIsCustom: false,
-        customTopicTitle: '',
+        customTopicTitle: "",
         customTopicItems: [],
-        reveal: rawPoll.personal_reveal ?? '',
+        reveal: rawPoll.personal_reveal ?? "",
         curatedCustomLabels: [],
         pickingTopic: false,
       }
@@ -77,23 +79,23 @@ export default async function EditEventPage({ params }: Props) {
 
   const initialData: CanvasInitialData = {
     protagonistName: event.protagonists.name,
-    protagonistAbout: event.protagonists.about ?? '',
+    protagonistAbout: event.protagonists.about ?? "",
     photoUrl: event.protagonists.photo_url ?? null,
-    dateLabel: event.protagonists.date_label ?? '',
+    dateLabel: event.protagonists.context ?? "",
     occasion: event.occasion,
-    occasionLabel: event.occasion_label ?? OCCASION_LABELS[event.occasion] ?? '',
-    description: event.description ?? '',
+    openingLine: event.opening_line ?? OCCASION_LABELS[event.occasion] ?? "",
+    description: event.description ?? "",
     charityIds: (event.event_charities ?? []).map(
-      (ec: { charity_id: string }) => ec.charity_id,
+      (ec: { charity_id: string }) => ec.charity_id
     ),
     closesAt: closesAtLocal,
     isPrivate: event.is_private,
-    potAmount: pot?.total_deposited?.toString() ?? '',
+    potAmount: pot?.total_deposited?.toString() ?? "",
     poll: initialPoll,
   }
 
   async function handleSave(data: CanvasSubmitData) {
-    'use server'
+    "use server"
     await updateEvent(id, event.protagonist_id, data)
     redirect(`/events/${id}`)
   }

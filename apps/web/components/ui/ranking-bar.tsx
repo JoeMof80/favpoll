@@ -26,7 +26,7 @@ export function RankingBar({
           <span className="truncate text-foreground">{label}</span>
           {labelSuffix}
         </span>
-        <span className="shrink-0 tabular-nums text-muted-foreground">
+        <span className="shrink-0 text-muted-foreground tabular-nums">
           {amount}
         </span>
       </div>

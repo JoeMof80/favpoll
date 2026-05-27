@@ -50,7 +50,9 @@ export function PollHeading(props: Props) {
                     type="text"
                     value={props.topicTitle}
                     onChange={(e) => props.onTopicTitleChange?.(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault() }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.preventDefault()
+                    }}
                     placeholder="board games"
                     className="peer w-full appearance-none bg-transparent pr-5 text-[11px] font-medium tracking-[0.09em] text-[#7F77DD] uppercase outline-none placeholder:text-[#7F77DD]/30"
                   />

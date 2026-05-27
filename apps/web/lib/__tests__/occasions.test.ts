@@ -56,23 +56,31 @@ describe("suggestClosingDate", () => {
 
   it("closes n days before eventDate when event is far enough in future", () => {
     // birthday = 14 days before event; event 2025-09-01 → close 2025-08-18
-    expect(suggestClosingDate("birthday", "2025-09-01")).toBe("2025-08-18T23:59")
+    expect(suggestClosingDate("birthday", "2025-09-01")).toBe(
+      "2025-08-18T23:59"
+    )
   })
 
   it("falls back to today + n days when eventDate - n is in the past", () => {
     // birthday = 14 days; event tomorrow (2025-06-02) → target = 2025-05-19 (past) → fallback
-    expect(suggestClosingDate("birthday", "2025-06-02")).toBe("2025-06-15T23:59")
+    expect(suggestClosingDate("birthday", "2025-06-02")).toBe(
+      "2025-06-15T23:59"
+    )
   })
 
   it("does NOT fall back when eventDate - n equals today at noon (target > midnight today)", () => {
     // birthday = 14 days; event 2025-06-15T12:00 - 14 days = 2025-06-01T12:00
     // today midnight is 2025-06-01T00:00 — noon > midnight, so condition fails → no fallback
-    expect(suggestClosingDate("birthday", "2025-06-15")).toBe("2025-06-01T23:59")
+    expect(suggestClosingDate("birthday", "2025-06-15")).toBe(
+      "2025-06-01T23:59"
+    )
   })
 
   it("falls back when eventDate - n is strictly before today midnight", () => {
     // birthday = 14 days; event 2025-06-14T12:00 - 14 days = 2025-05-31T12:00 < midnight June 1 → fallback
-    expect(suggestClosingDate("birthday", "2025-06-14")).toBe("2025-06-15T23:59")
+    expect(suggestClosingDate("birthday", "2025-06-14")).toBe(
+      "2025-06-15T23:59"
+    )
   })
 
   it("returns a string in YYYY-MM-DDTHH:MM format", () => {

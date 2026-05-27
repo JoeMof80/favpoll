@@ -2,16 +2,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { makeSupabaseMock } from "@/tests/mocks/supabase-admin"
 
-const mockAuth = vi.hoisted(() => vi.fn().mockResolvedValue({ userId: "user-1" }))
+const mockAuth = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ userId: "user-1" })
+)
 const mockRevalidatePath = vi.hoisted(() => vi.fn())
 
 vi.mock("@clerk/nextjs/server", () => ({ auth: mockAuth }))
 vi.mock("next/cache", () => ({ revalidatePath: mockRevalidatePath }))
 
 let mock = makeSupabaseMock()
-vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => mock.supabase }))
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => mock.supabase,
+}))
 
-import { hideEventPollItem, showEventPollItem } from "@/lib/actions/event-poll-items"
+import {
+  hideEventPollItem,
+  showEventPollItem,
+} from "@/lib/actions/event-poll-items"
 
 const ITEM_ID = "epi-1"
 const EVENT_ID = "event-1"
@@ -39,12 +46,16 @@ beforeEach(() => {
 describe("hideEventPollItem", () => {
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(hideEventPollItem(ITEM_ID)).rejects.toThrow("Not authenticated")
+    await expect(hideEventPollItem(ITEM_ID)).rejects.toThrow(
+      "Not authenticated"
+    )
   })
 
   it("throws when item not found", async () => {
     mock.queue(null, { message: "not found" }) // verifyOrganiser lookup fails
-    await expect(hideEventPollItem(ITEM_ID)).rejects.toThrow("Event poll item not found")
+    await expect(hideEventPollItem(ITEM_ID)).rejects.toThrow(
+      "Event poll item not found"
+    )
   })
 
   it("throws when caller is not the organiser", async () => {
@@ -60,12 +71,14 @@ describe("hideEventPollItem", () => {
   })
 
   it("sets is_hidden=true, hidden_at, hidden_by on the item", async () => {
-    mock.queue(organiserLookup)   // verifyOrganiser lookup
-    mock.queue(null)              // update → await
+    mock.queue(organiserLookup) // verifyOrganiser lookup
+    mock.queue(null) // update → await
 
     await hideEventPollItem(ITEM_ID)
 
-    const updateCall = mock.callsFor("event_poll_items").find((c) => c.method === "update")!
+    const updateCall = mock
+      .callsFor("event_poll_items")
+      .find((c) => c.method === "update")!
     expect(updateCall.args[0]).toMatchObject({
       is_hidden: true,
       hidden_by: ORGANISER_ID,
@@ -97,7 +110,9 @@ describe("hideEventPollItem", () => {
 describe("showEventPollItem", () => {
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(showEventPollItem(ITEM_ID)).rejects.toThrow("Not authenticated")
+    await expect(showEventPollItem(ITEM_ID)).rejects.toThrow(
+      "Not authenticated"
+    )
   })
 
   it("throws when caller is not the organiser", async () => {
@@ -118,7 +133,9 @@ describe("showEventPollItem", () => {
 
     await showEventPollItem(ITEM_ID)
 
-    const updateCall = mock.callsFor("event_poll_items").find((c) => c.method === "update")!
+    const updateCall = mock
+      .callsFor("event_poll_items")
+      .find((c) => c.method === "update")!
     expect(updateCall.args[0]).toEqual({
       is_hidden: false,
       hidden_at: null,

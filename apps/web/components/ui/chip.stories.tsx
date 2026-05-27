@@ -46,23 +46,41 @@ export const Sizes: Story = {
       <div className="flex flex-wrap items-center gap-2">
         <span className="w-20 text-xs text-muted-foreground">sm</span>
         <Chip size="sm">Default</Chip>
-        <Chip size="sm" selected>Selected</Chip>
-        <Chip size="sm" readOnly>Read-only</Chip>
-        <Chip size="sm" disabled>Disabled</Chip>
+        <Chip size="sm" selected>
+          Selected
+        </Chip>
+        <Chip size="sm" readOnly>
+          Read-only
+        </Chip>
+        <Chip size="sm" disabled>
+          Disabled
+        </Chip>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className="w-20 text-xs text-muted-foreground">md</span>
         <Chip size="md">Default</Chip>
-        <Chip size="md" selected>Selected</Chip>
-        <Chip size="md" readOnly>Read-only</Chip>
-        <Chip size="md" disabled>Disabled</Chip>
+        <Chip size="md" selected>
+          Selected
+        </Chip>
+        <Chip size="md" readOnly>
+          Read-only
+        </Chip>
+        <Chip size="md" disabled>
+          Disabled
+        </Chip>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className="w-20 text-xs text-muted-foreground">lg</span>
         <Chip size="lg">Default</Chip>
-        <Chip size="lg" selected>Selected</Chip>
-        <Chip size="lg" readOnly>Read-only</Chip>
-        <Chip size="lg" disabled>Disabled</Chip>
+        <Chip size="lg" selected>
+          Selected
+        </Chip>
+        <Chip size="lg" readOnly>
+          Read-only
+        </Chip>
+        <Chip size="lg" disabled>
+          Disabled
+        </Chip>
       </div>
     </div>
   ),
@@ -70,7 +88,14 @@ export const Sizes: Story = {
 
 export const OccasionChips: Story = {
   render: () => {
-    const occasions = ["Memorial", "Birthday", "Retirement", "Engagement", "Wedding", "Graduation"]
+    const occasions = [
+      "Memorial",
+      "Birthday",
+      "Retirement",
+      "Engagement",
+      "Wedding",
+      "Graduation",
+    ]
     return (
       <div className="flex flex-wrap gap-1.5">
         {occasions.map((label, i) => (

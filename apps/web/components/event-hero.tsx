@@ -22,13 +22,13 @@ type ViewProps = {
 type EditProps = {
   mode: "edit"
   occasion: string
-  occasionLabel: string
+  openingLine: string
   protagonistName: string
   protagonistAbout: string
   dateLabel: string
   initialPhotoUrl?: string | null
   placeholders: Pick<OccasionPlaceholders, "name" | "about">
-  onOccasionLabelChange: (v: string) => void
+  onOpeningLineChange: (v: string) => void
   onProtagonistNameChange: (v: string) => void
   onProtagonistAboutChange: (v: string) => void
   onDateLabelChange: (v: string) => void
@@ -52,9 +52,9 @@ export function EventHero(props: Props) {
     ? null
     : getEventHeadline({
         occasion: props.event.occasion,
-        occasionLabel: props.event.occasion_label,
+        occasionLabel: props.event.opening_line,
         name: props.protagonist.name,
-        dateLabel: props.protagonist.date_label,
+        dateLabel: props.protagonist.context,
       })
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,8 +98,8 @@ export function EventHero(props: Props) {
             <div className="relative mb-2">
               <input
                 type="text"
-                value={props.occasionLabel}
-                onChange={(e) => props.onOccasionLabelChange(e.target.value)}
+                value={props.openingLine}
+                onChange={(e) => props.onOpeningLineChange(e.target.value)}
                 placeholder={label || "In memory of"}
                 className="peer w-full appearance-none bg-transparent py-0 pr-5 text-xs font-medium tracking-widest text-muted-foreground uppercase outline-none placeholder:text-muted-foreground/30"
               />
@@ -110,7 +110,10 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <SectionEyebrow variant="muted" className="mb-2">
+            <SectionEyebrow
+              variant="muted"
+              className="mb-2 truncate wrap-break-word"
+            >
               {headline?.prefix ?? label}
             </SectionEyebrow>
           )}
@@ -132,12 +135,12 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <h1 className="text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A] sm:text-5xl">
+            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
               {protagonist?.name}
             </h1>
           )}
 
-          {/* Dates — edit mode: free text; view mode: rendered from date_label */}
+          {/* Dates — edit mode: free text; view mode: rendered from context */}
           {isEdit ? (
             <div className="relative mt-2">
               <input
@@ -156,7 +159,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : headline?.suffix ? (
-            <p className="mt-2 text-2xl font-normal text-[#534AB7]">
+            <p className="mt-2 truncate text-2xl font-normal wrap-break-word text-[#534AB7]">
               {headline.suffix}
             </p>
           ) : null}
@@ -184,7 +187,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : protagonist?.about ? (
-            <p className="mt-4 text-base leading-relaxed text-[#5F5E5A]">
+            <p className="mt-4 line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
               {protagonist.about}
             </p>
           ) : null}

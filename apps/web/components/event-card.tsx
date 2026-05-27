@@ -21,7 +21,7 @@ import type { Charity } from "@favpoll/types"
 
 type EventCardEvent = {
   id: string
-  occasion_label: string
+  opening_line: string
   description: string | null
   closes_at: string
   total_raised: number
@@ -102,7 +102,7 @@ export function EventCard({
           <Link href={`/events/${event.id}`} className="block px-5 pt-5">
             <FavpollHeader
               protagonist={{ name: event.protagonist.name }}
-              eyebrow={event.occasion_label}
+              eyebrow={event.opening_line}
             />
           </Link>
 

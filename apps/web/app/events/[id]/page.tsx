@@ -23,7 +23,9 @@ export default async function EventPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(*))")
+    .select(
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(*))"
+    )
     .eq("id", id)
     .single()
 
@@ -75,7 +77,9 @@ export default async function EventPage({ params }: Props) {
       }
       const { data: epiData } = await supabase
         .from("event_poll_items")
-        .select("id, event_poll_id, topic_item_id, is_hidden, is_guest_added, topic_items(*)")
+        .select(
+          "id, event_poll_id, topic_item_id, is_hidden, is_guest_added, topic_items(*)"
+        )
         .eq("event_poll_id", rawPoll.id)
         .order("label", { referencedTable: "topic_items", ascending: true })
 
@@ -87,12 +91,15 @@ export default async function EventPage({ params }: Props) {
           is_guest_added: epi.is_guest_added,
         }))
         .sort((a, b) => {
-          if (b.all_time_pledged !== a.all_time_pledged) return b.all_time_pledged - a.all_time_pledged
+          if (b.all_time_pledged !== a.all_time_pledged)
+            return b.all_time_pledged - a.all_time_pledged
           return a.label.localeCompare(b.label)
         })
 
       // Organiser sees all items (including hidden); guests see only visible ones
-      items = isOrganiser ? allItems : allItems.filter((item) => !item.is_hidden)
+      items = isOrganiser
+        ? allItems
+        : allItems.filter((item) => !item.is_hidden)
     }
 
     pollWithItems = {
@@ -152,8 +159,14 @@ export default async function EventPage({ params }: Props) {
 
   return (
     <>
-      <EventSubheader eventId={id} isOrganiser={isOrganiser} isClosed={isClosed} />
-      <main className={`mx-auto max-w-330 px-6 pt-8 ${isOrganiser ? "pb-28" : "pb-16"}`}>
+      <EventSubheader
+        eventId={id}
+        isOrganiser={isOrganiser}
+        isClosed={isClosed}
+      />
+      <main
+        className={`mx-auto max-w-330 px-6 pt-8 ${isOrganiser ? "pb-28" : "pb-16"}`}
+      >
         <EventContent
           event={typedEvent}
           pollWithItems={visiblePoll}

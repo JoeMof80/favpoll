@@ -52,7 +52,7 @@ export type TopicItem = {
 export type Protagonist = {
   id: string
   name: string
-  date_label: string | null
+  context: string | null
   about: string | null
   photo_url: string | null
   created_by: string | null
@@ -81,7 +81,7 @@ export type Event = {
   id: string
   protagonist_id: string
   occasion: OccasionType
-  occasion_label: string | null
+  opening_line: string | null
   market: string
   created_by: string
   closes_at: string
@@ -221,7 +221,7 @@ export type CanvasSubmitData = {
   dateLabel: string | null
   photoUrl?: string | null
   occasion: string
-  occasionLabel: string | null
+  openingLine: string | null
   description: string | null
   charityIds: string[]
   closesAt: string
@@ -235,7 +235,7 @@ export type CanvasInitialData = {
   protagonistAbout?: string
   dateLabel?: string
   occasion?: string
-  occasionLabel?: string
+  openingLine?: string
   description?: string
   charityIds?: string[]
   closesAt?: string

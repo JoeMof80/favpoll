@@ -5,7 +5,12 @@ import { Chip } from "@/components/ui/chip"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { OCCASION_LIST } from "@/lib/occasions"
 import { cn } from "@/lib/utils"
-import { CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE, CHIP_IN_INPUT_TEXT, type PickerSize } from "./constants"
+import {
+  CHIP_IN_INPUT,
+  CHIP_IN_INPUT_SIZE,
+  CHIP_IN_INPUT_TEXT,
+  type PickerSize,
+} from "./constants"
 
 export function OccasionPickerField({
   value,
@@ -84,7 +89,10 @@ export function OccasionPickerField({
             onFocus={openDropdown}
             onBlur={handleBlur}
             placeholder={selectedLabel ? "" : "Select an occasion…"}
-            className={cn("min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50", CHIP_IN_INPUT_TEXT[size])}
+            className={cn(
+              "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
+              CHIP_IN_INPUT_TEXT[size]
+            )}
           />
         </div>
       </PopoverAnchor>
@@ -94,7 +102,10 @@ export function OccasionPickerField({
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="max-h-60 overflow-y-auto p-2" onMouseDown={(e) => e.preventDefault()}>
+        <div
+          className="max-h-60 overflow-y-auto p-2"
+          onMouseDown={(e) => e.preventDefault()}
+        >
           {visible.length === 0 ? (
             <p className="py-3 text-center text-sm text-muted-foreground">
               No results.

@@ -5,7 +5,13 @@ import { Chip } from "@/components/ui/chip"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import type { Charity } from "@favpoll/types"
-import { CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE, CHIP_IN_INPUT_TEXT, MAX_CHARITIES, type PickerSize } from "./constants"
+import {
+  CHIP_IN_INPUT,
+  CHIP_IN_INPUT_SIZE,
+  CHIP_IN_INPUT_TEXT,
+  MAX_CHARITIES,
+  type PickerSize,
+} from "./constants"
 
 export function CharityField({
   charities,
@@ -101,7 +107,10 @@ export function CharityField({
                 placeholder={
                   selected.length === 0 ? "Select a charity…" : "Add another…"
                 }
-                className={cn("min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50", CHIP_IN_INPUT_TEXT[size])}
+                className={cn(
+                  "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
+                  CHIP_IN_INPUT_TEXT[size]
+                )}
               />
             )}
           </div>
@@ -113,7 +122,10 @@ export function CharityField({
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="max-h-60 overflow-y-auto p-2" onMouseDown={(e) => e.preventDefault()}>
+          <div
+            className="max-h-60 overflow-y-auto p-2"
+            onMouseDown={(e) => e.preventDefault()}
+          >
             {visible.length === 0 ? (
               <p className="py-3 text-center text-sm text-muted-foreground">
                 No results.

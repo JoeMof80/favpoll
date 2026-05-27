@@ -2,7 +2,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { makeSupabaseMock } from "@/tests/mocks/supabase-admin"
 
-const mockAuth = vi.hoisted(() => vi.fn().mockResolvedValue({ userId: "user-1" }))
+const mockAuth = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ userId: "user-1" })
+)
 const mockEmail = vi.hoisted(() => ({
   sendPledgeConfirmation: vi.fn().mockResolvedValue(undefined),
 }))
@@ -11,7 +13,9 @@ vi.mock("@clerk/nextjs/server", () => ({ auth: mockAuth }))
 vi.mock("@/lib/email", () => mockEmail)
 
 let mock = makeSupabaseMock()
-vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => mock.supabase }))
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => mock.supabase,
+}))
 
 import { createPledge, createGuestPledge } from "@/app/events/[id]/actions"
 
@@ -42,12 +46,14 @@ describe("createPledge", () => {
   })
 
   it("inserts pledge row with correct fee (3% of totalAmount)", async () => {
-    mock.queue({ id: "pledge-1" })  // pledge insert → single()
-    mock.queue(null)                 // allocations insert → await
+    mock.queue({ id: "pledge-1" }) // pledge insert → single()
+    mock.queue(null) // allocations insert → await
 
     await createPledge(input)
 
-    const pledgeInsert = mock.callsFor("pledges").find((c) => c.method === "insert")!
+    const pledgeInsert = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "insert")!
     expect(pledgeInsert.args[0]).toMatchObject({
       event_poll_id: "poll-1",
       clerk_user_id: "user-1",
@@ -62,7 +68,9 @@ describe("createPledge", () => {
 
     await createPledge({ ...input, potAllocationId: "pot-alloc-1" })
 
-    const pledgeInsert = mock.callsFor("pledges").find((c) => c.method === "insert")!
+    const pledgeInsert = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "insert")!
     expect(pledgeInsert.args[0].pot_allocation_id).toBe("pot-alloc-1")
   })
 
@@ -72,11 +80,21 @@ describe("createPledge", () => {
 
     await createPledge(input)
 
-    const allocInsert = mock.callsFor("pledge_allocations").find((c) => c.method === "insert")!
+    const allocInsert = mock
+      .callsFor("pledge_allocations")
+      .find((c) => c.method === "insert")!
     expect(allocInsert.args[0]).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ pledge_id: "pledge-99", topic_item_id: "item-a", amount: 6 }),
-        expect.objectContaining({ pledge_id: "pledge-99", topic_item_id: "item-b", amount: 4 }),
+        expect.objectContaining({
+          pledge_id: "pledge-99",
+          topic_item_id: "item-a",
+          amount: 6,
+        }),
+        expect.objectContaining({
+          pledge_id: "pledge-99",
+          topic_item_id: "item-b",
+          amount: 4,
+        }),
       ])
     )
   })
@@ -93,7 +111,9 @@ describe("createPledge", () => {
       ],
     })
 
-    const allocInsert = mock.callsFor("pledge_allocations").find((c) => c.method === "insert")!
+    const allocInsert = mock
+      .callsFor("pledge_allocations")
+      .find((c) => c.method === "insert")!
     expect(allocInsert.args[0]).toHaveLength(1)
     expect(allocInsert.args[0][0].topic_item_id).toBe("item-a")
   })
@@ -105,7 +125,7 @@ describe("createPledge", () => {
   })
 
   it("throws when allocation insert returns an error", async () => {
-    mock.queue({ id: "pledge-1" })        // pledge insert ok
+    mock.queue({ id: "pledge-1" }) // pledge insert ok
     mock.queue(null, { message: "FK violation" }) // alloc insert fails
 
     await expect(createPledge(input)).rejects.toThrow("FK violation")
@@ -117,7 +137,9 @@ describe("createPledge", () => {
 
     await createPledge({ ...input, totalAmount: 25 })
 
-    const pledgeInsert = mock.callsFor("pledges").find((c) => c.method === "insert")!
+    const pledgeInsert = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "insert")!
     // Math.round(25 * 0.03 * 100) / 100 = Math.round(75) / 100 = 0.75
     expect(pledgeInsert.args[0].fee).toBe(0.75)
   })
@@ -136,8 +158,9 @@ describe("createGuestPledge", () => {
   }
 
   it("throws 'Email is required' when guestEmail is empty", async () => {
-    await expect(createGuestPledge({ ...input, guestEmail: "" }))
-      .rejects.toThrow("Email is required")
+    await expect(
+      createGuestPledge({ ...input, guestEmail: "" })
+    ).rejects.toThrow("Email is required")
   })
 
   it("throws when a duplicate active pledge exists for the same email + poll", async () => {
@@ -149,10 +172,11 @@ describe("createGuestPledge", () => {
   })
 
   it("inserts pledge with clerk_user_id: null, a UUID guest_token, and fee", async () => {
-    mock.queue(null)                   // no existing pledge (maybeSingle)
-    mock.queue({ id: "pledge-1" })     // pledge insert (single)
-    mock.queue(null)                   // allocations insert (await)
-    mock.queue({                       // email data fetch (single)
+    mock.queue(null) // no existing pledge (maybeSingle)
+    mock.queue({ id: "pledge-1" }) // pledge insert (single)
+    mock.queue(null) // allocations insert (await)
+    mock.queue({
+      // email data fetch (single)
       events: {
         closes_at: "2025-12-01T00:00:00Z",
         protagonists: { name: "Alice" },
@@ -162,7 +186,9 @@ describe("createGuestPledge", () => {
 
     await createGuestPledge(input)
 
-    const pledgeInsert = mock.callsFor("pledges").find((c) => c.method === "insert")!
+    const pledgeInsert = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "insert")!
     const row = pledgeInsert.args[0]
     expect(row.clerk_user_id).toBeNull()
     expect(row.guest_email).toBe("guest@example.com")
@@ -177,7 +203,13 @@ describe("createGuestPledge", () => {
     mock.queue(null)
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
-    mock.queue({ events: { closes_at: "2025-12-01T00:00:00Z", protagonists: { name: "A" }, event_charities: [] } })
+    mock.queue({
+      events: {
+        closes_at: "2025-12-01T00:00:00Z",
+        protagonists: { name: "A" },
+        event_charities: [],
+      },
+    })
 
     const token = await createGuestPledge(input)
 
@@ -215,8 +247,16 @@ describe("createGuestPledge", () => {
     mock.queue(null)
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
-    mock.queue({ events: { closes_at: "", protagonists: { name: "A" }, event_charities: [] } })
-    mockEmail.sendPledgeConfirmation.mockRejectedValueOnce(new Error("Resend down"))
+    mock.queue({
+      events: {
+        closes_at: "",
+        protagonists: { name: "A" },
+        event_charities: [],
+      },
+    })
+    mockEmail.sendPledgeConfirmation.mockRejectedValueOnce(
+      new Error("Resend down")
+    )
 
     const token = await createGuestPledge(input)
 
@@ -224,7 +264,7 @@ describe("createGuestPledge", () => {
   })
 
   it("throws when pledge insert fails", async () => {
-    mock.queue(null)                            // no existing pledge
+    mock.queue(null) // no existing pledge
     mock.queue(null, { message: "insert fail" }) // pledge insert error
 
     await expect(createGuestPledge(input)).rejects.toThrow("insert fail")

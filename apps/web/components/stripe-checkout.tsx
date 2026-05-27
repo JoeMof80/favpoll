@@ -1,16 +1,18 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { loadStripe } from '@stripe/stripe-js'
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { loadStripe } from "@stripe/stripe-js"
 import {
   Elements,
   PaymentElement,
   useStripe,
   useElements,
-} from '@stripe/react-stripe-js'
+} from "@stripe/react-stripe-js"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+)
 
 type CheckoutFormProps = {
   onSuccess: () => void
@@ -44,11 +46,11 @@ function CheckoutForm({
       confirmParams: {
         return_url: window.location.href,
       },
-      redirect: 'if_required',
+      redirect: "if_required",
     })
 
     if (stripeError) {
-      setError(stripeError.message ?? 'Payment failed')
+      setError(stripeError.message ?? "Payment failed")
       setSubmitting(false)
       return
     }
@@ -75,7 +77,7 @@ function CheckoutForm({
           disabled={submitting || !stripe}
           className="flex-1"
         >
-          {submitting ? 'Processing…' : 'Pay now'}
+          {submitting ? "Processing…" : "Pay now"}
         </Button>
       </div>
     </form>
@@ -83,17 +85,25 @@ function CheckoutForm({
 }
 
 const gbp = (n: number) =>
-  new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n)
+  new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
+    n
+  )
 
 type Props = {
   clientSecret: string
   chargeAmount: number
-  charityAmount?: number  // if provided, shows breakdown; omit for fund top-ups
+  charityAmount?: number // if provided, shows breakdown; omit for fund top-ups
   onSuccess: () => void
   onClose: () => void
 }
 
-export function StripeCheckout({ clientSecret, chargeAmount, charityAmount, onSuccess, onClose }: Props) {
+export function StripeCheckout({
+  clientSecret,
+  chargeAmount,
+  charityAmount,
+  onSuccess,
+  onClose,
+}: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -105,19 +115,25 @@ export function StripeCheckout({ clientSecret, chargeAmount, charityAmount, onSu
       aria-label="Complete payment"
     >
       <div className="w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-lg">
-        <h2 className="mb-1 text-lg font-medium text-foreground">Complete your pledge</h2>
+        <h2 className="mb-1 text-lg font-medium text-foreground">
+          Complete your pledge
+        </h2>
         <p className="mb-1 text-sm text-muted-foreground">
-          You will be charged <span className="font-medium text-foreground">{gbp(chargeAmount)}</span>
+          You will be charged{" "}
+          <span className="font-medium text-foreground">
+            {gbp(chargeAmount)}
+          </span>
         </p>
         {charityAmount !== undefined && (
           <p className="mb-5 text-xs text-muted-foreground">
-            {gbp(charityAmount)} to charity · {gbp(chargeAmount - charityAmount)} platform fee
+            {gbp(charityAmount)} to charity ·{" "}
+            {gbp(chargeAmount - charityAmount)} platform fee
           </p>
         )}
         {charityAmount === undefined && <div className="mb-5" />}
         <Elements
           stripe={stripePromise}
-          options={{ clientSecret, appearance: { theme: 'stripe' } }}
+          options={{ clientSecret, appearance: { theme: "stripe" } }}
         >
           <CheckoutForm
             onSuccess={onSuccess}

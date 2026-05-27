@@ -297,3 +297,12 @@ These are internal/technical terms that should stay in code and documentation:
 `topic`, `event_poll`, `topic_item`, `pledge_allocation`, `pot_allocation`,
 `event_pot`, `hard_close`, `inclusion`, `is_canonical`, `is_finite`,
 `all_time_pledged`, `clerk_user_id`, `guest_token`, `protagonist`
+
+---
+
+## Field naming in UI copy
+
+- Never use "suffix" or "occasion label" in UI copy
+- The `context` DB column → "Context" in labels
+- The `opening_line` DB column → "Opening line" in labels
+- Code variable names are unaffected by these UI conventions

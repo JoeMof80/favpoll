@@ -18,11 +18,17 @@ type Options = {
 
 export function useEventCardPledge({ pollId, initialResults }: Options) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [selectedItemLabel, setSelectedItemLabel] = useState<string | null>(null)
+  const [selectedItemLabel, setSelectedItemLabel] = useState<string | null>(
+    null
+  )
   const [amount, setAmount] = useState<number | null>(null) // pounds
-  const [step, setStep] = useState<CardStep>(initialResults ? "pledged" : "idle")
+  const [step, setStep] = useState<CardStep>(
+    initialResults ? "pledged" : "idle"
+  )
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [results, setResults] = useState<CardResultItem[] | null>(initialResults ?? null)
+  const [results, setResults] = useState<CardResultItem[] | null>(
+    initialResults ?? null
+  )
   const [error, setError] = useState<string | null>(null)
 
   function selectItem(id: string, label: string) {
@@ -48,9 +54,13 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error((body as { error?: string }).error ?? "Failed to initialise payment")
+        throw new Error(
+          (body as { error?: string }).error ?? "Failed to initialise payment"
+        )
       }
-      const { clientSecret: secret } = (await res.json()) as { clientSecret: string }
+      const { clientSecret: secret } = (await res.json()) as {
+        clientSecret: string
+      }
       setClientSecret(secret)
       setStep("paying")
     } catch (err) {

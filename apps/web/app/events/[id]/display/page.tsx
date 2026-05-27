@@ -14,7 +14,9 @@ export default async function DisplayPage({ params }: Props) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name))")
+    .select(
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charities(name))"
+    )
     .eq("id", id)
     .single()
 
@@ -29,7 +31,10 @@ export default async function DisplayPage({ params }: Props) {
   const pollId = rawPoll?.id ?? null
 
   const { data: allItems } = rawPoll?.topic_id
-    ? await supabase.from("topic_items").select("*").eq("topic_id", rawPoll.topic_id)
+    ? await supabase
+        .from("topic_items")
+        .select("*")
+        .eq("topic_id", rawPoll.topic_id)
     : { data: null }
 
   // Total raised
@@ -45,16 +50,20 @@ export default async function DisplayPage({ params }: Props) {
   )
 
   const charityName =
-    (event.event_charities as { charities: { name: string } }[])?.[0]
-      ?.charities?.name ?? null
+    (event.event_charities as { charities: { name: string } }[])?.[0]?.charities
+      ?.name ?? null
 
   const displayPoll = rawPoll
     ? {
         id: rawPoll.id,
         personal_reveal: rawPoll.personal_reveal ?? null,
         topic: {
-          id: (rawPoll.topics as { id: string; title: string } | null)?.id ?? rawPoll.topic_id,
-          title: (rawPoll.topics as { id: string; title: string } | null)?.title ?? "",
+          id:
+            (rawPoll.topics as { id: string; title: string } | null)?.id ??
+            rawPoll.topic_id,
+          title:
+            (rawPoll.topics as { id: string; title: string } | null)?.title ??
+            "",
         },
         items: (allItems ?? []) as TopicItem[],
       }
@@ -64,15 +73,14 @@ export default async function DisplayPage({ params }: Props) {
   const headersList = await headers()
   const host = headersList.get("host") ?? ""
   const proto = headersList.get("x-forwarded-proto") ?? "https"
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`
 
   return (
     <DisplayScreen
       eventId={id}
       protagonistName={event.protagonists.name}
-      dateLabel={event.protagonists.date_label ?? null}
-      occasionLabel={event.occasion_label ?? null}
+      dateLabel={event.protagonists.context ?? null}
+      openingLine={event.opening_line ?? null}
       description={event.description ?? null}
       occasion={event.occasion}
       charityName={charityName}

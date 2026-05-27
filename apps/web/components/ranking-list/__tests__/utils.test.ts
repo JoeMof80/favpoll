@@ -46,9 +46,9 @@ describe("rankItems", () => {
 
   it("sorts by all_time_count descending when view is 'count'", () => {
     const result = rankItems(items, "count")
-    expect(result[0].id).toBe("high")  // count 5
-    expect(result[1].id).toBe("mid")   // count 3
-    expect(result[2].id).toBe("low")   // count 1
+    expect(result[0].id).toBe("high") // count 5
+    expect(result[1].id).toBe("mid") // count 3
+    expect(result[2].id).toBe("low") // count 1
   })
 
   it("does not mutate the original array", () => {

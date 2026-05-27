@@ -65,7 +65,6 @@ export function PollSection({
       {/* Results view */}
       {view === "results" && (
         <>
-
           {showRankings && (
             <>
               <div className="flex items-center justify-end">

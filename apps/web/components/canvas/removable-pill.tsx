@@ -22,8 +22,17 @@ export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
       tabIndex={0}
       aria-label={`Remove ${label}`}
       className={removeClassName}
-      onClick={(e) => { e.stopPropagation(); onRemove() }}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onRemove() } }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onRemove()
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          e.stopPropagation()
+          onRemove()
+        }
+      }}
     >
       <X className="h-2.5 w-2.5" />
     </span>
@@ -32,7 +41,10 @@ export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
       type="button"
       aria-label={`Remove ${label}`}
       className={removeClassName}
-      onClick={(e) => { e.stopPropagation(); onRemove() }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onRemove()
+      }}
     >
       <X className="h-2.5 w-2.5" />
     </button>
@@ -49,7 +61,7 @@ export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
             : "border-input bg-background text-foreground hover:bg-muted/50"
         }`}
       >
-        <span className="pl-3 pr-1">{label}</span>
+        <span className="pr-1 pl-3">{label}</span>
         {removeControl}
       </button>
     )
@@ -57,7 +69,7 @@ export function RemovablePill({ label, onRemove, onClick, selected }: Props) {
 
   return (
     <span className="inline-flex items-center rounded-full border border-input bg-background py-1.5 pr-1 text-xs text-foreground">
-      <span className="pl-3 pr-1">{label}</span>
+      <span className="pr-1 pl-3">{label}</span>
       {removeControl}
     </span>
   )

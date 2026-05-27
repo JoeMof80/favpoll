@@ -27,6 +27,7 @@ import {
   DATE_LABEL_PLACEHOLDERS,
   TOPIC_REVEAL_PLACEHOLDERS,
 } from "@/lib/occasions"
+import { PREFIXES } from "@/lib/display"
 import { cn } from "@/lib/utils"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
@@ -36,12 +37,7 @@ import { OccasionPickerField } from "./occasion-picker-field"
 import { CharityField } from "./charity-field"
 import { TopicPickerField } from "./topic-picker-field"
 import { ItemAddField } from "./item-add-field"
-import {
-  SECTION_LABEL,
-  INPUT_SIZE,
-  TEXTAREA_SIZE,
-  type PickerSize,
-} from "./constants"
+import { INPUT_SIZE, TEXTAREA_SIZE, type PickerSize } from "./constants"
 
 const STEP_NUMBER: Record<PickerSize, string> = {
   sm: "h-5 w-5 text-[10px]",
@@ -127,6 +123,26 @@ function StepSection({
   )
 }
 
+function CounterSpan({
+  remaining,
+  warning,
+  critical,
+}: {
+  remaining: number
+  warning: number
+  critical: number
+}) {
+  if (remaining > warning) return null
+  return (
+    <span
+      className={remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"}
+    >
+      {" "}
+      {remaining} characters remaining.
+    </span>
+  )
+}
+
 export function FormPanel({
   charities,
   topics,
@@ -147,6 +163,28 @@ export function FormPanel({
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
+
+  const openingLineValue = form.watch("openingLine") ?? ""
+  const nameValue = form.watch("name") ?? ""
+  const contextValue = form.watch("context") ?? ""
+  const aboutValue = form.watch("about") ?? ""
+  const revealValue = form.watch("reveal") ?? ""
+  const charitiesValue = form.watch("charities") ?? []
+
+  const nameRemaining = 40 - nameValue.length
+  const openingLineRemaining = 60 - openingLineValue.length
+  const contextRemaining = 40 - contextValue.length
+  const aboutRemaining = 300 - aboutValue.length
+  const revealRemaining = 280 - revealValue.length
+
+  const charitiesCount = charitiesValue.length
+  const charitiesDescription =
+    charitiesCount === 0
+      ? "Select up to three charities."
+      : charitiesCount === 1
+        ? "1 of 3 selected."
+        : `${charitiesCount} of 3 selected — proceeds split equally.`
+
   const basePlaceholders = occasion
     ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
     : null
@@ -183,11 +221,46 @@ export function FormPanel({
             <FormItem>
               <OccasionPickerField
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(value) => {
+                  field.onChange(value)
+                  form.setValue(
+                    "openingLine",
+                    PREFIXES[value as keyof typeof PREFIXES] ?? ""
+                  )
+                }}
                 onClear={() => form.reset()}
                 size={size}
               />
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="openingLine"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  className={cn(
+                    INPUT_SIZE[size],
+                    "bg-background placeholder:text-muted-foreground/50"
+                  )}
+                  placeholder={occasion ? "" : "Select an occasion first"}
+                  maxLength={60}
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+              <FieldDescription size={size} className="mb-2">
+                <CounterSpan
+                  remaining={openingLineRemaining}
+                  warning={12}
+                  critical={6}
+                />
+              </FieldDescription>
             </FormItem>
           )}
         />
@@ -207,13 +280,18 @@ export function FormPanel({
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
                   placeholder={basePlaceholders?.name ?? "Enter Name"}
+                  maxLength={40}
                   {...field}
                 />
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Use the name or nickname of the individual, couple, family or
-                group the event is for.
+                The name or nickname to be used throughout the event
+                <CounterSpan
+                  remaining={nameRemaining}
+                  warning={8}
+                  critical={4}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -221,14 +299,15 @@ export function FormPanel({
 
         <FormField
           control={form.control}
-          name="suffix"
+          name="context"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <InputGroup className={cn(INPUT_SIZE[size], "bg-background")}>
                   <InputGroupInput
-                    placeholder={datePlaceholder || "Enter Context"}
+                    placeholder={datePlaceholder || "Enter context"}
                     className="placeholder:text-muted-foreground/50"
+                    maxLength={40}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -249,7 +328,12 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Add important context to the occasion such as dates (optional).
+                Dates, years, or a short line of context. Optional.
+                <CounterSpan
+                  remaining={contextRemaining}
+                  warning={8}
+                  critical={4}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -309,11 +393,6 @@ export function FormPanel({
               />
             </div>
           </FormControl>
-          <FieldDescription size={size} className="mb-2">
-            Upload a special photo and click{" "}
-            <Eye className="inline-block h-4 w-4" /> to show/hide it in your
-            event.
-          </FieldDescription>
         </FormItem>
 
         <FormField
@@ -327,6 +406,7 @@ export function FormPanel({
                     aboutPlaceholder ?? "Enter infomation about the event"
                   }
                   rows={4}
+                  maxLength={300}
                   {...field}
                   value={field.value}
                   className={cn(
@@ -337,7 +417,11 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Tell the story
+                <CounterSpan
+                  remaining={aboutRemaining}
+                  warning={60}
+                  critical={15}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -358,7 +442,7 @@ export function FormPanel({
         />
       )}
 
-      {/* Step 3 — favpoll */}
+      {/* Step 3 — topic */}
       <StepSection number={3} title="Topic" size={size}>
         <div className="space-y-3">
           <FormField
@@ -375,7 +459,8 @@ export function FormPanel({
                 />
                 <FormMessage />
                 <FieldDescription size={size} className="mb-2">
-                  Select a topic that meant something to the honoree
+                  Filter and select the topic for guests to vote on or create a
+                  topic of your own.
                 </FieldDescription>
               </FormItem>
             )}
@@ -422,8 +507,8 @@ export function FormPanel({
                     size={size}
                   />
                   <FieldDescription size={size} className="mb-2">
-                    View items for the selected topic, and add custom ones if
-                    needed.
+                    View items for the selected topic. Add missing items that
+                    guests might want.
                   </FieldDescription>
                 </FormItem>
               )
@@ -447,6 +532,7 @@ export function FormPanel({
                   )}
                   placeholder={revealPlaceholder}
                   rows={5}
+                  maxLength={280}
                   {...field}
                   value={field.value ?? ""}
                   onFocus={onRevealFocus}
@@ -458,7 +544,12 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Shown to guests after they pledge.
+                Shown to guests after they&apos;ve chosen and pledged.
+                <CounterSpan
+                  remaining={revealRemaining}
+                  warning={56}
+                  critical={14}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -479,7 +570,8 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Pick a close date
+                The date for pledges to end and proceeds to go to the chosen
+                cause(s).
               </FieldDescription>
             </FormItem>
           )}
@@ -498,7 +590,7 @@ export function FormPanel({
               />
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Select a charity
+                {charitiesDescription}
               </FieldDescription>
             </FormItem>
           )}
@@ -510,14 +602,11 @@ export function FormPanel({
           render={({ field }) => (
             <FormItem>
               <div className="items-top flex justify-between gap-3 rounded-md border bg-background p-3">
-                <div>
-                  <FormLabel className={SECTION_LABEL}>Private event</FormLabel>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {field.value
-                      ? "Only guests you invite can view this event."
-                      : "Anyone can find and pledge to this event. It will appear on the live events page."}
-                  </p>
-                </div>
+                <FormLabel className="text-xs text-muted-foreground">
+                  {field.value
+                    ? "Only guests you invite can view this event."
+                    : "Anyone can find and pledge to this event. It will appear on the live events page."}
+                </FormLabel>
                 <FormControl>
                   <Switch
                     checked={field.value}

@@ -1,23 +1,23 @@
-import { formatCurrency } from './i18n'
+import { formatCurrency } from "./i18n"
 
 export function occasionLabel(occasion: string): string {
   const labels: Record<string, string> = {
-    memorial:           "In memory of",
-    funeral:            "In memory of",
-    birthday:           "Birthday",
-    retirement:         "Retirement",
-    wedding:            "Wedding",
-    engagement:         "Engagement",
-    anniversary:        "Anniversary",
-    leaving_do:         "Leaving do",
-    graduation:         "Graduation",
-    christening:        "Christening",
-    bar_bat_mitzvah:    "Bar / Bat Mitzvah",
-    get_well_soon:      "Get well soon",
+    memorial: "In memory of",
+    funeral: "In memory of",
+    birthday: "Birthday",
+    retirement: "Retirement",
+    wedding: "Wedding",
+    engagement: "Engagement",
+    anniversary: "Anniversary",
+    leaving_do: "Leaving do",
+    graduation: "Graduation",
+    christening: "Christening",
+    bar_bat_mitzvah: "Bar / Bat Mitzvah",
+    get_well_soon: "Get well soon",
     sports_achievement: "Achievement",
-    work_milestone:     "Work milestone",
-    just_because:       "Just because",
-    other:              "Event",
+    work_milestone: "Work milestone",
+    just_because: "Just because",
+    other: "Event",
   }
   return labels[occasion] ?? "Event"
 }
@@ -36,18 +36,21 @@ export function formatAmount(amount: number): string {
   return formatCurrency(Math.round(amount) * 100)
 }
 
-export function ordinal(n: number, locale: string = 'en-GB'): string {
-  const rules = new Intl.PluralRules(locale, { type: 'ordinal' })
+export function ordinal(n: number, locale: string = "en-GB"): string {
+  const rules = new Intl.PluralRules(locale, { type: "ordinal" })
   const suffixes: Record<string, string> = {
-    one: 'st',
-    two: 'nd',
-    few: 'rd',
-    other: 'th',
+    one: "st",
+    two: "nd",
+    few: "rd",
+    other: "th",
   }
-  return `${n}${suffixes[rules.select(n)] ?? 'th'}`
+  return `${n}${suffixes[rules.select(n)] ?? "th"}`
 }
 
-export function formatRelativeDate(dateStr: string, locale: string = 'en-GB'): string {
+export function formatRelativeDate(
+  dateStr: string,
+  locale: string = "en-GB"
+): string {
   const date = new Date(dateStr)
   const now = new Date()
   const days = Math.ceil((date.getTime() - now.getTime()) / 86400000)
@@ -59,7 +62,10 @@ export function formatRelativeDate(dateStr: string, locale: string = 'en-GB'): s
   return `${ordinal(date.getDate(), locale)} ${date.toLocaleString(locale, { month: "long" })}`
 }
 
-export function formatEventDate(date: string | Date, locale: string = 'en-GB'): string {
+export function formatEventDate(
+  date: string | Date,
+  locale: string = "en-GB"
+): string {
   const d = typeof date === "string" ? new Date(date + "T12:00:00") : date
   return `${ordinal(d.getDate(), locale)} ${d.toLocaleString(locale, {
     month: "long",
@@ -71,6 +77,25 @@ export function getPollHint(protagonistName: string): string {
   return `Is it the same as ${protagonistName}'s?`
 }
 
+export const PREFIXES: Record<string, string> = {
+  memorial: "In memory of",
+  tribute: "A tribute to",
+  birthday: "Happy birthday",
+  retirement: "Celebrating the retirement of",
+  wedding: "Congratulations to",
+  engagement: "Congratulations to",
+  anniversary: "Happy anniversary",
+  leaving: "Farewell",
+  graduation: "Congratulations",
+  christening: "Welcome",
+  achievement: "Well done",
+  recovery: "Cheering on",
+  award: "Congratulations to",
+  promotion: "Congratulations to",
+  celebration: "Celebrating",
+  other: "Honouring",
+}
+
 export function getEventHeadline(params: {
   occasion: string
   name: string
@@ -78,25 +103,6 @@ export function getEventHeadline(params: {
   occasionLabel?: string | null
 }): { prefix: string; name: string; suffix: string } {
   const { occasion, name: personName, dateLabel, occasionLabel } = params
-
-  const PREFIXES: Record<string, string> = {
-    memorial: "In memory of",
-    tribute: "A tribute to",
-    birthday: "Happy birthday",
-    retirement: "Celebrating the retirement of",
-    wedding: "Congratulations to",
-    engagement: "Congratulations to",
-    anniversary: "Happy anniversary",
-    leaving: "Farewell",
-    graduation: "Congratulations",
-    christening: "Welcome",
-    achievement: "Well done",
-    recovery: "Cheering on",
-    award: "Congratulations to",
-    promotion: "Congratulations to",
-    celebration: "Celebrating",
-    other: "Honouring",
-  }
 
   const prefix = occasionLabel || PREFIXES[occasion] || "Honouring"
 

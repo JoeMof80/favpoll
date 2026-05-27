@@ -20,8 +20,8 @@ const meta = {
       </div>
     ),
   ],
-// PollHeading uses a discriminated union prop — Meta<typeof PollHeading> produces
-// 'never' for args in StoryObj. Use Meta without the generic to avoid that.
+  // PollHeading uses a discriminated union prop — Meta<typeof PollHeading> produces
+  // 'never' for args in StoryObj. Use Meta without the generic to avoid that.
 } satisfies Meta
 
 export default meta

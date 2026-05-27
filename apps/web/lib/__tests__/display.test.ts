@@ -71,7 +71,11 @@ describe("formatEventDate", () => {
 describe("getEventHeadline", () => {
   it("returns the correct prefix for birthday", () => {
     const result = getEventHeadline({ occasion: "birthday", name: "Alice" })
-    expect(result).toEqual({ prefix: "Happy birthday", name: "Alice", suffix: "" })
+    expect(result).toEqual({
+      prefix: "Happy birthday",
+      name: "Alice",
+      suffix: "",
+    })
   })
 
   it("returns the correct prefix for memorial", () => {
@@ -80,7 +84,10 @@ describe("getEventHeadline", () => {
   })
 
   it("returns the correct prefix for wedding", () => {
-    const result = getEventHeadline({ occasion: "wedding", name: "Emma & James" })
+    const result = getEventHeadline({
+      occasion: "wedding",
+      name: "Emma & James",
+    })
     expect(result.prefix).toBe("Congratulations to")
   })
 
@@ -104,7 +111,11 @@ describe("getEventHeadline", () => {
   })
 
   it("returns empty string suffix when dateLabel is null", () => {
-    const result = getEventHeadline({ occasion: "birthday", name: "Eve", dateLabel: null })
+    const result = getEventHeadline({
+      occasion: "birthday",
+      name: "Eve",
+      dateLabel: null,
+    })
     expect(result.suffix).toBe("")
   })
 
@@ -118,7 +129,10 @@ describe("getEventHeadline", () => {
   })
 
   it("passes name through unchanged", () => {
-    const result = getEventHeadline({ occasion: "other", name: "Grace & Henry" })
+    const result = getEventHeadline({
+      occasion: "other",
+      name: "Grace & Henry",
+    })
     expect(result.name).toBe("Grace & Henry")
   })
 })

@@ -6,12 +6,54 @@ import type { Charity } from "@favpoll/types"
 import { CharityField } from "./charity-field"
 
 const MOCK_CHARITIES: Charity[] = [
-  { id: "1", name: "Macmillan Cancer Support", description: null, logo_url: null, registered_number: null, created_at: "" },
-  { id: "2", name: "British Heart Foundation", description: null, logo_url: null, registered_number: null, created_at: "" },
-  { id: "3", name: "Age UK", description: null, logo_url: null, registered_number: null, created_at: "" },
-  { id: "4", name: "Oxfam", description: null, logo_url: null, registered_number: null, created_at: "" },
-  { id: "5", name: "Cancer Research UK", description: null, logo_url: null, registered_number: null, created_at: "" },
-  { id: "6", name: "RSPCA", description: null, logo_url: null, registered_number: null, created_at: "" },
+  {
+    id: "1",
+    name: "Macmillan Cancer Support",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
+  {
+    id: "2",
+    name: "British Heart Foundation",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
+  {
+    id: "3",
+    name: "Age UK",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
+  {
+    id: "4",
+    name: "Oxfam",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
+  {
+    id: "5",
+    name: "Cancer Research UK",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
+  {
+    id: "6",
+    name: "RSPCA",
+    description: null,
+    logo_url: null,
+    registered_number: null,
+    created_at: "",
+  },
 ]
 
 const meta = {

@@ -41,10 +41,14 @@ export async function GET(
   // Aggregate by topic item
   const totals = new Map<string, { label: string; total: number }>()
   for (const row of allocations ?? []) {
-    const label = (row.topic_items as unknown as { label: string } | null)?.label
+    const label = (row.topic_items as unknown as { label: string } | null)
+      ?.label
     if (!label) continue
     const prev = totals.get(row.topic_item_id) ?? { label, total: 0 }
-    totals.set(row.topic_item_id, { label, total: prev.total + (row.amount ?? 0) })
+    totals.set(row.topic_item_id, {
+      label,
+      total: prev.total + (row.amount ?? 0),
+    })
   }
 
   const sorted = [...totals.values()]

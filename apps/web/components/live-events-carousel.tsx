@@ -45,11 +45,7 @@ export function LiveEventsCarousel({ events }: Props) {
       <div className="overflow-hidden" ref={emblaRef}>
         <ul className="flex gap-4" role="list">
           {events.map((event) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              className="w-80 shrink-0"
-            />
+            <EventCard key={event.id} event={event} className="w-80 shrink-0" />
           ))}
         </ul>
       </div>

@@ -1,5 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "./card"
 import { Button } from "./button"
 
 const meta = {
@@ -16,7 +23,9 @@ export const Default: Story = {
     <Card className="w-80">
       <CardHeader>
         <CardTitle>Favourite Colour</CardTitle>
-        <CardDescription>Belinda had a colour she returned to all her life</CardDescription>
+        <CardDescription>
+          Belinda had a colour she returned to all her life
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
@@ -47,8 +56,9 @@ export const ContentOnly: Story = {
   render: () => (
     <Card className="w-80">
       <CardContent>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Expressions of joy, for charitable causes, in the name of those we love.
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Expressions of joy, for charitable causes, in the name of those we
+          love.
         </p>
       </CardContent>
     </Card>

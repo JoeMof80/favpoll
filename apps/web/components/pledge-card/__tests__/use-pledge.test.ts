@@ -1,7 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { renderHook, act } from "@testing-library/react"
-import type { EventPollWithItems, EventPot, PotAllocation, TopicItem } from "@favpoll/types"
-import { FUND_GREEN, FUND_AMBER, FUND_RED } from "@/components/pledge-card/utils"
+import type {
+  EventPollWithItems,
+  EventPot,
+  PotAllocation,
+  TopicItem,
+} from "@favpoll/types"
+import {
+  FUND_GREEN,
+  FUND_AMBER,
+  FUND_RED,
+} from "@/components/pledge-card/utils"
 
 // --- mocks ---
 
@@ -145,7 +154,9 @@ describe("usePledge — charityLabel", () => {
 
 describe("usePledge — available & hasFund", () => {
   it("available is 0 when pot is null", () => {
-    const { result } = renderHook(() => usePledge({ ...baseOptions, pot: null }))
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, pot: null })
+    )
     expect(result.current.available).toBe(0)
   })
 
@@ -164,7 +175,9 @@ describe("usePledge — available & hasFund", () => {
   })
 
   it("hasFund is false when pot is null", () => {
-    const { result } = renderHook(() => usePledge({ ...baseOptions, pot: null }))
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, pot: null })
+    )
     expect(result.current.hasFund).toBe(false)
   })
 
@@ -195,20 +208,26 @@ describe("usePledge — pledge amount validation", () => {
 
   it("isPledgeValid is false for zero", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("0") })
+    act(() => {
+      result.current.updatePledgeAmount("0")
+    })
     expect(result.current.isPledgeValid).toBe(false)
   })
 
   it("isPledgeValid is true for a positive number", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.isPledgeValid).toBe(true)
     expect(result.current.numericPledge).toBe(10)
   })
 
   it("isPledgeValid is false for non-numeric input", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("abc") })
+    act(() => {
+      result.current.updatePledgeAmount("abc")
+    })
     expect(result.current.isPledgeValid).toBe(false)
   })
 
@@ -217,7 +236,9 @@ describe("usePledge — pledge amount validation", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, onPledgeAmountChange })
     )
-    act(() => { result.current.updatePledgeAmount("15") })
+    act(() => {
+      result.current.updatePledgeAmount("15")
+    })
     expect(onPledgeAmountChange).toHaveBeenCalledWith("15")
   })
 })
@@ -234,7 +255,9 @@ describe("usePledge — ownCharge & ownFee", () => {
 
   it("ownCharge = pledge * 1.03 when no topUp", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     // 10 * 1.03 = 10.30
     expect(result.current.ownCharge).toBe(10.3)
   })
@@ -252,7 +275,9 @@ describe("usePledge — ownCharge & ownFee", () => {
   it("ownFee (3% of pledge, rounded) appears in ownBreakdown.lines[2]", () => {
     // ownFee is internal; observable via ownBreakdown lines
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     // fee line is index 2: "Platform fee (3%)"
     expect(result.current.ownBreakdown!.lines[2].amount).toBe(0.3)
   })
@@ -261,7 +286,9 @@ describe("usePledge — ownCharge & ownFee", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.updatePledgeAmount("50") })
+    act(() => {
+      result.current.updatePledgeAmount("50")
+    })
     expect(result.current.fundOverAvailable).toBe(false)
   })
 
@@ -269,7 +296,9 @@ describe("usePledge — ownCharge & ownFee", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 60) })
     )
-    act(() => { result.current.updatePledgeAmount("50") })
+    act(() => {
+      result.current.updatePledgeAmount("50")
+    })
     // available = 40, pledge = 50 → over
     expect(result.current.fundOverAvailable).toBe(true)
   })
@@ -284,7 +313,9 @@ describe("usePledge — fundBarColor", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.updatePledgeAmount("80") })
+    act(() => {
+      result.current.updatePledgeAmount("80")
+    })
     expect(result.current.fundBarColor).toBe(FUND_GREEN)
   })
 
@@ -292,7 +323,9 @@ describe("usePledge — fundBarColor", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.updatePledgeAmount("90") })
+    act(() => {
+      result.current.updatePledgeAmount("90")
+    })
     expect(result.current.fundBarColor).toBe(FUND_AMBER)
   })
 
@@ -300,7 +333,9 @@ describe("usePledge — fundBarColor", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.updatePledgeAmount("110") })
+    act(() => {
+      result.current.updatePledgeAmount("110")
+    })
     expect(result.current.fundBarColor).toBe(FUND_RED)
   })
 })
@@ -328,7 +363,9 @@ describe("usePledge — isGuestEmailValid", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, clerkUserId: null })
     )
-    act(() => { result.current.setGuestEmail("guest@example.com") })
+    act(() => {
+      result.current.setGuestEmail("guest@example.com")
+    })
     expect(result.current.isGuestEmailValid).toBe(true)
   })
 
@@ -336,7 +373,9 @@ describe("usePledge — isGuestEmailValid", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, clerkUserId: null })
     )
-    act(() => { result.current.setGuestEmail("not-an-email") })
+    act(() => {
+      result.current.setGuestEmail("not-an-email")
+    })
     expect(result.current.isGuestEmailValid).toBe(false)
   })
 })
@@ -357,7 +396,9 @@ describe("usePledge — canOwnConfirm", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: {} })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.canOwnConfirm).toBe(false)
   })
 
@@ -365,7 +406,9 @@ describe("usePledge — canOwnConfirm", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.canOwnConfirm).toBe(true)
   })
 
@@ -377,7 +420,9 @@ describe("usePledge — canOwnConfirm", () => {
         pollSelections: { "poll-1": ["red"] },
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.canOwnConfirm).toBe(false)
   })
 
@@ -406,7 +451,9 @@ describe("usePledge — canFundConfirm", () => {
         pollSelections: { "poll-1": ["red"] },
       })
     )
-    act(() => { result.current.updatePledgeAmount("50") })
+    act(() => {
+      result.current.updatePledgeAmount("50")
+    })
     expect(result.current.canFundConfirm).toBe(false)
   })
 
@@ -418,7 +465,9 @@ describe("usePledge — canFundConfirm", () => {
         pollSelections: { "poll-1": ["red"] },
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.canFundConfirm).toBe(true)
   })
 })
@@ -446,7 +495,9 @@ describe("usePledge — ownBreakdown", () => {
 
   it("includes charity, fee, and total lines when valid", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
     expect(result.current.ownBreakdown).not.toBeNull()
     const lines = result.current.ownBreakdown!.lines
@@ -457,7 +508,9 @@ describe("usePledge — ownBreakdown", () => {
 
   it("marks the top-up line as hidden when no topUp is entered", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     const topUpLine = result.current.ownBreakdown!.lines[1]
     expect(topUpLine.hidden).toBe(true)
   })
@@ -477,7 +530,9 @@ describe("usePledge — ownBreakdown", () => {
 describe("usePledge — fundBreakdown", () => {
   it("is null when useSharedFund is false", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
     expect(result.current.fundBreakdown).toBeNull()
   })
 
@@ -502,7 +557,10 @@ describe("usePledge — fundBreakdown", () => {
     })
 
     expect(result.current.fundBreakdown).not.toBeNull()
-    expect(result.current.fundBreakdown!.total).toMatchObject({ label: "Charged to you", amount: 0 })
+    expect(result.current.fundBreakdown!.total).toMatchObject({
+      label: "Charged to you",
+      amount: 0,
+    })
   })
 })
 
@@ -515,9 +573,13 @@ describe("usePledge — toggleFund", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.toggleFund() })
+    act(() => {
+      result.current.toggleFund()
+    })
     expect(result.current.useSharedFund).toBe(true)
-    act(() => { result.current.toggleFund() })
+    act(() => {
+      result.current.toggleFund()
+    })
     expect(result.current.useSharedFund).toBe(false)
   })
 
@@ -525,8 +587,12 @@ describe("usePledge — toggleFund", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 0) })
     )
-    act(() => { result.current.setSubmitting(true) })
-    act(() => { result.current.toggleFund() })
+    act(() => {
+      result.current.setSubmitting(true)
+    })
+    act(() => {
+      result.current.toggleFund()
+    })
     expect(result.current.error).toBeNull()
   })
 })
@@ -540,22 +606,30 @@ describe("usePledge — handleOwnConfirm", () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch")
     const { result } = renderHook(() => usePledge(baseOptions))
 
-    await act(async () => { await result.current.handleOwnConfirm() })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
 
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
   it("calls /api/stripe/payment-intent with the correct charge amount", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), { status: 200 })
+      new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), {
+        status: 200,
+      })
     )
 
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleOwnConfirm() })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
 
     expect(fetchSpy).toHaveBeenCalledWith(
       "/api/stripe/payment-intent",
@@ -568,15 +642,21 @@ describe("usePledge — handleOwnConfirm", () => {
 
   it("sets pledgeClientSecret on successful payment-intent creation", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), { status: 200 })
+      new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), {
+        status: 200,
+      })
     )
 
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleOwnConfirm() })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
 
     expect(result.current.pledgeClientSecret).toBe("pi_secret_test")
   })
@@ -589,9 +669,13 @@ describe("usePledge — handleOwnConfirm", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleOwnConfirm() })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
 
     expect(result.current.error).toBe("Card declined")
     expect(result.current.submitting).toBe(false)
@@ -607,9 +691,13 @@ describe("usePledge — handleFundConfirm", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pot: makePot(100, 60) })
     )
-    act(() => { result.current.updatePledgeAmount("50") }) // exceeds available=40
+    act(() => {
+      result.current.updatePledgeAmount("50")
+    }) // exceeds available=40
 
-    await act(async () => { await result.current.handleFundConfirm() })
+    await act(async () => {
+      await result.current.handleFundConfirm()
+    })
 
     expect(mockActions.pledgeFromFund).not.toHaveBeenCalled()
   })
@@ -624,12 +712,20 @@ describe("usePledge — handleFundConfirm", () => {
         onPledgeSuccess,
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleFundConfirm() })
+    await act(async () => {
+      await result.current.handleFundConfirm()
+    })
 
     expect(mockActions.pledgeFromFund).toHaveBeenCalledWith(
-      expect.objectContaining({ eventPollId: "poll-1", potId: "pot-1", totalAmount: 10 })
+      expect.objectContaining({
+        eventPollId: "poll-1",
+        potId: "pot-1",
+        totalAmount: 10,
+      })
     )
   })
 
@@ -645,9 +741,13 @@ describe("usePledge — handleFundConfirm", () => {
         onPledgeSuccess,
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleFundConfirm() })
+    await act(async () => {
+      await result.current.handleFundConfirm()
+    })
 
     expect(onPledgeSuccess).toHaveBeenCalled()
     expect(mockRouter.refresh).toHaveBeenCalled()
@@ -663,9 +763,13 @@ describe("usePledge — handleFundConfirm", () => {
         pollSelections: { "poll-1": ["red"] },
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handleFundConfirm() })
+    await act(async () => {
+      await result.current.handleFundConfirm()
+    })
 
     expect(result.current.error).toBe("Fund error")
     expect(result.current.submitting).toBe(false)
@@ -688,9 +792,13 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
         onPledgeSuccess,
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handlePledgePaymentSuccess() })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
 
     expect(mockActions.createPledge).toHaveBeenCalledWith(
       expect.objectContaining({ eventPollId: "poll-1", totalAmount: 10 })
@@ -712,7 +820,9 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
       result.current.setGuestEmail("guest@example.com")
     })
 
-    await act(async () => { await result.current.handlePledgePaymentSuccess() })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
 
     expect(mockActions.createGuestPledge).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -740,9 +850,13 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     })
 
     // Trigger handleOwnConfirm to set pendingTopUp=true
-    await act(async () => { await result.current.handleOwnConfirm() })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
     // Then simulate payment success
-    await act(async () => { await result.current.handlePledgePaymentSuccess() })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
 
     expect(mockActions.topUpFund).toHaveBeenCalledWith("event-1", 5)
   })
@@ -759,7 +873,9 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
       result.current.setPledgeClientSecret("existing_secret")
     })
 
-    await act(async () => { await result.current.handlePledgePaymentSuccess() })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
 
     expect(result.current.pledgeClientSecret).toBeNull()
   })
@@ -773,9 +889,13 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
         pollSelections: { "poll-1": ["red"] },
       })
     )
-    act(() => { result.current.updatePledgeAmount("10") })
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
 
-    await act(async () => { await result.current.handlePledgePaymentSuccess() })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
 
     expect(result.current.error).toBe("DB error")
   })

@@ -7,13 +7,25 @@ import type { TopicItem } from "@favpoll/types"
 
 const supabaseMocks = vi.hoisted(() => {
   // We store the captured postgres_changes callback so tests can fire realtime events
-  const state = { postgresCallback: null as ((payload: { new: Record<string, unknown> }) => void) | null }
+  const state = {
+    postgresCallback: null as
+      | ((payload: { new: Record<string, unknown> }) => void)
+      | null,
+  }
 
   const subscribe = vi.fn().mockReturnThis()
-  const on = vi.fn().mockImplementation((_event: string, _filter: unknown, cb: (payload: { new: Record<string, unknown> }) => void) => {
-    state.postgresCallback = cb
-    return { on, subscribe }
-  })
+  const on = vi
+    .fn()
+    .mockImplementation(
+      (
+        _event: string,
+        _filter: unknown,
+        cb: (payload: { new: Record<string, unknown> }) => void
+      ) => {
+        state.postgresCallback = cb
+        return { on, subscribe }
+      }
+    )
   const channel = vi.fn().mockReturnValue({ on, subscribe })
   const removeChannel = vi.fn()
 
@@ -125,7 +137,9 @@ describe("useRankingItems — rankingView change", () => {
       { initialProps: { view: "amount" as "amount" | "count" } }
     )
 
-    act(() => { rerender({ view: "count" as const }) })
+    act(() => {
+      rerender({ view: "count" as const })
+    })
 
     // blue (count 5) should still be #1, green (count 1) should be #3
     const ids = result.current.items.map((i) => i.id)
@@ -140,7 +154,9 @@ describe("useRankingItems — rankingView change", () => {
       { initialProps: { view: "amount" as "amount" | "count" } }
     )
 
-    act(() => { rerender({ view: "count" as const }) })
+    act(() => {
+      rerender({ view: "count" as const })
+    })
 
     expect(result.current.announcement).toBe("Sorted by number of pledges")
   })
@@ -151,7 +167,9 @@ describe("useRankingItems — rankingView change", () => {
         useRankingItems(initialItems, "topic-1", view),
       { initialProps: { view: "count" as "amount" | "count" } }
     )
-    act(() => { rerender({ view: "amount" as const }) })
+    act(() => {
+      rerender({ view: "amount" as const })
+    })
     expect(result.current.announcement).toBe("Sorted by amount pledged")
   })
 })

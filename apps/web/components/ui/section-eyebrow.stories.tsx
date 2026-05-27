@@ -41,8 +41,12 @@ export const BothVariants = {
         <SectionEyebrow variant="muted">Poll closed</SectionEyebrow>
       </div>
       <div>
-        <p className="mb-2 text-xs text-muted-foreground">muted + font-semibold</p>
-        <SectionEyebrow variant="muted" className="font-semibold">Charity</SectionEyebrow>
+        <p className="mb-2 text-xs text-muted-foreground">
+          muted + font-semibold
+        </p>
+        <SectionEyebrow variant="muted" className="font-semibold">
+          Charity
+        </SectionEyebrow>
       </div>
     </div>
   ),

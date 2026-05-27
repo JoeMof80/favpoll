@@ -93,7 +93,6 @@ export default async function ManageEventPage({ params }: Props) {
         </Link>
       </div>
 
-
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-border bg-card px-4 py-4">
           <p className="text-xs text-muted-foreground">Total raised</p>

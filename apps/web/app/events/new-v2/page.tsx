@@ -2,7 +2,13 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventFormV2 } from "@/components/event-form-v2"
-import type { Category, Charity, Topic, TopicItem, TopicWithMeta } from "@favpoll/types"
+import type {
+  Category,
+  Charity,
+  Topic,
+  TopicItem,
+  TopicWithMeta,
+} from "@favpoll/types"
 
 export default async function NewEventV2Page() {
   const { userId } = await auth()
@@ -12,7 +18,11 @@ export default async function NewEventV2Page() {
 
   const [{ data: charities }, { data: topics }, { data: categories }] =
     await Promise.all([
-      supabase.from("charities").select("*").eq("is_active", true).order("name"),
+      supabase
+        .from("charities")
+        .select("*")
+        .eq("is_active", true)
+        .order("name"),
       supabase
         .from("topics")
         .select("*, topic_items(*), topic_categories(category_id)")
@@ -25,7 +35,7 @@ export default async function NewEventV2Page() {
     ...(t as Topic),
     topic_items: (t.topic_items ?? []) as TopicItem[],
     category_ids: (t.topic_categories ?? []).map(
-      (tc: { category_id: string }) => tc.category_id,
+      (tc: { category_id: string }) => tc.category_id
     ),
   }))
 

@@ -21,7 +21,7 @@ type FormFieldContextValue<
 > = { name: TName }
 
 const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue,
+  {} as FormFieldContextValue
 )
 
 function FormField<
@@ -37,7 +37,7 @@ function FormField<
 
 type FormItemContextValue = { id: string }
 const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
+  {} as FormItemContextValue
 )
 
 function useFormField() {
@@ -89,16 +89,13 @@ const FormControl = React.forwardRef<
   HTMLElement,
   React.HTMLAttributes<HTMLElement>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField()
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
   return (
     <Slot.Root
       ref={ref as React.Ref<HTMLElement>}
       id={formItemId}
       aria-describedby={
-        !error
-          ? formDescriptionId
-          : `${formDescriptionId} ${formMessageId}`
+        !error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
       {...props}

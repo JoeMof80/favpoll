@@ -71,7 +71,9 @@ export function PledgePanel({
 
   const visibleItems =
     isInfinite && lowerSearch
-      ? sortedItems.filter((item) => item.label.toLowerCase().includes(lowerSearch))
+      ? sortedItems.filter((item) =>
+          item.label.toLowerCase().includes(lowerSearch)
+        )
       : sortedItems
 
   async function handleAdd() {
@@ -135,16 +137,26 @@ export function PledgePanel({
           )
         })}
 
-        {isInfinite && onAddItem && (
-          addingCustom ? (
+        {isInfinite &&
+          onAddItem &&
+          (addingCustom ? (
             <div className="flex flex-col gap-1">
               <InlineOptionInput
                 value={customDraft}
-                onChange={(v) => { setCustomDraft(v); setAddError(null) }}
+                onChange={(v) => {
+                  setCustomDraft(v)
+                  setAddError(null)
+                }}
                 onConfirm={handleAdd}
-                onCancel={() => { setCustomDraft(""); setAddError(null); setAddingCustom(false) }}
+                onCancel={() => {
+                  setCustomDraft("")
+                  setAddError(null)
+                  setAddingCustom(false)
+                }}
               />
-              {addError && <p className="pl-3 text-xs text-destructive">{addError}</p>}
+              {addError && (
+                <p className="pl-3 text-xs text-destructive">{addError}</p>
+              )}
             </div>
           ) : (
             <Chip
@@ -153,8 +165,7 @@ export function PledgePanel({
             >
               Add custom option
             </Chip>
-          )
-        )}
+          ))}
       </div>
 
       {isInfinite && lowerSearch && visibleItems.length === 0 && (

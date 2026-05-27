@@ -65,12 +65,12 @@ export function EventCanvas(props: Props) {
   return (
     <>
       {/* Occasion subheader — fixed below main nav (top-14) */}
-      <div className="fixed top-14 left-0 right-0 z-30 border-b border-border bg-background">
+      <div className="fixed top-14 right-0 left-0 z-30 border-b border-border bg-background">
         <div className="mx-auto max-w-330 px-6 py-2">
           <div
             role="radiogroup"
             aria-label="Occasion"
-            className="flex gap-1.5 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="flex scrollbar-none gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
           >
             {OCCASIONS.map((occ) => {
               const selected = state.occasion === occ.value
@@ -82,7 +82,7 @@ export function EventCanvas(props: Props) {
                   selected={selected}
                   onClick={() => {
                     set("occasion", occ.value)
-                    set("occasionLabel", OCCASION_LABELS[occ.value] ?? "")
+                    set("openingLine", OCCASION_LABELS[occ.value] ?? "")
                   }}
                   className="shrink-0"
                 >
@@ -102,13 +102,13 @@ export function EventCanvas(props: Props) {
             <EventHero
               mode="edit"
               occasion={state.occasion}
-              occasionLabel={state.occasionLabel}
+              openingLine={state.openingLine}
               protagonistName={state.protagonistName}
               protagonistAbout={state.protagonistAbout}
               dateLabel={state.dateLabel}
               initialPhotoUrl={props.initialData?.photoUrl}
               placeholders={placeholders}
-              onOccasionLabelChange={(v) => set("occasionLabel", v)}
+              onOpeningLineChange={(v) => set("openingLine", v)}
               onProtagonistNameChange={(v) => set("protagonistName", v)}
               onProtagonistAboutChange={(v) => set("protagonistAbout", v)}
               onDateLabelChange={(v) => set("dateLabel", v)}
@@ -146,7 +146,7 @@ export function EventCanvas(props: Props) {
       </main>
 
       {/* Fixed bottom bar — action buttons only */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background">
+      <div className="fixed right-0 bottom-0 left-0 z-30 border-t border-border bg-background">
         <div className="mx-auto flex max-w-330 items-center justify-end gap-2 px-6 py-3">
           {error && (
             <p role="alert" className="mr-2 text-sm text-destructive">
@@ -163,11 +163,7 @@ export function EventCanvas(props: Props) {
               Cancel
             </Button>
           )}
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
+          <Button type="button" onClick={handleSubmit} disabled={submitting}>
             {submitting
               ? props.mode === "create"
                 ? "Creating…"

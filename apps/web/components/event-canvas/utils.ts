@@ -7,7 +7,7 @@ export type CanvasState = {
   protagonistAbout: string
   dateLabel: string
   occasion: string
-  occasionLabel: string
+  openingLine: string
   description: string
   charityIds: string[]
   charitySearch: string

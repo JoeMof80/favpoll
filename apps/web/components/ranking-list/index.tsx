@@ -5,7 +5,10 @@ import type { TopicItem } from "@favpoll/types"
 import { useRankingItems } from "./use-ranking-items"
 import { formatAmount } from "./utils"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import { hideEventPollItem, showEventPollItem } from "@/lib/actions/event-poll-items"
+import {
+  hideEventPollItem,
+  showEventPollItem,
+} from "@/lib/actions/event-poll-items"
 
 type Props = {
   initialItems: TopicItem[]
@@ -40,7 +43,7 @@ function HideToggle({
       type="button"
       onClick={toggle}
       disabled={isPending}
-      className="ml-2 shrink-0 rounded px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50 border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      className="ml-2 shrink-0 rounded border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
     >
       {isPending ? "…" : isHidden ? "Show" : "Hide"}
     </button>
@@ -72,7 +75,9 @@ export function RankingList({
       <ol aria-label="Rankings" className="space-y-3">
         {items.map((item) => {
           const value =
-            rankingView === "amount" ? item.all_time_pledged : item.all_time_count
+            rankingView === "amount"
+              ? item.all_time_pledged
+              : item.all_time_count
           const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0
           const valueLabel =
             rankingView === "amount"
@@ -80,7 +85,8 @@ export function RankingList({
               : `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
 
           const isHidden = item.is_hidden ?? false
-          const showToggle = isOrganiser && !!item.is_guest_added && !!item.event_poll_item_id
+          const showToggle =
+            isOrganiser && !!item.is_guest_added && !!item.event_poll_item_id
 
           const labelSuffix = showToggle ? (
             <>

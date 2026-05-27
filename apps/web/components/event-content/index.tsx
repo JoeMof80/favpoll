@@ -48,7 +48,10 @@ export function EventContent({
     showPledgeCard,
   } = useEventContent({ event, pollWithItems, isClosed, clerkUserId })
 
-  const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" })
+  const GBP = new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  })
   const closedAt = event.closed_at
     ? new Date(event.closed_at).toLocaleDateString("en-GB", {
         day: "numeric",
@@ -86,7 +89,7 @@ export function EventContent({
       {/* Right — sticky meta */}
       <div className="sticky top-20 space-y-4 self-start">
         {isClosed ? (
-          <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-1">
+          <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
             <SectionEyebrow variant="muted" className="font-semibold">
               Poll closed
             </SectionEyebrow>

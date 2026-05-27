@@ -119,7 +119,7 @@ topic_items (
 protagonists (
   id uuid primary key,
   name text not null,
-  date_label text,                  -- e.g. "1940 – 2024", "Turning 35"
+  context text,                     -- e.g. "1940 – 2024", "Turning 35"
   about text,
   photo_url text,
   created_by text references users(id),
@@ -130,7 +130,7 @@ events (
   id uuid primary key,
   protagonist_id uuid references protagonists(id),
   occasion text not null,           -- OccasionType value
-  occasion_label text,
+  opening_line text,
   market text not null default 'en-GB',
   created_by text references users(id),
   description text,
@@ -240,6 +240,8 @@ item_flags (
 20260523120000_guest_item_moderation.sql
 20260524000000_charity_management.sql
 20260526000000_remove_event_poll_item_priority.sql
+20260527000000_rename_suffix_to_context.sql
+20260527000001_rename_occasion_label_to_opening_line.sql
 ```
 
 ---
@@ -595,6 +597,10 @@ NEXT_PUBLIC_BASE_URL
 - **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `localeCompare` alphabetical for ties. Items in all views sorted alphabetically — `display_order` and `is_prioritized` removed from `event_poll_items`.
 
 - **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
+
+- **opening_line is organiser-editable.** Pre-populated from PREFIXES[occasion] on occasion select but freely editable. Stored in DB. Never derive it purely from occasion at render time.
+
+- **Field character limits.** name: 40, context: 40, opening_line: 60, about: 400, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
 
 - **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
 

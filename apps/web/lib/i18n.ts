@@ -1,6 +1,6 @@
-import messages from '@/messages/en-GB.json'
+import messages from "@/messages/en-GB.json"
 
-export type Market = 'en-GB' | 'en-US'
+export type Market = "en-GB" | "en-US"
 
 export type FormatCurrencyOptions = {
   locale: string
@@ -9,10 +9,10 @@ export type FormatCurrencyOptions = {
 
 export function formatCurrency(
   amountInPence: number,
-  options: FormatCurrencyOptions = { locale: 'en-GB', currency: 'GBP' }
+  options: FormatCurrencyOptions = { locale: "en-GB", currency: "GBP" }
 ): string {
   return new Intl.NumberFormat(options.locale, {
-    style: 'currency',
+    style: "currency",
     currency: options.currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -20,8 +20,8 @@ export function formatCurrency(
 }
 
 export const MARKET_DEFAULTS: Record<Market, FormatCurrencyOptions> = {
-  'en-GB': { locale: 'en-GB', currency: 'GBP' },
-  'en-US': { locale: 'en-US', currency: 'USD' },
+  "en-GB": { locale: "en-GB", currency: "GBP" },
+  "en-US": { locale: "en-US", currency: "USD" },
 }
 
 export function t(key: keyof typeof messages): string {

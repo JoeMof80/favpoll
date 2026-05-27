@@ -7,8 +7,18 @@ import {
   pledgeFromFund,
 } from "@/app/events/[id]/actions"
 import { computePledgeAllocations } from "@/components/pledge-panel"
-import type { EventPollWithItems, EventPot, PotAllocation } from "@favpoll/types"
-import { GBP, FUND_GREEN, FUND_AMBER, FUND_RED, formatCharityLabel } from "./utils"
+import type {
+  EventPollWithItems,
+  EventPot,
+  PotAllocation,
+} from "@favpoll/types"
+import {
+  GBP,
+  FUND_GREEN,
+  FUND_AMBER,
+  FUND_RED,
+  formatCharityLabel,
+} from "./utils"
 import type { BreakdownLine } from "./pledge-breakdown"
 
 export type UsePledgeOptions = {
@@ -44,7 +54,9 @@ export function usePledge({
   const [topUpAmount, setTopUpAmount] = useState("")
   const [guestEmail, setGuestEmail] = useState("")
   const [useSharedFund, setUseSharedFund] = useState(false)
-  const [pledgeClientSecret, setPledgeClientSecret] = useState<string | null>(null)
+  const [pledgeClientSecret, setPledgeClientSecret] = useState<string | null>(
+    null
+  )
   const [pendingTopUp, setPendingTopUp] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -84,7 +96,8 @@ export function usePledge({
 
   const hasAnySelection = (pollSelections[pollWithItems.id]?.length ?? 0) > 0
   const baseCanConfirm = isPledgeValid && hasAnySelection && !submitting
-  const canOwnConfirm = baseCanConfirm && (!clerkUserId ? isGuestEmailValid : true)
+  const canOwnConfirm =
+    baseCanConfirm && (!clerkUserId ? isGuestEmailValid : true)
   const canFundConfirm = baseCanConfirm && !fundOverAvailable
 
   const ownBreakdown: {

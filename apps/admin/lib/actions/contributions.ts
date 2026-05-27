@@ -28,7 +28,7 @@ export async function getPendingContributions(): Promise<{
     .from('topic_items')
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, event_polls!inner(event_id, events!inner(id, occasion_label, protagonists!events_protagonist_id_fkey(name))))`,
+       topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
     )
     .eq('review_status', 'pending')
     .eq('source', 'guest')
@@ -42,7 +42,7 @@ export async function getPendingContributions(): Promise<{
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? '',
     event_id: item.topics?.event_polls?.[0]?.events?.id ?? '',
-    event_title: item.topics?.event_polls?.[0]?.events?.occasion_label ?? '',
+    event_title: item.topics?.event_polls?.[0]?.events?.opening_line ?? '',
     protagonist_name: item.topics?.event_polls?.[0]?.events?.protagonists?.name ?? '',
     review_status: item.review_status,
     rejection_reason: item.rejection_reason,
@@ -64,7 +64,7 @@ export async function getReviewedContributions(): Promise<{
     .from('topic_items')
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, event_polls!inner(event_id, events!inner(id, occasion_label, protagonists!events_protagonist_id_fkey(name))))`,
+       topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
     )
     .neq('review_status', 'pending')
     .eq('source', 'guest')
@@ -78,7 +78,7 @@ export async function getReviewedContributions(): Promise<{
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? '',
     event_id: item.topics?.event_polls?.[0]?.events?.id ?? '',
-    event_title: item.topics?.event_polls?.[0]?.events?.occasion_label ?? '',
+    event_title: item.topics?.event_polls?.[0]?.events?.opening_line ?? '',
     protagonist_name: item.topics?.event_polls?.[0]?.events?.protagonists?.name ?? '',
     review_status: item.review_status,
     rejection_reason: item.rejection_reason,

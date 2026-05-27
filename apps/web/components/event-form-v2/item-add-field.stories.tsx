@@ -98,9 +98,7 @@ export const Finite: Story = {
 }
 
 export const NewCustomTopic: Story = {
-  render: () => (
-    <Controlled canonicalItems={[]} topicTitle="Sandwich" />
-  ),
+  render: () => <Controlled canonicalItems={[]} topicTitle="Sandwich" />,
 }
 
 export const Small: Story = {
