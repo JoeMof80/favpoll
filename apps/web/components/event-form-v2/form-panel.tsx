@@ -234,10 +234,7 @@ export function FormPanel({
                 value={field.value}
                 onChange={(value) => {
                   field.onChange(value)
-                  form.setValue(
-                    "openingLine",
-                    PREFIXES[value as keyof typeof PREFIXES] ?? ""
-                  )
+                  form.setValue("openingLine", "")
                 }}
                 onClear={() => form.reset()}
                 size={size}
@@ -258,7 +255,10 @@ export function FormPanel({
                     INPUT_SIZE[size],
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
-                  placeholder={occasion ? "" : "Enter opening line"}
+                  placeholder={
+                    PREFIXES[occasion as keyof typeof PREFIXES] ??
+                    "Enter opening line"
+                  }
                   maxLength={60}
                   {...field}
                   value={field.value ?? ""}

@@ -6,7 +6,6 @@ import {
   OCCASION_PLACEHOLDERS,
   DATE_LABEL_PLACEHOLDERS,
   DEFAULT_PLACEHOLDERS,
-  TOPIC_REVEAL_PLACEHOLDERS,
 } from "@/lib/occasions"
 import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
@@ -246,15 +245,25 @@ export function PreviewPanel({
   const displayCharities =
     selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
 
+  const hasTopicSelected = !!firstTopic
   const protagonistFirstName = (name || placeholders.name).split(" ")[0]
   const topicTitle = firstTopic?.title ?? "Colour"
-  const topicRevealPlaceholder = topicTitle
-    ? (
-        TOPIC_REVEAL_PLACEHOLDERS[topicTitle]?.reveal ?? placeholders.reveal
-      ).replace("{name}", protagonistFirstName)
-    : placeholders.reveal
-  // Show reveal when the reveal field is focused; otherwise hide it
-  const revealValue = showReveal ? reveal || topicRevealPlaceholder : null
+  const topicOccasionReveal = firstTopicMeta?.placeholders?.[occasion]?.reveal
+  const topicRevealPlaceholder =
+    topicTitle && topicOccasionReveal
+      ? topicOccasionReveal.replace("{name}", protagonistFirstName)
+      : topicTitle && hasTopicSelected
+        ? `Share their favourite ${topicTitle.toLowerCase()}…`
+        : placeholders.reveal.replace("{name}", protagonistFirstName)
+  // Show reveal placeholder only when focused and no topic selected yet;
+  // when topic is selected, only show if the user has actually typed something
+  const revealValue = hasTopicSelected
+    ? showReveal && reveal
+      ? reveal
+      : null
+    : showReveal
+      ? reveal || topicRevealPlaceholder
+      : null
 
   const pollResults: PollResultItem[] = topicItems.map((item) => ({
     label: item.label,
@@ -279,15 +288,16 @@ export function PreviewPanel({
               reveal={revealValue}
               protagonistFirstName={protagonistFirstName}
             />
-            {showReveal ? (
-              <PollResults results={pollResults} />
-            ) : (
-              <PledgePanel
-                items={topicItems}
-                totalAmount="0"
-                onSelectionsChange={() => {}}
-              />
-            )}
+            {!hasTopicSelected &&
+              (showReveal ? (
+                <PollResults results={pollResults} />
+              ) : (
+                <PledgePanel
+                  items={topicItems}
+                  totalAmount="0"
+                  onSelectionsChange={() => {}}
+                />
+              ))}
           </div>
         </div>
 
