@@ -42,6 +42,7 @@ import {
   TEXTAREA_SIZE,
   type PickerSize,
 } from "./constants"
+import { Button } from "../ui/button"
 
 const STEP_NUMBER: Record<PickerSize, string> = {
   sm: "h-5 w-5 text-[10px]",
@@ -147,13 +148,10 @@ export function FormPanel({
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
-  const suffixValue = form.watch("suffix") ?? ""
   const aboutValue = form.watch("about") ?? ""
   const revealValue = form.watch("reveal") ?? ""
   const charitiesValue = form.watch("charities") ?? []
 
-  const nameRemaining = 80 - (name ?? "").length
-  const suffixRemaining = 60 - suffixValue.length
   const aboutRemaining = 400 - aboutValue.length
   const revealRemaining = 280 - revealValue.length
 
@@ -229,8 +227,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"The name guests will see at the top of the event."}
-                {nameRemaining <= 16 && ` ${nameRemaining} characters remaining.`}
+                The name or nickname you enter will be used throughout the event
               </FieldDescription>
             </FormItem>
           )}
@@ -266,8 +263,27 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"Dates, years, or a short line of context. Optional."}
-                {suffixRemaining <= 12 && ` ${suffixRemaining} characters remaining.`}
+                Optional dates, years, or other context.{" "}
+                {previewSuffix ? "Hide" : "Show"} in the preview.
+                {previewSuffix ? (
+                  <Button
+                    size="icon-xs"
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={onToggleSuffix}
+                  >
+                    <Eye className="m-1 inline-block size-3" />
+                  </Button>
+                ) : (
+                  <Button
+                    size="icon-xs"
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={onToggleSuffix}
+                  >
+                    <EyeOff className="m-1 inline-block size-3" />
+                  </Button>
+                )}{" "}
               </FieldDescription>
             </FormItem>
           )}
@@ -328,7 +344,27 @@ export function FormPanel({
             </div>
           </FormControl>
           <FieldDescription size={size} className="mb-2">
-            Optional photo. Can be added later.
+            Optional photo. Can be added later. {previewPhoto ? "Hide" : "Show"}{" "}
+            in the preview.
+            {previewPhoto ? (
+              <Button
+                size="icon-xs"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={onTogglePhoto}
+              >
+                <Eye className="inline-block size-3" />
+              </Button>
+            ) : (
+              <Button
+                size="icon-xs"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={onTogglePhoto}
+              >
+                <EyeOff className="inline-block size-3" />
+              </Button>
+            )}
           </FieldDescription>
         </FormItem>
 
