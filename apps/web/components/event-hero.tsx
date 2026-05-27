@@ -27,7 +27,7 @@ type EditProps = {
   protagonistAbout: string
   dateLabel: string
   initialPhotoUrl?: string | null
-  placeholders: Pick
+  placeholders: Pick<OccasionPlaceholders, "name" | "about">
   onOpeningLineChange: (v: string) => void
   onProtagonistNameChange: (v: string) => void
   onProtagonistAboutChange: (v: string) => void
@@ -41,7 +41,7 @@ export function EventHero(props: Props) {
   const isEdit = props.mode === "edit"
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(
-    isEdit ? props.initialPhotoUrl ?? null : null
+    isEdit ? (props.initialPhotoUrl ?? null) : null
   )
   const [photoUploading, setPhotoUploading] = useState(false)
 
@@ -57,7 +57,7 @@ export function EventHero(props: Props) {
         dateLabel: props.protagonist.context,
       })
 
-  async function handlePhotoChange(e: React.ChangeEvent) {
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!isEdit) return
     const file = e.target.files?.[0]
     if (!file) return

@@ -46,7 +46,8 @@ function DisplayRankingRow({
   maxPledged: number
   style?: React.CSSProperties
 }) {
-  const barWidth = maxPledged > 0 ? (item.all_time_pledged / maxPledged) * 100 : 0
+  const barWidth =
+    maxPledged > 0 ? (item.all_time_pledged / maxPledged) * 100 : 0
   const amountStr = formatAmount(item.all_time_pledged)
   const pledgeStr = `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
 
@@ -74,7 +75,7 @@ function DisplayRankingRow({
         <span className="flex-1 truncate text-base text-foreground">
           {item.label}
         </span>
-        <span className="shrink-0 text-sm tabular-nums text-muted-foreground">
+        <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
           {amountStr} · {pledgeStr}
         </span>
       </div>
@@ -98,7 +99,8 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
     poll.topic.id,
     "amount"
   )
-  const isColorTopic = poll.topic.title.toLowerCase().includes("colour") ||
+  const isColorTopic =
+    poll.topic.title.toLowerCase().includes("colour") ||
     poll.topic.title.toLowerCase().includes("color")
 
   return (
@@ -110,13 +112,19 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
         {poll.topic.title}
       </h2>
       {poll.personal_reveal && (
-        <p className="mb-4 border-l-2 pl-3 text-sm italic text-muted-foreground"
+        <p
+          className="mb-4 border-l-2 pl-3 text-sm text-muted-foreground italic"
           style={{ borderColor: "#EEEDFE" }}
         >
           {poll.personal_reveal}
         </p>
       )}
-      <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+      <span
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
         {announcement}
       </span>
       <ol
@@ -131,7 +139,9 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
             item={item}
             isColorTopic={isColorTopic}
             maxPledged={maxValue}
-            style={{ transform: `translateY(${(item.rank - 1) * ROW_HEIGHT}px)` }}
+            style={{
+              transform: `translateY(${(item.rank - 1) * ROW_HEIGHT}px)`,
+            }}
           />
         ))}
       </ol>
@@ -183,19 +193,19 @@ export function DisplayScreen({
 
   const headline = getEventHeadline({
     occasion,
-    openingLine,
+    occasionLabel: openingLine,
     name: protagonistName,
     dateLabel,
   })
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background py-12">
       <div className="w-full max-w-3xl px-8">
         {/* Hero */}
         <div className="mb-12 text-center">
           {headline.prefix && (
             <p
-              className="mb-3 text-sm font-medium uppercase tracking-widest"
+              className="mb-3 text-sm font-medium tracking-widest uppercase"
               style={{ color: BRAND }}
             >
               {headline.prefix}
