@@ -110,7 +110,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <SectionEyebrow variant="muted" className="mb-2">
+            <SectionEyebrow variant="muted" className="mb-2 truncate">
               {headline?.prefix ?? label}
             </SectionEyebrow>
           )}
@@ -132,7 +132,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <h1 className="text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A] sm:text-5xl">
+            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A] sm:text-5xl">
               {protagonist?.name}
             </h1>
           )}
@@ -156,7 +156,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : headline?.suffix ? (
-            <p className="mt-2 text-2xl font-normal text-[#534AB7]">
+            <p className="mt-2 truncate text-2xl font-normal text-[#534AB7]">
               {headline.suffix}
             </p>
           ) : null}

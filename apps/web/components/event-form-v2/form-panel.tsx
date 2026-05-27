@@ -128,11 +128,22 @@ function StepSection({
   )
 }
 
-function CounterSpan({ remaining, warning, critical }: { remaining: number; warning: number; critical: number }) {
+function CounterSpan({
+  remaining,
+  warning,
+  critical,
+}: {
+  remaining: number
+  warning: number
+  critical: number
+}) {
   if (remaining > warning) return null
   return (
-    <span className={remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"}>
-      {" "}{remaining} characters remaining.
+    <span
+      className={remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"}
+    >
+      {" "}
+      {remaining} characters remaining.
     </span>
   )
 }
@@ -165,9 +176,9 @@ export function FormPanel({
   const revealValue = form.watch("reveal") ?? ""
   const charitiesValue = form.watch("charities") ?? []
 
-  const nameRemaining = 80 - nameValue.length
-  const openingLineRemaining = 100 - openingLineValue.length
-  const contextRemaining = 60 - contextValue.length
+  const nameRemaining = 40 - nameValue.length
+  const openingLineRemaining = 60 - openingLineValue.length
+  const contextRemaining = 40 - contextValue.length
   const aboutRemaining = 400 - aboutValue.length
   const revealRemaining = 280 - revealValue.length
 
@@ -217,7 +228,10 @@ export function FormPanel({
                 value={field.value}
                 onChange={(value) => {
                   field.onChange(value)
-                  form.setValue("openingLine", PREFIXES[value as keyof typeof PREFIXES] ?? "")
+                  form.setValue(
+                    "openingLine",
+                    PREFIXES[value as keyof typeof PREFIXES] ?? ""
+                  )
                 }}
                 onClear={() => form.reset()}
                 size={size}
@@ -234,17 +248,23 @@ export function FormPanel({
             <FormItem>
               <FormControl>
                 <Input
-                  className={cn(INPUT_SIZE[size], "bg-background placeholder:text-muted-foreground/50")}
+                  className={cn(
+                    INPUT_SIZE[size],
+                    "bg-background placeholder:text-muted-foreground/50"
+                  )}
                   placeholder={occasion ? "" : "Select an occasion first"}
-                  maxLength={100}
+                  maxLength={60}
                   {...field}
                   value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"The line that introduces the event. Defaults to the occasion — edit freely."}
-                <CounterSpan remaining={openingLineRemaining} warning={20} critical={10} />
+                <CounterSpan
+                  remaining={openingLineRemaining}
+                  warning={12}
+                  critical={6}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -265,14 +285,18 @@ export function FormPanel({
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
                   placeholder={basePlaceholders?.name ?? "Enter Name"}
-                  maxLength={80}
+                  maxLength={40}
                   {...field}
                 />
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 {"The name guests will see at the top of the event."}
-                <CounterSpan remaining={nameRemaining} warning={16} critical={8} />
+                <CounterSpan
+                  remaining={nameRemaining}
+                  warning={8}
+                  critical={4}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -288,7 +312,7 @@ export function FormPanel({
                   <InputGroupInput
                     placeholder={datePlaceholder || "Enter context"}
                     className="placeholder:text-muted-foreground/50"
-                    maxLength={60}
+                    maxLength={40}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -310,7 +334,11 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 {"Dates, years, or a short line of context. Optional."}
-                <CounterSpan remaining={contextRemaining} warning={12} critical={6} />
+                <CounterSpan
+                  remaining={contextRemaining}
+                  warning={8}
+                  critical={4}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -398,7 +426,11 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 {"A few words about them or what this occasion means."}
-                <CounterSpan remaining={aboutRemaining} warning={80} critical={20} />
+                <CounterSpan
+                  remaining={aboutRemaining}
+                  warning={80}
+                  critical={20}
+                />
               </FieldDescription>
             </FormItem>
           )}
@@ -521,9 +553,14 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                {"Shown to guests only after they've pledged — the answer, in your words."}
-                <CounterSpan remaining={revealRemaining} warning={56} critical={14} />
-
+                {
+                  "Shown to guests only after they've pledged — the answer, in your words."
+                }
+                <CounterSpan
+                  remaining={revealRemaining}
+                  warning={56}
+                  critical={14}
+                />
               </FieldDescription>
             </FormItem>
           )}
