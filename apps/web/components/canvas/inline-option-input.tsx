@@ -20,18 +20,24 @@ export function InlineOptionInput({
   autoFocus = true,
 }: Props) {
   return (
-    <div className="flex items-center rounded-full border border-input bg-background py-1 pl-3 pr-1">
+    <div className="flex items-center rounded-full border border-input bg-background py-1 pr-1 pl-3">
       <input
         autoFocus={autoFocus}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") { e.preventDefault(); onConfirm() }
-          if (e.key === "Escape") { e.preventDefault(); onCancel() }
+          if (e.key === "Enter") {
+            e.preventDefault()
+            onConfirm()
+          }
+          if (e.key === "Escape") {
+            e.preventDefault()
+            onCancel()
+          }
         }}
         placeholder={placeholder}
-        className="min-w-0 w-28 bg-transparent text-xs outline-none placeholder:text-muted-foreground/40"
+        className="w-28 min-w-0 bg-transparent text-xs outline-none placeholder:text-muted-foreground/40"
       />
       <div className="flex shrink-0 items-center">
         <button

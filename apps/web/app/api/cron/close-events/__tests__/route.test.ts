@@ -9,14 +9,19 @@ const mockEmail = vi.hoisted(() => ({
 vi.mock("@/lib/email", () => mockEmail)
 
 let mock = makeSupabaseMock()
-vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => mock.supabase }))
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => mock.supabase,
+}))
 
 import { POST } from "@/app/api/cron/close-events/route"
 
 function makeRequest(authHeader?: string): Request {
   const headers = new Headers()
   if (authHeader !== undefined) headers.set("authorization", authHeader)
-  return new Request("http://localhost/api/cron/close-events", { method: "POST", headers })
+  return new Request("http://localhost/api/cron/close-events", {
+    method: "POST",
+    headers,
+  })
 }
 
 beforeEach(() => {
@@ -43,7 +48,7 @@ describe("POST /api/cron/close-events — auth", () => {
   })
 
   it("proceeds when Authorization header matches CRON_SECRET", async () => {
-    mock.queue([])        // events select → no events
+    mock.queue([]) // events select → no events
     const res = await POST(makeRequest("Bearer test-secret"))
     expect(res.status).not.toBe(401)
   })
@@ -91,14 +96,16 @@ describe("POST /api/cron/close-events — DB error", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("POST /api/cron/close-events — closes events", () => {
-  function queueForOneEvent(options: {
-    eventId?: string
-    userId?: string
-    protagonistName?: string
-    totalRaised?: number
-    organiserEmail?: string | null
-    updateError?: { message: string } | null
-  } = {}) {
+  function queueForOneEvent(
+    options: {
+      eventId?: string
+      userId?: string
+      protagonistName?: string
+      totalRaised?: number
+      organiserEmail?: string | null
+      updateError?: { message: string } | null
+    } = {}
+  ) {
     const {
       eventId = "event-1",
       userId = "user-1",
@@ -138,7 +145,9 @@ describe("POST /api/cron/close-events — closes events", () => {
 
     await POST(makeRequest("Bearer test-secret"))
 
-    const eventsUpdate = mock.callsFor("events").find((c) => c.method === "update")!
+    const eventsUpdate = mock
+      .callsFor("events")
+      .find((c) => c.method === "update")!
     expect(eventsUpdate.args[0]).toMatchObject({
       total_raised: 200,
       closed_at: expect.any(String),
@@ -154,7 +163,12 @@ describe("POST /api/cron/close-events — closes events", () => {
   })
 
   it("sends sendEventClosed to the organiser email", async () => {
-    queueForOneEvent({ eventId: "event-1", protagonistName: "Bob", totalRaised: 75, organiserEmail: "bob@example.com" })
+    queueForOneEvent({
+      eventId: "event-1",
+      protagonistName: "Bob",
+      totalRaised: 75,
+      organiserEmail: "bob@example.com",
+    })
 
     await POST(makeRequest("Bearer test-secret"))
 
@@ -207,14 +221,18 @@ describe("POST /api/cron/close-events — closes events", () => {
     const body = await res.json()
 
     expect(body.closed).toBe(1)
-    expect(body.errors).toEqual(expect.arrayContaining([expect.stringContaining(eventId1)]))
+    expect(body.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining(eventId1)])
+    )
   })
 
   it("sums pledge totals correctly from pledgeTotals rows", async () => {
     const eventId = "event-1"
     const userId = "user-1"
 
-    mock.queue([{ id: eventId, created_by: userId, protagonists: { name: "A" } }])
+    mock.queue([
+      { id: eventId, created_by: userId, protagonists: { name: "A" } },
+    ])
     // Multiple pledge rows for the same event
     mock.queue([
       { event_polls: { event_id: eventId }, total_amount: 50 },
@@ -226,7 +244,9 @@ describe("POST /api/cron/close-events — closes events", () => {
 
     await POST(makeRequest("Bearer test-secret"))
 
-    const eventsUpdate = mock.callsFor("events").find((c) => c.method === "update")!
+    const eventsUpdate = mock
+      .callsFor("events")
+      .find((c) => c.method === "update")!
     expect(eventsUpdate.args[0].total_raised).toBe(100)
   })
 })

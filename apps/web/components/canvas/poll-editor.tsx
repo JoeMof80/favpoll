@@ -29,9 +29,9 @@ export function PollEditor({
   onSelectTopic,
 }: Props) {
   const [topicCategory, setTopicCategory] = useState<string | null>(null)
-  const [topicFinite, setTopicFinite] = useState<"finite" | "infinite" | "custom" | null>(
-    null
-  )
+  const [topicFinite, setTopicFinite] = useState<
+    "finite" | "infinite" | "custom" | null
+  >(null)
   const [topicSearch, setTopicSearch] = useState("")
 
   const topic = topics.find((t) => t.id === poll.topicId)
@@ -42,7 +42,9 @@ export function PollEditor({
     : (topic?.title ?? "")
   const canonicalItems = isCustomSaved
     ? (topic?.topic_items ?? [])
-    : topic ? topic.topic_items.filter((i) => i.is_canonical) : []
+    : topic
+      ? topic.topic_items.filter((i) => i.is_canonical)
+      : []
 
   const topicPlaceholders = topic?.placeholders
   const personFirstName = placeholders.name.split(" ")[0]
@@ -53,7 +55,10 @@ export function PollEditor({
     : null
   const occasionFallback = { reveal: placeholders.reveal }
   const pollPlaceholders = topicPlaceholders
-    ? (topicPlaceholders[occasion] ?? topicPlaceholders["default"] ?? topicRevealSubstituted ?? occasionFallback)
+    ? (topicPlaceholders[occasion] ??
+      topicPlaceholders["default"] ??
+      topicRevealSubstituted ??
+      occasionFallback)
     : (topicRevealSubstituted ?? occasionFallback)
 
   return (
@@ -94,7 +99,11 @@ export function PollEditor({
             setTopicSearch("")
           }}
           onSetCustom={() =>
-            onUpdatePoll({ topicIsCustom: true, topicId: "", pickingTopic: false })
+            onUpdatePoll({
+              topicIsCustom: true,
+              topicId: "",
+              pickingTopic: false,
+            })
           }
           onCancel={() => onUpdatePoll({ pickingTopic: false })}
           onTopicCategoryChange={(cat) => {

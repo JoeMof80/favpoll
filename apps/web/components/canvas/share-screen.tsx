@@ -19,7 +19,9 @@ export function ShareScreen({ shareLink, onNavigate }: Props) {
       <div className="space-y-6 text-center">
         <div>
           <p className="text-sm text-muted-foreground">Your event is ready</p>
-          <h1 className="mt-1 text-2xl font-medium text-foreground">Share with guests</h1>
+          <h1 className="mt-1 text-2xl font-medium text-foreground">
+            Share with guests
+          </h1>
         </div>
 
         <div className="flex justify-center">
@@ -29,7 +31,9 @@ export function ShareScreen({ shareLink, onNavigate }: Props) {
         </div>
 
         <div className="rounded-lg border border-border bg-card px-4 py-3">
-          <p className="break-all font-mono text-xs text-foreground">{fullUrl}</p>
+          <p className="font-mono text-xs break-all text-foreground">
+            {fullUrl}
+          </p>
         </div>
 
         <div className="flex gap-3">

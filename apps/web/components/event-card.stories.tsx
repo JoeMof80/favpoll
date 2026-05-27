@@ -19,11 +19,23 @@ const ICE_CREAM_ITEMS = [
 const baseEvent = {
   id: "1",
   opening_line: "In memory of",
-  description: "A beloved mother, teacher, and friend who spent her life bringing people together.",
+  description:
+    "A beloved mother, teacher, and friend who spent her life bringing people together.",
   closes_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   total_raised: 750,
   protagonist: { name: "Belinda Johnson" },
-  charities: [{ charity: { id: "c1", name: "Age UK", logo_url: null, registered_number: "1128267", description: null, created_at: "" } }],
+  charities: [
+    {
+      charity: {
+        id: "c1",
+        name: "Age UK",
+        logo_url: null,
+        registered_number: "1128267",
+        description: null,
+        created_at: "",
+      },
+    },
+  ],
   poll: {
     id: "poll-1",
     topic_id: "topic-1",
@@ -60,7 +72,18 @@ export const Birthday: Story = {
       description: null,
       total_raised: 480,
       protagonist: { name: "Poppy Clarke" },
-      charities: [{ charity: { id: "c2", name: "Comic Relief", logo_url: null, registered_number: null, description: null, created_at: "" } }],
+      charities: [
+        {
+          charity: {
+            id: "c2",
+            name: "Comic Relief",
+            logo_url: null,
+            registered_number: null,
+            description: null,
+            created_at: "",
+          },
+        },
+      ],
       poll: {
         id: "poll-2",
         topic_id: "topic-2",
@@ -76,12 +99,31 @@ export const Retirement: Story = {
       ...baseEvent,
       id: "3",
       opening_line: "After a lifetime of good work",
-      description: "After 35 years building the engineering team, David is finally putting down his laptop.",
+      description:
+        "After 35 years building the engineering team, David is finally putting down his laptop.",
       total_raised: 1250,
       protagonist: { name: "David Clarke" },
       charities: [
-        { charity: { id: "c3", name: "Macmillan", logo_url: null, registered_number: null, description: null, created_at: "" } },
-        { charity: { id: "c4", name: "Dogs Trust", logo_url: null, registered_number: null, description: null, created_at: "" } },
+        {
+          charity: {
+            id: "c3",
+            name: "Macmillan",
+            logo_url: null,
+            registered_number: null,
+            description: null,
+            created_at: "",
+          },
+        },
+        {
+          charity: {
+            id: "c4",
+            name: "Dogs Trust",
+            logo_url: null,
+            registered_number: null,
+            description: null,
+            created_at: "",
+          },
+        },
       ],
     },
   },

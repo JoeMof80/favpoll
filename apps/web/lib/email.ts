@@ -1,8 +1,8 @@
-import { Resend } from 'resend'
+import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'noreply@favpoll.com'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "noreply@favpoll.com"
 
 type PledgeConfirmationParams = {
   to: string
@@ -30,10 +30,10 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
     to: supportEmail,
     subject: `Extension request — event ${eventId}`,
     html: `
-      <p><strong>Organiser:</strong> ${organizerName ?? 'Unknown'} (${organizerEmail})</p>
+      <p><strong>Organiser:</strong> ${organizerName ?? "Unknown"} (${organizerEmail})</p>
       <p><strong>Event:</strong> <a href="${eventUrl}">${eventUrl}</a></p>
       <p><strong>Message:</strong></p>
-      <p>${message.replace(/\n/g, '<br>')}</p>
+      <p>${message.replace(/\n/g, "<br>")}</p>
     `,
   })
 }
@@ -47,7 +47,10 @@ type EventClosedParams = {
 
 export async function sendEventClosed(params: EventClosedParams) {
   const { to, protagonistName, totalRaised, eventId } = params
-  const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
+  const GBP = new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  })
   const resultsUrl = `${BASE_URL}/events/${eventId}`
 
   await resend.emails.send({
@@ -72,7 +75,8 @@ type GuestItemAddedParams = {
 }
 
 export async function sendGuestItemAdded(params: GuestItemAddedParams) {
-  const { to, itemLabel, topicTitle, openingLine, protagonistName, eventId } = params
+  const { to, itemLabel, topicTitle, openingLine, protagonistName, eventId } =
+    params
   const eventUrl = `${BASE_URL}/events/${eventId}`
 
   await resend.emails.send({
@@ -87,13 +91,24 @@ export async function sendGuestItemAdded(params: GuestItemAddedParams) {
 }
 
 export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
-  const { to, protagonistName, charityNames, amount, closesAt, guestToken } = params
-  const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
+  const { to, protagonistName, charityNames, amount, closesAt, guestToken } =
+    params
+  const GBP = new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  })
   const withdrawUrl = `${BASE_URL}/pledges/withdraw?token=${guestToken}`
-  const closesDate = new Date(closesAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const charityLabel = charityNames.length === 0 ? 'charity'
-    : charityNames.length === 1 ? charityNames[0]
-    : charityNames.slice(0, -1).join(', ') + ' & ' + charityNames.at(-1)!
+  const closesDate = new Date(closesAt).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+  const charityLabel =
+    charityNames.length === 0
+      ? "charity"
+      : charityNames.length === 1
+        ? charityNames[0]
+        : charityNames.slice(0, -1).join(", ") + " & " + charityNames.at(-1)!
 
   await resend.emails.send({
     from: FROM_EMAIL,

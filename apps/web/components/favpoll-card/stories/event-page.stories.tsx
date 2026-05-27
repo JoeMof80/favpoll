@@ -3,7 +3,13 @@ import { EventHero } from "@/components/event-hero"
 import { PollSection } from "@/components/poll-section"
 import { FavpollCharityRow } from "../favpoll-charity-row"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
-import type { Event, Protagonist, EventPollWithItems, TopicItem, OccasionType } from "@favpoll/types"
+import type {
+  Event,
+  Protagonist,
+  EventPollWithItems,
+  TopicItem,
+  OccasionType,
+} from "@favpoll/types"
 
 // ─── Static character data for the 6 demo scenes ─────────────────────────────
 
@@ -40,7 +46,10 @@ function parseGBP(s: string): number {
   return parseInt(s.replace(/[^0-9]/g, ""), 10) || 0
 }
 
-function makeHeroProps(sceneIndex: number): { event: Event; protagonist: Protagonist } {
+function makeHeroProps(sceneIndex: number): {
+  event: Event
+  protagonist: Protagonist
+} {
   const scene = SCENES[sceneIndex]
   const protagonist: Protagonist = {
     id: `p-ep-${sceneIndex}`,
@@ -83,19 +92,21 @@ function makePoll(sceneIndex: number): EventPollWithItems {
       },
     ])
   )
-  const topic_items: TopicItem[] = scene.poll.topic.topic_items.map((opt, i) => ({
-    id: `item-ep-${sceneIndex}-${i}`,
-    topic_id: topicId,
-    label: opt.label,
-    all_time_pledged: pledgeByLabel[opt.label]?.all_time_pledged ?? 0,
-    all_time_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
-    is_canonical: true,
-    source: "seed" as const,
-    markets: ["en-GB"],
-    event_count: 1,
-    total_pledge_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
-    created_at: "2024-01-01T00:00:00Z",
-  }))
+  const topic_items: TopicItem[] = scene.poll.topic.topic_items.map(
+    (opt, i) => ({
+      id: `item-ep-${sceneIndex}-${i}`,
+      topic_id: topicId,
+      label: opt.label,
+      all_time_pledged: pledgeByLabel[opt.label]?.all_time_pledged ?? 0,
+      all_time_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
+      is_canonical: true,
+      source: "seed" as const,
+      markets: ["en-GB"],
+      event_count: 1,
+      total_pledge_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
+      created_at: "2024-01-01T00:00:00Z",
+    })
+  )
   return {
     id: `poll-ep-${sceneIndex}`,
     event_id: "event-demo",

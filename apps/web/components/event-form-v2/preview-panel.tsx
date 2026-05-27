@@ -179,9 +179,9 @@ export function PreviewPanel({
     firstTopicMeta?.placeholders?.[occasion]?.about ??
     firstTopicMeta?.placeholders?.["default"]?.about
   const aboutPlaceholder = topicAbout ?? placeholders.about
-  const resolvedOpeningLine = openingLine || (occasion
-    ? (OCCASION_LABELS[occasion] ?? "A tribute to")
-    : "A tribute to")
+  const resolvedOpeningLine =
+    openingLine ||
+    (occasion ? (OCCASION_LABELS[occasion] ?? "A tribute to") : "A tribute to")
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)

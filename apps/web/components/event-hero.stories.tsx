@@ -85,8 +85,8 @@ const meta = {
       </div>
     ),
   ],
-// EventHero uses a discriminated union prop — Meta<typeof EventHero> produces
-// 'never' for args in StoryObj. Use Meta without the generic to avoid that.
+  // EventHero uses a discriminated union prop — Meta<typeof EventHero> produces
+  // 'never' for args in StoryObj. Use Meta without the generic to avoid that.
 } satisfies Meta
 
 export default meta

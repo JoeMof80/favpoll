@@ -155,7 +155,12 @@ export function TopicPickerField({
               setSearch(e.target.value)
               openDropdown()
             }}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleCreateTopic() } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                handleCreateTopic()
+              }
+            }}
             onFocus={openDropdown}
             onBlur={handleBlur}
             placeholder={hasSelection ? "" : "Search topics…"}

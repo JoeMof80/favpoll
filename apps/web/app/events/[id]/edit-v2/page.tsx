@@ -23,7 +23,7 @@ export default async function EditEventV2Page({ params }: Props) {
   const { data: event } = await supabase
     .from("events")
     .select(
-      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charity_id)",
+      "*, protagonists!events_protagonist_id_fkey(*), event_charities(charity_id)"
     )
     .eq("id", id)
     .single()
@@ -52,7 +52,7 @@ export default async function EditEventV2Page({ params }: Props) {
     ...(t as Topic),
     topic_items: (t.topic_items ?? []) as TopicItem[],
     category_ids: (t.topic_categories ?? []).map(
-      (tc: { category_id: string }) => tc.category_id,
+      (tc: { category_id: string }) => tc.category_id
     ),
   }))
 
@@ -82,7 +82,7 @@ export default async function EditEventV2Page({ params }: Props) {
     photoUrl: event.protagonists.photo_url ?? undefined,
     closesAt: new Date(event.closes_at),
     charities: (event.event_charities ?? []).map(
-      (ec: { charity_id: string }) => ec.charity_id,
+      (ec: { charity_id: string }) => ec.charity_id
     ),
     sharedFund: pot?.total_deposited ?? 0,
     isPrivate: event.is_private ?? false,

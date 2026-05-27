@@ -2,7 +2,11 @@
 
 import Link from "next/link"
 import { StripeCheckout } from "@/components/stripe-checkout"
-import type { EventPollWithItems, EventPot, PotAllocation } from "@favpoll/types"
+import type {
+  EventPollWithItems,
+  EventPot,
+  PotAllocation,
+} from "@favpoll/types"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {

@@ -41,7 +41,8 @@ async function getCroppedBlob(
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("Canvas toBlob failed"))),
+      (blob) =>
+        blob ? resolve(blob) : reject(new Error("Canvas toBlob failed")),
       "image/jpeg",
       0.9
     )
@@ -61,12 +62,9 @@ export function PhotoCropModal({ open, imageSrc, onClose, onSave }: Props) {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [saving, setSaving] = useState(false)
 
-  const onCropComplete = useCallback(
-    (_croppedArea: Area, pixelCrop: Area) => {
-      setCroppedAreaPixels(pixelCrop)
-    },
-    []
-  )
+  const onCropComplete = useCallback((_croppedArea: Area, pixelCrop: Area) => {
+    setCroppedAreaPixels(pixelCrop)
+  }, [])
 
   async function handleSave() {
     if (!croppedAreaPixels) return

@@ -17,7 +17,9 @@ export function HeroDemoPanel() {
     prefersReducedMotion ? "reveal" : "arriving"
   )
   const [barWidths, setBarWidths] = useState<number[]>(
-    prefersReducedMotion ? SCENES[0].results.map((r) => r.widthPercent) : SCENES[0].results.map(() => 0)
+    prefersReducedMotion
+      ? SCENES[0].results.map((r) => r.widthPercent)
+      : SCENES[0].results.map(() => 0)
   )
   const [fading, setFading] = useState(false)
 

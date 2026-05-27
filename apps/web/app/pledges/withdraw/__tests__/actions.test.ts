@@ -4,7 +4,9 @@ import { makeSupabaseMock } from "@/tests/mocks/supabase-admin"
 
 // redirect throws so execution halts — mirrors real Next.js NEXT_REDIRECT behaviour
 const mockRedirect = vi.hoisted(() =>
-  vi.fn().mockImplementation((url: string) => { throw new Error(url) })
+  vi.fn().mockImplementation((url: string) => {
+    throw new Error(url)
+  })
 )
 
 vi.mock("next/navigation", () => ({ redirect: mockRedirect }))
@@ -40,8 +42,9 @@ describe("withdrawPledge — no token", () => {
 describe("withdrawPledge — pledge not found", () => {
   it("redirects to /invalid when maybeSingle returns null", async () => {
     mock.queue(null) // pledge not found
-    await expect(withdrawPledge(makeFormData("bad-token")))
-      .rejects.toThrow("/pledges/withdraw/invalid")
+    await expect(withdrawPledge(makeFormData("bad-token"))).rejects.toThrow(
+      "/pledges/withdraw/invalid"
+    )
   })
 })
 
@@ -54,8 +57,9 @@ describe("withdrawPledge — event is closed", () => {
         events: { closes_at: "2020-01-01T00:00:00Z", id: "event-1" },
       },
     })
-    await expect(withdrawPledge(makeFormData("valid-token")))
-      .rejects.toThrow("/events/event-1")
+    await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
+      "/events/event-1"
+    )
   })
 
   it("does not redirect to ?withdrawn=1 when event is closed", async () => {
@@ -97,7 +101,9 @@ describe("withdrawPledge — success", () => {
       // expected redirect throw
     }
 
-    const updateCalls = mock.callsFor("pledges").filter((c) => c.method === "update")
+    const updateCalls = mock
+      .callsFor("pledges")
+      .filter((c) => c.method === "update")
     expect(updateCalls).toHaveLength(1)
     expect(updateCalls[0].args[0]).toMatchObject({
       guest_token: null,
@@ -109,8 +115,9 @@ describe("withdrawPledge — success", () => {
     mock.queue(makeFuturePledge("event-42"))
     mock.queue(null) // update response
 
-    await expect(withdrawPledge(makeFormData("valid-token")))
-      .rejects.toThrow("/events/event-42?withdrawn=1")
+    await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
+      "/events/event-42?withdrawn=1"
+    )
   })
 
   it("sets withdrawn_at to a valid ISO timestamp", async () => {
@@ -123,7 +130,9 @@ describe("withdrawPledge — success", () => {
       // expected redirect throw
     }
 
-    const updateCall = mock.callsFor("pledges").find((c) => c.method === "update")!
+    const updateCall = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "update")!
     const ts = updateCall.args[0].withdrawn_at
     expect(new Date(ts).toISOString()).toBe(ts)
   })

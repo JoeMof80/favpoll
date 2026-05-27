@@ -3,7 +3,7 @@ export type PollStep = "choose" | "pledge" | "pledged"
 
 export type PollResultItem = {
   label: string
-  amount: string      // formatted display string e.g. "£210"
+  amount: string // formatted display string e.g. "£210"
   widthPercent: number
 }
 

@@ -1,7 +1,11 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createEvent } from "@/app/events/new/actions"
-import { OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS, getAboutPlaceholder } from "@/lib/occasions"
+import {
+  OCCASION_PLACEHOLDERS,
+  DEFAULT_PLACEHOLDERS,
+  getAboutPlaceholder,
+} from "@/lib/occasions"
 import type {
   Category,
   Charity,
@@ -33,7 +37,10 @@ export function useCanvas({
 
   // Merge initial poll data safely — avoids spreading Partial<CanvasPoll> into CanvasState
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const initialPoll = { ...newPoll(preselectedTopicId ?? ""), ...(initialData?.poll ?? {}) } as CanvasPoll
+  const initialPoll = {
+    ...newPoll(preselectedTopicId ?? ""),
+    ...(initialData?.poll ?? {}),
+  } as CanvasPoll
 
   const [state, setState] = useState<CanvasState>({
     protagonistName: "",
@@ -182,9 +189,10 @@ export function useCanvas({
     }
   }
 
-  const firstTopic = topics.find(t => t.id === state.poll.topicId)
-  const topicAbout = firstTopic?.placeholders?.[state.occasion]?.about
-    ?? firstTopic?.placeholders?.["default"]?.about
+  const firstTopic = topics.find((t) => t.id === state.poll.topicId)
+  const topicAbout =
+    firstTopic?.placeholders?.[state.occasion]?.about ??
+    firstTopic?.placeholders?.["default"]?.about
   const placeholders = {
     ...(OCCASION_PLACEHOLDERS[state.occasion] ?? DEFAULT_PLACEHOLDERS),
     about: topicAbout ?? getAboutPlaceholder(state.occasion),

@@ -1,24 +1,20 @@
-import path from 'path'
-import { fileURLToPath } from 'url'
-import type { StorybookConfig } from '@storybook/nextjs-vite'
+import path from "path"
+import { fileURLToPath } from "url"
+import type { StorybookConfig } from "@storybook/nextjs-vite"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const config: StorybookConfig = {
-  stories: [
-    "../components/**/*.stories.@(js|jsx|mjs|ts|tsx)"
-  ],
+  stories: ["../components/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
-    "@storybook/addon-mcp"
+    "@storybook/addon-mcp",
   ],
   framework: "@storybook/nextjs-vite",
-  staticDirs: [
-    "../public"
-  ],
+  staticDirs: ["../public"],
   viteFinal: async (config) => {
     config.resolve = {
       ...config.resolve,
@@ -39,10 +35,7 @@ const config: StorybookConfig = {
           __dirname,
           "../__mocks__/supabase-client.ts"
         ),
-        "@stripe/stripe-js": path.resolve(
-          __dirname,
-          "../__mocks__/stripe.ts"
-        ),
+        "@stripe/stripe-js": path.resolve(__dirname, "../__mocks__/stripe.ts"),
       },
     }
     return config

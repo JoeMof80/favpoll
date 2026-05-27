@@ -6,7 +6,10 @@ type FavpollCharityRowProps = {
   amountRaised?: string
 }
 
-export function FavpollCharityRow({ charity, amountRaised }: FavpollCharityRowProps) {
+export function FavpollCharityRow({
+  charity,
+  amountRaised,
+}: FavpollCharityRowProps) {
   const { size } = useFavpollCard()
 
   const textClass = size === "full" ? "text-[13px]" : "text-[11px]"

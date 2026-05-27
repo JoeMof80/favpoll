@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from "vitest"
 import { renderHook, act } from "@testing-library/react"
-import type { EventWithDetails, EventPollWithItems, Protagonist, Charity } from "@favpoll/types"
+import type {
+  EventWithDetails,
+  EventPollWithItems,
+  Protagonist,
+  Charity,
+} from "@favpoll/types"
 
 // --- mocks (must be declared before vi.mock calls) ---
 
@@ -35,7 +40,9 @@ const charity: Charity = {
   created_at: "2024-01-01T00:00:00Z",
 }
 
-function makeEvent(overrides: Partial<EventWithDetails> = {}): EventWithDetails {
+function makeEvent(
+  overrides: Partial<EventWithDetails> = {}
+): EventWithDetails {
   return {
     id: "event-1",
     protagonist_id: "prot-1",
@@ -58,10 +65,7 @@ function makeEvent(overrides: Partial<EventWithDetails> = {}): EventWithDetails 
   }
 }
 
-function makePoll(
-  id: string,
-  isFinite = false
-): EventPollWithItems {
+function makePoll(id: string, isFinite = false): EventPollWithItems {
   return {
     id,
     event_id: "event-1",
@@ -88,21 +92,36 @@ const finitePoll = makePoll("finite-poll", true)
 describe("useEventContent — initial state", () => {
   it("starts with empty pledgeAmount", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.pledgeAmount).toBe("")
   })
 
   it("starts with empty pollSelections", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.pollSelections).toEqual({})
   })
 
   it("starts with pledgeConfirmed as false", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.pledgeConfirmed).toBe(false)
   })
@@ -111,12 +130,20 @@ describe("useEventContent — initial state", () => {
 describe("useEventContent — handleSelectionsChange", () => {
   it("updates pollSelections for a given pollId", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     act(() => {
       result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
     })
-    expect(result.current.pollSelections["poll-1"]).toEqual(["item-a", "item-b"])
+    expect(result.current.pollSelections["poll-1"]).toEqual([
+      "item-a",
+      "item-b",
+    ])
   })
 
   it("allows updating the poll's selections multiple times", () => {
@@ -134,14 +161,22 @@ describe("useEventContent — handleSelectionsChange", () => {
     act(() => {
       result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
     })
-    expect(result.current.pollSelections["poll-1"]).toEqual(["item-a", "item-b"])
+    expect(result.current.pollSelections["poll-1"]).toEqual([
+      "item-a",
+      "item-b",
+    ])
   })
 })
 
 describe("useEventContent — handlePledgeSuccess", () => {
   it("sets pledgeConfirmed to true", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     act(() => {
       result.current.handlePledgeSuccess()
@@ -165,21 +200,36 @@ describe("useEventContent — addItemHandler", () => {
 
   it("returns undefined when event is closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: true, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: true,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
   it("returns undefined when clerkUserId is null (guest)", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: null })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: null,
+      })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
   it("returns a function for an infinite, open poll with logged-in user", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(typeof result.current.addItemHandler(poll)).toBe("function")
   })
@@ -189,12 +239,23 @@ describe("useEventContent — addItemHandler", () => {
     mockActions.addGuestItem.mockClear()
 
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     const handler = result.current.addItemHandler(poll)!
-    await act(async () => { await handler("Mauve") })
+    await act(async () => {
+      await handler("Mauve")
+    })
 
-    expect(mockActions.addGuestItem).toHaveBeenCalledWith(poll.id, poll.topic_id, "Mauve")
+    expect(mockActions.addGuestItem).toHaveBeenCalledWith(
+      poll.id,
+      poll.topic_id,
+      "Mauve"
+    )
     expect(mockRouter.refresh).toHaveBeenCalled()
   })
 })
@@ -202,23 +263,37 @@ describe("useEventContent — addItemHandler", () => {
 describe("useEventContent — derived values", () => {
   it("showPledgeCard is true when not closed and poll is set", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.showPledgeCard).toBe(true)
   })
 
   it("showPledgeCard is false when closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: poll, isClosed: true, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: true,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.showPledgeCard).toBe(false)
   })
 
   it("showPledgeCard is false when pollWithItems is null", () => {
     const { result } = renderHook(() =>
-      useEventContent({ event, pollWithItems: null, isClosed: false, clerkUserId: "user-1" })
+      useEventContent({
+        event,
+        pollWithItems: null,
+        isClosed: false,
+        clerkUserId: "user-1",
+      })
     )
     expect(result.current.showPledgeCard).toBe(false)
   })
-
 })

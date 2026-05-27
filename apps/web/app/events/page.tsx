@@ -64,7 +64,9 @@ export default async function LiveEventsPage() {
         .eq("clerk_user_id", userId)
         .in("event_poll_id", pollIds)
 
-      const pledgedPollIds = (pledges ?? []).map((p) => p.event_poll_id as string)
+      const pledgedPollIds = (pledges ?? []).map(
+        (p) => p.event_poll_id as string
+      )
 
       if (pledgedPollIds.length > 0) {
         // Fetch pledge_allocations for all pledges in one query, grouped by poll
@@ -86,13 +88,17 @@ export default async function LiveEventsPage() {
         for (const row of allocations ?? []) {
           const pollId = pledgeToPoll.get(row.pledge_id)
           if (!pollId) continue
-          const label = (row.topic_items as unknown as { label: string } | null)?.label
+          const label = (row.topic_items as unknown as { label: string } | null)
+            ?.label
           if (!label) continue
 
           if (!byPoll.has(pollId)) byPoll.set(pollId, new Map())
           const totals = byPoll.get(pollId)!
           const prev = totals.get(row.topic_item_id) ?? { label, total: 0 }
-          totals.set(row.topic_item_id, { label, total: prev.total + (row.amount ?? 0) })
+          totals.set(row.topic_item_id, {
+            label,
+            total: prev.total + (row.amount ?? 0),
+          })
         }
 
         for (const [pollId, totals] of byPoll) {
@@ -180,7 +186,9 @@ export default async function LiveEventsPage() {
                   : null,
               }
             }
-            const initialResults = poll ? pledgedResultsByPollId.get(poll.id) : undefined
+            const initialResults = poll
+              ? pledgedResultsByPollId.get(poll.id)
+              : undefined
             return (
               <EventCard
                 key={ev.id}

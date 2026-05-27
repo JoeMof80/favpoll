@@ -143,10 +143,7 @@ export function PickerField({
                     }}
                   >
                     {isSelected && !closeOnSelect && (
-                      <Check
-                        className="h-3 w-3 shrink-0"
-                        aria-hidden="true"
-                      />
+                      <Check className="h-3 w-3 shrink-0" aria-hidden="true" />
                     )}
                     {item.label}
                   </Chip>

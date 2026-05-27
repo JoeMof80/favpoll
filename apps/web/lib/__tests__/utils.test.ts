@@ -16,11 +16,15 @@ describe("cn", () => {
   })
 
   it("ignores falsy values", () => {
-    expect(cn("text-sm", false, undefined, null, "font-bold")).toBe("text-sm font-bold")
+    expect(cn("text-sm", false, undefined, null, "font-bold")).toBe(
+      "text-sm font-bold"
+    )
   })
 
   it("handles conditional class objects", () => {
-    expect(cn({ "text-red-500": true, "text-blue-500": false })).toBe("text-red-500")
+    expect(cn({ "text-red-500": true, "text-blue-500": false })).toBe(
+      "text-red-500"
+    )
   })
 
   it("returns empty string when given no truthy values", () => {

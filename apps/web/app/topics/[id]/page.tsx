@@ -76,7 +76,9 @@ export default async function TopicPage({ params }: Props) {
               <TopicRankings
                 items={items}
                 topicTitle={typedTopic.title}
-                hasColourSwatch={typedTopic.title.toLowerCase().includes('colour')}
+                hasColourSwatch={typedTopic.title
+                  .toLowerCase()
+                  .includes("colour")}
               />
             </Suspense>
           </div>
@@ -94,10 +96,12 @@ export default async function TopicPage({ params }: Props) {
                   <div>
                     <p className="text-xs text-muted-foreground">Leading</p>
                     <div className="mt-0.5 flex items-center gap-2">
-                      {typedTopic.title.toLowerCase().includes('colour') && (
+                      {typedTopic.title.toLowerCase().includes("colour") && (
                         <span
                           className="h-3 w-3 shrink-0 rounded-full border border-border/50"
-                          style={{ backgroundColor: topItem.label.toLowerCase() }}
+                          style={{
+                            backgroundColor: topItem.label.toLowerCase(),
+                          }}
                           aria-hidden="true"
                         />
                       )}
@@ -130,8 +134,7 @@ export default async function TopicPage({ params }: Props) {
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Ask your guests what their favourite{" "}
               {typedTopic.title.toLowerCase().replace("favourite ", "")} is —
-              and turn their pledges into funds for a charity you care
-              about.
+              and turn their pledges into funds for a charity you care about.
             </p>
             <Button asChild className="mt-4">
               <Link href={`/events/new?topic=${id}`}>Create an event</Link>

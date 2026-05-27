@@ -25,5 +25,4 @@ describe("newPoll", () => {
   it("sets pickingTopic to true when topicId is empty string", () => {
     expect(newPoll("").pickingTopic).toBe(true)
   })
-
 })

@@ -66,7 +66,9 @@ beforeEach(() => {
 
   // Restore Webhook constructor mock (cleared by clearAllMocks)
   // Must use function keyword — arrow functions cannot be used as constructors with `new`
-  MockWebhook.mockImplementation(function() { return { verify: mockVerify } })
+  MockWebhook.mockImplementation(function () {
+    return { verify: mockVerify }
+  })
   // Default: valid signature returning a no-op event
   mockVerify.mockReturnValue({ type: "unknown", data: makeUserData() })
 
@@ -101,7 +103,9 @@ describe("POST /api/webhooks/clerk — guards", () => {
   })
 
   it("returns 400 when svix signature verification fails", async () => {
-    mockVerify.mockImplementationOnce(() => { throw new Error("bad sig") })
+    mockVerify.mockImplementationOnce(() => {
+      throw new Error("bad sig")
+    })
 
     const res = await POST(makeRequest())
     expect(res.status).toBe(400)
@@ -157,7 +161,9 @@ describe("POST /api/webhooks/clerk — user.created", () => {
   })
 
   it("returns 500 when insert fails", async () => {
-    mockInsert.mockReturnValueOnce(Promise.resolve({ error: { message: "duplicate key" } }))
+    mockInsert.mockReturnValueOnce(
+      Promise.resolve({ error: { message: "duplicate key" } })
+    )
 
     const res = await POST(makeRequest())
     expect(res.status).toBe(500)
@@ -190,7 +196,9 @@ describe("POST /api/webhooks/clerk — user.updated", () => {
   })
 
   it("returns 500 when update fails", async () => {
-    mockEq.mockReturnValueOnce(Promise.resolve({ error: { message: "row not found" } }))
+    mockEq.mockReturnValueOnce(
+      Promise.resolve({ error: { message: "row not found" } })
+    )
 
     const res = await POST(makeRequest())
     expect(res.status).toBe(500)
@@ -216,7 +224,9 @@ describe("POST /api/webhooks/clerk — user.deleted", () => {
   })
 
   it("returns 500 when delete fails", async () => {
-    mockEq.mockReturnValueOnce(Promise.resolve({ error: { message: "constraint violation" } }))
+    mockEq.mockReturnValueOnce(
+      Promise.resolve({ error: { message: "constraint violation" } })
+    )
 
     const res = await POST(makeRequest())
     expect(res.status).toBe(500)
@@ -229,7 +239,10 @@ describe("POST /api/webhooks/clerk — user.deleted", () => {
 
 describe("POST /api/webhooks/clerk — unknown event type", () => {
   it("returns 200 without touching the database", async () => {
-    mockVerify.mockReturnValue({ type: "session.created", data: makeUserData() })
+    mockVerify.mockReturnValue({
+      type: "session.created",
+      data: makeUserData(),
+    })
 
     const res = await POST(makeRequest())
 

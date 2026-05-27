@@ -88,7 +88,7 @@ describe("computePledgeAllocations", () => {
     const a = result.find((r) => r.topicItemId === "a")!
     const b = result.find((r) => r.topicItemId === "b")!
     const c = result.find((r) => r.topicItemId === "c")!
-    expect(c.amount).toBe(3.4)   // c is selectedIds[0] → gets remainder (34%)
+    expect(c.amount).toBe(3.4) // c is selectedIds[0] → gets remainder (34%)
     expect(b.amount).toBe(3.3)
     expect(a.amount).toBe(3.3)
   })

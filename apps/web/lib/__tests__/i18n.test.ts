@@ -29,11 +29,17 @@ describe("formatCurrency", () => {
 
 describe("MARKET_DEFAULTS", () => {
   it("en-GB uses GBP and en-GB locale", () => {
-    expect(MARKET_DEFAULTS["en-GB"]).toEqual({ locale: "en-GB", currency: "GBP" })
+    expect(MARKET_DEFAULTS["en-GB"]).toEqual({
+      locale: "en-GB",
+      currency: "GBP",
+    })
   })
 
   it("en-US uses USD and en-US locale", () => {
-    expect(MARKET_DEFAULTS["en-US"]).toEqual({ locale: "en-US", currency: "USD" })
+    expect(MARKET_DEFAULTS["en-US"]).toEqual({
+      locale: "en-US",
+      currency: "USD",
+    })
   })
 })
 

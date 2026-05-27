@@ -83,8 +83,19 @@ export function ItemAddField({
 
   if (disabled) {
     return (
-      <div className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size], "pointer-events-none opacity-40")}>
-        <span className={cn("min-w-0 flex-1 text-muted-foreground/50", CHIP_IN_INPUT_TEXT[size])}>
+      <div
+        className={cn(
+          CHIP_IN_INPUT,
+          CHIP_IN_INPUT_SIZE[size],
+          "pointer-events-none opacity-40"
+        )}
+      >
+        <span
+          className={cn(
+            "min-w-0 flex-1 text-muted-foreground/50",
+            CHIP_IN_INPUT_TEXT[size]
+          )}
+        >
           Select a topic first…
         </span>
       </div>

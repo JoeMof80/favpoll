@@ -96,10 +96,14 @@ describe("usePollSection — pledgeJustConfirmed reveal", () => {
     )
 
     rerender({ confirmed: true })
-    act(() => { vi.advanceTimersByTime(300) })
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
 
     // Manually switch back to pledge, simulate a second confirm signal
-    act(() => { result.current.setView("pledge") })
+    act(() => {
+      result.current.setView("pledge")
+    })
     rerender({ confirmed: true }) // still true — no new transition
 
     // view should stay at "pledge" (reveal guard is locked after first fire)
@@ -136,13 +140,17 @@ describe("usePollSection — hasPledged fallback reveal", () => {
 describe("usePollSection — setters", () => {
   it("setView changes the view", () => {
     const { result } = renderHook(() => usePollSection(defaults))
-    act(() => { result.current.setView("results") })
+    act(() => {
+      result.current.setView("results")
+    })
     expect(result.current.view).toBe("results")
   })
 
   it("setRankingView changes the rankingView", () => {
     const { result } = renderHook(() => usePollSection(defaults))
-    act(() => { result.current.setRankingView("count") })
+    act(() => {
+      result.current.setRankingView("count")
+    })
     expect(result.current.rankingView).toBe("count")
   })
 })
@@ -156,7 +164,10 @@ describe("usePollSection — handleSelectionsChange", () => {
     act(() => {
       result.current.handleSelectionsChange(["item-a", "item-b"])
     })
-    expect(onSelectionsChange).toHaveBeenCalledWith("poll-99", ["item-a", "item-b"])
+    expect(onSelectionsChange).toHaveBeenCalledWith("poll-99", [
+      "item-a",
+      "item-b",
+    ])
   })
 
   it("uses the current pollId even after multiple renders", () => {
@@ -164,7 +175,9 @@ describe("usePollSection — handleSelectionsChange", () => {
     const { result } = renderHook(() =>
       usePollSection({ ...defaults, pollId: "poll-1", onSelectionsChange })
     )
-    act(() => { result.current.handleSelectionsChange(["x"]) })
+    act(() => {
+      result.current.handleSelectionsChange(["x"])
+    })
     expect(onSelectionsChange).toHaveBeenCalledWith("poll-1", ["x"])
   })
 })

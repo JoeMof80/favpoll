@@ -1,9 +1,13 @@
-import { ClerkProvider as ClerkNextJSProvider } from '@clerk/nextjs';
-import { shadcn } from '@clerk/ui/themes';
+import { ClerkProvider as ClerkNextJSProvider } from "@clerk/nextjs"
+import { shadcn } from "@clerk/ui/themes"
 
-type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>;
+type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>
 
-export function ClerkProvider({ children, appearance, ...props }: ClerkProviderProps) {
+export function ClerkProvider({
+  children,
+  appearance,
+  ...props
+}: ClerkProviderProps) {
   return (
     <ClerkNextJSProvider
       appearance={{
@@ -14,5 +18,5 @@ export function ClerkProvider({ children, appearance, ...props }: ClerkProviderP
     >
       {children}
     </ClerkNextJSProvider>
-  );
+  )
 }

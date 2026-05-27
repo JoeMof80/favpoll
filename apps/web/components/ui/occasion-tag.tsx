@@ -9,7 +9,7 @@ export function OccasionTag({ label, className }: Props) {
   return (
     <p
       className={cn(
-        "text-[10px] font-medium tracking-[0.08em] uppercase text-[#534AB7] opacity-70",
+        "text-[10px] font-medium tracking-[0.08em] text-[#534AB7] uppercase opacity-70",
         className
       )}
     >

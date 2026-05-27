@@ -7,7 +7,9 @@ describe("formatCharityLabel", () => {
   })
 
   it("returns the name directly for a single charity", () => {
-    expect(formatCharityLabel(["Cancer Research UK"])).toBe("Cancer Research UK")
+    expect(formatCharityLabel(["Cancer Research UK"])).toBe(
+      "Cancer Research UK"
+    )
   })
 
   it("joins two charities with ' & '", () => {
@@ -15,10 +17,14 @@ describe("formatCharityLabel", () => {
   })
 
   it("joins three charities with Oxford-style comma and '&'", () => {
-    expect(formatCharityLabel(["Oxfam", "RNLI", "Mind"])).toBe("Oxfam, RNLI & Mind")
+    expect(formatCharityLabel(["Oxfam", "RNLI", "Mind"])).toBe(
+      "Oxfam, RNLI & Mind"
+    )
   })
 
   it("handles charity names with special characters", () => {
-    expect(formatCharityLabel(["St. John's Ambulance"])).toBe("St. John's Ambulance")
+    expect(formatCharityLabel(["St. John's Ambulance"])).toBe(
+      "St. John's Ambulance"
+    )
   })
 })

@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { PollReveal } from '../poll-reveal'
+import type { Meta, StoryObj } from "@storybook/react"
+import { PollReveal } from "../poll-reveal"
 
 const meta = {
-  title: 'FavpollCard/PollReveal',
+  title: "FavpollCard/PollReveal",
   component: PollReveal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: "centered" },
   decorators: [
     (Story) => (
       <div className="w-72">
@@ -19,10 +19,11 @@ type Story = StoryObj<typeof meta>
 
 export const WithReveal: Story = {
   args: {
-    personalReveal: 'Mine was purple. I wore it to every occasion that mattered.',
-    protagonistFirstName: 'Belinda',
-    role: 'status',
-    'aria-live': 'polite',
+    personalReveal:
+      "Mine was purple. I wore it to every occasion that mattered.",
+    protagonistFirstName: "Belinda",
+    role: "status",
+    "aria-live": "polite",
   },
 }
 

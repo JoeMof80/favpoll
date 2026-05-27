@@ -1,5 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldSet, FieldTitle } from "./field"
+import {
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldSet,
+  FieldTitle,
+} from "./field"
 import { Input } from "./input"
 
 const meta = {
@@ -31,7 +39,9 @@ export const WithDescription: Story = {
   render: () => (
     <Field>
       <FieldTitle>Email address</FieldTitle>
-      <FieldDescription>We'll send your pledge confirmation here.</FieldDescription>
+      <FieldDescription>
+        We'll send your pledge confirmation here.
+      </FieldDescription>
       <Input id="email" type="email" placeholder="you@example.com" />
     </Field>
   ),
@@ -65,7 +75,9 @@ export const FieldGroupExample: Story = {
       </Field>
       <Field>
         <FieldTitle>Email address</FieldTitle>
-        <FieldDescription>We'll send your pledge confirmation here.</FieldDescription>
+        <FieldDescription>
+          We'll send your pledge confirmation here.
+        </FieldDescription>
         <Input id="email" type="email" placeholder="you@example.com" />
       </Field>
       <Field data-invalid="true">
