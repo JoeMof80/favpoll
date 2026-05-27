@@ -27,7 +27,7 @@ type EditProps = {
   protagonistAbout: string
   dateLabel: string
   initialPhotoUrl?: string | null
-  placeholders: Pick<OccasionPlaceholders, "name" | "about">
+  placeholders: Pick
   onOpeningLineChange: (v: string) => void
   onProtagonistNameChange: (v: string) => void
   onProtagonistAboutChange: (v: string) => void
@@ -41,7 +41,7 @@ export function EventHero(props: Props) {
   const isEdit = props.mode === "edit"
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(
-    isEdit ? (props.initialPhotoUrl ?? null) : null
+    isEdit ? props.initialPhotoUrl ?? null : null
   )
   const [photoUploading, setPhotoUploading] = useState(false)
 
@@ -57,7 +57,7 @@ export function EventHero(props: Props) {
         dateLabel: props.protagonist.context,
       })
 
-  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: React.ChangeEvent) {
     if (!isEdit) return
     const file = e.target.files?.[0]
     if (!file) return
@@ -110,7 +110,10 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <SectionEyebrow variant="muted" className="mb-2 truncate">
+            <SectionEyebrow
+              variant="muted"
+              className="mb-2 truncate wrap-break-word"
+            >
               {headline?.prefix ?? label}
             </SectionEyebrow>
           )}
@@ -132,7 +135,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A] sm:text-5xl">
+            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
               {protagonist?.name}
             </h1>
           )}
@@ -156,7 +159,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : headline?.suffix ? (
-            <p className="mt-2 truncate text-2xl font-normal text-[#534AB7]">
+            <p className="mt-2 truncate text-2xl font-normal wrap-break-word text-[#534AB7]">
               {headline.suffix}
             </p>
           ) : null}
@@ -184,7 +187,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : protagonist?.about ? (
-            <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
+            <p className="mt-4 line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
               {protagonist.about}
             </p>
           ) : null}
