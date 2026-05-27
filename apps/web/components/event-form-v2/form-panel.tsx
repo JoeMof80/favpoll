@@ -74,34 +74,29 @@ type Props = {
 }
 
 function CounterWhenTyping({
-  value,
   remaining,
   description,
   warning,
   critical,
 }: {
-  value: string
   remaining: number
   description?: string
   warning: number
   critical: number
 }) {
-  if (value.length === 0) {
-    return description ? <>{description}</> : null
+  if (remaining <= warning) {
+    return (
+      <span
+        className={cn(
+          "block text-right",
+          remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"
+        )}
+      >
+        {remaining} left
+      </span>
+    )
   }
-  return (
-    <span
-      className={
-        remaining <= critical
-          ? "text-[#E24B4A]"
-          : remaining <= warning
-            ? "text-[#EF9F27]"
-            : undefined
-      }
-    >
-      {remaining} characters remaining.
-    </span>
-  )
+  return description ? <>{description}</> : null
 }
 
 function StepSection({
@@ -272,7 +267,6 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 <CounterWhenTyping
-                  value={openingLineValue}
                   remaining={openingLineRemaining}
                   warning={12}
                   critical={6}
@@ -306,7 +300,6 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 <CounterWhenTyping
-                  value={nameValue}
                   remaining={nameRemaining}
                   description="Name or nickname shown throughout the event"
                   warning={8}
@@ -349,7 +342,6 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 <CounterWhenTyping
-                  value={contextValue}
                   remaining={contextRemaining}
                   description="Dates, years, or other context. Optional."
                   warning={8}
@@ -450,7 +442,6 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 <CounterWhenTyping
-                  value={aboutValue}
                   remaining={aboutRemaining}
                   warning={60}
                   critical={15}
@@ -584,7 +575,6 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 <CounterWhenTyping
-                  value={revealValue}
                   remaining={revealRemaining}
                   description="Shown to guests after they've pledged."
                   warning={56}

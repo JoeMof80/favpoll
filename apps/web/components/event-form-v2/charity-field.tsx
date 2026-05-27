@@ -29,7 +29,6 @@ export function CharityField({
   const [search, setSearch] = useState("")
   const anchorRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const wasOpenRef = useRef(false)
 
   const atMax = value.length >= MAX_CHARITIES
   const selected = charities.filter((c) => value.includes(c.id))
@@ -54,10 +53,6 @@ export function CharityField({
     setOpen(true)
   }
 
-  function handleFocus() {
-    if (!wasOpenRef.current) openDropdown()
-  }
-
   function handleBlur() {
     setTimeout(() => {
       setOpen(false)
@@ -80,9 +75,6 @@ export function CharityField({
           <div
             ref={anchorRef}
             className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
-            onMouseDown={() => {
-              wasOpenRef.current = open
-            }}
             onClick={() => inputRef.current?.focus()}
           >
             {selected.map((c) => (
@@ -111,12 +103,16 @@ export function CharityField({
                   if (!open) openDropdown()
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Delete" && !search && value.length > 0) {
+                  if (
+                    (e.key === "Delete" || e.key === "Backspace") &&
+                    !search &&
+                    value.length > 0
+                  ) {
                     e.preventDefault()
                     onChange(value.slice(0, -1))
                   }
                 }}
-                onFocus={handleFocus}
+                onFocus={openDropdown}
                 onBlur={handleBlur}
                 placeholder={
                   selected.length === 0 ? "Select a charity…" : "Add another…"
@@ -135,6 +131,11 @@ export function CharityField({
           className="p-0"
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            if (anchorRef.current?.contains(e.target as Node)) {
+              e.preventDefault()
+            }
+          }}
         >
           <div
             className="max-h-60 overflow-y-auto p-2"

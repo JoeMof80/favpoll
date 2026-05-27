@@ -30,7 +30,6 @@ export function OccasionPickerField({
   const [open, setOpen] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState(0)
   const anchorRef = useRef<HTMLDivElement>(null)
-  const wasOpenRef = useRef(false)
 
   const selectedLabel =
     OCCASION_LIST.find((o) => o.value === value)?.label ?? null
@@ -56,12 +55,7 @@ export function OccasionPickerField({
             CHIP_IN_INPUT_SIZE[size],
             "cursor-pointer select-none"
           )}
-          onMouseDown={() => {
-            wasOpenRef.current = open
-          }}
-          onClick={() => {
-            if (!wasOpenRef.current) openDropdown()
-          }}
+          onClick={openDropdown}
         >
           {selectedLabel ? (
             <Chip
@@ -93,6 +87,11 @@ export function OccasionPickerField({
         className="p-0"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          if (anchorRef.current?.contains(e.target as Node)) {
+            e.preventDefault()
+          }
+        }}
       >
         <div
           className="max-h-60 overflow-y-auto p-2"
