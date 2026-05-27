@@ -52,7 +52,7 @@ export function EventHero(props: Props) {
     ? null
     : getEventHeadline({
         occasion: props.event.occasion,
-        openingLine: props.event.opening_line,
+        occasionLabel: props.event.opening_line,
         name: props.protagonist.name,
         dateLabel: props.protagonist.context,
       })
@@ -184,7 +184,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : protagonist?.about ? (
-            <p className="mt-4 text-base leading-relaxed text-[#5F5E5A]">
+            <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
               {protagonist.about}
             </p>
           ) : null}

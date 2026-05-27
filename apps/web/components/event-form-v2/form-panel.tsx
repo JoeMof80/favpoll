@@ -179,7 +179,7 @@ export function FormPanel({
   const nameRemaining = 40 - nameValue.length
   const openingLineRemaining = 60 - openingLineValue.length
   const contextRemaining = 40 - contextValue.length
-  const aboutRemaining = 400 - aboutValue.length
+  const aboutRemaining = 300 - aboutValue.length
   const revealRemaining = 280 - revealValue.length
 
   const charitiesCount = charitiesValue.length
@@ -414,7 +414,7 @@ export function FormPanel({
                     aboutPlaceholder ?? "Enter infomation about the event"
                   }
                   rows={4}
-                  maxLength={400}
+                  maxLength={300}
                   {...field}
                   value={field.value}
                   className={cn(
@@ -428,8 +428,8 @@ export function FormPanel({
                 {"A few words about them or what this occasion means."}
                 <CounterSpan
                   remaining={aboutRemaining}
-                  warning={80}
-                  critical={20}
+                  warning={60}
+                  critical={15}
                 />
               </FieldDescription>
             </FormItem>
