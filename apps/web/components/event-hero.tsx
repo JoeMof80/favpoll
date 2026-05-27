@@ -22,13 +22,13 @@ type ViewProps = {
 type EditProps = {
   mode: "edit"
   occasion: string
-  occasionLabel: string
+  openingLine: string
   protagonistName: string
   protagonistAbout: string
   dateLabel: string
   initialPhotoUrl?: string | null
   placeholders: Pick<OccasionPlaceholders, "name" | "about">
-  onOccasionLabelChange: (v: string) => void
+  onOpeningLineChange: (v: string) => void
   onProtagonistNameChange: (v: string) => void
   onProtagonistAboutChange: (v: string) => void
   onDateLabelChange: (v: string) => void
@@ -52,9 +52,9 @@ export function EventHero(props: Props) {
     ? null
     : getEventHeadline({
         occasion: props.event.occasion,
-        occasionLabel: props.event.occasion_label,
+        openingLine: props.event.opening_line,
         name: props.protagonist.name,
-        dateLabel: props.protagonist.date_label,
+        dateLabel: props.protagonist.context,
       })
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,8 +98,8 @@ export function EventHero(props: Props) {
             <div className="relative mb-2">
               <input
                 type="text"
-                value={props.occasionLabel}
-                onChange={(e) => props.onOccasionLabelChange(e.target.value)}
+                value={props.openingLine}
+                onChange={(e) => props.onOpeningLineChange(e.target.value)}
                 placeholder={label || "In memory of"}
                 className="peer w-full appearance-none bg-transparent py-0 pr-5 text-xs font-medium tracking-widest text-muted-foreground uppercase outline-none placeholder:text-muted-foreground/30"
               />
@@ -137,7 +137,7 @@ export function EventHero(props: Props) {
             </h1>
           )}
 
-          {/* Dates — edit mode: free text; view mode: rendered from date_label */}
+          {/* Dates — edit mode: free text; view mode: rendered from context */}
           {isEdit ? (
             <div className="relative mt-2">
               <input

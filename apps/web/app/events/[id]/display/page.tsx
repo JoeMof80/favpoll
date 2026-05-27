@@ -71,8 +71,8 @@ export default async function DisplayPage({ params }: Props) {
     <DisplayScreen
       eventId={id}
       protagonistName={event.protagonists.name}
-      dateLabel={event.protagonists.date_label ?? null}
-      occasionLabel={event.occasion_label ?? null}
+      dateLabel={event.protagonists.context ?? null}
+      openingLine={event.opening_line ?? null}
       description={event.description ?? null}
       occasion={event.occasion}
       charityName={charityName}

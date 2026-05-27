@@ -66,13 +66,13 @@ type GuestItemAddedParams = {
   to: string
   itemLabel: string
   topicTitle: string
-  occasionLabel: string
+  openingLine: string
   protagonistName: string
   eventId: string
 }
 
 export async function sendGuestItemAdded(params: GuestItemAddedParams) {
-  const { to, itemLabel, topicTitle, occasionLabel, protagonistName, eventId } = params
+  const { to, itemLabel, topicTitle, openingLine, protagonistName, eventId } = params
   const eventUrl = `${BASE_URL}/events/${eventId}`
 
   await resend.emails.send({
@@ -80,7 +80,7 @@ export async function sendGuestItemAdded(params: GuestItemAddedParams) {
     to,
     subject: `New item added to your ${topicTitle} poll`,
     html: `
-      <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${occasionLabel} for ${protagonistName}.</p>
+      <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${openingLine} for ${protagonistName}.</p>
       <p><a href="${eventUrl}">View your event</a></p>
     `,
   })

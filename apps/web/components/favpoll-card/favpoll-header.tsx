@@ -42,9 +42,9 @@ export function FavpollHeader({ protagonist, eyebrow }: FavpollHeaderProps) {
             </span>
           )}
           <span className={nameClass}>{protagonist.name}</span>
-          {protagonist.date_label && (
+          {protagonist.context && (
             <span className="text-[12px] text-[#888780]">
-              {protagonist.date_label}
+              {protagonist.context}
             </span>
           )}
         </div>

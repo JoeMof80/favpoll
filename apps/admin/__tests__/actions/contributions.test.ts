@@ -34,7 +34,7 @@ const makeRawItem = (overrides: Record<string, unknown> = {}) => ({
         event_id: 'event-1',
         events: {
           id: 'event-1',
-          occasion_label: 'Birthday',
+          opening_line: 'Birthday',
           protagonists: { name: 'Alex' },
         },
       },

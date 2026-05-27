@@ -79,9 +79,9 @@ export default async function EditEventPage({ params }: Props) {
     protagonistName: event.protagonists.name,
     protagonistAbout: event.protagonists.about ?? '',
     photoUrl: event.protagonists.photo_url ?? null,
-    dateLabel: event.protagonists.date_label ?? '',
+    dateLabel: event.protagonists.context ?? '',
     occasion: event.occasion,
-    occasionLabel: event.occasion_label ?? OCCASION_LABELS[event.occasion] ?? '',
+    openingLine: event.opening_line ?? OCCASION_LABELS[event.occasion] ?? '',
     description: event.description ?? '',
     charityIds: (event.event_charities ?? []).map(
       (ec: { charity_id: string }) => ec.charity_id,

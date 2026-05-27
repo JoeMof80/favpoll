@@ -19,7 +19,7 @@ function makeInput(overrides: Partial<CanvasSubmitData> = {}): CanvasSubmitData 
     dateLabel: null,
     photoUrl: null,
     occasion: "birthday",
-    occasionLabel: null,
+    openingLine: null,
     description: null,
     charityIds: ["charity-1"],
     closesAt: "2028-01-01T00:00",
@@ -173,7 +173,7 @@ describe("updateEvent — DB writes", () => {
     const protUpdate = mock.callsFor("protagonists").find((c) => c.method === "update")!
     expect(protUpdate.args[0]).toMatchObject({
       name: "Bob",
-      date_label: "1990–2025",
+      context: "1990–2025",
       about: "Bio text",
     })
   })

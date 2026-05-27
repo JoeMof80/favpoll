@@ -45,7 +45,7 @@ function makeHeroProps(sceneIndex: number): { event: Event; protagonist: Protago
   const protagonist: Protagonist = {
     id: `p-ep-${sceneIndex}`,
     name: scene.protagonist.name,
-    date_label: DATE_LABELS[sceneIndex],
+    context: DATE_LABELS[sceneIndex],
     about: BIOS[sceneIndex],
     photo_url: null,
     created_by: null,
@@ -55,7 +55,7 @@ function makeHeroProps(sceneIndex: number): { event: Event; protagonist: Protago
     id: `e-ep-${sceneIndex}`,
     protagonist_id: protagonist.id,
     occasion: OCCASIONS[sceneIndex],
-    occasion_label: SCENE_EYEBROWS[sceneIndex],
+    opening_line: SCENE_EYEBROWS[sceneIndex],
     market: "en-GB",
     created_by: "user-1",
     closes_at: "2026-12-31T00:00:00Z",

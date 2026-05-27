@@ -82,7 +82,7 @@ export function EventCanvas(props: Props) {
                   selected={selected}
                   onClick={() => {
                     set("occasion", occ.value)
-                    set("occasionLabel", OCCASION_LABELS[occ.value] ?? "")
+                    set("openingLine", OCCASION_LABELS[occ.value] ?? "")
                   }}
                   className="shrink-0"
                 >
@@ -102,13 +102,13 @@ export function EventCanvas(props: Props) {
             <EventHero
               mode="edit"
               occasion={state.occasion}
-              occasionLabel={state.occasionLabel}
+              openingLine={state.openingLine}
               protagonistName={state.protagonistName}
               protagonistAbout={state.protagonistAbout}
               dateLabel={state.dateLabel}
               initialPhotoUrl={props.initialData?.photoUrl}
               placeholders={placeholders}
-              onOccasionLabelChange={(v) => set("occasionLabel", v)}
+              onOpeningLineChange={(v) => set("openingLine", v)}
               onProtagonistNameChange={(v) => set("protagonistName", v)}
               onProtagonistAboutChange={(v) => set("protagonistAbout", v)}
               onDateLabelChange={(v) => set("dateLabel", v)}

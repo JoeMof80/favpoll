@@ -18,7 +18,7 @@ const ICE_CREAM_ITEMS = [
 
 const baseEvent = {
   id: "1",
-  occasion_label: "In memory of",
+  opening_line: "In memory of",
   description: "A beloved mother, teacher, and friend who spent her life bringing people together.",
   closes_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   total_raised: 750,
@@ -56,7 +56,7 @@ export const Birthday: Story = {
     event: {
       ...baseEvent,
       id: "2",
-      occasion_label: "Birthday",
+      opening_line: "Birthday",
       description: null,
       total_raised: 480,
       protagonist: { name: "Poppy Clarke" },
@@ -75,7 +75,7 @@ export const Retirement: Story = {
     event: {
       ...baseEvent,
       id: "3",
-      occasion_label: "After a lifetime of good work",
+      opening_line: "After a lifetime of good work",
       description: "After 35 years building the engineering team, David is finally putting down his laptop.",
       total_raised: 1250,
       protagonist: { name: "David Clarke" },

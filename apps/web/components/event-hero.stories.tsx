@@ -44,7 +44,7 @@ function makeViewProps(sceneIndex: number): {
   const protagonist: Protagonist = {
     id: `p-${sceneIndex}`,
     name: scene.protagonist.name,
-    date_label: DATE_LABELS[sceneIndex],
+    context: DATE_LABELS[sceneIndex],
     about: BIOS[sceneIndex],
     photo_url: null,
     created_by: null,
@@ -55,7 +55,7 @@ function makeViewProps(sceneIndex: number): {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
     occasion,
-    occasion_label: SCENE_EYEBROWS[sceneIndex],
+    opening_line: SCENE_EYEBROWS[sceneIndex],
     market: "en-GB",
     created_by: "user-1",
     closes_at: "2026-12-31T00:00:00Z",
@@ -140,7 +140,7 @@ export const EditMode = {
       about: "Bio",
       reveal: "",
     }
-    const [occasionLabel, setOccasionLabel] = useState("In memory of")
+    const [openingLine, setOpeningLine] = useState("In memory of")
     const [protagonistName, setProtagonistName] = useState("")
     const [protagonistAbout, setProtagonistAbout] = useState("")
     const [dateLabel, setDateLabel] = useState("")
@@ -148,13 +148,13 @@ export const EditMode = {
       <EventHero
         mode="edit"
         occasion="memorial"
-        occasionLabel={occasionLabel}
+        openingLine={openingLine}
         protagonistName={protagonistName}
         protagonistAbout={protagonistAbout}
         dateLabel={dateLabel}
         initialPhotoUrl={null}
         placeholders={placeholders}
-        onOccasionLabelChange={setOccasionLabel}
+        onOpeningLineChange={setOpeningLine}
         onProtagonistNameChange={setProtagonistName}
         onProtagonistAboutChange={setProtagonistAbout}
         onDateLabelChange={setDateLabel}

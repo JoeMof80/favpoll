@@ -74,7 +74,7 @@ export const Memorial: Story = {
     eventId: 'demo-memorial',
     protagonistName: SCENES[0].protagonist.name,
     dateLabel: '1943–2024',
-    occasionLabel: 'In memory of',
+    openingLine: 'In memory of',
     description:
       "Belinda was a school librarian for forty years at St Catherine's. She is remembered for her warmth, her impossible memory for every pupil's name, and her lifelong love of purple.",
     occasion: 'memorial',
@@ -91,7 +91,7 @@ export const Birthday: Story = {
     eventId: 'demo-birthday',
     protagonistName: SCENES[1].protagonist.name,
     dateLabel: '30th May 2026',
-    occasionLabel: 'Birthday',
+    openingLine: 'Birthday',
     description: null,
     occasion: 'birthday',
     charityName: SCENES[1].charities[0].name,
@@ -107,7 +107,7 @@ export const Retirement: Story = {
     eventId: 'demo-retirement',
     protagonistName: SCENES[2].protagonist.name,
     dateLabel: null,
-    occasionLabel: 'After a lifetime of good work',
+    openingLine: 'After a lifetime of good work',
     description:
       'Ros spent thirty-one years teaching secondary science. She never once took a sick day.',
     occasion: 'retirement',
@@ -124,7 +124,7 @@ export const Graduation: Story = {
     eventId: 'demo-graduation',
     protagonistName: SCENES[5].protagonist.name,
     dateLabel: '13th June 2026',
-    occasionLabel: 'Congratulations',
+    openingLine: 'Congratulations',
     description:
       "James graduated last week with a first in mechanical engineering. He's already accepted a job offer.",
     occasion: 'graduation',

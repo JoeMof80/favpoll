@@ -134,7 +134,7 @@ export function HeroDemoPanel() {
 
             <span className="sr-only">
               Animated demonstration of how favpoll works, showing a{" "}
-              {scene.occasion_label.toLowerCase()} event. The demonstration cycles
+              {scene.opening_line.toLowerCase()} event. The demonstration cycles
               through occasion types automatically. Use the buttons above to
               jump to a specific occasion.
             </span>

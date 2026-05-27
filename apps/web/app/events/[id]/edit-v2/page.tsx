@@ -76,7 +76,8 @@ export default async function EditEventV2Page({ params }: Props) {
   const defaultValues: Partial<EventFormValues> = {
     occasion: event.occasion ?? "",
     name: event.protagonists.name ?? "",
-    suffix: event.protagonists.date_label ?? "",
+    context: event.protagonists.context ?? "",
+    openingLine: event.opening_line ?? "",
     about: event.protagonists.about ?? "",
     photoUrl: event.protagonists.photo_url ?? undefined,
     closesAt: new Date(event.closes_at),

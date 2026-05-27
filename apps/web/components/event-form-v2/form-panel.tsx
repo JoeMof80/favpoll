@@ -27,6 +27,7 @@ import {
   DATE_LABEL_PLACEHOLDERS,
   TOPIC_REVEAL_PLACEHOLDERS,
 } from "@/lib/occasions"
+import { PREFIXES } from "@/lib/display"
 import { cn } from "@/lib/utils"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
@@ -42,7 +43,6 @@ import {
   TEXTAREA_SIZE,
   type PickerSize,
 } from "./constants"
-import { Button } from "../ui/button"
 
 const STEP_NUMBER: Record<PickerSize, string> = {
   sm: "h-5 w-5 text-[10px]",
@@ -128,6 +128,15 @@ function StepSection({
   )
 }
 
+function CounterSpan({ remaining, warning, critical }: { remaining: number; warning: number; critical: number }) {
+  if (remaining > warning) return null
+  return (
+    <span className={remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"}>
+      {" "}{remaining} characters remaining.
+    </span>
+  )
+}
+
 export function FormPanel({
   charities,
   topics,
@@ -148,10 +157,17 @@ export function FormPanel({
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
+
+  const openingLineValue = form.watch("openingLine") ?? ""
+  const nameValue = form.watch("name") ?? ""
+  const contextValue = form.watch("context") ?? ""
   const aboutValue = form.watch("about") ?? ""
   const revealValue = form.watch("reveal") ?? ""
   const charitiesValue = form.watch("charities") ?? []
 
+  const nameRemaining = 80 - nameValue.length
+  const openingLineRemaining = 100 - openingLineValue.length
+  const contextRemaining = 60 - contextValue.length
   const aboutRemaining = 400 - aboutValue.length
   const revealRemaining = 280 - revealValue.length
 
@@ -162,6 +178,7 @@ export function FormPanel({
       : charitiesCount === 1
         ? "1 of 3 selected."
         : `${charitiesCount} of 3 selected — proceeds split equally.`
+
   const basePlaceholders = occasion
     ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
     : null
@@ -198,11 +215,37 @@ export function FormPanel({
             <FormItem>
               <OccasionPickerField
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(value) => {
+                  field.onChange(value)
+                  form.setValue("openingLine", PREFIXES[value as keyof typeof PREFIXES] ?? "")
+                }}
                 onClear={() => form.reset()}
                 size={size}
               />
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="openingLine"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  className={cn(INPUT_SIZE[size], "bg-background placeholder:text-muted-foreground/50")}
+                  placeholder={occasion ? "" : "Select an occasion first"}
+                  maxLength={100}
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+              <FieldDescription size={size} className="mb-2">
+                {"The line that introduces the event. Defaults to the occasion — edit freely."}
+                <CounterSpan remaining={openingLineRemaining} warning={20} critical={10} />
+              </FieldDescription>
             </FormItem>
           )}
         />
@@ -222,12 +265,14 @@ export function FormPanel({
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
                   placeholder={basePlaceholders?.name ?? "Enter Name"}
+                  maxLength={80}
                   {...field}
                 />
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                The name or nickname you enter will be used throughout the event
+                {"The name guests will see at the top of the event."}
+                <CounterSpan remaining={nameRemaining} warning={16} critical={8} />
               </FieldDescription>
             </FormItem>
           )}
@@ -235,14 +280,15 @@ export function FormPanel({
 
         <FormField
           control={form.control}
-          name="suffix"
+          name="context"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <InputGroup className={cn(INPUT_SIZE[size], "bg-background")}>
                   <InputGroupInput
-                    placeholder={datePlaceholder || "Enter Context"}
+                    placeholder={datePlaceholder || "Enter context"}
                     className="placeholder:text-muted-foreground/50"
+                    maxLength={60}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -263,27 +309,8 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Optional dates, years, or other context.{" "}
-                {previewSuffix ? "Hide" : "Show"} in the preview.
-                {previewSuffix ? (
-                  <Button
-                    size="icon-xs"
-                    variant="outline"
-                    className="cursor-pointer"
-                    onClick={onToggleSuffix}
-                  >
-                    <Eye className="m-1 inline-block size-3" />
-                  </Button>
-                ) : (
-                  <Button
-                    size="icon-xs"
-                    variant="outline"
-                    className="cursor-pointer"
-                    onClick={onToggleSuffix}
-                  >
-                    <EyeOff className="m-1 inline-block size-3" />
-                  </Button>
-                )}{" "}
+                {"Dates, years, or a short line of context. Optional."}
+                <CounterSpan remaining={contextRemaining} warning={12} critical={6} />
               </FieldDescription>
             </FormItem>
           )}
@@ -344,27 +371,7 @@ export function FormPanel({
             </div>
           </FormControl>
           <FieldDescription size={size} className="mb-2">
-            Optional photo. Can be added later. {previewPhoto ? "Hide" : "Show"}{" "}
-            in the preview.
-            {previewPhoto ? (
-              <Button
-                size="icon-xs"
-                variant="outline"
-                className="cursor-pointer"
-                onClick={onTogglePhoto}
-              >
-                <Eye className="inline-block size-3" />
-              </Button>
-            ) : (
-              <Button
-                size="icon-xs"
-                variant="outline"
-                className="cursor-pointer"
-                onClick={onTogglePhoto}
-              >
-                <EyeOff className="inline-block size-3" />
-              </Button>
-            )}
+            Optional photo. Can be added later.
           </FieldDescription>
         </FormItem>
 
@@ -379,6 +386,7 @@ export function FormPanel({
                     aboutPlaceholder ?? "Enter infomation about the event"
                   }
                   rows={4}
+                  maxLength={400}
                   {...field}
                   value={field.value}
                   className={cn(
@@ -390,7 +398,7 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 {"A few words about them or what this occasion means."}
-                {aboutRemaining <= 80 && ` ${aboutRemaining} characters remaining.`}
+                <CounterSpan remaining={aboutRemaining} warning={80} critical={20} />
               </FieldDescription>
             </FormItem>
           )}
@@ -501,6 +509,7 @@ export function FormPanel({
                   )}
                   placeholder={revealPlaceholder}
                   rows={5}
+                  maxLength={280}
                   {...field}
                   value={field.value ?? ""}
                   onFocus={onRevealFocus}
@@ -513,7 +522,8 @@ export function FormPanel({
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
                 {"Shown to guests only after they've pledged — the answer, in your words."}
-                {revealRemaining <= 56 && ` ${revealRemaining} characters remaining.`}
+                <CounterSpan remaining={revealRemaining} warning={56} critical={14} />
+
               </FieldDescription>
             </FormItem>
           )}

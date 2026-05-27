@@ -187,7 +187,7 @@ export async function updateEvent(
     .from('protagonists')
     .update({
       name: input.protagonistName.trim(),
-      date_label: input.dateLabel,
+      context: input.dateLabel,
       about: input.protagonistAbout ?? null,
       photo_url: input.photoUrl ?? null,
     })
@@ -198,7 +198,7 @@ export async function updateEvent(
     .from('events')
     .update({
       occasion: input.occasion,
-      occasion_label: input.occasionLabel,
+      opening_line: input.openingLine,
       closes_at: newClosesAt,
       is_private: input.isPrivate,
       description: input.description,

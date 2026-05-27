@@ -204,7 +204,7 @@ export async function addGuestItem(eventPollId: string, topicId: string, label: 
           to: organizer.email,
           itemLabel: trimmed,
           topicTitle: topicData?.title ?? 'poll',
-          occasionLabel: eventData?.occasion ?? 'event',
+          openingLine: eventData?.occasion ?? 'event',
           protagonistName: eventData?.protagonists?.name ?? 'your event',
           eventId: pollData?.event_id ?? '',
         })

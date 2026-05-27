@@ -26,7 +26,7 @@ type CreateEventInput = {
   photoUrl: string | null
   dateLabel: string | null
   occasion: string
-  occasionLabel: string | null
+  openingLine: string | null
   description: string | null
   charityIds: string[]
   closesAt: string
@@ -172,7 +172,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
     name: input.protagonistName.trim(),
     about: input.protagonistAbout || null,
     photo_url: input.photoUrl || null,
-    date_label: input.dateLabel || null,
+    context: input.dateLabel || null,
     created_by: userId,
   }
 
@@ -193,7 +193,7 @@ export async function createEvent(input: CreateEventInput): Promise<{ eventId: s
     .insert({
       protagonist_id: protagonist.id,
       occasion: input.occasion,
-      occasion_label: input.occasionLabel,
+      opening_line: input.openingLine,
       created_by: userId,
       closes_at: closesAt,
       original_closes_at: closesAt,

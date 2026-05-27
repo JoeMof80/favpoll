@@ -25,7 +25,7 @@ export const WithPhoto: Story = {
     protagonist: {
       name: 'Belinda Hartley',
       photo_url: 'https://i.pravatar.cc/150?img=47',
-      date_label: '1942–2024',
+      context: '1942–2024',
     },
     eyebrow: 'Memorial',
   },
@@ -35,7 +35,7 @@ export const InitialsOnly: Story = {
   args: {
     protagonist: {
       name: 'Belinda Hartley',
-      date_label: '1942–2024',
+      context: '1942–2024',
     },
     eyebrow: 'Memorial',
   },

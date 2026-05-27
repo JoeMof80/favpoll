@@ -21,7 +21,7 @@ export default async function LiveEventsPage() {
     .select(
       `
       id,
-      occasion_label,
+      opening_line,
       description,
       closes_at,
       total_raised,
@@ -127,7 +127,7 @@ export default async function LiveEventsPage() {
   }
   type RawEvent = {
     id: string
-    occasion_label: string
+    opening_line: string
     description: string | null
     closes_at: string
     total_raised: number

@@ -71,6 +71,25 @@ export function getPollHint(protagonistName: string): string {
   return `Is it the same as ${protagonistName}'s?`
 }
 
+export const PREFIXES: Record<string, string> = {
+  memorial: "In memory of",
+  tribute: "A tribute to",
+  birthday: "Happy birthday",
+  retirement: "Celebrating the retirement of",
+  wedding: "Congratulations to",
+  engagement: "Congratulations to",
+  anniversary: "Happy anniversary",
+  leaving: "Farewell",
+  graduation: "Congratulations",
+  christening: "Welcome",
+  achievement: "Well done",
+  recovery: "Cheering on",
+  award: "Congratulations to",
+  promotion: "Congratulations to",
+  celebration: "Celebrating",
+  other: "Honouring",
+}
+
 export function getEventHeadline(params: {
   occasion: string
   name: string
@@ -78,25 +97,6 @@ export function getEventHeadline(params: {
   occasionLabel?: string | null
 }): { prefix: string; name: string; suffix: string } {
   const { occasion, name: personName, dateLabel, occasionLabel } = params
-
-  const PREFIXES: Record<string, string> = {
-    memorial: "In memory of",
-    tribute: "A tribute to",
-    birthday: "Happy birthday",
-    retirement: "Celebrating the retirement of",
-    wedding: "Congratulations to",
-    engagement: "Congratulations to",
-    anniversary: "Happy anniversary",
-    leaving: "Farewell",
-    graduation: "Congratulations",
-    christening: "Welcome",
-    achievement: "Well done",
-    recovery: "Cheering on",
-    award: "Congratulations to",
-    promotion: "Congratulations to",
-    celebration: "Celebrating",
-    other: "Honouring",
-  }
 
   const prefix = occasionLabel || PREFIXES[occasion] || "Honouring"
 

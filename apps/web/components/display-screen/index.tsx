@@ -25,7 +25,7 @@ type Props = {
   eventId: string
   protagonistName: string
   dateLabel: string | null
-  occasionLabel: string | null
+  openingLine: string | null
   description: string | null
   occasion: string
   charityName: string | null
@@ -143,7 +143,7 @@ export function DisplayScreen({
   eventId,
   protagonistName,
   dateLabel,
-  occasionLabel,
+  openingLine,
   description,
   occasion,
   charityName,
@@ -183,7 +183,7 @@ export function DisplayScreen({
 
   const headline = getEventHeadline({
     occasion,
-    occasionLabel,
+    openingLine,
     name: protagonistName,
     dateLabel,
   })

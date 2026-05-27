@@ -14,7 +14,7 @@ export type PollResultItem = {
 export type CardProtagonist = {
   name: string
   photo_url?: string | null
-  date_label?: string | null
+  context?: string | null
   initials?: string
 }
 
@@ -55,7 +55,7 @@ export type CardCharity = {
 export type FavpollCardProps = {
   size?: FavpollCardSize
   protagonist: CardProtagonist
-  /** Maps to event.occasion_label */
+  /** Maps to event.opening_line */
   eyebrow?: string
   charities: CardCharity[]
   /** charity id → formatted amount string shown next to each charity row */

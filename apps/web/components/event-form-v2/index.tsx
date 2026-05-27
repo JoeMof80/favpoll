@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent } from "@/app/events/[id]/edit/actions"
-import { OCCASION_LABELS } from "@/lib/occasions"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { FormPanel } from "./form-panel"
 import { PreviewPanel } from "./preview-panel"
@@ -53,8 +52,9 @@ export function EventFormV2({
     resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       occasion: "",
+      openingLine: "",
       name: "",
-      suffix: "",
+      context: "",
       about: "",
       reveal: "",
       charities: [],
@@ -101,16 +101,16 @@ export function EventFormV2({
             : null,
       }
 
-      const occasionLabel = OCCASION_LABELS[values.occasion] ?? null
+      const openingLine = values.openingLine ?? null
 
       if (mode === "create") {
         const { eventId: newId } = await createEvent({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
-          dateLabel: values.suffix || null,
+          dateLabel: values.context || null,
           occasion: values.occasion,
-          occasionLabel,
+          openingLine,
           description: null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),
@@ -135,9 +135,9 @@ export function EventFormV2({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
-          dateLabel: values.suffix || null,
+          dateLabel: values.context || null,
           occasion: values.occasion,
-          occasionLabel,
+          openingLine,
           description: null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),

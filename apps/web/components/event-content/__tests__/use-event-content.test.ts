@@ -19,7 +19,7 @@ import { useEventContent } from "@/components/event-content/use-event-content"
 const protagonist: Protagonist = {
   id: "prot-1",
   name: "Alice",
-  date_label: null,
+  context: null,
   about: null,
   photo_url: null,
   created_by: "user-1",
@@ -40,7 +40,7 @@ function makeEvent(overrides: Partial<EventWithDetails> = {}): EventWithDetails 
     id: "event-1",
     protagonist_id: "prot-1",
     occasion: "birthday",
-    occasion_label: null,
+    opening_line: null,
     market: "en-GB",
     created_by: "user-1",
     closes_at: "2025-12-01T23:59:00Z",

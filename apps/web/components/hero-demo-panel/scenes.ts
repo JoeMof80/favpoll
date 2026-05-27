@@ -23,7 +23,7 @@ export type Phase =
  */
 export type HeroScene = {
   // ── Supabase-aligned ──────────────────────────────────────────────────────
-  occasion_label: string
+  opening_line: string
   protagonist: {
     name: string
     photo_url: string | null
@@ -62,7 +62,7 @@ export type HeroScene = {
 
 export const SCENES: HeroScene[] = [
   {
-    occasion_label: "Memorial",
+    opening_line: "Memorial",
     protagonist: { name: "Belinda Hartley", photo_url: null },
     poll: {
       id: "demo-poll-0",
@@ -102,7 +102,7 @@ export const SCENES: HeroScene[] = [
     total: "£1,005",
   },
   {
-    occasion_label: "Birthday",
+    opening_line: "Birthday",
     protagonist: { name: "Poppy Chen", photo_url: null },
     poll: {
       id: "demo-poll-1",
@@ -161,7 +161,7 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
-    occasion_label: "Retirement",
+    opening_line: "Retirement",
     protagonist: { name: "Ros Turner", photo_url: null },
     poll: {
       id: "demo-poll-2",
@@ -190,7 +190,7 @@ export const SCENES: HeroScene[] = [
     total: "£700",
   },
   {
-    occasion_label: "Engagement",
+    opening_line: "Engagement",
     protagonist: { name: "Alex & Jordan", photo_url: null },
     poll: {
       id: "demo-poll-3",
@@ -252,7 +252,7 @@ export const SCENES: HeroScene[] = [
     total: "£950",
   },
   {
-    occasion_label: "Leaving do",
+    opening_line: "Leaving do",
     protagonist: { name: "Dave Kowalski", photo_url: null },
     poll: {
       id: "demo-poll-4",
@@ -311,7 +311,7 @@ export const SCENES: HeroScene[] = [
     total: "£585",
   },
   {
-    occasion_label: "Graduation",
+    opening_line: "Graduation",
     protagonist: { name: "James Okafor", photo_url: null },
     poll: {
       id: "demo-poll-5",
@@ -374,7 +374,7 @@ export const SCENES: HeroScene[] = [
 ]
 
 export const OCCASION_CHIPS = SCENES.map((s, i) => ({
-  label: s.occasion_label,
+  label: s.opening_line,
   index: i,
 }))
 
