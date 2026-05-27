@@ -614,13 +614,11 @@ describe("usePledge — handleOwnConfirm", () => {
   })
 
   it("calls /api/stripe/payment-intent with the correct charge amount", async () => {
-    const fetchSpy = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValue(
-        new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), {
-          status: 200,
-        })
-      )
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), {
+        status: 200,
+      })
+    )
 
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })

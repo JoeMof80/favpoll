@@ -48,17 +48,15 @@ async function ensureUser(
   const displayName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || null
 
-  await supabase
-    .from("users")
-    .upsert(
-      {
-        id: userId,
-        email: primaryEmail,
-        display_name: displayName,
-        avatar_url: user.imageUrl,
-      },
-      { onConflict: "id" }
-    )
+  await supabase.from("users").upsert(
+    {
+      id: userId,
+      email: primaryEmail,
+      display_name: displayName,
+      avatar_url: user.imageUrl,
+    },
+    { onConflict: "id" }
+  )
 }
 
 export async function uploadPersonPhoto(formData: FormData): Promise<string> {
