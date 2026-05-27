@@ -403,14 +403,15 @@ components/
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
-├── event-hero.tsx
+├── event-hero.tsx               -- view-only: event + protagonist props, hideAvatar?
 ├── event-card.tsx
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
 │   └── event-card-charity-carousel.tsx
 ├── live-events-carousel.tsx
 ├── charity-banner.tsx, countdown.tsx
-├── header.tsx, poll-heading.tsx
+├── header.tsx
+├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?, pledged?
 ├── stripe-checkout.tsx, pot-banner.tsx
 └── theme-provider.tsx, menu-button.tsx  -- TODO: move to packages/ui/
 
@@ -530,7 +531,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: ~426 web, ~22 admin.
+All tests must pass before committing. Current counts: ~455 web, ~22 admin.
 
 Co-located `__tests__/` directories. Environments:
 - Default (jsdom): pure functions, hooks
@@ -583,7 +584,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **`personal_framing` retired.** Column kept but never read/written. Auto-generated hint line replaces it.
 
-- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). Canvas reads `topic.placeholders[occasion].about`, falls back to `getAboutPlaceholder(occasion)`. `lib/topic-bio-placeholders.ts` deleted.
+- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). EventFormV2 preview panel reads `topic.placeholders[occasion].about` for the about placeholder, falls back to `getAboutPlaceholder(occasion)`. `lib/topic-bio-placeholders.ts` deleted.
 
 - **Localisation foundations.** `events.market` default `'en-GB'`, `topic_items.markets` default `['en-GB']`. `formatCurrency()` in `lib/i18n.ts`. `next-intl` deferred. See `references/LOCALISATION.md`.
 
