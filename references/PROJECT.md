@@ -33,7 +33,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **Package manager:** pnpm (workspace root; run all commands from root or with `--filter`)
 - **Hosting:** Vercel (Pro Trial team `favpoll`). Two projects: `favpoll-web` and `favpoll-admin`.
 - **Domain:** favpoll.com (holding page live; main app deployed at `favpoll-web-gamma.vercel.app` until domain is switched)
-- **CI:** GitHub Actions (`.github/workflows/ci.yml`) — Test and Typecheck jobs on push/PR to main
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) — Test, Typecheck, and Format jobs on push/PR to main. Format job runs `pnpm --filter @favpoll/web exec prettier --check .` (must run from apps/web — prettier is only installed there)
 - **Branch:** `main` (renamed from `master`)
 - **Localisation:** UK-first (`en-GB`). `messages/en-GB.json` holds UI strings. `lib/i18n.ts` provides `formatCurrency()`, `t()`, and `MARKET_DEFAULTS`. `next-intl` planned when a second market launches.
 
@@ -240,8 +240,8 @@ item_flags (
 20260523120000_guest_item_moderation.sql
 20260524000000_charity_management.sql
 20260526000000_remove_event_poll_item_priority.sql
-20260527000000_rename_suffix_to_context.sql
-20260527000001_rename_occasion_label_to_opening_line.sql
+20260527000000_rename_date_label_to_context.sql        -- protagonists.date_label → context
+20260527000001_rename_occasion_label_to_opening_line.sql  -- events.occasion_label → opening_line
 ```
 
 ---
@@ -600,7 +600,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **opening_line is organiser-editable.** Pre-populated from PREFIXES[occasion] on occasion select but freely editable. Stored in DB. Never derive it purely from occasion at render time.
 
-- **Field character limits.** name: 40, context: 40, opening_line: 60, about: 400, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
+- **Field character limits.** name: 40, context: 40, opening_line: 60, about: 300, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
 
 - **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
 
