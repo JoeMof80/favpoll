@@ -306,9 +306,9 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ```
 /                              -- Home: HeroDemoPanel + live events carousel + CTA
 /events                        -- Live events grid (public, no auth)
-/events/new                    -- Create event (EventCanvas)
+/events/new                    -- Create event (EventFormV2)
 /events/[id]                   -- Event page — guest pledge view + edit mode toggle
-/events/[id]/edit              -- Edit event (EventCanvas edit mode)
+/events/[id]/edit              -- Edit event (EventFormV2)
 /events/[id]/manage            -- Management panel (organiser only)
 /events/[id]/display           -- Live display for projector screen
 /my-events                     -- Organiser's created events (auth required)
@@ -377,12 +377,8 @@ components/
 │   ├── picker-field.tsx
 │   └── tooltip.tsx
 ├── canvas/
-│   ├── poll-editor.tsx, topic-picker.tsx, topic-priority-editor.tsx
-│   ├── custom-topic-options.tsx, share-screen.tsx
-│   └── canvas-sidebar/
-│       ├── index.tsx, charity-picker.tsx, closing-date.tsx
-│       ├── privacy-toggle.tsx, shared-fund.tsx
-├── event-form-v2/                -- Replacement for EventCanvas (in progress)
+│   └── inline-option-input.tsx   -- used by pledge-panel.tsx for guest item addition
+├── event-form-v2/                -- Canonical create/edit form
 │   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName state
 │   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection
 │   ├── preview-panel.tsx         -- Live preview panel
@@ -407,7 +403,6 @@ components/
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
-├── event-canvas/use-canvas.ts   -- reads topic.placeholders[occasion].about
 ├── event-hero.tsx
 ├── event-card.tsx
 ├── event-card/

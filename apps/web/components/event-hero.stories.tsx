@@ -1,8 +1,7 @@
-import React, { useState } from "react"
+import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { EventHero } from "./event-hero"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
-import { OCCASION_PLACEHOLDERS } from "@/lib/occasions"
 import type { Event, Protagonist, OccasionType } from "@favpoll/types"
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -95,71 +94,36 @@ type Story = StoryObj<typeof meta>
 // ─── View mode stories ────────────────────────────────────────────────────────
 
 export const Memorial: Story = {
-  args: { mode: "view", ...makeViewProps(0) },
+  args: { ...makeViewProps(0) },
 }
 
 export const Birthday: Story = {
-  args: { mode: "view", ...makeViewProps(1) },
+  args: { ...makeViewProps(1) },
 }
 
 export const Retirement: Story = {
-  args: { mode: "view", ...makeViewProps(2) },
+  args: { ...makeViewProps(2) },
 }
 
 export const Engagement: Story = {
-  args: { mode: "view", ...makeViewProps(3) },
+  args: { ...makeViewProps(3) },
 }
 
 export const LeavingDo: Story = {
-  args: { mode: "view", ...makeViewProps(4) },
+  args: { ...makeViewProps(4) },
 }
 
 export const Graduation: Story = {
-  args: { mode: "view", ...makeViewProps(5) },
+  args: { ...makeViewProps(5) },
 }
 
 export const WithPhoto: Story = {
   args: {
-    mode: "view",
     ...makeViewProps(0),
     protagonist: {
       ...makeViewProps(0).protagonist,
       photo_url:
         "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&h=200&fit=crop",
     },
-  },
-}
-
-// ─── Edit mode story ──────────────────────────────────────────────────────────
-
-export const EditMode = {
-  name: "Edit mode (interactive)",
-  render: () => {
-    const placeholders = OCCASION_PLACEHOLDERS["memorial"] ?? {
-      name: "Name",
-      about: "Bio",
-      reveal: "",
-    }
-    const [openingLine, setOpeningLine] = useState("In memory of")
-    const [protagonistName, setProtagonistName] = useState("")
-    const [protagonistAbout, setProtagonistAbout] = useState("")
-    const [dateLabel, setDateLabel] = useState("")
-    return (
-      <EventHero
-        mode="edit"
-        occasion="memorial"
-        openingLine={openingLine}
-        protagonistName={protagonistName}
-        protagonistAbout={protagonistAbout}
-        dateLabel={dateLabel}
-        initialPhotoUrl={null}
-        placeholders={placeholders}
-        onOpeningLineChange={setOpeningLine}
-        onProtagonistNameChange={setProtagonistName}
-        onProtagonistAboutChange={setProtagonistAbout}
-        onDateLabelChange={setDateLabel}
-        onPhotoUrlChange={() => {}}
-      />
-    )
   },
 }

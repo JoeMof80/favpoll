@@ -275,7 +275,6 @@ export function PreviewPanel({
 
           <div className="space-y-4">
             <PollHeading
-              pollId="preview"
               topicTitle={topicTitle}
               reveal={revealValue}
               protagonistFirstName={protagonistFirstName}

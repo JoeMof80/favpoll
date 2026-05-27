@@ -54,8 +54,6 @@ export function PollSection({
   return (
     <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
       <PollHeading
-        mode="view"
-        pollId={poll.id}
         topicTitle={poll.topics.title}
         reveal={pledged ? (poll.personal_reveal ?? null) : null}
         protagonistFirstName={personFirstName}
