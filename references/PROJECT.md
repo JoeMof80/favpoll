@@ -28,6 +28,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests. Admin app requires `publicMetadata.role === 'admin'` on the Clerk user.
 - **Database:** Supabase (Postgres + Realtime). Production and staging are separate projects.
 - **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities via Stripe Connect Express). Connect application submitted, pending approval.
+- **Image cropping:** react-easy-crop (photo crop modal, circular 1:1, JPEG output)
 - **Email:** Resend
 - **Package manager:** pnpm (workspace root; run all commands from root or with `--filter`)
 - **Hosting:** Vercel (Pro Trial team `favpoll`). Two projects: `favpoll-web` and `favpoll-admin`.
@@ -381,6 +382,18 @@ components/
 │   └── canvas-sidebar/
 │       ├── index.tsx, charity-picker.tsx, closing-date.tsx
 │       ├── privacy-toggle.tsx, shared-fund.tsx
+├── event-form-v2/                -- Replacement for EventCanvas (in progress)
+│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName state
+│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection
+│   ├── preview-panel.tsx         -- Live preview panel
+│   ├── schema.ts                 -- Zod schema + EventFormValues
+│   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
+│   ├── date-time-picker.tsx      -- Trigger Button with size prop, no hover bg, conditional text opacity
+│   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button
+│   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic, dropdown stays open
+│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; popover stays open after add
+│   ├── charity-field.tsx         -- Click-to-toggle chips, no X button
+│   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
 ├── pledge-card/
 │   ├── index.tsx, use-pledge.ts, amount-input.tsx
 │   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
@@ -417,6 +430,12 @@ lib/
 
 lib/actions/
 └── event-poll-items.ts           -- hideEventPollItem, showEventPollItem
+
+__mocks__/
+├── supabase-client.ts            -- Storybook stub for @/lib/supabase/client (no-op channel/removeChannel/from)
+└── stripe.ts                     -- Storybook stub for @stripe/stripe-js (loadStripe returns null)
+
+.storybook/main.ts                -- viteFinal aliases __mocks__/supabase-client and __mocks__/stripe for browser test isolation
 
 messages/en-GB.json
 packages/types/index.ts           -- All domain types (@favpoll/types)
@@ -461,7 +480,7 @@ lib/
 | `SectionEyebrow` | `children, className?, variant?` | `variant="brand"` or `variant="muted"` |
 | `RankingBar` | `label, amount, widthPercent, ..., labelSuffix?` | `labelSuffix` renders inline after label — used for Hide/Show toggle |
 | `RevealQuote` | `text, ...` | Left-bordered italic blockquote |
-| `Chip` | `selected?, ...buttonProps` | Selectable pill — never use for amount presets |
+| `Chip` | `selected?, readOnly?, size?: "sm"\|"md"\|"lg", ...buttonProps` | Selectable pill. Default bg: `bg-muted`. `readOnly`: `bg-background pointer-events-none`. Never use for amount presets. |
 
 ---
 
@@ -587,15 +606,14 @@ NEXT_PUBLIC_BASE_URL
 
 - **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`
 
+- **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item *addition* always uses ItemAddField pickerfield regardless of count.
+
 ---
 
 ## Outstanding TODO
 
 - **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` are blank in Vercel. Configure endpoints at Clerk and Stripe dashboards.
 - **Clerk production keys** — using `pk_test_` on Vercel until `favpoll.com` points at the app. Swap to `pk_live_` when domain is switched.
-- **Branch rename** — `master` → `main` (may already be done by CI task). Verify with `git branch`.
-- **Preview env vars** — staging Supabase credentials not yet set in Vercel Preview environment.
-- **Branch protection status checks** — add `Test` and `Typecheck` to GitHub branch protection after first CI run.
 - **Stripe Connect** — disbursement not wired. Cron has placeholder. Connect application pending approval.
 - **All-time rankings** — `/rankings` exists but needs data threshold logic.
 - **Event oversight admin page** — `/events` in admin app is a shell only.
