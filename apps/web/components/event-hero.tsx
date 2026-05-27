@@ -112,7 +112,7 @@ export function EventHero(props: Props) {
           ) : (
             <SectionEyebrow
               variant="muted"
-              className="mb-2 truncate wrap-break-word"
+              className="mb-2 truncate break-words"
             >
               {headline?.prefix ?? label}
             </SectionEyebrow>
@@ -135,7 +135,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : (
-            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight break-words text-[#2C2C2A] sm:text-5xl">
               {protagonist?.name}
             </h1>
           )}
@@ -159,7 +159,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : headline?.suffix ? (
-            <p className="mt-2 truncate text-2xl font-normal wrap-break-word text-[#534AB7]">
+            <p className="mt-2 truncate text-2xl font-normal break-words text-[#534AB7]">
               {headline.suffix}
             </p>
           ) : null}
@@ -170,7 +170,7 @@ export function EventHero(props: Props) {
               {/* Mirror p drives the height — textarea is absolutely positioned over it */}
               <p
                 aria-hidden="true"
-                className="invisible min-h-13 w-full text-base leading-relaxed wrap-break-word whitespace-pre-wrap text-muted-foreground"
+                className="invisible min-h-13 w-full text-base leading-relaxed break-words whitespace-pre-wrap text-muted-foreground"
               >
                 {(props as EditProps).protagonistAbout || "\u00A0"}
               </p>
@@ -187,7 +187,7 @@ export function EventHero(props: Props) {
               />
             </div>
           ) : protagonist?.about ? (
-            <p className="mt-4 line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+            <p className="mt-4 line-clamp-4 text-base leading-relaxed break-words text-[#5F5E5A]">
               {protagonist.about}
             </p>
           ) : null}
