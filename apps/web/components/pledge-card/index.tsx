@@ -19,7 +19,13 @@ import { AmountInput } from "./amount-input"
 import { AmountPresets } from "./amount-presets"
 import { PledgeBreakdown } from "./pledge-breakdown"
 import { usePledge } from "./use-pledge"
-import { GBP, FUND_GREEN, FUND_AMBER, FUND_RED, formatCharityLabel } from "./utils"
+import {
+  GBP,
+  FUND_GREEN,
+  FUND_AMBER,
+  FUND_RED,
+  formatCharityLabel,
+} from "./utils"
 
 type PrePublishProps = {
   prePublish: true
@@ -72,7 +78,8 @@ function PreviewPledgeCard({
     numericPledge + numericTopUp > 0
       ? Math.round((numericPledge + numericTopUp) * 1.03 * 100) / 100
       : 0
-  const ownFee = Math.round((ownCharge - (numericPledge + numericTopUp)) * 100) / 100
+  const ownFee =
+    Math.round((ownCharge - (numericPledge + numericTopUp)) * 100) / 100
   const charityLabel = formatCharityLabel(charityNames)
 
   const ownBreakdown =
