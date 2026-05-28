@@ -182,7 +182,7 @@ export function PreviewPanel({
   const revealValue = reveal || (showReveal ? topicRevealPlaceholder : null)
 
   return (
-    <div className="mx-auto max-w-5xl border border-x p-16">
+    <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Left — hero + poll */}
         <div>

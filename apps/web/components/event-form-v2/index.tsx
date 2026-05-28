@@ -157,7 +157,7 @@ export function EventFormV2({
 
   return (
     <Form {...form}>
-      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-primary/5">
         {/* Left panel — scrollable form */}
         <div className="flex w-105 shrink-0 flex-col overflow-hidden border-r border-border bg-muted">
           <div className="flex-1 overflow-y-auto">
@@ -230,7 +230,7 @@ export function EventFormV2({
         </div>
 
         {/* Right panel — live preview */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex-1 overflow-y-auto">
           <PreviewPanel
             charities={charities}
             topics={topics}
