@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import {
   OCCASION_PLACEHOLDERS,
@@ -14,7 +15,7 @@ import { PollResults } from "@/components/favpoll-card/poll-results"
 import type { PollResultItem } from "@/components/favpoll-card/types"
 import { Countdown } from "@/components/countdown"
 import { CharityBanner } from "@/components/charity-banner"
-import { InfoIcon } from "lucide-react"
+import { PledgeCard } from "@/components/pledge-card"
 import type {
   Charity,
   TopicWithMeta,
@@ -36,67 +37,6 @@ type Props = {
 const PLACEHOLDER_CHARITIES: Charity[] = [
   { id: "ch-1", name: "Chosen charity", is_active: true },
 ] as unknown as Charity[]
-
-function PledgeCardPreview() {
-  return (
-    <div className="space-y-4 rounded-lg border border-border bg-card px-5 py-4">
-      {/* Amount input — mirrors AmountInput */}
-      <div>
-        <div className="flex items-center justify-between gap-1.5">
-          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            Your pledge
-          </p>
-          <InfoIcon className="h-3 w-3 text-muted-foreground/40" aria-hidden />
-        </div>
-        <div className="relative mt-2">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xl text-muted-foreground">
-            £
-          </span>
-          <div className="w-full rounded-md border border-input bg-background py-3 pr-3 pl-8 text-2xl font-medium text-foreground/25">
-            0
-          </div>
-        </div>
-        {/* Presets — mirrors AmountPresets ghost+bg-muted style */}
-        <div className="mt-2 flex gap-1.5">
-          {[5, 10, 20, 50].map((n) => (
-            <div
-              key={n}
-              className="flex-1 rounded-md bg-muted py-1.5 text-center text-sm text-muted-foreground"
-            >
-              £{n}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Pot top-up — mirrors the rounded bg-muted p-3 block */}
-      <div className="rounded bg-muted p-3">
-        <p className="text-xs text-muted-foreground">Add to the shared fund</p>
-        <div className="relative mt-2">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
-            £
-          </span>
-          <div className="w-full rounded-md border border-input bg-background py-2 pr-3 pl-7 text-sm text-foreground/25">
-            0
-          </div>
-        </div>
-      </div>
-
-      {/* Confirm + fund toggle */}
-      <div className="flex flex-col items-center gap-2">
-        <div className="w-full rounded-md bg-primary py-2 text-center text-sm font-medium text-primary-foreground opacity-60">
-          Pledge favourites
-        </div>
-        <div className="my-1 flex w-full items-center gap-4">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-muted-foreground">or</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-        <p className="text-sm text-muted-foreground">Use the shared fund</p>
-      </div>
-    </div>
-  )
-}
 
 function CountdownPlaceholder() {
   return (
@@ -123,6 +63,7 @@ export function PreviewPanel({
   previewSuffix,
   previewPhoto,
 }: Props) {
+  const [pledgeAmount, setPledgeAmount] = useState("")
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -238,11 +179,10 @@ export function PreviewPanel({
       : topicTitle && hasTopicSelected
         ? `Share their favourite ${topicTitle.toLowerCase()}…`
         : placeholders.reveal.replace("{name}", protagonistFirstName)
-  // Always show typed reveal; show placeholder only while the field is focused
   const revealValue = reveal || (showReveal ? topicRevealPlaceholder : null)
 
   return (
-    <div className="mx-auto max-w-330 px-6 pt-8 pb-16">
+    <div className="mx-auto max-w-5xl border border-x p-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Left — hero + poll */}
         <div>
@@ -264,7 +204,7 @@ export function PreviewPanel({
               ) : (
                 <PledgePanel
                   items={topicItems}
-                  totalAmount="0"
+                  totalAmount={pledgeAmount}
                   onSelectionsChange={() => {}}
                 />
               )}
@@ -280,7 +220,12 @@ export function PreviewPanel({
             <CountdownPlaceholder />
           )}
           <CharityBanner charities={displayCharities} totalRaised={0} />
-          <PledgeCardPreview />
+          <PledgeCard
+            prePublish
+            pledgeAmount={pledgeAmount}
+            onPledgeAmountChange={setPledgeAmount}
+            charityNames={selectedCharities.map((c) => c.name)}
+          />
         </div>
       </div>
     </div>
