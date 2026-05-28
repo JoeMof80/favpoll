@@ -9,10 +9,19 @@ import {
 import { PREFIXES } from "@/lib/display"
 import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
+import { PledgePanel } from "@/components/pledge-panel"
+import { PollResults } from "@/components/favpoll-card/poll-results"
+import type { PollResultItem } from "@/components/favpoll-card/types"
 import { Countdown } from "@/components/countdown"
 import { CharityBanner } from "@/components/charity-banner"
 import { InfoIcon } from "lucide-react"
-import type { Charity, TopicWithMeta, Event, Protagonist } from "@favpoll/types"
+import type {
+  Charity,
+  TopicWithMeta,
+  TopicItem,
+  Event,
+  Protagonist,
+} from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 
 type Props = {
@@ -176,6 +185,44 @@ export function PreviewPanel({
   } as unknown as Event
 
   const firstTopic = selectedTopics[0]
+  const firstTopicCustomLabels = firstTopic?.customLabels ?? []
+
+  const topicItems: TopicItem[] = firstTopic
+    ? [
+        ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
+          (item) =>
+            ({
+              id: item.id,
+              label: item.label,
+              topic_id: firstTopic.topicId ?? "",
+              all_time_pledged: 0,
+              all_time_count: 0,
+              is_canonical: true,
+              is_active: true,
+              created_at: "",
+            }) as unknown as TopicItem
+        ),
+        ...firstTopicCustomLabels.map(
+          (label, i) =>
+            ({
+              id: `custom-preview-${i}`,
+              label,
+              topic_id: firstTopic.topicId ?? "",
+              all_time_pledged: 0,
+              all_time_count: 0,
+              is_canonical: false,
+              is_active: true,
+              created_at: "",
+            }) as unknown as TopicItem
+        ),
+      ]
+    : []
+
+  const pollResults: PollResultItem[] = topicItems.map((item) => ({
+    label: item.label,
+    amount: "£0",
+    widthPercent: 0,
+  }))
 
   const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
   const displayCharities =
@@ -191,15 +238,8 @@ export function PreviewPanel({
       : topicTitle && hasTopicSelected
         ? `Share their favourite ${topicTitle.toLowerCase()}…`
         : placeholders.reveal.replace("{name}", protagonistFirstName)
-  // Show reveal placeholder only when focused and no topic selected yet;
-  // when topic is selected, only show if the user has actually typed something
-  const revealValue = hasTopicSelected
-    ? showReveal && reveal
-      ? reveal
-      : null
-    : showReveal
-      ? reveal || topicRevealPlaceholder
-      : null
+  // Always show typed reveal; show placeholder only while the field is focused
+  const revealValue = reveal || (showReveal ? topicRevealPlaceholder : null)
 
   return (
     <div className="mx-auto max-w-330 px-6 pt-8 pb-16">
@@ -219,6 +259,15 @@ export function PreviewPanel({
                 reveal={revealValue}
                 protagonistFirstName={protagonistFirstName}
               />
+              {revealValue ? (
+                <PollResults results={pollResults} />
+              ) : (
+                <PledgePanel
+                  items={topicItems}
+                  totalAmount="0"
+                  onSelectionsChange={() => {}}
+                />
+              )}
             </div>
           )}
         </div>
