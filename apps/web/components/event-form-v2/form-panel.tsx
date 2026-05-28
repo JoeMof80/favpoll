@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { Camera, Eye, EyeOff } from "lucide-react"
 import {
   FormField,
   FormItem,
   FormControl,
-  FormDescription,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
@@ -25,7 +24,6 @@ import {
   OCCASION_PLACEHOLDERS,
   DEFAULT_PLACEHOLDERS,
   DATE_LABEL_PLACEHOLDERS,
-  TOPIC_REVEAL_PLACEHOLDERS,
 } from "@/lib/occasions"
 import { PREFIXES } from "@/lib/display"
 import { cn } from "@/lib/utils"
@@ -73,6 +71,32 @@ type Props = {
   photoFileName: string | null
   onPhotoFileChange: (name: string | null) => void
   size?: PickerSize
+}
+
+function CounterWhenTyping({
+  remaining,
+  description,
+  warning,
+  critical,
+}: {
+  remaining: number
+  description?: string
+  warning: number
+  critical: number
+}) {
+  if (remaining <= warning) {
+    return (
+      <span
+        className={cn(
+          "block text-right",
+          remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"
+        )}
+      >
+        {remaining} left
+      </span>
+    )
+  }
+  return description ? <>{description}</> : null
 }
 
 function StepSection({
@@ -123,26 +147,6 @@ function StepSection({
   )
 }
 
-function CounterSpan({
-  remaining,
-  warning,
-  critical,
-}: {
-  remaining: number
-  warning: number
-  critical: number
-}) {
-  if (remaining > warning) return null
-  return (
-    <span
-      className={remaining <= critical ? "text-[#E24B4A]" : "text-[#EF9F27]"}
-    >
-      {" "}
-      {remaining} characters remaining.
-    </span>
-  )
-}
-
 export function FormPanel({
   charities,
   topics,
@@ -163,6 +167,7 @@ export function FormPanel({
   const occasion = form.watch("occasion")
   const name = form.watch("name")
   const selectedTopics = form.watch("topics")
+  const currentPhotoUrl = form.watch("photoUrl")
 
   const openingLineValue = form.watch("openingLine") ?? ""
   const nameValue = form.watch("name") ?? ""
@@ -170,6 +175,13 @@ export function FormPanel({
   const aboutValue = form.watch("about") ?? ""
   const revealValue = form.watch("reveal") ?? ""
   const charitiesValue = form.watch("charities") ?? []
+
+  // Clear reveal when topic is cleared
+  useEffect(() => {
+    if (selectedTopics?.length === 0) {
+      form.setValue("reveal", "")
+    }
+  }, [selectedTopics?.length, form])
 
   const nameRemaining = 40 - nameValue.length
   const openingLineRemaining = 60 - openingLineValue.length
@@ -201,14 +213,13 @@ export function FormPanel({
   const aboutPlaceholder = basePlaceholders
     ? (topicAbout ?? basePlaceholders.about)
     : ""
-  const revealPlaceholder = basePlaceholders
-    ? topicTitle
-      ? (
-          TOPIC_REVEAL_PLACEHOLDERS[topicTitle]?.reveal ??
-          basePlaceholders.reveal
-        ).replace("{name}", firstName)
-      : basePlaceholders.reveal
-    : ""
+  const topicOccasionReveal = firstTopicMeta?.placeholders?.[occasion]?.reveal
+  const revealPlaceholder =
+    topicTitle && occasion && topicOccasionReveal
+      ? topicOccasionReveal.replace("{name}", firstName)
+      : topicTitle
+        ? `Share their favourite ${topicTitle.toLowerCase()}…`
+        : "Share something they loved…"
 
   return (
     <div className="p-6">
@@ -223,10 +234,7 @@ export function FormPanel({
                 value={field.value}
                 onChange={(value) => {
                   field.onChange(value)
-                  form.setValue(
-                    "openingLine",
-                    PREFIXES[value as keyof typeof PREFIXES] ?? ""
-                  )
+                  form.setValue("openingLine", "")
                 }}
                 onClear={() => form.reset()}
                 size={size}
@@ -247,7 +255,10 @@ export function FormPanel({
                     INPUT_SIZE[size],
                     "bg-background placeholder:text-muted-foreground/50"
                   )}
-                  placeholder={occasion ? "" : "Enter opening line"}
+                  placeholder={
+                    PREFIXES[occasion as keyof typeof PREFIXES] ??
+                    "Enter opening line"
+                  }
                   maxLength={60}
                   {...field}
                   value={field.value ?? ""}
@@ -255,7 +266,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                <CounterSpan
+                <CounterWhenTyping
                   remaining={openingLineRemaining}
                   warning={12}
                   critical={6}
@@ -288,9 +299,9 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Name or nickname shown throughout the event
-                <CounterSpan
+                <CounterWhenTyping
                   remaining={nameRemaining}
+                  description="Name or nickname shown throughout the event"
                   warning={8}
                   critical={4}
                 />
@@ -330,9 +341,9 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Dates, years, or other context. Optional.
-                <CounterSpan
+                <CounterWhenTyping
                   remaining={contextRemaining}
+                  description="Dates, years, or other context. Optional."
                   warning={8}
                   critical={4}
                 />
@@ -351,13 +362,26 @@ export function FormPanel({
                   className="cursor-pointer text-muted-foreground/50"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Camera />
+                  {currentPhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={currentPhotoUrl}
+                      alt="Profile photo preview"
+                      className="h-6 w-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Camera />
+                  )}
                 </InputGroupAddon>
                 <InputGroupInput
                   readOnly
-                  value={photoFileName ?? "Pick an image"}
+                  value={
+                    currentPhotoUrl
+                      ? (photoFileName ?? "Photo selected")
+                      : "Pick an image"
+                  }
                   className={
-                    photoFileName
+                    currentPhotoUrl
                       ? "cursor-pointer"
                       : "cursor-pointer text-muted-foreground/50"
                   }
@@ -404,9 +428,7 @@ export function FormPanel({
             <FormItem>
               <FormControl>
                 <Textarea
-                  placeholder={
-                    aboutPlaceholder ?? "Enter infomation about the event"
-                  }
+                  placeholder={aboutPlaceholder || "Tell guests about them"}
                   rows={4}
                   maxLength={300}
                   {...field}
@@ -419,7 +441,7 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                <CounterSpan
+                <CounterWhenTyping
                   remaining={aboutRemaining}
                   warning={60}
                   critical={15}
@@ -477,7 +499,14 @@ export function FormPanel({
               const canonical = topicMeta
                 ? [...topicMeta.topic_items]
                     .filter((i) => i.is_canonical)
-                    .sort((a, b) => a.label.localeCompare(b.label))
+                    .sort((a, b) => {
+                      const da = a.display_order ?? null
+                      const db = b.display_order ?? null
+                      if (da !== null && db !== null) return da - db
+                      if (da !== null) return -1
+                      if (db !== null) return 1
+                      return a.label.localeCompare(b.label)
+                    })
                 : []
               const customLabels = field.value[0]?.customLabels ?? []
 
@@ -545,9 +574,9 @@ export function FormPanel({
               </FormControl>
               <FormMessage />
               <FieldDescription size={size} className="mb-2">
-                Shown to guests after they&apos;ve chosen and pledged.
-                <CounterSpan
+                <CounterWhenTyping
                   remaining={revealRemaining}
+                  description="Shown to guests after they've pledged."
                   warning={56}
                   critical={14}
                 />
@@ -604,8 +633,8 @@ export function FormPanel({
               <div className="items-top flex justify-between gap-3 rounded-md border bg-background p-3">
                 <FormLabel className="text-xs text-muted-foreground">
                   {field.value
-                    ? "Only guests you invite can view this event."
-                    : "Anyone can find and pledge to this event. It will appear on the live events page."}
+                    ? "Private — only guests you invite can view and pledge."
+                    : "Public — anyone can find this event and make a pledge."}
                 </FormLabel>
                 <FormControl>
                   <Switch

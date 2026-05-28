@@ -1,38 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { VALID_OCCASIONS, type PlaceholdersMap } from '@/lib/occasions'
-import { updatePlaceholder, deleteOccasion, addOccasion } from '@/lib/actions/placeholders'
+import { useState, useTransition } from "react";
+import { VALID_OCCASIONS, type PlaceholdersMap } from "@/lib/occasions";
+import {
+  updatePlaceholder,
+  deleteOccasion,
+  addOccasion,
+} from "@/lib/actions/placeholders";
 
 // Fixed display order for occasions
 const OCCASION_ORDER: string[] = [
-  'memorial',
-  'tribute',
-  'birthday',
-  'retirement',
-  'wedding',
-  'engagement',
-  'anniversary',
-  'leaving',
-  'graduation',
-  'christening',
-  'achievement',
-  'recovery',
-  'award',
-  'promotion',
-  'celebration',
-  'other',
-  'default',
-]
+  "memorial",
+  "tribute",
+  "birthday",
+  "retirement",
+  "wedding",
+  "engagement",
+  "anniversary",
+  "leaving",
+  "graduation",
+  "christening",
+  "achievement",
+  "recovery",
+  "award",
+  "promotion",
+  "celebration",
+  "other",
+  "default",
+];
 
 function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1)
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function sortOccasions(keys: string[]): string[] {
-  const ordered = OCCASION_ORDER.filter((o) => keys.includes(o))
-  const rest = keys.filter((k) => !OCCASION_ORDER.includes(k)).sort()
-  return [...ordered, ...rest]
+  const ordered = OCCASION_ORDER.filter((o) => keys.includes(o));
+  const rest = keys.filter((k) => !OCCASION_ORDER.includes(k)).sort();
+  return [...ordered, ...rest];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -45,49 +49,56 @@ function OccasionRow({
   about: initialAbout,
   reveal: initialReveal,
 }: {
-  topicId: string
-  occasion: string
-  about: string
-  reveal: string
+  topicId: string;
+  occasion: string;
+  about: string;
+  reveal: string;
 }) {
-  const [about, setAbout] = useState(initialAbout)
-  const [reveal, setReveal] = useState(initialReveal)
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [isPending, startTransition] = useTransition()
-  const [isDeleting, startDeleteTransition] = useTransition()
+  const [about, setAbout] = useState(initialAbout);
+  const [reveal, setReveal] = useState(initialReveal);
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
+    "idle",
+  );
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   function handleSave() {
-    setStatus('saving')
-    setErrorMsg('')
+    setStatus("saving");
+    setErrorMsg("");
     startTransition(async () => {
-      const result = await updatePlaceholder(topicId, occasion, about, reveal)
+      const result = await updatePlaceholder(topicId, occasion, about, reveal);
       if (result.error) {
-        setStatus('error')
-        setErrorMsg(result.error)
+        setStatus("error");
+        setErrorMsg(result.error);
       } else {
-        setStatus('saved')
-        setTimeout(() => setStatus('idle'), 2000)
+        setStatus("saved");
+        setTimeout(() => setStatus("idle"), 2000);
       }
-    })
+    });
   }
 
   function handleDelete() {
-    if (!confirm(`Remove the "${capitalize(occasion)}" occasion from this topic?`)) return
+    if (
+      !confirm(`Remove the "${capitalize(occasion)}" occasion from this topic?`)
+    )
+      return;
     startDeleteTransition(async () => {
-      const result = await deleteOccasion(topicId, occasion)
+      const result = await deleteOccasion(topicId, occasion);
       if (result.error) {
-        setErrorMsg(result.error)
+        setErrorMsg(result.error);
       }
-    })
+    });
   }
 
-  const isDefault = occasion === 'default'
+  const isDefault = occasion === "default";
 
   return (
     <div className="border border-neutral-200 rounded-lg p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-neutral-900">{capitalize(occasion)}</h3>
+        <h3 className="text-sm font-medium text-neutral-900">
+          {capitalize(occasion)}
+        </h3>
         <div className="flex items-center gap-2">
           {isDefault ? (
             <span
@@ -103,7 +114,7 @@ function OccasionRow({
               disabled={isDeleting}
               className="text-xs text-red-500 hover:text-red-700 disabled:opacity-40 transition-colors"
             >
-              {isDeleting ? 'Removing…' : 'Remove'}
+              {isDeleting ? "Removing…" : "Remove"}
             </button>
           )}
         </div>
@@ -116,7 +127,10 @@ function OccasionRow({
         <textarea
           rows={4}
           value={about}
-          onChange={(e) => { setAbout(e.target.value); setStatus('idle') }}
+          onChange={(e) => {
+            setAbout(e.target.value);
+            setStatus("idle");
+          }}
           className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30 focus:border-[#534AB7]"
           placeholder="Placeholder text shown in the protagonist about field…"
         />
@@ -129,7 +143,10 @@ function OccasionRow({
         <textarea
           rows={3}
           value={reveal}
-          onChange={(e) => { setReveal(e.target.value); setStatus('idle') }}
+          onChange={(e) => {
+            setReveal(e.target.value);
+            setStatus("idle");
+          }}
           className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30 focus:border-[#534AB7]"
           placeholder="Placeholder text shown in the poll reveal field…"
         />
@@ -142,17 +159,21 @@ function OccasionRow({
           disabled={isPending}
           className="inline-flex items-center rounded-md bg-[#534AB7] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#3C3489] disabled:opacity-50 transition-colors"
         >
-          {status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved' : 'Save'}
+          {status === "saving"
+            ? "Saving…"
+            : status === "saved"
+              ? "Saved"
+              : "Save"}
         </button>
-        {status === 'saved' && (
+        {status === "saved" && (
           <span className="text-xs text-green-600">Changes saved</span>
         )}
-        {status === 'error' && (
+        {status === "error" && (
           <span className="text-xs text-red-600">{errorMsg}</span>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,30 +184,34 @@ function AddOccasionSection({
   topicId,
   existingOccasions,
 }: {
-  topicId: string
-  existingOccasions: string[]
+  topicId: string;
+  existingOccasions: string[];
 }) {
-  const available = VALID_OCCASIONS.filter((o) => !existingOccasions.includes(o))
-  const [selected, setSelected] = useState<string>(available[0] ?? '')
-  const [about, setAbout] = useState('')
-  const [reveal, setReveal] = useState('')
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState('')
+  const available = VALID_OCCASIONS.filter(
+    (o) => !existingOccasions.includes(o),
+  );
+  const [selected, setSelected] = useState<string>(available[0] ?? "");
+  const [about, setAbout] = useState("");
+  const [reveal, setReveal] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
 
-  if (available.length === 0) return null
+  if (available.length === 0) return null;
 
   function handleAdd() {
-    setError('')
+    setError("");
     startTransition(async () => {
-      const result = await addOccasion(topicId, selected, about, reveal)
+      const result = await addOccasion(topicId, selected, about, reveal);
       if (result.error) {
-        setError(result.error)
+        setError(result.error);
       } else {
-        setAbout('')
-        setReveal('')
-        setSelected(available.filter((o) => o !== selected)[0] ?? '' as string)
+        setAbout("");
+        setReveal("");
+        setSelected(
+          available.filter((o) => o !== selected)[0] ?? ("" as string),
+        );
       }
-    })
+    });
   }
 
   return (
@@ -243,12 +268,12 @@ function AddOccasionSection({
           disabled={isPending || !selected}
           className="inline-flex items-center rounded-md bg-[#534AB7] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#3C3489] disabled:opacity-50 transition-colors"
         >
-          {isPending ? 'Adding…' : 'Add occasion'}
+          {isPending ? "Adding…" : "Add occasion"}
         </button>
         {error && <span className="text-xs text-red-600">{error}</span>}
       </div>
     </div>
-  )
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -259,18 +284,20 @@ export function OccasionEditor({
   topicId,
   placeholders,
 }: {
-  topicId: string
-  placeholders: PlaceholdersMap
+  topicId: string;
+  placeholders: PlaceholdersMap;
 }) {
   // Show all 17 valid occasions — empty ones are shown as blank rows
-  const allOccasions = OCCASION_ORDER
-  const existingKeys = Object.keys(placeholders)
+  const allOccasions = OCCASION_ORDER;
+  const existingKeys = Object.keys(placeholders);
 
   // Occasions to show: all valid occasions (even if empty) + any unexpected keys
-  const orderedExisting = sortOccasions(existingKeys)
-  const emptyOccasions = OCCASION_ORDER.filter((o) => !existingKeys.includes(o))
+  const orderedExisting = sortOccasions(existingKeys);
+  const emptyOccasions = OCCASION_ORDER.filter(
+    (o) => !existingKeys.includes(o),
+  );
 
-  const allToShow = [...orderedExisting, ...emptyOccasions]
+  const allToShow = [...orderedExisting, ...emptyOccasions];
 
   return (
     <div className="flex flex-col gap-4">
@@ -279,15 +306,12 @@ export function OccasionEditor({
           key={occasion}
           topicId={topicId}
           occasion={occasion}
-          about={placeholders[occasion]?.about ?? ''}
-          reveal={placeholders[occasion]?.reveal ?? ''}
+          about={placeholders[occasion]?.about ?? ""}
+          reveal={placeholders[occasion]?.reveal ?? ""}
         />
       ))}
 
-      <AddOccasionSection
-        topicId={topicId}
-        existingOccasions={existingKeys}
-      />
+      <AddOccasionSection topicId={topicId} existingOccasions={existingKeys} />
     </div>
-  )
+  );
 }

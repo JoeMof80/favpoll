@@ -160,6 +160,14 @@ export function TopicPickerField({
                 e.preventDefault()
                 handleCreateTopic()
               }
+              if (
+                (e.key === "Delete" || e.key === "Backspace") &&
+                !search &&
+                hasSelection
+              ) {
+                e.preventDefault()
+                handleClear()
+              }
             }}
             onFocus={openDropdown}
             onBlur={handleBlur}
@@ -178,6 +186,11 @@ export function TopicPickerField({
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onMouseDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          if (anchorRef.current?.contains(e.target as Node)) {
+            e.preventDefault()
+          }
+        }}
       >
         {/* Filters — top of dropdown */}
         <div className="border-b border-border p-2">

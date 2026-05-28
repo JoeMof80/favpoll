@@ -12,6 +12,10 @@ import {
   type PickerSize,
 } from "./constants"
 
+const SORTED_OCCASIONS = [...OCCASION_LIST].sort((a, b) =>
+  a.label.localeCompare(b.label)
+)
+
 export function OccasionPickerField({
   value,
   onChange,
@@ -25,16 +29,10 @@ export function OccasionPickerField({
 }) {
   const [open, setOpen] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState(0)
-  const [search, setSearch] = useState("")
   const anchorRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const selectedLabel =
     OCCASION_LIST.find((o) => o.value === value)?.label ?? null
-
-  const visible = OCCASION_LIST.filter(
-    (o) => !search || o.label.toLowerCase().includes(search.toLowerCase())
-  )
 
   function openDropdown() {
     if (anchorRef.current)
@@ -42,18 +40,9 @@ export function OccasionPickerField({
     setOpen(true)
   }
 
-  function handleBlur() {
-    setTimeout(() => {
-      setOpen(false)
-      setSearch("")
-    }, 150)
-  }
-
   function handleSelect(v: string) {
     onChange(v)
-    setSearch("")
     setOpen(false)
-    inputRef.current?.blur()
   }
 
   return (
@@ -61,10 +50,14 @@ export function OccasionPickerField({
       <PopoverAnchor asChild>
         <div
           ref={anchorRef}
-          className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
-          onClick={() => inputRef.current?.focus()}
+          className={cn(
+            CHIP_IN_INPUT,
+            CHIP_IN_INPUT_SIZE[size],
+            "cursor-pointer select-none"
+          )}
+          onClick={openDropdown}
         >
-          {selectedLabel && (
+          {selectedLabel ? (
             <Chip
               selected
               size={size}
@@ -77,23 +70,16 @@ export function OccasionPickerField({
             >
               {selectedLabel}
             </Chip>
+          ) : (
+            <span
+              className={cn(
+                "min-w-0 flex-1 text-muted-foreground/50",
+                CHIP_IN_INPUT_TEXT[size]
+              )}
+            >
+              Select occasion
+            </span>
           )}
-          <input
-            ref={inputRef}
-            type="text"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              openDropdown()
-            }}
-            onFocus={openDropdown}
-            onBlur={handleBlur}
-            placeholder={selectedLabel ? "" : "Select occasion"}
-            className={cn(
-              "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
-              CHIP_IN_INPUT_TEXT[size]
-            )}
-          />
         </div>
       </PopoverAnchor>
       <PopoverContent
@@ -101,32 +87,31 @@ export function OccasionPickerField({
         className="p-0"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          if (anchorRef.current?.contains(e.target as Node)) {
+            e.preventDefault()
+          }
+        }}
       >
         <div
           className="max-h-60 overflow-y-auto p-2"
           onMouseDown={(e) => e.preventDefault()}
         >
-          {visible.length === 0 ? (
-            <p className="py-3 text-center text-sm text-muted-foreground">
-              No results.
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {visible.map((o) => (
-                <Chip
-                  key={o.value}
-                  selected={o.value === value}
-                  size={size}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    handleSelect(o.value)
-                  }}
-                >
-                  {o.label}
-                </Chip>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-1.5">
+            {SORTED_OCCASIONS.map((o) => (
+              <Chip
+                key={o.value}
+                selected={o.value === value}
+                size={size}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  handleSelect(o.value)
+                }}
+              >
+                {o.label}
+              </Chip>
+            ))}
+          </div>
         </div>
       </PopoverContent>
     </Popover>

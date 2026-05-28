@@ -59,8 +59,8 @@ export function ItemAddField({
   const showEmpty = allItems.length === 0 && !trimmed
 
   const placeholder = isFinite
-    ? `View ${topicTitle.toLowerCase()}…`
-    : `Type to add a missing ${topicTitle.toLowerCase()}…`
+    ? `View items for ${topicTitle}…`
+    : `Add ${topicTitle} items…`
 
   function openPopover() {
     if (anchorRef.current)
@@ -136,6 +136,11 @@ export function ItemAddField({
         className="p-0"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          if (anchorRef.current?.contains(e.target as Node)) {
+            e.preventDefault()
+          }
+        }}
       >
         <div
           className="max-h-60 overflow-y-auto p-2"
@@ -165,7 +170,7 @@ export function ItemAddField({
             <div className="flex flex-wrap gap-1.5">
               {filteredItems.map((item) =>
                 !isFinite && item.isCustom ? (
-                  <Chip key={item.id} selected size={size} className="gap-1">
+                  <Chip key={item.id} size={size} className="gap-1">
                     {item.label}
                     <span
                       role="button"

@@ -100,7 +100,17 @@ export function CharityField({
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
-                  openDropdown()
+                  if (!open) openDropdown()
+                }}
+                onKeyDown={(e) => {
+                  if (
+                    (e.key === "Delete" || e.key === "Backspace") &&
+                    !search &&
+                    value.length > 0
+                  ) {
+                    e.preventDefault()
+                    onChange(value.slice(0, -1))
+                  }
                 }}
                 onFocus={openDropdown}
                 onBlur={handleBlur}
@@ -121,6 +131,11 @@ export function CharityField({
           className="p-0"
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            if (anchorRef.current?.contains(e.target as Node)) {
+              e.preventDefault()
+            }
+          }}
         >
           <div
             className="max-h-60 overflow-y-auto p-2"

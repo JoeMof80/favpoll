@@ -2,12 +2,11 @@
 
 import { useWatch, useFormContext } from "react-hook-form"
 import {
-  OCCASION_LABELS,
   OCCASION_PLACEHOLDERS,
   DATE_LABEL_PLACEHOLDERS,
   DEFAULT_PLACEHOLDERS,
-  TOPIC_REVEAL_PLACEHOLDERS,
 } from "@/lib/occasions"
+import { PREFIXES } from "@/lib/display"
 import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
 import { PledgePanel } from "@/components/pledge-panel"
@@ -32,28 +31,6 @@ type Props = {
   previewSuffix: boolean
   previewPhoto: boolean
 }
-
-// Static placeholder poll options when no topic is selected yet
-const PLACEHOLDER_ITEMS: TopicItem[] = [
-  "Option one",
-  "Option two",
-  "Option three",
-  "Option four",
-  "Option five",
-  "Option six",
-].map(
-  (label, i) =>
-    ({
-      id: `placeholder-${i}`,
-      label,
-      topic_id: "placeholder",
-      all_time_pledged: 0,
-      all_time_count: 0,
-      is_canonical: false,
-      is_active: true,
-      created_at: "",
-    }) as unknown as TopicItem
-)
 
 // Placeholder charities shown before the user selects any
 const PLACEHOLDER_CHARITIES: Charity[] = [
@@ -181,7 +158,7 @@ export function PreviewPanel({
   const aboutPlaceholder = topicAbout ?? placeholders.about
   const resolvedOpeningLine =
     openingLine ||
-    (occasion ? (OCCASION_LABELS[occasion] ?? "A tribute to") : "A tribute to")
+    (occasion ? (PREFIXES[occasion] ?? "A tribute to") : "A tribute to")
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
@@ -210,57 +187,59 @@ export function PreviewPanel({
   const firstTopic = selectedTopics[0]
   const firstTopicCustomLabels = firstTopic?.customLabels ?? []
 
-  const topicItems: TopicItem[] =
-    firstTopic && (firstTopic.items ?? []).length > 0
-      ? [
-          ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
-            (item) =>
-              ({
-                id: item.id,
-                label: item.label,
-                topic_id: firstTopic.topicId ?? "",
-                all_time_pledged: 0,
-                all_time_count: 0,
-                is_canonical: true,
-                is_active: true,
-                created_at: "",
-              }) as unknown as TopicItem
-          ),
-          ...firstTopicCustomLabels.map(
-            (label, i) =>
-              ({
-                id: `custom-preview-${i}`,
-                label,
-                topic_id: firstTopic.topicId ?? "",
-                all_time_pledged: 0,
-                all_time_count: 0,
-                is_canonical: false,
-                is_active: true,
-                created_at: "",
-              }) as unknown as TopicItem
-          ),
-        ]
-      : PLACEHOLDER_ITEMS
-
-  const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
-  const displayCharities =
-    selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
-
-  const protagonistFirstName = (name || placeholders.name).split(" ")[0]
-  const topicTitle = firstTopic?.title ?? "Colour"
-  const topicRevealPlaceholder = topicTitle
-    ? (
-        TOPIC_REVEAL_PLACEHOLDERS[topicTitle]?.reveal ?? placeholders.reveal
-      ).replace("{name}", protagonistFirstName)
-    : placeholders.reveal
-  // Show reveal when the reveal field is focused; otherwise hide it
-  const revealValue = showReveal ? reveal || topicRevealPlaceholder : null
+  const topicItems: TopicItem[] = firstTopic
+    ? [
+        ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
+          (item) =>
+            ({
+              id: item.id,
+              label: item.label,
+              topic_id: firstTopic.topicId ?? "",
+              all_time_pledged: 0,
+              all_time_count: 0,
+              is_canonical: true,
+              is_active: true,
+              created_at: "",
+            }) as unknown as TopicItem
+        ),
+        ...firstTopicCustomLabels.map(
+          (label, i) =>
+            ({
+              id: `custom-preview-${i}`,
+              label,
+              topic_id: firstTopic.topicId ?? "",
+              all_time_pledged: 0,
+              all_time_count: 0,
+              is_canonical: false,
+              is_active: true,
+              created_at: "",
+            }) as unknown as TopicItem
+        ),
+      ]
+    : []
 
   const pollResults: PollResultItem[] = topicItems.map((item) => ({
     label: item.label,
     amount: "£0",
     widthPercent: 0,
   }))
+
+  const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
+  const displayCharities =
+    selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
+
+  const hasTopicSelected = !!firstTopic
+  const protagonistFirstName = (name || placeholders.name).split(" ")[0]
+  const topicTitle = firstTopic?.title ?? "Colour"
+  const topicOccasionReveal = firstTopicMeta?.placeholders?.[occasion]?.reveal
+  const topicRevealPlaceholder =
+    topicTitle && topicOccasionReveal
+      ? topicOccasionReveal.replace("{name}", protagonistFirstName)
+      : topicTitle && hasTopicSelected
+        ? `Share their favourite ${topicTitle.toLowerCase()}…`
+        : placeholders.reveal.replace("{name}", protagonistFirstName)
+  // Always show typed reveal; show placeholder only while the field is focused
+  const revealValue = reveal || (showReveal ? topicRevealPlaceholder : null)
 
   return (
     <div className="mx-auto max-w-330 px-6 pt-8 pb-16">
@@ -273,22 +252,24 @@ export function PreviewPanel({
             hideAvatar={!previewPhoto}
           />
 
-          <div className="space-y-4">
-            <PollHeading
-              topicTitle={topicTitle}
-              reveal={revealValue}
-              protagonistFirstName={protagonistFirstName}
-            />
-            {showReveal ? (
-              <PollResults results={pollResults} />
-            ) : (
-              <PledgePanel
-                items={topicItems}
-                totalAmount="0"
-                onSelectionsChange={() => {}}
+          {hasTopicSelected && (
+            <div className="space-y-4">
+              <PollHeading
+                topicTitle={topicTitle}
+                reveal={revealValue}
+                protagonistFirstName={protagonistFirstName}
               />
-            )}
-          </div>
+              {revealValue ? (
+                <PollResults results={pollResults} />
+              ) : (
+                <PledgePanel
+                  items={topicItems}
+                  totalAmount="0"
+                  onSelectionsChange={() => {}}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right — sticky meta */}
