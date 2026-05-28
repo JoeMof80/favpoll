@@ -179,7 +179,7 @@ Never delete data — the script is additive and idempotent.
 
 ## Testing conventions
 
-Run tests with `pnpm test:run`. All 261 tests must pass before committing.
+Run tests with `pnpm test:run`. All 455 tests must pass before committing.
 
 **When to write tests:**
 

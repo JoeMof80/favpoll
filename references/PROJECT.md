@@ -109,6 +109,7 @@ topic_items (
   markets text[] not null default array['en-GB'],
   event_count integer default 0,
   total_pledge_count integer default 0,
+  display_order integer,            -- null = alphabetical; set only for finite topics
   review_status text,               -- 'pending_review' | 'accepted' | 'rejected' | null (null for seed items)
   rejection_reason text,
   reviewed_at timestamptz,
@@ -242,6 +243,7 @@ item_flags (
 20260526000000_remove_event_poll_item_priority.sql
 20260527000000_rename_date_label_to_context.sql        -- protagonists.date_label → context
 20260527000001_rename_occasion_label_to_opening_line.sql  -- events.occasion_label → opening_line
+20260527000002_restore_topic_item_display_order.sql    -- topic_items.display_order integer nullable
 ```
 
 ---
@@ -384,11 +386,11 @@ components/
 │   ├── preview-panel.tsx         -- Live preview panel
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
-│   ├── date-time-picker.tsx      -- Trigger Button with size prop, no hover bg, conditional text opacity
-│   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button
-│   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic, dropdown stays open
-│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; popover stays open after add
-│   ├── charity-field.tsx         -- Click-to-toggle chips, no X button
+│   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button syncs width to calendar on first open
+│   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button; onInteractOutside prevents close on anchor click
+│   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic; Backspace/Delete clears chip; onInteractOutside keeps open
+│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open
+│   ├── charity-field.tsx         -- Click-to-toggle chips; Backspace/Delete removes last chip; onInteractOutside keeps open
 │   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
 ├── pledge-card/
 │   ├── index.tsx, use-pledge.ts, amount-input.tsx
@@ -454,6 +456,7 @@ app/
 components/
 ├── sidebar.tsx
 ├── occasion-editor.tsx
+├── display-order-editor.tsx      -- Per-item number inputs for finite topic display_order; shown above OccasionEditor
 ├── charity-list.tsx
 ├── theme-provider.tsx            -- TODO: move to packages/ui/
 └── menu-button.tsx               -- TODO: move to packages/ui/
@@ -461,7 +464,7 @@ components/
 lib/
 ├── supabase/admin.ts             -- createAdminClient() — service role, bypasses RLS
 └── actions/
-    ├── placeholders.ts           -- getTopics, updatePlaceholder, addOccasion, deleteOccasion
+    ├── placeholders.ts           -- getTopics, updatePlaceholder, addOccasion, deleteOccasion, getTopicItems, updateItemDisplayOrder
     ├── contributions.ts          -- getPendingContributions, acceptContribution, rejectContribution
     └── charities.ts              -- getCharities, createCharity, updateCharity, deactivateCharity, reactivateCharity
 ```
@@ -531,7 +534,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: ~455 web, ~22 admin.
+All tests must pass before committing. Current counts: 455 web, ~22 admin.
 
 Co-located `__tests__/` directories. Environments:
 - Default (jsdom): pure functions, hooks
@@ -590,11 +593,11 @@ NEXT_PUBLIC_BASE_URL
 
 - **Guest item moderation.** Guest items land immediately (pledge works without review). `review_status` on `topic_items` governs canonical promotion only. Organisers hide/show via `event_poll_items.is_hidden`. `acceptContribution` must set both `is_canonical = true` AND `review_status = 'accepted'`.
 
-- **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `localeCompare` alphabetical for ties. Items in all views sorted alphabetically — `display_order` and `is_prioritized` removed from `event_poll_items`.
+- **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `display_order asc nulls last` for finite topics, then `localeCompare` alphabetical for ties. `topic_items.display_order` (nullable integer) set only for finite topics via admin `DisplayOrderEditor`; null = alphabetical sort.
 
 - **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
 
-- **opening_line is organiser-editable.** Pre-populated from PREFIXES[occasion] on occasion select but freely editable. Stored in DB. Never derive it purely from occasion at render time.
+- **opening_line is organiser-editable.** Shown as placeholder text in the form (from `PREFIXES[occasion]`) — not pre-filled. Organiser may type their own. Stored in DB. Preview falls back to `PREFIXES[occasion]` when field is empty. Never derive it purely from occasion at render time.
 
 - **Field character limits.** name: 40, context: 40, opening_line: 60, about: 300, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
 
