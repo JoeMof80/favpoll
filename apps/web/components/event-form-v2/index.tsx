@@ -230,7 +230,7 @@ export function EventFormV2({
         </div>
 
         {/* Right panel — live preview */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex-1 overflow-y-auto">
           <PreviewPanel
             charities={charities}
             topics={topics}

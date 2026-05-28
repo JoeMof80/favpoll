@@ -172,7 +172,7 @@ export default async function EventPage({ params }: Props) {
         isClosed={isClosed}
       />
       <main
-        className={`mx-auto max-w-330 px-6 pt-8 ${isOrganiser ? "pb-28" : "pb-16"}`}
+        className={`mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background p-16 drop-shadow-lg ${isOrganiser ? "pb-28" : "pb-16"}`}
       >
         <EventContent
           event={typedEvent}
