@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { CalendarIcon, Clock2Icon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -29,8 +29,6 @@ export function DateTimePicker({
   size?: PickerSize
 }) {
   const [open, setOpen] = useState(false)
-  const [popoverWidth, setPopoverWidth] = useState(0)
-  const triggerRef = useRef<HTMLButtonElement>(null)
 
   const dateStr = value
     ? value.toLocaleDateString("en-GB", {
@@ -63,21 +61,13 @@ export function DateTimePicker({
   today.setHours(0, 0, 0, 0)
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={(v) => {
-        if (v && triggerRef.current)
-          setPopoverWidth(triggerRef.current.getBoundingClientRect().width)
-        setOpen(v)
-      }}
-    >
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          ref={triggerRef}
           type="button"
           variant="outline"
           className={cn(
-            "w-full cursor-pointer justify-start gap-2 font-normal hover:bg-background",
+            "w-full cursor-pointer justify-start gap-2 bg-background! font-normal",
             INPUT_SIZE[size],
             !value && "text-muted-foreground"
           )}
@@ -104,12 +94,8 @@ export function DateTimePicker({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        style={{ width: popoverWidth || undefined }}
-        className="p-0"
-        align="start"
-      >
-        <Card size="sm" className="w-full shadow-none ring-0">
+      <PopoverContent className="w-auto p-0" align="start">
+        <Card size="sm" className="w-fit shadow-none ring-0">
           <CardContent>
             <Calendar
               mode="single"
