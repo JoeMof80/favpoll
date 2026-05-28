@@ -9,8 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   InputGroup,
   InputGroupAddon,
@@ -29,6 +28,7 @@ export function DateTimePicker({
   size?: PickerSize
 }) {
   const [open, setOpen] = useState(false)
+  const [buttonWidth, setButtonWidth] = useState(0)
 
   const dateStr = value
     ? value.toLocaleDateString("en-GB", {
@@ -61,76 +61,70 @@ export function DateTimePicker({
   today.setHours(0, 0, 0, 0)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className={cn(
-            "w-full cursor-pointer justify-start gap-2 bg-background! font-normal",
-            INPUT_SIZE[size],
-            !value && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon
-            className="h-4 w-4 shrink-0 text-muted-foreground/50 opacity-50"
-            aria-hidden
-          />
-          <span
+    <div className="flex gap-2">
+      {/* Date picker */}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            style={buttonWidth ? { width: buttonWidth } : undefined}
             className={cn(
-              "flex-1 text-left",
-              !value && "text-muted-foreground/50"
+              "cursor-pointer justify-start gap-2 bg-background! font-normal",
+              !buttonWidth && "flex-1",
+              INPUT_SIZE[size],
+              !value && "text-muted-foreground"
             )}
           >
-            {dateStr}
-          </span>
-          <span
-            className={cn(
-              "shrink-0 tabular-nums",
-              !value ? "text-muted-foreground/50" : "text-muted-foreground"
-            )}
-          >
-            {timeStr}
-          </span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Card size="sm" className="w-fit shadow-none ring-0">
-          <CardContent>
-            <Calendar
-              mode="single"
-              captionLayout="dropdown"
-              selected={value}
-              defaultMonth={value ?? today}
-              startMonth={today}
-              endMonth={new Date(new Date().getFullYear() + 5, 11)}
-              disabled={{ before: today }}
-              onSelect={handleDaySelect}
-              className="p-0"
+            <CalendarIcon
+              className="h-4 w-4 shrink-0 text-muted-foreground/50"
+              aria-hidden
             />
-          </CardContent>
-          <CardFooter className="bg-card">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="v2-closes-time">Time</FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id="v2-closes-time"
-                    type="time"
-                    step="60"
-                    value={timeStr}
-                    onChange={handleTimeChange}
-                    className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <Clock2Icon className="text-muted-foreground" />
-                  </InputGroupAddon>
-                </InputGroup>
-              </Field>
-            </FieldGroup>
-          </CardFooter>
-        </Card>
-      </PopoverContent>
-    </Popover>
+            <span className={cn(!value && "text-muted-foreground/50")}>
+              {dateStr}
+            </span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <div
+            ref={(el) => {
+              if (el && !buttonWidth) {
+                setButtonWidth(el.getBoundingClientRect().width)
+              }
+            }}
+          >
+            <Card size="sm" className="w-fit shadow-none ring-0">
+              <CardContent>
+                <Calendar
+                  mode="single"
+                  captionLayout="dropdown"
+                  selected={value}
+                  defaultMonth={value ?? today}
+                  startMonth={today}
+                  endMonth={new Date(new Date().getFullYear() + 5, 11)}
+                  disabled={{ before: today }}
+                  onSelect={handleDaySelect}
+                  className="p-0"
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {/* Time picker */}
+      <InputGroup className={cn(INPUT_SIZE[size], "w-32 bg-background")}>
+        <InputGroupInput
+          type="time"
+          step="60"
+          value={timeStr}
+          onChange={handleTimeChange}
+          className="appearance-none tabular-nums [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        />
+        <InputGroupAddon align="inline-end">
+          <Clock2Icon className="h-4 w-4 text-muted-foreground/50" />
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
   )
 }
