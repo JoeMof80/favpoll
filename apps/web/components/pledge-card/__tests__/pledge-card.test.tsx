@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }))
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}))
 vi.mock("@/app/events/[id]/actions", () => ({
   createPledge: vi.fn(),
   createGuestPledge: vi.fn(),
