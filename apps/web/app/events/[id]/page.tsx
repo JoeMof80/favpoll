@@ -165,7 +165,7 @@ export default async function EventPage({ params }: Props) {
       : null
 
   return (
-    <>
+    <div className="bg-primary/5">
       <EventSubheader
         eventId={id}
         isOrganiser={isOrganiser}
@@ -186,6 +186,6 @@ export default async function EventPage({ params }: Props) {
           isOrganiser={isOrganiser}
         />
       </main>
-    </>
+    </div>
   )
 }

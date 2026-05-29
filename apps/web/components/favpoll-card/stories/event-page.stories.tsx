@@ -147,6 +147,7 @@ function EventPageLayout({ sceneIndex }: PageArgs) {
         hasPledged={false}
         protagonistName={scene.protagonist.name}
         isOrganiser={false}
+        eventId="event-demo"
         onSelectionsChange={() => {}}
       />
 

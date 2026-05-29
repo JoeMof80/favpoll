@@ -238,6 +238,82 @@ export async function addGuestItem(
   }
 }
 
+export async function addOrganizerItem(eventId: string, label: string) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+  const trimmed = label.trim()
+  if (!trimmed) throw new Error("Label is required")
+
+  // Verify ownership
+  const { data: event } = await supabase
+    .from("events")
+    .select("created_by")
+    .eq("id", eventId)
+    .single()
+  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+
+  // Fetch poll + topic, verify infinite
+  const { data: poll } = await supabase
+    .from("event_polls")
+    .select("id, topic_id, topics(is_finite)")
+    .eq("event_id", eventId)
+    .single()
+  if (!poll) throw new Error("No poll found")
+  const topicMeta = Array.isArray(poll.topics) ? poll.topics[0] : poll.topics
+  if ((topicMeta as { is_finite: boolean } | null)?.is_finite)
+    throw new Error("Cannot add items to a finite topic")
+
+  const topicId = poll.topic_id
+
+  // Reuse existing topic_item if label matches (case-insensitive)
+  const { data: existing } = await supabase
+    .from("topic_items")
+    .select("id")
+    .eq("topic_id", topicId)
+    .ilike("label", trimmed)
+    .maybeSingle()
+
+  let topicItemId: string
+  if (existing) {
+    topicItemId = existing.id
+  } else {
+    const { data: newItem, error } = await supabase
+      .from("topic_items")
+      .insert({
+        topic_id: topicId,
+        label: trimmed,
+        source: "organiser",
+        is_canonical: false,
+        review_status: "pending",
+        markets: ["en-GB"],
+      })
+      .select("id")
+      .single()
+    if (error || !newItem)
+      throw new Error(error?.message ?? "Failed to create item")
+    topicItemId = newItem.id
+  }
+
+  // Idempotent — skip if already in poll
+  const { data: existingEpi } = await supabase
+    .from("event_poll_items")
+    .select("id")
+    .eq("event_poll_id", poll.id)
+    .eq("topic_item_id", topicItemId)
+    .maybeSingle()
+  if (existingEpi) return
+
+  const { error: epiErr } = await supabase.from("event_poll_items").insert({
+    event_poll_id: poll.id,
+    topic_item_id: topicItemId,
+    is_guest_added: false,
+    added_by: userId,
+  })
+  if (epiErr) throw new Error(epiErr.message)
+}
+
 export async function removeEventPollItem(id: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
@@ -306,7 +382,20 @@ export async function topUpFund(eventId: string, amount: number) {
     .eq("event_id", eventId)
     .single()
 
-  if (!pot) throw new Error("No fund found for this event")
+  if (!pot) {
+    const { data: organiserData } = await supabase
+      .from("events")
+      .select("created_by")
+      .eq("id", eventId)
+      .single()
+    const { error: createErr } = await supabase.from("event_pots").insert({
+      event_id: eventId,
+      created_by: organiserData?.created_by ?? userId,
+      total_deposited: amount,
+    })
+    if (createErr) throw new Error(createErr.message)
+    return
+  }
 
   const { error } = await supabase
     .from("event_pots")

@@ -199,6 +199,12 @@ export function PledgePanel({
                   {search.trim()}
                 </span>
               </button>
+            ) : filteredItems.length === 0 && !lowerSearch ? (
+              <p className="py-3 text-center text-sm text-muted-foreground">
+                {isInfinite && onAddItem
+                  ? "No items yet — start typing to add one."
+                  : "No items."}
+              </p>
             ) : filteredItems.length === 0 ? (
               <p className="py-3 text-center text-sm text-muted-foreground">
                 No options found.

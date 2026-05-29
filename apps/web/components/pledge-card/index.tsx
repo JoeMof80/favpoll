@@ -370,7 +370,7 @@ function LivePledgeCard(props: LiveProps) {
         </div>
 
         {/* Top-up — own funds only */}
-        {props.pot && !useSharedFund && (
+        {!useSharedFund && (
           <div className="rounded bg-muted p-3">
             <div className="flex items-center justify-between gap-1.5">
               <label

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
-import { addGuestItem } from "@/app/events/[id]/actions"
+import { addGuestItem, addOrganizerItem } from "@/app/events/[id]/actions"
 import type { EventWithDetails, EventPollWithItems } from "@favpoll/types"
 
 type UseEventContentOptions = {
@@ -34,9 +34,17 @@ export function useEventContent({
     router.refresh()
   }, [router])
 
-  // Returns an addItem handler for infinite, open polls — undefined otherwise
+  // Returns an addItem handler for infinite, open polls.
+  // Organiser path calls addOrganizerItem; guest path calls addGuestItem.
   function addItemHandler(poll: EventPollWithItems) {
     if (poll.topics.is_finite || isClosed || !clerkUserId) return undefined
+    const isOrganiser = clerkUserId === event.created_by
+    if (isOrganiser) {
+      return async (label: string) => {
+        await addOrganizerItem(event.id, label)
+        router.refresh()
+      }
+    }
     return async (label: string) => {
       await addGuestItem(poll.id, poll.topic_id, label)
       router.refresh()

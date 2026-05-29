@@ -74,7 +74,7 @@ async function upsertPollForEvent(
         title: poll.customTopicTitle.trim(),
         created_by: userId,
         is_finite: false,
-        is_active: false,
+        is_active: true,
       })
       .select("id")
       .single()

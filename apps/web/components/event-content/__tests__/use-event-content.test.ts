@@ -12,6 +12,7 @@ import type {
 const mockRouter = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }))
 const mockActions = vi.hoisted(() => ({
   addGuestItem: vi.fn().mockResolvedValue(undefined),
+  addOrganizerItem: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
@@ -222,13 +223,40 @@ describe("useEventContent — addItemHandler", () => {
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
-  it("returns a function for an infinite, open poll with logged-in user", () => {
+  it("returns a function for the organiser that calls addOrganizerItem", async () => {
+    mockRouter.refresh.mockClear()
+    mockActions.addOrganizerItem.mockClear()
+
+    // event.created_by is "user-1" — same as clerkUserId means organiser
     const { result } = renderHook(() =>
       useEventContent({
         event,
         pollWithItems: poll,
         isClosed: false,
         clerkUserId: "user-1",
+      })
+    )
+    const handler = result.current.addItemHandler(poll)!
+    expect(typeof handler).toBe("function")
+
+    await act(async () => {
+      await handler("Scarlet")
+    })
+
+    expect(mockActions.addOrganizerItem).toHaveBeenCalledWith(
+      "event-1",
+      "Scarlet"
+    )
+    expect(mockRouter.refresh).toHaveBeenCalled()
+  })
+
+  it("returns a function for an infinite, open poll with a non-organiser logged-in user", () => {
+    const { result } = renderHook(() =>
+      useEventContent({
+        event,
+        pollWithItems: poll,
+        isClosed: false,
+        clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
       })
     )
     expect(typeof result.current.addItemHandler(poll)).toBe("function")
@@ -243,7 +271,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
-        clerkUserId: "user-1",
+        clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
       })
     )
     const handler = result.current.addItemHandler(poll)!

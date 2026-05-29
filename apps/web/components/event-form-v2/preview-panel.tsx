@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import {
   OCCASION_PLACEHOLDERS,
@@ -64,6 +64,7 @@ export function PreviewPanel({
   previewPhoto,
 }: Props) {
   const [pledgeAmount, setPledgeAmount] = useState("")
+  const [previewAddedLabels, setPreviewAddedLabels] = useState<string[]>([])
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -79,6 +80,14 @@ export function PreviewPanel({
   const charityIds = values.charities ?? []
   const selectedTopics = values.topics ?? []
 
+  const firstSelectedTopicId = selectedTopics[0]?.topicId
+  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
+
+  // Reset preview-added items when the topic changes — must be above early return
+  useEffect(() => {
+    setPreviewAddedLabels([])
+  }, [firstSelectedTopicId])
+
   if (!occasion)
     return (
       <div className="flex h-full items-center justify-center">
@@ -91,8 +100,6 @@ export function PreviewPanel({
   // Resolve occasion-specific placeholders
   const placeholders = OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS
   const datePlaceholder = DATE_LABEL_PLACEHOLDERS[occasion] ?? ""
-  const firstSelectedTopicId = selectedTopics[0]?.topicId
-  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
   const topicAbout =
     firstTopicMeta?.placeholders?.[occasion]?.about ??
     firstTopicMeta?.placeholders?.["default"]?.about
@@ -128,6 +135,13 @@ export function PreviewPanel({
   const firstTopic = selectedTopics[0]
   const firstTopicCustomLabels = firstTopic?.customLabels ?? []
 
+  // Custom topics (not yet in DB) are always infinite
+  const isInfinite = firstTopic
+    ? firstTopic.isCustom
+      ? true
+      : !(firstTopicMeta?.is_finite ?? true)
+    : false
+
   const topicItems: TopicItem[] = firstTopic
     ? [
         ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
@@ -147,6 +161,19 @@ export function PreviewPanel({
           (label, i) =>
             ({
               id: `custom-preview-${i}`,
+              label,
+              topic_id: firstTopic.topicId ?? "",
+              all_time_pledged: 0,
+              all_time_count: 0,
+              is_canonical: false,
+              is_active: true,
+              created_at: "",
+            }) as unknown as TopicItem
+        ),
+        ...previewAddedLabels.map(
+          (label, i) =>
+            ({
+              id: `preview-added-${i}`,
               label,
               topic_id: firstTopic.topicId ?? "",
               all_time_pledged: 0,
@@ -179,7 +206,7 @@ export function PreviewPanel({
       : topicTitle && hasTopicSelected
         ? `Share their favourite ${topicTitle.toLowerCase()}…`
         : placeholders.reveal.replace("{name}", protagonistFirstName)
-  const revealValue = reveal || (showReveal ? topicRevealPlaceholder : null)
+  const revealValue = showReveal ? reveal || topicRevealPlaceholder : null
 
   return (
     <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
@@ -206,6 +233,13 @@ export function PreviewPanel({
                   items={topicItems}
                   totalAmount={pledgeAmount}
                   onSelectionsChange={() => {}}
+                  isInfinite={isInfinite}
+                  onAddItem={
+                    isInfinite
+                      ? async (label) =>
+                          setPreviewAddedLabels((prev) => [...prev, label])
+                      : undefined
+                  }
                 />
               )}
             </div>

@@ -105,7 +105,7 @@ async function createPollForEvent(
         title: poll.customTopic.title.trim(),
         created_by: userId,
         is_finite: false,
-        is_active: false,
+        is_active: true,
       })
       .select("id")
       .single()
@@ -252,14 +252,12 @@ export async function createEvent(
 
   await createPollForEvent(supabase, event.id, userId, input.poll)
 
-  if (input.potAmount && input.potAmount > 0) {
-    const { error: potErr } = await supabase.from("event_pots").insert({
-      event_id: event.id,
-      created_by: userId,
-      total_deposited: input.potAmount,
-    })
-    if (potErr) throw new Error(`Failed to create fund: ${potErr?.message}`)
-  }
+  const { error: potErr } = await supabase.from("event_pots").insert({
+    event_id: event.id,
+    created_by: userId,
+    total_deposited: input.potAmount ?? 0,
+  })
+  if (potErr) throw new Error(`Failed to create fund: ${potErr?.message}`)
 
   return { eventId: event.id }
 }
