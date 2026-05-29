@@ -77,40 +77,27 @@ event-card  (client component)
 ### `app/events/new/page.tsx` — Create event
 ```
 app/events/new/page.tsx
-  → event-canvas
-      → event-hero
-      → canvas/poll-editor
+  → event-form-v2  (EventFormV2 — split FormPanel + PreviewPanel)
+      → event-form-v2/form-panel  (5-step form)
+          → event-form-v2/occasion-picker-field
+              → ui/popover, ui/chip
+          → event-form-v2/topic-picker-field
+              → ui/popover, ui/chip
+          → event-form-v2/charity-field
+              → ui/popover, ui/chip
+          → event-form-v2/date-time-picker
+              → ui/calendar, ui/button
+          → event-form-v2/photo-crop-modal
+              → react-easy-crop
+          → ui/button
+      → event-form-v2/preview-panel  (live preview)
+          → event-hero
           → poll-heading
-              → favpoll-card/poll-title
-              → favpoll-card/poll-reveal
-          → canvas/topic-picker
-              → canvas/removable-pill
-          → canvas/custom-topic-options
-              → canvas/inline-option-input
-              → canvas/removable-pill
-          → canvas/topic-priority-editor
-              → canvas/inline-option-input
-              → canvas/removable-pill
-      → canvas/canvas-sidebar
-          → canvas/canvas-sidebar/closing-date
-              → ui/calendar
-              → ui/section-eyebrow
-              → ui/card
-              → ui/field
-              → ui/button
-              → ui/textarea
-          → canvas/canvas-sidebar/charity-picker
-              → ui/picker-field
-                  → ui/popover
-                  → ui/chip
-              → ui/button
-              → ui/section-eyebrow
-          → canvas/canvas-sidebar/shared-fund
-          → canvas/canvas-sidebar/privacy-toggle
-              → ui/switch
-      → canvas/share-screen
-      → ui/button
-      → ui/chip
+          → pledge-panel
+          → favpoll-card/poll-results
+          → countdown
+          → charity-banner
+          → pledge-card  (prePublish mode)
 ```
 
 ### `app/events/[id]/page.tsx` — Event view
@@ -131,6 +118,7 @@ app/events/[id]/page.tsx
               → ui/ranking-bar
           → ui/tabs
           → ui/button
+          → ui/alert  (empty-poll warning when all items hidden)
       → pledge-card
           → stripe-checkout
           → pledge-card/amount-input *
@@ -145,7 +133,7 @@ app/events/[id]/page.tsx
 ### `app/events/[id]/edit/page.tsx` — Edit event
 ```
 app/events/[id]/edit/page.tsx
-  → event-canvas  (same tree as create)
+  → event-form-v2  (same tree as create)
 ```
 
 ### `app/events/[id]/manage/page.tsx` — Manage event
@@ -219,7 +207,7 @@ app/pledges/withdraw/page.tsx
 | `switch` | privacy-toggle | — |
 | `dropdown-menu` | — | — |
 | `separator` | — | — |
-| `alert` | — | — |
+| `alert` | poll-section | — |
 | `toggle` | — | — |
 | `label` | — | — |
 | `input-group` | — | — |
@@ -259,7 +247,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 | `favpoll-card` | `components/favpoll-card/favpoll-card.tsx` | Stories only |
 | `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No imports found |
 | `ui/separator` | `components/ui/separator.tsx` | No imports found |
-| `ui/alert` | `components/ui/alert.tsx` | No imports found |
+| `ui/alert` | `components/ui/alert.tsx` | Used by `poll-section` — no longer unused |
 | `ui/toggle` | `components/ui/toggle.tsx` | No imports found |
 | `ui/label` | `components/ui/label.tsx` | No imports found |
 | `ui/input-group` | `components/ui/input-group.tsx` | No imports found |
