@@ -76,6 +76,7 @@ export function EventContent({
             pledgeJustConfirmed={pledgeConfirmed}
             protagonistName={event.protagonists.name}
             isOrganiser={isOrganiser}
+            eventId={event.id}
             onSelectionsChange={handleSelectionsChange}
             onAddItem={addItemHandler(pollWithItems)}
           />

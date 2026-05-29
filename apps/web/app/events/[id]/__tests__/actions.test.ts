@@ -17,7 +17,11 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
 
-import { createPledge, createGuestPledge } from "@/app/events/[id]/actions"
+import {
+  createPledge,
+  createGuestPledge,
+  addOrganizerItem,
+} from "@/app/events/[id]/actions"
 
 beforeEach(() => {
   mock = makeSupabaseMock()
@@ -268,5 +272,132 @@ describe("createGuestPledge", () => {
     mock.queue(null, { message: "insert fail" }) // pledge insert error
 
     await expect(createGuestPledge(input)).rejects.toThrow("insert fail")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// addOrganizerItem
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("addOrganizerItem", () => {
+  const eventId = "event-1"
+  const label = "Red"
+
+  it("throws 'Not authenticated' when userId is null", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null })
+    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+      "Not authenticated"
+    )
+  })
+
+  it("throws 'Unauthorized' when user is not the event creator", async () => {
+    mock.queue({ created_by: "other-user" }) // events select
+
+    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+      "Unauthorized"
+    )
+  })
+
+  it("throws when the event poll topic is finite", async () => {
+    mock.queue({ created_by: "user-1" }) // events select
+    mock.queue({
+      id: "poll-1",
+      topic_id: "topic-1",
+      topics: { is_finite: true },
+    }) // event_polls select
+
+    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+      "Cannot add items to a finite topic"
+    )
+  })
+
+  it("reuses existing topic_item when label matches case-insensitively", async () => {
+    mock.queue({ created_by: "user-1" }) // events
+    mock.queue({
+      id: "poll-1",
+      topic_id: "topic-1",
+      topics: { is_finite: false },
+    }) // event_polls
+    mock.queue({ id: "item-existing" }) // topic_items ilike match
+    mock.queue(null) // no existing event_poll_item
+    mock.queue(null) // event_poll_items insert
+
+    await addOrganizerItem(eventId, label)
+
+    // Should NOT have inserted a new topic_item
+    const topicItemInserts = mock
+      .callsFor("topic_items")
+      .filter((c) => c.method === "insert")
+    expect(topicItemInserts).toHaveLength(0)
+
+    const epiInsert = mock
+      .callsFor("event_poll_items")
+      .find((c) => c.method === "insert")!
+    expect(epiInsert.args[0]).toMatchObject({
+      event_poll_id: "poll-1",
+      topic_item_id: "item-existing",
+      is_guest_added: false,
+      added_by: "user-1",
+    })
+  })
+
+  it("creates a new topic_item and event_poll_item when no match exists", async () => {
+    mock.queue({ created_by: "user-1" }) // events
+    mock.queue({
+      id: "poll-1",
+      topic_id: "topic-1",
+      topics: { is_finite: false },
+    }) // event_polls
+    mock.queue(null) // no existing topic_item
+    mock.queue({ id: "item-new" }) // topic_items insert
+    mock.queue(null) // no existing event_poll_item
+    mock.queue(null) // event_poll_items insert
+
+    await addOrganizerItem(eventId, label)
+
+    const topicItemInsert = mock
+      .callsFor("topic_items")
+      .find((c) => c.method === "insert")!
+    expect(topicItemInsert.args[0]).toMatchObject({
+      topic_id: "topic-1",
+      label: "Red",
+      source: "organiser",
+      is_canonical: false,
+      review_status: "pending",
+      markets: ["en-GB"],
+    })
+
+    const epiInsert = mock
+      .callsFor("event_poll_items")
+      .find((c) => c.method === "insert")!
+    expect(epiInsert.args[0]).toMatchObject({
+      event_poll_id: "poll-1",
+      topic_item_id: "item-new",
+      is_guest_added: false,
+    })
+  })
+
+  it("skips event_poll_items insert when item already in poll (idempotent)", async () => {
+    mock.queue({ created_by: "user-1" }) // events
+    mock.queue({
+      id: "poll-1",
+      topic_id: "topic-1",
+      topics: { is_finite: false },
+    }) // event_polls
+    mock.queue({ id: "item-existing" }) // topic_items ilike match
+    mock.queue({ id: "epi-1" }) // event_poll_items already exists
+
+    await addOrganizerItem(eventId, label)
+
+    const epiInserts = mock
+      .callsFor("event_poll_items")
+      .filter((c) => c.method === "insert")
+    expect(epiInserts).toHaveLength(0)
+  })
+
+  it("throws 'Label is required' for blank label", async () => {
+    await expect(addOrganizerItem(eventId, "   ")).rejects.toThrow(
+      "Label is required"
+    )
   })
 })

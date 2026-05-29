@@ -34,7 +34,6 @@ import { DateTimePicker } from "./date-time-picker"
 import { OccasionPickerField } from "./occasion-picker-field"
 import { CharityField } from "./charity-field"
 import { TopicPickerField } from "./topic-picker-field"
-import { ItemAddField } from "./item-add-field"
 import { INPUT_SIZE, TEXTAREA_SIZE, type PickerSize } from "./constants"
 
 const STEP_NUMBER: Record<PickerSize, string> = {
@@ -489,61 +488,13 @@ export function FormPanel({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="topics"
-            render={({ field }) => {
-              const topicMeta = topics.find(
-                (t) => t.id === field.value[0]?.topicId
-              )
-              const canonical = topicMeta
-                ? [...topicMeta.topic_items]
-                    .filter((i) => i.is_canonical)
-                    .sort((a, b) => {
-                      const da = a.display_order ?? null
-                      const db = b.display_order ?? null
-                      if (da !== null && db !== null) return da - db
-                      if (da !== null) return -1
-                      if (db !== null) return 1
-                      return a.label.localeCompare(b.label)
-                    })
-                : []
-              const customLabels = field.value[0]?.customLabels ?? []
-
-              return (
-                <FormItem>
-                  <ItemAddField
-                    canonicalItems={canonical}
-                    customLabels={customLabels}
-                    topicTitle={topicMeta?.title ?? field.value[0]?.title ?? ""}
-                    isFinite={topicMeta?.is_finite ?? false}
-                    disabled={!field.value[0]}
-                    onAdd={(label) =>
-                      field.onChange([
-                        {
-                          ...field.value[0],
-                          customLabels: [...customLabels, label],
-                        },
-                      ])
-                    }
-                    onRemove={(label) =>
-                      field.onChange([
-                        {
-                          ...field.value[0],
-                          customLabels: customLabels.filter((l) => l !== label),
-                        },
-                      ])
-                    }
-                    size={size}
-                  />
-                  <FieldDescription size={size} className="mb-2">
-                    View items for selected topic. Add missing items or let
-                    guests add them.
-                  </FieldDescription>
-                </FormItem>
-              )
-            }}
-          />
+          {selectedTopics?.[0] && (
+            <p className="text-sm text-muted-foreground">
+              {selectedTopics[0].isCustom
+                ? "This is a new topic. Add items after publishing — guests won't see any options until you do."
+                : "You can add items to this poll after publishing."}
+            </p>
+          )}
         </div>
       </StepSection>
 

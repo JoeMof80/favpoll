@@ -7,6 +7,8 @@ import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@favpoll/types"
 import { Button } from "@/components/ui/button"
 import { usePollSection } from "./use-poll-section"
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
+import { CircleAlert } from "lucide-react"
 
 type Props = {
   poll: EventPollWithItems
@@ -17,6 +19,7 @@ type Props = {
   pledgeJustConfirmed?: boolean
   protagonistName: string
   isOrganiser: boolean
+  eventId: string
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
   onAddItem?: (label: string) => Promise<void>
 }
@@ -29,6 +32,7 @@ export function PollSection({
   pledgeJustConfirmed,
   protagonistName,
   isOrganiser,
+  eventId,
   onSelectionsChange,
   onAddItem,
 }: Props) {
@@ -131,6 +135,15 @@ export function PollSection({
             </Button>
           )}
         </div>
+      )}
+
+      {poll.topics.topic_items.every((i) => i.is_hidden ?? false) && (
+        <Alert className="border-amber-500 text-sm text-amber-500">
+          <CircleAlert />
+          <AlertDescription className="text-amber-500">
+            Add some items before sharing your event link.
+          </AlertDescription>
+        </Alert>
       )}
     </section>
   )
