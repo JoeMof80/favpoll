@@ -206,7 +206,7 @@ export function PreviewPanel({
       : topicTitle && hasTopicSelected
         ? `Share their favourite ${topicTitle.toLowerCase()}…`
         : placeholders.reveal.replace("{name}", protagonistFirstName)
-  const revealValue = showReveal ? (reveal || topicRevealPlaceholder) : null
+  const revealValue = showReveal ? reveal || topicRevealPlaceholder : null
 
   return (
     <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">

@@ -243,7 +243,10 @@ describe("useEventContent — addItemHandler", () => {
       await handler("Scarlet")
     })
 
-    expect(mockActions.addOrganizerItem).toHaveBeenCalledWith("event-1", "Scarlet")
+    expect(mockActions.addOrganizerItem).toHaveBeenCalledWith(
+      "event-1",
+      "Scarlet"
+    )
     expect(mockRouter.refresh).toHaveBeenCalled()
   })
 

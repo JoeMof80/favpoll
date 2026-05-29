@@ -261,7 +261,8 @@ export async function addOrganizerItem(eventId: string, label: string) {
     .eq("event_id", eventId)
     .single()
   if (!poll) throw new Error("No poll found")
-  if ((poll.topics as { is_finite: boolean } | null)?.is_finite)
+  const topicMeta = Array.isArray(poll.topics) ? poll.topics[0] : poll.topics
+  if ((topicMeta as { is_finite: boolean } | null)?.is_finite)
     throw new Error("Cannot add items to a finite topic")
 
   const topicId = poll.topic_id
@@ -381,7 +382,20 @@ export async function topUpFund(eventId: string, amount: number) {
     .eq("event_id", eventId)
     .single()
 
-  if (!pot) throw new Error("No fund found for this event")
+  if (!pot) {
+    const { data: organiserData } = await supabase
+      .from("events")
+      .select("created_by")
+      .eq("id", eventId)
+      .single()
+    const { error: createErr } = await supabase.from("event_pots").insert({
+      event_id: eventId,
+      created_by: organiserData?.created_by ?? userId,
+      total_deposited: amount,
+    })
+    if (createErr) throw new Error(createErr.message)
+    return
+  }
 
   const { error } = await supabase
     .from("event_pots")
