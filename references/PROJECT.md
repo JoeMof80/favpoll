@@ -381,9 +381,9 @@ components/
 ├── canvas/
 │   └── inline-option-input.tsx   -- used by pledge-panel.tsx for guest item addition
 ├── event-form-v2/                -- Canonical create/edit form
-│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName state
+│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state
 │   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection
-│   ├── preview-panel.tsx         -- Live preview panel
+│   ├── preview-panel.tsx         -- Live preview; real PledgeCard (prePublish), lifted pledgeAmount state; showReveal toggles PollResults
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button syncs width to calendar on first open
@@ -392,9 +392,12 @@ components/
 │   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open
 │   ├── charity-field.tsx         -- Click-to-toggle chips; Backspace/Delete removes last chip; onInteractOutside keeps open
 │   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
+├── pledge-panel.tsx              -- Searchable CHIP_IN_INPUT picker; selected chips show allocation % · amount; computePledgeAllocations export
 ├── pledge-card/
-│   ├── index.tsx, use-pledge.ts, amount-input.tsx
+│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard
+│   ├── use-pledge.ts, amount-input.tsx
 │   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
+│   └── __tests__/pledge-card.test.tsx, use-pledge.test.ts, utils.test.ts
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
@@ -534,7 +537,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 455 web, ~22 admin.
+All tests must pass before committing. Current counts: 459 web, ~22 admin.
 
 Co-located `__tests__/` directories. Environments:
 - Default (jsdom): pure functions, hooks
