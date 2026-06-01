@@ -18,6 +18,10 @@ import {
 import { cn } from "@/lib/utils"
 import { type PickerSize, INPUT_SIZE } from "./constants"
 
+// Matches the natural rendered width of the calendar popover:
+// 7 day columns × 28px (--cell-size = --spacing(7)) + CardContent px-3 (12px × 2)
+const CALENDAR_WIDTH = 220
+
 export function DateTimePicker({
   value,
   onChange,
@@ -28,7 +32,6 @@ export function DateTimePicker({
   size?: PickerSize
 }) {
   const [open, setOpen] = useState(false)
-  const [buttonWidth, setButtonWidth] = useState(0)
 
   const dateStr = value
     ? value.toLocaleDateString("en-GB", {
@@ -68,10 +71,9 @@ export function DateTimePicker({
           <Button
             type="button"
             variant="outline"
-            style={buttonWidth ? { width: buttonWidth } : undefined}
+            style={{ width: CALENDAR_WIDTH }}
             className={cn(
               "cursor-pointer justify-start gap-2 bg-background! font-normal",
-              !buttonWidth && "flex-1",
               INPUT_SIZE[size],
               !value && "text-muted-foreground"
             )}
@@ -86,29 +88,21 @@ export function DateTimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div
-            ref={(el) => {
-              if (el && !buttonWidth) {
-                setButtonWidth(el.getBoundingClientRect().width)
-              }
-            }}
-          >
-            <Card size="sm" className="w-fit shadow-none ring-0">
-              <CardContent>
-                <Calendar
-                  mode="single"
-                  captionLayout="dropdown"
-                  selected={value}
-                  defaultMonth={value ?? today}
-                  startMonth={today}
-                  endMonth={new Date(new Date().getFullYear() + 5, 11)}
-                  disabled={{ before: today }}
-                  onSelect={handleDaySelect}
-                  className="p-0"
-                />
-              </CardContent>
-            </Card>
-          </div>
+          <Card size="sm" className="w-fit shadow-none ring-0">
+            <CardContent>
+              <Calendar
+                mode="single"
+                captionLayout="dropdown"
+                selected={value}
+                defaultMonth={value ?? today}
+                startMonth={today}
+                endMonth={new Date(new Date().getFullYear() + 5, 11)}
+                disabled={{ before: today }}
+                onSelect={handleDaySelect}
+                className="p-0"
+              />
+            </CardContent>
+          </Card>
         </PopoverContent>
       </Popover>
 
