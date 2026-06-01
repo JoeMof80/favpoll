@@ -382,14 +382,14 @@ components/
 │   └── inline-option-input.tsx   -- used by pledge-panel.tsx for guest item addition
 ├── event-form-v2/                -- Canonical create/edit form
 │   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state
-│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection
-│   ├── preview-panel.tsx         -- Live preview; real PledgeCard (prePublish), lifted pledgeAmount state; showReveal toggles PollResults
+│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection; step 3 has TopicPickerField only (no ItemAddField)
+│   ├── preview-panel.tsx         -- Live preview; real PledgeCard (prePublish), lifted pledgeAmount state; showReveal toggles PollResults; PledgePanel interactive for infinite topics
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button syncs width to calendar on first open
 │   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button; onInteractOutside prevents close on anchor click
 │   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic; Backspace/Delete clears chip; onInteractOutside keeps open
-│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open
+│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open; NOT used in form step 3
 │   ├── charity-field.tsx         -- Click-to-toggle chips; Backspace/Delete removes last chip; onInteractOutside keeps open
 │   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
 ├── pledge-panel.tsx              -- Searchable CHIP_IN_INPUT picker; selected chips show allocation % · amount; computePledgeAllocations export
@@ -404,7 +404,8 @@ components/
 │   ├── poll-title.tsx, poll-framing.tsx (retired), poll-reveal.tsx
 │   ├── poll-options.tsx, poll-results.tsx, favpoll-card.tsx
 ├── poll-section/
-│   ├── index.tsx, use-poll-section.ts
+│   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
+│   ├── use-poll-section.ts
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
@@ -537,7 +538,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 459 web, ~22 admin.
+All tests must pass before committing. Current counts: 467 web, ~22 admin.
 
 Co-located `__tests__/` directories. Environments:
 - Default (jsdom): pure functions, hooks
@@ -599,6 +600,10 @@ NEXT_PUBLIC_BASE_URL
 - **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `display_order asc nulls last` for finite topics, then `localeCompare` alphabetical for ties. `topic_items.display_order` (nullable integer) set only for finite topics via admin `DisplayOrderEditor`; null = alphabetical sort.
 
 - **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
+
+- **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
+
+- **Item management on the event page, not the form.** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). `ItemAddField` is not rendered in form step 3. The form only picks a topic. Custom organiser-added items land with `source: 'organiser'`, `is_canonical: false`, `review_status: 'pending'`. Guest-added items use `source: 'guest'`, `review_status: 'pending'`. Both use `'pending'` — not `'pending_review'`.
 
 - **opening_line is organiser-editable.** Shown as placeholder text in the form (from `PREFIXES[occasion]`) — not pre-filled. Organiser may type their own. Stored in DB. Preview falls back to `PREFIXES[occasion]` when field is empty. Never derive it purely from occasion at render time.
 
