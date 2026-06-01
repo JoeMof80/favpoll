@@ -70,7 +70,6 @@ export function PollSection({
         topicTitle={poll.topics.title}
         reveal={pledged ? (poll.personal_reveal ?? null) : null}
         protagonistFirstName={personFirstName}
-        pledged={pledged}
         onResetPledge={onResetPledge}
         onViewResults={onViewResults}
       />
