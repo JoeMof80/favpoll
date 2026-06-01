@@ -27,8 +27,7 @@ export function TooltipIconButton({
           variant="ghost"
           size="icon"
           className={
-            className ??
-            "shrink-0 text-muted-foreground hover:text-foreground"
+            className ?? "shrink-0 text-muted-foreground hover:text-foreground"
           }
           onClick={onClick}
           aria-label={label}
