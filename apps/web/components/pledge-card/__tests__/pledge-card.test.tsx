@@ -10,8 +10,12 @@ vi.mock("@/app/events/[id]/actions", () => ({
   topUpFund: vi.fn(),
   pledgeFromFund: vi.fn(),
 }))
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), { warning: vi.fn() }),
+}))
 
 import { PledgeCard } from "../index"
+import { toast } from "sonner"
 
 describe("PledgeCard prePublish", () => {
   it("renders the Your pledge label", () => {
@@ -31,13 +35,12 @@ describe("PledgeCard prePublish", () => {
     ).toBeInTheDocument()
   })
 
-  it("shows an alert when Pledge favourites is clicked", () => {
-    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
+  it("shows a toast when Pledge favourites is clicked", () => {
     render(<PledgeCard prePublish />)
     fireEvent.click(screen.getByRole("button", { name: /pledge favourites/i }))
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Publish this event to start receiving pledges."
+    expect(toast.warning).toHaveBeenCalledWith(
+      "Publish your event to start receiving pledges.",
+      expect.objectContaining({ style: expect.any(Object) })
     )
-    alertSpy.mockRestore()
   })
 })
