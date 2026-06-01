@@ -5,7 +5,7 @@ import { Gift, ChartBarDecreasing } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatCurrency } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
+import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { PickerField } from "@/components/ui/picker-field"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import { FavpollCardProvider } from "./favpoll-card/favpoll-card-context"
@@ -121,35 +121,17 @@ export function EventCard({
               {poll && topicItems.length > 0 && (
                 <>
                   {step === "pledged" ? (
-                    <TooltipProvider>
-                      <Tooltip content="Pledge again" side="left">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 text-muted-foreground hover:text-foreground"
-                          onClick={resetPledge}
-                          aria-label="Pledge again"
-                        >
-                          <Gift className="h-4 w-4" />
-                        </Button>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <TooltipIconButton
+                      icon={Gift}
+                      label="Pledge again"
+                      onClick={resetPledge}
+                    />
                   ) : results !== null ? (
-                    <TooltipProvider>
-                      <Tooltip content="View results" side="left">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 text-muted-foreground hover:text-foreground"
-                          onClick={viewResults}
-                          aria-label="View results"
-                        >
-                          <ChartBarDecreasing className="h-4 w-4" />
-                        </Button>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <TooltipIconButton
+                      icon={ChartBarDecreasing}
+                      label="View results"
+                      onClick={viewResults}
+                    />
                   ) : null}
                 </>
               )}

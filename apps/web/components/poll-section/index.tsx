@@ -5,9 +5,8 @@ import { RankingList } from "@/components/ranking-list"
 import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@favpoll/types"
-import { Button } from "@/components/ui/button"
 import { usePollSection } from "./use-poll-section"
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
+import { Alert, AlertDescription } from "../ui/alert"
 import { CircleAlert } from "lucide-react"
 
 type Props = {
@@ -55,6 +54,16 @@ export function PollSection({
   const personFirstName = protagonistName.split(/[\s&]+/)[0]
   const pledged = view === "results" && pledgeConfirmed
 
+  const onResetPledge =
+    view === "results" && !isClosed && showRankings
+      ? () => setView("pledge")
+      : undefined
+
+  const onViewResults =
+    view === "pledge" && (hasPledged || isClosed)
+      ? () => setView("results")
+      : undefined
+
   return (
     <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
       <PollHeading
@@ -62,6 +71,8 @@ export function PollSection({
         reveal={pledged ? (poll.personal_reveal ?? null) : null}
         protagonistFirstName={personFirstName}
         pledged={pledged}
+        onResetPledge={onResetPledge}
+        onViewResults={onViewResults}
       />
 
       {/* Results view */}
@@ -93,16 +104,6 @@ export function PollSection({
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
               />
-              {!isClosed && (
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => setView("pledge")}
-                  className="mt-4 h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  {hasPledged ? "Change my pledge" : "Make a pledge"}
-                </Button>
-              )}
             </>
           )}
         </>
@@ -123,16 +124,6 @@ export function PollSection({
               isInfinite={!poll.topics.is_finite}
               onAddItem={onAddItem}
             />
-          )}
-          {(hasPledged || isClosed) && (
-            <Button
-              type="button"
-              variant="link"
-              onClick={() => setView("results")}
-              className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← See results
-            </Button>
           )}
         </div>
       )}
