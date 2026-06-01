@@ -61,15 +61,7 @@ export function CharityField({
   }
 
   return (
-    <div className="space-y-0.5">
-      <div className="flex items-center justify-end">
-        {value.length > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {value.length}/{MAX_CHARITIES}
-          </span>
-        )}
-      </div>
-
+    <div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverAnchor asChild>
           <div
