@@ -12,7 +12,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 - **Events** honour a person (protagonist) on a specific occasion
 - **Topics** are canonical questions — Colour, Season, Biscuit, Film, etc.
-- **Event polls** activate a topic within an event, with an optional personal reveal (shown after pledging). A hint line — "Is it the same as [Name]'s?" — is shown to guests before pledging, derived automatically from the protagonist's name.
+- **Event polls** activate a topic within an event, with an optional personal reveal (shown after pledging). The reveal is the sole mechanic for disclosing the protagonist's favourite — no hint line is shown before pledging.
 - **Pledges** are financial commitments against specific topic items, contributing to both the event ranking and the all-time universal ranking
 - **Pledge allocations** split a single pledge across multiple items (e.g. 60% Purple, 40% Blue)
 - **Shared fund** allows generous donors to top up a communal pot so others (e.g. children) can participate without paying
