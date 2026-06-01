@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { EditModeProvider } from "@/lib/edit-mode-context"
 import { Header } from "@/components/header"
 import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
               <Header />
               {children}
             </EditModeProvider>
+            <Toaster position="bottom-center" />
           </ThemeProvider>
         </body>
       </html>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import {
   OCCASION_PLACEHOLDERS,
@@ -24,6 +24,7 @@ import type {
   Protagonist,
 } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
+import { toast } from "sonner"
 
 type Props = {
   charities: Charity[]
@@ -64,7 +65,6 @@ export function PreviewPanel({
   previewPhoto,
 }: Props) {
   const [pledgeAmount, setPledgeAmount] = useState("")
-  const [previewAddedLabels, setPreviewAddedLabels] = useState<string[]>([])
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -82,11 +82,6 @@ export function PreviewPanel({
 
   const firstSelectedTopicId = selectedTopics[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-
-  // Reset preview-added items when the topic changes — must be above early return
-  useEffect(() => {
-    setPreviewAddedLabels([])
-  }, [firstSelectedTopicId])
 
   if (!occasion)
     return (
@@ -170,19 +165,6 @@ export function PreviewPanel({
               created_at: "",
             }) as unknown as TopicItem
         ),
-        ...previewAddedLabels.map(
-          (label, i) =>
-            ({
-              id: `preview-added-${i}`,
-              label,
-              topic_id: firstTopic.topicId ?? "",
-              all_time_pledged: 0,
-              all_time_count: 0,
-              is_canonical: false,
-              is_active: true,
-              created_at: "",
-            }) as unknown as TopicItem
-        ),
       ]
     : []
 
@@ -236,8 +218,19 @@ export function PreviewPanel({
                   isInfinite={isInfinite}
                   onAddItem={
                     isInfinite
-                      ? async (label) =>
-                          setPreviewAddedLabels((prev) => [...prev, label])
+                      ? async () => {
+                          toast.warning(
+                            "Items added here won't be saved — add them to your event after publishing.",
+                            {
+                              style: {
+                                background: "#fffbeb",
+                                color: "#f59e0b",
+                                border: "1px solid #f59e0b",
+                              },
+                              position: "top-center",
+                            }
+                          )
+                        }
                       : undefined
                   }
                 />
