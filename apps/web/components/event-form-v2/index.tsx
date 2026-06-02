@@ -28,6 +28,7 @@ type Props = {
   protagonistId?: string
   existingPollId?: string
   defaultValues?: Partial<EventFormValues>
+  isFirstTime?: boolean
 }
 
 export function EventFormV2({
@@ -39,6 +40,7 @@ export function EventFormV2({
   protagonistId,
   existingPollId,
   defaultValues,
+  isFirstTime = false,
 }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -237,6 +239,7 @@ export function EventFormV2({
             showReveal={showReveal}
             previewSuffix={previewSuffix}
             previewPhoto={previewPhoto}
+            isFirstTime={isFirstTime}
           />
         </div>
       </div>

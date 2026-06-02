@@ -248,6 +248,9 @@ export function FormPanel({
           name="openingLine"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                Context
+              </FormLabel>
               <FormControl>
                 <Input
                   className={cn(
@@ -283,6 +286,9 @@ export function FormPanel({
           name="name"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                Name
+              </FormLabel>
               <FormControl>
                 <Input
                   className={cn(
@@ -314,6 +320,9 @@ export function FormPanel({
           name="context"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                Context
+              </FormLabel>
               <FormControl>
                 <InputGroup className={cn(INPUT_SIZE[size], "bg-background")}>
                   <InputGroupInput
@@ -353,6 +362,7 @@ export function FormPanel({
 
         {/* Picture field */}
         <FormItem>
+          <p className="text-xs font-medium text-muted-foreground">Photo</p>
           <FormControl>
             <div>
               <InputGroup className={cn(INPUT_SIZE[size], "bg-background")}>
@@ -425,6 +435,9 @@ export function FormPanel({
           name="about"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                About
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder={aboutPlaceholder || "Tell guests about them"}
@@ -473,6 +486,9 @@ export function FormPanel({
             name="topics"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-xs text-muted-foreground">
+                  Topic
+                </FormLabel>
                 <TopicPickerField
                   topics={topics}
                   categories={categories}
@@ -505,6 +521,9 @@ export function FormPanel({
           name="reveal"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                The reveal
+              </FormLabel>
               <FormControl>
                 <Textarea
                   className={cn(
@@ -544,6 +563,9 @@ export function FormPanel({
           name="closesAt"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                Close date
+              </FormLabel>
               <DateTimePicker
                 value={field.value}
                 onChange={field.onChange}
@@ -562,6 +584,9 @@ export function FormPanel({
           name="charities"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                Charity
+              </FormLabel>
               <CharityField
                 charities={charities}
                 value={field.value}

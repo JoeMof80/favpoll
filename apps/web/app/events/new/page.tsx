@@ -16,20 +16,23 @@ export default async function NewEventPage() {
 
   const supabase = createAdminClient()
 
-  const [{ data: charities }, { data: topics }, { data: categories }] =
-    await Promise.all([
-      supabase
-        .from("charities")
-        .select("*")
-        .eq("is_active", true)
-        .order("name"),
-      supabase
-        .from("topics")
-        .select("*, topic_items(*), topic_categories(category_id)")
-        .eq("is_active", true)
-        .order("title"),
-      supabase.from("categories").select("*").order("label"),
-    ])
+  const [
+    { data: charities },
+    { data: topics },
+    { data: categories },
+    { data: existingEvents },
+  ] = await Promise.all([
+    supabase.from("charities").select("*").eq("is_active", true).order("name"),
+    supabase
+      .from("topics")
+      .select("*, topic_items(*), topic_categories(category_id)")
+      .eq("is_active", true)
+      .order("title"),
+    supabase.from("categories").select("*").order("label"),
+    supabase.from("events").select("id").eq("created_by", userId).limit(1),
+  ])
+
+  const isFirstTime = !existingEvents || existingEvents.length === 0
 
   const enrichedTopics: TopicWithMeta[] = (topics ?? []).map((t) => ({
     ...(t as Topic),
@@ -45,6 +48,7 @@ export default async function NewEventPage() {
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
+      isFirstTime={isFirstTime}
     />
   )
 }

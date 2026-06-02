@@ -22,6 +22,7 @@ app/layout.tsx
       → user-button-client
       → menu-button
       → ui/button
+  → sonner/Toaster  (position="bottom-center")
 ```
 
 ### `app/page.tsx` — Home
@@ -70,15 +71,17 @@ event-card  (client component)
           → favpoll-card/favpoll-card-context  (useFavpollCard, size-aware)
   → stripe-checkout
   → ui/button
-  → ui/tooltip
-      → @radix-ui/react-tooltip
+  → ui/tooltip-icon-button  (reset pledge, view results actions)
+      → ui/button
+      → ui/tooltip
+          → @radix-ui/react-tooltip
 ```
 
 ### `app/events/new/page.tsx` — Create event
 ```
-app/events/new/page.tsx
+app/events/new/page.tsx  (queries events table to derive isFirstTime)
   → event-form-v2  (EventFormV2 — split FormPanel + PreviewPanel)
-      → event-form-v2/form-panel  (5-step form)
+      → event-form-v2/form-panel  (5-step form; all fields have visible labels)
           → event-form-v2/occasion-picker-field
               → ui/popover, ui/chip
           → event-form-v2/topic-picker-field
@@ -90,14 +93,18 @@ app/events/new/page.tsx
           → event-form-v2/photo-crop-modal
               → react-easy-crop
           → ui/button
-      → event-form-v2/preview-panel  (live preview)
+      → event-form-v2/preview-panel  (live preview; isFirstTime prop)
+          → event-form-v2/onboarding-panel  (shown when no occasion selected, first-time or localStorage flag)
+              → ui/separator
+              → ui/button
           → event-hero
           → poll-heading
+              → ui/tooltip-icon-button  (onResetPledge, onViewResults)
           → pledge-panel
           → favpoll-card/poll-results
           → countdown
           → charity-banner
-          → pledge-card  (prePublish mode)
+          → pledge-card  (prePublish mode; toast.warning on click)
 ```
 
 ### `app/events/[id]/page.tsx` — Event view
@@ -133,7 +140,7 @@ app/events/[id]/page.tsx
 ### `app/events/[id]/edit/page.tsx` — Edit event
 ```
 app/events/[id]/edit/page.tsx
-  → event-form-v2  (same tree as create)
+  → event-form-v2  (same tree as create; isFirstTime always false on edit)
 ```
 
 ### `app/events/[id]/manage/page.tsx` — Manage event
@@ -198,7 +205,8 @@ app/pledges/withdraw/page.tsx
 | `tabs` | poll-section, topic-rankings | — |
 | `popover` | charity-picker, picker-field | — |
 | `picker-field` | charity-picker, event-card | — |
-| `tooltip` | event-card | — |
+| `tooltip` | event-card, tooltip-icon-button | — |
+| `tooltip-icon-button` | event-card, poll-heading | — |
 | `calendar` | closing-date | — |
 | `card` | closing-date | — |
 | `field` | closing-date | — |
@@ -206,11 +214,11 @@ app/pledges/withdraw/page.tsx
 | `textarea` | closing-date | — |
 | `switch` | privacy-toggle | — |
 | `dropdown-menu` | — | — |
-| `separator` | — | — |
+| `separator` | onboarding-panel | — |
 | `alert` | poll-section | — |
 | `toggle` | — | — |
 | `label` | — | — |
-| `input-group` | — | — |
+| `input-group` | form-panel | — |
 
 ---
 
@@ -246,9 +254,9 @@ These are **not** a self-contained card used in the app — they are a set of sh
 | `poll-framing` | `components/favpoll-card/poll-framing.tsx` | No imports anywhere — `personal_framing` retired |
 | `favpoll-card` | `components/favpoll-card/favpoll-card.tsx` | Stories only |
 | `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No imports found |
-| `ui/separator` | `components/ui/separator.tsx` | No imports found |
 | `ui/alert` | `components/ui/alert.tsx` | Used by `poll-section` — no longer unused |
+| `ui/separator` | `components/ui/separator.tsx` | Used by `onboarding-panel` — no longer unused |
+| `ui/input-group` | `components/ui/input-group.tsx` | Used by `form-panel` — no longer unused |
 | `ui/toggle` | `components/ui/toggle.tsx` | No imports found |
 | `ui/label` | `components/ui/label.tsx` | No imports found |
-| `ui/input-group` | `components/ui/input-group.tsx` | No imports found |
 | `ui/input` | `components/ui/input.tsx` | Stories only (raw `<input>` used in production) |
