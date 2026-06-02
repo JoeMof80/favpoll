@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import {
   OCCASION_PLACEHOLDERS,
@@ -25,6 +25,8 @@ import type {
 } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 import { toast } from "sonner"
+import { OnboardingPanel } from "./onboarding-panel"
+import { Button } from "@/components/ui/button"
 
 type Props = {
   charities: Charity[]
@@ -32,6 +34,7 @@ type Props = {
   showReveal: boolean
   previewSuffix: boolean
   previewPhoto: boolean
+  isFirstTime?: boolean
 }
 
 // Placeholder charities shown before the user selects any
@@ -63,8 +66,20 @@ export function PreviewPanel({
   showReveal,
   previewSuffix,
   previewPhoto,
+  isFirstTime = false,
 }: Props) {
   const [pledgeAmount, setPledgeAmount] = useState("")
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    setShowOnboarding(localStorage.getItem("favpoll_show_onboarding") === "1")
+  }, [])
+
+  function handleHowItWorks() {
+    localStorage.setItem("favpoll_show_onboarding", "1")
+    setShowOnboarding(true)
+  }
+
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
@@ -83,14 +98,26 @@ export function PreviewPanel({
   const firstSelectedTopicId = selectedTopics[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
 
-  if (!occasion)
+  if (!occasion) {
+    if (isFirstTime || showOnboarding) {
+      return <OnboardingPanel onHowItWorks={handleHowItWorks} />
+    }
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-full flex-col items-center justify-center gap-2">
         <p className="text-sm text-muted-foreground">
-          Preview your event here. Select an occasion to begin.
+          Select an occasion to begin.
         </p>
+        <Button
+          type="button"
+          variant="link"
+          className="h-auto p-0 text-[13px] text-muted-foreground hover:text-foreground"
+          onClick={handleHowItWorks}
+        >
+          How favpoll works →
+        </Button>
       </div>
     )
+  }
 
   // Resolve occasion-specific placeholders
   const placeholders = OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS
