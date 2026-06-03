@@ -17,65 +17,6 @@ export const OCCASION_LIST = [
   { value: "other", label: "Other" },
 ] as const
 
-export const OCCASIONS = OCCASION_LIST
-
-export const OCCASION_LABELS: Record<string, string> = {
-  memorial: "In memory of",
-  tribute: "A tribute to",
-  birthday: "Happy birthday to",
-  retirement: "Celebrating the retirement of",
-  wedding: "Congratulations to",
-  engagement: "Congratulations to",
-  anniversary: "Happy anniversary to",
-  leaving: "Farewell to",
-  graduation: "Congratulations to",
-  christening: "Welcome",
-  achievement: "Celebrating",
-  recovery: "Cheering on",
-  award: "Congratulations to",
-  promotion: "Congratulations to",
-  celebration: "Celebrating",
-  other: "A tribute to",
-}
-
-export const NAME_LABELS: Record<string, string> = {
-  memorial: "Who are we remembering?",
-  tribute: "Who are we honouring?",
-  birthday: "Who's celebrating?",
-  retirement: "Who's retiring?",
-  wedding: "Who's getting married?",
-  engagement: "Who got engaged?",
-  anniversary: "Who's celebrating their anniversary?",
-  leaving: "Who's leaving?",
-  graduation: "Who's graduating?",
-  christening: "Who's being christened?",
-  achievement: "Who's the star?",
-  recovery: "Who are we cheering on?",
-  award: "Who won the award?",
-  promotion: "Who got promoted?",
-  celebration: "Who are we celebrating?",
-  other: "Who is this for?",
-}
-
-export const DESCRIPTION_LABELS: Record<string, string> = {
-  memorial: "Tell their story",
-  tribute: "Tell their story",
-  birthday: "A bit about them",
-  retirement: "Their career in a nutshell",
-  wedding: "How they met",
-  engagement: "How they got engaged",
-  anniversary: "Their story so far",
-  leaving: "What they're off to do",
-  graduation: "Their journey",
-  christening: "About the family",
-  achievement: "What they achieved",
-  recovery: "Their journey",
-  award: "Why they deserve it",
-  promotion: "Their career so far",
-  celebration: "What we're celebrating",
-  other: "A bit of context",
-}
-
 export const DATE_LABEL_PLACEHOLDERS: Record<string, string> = {
   memorial: "1940 - 2024",
   tribute: "Born 1962",
@@ -232,61 +173,10 @@ export const OCCASION_PLACEHOLDERS: Record<string, OccasionPlaceholders> = {
   },
 }
 
-/**
- * Per-topic-title placeholder overrides for the reveal field.
- * Used in PollEditor as a fallback when no topic JSONB placeholder exists.
- * {name} is substituted with the first name of the occasion persona at render time.
- */
-export const TOPIC_REVEAL_PLACEHOLDERS: Record<string, { reveal: string }> = {
-  Colour: {
-    reveal:
-      "e.g. Belinda's was purple. She wore it to every important occasion.",
-  },
-  Season: {
-    reveal:
-      "e.g. {name}'s was autumn. She said it always felt like coming home.",
-  },
-  Film: {
-    reveal: "e.g. {name}'s was It's a Wonderful Life. She cried every time.",
-  },
-  Song: {
-    reveal:
-      "e.g. {name}'s was Waterloo Sunset. She said it made London feel beautiful.",
-  },
-  Flower: {
-    reveal:
-      "e.g. {name}'s was lavender. She grew it in every garden she ever had.",
-  },
-  Animal: {
-    reveal:
-      "e.g. {name}'s was the robin. She said they were the bravest small thing.",
-  },
-  "Comfort food": {
-    reveal:
-      "e.g. {name}'s was beans on toast. She said nothing else did the job.",
-  },
-  Drink: {
-    reveal:
-      "e.g. {name}'s was tea. Builders brew, milk no sugar, never negotiable.",
-  },
-  "Way to spend Sunday": {
-    reveal:
-      "e.g. {name}'s was a long walk followed by a roast. Every week without fail.",
-  },
-  Biscuit: {
-    reveal:
-      "e.g. {name}'s was the Bourbon. She once ate four packets in one sitting.",
-  },
-}
-
 export const DEFAULT_PLACEHOLDERS: OccasionPlaceholders = {
   name: "Name",
   about: "A short bio…",
   reveal: "e.g. Belinda's was purple. She wore it to every important occasion.",
-}
-
-export function getAboutPlaceholder(occasion: string): string {
-  return OCCASION_PLACEHOLDERS[occasion]?.about ?? DEFAULT_PLACEHOLDERS.about
 }
 
 export function shortTopicLabel(title: string): string {

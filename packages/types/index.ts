@@ -186,24 +186,13 @@ export type PledgeWithAllocations = Pledge & {
   pledge_allocations: PledgeAllocation[]
 }
 
-// Canvas types — shared between EventCanvas sub-components and server pages
+// Shared types used by EventFormV2 and server actions
 export type TopicPlaceholders = Record<string, { about?: string; reveal: string }>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[]
   category_ids: string[]
   placeholders?: TopicPlaceholders
-}
-
-export type CanvasPoll = {
-  id?: string
-  topicId: string
-  topicIsCustom: boolean
-  customTopicTitle: string
-  customTopicItems: string[]
-  reveal: string
-  curatedCustomLabels: string[]
-  pickingTopic: boolean
 }
 
 export type CanvasPollInput = {
@@ -231,17 +220,3 @@ export type CanvasSubmitData = {
   poll: CanvasPollInput
 }
 
-export type CanvasInitialData = {
-  protagonistName?: string
-  protagonistAbout?: string
-  dateLabel?: string
-  occasion?: string
-  openingLine?: string
-  description?: string
-  charityIds?: string[]
-  closesAt?: string
-  isPrivate?: boolean
-  potAmount?: string
-  poll?: Partial<CanvasPoll>
-  photoUrl?: string | null
-}
