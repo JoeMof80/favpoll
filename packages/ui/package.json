@@ -8,5 +8,8 @@
     "lucide-react": "*",
     "next-themes": "*",
     "react": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*"
   }
 }
