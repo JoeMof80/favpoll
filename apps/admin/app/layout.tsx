@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "@/components/theme-provider";
-import { MenuButton } from "@/components/menu-button";
+import { ThemeProvider, MenuButton } from "@favpoll/ui";
 import { Sidebar } from "@/components/sidebar";
 import "./globals.css";
 

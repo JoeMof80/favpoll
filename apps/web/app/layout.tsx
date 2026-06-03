@@ -1,7 +1,7 @@
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { ClerkProvider } from "@/components/clerk-provider"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@favpoll/ui"
 import { EditModeProvider } from "@/lib/edit-mode-context"
 import { Header } from "@/components/header"
 import { cn } from "@/lib/utils"

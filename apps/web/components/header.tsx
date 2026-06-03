@@ -6,7 +6,7 @@ import { Menu } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { MenuButton } from "@/components/menu-button"
+import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
 
 export function Header() {

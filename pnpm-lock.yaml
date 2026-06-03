@@ -20,6 +20,9 @@ importers:
       '@favpoll/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@favpoll/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@supabase/supabase-js':
         specifier: ^2.105.4
         version: 2.105.4
@@ -90,6 +93,9 @@ importers:
       '@favpoll/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@favpoll/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.76.1(react@19.2.6))
@@ -279,6 +285,18 @@ importers:
         version: 4.1.6(@types/node@25.6.2)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.5(@types/node@25.6.2)(typescript@5.9.3))(vite@8.0.13(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))
 
   packages/types: {}
+
+  packages/ui:
+    dependencies:
+      lucide-react:
+        specifier: '*'
+        version: 1.14.0(react@19.2.4)
+      next-themes:
+        specifier: '*'
+        version: 0.4.6(react-dom@19.2.6(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: '*'
+        version: 19.2.4
 
 packages:
 
@@ -12085,6 +12103,11 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
+  next-themes@0.4.6(react-dom@19.2.6(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.6(react@19.2.4)
+
   next-themes@0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       react: 19.2.6
@@ -12627,6 +12650,11 @@ snapshots:
       - supports-color
 
   react-dom@19.2.4(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      scheduler: 0.27.0
+
+  react-dom@19.2.6(react@19.2.4):
     dependencies:
       react: 19.2.4
       scheduler: 0.27.0
