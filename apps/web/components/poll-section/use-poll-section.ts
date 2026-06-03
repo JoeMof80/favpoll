@@ -30,7 +30,7 @@ export function usePollSection({
       notifiedInitial.current = true
       onViewChange?.(initialView)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Single ref to ensure reveal fires at most once
