@@ -208,6 +208,28 @@ describe("formatEventDate — locale parameter", () => {
   })
 })
 
+describe("getEventHeadline — all PREFIXES occasions", () => {
+  it.each([
+    ["tribute", "A tribute to"],
+    ["retirement", "Celebrating the retirement of"],
+    ["engagement", "Congratulations to"],
+    ["anniversary", "Happy anniversary"],
+    ["leaving", "Farewell"],
+    ["graduation", "Congratulations"],
+    ["christening", "Welcome"],
+    ["achievement", "Well done"],
+    ["recovery", "Cheering on"],
+    ["award", "Congratulations to"],
+    ["promotion", "Congratulations to"],
+    ["celebration", "Celebrating"],
+    ["other", "Honouring"],
+  ])('occasion "%s" returns prefix "%s"', (occasion, expectedPrefix) => {
+    expect(getEventHeadline({ occasion, name: "Test" }).prefix).toBe(
+      expectedPrefix
+    )
+  })
+})
+
 describe("formatRelativeDate", () => {
   beforeEach(() => {
     vi.useFakeTimers()
