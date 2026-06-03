@@ -97,6 +97,7 @@ describe("useEventContent — initial state", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -109,6 +110,7 @@ describe("useEventContent — initial state", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -121,6 +123,7 @@ describe("useEventContent — initial state", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -135,6 +138,7 @@ describe("useEventContent — handleSelectionsChange", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -153,6 +157,7 @@ describe("useEventContent — handleSelectionsChange", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -176,6 +181,7 @@ describe("useEventContent — handlePledgeSuccess", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -193,6 +199,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: finitePoll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -205,6 +212,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: true,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -217,6 +225,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: null,
       })
     )
@@ -233,6 +242,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -256,6 +266,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
       })
     )
@@ -271,6 +282,7 @@ describe("useEventContent — addItemHandler", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
       })
     )
@@ -295,6 +307,7 @@ describe("useEventContent — derived values", () => {
         event,
         pollWithItems: poll,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -307,6 +320,7 @@ describe("useEventContent — derived values", () => {
         event,
         pollWithItems: poll,
         isClosed: true,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )
@@ -319,6 +333,7 @@ describe("useEventContent — derived values", () => {
         event,
         pollWithItems: null,
         isClosed: false,
+        hasPledged: false,
         clerkUserId: "user-1",
       })
     )

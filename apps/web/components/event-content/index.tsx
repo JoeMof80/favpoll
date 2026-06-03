@@ -48,7 +48,13 @@ export function EventContent({
     addItemHandler,
     showPledgeCard,
     setPollView,
-  } = useEventContent({ event, pollWithItems, isClosed, hasPledged, clerkUserId })
+  } = useEventContent({
+    event,
+    pollWithItems,
+    isClosed,
+    hasPledged,
+    clerkUserId,
+  })
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -140,7 +146,9 @@ export function EventContent({
             <PledgeCard
               eventId={event.id}
               clerkUserId={clerkUserId}
-              charityNames={event.event_charities.map((ec) => ec.charities.name)}
+              charityNames={event.event_charities.map(
+                (ec) => ec.charities.name
+              )}
               pollWithItems={pollWithItems}
               pot={pot}
               userPotAllocation={userPotAllocation}
@@ -155,7 +163,7 @@ export function EventContent({
       {/* Fixed charity carousel — mobile only, always visible */}
       {event.event_charities.length > 0 && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
+          className="fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <EventCardCharityCarousel
