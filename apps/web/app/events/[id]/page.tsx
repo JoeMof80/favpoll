@@ -165,27 +165,27 @@ export default async function EventPage({ params }: Props) {
       : null
 
   return (
-    <div className="bg-primary/5">
+    <>
       <EventSubheader
         eventId={id}
         isOrganiser={isOrganiser}
         isClosed={isClosed}
       />
-      <main
-        className={`mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background p-16 drop-shadow-lg ${isOrganiser ? "pb-28" : "pb-16"}`}
-      >
-        <EventContent
-          event={typedEvent}
-          pollWithItems={visiblePoll}
-          pot={pot ?? null}
-          userPotAllocation={userPotAllocation}
-          hasPledged={!!hasPledged}
-          totalRaised={totalRaised}
-          isClosed={isClosed}
-          clerkUserId={userId}
-          isOrganiser={isOrganiser}
-        />
-      </main>
-    </div>
+      <div className="overflow-x-clip bg-primary/5">
+        <main className="mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background p-6 pb-24 md:p-16 md:pb-24 md:drop-shadow-lg">
+          <EventContent
+            event={typedEvent}
+            pollWithItems={visiblePoll}
+            pot={pot ?? null}
+            userPotAllocation={userPotAllocation}
+            hasPledged={!!hasPledged}
+            totalRaised={totalRaised}
+            isClosed={isClosed}
+            clerkUserId={userId}
+            isOrganiser={isOrganiser}
+          />
+        </main>
+      </div>
+    </>
   )
 }

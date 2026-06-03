@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -12,6 +12,7 @@ import { updateEvent } from "@/app/events/[id]/edit/actions"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { FormPanel } from "./form-panel"
 import { PreviewPanel } from "./preview-panel"
+import { OnboardingInterstitial } from "./onboarding-interstitial"
 import type {
   Category,
   Charity,
@@ -49,6 +50,19 @@ export function EventFormV2({
   const [previewSuffix, setPreviewSuffix] = useState(true)
   const [previewPhoto, setPreviewPhoto] = useState(true)
   const [photoFileName, setPhotoFileName] = useState<string | null>(null)
+  const [showInterstitial, setShowInterstitial] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("favpoll_show_onboarding")
+    if ((isFirstTime && stored !== "0") || stored === "1") {
+      setShowInterstitial(true)
+    }
+  }, [isFirstTime])
+
+  function handleDismissInterstitial() {
+    localStorage.setItem("favpoll_show_onboarding", "0")
+    setShowInterstitial(false)
+  }
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
     resolver: zodResolver(eventFormSchema as never),
@@ -91,7 +105,7 @@ export function EventFormV2({
         customTopicItems: isCustomTopic
           ? (selectedTopic.customLabels ?? [])
           : [],
-        reveal: null,
+        reveal: values.reveal || null,
         infiniteItems:
           !isCustomTopic && topicMeta && !topicMeta.is_finite
             ? {
@@ -161,8 +175,24 @@ export function EventFormV2({
     <Form {...form}>
       <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-primary/5">
         {/* Left panel — scrollable form */}
-        <div className="flex w-105 shrink-0 flex-col overflow-hidden border-r border-border bg-muted">
+        <div className="flex w-full flex-col overflow-hidden bg-muted md:w-105 md:shrink-0 md:border-r md:border-border">
           <div className="flex-1 overflow-y-auto">
+            {/* "How favpoll works" link — mobile only, shown after interstitial dismissed */}
+            {!showInterstitial && (
+              <div className="flex justify-end px-5 pt-3 md:hidden">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-[13px] text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    localStorage.setItem("favpoll_show_onboarding", "1")
+                    setShowInterstitial(true)
+                  }}
+                >
+                  How favpoll works →
+                </Button>
+              </div>
+            )}
             <FormPanel
               charities={charities}
               topics={topics}
@@ -180,7 +210,10 @@ export function EventFormV2({
           </div>
 
           {/* Fixed save button */}
-          <div className="shrink-0 border-t border-border bg-background px-5 py-4">
+          <div
+            className="shrink-0 border-t border-border bg-background px-5 py-4"
+            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+          >
             {error && (
               <p role="alert" className="mb-3 text-sm text-destructive">
                 {error}
@@ -231,8 +264,8 @@ export function EventFormV2({
           </div>
         </div>
 
-        {/* Right panel — live preview */}
-        <div className="h-full flex-1 overflow-y-auto">
+        {/* Right panel — live preview (hidden on mobile, kept in DOM for useWatch) */}
+        <div className="hidden h-full flex-1 overflow-y-auto md:flex">
           <PreviewPanel
             charities={charities}
             topics={topics}
@@ -243,6 +276,11 @@ export function EventFormV2({
           />
         </div>
       </div>
+
+      {/* Mobile onboarding interstitial */}
+      {showInterstitial && (
+        <OnboardingInterstitial onDismiss={handleDismissInterstitial} />
+      )}
     </Form>
   )
 }

@@ -26,7 +26,7 @@ function Chip({
       type="button"
       aria-pressed={selected}
       className={cn(
-        "h-auto rounded-full border transition-all duration-200 hover:cursor-pointer",
+        "h-auto min-w-0 shrink rounded-full border whitespace-normal transition-all duration-200 hover:cursor-pointer",
         chipSizeClasses[size],
         readOnly
           ? "pointer-events-none border-border bg-background font-normal text-muted-foreground/60 shadow-none"

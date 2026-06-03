@@ -59,7 +59,7 @@ export default async function TopicPage({ params }: Props) {
         <span>{typedTopic.title}</span>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+      <div className="grid gap-10 md:grid-cols-[1fr_300px]">
         {/* Left — rankings */}
         <div>
           <h1 className="text-2xl font-medium text-foreground">
