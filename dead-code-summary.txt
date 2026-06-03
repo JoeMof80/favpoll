@@ -1,0 +1,135 @@
+Dead Code Removal Summary — branch: refactor/dead-code-removal
+Generated: 2026-06-03
+
+================================================================
+1. FILES DELETED
+================================================================
+
+apps/web/components/canvas/
+  └── inline-option-input.tsx
+  Reason: EventCanvas was removed. No import of InlineOptionInput exists
+  anywhere in the codebase (verified: grep for both the import path and
+  the component name returned zero results in all .ts/.tsx files).
+  PROJECT.md comment "used by pledge-panel.tsx" was outdated.
+
+apps/web/components/home-carousel.tsx
+  Reason: Zero imports across the entire codebase. Noted as unused in
+  PROJECT.md Outstanding TODO.
+
+apps/web/components/favpoll-card/poll-framing.tsx
+  Reason: Zero imports across the entire codebase. Noted as "retired"
+  in PROJECT.md Key Files section.
+
+================================================================
+2. EXPORTS / FUNCTIONS REMOVED
+================================================================
+
+lib/display.ts — 2 exports removed:
+
+  occasionLabel(occasion: string): string
+    Reason: Legacy function using old occasion slugs (funeral, leaving_do,
+    bar_bat_mitzvah, etc.) that no longer exist in the current OCCASION_LIST.
+    Zero imports in any production file. Superseded by PREFIXES / OCCASION_LABELS
+    in occasions.ts. Tests in display.test.ts removed too (17 test cases).
+
+  getPollHint(protagonistName: string): string
+    Reason: Explicitly retired in PR #18. The protagonist hint line was
+    removed; the reveal is now the sole post-pledge disclosure mechanic.
+    Zero imports in any production file. Tests in display.test.ts removed
+    too (3 test cases).
+
+lib/occasions.ts — 6 exports removed:
+
+  OCCASIONS (alias for OCCASION_LIST)
+    Reason: Never imported from @/lib/occasions anywhere. Story files that
+    use the name OCCASIONS define it locally — they do not import from here.
+
+  OCCASION_LABELS
+    Reason: Never imported from @/lib/occasions anywhere. my-events/page.tsx
+    defines its own local OCCASION_LABELS constant.
+
+  NAME_LABELS
+    Reason: Zero imports in any file outside occasions.ts.
+
+  DESCRIPTION_LABELS
+    Reason: Zero imports in any file outside occasions.ts.
+
+  TOPIC_REVEAL_PLACEHOLDERS
+    Reason: Zero imports anywhere. Was used by the old PollEditor component
+    (pre-EventFormV2). preview-panel.tsx now derives reveal placeholder
+    from topic.placeholders JSONB directly.
+
+  getAboutPlaceholder(occasion: string): string
+    Reason: Zero imports anywhere. PROJECT.md described it as the fallback
+    for the about placeholder, but preview-panel.tsx and form-panel.tsx
+    use OCCASION_PLACEHOLDERS[occasion]?.about directly instead.
+
+Tests updated:
+  lib/__tests__/display.test.ts — removed imports and test blocks for
+  occasionLabel (17 cases) and getPollHint (3 cases). 19 test cases total
+  removed. Test count: 467 → 448 (all passing).
+
+================================================================
+3. ITEMS CONFIRMED STILL IN USE (looked like candidates but were NOT dead)
+================================================================
+
+protagonistFirstName prop on PollHeading
+  LIVE. Used in: poll-section/index.tsx, event-form-v2/preview-panel.tsx,
+  favpoll-card/favpoll-poll.tsx, favpoll-card/poll-reveal.tsx,
+  poll-heading.stories.tsx, favpoll-card/stories/poll-reveal.stories.tsx
+
+personal_framing
+  Already absent from all TypeScript — no references found in apps/web.
+  DB column retained per decision (never read or written by app).
+
+previewSuffix prop on FormPanel / PreviewPanel
+  LIVE. Drives the Eye/EyeOff toggle on the preview panel. Controls whether
+  the protagonist context field is shown in the preview. Defined and consumed
+  in event-form-v2/index.tsx, form-panel.tsx, preview-panel.tsx.
+
+showReveal state in EventFormV2
+  LIVE. Drives the reveal display in preview-panel.tsx (revealValue) and in
+  hero-demo-panel/demo-card.tsx (showReveal phase). Do not remove.
+
+lib/display.ts — ordinal, formatRelativeDate, formatEventDate
+  No production callers, but imported and comprehensively tested in
+  lib/__tests__/display.test.ts. Retained — removing them would delete a
+  meaningful test suite for valid utility functions.
+
+lib/occasions.ts — suggestClosingDate, CLOSING_DEFAULTS
+  No production callers, but imported and comprehensively tested in
+  lib/__tests__/occasions.test.ts (9 test cases). Retained — CLOSING_DEFAULTS
+  is also used internally by suggestClosingDate. Both flagged for developer
+  review if they are not added to the form in the near term.
+
+MARKET_DEFAULTS in lib/i18n.ts
+  Only used in lib/__tests__/i18n.test.ts (no production callers). Retained
+  as a companion constant to formatCurrency — it is the correct way to pass
+  locale/currency options and will be needed when multi-market support lands.
+
+================================================================
+4. UNUSED DEPENDENCIES REMOVED
+================================================================
+
+date-fns removed from apps/web/package.json
+  Zero direct imports in apps/web source code. date-fns is a declared
+  dependency of react-day-picker@10.0.0 and will continue to be resolved
+  as a transitive dep. The explicit entry was redundant.
+
+================================================================
+5. DEAD TYPES DELETED FROM packages/types/index.ts
+================================================================
+
+CanvasPoll — deleted
+  No references in apps/web or apps/admin. Legacy EventCanvas type
+  replaced by EventFormV2.
+
+CanvasInitialData — deleted
+  No references in apps/web or apps/admin. Same origin as CanvasPoll.
+
+Note: CanvasPollInput and CanvasSubmitData are LIVE — used by
+event-form-v2/index.tsx and app/events/[id]/edit/actions.ts respectively.
+
+================================================================
+END OF SUMMARY
+================================================================

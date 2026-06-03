@@ -371,7 +371,8 @@ app/
 components/
 ├── ui/
 │   ├── button.tsx, card.tsx, input.tsx, field.tsx
-│   ├── chip.tsx                  -- Selectable pill toggle
+│   ├── chip.tsx                  -- Selectable pill toggle; min-w-0 shrink whitespace-normal to allow truncation
+│   ├── sheet.tsx                 -- shadcn Sheet (SlideOver drawer); used by pledge-panel on mobile
 │   ├── occasion-tag.tsx
 │   ├── section-eyebrow.tsx
 │   ├── ranking-bar.tsx           -- labelSuffix prop for inline Hide/Show toggle
@@ -379,13 +380,12 @@ components/
 │   ├── picker-field.tsx
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
-├── canvas/
-│   └── inline-option-input.tsx   -- used by pledge-panel.tsx for guest item addition
 ├── event-form-v2/                -- Canonical create/edit form
-│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state; isFirstTime prop
+│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state; isFirstTime prop; mobile: single panel, onboarding interstitial overlay
 │   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection; all fields have visible FormLabel; step 3 has TopicPickerField only (no ItemAddField)
-│   ├── preview-panel.tsx         -- Live preview; isFirstTime prop; shows OnboardingPanel when no occasion selected (first-time or localStorage flag); toast.warning on prePublish pledge click
-│   ├── onboarding-panel.tsx      -- Three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
+│   ├── preview-panel.tsx         -- Live preview; hidden on mobile (md:flex); isFirstTime prop; shows OnboardingPanel when no occasion selected
+│   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
+│   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button width hardcoded to CALENDAR_WIDTH = 220
@@ -394,20 +394,23 @@ components/
 │   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open; NOT used in form step 3
 │   ├── charity-field.tsx         -- Click-to-toggle chips; Backspace/Delete removes last chip; onInteractOutside keeps open
 │   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
-├── pledge-panel.tsx              -- Searchable CHIP_IN_INPUT picker; selected chips show allocation % · amount; computePledgeAllocations export
+├── pledge-panel.tsx              -- Draft state: draftIds committed on Done, discarded on close. Sheet (mobile) + Dialog (desktop). Chips + input inline (flex-wrap); input collapses to w-0 when chips present. Backspace removes last chip. size=lg chips.
 ├── pledge-card/
-│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard
+│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix)
 │   ├── use-pledge.ts, amount-input.tsx
 │   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
 │   └── __tests__/pledge-card.test.tsx, use-pledge.test.ts, utils.test.ts
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
-│   ├── poll-title.tsx, poll-framing.tsx (retired), poll-reveal.tsx
+│   ├── poll-title.tsx, poll-reveal.tsx
 │   ├── poll-options.tsx, poll-results.tsx, favpoll-card.tsx
 ├── poll-section/
 │   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
-│   ├── use-poll-section.ts
+│   ├── use-poll-section.ts   -- fires onViewChange on mount (initial view) and all view transitions
+├── event-content/
+│   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; LivePledgeCard mobile (md:hidden); charity carousel fixed bottom mobile
+│   └── use-event-content.ts  -- pollView state tracks pledge/results view; showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView==="pledge"
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
@@ -415,17 +418,17 @@ components/
 ├── event-card.tsx
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
-│   └── event-card-charity-carousel.tsx
+│   └── event-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
 ├── live-events-carousel.tsx
 ├── charity-banner.tsx, countdown.tsx
-├── header.tsx
+├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes
 ├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
 ├── stripe-checkout.tsx, pot-banner.tsx
 └── theme-provider.tsx, menu-button.tsx  -- TODO: move to packages/ui/
 
 lib/
-├── occasions.ts                  -- getAboutPlaceholder(occasion) fallback
-├── display.ts                    -- formatAmount, formatRelativeDate, getEventHeadline
+├── occasions.ts                  -- OCCASION_LIST, OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS, DATE_LABEL_PLACEHOLDERS, shortTopicLabel, suggestClosingDate
+├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatEventDate, PREFIXES, getEventHeadline
 ├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
 ├── email.ts                      -- Resend helpers
 ├── edit-mode-context.tsx
@@ -540,7 +543,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 467 web, ~22 admin.
+All tests must pass before committing. Current counts: 467 web, ~22 admin. (467 includes 12 new cases added for `hasPledged` in `use-event-content.test.ts`.)
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -610,7 +613,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **Onboarding panel for first-time organisers.** `app/events/new/page.tsx` queries `events` to set `isFirstTime`. `PreviewPanel` shows `OnboardingPanel` when no occasion is selected and `isFirstTime === true` or `localStorage.favpoll_show_onboarding === '1'`. Returning users see a minimal blank state with a "How favpoll works →" link to re-open the panel.
+- **Onboarding for first-time organisers.** `app/events/new/page.tsx` queries `events` to set `isFirstTime`. On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
 - **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Use `toast.warning()` with explicit `style: { background, color, border }` props — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them.
 
@@ -624,6 +627,14 @@ NEXT_PUBLIC_BASE_URL
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item *addition* always uses ItemAddField pickerfield regardless of count.
 
+- **Pledge panel draft state.** Selections are not committed until the user clicks Done. Opening the Sheet/Dialog initialises `draftIds` from the current `selectedIds`. Closing/dismissing without Done discards the draft. This prevents partial selections appearing in the trigger display.
+
+- **Pledge card visibility.** `showPledgeCard` in `useEventContent` is `!isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`. `pollView` is initialised from `hasPledged || isClosed` and updated via `onViewChange` callback from `PollSection`. No `!hasPledged` check — Reset Pledge correctly re-shows the card for previously-pledged users who switch back to pledge view.
+
+- **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout (only for spacing/typography if needed).
+
+- **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Inputs below 16px font size trigger iOS auto-zoom. Do not set `text-sm` or smaller on any focusable input element.
+
 ---
 
 ## Outstanding TODO
@@ -635,7 +646,6 @@ NEXT_PUBLIC_BASE_URL
 - **Event oversight admin page** — `/events` in admin app is a shell only.
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
-- **`home-carousel.tsx`** — unused, remove or repurpose.
 - **`theme-provider.tsx` and `menu-button.tsx`** — duplicated in apps/web and apps/admin. TODO: extract to `packages/ui/`.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep.
 - **Mobile app** — future.

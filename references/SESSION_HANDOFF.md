@@ -1,68 +1,129 @@
 # Session Handoff — 2026-06-03
 
 ## Branch
+
 `main` — all PRs merged.
 
 ## PRs merged this session
 
-| PR | Title | Key change |
-|----|-------|------------|
-| #17 | refactor: extract TooltipIconButton and apply to PollHeading | New `ui/tooltip-icon-button.tsx`; reset-pledge / view-results icon buttons on PollHeading; EventCard deduped |
-| #18 | fix: remove protagonist hint line from poll heading | `pledged` prop and `getPollHint` removed; reveal is the sole post-pledge disclosure mechanic |
-| #19 | fix: hardcode date button width | `CALENDAR_WIDTH = 220` in `date-time-picker.tsx`; removed callback-ref sync |
-| #20 | fix: remove charity counter from charity field | `{n/3}` counter span removed from `CharityField` |
-| #21 | fix: replace window.alert and inline alert with warning toasts | `toast.warning()` with amber inline styles; `<Toaster>` in `app/layout.tsx`; sonner CSS variables approach does not work — must pass `style` directly on each call |
-| #22 | feat: onboarding panel and form field labels | `OnboardingPanel` with Honour/Love/Charity sections; `isFirstTime` from events table query; localStorage flag for returning users; visible labels on all FormPanel fields |
+| PR  | Title                                                               | Key change                                                                                                                                                                |
+| --- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #17 | refactor: extract TooltipIconButton and apply to PollHeading        | New `ui/tooltip-icon-button.tsx`; reset-pledge / view-results icon buttons on PollHeading; EventCard deduped                                                              |
+| #18 | fix: remove protagonist hint line from poll heading                 | `pledged` prop and `getPollHint` removed; reveal is the sole post-pledge disclosure mechanic                                                                              |
+| #19 | fix: hardcode date button width                                     | `CALENDAR_WIDTH = 220` in `date-time-picker.tsx`; removed callback-ref sync                                                                                               |
+| #20 | fix: remove charity counter from charity field                      | `{n/3}` counter span removed from `CharityField`                                                                                                                          |
+| #21 | fix: replace window.alert and inline alert with warning toasts      | `toast.warning()` with amber inline styles; `<Toaster>` in `app/layout.tsx`; sonner CSS variables approach does not work — must pass `style` directly on each call        |
+| #22 | feat: onboarding panel and form field labels                        | `OnboardingPanel` with Honour/Love/Charity sections; `isFirstTime` from events table query; localStorage flag for returning users; visible labels on all FormPanel fields |
+| #23 | feat: responsive layout, mobile picker UX, pledge panel draft state | See below                                                                                                                                                                 |
 
-## Current state of the codebase
+## PR #23 — what changed
+
+### Responsive layout
+
+- **Header**: converted to `"use client"`, hamburger menu on mobile (`md:hidden`), click-outside closes, all nav links hidden on mobile
+- **Event page** (`app/events/[id]/page.tsx`): `px-4 py-6 md:p-16` padding; `pb-24` bottom padding
+- **Event content grid**: `md:grid-cols-[1fr_300px]` (was `lg:`)
+- **Topics page**: same grid change `md:` (was `lg:`)
+- **Event subheader**: `style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}` on bottom bar
+
+### Event form — mobile
+
+- Left panel: full-width on mobile, `md:w-105` on desktop
+- Right preview panel: `hidden md:flex` (stays in DOM for useWatch, hidden visually on mobile)
+- New `onboarding-interstitial.tsx`: mobile-only full-screen overlay (fixed inset-0) shown to first-time organisers instead of the split-panel preview. "How favpoll works →" link re-shows it. Dismissed via localStorage `favpoll_show_onboarding = '0'`.
+- Bottom bar: `paddingBottom: max(1rem, env(safe-area-inset-bottom))`
+
+### Pledge panel rewrite (`pledge-panel.tsx`)
+
+- **Draft state**: `draftIds` initialised from `selectedIds` on open, committed to `selectedIds` on Done, discarded on close/sheet-dismiss
+- **Sheet (mobile) + Dialog (desktop)**: separate `sheetOpen`/`dialogOpen` states. The picker overlay approach was superseded by this pattern — the Sheet/Dialog provides natural focus containment on both platforms without a custom overlay.
+- **Item chips + input inline**: chips and search input in a single `flex-wrap` container; input collapses to `w-0` when items are selected (prevents iOS keyboard on tap)
+- **Backspace to deselect**: when input is empty and items selected, Backspace/Delete removes last chip
+- **Placeholder hidden** when items are selected
+- **Size `lg`** on all chips in picker and trigger; Done buttons `h-11 w-full text-base`
+- **`topicTitle` prop** for contextual placeholder: `Search for your favourite [topic]…`
+- `onOpenAutoFocus`: only `e.preventDefault()` — no auto-focus to avoid keyboard obscuring sheet
+
+### Pledge card visibility (`event-content/`)
+
+- `pollView` state in `useEventContent` initialised from `hasPledged || isClosed`
+- `PollSection` fires `onViewChange` on mount (initial view) and on every view transition
+- `showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`
+- No `!hasPledged` check — Reset Pledge correctly re-shows the card for previously-pledged users
+- `pledgeConfirmed` hides immediately on submit; `router.refresh()` then updates `hasPledged` from server
+
+### Charity carousel
+
+- `EventCardCharityCarousel` moved outside the grid to a `fixed bottom-0` bar (`md:hidden`)
+- Always visible on mobile regardless of pledge/results state
+- `paddingBottom: max(0.75rem, env(safe-area-inset-bottom))`
+
+### Bug fixes
+
+- **Reveal not saving on edit**: `event-form-v2/index.tsx` had `reveal: null` hardcoded; fixed to `reveal: values.reveal || null`
+- **Topic items deleted on edit**: `upsertPollForEvent` in `edit/actions.ts` now checks if `topic_id` actually changed before deleting and re-inserting `event_poll_items`
+- **iOS zoom**: `font-size: max(16px, 1em)` globally on `input, textarea, select` in `globals.css`; all `text-sm` changed to `text-base` on pledge card inputs
+- **Chip truncation**: added `min-w-0 shrink whitespace-normal` to `chip.tsx` base class
 
 ### New files
-- `components/ui/tooltip-icon-button.tsx` — wraps TooltipProvider > Tooltip > Button; props: `icon`, `label`, `onClick`, `side?`, `className?`
-- `components/event-form-v2/onboarding-panel.tsx` — three-section onboarding panel with labelled form mockups, Mary Poppins photo avatar, filled date/time fields, `onHowItWorks` callback
-- `public/mary-poppins.png` — photo asset used as avatar in onboarding panel mockup
 
-### Key behaviour to know
-- **PollHeading** no longer shows a hint line before pledging. `pledged` prop is gone.
-- **PreviewPanel** shows `OnboardingPanel` when no occasion is selected if `isFirstTime` (from DB) or `localStorage.favpoll_show_onboarding === '1'`. "How favpoll works →" button in blank state sets the flag and shows the panel.
-- **All FormPanel fields** (Name, Photo, About, Context, Intro line, Topic, The reveal, Close date, Charity) now have visible labels using `FormLabel` or `<p>` (photo field, which has no FormField context).
-- **Sonner styling**: Only `style: { background, color, border }` on each `toast.warning()` call works reliably. `classNames.warning` and CSS variables on `<Toaster>` are overridden by sonner's own inline styles.
-- **DateTimePicker** button width is `CALENDAR_WIDTH = 220` (7 cols × 28px + 2 × 12px padding). No dynamic sync.
+- `components/event-form-v2/onboarding-interstitial.tsx` — mobile-only full-screen onboarding overlay
+- `components/ui/sheet.tsx` — shadcn Sheet component (SlideOver drawer, mobile picker)
 
-## Outstanding from this session
+---
 
-### Mary Poppins copy — verify before shipping
-The onboarding panel was built this session but the copy inside it may not match the final agreed version. Verify `onboarding-panel.tsx` contains exactly:
+## Decisions locked in (additions from this session)
 
-- **Name field:** Mary Poppins
-- **Context field:** Practically perfect in every way
-- **About field:** She arrived by umbrella when the wind changed, with a cheery disposition, rosy cheeks and games to play. She knows what helps the medicine go down at Great Ormond Street.
-- **Topic chip:** Favourite Things
-- **Charity row:** Great Ormond Street Hospital
-- **Reveal field:** Raindrops on roses. We don't know why. She never explained.
+- **Picker overlay superseded.** The planned dark overlay behind open picker fields was not built. The Sheet (mobile) + Dialog (desktop) pattern in `pledge-panel.tsx` provides equivalent focus containment natively. Do not add a custom overlay to picker fields without explicit instruction.
 
-If the copy in the file differs, update it to match exactly. Do not paraphrase or improve — this wording was arrived at deliberately.
+- **Reveal must never be hardcoded to null on edit.** Pass `values.reveal || null` in the edit action. Hardcoding `reveal: null` silently deletes the organiser's reveal on every edit save.
 
-### "How favpoll works →" link — no destination yet
-The link currently sets `localStorage.favpoll_show_onboarding = '1'` to restore the panel for returning organisers. A proper `/how-it-works` or `/about` page does not exist yet. Added to outstanding TODO below.
+- **`upsertPollForEvent` must check topic_id before deleting poll items.** Only delete and re-insert `event_poll_items` if `topic_id` has actually changed. Unconditional delete loses all organiser-added items on every edit save.
 
-### Copyright — flag for legal review before public launch
-The Mary Poppins example references the character name and alludes to "A spoonful of sugar" obliquely. The about copy paraphrases rather than quotes the film directly. This should be reviewed by someone with a legal eye before the product goes public. Note also that Great Ormond Street Hospital holds the rights to Peter Pan — not Mary Poppins — but the proximity of the two is worth flagging. Not urgent; do not block development on this.
+- **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout.
+
+- **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Do not set `text-sm` or smaller on any focusable input element.
+
+---
+
+## Mary Poppins onboarding copy — canonical version
+
+Verify `components/event-form-v2/onboarding-panel.tsx` and
+`components/event-form-v2/onboarding-interstitial.tsx` contain
+exactly this copy. Do not paraphrase or improve — this wording
+was arrived at deliberately.
+
+| Field      | Value                                                                                                                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name       | Mary Poppins                                                                                                                                                                                          |
+| Context    | Practically perfect in every way                                                                                                                                                                      |
+| About      | She arrived by umbrella when the wind changed, with a cheery disposition, rosy cheeks, and a surprising number of favourite things. She knows what helps the medicine go down at Great Ormond Street. |
+| Topic chip | Favourite Things                                                                                                                                                                                      |
+| Charity    | Great Ormond Street Hospital                                                                                                                                                                          |
+| Reveal     | Raindrops on roses. We don't know why. She never explained.                                                                                                                                           |
+
+---
 
 ## Tests
-467 passing (no new tests added this session — no new pure functions or hooks).
+
+467 passing (12 new test cases added to `use-event-content.test.ts` for `hasPledged` prop).
+
+---
 
 ## Standing instruction for Claude Code
+
 > **Do not commit or push any changes. Make all changes locally so the developer can review them in VS Code before committing.**
 
 This applies to every task, every session, without exception.
 
+---
+
 ## Outstanding TODO
 
-- **Mary Poppins copy** — verify `onboarding-panel.tsx` matches agreed copy exactly (see above)
+- **Mary Poppins copy** — verify both `onboarding-panel.tsx` and `onboarding-interstitial.tsx` match the canonical copy table above
 - **"How favpoll works" page** — `OnboardingPanel` footer link has no destination; a `/how-it-works` or `/about` page needs building
 - **Copyright review** — Mary Poppins example copy; review before public launch
 - **`review_status` inconsistency** — `addGuestItem` and `addOrganizerItem` use `'pending'`; schema docs and `acceptContribution` reference `'pending_review'`; needs a migration to align before contributions queue is relied upon
-- **`window.alert` in `PreviewPledgeCard`** — replaced with toast this session; confirm no `window.alert()` calls remain anywhere
 - **Stripe Connect** — disbursement not wired; cron has placeholder; Connect application pending approval
 - **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` blank in Vercel
 - **Clerk production keys** — using `pk_test_` until `favpoll.com` DNS pointed at app
@@ -77,7 +138,10 @@ This applies to every task, every session, without exception.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep
 - **Mobile app** — future
 
+---
+
 ## Skills to use next session
+
 - `/favpoll-context` — always run at session start; reads `references/PROJECT.md` and `references/GLOSSARY.md`
 - `/favpoll-brand` — if working on any user-facing copy
 - `/favpoll-placeholders` — if working on reveal or about placeholder copy

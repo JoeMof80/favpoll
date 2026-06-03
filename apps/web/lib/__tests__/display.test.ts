@@ -3,11 +3,9 @@ import {
   ordinal,
   formatEventDate,
   getEventHeadline,
-  occasionLabel,
   charityNames,
   formatAmount,
   formatRelativeDate,
-  getPollHint,
 } from "@/lib/display"
 
 describe("ordinal", () => {
@@ -137,32 +135,6 @@ describe("getEventHeadline", () => {
   })
 })
 
-describe("occasionLabel", () => {
-  it.each([
-    ["memorial", "In memory of"],
-    ["funeral", "In memory of"],
-    ["birthday", "Birthday"],
-    ["retirement", "Retirement"],
-    ["wedding", "Wedding"],
-    ["anniversary", "Anniversary"],
-    ["leaving_do", "Leaving do"],
-    ["graduation", "Graduation"],
-    ["christening", "Christening"],
-    ["bar_bat_mitzvah", "Bar / Bat Mitzvah"],
-    ["get_well_soon", "Get well soon"],
-    ["sports_achievement", "Achievement"],
-    ["work_milestone", "Work milestone"],
-    ["just_because", "Just because"],
-    ["other", "Event"],
-  ])("occasionLabel(%s) → %s", (occasion, expected) => {
-    expect(occasionLabel(occasion)).toBe(expected)
-  })
-
-  it("returns 'Event' for unknown occasion", () => {
-    expect(occasionLabel("unknown_type")).toBe("Event")
-  })
-})
-
 describe("charityNames", () => {
   it("returns empty string for empty array", () => {
     expect(charityNames([])).toBe("")
@@ -233,20 +205,6 @@ describe("formatEventDate — locale parameter", () => {
 
   it("accepts an explicit locale matching en-GB output", () => {
     expect(formatEventDate("2025-06-15", "en-GB")).toBe("15th June 2025")
-  })
-})
-
-describe("getPollHint", () => {
-  it("returns the hint with a regular first name", () => {
-    expect(getPollHint("Belinda")).toBe("Is it the same as Belinda's?")
-  })
-
-  it("works with informal single names", () => {
-    expect(getPollHint("Mum")).toBe("Is it the same as Mum's?")
-  })
-
-  it("works with compound informal names", () => {
-    expect(getPollHint("Nana")).toBe("Is it the same as Nana's?")
   })
 })
 

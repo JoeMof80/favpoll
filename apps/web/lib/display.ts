@@ -1,27 +1,5 @@
 import { formatCurrency } from "./i18n"
 
-export function occasionLabel(occasion: string): string {
-  const labels: Record<string, string> = {
-    memorial: "In memory of",
-    funeral: "In memory of",
-    birthday: "Birthday",
-    retirement: "Retirement",
-    wedding: "Wedding",
-    engagement: "Engagement",
-    anniversary: "Anniversary",
-    leaving_do: "Leaving do",
-    graduation: "Graduation",
-    christening: "Christening",
-    bar_bat_mitzvah: "Bar / Bat Mitzvah",
-    get_well_soon: "Get well soon",
-    sports_achievement: "Achievement",
-    work_milestone: "Work milestone",
-    just_because: "Just because",
-    other: "Event",
-  }
-  return labels[occasion] ?? "Event"
-}
-
 export function charityNames(
   charities: { charity: { name: string } }[]
 ): string {
@@ -71,10 +49,6 @@ export function formatEventDate(
     month: "long",
     year: "numeric",
   })}`
-}
-
-export function getPollHint(protagonistName: string): string {
-  return `Is it the same as ${protagonistName}'s?`
 }
 
 export const PREFIXES: Record<string, string> = {

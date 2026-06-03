@@ -104,8 +104,9 @@ export function OnboardingPanel({
           <MockFieldGroup label="About">
             <div className="rounded-lg border border-[#D3D1C7] bg-white px-3 py-2 text-sm leading-relaxed">
               She arrived by umbrella when the wind changed, with a cheery
-              disposition and rosy cheeks. She knows what helps the medicine go
-              down at Great Ormond Street.
+              disposition, rosy cheeks, and a surprising number of favourite
+              things. She knows what helps the medicine go down at Great Ormond
+              Street.
             </div>
           </MockFieldGroup>
           <MockFieldGroup label="Context">
