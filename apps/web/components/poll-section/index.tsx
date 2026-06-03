@@ -6,8 +6,7 @@ import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
-import { Alert, AlertDescription } from "../ui/alert"
-import { CircleAlert } from "lucide-react"
+import { EmptyPollAlert } from "./empty-poll-alert"
 
 type Props = {
   poll: EventPollWithItems
@@ -137,12 +136,7 @@ export function PollSection({
       )}
 
       {poll.topics.topic_items.every((i) => i.is_hidden ?? false) && (
-        <Alert className="border-amber-500 text-sm text-amber-500">
-          <CircleAlert />
-          <AlertDescription className="text-amber-500">
-            Add some items before sharing your event link.
-          </AlertDescription>
-        </Alert>
+        <EmptyPollAlert />
       )}
     </section>
   )

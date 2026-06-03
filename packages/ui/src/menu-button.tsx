@@ -1,11 +1,10 @@
-// TODO: move to packages/ui/ when shared component extraction is done
-"use client";
+"use client"
 
-import { Menu, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export function MenuButton() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme()
 
   return (
     <button
@@ -24,5 +23,5 @@ export function MenuButton() {
         <Moon className="h-4 w-4" />
       )}
     </button>
-  );
+  )
 }
