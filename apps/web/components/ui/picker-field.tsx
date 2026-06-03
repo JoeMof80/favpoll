@@ -107,7 +107,7 @@ export function PickerField({
             onBlur={handleBlur}
             className={
               inputClassName ??
-              "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              "w-full rounded-md border border-input bg-background px-3 py-2 text-base focus:ring-2 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             }
           />
         </div>

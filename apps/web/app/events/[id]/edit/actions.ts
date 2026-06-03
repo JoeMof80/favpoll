@@ -13,7 +13,15 @@ async function upsertPollForEvent(
   poll: PollInput
 ) {
   if (poll.id) {
-    // Always sync topic_id in case the organiser switched topics
+    // Check if the topic has changed before touching items
+    const { data: currentPoll } = await supabase
+      .from("event_polls")
+      .select("topic_id")
+      .eq("id", poll.id)
+      .single()
+
+    const topicChanged = currentPoll?.topic_id !== poll.topicId
+
     await supabase
       .from("event_polls")
       .update({
@@ -22,7 +30,8 @@ async function upsertPollForEvent(
       })
       .eq("id", poll.id)
 
-    if (poll.infiniteItems) {
+    // Only delete and re-insert items if the topic changed
+    if (topicChanged && poll.infiniteItems) {
       const { canonicalItemIds, customLabels } = poll.infiniteItems
 
       // Delete all organiser-curated items; guest-added items are preserved

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { Pencil, Share2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type Props = {
@@ -24,18 +25,39 @@ export function EventSubheader({ eventId, isOrganiser, isClosed }: Props) {
   }
 
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-30 border-t border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-330 items-center justify-end px-6">
-        {isClosed ? (
-          <Button type="button" onClick={handleShareResults}>
-            {copied ? "Link copied!" : "Share results"}
-          </Button>
-        ) : (
-          <Button asChild size="lg">
-            <Link href={`/events/${eventId}/edit`}>Edit event</Link>
-          </Button>
-        )}
-      </div>
+    <div
+      className="fixed z-30"
+      style={{
+        right: "1.25rem",
+        bottom: "max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem))",
+      }}
+    >
+      {isClosed ? (
+        <Button
+          type="button"
+          size="icon"
+          onClick={handleShareResults}
+          aria-label={copied ? "Link copied" : "Share results"}
+          className="h-12 w-12 rounded-full shadow-lg"
+        >
+          {copied ? (
+            <Check className="h-5 w-5" />
+          ) : (
+            <Share2 className="h-5 w-5" />
+          )}
+        </Button>
+      ) : (
+        <Button
+          asChild
+          size="icon"
+          aria-label="Edit event"
+          className="h-12 w-12 rounded-full shadow-lg"
+        >
+          <Link href={`/events/${eventId}/edit`}>
+            <Pencil className="h-5 w-5" />
+          </Link>
+        </Button>
+      )}
     </div>
   )
 }

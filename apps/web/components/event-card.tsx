@@ -18,6 +18,7 @@ import { EventCardResults } from "./event-card/event-card-results"
 import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
 import type { CardResultItem } from "./event-card/use-event-card-pledge"
 import type { Charity } from "@favpoll/types"
+import { AmountInput } from "./pledge-card/amount-input"
 
 type EventCardEvent = {
   id: string
@@ -165,6 +166,12 @@ export function EventCard({
                     popoverLabel={topicTitle}
                   />
 
+                  <AmountInput
+                    id="pledge-amount"
+                    value={amount !== null ? String(amount) : ""}
+                    onChange={(v) => selectAmount(Number(v))}
+                  />
+
                   <AmountPresets
                     amounts={PRESET_AMOUNTS}
                     value={amount !== null ? String(amount) : ""}
@@ -199,17 +206,16 @@ export function EventCard({
               </Link>
             </div>
           )}
-
-          {/* Footer — charity carousel */}
-          {event.charities.length > 0 && (
-            <div className="mt-auto border-t border-border px-4 py-3">
-              <EventCardCharityCarousel
-                charities={event.charities}
-                perCharity={perCharity}
-              />
-            </div>
-          )}
         </div>
+        {/* Footer — charity carousel */}
+        {event.charities.length > 0 && (
+          <div className="mt-auto border-t border-border px-4 py-3">
+            <EventCardCharityCarousel
+              charities={event.charities}
+              perCharity={perCharity}
+            />
+          </div>
+        )}
 
         {/* Stripe payment modal */}
         {step === "paying" && clientSecret && (

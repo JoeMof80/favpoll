@@ -6,6 +6,7 @@ type UsePollSectionOptions = {
   isClosed: boolean
   pledgeJustConfirmed?: boolean
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
+  onViewChange?: (view: "pledge" | "results") => void
 }
 
 export function usePollSection({
@@ -14,13 +15,23 @@ export function usePollSection({
   isClosed,
   pledgeJustConfirmed,
   onSelectionsChange,
+  onViewChange,
 }: UsePollSectionOptions) {
-  const [view, setView] = useState<"pledge" | "results">(
-    hasPledged || isClosed ? "results" : "pledge"
-  )
+  const initialView = hasPledged || isClosed ? "results" : "pledge"
+  const [view, setView] = useState<"pledge" | "results">(initialView)
   const [rankingView, setRankingView] = useState<"amount" | "count">("amount")
   const [pledgeConfirmed, setPledgeConfirmed] = useState(hasPledged)
   const [showRankings, setShowRankings] = useState(true)
+
+  // Notify parent of initial view
+  const notifiedInitial = useRef(false)
+  useEffect(() => {
+    if (!notifiedInitial.current) {
+      notifiedInitial.current = true
+      onViewChange?.(initialView)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Single ref to ensure reveal fires at most once
   const revealed = useRef(false)
@@ -30,12 +41,13 @@ export function usePollSection({
     if (!revealed.current && pledgeJustConfirmed) {
       revealed.current = true
       setView("results")
+      onViewChange?.("results")
       setPledgeConfirmed(true)
       setShowRankings(false)
       const t = setTimeout(() => setShowRankings(true), 300)
       return () => clearTimeout(t)
     }
-  }, [pledgeJustConfirmed])
+  }, [pledgeJustConfirmed, onViewChange])
 
   // Fallback: fires when hasPledged transitions false → true (signed-in, after router.refresh)
   const prevHasPledged = useRef(hasPledged)
@@ -43,13 +55,14 @@ export function usePollSection({
     if (!prevHasPledged.current && hasPledged && !revealed.current) {
       revealed.current = true
       setView("results")
+      onViewChange?.("results")
       setPledgeConfirmed(true)
       setShowRankings(false)
       const t = setTimeout(() => setShowRankings(true), 300)
       return () => clearTimeout(t)
     }
     prevHasPledged.current = hasPledged
-  }, [hasPledged])
+  }, [hasPledged, onViewChange])
 
   const handleSelectionsChange = useCallback(
     (selectedIds: string[]) => onSelectionsChange(pollId, selectedIds),

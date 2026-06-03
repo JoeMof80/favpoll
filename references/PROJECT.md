@@ -377,16 +377,18 @@ components/
 │   ├── ranking-bar.tsx           -- labelSuffix prop for inline Hide/Show toggle
 │   ├── reveal-quote.tsx
 │   ├── picker-field.tsx
-│   └── tooltip.tsx
+│   ├── tooltip.tsx
+│   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
 ├── canvas/
 │   └── inline-option-input.tsx   -- used by pledge-panel.tsx for guest item addition
 ├── event-form-v2/                -- Canonical create/edit form
-│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state
-│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection; step 3 has TopicPickerField only (no ItemAddField)
-│   ├── preview-panel.tsx         -- Live preview; real PledgeCard (prePublish), lifted pledgeAmount state; showReveal toggles PollResults; PledgePanel interactive for infinite topics
+│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state; isFirstTime prop
+│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection; all fields have visible FormLabel; step 3 has TopicPickerField only (no ItemAddField)
+│   ├── preview-panel.tsx         -- Live preview; isFirstTime prop; shows OnboardingPanel when no occasion selected (first-time or localStorage flag); toast.warning on prePublish pledge click
+│   ├── onboarding-panel.tsx      -- Three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
-│   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button syncs width to calendar on first open
+│   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button width hardcoded to CALENDAR_WIDTH = 220
 │   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button; onInteractOutside prevents close on anchor click
 │   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic; Backspace/Delete clears chip; onInteractOutside keeps open
 │   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open; NOT used in form step 3
@@ -417,7 +419,7 @@ components/
 ├── live-events-carousel.tsx
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx
-├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?, pledged?
+├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
 ├── stripe-checkout.tsx, pot-banner.tsx
 └── theme-provider.tsx, menu-button.tsx  -- TODO: move to packages/ui/
 
@@ -539,6 +541,7 @@ pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
 All tests must pass before committing. Current counts: 467 web, ~22 admin.
+Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
 - Default (jsdom): pure functions, hooks
@@ -604,6 +607,12 @@ NEXT_PUBLIC_BASE_URL
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
 - **Item management on the event page, not the form.** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). `ItemAddField` is not rendered in form step 3. The form only picks a topic. Custom organiser-added items land with `source: 'organiser'`, `is_canonical: false`, `review_status: 'pending'`. Guest-added items use `source: 'guest'`, `review_status: 'pending'`. Both use `'pending'` — not `'pending_review'`.
+
+- **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
+
+- **Onboarding panel for first-time organisers.** `app/events/new/page.tsx` queries `events` to set `isFirstTime`. `PreviewPanel` shows `OnboardingPanel` when no occasion is selected and `isFirstTime === true` or `localStorage.favpoll_show_onboarding === '1'`. Returning users see a minimal blank state with a "How favpoll works →" link to re-open the panel.
+
+- **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Use `toast.warning()` with explicit `style: { background, color, border }` props — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them.
 
 - **opening_line is organiser-editable.** Shown as placeholder text in the form (from `PREFIXES[occasion]`) — not pre-filled. Organiser may type their own. Stored in DB. Preview falls back to `PREFIXES[occasion]` when field is empty. Never derive it purely from occasion at render time.
 

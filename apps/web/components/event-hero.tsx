@@ -19,8 +19,8 @@ export function EventHero({ event, protagonist, hideAvatar }: Props) {
   })
 
   return (
-    <div className="mb-10">
-      <div className="flex items-start gap-6">
+    <div className="mb-5 md:mb-10">
+      <div className="flex items-start gap-4 md:gap-6">
         {/* Text */}
         <div className="min-w-0 flex-1">
           <SectionEyebrow variant="muted" className="mb-2 truncate break-words">
@@ -32,21 +32,15 @@ export function EventHero({ event, protagonist, hideAvatar }: Props) {
           </h1>
 
           {headline?.suffix && (
-            <p className="mt-2 truncate text-2xl font-normal break-words text-[#534AB7]">
+            <p className="mt-2 truncate text-xl font-normal text-[#534AB7] md:text-2xl">
               {headline.suffix}
-            </p>
-          )}
-
-          {protagonist.about && (
-            <p className="mt-4 line-clamp-4 text-base leading-relaxed break-words text-[#5F5E5A]">
-              {protagonist.about}
             </p>
           )}
         </div>
 
         {/* Photo */}
         {!hideAvatar && (
-          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-[#D3D1C7]">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-[#D3D1C7] md:h-28 md:w-28">
             {protagonist.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -95,7 +89,13 @@ export function EventHero({ event, protagonist, hideAvatar }: Props) {
         )}
       </div>
 
-      <hr className="mt-8 border-[#D3D1C7]" />
+      {protagonist.about && (
+        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
+          {protagonist.about}
+        </p>
+      )}
+
+      <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
     </div>
   )
 }

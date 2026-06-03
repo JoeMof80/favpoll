@@ -7,6 +7,7 @@ type UseEventContentOptions = {
   event: EventWithDetails
   pollWithItems: EventPollWithItems | null
   isClosed: boolean
+  hasPledged: boolean
   clerkUserId: string | null
 }
 
@@ -14,6 +15,7 @@ export function useEventContent({
   event,
   pollWithItems,
   isClosed,
+  hasPledged,
   clerkUserId,
 }: UseEventContentOptions) {
   const router = useRouter()
@@ -22,6 +24,9 @@ export function useEventContent({
     Record<string, string[]>
   >({})
   const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
+  const [pollView, setPollView] = useState<"pledge" | "results">(
+    hasPledged || isClosed ? "results" : "pledge"
+  )
 
   const handleSelectionsChange = useCallback(
     (pollId: string, selectedIds: string[]) =>
@@ -51,7 +56,8 @@ export function useEventContent({
     }
   }
 
-  const showPledgeCard = !isClosed && !!pollWithItems
+  const showPledgeCard =
+    !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"
 
   return {
     pledgeAmount,
@@ -62,5 +68,6 @@ export function useEventContent({
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
+    setPollView,
   }
 }

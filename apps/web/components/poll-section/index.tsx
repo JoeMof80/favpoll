@@ -21,6 +21,7 @@ type Props = {
   eventId: string
   onSelectionsChange: (pollId: string, selectedIds: string[]) => void
   onAddItem?: (label: string) => Promise<void>
+  onViewChange?: (view: "pledge" | "results") => void
 }
 
 export function PollSection({
@@ -34,6 +35,7 @@ export function PollSection({
   eventId,
   onSelectionsChange,
   onAddItem,
+  onViewChange,
 }: Props) {
   const {
     view,
@@ -49,19 +51,25 @@ export function PollSection({
     isClosed,
     pledgeJustConfirmed,
     onSelectionsChange,
+    onViewChange,
   })
 
   const personFirstName = protagonistName.split(/[\s&]+/)[0]
   const pledged = view === "results" && pledgeConfirmed
 
+  function changeView(v: "pledge" | "results") {
+    setView(v)
+    onViewChange?.(v)
+  }
+
   const onResetPledge =
     view === "results" && !isClosed && showRankings
-      ? () => setView("pledge")
+      ? () => changeView("pledge")
       : undefined
 
   const onViewResults =
     view === "pledge" && (hasPledged || isClosed)
-      ? () => setView("results")
+      ? () => changeView("results")
       : undefined
 
   return (
@@ -122,6 +130,7 @@ export function PollSection({
               onSelectionsChange={handleSelectionsChange}
               isInfinite={!poll.topics.is_finite}
               onAddItem={onAddItem}
+              topicTitle={poll.topics.title}
             />
           )}
         </div>

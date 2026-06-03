@@ -5,7 +5,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EventHero } from "@/components/event-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
-import { PledgeCard } from "@/components/pledge-card"
+import { PledgeCard, LivePledgeCard } from "@/components/pledge-card"
 import type {
   EventWithDetails,
   EventPollWithItems,
@@ -13,6 +13,7 @@ import type {
   PotAllocation,
 } from "@favpoll/types"
 import { useEventContent } from "./use-event-content"
+import { EventCardCharityCarousel } from "../event-card/event-card-charity-carousel"
 
 type Props = {
   event: EventWithDetails
@@ -46,7 +47,8 @@ export function EventContent({
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-  } = useEventContent({ event, pollWithItems, isClosed, clerkUserId })
+    setPollView,
+  } = useEventContent({ event, pollWithItems, isClosed, hasPledged, clerkUserId })
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -60,69 +62,110 @@ export function EventContent({
       })
     : null
 
+  const perCharity =
+    event.event_charities.length > 0
+      ? totalRaised / event.event_charities.length
+      : 0
+
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
-      {/* Left — hero + polls */}
-      <div>
-        <EventHero event={event} protagonist={event.protagonists} />
+    <>
+      <div className="grid gap-10 md:grid-cols-[1fr_300px]">
+        {/* Left — hero + polls */}
+        <div>
+          <EventHero event={event} protagonist={event.protagonists} />
 
-        {pollWithItems ? (
-          <PollSection
-            poll={pollWithItems}
-            clerkUserId={clerkUserId}
-            pledgeAmount={pledgeAmount}
-            isClosed={isClosed}
-            hasPledged={hasPledged}
-            pledgeJustConfirmed={pledgeConfirmed}
-            protagonistName={event.protagonists.name}
-            isOrganiser={isOrganiser}
-            eventId={event.id}
-            onSelectionsChange={handleSelectionsChange}
-            onAddItem={addItemHandler(pollWithItems)}
-          />
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
-            No poll has been set up for this event yet.
-          </p>
-        )}
-      </div>
-
-      {/* Right — sticky meta */}
-      <div className="sticky top-20 space-y-4 self-start">
-        {isClosed ? (
-          <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
-            <SectionEyebrow variant="muted" className="font-semibold">
-              Poll closed
-            </SectionEyebrow>
-            {closedAt && (
-              <p className="text-sm text-muted-foreground">{closedAt}</p>
-            )}
-            <p className="text-xl font-medium text-primary">
-              {GBP.format(event.total_raised ?? totalRaised)}
+          {pollWithItems ? (
+            <PollSection
+              poll={pollWithItems}
+              clerkUserId={clerkUserId}
+              pledgeAmount={pledgeAmount}
+              isClosed={isClosed}
+              hasPledged={hasPledged}
+              pledgeJustConfirmed={pledgeConfirmed}
+              protagonistName={event.protagonists.name}
+              isOrganiser={isOrganiser}
+              eventId={event.id}
+              onSelectionsChange={handleSelectionsChange}
+              onAddItem={addItemHandler(pollWithItems)}
+              onViewChange={setPollView}
+            />
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              No poll has been set up for this event yet.
             </p>
-            <p className="text-xs text-muted-foreground">raised in total</p>
-          </div>
-        ) : (
-          <Countdown closesAt={event.closes_at} />
-        )}
-        <CharityBanner
-          charities={event.event_charities.map((ec) => ec.charities)}
-          totalRaised={totalRaised}
-        />
-        {!isClosed && showPledgeCard && pollWithItems && (
-          <PledgeCard
-            eventId={event.id}
-            clerkUserId={clerkUserId}
-            charityNames={event.event_charities.map((ec) => ec.charities.name)}
-            pollWithItems={pollWithItems}
-            pot={pot}
-            userPotAllocation={userPotAllocation}
-            pollSelections={pollSelections}
-            onPledgeAmountChange={setPledgeAmount}
-            onPledgeSuccess={handlePledgeSuccess}
+          )}
+
+          {!isClosed && showPledgeCard && pollWithItems && (
+            <div className="mt-6 md:hidden">
+              <LivePledgeCard
+                eventId={event.id}
+                clerkUserId={clerkUserId}
+                charityNames={event.event_charities.map(
+                  (ec) => ec.charities.name
+                )}
+                pollWithItems={pollWithItems}
+                pot={pot}
+                userPotAllocation={userPotAllocation}
+                pollSelections={pollSelections}
+                onPledgeAmountChange={setPledgeAmount}
+                onPledgeSuccess={handlePledgeSuccess}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right — sticky meta */}
+        <div className="sticky top-20 hidden space-y-4 self-start md:block">
+          {isClosed ? (
+            <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+              <SectionEyebrow variant="muted" className="font-semibold">
+                Poll closed
+              </SectionEyebrow>
+              {closedAt && (
+                <p className="text-sm text-muted-foreground">{closedAt}</p>
+              )}
+              <p className="text-xl font-medium text-primary">
+                {GBP.format(event.total_raised ?? totalRaised)}
+              </p>
+              <p className="text-xs text-muted-foreground">raised in total</p>
+            </div>
+          ) : (
+            <Countdown closesAt={event.closes_at} />
+          )}
+          <CharityBanner
+            charities={event.event_charities.map((ec) => ec.charities)}
+            totalRaised={totalRaised}
           />
-        )}
+          {!isClosed && showPledgeCard && pollWithItems && (
+            <PledgeCard
+              eventId={event.id}
+              clerkUserId={clerkUserId}
+              charityNames={event.event_charities.map((ec) => ec.charities.name)}
+              pollWithItems={pollWithItems}
+              pot={pot}
+              userPotAllocation={userPotAllocation}
+              pollSelections={pollSelections}
+              onPledgeAmountChange={setPledgeAmount}
+              onPledgeSuccess={handlePledgeSuccess}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Fixed charity carousel — mobile only, always visible */}
+      {event.event_charities.length > 0 && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <EventCardCharityCarousel
+            charities={event.event_charities.map((ec) => ({
+              charity: ec.charities,
+            }))}
+            perCharity={perCharity}
+          />
+        </div>
+      )}
+    </>
   )
 }
