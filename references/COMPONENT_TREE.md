@@ -204,7 +204,7 @@ app/pledges/withdraw/page.tsx
 | Component | Used by | Stories |
 |-----------|---------|---------|
 | `button` | throughout | ✓ |
-| `chip` | event-canvas, charity-picker, hero-demo-panel, rankings-client | ✓ |
+| `chip` | pledge-panel, picker-field, event-form-v2/{occasion,topic,charity,item-add}-field, hero-demo-panel, rankings-client | ✓ |
 | `section-eyebrow` | event-content, closing-date, charity-picker, events page, home | ✓ |
 | `ranking-bar` | ranking-list, demo-card | ✓ |
 | `reveal-quote` | demo-card | ✓ |
@@ -220,7 +220,6 @@ app/pledges/withdraw/page.tsx
 | `input` | — (direct HTML used elsewhere) | ✓ |
 | `textarea` | closing-date | — |
 | `switch` | privacy-toggle | — |
-| `dropdown-menu` | — ⚠ | — |
 | `separator` | onboarding-panel | — |
 | `alert` | poll-section/empty-poll-alert | — |
 | `label` | ui/form, ui/field | — |
@@ -236,7 +235,6 @@ These are **not** a self-contained card used in the app — they are a set of sh
 |-----------|----------------------|
 | `poll-title` | poll-heading, event-card |
 | `poll-reveal` | poll-heading |
-| `poll-options` | (no production caller) |
 | `poll-results` | preview-panel |
 | `favpoll-card-context` | event-card, demo-card, charity-row |
 | `favpoll-header` | event-card, demo-card |
@@ -249,8 +247,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 | Component | File | Notes |
 |-----------|------|-------|
-| `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No importers — `menu-button` moved to `@favpoll/ui` (plain button, no dropdown) |
 | `ui/input` | `components/ui/input.tsx` | Stories only (raw `<input>` used in production) |
 
 > `home-carousel`, `pot-banner`, `poll-framing`, `ui/toggle` deleted in PR #24.
-> `favpoll-card` cluster (favpoll-card, favpoll-poll, favpoll-pledge-panel, favpoll-shared-fund, favpoll-charity-row) deleted in PR #25.
+> `favpoll-card` cluster + `poll-options`, `ui/dropdown-menu` deleted in PRs #25–#27.
