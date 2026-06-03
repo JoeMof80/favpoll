@@ -11,7 +11,7 @@ export type Contribution = {
   event_title: string;
   event_id: string;
   protagonist_name: string;
-  review_status: "pending" | "accepted" | "rejected";
+  review_status: "pending_review" | "accepted" | "rejected";
   rejection_reason: string | null;
   reviewed_at: string | null;
   reviewed_by: string | null;
@@ -30,7 +30,7 @@ export async function getPendingContributions(): Promise<{
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
        topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
     )
-    .eq("review_status", "pending")
+    .eq("review_status", "pending_review")
     .eq("source", "guest")
     .order("created_at", { ascending: true });
 
@@ -67,7 +67,7 @@ export async function getReviewedContributions(): Promise<{
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
        topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
     )
-    .neq("review_status", "pending")
+    .neq("review_status", "pending_review")
     .eq("source", "guest")
     .order("reviewed_at", { ascending: false });
 
@@ -106,7 +106,7 @@ export async function acceptContribution(
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", itemId)
-    .eq("review_status", "pending");
+    .eq("review_status", "pending_review");
 
   if (error) return { error: error.message };
 
@@ -139,7 +139,7 @@ export async function rejectContribution(
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", itemId)
-    .eq("review_status", "pending");
+    .eq("review_status", "pending_review");
 
   if (error) return { error: error.message };
 

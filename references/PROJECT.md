@@ -244,6 +244,7 @@ item_flags (
 20260527000000_rename_date_label_to_context.sql        -- protagonists.date_label → context
 20260527000001_rename_occasion_label_to_opening_line.sql  -- events.occasion_label → opening_line
 20260527000002_restore_topic_item_display_order.sql    -- topic_items.display_order integer nullable
+20260604000000_fix_review_status_pending.sql           -- corrects review_status 'pending' → 'pending_review' for existing rows
 ```
 
 ---
@@ -609,7 +610,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
-- **Item management on the event page, not the form.** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). `ItemAddField` is not rendered in form step 3. The form only picks a topic. Custom organiser-added items land with `source: 'organiser'`, `is_canonical: false`, `review_status: 'pending'`. Guest-added items use `source: 'guest'`, `review_status: 'pending'`. Both use `'pending'` — not `'pending_review'`.
+- **Item management on the event page, not the form.** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). `ItemAddField` is not rendered in form step 3. The form only picks a topic. Custom organiser-added items land with `source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`. Guest-added items use `source: 'guest'`, `review_status: 'pending_review'`. The admin contributions queue filters on `'pending_review'`.
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 

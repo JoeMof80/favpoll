@@ -177,7 +177,7 @@ export async function addGuestItem(
         label: trimmed,
         source: "guest",
         is_canonical: false,
-        review_status: "pending",
+        review_status: "pending_review",
       })
       .select("id")
       .single()
@@ -286,7 +286,7 @@ export async function addOrganizerItem(eventId: string, label: string) {
         label: trimmed,
         source: "organiser",
         is_canonical: false,
-        review_status: "pending",
+        review_status: "pending_review",
         markets: ["en-GB"],
       })
       .select("id")

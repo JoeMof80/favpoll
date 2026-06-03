@@ -56,7 +56,7 @@ export function ContributionRow({ item }: { item: Contribution }) {
     });
   }
 
-  const isPending_ = item.review_status === "pending";
+  const isPending_ = item.review_status === "pending_review";
 
   return (
     <div className="rounded-lg border border-border bg-card p-4 space-y-2">
