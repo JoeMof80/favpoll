@@ -363,7 +363,7 @@ describe("addOrganizerItem", () => {
       label: "Red",
       source: "organiser",
       is_canonical: false,
-      review_status: "pending",
+      review_status: "pending_review",
       markets: ["en-GB"],
     })
 
