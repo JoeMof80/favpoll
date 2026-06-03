@@ -16,11 +16,11 @@
 ```
 app/layout.tsx
   → clerk-provider
-  → theme-provider
+  → @favpoll/ui/ThemeProvider
   → header
       → favpoll-logo
       → user-button-client
-      → menu-button
+      → @favpoll/ui/MenuButton  (plain button, Moon/Sun toggle)
       → ui/button
   → sonner/Toaster  (position="bottom-center")
 ```
@@ -81,18 +81,24 @@ event-card  (client component)
 ```
 app/events/new/page.tsx  (queries events table to derive isFirstTime)
   → event-form-v2  (EventFormV2 — split FormPanel + PreviewPanel)
-      → event-form-v2/form-panel  (5-step form; all fields have visible labels)
-          → event-form-v2/occasion-picker-field
-              → ui/popover, ui/chip
-          → event-form-v2/topic-picker-field
-              → ui/popover, ui/chip
-          → event-form-v2/charity-field
-              → ui/popover, ui/chip
-          → event-form-v2/date-time-picker
-              → ui/calendar, ui/button
-          → event-form-v2/photo-crop-modal
-              → react-easy-crop
-          → ui/button
+      → event-form-v2/form-panel  (thin shell — sequences 5 StepSection wrappers)
+          → event-form-v2/step-section  (StepSection, CounterWhenTyping)
+          → event-form-v2/steps/step-occasion
+              → event-form-v2/occasion-picker-field
+                  → ui/popover, ui/chip
+          → event-form-v2/steps/step-profile
+              → event-form-v2/photo-crop-modal
+                  → react-easy-crop
+              → ui/input-group
+          → event-form-v2/steps/step-topic
+              → event-form-v2/topic-picker-field
+                  → ui/popover, ui/chip
+          → event-form-v2/steps/step-reveal
+          → event-form-v2/steps/step-event
+              → event-form-v2/charity-field
+                  → ui/popover, ui/chip
+              → event-form-v2/date-time-picker
+                  → ui/calendar, ui/button
       → event-form-v2/preview-panel  (live preview; isFirstTime prop)
           → event-form-v2/onboarding-panel  (shown when no occasion selected, first-time or localStorage flag)
               → ui/separator
@@ -112,6 +118,7 @@ app/events/new/page.tsx  (queries events table to derive isFirstTime)
 app/events/[id]/page.tsx
   → event-content
       → event-hero
+          → event-hero-avatar *  (ProtagonistAvatar — photo or hatched initials circle)
       → countdown *
       → ui/section-eyebrow
       → charity-banner *
@@ -125,7 +132,7 @@ app/events/[id]/page.tsx
               → ui/ranking-bar
           → ui/tabs
           → ui/button
-          → ui/alert  (empty-poll warning when all items hidden)
+          → poll-section/empty-poll-alert *  (shown when all poll items are hidden)
       → pledge-card
           → stripe-checkout
           → pledge-card/amount-input *
@@ -206,18 +213,17 @@ app/pledges/withdraw/page.tsx
 | `popover` | charity-picker, picker-field | — |
 | `picker-field` | charity-picker, event-card | — |
 | `tooltip` | event-card, tooltip-icon-button | — |
-| `tooltip-icon-button` | event-card, poll-heading | — |
+| `tooltip-icon-button` | event-card, poll-heading | ✓ |
 | `calendar` | closing-date | — |
 | `card` | closing-date | — |
 | `field` | closing-date | — |
 | `input` | — (direct HTML used elsewhere) | ✓ |
 | `textarea` | closing-date | — |
 | `switch` | privacy-toggle | — |
-| `dropdown-menu` | — | — |
+| `dropdown-menu` | — ⚠ | — |
 | `separator` | onboarding-panel | — |
-| `alert` | poll-section | — |
-| `toggle` | — | — |
-| `label` | — | — |
+| `alert` | poll-section/empty-poll-alert | — |
+| `label` | ui/form, ui/field | — |
 | `input-group` | form-panel | — |
 
 ---
@@ -229,19 +235,13 @@ These are **not** a self-contained card used in the app — they are a set of sh
 | Component | Used in production by |
 |-----------|----------------------|
 | `poll-title` | poll-heading, event-card |
-| `poll-framing` | nobody ⚠ |
 | `poll-reveal` | poll-heading |
-| `poll-options` | favpoll-poll only |
-| `poll-results` | favpoll-poll only |
+| `poll-options` | (no production caller) |
+| `poll-results` | preview-panel |
 | `favpoll-card-context` | event-card, demo-card, charity-row |
-| `favpoll-card` | stories only ⚠ |
-| `favpoll-poll` | favpoll-card only |
 | `favpoll-header` | event-card, demo-card |
-| `favpoll-pledge-panel` | favpoll-card only |
-| `favpoll-shared-fund` | favpoll-poll only |
-| `favpoll-charity-row` | event-page story only |
 
-> `favpoll-card` (the assembled card component) has stories but is not rendered anywhere in the app. Its sub-primitives (`poll-title`, `poll-reveal`) are consumed via `poll-heading` in both the canvas editor and the event page. `poll-framing` is entirely unused — `personal_framing` was retired.
+> The assembled `favpoll-card`, `favpoll-poll`, `favpoll-pledge-panel`, `favpoll-shared-fund`, `favpoll-charity-row` components were deleted in PR #25 — they had no production importers. `poll-framing` and the canvas cluster were deleted in PR #24.
 
 ---
 
@@ -249,14 +249,8 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 | Component | File | Notes |
 |-----------|------|-------|
-| `home-carousel` | `components/home-carousel.tsx` | Not imported by production code — live-events-carousel is used for homepage |
-| `pot-banner` | `components/pot-banner.tsx` | No imports anywhere |
-| `poll-framing` | `components/favpoll-card/poll-framing.tsx` | No imports anywhere — `personal_framing` retired |
-| `favpoll-card` | `components/favpoll-card/favpoll-card.tsx` | Stories only |
-| `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No imports found |
-| `ui/alert` | `components/ui/alert.tsx` | Used by `poll-section` — no longer unused |
-| `ui/separator` | `components/ui/separator.tsx` | Used by `onboarding-panel` — no longer unused |
-| `ui/input-group` | `components/ui/input-group.tsx` | Used by `form-panel` — no longer unused |
-| `ui/toggle` | `components/ui/toggle.tsx` | No imports found |
-| `ui/label` | `components/ui/label.tsx` | No imports found |
+| `ui/dropdown-menu` | `components/ui/dropdown-menu.tsx` | No importers — `menu-button` moved to `@favpoll/ui` (plain button, no dropdown) |
 | `ui/input` | `components/ui/input.tsx` | Stories only (raw `<input>` used in production) |
+
+> `home-carousel`, `pot-banner`, `poll-framing`, `ui/toggle` deleted in PR #24.
+> `favpoll-card` cluster (favpoll-card, favpoll-poll, favpoll-pledge-panel, favpoll-shared-fund, favpoll-charity-row) deleted in PR #25.
