@@ -14,7 +14,9 @@
 | #20 | fix: remove charity counter from charity field                      | `{n/3}` counter span removed from `CharityField`                                                                                                                          |
 | #21 | fix: replace window.alert and inline alert with warning toasts      | `toast.warning()` with amber inline styles; `<Toaster>` in `app/layout.tsx`; sonner CSS variables approach does not work — must pass `style` directly on each call        |
 | #22 | feat: onboarding panel and form field labels                        | `OnboardingPanel` with Honour/Love/Charity sections; `isFirstTime` from events table query; localStorage flag for returning users; visible labels on all FormPanel fields |
-| #23 | feat: responsive layout, mobile picker UX, pledge panel draft state | See below                                                                                                                                                                 |
+| #23 | feat: responsive layout, mobile picker UX, pledge panel draft state | See PR #23 notes below                                                                                                                                                    |
+| #24 | refactor: remove dead code across apps/web                          | See PR #24 notes below                                                                                                                                                    |
+| #25 | refactor: component cleanup, packages/ui extraction, form-panel decomposition | See PR #25 notes below                                                                                                                              |
 
 ## PR #23 — what changed
 
@@ -70,6 +72,69 @@
 - `components/event-form-v2/onboarding-interstitial.tsx` — mobile-only full-screen onboarding overlay
 - `components/ui/sheet.tsx` — shadcn Sheet component (SlideOver drawer, mobile picker)
 
+## PR #24 — what changed
+
+Dead code audit and removal. Full detail in `dead-code-summary.txt` at repo root.
+
+### Files deleted
+
+- `components/canvas/inline-option-input.tsx` — no importers after EventCanvas removal
+- `components/home-carousel.tsx` — no importers
+- `components/favpoll-card/poll-framing.tsx` — no importers
+
+### Exports removed
+
+- `lib/display.ts`: `occasionLabel` (legacy slugs), `getPollHint` (retired PR #18)
+- `lib/occasions.ts`: `OCCASIONS`, `OCCASION_LABELS`, `NAME_LABELS`, `DESCRIPTION_LABELS`, `TOPIC_REVEAL_PLACEHOLDERS`, `getAboutPlaceholder`
+
+### Types deleted
+
+- `packages/types/index.ts`: `CanvasPoll`, `CanvasInitialData` — legacy EventCanvas types, no references in either app
+
+### Dependency removed
+
+- `date-fns` from `apps/web/package.json` — no direct imports; resolved transitively via react-day-picker
+
+### Still live — do not touch
+
+- `protagonistFirstName` on `PollHeading` — used in poll-section, preview-panel, favpoll-poll, poll-reveal
+- `previewSuffix` — drives Eye/EyeOff toggle in preview panel
+- `showReveal` — drives reveal display in preview-panel and hero-demo-panel
+- `CanvasPollInput`, `CanvasSubmitData` — used by event-form-v2 and edit actions
+- `suggestClosingDate` / `CLOSING_DEFAULTS` — tested, no production caller yet; retained
+- `ordinal` / `formatRelativeDate` / `formatEventDate` — tested utilities; retained
+
+## PR #25 — what changed
+
+### Phase 2a — Dead files deleted
+
+- `components/pot-banner.tsx`
+- `components/ui/toggle.tsx`
+- `components/favpoll-card/favpoll-card.tsx`, `favpoll-poll.tsx`, `favpoll-pledge-panel.tsx`, `favpoll-shared-fund.tsx`, `favpoll-charity-row.tsx`
+- `components/favpoll-card/stories/favpoll-card.stories.tsx`, `event-page.stories.tsx`
+- **Not deleted**: `ui/dropdown-menu.tsx` had a live importer (`menu-button.tsx`); `ui/label.tsx` used by `ui/form.tsx` and `ui/field.tsx`
+- **Post-merge note**: `ui/dropdown-menu.tsx` is now genuinely unused — `menu-button.tsx` was replaced by `@favpoll/ui/MenuButton` (plain button, no dropdown)
+
+### Phase 2b — Component decomposition
+
+- `ProtagonistAvatar` extracted from `event-hero.tsx` → `event-hero-avatar.tsx` + story (3 variants)
+- `EmptyPollAlert` extracted from `poll-section/index.tsx` → `poll-section/empty-poll-alert.tsx` + story
+- `StepSection` + `CounterWhenTyping` extracted → `event-form-v2/step-section.tsx`
+- `form-panel.tsx` (630 lines) split into `steps/step-occasion.tsx`, `steps/step-profile.tsx`, `steps/step-topic.tsx`, `steps/step-reveal.tsx`, `steps/step-event.tsx`; `form-panel.tsx` is now a ~70-line thin shell
+- Each step file uses `useFormContext<EventFormValues>()` internally; `StepProfile` owns `cropSrc`/`fileInputRef` photo state; `StepReveal` owns the `useEffect` clearing reveal when topic cleared
+
+### Phase 2c — `packages/ui` extraction
+
+- `packages/ui/` created: `ThemeProvider` (identical between apps) and `MenuButton` (plain button variant from admin — no shadcn `DropdownMenu` dependency)
+- Both `apps/web` and `apps/admin` now import `ThemeProvider` and `MenuButton` from `@favpoll/ui`
+- Duplicate `components/theme-provider.tsx` and `components/menu-button.tsx` deleted from both apps
+- `packages/ui/package.json` has `@types/react` as devDependency + `tsconfig.json` for CI type resolution
+
+### Phase 2d — Storybook
+
+- `components/ui/tooltip-icon-button.stories.tsx` added (was the only missing story)
+- New stories: `event-hero-avatar.stories.tsx`, `poll-section/empty-poll-alert.stories.tsx`
+
 ---
 
 ## Decisions locked in (additions from this session)
@@ -83,6 +148,10 @@
 - **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout.
 
 - **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Do not set `text-sm` or smaller on any focusable input element.
+
+- **`packages/ui` uses plain button for `MenuButton`.** The web app's `DropdownMenu`-based version was superseded by the simpler admin version. `ui/dropdown-menu` is now unused in `apps/web`.
+
+- **`form-panel.tsx` is a thin shell.** Each step is a self-contained component using `useFormContext`. Do not put form logic back into `form-panel.tsx` — add it to the relevant step file.
 
 ---
 
@@ -106,7 +175,7 @@ was arrived at deliberately.
 
 ## Tests
 
-467 passing (12 new test cases added to `use-event-content.test.ts` for `hasPledged` prop).
+442 passing (448 − 6 story-based test cases removed with the deleted favpoll-card stories).
 
 ---
 
@@ -120,7 +189,6 @@ This applies to every task, every session, without exception.
 
 ## Outstanding TODO
 
-- **Mary Poppins copy** — verify both `onboarding-panel.tsx` and `onboarding-interstitial.tsx` match the canonical copy table above
 - **"How favpoll works" page** — `OnboardingPanel` footer link has no destination; a `/how-it-works` or `/about` page needs building
 - **Copyright review** — Mary Poppins example copy; review before public launch
 - **`review_status` inconsistency** — `addGuestItem` and `addOrganizerItem` use `'pending'`; schema docs and `acceptContribution` reference `'pending_review'`; needs a migration to align before contributions queue is relied upon
@@ -131,8 +199,7 @@ This applies to every task, every session, without exception.
 - **Event oversight admin page** — `/events` in admin is a shell only
 - **Email templates** — currently plain text via Resend
 - **Rate limiting** on API routes
-- **`home-carousel.tsx`** — unused, remove or repurpose
-- **`theme-provider.tsx` / `menu-button.tsx`** — duplicated across apps; extract to `packages/ui/`
+- **`ui/dropdown-menu.tsx`** — now unused (no importers after MenuButton moved to packages/ui); safe to delete
 - **Guest returning-visitor detection** — pledge detection only works for authenticated users server-side
 - **Upload a list of items** — future TODO for infinite topic seeding
 - **Localisation next steps** — `next-intl`, string extraction, US market prep
