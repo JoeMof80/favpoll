@@ -265,7 +265,7 @@ export function EventFormV2({
         </div>
 
         {/* Right panel — live preview (hidden on mobile, kept in DOM for useWatch) */}
-        <div className="hidden h-full flex-1 overflow-y-auto md:flex">
+        <div className="hidden h-full flex-1 overflow-y-auto md:block">
           <PreviewPanel
             charities={charities}
             topics={topics}

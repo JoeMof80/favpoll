@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import {
   OCCASION_PLACEHOLDERS,
@@ -69,11 +69,9 @@ export function PreviewPanel({
   isFirstTime = false,
 }: Props) {
   const [pledgeAmount, setPledgeAmount] = useState("")
-  const [showOnboarding, setShowOnboarding] = useState(false)
-
-  useEffect(() => {
-    setShowOnboarding(localStorage.getItem("favpoll_show_onboarding") === "1")
-  }, [])
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => localStorage.getItem("favpoll_show_onboarding") === "1"
+  )
 
   function handleHowItWorks() {
     localStorage.setItem("favpoll_show_onboarding", "1")
@@ -103,7 +101,7 @@ export function PreviewPanel({
       return <OnboardingPanel onHowItWorks={handleHowItWorks} />
     }
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2">
+      <div className="flex min-h-full flex-col items-center justify-center gap-2">
         <p className="text-sm text-muted-foreground">
           Select an occasion to begin.
         </p>
