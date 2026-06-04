@@ -15,46 +15,66 @@ export async function GET(
   const supabase = createAdminClient()
 
   // pledge_allocations has no event_poll_id — must join through pledges
-  const { data: pledges, error: pledgeErr } = await supabase
-    .from("pledges")
-    .select("id")
+  // Fetch all visible items in the poll
+  const { data: pollItems, error: pollItemsErr } = await supabase
+    .from("event_poll_items")
+    .select("topic_item_id, topic_items ( label )")
     .eq("event_poll_id", pollId)
+    .eq("is_hidden", false)
 
-  if (pledgeErr) {
-    return NextResponse.json({ error: pledgeErr.message }, { status: 500 })
+  if (pollItemsErr) {
+    return NextResponse.json({ error: pollItemsErr.message }, { status: 500 })
   }
 
-  const pledgeIds = (pledges ?? []).map((p) => p.id)
-  if (pledgeIds.length === 0) {
+  if (!pollItems || pollItems.length === 0) {
     return NextResponse.json({ results: [] })
   }
 
-  const { data: allocations, error: allocErr } = await supabase
-    .from("pledge_allocations")
-    .select("topic_item_id, amount, topic_items ( label )")
-    .in("pledge_id", pledgeIds)
-
-  if (allocErr) {
-    return NextResponse.json({ error: allocErr.message }, { status: 500 })
-  }
-
-  // Aggregate by topic item
-  const totals = new Map<string, { label: string; total: number }>()
-  for (const row of allocations ?? []) {
+  // Build a label map for all poll items
+  const labelMap = new Map<string, string>()
+  for (const row of pollItems) {
     const label = (row.topic_items as unknown as { label: string } | null)
       ?.label
-    if (!label) continue
-    const prev = totals.get(row.topic_item_id) ?? { label, total: 0 }
-    totals.set(row.topic_item_id, {
-      label,
-      total: prev.total + (row.amount ?? 0),
-    })
+    if (label) labelMap.set(row.topic_item_id, label)
   }
 
-  const sorted = [...totals.values()]
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 5)
+  // Aggregate pledged amounts
+  const { data: pledges } = await supabase
+    .from("pledges")
+    .select("id")
+    .eq("event_poll_id", pollId)
+    .is("withdrawn_at", null)
 
+  const pledgeIds = (pledges ?? []).map((p) => p.id)
+  const totals = new Map<string, number>()
+
+  if (pledgeIds.length > 0) {
+    const { data: allocations, error: allocErr } = await supabase
+      .from("pledge_allocations")
+      .select("topic_item_id, amount")
+      .in("pledge_id", pledgeIds)
+
+    if (allocErr) {
+      return NextResponse.json({ error: allocErr.message }, { status: 500 })
+    }
+
+    for (const row of allocations ?? []) {
+      totals.set(
+        row.topic_item_id,
+        (totals.get(row.topic_item_id) ?? 0) + (row.amount ?? 0)
+      )
+    }
+  }
+
+  // Merge: all poll items, using pledge totals where available
+  const merged = [...labelMap.entries()].map(([id, label]) => ({
+    label,
+    total: totals.get(id) ?? 0,
+  }))
+
+  const sorted = merged.sort(
+    (a, b) => b.total - a.total || a.label.localeCompare(b.label)
+  )
   const max = sorted[0]?.total ?? 0
 
   const results: PollResultItem[] = sorted.map((item) => ({

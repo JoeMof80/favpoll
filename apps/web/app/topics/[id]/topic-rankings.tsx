@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { RankingBar } from "@/components/ui/ranking-bar"
 import type { TopicItem } from "@favpoll/types"
 
 type RankingView = "amount" | "count"
@@ -69,10 +70,11 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
         </Tabs>
       </div>
 
-      <ol
+      <ul
+        role="list"
         aria-label={`${topicTitle} — the record`}
         aria-live="polite"
-        className="space-y-2"
+        className="space-y-2.5"
       >
         {sorted.map((item, i) => {
           const value =
@@ -81,50 +83,36 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
           const valueLabel =
             view === "amount"
               ? formatAmount(item.all_time_pledged)
-              : `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
+              : item.all_time_count > 0
+                ? `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
+                : "—"
 
           return (
             <li
               key={item.id}
-              className={`rounded-lg border bg-card px-4 py-3 ${i === 0 && hasActivity ? "border-primary/30" : "border-border"}`}
               aria-label={`${item.label}, ranked ${i + 1}, ${valueLabel}`}
             >
-              <div className="flex items-center gap-3">
-                <span
-                  className="w-6 shrink-0 text-right text-sm text-muted-foreground tabular-nums"
-                  aria-hidden="true"
-                >
-                  {i + 1}
-                </span>
-                {hasColourSwatch && (
-                  <span
-                    className="h-4 w-4 shrink-0 rounded-full border border-border/50"
-                    style={{ backgroundColor: item.label.toLowerCase() }}
-                    aria-hidden="true"
-                  />
-                )}
-                <span
-                  className={`flex-1 text-sm ${i === 0 && hasActivity ? "font-medium text-foreground" : "text-foreground"}`}
-                >
-                  {item.label}
-                </span>
-                <span className="text-sm text-muted-foreground tabular-nums">
-                  {valueLabel}
-                </span>
-              </div>
-              <div
-                className="mt-2 h-1 overflow-hidden rounded-full bg-muted"
-                role="presentation"
-              >
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-700"
-                  style={{ width: `${barWidth}%` }}
-                />
-              </div>
+              <RankingBar
+                label={item.label}
+                amount={valueLabel}
+                widthPercent={barWidth}
+                barStyle={{
+                  background: i === 0 && hasActivity ? "#534AB7" : "#AFA9EC",
+                }}
+                labelSuffix={
+                  hasColourSwatch ? (
+                    <span
+                      className="inline-block h-3 w-3 shrink-0 rounded-full border border-border/50"
+                      style={{ backgroundColor: item.label.toLowerCase() }}
+                      aria-hidden="true"
+                    />
+                  ) : undefined
+                }
+              />
             </li>
           )
         })}
-      </ol>
+      </ul>
 
       {sorted.length === 0 && (
         <p className="mt-8 text-center text-sm text-muted-foreground">

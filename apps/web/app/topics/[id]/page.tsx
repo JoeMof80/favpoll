@@ -50,7 +50,7 @@ export default async function TopicPage({ params }: Props) {
   const topItem = items[0]
 
   return (
-    <main className="mx-auto max-w-330 px-4 pt-10 pb-16">
+    <main className="mx-auto max-w-5xl px-4 pt-10 pb-16">
       <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/rankings" className="hover:text-foreground">
           Rankings
