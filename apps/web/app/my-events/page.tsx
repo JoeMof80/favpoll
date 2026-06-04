@@ -48,9 +48,7 @@ export default async function EventsPage() {
     total_raised: ev.total_raised,
     protagonist: { name: ev.protagonists.name },
     charities: ev.event_charities.map((ec) => ({ charity: ec.charities })),
-    poll: ev.event_polls[0]
-      ? { topic: ev.event_polls[0].topics }
-      : null,
+    poll: ev.event_polls[0] ? { topic: ev.event_polls[0].topics } : null,
   }))
 
   return (

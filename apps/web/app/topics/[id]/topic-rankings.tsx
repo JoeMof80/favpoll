@@ -88,12 +88,17 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
                 : "—"
 
           return (
-            <li key={item.id} aria-label={`${item.label}, ranked ${i + 1}, ${valueLabel}`}>
+            <li
+              key={item.id}
+              aria-label={`${item.label}, ranked ${i + 1}, ${valueLabel}`}
+            >
               <RankingBar
                 label={item.label}
                 amount={valueLabel}
                 widthPercent={barWidth}
-                barStyle={{ background: i === 0 && hasActivity ? "#534AB7" : "#AFA9EC" }}
+                barStyle={{
+                  background: i === 0 && hasActivity ? "#534AB7" : "#AFA9EC",
+                }}
                 labelSuffix={
                   hasColourSwatch ? (
                     <span

@@ -72,7 +72,9 @@ export async function GET(
     total: totals.get(id) ?? 0,
   }))
 
-  const sorted = merged.sort((a, b) => b.total - a.total || a.label.localeCompare(b.label))
+  const sorted = merged.sort(
+    (a, b) => b.total - a.total || a.label.localeCompare(b.label)
+  )
   const max = sorted[0]?.total ?? 0
 
   const results: PollResultItem[] = sorted.map((item) => ({

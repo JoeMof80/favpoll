@@ -103,7 +103,9 @@ export default async function LiveEventsPage() {
           const isFinite = rawPoll.topics?.is_finite ?? false
           const items = isFinite
             ? (rawPoll.topics?.topic_items ?? [])
-            : (rawPoll.event_poll_items ?? []).map((epi) => epi.topic_items).filter(Boolean)
+            : (rawPoll.event_poll_items ?? [])
+                .map((epi) => epi.topic_items)
+                .filter(Boolean)
           for (const item of items) {
             labelMap.set(item.id, item.label)
           }
@@ -113,7 +115,8 @@ export default async function LiveEventsPage() {
         // Merge: all poll items with totals (0 for unpledged items)
         for (const pollId of pledgedPollIds) {
           const totals = byPoll.get(pollId) ?? new Map<string, number>()
-          const labelMap = pollItemLabels.get(pollId) ?? new Map<string, string>()
+          const labelMap =
+            pollItemLabels.get(pollId) ?? new Map<string, string>()
 
           const merged = [...labelMap.entries()].map(([id, label]) => ({
             label,
