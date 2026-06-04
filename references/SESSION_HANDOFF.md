@@ -1,157 +1,112 @@
-# Session Handoff — 2026-06-03
+# Session Handoff — 2026-06-04
 
 ## Branch
 
-`main` — all PRs merged.
+`main` — all PRs merged through #32.
 
-## PRs merged this session
+## PRs merged (current state)
 
-| PR  | Title                                                               | Key change                                                                                                                                                                |
-| --- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #17 | refactor: extract TooltipIconButton and apply to PollHeading        | New `ui/tooltip-icon-button.tsx`; reset-pledge / view-results icon buttons on PollHeading; EventCard deduped                                                              |
-| #18 | fix: remove protagonist hint line from poll heading                 | `pledged` prop and `getPollHint` removed; reveal is the sole post-pledge disclosure mechanic                                                                              |
-| #19 | fix: hardcode date button width                                     | `CALENDAR_WIDTH = 220` in `date-time-picker.tsx`; removed callback-ref sync                                                                                               |
-| #20 | fix: remove charity counter from charity field                      | `{n/3}` counter span removed from `CharityField`                                                                                                                          |
-| #21 | fix: replace window.alert and inline alert with warning toasts      | `toast.warning()` with amber inline styles; `<Toaster>` in `app/layout.tsx`; sonner CSS variables approach does not work — must pass `style` directly on each call        |
-| #22 | feat: onboarding panel and form field labels                        | `OnboardingPanel` with Honour/Love/Charity sections; `isFirstTime` from events table query; localStorage flag for returning users; visible labels on all FormPanel fields |
-| #23 | feat: responsive layout, mobile picker UX, pledge panel draft state | See PR #23 notes below                                                                                                                                                    |
-| #24 | refactor: remove dead code across apps/web                          | See PR #24 notes below                                                                                                                                                    |
-| #25 | refactor: component cleanup, packages/ui extraction, form-panel decomposition | See PR #25 notes below                                                                                                                              |
-
-## PR #23 — what changed
-
-### Responsive layout
-
-- **Header**: converted to `"use client"`, hamburger menu on mobile (`md:hidden`), click-outside closes, all nav links hidden on mobile
-- **Event page** (`app/events/[id]/page.tsx`): `px-4 py-6 md:p-16` padding; `pb-24` bottom padding
-- **Event content grid**: `md:grid-cols-[1fr_300px]` (was `lg:`)
-- **Topics page**: same grid change `md:` (was `lg:`)
-- **Event subheader**: `style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}` on bottom bar
-
-### Event form — mobile
-
-- Left panel: full-width on mobile, `md:w-105` on desktop
-- Right preview panel: `hidden md:flex` (stays in DOM for useWatch, hidden visually on mobile)
-- New `onboarding-interstitial.tsx`: mobile-only full-screen overlay (fixed inset-0) shown to first-time organisers instead of the split-panel preview. "How favpoll works →" link re-shows it. Dismissed via localStorage `favpoll_show_onboarding = '0'`.
-- Bottom bar: `paddingBottom: max(1rem, env(safe-area-inset-bottom))`
-
-### Pledge panel rewrite (`pledge-panel.tsx`)
-
-- **Draft state**: `draftIds` initialised from `selectedIds` on open, committed to `selectedIds` on Done, discarded on close/sheet-dismiss
-- **Sheet (mobile) + Dialog (desktop)**: separate `sheetOpen`/`dialogOpen` states. The picker overlay approach was superseded by this pattern — the Sheet/Dialog provides natural focus containment on both platforms without a custom overlay.
-- **Item chips + input inline**: chips and search input in a single `flex-wrap` container; input collapses to `w-0` when items are selected (prevents iOS keyboard on tap)
-- **Backspace to deselect**: when input is empty and items selected, Backspace/Delete removes last chip
-- **Placeholder hidden** when items are selected
-- **Size `lg`** on all chips in picker and trigger; Done buttons `h-11 w-full text-base`
-- **`topicTitle` prop** for contextual placeholder: `Search for your favourite [topic]…`
-- `onOpenAutoFocus`: only `e.preventDefault()` — no auto-focus to avoid keyboard obscuring sheet
-
-### Pledge card visibility (`event-content/`)
-
-- `pollView` state in `useEventContent` initialised from `hasPledged || isClosed`
-- `PollSection` fires `onViewChange` on mount (initial view) and on every view transition
-- `showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`
-- No `!hasPledged` check — Reset Pledge correctly re-shows the card for previously-pledged users
-- `pledgeConfirmed` hides immediately on submit; `router.refresh()` then updates `hasPledged` from server
-
-### Charity carousel
-
-- `EventCardCharityCarousel` moved outside the grid to a `fixed bottom-0` bar (`md:hidden`)
-- Always visible on mobile regardless of pledge/results state
-- `paddingBottom: max(0.75rem, env(safe-area-inset-bottom))`
-
-### Bug fixes
-
-- **Reveal not saving on edit**: `event-form-v2/index.tsx` had `reveal: null` hardcoded; fixed to `reveal: values.reveal || null`
-- **Topic items deleted on edit**: `upsertPollForEvent` in `edit/actions.ts` now checks if `topic_id` actually changed before deleting and re-inserting `event_poll_items`
-- **iOS zoom**: `font-size: max(16px, 1em)` globally on `input, textarea, select` in `globals.css`; all `text-sm` changed to `text-base` on pledge card inputs
-- **Chip truncation**: added `min-w-0 shrink whitespace-normal` to `chip.tsx` base class
-
-### New files
-
-- `components/event-form-v2/onboarding-interstitial.tsx` — mobile-only full-screen onboarding overlay
-- `components/ui/sheet.tsx` — shadcn Sheet component (SlideOver drawer, mobile picker)
-
-## PR #24 — what changed
-
-Dead code audit and removal. Full detail in `dead-code-summary.txt` at repo root.
-
-### Files deleted
-
-- `components/canvas/inline-option-input.tsx` — no importers after EventCanvas removal
-- `components/home-carousel.tsx` — no importers
-- `components/favpoll-card/poll-framing.tsx` — no importers
-
-### Exports removed
-
-- `lib/display.ts`: `occasionLabel` (legacy slugs), `getPollHint` (retired PR #18)
-- `lib/occasions.ts`: `OCCASIONS`, `OCCASION_LABELS`, `NAME_LABELS`, `DESCRIPTION_LABELS`, `TOPIC_REVEAL_PLACEHOLDERS`, `getAboutPlaceholder`
-
-### Types deleted
-
-- `packages/types/index.ts`: `CanvasPoll`, `CanvasInitialData` — legacy EventCanvas types, no references in either app
-
-### Dependency removed
-
-- `date-fns` from `apps/web/package.json` — no direct imports; resolved transitively via react-day-picker
-
-### Still live — do not touch
-
-- `protagonistFirstName` on `PollHeading` — used in poll-section, preview-panel, favpoll-poll, poll-reveal
-- `previewSuffix` — drives Eye/EyeOff toggle in preview panel
-- `showReveal` — drives reveal display in preview-panel and hero-demo-panel
-- `CanvasPollInput`, `CanvasSubmitData` — used by event-form-v2 and edit actions
-- `suggestClosingDate` / `CLOSING_DEFAULTS` — tested, no production caller yet; retained
-- `ordinal` / `formatRelativeDate` / `formatEventDate` — tested utilities; retained
-
-## PR #25 — what changed
-
-### Phase 2a — Dead files deleted
-
-- `components/pot-banner.tsx`
-- `components/ui/toggle.tsx`
-- `components/favpoll-card/favpoll-card.tsx`, `favpoll-poll.tsx`, `favpoll-pledge-panel.tsx`, `favpoll-shared-fund.tsx`, `favpoll-charity-row.tsx`
-- `components/favpoll-card/stories/favpoll-card.stories.tsx`, `event-page.stories.tsx`
-- **Not deleted**: `ui/dropdown-menu.tsx` had a live importer (`menu-button.tsx`); `ui/label.tsx` used by `ui/form.tsx` and `ui/field.tsx`
-- **Post-merge note**: `ui/dropdown-menu.tsx` is now genuinely unused — `menu-button.tsx` was replaced by `@favpoll/ui/MenuButton` (plain button, no dropdown)
-
-### Phase 2b — Component decomposition
-
-- `ProtagonistAvatar` extracted from `event-hero.tsx` → `event-hero-avatar.tsx` + story (3 variants)
-- `EmptyPollAlert` extracted from `poll-section/index.tsx` → `poll-section/empty-poll-alert.tsx` + story
-- `StepSection` + `CounterWhenTyping` extracted → `event-form-v2/step-section.tsx`
-- `form-panel.tsx` (630 lines) split into `steps/step-occasion.tsx`, `steps/step-profile.tsx`, `steps/step-topic.tsx`, `steps/step-reveal.tsx`, `steps/step-event.tsx`; `form-panel.tsx` is now a ~70-line thin shell
-- Each step file uses `useFormContext<EventFormValues>()` internally; `StepProfile` owns `cropSrc`/`fileInputRef` photo state; `StepReveal` owns the `useEffect` clearing reveal when topic cleared
-
-### Phase 2c — `packages/ui` extraction
-
-- `packages/ui/` created: `ThemeProvider` (identical between apps) and `MenuButton` (plain button variant from admin — no shadcn `DropdownMenu` dependency)
-- Both `apps/web` and `apps/admin` now import `ThemeProvider` and `MenuButton` from `@favpoll/ui`
-- Duplicate `components/theme-provider.tsx` and `components/menu-button.tsx` deleted from both apps
-- `packages/ui/package.json` has `@types/react` as devDependency + `tsconfig.json` for CI type resolution
-
-### Phase 2d — Storybook
-
-- `components/ui/tooltip-icon-button.stories.tsx` added (was the only missing story)
-- New stories: `event-hero-avatar.stories.tsx`, `poll-section/empty-poll-alert.stories.tsx`
+| PR  | Title                                                                        | Key change                                                                       |
+| --- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| #17 | refactor: extract TooltipIconButton                                          | `ui/tooltip-icon-button.tsx`; reset-pledge / view-results icon buttons           |
+| #18 | fix: remove protagonist hint line from poll heading                          | `pledged` prop and `getPollHint` removed                                         |
+| #19 | fix: hardcode date button width                                              | `CALENDAR_WIDTH = 220` in `date-time-picker.tsx`                                 |
+| #20 | fix: remove charity counter from charity field                               | `{n/3}` counter span removed                                                     |
+| #21 | fix: replace window.alert and inline alert with warning toasts               | `toast.warning()` with inline styles; sonner CSS variables don't work            |
+| #22 | feat: onboarding panel and form field labels                                 | `OnboardingPanel`; `isFirstTime` from events table; localStorage flag           |
+| #23 | feat: responsive layout, mobile picker UX, pledge panel draft state          | Header hamburger, Sheet+Dialog pledge panel, mobile form interstitial             |
+| #24 | refactor: remove dead code across apps/web                                   | Deleted canvas, home-carousel, poll-framing, legacy lib exports                  |
+| #25 | refactor: component cleanup, packages/ui extraction, form-panel decomposition | `packages/ui` for ThemeProvider+MenuButton; form-panel split into step files     |
+| #26 | docs: update session handoff and component tree for PR #25                   | Reference docs updated                                                            |
+| #27 | refactor: delete poll-options and dropdown-menu (zero importers)             | `poll-options.tsx` and `ui/dropdown-menu.tsx` deleted                            |
+| #28 | test: add unit tests for display utilities, event form schema, pledge hook   | New test files for `lib/display.ts`, `schema.ts`, `use-event-card-pledge.ts`     |
+| #29 | fix: correct review_status 'pending' → 'pending_review' throughout           | Migration + code aligned; contributions queue now reliable                        |
+| #30 | fix: onboarding panel height, alignment, and tsconfig deprecation            | Onboarding panel layout fixes; tsconfig `moduleResolution` updated                |
+| #31 | feat: add seed-events script for scale testing                               | `scripts/seed-events.ts` — 40 events, idempotent, staging-safety guard           |
+| #32 | feat: EventSummaryCard, rankings polish, and event card improvements         | See PR #32 notes below                                                            |
 
 ---
 
-## Decisions locked in (additions from this session)
+## PR #32 — what changed
 
-- **Picker overlay superseded.** The planned dark overlay behind open picker fields was not built. The Sheet (mobile) + Dialog (desktop) pattern in `pledge-panel.tsx` provides equivalent focus containment natively. Do not add a custom overlay to picker fields without explicit instruction.
+### New component: `EventSummaryCard`
 
-- **Reveal must never be hardcoded to null on edit.** Pass `values.reveal || null` in the edit action. Hardcoding `reveal: null` silently deletes the organiser's reveal on every edit save.
+`apps/web/components/event-summary-card.tsx` — compact read-only card with no pledge UI.
 
-- **`upsertPollForEvent` must check topic_id before deleting poll items.** Only delete and re-insert `event_poll_items` if `topic_id` has actually changed. Unconditional delete loses all organiser-added items on every edit save.
+- Three sections: `FavpollHeader` (protagonist + opening_line eyebrow), `Countdown` + `PollTitle` (topic title + poll closes), `EventCardCharityCarousel` (charity row)
+- Entire card is a `<Link href="/events/[id]">` — no interactive elements inside
+- Wrapped in `FavpollCardProvider value={{ size: "full" }}` so `EventCardCharityCarousel` sizes correctly
+- `EventSummaryCardEvent` type exported for use in pages and carousel
 
-- **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout.
+### Landing page carousel
 
-- **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Do not set `text-sm` or smaller on any focusable input element.
+`apps/web/components/live-events-carousel.tsx` now accepts `EventSummaryCardEvent[]` and renders `EventSummaryCard` per slide (was `EventCard`). Carousel structure preserved (Embla + Autoplay + prev/next buttons).
 
-- **`packages/ui` uses plain button for `MenuButton`.** The web app's `DropdownMenu`-based version was superseded by the simpler admin version. `ui/dropdown-menu` is now unused in `apps/web`.
+### Your Events page (`/my-events`)
 
-- **`form-panel.tsx` is a thin shell.** Each step is a self-contained component using `useFormContext`. Do not put form logic back into `form-panel.tsx` — add it to the relevant step file.
+`apps/web/app/my-events/page.tsx` now renders a 4-column responsive grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`) of `EventSummaryCard`. Query updated to include `logo_url` and `registered_number` for the charity carousel.
+
+### EventCard — multi-select pledge panel
+
+`apps/web/components/event-card.tsx`: replaced `PickerField` with `PledgePanel` (Sheet/Dialog pattern, consistent with the event page pledge flow).
+
+`apps/web/components/event-card/use-event-card-pledge.ts`: refactored from single-item (`selectedItemId`/`selectItem`) to multi-item (`selectedIds`/`setSelectedIds`). `onPaymentSuccess` computes equal-split `pledge_allocations` across all selected items.
+
+### Charity carousel overflow fix
+
+Moved charity `<div>` inside the bordered card container `<div>` in `event-card.tsx`. It was outside, causing the charity row to bleed into the next CSS grid row.
+
+### Poll results — all items shown
+
+`apps/web/app/api/polls/[pollId]/results/route.ts`: now fetches all visible `event_poll_items` first, merges pledge totals in JS, and returns 0-value items. No more `slice(0,5)`. Excludes withdrawn pledges.
+
+`apps/web/app/events/page.tsx`: `initialResults` computation updated to include all poll items (not just pledged ones), using poll items from already-fetched event data.
+
+`apps/web/components/event-card/event-card-results.tsx`: delegates to `PollResults` component; 0-value items display `"—"`. Wrapped in `max-h-48 overflow-y-auto` scroll container.
+
+### RankingBar used throughout
+
+`apps/web/app/topics/[id]/topic-rankings.tsx`: replaced bordered `<li>` card rows with `RankingBar`.
+
+`apps/web/components/display-screen/index.tsx`: `DisplayRankingRow` now uses `RankingBar` internally, keeping the animated `translateY` wrapper for live re-ranking.
+
+---
+
+## Staging DB notes
+
+- Staging Supabase ref: `eotqyintgusvzidymumb`
+- `apps/web/.env.local` points to **production**; root `.env.local` points to **staging**
+- **Canonical seed-events command** (always loads root env → staging):
+  ```
+  cd apps/web && pnpm exec tsx ../../scripts/seed-events.ts --env-file=../../.env.local
+  ```
+  Or from repo root: `pnpm --filter @favpoll/web exec tsx ../../scripts/seed-events.ts`
+- `ALLOW_EVENT_SEED=1` **must only be used after explicitly confirming** the loaded `NEXT_PUBLIC_SUPABASE_URL` contains `eotqyintgusvzidymumb`. It is the bypass for the staging-ref guard — not a casual alternative to the explicit env load.
+- Schema lag resolved: `guest_email`, `guest_token`, `withdrawn_at`, `pot_allocation_id` on `pledges` are now captured in migration `20260604120000_add_guest_pledge_columns.sql`. Applied to staging manually; **production needs this migration run** (see migration file for SQL).
+
+---
+
+## Tests
+
+481 passing (51 test files).
+
+---
+
+## Decisions locked in (additions from PRs #27–#32)
+
+- **`review_status` values are `'pending_review'`** (not `'pending'`). Migration #29 aligned all code and existing rows. The contributions queue now reliably shows pending items. Do not use `'pending'` anywhere.
+
+- **`poll-options.tsx` and `ui/dropdown-menu.tsx` are deleted.** Both had zero importers after PR #25. Do not reintroduce.
+
+- **EventCard uses PledgePanel (Sheet+Dialog), not PickerField.** Consistent with the event page pledge flow. Multi-item selection with equal-split allocations.
+
+- **Poll results always include all visible items.** Even 0-value items are returned by the API and shown in `EventCardResults`. `widthPercent` is 0 for items with no pledges; amount displayed as `"—"`.
+
+- **EventSummaryCard is the read-only listing card.** Used on the landing page carousel and `/my-events` grid. `EventCard` (with pledge UI) remains for the `/events` listing page only.
+
+- **RankingBar is the canonical ranking row component.** Used in EventCardResults (via PollResults), topic rankings page, and display screen. Do not build custom ranking rows.
+
+- **`scripts/seed-events.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_EVENTS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from events where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots).
 
 ---
 
@@ -173,25 +128,10 @@ was arrived at deliberately.
 
 ---
 
-## Tests
-
-442 passing (448 − 6 story-based test cases removed with the deleted favpoll-card stories).
-
----
-
-## Standing instruction for Claude Code
-
-> **Do not commit or push any changes. Make all changes locally so the developer can review them in VS Code before committing.**
-
-This applies to every task, every session, without exception.
-
----
-
 ## Outstanding TODO
 
 - **"How favpoll works" page** — `OnboardingPanel` footer link has no destination; a `/how-it-works` or `/about` page needs building
 - **Copyright review** — Mary Poppins example copy; review before public launch
-- **`review_status` inconsistency** — `addGuestItem` and `addOrganizerItem` use `'pending'`; schema docs and `acceptContribution` reference `'pending_review'`; needs a migration to align before contributions queue is relied upon
 - **Stripe Connect** — disbursement not wired; cron has placeholder; Connect application pending approval
 - **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` blank in Vercel
 - **Clerk production keys** — using `pk_test_` until `favpoll.com` DNS pointed at app
@@ -199,7 +139,6 @@ This applies to every task, every session, without exception.
 - **Event oversight admin page** — `/events` in admin is a shell only
 - **Email templates** — currently plain text via Resend
 - **Rate limiting** on API routes
-- **`ui/dropdown-menu.tsx`** — now unused (no importers after MenuButton moved to packages/ui); safe to delete
 - **Guest returning-visitor detection** — pledge detection only works for authenticated users server-side
 - **Upload a list of items** — future TODO for infinite topic seeding
 - **Localisation next steps** — `next-intl`, string extraction, US market prep

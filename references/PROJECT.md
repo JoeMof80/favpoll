@@ -245,6 +245,7 @@ item_flags (
 20260527000001_rename_occasion_label_to_opening_line.sql  -- events.occasion_label → opening_line
 20260527000002_restore_topic_item_display_order.sql    -- topic_items.display_order integer nullable
 20260604000000_fix_review_status_pending.sql           -- corrects review_status 'pending' → 'pending_review' for existing rows
+20260604120000_add_guest_pledge_columns.sql            -- guest_email, guest_token, withdrawn_at, pot_allocation_id on pledges; re-adds pledges_identity_check
 ```
 
 ---
@@ -405,7 +406,7 @@ components/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
 │   ├── poll-title.tsx, poll-reveal.tsx
-│   ├── poll-options.tsx, poll-results.tsx, favpoll-card.tsx
+│   ├── poll-results.tsx
 ├── poll-section/
 │   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
 │   ├── use-poll-section.ts   -- fires onViewChange on mount (initial view) and all view transitions
@@ -420,12 +421,12 @@ components/
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
 │   └── event-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
+├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + PollTitle + EventCardCharityCarousel. Used on landing carousel and /my-events grid.
 ├── live-events-carousel.tsx
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes
 ├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
 ├── stripe-checkout.tsx, pot-banner.tsx
-└── theme-provider.tsx, menu-button.tsx  -- TODO: move to packages/ui/
 
 lib/
 ├── occasions.ts                  -- OCCASION_LIST, OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS, DATE_LABEL_PLACEHOLDERS, shortTopicLabel, suggestClosingDate
@@ -447,7 +448,9 @@ __mocks__/
 
 messages/en-GB.json
 packages/types/index.ts           -- All domain types (@favpoll/types)
+packages/ui/                      -- @favpoll/ui: ThemeProvider + MenuButton (shared between apps/web and apps/admin)
 scripts/seed.ts                   -- pnpm seed — additive, idempotent
+scripts/seed-events.ts            -- scale-test seed: generates 40 events across all occasions/topics. Run with ALLOW_EVENT_SEED=1 or against a staging URL.
 ```
 
 ### apps/admin
@@ -467,9 +470,7 @@ components/
 ├── sidebar.tsx
 ├── occasion-editor.tsx
 ├── display-order-editor.tsx      -- Per-item number inputs for finite topic display_order; shown above OccasionEditor
-├── charity-list.tsx
-├── theme-provider.tsx            -- TODO: move to packages/ui/
-└── menu-button.tsx               -- TODO: move to packages/ui/
+└── charity-list.tsx
 
 lib/
 ├── supabase/admin.ts             -- createAdminClient() — service role, bypasses RLS
@@ -544,7 +545,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 467 web, ~22 admin. (467 includes 12 new cases added for `hasPledged` in `use-event-content.test.ts`.)
+All tests must pass before committing. Current counts: 481 web, ~22 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -636,6 +637,8 @@ NEXT_PUBLIC_BASE_URL
 
 - **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Inputs below 16px font size trigger iOS auto-zoom. Do not set `text-sm` or smaller on any focusable input element.
 
+- **`scripts/seed-events.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_EVENTS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from events where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots).
+
 ---
 
 ## Outstanding TODO
@@ -647,6 +650,5 @@ NEXT_PUBLIC_BASE_URL
 - **Event oversight admin page** — `/events` in admin app is a shell only.
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
-- **`theme-provider.tsx` and `menu-button.tsx`** — duplicated in apps/web and apps/admin. TODO: extract to `packages/ui/`.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep.
 - **Mobile app** — future.
