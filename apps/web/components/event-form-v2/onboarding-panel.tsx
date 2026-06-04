@@ -65,7 +65,7 @@ export function OnboardingPanel({
 
       <section
         aria-labelledby="section-honour"
-        className="grid gap-8 md:grid-cols-2"
+        className="grid items-start gap-8 md:grid-cols-2"
       >
         <div className="space-y-2">
           <SectionEyebrow>HONOUR</SectionEyebrow>
@@ -103,10 +103,10 @@ export function OnboardingPanel({
           </MockFieldGroup>
           <MockFieldGroup label="About">
             <div className="rounded-lg border border-[#D3D1C7] bg-white px-3 py-2 text-sm leading-relaxed">
-              She arrived by umbrella when the wind changed, with a cheery
-              disposition, rosy cheeks, and a surprising number of favourite
-              things. She knows what helps the medicine go down at Great Ormond
-              Street.
+              Mary arrived by umbrella when the wind changed, with a cheery
+              disposition and rosy cheeks. She has a surprising number of
+              favourite things and helps the medicine go down at Great Ormond
+              Street Hospital.
             </div>
           </MockFieldGroup>
           <MockFieldGroup label="Context">
@@ -125,7 +125,7 @@ export function OnboardingPanel({
 
       <section
         aria-labelledby="section-love"
-        className="grid gap-8 md:grid-cols-2"
+        className="grid items-start gap-8 md:grid-cols-2"
       >
         <div className="space-y-2">
           <SectionEyebrow>LOVE</SectionEyebrow>
@@ -158,7 +158,7 @@ export function OnboardingPanel({
 
       <section
         aria-labelledby="section-charity"
-        className="grid gap-8 md:grid-cols-2"
+        className="grid items-start gap-8 md:grid-cols-2"
       >
         <div className="space-y-2">
           <SectionEyebrow>CHARITY</SectionEyebrow>
