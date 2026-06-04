@@ -17,10 +17,7 @@ type Options = {
 }
 
 export function useEventCardPledge({ pollId, initialResults }: Options) {
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [selectedItemLabel, setSelectedItemLabel] = useState<string | null>(
-    null
-  )
+  const [selectedIds, setSelectedIdsState] = useState<string[]>([])
   const [amount, setAmount] = useState<number | null>(null) // pounds
   const [step, setStep] = useState<CardStep>(
     initialResults ? "pledged" : "idle"
@@ -31,20 +28,19 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
   )
   const [error, setError] = useState<string | null>(null)
 
-  function selectItem(id: string, label: string) {
-    setSelectedItemId(id)
-    setSelectedItemLabel(label)
-    // Picker closes; move to ready if amount is already set
-    setStep(amount !== null ? "ready" : "idle")
+  function setSelectedIds(ids: string[]) {
+    setSelectedIdsState(ids)
+    setStep(ids.length > 0 && amount !== null && amount > 0 ? "ready" : "idle")
   }
 
   function selectAmount(pounds: number) {
     setAmount(pounds)
-    if (selectedItemId !== null) setStep("ready")
+    if (selectedIds.length > 0 && pounds > 0) setStep("ready")
+    else if (step === "ready") setStep("idle")
   }
 
   async function initPayment() {
-    if (selectedItemId === null || amount === null) return
+    if (selectedIds.length === 0 || amount === null) return
     setError(null)
     try {
       const res = await fetch("/api/stripe/payment-intent", {
@@ -69,14 +65,24 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
   }
 
   async function onPaymentSuccess() {
-    if (selectedItemId === null || amount === null) return
+    if (selectedIds.length === 0 || amount === null) return
+
+    const equal = Math.floor(100 / selectedIds.length)
+    const remainder = 100 - equal * selectedIds.length
+    const allocations = selectedIds.map((id, idx) => ({
+      topicItemId: id,
+      amount:
+        Math.round(
+          ((amount * (idx === 0 ? equal + remainder : equal)) / 100) * 100
+        ) / 100,
+    }))
 
     try {
       await createPledge({
         eventPollId: pollId,
         potAllocationId: null,
         totalAmount: amount,
-        allocations: [{ topicItemId: selectedItemId, amount }],
+        allocations,
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")
@@ -112,8 +118,7 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
   }
 
   function resetPledge() {
-    setSelectedItemId(null)
-    setSelectedItemLabel(null)
+    setSelectedIdsState([])
     setAmount(null)
     setStep("idle")
     setClientSecret(null)
@@ -121,14 +126,13 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
   }
 
   return {
-    selectedItemId,
-    selectedItemLabel,
+    selectedIds,
+    setSelectedIds,
     amount,
     step,
     clientSecret,
     results,
     error,
-    selectItem,
     selectAmount,
     initPayment,
     onPaymentSuccess,

@@ -1,4 +1,4 @@
-import { RankingBar } from "@/components/ui/ranking-bar"
+import { PollResults } from "@/components/favpoll-card/poll-results"
 import { formatCurrency } from "@/lib/i18n"
 import type { CardResultItem } from "./use-event-card-pledge"
 
@@ -7,20 +7,15 @@ type Props = {
 }
 
 export function EventCardResults({ results }: Props) {
+  const pollResults = results.map((item) => ({
+    label: item.label,
+    amount: item.amountPence > 0 ? formatCurrency(item.amountPence) : "—",
+    widthPercent: item.widthPercent,
+  }))
+
   return (
-    <div className="space-y-2.5">
-      <ol role="list" aria-label="Results" className="space-y-2">
-        {results.map((item, i) => (
-          <li key={item.label}>
-            <RankingBar
-              label={item.label}
-              amount={formatCurrency(item.amountPence)}
-              widthPercent={item.widthPercent}
-              barStyle={{ background: i === 0 ? "#534AB7" : "#AFA9EC" }}
-            />
-          </li>
-        ))}
-      </ol>
+    <div className="max-h-48 overflow-y-auto">
+      <PollResults results={pollResults} />
     </div>
   )
 }

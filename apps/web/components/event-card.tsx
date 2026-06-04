@@ -3,10 +3,9 @@
 import Link from "next/link"
 import { Gift, ChartBarDecreasing } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { formatCurrency } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
-import { PickerField } from "@/components/ui/picker-field"
+import { PledgePanel } from "@/components/pledge-panel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import { FavpollCardProvider } from "./favpoll-card/favpoll-card-context"
 import type { FavpollCardSize } from "./favpoll-card/types"
@@ -17,7 +16,7 @@ import { useEventCardPledge } from "./event-card/use-event-card-pledge"
 import { EventCardResults } from "./event-card/event-card-results"
 import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
 import type { CardResultItem } from "./event-card/use-event-card-pledge"
-import type { Charity } from "@favpoll/types"
+import type { Charity, TopicItem } from "@favpoll/types"
 import { AmountInput } from "./pledge-card/amount-input"
 
 type EventCardEvent = {
@@ -47,16 +46,6 @@ type Props = {
 
 const PRESET_AMOUNTS = [5, 10, 20, 50]
 
-function buildDisplayValue(
-  label: string | null,
-  amount: number | null
-): string | null {
-  if (!label) return null
-  const base = `${label} • 100%`
-  if (amount === null) return base
-  return `${base} • ${formatCurrency(amount * 100)}`
-}
-
 export function EventCard({
   size = "full",
   event,
@@ -65,19 +54,18 @@ export function EventCard({
 }: Props) {
   const poll = event.poll
   const topicTitle = poll?.topic?.title ?? ""
-  const topicItems = poll?.topic?.topic_items ?? []
+  const topicItems = (poll?.topic?.topic_items ?? []) as TopicItem[]
   const perCharity =
     event.charities.length > 0 ? event.total_raised / event.charities.length : 0
 
   const {
-    selectedItemId,
-    selectedItemLabel,
+    selectedIds,
+    setSelectedIds,
     amount,
     step,
     clientSecret,
     results,
     error,
-    selectItem,
     selectAmount,
     initPayment,
     onPaymentSuccess,
@@ -88,12 +76,6 @@ export function EventCard({
     pollId: poll?.id ?? "",
     initialResults,
   })
-
-  const pickerItems = topicItems.map((item) => ({
-    id: item.id,
-    label: item.label,
-  }))
-  const displayValue = buildDisplayValue(selectedItemLabel, amount)
 
   return (
     <FavpollCardProvider value={{ size }}>
@@ -153,17 +135,11 @@ export function EventCard({
             <div className="px-5 pb-5">
               {step !== "pledged" ? (
                 <div className="space-y-2">
-                  <PickerField
-                    items={pickerItems}
-                    selectedIds={selectedItemId ? [selectedItemId] : []}
-                    onToggle={(id) => {
-                      const item = topicItems.find((i) => i.id === id)
-                      if (item) selectItem(id, item.label)
-                    }}
-                    displayValue={displayValue}
-                    placeholder="Select favourites…"
-                    closeOnSelect
-                    popoverLabel={topicTitle}
+                  <PledgePanel
+                    items={topicItems}
+                    totalAmount={amount !== null ? String(amount) : ""}
+                    onSelectionsChange={setSelectedIds}
+                    topicTitle={topicTitle}
                   />
 
                   <AmountInput
@@ -206,16 +182,17 @@ export function EventCard({
               </Link>
             </div>
           )}
+
+          {/* Charity footer — inside the card so it doesn't overflow the grid cell */}
+          {event.charities.length > 0 && (
+            <div className="mt-auto border-t border-border px-4 py-3">
+              <EventCardCharityCarousel
+                charities={event.charities}
+                perCharity={perCharity}
+              />
+            </div>
+          )}
         </div>
-        {/* Footer — charity carousel */}
-        {event.charities.length > 0 && (
-          <div className="mt-auto border-t border-border px-4 py-3">
-            <EventCardCharityCarousel
-              charities={event.charities}
-              perCharity={perCharity}
-            />
-          </div>
-        )}
 
         {/* Stripe payment modal */}
         {step === "paying" && clientSecret && (

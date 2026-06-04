@@ -5,13 +5,11 @@ import Autoplay from "embla-carousel-autoplay"
 import { useCallback, useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { EventCard } from "@/components/event-card"
-import type { ComponentProps } from "react"
-
-type EventCardEvent = ComponentProps<typeof EventCard>["event"]
+import { EventSummaryCard } from "@/components/event-summary-card"
+import type { EventSummaryCardEvent } from "@/components/event-summary-card"
 
 type Props = {
-  events: EventCardEvent[]
+  events: EventSummaryCardEvent[]
 }
 
 export function LiveEventsCarousel({ events }: Props) {
@@ -45,7 +43,9 @@ export function LiveEventsCarousel({ events }: Props) {
       <div className="overflow-hidden" ref={emblaRef}>
         <ul className="flex gap-4" role="list">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} className="w-80 shrink-0" />
+            <li key={event.id} className="w-80 shrink-0 list-none">
+              <EventSummaryCard event={event} className="h-full" />
+            </li>
           ))}
         </ul>
       </div>

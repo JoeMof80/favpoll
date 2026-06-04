@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useRankingItems } from "@/components/ranking-list/use-ranking-items"
 import { formatAmount } from "@/components/ranking-list/utils"
 import { getEventHeadline } from "@/lib/display"
+import { RankingBar } from "@/components/ui/ranking-bar"
 import type { TopicItem } from "@favpoll/types"
 
 const BRAND = "#534AB7"
@@ -39,56 +40,40 @@ function DisplayRankingRow({
   item,
   isColorTopic,
   maxPledged,
+  isFirst,
   style,
 }: {
   item: TopicItem & { rank: number }
   isColorTopic: boolean
   maxPledged: number
+  isFirst: boolean
   style?: React.CSSProperties
 }) {
   const barWidth =
     maxPledged > 0 ? (item.all_time_pledged / maxPledged) * 100 : 0
   const amountStr = formatAmount(item.all_time_pledged)
-  const pledgeStr = `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
 
   return (
     <li
-      aria-label={`${item.label}, rank ${item.rank}, ${amountStr} · ${pledgeStr}`}
+      aria-label={`${item.label}, rank ${item.rank}, ${amountStr}`}
       className="absolute w-full transition-transform duration-500 ease-in-out"
       style={style}
     >
-      <div className="flex items-center gap-3 pb-1">
-        <span
-          className="w-5 shrink-0 text-right text-sm font-medium tabular-nums"
-          style={{ color: item.rank === 1 ? "#C09B2E" : undefined }}
-          aria-hidden="true"
-        >
-          {item.rank}
-        </span>
-        {isColorTopic && (
-          <span
-            className="h-4 w-4 shrink-0 rounded-full border border-black/10"
-            style={{ backgroundColor: item.label.toLowerCase() }}
-            aria-hidden="true"
-          />
-        )}
-        <span className="flex-1 truncate text-base text-foreground">
-          {item.label}
-        </span>
-        <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
-          {amountStr} · {pledgeStr}
-        </span>
-      </div>
-      <div
-        className="ml-8 h-2 w-full overflow-hidden rounded-full bg-muted"
-        role="presentation"
-      >
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${barWidth}%`, backgroundColor: BRAND }}
-          aria-hidden="true"
-        />
-      </div>
+      <RankingBar
+        label={item.label}
+        amount={amountStr}
+        widthPercent={barWidth}
+        barStyle={{ background: isFirst ? BRAND : "#AFA9EC" }}
+        labelSuffix={
+          isColorTopic ? (
+            <span
+              className="inline-block h-3 w-3 shrink-0 rounded-full border border-black/10"
+              style={{ backgroundColor: item.label.toLowerCase() }}
+              aria-hidden="true"
+            />
+          ) : undefined
+        }
+      />
     </li>
   )
 }
@@ -139,6 +124,7 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
             item={item}
             isColorTopic={isColorTopic}
             maxPledged={maxValue}
+            isFirst={item.rank === 1}
             style={{
               transform: `translateY(${(item.rank - 1) * ROW_HEIGHT}px)`,
             }}

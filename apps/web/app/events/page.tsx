@@ -73,7 +73,7 @@ export default async function LiveEventsPage() {
         const pledgeIds = (pledges ?? []).map((p) => p.id)
         const { data: allocations } = await supabase
           .from("pledge_allocations")
-          .select("pledge_id, topic_item_id, amount, topic_items ( label )")
+          .select("pledge_id, topic_item_id, amount")
           .in("pledge_id", pledgeIds)
 
         // Map pledge_id → event_poll_id for grouping
@@ -81,30 +81,48 @@ export default async function LiveEventsPage() {
           (pledges ?? []).map((p) => [p.id, p.event_poll_id as string])
         )
 
-        // Aggregate by poll → topic item
-        type PollTotals = Map<string, { label: string; total: number }>
-        const byPoll = new Map<string, PollTotals>()
-
+        // Aggregate pledge totals by poll → topic_item_id
+        const byPoll = new Map<string, Map<string, number>>()
         for (const row of allocations ?? []) {
           const pollId = pledgeToPoll.get(row.pledge_id)
           if (!pollId) continue
-          const label = (row.topic_items as unknown as { label: string } | null)
-            ?.label
-          if (!label) continue
-
           if (!byPoll.has(pollId)) byPoll.set(pollId, new Map())
           const totals = byPoll.get(pollId)!
-          const prev = totals.get(row.topic_item_id) ?? { label, total: 0 }
-          totals.set(row.topic_item_id, {
-            label,
-            total: prev.total + (row.amount ?? 0),
-          })
+          totals.set(
+            row.topic_item_id,
+            (totals.get(row.topic_item_id) ?? 0) + (row.amount ?? 0)
+          )
         }
 
-        for (const [pollId, totals] of byPoll) {
-          const sorted = [...totals.values()]
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 5)
+        // Build a label map for every poll item from the already-fetched event data
+        const pollItemLabels = new Map<string, Map<string, string>>()
+        for (const ev of (events ?? []) as unknown as RawEvent[]) {
+          const rawPoll = ev.event_polls
+          if (!rawPoll) continue
+          const labelMap = new Map<string, string>()
+          const isFinite = rawPoll.topics?.is_finite ?? false
+          const items = isFinite
+            ? (rawPoll.topics?.topic_items ?? [])
+            : (rawPoll.event_poll_items ?? []).map((epi) => epi.topic_items).filter(Boolean)
+          for (const item of items) {
+            labelMap.set(item.id, item.label)
+          }
+          pollItemLabels.set(rawPoll.id, labelMap)
+        }
+
+        // Merge: all poll items with totals (0 for unpledged items)
+        for (const pollId of pledgedPollIds) {
+          const totals = byPoll.get(pollId) ?? new Map<string, number>()
+          const labelMap = pollItemLabels.get(pollId) ?? new Map<string, string>()
+
+          const merged = [...labelMap.entries()].map(([id, label]) => ({
+            label,
+            total: totals.get(id) ?? 0,
+          }))
+
+          const sorted = merged.sort(
+            (a, b) => b.total - a.total || a.label.localeCompare(b.label)
+          )
           const max = sorted[0]?.total ?? 0
           pledgedResultsByPollId.set(
             pollId,
