@@ -24,7 +24,7 @@ const makeRawItem = (overrides: Record<string, unknown> = {}) => ({
   id: "item-1",
   label: "Pineapple",
   topic_id: "topic-1",
-  review_status: "pending",
+  review_status: "pending_review",
   rejection_reason: null,
   reviewed_at: null,
   reviewed_by: null,
@@ -63,7 +63,7 @@ describe("getPendingContributions", () => {
       topic_title: "Food",
       event_id: "event-1",
       protagonist_name: "Alex",
-      review_status: "pending",
+      review_status: "pending_review",
     });
   });
 
