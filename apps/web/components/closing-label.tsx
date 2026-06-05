@@ -62,24 +62,37 @@ type Props = {
 }
 
 export function ClosingLabel({ closesAt, className }: Props) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => getTimeLeft(closesAt))
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
+    getTimeLeft(closesAt)
+  )
 
   useEffect(() => {
     setTimeLeft(getTimeLeft(closesAt))
-    const interval = setInterval(() => setTimeLeft(getTimeLeft(closesAt)), 60_000)
+    const interval = setInterval(
+      () => setTimeLeft(getTimeLeft(closesAt)),
+      60_000
+    )
     return () => clearInterval(interval)
   }, [closesAt])
 
   const closed = timeLeft.urgency === "closed"
 
   return (
-    <div className={cn("flex items-baseline gap-1.5", className)} aria-live="off">
+    <div
+      className={cn("flex items-baseline gap-1.5", className)}
+      aria-live="off"
+    >
       {!closed && (
         <span className="text-[10px] font-medium text-muted-foreground">
           Closes in
         </span>
       )}
-      <span className={cn("text-sm font-semibold tabular-nums", urgencyClass[timeLeft.urgency])}>
+      <span
+        className={cn(
+          "text-sm font-semibold tabular-nums",
+          urgencyClass[timeLeft.urgency]
+        )}
+      >
         {timeLeft.label}
       </span>
     </div>

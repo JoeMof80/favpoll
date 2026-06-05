@@ -1,4 +1,3 @@
-import { FavpollLogo2 } from "../favpoll-logo2"
 import type { FavpollCardSize } from "./types"
 
 type PollTitleProps = {

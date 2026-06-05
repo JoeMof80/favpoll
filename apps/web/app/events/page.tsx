@@ -158,6 +158,7 @@ export default async function LiveEventsPage() {
     opening_line: string
     description: string | null
     closes_at: string
+    occasion: string
     total_raised: number
     protagonist: { name: string }
     charities: { charity: import("@favpoll/types").Charity }[]

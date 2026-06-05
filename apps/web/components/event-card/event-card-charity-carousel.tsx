@@ -38,7 +38,11 @@ export function EventCardCharityCarousel({
 
   return (
     // Fixed height matches a single CharityRow so the footer never resizes
-    <div className="overflow-hidden" style={{ height: rowHeight }} ref={emblaRef}>
+    <div
+      className="overflow-hidden"
+      style={{ height: rowHeight }}
+      ref={emblaRef}
+    >
       <div className="flex h-full flex-col">
         {charities.map(({ charity }) => (
           <div key={charity.id} className="min-h-0 shrink-0 grow-0 basis-full">

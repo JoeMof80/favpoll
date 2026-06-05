@@ -304,7 +304,11 @@ export function PledgePanel({
     const buttonSize = size === "lg" ? "default" : "sm"
     if (selectedIds.length === 0) {
       return (
-        <Button type="button" size={buttonSize} className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}>
+        <Button
+          type="button"
+          size={buttonSize}
+          className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}
+        >
           Select Yours
         </Button>
       )

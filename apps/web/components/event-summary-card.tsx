@@ -25,7 +25,6 @@ type Props = {
   className?: string
 }
 
-
 export function EventSummaryCard({ event, className }: Props) {
   const topicTitle = event.poll?.topic?.title ?? null
   const perCharity =
