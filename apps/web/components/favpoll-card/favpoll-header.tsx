@@ -1,9 +1,9 @@
-import { useFavpollCard } from "./favpoll-card-context"
-import type { CardProtagonist } from "./types"
+import type { CardProtagonist, FavpollCardSize } from "./types"
 
 type FavpollHeaderProps = {
   protagonist: CardProtagonist
   eyebrow?: string
+  size?: FavpollCardSize
 }
 
 function getInitials(name: string, override?: string): string {
@@ -17,18 +17,20 @@ function getInitials(name: string, override?: string): string {
     .toUpperCase()
 }
 
-export function FavpollHeader({ protagonist, eyebrow }: FavpollHeaderProps) {
-  const { size } = useFavpollCard()
-
-  const avatarSize = size === "full" ? 56 : size === "demo" ? 36 : 32
+export function FavpollHeader({
+  protagonist,
+  eyebrow,
+  size = "lg",
+}: FavpollHeaderProps) {
+  const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
   const nameClass =
-    size === "full"
+    size === "lg"
       ? "text-[22px] font-medium text-[#2C2C2A]"
-      : size === "demo"
+      : size === "md"
         ? "text-[16px] font-medium text-[#2C2C2A]"
         : "text-[14px] font-medium text-[#2C2C2A]"
   const initialsTextClass =
-    size === "full" ? "text-sm" : size === "demo" ? "text-xs" : "text-[10px]"
+    size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
 
   const initials = getInitials(protagonist.name, protagonist.initials)
 
@@ -76,7 +78,7 @@ export function FavpollHeader({ protagonist, eyebrow }: FavpollHeaderProps) {
         </div>
       </div>
 
-      <div className="mt-3 mb-4 border-b border-[#D3D1C7]" />
+      {/* <div className="mt-3 mb-4 border-b border-[#D3D1C7]" /> */}
     </div>
   )
 }

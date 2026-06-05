@@ -136,7 +136,9 @@ export function EventContent({
               <p className="text-xs text-muted-foreground">raised in total</p>
             </div>
           ) : (
-            <Countdown closesAt={event.closes_at} />
+            <div className="rounded-lg border border-border bg-card px-5 py-4">
+              <Countdown closesAt={event.closes_at} />
+            </div>
           )}
           <CharityBanner
             charities={event.event_charities.map((ec) => ec.charities)}

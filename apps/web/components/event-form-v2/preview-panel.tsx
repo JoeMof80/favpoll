@@ -267,7 +267,9 @@ export function PreviewPanel({
         {/* Right — sticky meta */}
         <div className="sticky top-20 space-y-4 self-start">
           {closesAt instanceof Date ? (
-            <Countdown closesAt={closesAt.toISOString()} />
+            <div className="rounded-lg border border-border bg-card px-5 py-4">
+              <Countdown closesAt={closesAt.toISOString()} />
+            </div>
           ) : (
             <CountdownPlaceholder />
           )}

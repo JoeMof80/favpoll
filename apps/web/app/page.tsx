@@ -17,6 +17,7 @@ export default async function HomePage() {
       opening_line,
       description,
       closes_at,
+      occasion,
       total_raised,
       protagonist:protagonists ( name ),
       charities:event_charities (
@@ -38,6 +39,7 @@ export default async function HomePage() {
     )
     .eq("is_private", false)
     .is("closed_at", null)
+    .gt("closes_at", new Date().toISOString())
     .order("created_at", { ascending: false })
     .limit(6)
 
@@ -58,6 +60,7 @@ export default async function HomePage() {
     opening_line: string
     description: string | null
     closes_at: string
+    occasion: string
     total_raised: number
     protagonist: { name: string }
     charities: { charity: import("@favpoll/types").Charity }[]

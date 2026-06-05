@@ -1,9 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
 type Props = {
   closesAt: string
+  size?: FavpollCardSize
+  variant?: "stacked" | "inline"
 }
 
 function getTimeLeft(closesAt: string) {
@@ -18,7 +21,11 @@ function getTimeLeft(closesAt: string) {
   return { days, hours, minutes, seconds }
 }
 
-export function Countdown({ closesAt }: Props) {
+export function Countdown({
+  closesAt,
+  size = "md",
+  variant = "inline",
+}: Props) {
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
@@ -52,22 +59,64 @@ export function Countdown({ closesAt }: Props) {
             { value: seconds, label: "sec" },
           ]
 
+  if (variant === "inline") {
+    const inlineValueClass =
+      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
+    const inlineLabelClass =
+      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineHeadingClass =
+      size === "lg" ? "text-xs" : size === "md" ? "text-[10px]" : "text-[10px]"
+    return (
+      <div aria-live="off">
+        <p className={`mb-2 ${inlineHeadingClass} font-medium text-[#7F77DD]`}>
+          Poll closes in
+        </p>
+        <div
+          className="flex flex-wrap items-baseline justify-between gap-y-1"
+          aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
+        >
+          {parts.map(({ value, label }) => (
+            <span key={label} className="tabular-nums">
+              <span
+                className={`${inlineValueClass} leading-none font-medium text-foreground`}
+              >
+                {String(value).padStart(2, "0")}
+              </span>
+              <span
+                className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
+              >
+                {label}
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  const valueClass =
+    size === "lg" ? "text-base" : size === "md" ? "text-sm" : "text-xs"
+  const labelClass = size === "sm" ? "text-[10px]" : "text-xs"
+
   return (
-    <div
-      className="rounded-lg border border-border bg-card px-5 py-4"
-      aria-live="off"
-    >
-      <p className="mb-2 text-xs text-muted-foreground">Poll closes in</p>
+    <div aria-live="off">
+      <p className={`mb-2 ${labelClass} text-muted-foreground`}>
+        Poll closes in
+      </p>
       <div
-        className="flex items-end gap-3"
+        className="flex items-end justify-between"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
       >
         {parts.map(({ value, label }) => (
           <div key={label} className="text-center">
-            <p className="text-2xl leading-none font-medium text-foreground tabular-nums">
+            <p
+              className={`${valueClass} leading-none font-medium text-foreground tabular-nums`}
+            >
               {String(value).padStart(2, "0")}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+            <p className={`mt-1 ${labelClass} text-muted-foreground`}>
+              {label}
+            </p>
           </div>
         ))}
       </div>

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { PledgePanel } from "@/components/pledge-panel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
-import { FavpollCardProvider } from "./favpoll-card/favpoll-card-context"
 import type { FavpollCardSize } from "./favpoll-card/types"
 import { PollTitle } from "./favpoll-card/poll-title"
 import { StripeCheckout } from "./stripe-checkout"
@@ -21,6 +20,7 @@ import { AmountInput } from "./pledge-card/amount-input"
 
 type EventCardEvent = {
   id: string
+  occasion: string
   opening_line: string
   description: string | null
   closes_at: string
@@ -47,7 +47,7 @@ type Props = {
 const PRESET_AMOUNTS = [5, 10, 20, 50]
 
 export function EventCard({
-  size = "full",
+  size = "sm",
   event,
   className,
   initialResults,
@@ -78,74 +78,78 @@ export function EventCard({
   })
 
   return (
-    <FavpollCardProvider value={{ size }}>
-      <li className={cn("list-none", className)}>
-        <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
-          {/* Navigable header — links to event page */}
-          <Link href={`/events/${event.id}`} className="block px-5 pt-5">
-            <FavpollHeader
-              protagonist={{ name: event.protagonist.name }}
-              eyebrow={event.opening_line}
-            />
-          </Link>
+    <li className={cn("list-none", className)}>
+      <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
+        {/* Navigable header — links to event page */}
+        <Link href={`/events/${event.id}`} className="block p-3">
+          <FavpollHeader
+            protagonist={{ name: event.protagonist.name }}
+            eyebrow={event.occasion}
+            size={size}
+          />
+        </Link>
 
-          {/* PollTitle row — with pledge-again button when in pledged state */}
-          {topicTitle && (
-            <div className="flex items-center justify-between gap-1 px-5 pb-2">
-              <div>
-                <PollTitle title={topicTitle} />
-                {event.description && (
-                  <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-                    {event.description}
-                  </p>
-                )}
-              </div>
-
-              {poll && topicItems.length > 0 && (
-                <>
-                  {step === "pledged" ? (
-                    <TooltipIconButton
-                      icon={Gift}
-                      label="Pledge again"
-                      onClick={resetPledge}
-                    />
-                  ) : results !== null ? (
-                    <TooltipIconButton
-                      icon={ChartBarDecreasing}
-                      label="View results"
-                      onClick={viewResults}
-                    />
-                  ) : null}
-                </>
+        {/* PollTitle row — with pledge-again button when in pledged state */}
+        {topicTitle && (
+          <div className="flex items-center justify-between gap-1 border-t border-border px-3 pt-2">
+            <div>
+              <PollTitle title={topicTitle} size="md" />
+              {event.description && (
+                <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+                  {event.description}
+                </p>
               )}
             </div>
-          )}
 
-          {/* Description only — when there's no topicTitle */}
-          {!topicTitle && event.description && (
-            <Link href={`/events/${event.id}`} className="block px-5">
-              <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-                {event.description}
-              </p>
-            </Link>
-          )}
+            {poll && topicItems.length > 0 && (
+              <>
+                {step === "pledged" ? (
+                  <TooltipIconButton
+                    icon={Gift}
+                    label="Pledge again"
+                    onClick={resetPledge}
+                  />
+                ) : results !== null ? (
+                  <TooltipIconButton
+                    icon={ChartBarDecreasing}
+                    label="View results"
+                    onClick={viewResults}
+                  />
+                ) : null}
+              </>
+            )}
+          </div>
+        )}
 
-          {/* Pledge section — not inside Link */}
-          {poll && topicItems.length > 0 ? (
-            <div className="px-5 pb-5">
-              {step !== "pledged" ? (
-                <div className="space-y-2">
+        {/* Description only — when there's no topicTitle */}
+        {!topicTitle && event.description && (
+          <Link href={`/events/${event.id}`} className="block px-5">
+            <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+              {event.description}
+            </p>
+          </Link>
+        )}
+
+        {/* Pledge section — not inside Link */}
+        {poll && topicItems.length > 0 ? (
+          <div>
+            {step !== "pledged" ? (
+              <>
+                <div className="px-3 py-2">
                   <PledgePanel
                     items={topicItems}
                     totalAmount={amount !== null ? String(amount) : ""}
                     onSelectionsChange={setSelectedIds}
                     topicTitle={topicTitle}
+                    size={size}
                   />
-
+                </div>
+                <div className="space-y-2 border-t border-border px-3 py-2">
                   <AmountInput
                     id="pledge-amount"
                     value={amount !== null ? String(amount) : ""}
                     onChange={(v) => selectAmount(Number(v))}
+                    size={size}
                   />
 
                   <AmountPresets
@@ -162,6 +166,7 @@ export function EventCard({
 
                   <Button
                     type="button"
+                    size={size === "lg" ? "default" : "sm"}
                     className="w-full"
                     disabled={step !== "ready"}
                     onClick={initPayment}
@@ -169,41 +174,44 @@ export function EventCard({
                     Pledge favourites
                   </Button>
                 </div>
-              ) : (
+              </>
+            ) : (
+              <div className="border-t border-border px-3 py-2">
                 <EventCardResults results={results ?? []} />
-              )}
-            </div>
-          ) : (
-            <div className="px-5 pb-5">
-              <Link href={`/events/${event.id}`} tabIndex={-1}>
-                <Button type="button" variant="outline" className="w-full">
-                  View event
-                </Button>
-              </Link>
-            </div>
-          )}
-
-          {/* Charity footer — inside the card so it doesn't overflow the grid cell */}
-          {event.charities.length > 0 && (
-            <div className="mt-auto border-t border-border px-4 py-3">
-              <EventCardCharityCarousel
-                charities={event.charities}
-                perCharity={perCharity}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Stripe payment modal */}
-        {step === "paying" && clientSecret && (
-          <StripeCheckout
-            clientSecret={clientSecret}
-            chargeAmount={amount ?? 0}
-            onSuccess={onPaymentSuccess}
-            onClose={closePayment}
-          />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="px-5 pb-5">
+            <Link href={`/events/${event.id}`} tabIndex={-1}>
+              <Button type="button" variant="outline" className="w-full">
+                View event
+              </Button>
+            </Link>
+          </div>
         )}
-      </li>
-    </FavpollCardProvider>
+
+        {/* Charity footer — inside the card so it doesn't overflow the grid cell */}
+        {event.charities.length > 0 && (
+          <div className="mt-auto border-t border-border px-4 py-3">
+            <EventCardCharityCarousel
+              charities={event.charities}
+              perCharity={perCharity}
+              size="sm"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Stripe payment modal */}
+      {step === "paying" && clientSecret && (
+        <StripeCheckout
+          clientSecret={clientSecret}
+          chargeAmount={amount ?? 0}
+          onSuccess={onPaymentSuccess}
+          onClose={closePayment}
+        />
+      )}
+    </li>
   )
 }
