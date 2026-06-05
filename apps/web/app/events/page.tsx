@@ -24,6 +24,7 @@ export default async function LiveEventsPage() {
       opening_line,
       description,
       closes_at,
+      occasion,
       total_raised,
       protagonist:protagonists ( name ),
       charities:event_charities (
@@ -164,62 +165,51 @@ export default async function LiveEventsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-330 px-6 py-12">
-      <div className="mb-10">
-        <SectionEyebrow className="mb-3">Live events</SectionEyebrow>
-        <h1 className="mb-3 text-[32px] font-medium tracking-tight text-foreground">
-          Happening right now
-        </h1>
-        <p className="max-w-120 text-[14px] leading-relaxed text-muted-foreground">
-          Real events, real people, real causes. Pledge to any of these — or{" "}
-          <Link href="/events/new" className="text-[#534AB7]">
-            create your own.
-          </Link>
-        </p>
-      </div>
-
-      {events?.length === 0 ? (
-        <EventCardEmpty />
-      ) : (
-        <ul
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          role="list"
-        >
-          {((events ?? []) as unknown as RawEvent[]).map((ev) => {
-            const rawPoll = ev.event_polls ?? null
-            let poll: {
-              id: string
-              topic_id: string | null
-              topic: { title: string; topic_items: RawTopicItem[] } | null
-            } | null = null
-            if (rawPoll) {
-              const isFinite = rawPoll.topics?.is_finite ?? false
-              const topicItems = isFinite
-                ? (rawPoll.topics?.topic_items ?? [])
-                : (rawPoll.event_poll_items ?? [])
-                    .map((epi) => epi.topic_items)
-                    .filter(Boolean)
-              poll = {
-                id: rawPoll.id,
-                topic_id: rawPoll.topic_id,
-                topic: rawPoll.topics
-                  ? { title: rawPoll.topics.title, topic_items: topicItems }
-                  : null,
+    <main className="bg-primary/5">
+      <div className="mx-auto max-w-330 px-6 py-12">
+        {events?.length === 0 ? (
+          <EventCardEmpty />
+        ) : (
+          <ul
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            role="list"
+          >
+            {((events ?? []) as unknown as RawEvent[]).map((ev) => {
+              const rawPoll = ev.event_polls ?? null
+              let poll: {
+                id: string
+                topic_id: string | null
+                topic: { title: string; topic_items: RawTopicItem[] } | null
+              } | null = null
+              if (rawPoll) {
+                const isFinite = rawPoll.topics?.is_finite ?? false
+                const topicItems = isFinite
+                  ? (rawPoll.topics?.topic_items ?? [])
+                  : (rawPoll.event_poll_items ?? [])
+                      .map((epi) => epi.topic_items)
+                      .filter(Boolean)
+                poll = {
+                  id: rawPoll.id,
+                  topic_id: rawPoll.topic_id,
+                  topic: rawPoll.topics
+                    ? { title: rawPoll.topics.title, topic_items: topicItems }
+                    : null,
+                }
               }
-            }
-            const initialResults = poll
-              ? pledgedResultsByPollId.get(poll.id)
-              : undefined
-            return (
-              <EventCard
-                key={ev.id}
-                event={{ ...ev, poll }}
-                initialResults={initialResults}
-              />
-            )
-          })}
-        </ul>
-      )}
+              const initialResults = poll
+                ? pledgedResultsByPollId.get(poll.id)
+                : undefined
+              return (
+                <EventCard
+                  key={ev.id}
+                  event={{ ...ev, poll }}
+                  initialResults={initialResults}
+                />
+              )
+            })}
+          </ul>
+        )}
+      </div>
     </main>
   )
 }

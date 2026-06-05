@@ -14,7 +14,7 @@ type Props = {
 
 export function LiveEventsCarousel({ events }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "start", dragFree: false },
+    { loop: false, align: "start" },
     [Autoplay({ delay: 5000, stopOnInteraction: true })]
   )
 
@@ -43,7 +43,7 @@ export function LiveEventsCarousel({ events }: Props) {
       <div className="overflow-hidden" ref={emblaRef}>
         <ul className="flex gap-4" role="list">
           {events.map((event) => (
-            <li key={event.id} className="w-80 shrink-0 list-none">
+            <li key={event.id} className="w-[306px] shrink-0 list-none">
               <EventSummaryCard event={event} className="h-full" />
             </li>
           ))}

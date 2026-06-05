@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import type { TopicItem } from "@favpoll/types"
+import type { FavpollCardSize } from "@/components/favpoll-card/types"
 import { Button } from "./ui/button"
 import {
   Sheet,
@@ -25,6 +26,7 @@ type Props = {
   isInfinite?: boolean
   onAddItem?: (label: string) => Promise<void>
   topicTitle?: string
+  size?: FavpollCardSize
 }
 
 function computeAllocations(
@@ -229,6 +231,7 @@ export function PledgePanel({
   isInfinite,
   onAddItem,
   topicTitle,
+  size = "lg",
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [draftIds, setDraftIds] = useState<string[]>([])
@@ -298,9 +301,10 @@ export function PledgePanel({
   }
 
   function trigger(className: string) {
+    const buttonSize = size === "lg" ? "default" : "sm"
     if (selectedIds.length === 0) {
       return (
-        <Button type="button" className={`h-11 w-full text-base ${className}`}>
+        <Button type="button" size={buttonSize} className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}>
           Select Yours
         </Button>
       )

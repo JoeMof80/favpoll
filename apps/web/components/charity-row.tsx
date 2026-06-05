@@ -1,9 +1,10 @@
 import type { Charity } from "@favpoll/types"
-import { useFavpollCard } from "@/components/favpoll-card/favpoll-card-context"
+import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
 type Props = {
   charity: Charity
   amountRaised: number
+  size?: FavpollCardSize
 }
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -12,12 +13,10 @@ const GBP = new Intl.NumberFormat("en-GB", {
   minimumFractionDigits: 0,
 })
 
-export function CharityRow({ charity, amountRaised }: Props) {
-  const { size } = useFavpollCard()
-
-  const logoClass = size === "full" ? "h-8 w-8" : "h-6 w-6"
-  const nameClass = size === "full" ? "text-sm" : "text-xs"
-  const amountClass = size === "full" ? "text-sm" : "text-xs"
+export function CharityRow({ charity, amountRaised, size = "lg" }: Props) {
+  const logoClass = size === "lg" ? "h-8 w-8" : "h-6 w-6"
+  const nameClass = size === "lg" ? "text-sm" : "text-sm"
+  const amountClass = size === "lg" ? "text-sm" : "text-sm"
 
   return (
     <div className="flex items-center gap-3">
@@ -40,7 +39,7 @@ export function CharityRow({ charity, amountRaised }: Props) {
         <p className={`truncate ${nameClass} font-medium text-foreground`}>
           {charity.name}
         </p>
-        {charity.registered_number && (
+        {charity.registered_number && size === "lg" && (
           <p className="text-xs text-muted-foreground">
             Charity no. {charity.registered_number}
           </p>

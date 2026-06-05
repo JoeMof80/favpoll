@@ -1,4 +1,4 @@
-export type FavpollCardSize = "full" | "demo" | "embed"
+export type FavpollCardSize = "lg" | "md" | "sm"
 export type PollStep = "choose" | "pledge" | "pledged"
 
 export type PollResultItem = {
