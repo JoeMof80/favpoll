@@ -83,7 +83,9 @@ export const InlineAllSizes: Story = {
           <p className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
             {label}
           </p>
-          <div className={`${width} ${padding} rounded-lg border border-border bg-card`}>
+          <div
+            className={`${width} ${padding} rounded-lg border border-border bg-card`}
+          >
             <Countdown closesAt={closesAt} variant="inline" size={size} />
           </div>
         </div>
@@ -107,7 +109,9 @@ export const AllSizes: Story = {
           <p className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
             {label}
           </p>
-          <div className={`${width} ${padding} rounded-lg border border-border bg-card`}>
+          <div
+            className={`${width} ${padding} rounded-lg border border-border bg-card`}
+          >
             <Countdown closesAt={closesAt} size={size} />
           </div>
         </div>

@@ -92,7 +92,11 @@ export const AllSizes: Story = {
           <p className="mb-3 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
             {label}
           </p>
-          <FavpollHeader protagonist={protagonist} eyebrow="Memorial" size={size} />
+          <FavpollHeader
+            protagonist={protagonist}
+            eyebrow="Memorial"
+            size={size}
+          />
         </div>
       ))}
     </div>
