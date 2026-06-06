@@ -60,28 +60,18 @@ export type Protagonist = {
   created_at: string
 }
 
-export type OccasionType =
-  | 'memorial'
-  | 'tribute'
-  | 'birthday'
-  | 'retirement'
-  | 'wedding'
-  | 'engagement'
-  | 'anniversary'
-  | 'leaving'
-  | 'graduation'
-  | 'christening'
-  | 'achievement'
-  | 'recovery'
-  | 'award'
-  | 'promotion'
-  | 'celebration'
-  | 'other'
+export type Register =
+  | 'remembering'
+  | 'celebrating_one'
+  | 'celebrating_many'
+  | 'cause'
+  | 'neutral'
 
 export type Event = {
   id: string
   protagonist_id: string
-  occasion: OccasionType
+  register: Register
+  occasion_type: string | null
   opening_line: string | null
   market: string
   created_by: string
@@ -210,7 +200,8 @@ export type CanvasSubmitData = {
   protagonistAbout?: string | null
   dateLabel: string | null
   photoUrl?: string | null
-  occasion: string
+  register: string
+  occasionType: string | null
   openingLine: string | null
   description: string | null
   charityIds: string[]

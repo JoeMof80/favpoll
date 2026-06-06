@@ -47,7 +47,8 @@ function makeEvent(
   return {
     id: "event-1",
     protagonist_id: "prot-1",
-    occasion: "birthday",
+    register: "celebrating_one",
+    occasion_type: "Birthday",
     opening_line: null,
     market: "en-GB",
     created_by: "user-1",

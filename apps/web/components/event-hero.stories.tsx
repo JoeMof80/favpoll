@@ -2,17 +2,26 @@ import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { EventHero } from "./event-hero"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
-import type { Event, Protagonist, OccasionType } from "@favpoll/types"
+import type { Event, Protagonist, Register } from "@favpoll/types"
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
-const OCCASIONS: OccasionType[] = [
-  "memorial",
-  "birthday",
-  "retirement",
-  "engagement",
-  "leaving",
-  "graduation",
+const REGISTERS: Register[] = [
+  "remembering",
+  "celebrating_one",
+  "celebrating_one",
+  "celebrating_many",
+  "celebrating_one",
+  "celebrating_one",
+]
+
+const OCCASION_TYPES: (string | null)[] = [
+  "Memorial",
+  "Birthday",
+  "Retirement",
+  "Engagement",
+  "Leaving do",
+  "Graduation",
 ]
 
 const DATE_LABELS: (string | null)[] = [
@@ -38,7 +47,6 @@ function makeViewProps(sceneIndex: number): {
   protagonist: Protagonist
 } {
   const scene = SCENES[sceneIndex]
-  const occasion = OCCASIONS[sceneIndex]
 
   const protagonist: Protagonist = {
     id: `p-${sceneIndex}`,
@@ -53,7 +61,8 @@ function makeViewProps(sceneIndex: number): {
   const event: Event = {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
-    occasion,
+    register: REGISTERS[sceneIndex],
+    occasion_type: OCCASION_TYPES[sceneIndex],
     opening_line: SCENE_EYEBROWS[sceneIndex],
     market: "en-GB",
     created_by: "user-1",

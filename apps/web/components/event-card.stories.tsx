@@ -18,7 +18,8 @@ const ICE_CREAM_ITEMS = [
 
 const baseEvent = {
   id: "1",
-  occasion: "Memorial",
+  register: "remembering",
+  occasion_type: "Memorial",
   opening_line: "In memory of",
   description:
     "A beloved mother, teacher, and friend who spent her life bringing people together.",

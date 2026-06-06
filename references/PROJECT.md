@@ -41,11 +41,11 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 
 ## Environments
 
-| Environment | Web URL | Admin URL | Supabase | Clerk |
-|---|---|---|---|---|
-| Production | favpoll-web-gamma.vercel.app | [admin vercel URL] | production project | pk_test_ keys until domain swap |
-| Preview (PRs) | auto-generated vercel URL | auto-generated vercel URL | staging (eotqyintgusvzidymumb) | pk_test_ keys |
-| Development | localhost:3000 | localhost:3001 | production or staging | pk_test_ keys |
+| Environment   | Web URL                      | Admin URL                 | Supabase                       | Clerk                           |
+| ------------- | ---------------------------- | ------------------------- | ------------------------------ | ------------------------------- |
+| Production    | favpoll-web-gamma.vercel.app | [admin vercel URL]        | production project             | pk*test* keys until domain swap |
+| Preview (PRs) | auto-generated vercel URL    | auto-generated vercel URL | staging (eotqyintgusvzidymumb) | pk*test* keys                   |
+| Development   | localhost:3000               | localhost:3001            | production or staging          | pk*test* keys                   |
 
 Production Clerk instance is configured with Google OAuth and ready — using dev keys temporarily until `favpoll.com` points at the app.
 
@@ -254,10 +254,22 @@ item_flags (
 
 ```typescript
 type OccasionType =
-  | 'memorial' | 'tribute'    | 'birthday'    | 'retirement'
-  | 'wedding'  | 'engagement' | 'anniversary' | 'leaving'
-  | 'graduation' | 'christening' | 'achievement' | 'recovery'
-  | 'award'    | 'promotion'  | 'celebration' | 'other'
+  | "memorial"
+  | "tribute"
+  | "birthday"
+  | "retirement"
+  | "wedding"
+  | "engagement"
+  | "anniversary"
+  | "leaving"
+  | "graduation"
+  | "christening"
+  | "achievement"
+  | "recovery"
+  | "award"
+  | "promotion"
+  | "celebration"
+  | "other";
 ```
 
 ### Display headline prefixes (from `lib/display.ts` PREFIXES)
@@ -283,20 +295,22 @@ other       → 'Honouring'
 
 ### Default poll closing period by occasion
 
-| Occasion | Days until close |
-|---|---|
-| memorial | 30 |
-| tribute, retirement, anniversary | 21 |
-| All others | 14 |
+| Occasion                         | Days until close |
+| -------------------------------- | ---------------- |
+| memorial                         | 30               |
+| tribute, retirement, anniversary | 21               |
+| All others                       | 14               |
 
 ---
 
 ## Topic Types
 
 ### Finite (`is_finite = true`) — fixed list, no guest additions
+
 Colour, Season, Day of the week, Meal of the day, Time of day, Decade
 
 ### Infinite (`is_finite = false`) — open list
+
 Organiser can pin/reorder (not remove) items. Guests can suggest additions.
 Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 `review_status = 'pending_review'`. Admin reviews at `apps/admin/app/contributions/`.
@@ -495,19 +509,20 @@ lib/
 
 ## Atomic UI Components
 
-| Component | Props | Usage |
-|---|---|---|
-| `OccasionTag` | `label, className?` | Small uppercase occasion label, brand purple |
-| `SectionEyebrow` | `children, className?, variant?` | `variant="brand"` or `variant="muted"` |
-| `RankingBar` | `label, amount, widthPercent, ..., labelSuffix?` | `labelSuffix` renders inline after label — used for Hide/Show toggle |
-| `RevealQuote` | `text, ...` | Left-bordered italic blockquote |
-| `Chip` | `selected?, readOnly?, size?: "sm"\|"md"\|"lg", ...buttonProps` | Selectable pill. Default bg: `bg-muted`. `readOnly`: `bg-background pointer-events-none`. Never use for amount presets. |
+| Component        | Props                                                           | Usage                                                                                                                   |
+| ---------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `OccasionTag`    | `label, className?`                                             | Small uppercase occasion label, brand purple                                                                            |
+| `SectionEyebrow` | `children, className?, variant?`                                | `variant="brand"` or `variant="muted"`                                                                                  |
+| `RankingBar`     | `label, amount, widthPercent, ..., labelSuffix?`                | `labelSuffix` renders inline after label — used for Hide/Show toggle                                                    |
+| `RevealQuote`    | `text, ...`                                                     | Left-bordered italic blockquote                                                                                         |
+| `Chip`           | `selected?, readOnly?, size?: "sm"\|"md"\|"lg", ...buttonProps` | Selectable pill. Default bg: `bg-muted`. `readOnly`: `bg-background pointer-events-none`. Never use for amount presets. |
 
 ---
 
 ## Design System
 
 ### Brand colours
+
 ```
 Primary:   #534AB7   — buttons, logo, links
 Mid:       #7F77DD   — ranking bars
@@ -520,11 +535,13 @@ Gray 100:  #D3D1C7   — borders, dividers
 ```
 
 ### Typography
+
 - Typeface: Plus Jakarta Sans, weights 400/500 only (never 600/700)
 - Reveal/quote: 18px italic `leading-relaxed text-[#26215C] border-l-[2.5px] border-[#7F77DD]`
 - Section eyebrow (brand): 11px medium `tracking-widest uppercase text-[#534AB7]`
 
 ### Edit mode field treatment
+
 - `peer` on input/textarea + zero-height sibling div `border-b-2 border-dotted border-border peer-focus:border-primary/40`
 - Guest view: no underlines, no placeholders, no edit controls
 
@@ -551,6 +568,7 @@ Gray 100:  #D3D1C7   — borders, dividers
 ## Testing
 
 Run from repo root:
+
 ```
 pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
@@ -560,6 +578,7 @@ All tests must pass before committing. Current counts: 505 web, ~22 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
+
 - Default (jsdom): pure functions, hooks
 - `// @vitest-environment node`: server actions, API routes
 
@@ -572,6 +591,7 @@ Supabase mock: `makeSupabaseMock()` from `@/tests/mocks/supabase-admin`.
 ## Environment Variables
 
 ### apps/web
+
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 CLERK_SECRET_KEY
@@ -593,6 +613,7 @@ CRON_SECRET                       -- random hex, used to authenticate cron calls
 ```
 
 ### apps/admin
+
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 CLERK_SECRET_KEY
@@ -638,7 +659,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`
 
-- **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item *addition* always uses ItemAddField pickerfield regardless of count.
+- **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 
 - **Pledge panel draft state.** Selections are not committed until the user clicks Done. Opening the Sheet/Dialog initialises `draftIds` from the current `selectedIds`. Closing/dismissing without Done discards the draft. This prevents partial selections appearing in the trigger display.
 

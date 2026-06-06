@@ -199,7 +199,7 @@ export async function addGuestItem(
     const { data: pollData } = await supabase
       .from("event_polls")
       .select(
-        "event_id, events(id, occasion, created_by, protagonists(name)), topics(title)"
+        "event_id, events(id, occasion_type, created_by, protagonists(name)), topics(title)"
       )
       .eq("id", eventPollId)
       .single()
@@ -220,7 +220,7 @@ export async function addGuestItem(
           to: organizer.email,
           itemLabel: trimmed,
           topicTitle: topicData?.title ?? "poll",
-          openingLine: eventData?.occasion ?? "event",
+          openingLine: eventData?.occasion_type ?? "event",
           protagonistName: eventData?.protagonists?.name ?? "your event",
           eventId: pollData?.event_id ?? "",
         })

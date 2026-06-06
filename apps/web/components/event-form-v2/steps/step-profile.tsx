@@ -19,11 +19,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { FieldDescription } from "@/components/ui/field"
-import {
-  OCCASION_PLACEHOLDERS,
-  DEFAULT_PLACEHOLDERS,
-  DATE_LABEL_PLACEHOLDERS,
-} from "@/lib/occasions"
+import { resolvePlaceholders, DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
@@ -56,7 +52,8 @@ export function StepProfile({
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const occasion = form.watch("occasion")
+  const register = form.watch("register") ?? ""
+  const occasionType = (form.watch("occasionType") ?? "") || null
   const selectedTopics = form.watch("topics")
   const currentPhotoUrl = form.watch("photoUrl")
   const nameValue = form.watch("name") ?? ""
@@ -67,16 +64,19 @@ export function StepProfile({
   const contextRemaining = 40 - contextValue.length
   const aboutRemaining = 300 - aboutValue.length
 
-  const basePlaceholders = occasion
-    ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
+  const basePlaceholders = register
+    ? resolvePlaceholders(register, occasionType)
     : null
-  const datePlaceholder = occasion
-    ? (DATE_LABEL_PLACEHOLDERS[occasion] ?? "")
+  // Date label placeholder: keyed by occasion_type if known
+  const datePlaceholder = occasionType
+    ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
     : ""
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
+  // Topic placeholders are still keyed by lowercase occasion_type for compat
+  const topicKey = occasionType?.toLowerCase()
   const topicAbout =
-    firstTopicMeta?.placeholders?.[occasion]?.about ??
+    (topicKey && firstTopicMeta?.placeholders?.[topicKey]?.about) ??
     firstTopicMeta?.placeholders?.["default"]?.about
   const aboutPlaceholder = basePlaceholders
     ? (topicAbout ?? basePlaceholders.about)

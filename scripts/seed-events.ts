@@ -95,30 +95,42 @@ const POPULAR_TOPICS = new Set([
   "Flower",
 ])
 
-// Occasion mix — keys MUST match events_occasion_check / OCCASION_LIST.
-const OCCASION_WEIGHTS: Record<string, number> = {
-  memorial: 10,
-  tribute: 4,
-  birthday: 12,
-  retirement: 8,
-  wedding: 8,
-  engagement: 5,
-  anniversary: 6,
-  leaving: 6,
-  graduation: 6,
-  christening: 4,
-  achievement: 5,
-  recovery: 4,
-  award: 3,
-  promotion: 4,
-  celebration: 4,
-  other: 3,
+// Event type mix — weighted {register, occasionType} pairs.
+type EventType = { register: string; occasionType: string | null }
+const EVENT_TYPE_WEIGHTS: Array<{ et: EventType; weight: number }> = [
+  { et: { register: "remembering", occasionType: "Memorial" }, weight: 10 },
+  { et: { register: "remembering", occasionType: "Tribute" }, weight: 4 },
+  { et: { register: "celebrating_one", occasionType: "Birthday" }, weight: 12 },
+  { et: { register: "celebrating_one", occasionType: "Retirement" }, weight: 8 },
+  { et: { register: "celebrating_many", occasionType: "Wedding" }, weight: 8 },
+  { et: { register: "celebrating_many", occasionType: "Engagement" }, weight: 5 },
+  { et: { register: "celebrating_many", occasionType: "Anniversary" }, weight: 6 },
+  { et: { register: "celebrating_one", occasionType: "Leaving do" }, weight: 6 },
+  { et: { register: "celebrating_one", occasionType: "Graduation" }, weight: 6 },
+  { et: { register: "celebrating_one", occasionType: "Christening" }, weight: 4 },
+  { et: { register: "celebrating_one", occasionType: "Achievement" }, weight: 5 },
+  { et: { register: "celebrating_one", occasionType: "Recovery" }, weight: 4 },
+  { et: { register: "celebrating_one", occasionType: "Award" }, weight: 3 },
+  { et: { register: "celebrating_one", occasionType: "Promotion" }, weight: 4 },
+  { et: { register: "neutral", occasionType: null }, weight: 4 },
+  { et: { register: "neutral", occasionType: null }, weight: 3 },
+]
+
+function pickEventType(): EventType {
+  const total = EVENT_TYPE_WEIGHTS.reduce((s, e) => s + e.weight, 0)
+  let r = Math.random() * total
+  for (const { et, weight } of EVENT_TYPE_WEIGHTS) {
+    r -= weight
+    if (r <= 0) return et
+  }
+  return EVENT_TYPE_WEIGHTS[0].et
 }
 
-// Default poll closing period (days) by occasion — from PROJECT.md.
-function closingDays(occasion: string): number {
-  if (occasion === "memorial") return 30
-  if (["tribute", "retirement", "anniversary"].includes(occasion)) return 21
+// Default poll closing period (days) by register / occasion_type.
+function closingDays(register: string, occasionType: string | null): number {
+  if (occasionType === "Tribute" || occasionType === "Retirement" || occasionType === "Anniversary") return 21
+  if (register === "remembering") return 30
+  if (register === "cause") return 21
   return 14
 }
 
@@ -159,48 +171,48 @@ const NAME_POOL = [
   "Frances Whittaker",
 ]
 
-// Context strings keyed loosely by occasion (kept <= 40 chars).
-function contextFor(occasion: string): string | null {
+// Context strings keyed loosely by occasion_type (kept <= 40 chars).
+function contextFor(occasionType: string | null): string | null {
   const year = 1932 + randInt(0, 60)
-  switch (occasion) {
-    case "memorial":
-    case "tribute":
+  switch (occasionType) {
+    case "Memorial":
+    case "Tribute":
       return `${year} – 2025`
-    case "birthday":
+    case "Birthday":
       return `Turning ${pick([30, 40, 50, 60, 70, 80, 90])}`
-    case "retirement":
+    case "Retirement":
       return `After ${randInt(20, 40)} years`
-    case "wedding":
+    case "Wedding":
       return "On their wedding day"
-    case "engagement":
+    case "Engagement":
       return "Newly engaged"
-    case "anniversary":
+    case "Anniversary":
       return `${randInt(10, 60)} years together`
-    case "leaving":
+    case "Leaving do":
       return "Moving on"
-    case "graduation":
+    case "Graduation":
       return "Class of 2025"
-    case "christening":
+    case "Christening":
       return "Newly arrived"
-    case "achievement":
+    case "Achievement":
       return "A first marathon"
-    case "recovery":
+    case "Recovery":
       return "On the mend"
-    case "award":
+    case "Award":
       return "Award winner"
-    case "promotion":
+    case "Promotion":
       return "Newly promoted"
     default:
       return null
   }
 }
 
-const SOLEMN = new Set(["memorial", "tribute", "recovery"])
+const SOLEMN_REGISTERS = new Set(["remembering"])
 
 // Neutral about templates — never name a favourite (so they can't leak a
 // reveal), coherent with the generated name, varied length for layout testing.
-function aboutFor(name: string, occasion: string): string {
-  const solemn = SOLEMN.has(occasion)
+function aboutFor(name: string, register: string): string {
+  const solemn = SOLEMN_REGISTERS.has(register)
   const short = solemn
     ? `${name} is remembered with great affection by everyone here.`
     : `${name} is being celebrated by the people who know them best.`
@@ -352,7 +364,7 @@ async function createOneEvent(
   itemsByTopic: Map<string, Item[]>,
   charityIds: string[]
 ) {
-  const occasion = weightedPickKey(OCCASION_WEIGHTS)
+  const { register, occasionType } = pickEventType()
 
   // Pick a topic, weighting the popular core so items recur across events.
   const weightedTopics = topics.flatMap((t) =>
@@ -363,7 +375,7 @@ async function createOneEvent(
   if (allItems.length === 0) return null // topic has no items; skip
 
   const closed = chance(CLOSED_FRACTION)
-  const closing = closingDays(occasion)
+  const closing = closingDays(register, occasionType)
 
   let createdAt: string
   let closesAt: string
@@ -400,8 +412,8 @@ async function createOneEvent(
     .from("protagonists")
     .insert({
       name,
-      context: contextFor(occasion),
-      about: aboutFor(name, occasion),
+      context: contextFor(occasionType),
+      about: aboutFor(name, register),
       created_by: SEED_USER_ID,
     })
     .select("id")
@@ -416,7 +428,8 @@ async function createOneEvent(
     .from("events")
     .insert({
       protagonist_id: protagonist.id,
-      occasion,
+      register,
+      occasion_type: occasionType,
       market: "en-GB",
       created_by: SEED_USER_ID,
       closes_at: closesAt,
@@ -454,8 +467,10 @@ async function createOneEvent(
   )
 
   // 5) event poll (one per event; reveal from placeholder copy; no framing)
+  // Topic placeholders are keyed by lowercase occasion_type for compat with seed data
+  const topicKey = occasionType?.toLowerCase()
   const reveal =
-    topic.placeholders?.[occasion]?.reveal ??
+    (topicKey && topic.placeholders?.[topicKey]?.reveal) ??
     topic.placeholders?.["default"]?.reveal ??
     null
   const { data: poll, error: pollErr } = await supabase
@@ -598,7 +613,7 @@ async function createOneEvent(
       .eq("id", event.id)
   }
 
-  return { occasion, topic: topic.title, pledges: pledgeRows.length }
+  return { occasion: occasionType ?? register, topic: topic.title, pledges: pledgeRows.length }
 }
 
 async function seedEvents() {

@@ -51,34 +51,51 @@ export function formatEventDate(
   })}`
 }
 
-export const PREFIXES: Record<string, string> = {
-  memorial: "In memory of",
-  tribute: "A tribute to",
-  birthday: "Happy birthday",
-  retirement: "Celebrating the retirement of",
-  wedding: "Congratulations to",
-  engagement: "Congratulations to",
-  anniversary: "Happy anniversary",
-  leaving: "Farewell",
-  graduation: "Congratulations",
-  christening: "Welcome",
-  achievement: "Well done",
-  recovery: "Cheering on",
-  award: "Congratulations to",
-  promotion: "Congratulations to",
-  celebration: "Celebrating",
-  other: "Honouring",
+const OCCASION_TYPE_PREFIXES: Record<string, string> = {
+  Memorial: "In memory of",
+  Tribute: "A tribute to",
+  Birthday: "Happy birthday",
+  Retirement: "Celebrating the retirement of",
+  Wedding: "Congratulations to",
+  Engagement: "Congratulations to",
+  Anniversary: "Happy anniversary",
+  "Leaving do": "Farewell",
+  Graduation: "Congratulations",
+  Christening: "Welcome",
+  Achievement: "Well done",
+  Recovery: "Cheering on",
+  Award: "Congratulations to",
+  Promotion: "Congratulations to",
+}
+
+const REGISTER_PREFIXES: Record<string, string> = {
+  remembering: "In memory of",
+  celebrating_one: "Celebrating",
+  celebrating_many: "Celebrating",
+  cause: "Supporting",
+  neutral: "Honouring",
 }
 
 export function getEventHeadline(params: {
-  occasion: string
+  register: string
+  occasionType: string | null
   name: string
   dateLabel?: string | null
-  occasionLabel?: string | null
+  openingLine?: string | null
 }): { prefix: string; name: string; suffix: string } {
-  const { occasion, name: personName, dateLabel, occasionLabel } = params
+  const {
+    register,
+    occasionType,
+    name: personName,
+    dateLabel,
+    openingLine,
+  } = params
 
-  const prefix = occasionLabel || PREFIXES[occasion] || "Honouring"
+  const prefix =
+    openingLine ||
+    (occasionType && OCCASION_TYPE_PREFIXES[occasionType]) ||
+    REGISTER_PREFIXES[register] ||
+    "Honouring"
 
   return { prefix, name: personName, suffix: dateLabel ?? "" }
 }

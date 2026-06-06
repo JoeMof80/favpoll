@@ -74,7 +74,8 @@ export default async function EditEventPage({ params }: Props) {
   }
 
   const defaultValues: Partial<EventFormValues> = {
-    occasion: event.occasion ?? "",
+    register: event.register ?? "",
+    occasionType: event.occasion_type ?? "",
     name: event.protagonists.name ?? "",
     context: event.protagonists.context ?? "",
     openingLine: event.opening_line ?? "",

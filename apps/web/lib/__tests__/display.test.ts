@@ -67,8 +67,12 @@ describe("formatEventDate", () => {
 })
 
 describe("getEventHeadline", () => {
-  it("returns the correct prefix for birthday", () => {
-    const result = getEventHeadline({ occasion: "birthday", name: "Alice" })
+  it("returns the correct prefix for Birthday occasion_type", () => {
+    const result = getEventHeadline({
+      register: "celebrating_one",
+      occasionType: "Birthday",
+      name: "Alice",
+    })
     expect(result).toEqual({
       prefix: "Happy birthday",
       name: "Alice",
@@ -76,41 +80,65 @@ describe("getEventHeadline", () => {
     })
   })
 
-  it("returns the correct prefix for memorial", () => {
-    const result = getEventHeadline({ occasion: "memorial", name: "Bob" })
+  it("returns the correct prefix for Memorial occasion_type", () => {
+    const result = getEventHeadline({
+      register: "remembering",
+      occasionType: "Memorial",
+      name: "Bob",
+    })
     expect(result.prefix).toBe("In memory of")
   })
 
-  it("returns the correct prefix for wedding", () => {
+  it("returns the correct prefix for Wedding occasion_type", () => {
     const result = getEventHeadline({
-      occasion: "wedding",
+      register: "celebrating_many",
+      occasionType: "Wedding",
       name: "Emma & James",
     })
     expect(result.prefix).toBe("Congratulations to")
   })
 
-  it("falls back to 'Honouring' for unknown occasion", () => {
-    const result = getEventHeadline({ occasion: "unknown_type", name: "Carol" })
+  it("falls back to register prefix when occasionType is null", () => {
+    const result = getEventHeadline({
+      register: "neutral",
+      occasionType: null,
+      name: "Carol",
+    })
     expect(result.prefix).toBe("Honouring")
   })
 
-  it("occasionLabel overrides PREFIXES lookup", () => {
+  it("falls back to 'Honouring' for unknown register with no occasionType", () => {
     const result = getEventHeadline({
-      occasion: "birthday",
+      register: "unknown_register",
+      occasionType: null,
+      name: "Carol",
+    })
+    expect(result.prefix).toBe("Honouring")
+  })
+
+  it("openingLine overrides prefix lookup", () => {
+    const result = getEventHeadline({
+      register: "celebrating_one",
+      occasionType: "Birthday",
       name: "Dave",
-      occasionLabel: "Custom prefix",
+      openingLine: "Custom prefix",
     })
     expect(result.prefix).toBe("Custom prefix")
   })
 
   it("returns empty string suffix when dateLabel is omitted", () => {
-    const result = getEventHeadline({ occasion: "birthday", name: "Eve" })
+    const result = getEventHeadline({
+      register: "celebrating_one",
+      occasionType: "Birthday",
+      name: "Eve",
+    })
     expect(result.suffix).toBe("")
   })
 
   it("returns empty string suffix when dateLabel is null", () => {
     const result = getEventHeadline({
-      occasion: "birthday",
+      register: "celebrating_one",
+      occasionType: "Birthday",
       name: "Eve",
       dateLabel: null,
     })
@@ -119,7 +147,8 @@ describe("getEventHeadline", () => {
 
   it("returns dateLabel as suffix when provided", () => {
     const result = getEventHeadline({
-      occasion: "memorial",
+      register: "remembering",
+      occasionType: "Memorial",
       name: "Fred",
       dateLabel: "1940 – 2024",
     })
@@ -128,7 +157,8 @@ describe("getEventHeadline", () => {
 
   it("passes name through unchanged", () => {
     const result = getEventHeadline({
-      occasion: "other",
+      register: "neutral",
+      occasionType: null,
       name: "Grace & Henry",
     })
     expect(result.name).toBe("Grace & Henry")
@@ -208,25 +238,40 @@ describe("formatEventDate — locale parameter", () => {
   })
 })
 
-describe("getEventHeadline — all PREFIXES occasions", () => {
+describe("getEventHeadline — all known occasion_types", () => {
   it.each([
-    ["tribute", "A tribute to"],
-    ["retirement", "Celebrating the retirement of"],
-    ["engagement", "Congratulations to"],
-    ["anniversary", "Happy anniversary"],
-    ["leaving", "Farewell"],
-    ["graduation", "Congratulations"],
-    ["christening", "Welcome"],
-    ["achievement", "Well done"],
-    ["recovery", "Cheering on"],
-    ["award", "Congratulations to"],
-    ["promotion", "Congratulations to"],
-    ["celebration", "Celebrating"],
-    ["other", "Honouring"],
-  ])('occasion "%s" returns prefix "%s"', (occasion, expectedPrefix) => {
-    expect(getEventHeadline({ occasion, name: "Test" }).prefix).toBe(
-      expectedPrefix
-    )
+    ["Tribute", "remembering", "A tribute to"],
+    ["Retirement", "celebrating_one", "Celebrating the retirement of"],
+    ["Engagement", "celebrating_many", "Congratulations to"],
+    ["Anniversary", "celebrating_many", "Happy anniversary"],
+    ["Leaving do", "celebrating_one", "Farewell"],
+    ["Graduation", "celebrating_one", "Congratulations"],
+    ["Christening", "celebrating_one", "Welcome"],
+    ["Achievement", "celebrating_one", "Well done"],
+    ["Recovery", "celebrating_one", "Cheering on"],
+    ["Award", "celebrating_one", "Congratulations to"],
+    ["Promotion", "celebrating_one", "Congratulations to"],
+  ])(
+    'occasion_type "%s" returns prefix "%s"',
+    (occasionType, register, expectedPrefix) => {
+      expect(
+        getEventHeadline({ register, occasionType, name: "Test" }).prefix
+      ).toBe(expectedPrefix)
+    }
+  )
+})
+
+describe("getEventHeadline — register fallbacks (no occasion_type)", () => {
+  it.each([
+    ["remembering", "In memory of"],
+    ["celebrating_one", "Celebrating"],
+    ["celebrating_many", "Celebrating"],
+    ["cause", "Supporting"],
+    ["neutral", "Honouring"],
+  ])('register "%s" falls back to "%s"', (register, expectedPrefix) => {
+    expect(
+      getEventHeadline({ register, occasionType: null, name: "Test" }).prefix
+    ).toBe(expectedPrefix)
   })
 })
 

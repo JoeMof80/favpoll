@@ -20,7 +20,8 @@ import { AmountInput } from "./pledge-card/amount-input"
 
 type EventCardEvent = {
   id: string
-  occasion: string
+  register: string
+  occasion_type: string | null
   opening_line: string
   description: string | null
   closes_at: string
@@ -84,7 +85,7 @@ export function EventCard({
         <Link href={`/events/${event.id}`} className="block p-3">
           <FavpollHeader
             protagonist={{ name: event.protagonist.name }}
-            eyebrow={event.occasion}
+            eyebrow={event.occasion_type ?? event.register}
             size={size}
           />
         </Link>

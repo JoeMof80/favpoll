@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldDescription } from "@/components/ui/field"
-import { OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS } from "@/lib/occasions"
+import { resolvePlaceholders } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
@@ -32,7 +32,8 @@ export function StepReveal({
   size = "md",
 }: Props) {
   const form = useFormContext<EventFormValues>()
-  const occasion = form.watch("occasion")
+  const register = form.watch("register") ?? ""
+  const occasionType = (form.watch("occasionType") ?? "") || null
   const selectedTopics = form.watch("topics")
   const revealValue = form.watch("reveal") ?? ""
   const revealRemaining = 280 - revealValue.length
@@ -44,17 +45,20 @@ export function StepReveal({
     }
   }, [selectedTopics?.length, form])
 
-  const basePlaceholders = occasion
-    ? (OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS)
+  const basePlaceholders = register
+    ? resolvePlaceholders(register, occasionType)
     : null
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
   const topicTitle = selectedTopics?.[0]?.title ?? ""
   const name = form.watch("name")
   const firstName = (name || (basePlaceholders?.name ?? "")).split(" ")[0]
-  const topicOccasionReveal = firstTopicMeta?.placeholders?.[occasion]?.reveal
+  // Topic placeholders keyed by lowercase occasion_type for compat with existing data
+  const topicKey = occasionType?.toLowerCase()
+  const topicOccasionReveal =
+    topicKey && firstTopicMeta?.placeholders?.[topicKey]?.reveal
   const revealPlaceholder =
-    topicTitle && occasion && topicOccasionReveal
+    topicTitle && register && topicOccasionReveal
       ? topicOccasionReveal.replace("{name}", firstName)
       : topicTitle
         ? `Share their favourite ${topicTitle.toLowerCase()}…`
