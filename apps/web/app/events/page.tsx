@@ -166,7 +166,7 @@ export default async function LiveEventsPage() {
   }
 
   return (
-    <main className="bg-primary/5">
+    <main className="bg-muted">
       <div className="mx-auto max-w-330 px-6 py-12">
         {events?.length === 0 ? (
           <EventCardEmpty />
