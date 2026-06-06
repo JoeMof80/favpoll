@@ -309,7 +309,7 @@ export function PledgePanel({
           size={buttonSize}
           className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}
         >
-          Select Yours
+          Select favourites
         </Button>
       )
     }
