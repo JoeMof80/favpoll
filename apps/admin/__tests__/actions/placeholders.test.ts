@@ -56,15 +56,15 @@ describe("getTopics", () => {
 describe("updatePlaceholder", () => {
   it("fetches current placeholders, merges occasion, and updates without overwriting others", async () => {
     const existing = {
-      memorial: { about: "Old about", reveal: "Old reveal" },
-      birthday: { about: "Birthday about", reveal: "Birthday reveal" },
+      Memorial: { about: "Old about", reveal: "Old reveal" },
+      Birthday: { about: "Birthday about", reveal: "Birthday reveal" },
     };
     mock.queue({ placeholders: existing }); // fetch .single()
     mock.queue(null); // update direct await
 
     const { error } = await updatePlaceholder(
       "topic-1",
-      "memorial",
+      "Memorial",
       "New about",
       "New reveal",
     );
@@ -75,22 +75,22 @@ describe("updatePlaceholder", () => {
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0]).toEqual({
       placeholders: {
-        memorial: { about: "New about", reveal: "New reveal" },
-        birthday: { about: "Birthday about", reveal: "Birthday reveal" },
+        Memorial: { about: "New about", reveal: "New reveal" },
+        Birthday: { about: "Birthday about", reveal: "Birthday reveal" },
       },
     });
   });
 
   it("returns error when fetch fails", async () => {
     mock.queue(null, { message: "Not found" });
-    const { error } = await updatePlaceholder("topic-1", "memorial", "A", "B");
+    const { error } = await updatePlaceholder("topic-1", "Memorial", "A", "B");
     expect(error).toBe("Not found");
   });
 
   it("returns error when update fails", async () => {
     mock.queue({ placeholders: {} }); // fetch ok
     mock.queue(null, { message: "Write failed" }); // update error
-    const { error } = await updatePlaceholder("topic-1", "memorial", "A", "B");
+    const { error } = await updatePlaceholder("topic-1", "Memorial", "A", "B");
     expect(error).toBe("Write failed");
   });
 });
@@ -100,35 +100,33 @@ describe("updatePlaceholder", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("addOccasion", () => {
-  it("rejects invalid occasion names without hitting the DB", async () => {
+  it("rejects invalid occasion type names without hitting the DB", async () => {
     const { error } = await addOccasion(
       "topic-1",
       "INVALID_OCCASION",
       "A",
       "B",
     );
-    expect(error).toMatch(/Invalid occasion/);
+    expect(error).toMatch(/Invalid occasion type/);
     expect(mock.calls).toHaveLength(0);
   });
 
-  it("accepts all 17 valid occasions", async () => {
+  it("accepts all 15 valid occasion types", async () => {
     const validOccasions = [
-      "memorial",
-      "tribute",
-      "birthday",
-      "retirement",
-      "wedding",
-      "engagement",
-      "anniversary",
-      "leaving",
-      "graduation",
-      "christening",
-      "achievement",
-      "recovery",
-      "award",
-      "promotion",
-      "celebration",
-      "other",
+      "Memorial",
+      "Tribute",
+      "Birthday",
+      "Retirement",
+      "Leaving do",
+      "Graduation",
+      "Christening",
+      "Achievement",
+      "Recovery",
+      "Award",
+      "Promotion",
+      "Wedding",
+      "Engagement",
+      "Anniversary",
       "default",
     ];
     for (const occasion of validOccasions) {
@@ -139,12 +137,12 @@ describe("addOccasion", () => {
     }
   });
 
-  it("rejects an occasion that already exists", async () => {
-    const existing = { memorial: { about: "M about", reveal: "M reveal" } };
+  it("rejects an occasion type that already exists", async () => {
+    const existing = { Memorial: { about: "M about", reveal: "M reveal" } };
     mock.queue({ placeholders: existing });
     const { error } = await addOccasion(
       "topic-1",
-      "memorial",
+      "Memorial",
       "New about",
       "New reveal",
     );
@@ -155,13 +153,13 @@ describe("addOccasion", () => {
     ).toBeUndefined();
   });
 
-  it("merges the new occasion without overwriting existing ones", async () => {
-    const existing = { birthday: { about: "B about", reveal: "B reveal" } };
+  it("merges the new occasion type without overwriting existing ones", async () => {
+    const existing = { Birthday: { about: "B about", reveal: "B reveal" } };
     mock.queue({ placeholders: existing });
     mock.queue(null);
     const { error } = await addOccasion(
       "topic-1",
-      "memorial",
+      "Memorial",
       "M about",
       "M reveal",
     );
@@ -170,8 +168,8 @@ describe("addOccasion", () => {
       .callsFor("topics")
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0].placeholders).toMatchObject({
-      birthday: existing.birthday,
-      memorial: { about: "M about", reveal: "M reveal" },
+      Birthday: existing.Birthday,
+      Memorial: { about: "M about", reveal: "M reveal" },
     });
   });
 });
@@ -189,27 +187,27 @@ describe("deleteOccasion", () => {
 
   it("removes only the specified occasion key from placeholders", async () => {
     const existing = {
-      memorial: { about: "M about", reveal: "M reveal" },
-      birthday: { about: "B about", reveal: "B reveal" },
+      Memorial: { about: "M about", reveal: "M reveal" },
+      Birthday: { about: "B about", reveal: "B reveal" },
     };
     mock.queue({ placeholders: existing });
     mock.queue(null);
 
-    const { error } = await deleteOccasion("topic-1", "birthday");
+    const { error } = await deleteOccasion("topic-1", "Birthday");
     expect(error).toBeNull();
 
     const updateCall = mock
       .callsFor("topics")
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0].placeholders).toEqual({
-      memorial: { about: "M about", reveal: "M reveal" },
+      Memorial: { about: "M about", reveal: "M reveal" },
     });
-    expect(updateCall.args[0].placeholders.birthday).toBeUndefined();
+    expect(updateCall.args[0].placeholders.Birthday).toBeUndefined();
   });
 
   it("returns error when fetch fails", async () => {
     mock.queue(null, { message: "Fetch error" });
-    const { error } = await deleteOccasion("topic-1", "memorial");
+    const { error } = await deleteOccasion("topic-1", "Memorial");
     expect(error).toBe("Fetch error");
   });
 });

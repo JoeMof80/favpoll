@@ -1,37 +1,31 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { VALID_OCCASIONS, type PlaceholdersMap } from "@/lib/occasions";
+import { VALID_OCCASION_TYPES, type PlaceholdersMap } from "@/lib/occasions";
 import {
   updatePlaceholder,
   deleteOccasion,
   addOccasion,
 } from "@/lib/actions/placeholders";
 
-// Fixed display order for occasions
+// Display order matches VALID_OCCASION_TYPES; "default" shown last
 const OCCASION_ORDER: string[] = [
-  "memorial",
-  "tribute",
-  "birthday",
-  "retirement",
-  "wedding",
-  "engagement",
-  "anniversary",
-  "leaving",
-  "graduation",
-  "christening",
-  "achievement",
-  "recovery",
-  "award",
-  "promotion",
-  "celebration",
-  "other",
+  "Memorial",
+  "Tribute",
+  "Birthday",
+  "Retirement",
+  "Leaving do",
+  "Graduation",
+  "Christening",
+  "Achievement",
+  "Recovery",
+  "Award",
+  "Promotion",
+  "Wedding",
+  "Engagement",
+  "Anniversary",
   "default",
 ];
-
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
 
 function sortOccasions(keys: string[]): string[] {
   const ordered = OCCASION_ORDER.filter((o) => keys.includes(o));
@@ -80,7 +74,7 @@ function OccasionRow({
 
   function handleDelete() {
     if (
-      !confirm(`Remove the "${capitalize(occasion)}" occasion from this topic?`)
+      !confirm(`Remove "${occasion}" from this topic?`)
     )
       return;
     startDeleteTransition(async () => {
@@ -97,13 +91,13 @@ function OccasionRow({
     <div className="border border-neutral-200 rounded-lg p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-neutral-900">
-          {capitalize(occasion)}
+          {isDefault ? "Default (fallback)" : occasion}
         </h3>
         <div className="flex items-center gap-2">
           {isDefault ? (
             <span
               className="text-xs text-neutral-400 cursor-default select-none"
-              title="The default occasion cannot be deleted"
+              title="The default fallback cannot be deleted"
             >
               Cannot delete
             </span>
@@ -187,7 +181,7 @@ function AddOccasionSection({
   topicId: string;
   existingOccasions: string[];
 }) {
-  const available = VALID_OCCASIONS.filter(
+  const available = VALID_OCCASION_TYPES.filter(
     (o) => !existingOccasions.includes(o),
   );
   const [selected, setSelected] = useState<string>(available[0] ?? "");
@@ -229,7 +223,7 @@ function AddOccasionSection({
         >
           {available.map((o) => (
             <option key={o} value={o}>
-              {capitalize(o)}
+              {o === "default" ? "Default (fallback)" : o}
             </option>
           ))}
         </select>
@@ -287,8 +281,7 @@ export function OccasionEditor({
   topicId: string;
   placeholders: PlaceholdersMap;
 }) {
-  // Show all 17 valid occasions — empty ones are shown as blank rows
-  const allOccasions = OCCASION_ORDER;
+  // Show all 15 valid occasion types — empty ones are shown as blank rows
   const existingKeys = Object.keys(placeholders);
 
   // Occasions to show: all valid occasions (even if empty) + any unexpected keys

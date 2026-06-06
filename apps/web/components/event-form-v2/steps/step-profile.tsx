@@ -73,10 +73,8 @@ export function StepProfile({
     : ""
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-  // Topic placeholders are still keyed by lowercase occasion_type for compat
-  const topicKey = occasionType?.toLowerCase()
   const topicAbout =
-    (topicKey && firstTopicMeta?.placeholders?.[topicKey]?.about) ??
+    (occasionType && firstTopicMeta?.placeholders?.[occasionType]?.about) ??
     firstTopicMeta?.placeholders?.["default"]?.about
   const aboutPlaceholder = basePlaceholders
     ? (topicAbout ?? basePlaceholders.about)

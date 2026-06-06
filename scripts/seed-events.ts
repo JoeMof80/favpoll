@@ -467,10 +467,8 @@ async function createOneEvent(
   )
 
   // 5) event poll (one per event; reveal from placeholder copy; no framing)
-  // Topic placeholders are keyed by lowercase occasion_type for compat with seed data
-  const topicKey = occasionType?.toLowerCase()
   const reveal =
-    (topicKey && topic.placeholders?.[topicKey]?.reveal) ??
+    (occasionType && topic.placeholders?.[occasionType]?.reveal) ??
     topic.placeholders?.["default"]?.reveal ??
     null
   const { data: poll, error: pollErr } = await supabase

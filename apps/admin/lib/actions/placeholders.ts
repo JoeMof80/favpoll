@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  VALID_OCCASIONS,
+  VALID_OCCASION_TYPES,
   type Topic,
   type PlaceholdersMap,
 } from "@/lib/occasions";
@@ -73,8 +73,8 @@ export async function addOccasion(
   about: string,
   reveal: string,
 ): Promise<{ error: string | null }> {
-  if (!(VALID_OCCASIONS as readonly string[]).includes(occasion)) {
-    return { error: `Invalid occasion: "${occasion}"` };
+  if (!(VALID_OCCASION_TYPES as readonly string[]).includes(occasion)) {
+    return { error: `Invalid occasion type: "${occasion}"` };
   }
 
   const supabase = createAdminClient();

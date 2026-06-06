@@ -53,10 +53,8 @@ export function StepReveal({
   const topicTitle = selectedTopics?.[0]?.title ?? ""
   const name = form.watch("name")
   const firstName = (name || (basePlaceholders?.name ?? "")).split(" ")[0]
-  // Topic placeholders keyed by lowercase occasion_type for compat with existing data
-  const topicKey = occasionType?.toLowerCase()
   const topicOccasionReveal =
-    topicKey && firstTopicMeta?.placeholders?.[topicKey]?.reveal
+    occasionType && firstTopicMeta?.placeholders?.[occasionType]?.reveal
   const revealPlaceholder =
     topicTitle && register && topicOccasionReveal
       ? topicOccasionReveal.replace("{name}", firstName)
