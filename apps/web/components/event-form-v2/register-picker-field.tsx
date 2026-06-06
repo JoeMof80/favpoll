@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
-import { OCCASION_LIST } from "@/lib/occasions"
+import { REGISTER_OPTIONS } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import {
   CHIP_IN_INPUT,
@@ -12,27 +12,33 @@ import {
   type PickerSize,
 } from "./constants"
 
-const SORTED_OCCASIONS = [...OCCASION_LIST].sort((a, b) =>
-  a.label.localeCompare(b.label)
-)
+// Stable labels for the selected chip — not tied to the occasionType preset
+const REGISTER_CHIP_LABELS: Record<string, string> = {
+  remembering: "In memory of someone",
+  celebrating_one: "Celebrating a person",
+  celebrating_many: "Celebrating a couple or group",
+  cause: "Supporting a cause",
+  neutral: "Other / open",
+}
 
-export function OccasionPickerField({
-  value,
+type Props = {
+  register: string
+  onChange: (register: string, occasionType: string | null) => void
+  onClear: () => void
+  size?: PickerSize
+}
+
+export function RegisterPickerField({
+  register,
   onChange,
   onClear,
   size = "md",
-}: {
-  value: string
-  onChange: (v: string) => void
-  onClear: () => void
-  size?: PickerSize
-}) {
+}: Props) {
   const [open, setOpen] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState(0)
   const anchorRef = useRef<HTMLDivElement>(null)
 
-  const selectedLabel =
-    OCCASION_LIST.find((o) => o.value === value)?.label ?? null
+  const chipLabel = register ? (REGISTER_CHIP_LABELS[register] ?? null) : null
 
   function openDropdown() {
     if (anchorRef.current)
@@ -40,8 +46,8 @@ export function OccasionPickerField({
     setOpen(true)
   }
 
-  function handleSelect(v: string) {
-    onChange(v)
+  function handleSelect(reg: string, oType: string | null) {
+    onChange(reg, oType)
     setOpen(false)
   }
 
@@ -57,7 +63,7 @@ export function OccasionPickerField({
           )}
           onClick={openDropdown}
         >
-          {selectedLabel ? (
+          {chipLabel ? (
             <Chip
               selected
               size={size}
@@ -66,9 +72,9 @@ export function OccasionPickerField({
                 e.stopPropagation()
                 onClear()
               }}
-              aria-label={`Clear ${selectedLabel}`}
+              aria-label={`Clear ${chipLabel}`}
             >
-              {selectedLabel}
+              {chipLabel}
             </Chip>
           ) : (
             <span
@@ -98,14 +104,18 @@ export function OccasionPickerField({
           onMouseDown={(e) => e.preventDefault()}
         >
           <div className="flex flex-wrap gap-1.5">
-            {SORTED_OCCASIONS.map((o) => (
+            {REGISTER_OPTIONS.map((o) => (
               <Chip
-                key={o.value}
-                selected={o.value === value}
+                key={`${o.register}-${o.occasionType ?? "null"}`}
+                selected={
+                  o.register === register && o.occasionType === null
+                    ? register === o.register
+                    : false
+                }
                 size={size}
                 onMouseDown={(e) => {
                   e.preventDefault()
-                  handleSelect(o.value)
+                  handleSelect(o.register, o.occasionType)
                 }}
               >
                 {o.label}

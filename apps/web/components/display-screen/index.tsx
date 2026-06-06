@@ -28,7 +28,8 @@ type Props = {
   dateLabel: string | null
   openingLine: string | null
   description: string | null
-  occasion: string
+  register: string
+  occasionType: string | null
   charityName: string | null
   poll: DisplayPoll | null
   initialTotalRaised: number
@@ -141,7 +142,8 @@ export function DisplayScreen({
   dateLabel,
   openingLine,
   description,
-  occasion,
+  register,
+  occasionType,
   charityName,
   poll,
   initialTotalRaised,
@@ -178,8 +180,9 @@ export function DisplayScreen({
   }, [eventId, pollId, supabase])
 
   const headline = getEventHeadline({
-    occasion,
-    occasionLabel: openingLine,
+    register,
+    occasionType,
+    openingLine,
     name: protagonistName,
     dateLabel,
   })

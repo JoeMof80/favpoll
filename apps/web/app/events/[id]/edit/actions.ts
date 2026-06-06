@@ -228,7 +228,8 @@ export async function updateEvent(
   await supabase
     .from("events")
     .update({
-      occasion: input.occasion,
+      register: input.register,
+      occasion_type: input.occasionType,
       opening_line: input.openingLine,
       closes_at: newClosesAt,
       is_private: input.isPrivate,

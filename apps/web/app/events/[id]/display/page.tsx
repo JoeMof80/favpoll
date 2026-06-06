@@ -82,7 +82,8 @@ export default async function DisplayPage({ params }: Props) {
       dateLabel={event.protagonists.context ?? null}
       openingLine={event.opening_line ?? null}
       description={event.description ?? null}
-      occasion={event.occasion}
+      register={event.register}
+      occasionType={event.occasion_type ?? null}
       charityName={charityName}
       poll={displayPoll}
       initialTotalRaised={initialTotalRaised}

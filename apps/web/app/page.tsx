@@ -17,7 +17,8 @@ export default async function HomePage() {
       opening_line,
       description,
       closes_at,
-      occasion,
+      register,
+      occasion_type,
       total_raised,
       protagonist:protagonists ( name ),
       charities:event_charities (
@@ -60,7 +61,8 @@ export default async function HomePage() {
     opening_line: string
     description: string | null
     closes_at: string
-    occasion: string
+    register: string
+    occasion_type: string | null
     total_raised: number
     protagonist: { name: string }
     charities: { charity: import("@favpoll/types").Charity }[]

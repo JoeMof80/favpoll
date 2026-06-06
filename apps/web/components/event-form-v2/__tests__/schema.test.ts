@@ -3,7 +3,7 @@ import { eventFormSchema } from "@/components/event-form-v2/schema"
 
 // Minimal valid input — only required fields
 const VALID_BASE = {
-  occasion: "birthday",
+  register: "celebrating_one",
   name: "Alice",
   closesAt: new Date("2027-01-01"),
   charities: ["charity-1"],
@@ -117,8 +117,8 @@ describe("eventFormSchema — field length limits", () => {
 })
 
 describe("eventFormSchema — required fields", () => {
-  it("rejects missing occasion", () => {
-    const { occasion: _o, ...rest } = VALID_BASE
+  it("rejects missing register", () => {
+    const { register: _r, ...rest } = VALID_BASE
     const result = eventFormSchema.safeParse(rest)
     expect(result.success).toBe(false)
   })

@@ -2,12 +2,8 @@
 
 import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
-import {
-  OCCASION_PLACEHOLDERS,
-  DATE_LABEL_PLACEHOLDERS,
-  DEFAULT_PLACEHOLDERS,
-} from "@/lib/occasions"
-import { PREFIXES } from "@/lib/display"
+import { resolvePlaceholders, DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
+import { getEventHeadline } from "@/lib/display"
 import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
 import { PledgePanel } from "@/components/pledge-panel"
@@ -81,7 +77,8 @@ export function PreviewPanel({
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
-  const occasion = values.occasion ?? ""
+  const register = values.register ?? ""
+  const occasionType = (values.occasionType ?? "") || null
   const name = values.name ?? ""
   const context = values.context ?? ""
   const openingLine = values.openingLine ?? ""
@@ -96,7 +93,7 @@ export function PreviewPanel({
   const firstSelectedTopicId = selectedTopics[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
 
-  if (!occasion) {
+  if (!register) {
     if (isFirstTime || showOnboarding) {
       return <OnboardingPanel onHowItWorks={handleHowItWorks} />
     }
@@ -117,16 +114,18 @@ export function PreviewPanel({
     )
   }
 
-  // Resolve occasion-specific placeholders
-  const placeholders = OCCASION_PLACEHOLDERS[occasion] ?? DEFAULT_PLACEHOLDERS
-  const datePlaceholder = DATE_LABEL_PLACEHOLDERS[occasion] ?? ""
+  // Resolve placeholders
+  const placeholders = resolvePlaceholders(register, occasionType)
+  const datePlaceholder = occasionType
+    ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
+    : ""
+  const topicKey = occasionType?.toLowerCase()
   const topicAbout =
-    firstTopicMeta?.placeholders?.[occasion]?.about ??
+    (topicKey && firstTopicMeta?.placeholders?.[topicKey]?.about) ??
     firstTopicMeta?.placeholders?.["default"]?.about
   const aboutPlaceholder = topicAbout ?? placeholders.about
   const resolvedOpeningLine =
-    openingLine ||
-    (occasion ? (PREFIXES[occasion] ?? "A tribute to") : "A tribute to")
+    openingLine || getEventHeadline({ register, occasionType, name: "" }).prefix
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
@@ -143,7 +142,8 @@ export function PreviewPanel({
 
   const fakeEvent = {
     id: "preview",
-    occasion: occasion || "tribute",
+    register: register || "neutral",
+    occasion_type: occasionType,
     opening_line: resolvedOpeningLine,
     closes_at:
       closesAt instanceof Date
@@ -206,7 +206,8 @@ export function PreviewPanel({
   const hasTopicSelected = !!firstTopic
   const protagonistFirstName = (name || placeholders.name).split(" ")[0]
   const topicTitle = firstTopic?.title ?? "Colour"
-  const topicOccasionReveal = firstTopicMeta?.placeholders?.[occasion]?.reveal
+  const topicOccasionReveal =
+    topicKey && firstTopicMeta?.placeholders?.[topicKey]?.reveal
   const topicRevealPlaceholder =
     topicTitle && topicOccasionReveal
       ? topicOccasionReveal.replace("{name}", protagonistFirstName)

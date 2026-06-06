@@ -10,39 +10,75 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { FieldDescription } from "@/components/ui/field"
-import { PREFIXES } from "@/lib/display"
+import { getEventHeadline } from "@/lib/display"
 import { cn } from "@/lib/utils"
 import type { EventFormValues } from "../schema"
-import { OccasionPickerField } from "../occasion-picker-field"
+import { RegisterPickerField } from "../register-picker-field"
+import { OccasionTypeField } from "../occasion-type-field"
 import { CounterWhenTyping } from "../step-section"
 import { INPUT_SIZE, type PickerSize } from "../constants"
 
 export function StepOccasion({ size = "md" }: { size?: PickerSize }) {
   const form = useFormContext<EventFormValues>()
-  const occasion = form.watch("occasion")
+  const register = form.watch("register") ?? ""
+  const occasionType = form.watch("occasionType") ?? null
   const openingLineValue = form.watch("openingLine") ?? ""
   const openingLineRemaining = 60 - openingLineValue.length
+
+  const openingLinePlaceholder = register
+    ? getEventHeadline({
+        register,
+        occasionType: occasionType || null,
+        name: "",
+      }).prefix
+    : "Enter opening line"
 
   return (
     <>
       <FormField
         control={form.control}
-        name="occasion"
+        name="register"
         render={({ field }) => (
           <FormItem>
-            <OccasionPickerField
-              value={field.value}
-              onChange={(value) => {
-                field.onChange(value)
+            <RegisterPickerField
+              register={field.value}
+              onChange={(reg, oType) => {
+                field.onChange(reg)
+                form.setValue("occasionType", oType ?? "")
                 form.setValue("openingLine", "")
               }}
-              onClear={() => form.reset()}
+              onClear={() => {
+                form.reset()
+              }}
               size={size}
             />
             <FormMessage />
           </FormItem>
         )}
       />
+
+      {register && (
+        <FormField
+          control={form.control}
+          name="occasionType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs text-muted-foreground">
+                What is it?
+              </FormLabel>
+              <FormControl>
+                <OccasionTypeField
+                  register={register}
+                  value={field.value ?? ""}
+                  onChange={(v) => field.onChange(v)}
+                  size={size}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
 
       <FormField
         control={form.control}
@@ -58,10 +94,7 @@ export function StepOccasion({ size = "md" }: { size?: PickerSize }) {
                   INPUT_SIZE[size],
                   "bg-background placeholder:text-muted-foreground/50"
                 )}
-                placeholder={
-                  PREFIXES[occasion as keyof typeof PREFIXES] ??
-                  "Enter opening line"
-                }
+                placeholder={openingLinePlaceholder}
                 maxLength={60}
                 {...field}
                 value={field.value ?? ""}

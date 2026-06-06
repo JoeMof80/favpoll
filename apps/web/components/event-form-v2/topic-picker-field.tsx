@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
-import { shortTopicLabel } from "@/lib/occasions"
+import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { Category, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"

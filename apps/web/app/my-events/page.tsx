@@ -20,7 +20,8 @@ export default async function EventsPage() {
       opening_line,
       closes_at,
       closed_at,
-      occasion,
+      register,
+      occasion_type,
       total_raised,
       protagonists!events_protagonist_id_fkey ( name ),
       event_charities ( charities ( id, name, logo_url, registered_number ) ),
@@ -35,7 +36,8 @@ export default async function EventsPage() {
     opening_line: string
     closes_at: string
     closed_at: string | null
-    occasion: string
+    register: string
+    occasion_type: string | null
     total_raised: number
     protagonists: { name: string }
     event_charities: { charities: Charity }[]
@@ -44,7 +46,8 @@ export default async function EventsPage() {
 
   const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => ({
     id: ev.id,
-    occasion: ev.occasion,
+    register: ev.register,
+    occasion_type: ev.occasion_type,
     opening_line: ev.opening_line,
     closes_at: ev.closes_at,
     closed_at: ev.closed_at,
