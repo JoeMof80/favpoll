@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 
 /**
  * FavpollMark — the favpoll mark (symbol only, no wordmark).
@@ -12,7 +12,7 @@ import * as React from "react";
  */
 
 // Native coordinate box of the mark (matches the design source).
-export const MARK_VIEWBOX = "298 282 120 109";
+export const MARK_VIEWBOX = "298 282 120 109"
 
 export const FAVPOLL_MARK_PATHS: { d: string; opacity?: number }[] = [
   // heart outline (full colour)
@@ -34,7 +34,7 @@ export const FAVPOLL_MARK_PATHS: { d: string; opacity?: number }[] = [
     d: "M363.969 383.043C363.969 386.357 361.418 389.043 358.269 389.043C355.121 389.043 352.569 386.357 352.569 383.043C352.569 379.729 355.121 377.043 358.269 377.043C361.418 377.043 363.969 379.729 363.969 383.043Z",
     opacity: 0.6,
   },
-];
+]
 
 /**
  * Bare <g> of mark paths in `currentColor`, drawn in the mark's native
@@ -45,21 +45,30 @@ export function FavpollMarkGlyph(props: React.SVGProps<SVGGElement>) {
   return (
     <g {...props}>
       {FAVPOLL_MARK_PATHS.map((p, i) => (
-        <path key={i} d={p.d} fill="currentColor" fillOpacity={p.opacity ?? 1} />
+        <path
+          key={i}
+          d={p.d}
+          fill="currentColor"
+          fillOpacity={p.opacity ?? 1}
+        />
       ))}
     </g>
-  );
+  )
 }
 
 export interface FavpollMarkProps extends React.SVGProps<SVGSVGElement> {
   /** Pixel size of the mark; omit to size via CSS/className instead. */
-  size?: number | string;
+  size?: number | string
   /** Accessible label. Omit for a decorative mark (it becomes aria-hidden). */
-  title?: string;
+  title?: string
 }
 
 /** Standalone favpoll mark. Colour follows `currentColor`. */
-export default function FavpollMark({ size, title, ...rest }: FavpollMarkProps) {
+export default function FavpollMark({
+  size,
+  title,
+  ...rest
+}: FavpollMarkProps) {
   return (
     <svg
       viewBox={MARK_VIEWBOX}
@@ -74,5 +83,5 @@ export default function FavpollMark({ size, title, ...rest }: FavpollMarkProps) 
       {title ? <title>{title}</title> : null}
       <FavpollMarkGlyph />
     </svg>
-  );
+  )
 }
