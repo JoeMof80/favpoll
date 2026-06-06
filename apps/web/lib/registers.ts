@@ -253,6 +253,15 @@ export function resolvePlaceholders(
   return DEFAULT_PLACEHOLDERS
 }
 
+/** Short labels for register filter chips on the /events page. */
+export const REGISTER_FILTER_LABELS: Record<Register, string> = {
+  remembering: "In memory",
+  celebrating_one: "Celebrating",
+  celebrating_many: "Couple or group",
+  cause: "For a cause",
+  neutral: "Other",
+}
+
 export function shortTopicLabel(title: string): string {
   const s = title.replace(/^favourite\s+/i, "")
   return s.charAt(0).toUpperCase() + s.slice(1)

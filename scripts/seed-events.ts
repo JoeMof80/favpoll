@@ -60,6 +60,7 @@ const supabase = createClient(
 // ───────────────────────── Config — tweak freely ──────────────────────────
 
 const SEED_USER_ID = "user_seed_scale"
+const EXEMPLAR_USER_ID = "user_seed_exemplar"
 const TARGET_EVENTS = 40 // "dozens"
 
 const CLOSED_FRACTION = 0.4 // share of events already closed
@@ -614,6 +615,228 @@ async function createOneEvent(
   return { occasion: occasionType ?? register, topic: topic.title, pledges: pledgeRows.length }
 }
 
+// ─────────────────────── Exemplar events ──────────────────────────────────
+// Five curated hand-crafted events — one per register — seeded once.
+// They show what each register looks like on the /events page.
+// Created under EXEMPLAR_USER_ID so they can be wiped independently.
+
+type ExemplarSpec = {
+  register: string
+  occasionType: string | null
+  openingLine: string | null
+  protagonistName: string
+  about: string
+  description: string | null
+  topicTitle: string // pick topic by title
+  reveal: string
+}
+
+const EXEMPLAR_SPECS: ExemplarSpec[] = [
+  {
+    register: "remembering",
+    occasionType: "Memorial",
+    openingLine: "In memory of",
+    protagonistName: "Belinda Johnson",
+    about:
+      "A retired teacher and mother who gave forty years to her pupils and her garden. She had a precise eye for what belonged where — in a room, in a border, on a person. Marie Curie nurses cared for her at home in her final weeks.",
+    description:
+      "Belinda spent forty years as a school librarian at St Catherine's. She is remembered for her warmth, her impossible memory for every pupil's name, and her lifelong love of purple.",
+    topicTitle: "Colour",
+    reveal:
+      "Hers was purple. She wore it to every occasion that mattered, and grew lavender in every garden she ever had.",
+  },
+  {
+    register: "celebrating_one",
+    occasionType: "Birthday",
+    openingLine: "Happy birthday",
+    protagonistName: "Sarah Mitchell",
+    about:
+      "Sarah is turning 40 and has never made a neutral choice in her life. Three weekends of deliberation for a single wall, two trips to the paint shop, and complete conviction about the result. She has not once looked back.",
+    description:
+      "Sarah turns 40 this month. Her friends say she has never met a decision she couldn't agonise over beautifully. This one is for her.",
+    topicTitle: "Biscuit",
+    reveal:
+      "Hers is the Bourbon. She once ate four packets in one sitting and maintains this was reasonable given the circumstances.",
+  },
+  {
+    register: "celebrating_one",
+    occasionType: "Retirement",
+    openingLine: "After a lifetime of good work",
+    protagonistName: "David Clarke",
+    about:
+      "Thirty-five years building engineering teams, and David arrived at every important occasion dressed as a man who had made a decision and stuck to it. His team knew exactly what to expect. They found this more comforting than they expected.",
+    description:
+      "David is finally putting down his laptop after 35 years. He built the team from four people to four hundred. This is for him.",
+    topicTitle: "Season",
+    reveal:
+      "His was autumn. He said it was the only season that got the light right, and the only one that had the decency to admit it was ending.",
+  },
+  {
+    register: "celebrating_many",
+    occasionType: "Wedding",
+    openingLine: "Congratulations to",
+    protagonistName: "Emma & James",
+    about:
+      "Emma and James met at a rainy festival in 2019 and have been disagreeing about interior design ever since. Their flat has one wall that remains unpainted after two years. Neither of them is in a hurry to resolve it.",
+    description:
+      "Emma and James are getting married next month. They've asked us not to buy them things. This is the alternative.",
+    topicTitle: "Film",
+    reveal:
+      "Theirs is Amélie. She named it first; he pretended he hadn't already thought the same thing. They haven't resolved the wall either.",
+  },
+  {
+    register: "cause",
+    occasionType: null,
+    openingLine: "Supporting",
+    protagonistName: "Thornfield Community Hub",
+    about:
+      "After the flooding in January, the Thornfield community hub lost its kitchen and most of its equipment. They've been feeding over forty families a week since 2019. The rebuild starts next month.",
+    description:
+      "Everything donated goes directly to the kitchen rebuild. The hub reopens in September.",
+    topicTitle: "Biscuit",
+    reveal:
+      "The volunteers' collective favourite is the Rich Tea. They go through six packets a shift and consider this non-negotiable.",
+  },
+]
+
+async function seedExemplarEvents(
+  topics: Topic[],
+  itemsByTopic: Map<string, Item[]>,
+  charityIds: string[]
+) {
+  // Ensure exemplar user exists
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", EXEMPLAR_USER_ID)
+    .maybeSingle()
+  if (!existingUser) {
+    await supabase.from("users").insert({
+      id: EXEMPLAR_USER_ID,
+      email: "exemplar.organiser@example.test",
+      display_name: "Exemplar Organiser",
+    })
+  }
+
+  // Count already-seeded exemplars
+  const { count } = await supabase
+    .from("events")
+    .select("id", { count: "exact", head: true })
+    .eq("created_by", EXEMPLAR_USER_ID)
+
+  if ((count ?? 0) >= EXEMPLAR_SPECS.length) {
+    console.log(
+      `  Exemplar events already seeded (${count}). Skipping.\n`
+    )
+    return
+  }
+
+  console.log("Seeding exemplar events…\n")
+
+  // Closes 1 year from now
+  const closesAt = new Date()
+  closesAt.setFullYear(closesAt.getFullYear() + 1)
+  closesAt.setHours(23, 59, 0, 0)
+
+  for (const spec of EXEMPLAR_SPECS) {
+    const topic =
+      topics.find((t) => t.title === spec.topicTitle) ?? topics[0]
+    const allItems = itemsByTopic.get(topic.id) ?? []
+    if (allItems.length === 0) {
+      console.error(`  ✗ exemplar: no items for topic "${topic.title}"`)
+      continue
+    }
+
+    // Protagonist
+    const { data: prot, error: pErr } = await supabase
+      .from("protagonists")
+      .insert({
+        name: spec.protagonistName,
+        about: spec.about,
+        photo_url: null,
+        created_by: EXEMPLAR_USER_ID,
+      })
+      .select("id")
+      .single()
+    if (pErr || !prot) {
+      console.error("  ✗ exemplar protagonist:", pErr?.message)
+      continue
+    }
+
+    // Event
+    const { data: event, error: eErr } = await supabase
+      .from("events")
+      .insert({
+        protagonist_id: prot.id,
+        register: spec.register,
+        occasion_type: spec.occasionType,
+        opening_line: spec.openingLine,
+        description: spec.description,
+        closes_at: closesAt.toISOString(),
+        is_private: false,
+        total_raised: 0,
+        market: "en-GB",
+        created_by: EXEMPLAR_USER_ID,
+      })
+      .select("id")
+      .single()
+    if (eErr || !event) {
+      console.error("  ✗ exemplar event:", eErr?.message)
+      continue
+    }
+
+    // Charity
+    const charityId = pick(charityIds)
+    await supabase
+      .from("event_charities")
+      .insert({ event_id: event.id, charity_id: charityId, display_order: 0 })
+
+    // Shared fund (mandatory per product rules)
+    await supabase.from("event_pots").insert({
+      event_id: event.id,
+      created_by: EXEMPLAR_USER_ID,
+      total_deposited: 0,
+    })
+
+    // Poll
+    const reveal =
+      spec.reveal ??
+      topic.placeholders?.[spec.occasionType ?? ""]?.reveal ??
+      null
+    const { data: poll, error: pollErr } = await supabase
+      .from("event_polls")
+      .insert({
+        event_id: event.id,
+        topic_id: topic.id,
+        personal_reveal: reveal,
+      })
+      .select("id")
+      .single()
+    if (pollErr || !poll) {
+      console.error("  ✗ exemplar poll:", pollErr?.message)
+      continue
+    }
+
+    // Poll items (all canonical items for the topic)
+    const pollItemRows = allItems.map((item) => ({
+      event_poll_id: poll.id,
+      topic_item_id: item.id,
+    }))
+    const { error: itemsErr } = await supabase
+      .from("event_poll_items")
+      .insert(pollItemRows)
+    if (itemsErr) {
+      console.error("  ✗ exemplar poll items:", itemsErr.message)
+    }
+
+    console.log(
+      `  ✓ exemplar: ${spec.register}/${spec.occasionType ?? "–"} · ${topic.title}`
+    )
+  }
+
+  console.log()
+}
+
 async function seedEvents() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
   const STAGING_REF = "eotqyintgusvzidymumb" // from PROJECT.md
@@ -642,6 +865,8 @@ async function seedEvents() {
     arr.push(it)
     itemsByTopic.set(it.topic_id, arr)
   }
+
+  await seedExemplarEvents(topics, itemsByTopic, charityIds)
 
   // Idempotent top-up: only create up to TARGET_EVENTS for the seed user.
   const { count } = await supabase

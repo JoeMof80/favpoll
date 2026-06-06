@@ -3,7 +3,8 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventCard } from "@/components/event-card"
 import { EventCardEmpty } from "@/components/event-card-empty"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { REGISTER_FILTER_LABELS, type Register } from "@/lib/registers"
+import { cn } from "@/lib/utils"
 import type { CardResultItem } from "@/components/event-card/use-event-card-pledge"
 
 export const metadata = {
@@ -12,11 +13,29 @@ export const metadata = {
     "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
 
-export default async function LiveEventsPage() {
+const VALID_REGISTERS = Object.keys(REGISTER_FILTER_LABELS) as Register[]
+
+const FILTER_CHIPS = [
+  { label: "All", value: null },
+  ...VALID_REGISTERS.map((r) => ({
+    label: REGISTER_FILTER_LABELS[r],
+    value: r,
+  })),
+]
+
+type Props = {
+  searchParams: Promise<{ register?: string }>
+}
+
+export default async function LiveEventsPage({ searchParams }: Props) {
+  const { register: registerParam } = await searchParams
+  const activeRegister = VALID_REGISTERS.includes(registerParam as Register)
+    ? (registerParam as Register)
+    : null
   const supabase = createAdminClient()
   const { userId } = await auth()
 
-  const { data: events } = await supabase
+  let eventsQuery = supabase
     .from("events")
     .select(
       `
@@ -49,6 +68,12 @@ export default async function LiveEventsPage() {
     .is("closed_at", null)
     .order("created_at", { ascending: false })
     .limit(24)
+
+  if (activeRegister) {
+    eventsQuery = eventsQuery.eq("register", activeRegister)
+  }
+
+  const { data: events } = await eventsQuery
 
   // For authenticated users, find which polls they've already pledged to
   // and pre-fetch results for those polls so returning visitors see results immediately
@@ -170,8 +195,34 @@ export default async function LiveEventsPage() {
   return (
     <main className="bg-muted">
       <div className="mx-auto max-w-330 px-6 py-12">
+        {/* Register filter chips */}
+        <nav aria-label="Filter events by occasion" className="mb-8">
+          <ul className="flex flex-wrap gap-2" role="list">
+            {FILTER_CHIPS.map(({ label, value }) => {
+              const isActive = value === activeRegister
+              const href = value ? `/events?register=${value}` : "/events"
+              return (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-3 py-1 text-xs transition-colors",
+                      isActive
+                        ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
+                        : "border-border bg-background font-normal text-muted-foreground hover:border-[#AFA9EC] hover:text-[#534AB7]"
+                    )}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+
         {events?.length === 0 ? (
-          <EventCardEmpty />
+          <EventCardEmpty activeRegister={activeRegister} />
         ) : (
           <ul
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
