@@ -308,7 +308,8 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ### apps/web
 
 ```
-/                              -- Home: HeroDemoPanel + live events carousel + CTA
+/                              -- Home: HeroDemoPanel + live events carousel (bg-primary/5) + CTA
+/landing-v2                    -- Alternate landing page: animated Venn hero + six-step how-it-works + CTA
 /events                        -- Live events grid (public, no auth)
 /events/new                    -- Create event (EventFormV2)
 /events/[id]                   -- Event page — guest pledge view + edit mode toggle
@@ -423,6 +424,15 @@ components/
 │   └── event-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
 ├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + PollTitle + EventCardCharityCarousel. Used on landing carousel and /my-events grid.
 ├── live-events-carousel.tsx
+├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths) + default FavpollMark SVG
+├── honour-love-charity-venn.tsx  -- Animated Venn SVG (three rotating rings); uses FavpollMarkGlyph at centroid
+├── landing-v2/
+│   ├── example.ts               -- Belinda Hartley thread: EXAMPLE data + OCCASIONS list
+│   ├── occasion-eyebrow.tsx     -- Client: cycles occasion names every 2.8s with framer-motion fade
+│   ├── favour-love-charity-venn.tsx  -- See root-level; this is the landing-v2-scoped variant
+│   ├── honour-love-charity-venn.stories.tsx
+│   ├── how-it-works.tsx         -- Six-step timeline (Create/Share/Reveal phases) with mini preview cards
+│   └── favpoll-mark.tsx         -- landing-v2-scoped FavpollMark with native design-source coordinates
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes
 ├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
@@ -451,6 +461,7 @@ packages/types/index.ts           -- All domain types (@favpoll/types)
 packages/ui/                      -- @favpoll/ui: ThemeProvider + MenuButton (shared between apps/web and apps/admin)
 scripts/seed.ts                   -- pnpm seed — additive, idempotent
 scripts/seed-events.ts            -- scale-test seed: generates 40 events across all occasions/topics. Run with ALLOW_EVENT_SEED=1 or against a staging URL.
+scripts/lint-topics.mjs           -- build-time guard: validates every occasion reveal names an item present in that topic's item list
 ```
 
 ### apps/admin
@@ -545,7 +556,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 481 web, ~22 admin.
+All tests must pass before committing. Current counts: 505 web, ~22 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
