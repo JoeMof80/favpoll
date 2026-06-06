@@ -1,5 +1,5 @@
-import * as React from "react";
-import { FavpollMarkGlyph } from "./favpoll-mark";
+import * as React from "react"
+import { FavpollMarkGlyph } from "./favpoll-mark"
 
 /**
  * HonourLoveCharityVenn — the hero emblem for the alt landing page.
@@ -18,22 +18,24 @@ import { FavpollMarkGlyph } from "./favpoll-mark";
  *   <HonourLoveCharityVenn className="w-full max-w-md mx-auto" />
  */
 
-export interface HonourLoveCharityVennProps
-  extends Omit<React.SVGProps<SVGSVGElement>, "speed"> {
+export interface HonourLoveCharityVennProps extends Omit<
+  React.SVGProps<SVGSVGElement>,
+  "speed"
+> {
   /** Pixel size; omit to size via CSS/className. */
-  size?: number | string;
+  size?: number | string
   /** The three ring labels. */
-  labels?: { honour: string; love: string; charity: string };
+  labels?: { honour: string; love: string; charity: string }
   /** Ring + label colour. */
-  ringColor?: string;
+  ringColor?: string
   /** Mark colour (heart full, inner strokes 60%). */
-  markColor?: string;
+  markColor?: string
   /** Slowly rotate the rings. Always paused when the user prefers reduced motion. */
-  animate?: boolean;
+  animate?: boolean
   /** Seconds per full rotation, per ring. */
-  speed?: { honour?: number; love?: number; charity?: number };
+  speed?: { honour?: number; love?: number; charity?: number }
   /** Accessible label. */
-  title?: string;
+  title?: string
 }
 
 // Ring centres + the resting orientation that points each fade outward.
@@ -42,28 +44,28 @@ const RINGS = [
   { key: "honour", cx: 282.843, cy: 282.843, base: -45, dir: 1, dur: 30 },
   { key: "love", cx: 440.812, cy: 282.843, base: 45, dir: -1, dur: 34 },
   { key: "charity", cx: 357.969, cy: 411.963, base: 180, dir: 1, dur: 38 },
-] as const;
+] as const
 
-const RADIUS = 194;
-const STROKE = 12;
+const RADIUS = 194
+const STROKE = 12
 
 // Label baselines: arcs just outside each ring, on its outer curve.
 const LABEL_ARCS = {
   honour: "M71.7 241.7 A215 215 0 0 1 136.2 125.6", // upper-left, ~45°
   love: "M590.2 128.2 A215 215 0 0 1 652.6 245.4", // upper-right, ~45°
   charity: "M420.8 617.5 A215 215 0 0 1 281 612.8", // bottom (badge-flip)
-};
+}
 
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = React.useState(false);
+  const [reduced, setReduced] = React.useState(false)
   React.useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener?.("change", update);
-    return () => mq.removeEventListener?.("change", update);
-  }, []);
-  return reduced;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const update = () => setReduced(mq.matches)
+    update()
+    mq.addEventListener?.("change", update)
+    return () => mq.removeEventListener?.("change", update)
+  }, [])
+  return reduced
 }
 
 export default function HonourLoveCharityVenn({
@@ -76,13 +78,13 @@ export default function HonourLoveCharityVenn({
   title = "favpoll — honour, love and charity",
   ...rest
 }: HonourLoveCharityVennProps) {
-  const reduced = usePrefersReducedMotion();
-  const spinning = animate && !reduced;
+  const reduced = usePrefersReducedMotion()
+  const spinning = animate && !reduced
   const dur = {
     honour: speed?.honour ?? 30,
     love: speed?.love ?? 34,
     charity: speed?.charity ?? 38,
-  };
+  }
 
   return (
     <svg
@@ -157,7 +159,11 @@ export default function HonourLoveCharityVenn({
         fontSize={28}
       >
         <text>
-          <textPath href="#hlc-arc-honour" startOffset="50%" textAnchor="middle">
+          <textPath
+            href="#hlc-arc-honour"
+            startOffset="50%"
+            textAnchor="middle"
+          >
             {labels.honour}
           </textPath>
         </text>
@@ -167,11 +173,15 @@ export default function HonourLoveCharityVenn({
           </textPath>
         </text>
         <text>
-          <textPath href="#hlc-arc-charity" startOffset="50%" textAnchor="middle">
+          <textPath
+            href="#hlc-arc-charity"
+            startOffset="50%"
+            textAnchor="middle"
+          >
             {labels.charity}
           </textPath>
         </text>
       </g>
     </svg>
-  );
+  )
 }
