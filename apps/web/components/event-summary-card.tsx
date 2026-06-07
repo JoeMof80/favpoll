@@ -10,7 +10,6 @@ import { PollTitle } from "./favpoll-card/poll-title"
 
 export type EventSummaryCardEvent = {
   id: string
-  register: string
   occasion_type: string | null
   opening_line: string
   closes_at: string
@@ -49,7 +48,7 @@ export function EventSummaryCard({ event, className }: Props) {
         )}
         <FavpollHeader
           protagonist={{ name: event.protagonist.name }}
-          eyebrow={event.occasion_type ?? event.register}
+          eyebrow={event.occasion_type ?? ""}
           size="md"
         />
       </div>

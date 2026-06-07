@@ -1,4 +1,5 @@
 import { formatCurrency } from "./i18n"
+import { registerForOccasionType } from "./registers"
 
 export function charityNames(
   charities: { charity: { name: string } }[]
@@ -102,19 +103,14 @@ const REGISTER_PREFIXES: Record<string, string> = {
 }
 
 export function getEventHeadline(params: {
-  register: string
+  register?: string
   occasionType: string | null
   name: string
   dateLabel?: string | null
   openingLine?: string | null
 }): { prefix: string; name: string; suffix: string } {
-  const {
-    register,
-    occasionType,
-    name: personName,
-    dateLabel,
-    openingLine,
-  } = params
+  const { occasionType, name: personName, dateLabel, openingLine } = params
+  const register = params.register ?? registerForOccasionType(occasionType)
 
   const prefix =
     openingLine ||

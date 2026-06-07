@@ -20,7 +20,6 @@ export default async function EventsPage() {
       opening_line,
       closes_at,
       closed_at,
-      register,
       occasion_type,
       total_raised,
       protagonists!events_protagonist_id_fkey ( name ),
@@ -36,7 +35,6 @@ export default async function EventsPage() {
     opening_line: string
     closes_at: string
     closed_at: string | null
-    register: string
     occasion_type: string | null
     total_raised: number
     protagonists: { name: string }
@@ -46,7 +44,6 @@ export default async function EventsPage() {
 
   const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => ({
     id: ev.id,
-    register: ev.register,
     occasion_type: ev.occasion_type,
     opening_line: ev.opening_line,
     closes_at: ev.closes_at,

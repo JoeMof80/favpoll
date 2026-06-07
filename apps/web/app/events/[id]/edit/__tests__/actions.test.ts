@@ -24,7 +24,6 @@ function makeInput(
     protagonistAbout: "A bio",
     dateLabel: null,
     photoUrl: null,
-    register: "celebrating_one",
     occasionType: "Birthday",
     openingLine: null,
     description: null,

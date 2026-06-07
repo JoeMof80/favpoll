@@ -70,7 +70,6 @@ export type Register =
 export type Event = {
   id: string
   protagonist_id: string
-  register: Register
   occasion_type: string | null
   opening_line: string | null
   market: string
@@ -201,7 +200,6 @@ export type CanvasSubmitData = {
   protagonistAbout?: string | null
   dateLabel: string | null
   photoUrl?: string | null
-  register: string
   occasionType: string | null
   openingLine: string | null
   description: string | null

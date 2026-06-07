@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  VALID_OCCASION_TYPES,
+  VALID_REGISTERS,
   type Topic,
   type PlaceholdersMap,
+  type RegisterKey,
 } from "@/lib/occasions";
 
 export async function getTopics(): Promise<{
@@ -38,43 +39,12 @@ export async function getTopicById(
 
 export async function updatePlaceholder(
   topicId: string,
-  occasion: string,
+  register: RegisterKey,
   about: string,
   reveal: string,
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
-
-  const { data: topic, error: fetchError } = await supabase
-    .from("topics")
-    .select("placeholders")
-    .eq("id", topicId)
-    .single();
-
-  if (fetchError) return { error: fetchError.message };
-
-  const current: PlaceholdersMap = (topic as any)?.placeholders ?? {};
-  const merged: PlaceholdersMap = { ...current, [occasion]: { about, reveal } };
-
-  const { error: updateError } = await supabase
-    .from("topics")
-    .update({ placeholders: merged })
-    .eq("id", topicId);
-
-  if (updateError) return { error: updateError.message };
-
-  revalidatePath("/placeholders");
-  revalidatePath(`/placeholders/${topicId}`);
-  return { error: null };
-}
-
-export async function addOccasion(
-  topicId: string,
-  occasion: string,
-  about: string,
-  reveal: string,
-): Promise<{ error: string | null }> {
-  if (!(VALID_OCCASION_TYPES as readonly string[]).includes(occasion)) {
-    return { error: `Invalid occasion type: "${occasion}"` };
+  if (!(VALID_REGISTERS as readonly string[]).includes(register)) {
+    return { error: `Invalid register: "${register}"` };
   }
 
   const supabase = createAdminClient();
@@ -88,14 +58,7 @@ export async function addOccasion(
   if (fetchError) return { error: fetchError.message };
 
   const current: PlaceholdersMap = (topic as any)?.placeholders ?? {};
-
-  if (Object.prototype.hasOwnProperty.call(current, occasion)) {
-    return {
-      error: `Occasion "${occasion}" already exists. Use Save to update it.`,
-    };
-  }
-
-  const merged: PlaceholdersMap = { ...current, [occasion]: { about, reveal } };
+  const merged: PlaceholdersMap = { ...current, [register]: { about, reveal } };
 
   const { error: updateError } = await supabase
     .from("topics")
@@ -109,9 +72,7 @@ export async function addOccasion(
   return { error: null };
 }
 
-export async function getTopicItems(
-  topicId: string,
-): Promise<{
+export async function getTopicItems(topicId: string): Promise<{
   data: { id: string; label: string; display_order: number | null }[] | null;
   error: string | null;
 }> {
@@ -142,40 +103,6 @@ export async function updateItemDisplayOrder(
     .eq("id", itemId);
 
   if (error) return { error: error.message };
-
-  revalidatePath("/placeholders");
-  revalidatePath(`/placeholders/${topicId}`);
-  return { error: null };
-}
-
-export async function deleteOccasion(
-  topicId: string,
-  occasion: string,
-): Promise<{ error: string | null }> {
-  if (occasion === "default") {
-    return { error: "The default occasion cannot be deleted." };
-  }
-
-  const supabase = createAdminClient();
-
-  const { data: topic, error: fetchError } = await supabase
-    .from("topics")
-    .select("placeholders")
-    .eq("id", topicId)
-    .single();
-
-  if (fetchError) return { error: fetchError.message };
-
-  const current: PlaceholdersMap = (topic as any)?.placeholders ?? {};
-  const updated: PlaceholdersMap = { ...current };
-  delete updated[occasion];
-
-  const { error: updateError } = await supabase
-    .from("topics")
-    .update({ placeholders: updated })
-    .eq("id", topicId);
-
-  if (updateError) return { error: updateError.message };
 
   revalidatePath("/placeholders");
   revalidatePath(`/placeholders/${topicId}`);

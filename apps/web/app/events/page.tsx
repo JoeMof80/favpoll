@@ -6,6 +6,7 @@ import { EventCardEmpty } from "@/components/event-card-empty"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/event-card/use-event-card-pledge"
 import { cn } from "@/lib/utils"
+import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
 
 export const metadata = {
   title: "Events — favpoll",
@@ -19,7 +20,6 @@ const EVENT_SELECT = `
   description,
   closes_at,
   closed_at,
-  register,
   occasion_type,
   total_raised,
   is_exemplar,
@@ -59,7 +59,6 @@ type RawEvent = {
   description: string | null
   closes_at: string
   closed_at: string | null
-  register: string
   occasion_type: string | null
   total_raised: number
   is_exemplar: boolean
@@ -97,7 +96,20 @@ export default async function EventsPage({
     eventsQuery = eventsQuery.is("closed_at", null)
   }
   if (activeRegister) {
-    eventsQuery = eventsQuery.eq("register", activeRegister)
+    const reg = activeRegister as Register
+    const types = OCCASION_TYPES_BY_REGISTER[reg] ?? []
+    if (reg === "neutral") {
+      const allNonNeutral = (
+        Object.entries(OCCASION_TYPES_BY_REGISTER) as [Register, string[]][]
+      )
+        .filter(([r]) => r !== "neutral")
+        .flatMap(([, t]) => t)
+      eventsQuery = eventsQuery.or(
+        `occasion_type.is.null,occasion_type.not.in.(${allNonNeutral.join(",")})`
+      )
+    } else if (types.length > 0) {
+      eventsQuery = eventsQuery.in("occasion_type", types)
+    }
   }
   if (activeOccasionType) {
     eventsQuery = eventsQuery.eq("occasion_type", activeOccasionType)
@@ -121,7 +133,20 @@ export default async function EventsPage({
       .not("closed_at", "is", null)
 
     if (activeRegister) {
-      exemplarQuery = exemplarQuery.eq("register", activeRegister)
+      const reg = activeRegister as Register
+      const types = OCCASION_TYPES_BY_REGISTER[reg] ?? []
+      if (reg === "neutral") {
+        const allNonNeutral = (
+          Object.entries(OCCASION_TYPES_BY_REGISTER) as [Register, string[]][]
+        )
+          .filter(([r]) => r !== "neutral")
+          .flatMap(([, t]) => t)
+        exemplarQuery = exemplarQuery.or(
+          `occasion_type.is.null,occasion_type.not.in.(${allNonNeutral.join(",")})`
+        )
+      } else if (types.length > 0) {
+        exemplarQuery = exemplarQuery.in("occasion_type", types)
+      }
     }
 
     exemplarQuery = exemplarQuery

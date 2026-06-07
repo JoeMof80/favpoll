@@ -18,7 +18,9 @@ import type {
   Charity,
   CanvasPollInput,
   TopicWithMeta,
+  Register,
 } from "@favpoll/types"
+import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
 
 type Props = {
   charities: Charity[]
@@ -120,14 +122,19 @@ export function EventFormV2({
 
       const openingLine = values.openingLine ?? null
 
+      // Ensure occasion_type is never null for non-neutral registers
+      const resolvedOccasionType =
+        values.occasionType ||
+        DEFAULT_OCCASION_TYPE[values.register as Register] ||
+        null
+
       if (mode === "create") {
         const { eventId: newId } = await createEvent({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
           dateLabel: values.context || null,
-          register: values.register,
-          occasionType: values.occasionType || null,
+          occasionType: resolvedOccasionType,
           openingLine,
           description: null,
           charityIds: values.charities,
@@ -154,8 +161,7 @@ export function EventFormV2({
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
           dateLabel: values.context || null,
-          register: values.register,
-          occasionType: values.occasionType || null,
+          occasionType: resolvedOccasionType,
           openingLine,
           description: null,
           charityIds: values.charities,

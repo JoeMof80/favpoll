@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { shortTopicLabel, suggestClosingDate } from "@/lib/registers"
+import {
+  shortTopicLabel,
+  suggestClosingDate,
+  registerForOccasionType,
+  DEFAULT_OCCASION_TYPE,
+  type Register,
+} from "@/lib/registers"
 
 describe("shortTopicLabel", () => {
   it("strips leading 'favourite ' (lowercase)", () => {
@@ -107,5 +113,52 @@ describe("suggestClosingDate", () => {
       "2025-12-01"
     )
     expect(result).toMatch(/T23:59$/)
+  })
+})
+
+describe("registerForOccasionType", () => {
+  it("returns neutral for null", () => {
+    expect(registerForOccasionType(null)).toBe("neutral")
+  })
+
+  it("returns neutral for empty string", () => {
+    expect(registerForOccasionType("")).toBe("neutral")
+  })
+
+  it("returns neutral for unknown free-text", () => {
+    expect(registerForOccasionType("Some random event")).toBe("neutral")
+  })
+
+  it("maps Birthday → celebrating_one", () => {
+    expect(registerForOccasionType("Birthday")).toBe("celebrating_one")
+  })
+
+  it("maps Memorial → remembering", () => {
+    expect(registerForOccasionType("Memorial")).toBe("remembering")
+  })
+
+  it("maps Wedding → celebrating_many", () => {
+    expect(registerForOccasionType("Wedding")).toBe("celebrating_many")
+  })
+
+  it("maps Fundraiser → cause", () => {
+    expect(registerForOccasionType("Fundraiser")).toBe("cause")
+  })
+
+  it("round-trips every DEFAULT_OCCASION_TYPE back to its register", () => {
+    const registers: Register[] = [
+      "remembering",
+      "celebrating_one",
+      "celebrating_many",
+      "cause",
+    ]
+    for (const reg of registers) {
+      const defaultType = DEFAULT_OCCASION_TYPE[reg]!
+      expect(registerForOccasionType(defaultType)).toBe(reg)
+    }
+  })
+
+  it("neutral DEFAULT_OCCASION_TYPE is null", () => {
+    expect(DEFAULT_OCCASION_TYPE.neutral).toBeNull()
   })
 })
