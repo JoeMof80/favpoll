@@ -19,7 +19,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { FieldDescription } from "@/components/ui/field"
-import { resolvePlaceholders, DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
+import { DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
+import { getShapePrompt } from "@/lib/shape-prompts"
 import { cn } from "@/lib/utils"
 import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
@@ -64,20 +65,15 @@ export function StepProfile({
   const contextRemaining = 40 - contextValue.length
   const aboutRemaining = 300 - aboutValue.length
 
-  const basePlaceholders = register
-    ? resolvePlaceholders(register, occasionType)
-    : null
   // Date label placeholder: keyed by occasion_type if known
   const datePlaceholder = occasionType
     ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
     : ""
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-  const topicAbout =
-    (occasionType && firstTopicMeta?.placeholders?.[occasionType]?.about) ??
-    firstTopicMeta?.placeholders?.["default"]?.about
-  const aboutPlaceholder = basePlaceholders
-    ? (topicAbout ?? basePlaceholders.about)
+  const topicTitleLower = firstTopicMeta?.title?.toLowerCase() ?? ""
+  const aboutPlaceholder = register
+    ? getShapePrompt(register, topicTitleLower, "about")
     : ""
 
   return (
@@ -96,7 +92,7 @@ export function StepProfile({
                   INPUT_SIZE[size],
                   "bg-background placeholder:text-muted-foreground/50"
                 )}
-                placeholder={basePlaceholders?.name ?? "Enter name or nickname"}
+                placeholder="Enter name or nickname"
                 maxLength={40}
                 {...field}
               />

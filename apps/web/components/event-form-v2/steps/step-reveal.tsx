@@ -11,29 +11,25 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldDescription } from "@/components/ui/field"
-import { resolvePlaceholders } from "@/lib/registers"
+import { getShapePrompt } from "@/lib/shape-prompts"
 import { cn } from "@/lib/utils"
-import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
 import { CounterWhenTyping } from "../step-section"
 import { TEXTAREA_SIZE, type PickerSize } from "../constants"
 
 type Props = {
-  topics: TopicWithMeta[]
   onRevealFocus: () => void
   onRevealBlur: () => void
   size?: PickerSize
 }
 
 export function StepReveal({
-  topics,
   onRevealFocus,
   onRevealBlur,
   size = "md",
 }: Props) {
   const form = useFormContext<EventFormValues>()
   const register = form.watch("register") ?? ""
-  const occasionType = (form.watch("occasionType") ?? "") || null
   const selectedTopics = form.watch("topics")
   const revealValue = form.watch("reveal") ?? ""
   const revealRemaining = 280 - revealValue.length
@@ -45,22 +41,11 @@ export function StepReveal({
     }
   }, [selectedTopics?.length, form])
 
-  const basePlaceholders = register
-    ? resolvePlaceholders(register, occasionType)
-    : null
-  const firstSelectedTopicId = selectedTopics?.[0]?.topicId
-  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
   const topicTitle = selectedTopics?.[0]?.title ?? ""
-  const name = form.watch("name")
-  const firstName = (name || (basePlaceholders?.name ?? "")).split(" ")[0]
-  const topicOccasionReveal =
-    occasionType && firstTopicMeta?.placeholders?.[occasionType]?.reveal
   const revealPlaceholder =
-    topicTitle && register && topicOccasionReveal
-      ? topicOccasionReveal.replace("{name}", firstName)
-      : topicTitle
-        ? `Share their favourite ${topicTitle.toLowerCase()}…`
-        : "Share something they loved…"
+    topicTitle && register
+      ? getShapePrompt(register, topicTitle.toLowerCase(), "reveal")
+      : "Share something they loved…"
 
   return (
     <FormField

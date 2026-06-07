@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
-import { resolvePlaceholders, DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
+import { DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
 import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
@@ -114,16 +114,9 @@ export function PreviewPanel({
     )
   }
 
-  // Resolve placeholders
-  const placeholders = resolvePlaceholders(register, occasionType)
   const datePlaceholder = occasionType
     ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
     : ""
-  const topicKey = occasionType?.toLowerCase()
-  const topicAbout =
-    (topicKey && firstTopicMeta?.placeholders?.[topicKey]?.about) ??
-    firstTopicMeta?.placeholders?.["default"]?.about
-  const aboutPlaceholder = topicAbout ?? placeholders.about
   const resolvedOpeningLine =
     openingLine || getEventHeadline({ register, occasionType, name: "" }).prefix
 
@@ -134,8 +127,8 @@ export function PreviewPanel({
   // Always build a fully formed fake event — real values replace placeholders
   const fakeProtagonist = {
     id: "preview",
-    name: name || placeholders.name,
-    about: about || aboutPlaceholder,
+    name: name || "",
+    about: about || "",
     photo_url: previewPhoto ? resolvedPhotoUrl : null,
     context: previewSuffix ? context || datePlaceholder || null : null,
   } as unknown as Protagonist
@@ -204,17 +197,9 @@ export function PreviewPanel({
     selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
 
   const hasTopicSelected = !!firstTopic
-  const protagonistFirstName = (name || placeholders.name).split(" ")[0]
+  const protagonistFirstName = name.split(" ")[0] || ""
   const topicTitle = firstTopic?.title ?? "Colour"
-  const topicOccasionReveal =
-    topicKey && firstTopicMeta?.placeholders?.[topicKey]?.reveal
-  const topicRevealPlaceholder =
-    topicTitle && topicOccasionReveal
-      ? topicOccasionReveal.replace("{name}", protagonistFirstName)
-      : topicTitle && hasTopicSelected
-        ? `Share their favourite ${topicTitle.toLowerCase()}…`
-        : placeholders.reveal.replace("{name}", protagonistFirstName)
-  const revealValue = showReveal ? reveal || topicRevealPlaceholder : null
+  const revealValue = showReveal ? reveal || null : null
 
   return (
     <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
