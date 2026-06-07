@@ -63,7 +63,6 @@ export function FormPanel({
 
       <StepSection number={4} title="Reveal" size={size}>
         <StepReveal
-          topics={topics}
           onRevealFocus={onRevealFocus}
           onRevealBlur={onRevealBlur}
           size={size}
