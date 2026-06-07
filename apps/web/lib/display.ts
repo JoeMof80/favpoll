@@ -52,27 +52,52 @@ export function formatEventDate(
 }
 
 const OCCASION_TYPE_PREFIXES: Record<string, string> = {
+  // remembering
   Memorial: "In memory of",
-  Tribute: "A tribute to",
+  "Celebration of life": "Celebrating the life of",
+  Tribute: "In honour of",
+  "Pet memorial": "In memory of",
+  // celebrating_one
   Birthday: "Happy birthday",
+  "Milestone birthday": "Happy birthday",
   Retirement: "Celebrating the retirement of",
+  "Leaving do": "Farewell",
+  Graduation: "Congratulations to",
+  Christening: "Welcome",
+  "Baby shower": "Celebrating",
+  "New baby": "Welcome",
+  "Bar or bat mitzvah": "Mazel tov to",
+  Recovery: "Wishing a speedy recovery to",
+  "New job": "Congratulations to",
+  Promotion: "Congratulations to",
+  Achievement: "Well done",
+  Award: "Congratulations to",
+  "Exam success": "Congratulations to",
+  "New home": "Congratulations to",
+  Citizenship: "Congratulations to",
+  "Coming out": "Celebrating",
+  "Divorce party": "Celebrating",
+  "Just because": "Honouring",
+  // celebrating_many
   Wedding: "Congratulations to",
   Engagement: "Congratulations to",
   Anniversary: "Happy anniversary",
-  "Leaving do": "Farewell",
-  Graduation: "Congratulations",
-  Christening: "Welcome",
-  Achievement: "Well done",
-  Recovery: "Cheering on",
-  Award: "Congratulations to",
-  Promotion: "Congratulations to",
+  "Renewal of vows": "Congratulations to",
+  Reunion: "Celebrating",
+  "Team celebration": "Celebrating",
+  "Family gathering": "Celebrating",
+  // cause
+  Fundraiser: "In support of",
+  "Sponsored event": "In support of",
+  "Charity night": "In support of",
+  "In memoriam appeal": "In memory of",
 }
 
 const REGISTER_PREFIXES: Record<string, string> = {
   remembering: "In memory of",
   celebrating_one: "Celebrating",
   celebrating_many: "Celebrating",
-  cause: "Supporting",
+  cause: "In support of",
   neutral: "Honouring",
 }
 

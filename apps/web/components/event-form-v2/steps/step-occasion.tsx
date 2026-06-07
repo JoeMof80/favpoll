@@ -86,7 +86,7 @@ export function StepOccasion({ size = "md" }: { size?: PickerSize }) {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-xs text-muted-foreground">
-              Context
+              Opening line
             </FormLabel>
             <FormControl>
               <Input
