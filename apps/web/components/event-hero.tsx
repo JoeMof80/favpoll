@@ -13,7 +13,6 @@ type Props = {
 
 export function EventHero({ event, protagonist, hideAvatar }: Props) {
   const headline = getEventHeadline({
-    register: event.register,
     occasionType: event.occasion_type,
     openingLine: event.opening_line,
     name: protagonist.name,

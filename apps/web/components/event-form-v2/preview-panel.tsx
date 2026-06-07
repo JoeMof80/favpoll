@@ -138,7 +138,6 @@ export function PreviewPanel({
 
   const fakeEvent = {
     id: "preview",
-    register: register || "neutral",
     occasion_type: occasionType,
     opening_line: resolvedOpeningLine,
     closes_at:

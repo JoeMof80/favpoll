@@ -10,6 +10,7 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
+import { registerForOccasionType } from "@/lib/registers"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -74,7 +75,7 @@ export default async function EditEventPage({ params }: Props) {
   }
 
   const defaultValues: Partial<EventFormValues> = {
-    register: event.register ?? "",
+    register: registerForOccasionType(event.occasion_type ?? null),
     occasionType: event.occasion_type ?? "",
     name: event.protagonists.name ?? "",
     context: event.protagonists.context ?? "",

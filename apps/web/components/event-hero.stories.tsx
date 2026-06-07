@@ -61,7 +61,6 @@ function makeViewProps(sceneIndex: number): {
   const event: Event = {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
-    register: REGISTERS[sceneIndex],
     occasion_type: OCCASION_TYPES[sceneIndex],
     opening_line: SCENE_EYEBROWS[sceneIndex],
     market: "en-GB",

@@ -25,7 +25,6 @@ type CreateEventInput = {
   protagonistAbout: string | null
   photoUrl: string | null
   dateLabel: string | null
-  register: string
   occasionType: string | null
   openingLine: string | null
   description: string | null
@@ -225,7 +224,6 @@ export async function createEvent(
     .from("events")
     .insert({
       protagonist_id: protagonist.id,
-      register: input.register,
       occasion_type: input.occasionType,
       opening_line: input.openingLine,
       created_by: userId,

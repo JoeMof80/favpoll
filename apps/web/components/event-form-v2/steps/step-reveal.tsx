@@ -11,19 +11,21 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldDescription } from "@/components/ui/field"
-import { getShapePrompt } from "@/lib/shape-prompts"
 import { cn } from "@/lib/utils"
+import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
 import { CounterWhenTyping } from "../step-section"
 import { TEXTAREA_SIZE, type PickerSize } from "../constants"
 
 type Props = {
+  topics: TopicWithMeta[]
   onRevealFocus: () => void
   onRevealBlur: () => void
   size?: PickerSize
 }
 
 export function StepReveal({
+  topics,
   onRevealFocus,
   onRevealBlur,
   size = "md",
@@ -41,10 +43,11 @@ export function StepReveal({
     }
   }, [selectedTopics?.length, form])
 
-  const topicTitle = selectedTopics?.[0]?.title ?? ""
+  const firstSelectedTopicId = selectedTopics?.[0]?.topicId
+  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
   const revealPlaceholder =
-    topicTitle && register
-      ? getShapePrompt(register, topicTitle.toLowerCase(), "reveal")
+    register && firstTopicMeta
+      ? (firstTopicMeta.placeholders?.[register]?.reveal ?? "")
       : "Share something they loved…"
 
   return (

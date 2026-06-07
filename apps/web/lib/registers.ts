@@ -39,8 +39,15 @@ export const REGISTER_OPTIONS: RegisterOption[] = [
 
 /** Suggested occasion_type pick-list, filtered by selected register. */
 export const OCCASION_TYPES_BY_REGISTER: Record<Register, string[]> = {
-  remembering: ["Memorial", "Celebration of life", "Tribute", "Pet memorial"],
+  remembering: [
+    "Remembrance",
+    "Memorial",
+    "Celebration of life",
+    "Tribute",
+    "Pet memorial",
+  ],
   celebrating_one: [
+    "Celebration",
     "Birthday",
     "Milestone birthday",
     "Retirement",
@@ -63,6 +70,7 @@ export const OCCASION_TYPES_BY_REGISTER: Record<Register, string[]> = {
     "Just because",
   ],
   celebrating_many: [
+    "Joint celebration",
     "Wedding",
     "Engagement",
     "Anniversary",
@@ -78,6 +86,34 @@ export const OCCASION_TYPES_BY_REGISTER: Record<Register, string[]> = {
     "In memoriam appeal",
   ],
   neutral: [],
+}
+
+/**
+ * Default occasion_type written when the organiser picks a register but no
+ * finer occasion_type. Each value is also a member of OCCASION_TYPES_BY_REGISTER
+ * for its register so round-trip derivation is exact.
+ */
+export const DEFAULT_OCCASION_TYPE: Record<Register, string | null> = {
+  remembering: "Remembrance",
+  celebrating_one: "Celebration",
+  celebrating_many: "Joint celebration",
+  cause: "Fundraiser",
+  neutral: null,
+}
+
+/**
+ * Derive the register from an occasion_type string (or null → neutral).
+ * Free-text / unknown / absent → "neutral".
+ */
+export function registerForOccasionType(occasionType: string | null): Register {
+  if (!occasionType) return "neutral"
+  for (const [reg, types] of Object.entries(OCCASION_TYPES_BY_REGISTER) as [
+    Register,
+    string[],
+  ][]) {
+    if (types.includes(occasionType)) return reg
+  }
+  return "neutral"
 }
 
 const REGISTER_CLOSING_DEFAULTS: Record<Register, number> = {

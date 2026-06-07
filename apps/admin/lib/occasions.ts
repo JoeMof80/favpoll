@@ -1,26 +1,25 @@
-/** Valid occasion_type keys for topics.placeholders. */
-export const VALID_OCCASION_TYPES = [
-  "Memorial",
-  "Tribute",
-  "Birthday",
-  "Retirement",
-  "Leaving do",
-  "Graduation",
-  "Christening",
-  "Achievement",
-  "Recovery",
-  "Award",
-  "Promotion",
-  "Wedding",
-  "Engagement",
-  "Anniversary",
-  "default",
+/** Valid keys for topics.placeholders — the 5 event registers. */
+export const VALID_REGISTERS = [
+  "remembering",
+  "celebrating_one",
+  "celebrating_many",
+  "cause",
+  "neutral",
 ] as const;
 
-export type OccasionType = (typeof VALID_OCCASION_TYPES)[number];
+export type RegisterKey = (typeof VALID_REGISTERS)[number];
+
+/** Human-readable labels for each register shown in the admin UI. */
+export const REGISTER_LABELS: Record<RegisterKey, string> = {
+  remembering: "In memory of someone",
+  celebrating_one: "Celebrating a person",
+  celebrating_many: "Celebrating a couple / group",
+  cause: "Supporting a cause",
+  neutral: "Other / open",
+};
 
 export type PlaceholderEntry = { about: string; reveal: string };
-export type PlaceholdersMap = Record<string, PlaceholderEntry>;
+export type PlaceholdersMap = Partial<Record<RegisterKey, PlaceholderEntry>>;
 
 export type Topic = {
   id: string;

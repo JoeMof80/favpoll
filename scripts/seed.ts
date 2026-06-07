@@ -196,8 +196,77 @@ const categories = [
 // Marcus Webb (achievement) raises RNLI money via favpoll itself.
 // ---------------------------------------------------------------------------
 
-type TopicPlaceholders = {
+type RegisterKey =
+  | "remembering"
+  | "celebrating_one"
+  | "celebrating_many"
+  | "cause"
+  | "neutral"
+
+// Raw seed data uses occasion-type keys for readability; normalised to 5
+// register keys before writing to the DB.
+type RawTopicPlaceholders = {
   [occasion: string]: { about: string; reveal: string }
+}
+
+type TopicPlaceholders = Partial<Record<RegisterKey, { about: string; reveal: string }>>
+
+const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
+  // remembering
+  Memorial: "remembering",
+  Tribute: "remembering",
+  "Celebration of life": "remembering",
+  "Pet memorial": "remembering",
+  "In memoriam appeal": "remembering",
+  // celebrating_one
+  Birthday: "celebrating_one",
+  "Milestone birthday": "celebrating_one",
+  Retirement: "celebrating_one",
+  "Leaving do": "celebrating_one",
+  Graduation: "celebrating_one",
+  Christening: "celebrating_one",
+  "Baby shower": "celebrating_one",
+  "New baby": "celebrating_one",
+  "Bar or bat mitzvah": "celebrating_one",
+  Recovery: "celebrating_one",
+  "New job": "celebrating_one",
+  Promotion: "celebrating_one",
+  Achievement: "celebrating_one",
+  Award: "celebrating_one",
+  "Exam success": "celebrating_one",
+  "New home": "celebrating_one",
+  Citizenship: "celebrating_one",
+  "Coming out": "celebrating_one",
+  "Divorce party": "celebrating_one",
+  "Just because": "celebrating_one",
+  // celebrating_many
+  Wedding: "celebrating_many",
+  Engagement: "celebrating_many",
+  Anniversary: "celebrating_many",
+  "Renewal of vows": "celebrating_many",
+  Reunion: "celebrating_many",
+  "Team celebration": "celebrating_many",
+  "Family gathering": "celebrating_many",
+  // cause
+  Fundraiser: "cause",
+  "Sponsored event": "cause",
+  "Charity night": "cause",
+  // neutral
+  default: "neutral",
+}
+
+/**
+ * Converts occasion-keyed raw placeholders to 5-register-keyed placeholders.
+ * First match per register wins.  `cause` falls back to `neutral` if absent.
+ */
+function normalizeTopicPlaceholders(raw: RawTopicPlaceholders): TopicPlaceholders {
+  const result: TopicPlaceholders = {}
+  for (const [occasion, entry] of Object.entries(raw)) {
+    const reg = OCCASION_TO_REGISTER[occasion]
+    if (reg && !result[reg]) result[reg] = entry
+  }
+  if (!result.cause && result.neutral) result.cause = result.neutral
+  return result
 }
 
 type TopicSeed = {
@@ -205,7 +274,7 @@ type TopicSeed = {
   description: string
   is_finite: boolean
   categories: string[]
-  placeholders: TopicPlaceholders
+  placeholders: RawTopicPlaceholders
 }
 
 const topics: TopicSeed[] = [
@@ -4442,7 +4511,7 @@ async function seedTopics() {
 
     if (existing) {
       const patch: Record<string, unknown> = {
-        placeholders: topic.placeholders,
+        placeholders: normalizeTopicPlaceholders(topic.placeholders),
       }
       if (existing.is_finite !== topic.is_finite)
         patch.is_finite = topic.is_finite
@@ -4456,7 +4525,7 @@ async function seedTopics() {
       description: topic.description,
       is_finite: topic.is_finite,
       is_active: true,
-      placeholders: topic.placeholders,
+      placeholders: normalizeTopicPlaceholders(topic.placeholders),
     })
     if (error) console.error(`  ✗ ${topic.title}:`, error.message)
     else inserted++

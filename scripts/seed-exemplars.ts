@@ -272,7 +272,6 @@ async function main() {
       .from("events")
       .insert({
         protagonist_id: protagonist.id,
-        register: ex.register,
         occasion_type: ex.occasionType,
         opening_line: null,
         market: "en-GB",

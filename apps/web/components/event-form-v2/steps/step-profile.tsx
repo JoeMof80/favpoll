@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/input-group"
 import { FieldDescription } from "@/components/ui/field"
 import { DATE_LABEL_PLACEHOLDERS } from "@/lib/registers"
-import { getShapePrompt } from "@/lib/shape-prompts"
 import { cn } from "@/lib/utils"
 import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "../schema"
@@ -71,9 +70,8 @@ export function StepProfile({
     : ""
   const firstSelectedTopicId = selectedTopics?.[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-  const topicTitleLower = firstTopicMeta?.title?.toLowerCase() ?? ""
   const aboutPlaceholder = register
-    ? getShapePrompt(register, topicTitleLower, "about")
+    ? (firstTopicMeta?.placeholders?.[register]?.about ?? "")
     : ""
 
   return (
