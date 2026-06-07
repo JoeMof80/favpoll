@@ -9,9 +9,15 @@ type Props = {
   event: Event
   protagonist: Protagonist
   hideAvatar?: boolean
+  aboutPlaceholder?: string
 }
 
-export function EventHero({ event, protagonist, hideAvatar }: Props) {
+export function EventHero({
+  event,
+  protagonist,
+  hideAvatar,
+  aboutPlaceholder,
+}: Props) {
   const headline = getEventHeadline({
     occasionType: event.occasion_type,
     openingLine: event.opening_line,
@@ -48,11 +54,15 @@ export function EventHero({ event, protagonist, hideAvatar }: Props) {
         )}
       </div>
 
-      {protagonist.about && (
+      {protagonist.about ? (
         <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
           {protagonist.about}
         </p>
-      )}
+      ) : aboutPlaceholder ? (
+        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-muted-foreground/50">
+          {aboutPlaceholder}
+        </p>
+      ) : null}
 
       <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
     </div>
