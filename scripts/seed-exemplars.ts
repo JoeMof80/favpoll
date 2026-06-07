@@ -170,10 +170,29 @@ function closingDate(closedDaysAgo: number): string {
   ).toISOString()
 }
 
+// ─────────────────────── Helpers ─────────────────────────────────────────────
+
+async function ensureSeedUser() {
+  const { data: existing } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", SEED_USER_ID)
+    .maybeSingle()
+  if (existing) return
+  const { error } = await supabase.from("users").insert({
+    id: SEED_USER_ID,
+    email: "exemplar.organiser@example.test",
+    display_name: "Exemplar Organiser",
+  })
+  if (error) console.error("  ✗ user insert:", error.message)
+}
+
 // ─────────────────────── Main ─────────────────────────────────────────────────
 
 async function main() {
   console.log("🌱  Seeding exemplar events…")
+
+  await ensureSeedUser()
 
   // Check how many exemplars already exist
   const { count: existing } = await supabase
