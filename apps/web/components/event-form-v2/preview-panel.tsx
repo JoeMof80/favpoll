@@ -23,6 +23,7 @@ import type { EventFormValues } from "./schema"
 import { toast } from "sonner"
 import { OnboardingPanel } from "./onboarding-panel"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 type Props = {
   charities: Charity[]
@@ -266,6 +267,16 @@ export function PreviewPanel({
             onPledgeAmountChange={setPledgeAmount}
             charityNames={selectedCharities.map((c) => c.name)}
           />
+          <div className="border-t border-border pt-4 text-center">
+            <Link
+              href={`/events?register=${register}${occasionType ? `&occasion_type=${encodeURIComponent(occasionType)}` : ""}&state=closed`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] text-muted-foreground hover:text-foreground"
+            >
+              See events like this →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
