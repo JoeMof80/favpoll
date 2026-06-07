@@ -5,57 +5,144 @@ import { EventCard } from "@/components/event-card"
 import { EventCardEmpty } from "@/components/event-card-empty"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/event-card/use-event-card-pledge"
+import { cn } from "@/lib/utils"
 
 export const metadata = {
-  title: "Live events — favpoll",
+  title: "Events — favpoll",
   description:
     "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
 
-export default async function LiveEventsPage() {
+const EVENT_SELECT = `
+  id,
+  opening_line,
+  description,
+  closes_at,
+  closed_at,
+  register,
+  occasion_type,
+  total_raised,
+  is_exemplar,
+  protagonist:protagonists ( name ),
+  charities:event_charities (
+    charity:charities ( id, name, logo_url, registered_number )
+  ),
+  event_polls (
+    id,
+    topic_id,
+    topics (
+      title,
+      is_finite,
+      topic_items ( id, label )
+    ),
+    event_poll_items (
+      topic_items ( id, label )
+    )
+  )
+`
+
+type RawTopicItem = { id: string; label: string }
+type RawEpi = { topic_items: RawTopicItem }
+type RawPoll = {
+  id: string
+  topic_id: string | null
+  topics: {
+    title: string
+    is_finite: boolean
+    topic_items: RawTopicItem[]
+  } | null
+  event_poll_items: RawEpi[]
+}
+type RawEvent = {
+  id: string
+  opening_line: string
+  description: string | null
+  closes_at: string
+  closed_at: string | null
+  register: string
+  occasion_type: string | null
+  total_raised: number
+  is_exemplar: boolean
+  protagonist: { name: string }
+  charities: { charity: import("@favpoll/types").Charity }[]
+  event_polls: RawPoll | null
+}
+
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    register?: string
+    occasion_type?: string
+    state?: string
+  }>
+}) {
+  const params = await searchParams
+  const activeRegister = params.register ?? null
+  const activeOccasionType = params.occasion_type ?? null
+  const showClosed = params.state === "closed"
+
   const supabase = createAdminClient()
   const { userId } = await auth()
 
-  const { data: events } = await supabase
+  // Build event query
+  let eventsQuery = supabase
     .from("events")
-    .select(
-      `
-      id,
-      opening_line,
-      description,
-      closes_at,
-      register,
-      occasion_type,
-      total_raised,
-      protagonist:protagonists ( name ),
-      charities:event_charities (
-        charity:charities ( id, name, logo_url, registered_number )
-      ),
-      event_polls (
-        id,
-        topic_id,
-        topics (
-          title,
-          is_finite,
-          topic_items ( id, label )
-        ),
-        event_poll_items (
-          topic_items ( id, label )
-        )
-      )
-    `
-    )
+    .select(EVENT_SELECT)
     .eq("is_private", false)
-    .is("closed_at", null)
-    .order("created_at", { ascending: false })
-    .limit(24)
 
-  // For authenticated users, find which polls they've already pledged to
-  // and pre-fetch results for those polls so returning visitors see results immediately
+  if (showClosed) {
+    eventsQuery = eventsQuery.not("closed_at", "is", null)
+  } else {
+    eventsQuery = eventsQuery.is("closed_at", null)
+  }
+  if (activeRegister) {
+    eventsQuery = eventsQuery.eq("register", activeRegister)
+  }
+  if (activeOccasionType) {
+    eventsQuery = eventsQuery.eq("occasion_type", activeOccasionType)
+  }
+
+  eventsQuery = eventsQuery.order("created_at", { ascending: false }).limit(24)
+
+  const { data: events } = await eventsQuery
+
+  // Exemplar fallback: if a register/occasion_type filter returns no results,
+  // show exemplar events for that filter so the shelf is never empty.
+  const hasFilter = !!(activeRegister || activeOccasionType)
+  let fallbackExemplars: RawEvent[] | null = null
+
+  if (hasFilter && (events?.length ?? 0) === 0) {
+    let exemplarQuery = supabase
+      .from("events")
+      .select(EVENT_SELECT)
+      .eq("is_private", false)
+      .eq("is_exemplar", true)
+      .not("closed_at", "is", null)
+
+    if (activeRegister) {
+      exemplarQuery = exemplarQuery.eq("register", activeRegister)
+    }
+
+    exemplarQuery = exemplarQuery
+      .order("created_at", { ascending: false })
+      .limit(8)
+
+    const { data: exemplars } = await exemplarQuery
+    if ((exemplars?.length ?? 0) > 0) {
+      fallbackExemplars = exemplars as unknown as RawEvent[]
+    }
+  }
+
+  const displayEvents =
+    fallbackExemplars ?? ((events ?? []) as unknown as RawEvent[])
+  const showingExemplars = !!fallbackExemplars
+
+  // For authenticated users, pre-fetch pledge results for live events
   const pledgedResultsByPollId = new Map<string, CardResultItem[]>()
 
-  if (userId) {
-    const pollIds = ((events ?? []) as unknown as RawEvent[])
+  if (userId && !showClosed && !showingExemplars) {
+    const pollIds = displayEvents
       .map((ev) => (ev.event_polls as RawPoll | null)?.id)
       .filter((id): id is string => Boolean(id))
 
@@ -71,19 +158,16 @@ export default async function LiveEventsPage() {
       )
 
       if (pledgedPollIds.length > 0) {
-        // Fetch pledge_allocations for all pledges in one query, grouped by poll
         const pledgeIds = (pledges ?? []).map((p) => p.id)
         const { data: allocations } = await supabase
           .from("pledge_allocations")
           .select("pledge_id, topic_item_id, amount")
           .in("pledge_id", pledgeIds)
 
-        // Map pledge_id → event_poll_id for grouping
         const pledgeToPoll = new Map(
           (pledges ?? []).map((p) => [p.id, p.event_poll_id as string])
         )
 
-        // Aggregate pledge totals by poll → topic_item_id
         const byPoll = new Map<string, Map<string, number>>()
         for (const row of allocations ?? []) {
           const pollId = pledgeToPoll.get(row.pledge_id)
@@ -96,9 +180,8 @@ export default async function LiveEventsPage() {
           )
         }
 
-        // Build a label map for every poll item from the already-fetched event data
         const pollItemLabels = new Map<string, Map<string, string>>()
-        for (const ev of (events ?? []) as unknown as RawEvent[]) {
+        for (const ev of displayEvents) {
           const rawPoll = ev.event_polls
           if (!rawPoll) continue
           const labelMap = new Map<string, string>()
@@ -114,17 +197,14 @@ export default async function LiveEventsPage() {
           pollItemLabels.set(rawPoll.id, labelMap)
         }
 
-        // Merge: all poll items with totals (0 for unpledged items)
         for (const pollId of pledgedPollIds) {
           const totals = byPoll.get(pollId) ?? new Map<string, number>()
           const labelMap =
             pollItemLabels.get(pollId) ?? new Map<string, string>()
-
           const merged = [...labelMap.entries()].map(([id, label]) => ({
             label,
             total: totals.get(id) ?? 0,
           }))
-
           const sorted = merged.sort(
             (a, b) => b.total - a.total || a.label.localeCompare(b.label)
           )
@@ -142,42 +222,70 @@ export default async function LiveEventsPage() {
     }
   }
 
-  type RawTopicItem = { id: string; label: string }
-  type RawEpi = { topic_items: RawTopicItem }
-  type RawPoll = {
-    id: string
-    topic_id: string | null
-    topics: {
-      title: string
-      is_finite: boolean
-      topic_items: RawTopicItem[]
-    } | null
-    event_poll_items: RawEpi[]
-  }
-  type RawEvent = {
-    id: string
-    opening_line: string
-    description: string | null
-    closes_at: string
-    register: string
-    occasion_type: string | null
-    total_raised: number
-    protagonist: { name: string }
-    charities: { charity: import("@favpoll/types").Charity }[]
-    event_polls: RawPoll | null
-  }
+  const filterLabel = activeOccasionType ?? activeRegister ?? null
 
   return (
     <main className="bg-muted">
       <div className="mx-auto max-w-330 px-6 py-12">
-        {events?.length === 0 ? (
+        {/* State filter tabs */}
+        <div className="mb-8 flex items-center gap-3">
+          <Link
+            href={
+              activeRegister
+                ? `/events?register=${activeRegister}${activeOccasionType ? `&occasion_type=${encodeURIComponent(activeOccasionType)}` : ""}`
+                : "/events"
+            }
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              !showClosed
+                ? "bg-foreground text-background"
+                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/15"
+            )}
+          >
+            Live
+          </Link>
+          <Link
+            href={`/events?state=closed${activeRegister ? `&register=${activeRegister}` : ""}${activeOccasionType ? `&occasion_type=${encodeURIComponent(activeOccasionType)}` : ""}`}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              showClosed
+                ? "bg-foreground text-background"
+                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/15"
+            )}
+          >
+            Closed
+          </Link>
+          {filterLabel && (
+            <div className="flex items-center gap-1.5">
+              <span className="rounded-full bg-[#EEEDFE] px-3 py-1.5 text-sm font-medium text-[#534AB7]">
+                {filterLabel}
+              </span>
+              <Link
+                href={`/events${showClosed ? "?state=closed" : ""}`}
+                className="text-sm text-muted-foreground hover:text-foreground"
+                aria-label="Clear filter"
+              >
+                ×
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {showingExemplars && (
+          <SectionEyebrow variant="muted" className="mb-6">
+            No live events yet for this occasion — here are some examples to
+            inspire you.
+          </SectionEyebrow>
+        )}
+
+        {displayEvents.length === 0 ? (
           <EventCardEmpty />
         ) : (
           <ul
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
             role="list"
           >
-            {((events ?? []) as unknown as RawEvent[]).map((ev) => {
+            {displayEvents.map((ev) => {
               const rawPoll = ev.event_polls ?? null
               let poll: {
                 id: string

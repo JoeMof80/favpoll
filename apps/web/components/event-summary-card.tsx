@@ -16,6 +16,7 @@ export type EventSummaryCardEvent = {
   closes_at: string
   closed_at?: string | null
   total_raised: number
+  is_exemplar?: boolean
   protagonist: { name: string }
   charities: { charity: Charity }[]
   poll: { topic: { title: string } | null } | null
@@ -40,7 +41,12 @@ export function EventSummaryCard({ event, className }: Props) {
       )}
     >
       {/* Header */}
-      <div className="p-3">
+      <div className="relative p-3">
+        {event.is_exemplar && (
+          <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
+            Example
+          </span>
+        )}
         <FavpollHeader
           protagonist={{ name: event.protagonist.name }}
           eyebrow={event.occasion_type ?? event.register}

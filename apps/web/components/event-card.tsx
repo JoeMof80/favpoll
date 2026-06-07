@@ -26,6 +26,7 @@ type EventCardEvent = {
   description: string | null
   closes_at: string
   total_raised: number
+  is_exemplar?: boolean
   protagonist: { name: string }
   charities: { charity: Charity }[]
   poll: {
@@ -82,7 +83,12 @@ export function EventCard({
     <li className={cn("list-none", className)}>
       <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
         {/* Navigable header — links to event page */}
-        <Link href={`/events/${event.id}`} className="block p-3">
+        <Link href={`/events/${event.id}`} className="relative block p-3">
+          {event.is_exemplar && (
+            <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
+              Example
+            </span>
+          )}
           <FavpollHeader
             protagonist={{ name: event.protagonist.name }}
             eyebrow={event.occasion_type ?? event.register}
