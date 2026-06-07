@@ -23,7 +23,6 @@ import type {
 import type { EventFormValues } from "./schema"
 import { toast } from "sonner"
 import { OnboardingPanel } from "./onboarding-panel"
-import { ExamplePanel } from "./example-panel"
 
 type Props = {
   charities: Charity[]
@@ -66,7 +65,6 @@ export function PreviewPanel({
   isFirstTime = false,
 }: Props) {
   const [pledgeAmount, setPledgeAmount] = useState("")
-  const [pane, setPane] = useState<"example" | "preview">("example")
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem("favpoll_show_onboarding") === "1"
   )
@@ -116,8 +114,6 @@ export function PreviewPanel({
     )
   }
 
-  // ── Preview yours content ────────────────────────────────────────────────
-
   const datePlaceholder = occasionType
     ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
     : ""
@@ -127,6 +123,11 @@ export function PreviewPanel({
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
+
+  // Grey placeholder text for unfilled about/reveal — keyed by register
+  const aboutPlaceholder = !about
+    ? (firstTopicMeta?.placeholders?.[register]?.about ?? "")
+    : ""
 
   const fakeProtagonist = {
     id: "preview",
@@ -202,127 +203,96 @@ export function PreviewPanel({
   const topicTitle = firstTopic?.title ?? "Colour"
   const revealValue = showReveal ? reveal || null : null
 
-  // ── Floating toggle ──────────────────────────────────────────────────────
-  const toggle = (
-    <div className="absolute top-3 left-1/2 z-10 -translate-x-1/2">
-      <div className="flex gap-0.5 rounded-full border border-border bg-background p-0.5 shadow-md">
-        <Button
-          type="button"
-          size="sm"
-          variant={pane === "preview" ? "default" : "ghost"}
-          className="h-7 rounded-full px-3 text-xs"
-          onClick={() => setPane("preview")}
-        >
-          Preview yours
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={pane === "example" ? "default" : "ghost"}
-          className="h-7 rounded-full px-3 text-xs"
-          onClick={() => setPane("example")}
-        >
-          Example
-        </Button>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="relative mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
-      {toggle}
+    <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
+      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+        {/* Left — hero + poll */}
+        <div>
+          <EventHero
+            event={fakeEvent}
+            protagonist={fakeProtagonist}
+            hideAvatar={!previewPhoto}
+            aboutPlaceholder={aboutPlaceholder}
+          />
 
-      {pane === "example" ? (
-        <ExamplePanel register={register} occasionType={occasionType} />
-      ) : (
-        <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
-          {/* Left — hero + poll */}
-          <div>
-            <EventHero
-              event={fakeEvent}
-              protagonist={fakeProtagonist}
-              hideAvatar={!previewPhoto}
-            />
-
-            {/* Poll area skeleton — visible before topic is chosen */}
-            {!hasTopicSelected && (
-              <div className="pointer-events-none mt-4 space-y-4 opacity-20">
-                <div className="h-5 w-36 rounded bg-foreground" />
-                <div className="space-y-2.5">
-                  {[92, 78, 64, 58, 50].map((w) => (
-                    <div
-                      key={w}
-                      className="h-12 rounded-xl bg-foreground"
-                      style={{ width: `${w}%` }}
-                    />
-                  ))}
-                </div>
+          {/* Poll area skeleton — visible before topic is chosen */}
+          {!hasTopicSelected && (
+            <div className="pointer-events-none mt-4 space-y-4 opacity-20">
+              <div className="h-5 w-36 rounded bg-foreground" />
+              <div className="space-y-2.5">
+                {[92, 78, 64, 58, 50].map((w) => (
+                  <div
+                    key={w}
+                    className="h-12 rounded-xl bg-foreground"
+                    style={{ width: `${w}%` }}
+                  />
+                ))}
               </div>
-            )}
-
-            {hasTopicSelected && (
-              <div className="space-y-4">
-                <PollHeading
-                  topicTitle={topicTitle}
-                  reveal={revealValue}
-                  protagonistFirstName={protagonistFirstName}
-                />
-                {revealValue ? (
-                  <PollResults results={pollResults} />
-                ) : (
-                  /* Dimmed + inert — organiser is composing, not pledging */
-                  <div className="pointer-events-none opacity-40">
-                    <PledgePanel
-                      items={topicItems}
-                      totalAmount={pledgeAmount}
-                      onSelectionsChange={() => {}}
-                      isInfinite={isInfinite}
-                      onAddItem={
-                        isInfinite
-                          ? async () => {
-                              toast.warning(
-                                "Items added here won't be saved — add them to your event after publishing.",
-                                {
-                                  style: {
-                                    background: "#fffbeb",
-                                    color: "#f59e0b",
-                                    border: "1px solid #f59e0b",
-                                  },
-                                  position: "top-center",
-                                }
-                              )
-                            }
-                          : undefined
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Right — sticky meta */}
-          <div className="sticky top-20 space-y-4 self-start">
-            {closesAt instanceof Date ? (
-              <div className="rounded-lg border border-border bg-card px-5 py-4">
-                <Countdown closesAt={closesAt.toISOString()} />
-              </div>
-            ) : (
-              <CountdownPlaceholder />
-            )}
-            <CharityBanner charities={displayCharities} totalRaised={0} />
-            {/* Pledge card — dimmed and inert during creation */}
-            <div className="pointer-events-none opacity-40">
-              <PledgeCard
-                prePublish
-                pledgeAmount={pledgeAmount}
-                onPledgeAmountChange={setPledgeAmount}
-                charityNames={selectedCharities.map((c) => c.name)}
-              />
             </div>
+          )}
+
+          {hasTopicSelected && (
+            <div className="space-y-4">
+              <PollHeading
+                topicTitle={topicTitle}
+                reveal={revealValue}
+                protagonistFirstName={protagonistFirstName}
+              />
+              {revealValue ? (
+                <PollResults results={pollResults} />
+              ) : (
+                /* Dimmed + inert — organiser is composing, not pledging */
+                <div className="pointer-events-none opacity-40">
+                  <PledgePanel
+                    items={topicItems}
+                    totalAmount={pledgeAmount}
+                    onSelectionsChange={() => {}}
+                    isInfinite={isInfinite}
+                    onAddItem={
+                      isInfinite
+                        ? async () => {
+                            toast.warning(
+                              "Items added here won't be saved — add them to your event after publishing.",
+                              {
+                                style: {
+                                  background: "#fffbeb",
+                                  color: "#f59e0b",
+                                  border: "1px solid #f59e0b",
+                                },
+                                position: "top-center",
+                              }
+                            )
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Right — sticky meta */}
+        <div className="sticky top-20 space-y-4 self-start">
+          {closesAt instanceof Date ? (
+            <div className="rounded-lg border border-border bg-card px-5 py-4">
+              <Countdown closesAt={closesAt.toISOString()} />
+            </div>
+          ) : (
+            <CountdownPlaceholder />
+          )}
+          <CharityBanner charities={displayCharities} totalRaised={0} />
+          {/* Pledge card — dimmed and inert during creation */}
+          <div className="pointer-events-none opacity-40">
+            <PledgeCard
+              prePublish
+              pledgeAmount={pledgeAmount}
+              onPledgeAmountChange={setPledgeAmount}
+              charityNames={selectedCharities.map((c) => c.name)}
+            />
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
