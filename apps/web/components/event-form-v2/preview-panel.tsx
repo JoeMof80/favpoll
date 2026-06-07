@@ -116,41 +116,7 @@ export function PreviewPanel({
     )
   }
 
-  // ── Toggle bar — shown whenever a register is selected ──────────────────
-  const toggleBar = (
-    <div className="sticky top-0 z-10 flex justify-center gap-1 border-b border-border bg-background/95 px-4 py-2 backdrop-blur-sm">
-      <Button
-        type="button"
-        size="sm"
-        variant={pane === "example" ? "default" : "ghost"}
-        className="h-7 rounded-full px-3 text-xs"
-        onClick={() => setPane("example")}
-      >
-        Example
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={pane === "preview" ? "default" : "ghost"}
-        className="h-7 rounded-full px-3 text-xs"
-        onClick={() => setPane("preview")}
-      >
-        Preview yours
-      </Button>
-    </div>
-  )
-
-  // ── Example pane ────────────────────────────────────────────────────────
-  if (pane === "example") {
-    return (
-      <div>
-        {toggleBar}
-        <ExamplePanel register={register} occasionType={occasionType} />
-      </div>
-    )
-  }
-
-  // ── Preview yours pane ──────────────────────────────────────────────────
+  // ── Preview yours content ────────────────────────────────────────────────
 
   const datePlaceholder = occasionType
     ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
@@ -237,10 +203,39 @@ export function PreviewPanel({
   const topicTitle = firstTopic?.title ?? "Colour"
   const revealValue = showReveal ? reveal || null : null
 
+  // ── Floating toggle ──────────────────────────────────────────────────────
+  const toggle = (
+    <div className="absolute top-6 right-6 z-10">
+      <div className="flex gap-0.5 rounded-full border border-border bg-background/95 p-0.5 shadow-sm backdrop-blur-sm">
+        <Button
+          type="button"
+          size="sm"
+          variant={pane === "example" ? "default" : "ghost"}
+          className="h-7 rounded-full px-3 text-xs"
+          onClick={() => setPane("example")}
+        >
+          Example
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={pane === "preview" ? "default" : "ghost"}
+          className="h-7 rounded-full px-3 text-xs"
+          onClick={() => setPane("preview")}
+        >
+          Preview yours
+        </Button>
+      </div>
+    </div>
+  )
+
   return (
-    <div>
-      {toggleBar}
-      <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
+    <div className="relative mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
+      {toggle}
+
+      {pane === "example" ? (
+        <ExamplePanel register={register} occasionType={occasionType} />
+      ) : (
         <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
           {/* Left — hero + poll */}
           <div>
@@ -301,7 +296,7 @@ export function PreviewPanel({
               <CountdownPlaceholder />
             )}
             <CharityBanner charities={displayCharities} totalRaised={0} />
-            {/* Pledge card dimmed + inert — guest action, not available during creation */}
+            {/* Pledge card — dimmed and inert during creation */}
             <div className="pointer-events-none opacity-40">
               <PledgeCard
                 prePublish
@@ -312,7 +307,7 @@ export function PreviewPanel({
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { EventHero } from "@/components/event-hero"
 import { PollHeading } from "@/components/poll-heading"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import { CharityBanner } from "@/components/charity-banner"
+import { PledgeCard } from "@/components/pledge-card"
 import type { Event, Protagonist, Charity } from "@favpoll/types"
 import type { PollResultItem } from "@/components/favpoll-card/types"
 
@@ -58,18 +59,18 @@ export function ExamplePanel({ register, occasionType }: Props) {
 
   if (loading) {
     return (
-      <div className="animate-pulse space-y-6 p-16">
+      <div className="animate-pulse space-y-6">
         <div className="h-4 w-24 rounded bg-muted" />
         <div className="h-10 w-56 rounded bg-muted" />
         <div className="h-4 w-full rounded bg-muted" />
         <div className="h-4 w-3/4 rounded bg-muted" />
-        <div className="h-px w-full rounded bg-muted" />
+        <div className="h-px w-full bg-muted" />
         <div className="h-4 w-48 rounded bg-muted" />
         <div className="space-y-2">
           {[80, 55, 35].map((w) => (
             <div
               key={w}
-              className={`h-7 rounded bg-muted`}
+              className="h-7 rounded bg-muted"
               style={{ width: `${w}%` }}
             />
           ))}
@@ -80,7 +81,7 @@ export function ExamplePanel({ register, occasionType }: Props) {
 
   if (!exemplar) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-16">
+      <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-sm text-muted-foreground">
           No example available yet.
         </p>
@@ -93,7 +94,7 @@ export function ExamplePanel({ register, occasionType }: Props) {
     register: exemplar.register,
     occasion_type: exemplar.occasion_type,
     opening_line: exemplar.opening_line,
-    closes_at: new Date().toISOString(),
+    closes_at: new Date(0).toISOString(),
     closed_at: new Date().toISOString(),
     total_raised: exemplar.total_raised,
     is_private: false,
@@ -121,51 +122,59 @@ export function ExamplePanel({ register, occasionType }: Props) {
   const protagonistFirstName = exemplar.protagonist.name.split(" ")[0] || ""
 
   return (
-    <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
-      {/* Example badge */}
-      <div className="mb-6">
-        <span className="rounded-full bg-[#EEEDFE] px-2.5 py-1 text-[11px] font-medium text-[#534AB7]">
-          Example
-        </span>
+    <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+      {/* Left — hero + poll */}
+      <div>
+        <EventHero event={fakeEvent} protagonist={fakeProtagonist} />
+
+        {exemplar.poll && (
+          <div className="space-y-4">
+            <PollHeading
+              topicTitle={exemplar.poll.topicTitle}
+              reveal={exemplar.poll.personalReveal}
+              protagonistFirstName={protagonistFirstName}
+            />
+            {exemplar.poll.results.length > 0 && (
+              <PollResults results={exemplar.poll.results} />
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
-        {/* Left — hero + poll */}
-        <div>
-          <EventHero event={fakeEvent} protagonist={fakeProtagonist} />
-
-          {exemplar.poll && (
-            <div className="space-y-4">
-              <PollHeading
-                topicTitle={exemplar.poll.topicTitle}
-                reveal={exemplar.poll.personalReveal}
-                protagonistFirstName={protagonistFirstName}
-              />
-              {exemplar.poll.results.length > 0 && (
-                <PollResults results={exemplar.poll.results} />
-              )}
-            </div>
-          )}
+      {/* Right — closed indicator + charity + dimmed pledge card */}
+      <div className="sticky top-20 space-y-4 self-start">
+        {/* Poll closed */}
+        <div className="rounded-lg border border-border bg-card px-5 py-4">
+          <p className="text-xs font-medium text-[#7F77DD]">Poll closed</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            This example event has ended.
+          </p>
         </div>
 
-        {/* Right — charity + total raised */}
-        <div className="sticky top-20 space-y-4 self-start">
-          {exemplar.charities.length > 0 && (
-            <CharityBanner
-              charities={exemplar.charities as Charity[]}
-              totalRaised={exemplar.total_raised}
-            />
-          )}
-          <div className="border-t border-border pt-4 text-center">
-            <Link
-              href={`/events?register=${exemplar.register}${exemplar.occasion_type ? `&occasion_type=${encodeURIComponent(exemplar.occasion_type)}` : ""}&state=closed`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] text-muted-foreground hover:text-foreground"
-            >
-              See events like this →
-            </Link>
-          </div>
+        {exemplar.charities.length > 0 && (
+          <CharityBanner
+            charities={exemplar.charities as Charity[]}
+            totalRaised={exemplar.total_raised}
+          />
+        )}
+
+        {/* Pledge card — dimmed, shows the guest experience */}
+        <div className="pointer-events-none opacity-40">
+          <PledgeCard
+            prePublish
+            charityNames={exemplar.charities.map((c) => c.name)}
+          />
+        </div>
+
+        <div className="border-t border-border pt-4 text-center">
+          <Link
+            href={`/events?register=${exemplar.register}${exemplar.occasion_type ? `&occasion_type=${encodeURIComponent(exemplar.occasion_type)}` : ""}&state=closed`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-muted-foreground hover:text-foreground"
+          >
+            See events like this →
+          </Link>
         </div>
       </div>
     </div>
