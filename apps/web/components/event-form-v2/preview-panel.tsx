@@ -130,7 +130,7 @@ export function PreviewPanel({
 
   const fakeProtagonist = {
     id: "preview",
-    name: name || "",
+    name: name || "Name or nickname",
     about: about || "",
     photo_url: previewPhoto ? resolvedPhotoUrl : null,
     context: previewSuffix ? context || datePlaceholder || null : null,
@@ -205,17 +205,8 @@ export function PreviewPanel({
 
   // ── Floating toggle ──────────────────────────────────────────────────────
   const toggle = (
-    <div className="absolute top-6 right-6 z-10">
-      <div className="flex gap-0.5 rounded-full border border-border bg-background/95 p-0.5 shadow-sm backdrop-blur-sm">
-        <Button
-          type="button"
-          size="sm"
-          variant={pane === "example" ? "default" : "ghost"}
-          className="h-7 rounded-full px-3 text-xs"
-          onClick={() => setPane("example")}
-        >
-          Example
-        </Button>
+    <div className="absolute top-3 left-1/2 z-10 -translate-x-1/2">
+      <div className="flex gap-0.5 rounded-full border border-border bg-background p-0.5 shadow-md">
         <Button
           type="button"
           size="sm"
@@ -224,6 +215,15 @@ export function PreviewPanel({
           onClick={() => setPane("preview")}
         >
           Preview yours
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={pane === "example" ? "default" : "ghost"}
+          className="h-7 rounded-full px-3 text-xs"
+          onClick={() => setPane("example")}
+        >
+          Example
         </Button>
       </div>
     </div>
@@ -245,6 +245,22 @@ export function PreviewPanel({
               hideAvatar={!previewPhoto}
             />
 
+            {/* Poll area skeleton — visible before topic is chosen */}
+            {!hasTopicSelected && (
+              <div className="pointer-events-none mt-4 space-y-4 opacity-20">
+                <div className="h-5 w-36 rounded bg-foreground" />
+                <div className="space-y-2.5">
+                  {[92, 78, 64, 58, 50].map((w) => (
+                    <div
+                      key={w}
+                      className="h-12 rounded-xl bg-foreground"
+                      style={{ width: `${w}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {hasTopicSelected && (
               <div className="space-y-4">
                 <PollHeading
@@ -255,7 +271,7 @@ export function PreviewPanel({
                 {revealValue ? (
                   <PollResults results={pollResults} />
                 ) : (
-                  // Dimmed + inert — organiser is composing, not pledging
+                  /* Dimmed + inert — organiser is composing, not pledging */
                   <div className="pointer-events-none opacity-40">
                     <PledgePanel
                       items={topicItems}
