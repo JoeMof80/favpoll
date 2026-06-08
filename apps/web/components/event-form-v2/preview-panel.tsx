@@ -5,7 +5,7 @@ import { useWatch, useFormContext } from "react-hook-form"
 import { Pencil } from "lucide-react"
 import {
   DATE_LABEL_PLACEHOLDERS,
-  CONTEXT_PLACEHOLDER,
+  contextExamples,
   effectiveRegister,
 } from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
@@ -393,7 +393,7 @@ export function PreviewPanel({
                   >
                     {previewSuffix && context
                       ? context
-                      : datePlaceholder || CONTEXT_PLACEHOLDER}
+                      : contextExamples[effReg]}
                   </p>
                   <Pencil className={PENCIL_ICON} aria-hidden />
                 </Button>

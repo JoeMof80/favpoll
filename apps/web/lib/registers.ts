@@ -164,8 +164,18 @@ export function effectiveRegister(
   return tone
 }
 
-/** Generic grey placeholder for context when no occasion-type-specific value exists. */
-export const CONTEXT_PLACEHOLDER = "1940 – 2024 · dates or context"
+/**
+ * Register-keyed grey placeholder for the context line under the protagonist's
+ * name. Shown when the organiser has not yet typed a dates-or-context value.
+ * Topic-independent — one string per register.
+ */
+export const contextExamples: Record<Register, string> = {
+  remembering: "A life full of small, specific, unforgettable things.",
+  celebrating_one: "A good while in, and only just getting started.",
+  celebrating_many: "Worth getting everyone together for.",
+  cause: "A cause worth turning out for.",
+  neutral: "The handful of favourites that sum someone up.",
+}
 
 export function shortTopicLabel(title: string): string {
   const s = title.replace(/^favourite\s+/i, "")
