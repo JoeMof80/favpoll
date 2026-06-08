@@ -1,5 +1,7 @@
 "use client"
 
+// TODO(refactor): adopt ResponsiveOverlay from @/components/ui/responsive-overlay to replace the duplicate Sheet+Dialog pattern here
+
 import { useEffect, useRef, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import type { TopicItem } from "@favpoll/types"

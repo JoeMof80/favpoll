@@ -147,6 +147,26 @@ export const DATE_LABEL_PLACEHOLDERS: Record<string, string> = {
   Promotion: "Starting 1st February 2025",
 }
 
+/**
+ * Maps (occasionType, isPlural) to the effective register used for copy,
+ * tense, and placeholder lookups.
+ * - celebrating + isPlural  → celebrating_many
+ * - celebrating + !isPlural → celebrating_one
+ * - other tones ignore isPlural
+ */
+export function effectiveRegister(
+  occasionType: string | null,
+  isPlural: boolean
+): Register {
+  const tone = registerForOccasionType(occasionType)
+  if (tone === "celebrating_one" && isPlural) return "celebrating_many"
+  if (tone === "celebrating_many" && !isPlural) return "celebrating_one"
+  return tone
+}
+
+/** Generic grey placeholder for context when no occasion-type-specific value exists. */
+export const CONTEXT_PLACEHOLDER = "1940 – 2024 · dates or context"
+
 export function shortTopicLabel(title: string): string {
   const s = title.replace(/^favourite\s+/i, "")
   return s.charAt(0).toUpperCase() + s.slice(1)

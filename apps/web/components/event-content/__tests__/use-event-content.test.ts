@@ -57,6 +57,7 @@ function makeEvent(
     extension_count: 0,
     closed_at: null,
     total_raised: 0,
+    is_plural: null,
     is_private: false,
     description: null,
     created_at: "2024-01-01T00:00:00Z",

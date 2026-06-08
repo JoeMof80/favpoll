@@ -19,6 +19,7 @@ export const eventFormSchema = z.object({
     .max(3, "Maximum 3 charities"),
   sharedFund: z.number().min(0),
   isPrivate: z.boolean(),
+  isPlural: z.boolean().default(false),
   reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
   topics: z
     .array(

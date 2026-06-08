@@ -31,6 +31,7 @@ type CreateEventInput = {
   charityIds: string[]
   closesAt: string
   isPrivate: boolean
+  isPlural: boolean
   potAmount: number | null
   poll: PollInput
 }
@@ -232,6 +233,7 @@ export async function createEvent(
       hard_close_at: hardCloseAt.toISOString(),
       extension_count: 0,
       is_private: input.isPrivate,
+      is_plural: input.isPlural,
       description: input.description,
     })
     .select("id")
