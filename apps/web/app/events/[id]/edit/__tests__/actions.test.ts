@@ -27,6 +27,7 @@ function makeInput(
     occasionType: "Birthday",
     openingLine: null,
     description: null,
+    isPlural: false,
     charityIds: ["charity-1"],
     closesAt: "2028-01-01T00:00",
     isPrivate: false,

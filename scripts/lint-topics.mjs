@@ -68,19 +68,34 @@ for (let i = 0; i < titlePositions.length; i++) {
       .replace(/\s+/g, " ")
       .toLowerCase();
 
+    // Normalise the reveal: & → and, collapse whitespace
+    const normReveal = reveal.replace(/\s*&\s*/g, " and ");
+
     const hit = list.some((label) => {
-      const full = label.toLowerCase();
-      if (reveal.includes(full)) return true;
+      // Base normalisation: lowercase, & → and
+      const full = label.toLowerCase().replace(/\s*&\s*/g, " and ");
+      if (normReveal.includes(full)) return true;
+
+      // Strip parenthetical qualifiers: "Monster Munch (pickled onion)" → "monster munch"
+      const noParens = full.replace(/\s*\([^)]*\)/g, "").trim();
+      if (noParens.length >= 3 && normReveal.includes(noParens)) return true;
+
+      // Strip a leading article: "the west indies" → "west indies"
+      const noArticle = full.replace(/^(the |a |an )/, "");
+      if (noArticle.length >= 3 && normReveal.includes(noArticle)) return true;
+
       // Song-style "Title — Artist": match on the title portion before the dash
       const titlePart = full.split(/\s+—\s+/)[0].trim();
-      if (titlePart.length >= 3 && reveal.includes(titlePart)) return true;
+      if (titlePart.length >= 3 && normReveal.includes(titlePart)) return true;
+
       // "By train" / "On motorbike" / "By river": match on the significant word(s)
       // after a leading short preposition
       const stripped = full.replace(/^(by|on|in|at|the)\s+/, "").trim();
-      if (stripped.length >= 4 && reveal.includes(stripped)) return true;
+      if (stripped.length >= 4 && normReveal.includes(stripped)) return true;
+
       // fall back to first distinctive token
-      const tok = full.split(/[ —-]/)[0];
-      return tok.length >= 4 && reveal.includes(tok);
+      const tok = full.split(/[ —(]/)[0].replace(/['".,!?;:]$/, "");
+      return tok.length >= 4 && normReveal.includes(tok);
     });
 
     checked++;

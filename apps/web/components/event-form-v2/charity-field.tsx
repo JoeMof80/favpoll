@@ -1,8 +1,9 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { Chip } from "@/components/ui/chip"
-import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { cn } from "@/lib/utils"
 import type { Charity } from "@favpoll/types"
 import {
@@ -25,10 +26,7 @@ export function CharityField({
   size?: PickerSize
 }) {
   const [open, setOpen] = useState(false)
-  const [popoverWidth, setPopoverWidth] = useState(0)
   const [search, setSearch] = useState("")
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const atMax = value.length >= MAX_CHARITIES
   const selected = charities.filter((c) => value.includes(c.id))
@@ -42,122 +40,115 @@ export function CharityField({
       onChange(value.filter((x) => x !== id))
     } else if (!atMax) {
       onChange([...value, id])
-      setSearch("")
-      inputRef.current?.focus()
     }
   }
 
-  function openDropdown() {
-    if (anchorRef.current)
-      setPopoverWidth(anchorRef.current.getBoundingClientRect().width)
-    setOpen(true)
-  }
-
-  function handleBlur() {
-    setTimeout(() => {
-      setOpen(false)
-      setSearch("")
-    }, 150)
-  }
+  const charityCount = value.length
+  const charityDescription =
+    charityCount === 0
+      ? "Choose up to 3 charities."
+      : charityCount === 1
+        ? "1 of 3 selected."
+        : `${charityCount} of 3 selected — proceeds split equally.`
 
   return (
     <div>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverAnchor asChild>
-          <div
-            ref={anchorRef}
-            className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
-            onClick={() => inputRef.current?.focus()}
-          >
-            {selected.map((c) => (
-              <Chip
-                key={c.id}
-                selected
-                size={size}
-                className="gap-1"
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  toggle(c.id)
-                }}
-                aria-label={`Remove ${c.name}`}
-              >
-                {c.name}
-              </Chip>
-            ))}
-            {!atMax && (
-              <input
-                ref={inputRef}
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value)
-                  if (!open) openDropdown()
-                }}
-                onKeyDown={(e) => {
-                  if (
-                    (e.key === "Delete" || e.key === "Backspace") &&
-                    !search &&
-                    value.length > 0
-                  ) {
-                    e.preventDefault()
-                    onChange(value.slice(0, -1))
-                  }
-                }}
-                onFocus={openDropdown}
-                onBlur={handleBlur}
-                placeholder={
-                  selected.length === 0 ? "Select a charity…" : "Add another…"
-                }
-                className={cn(
-                  "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
-                  CHIP_IN_INPUT_TEXT[size]
-                )}
-              />
-            )}
-          </div>
-        </PopoverAnchor>
-
-        <PopoverContent
-          style={{ width: popoverWidth || undefined }}
-          className="p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onInteractOutside={(e) => {
-            if (anchorRef.current?.contains(e.target as Node)) {
+      {/* Trigger */}
+      <div
+        className={cn(
+          CHIP_IN_INPUT,
+          CHIP_IN_INPUT_SIZE[size],
+          "cursor-pointer"
+        )}
+        onClick={() => setOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+      >
+        {selected.map((c) => (
+          <Chip
+            key={c.id}
+            selected
+            size={size}
+            className="gap-1"
+            onMouseDown={(e) => {
               e.preventDefault()
-            }
-          }}
-        >
-          <div
-            className="max-h-60 overflow-y-auto p-2"
-            onMouseDown={(e) => e.preventDefault()}
+              e.stopPropagation()
+              toggle(c.id)
+            }}
+            aria-label={`Remove ${c.name}`}
           >
-            {visible.length === 0 ? (
-              <p className="py-3 text-center text-sm text-muted-foreground">
-                No results.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {visible.map((c) => (
-                  <Chip
-                    key={c.id}
-                    selected={value.includes(c.id)}
-                    size={size}
-                    disabled={!value.includes(c.id) && atMax}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      toggle(c.id)
-                    }}
-                  >
-                    {c.name}
-                  </Chip>
-                ))}
-              </div>
+            {c.name}
+          </Chip>
+        ))}
+        {!atMax && (
+          <span
+            className={cn(
+              "min-w-0 flex-1 text-muted-foreground/50",
+              CHIP_IN_INPUT_TEXT[size]
             )}
-          </div>
-        </PopoverContent>
-      </Popover>
+          >
+            {selected.length === 0 ? "Select a charity…" : "Add another…"}
+          </span>
+        )}
+      </div>
+
+      {/* Overlay */}
+      <ResponsiveOverlay
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o)
+          if (!o) setSearch("")
+        }}
+        title="Charity"
+        description={charityDescription}
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              setOpen(false)
+              setSearch("")
+            }}
+          >
+            Done
+          </Button>
+        }
+      >
+        <div className="space-y-3">
+          {/* Search */}
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search charities…"
+            autoFocus
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
+          />
+          {/* Charity chips */}
+          {visible.length === 0 ? (
+            <p className="py-3 text-center text-sm text-muted-foreground">
+              No results.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {visible.map((c) => (
+                <Chip
+                  key={c.id}
+                  selected={value.includes(c.id)}
+                  size="lg"
+                  disabled={!value.includes(c.id) && atMax}
+                  onClick={() => toggle(c.id)}
+                >
+                  {c.name}
+                </Chip>
+              ))}
+            </div>
+          )}
+        </div>
+      </ResponsiveOverlay>
     </div>
   )
 }

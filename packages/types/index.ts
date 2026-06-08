@@ -81,6 +81,7 @@ export type Event = {
   closed_at: string | null
   total_raised: number
   is_private: boolean
+  is_plural: boolean | null
   is_exemplar?: boolean
   description: string | null
   created_at: string
@@ -206,6 +207,7 @@ export type CanvasSubmitData = {
   charityIds: string[]
   closesAt: string
   isPrivate: boolean
+  isPlural: boolean
   potAmount: number | null
   poll: CanvasPollInput
 }

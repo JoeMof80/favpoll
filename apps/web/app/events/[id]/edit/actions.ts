@@ -232,6 +232,7 @@ export async function updateEvent(
       opening_line: input.openingLine,
       closes_at: newClosesAt,
       is_private: input.isPrivate,
+      is_plural: input.isPlural,
       description: input.description,
       ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
     })

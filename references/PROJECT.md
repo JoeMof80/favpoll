@@ -87,7 +87,7 @@ topics (
   description text,
   is_finite boolean default false,
   is_active boolean not null default true,
-  placeholders jsonb default '{}',  -- Keyed about+reveal pairs by occasion
+  placeholders jsonb default '{}',  -- Keyed about+reveal pairs by register: { remembering, celebrating_one, celebrating_many, cause, neutral }
   created_by text references users(id),
   created_at timestamptz
 )
@@ -130,7 +130,7 @@ protagonists (
 events (
   id uuid primary key,
   protagonist_id uuid references protagonists(id),
-  occasion text not null,           -- OccasionType value
+  occasion_type text,               -- e.g. "Birthday", "Memorial", "Wedding". Nullable (neutral register). register is derived in code via registerForOccasionType()
   opening_line text,
   market text not null default 'en-GB',
   created_by text references users(id),
@@ -246,60 +246,61 @@ item_flags (
 20260527000002_restore_topic_item_display_order.sql    -- topic_items.display_order integer nullable
 20260604000000_fix_review_status_pending.sql           -- corrects review_status 'pending' → 'pending_review' for existing rows
 20260604120000_add_guest_pledge_columns.sql            -- guest_email, guest_token, withdrawn_at, pot_allocation_id on pledges; re-adds pledges_identity_check
+20260607140000_derive_register.sql                     -- backfills occasion_type from register, then drops events.register column
 ```
 
 ---
 
-## Occasion Types
+## Registers and Occasion Types
+
+`register` is a **code-only concept** — never stored in the DB. It is derived at runtime via `registerForOccasionType(occasionType)` in `apps/web/lib/registers.ts`.
 
 ```typescript
-type OccasionType =
-  | "memorial"
-  | "tribute"
-  | "birthday"
-  | "retirement"
-  | "wedding"
-  | "engagement"
-  | "anniversary"
-  | "leaving"
-  | "graduation"
-  | "christening"
-  | "achievement"
-  | "recovery"
-  | "award"
-  | "promotion"
-  | "celebration"
-  | "other";
+type Register =
+  | "remembering"       // In memory of / tribute
+  | "celebrating_one"   // One person: birthday, retirement, graduation, etc.
+  | "celebrating_many"  // Multiple: wedding, anniversary, reunion, etc.
+  | "cause"             // Charity fundraiser / sponsored event
+  | "neutral"           // No specific occasion (occasion_type is null)
 ```
 
-### Display headline prefixes (from `lib/display.ts` PREFIXES)
+### `registerForOccasionType(occasionType: string | null): Register`
+
+Pure lookup in `lib/registers.ts`. Returns `"neutral"` for null or unrecognised values.
+
+### `DEFAULT_OCCASION_TYPE: Record<Register, string | null>`
+
+Written to `events.occasion_type` when organiser picks a register chip with no finer occasion type (i.e. the chip's `occasionType` is null): `Remembrance`, `Celebration`, `Joint celebration`, `Fundraiser`, `null`. This write-through (in `OccasionOverlay.handleRegisterSelect`) ensures the event headline and the topic placeholder both resolve via the same register — without it, a plain register selection yields a `neutral` placeholder while the headline shows the correct register tone.
+
+### Occasion types by register (from `OCCASION_TYPES_BY_REGISTER` in `lib/registers.ts`)
+
+| Register          | Occasion types (title-cased strings stored in DB)                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| remembering       | Memorial, Celebration of life, Tribute, Pet memorial, Remembrance                                                                                           |
+| celebrating_one   | Birthday, Milestone birthday, Retirement, Leaving do, Graduation, Christening, Baby shower, New baby, Bar or bat mitzvah, Recovery, New job, Promotion, Achievement, Award, Exam success, New home, Citizenship, Coming out, Divorce party, Just because, Celebration |
+| celebrating_many  | Wedding, Engagement, Anniversary, Renewal of vows, Reunion, Team celebration, Family gathering, Joint celebration                                            |
+| cause             | Fundraiser, Sponsored event, Charity night, In memoriam appeal                                                                                              |
+| neutral           | null (no occasion_type set)                                                                                                                                 |
+
+### Display headline prefixes (from `lib/display.ts`)
+
+Occasion-specific prefixes take precedence; register-level prefixes are the fallback:
 
 ```
-memorial    → 'In memory of'
-tribute     → 'In honour of'
-birthday    → 'Happy birthday'
-retirement  → 'Celebrating the retirement of'
-wedding     → 'Congratulations to'
-engagement  → 'Congratulations to'
-anniversary → 'Happy anniversary'
-leaving     → 'Farewell'
-graduation  → 'Congratulations to'
-christening → 'Welcome'
-achievement → 'Well done'
-recovery    → 'Wishing a speedy recovery to'
-award       → 'Congratulations to'
-promotion   → 'Congratulations to'
-celebration → 'Celebrating'
-other       → 'Honouring'
+remembering      → 'In memory of'
+celebrating_one  → 'Celebrating'
+celebrating_many → 'Celebrating'
+cause            → 'In support of'
+neutral          → 'Honouring'
 ```
 
-### Default poll closing period by occasion
+### Default poll closing period (from `lib/occasions.ts` `suggestClosingDate`)
 
-| Occasion                         | Days until close |
-| -------------------------------- | ---------------- |
-| memorial                         | 30               |
-| tribute, retirement, anniversary | 21               |
-| All others                       | 14               |
+| Occasion type                          | Days until close |
+| -------------------------------------- | ---------------- |
+| Memorial, Remembrance                  | 30               |
+| Tribute, Retirement, Anniversary       | 21               |
+| All others                             | 14               |
 
 ---
 
@@ -342,6 +343,7 @@ API:
 /api/webhooks/clerk            -- Clerk user sync webhook
 /api/events/[id]/request-extension -- Sends extension request email to admin
 /api/polls/[pollId]/results    -- Ranked pledge totals for a poll (admin client)
+NOTE: /api/exemplar removed (PR-B) — example pane replaced by grey placeholder preview
 ```
 
 ### apps/admin
@@ -390,26 +392,26 @@ components/
 │   ├── button.tsx, card.tsx, input.tsx, field.tsx
 │   ├── chip.tsx                  -- Selectable pill toggle; min-w-0 shrink whitespace-normal to allow truncation
 │   ├── sheet.tsx                 -- shadcn Sheet (SlideOver drawer); used by pledge-panel on mobile
+│   ├── responsive-overlay.tsx    -- Sheet (mobile <768px) / Dialog (desktop) dual primitive; useIsMobile() hook init false (no hydration flash); props: open, onOpenChange, title, description?, footer?, children
 │   ├── occasion-tag.tsx
 │   ├── section-eyebrow.tsx
 │   ├── ranking-bar.tsx           -- labelSuffix prop for inline Hide/Show toggle
 │   ├── reveal-quote.tsx
-│   ├── picker-field.tsx
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
-├── event-form-v2/                -- Canonical create/edit form
-│   ├── index.tsx                 -- EventFormV2: Cancel button, lifted photoFileName + showReveal state; isFirstTime prop; mobile: single panel, onboarding interstitial overlay
-│   ├── form-panel.tsx            -- 5-step form, size prop (sm/md/lg), StepSection; all fields have visible FormLabel; step 3 has TopicPickerField only (no ItemAddField)
-│   ├── preview-panel.tsx         -- Live preview; hidden on mobile (md:flex); isFirstTime prop; shows OnboardingPanel when no occasion selected
+├── event-form-v2/                -- Canonical create/edit form (3-pillar + in-place editing)
+│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner (inside <Form> for useWatch access); Event Settings overlay (isPrivate Switch + sharedFund input) in publish bar; publish checklist (missing[] list above button); isFirstTime prop; mobile: flex-col with preview stacked below
+│   ├── form-panel.tsx            -- 3-pillar layout (Honour/Love/Charity): OccasionOverlay (controlled-open), TopicPickerField, CharityField. Retired step files left with TODO(refactor) comments. Uses useFormContext.
+│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below left panel). Shows OnboardingPanel when no occasion selected.
+│   ├── occasion-overlay.tsx      -- Merged register chip grid + occasion-type input (inline chips, no nested Popover); controlled-open; exports REGISTER_CHIP_LABELS; Footer: Done + Clear
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
 │   ├── schema.ts                 -- Zod schema + EventFormValues
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button width hardcoded to CALENDAR_WIDTH = 220
-│   ├── occasion-picker-field.tsx -- Click-to-clear chip, no X button; onInteractOutside prevents close on anchor click
-│   ├── topic-picker-field.tsx    -- Click-to-clear chip, Enter creates topic; Backspace/Delete clears chip; onInteractOutside keeps open
-│   ├── item-add-field.tsx        -- isFinite (view-only) + disabled (no topic) props; Enter adds item; onInteractOutside keeps open; NOT used in form step 3
-│   ├── charity-field.tsx         -- Click-to-toggle chips; Backspace/Delete removes last chip; onInteractOutside keeps open
+│   ├── topic-picker-field.tsx    -- ResponsiveOverlay (internal open state); search input + filter buttons + topic chips; Enter creates custom topic
+│   ├── item-add-field.tsx        -- ResponsiveOverlay (internal open state); disabled state unchanged; NOT used in form pillar 2
+│   ├── charity-field.tsx         -- ResponsiveOverlay (internal open state); search input + charity chip grid; max 3
 │   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
 ├── pledge-panel.tsx              -- Draft state: draftIds committed on Done, discarded on close. Sheet (mobile) + Dialog (desktop). Chips + input inline (flex-wrap); input collapses to w-0 when chips present. Backspace removes last chip. size=lg chips.
 ├── pledge-card/
@@ -431,7 +433,7 @@ components/
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
-├── event-hero.tsx               -- view-only: event + protagonist props, hideAvatar?
+├── event-hero.tsx               -- view-only: event + protagonist props, hideAvatar?, aboutPlaceholder? (renders grey when about is blank)
 ├── event-card.tsx
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
@@ -453,8 +455,9 @@ components/
 ├── stripe-checkout.tsx, pot-banner.tsx
 
 lib/
-├── occasions.ts                  -- OCCASION_LIST, OCCASION_PLACEHOLDERS, DEFAULT_PLACEHOLDERS, DATE_LABEL_PLACEHOLDERS, shortTopicLabel, suggestClosingDate
-├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatEventDate, PREFIXES, getEventHeadline
+├── occasions.ts                  -- DATE_LABEL_PLACEHOLDERS, shortTopicLabel, suggestClosingDate
+├── registers.ts                  -- OCCASION_TYPES_BY_REGISTER, Register type, registerForOccasionType(), DEFAULT_OCCASION_TYPE
+├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatEventDate, getEventHeadline (register param optional — derived from occasionType if absent)
 ├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
 ├── email.ts                      -- Resend helpers
 ├── edit-mode-context.tsx
@@ -493,14 +496,14 @@ app/
 
 components/
 ├── sidebar.tsx
-├── occasion-editor.tsx
+├── occasion-editor.tsx           -- 5 register rows per topic (remembering/celebrating_one/celebrating_many/cause/neutral); about + reveal textarea each
 ├── display-order-editor.tsx      -- Per-item number inputs for finite topic display_order; shown above OccasionEditor
 └── charity-list.tsx
 
 lib/
 ├── supabase/admin.ts             -- createAdminClient() — service role, bypasses RLS
 └── actions/
-    ├── placeholders.ts           -- getTopics, updatePlaceholder, addOccasion, deleteOccasion, getTopicItems, updateItemDisplayOrder
+    ├── placeholders.ts           -- getTopics, updatePlaceholder, getTopicItems, updateItemDisplayOrder
     ├── contributions.ts          -- getPendingContributions, acceptContribution, rejectContribution
     └── charities.ts              -- getCharities, createCharity, updateCharity, deactivateCharity, reactivateCharity
 ```
@@ -574,7 +577,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 505 web, ~22 admin.
+All tests must pass before committing. Current counts: 542 web, 35 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -631,7 +634,9 @@ NEXT_PUBLIC_BASE_URL
 
 - **`personal_framing` retired.** Column kept but never read/written. Auto-generated hint line replaces it.
 
-- **Topic-aware about placeholders.** `protagonists.about` (renamed from `bio`). EventFormV2 preview panel reads `topic.placeholders[occasion].about` for the about placeholder, falls back to `getAboutPlaceholder(occasion)`. `lib/topic-bio-placeholders.ts` deleted.
+- **Topic-aware about placeholders, keyed by effective register.** `protagonists.about`. EventFormV2 preview panel reads `topic.placeholders[effectiveRegister].about/reveal` for grey placeholder text when fields are blank. `effectiveRegister(occasionType, isPlural)` in `lib/registers.ts` resolves the tone: celebrating + `is_plural` → `celebrating_many`; celebrating + !`is_plural` → `celebrating_one`; other tones ignore `is_plural`. `lib/shape-prompts.ts` deleted (replaced by register-keyed topic placeholders). `topics.placeholders` stores exactly 5 keys: `remembering`, `celebrating_one`, `celebrating_many`, `cause`, `neutral`.
+
+- **Placeholder `about` is charity-free.** Placeholder `about` strings are shared across all charities, so per-(register × topic × charity) sets are not viable. Placeholder `about` teases the topic domain only — no charity references. Charity weaving belongs in the organiser's own words (their free-text `about`) and in per-event exemplars only. Exemplars keep their charity weaving unchanged.
 
 - **Localisation foundations.** `events.market` default `'en-GB'`, `topic_items.markets` default `['en-GB']`. `formatCurrency()` in `lib/i18n.ts`. `next-intl` deferred. See `references/LOCALISATION.md`.
 
@@ -639,7 +644,9 @@ NEXT_PUBLIC_BASE_URL
 
 - **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `display_order asc nulls last` for finite topics, then `localeCompare` alphabetical for ties. `topic_items.display_order` (nullable integer) set only for finite topics via admin `DisplayOrderEditor`; null = alphabetical sort.
 
-- **`events_occasion_check` constraint.** Must match `OCCASION_LIST` in `lib/occasions.ts`. All 16 occasion values currently included including `promotion`.
+- **`events.occasion_type` is nullable.** No DB check constraint. Null = neutral register. All values are title-cased strings from `OCCASION_TYPES_BY_REGISTER` in `lib/registers.ts`. `register` is never stored — always derived via `registerForOccasionType(occasion_type)`.
+
+- **`events.is_plural` persists the number axis.** A boolean (nullable) on `events` that records whether the protagonist is one person or a couple/group. Derived by default from the occasion's register (celebrating_many → true; others → false) but overridable via a Switch in the Occasion overlay for ambiguous cases (e.g. joint birthday). Used only by `effectiveRegister()` to select plural vs singular placeholder copy — never drives a separate DB column lookup.
 
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
@@ -657,7 +664,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
 
-- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`
+- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** directly in the seed source (5 keys: `remembering`, `celebrating_one`, `celebrating_many`, `cause`, `neutral`); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `scripts/seed.ts` imports all six batches and validates at startup: duplicate title → throw; seed topic not in map → throw.
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 

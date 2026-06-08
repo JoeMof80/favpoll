@@ -1,9 +1,10 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { X } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
-import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { cn } from "@/lib/utils"
 import {
   CHIP_IN_INPUT,
@@ -32,10 +33,7 @@ export function ItemAddField({
   size?: PickerSize
 }) {
   const [open, setOpen] = useState(false)
-  const [popoverWidth, setPopoverWidth] = useState(0)
   const [search, setSearch] = useState("")
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const trimmed = search.trim()
   const lowerTrimmed = trimmed.toLowerCase()
@@ -61,19 +59,6 @@ export function ItemAddField({
   const placeholder = isFinite
     ? `View items for ${topicTitle}…`
     : `Add ${topicTitle} items…`
-
-  function openPopover() {
-    if (anchorRef.current)
-      setPopoverWidth(anchorRef.current.getBoundingClientRect().width)
-    setOpen(true)
-  }
-
-  function handleBlur() {
-    setTimeout(() => {
-      setOpen(false)
-      setSearch("")
-    }, 150)
-  }
 
   function handleCreate() {
     if (!trimmed) return
@@ -103,56 +88,76 @@ export function ItemAddField({
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverAnchor asChild>
-        <div
-          ref={anchorRef}
-          className={cn(CHIP_IN_INPUT, CHIP_IN_INPUT_SIZE[size])}
-          onClick={() => inputRef.current?.focus()}
-        >
-          <input
-            ref={inputRef}
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                handleCreate()
-              }
-            }}
-            onFocus={openPopover}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            className={cn(
-              "min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/50",
-              CHIP_IN_INPUT_TEXT[size]
-            )}
-          />
-        </div>
-      </PopoverAnchor>
-      <PopoverContent
-        style={{ width: popoverWidth || undefined }}
-        className="p-0"
-        align="start"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onInteractOutside={(e) => {
-          if (anchorRef.current?.contains(e.target as Node)) {
-            e.preventDefault()
-          }
-        }}
+    <div>
+      {/* Trigger */}
+      <div
+        className={cn(
+          CHIP_IN_INPUT,
+          CHIP_IN_INPUT_SIZE[size],
+          "cursor-pointer"
+        )}
+        onClick={() => setOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
       >
-        <div
-          className="max-h-60 overflow-y-auto p-2"
-          onMouseDown={(e) => e.preventDefault()}
+        <span
+          className={cn(
+            "min-w-0 flex-1 text-muted-foreground/50",
+            CHIP_IN_INPUT_TEXT[size]
+          )}
         >
+          {placeholder}
+        </span>
+      </div>
+
+      {/* Overlay */}
+      <ResponsiveOverlay
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o)
+          if (!o) setSearch("")
+        }}
+        title={isFinite ? `Items for ${topicTitle}` : `Add ${topicTitle} items`}
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              setOpen(false)
+              setSearch("")
+            }}
+          >
+            Done
+          </Button>
+        }
+      >
+        <div className="space-y-3">
+          {/* Search / add input — only shown for infinite topics */}
+          {!isFinite && (
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  handleCreate()
+                }
+              }}
+              placeholder={`Add ${topicTitle} items…`}
+              autoFocus
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
+            />
+          )}
+
+          {/* Items */}
           {showCreate ? (
             <button
               type="button"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                handleCreate()
-              }}
+              onClick={handleCreate}
               className="flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
             >
               <span className="text-muted-foreground">Add</span>
@@ -170,15 +175,12 @@ export function ItemAddField({
             <div className="flex flex-wrap gap-1.5">
               {filteredItems.map((item) =>
                 !isFinite && item.isCustom ? (
-                  <Chip key={item.id} size={size} className="gap-1">
+                  <Chip key={item.id} size="lg" className="gap-1">
                     {item.label}
                     <span
                       role="button"
                       tabIndex={-1}
-                      onMouseDown={(e) => {
-                        e.preventDefault()
-                        onRemove(item.label)
-                      }}
+                      onClick={() => onRemove(item.label)}
                       className="hover:text-white/70"
                       aria-label={`Remove ${item.label}`}
                     >
@@ -186,7 +188,7 @@ export function ItemAddField({
                     </span>
                   </Chip>
                 ) : (
-                  <Chip key={item.id} size={size} readOnly>
+                  <Chip key={item.id} size="lg" readOnly>
                     {item.label}
                   </Chip>
                 )
@@ -194,7 +196,7 @@ export function ItemAddField({
             </div>
           )}
         </div>
-      </PopoverContent>
-    </Popover>
+      </ResponsiveOverlay>
+    </div>
   )
 }
