@@ -31,14 +31,12 @@ import { cn } from "@/lib/utils"
 import type { Charity, TopicWithMeta, TopicItem } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 import { toast } from "sonner"
-import { OnboardingPanel } from "./onboarding-panel"
 
 type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
   showReveal: boolean
   onToggleReveal: () => void
-  isFirstTime?: boolean
 }
 
 // Placeholder charities shown before the user selects any
@@ -94,7 +92,6 @@ export function PreviewPanel({
   topics,
   showReveal,
   onToggleReveal,
-  isFirstTime = false,
 }: Props) {
   // Local preview toggles
   const [previewSuffix, setPreviewSuffix] = useState(true)
@@ -102,13 +99,6 @@ export function PreviewPanel({
 
   // Pledge amount for the dimmed preview card
   const [pledgeAmount, setPledgeAmount] = useState("")
-
-  // Onboarding panel state
-  const [showOnboarding, setShowOnboarding] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      localStorage.getItem("favpoll_show_onboarding") === "1"
-  )
 
   // Overlay open states
   const [nameOpen, setNameOpen] = useState(false)
@@ -156,31 +146,7 @@ export function PreviewPanel({
   const firstSelectedTopicId = selectedTopics[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
 
-  function handleHowItWorks() {
-    localStorage.setItem("favpoll_show_onboarding", "1")
-    setShowOnboarding(true)
-  }
-
-  if (!occasionType) {
-    if (isFirstTime || showOnboarding) {
-      return <OnboardingPanel onHowItWorks={handleHowItWorks} />
-    }
-    return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-2">
-        <p className="text-sm text-muted-foreground">
-          Select an occasion to begin.
-        </p>
-        <Button
-          type="button"
-          variant="link"
-          className="h-auto p-0 text-[13px] text-muted-foreground hover:text-foreground"
-          onClick={handleHowItWorks}
-        >
-          How favpoll works →
-        </Button>
-      </div>
-    )
-  }
+  if (!occasionType) return null
 
   const datePlaceholder = occasionType
     ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
