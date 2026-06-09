@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import { shortTopicLabel } from "@/lib/registers"
+import { cn } from "@/lib/utils"
 import type { Category, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
@@ -103,25 +104,25 @@ export function LoveStep({
           className="mb-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
         />
 
-        {/* Category filter chips */}
-        <div className="flex flex-wrap gap-1.5">
-          <Chip
-            size="sm"
-            selected={!catFilter}
-            onClick={() => setCatFilter(null)}
-          >
-            All
-          </Chip>
-          {categories.map((cat) => (
-            <Chip
-              key={cat.id}
-              size="sm"
-              selected={catFilter === cat.id}
-              onClick={() => setCatFilter(catFilter === cat.id ? null : cat.id)}
-            >
-              {cat.label}
-            </Chip>
-          ))}
+        {/* Category filter buttons */}
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+          {[{ id: null, label: "All" }, ...categories.map((c) => ({ id: c.id, label: c.label }))].map(
+            ({ id, label }) => (
+              <button
+                key={id ?? "__all__"}
+                type="button"
+                onClick={() => setCatFilter(id)}
+                className={cn(
+                  "shrink-0 whitespace-nowrap rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors",
+                  (id === null ? !catFilter : catFilter === id)
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                )}
+              >
+                {label}
+              </button>
+            )
+          )}
         </div>
       </div>
 
