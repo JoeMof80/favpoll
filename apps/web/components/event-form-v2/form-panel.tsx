@@ -3,19 +3,15 @@
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { Chip } from "@/components/ui/chip"
+import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { cn } from "@/lib/utils"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { shortTopicLabel, registerForOccasionType } from "@/lib/registers"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
-import { OccasionOverlay } from "./occasion-overlay"
-import { TopicPickerField } from "./topic-picker-field"
-import { CharityField } from "./charity-field"
-import {
-  CHIP_IN_INPUT,
-  CHIP_IN_INPUT_SIZE,
-  CHIP_IN_INPUT_TEXT,
-} from "./constants"
+import { HonourStep } from "@/components/event-flow/honour-step"
+import { LoveStep } from "@/components/event-flow/love-step"
+import { CharityStep } from "@/components/event-flow/charity-step"
 
 type Props = {
   charities: Charity[]
@@ -30,86 +26,62 @@ export function FormPanel({ charities, topics, categories }: Props) {
   const selectedTopics = form.watch("topics") ?? []
   const selectedCharities = form.watch("charities") ?? []
 
-  const [occasionOpen, setOccasionOpen] = useState(false)
+  const [honourOpen, setHonourOpen] = useState(false)
+  const [loveOpen, setLoveOpen] = useState(false)
+  const [charityOpen, setCharityOpen] = useState(false)
 
   const topicLabel = selectedTopics[0]
     ? shortTopicLabel(selectedTopics[0].title)
     : null
-  const selectedCharityNames = charities
+  const charityNames = charities
     .filter((c) => selectedCharities.includes(c.id))
     .map((c) => c.name)
 
+  const charityCount = selectedCharities.length
+  const charityDescription =
+    charityCount === 0
+      ? "Choose up to 3 charities."
+      : charityCount === 1
+        ? "1 of 3 selected."
+        : `${charityCount} of 3 selected — proceeds split equally.`
+
   return (
     <div className="space-y-5 p-5">
-      {/* Pillar 1 — Occasion */}
+      {/* Editable summary */}
       <div className="space-y-1.5">
-        <SectionEyebrow variant="brand">Honour</SectionEyebrow>
-        <div
-          className={cn(
-            CHIP_IN_INPUT,
-            CHIP_IN_INPUT_SIZE["md"],
-            "cursor-pointer"
-          )}
-          onClick={() => setOccasionOpen(true)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && setOccasionOpen(true)}
-          aria-label="Choose occasion"
-          aria-haspopup="dialog"
-          aria-expanded={occasionOpen}
-        >
-          {occasionType ? (
-            <Chip
-              selected
-              size="md"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                form.reset()
-              }}
-              aria-label={`Clear ${occasionType}`}
-            >
-              {occasionType}
-            </Chip>
+        <SectionEyebrow variant="brand">Your event</SectionEyebrow>
+        <div className="flex flex-wrap gap-2">
+          <Chip
+            selected={!!occasionType}
+            size="md"
+            onClick={() => setHonourOpen(true)}
+          >
+            {occasionType || "Occasion…"}
+          </Chip>
+          <Chip
+            selected={!!topicLabel}
+            size="md"
+            onClick={() => setLoveOpen(true)}
+          >
+            {topicLabel || "Topic…"}
+          </Chip>
+          {charityNames.length > 0 ? (
+            charityNames.map((name) => (
+              <Chip
+                key={name}
+                selected
+                size="md"
+                onClick={() => setCharityOpen(true)}
+              >
+                {name}
+              </Chip>
+            ))
           ) : (
-            <span
-              className={cn(
-                "min-w-0 flex-1 text-muted-foreground/50",
-                CHIP_IN_INPUT_TEXT["md"]
-              )}
-            >
-              Choose occasion…
-            </span>
+            <Chip size="md" onClick={() => setCharityOpen(true)}>
+              Charity…
+            </Chip>
           )}
         </div>
-        <OccasionOverlay
-          occasionType={occasionType}
-          isPlural={isPlural}
-          onOccasionChange={(oType) => {
-            const derived = registerForOccasionType(oType || null)
-            form.setValue("occasionType", oType, { shouldValidate: true })
-            form.setValue("register", derived)
-            if (derived === "celebrating_many") form.setValue("isPlural", true)
-            else if (derived === "celebrating_one")
-              form.setValue("isPlural", false)
-            form.setValue("openingLine", "")
-          }}
-          onIsPluralChange={(v) => form.setValue("isPlural", v)}
-          onClear={() => form.reset()}
-          open={occasionOpen}
-          onOpenChange={setOccasionOpen}
-        />
-      </div>
-
-      {/* Pillar 2 — favpoll (Topic) */}
-      <div className="space-y-1.5">
-        <SectionEyebrow variant="brand">Love</SectionEyebrow>
-        <TopicPickerField
-          topics={topics}
-          categories={categories}
-          value={selectedTopics}
-          onChange={(v) => form.setValue("topics", v, { shouldValidate: true })}
-        />
         {topicLabel && (
           <p className="text-xs text-muted-foreground">
             {selectedTopics[0]?.isCustom
@@ -117,24 +89,89 @@ export function FormPanel({ charities, topics, categories }: Props) {
               : "You can add items after publishing."}
           </p>
         )}
+        {charityNames.length > 1 && (
+          <p className="text-xs text-muted-foreground">
+            {charityNames.length} charities — proceeds split equally.
+          </p>
+        )}
       </div>
 
-      {/* Pillar 3 — Charity */}
-      <div className="space-y-1.5">
-        <SectionEyebrow variant="brand">Charity</SectionEyebrow>
-        <CharityField
+      {/* Honour sheet */}
+      <ResponsiveOverlay
+        open={honourOpen}
+        onOpenChange={setHonourOpen}
+        title="Occasion"
+        description="What is this event for?"
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setHonourOpen(false)}
+          >
+            Done
+          </Button>
+        }
+      >
+        <HonourStep
+          value={{ occasionType, isPlural }}
+          onChange={({ occasionType: oType, isPlural: iP }) => {
+            const derived = registerForOccasionType(oType || null)
+            form.setValue("occasionType", oType, { shouldValidate: true })
+            form.setValue("register", derived)
+            form.setValue("isPlural", iP)
+            form.setValue("openingLine", "")
+          }}
+        />
+      </ResponsiveOverlay>
+
+      {/* Love sheet */}
+      <ResponsiveOverlay
+        open={loveOpen}
+        onOpenChange={setLoveOpen}
+        title="favpoll topic"
+        description="Choose what everyone votes on."
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setLoveOpen(false)}
+          >
+            Done
+          </Button>
+        }
+      >
+        <LoveStep
+          topics={topics}
+          categories={categories}
+          value={selectedTopics}
+          onChange={(v) => form.setValue("topics", v, { shouldValidate: true })}
+        />
+      </ResponsiveOverlay>
+
+      {/* Charity sheet */}
+      <ResponsiveOverlay
+        open={charityOpen}
+        onOpenChange={setCharityOpen}
+        title="Charity"
+        description={charityDescription}
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setCharityOpen(false)}
+          >
+            Done
+          </Button>
+        }
+      >
+        <CharityStep
           charities={charities}
           value={selectedCharities}
           onChange={(v) =>
             form.setValue("charities", v, { shouldValidate: true })
           }
         />
-        {selectedCharityNames.length > 1 && (
-          <p className="text-xs text-muted-foreground">
-            {selectedCharityNames.length} charities — proceeds split equally.
-          </p>
-        )}
-      </div>
+      </ResponsiveOverlay>
     </div>
   )
 }

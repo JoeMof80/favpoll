@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -14,7 +14,6 @@ import { updateEvent } from "@/app/events/[id]/edit/actions"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { FormPanel } from "./form-panel"
 import { PreviewPanel } from "./preview-panel"
-import { OnboardingInterstitial } from "./onboarding-interstitial"
 import type {
   Category,
   Charity,
@@ -31,7 +30,6 @@ type Props = {
   protagonistId?: string
   existingPollId?: string
   defaultValues?: Partial<EventFormValues>
-  isFirstTime?: boolean
 }
 
 export function EventFormV2({
@@ -43,28 +41,14 @@ export function EventFormV2({
   protagonistId,
   existingPollId,
   defaultValues,
-  isFirstTime = false,
 }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showReveal, setShowReveal] = useState(false)
-  const [showInterstitial, setShowInterstitial] = useState(false)
   const [eventSettingsOpen, setEventSettingsOpen] = useState(false)
   const [isPrivateDraft, setIsPrivateDraft] = useState(false)
   const [sharedFundDraft, setSharedFundDraft] = useState("0")
-
-  useEffect(() => {
-    const stored = localStorage.getItem("favpoll_show_onboarding")
-    if ((isFirstTime && stored !== "0") || stored === "1") {
-      setShowInterstitial(true)
-    }
-  }, [isFirstTime])
-
-  function handleDismissInterstitial() {
-    localStorage.setItem("favpoll_show_onboarding", "0")
-    setShowInterstitial(false)
-  }
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
     resolver: zodResolver(eventFormSchema as never),
@@ -190,8 +174,6 @@ export function EventFormV2({
         error={error}
         showReveal={showReveal}
         onToggleReveal={() => setShowReveal((s) => !s)}
-        showInterstitial={showInterstitial}
-        onDismissInterstitial={handleDismissInterstitial}
         eventSettingsOpen={eventSettingsOpen}
         onEventSettingsOpen={() => {
           setIsPrivateDraft(form.getValues("isPrivate"))
@@ -209,11 +191,6 @@ export function EventFormV2({
         sharedFundDraft={sharedFundDraft}
         onSharedFundDraftChange={setSharedFundDraft}
         onSubmit={form.handleSubmit(onSubmit)}
-        onShowInterstitial={() => {
-          localStorage.setItem("favpoll_show_onboarding", "1")
-          setShowInterstitial(true)
-        }}
-        isFirstTime={isFirstTime}
         onCancel={() => {
           if (mode === "edit") router.back()
           else form.reset()
@@ -234,8 +211,6 @@ type InnerProps = {
   error: string | null
   showReveal: boolean
   onToggleReveal: () => void
-  showInterstitial: boolean
-  onDismissInterstitial: () => void
   eventSettingsOpen: boolean
   onEventSettingsOpen: () => void
   onEventSettingsClose: () => void
@@ -246,8 +221,6 @@ type InnerProps = {
   onSharedFundDraftChange: (v: string) => void
   onSubmit: () => void
   onCancel: () => void
-  onShowInterstitial: () => void
-  isFirstTime: boolean
 }
 
 function FormInner({
@@ -260,8 +233,6 @@ function FormInner({
   error,
   showReveal,
   onToggleReveal,
-  showInterstitial,
-  onDismissInterstitial,
   eventSettingsOpen,
   onEventSettingsOpen,
   onEventSettingsClose,
@@ -272,8 +243,6 @@ function FormInner({
   onSharedFundDraftChange,
   onSubmit,
   onCancel,
-  onShowInterstitial,
-  isFirstTime,
 }: InnerProps) {
   const occasionTypeValue = useWatch({
     control: form.control,
@@ -299,19 +268,6 @@ function FormInner({
         {/* Left panel — pillars + publish bar */}
         <div className="flex w-full flex-col bg-muted md:w-105 md:shrink-0 md:overflow-hidden md:border-r md:border-border">
           <div className="flex-1 overflow-y-auto">
-            {/* "How favpoll works" link — mobile only, shown after interstitial dismissed */}
-            {!showInterstitial && (
-              <div className="flex justify-end px-5 pt-3 md:hidden">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto p-0 text-[13px] text-muted-foreground hover:text-foreground"
-                  onClick={onShowInterstitial}
-                >
-                  How favpoll works →
-                </Button>
-              </div>
-            )}
             <FormPanel
               charities={charities}
               topics={topics}
@@ -386,7 +342,6 @@ function FormInner({
             topics={topics}
             showReveal={showReveal}
             onToggleReveal={onToggleReveal}
-            isFirstTime={isFirstTime}
           />
         </div>
       </div>
@@ -454,11 +409,6 @@ function FormInner({
           </div>
         </div>
       </ResponsiveOverlay>
-
-      {/* Mobile onboarding interstitial */}
-      {showInterstitial && (
-        <OnboardingInterstitial onDismiss={onDismissInterstitial} />
-      )}
     </>
   )
 }
