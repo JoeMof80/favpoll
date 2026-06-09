@@ -87,9 +87,9 @@ export function LoveStep({
   }
 
   return (
-    <div className="min-h-[22rem] space-y-0">
+    <div className="min-h-88 space-y-0">
       {/* Sticky search + filter row */}
-      <div className="sticky top-0 z-10 bg-background pt-1 pb-2">
+      <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
         <input
           type="text"
           value={search}
@@ -107,34 +107,33 @@ export function LoveStep({
 
         {/* Category filter buttons */}
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {[{ id: null, label: "All" }, ...categories.map((c) => ({ id: c.id, label: c.label }))].map(
-            ({ id, label }) => {
-              const active = id === null ? !catFilter : catFilter === id
-              return (
-                <Button
-                  key={id ?? "__all__"}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCatFilter(id)}
-                  className={cn(
-                    "shrink-0",
-                    active && "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-                  )}
-                >
-                  {label}
-                </Button>
-              )
-            }
-          )}
+          {[
+            { id: null, label: "All" },
+            ...categories.map((c) => ({ id: c.id, label: c.label })),
+          ].map(({ id, label }) => {
+            const active = id === null ? !catFilter : catFilter === id
+            return (
+              <Button
+                key={id ?? "__all__"}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCatFilter(id)}
+                className={cn(
+                  "shrink-0",
+                  active &&
+                    "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
+                )}
+              >
+                {label}
+              </Button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Separator */}
-      <div className="border-b border-border" />
-
       {/* Topic chips */}
-      <div className="pt-3">
+      <div className="px-5 py-4">
         {showCreate ? (
           <button
             type="button"
@@ -156,7 +155,6 @@ export function LoveStep({
               <Chip
                 key={t.id}
                 selected={t.id === selectedId || t.id === "__custom__"}
-                size="lg"
                 onClick={() => handleSelect(t.id)}
               >
                 {shortTopicLabel(t.title)}

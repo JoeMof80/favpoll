@@ -32,7 +32,7 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
   return (
     <div className="space-y-0">
       {/* Sticky search */}
-      <div className="sticky top-0 z-10 bg-background pb-2 pt-1">
+      <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
         <input
           type="text"
           value={search}
@@ -41,7 +41,6 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
           autoFocus
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
         />
-        <div className="mt-2 border-b border-border" />
       </div>
       {/* Charity chips */}
       {visible.length === 0 ? (
@@ -49,7 +48,7 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
           No results.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 px-5 py-4">
           {visible.map((c) => (
             <Chip
               key={c.id}

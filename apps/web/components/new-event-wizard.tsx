@@ -192,8 +192,8 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
           </div>
 
           {/* Right column: step content — scrolls */}
-          <div className="flex-1 overflow-y-auto px-5 py-4">
-            <div className="min-h-88">
+          <div className="h-88 flex-1 overflow-y-auto">
+            <div>
               {step === "honour" ? (
                 <HonourStep
                   value={{ category, grouping }}

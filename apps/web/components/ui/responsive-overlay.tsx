@@ -90,7 +90,9 @@ export function ResponsiveOverlay({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className={dialogContentClassName ?? "flex-1 overflow-y-auto px-5 py-4"}>{children}</div>
+        <div className={dialogContentClassName ?? "flex-1 overflow-y-auto"}>
+          {children}
+        </div>
         {footer && (
           <div className="shrink-0 border-t border-border px-5 py-4">
             {footer}

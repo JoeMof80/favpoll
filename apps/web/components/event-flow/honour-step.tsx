@@ -42,7 +42,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
   return (
     <div className="space-y-5">
       {/* Category — horizontal scroll row */}
-      <div>
+      <div className="px-5 py-4">
         <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
           Occasion type
         </p>
@@ -68,7 +68,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
 
       {/* Grouping segmented control */}
       {showGrouping && (
-        <div>
+        <div className="px-5 py-4">
           <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
             For
           </p>
