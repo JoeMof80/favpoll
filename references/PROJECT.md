@@ -142,6 +142,7 @@ events (
   extension_count integer default 0,
   original_closes_at timestamptz,
   hard_close_at timestamptz,        -- created_at + 90 days, immutable
+  is_listed boolean not null default true,  -- discoverability only; false = URL-accessible but not on /events
   created_at timestamptz
 )
 
@@ -247,6 +248,7 @@ item_flags (
 20260604000000_fix_review_status_pending.sql           -- corrects review_status 'pending' → 'pending_review' for existing rows
 20260604120000_add_guest_pledge_columns.sql            -- guest_email, guest_token, withdrawn_at, pot_allocation_id on pledges; re-adds pledges_identity_check
 20260607140000_derive_register.sql                     -- backfills occasion_type from register, then drops events.register column
+20260609000000_add_is_listed.sql                       -- ADD COLUMN is_listed boolean NOT NULL DEFAULT true
 ```
 
 ---
@@ -405,10 +407,10 @@ components/
 │   ├── reveal-quote.tsx
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
-├── event-form-v2/                -- Canonical create/edit form (3-pillar + in-place editing)
-│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner (inside <Form> for useWatch access); Event Settings overlay (isPrivate Switch + sharedFund input) in publish bar; publish checklist (missing[] list above button); isFirstTime prop; mobile: flex-col with preview stacked below
-│   ├── form-panel.tsx            -- 3-pillar layout (Honour/Love/Charity): OccasionOverlay (controlled-open), TopicPickerField, CharityField. Retired step files left with TODO(refactor) comments. Uses useFormContext.
-│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below left panel). Shows OnboardingPanel when no occasion selected.
+├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
+│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input); isFirstTime prop
+│   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist, Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
+│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected.
 │   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
@@ -663,6 +665,10 @@ NEXT_PUBLIC_BASE_URL
 - **Onboarding for first-time organisers.** `app/events/new/page.tsx` queries `events` to set `isFirstTime`. On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
 - **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Use `toast.warning()` with explicit `style: { background, color, border }` props — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them.
+
+- **Command panel + one-action publish.** The floating `CommandPanel` (`fixed bottom-4 right-4 w-72` desktop; full-width bottom bar mobile) replaces the former left panel and fixed publish bar. Clicking Publish creates/updates the event immediately — the event is live at its URL at that instant. `is_listed` is a post-publish-flippable property; toggling it via the Listed/Unlisted switch before publishing sets the initial value. `form-panel.tsx` is deleted; its content is fully absorbed into `CommandPanel`.
+
+- **Listed/Unlisted model.** `events.is_listed` (boolean, default `true`). Listed → appears on the `/events` live events page. Unlisted → reachable by URL only, not shown on `/events`. **All events feed the record regardless of `is_listed`** — rankings query `topic_items.all_time_pledged` directly, not through `events`. `remembering` register defaults to `is_listed = false`; organisers can override with the switch before publishing. The `/events` query filters `.eq("is_listed", true)` in addition to `.eq("is_private", false)`. `is_private` (access control) and `is_listed` (discoverability) are orthogonal.
 
 - **opening_line is organiser-editable.** Shown as placeholder text in the form (from `PREFIXES[occasion]`) — not pre-filled. Organiser may type their own. Stored in DB. Preview falls back to `PREFIXES[occasion]` when field is empty. Never derive it purely from occasion at render time.
 
