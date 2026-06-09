@@ -378,7 +378,7 @@ app/
 ├── events/
 │   ├── page.tsx
 │   ├── actions.ts
-│   ├── new/page.tsx, actions.ts
+│   ├── new/page.tsx, actions.ts, wizard-data.ts
 │   └── [id]/
 │       ├── page.tsx
 │       ├── actions.ts
@@ -407,8 +407,10 @@ components/
 │   ├── reveal-quote.tsx
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
+├── new-event-button.tsx          -- Client button that opens NewEventWizard; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
+├── new-event-wizard.tsx          -- 3-step ResponsiveOverlay wizard (Honour → Love → Charity); fetches data lazily via getWizardData() server action; on completion redirects to /events/new?occasionType=...
 ├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
-│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input); isFirstTime prop
+│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input)
 │   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist, Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
 │   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected.
 │   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
@@ -458,7 +460,7 @@ components/
 │   ├── how-it-works.tsx         -- Six-step timeline (Create/Share/Reveal phases) with mini preview cards
 │   └── favpoll-mark.tsx         -- landing-v2-scoped FavpollMark with native design-source coordinates
 ├── charity-banner.tsx, countdown.tsx
-├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes
+├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes; uses NewEventButton (passes onBeforeOpen={close} in mobile menu)
 ├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
 ├── stripe-checkout.tsx, pot-banner.tsx
 
@@ -662,7 +664,9 @@ NEXT_PUBLIC_BASE_URL
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **Onboarding for first-time organisers.** `app/events/new/page.tsx` queries `events` to set `isFirstTime`. On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
+- **New event entry point is a wizard dialog.** Clicking any "New event" button opens `NewEventWizard` — a `ResponsiveOverlay` with 3 steps (Honour → Love → Charity). Data is fetched once (lazily) via `getWizardData()` server action when the dialog first opens. On completion the user is redirected to `/events/new?occasionType=...&topicId=...&charityIds=...` which pre-populates `EventFormV2` defaultValues. The 3 prior full-page routes (`/events/new/honour`, `/love`, `/charity`, `/create`) and `FlowShell` are deleted. `NewEventButton` handles signed-out users by redirecting to `/sign-in`. The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are kept — they are used by both `NewEventWizard` and `CommandPanel`.
+
+- **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
 - **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Use `toast.warning()` with explicit `style: { background, color, border }` props — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them.
 
