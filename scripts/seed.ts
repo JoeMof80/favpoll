@@ -9,8 +9,8 @@ import { celebratingManySetOverrides } from "./celebrating-many-groups"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
 
 // ---------------------------------------------------------------------------
 // Data
@@ -168,7 +168,7 @@ const charities = [
     description: "Support and research for stroke survivors",
     registered_number: "211015",
   },
-]
+];
 
 const categories = [
   { label: "Nature", description: "Natural world and our place in it" },
@@ -187,7 +187,7 @@ const categories = [
   { label: "Everyday life", description: "Small things that make up a life" },
   { label: "Childhood", description: "What we remember from growing up" },
   { label: "Time", description: "Seasons, moments, and the rhythm of days" },
-]
+];
 
 // ---------------------------------------------------------------------------
 // Placeholder writing discipline
@@ -208,14 +208,19 @@ type RegisterKey =
   | "celebrating_one"
   | "celebrating_many"
   | "cause"
-  | "neutral"
+  | "neutral";
 
 // Raw seed data uses occasion-type keys for readability; normalised to 5
 // register keys before writing to the DB.
 // Topics with regenerated placeholders use register keys directly (no normalization needed).
 type RawTopicPlaceholders = {
-  [occasion: string]: { about: string; reveal: string }
-}
+  [occasion: string]: { about: string; reveal: string };
+};
+
+type TopicPlaceholders = Record<
+  RegisterKey,
+  { pronouns: "she" | "he" | "they"; about: string; reveal: string }
+>;
 
 type TopicPlaceholders = Record<
   RegisterKey,
@@ -272,7 +277,7 @@ const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
   "Charity night": "cause",
   // neutral
   default: "neutral",
-}
+};
 
 /**
  * Combined register-keyed placeholder map built from all 6 regenerated-batch
@@ -626,8 +631,8 @@ const topics: TopicSeed[] = [
     },
   },
   {
-    title: "Flower",
-    description: "Bloom that stopped them in their tracks",
+    title: "Weather",
+    description: "Sky that lifted their spirit",
     is_finite: false,
     categories: ["Nature", "Everyday life"],
     placeholders: {
@@ -1735,7 +1740,7 @@ const topics: TopicSeed[] = [
       },
     },
   },
-]
+];
 
 // ---------------------------------------------------------------------------
 // Topic items
@@ -1789,7 +1794,7 @@ const topicItemDisplayOrder: Record<string, Record<string, number>> = {
     Autumn: 3,
     Winter: 4,
   },
-}
+};
 
 const topicItems: Record<string, string[]> = {
   Colour: [
@@ -2284,54 +2289,54 @@ const topicItems: Record<string, string[]> = {
     "Misty and still",
     "Warm summer evening",
   ],
-}
+};
 
 // ---------------------------------------------------------------------------
 // Seed functions
 // ---------------------------------------------------------------------------
 
 async function seedCharities() {
-  console.log("Seeding charities…")
-  let inserted = 0
+  console.log("Seeding charities…");
+  let inserted = 0;
   for (const charity of charities) {
     const { data: existing } = await supabase
       .from("charities")
       .select("id")
       .eq("name", charity.name)
-      .maybeSingle()
-    if (existing) continue
-    const { error } = await supabase.from("charities").insert(charity)
-    if (error) console.error(`  ✗ ${charity.name}:`, error.message)
-    else inserted++
+      .maybeSingle();
+    if (existing) continue;
+    const { error } = await supabase.from("charities").insert(charity);
+    if (error) console.error(`  ✗ ${charity.name}:`, error.message);
+    else inserted++;
   }
   console.log(
-    `  ${inserted} inserted, ${charities.length - inserted} already existed`
-  )
+    `  ${inserted} inserted, ${charities.length - inserted} already existed`,
+  );
 }
 
 async function seedCategories() {
-  console.log("Seeding categories…")
-  let inserted = 0
+  console.log("Seeding categories…");
+  let inserted = 0;
   for (const cat of categories) {
     const { data: existing } = await supabase
       .from("categories")
       .select("id")
       .eq("label", cat.label)
-      .maybeSingle()
-    if (existing) continue
-    const { error } = await supabase.from("categories").insert(cat)
-    if (error) console.error(`  ✗ ${cat.label}:`, error.message)
-    else inserted++
+      .maybeSingle();
+    if (existing) continue;
+    const { error } = await supabase.from("categories").insert(cat);
+    if (error) console.error(`  ✗ ${cat.label}:`, error.message);
+    else inserted++;
   }
   console.log(
-    `  ${inserted} inserted, ${categories.length - inserted} already existed`
-  )
+    `  ${inserted} inserted, ${categories.length - inserted} already existed`,
+  );
 }
 
 async function seedTopics() {
-  console.log("Seeding topics…")
-  let inserted = 0
-  let updated = 0
+  console.log("Seeding topics…");
+  let inserted = 0;
+  let updated = 0;
   for (const topic of topics) {
     const placeholders = combinedPlaceholders[topic.title]
 
@@ -2339,15 +2344,15 @@ async function seedTopics() {
       .from("topics")
       .select("id, is_finite")
       .eq("title", topic.title)
-      .maybeSingle()
+      .maybeSingle();
 
     if (existing) {
       const patch: Record<string, unknown> = { placeholders }
       if (existing.is_finite !== topic.is_finite)
-        patch.is_finite = topic.is_finite
-      await supabase.from("topics").update(patch).eq("id", existing.id)
-      updated++
-      continue
+        patch.is_finite = topic.is_finite;
+      await supabase.from("topics").update(patch).eq("id", existing.id);
+      updated++;
+      continue;
     }
 
     const { error } = await supabase.from("topics").insert({
@@ -2360,34 +2365,34 @@ async function seedTopics() {
     if (error) console.error(`  ✗ ${topic.title}:`, error.message)
     else inserted++
   }
-  console.log(`  ${inserted} inserted, ${updated} updated`)
+  console.log(`  ${inserted} inserted, ${updated} updated`);
 }
 
 async function seedTopicItems() {
-  console.log("Seeding topic items…")
-  let inserted = 0
+  console.log("Seeding topic items…");
+  let inserted = 0;
 
-  const { data: allTopics } = await supabase.from("topics").select("id, title")
+  const { data: allTopics } = await supabase.from("topics").select("id, title");
   const topicByTitle = Object.fromEntries(
-    (allTopics ?? []).map((t) => [t.title, t.id])
-  )
+    (allTopics ?? []).map((t) => [t.title, t.id]),
+  );
 
   for (const [title, items] of Object.entries(topicItems)) {
-    const topicId = topicByTitle[title]
+    const topicId = topicByTitle[title];
     if (!topicId) {
-      console.error(`  ✗ Topic not found: ${title}`)
-      continue
+      console.error(`  ✗ Topic not found: ${title}`);
+      continue;
     }
 
     const { data: existing } = await supabase
       .from("topic_items")
       .select("label")
-      .eq("topic_id", topicId)
+      .eq("topic_id", topicId);
     const existingLabels = new Set(
-      (existing ?? []).map((i: { label: string }) => i.label.toLowerCase())
-    )
+      (existing ?? []).map((i: { label: string }) => i.label.toLowerCase()),
+    );
 
-    const orderMap = topicItemDisplayOrder[title]
+    const orderMap = topicItemDisplayOrder[title];
     const toInsert = items
       .filter((label) => !existingLabels.has(label.toLowerCase()))
       .map((label) => ({
@@ -2399,46 +2404,46 @@ async function seedTopicItems() {
         ...(orderMap?.[label] !== undefined
           ? { display_order: orderMap[label] }
           : {}),
-      }))
+      }));
 
-    if (toInsert.length === 0) continue
+    if (toInsert.length === 0) continue;
 
-    const { error } = await supabase.from("topic_items").insert(toInsert)
-    if (error) console.error(`  ✗ Items for "${title}":`, error.message)
-    else inserted += toInsert.length
+    const { error } = await supabase.from("topic_items").insert(toInsert);
+    if (error) console.error(`  ✗ Items for "${title}":`, error.message);
+    else inserted += toInsert.length;
   }
 
-  console.log(`  ${inserted} items inserted`)
+  console.log(`  ${inserted} items inserted`);
 }
 
 async function seedTopicCategories() {
-  console.log("Seeding topic–category links…")
-  let inserted = 0
+  console.log("Seeding topic–category links…");
+  let inserted = 0;
 
-  const { data: allTopics } = await supabase.from("topics").select("id, title")
+  const { data: allTopics } = await supabase.from("topics").select("id, title");
   const topicByTitle = Object.fromEntries(
-    (allTopics ?? []).map((t) => [t.title, t.id])
-  )
+    (allTopics ?? []).map((t) => [t.title, t.id]),
+  );
 
   const { data: allCategories } = await supabase
     .from("categories")
-    .select("id, label")
+    .select("id, label");
   const categoryByLabel = Object.fromEntries(
     (allCategories ?? []).map((c: { id: string; label: string }) => [
       c.label,
       c.id,
-    ])
-  )
+    ]),
+  );
 
   for (const topic of topics) {
-    const topicId = topicByTitle[topic.title]
-    if (!topicId) continue
+    const topicId = topicByTitle[topic.title];
+    if (!topicId) continue;
 
     for (const catLabel of topic.categories) {
-      const categoryId = categoryByLabel[catLabel]
+      const categoryId = categoryByLabel[catLabel];
       if (!categoryId) {
-        console.error(`  ✗ Category not found: ${catLabel}`)
-        continue
+        console.error(`  ✗ Category not found: ${catLabel}`);
+        continue;
       }
 
       const { data: existing } = await supabase
@@ -2446,20 +2451,124 @@ async function seedTopicCategories() {
         .select("topic_id")
         .eq("topic_id", topicId)
         .eq("category_id", categoryId)
-        .maybeSingle()
+        .maybeSingle();
 
-      if (existing) continue
+      if (existing) continue;
 
       const { error } = await supabase
         .from("topic_categories")
-        .insert({ topic_id: topicId, category_id: categoryId })
+        .insert({ topic_id: topicId, category_id: categoryId });
       if (error)
-        console.error(`  ✗ Link ${topic.title} → ${catLabel}:`, error.message)
-      else inserted++
+        console.error(`  ✗ Link ${topic.title} → ${catLabel}:`, error.message);
+      else inserted++;
     }
   }
 
-  console.log(`  ${inserted} links inserted`)
+  console.log(`  ${inserted} links inserted`);
+}
+
+// ---------------------------------------------------------------------------
+// Placeholder application and validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Applies register-keyed placeholder sets to every topic row that has an
+ * entry in combinedPlaceholders, regardless of which seed path created the
+ * row.  Throws (with the full list) if any map title has no topic row —
+ * those topics must be created first (by this seed or another).
+ */
+async function applyAllPlaceholders() {
+  console.log("Applying placeholders to all topics…");
+
+  const { data: rows } = await supabase.from("topics").select("id, title");
+  const idByTitle = new Map(
+    (rows ?? []).map((r: { id: string; title: string }) => [r.title, r.id]),
+  );
+
+  const missing: string[] = [];
+  let patched = 0;
+
+  for (const [title, placeholders] of Object.entries(combinedPlaceholders)) {
+    const id = idByTitle.get(title);
+    if (!id) {
+      missing.push(title);
+      continue;
+    }
+    const { error } = await supabase
+      .from("topics")
+      .update({ placeholders })
+      .eq("id", id);
+    if (error) console.error(`  ✗ placeholders for "${title}":`, error.message);
+    else patched++;
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Placeholder map has ${missing.length} title(s) with no topic row ` +
+        `(these topics must be created before this seed runs):\n` +
+        missing.map((t) => `  "${t}"`).join("\n"),
+    );
+  }
+
+  console.log(`  ${patched} topics had placeholders applied`);
+}
+
+const ALL_REGISTER_KEYS: RegisterKey[] = [
+  "remembering",
+  "celebrating_one",
+  "celebrating_many",
+  "cause",
+  "neutral",
+];
+
+/**
+ * Asserts that every active topic whose title appears in combinedPlaceholders
+ * has a complete, non-empty placeholder set (all 5 register keys present, each
+ * with non-empty about and reveal strings).  Throws listing every offender.
+ * This is the bidirectional fail-loud guard: applyAllPlaceholders() ensures
+ * the writes succeeded; this confirms what's in the DB is correct.
+ */
+async function assertAllTopicsHavePlaceholders() {
+  console.log("Asserting placeholder completeness…");
+
+  const { data: rows } = await supabase
+    .from("topics")
+    .select("title, placeholders")
+    .eq("is_active", true);
+
+  const covered = new Set(Object.keys(combinedPlaceholders));
+  const bad: string[] = [];
+
+  for (const row of rows ?? []) {
+    if (!covered.has(row.title)) continue; // topic not in the map — skip
+    const ph = row.placeholders as Record<
+      string,
+      { pronouns?: string; about?: string; reveal?: string }
+    > | null;
+    if (!ph) {
+      bad.push(`"${row.title}": no placeholders`);
+      continue;
+    }
+    const missingKeys = ALL_REGISTER_KEYS.filter(
+      (k) => !ph[k]?.about || !ph[k]?.reveal || !ph[k]?.pronouns,
+    );
+    if (missingKeys.length > 0) {
+      bad.push(
+        `"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`,
+      );
+    }
+  }
+
+  if (bad.length > 0) {
+    throw new Error(
+      `${bad.length} active topic(s) have incomplete placeholder sets:\n` +
+        bad.map((b) => `  ${b}`).join("\n"),
+    );
+  }
+
+  console.log(
+    "  ✓ All active topics in the map have complete 5-register placeholder sets",
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -2581,6 +2690,6 @@ async function seed() {
 }
 
 seed().catch((err) => {
-  console.error("Seed failed:", err)
-  process.exit(1)
-})
+  console.error("Seed failed:", err);
+  process.exit(1);
+});
