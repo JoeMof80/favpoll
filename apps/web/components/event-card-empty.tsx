@@ -1,5 +1,4 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { NewEventButton } from "@/components/new-event-button"
 
 export function EventCardEmpty() {
   return (
@@ -11,9 +10,7 @@ export function EventCardEmpty() {
       <p className="mx-auto mb-6 max-w-[280px] text-[13px] text-muted-foreground">
         Be the first to create a favpoll event and it will appear here.
       </p>
-      <Button asChild size="lg">
-        <Link href="/events/new">Create an event</Link>
-      </Button>
+      <NewEventButton size="lg">Create an event</NewEventButton>
     </div>
   )
 }

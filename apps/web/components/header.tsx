@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import { NewEventButton } from "@/components/new-event-button"
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -64,9 +65,7 @@ export function Header() {
               >
                 Your events
               </Link>
-              <Button asChild size="lg">
-                <Link href="/events/new">New event</Link>
-              </Button>
+              <NewEventButton size="lg">New event</NewEventButton>
             </Show>
             <Show when="signed-out">
               <SignInButton>
@@ -143,11 +142,9 @@ export function Header() {
             </Show>
             <Show when="signed-in">
               <div className="pt-3">
-                <Button asChild className="w-full">
-                  <Link href="/events/new" onClick={close}>
-                    New event
-                  </Link>
-                </Button>
+                <NewEventButton className="w-full" onBeforeOpen={close}>
+                  New event
+                </NewEventButton>
               </div>
             </Show>
           </nav>

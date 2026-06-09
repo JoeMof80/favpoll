@@ -36,6 +36,10 @@ const config: StorybookConfig = {
           "../__mocks__/supabase-client.ts"
         ),
         "@stripe/stripe-js": path.resolve(__dirname, "../__mocks__/stripe.ts"),
+        "@/components/new-event-button": path.resolve(
+          __dirname,
+          "./__mocks__/new-event-button.tsx"
+        ),
       },
     }
     return config

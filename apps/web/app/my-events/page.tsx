@@ -1,6 +1,5 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { auth } from "@clerk/nextjs/server"
+import { NewEventButton } from "@/components/new-event-button"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventSummaryCard } from "@/components/event-summary-card"
@@ -58,9 +57,7 @@ export default async function EventsPage() {
     <main className="mx-auto max-w-330 px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-medium text-foreground">Your events</h1>
-        <Button asChild size="lg">
-          <Link href="/events/new">New event</Link>
-        </Button>
+        <NewEventButton size="lg">New event</NewEventButton>
       </div>
 
       {normalised.length > 0 ? (
@@ -79,9 +76,9 @@ export default async function EventsPage() {
           <p className="text-sm text-muted-foreground">
             You haven&apos;t created any events yet.
           </p>
-          <Button asChild className="mt-4">
-            <Link href="/events/new">Create your first event</Link>
-          </Button>
+          <NewEventButton className="mt-4">
+            Create your first event
+          </NewEventButton>
         </div>
       )}
     </main>
