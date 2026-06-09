@@ -1,9 +1,9 @@
 import { z } from "zod"
 
 export const eventFormSchema = z.object({
-  register: z.string().min(1, "Please select an occasion"),
-  occasionType: z.string().optional(),
-  openingLine: z.string().max(60, "Must be 60 characters or fewer").optional(),
+  register: z.string().optional().default(""),
+  occasionType: z.string().min(1, "Please select an occasion type"),
+  openingLine: z.string().max(50, "Must be 50 characters or fewer").optional(),
   name: z
     .string()
     .min(1, "Name is required")

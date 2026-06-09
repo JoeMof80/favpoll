@@ -3,6 +3,7 @@ import {
   shortTopicLabel,
   suggestClosingDate,
   registerForOccasionType,
+  getExampleName,
   DEFAULT_OCCASION_TYPE,
   type Register,
 } from "@/lib/registers"
@@ -160,5 +161,97 @@ describe("registerForOccasionType", () => {
 
   it("neutral DEFAULT_OCCASION_TYPE is null", () => {
     expect(DEFAULT_OCCASION_TYPE.neutral).toBeNull()
+  })
+})
+
+describe("getExampleName", () => {
+  it("returns empty string for null topicTitle", () => {
+    expect(getExampleName(null, "she", "pair", "celebrating_one")).toBe("")
+  })
+
+  it("returns a stable she-name for celebrating_one + pronouns:she", () => {
+    const name = getExampleName("Colour", "she", undefined, "celebrating_one")
+    expect([
+      "Margaret",
+      "Eleanor",
+      "Joan",
+      "Sylvia",
+      "Patricia",
+      "Vera",
+    ]).toContain(name)
+    // Stable: same inputs produce the same output
+    expect(getExampleName("Colour", "she", undefined, "celebrating_one")).toBe(
+      name
+    )
+  })
+
+  it("returns a stable he-name for celebrating_one + pronouns:he", () => {
+    const name = getExampleName("Colour", "he", undefined, "celebrating_one")
+    expect([
+      "Arthur",
+      "George",
+      "Frank",
+      "Raymond",
+      "Donald",
+      "Stanley",
+    ]).toContain(name)
+  })
+
+  it("returns a pair name for celebrating_many + group:pair", () => {
+    const name = getExampleName("Colour", "they", "pair", "celebrating_many")
+    expect([
+      "Joan & Arthur",
+      "Margaret & George",
+      "Sylvia & Frank",
+      "Eleanor & Raymond",
+    ]).toContain(name)
+  })
+
+  it("returns a set name for celebrating_many + group:set", () => {
+    const name = getExampleName("Colour", "they", "set", "celebrating_many")
+    expect([
+      "The Wednesday Walkers",
+      "Class of 2015",
+      "The Old Faithfuls",
+      "The Thursday Club",
+      "The Sunday League",
+      "The Allotment Committee",
+    ]).toContain(name)
+  })
+
+  it("defaults to pair for celebrating_many with no group", () => {
+    const name = getExampleName("Colour", "they", undefined, "celebrating_many")
+    expect([
+      "Joan & Arthur",
+      "Margaret & George",
+      "Sylvia & Frank",
+      "Eleanor & Raymond",
+    ]).toContain(name)
+  })
+
+  it("returns a cause name for cause register", () => {
+    const name = getExampleName("Colour", undefined, undefined, "cause")
+    expect([
+      "The Sunshine Appeal",
+      "Helping Hands Fund",
+      "The Riverside Appeal",
+    ]).toContain(name)
+  })
+
+  it("returns a non-empty string for neutral register", () => {
+    const name = getExampleName("Colour", undefined, undefined, "neutral")
+    expect(name.length).toBeGreaterThan(0)
+  })
+
+  it("falls back to she when pronouns is undefined in remembering register", () => {
+    const name = getExampleName("Colour", undefined, undefined, "remembering")
+    expect([
+      "Margaret",
+      "Eleanor",
+      "Joan",
+      "Sylvia",
+      "Patricia",
+      "Vera",
+    ]).toContain(name)
   })
 })

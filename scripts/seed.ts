@@ -1,10 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
-import { regeneratedPlaceholders } from "./placeholders-regenerated";
-import { regeneratedPlaceholdersBatch2 } from "./placeholders-regenerated-2";
-import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3";
-import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4";
-import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5";
-import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6";
+import { createClient } from "@supabase/supabase-js"
+import { regeneratedPlaceholders } from "./placeholders-regenerated"
+import { regeneratedPlaceholdersBatch2 } from "./placeholders-regenerated-2"
+import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3"
+import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4"
+import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5"
+import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6"
+import { celebratingManySetOverrides } from "./celebrating-many-groups"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -221,13 +222,18 @@ type TopicPlaceholders = Record<
   { pronouns: "she" | "he" | "they"; about: string; reveal: string }
 >;
 
+type TopicPlaceholders = Record<
+  RegisterKey,
+  { about: string; reveal: string; pronouns?: "she" | "he" | "they"; group?: "pair" | "set" }
+>
+
 const REGISTER_KEYS = new Set<string>([
   "remembering",
   "celebrating_one",
   "celebrating_many",
   "cause",
   "neutral",
-]);
+])
 
 const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
   // remembering
@@ -280,40 +286,42 @@ const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
  * the seed and are listed (not thrown) at startup.
  */
 const combinedPlaceholders = (() => {
-  const batches: Record<
-    string,
-    Record<RegisterKey, TopicPlaceholders[RegisterKey]>
-  >[] = [
+  const batches: Record<string, Record<RegisterKey, { about: string; reveal: string; pronouns?: "she" | "he" | "they" }>>[] = [
     regeneratedPlaceholders as never,
     regeneratedPlaceholdersBatch2 as never,
     regeneratedPlaceholdersBatch3 as never,
     regeneratedPlaceholdersBatch4 as never,
     regeneratedPlaceholdersBatch5 as never,
     regeneratedPlaceholdersBatch6 as never,
-  ];
-  const map: Record<
-    string,
-    Record<RegisterKey, TopicPlaceholders[RegisterKey]>
-  > = {};
+  ]
+  const map: Record<string, Record<RegisterKey, { about: string; reveal: string; pronouns?: "she" | "he" | "they"; group?: "pair" | "set" }>> = {}
   for (const batch of batches) {
     for (const [title, data] of Object.entries(batch)) {
-      if (map[title])
-        throw new Error(
-          `Duplicate topic title in placeholder batches: "${title}"`,
-        );
-      map[title] = data;
+      if (map[title]) throw new Error(`Duplicate topic title in placeholder batches: "${title}"`)
+      map[title] = { ...data }
     }
   }
-  return map;
-})();
+  // Apply group tags to celebrating_many entries
+  for (const [title, registers] of Object.entries(map)) {
+    if (!registers.celebrating_many) continue
+    const override = celebratingManySetOverrides[title]
+    if (override) {
+      registers.celebrating_many = { ...override }
+    } else {
+      registers.celebrating_many = { ...registers.celebrating_many, group: "pair" }
+    }
+  }
+  return map
+})()
+
 
 type TopicSeed = {
-  title: string;
-  description: string;
-  is_finite: boolean;
-  categories: string[];
-  placeholders: RawTopicPlaceholders | TopicPlaceholders;
-};
+  title: string
+  description: string
+  is_finite: boolean
+  categories: string[]
+  placeholders: RawTopicPlaceholders | TopicPlaceholders
+}
 
 const topics: TopicSeed[] = [
   // ── Finite ──────────────────────────────────────────────────────────────────
@@ -350,7 +358,8 @@ const topics: TopicSeed[] = [
       neutral: {
         about:
           "Some people have known their answer to this since childhood and have never felt the need to revisit it.",
-        reveal: "Theirs is red. No particular reason. It simply always wins.",
+        reveal:
+          "Theirs is red. No particular reason. It simply always wins.",
       },
     },
   },
@@ -622,20 +631,22 @@ const topics: TopicSeed[] = [
     },
   },
   {
-    title: "Flower",
-    description: "Bloom that stopped them in their tracks",
+    title: "Weather",
+    description: "Sky that lifted their spirit",
     is_finite: false,
     categories: ["Nature", "Everyday life"],
     placeholders: {
       remembering: {
         about:
           "She grew the same plant in every garden she ever had — same spot where she could manage it, same care each year.",
-        reveal: "Hers was lavender. The smell is still entirely hers.",
+        reveal:
+          "Hers was lavender. The smell is still entirely hers.",
       },
       celebrating_one: {
         about:
           "She keeps the flat stocked with one particular bloom from April to June, having decided years ago there's no reasonable argument against it.",
-        reveal: "Hers is the peony. Nobody has yet challenged the policy.",
+        reveal:
+          "Hers is the peony. Nobody has yet challenged the policy.",
       },
       celebrating_many: {
         about:
@@ -652,7 +663,8 @@ const topics: TopicSeed[] = [
       neutral: {
         about:
           "Some people have a flower that's simply theirs, no occasion required.",
-        reveal: "Theirs is the rose. Predictable, they'll admit. Also correct.",
+        reveal:
+          "Theirs is the rose. Predictable, they'll admit. Also correct.",
       },
     },
   },
@@ -681,7 +693,8 @@ const topics: TopicSeed[] = [
           "Theirs is the silver birch. Still in the wrong place. Still not moving.",
       },
       cause: {
-        about: "Pick the tree you'd sit under and pledge what it's worth.",
+        about:
+          "Pick the tree you'd sit under and pledge what it's worth.",
         reveal:
           "Our pick to start: the beech — all that canopy, all that shade, nothing asked in return.",
       },
@@ -803,7 +816,8 @@ const topics: TopicSeed[] = [
       neutral: {
         about:
           "Some people have one place that quietly outranks everywhere else they've ever been.",
-        reveal: "Theirs is the garden. Wherever the day goes, it ends there.",
+        reveal:
+          "Theirs is the garden. Wherever the day goes, it ends there.",
       },
     },
   },
@@ -854,7 +868,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She always took the train. You miss everything, she said, if you're in a hurry — and the journey was always part of the point.",
-        reveal: "Hers was the train. She was right about that, too.",
+        reveal:
+          "Hers was the train. She was right about that, too.",
       },
       celebrating_one: {
         about:
@@ -904,7 +919,8 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "They argued about which film explained their relationship before realising they were defending the same one from different angles.",
-        reveal: "Theirs is Local Hero. He came round eventually.",
+        reveal:
+          "Theirs is Local Hero. He came round eventually.",
       },
       cause: {
         about:
@@ -929,7 +945,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She considered a good documentary a serious commitment and watched them with the full attention she felt they deserved.",
-        reveal: "Hers was the documentary — the only honest films, she said.",
+        reveal:
+          "Hers was the documentary — the only honest films, she said.",
       },
       celebrating_one: {
         about:
@@ -940,7 +957,8 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "They agree on exactly one kind of film, absolutely and without discussion. Everything else is still disputed.",
-        reveal: "Theirs is romance. Settled since the first date.",
+        reveal:
+          "Theirs is romance. Settled since the first date.",
       },
       cause: {
         about:
@@ -1004,7 +1022,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She sang under her breath without noticing, and her children knew every word to songs they'd never consciously learned.",
-        reveal: "Hers was Jerusalem — Parry. Always the same verse first.",
+        reveal:
+          "Hers was Jerusalem — Parry. Always the same verse first.",
       },
       celebrating_one: {
         about:
@@ -1041,7 +1060,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She had firm views on what made a good song and listened to one kind of music above all, able to explain exactly why.",
-        reveal: "Hers was folk. The only music, she said, that told the truth.",
+        reveal:
+          "Hers was folk. The only music, she said, that told the truth.",
       },
       celebrating_one: {
         about:
@@ -1052,7 +1072,8 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "They come from different musical worlds and together make something without a name that works perfectly.",
-        reveal: "Theirs is soul. She brought it; he agreed at once.",
+        reveal:
+          "Theirs is soul. She brought it; he agreed at once.",
       },
       cause: {
         about:
@@ -1083,12 +1104,14 @@ const topics: TopicSeed[] = [
       celebrating_one: {
         about:
           "She has one era rooted in her bones and knows every B-side, which she does not consider a niche concern.",
-        reveal: "Hers is eighties pop. Every track, every year, 1984 to 1989.",
+        reveal:
+          "Hers is eighties pop. Every track, every year, 1984 to 1989.",
       },
       celebrating_many: {
         about:
           "They grew up to the same sound in different cities and discovered the overlap on a first date that ran long.",
-        reveal: "Theirs is the noughties. The wedding playlist made it plain.",
+        reveal:
+          "Theirs is the noughties. The wedding playlist made it plain.",
       },
       cause: {
         about:
@@ -1129,14 +1152,16 @@ const topics: TopicSeed[] = [
           "Theirs is the harp. She'd known for years. He knew better than to argue.",
       },
       cause: {
-        about: "Pick the sound that moves you most and pledge what it's worth.",
+        about:
+          "Pick the sound that moves you most and pledge what it's worth.",
         reveal:
           "Our pick to start: the cello — the instrument that sounds like it means it.",
       },
       neutral: {
         about:
           "Some people have an instrument that's simply theirs, played well or otherwise.",
-        reveal: "Theirs is the guitar. Nothing flashy, always enough.",
+        reveal:
+          "Theirs is the guitar. Nothing flashy, always enough.",
       },
     },
   },
@@ -1161,7 +1186,8 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "Their story started as one kind of song and has had the texture of something truer ever since.",
-        reveal: "Theirs is the love song. It started there and stayed there.",
+        reveal:
+          "Theirs is the love song. It started there and stayed there.",
       },
       cause: {
         about:
@@ -1269,7 +1295,8 @@ const topics: TopicSeed[] = [
       celebrating_one: {
         about:
           "She has held the same position on biscuits since she was seven, and will not be revisiting it.",
-        reveal: "Hers is the Bourbon. The conviction has never once wavered.",
+        reveal:
+          "Hers is the Bourbon. The conviction has never once wavered.",
       },
       celebrating_many: {
         about:
@@ -1317,7 +1344,8 @@ const topics: TopicSeed[] = [
           "Theirs is rugby. They turned up to the same match independently before they'd even met.",
       },
       cause: {
-        about: "Pick the game you'd never miss and pledge what it's worth.",
+        about:
+          "Pick the game you'd never miss and pledge what it's worth.",
         reveal:
           "Our pick to start: snooker — the most soothing tension ever televised.",
       },
@@ -1338,7 +1366,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She swam every morning until her seventies — the only sport, she said, where you couldn't have your phone.",
-        reveal: "Hers was swimming. She loved it for exactly that reason.",
+        reveal:
+          "Hers was swimming. She loved it for exactly that reason.",
       },
       celebrating_one: {
         about:
@@ -1375,25 +1404,30 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She walked every morning, same route, same pace, for thirty years — where she did her best thinking.",
-        reveal: "Hers was walking. The lane still feels like hers.",
+        reveal:
+          "Hers was walking. The lane still feels like hers.",
       },
       celebrating_one: {
         about:
           "She downloaded seventeen fitness apps and uses exactly one, consistently, having found it after two years of looking.",
-        reveal: "Hers is running. Everything else was just looking for this.",
+        reveal:
+          "Hers is running. Everything else was just looking for this.",
       },
       celebrating_many: {
         about:
           "They've never had an argument that a long walk didn't resolve. It's a documented fact of the relationship.",
-        reveal: "Theirs is walking. The walks are the solution to most things.",
+        reveal:
+          "Theirs is walking. The walks are the solution to most things.",
       },
       cause: {
-        about: "Pick how you most love to move and pledge what it's worth.",
+        about:
+          "Pick how you most love to move and pledge what it's worth.",
         reveal:
           "Our pick to start: dancing — the only exercise that doesn't feel like exercise.",
       },
       neutral: {
-        about: "How a person keeps moving says something true about them.",
+        about:
+          "How a person keeps moving says something true about them.",
         reveal:
           "Theirs is yoga. They mean to do it properly, and occasionally do.",
       },
@@ -1409,7 +1443,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She had strong views on the correct rules of one playground game, passed on with the precision she brought to everything.",
-        reveal: "Hers was conkers. The rules she taught are still observed.",
+        reveal:
+          "Hers was conkers. The rules she taught are still observed.",
       },
       celebrating_one: {
         about:
@@ -1432,7 +1467,8 @@ const topics: TopicSeed[] = [
       neutral: {
         about:
           "Some people have one childhood game that still says exactly who they are.",
-        reveal: "Theirs is card games. Played with focus, and no mercy.",
+        reveal:
+          "Theirs is card games. Played with focus, and no mercy.",
       },
     },
   },
@@ -1461,7 +1497,8 @@ const topics: TopicSeed[] = [
           "Theirs is languages. They met in a French class and speak no French. They consider this irrelevant.",
       },
       cause: {
-        about: "Pick the lesson you always enjoyed and pledge what it's worth.",
+        about:
+          "Pick the lesson you always enjoyed and pledge what it's worth.",
         reveal:
           "Our pick to start: art — the only lesson where being wrong was allowed.",
       },
@@ -1527,7 +1564,8 @@ const topics: TopicSeed[] = [
       celebrating_one: {
         about:
           "She quoted a poem at a dinner once and made someone cry. She says she doesn't read poetry; there are four collections by her bed.",
-        reveal: "Hers is Pam Ayres — said without apology, and rightly so.",
+        reveal:
+          "Hers is Pam Ayres — said without apology, and rightly so.",
       },
       celebrating_many: {
         about:
@@ -1542,7 +1580,8 @@ const topics: TopicSeed[] = [
           "Our pick to start: Seamus Heaney — the one who makes ordinary ground feel like history.",
       },
       neutral: {
-        about: "Some people have one poet who simply speaks for them.",
+        about:
+          "Some people have one poet who simply speaks for them.",
         reveal:
           "Theirs is Philip Larkin. They'd never admit how often the lines turn up unbidden.",
       },
@@ -1582,7 +1621,8 @@ const topics: TopicSeed[] = [
       neutral: {
         about:
           "Some people have one thing they do for no reason but the doing of it.",
-        reveal: "Theirs is reading. They always read; now they read properly.",
+        reveal:
+          "Theirs is reading. They always read; now they read properly.",
       },
     },
   },
@@ -1617,8 +1657,10 @@ const topics: TopicSeed[] = [
           "Our pick to start: the long walk — the Sunday that earns the evening.",
       },
       neutral: {
-        about: "Some people have one Sunday shape and protect it fiercely.",
-        reveal: "Theirs is the pub lunch. Same table, same order, no notes.",
+        about:
+          "Some people have one Sunday shape and protect it fiercely.",
+        reveal:
+          "Theirs is the pub lunch. Same table, same order, no notes.",
       },
     },
   },
@@ -1631,7 +1673,8 @@ const topics: TopicSeed[] = [
       remembering: {
         about:
           "She grew lavender in every garden she had, and the smell attached itself to the rooms and the people she'd been near.",
-        reveal: "Hers was lavender. It doesn't need explaining.",
+        reveal:
+          "Hers was lavender. It doesn't need explaining.",
       },
       celebrating_one: {
         about:
@@ -1642,12 +1685,14 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "They married in a garden rained on the night before, and everyone remarked on the smell — the best thing about the venue, they agree.",
-        reveal: "Theirs is garden after rain. Nobody had planned it.",
+        reveal:
+          "Theirs is garden after rain. Nobody had planned it.",
       },
       cause: {
         about:
           "Pick the scent that takes you somewhere instantly and pledge what it's worth.",
-        reveal: "Our pick to start: sea air — the smell that resets a person.",
+        reveal:
+          "Our pick to start: sea air — the smell that resets a person.",
       },
       neutral: {
         about:
@@ -1678,7 +1723,8 @@ const topics: TopicSeed[] = [
       celebrating_many: {
         about:
           "Their first proper walk was in weather neither would have chosen, and they've sought it out on purpose ever since.",
-        reveal: "Theirs is after rain. The light, the smell, the empty path.",
+        reveal:
+          "Theirs is after rain. The light, the smell, the empty path.",
       },
       cause: {
         about:
@@ -2292,7 +2338,7 @@ async function seedTopics() {
   let inserted = 0;
   let updated = 0;
   for (const topic of topics) {
-    const placeholders = combinedPlaceholders[topic.title];
+    const placeholders = combinedPlaceholders[topic.title]
 
     const { data: existing } = await supabase
       .from("topics")
@@ -2301,7 +2347,7 @@ async function seedTopics() {
       .maybeSingle();
 
     if (existing) {
-      const patch: Record<string, unknown> = { placeholders };
+      const patch: Record<string, unknown> = { placeholders }
       if (existing.is_finite !== topic.is_finite)
         patch.is_finite = topic.is_finite;
       await supabase.from("topics").update(patch).eq("id", existing.id);
@@ -2315,9 +2361,9 @@ async function seedTopics() {
       is_finite: topic.is_finite,
       is_active: true,
       placeholders,
-    });
-    if (error) console.error(`  ✗ ${topic.title}:`, error.message);
-    else inserted++;
+    })
+    if (error) console.error(`  ✗ ${topic.title}:`, error.message)
+    else inserted++
   }
   console.log(`  ${inserted} inserted, ${updated} updated`);
 }
@@ -2526,19 +2572,121 @@ async function assertAllTopicsHavePlaceholders() {
 }
 
 // ---------------------------------------------------------------------------
+// Placeholder application and validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Applies register-keyed placeholder sets to every topic row that has an
+ * entry in combinedPlaceholders, regardless of which seed path created the
+ * row.  Throws (with the full list) if any map title has no topic row —
+ * those topics must be created first (by this seed or another).
+ */
+async function applyAllPlaceholders() {
+  console.log("Applying placeholders to all topics…")
+
+  const { data: rows } = await supabase.from("topics").select("id, title")
+  const idByTitle = new Map(
+    (rows ?? []).map((r: { id: string; title: string }) => [r.title, r.id])
+  )
+
+  const missing: string[] = []
+  let patched = 0
+
+  for (const [title, placeholders] of Object.entries(combinedPlaceholders)) {
+    const id = idByTitle.get(title)
+    if (!id) {
+      missing.push(title)
+      continue
+    }
+    const { error } = await supabase
+      .from("topics")
+      .update({ placeholders })
+      .eq("id", id)
+    if (error)
+      console.error(`  ✗ placeholders for "${title}":`, error.message)
+    else patched++
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Placeholder map has ${missing.length} title(s) with no topic row ` +
+        `(these topics must be created before this seed runs):\n` +
+        missing.map((t) => `  "${t}"`).join("\n")
+    )
+  }
+
+  console.log(`  ${patched} topics had placeholders applied`)
+}
+
+const ALL_REGISTER_KEYS: RegisterKey[] = [
+  "remembering",
+  "celebrating_one",
+  "celebrating_many",
+  "cause",
+  "neutral",
+]
+
+/**
+ * Asserts that every active topic whose title appears in combinedPlaceholders
+ * has a complete, non-empty placeholder set (all 5 register keys present, each
+ * with non-empty about and reveal strings).  Throws listing every offender.
+ * This is the bidirectional fail-loud guard: applyAllPlaceholders() ensures
+ * the writes succeeded; this confirms what's in the DB is correct.
+ */
+async function assertAllTopicsHavePlaceholders() {
+  console.log("Asserting placeholder completeness…")
+
+  const { data: rows } = await supabase
+    .from("topics")
+    .select("title, placeholders")
+    .eq("is_active", true)
+
+  const covered = new Set(Object.keys(combinedPlaceholders))
+  const bad: string[] = []
+
+  for (const row of rows ?? []) {
+    if (!covered.has(row.title)) continue // topic not in the map — skip
+    const ph = row.placeholders as Record<string, { about?: string; reveal?: string }> | null
+    if (!ph) {
+      bad.push(`"${row.title}": no placeholders`)
+      continue
+    }
+    const missingKeys = ALL_REGISTER_KEYS.filter(
+      (k) => !ph[k]?.about || !ph[k]?.reveal
+    )
+    if (missingKeys.length > 0) {
+      bad.push(`"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`)
+    }
+    const cm = ph["celebrating_many"] as { group?: string } | undefined
+    if (cm && !cm.group) {
+      bad.push(`"${row.title}": celebrating_many missing group field`)
+    }
+  }
+
+  if (bad.length > 0) {
+    throw new Error(
+      `${bad.length} active topic(s) have incomplete placeholder sets:\n` +
+        bad.map((b) => `  ${b}`).join("\n")
+    )
+  }
+
+  console.log("  ✓ All active topics in the map have complete 5-register placeholder sets")
+}
+
+// ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
 async function seed() {
-  console.log("Starting seed…\n");
-  await seedCharities();
-  await seedCategories();
-  await seedTopics();
-  await applyAllPlaceholders();
-  await assertAllTopicsHavePlaceholders();
-  await seedTopicItems();
-  await seedTopicCategories();
-  console.log("\nSeed complete.");
+  console.log("Starting seed…\n")
+  await seedCharities()
+  await seedCategories()
+  await seedTopics()
+  await applyAllPlaceholders()
+  await assertAllTopicsHavePlaceholders()
+  await seedTopicItems()
+  await seedTopicCategories()
+  console.log("\nSeed complete.")
 }
 
 seed().catch((err) => {

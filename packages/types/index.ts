@@ -68,24 +68,24 @@ export type Register =
   | "neutral";
 
 export type Event = {
-  id: string;
-  protagonist_id: string;
-  occasion_type: string | null;
-  opening_line: string | null;
-  market: string;
-  created_by: string;
-  closes_at: string;
-  original_closes_at: string | null;
-  hard_close_at: string | null;
-  extension_count: number;
-  closed_at: string | null;
-  total_raised: number;
-  is_private: boolean;
-  is_plural: boolean | null;
-  is_exemplar?: boolean;
-  description: string | null;
-  created_at: string;
-};
+  id: string
+  protagonist_id: string
+  occasion_type: string | null
+  opening_line: string | null
+  market: string
+  created_by: string
+  closes_at: string
+  original_closes_at: string | null
+  hard_close_at: string | null
+  extension_count: number
+  closed_at: string | null
+  total_raised: number
+  is_private: boolean
+  is_plural: boolean | null
+  is_exemplar?: boolean
+  description: string | null
+  created_at: string
+}
 
 export type EventPoll = {
   id: string;
@@ -180,8 +180,13 @@ export type PledgeWithAllocations = Pledge & {
 // Shared types used by EventFormV2 and server actions
 export type TopicPlaceholders = Record<
   string,
-  { pronouns?: "she" | "he" | "they"; about?: string; reveal: string }
->;
+  {
+    about?: string
+    reveal: string
+    pronouns?: "she" | "he" | "they"
+    group?: "pair" | "set"
+  }
+>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[];
@@ -200,17 +205,18 @@ export type CanvasPollInput = {
 };
 
 export type CanvasSubmitData = {
-  protagonistName: string;
-  protagonistAbout?: string | null;
-  dateLabel: string | null;
-  photoUrl?: string | null;
-  occasionType: string | null;
-  openingLine: string | null;
-  description: string | null;
-  charityIds: string[];
-  closesAt: string;
-  isPrivate: boolean;
-  isPlural: boolean;
-  potAmount: number | null;
-  poll: CanvasPollInput;
-};
+  protagonistName: string
+  protagonistAbout?: string | null
+  dateLabel: string | null
+  photoUrl?: string | null
+  occasionType: string | null
+  openingLine: string | null
+  description: string | null
+  charityIds: string[]
+  closesAt: string
+  isPrivate: boolean
+  isPlural: boolean
+  potAmount: number | null
+  poll: CanvasPollInput
+}
+
