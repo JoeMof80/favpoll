@@ -67,6 +67,9 @@ export type Register =
   | "cause"
   | "neutral";
 
+export type EventCategory = "celebration" | "memorial" | "fundraiser"
+export type EventGrouping = "individual" | "couple" | "group"
+
 export type Event = {
   id: string
   protagonist_id: string
@@ -84,6 +87,8 @@ export type Event = {
   is_plural: boolean | null
   is_exemplar?: boolean
   is_listed?: boolean
+  event_category?: EventCategory | null
+  event_grouping?: EventGrouping
   description: string | null
   created_at: string
 }
@@ -210,13 +215,13 @@ export type CanvasSubmitData = {
   protagonistAbout?: string | null
   dateLabel: string | null
   photoUrl?: string | null
-  occasionType: string | null
+  category: EventCategory | null
+  grouping: EventGrouping
   openingLine: string | null
   description: string | null
   charityIds: string[]
   closesAt: string
   isPrivate: boolean
-  isPlural: boolean
   isListed: boolean
   potAmount: number | null
   poll: CanvasPollInput

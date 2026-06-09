@@ -30,23 +30,25 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
   }
 
   return (
-    <div className="space-y-3">
-      {/* Search */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search charities…"
-        autoFocus
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-      />
+    <div className="space-y-0">
+      {/* Sticky search */}
+      <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search charities…"
+          autoFocus
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
+        />
+      </div>
       {/* Charity chips */}
       {visible.length === 0 ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           No results.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 px-5 py-4">
           {visible.map((c) => (
             <Chip
               key={c.id}

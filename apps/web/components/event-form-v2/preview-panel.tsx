@@ -4,9 +4,8 @@ import { useRef, useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import { Pencil } from "lucide-react"
 import {
-  DATE_LABEL_PLACEHOLDERS,
   contextExamples,
-  effectiveRegister,
+  deriveRegister,
   getExampleName,
 } from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
@@ -130,8 +129,8 @@ export function PreviewPanel({
   const values = useWatch({ control: form.control })
 
   const register = values.register ?? ""
-  const occasionType = (values.occasionType ?? "") || null
-  const isPlural = values.isPlural ?? false
+  const category = values.category ?? null
+  const grouping = values.grouping ?? "individual"
   const name = values.name ?? ""
   const context = values.context ?? ""
   const openingLine = values.openingLine ?? ""
@@ -146,19 +145,18 @@ export function PreviewPanel({
   const firstSelectedTopicId = selectedTopics[0]?.topicId
   const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
 
-  if (!occasionType) return null
+  if (!category) return null
 
-  const datePlaceholder = occasionType
-    ? (DATE_LABEL_PLACEHOLDERS[occasionType] ?? "")
-    : ""
+  const datePlaceholder = ""
   const resolvedOpeningLine =
-    openingLine || getEventHeadline({ register, occasionType, name: "" }).prefix
+    openingLine ||
+    getEventHeadline({ register, occasionType: null, name: "" }).prefix
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
 
-  const effReg = effectiveRegister(occasionType, isPlural)
+  const effReg = deriveRegister(category, grouping)
 
   // Grey placeholder text for unfilled about — keyed by effective register + topic
   const aboutPlaceholder = !about
@@ -173,7 +171,7 @@ export function PreviewPanel({
   // Computed opening line placeholder for the overlay
   const openingLinePlaceholder = getEventHeadline({
     register,
-    occasionType,
+    occasionType: null,
     name: "",
   }).prefix
 
@@ -185,7 +183,7 @@ export function PreviewPanel({
     ? getExampleName(
         firstTopic.title ?? null,
         firstTopicPlaceholder?.pronouns,
-        firstTopicPlaceholder?.group as "pair" | "set" | undefined,
+        grouping,
         effReg
       )
     : ""

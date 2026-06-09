@@ -5,12 +5,14 @@ import { EventFormV2 } from "@/components/event-form-v2"
 import type {
   Category,
   Charity,
+  EventCategory,
+  EventGrouping,
   Topic,
   TopicItem,
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
-import { registerForOccasionType } from "@/lib/registers"
+import { deriveRegister } from "@/lib/registers"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -74,10 +76,13 @@ export default async function EditEventPage({ params }: Props) {
     }
   }
 
+  const category = (event.event_category ?? null) as EventCategory | null
+  const grouping = (event.event_grouping ?? "individual") as EventGrouping
+
   const defaultValues: Partial<EventFormValues> = {
-    register: registerForOccasionType(event.occasion_type ?? null),
-    occasionType: event.occasion_type ?? "",
-    isPlural: event.is_plural ?? false,
+    category: category ?? undefined,
+    grouping,
+    register: deriveRegister(category, grouping),
     name: event.protagonists.name ?? "",
     context: event.protagonists.context ?? "",
     openingLine: event.opening_line ?? "",

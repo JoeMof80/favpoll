@@ -2,10 +2,12 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventFormV2 } from "@/components/event-form-v2"
-import { registerForOccasionType, suggestClosingDate } from "@/lib/registers"
+import { deriveRegister, suggestClosingDate } from "@/lib/registers"
 import type {
   Category,
   Charity,
+  EventCategory,
+  EventGrouping,
   Topic,
   TopicItem,
   TopicWithMeta,
@@ -19,8 +21,8 @@ export default async function NewEventPage({ searchParams }: Props) {
   if (!userId) redirect("/sign-in?redirect_url=/events/new")
 
   const params = await searchParams
-  const occasionType = params.occasionType ?? ""
-  const isPlural = params.isPlural === "true"
+  const category = (params.category ?? "") as EventCategory | ""
+  const grouping = (params.grouping ?? "individual") as EventGrouping
   const topicId = params.topicId ?? ""
   const topicIsCustom = params.topicIsCustom === "true"
   const topicTitle = params.topicTitle ?? ""
@@ -78,17 +80,17 @@ export default async function NewEventPage({ searchParams }: Props) {
     }
   }
 
-  const register = registerForOccasionType(occasionType || null)
+  const register = deriveRegister(category || null, grouping)
 
-  const defaultValues: Partial<EventFormValues> = occasionType
+  const defaultValues: Partial<EventFormValues> = category
     ? {
-        occasionType,
+        category: category as EventCategory,
+        grouping,
         register,
-        isPlural,
         isListed: register !== "remembering",
         topics: defaultTopics,
         charities: charityIds,
-        closesAt: new Date(suggestClosingDate(register, occasionType)),
+        closesAt: new Date(suggestClosingDate(category as EventCategory)),
       }
     : {}
 

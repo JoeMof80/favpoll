@@ -54,8 +54,7 @@ export function EventFormV2({
     resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       register: "",
-      occasionType: "",
-      isPlural: false,
+      grouping: "individual",
       isListed: true,
       openingLine: "",
       name: "",
@@ -107,21 +106,19 @@ export function EventFormV2({
             : null,
       }
 
-      const resolvedOccasionType = values.occasionType || null
-
       if (mode === "create") {
         const { eventId: newId } = await createEvent({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
           dateLabel: values.context || null,
-          occasionType: resolvedOccasionType,
+          category: values.category ?? null,
+          grouping: values.grouping ?? "individual",
           openingLine: values.openingLine ?? null,
           description: null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
-          isPlural: values.isPlural ?? false,
           isListed: values.isListed ?? true,
           potAmount: values.sharedFund > 0 ? values.sharedFund : null,
           poll: {
@@ -144,13 +141,13 @@ export function EventFormV2({
           protagonistAbout: values.about || null,
           photoUrl: resolvedPhotoUrl,
           dateLabel: values.context || null,
-          occasionType: resolvedOccasionType,
+          category: values.category ?? null,
+          grouping: values.grouping ?? "individual",
           openingLine: values.openingLine ?? null,
           description: null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
-          isPlural: values.isPlural ?? false,
           isListed: values.isListed ?? true,
           potAmount: values.sharedFund > 0 ? values.sharedFund : null,
           poll,

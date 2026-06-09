@@ -1,3 +1,5 @@
+import type { EventCategory, EventGrouping } from "@favpoll/types"
+
 export type Register =
   | "remembering"
   | "celebrating_one"
@@ -116,12 +118,17 @@ export function registerForOccasionType(occasionType: string | null): Register {
   return "neutral"
 }
 
-const REGISTER_CLOSING_DEFAULTS: Record<Register, number> = {
-  remembering: 30,
-  celebrating_one: 14,
-  celebrating_many: 14,
-  cause: 21,
-  neutral: 14,
+/**
+ * Derive the register from the new category + grouping model.
+ */
+export function deriveRegister(
+  category: EventCategory | null,
+  grouping: EventGrouping
+): Register {
+  if (!category) return "neutral"
+  if (category === "memorial") return "remembering"
+  if (category === "fundraiser") return "cause"
+  return grouping === "individual" ? "celebrating_one" : "celebrating_many"
 }
 
 const OCCASION_TYPE_CLOSING_OVERRIDES: Record<string, number> = {
@@ -145,23 +152,6 @@ export const DATE_LABEL_PLACEHOLDERS: Record<string, string> = {
   Recovery: "One year on 15th June",
   Award: "Awarded January 2025",
   Promotion: "Starting 1st February 2025",
-}
-
-/**
- * Maps (occasionType, isPlural) to the effective register used for copy,
- * tense, and placeholder lookups.
- * - celebrating + isPlural  → celebrating_many
- * - celebrating + !isPlural → celebrating_one
- * - other tones ignore isPlural
- */
-export function effectiveRegister(
-  occasionType: string | null,
-  isPlural: boolean
-): Register {
-  const tone = registerForOccasionType(occasionType)
-  if (tone === "celebrating_one" && isPlural) return "celebrating_many"
-  if (tone === "celebrating_many" && !isPlural) return "celebrating_one"
-  return tone
 }
 
 /** Register-keyed grey placeholder for the context line in preview. */
@@ -219,7 +209,7 @@ function simpleHash(s: string): number {
 export function getExampleName(
   topicTitle: string | null,
   pronouns: "she" | "he" | "they" | undefined,
-  group: "pair" | "set" | undefined,
+  grouping: EventGrouping,
   register: Register
 ): string {
   if (!topicTitle) return ""
@@ -228,7 +218,7 @@ export function getExampleName(
     return exampleNames.cause[h % exampleNames.cause.length]
   }
   if (register === "celebrating_many") {
-    const key = group ?? "pair"
+    const key = grouping === "group" ? "set" : "pair"
     const pool = exampleNames[key]
     return pool[h % pool.length]
   }
@@ -251,19 +241,14 @@ export function shortTopicLabel(title: string): string {
  * Suggest a closing date for a poll.
  * - With eventDate: closes N days before the event (min: today + N days)
  * - Without eventDate: closes N days from today
- * N is determined by register default, overridden by occasion_type if applicable.
+ * N is 30 days for memorials, 14 days otherwise.
  * Returns "YYYY-MM-DDTHH:MM"
  */
 export function suggestClosingDate(
-  register: string,
-  occasionType?: string | null,
+  category: EventCategory | null,
   eventDate?: string | null
 ): string {
-  const typeOverride = occasionType
-    ? (OCCASION_TYPE_CLOSING_OVERRIDES[occasionType] ?? null)
-    : null
-  const days =
-    typeOverride ?? REGISTER_CLOSING_DEFAULTS[register as Register] ?? 14
+  const days = category === "memorial" ? 30 : 14
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
