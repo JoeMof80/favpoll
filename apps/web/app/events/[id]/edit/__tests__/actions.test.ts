@@ -28,6 +28,7 @@ function makeInput(
     openingLine: null,
     description: null,
     isPlural: false,
+    isListed: true,
     charityIds: ["charity-1"],
     closesAt: "2028-01-01T00:00",
     isPrivate: false,

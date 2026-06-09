@@ -300,7 +300,7 @@ export function PreviewPanel({
   )
 
   return (
-    <div className="mx-auto min-h-full max-w-5xl bg-background p-16 drop-shadow-lg">
+    <div className="mx-auto min-h-full max-w-5xl bg-background p-16 pb-52 drop-shadow-lg md:pb-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Left — hero + poll */}
         <div>

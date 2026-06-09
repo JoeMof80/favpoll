@@ -83,6 +83,7 @@ export type Event = {
   is_private: boolean
   is_plural: boolean | null
   is_exemplar?: boolean
+  is_listed?: boolean
   description: string | null
   created_at: string
 }
@@ -216,6 +217,7 @@ export type CanvasSubmitData = {
   closesAt: string
   isPrivate: boolean
   isPlural: boolean
+  isListed: boolean
   potAmount: number | null
   poll: CanvasPollInput
 }

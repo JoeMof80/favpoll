@@ -89,6 +89,7 @@ export default async function EditEventPage({ params }: Props) {
     ),
     sharedFund: pot?.total_deposited ?? 0,
     isPrivate: event.is_private ?? false,
+    isListed: event.is_listed ?? true,
     reveal: rawPoll?.personal_reveal ?? "",
     topics: preselectedTopics,
   }

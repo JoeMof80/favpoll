@@ -89,6 +89,7 @@ export default async function EventsPage({
     .from("events")
     .select(EVENT_SELECT)
     .eq("is_private", false)
+    .eq("is_listed", true)
 
   if (showClosed) {
     eventsQuery = eventsQuery.not("closed_at", "is", null)
@@ -129,6 +130,7 @@ export default async function EventsPage({
       .from("events")
       .select(EVENT_SELECT)
       .eq("is_private", false)
+      .eq("is_listed", true)
       .eq("is_exemplar", true)
       .not("closed_at", "is", null)
 
