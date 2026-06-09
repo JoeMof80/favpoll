@@ -25,6 +25,8 @@ type Props = {
   description?: string
   footer?: React.ReactNode
   children: React.ReactNode
+  /** Override the content wrapper class on the Dialog (desktop) variant only. */
+  dialogContentClassName?: string
 }
 
 function useIsMobile() {
@@ -46,6 +48,7 @@ export function ResponsiveOverlay({
   description,
   footer,
   children,
+  dialogContentClassName,
 }: Props) {
   const isMobile = useIsMobile()
 
@@ -80,14 +83,14 @@ export function ResponsiveOverlay({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex flex-col gap-0 overflow-hidden p-0"
+        className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
         style={{ maxHeight: "min(600px, 80vh)" }}
       >
         <DialogHeader className="shrink-0 border-b border-border px-5 py-4">
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className={dialogContentClassName ?? "flex-1 overflow-y-auto px-5 py-4"}>{children}</div>
         {footer && (
           <div className="shrink-0 border-t border-border px-5 py-4">
             {footer}

@@ -1,6 +1,5 @@
 "use client"
 
-import { Chip } from "@/components/ui/chip"
 import { cn } from "@/lib/utils"
 import type { EventCategory, EventGrouping } from "@favpoll/types"
 
@@ -13,23 +12,10 @@ const GROUPINGS: { value: EventGrouping; label: string }[] = [
 const CATEGORIES: {
   value: EventCategory
   label: string
-  description: string
 }[] = [
-  {
-    value: "celebration",
-    label: "Celebration",
-    description: "Birthday, retirement, wedding, graduation, and more.",
-  },
-  {
-    value: "memorial",
-    label: "Memorial",
-    description: "Remembering someone who has passed.",
-  },
-  {
-    value: "fundraiser",
-    label: "Fundraiser",
-    description: "Supporting a cause or charity directly.",
-  },
+  { value: "celebration", label: "Celebration" },
+  { value: "memorial", label: "Memorial" },
+  { value: "fundraiser", label: "Fundraiser" },
 ]
 
 type HonourStepProps = {
@@ -54,54 +40,55 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
 
   return (
     <div className="space-y-5">
+      {/* Category — horizontal scroll row */}
+      <div>
+        <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          Occasion type
+        </p>
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {CATEGORIES.map(({ value: cat, label }) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => handleCategorySelect(cat)}
+              className={cn(
+                "shrink-0 whitespace-nowrap rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+                value.category === cat
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Grouping segmented control */}
       {showGrouping && (
         <div>
           <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
             For
           </p>
-          <div className="flex gap-1.5">
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
             {GROUPINGS.map(({ value: grp, label }) => (
-              <Chip
+              <button
                 key={grp}
-                size="md"
-                selected={value.grouping === grp}
+                type="button"
                 onClick={() => handleGroupingSelect(grp)}
-                className="flex-1 justify-center"
+                className={cn(
+                  "shrink-0 whitespace-nowrap rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+                  value.grouping === grp
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                )}
               >
                 {label}
-              </Chip>
+              </button>
             ))}
           </div>
         </div>
       )}
-
-      {/* Category chips */}
-      <div>
-        <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-          Occasion type
-        </p>
-        <div className="space-y-2">
-          {CATEGORIES.map(({ value: cat, label, description }) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => handleCategorySelect(cat)}
-              className={cn(
-                "w-full rounded-lg border px-4 py-3 text-left transition-colors",
-                value.category === cat
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-background hover:border-primary/40 hover:bg-muted/50"
-              )}
-            >
-              <p className="text-sm font-medium">{label}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {description}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

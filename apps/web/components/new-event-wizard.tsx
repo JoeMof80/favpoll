@@ -175,47 +175,50 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
       title={title}
       description={description}
       footer={footer}
+      dialogContentClassName="flex flex-1 overflow-hidden"
     >
       {!data ? (
-        <div className="flex min-h-[22rem] items-center justify-center">
+        <div className="flex min-h-88 w-full items-center justify-center px-5 py-4">
           <p className="text-sm text-muted-foreground">Loading…</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-[9rem_1fr] md:gap-6">
-          {/* Left column: icon + tense-aware prompt (desktop only) */}
-          <div className="hidden md:flex md:flex-col md:items-center md:gap-3 md:pt-2">
+        <>
+          {/* Left column: icon + prompt — desktop only, does not scroll */}
+          <div className="hidden w-1/2 shrink-0 flex-col items-center justify-center gap-4 border-r border-border px-6 py-6 md:flex">
             {meta.icon}
             <p className="text-center text-xs leading-relaxed text-muted-foreground">
               {meta.prompt(category)}
             </p>
           </div>
 
-          {/* Right column: step content */}
-          <div className="min-h-[22rem]">
-            {step === "honour" ? (
-              <HonourStep
-                value={{ category, grouping }}
-                onChange={({ category: cat, grouping: grp }) => {
-                  setCategory(cat)
-                  setGrouping(grp)
-                }}
-              />
-            ) : step === "love" ? (
-              <LoveStep
-                topics={data.topics}
-                categories={data.categories}
-                value={topics}
-                onChange={setTopics}
-              />
-            ) : (
-              <CharityStep
-                charities={data.charities}
-                value={charityIds}
-                onChange={setCharityIds}
-              />
-            )}
+          {/* Right column: step content — scrolls */}
+          <div className="flex-1 overflow-y-auto px-5 py-4">
+            <div className="min-h-88">
+              {step === "honour" ? (
+                <HonourStep
+                  value={{ category, grouping }}
+                  onChange={({ category: cat, grouping: grp }) => {
+                    setCategory(cat)
+                    setGrouping(grp)
+                  }}
+                />
+              ) : step === "love" ? (
+                <LoveStep
+                  topics={data.topics}
+                  categories={data.categories}
+                  value={topics}
+                  onChange={setTopics}
+                />
+              ) : (
+                <CharityStep
+                  charities={data.charities}
+                  value={charityIds}
+                  onChange={setCharityIds}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </ResponsiveOverlay>
   )
