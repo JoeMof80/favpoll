@@ -178,7 +178,15 @@ export type PledgeWithAllocations = Pledge & {
 }
 
 // Shared types used by EventFormV2 and server actions
-export type TopicPlaceholders = Record<string, { about?: string; reveal: string }>
+export type TopicPlaceholders = Record<
+  string,
+  {
+    about?: string
+    reveal: string
+    pronouns?: "she" | "he" | "they"
+    group?: "pair" | "set"
+  }
+>
 
 export type TopicWithMeta = Topic & {
   topic_items: TopicItem[]

@@ -5,6 +5,7 @@ import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3"
 import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4"
 import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5"
 import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6"
+import { celebratingManySetOverrides } from "./celebrating-many-groups"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -216,7 +217,10 @@ type RawTopicPlaceholders = {
   [occasion: string]: { about: string; reveal: string }
 }
 
-type TopicPlaceholders = Record<RegisterKey, { about: string; reveal: string }>
+type TopicPlaceholders = Record<
+  RegisterKey,
+  { about: string; reveal: string; pronouns?: "she" | "he" | "they"; group?: "pair" | "set" }
+>
 
 const REGISTER_KEYS = new Set<string>([
   "remembering",
@@ -277,7 +281,7 @@ const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
  * the seed and are listed (not thrown) at startup.
  */
 const combinedPlaceholders = (() => {
-  const batches: Record<string, Record<RegisterKey, { about: string; reveal: string }>>[] = [
+  const batches: Record<string, Record<RegisterKey, { about: string; reveal: string; pronouns?: "she" | "he" | "they" }>>[] = [
     regeneratedPlaceholders as never,
     regeneratedPlaceholdersBatch2 as never,
     regeneratedPlaceholdersBatch3 as never,
@@ -285,11 +289,21 @@ const combinedPlaceholders = (() => {
     regeneratedPlaceholdersBatch5 as never,
     regeneratedPlaceholdersBatch6 as never,
   ]
-  const map: Record<string, Record<RegisterKey, { about: string; reveal: string }>> = {}
+  const map: Record<string, Record<RegisterKey, { about: string; reveal: string; pronouns?: "she" | "he" | "they"; group?: "pair" | "set" }>> = {}
   for (const batch of batches) {
     for (const [title, data] of Object.entries(batch)) {
       if (map[title]) throw new Error(`Duplicate topic title in placeholder batches: "${title}"`)
-      map[title] = data
+      map[title] = { ...data }
+    }
+  }
+  // Apply group tags to celebrating_many entries
+  for (const [title, registers] of Object.entries(map)) {
+    if (!registers.celebrating_many) continue
+    const override = celebratingManySetOverrides[title]
+    if (override) {
+      registers.celebrating_many = { ...override }
+    } else {
+      registers.celebrating_many = { ...registers.celebrating_many, group: "pair" }
     }
   }
   return map
@@ -2533,6 +2547,10 @@ async function assertAllTopicsHavePlaceholders() {
     )
     if (missingKeys.length > 0) {
       bad.push(`"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`)
+    }
+    const cm = ph["celebrating_many"] as { group?: string } | undefined
+    if (cm && !cm.group) {
+      bad.push(`"${row.title}": celebrating_many missing group field`)
     }
   }
 

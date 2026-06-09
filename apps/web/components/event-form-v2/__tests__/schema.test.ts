@@ -3,7 +3,7 @@ import { eventFormSchema } from "@/components/event-form-v2/schema"
 
 // Minimal valid input — only required fields
 const VALID_BASE = {
-  register: "celebrating_one",
+  occasionType: "Birthday",
   name: "Alice",
   closesAt: new Date("2027-01-01"),
   charities: ["charity-1"],
@@ -80,10 +80,10 @@ describe("eventFormSchema — field length limits", () => {
     }
   })
 
-  it("rejects openingLine exceeding 60 characters", () => {
+  it("rejects openingLine exceeding 50 characters", () => {
     const result = eventFormSchema.safeParse({
       ...VALID_BASE,
-      openingLine: "A".repeat(61),
+      openingLine: "A".repeat(51),
     })
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -117,10 +117,36 @@ describe("eventFormSchema — field length limits", () => {
 })
 
 describe("eventFormSchema — required fields", () => {
-  it("rejects missing register", () => {
-    const { register: _r, ...rest } = VALID_BASE
+  it("accepts missing register (register is now optional)", () => {
+    const { register: _r, ...rest } = VALID_BASE as typeof VALID_BASE & {
+      register?: string
+    }
+    const result = eventFormSchema.safeParse(rest)
+    expect(result.success).toBe(true)
+  })
+
+  it("rejects missing occasionType", () => {
+    const { occasionType: _o, ...rest } = VALID_BASE
     const result = eventFormSchema.safeParse(rest)
     expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((i) => i.path[0] === "occasionType")
+      ).toBe(true)
+    }
+  })
+
+  it("rejects empty occasionType", () => {
+    const result = eventFormSchema.safeParse({
+      ...VALID_BASE,
+      occasionType: "",
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((i) => i.path[0] === "occasionType")
+      ).toBe(true)
+    }
   })
 
   it("rejects empty name", () => {

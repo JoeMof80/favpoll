@@ -268,9 +268,15 @@ type Register =
 
 Pure lookup in `lib/registers.ts`. Returns `"neutral"` for null or unrecognised values.
 
+### HONOUR step — occasion type is the sole input
+
+The six register-chip step is removed. `occasion_type` is now the only HONOUR input — register is always derived from it via `registerForOccasionType(occasionType)` and auto-set in the form. `DEFAULT_OCCASION_TYPE` is retained for display/suggestion but is no longer written on chip-select.
+
+The `is_plural` Switch is shown only when the derived register is `celebrating_one` (e.g. Birthday, Retirement). For `celebrating_many` occasions (Wedding, Anniversary, etc.) `isPlural` is auto-set to `true` and the switch is hidden. For all other registers the switch is hidden.
+
 ### `DEFAULT_OCCASION_TYPE: Record<Register, string | null>`
 
-Written to `events.occasion_type` when organiser picks a register chip with no finer occasion type (i.e. the chip's `occasionType` is null): `Remembrance`, `Celebration`, `Joint celebration`, `Fundraiser`, `null`. This write-through (in `OccasionOverlay.handleRegisterSelect`) ensures the event headline and the topic placeholder both resolve via the same register — without it, a plain register selection yields a `neutral` placeholder while the headline shows the correct register tone.
+Used for display and suggestion purposes. `Remembrance`, `Celebration`, `Joint celebration`, `Fundraiser`, `null`.
 
 ### Occasion types by register (from `OCCASION_TYPES_BY_REGISTER` in `lib/registers.ts`)
 
@@ -403,7 +409,7 @@ components/
 │   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner (inside <Form> for useWatch access); Event Settings overlay (isPrivate Switch + sharedFund input) in publish bar; publish checklist (missing[] list above button); isFirstTime prop; mobile: flex-col with preview stacked below
 │   ├── form-panel.tsx            -- 3-pillar layout (Honour/Love/Charity): OccasionOverlay (controlled-open), TopicPickerField, CharityField. Retired step files left with TODO(refactor) comments. Uses useFormContext.
 │   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below left panel). Shows OnboardingPanel when no occasion selected.
-│   ├── occasion-overlay.tsx      -- Merged register chip grid + occasion-type input (inline chips, no nested Popover); controlled-open; exports REGISTER_CHIP_LABELS; Footer: Done + Clear
+│   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
 │   ├── schema.ts                 -- Zod schema + EventFormValues
@@ -660,11 +666,13 @@ NEXT_PUBLIC_BASE_URL
 
 - **opening_line is organiser-editable.** Shown as placeholder text in the form (from `PREFIXES[occasion]`) — not pre-filled. Organiser may type their own. Stored in DB. Preview falls back to `PREFIXES[occasion]` when field is empty. Never derive it purely from occasion at render time.
 
-- **Field character limits.** name: 40, context: 40, opening_line: 60, about: 300, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
+- **Field character limits.** name: 40, context: 40, opening_line: 50, about: 300, personal_reveal: 280. Enforced via Zod max(), HTML maxLength, and CSS overflow (line-clamp-2 on name heading, truncate on context and opening line). Limits chosen to prevent layout breakage in the event preview.
 
 - **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
 
-- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty in the DB, providing a bidirectional fail-loud guard.
+- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty in the DB, providing a bidirectional fail-loud guard. `celebrating_many` placeholder entries carry `group: "pair"` (default) or `group: "set"` (sport cluster, defined in `scripts/celebrating-many-groups.ts`); group tagging is applied inside `combinedPlaceholders` at seed startup.
+
+- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Eleanor" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName()` in `lib/registers.ts`. The selection varies by register/pronouns/group: she/he names for personal registers, pair/set names for group occasions, cause names for fundraisers. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 
