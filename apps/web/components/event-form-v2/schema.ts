@@ -2,7 +2,8 @@ import { z } from "zod"
 
 export const eventFormSchema = z.object({
   register: z.string().optional().default(""),
-  occasionType: z.string().min(1, "Please select an occasion type"),
+  category: z.enum(["celebration", "memorial", "fundraiser"]).optional(),
+  grouping: z.enum(["individual", "couple", "group"]).default("individual"),
   openingLine: z.string().max(50, "Must be 50 characters or fewer").optional(),
   name: z
     .string()
@@ -19,7 +20,6 @@ export const eventFormSchema = z.object({
     .max(3, "Maximum 3 charities"),
   sharedFund: z.number().min(0),
   isPrivate: z.boolean(),
-  isPlural: z.boolean().default(false),
   isListed: z.boolean().default(true),
   reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
   topics: z

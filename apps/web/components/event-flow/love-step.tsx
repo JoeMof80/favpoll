@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import { shortTopicLabel } from "@/lib/registers"
-import { cn } from "@/lib/utils"
 import type { Category, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
@@ -22,9 +21,6 @@ export function LoveStep({
 }: LoveStepProps) {
   const [search, setSearch] = useState("")
   const [catFilter, setCatFilter] = useState<string | null>(null)
-  const [finiteFilter, setFiniteFilter] = useState<
-    "finite" | "infinite" | null
-  >(null)
 
   const activeTopics = topics.filter((t) => t.is_active !== false)
   const selectedId = value[0]?.topicId ?? null
@@ -50,11 +46,9 @@ export function LoveStep({
   const filtered = allDisplayTopics.filter((t) => {
     const matchesCat =
       t.id === "__custom__" || !catFilter || t.category_ids.includes(catFilter)
-    const matchesFinite =
-      !finiteFilter || (finiteFilter === "finite" ? t.is_finite : !t.is_finite)
     const matchesSearch =
       !search || t.title.toLowerCase().includes(search.toLowerCase())
-    return matchesCat && matchesFinite && matchesSearch
+    return matchesCat && matchesSearch
   })
 
   const trimmedSearch = search.trim()
@@ -91,82 +85,51 @@ export function LoveStep({
   }
 
   return (
-    <div className="space-y-3">
-      {/* Search input */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            handleCreateTopic()
-          }
-        }}
-        placeholder="Search topics…"
-        autoFocus
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-      />
+    <div className="min-h-[22rem] space-y-0">
+      {/* Sticky search + filter row */}
+      <div className="sticky top-0 z-10 bg-background pt-1 pb-2">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              handleCreateTopic()
+            }
+          }}
+          placeholder="Search topics…"
+          autoFocus
+          className="mb-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
+        />
 
-      {/* Filters */}
-      <div>
-        <p className="mb-1.5 text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
-          Filter by category
-        </p>
+        {/* Category filter chips */}
         <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => {
-              setCatFilter(null)
-              setFiniteFilter(null)
-            }}
-            className={cn(
-              "rounded px-2.5 py-1 text-xs font-medium",
-              !catFilter && !finiteFilter
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            )}
+          <Chip
+            size="sm"
+            selected={!catFilter}
+            onClick={() => setCatFilter(null)}
           >
             All
-          </button>
-          {(["finite", "infinite"] as const).map((val) => (
-            <button
-              key={val}
-              type="button"
-              onClick={() => setFiniteFilter(finiteFilter === val ? null : val)}
-              className={cn(
-                "rounded px-2.5 py-1 text-xs font-medium",
-                finiteFilter === val
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {val.charAt(0).toUpperCase() + val.slice(1)}
-            </button>
-          ))}
+          </Chip>
           {categories.map((cat) => (
-            <button
+            <Chip
               key={cat.id}
-              type="button"
-              onClick={() => {
-                setFiniteFilter(null)
-                setCatFilter(catFilter === cat.id ? null : cat.id)
-              }}
-              className={cn(
-                "rounded px-2.5 py-1 text-xs font-medium",
-                catFilter === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              )}
+              size="sm"
+              selected={catFilter === cat.id}
+              onClick={() => setCatFilter(catFilter === cat.id ? null : cat.id)}
             >
               {cat.label}
-            </button>
+            </Chip>
           ))}
         </div>
       </div>
 
+      {/* Separator */}
+      <div className="border-b border-border" />
+
       {/* Topic chips */}
-      <div>
+      <div className="pt-3">
         {showCreate ? (
           <button
             type="button"

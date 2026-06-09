@@ -25,13 +25,13 @@ type CreateEventInput = {
   protagonistAbout: string | null
   photoUrl: string | null
   dateLabel: string | null
-  occasionType: string | null
+  category: string | null
+  grouping: string
   openingLine: string | null
   description: string | null
   charityIds: string[]
   closesAt: string
   isPrivate: boolean
-  isPlural: boolean
   isListed: boolean
   potAmount: number | null
   poll: PollInput
@@ -226,7 +226,9 @@ export async function createEvent(
     .from("events")
     .insert({
       protagonist_id: protagonist.id,
-      occasion_type: input.occasionType,
+      event_category: input.category,
+      event_grouping: input.grouping,
+      is_plural: input.grouping !== "individual",
       opening_line: input.openingLine,
       created_by: userId,
       closes_at: closesAt,
@@ -234,7 +236,6 @@ export async function createEvent(
       hard_close_at: hardCloseAt.toISOString(),
       extension_count: 0,
       is_private: input.isPrivate,
-      is_plural: input.isPlural,
       is_listed: input.isListed,
       description: input.description,
     })

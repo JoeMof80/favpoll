@@ -3,8 +3,8 @@ import {
   shortTopicLabel,
   suggestClosingDate,
   registerForOccasionType,
+  deriveRegister,
   getExampleName,
-  DEFAULT_OCCASION_TYPE,
   type Register,
 } from "@/lib/registers"
 
@@ -35,6 +35,35 @@ describe("shortTopicLabel", () => {
   })
 })
 
+describe("deriveRegister", () => {
+  it("returns neutral for null category", () => {
+    expect(deriveRegister(null, "individual")).toBe("neutral")
+  })
+
+  it("memorial → remembering regardless of grouping", () => {
+    expect(deriveRegister("memorial", "individual")).toBe("remembering")
+    expect(deriveRegister("memorial", "couple")).toBe("remembering")
+    expect(deriveRegister("memorial", "group")).toBe("remembering")
+  })
+
+  it("fundraiser → cause regardless of grouping", () => {
+    expect(deriveRegister("fundraiser", "individual")).toBe("cause")
+    expect(deriveRegister("fundraiser", "couple")).toBe("cause")
+  })
+
+  it("celebration + individual → celebrating_one", () => {
+    expect(deriveRegister("celebration", "individual")).toBe("celebrating_one")
+  })
+
+  it("celebration + couple → celebrating_many", () => {
+    expect(deriveRegister("celebration", "couple")).toBe("celebrating_many")
+  })
+
+  it("celebration + group → celebrating_many", () => {
+    expect(deriveRegister("celebration", "group")).toBe("celebrating_many")
+  })
+})
+
 describe("suggestClosingDate", () => {
   // Freeze to noon UTC on a Sunday — safe from day-boundary issues in all timezones
   const FROZEN = new Date("2025-06-01T12:00:00Z")
@@ -48,72 +77,43 @@ describe("suggestClosingDate", () => {
     vi.useRealTimers()
   })
 
-  it("closes 14 days from today for celebrating_one with no occasion type", () => {
-    expect(suggestClosingDate("celebrating_one")).toBe("2025-06-15T23:59")
+  it("closes 14 days from today for celebration", () => {
+    expect(suggestClosingDate("celebration")).toBe("2025-06-15T23:59")
   })
 
-  it("closes 30 days from today for remembering (longest register default)", () => {
-    expect(suggestClosingDate("remembering")).toBe("2025-07-01T23:59")
+  it("closes 30 days from today for memorial", () => {
+    expect(suggestClosingDate("memorial")).toBe("2025-07-01T23:59")
   })
 
-  it("closes 21 days for cause register", () => {
-    expect(suggestClosingDate("cause")).toBe("2025-06-22T23:59")
+  it("closes 14 days from today for fundraiser", () => {
+    expect(suggestClosingDate("fundraiser")).toBe("2025-06-15T23:59")
   })
 
-  it("defaults to 14 days for an unknown register", () => {
-    expect(suggestClosingDate("unknown_register")).toBe("2025-06-15T23:59")
-  })
-
-  it("occasion_type Tribute overrides remembering default (30 → 21)", () => {
-    expect(suggestClosingDate("remembering", "Tribute")).toBe(
-      "2025-06-22T23:59"
-    )
-  })
-
-  it("occasion_type Retirement overrides celebrating_one default (14 → 21)", () => {
-    expect(suggestClosingDate("celebrating_one", "Retirement")).toBe(
-      "2025-06-22T23:59"
-    )
-  })
-
-  it("occasion_type Anniversary overrides celebrating_many default (14 → 21)", () => {
-    expect(suggestClosingDate("celebrating_many", "Anniversary")).toBe(
-      "2025-06-22T23:59"
-    )
-  })
-
-  it("occasion_type Birthday has no override — uses register default (14)", () => {
-    expect(suggestClosingDate("celebrating_one", "Birthday")).toBe(
-      "2025-06-15T23:59"
-    )
+  it("closes 14 days for null category", () => {
+    expect(suggestClosingDate(null)).toBe("2025-06-15T23:59")
   })
 
   it("closes n days before eventDate when event is far enough in future", () => {
-    // celebrating_one = 14 days before event; event 2025-09-01 → close 2025-08-18
-    expect(suggestClosingDate("celebrating_one", null, "2025-09-01")).toBe(
+    // celebration = 14 days before event; event 2025-09-01 → close 2025-08-18
+    expect(suggestClosingDate("celebration", "2025-09-01")).toBe(
       "2025-08-18T23:59"
     )
   })
 
   it("falls back to today + n days when eventDate - n is in the past", () => {
-    // celebrating_one = 14 days; event tomorrow (2025-06-02) → target past → fallback
-    expect(suggestClosingDate("celebrating_one", null, "2025-06-02")).toBe(
+    // celebration = 14 days; event tomorrow (2025-06-02) → target past → fallback
+    expect(suggestClosingDate("celebration", "2025-06-02")).toBe(
       "2025-06-15T23:59"
     )
   })
 
   it("returns a string in YYYY-MM-DDTHH:MM format", () => {
-    const result = suggestClosingDate("celebrating_many")
+    const result = suggestClosingDate("celebration")
     expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
   })
 
   it("always ends in T23:59", () => {
-    const result = suggestClosingDate(
-      "celebrating_one",
-      "Retirement",
-      "2025-12-01"
-    )
-    expect(result).toMatch(/T23:59$/)
+    expect(suggestClosingDate("memorial", "2025-12-01")).toMatch(/T23:59$/)
   })
 })
 
@@ -145,32 +145,22 @@ describe("registerForOccasionType", () => {
   it("maps Fundraiser → cause", () => {
     expect(registerForOccasionType("Fundraiser")).toBe("cause")
   })
-
-  it("round-trips every DEFAULT_OCCASION_TYPE back to its register", () => {
-    const registers: Register[] = [
-      "remembering",
-      "celebrating_one",
-      "celebrating_many",
-      "cause",
-    ]
-    for (const reg of registers) {
-      const defaultType = DEFAULT_OCCASION_TYPE[reg]!
-      expect(registerForOccasionType(defaultType)).toBe(reg)
-    }
-  })
-
-  it("neutral DEFAULT_OCCASION_TYPE is null", () => {
-    expect(DEFAULT_OCCASION_TYPE.neutral).toBeNull()
-  })
 })
 
 describe("getExampleName", () => {
   it("returns empty string for null topicTitle", () => {
-    expect(getExampleName(null, "she", "pair", "celebrating_one")).toBe("")
+    expect(getExampleName(null, "she", "individual", "celebrating_one")).toBe(
+      ""
+    )
   })
 
   it("returns a stable she-name for celebrating_one + pronouns:she", () => {
-    const name = getExampleName("Colour", "she", undefined, "celebrating_one")
+    const name = getExampleName(
+      "Colour",
+      "she",
+      "individual",
+      "celebrating_one"
+    )
     expect([
       "Margaret",
       "Eleanor",
@@ -180,13 +170,13 @@ describe("getExampleName", () => {
       "Vera",
     ]).toContain(name)
     // Stable: same inputs produce the same output
-    expect(getExampleName("Colour", "she", undefined, "celebrating_one")).toBe(
-      name
-    )
+    expect(
+      getExampleName("Colour", "she", "individual", "celebrating_one")
+    ).toBe(name)
   })
 
   it("returns a stable he-name for celebrating_one + pronouns:he", () => {
-    const name = getExampleName("Colour", "he", undefined, "celebrating_one")
+    const name = getExampleName("Colour", "he", "individual", "celebrating_one")
     expect([
       "Arthur",
       "George",
@@ -197,8 +187,8 @@ describe("getExampleName", () => {
     ]).toContain(name)
   })
 
-  it("returns a pair name for celebrating_many + group:pair", () => {
-    const name = getExampleName("Colour", "they", "pair", "celebrating_many")
+  it("returns a pair name for celebrating_many + grouping:couple", () => {
+    const name = getExampleName("Colour", "they", "couple", "celebrating_many")
     expect([
       "Joan & Arthur",
       "Margaret & George",
@@ -207,8 +197,8 @@ describe("getExampleName", () => {
     ]).toContain(name)
   })
 
-  it("returns a set name for celebrating_many + group:set", () => {
-    const name = getExampleName("Colour", "they", "set", "celebrating_many")
+  it("returns a set name for celebrating_many + grouping:group", () => {
+    const name = getExampleName("Colour", "they", "group", "celebrating_many")
     expect([
       "The Wednesday Walkers",
       "Class of 2015",
@@ -219,8 +209,13 @@ describe("getExampleName", () => {
     ]).toContain(name)
   })
 
-  it("defaults to pair for celebrating_many with no group", () => {
-    const name = getExampleName("Colour", "they", undefined, "celebrating_many")
+  it("defaults to pair for celebrating_many with grouping:individual", () => {
+    const name = getExampleName(
+      "Colour",
+      "they",
+      "individual",
+      "celebrating_many"
+    )
     expect([
       "Joan & Arthur",
       "Margaret & George",
@@ -230,7 +225,7 @@ describe("getExampleName", () => {
   })
 
   it("returns a cause name for cause register", () => {
-    const name = getExampleName("Colour", undefined, undefined, "cause")
+    const name = getExampleName("Colour", undefined, "individual", "cause")
     expect([
       "The Sunshine Appeal",
       "Helping Hands Fund",
@@ -239,12 +234,17 @@ describe("getExampleName", () => {
   })
 
   it("returns a non-empty string for neutral register", () => {
-    const name = getExampleName("Colour", undefined, undefined, "neutral")
+    const name = getExampleName("Colour", undefined, "individual", "neutral")
     expect(name.length).toBeGreaterThan(0)
   })
 
   it("falls back to she when pronouns is undefined in remembering register", () => {
-    const name = getExampleName("Colour", undefined, undefined, "remembering")
+    const name = getExampleName(
+      "Colour",
+      undefined,
+      "individual",
+      "remembering"
+    )
     expect([
       "Margaret",
       "Eleanor",

@@ -6,14 +6,18 @@ import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { shortTopicLabel, registerForOccasionType } from "@/lib/registers"
-import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
+import { shortTopicLabel, deriveRegister } from "@/lib/registers"
+import type {
+  Category,
+  Charity,
+  EventCategory,
+  EventGrouping,
+  TopicWithMeta,
+} from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 import { HonourStep } from "@/components/event-flow/honour-step"
 import { LoveStep } from "@/components/event-flow/love-step"
 import { CharityStep } from "@/components/event-flow/charity-step"
-
-const MAX_CHARITIES = 3
 
 type CommandPanelProps = {
   charities: Charity[]
@@ -40,10 +44,10 @@ export function CommandPanel({
 }: CommandPanelProps) {
   const form = useFormContext<EventFormValues>()
 
-  const occasionType =
-    useWatch({ control: form.control, name: "occasionType" }) ?? ""
-  const isPlural =
-    useWatch({ control: form.control, name: "isPlural" }) ?? false
+  const category = (useWatch({ control: form.control, name: "category" }) ??
+    null) as EventCategory | null
+  const grouping = (useWatch({ control: form.control, name: "grouping" }) ??
+    "individual") as EventGrouping
   const topicsValue = useWatch({ control: form.control, name: "topics" }) ?? []
   const charitiesValue =
     useWatch({ control: form.control, name: "charities" }) ?? []
@@ -53,6 +57,10 @@ export function CommandPanel({
   const [honourOpen, setHonourOpen] = useState(false)
   const [loveOpen, setLoveOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)
+
+  const categoryLabel = category
+    ? category.charAt(0).toUpperCase() + category.slice(1)
+    : null
 
   const topicLabel = topicsValue[0]
     ? shortTopicLabel(topicsValue[0].title)
@@ -70,7 +78,7 @@ export function CommandPanel({
         : `${charityCount} of 3 selected — proceeds split equally.`
 
   const missing: string[] = []
-  if (!occasionType) missing.push("Occasion")
+  if (!category) missing.push("Occasion")
   if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
     missing.push("favpoll topic")
   if (!charitiesValue?.length) missing.push("Charity")
@@ -93,11 +101,11 @@ export function CommandPanel({
             </p>
             <div className="flex flex-wrap gap-1.5">
               <Chip
-                selected={!!occasionType}
+                selected={!!categoryLabel}
                 size="sm"
                 onClick={() => setHonourOpen(true)}
               >
-                {occasionType || "Occasion…"}
+                {categoryLabel || "Occasion…"}
               </Chip>
               <Chip
                 selected={!!topicLabel}
@@ -220,12 +228,12 @@ export function CommandPanel({
         }
       >
         <HonourStep
-          value={{ occasionType, isPlural }}
-          onChange={({ occasionType: oType, isPlural: iP }) => {
-            const derived = registerForOccasionType(oType || null)
-            form.setValue("occasionType", oType, { shouldValidate: true })
+          value={{ category, grouping }}
+          onChange={({ category: cat, grouping: grp }) => {
+            const derived = deriveRegister(cat, grp)
+            form.setValue("category", cat ?? undefined)
+            form.setValue("grouping", grp)
             form.setValue("register", derived)
-            form.setValue("isPlural", iP)
             form.setValue("openingLine", "")
             form.setValue("isListed", derived !== "remembering")
           }}

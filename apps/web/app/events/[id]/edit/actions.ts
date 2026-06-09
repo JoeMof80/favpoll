@@ -228,11 +228,12 @@ export async function updateEvent(
   await supabase
     .from("events")
     .update({
-      occasion_type: input.occasionType,
+      event_category: input.category,
+      event_grouping: input.grouping,
+      is_plural: input.grouping !== "individual",
       opening_line: input.openingLine,
       closes_at: newClosesAt,
       is_private: input.isPrivate,
-      is_plural: input.isPlural,
       is_listed: input.isListed,
       description: input.description,
       ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),

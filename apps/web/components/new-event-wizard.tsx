@@ -2,13 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { Heart, Sparkles, HandHeart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { HonourStep } from "@/components/event-flow/honour-step"
 import { LoveStep } from "@/components/event-flow/love-step"
 import { CharityStep } from "@/components/event-flow/charity-step"
 import { getWizardData } from "@/app/events/new/wizard-data"
-import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
+import type {
+  Category,
+  Charity,
+  EventCategory,
+  EventGrouping,
+  TopicWithMeta,
+} from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
 type WizardData = {
@@ -20,6 +27,32 @@ type Step = "honour" | "love" | "charity"
 
 const STEPS: Step[] = ["honour", "love", "charity"]
 
+type StepMeta = {
+  icon: React.ReactNode
+  prompt: (cat: EventCategory | null) => string
+}
+
+const STEP_META: Record<Step, StepMeta> = {
+  honour: {
+    icon: <Heart className="h-8 w-8 text-muted-foreground/40" />,
+    prompt: (cat) =>
+      cat === "memorial"
+        ? "Who would you like to remember?"
+        : cat === "fundraiser"
+          ? "What cause are you supporting?"
+          : "Who are you celebrating?",
+  },
+  love: {
+    icon: <Sparkles className="h-8 w-8 text-muted-foreground/40" />,
+    prompt: () =>
+      "Choose what everyone votes on — their favourite colour, film, dish, and more.",
+  },
+  charity: {
+    icon: <HandHeart className="h-8 w-8 text-muted-foreground/40" />,
+    prompt: () => "All pledges go to the charity you choose.",
+  },
+}
+
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -29,8 +62,8 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
   const router = useRouter()
   const [step, setStep] = useState<Step>("honour")
   const [data, setData] = useState<WizardData | null>(null)
-  const [occasionType, setOccasionType] = useState("")
-  const [isPlural, setIsPlural] = useState(false)
+  const [category, setCategory] = useState<EventCategory | null>(null)
+  const [grouping, setGrouping] = useState<EventGrouping>("individual")
   const [topics, setTopics] = useState<EventFormValues["topics"]>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
 
@@ -43,8 +76,8 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
   useEffect(() => {
     if (!open) {
       setStep("honour")
-      setOccasionType("")
-      setIsPlural(false)
+      setCategory(null)
+      setGrouping("individual")
       setTopics([])
       setCharityIds([])
     }
@@ -74,7 +107,7 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
 
   const nextDisabled =
     step === "honour"
-      ? !occasionType
+      ? !category
       : step === "love"
         ? topics.length === 0
         : charityIds.length === 0
@@ -82,8 +115,8 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
   function handleFinish() {
     const topic = topics[0]
     const params = new URLSearchParams({
-      occasionType,
-      isPlural: String(isPlural),
+      category: category ?? "",
+      grouping,
       charityIds: charityIds.join(","),
     })
     if (topic) {
@@ -98,6 +131,8 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
     onOpenChange(false)
     router.push(`/events/new?${params}`)
   }
+
+  const meta = STEP_META[step]
 
   const footer = (
     <div className="flex gap-2">
@@ -142,30 +177,45 @@ export function NewEventWizard({ open, onOpenChange }: Props) {
       footer={footer}
     >
       {!data ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex min-h-[22rem] items-center justify-center">
           <p className="text-sm text-muted-foreground">Loading…</p>
         </div>
-      ) : step === "honour" ? (
-        <HonourStep
-          value={{ occasionType, isPlural }}
-          onChange={({ occasionType: oType, isPlural: iP }) => {
-            setOccasionType(oType)
-            setIsPlural(iP)
-          }}
-        />
-      ) : step === "love" ? (
-        <LoveStep
-          topics={data.topics}
-          categories={data.categories}
-          value={topics}
-          onChange={setTopics}
-        />
       ) : (
-        <CharityStep
-          charities={data.charities}
-          value={charityIds}
-          onChange={setCharityIds}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-[9rem_1fr] md:gap-6">
+          {/* Left column: icon + tense-aware prompt (desktop only) */}
+          <div className="hidden md:flex md:flex-col md:items-center md:gap-3 md:pt-2">
+            {meta.icon}
+            <p className="text-center text-xs leading-relaxed text-muted-foreground">
+              {meta.prompt(category)}
+            </p>
+          </div>
+
+          {/* Right column: step content */}
+          <div className="min-h-[22rem]">
+            {step === "honour" ? (
+              <HonourStep
+                value={{ category, grouping }}
+                onChange={({ category: cat, grouping: grp }) => {
+                  setCategory(cat)
+                  setGrouping(grp)
+                }}
+              />
+            ) : step === "love" ? (
+              <LoveStep
+                topics={data.topics}
+                categories={data.categories}
+                value={topics}
+                onChange={setTopics}
+              />
+            ) : (
+              <CharityStep
+                charities={data.charities}
+                value={charityIds}
+                onChange={setCharityIds}
+              />
+            )}
+          </div>
+        </div>
       )}
     </ResponsiveOverlay>
   )

@@ -3,7 +3,7 @@ import { eventFormSchema } from "@/components/event-form-v2/schema"
 
 // Minimal valid input — only required fields
 const VALID_BASE = {
-  occasionType: "Birthday",
+  category: "celebration" as const,
   name: "Alice",
   closesAt: new Date("2027-01-01"),
   charities: ["charity-1"],
@@ -43,6 +43,13 @@ describe("eventFormSchema — valid inputs", () => {
       charities: ["c1", "c2", "c3"],
     })
     expect(result.success).toBe(true)
+  })
+
+  it("accepts grouping values", () => {
+    for (const grouping of ["individual", "couple", "group"] as const) {
+      const result = eventFormSchema.safeParse({ ...VALID_BASE, grouping })
+      expect(result.success).toBe(true)
+    }
   })
 })
 
@@ -117,7 +124,7 @@ describe("eventFormSchema — field length limits", () => {
 })
 
 describe("eventFormSchema — required fields", () => {
-  it("accepts missing register (register is now optional)", () => {
+  it("accepts missing register (register is optional)", () => {
     const { register: _r, ...rest } = VALID_BASE as typeof VALID_BASE & {
       register?: string
     }
@@ -125,27 +132,22 @@ describe("eventFormSchema — required fields", () => {
     expect(result.success).toBe(true)
   })
 
-  it("rejects missing occasionType", () => {
-    const { occasionType: _o, ...rest } = VALID_BASE
+  it("accepts missing category (category is optional)", () => {
+    const { category: _c, ...rest } = VALID_BASE
     const result = eventFormSchema.safeParse(rest)
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(
-        result.error.issues.some((i) => i.path[0] === "occasionType")
-      ).toBe(true)
-    }
+    expect(result.success).toBe(true)
   })
 
-  it("rejects empty occasionType", () => {
+  it("rejects an invalid category value", () => {
     const result = eventFormSchema.safeParse({
       ...VALID_BASE,
-      occasionType: "",
+      category: "party",
     })
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(
-        result.error.issues.some((i) => i.path[0] === "occasionType")
-      ).toBe(true)
+      expect(result.error.issues.some((i) => i.path[0] === "category")).toBe(
+        true
+      )
     }
   })
 

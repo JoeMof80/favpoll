@@ -1,99 +1,107 @@
 "use client"
 
-import { useState } from "react"
 import { Chip } from "@/components/ui/chip"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import {
-  OCCASION_TYPES_BY_REGISTER,
-  registerForOccasionType,
-  type Register,
-} from "@/lib/registers"
+import { cn } from "@/lib/utils"
+import type { EventCategory, EventGrouping } from "@favpoll/types"
 
-const OCCASION_GROUP_ORDER: { register: Register; label: string }[] = [
-  { register: "celebrating_one", label: "Celebrating a person" },
-  { register: "celebrating_many", label: "Celebrating a couple or group" },
-  { register: "remembering", label: "In memory of someone" },
-  { register: "cause", label: "Supporting a cause" },
+const GROUPINGS: { value: EventGrouping; label: string }[] = [
+  { value: "individual", label: "An individual" },
+  { value: "couple", label: "A couple" },
+  { value: "group", label: "A group" },
+]
+
+const CATEGORIES: {
+  value: EventCategory
+  label: string
+  description: string
+}[] = [
+  {
+    value: "celebration",
+    label: "Celebration",
+    description: "Birthday, retirement, wedding, graduation, and more.",
+  },
+  {
+    value: "memorial",
+    label: "Memorial",
+    description: "Remembering someone who has passed.",
+  },
+  {
+    value: "fundraiser",
+    label: "Fundraiser",
+    description: "Supporting a cause or charity directly.",
+  },
 ]
 
 type HonourStepProps = {
-  value: { occasionType: string; isPlural: boolean }
-  onChange: (v: { occasionType: string; isPlural: boolean }) => void
+  value: { category: EventCategory | null; grouping: EventGrouping }
+  onChange: (v: {
+    category: EventCategory | null
+    grouping: EventGrouping
+  }) => void
 }
 
 export function HonourStep({ value, onChange }: HonourStepProps) {
-  const [typeInput, setTypeInput] = useState(value.occasionType)
+  const showGrouping = value.category !== "fundraiser"
 
-  const derivedRegister = registerForOccasionType(value.occasionType || null)
-  const showSwitch = derivedRegister === "celebrating_one"
-
-  function handleTypeInput(v: string) {
-    setTypeInput(v)
-    const reg = registerForOccasionType(v || null)
-    const autoPlural = reg === "celebrating_many"
-    onChange({ occasionType: v, isPlural: autoPlural ? true : value.isPlural })
+  function handleCategorySelect(cat: EventCategory) {
+    const newGrouping = cat === "fundraiser" ? "individual" : value.grouping
+    onChange({ category: cat, grouping: newGrouping })
   }
 
-  function handleTypeSelect(t: string) {
-    setTypeInput(t)
-    const reg = registerForOccasionType(t)
-    const autoPlural = reg === "celebrating_many"
-    onChange({ occasionType: t, isPlural: autoPlural ? true : false })
+  function handleGroupingSelect(grp: EventGrouping) {
+    onChange({ category: value.category, grouping: grp })
   }
 
   return (
-    <div className="space-y-4">
-      {/* Free-text input — always shown */}
-      <div>
-        <Input
-          placeholder="e.g. Birthday, Retirement… (optional)"
-          value={typeInput}
-          maxLength={40}
-          onChange={(e) => handleTypeInput(e.target.value)}
-          className="bg-background placeholder:text-muted-foreground/50"
-        />
-      </div>
-
-      {/* Grouped occasion chips */}
-      {OCCASION_GROUP_ORDER.map(({ register, label }) => {
-        const types = OCCASION_TYPES_BY_REGISTER[register] ?? []
-        if (types.length === 0) return null
-        return (
-          <div key={register}>
-            <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-              {label}
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {types.map((t) => (
-                <Chip
-                  key={t}
-                  size="md"
-                  selected={t === value.occasionType}
-                  onClick={() => handleTypeSelect(t)}
-                >
-                  {t}
-                </Chip>
-              ))}
-            </div>
-          </div>
-        )
-      })}
-
-      {/* Plural switch — shown only for celebrating_one occasions */}
-      {showSwitch && (
-        <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3">
-          <p className="text-sm font-medium">
-            {value.isPlural ? "For a couple or group" : "For one person"}
+    <div className="space-y-5">
+      {/* Grouping segmented control */}
+      {showGrouping && (
+        <div>
+          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            For
           </p>
-          <Switch
-            checked={value.isPlural}
-            onCheckedChange={(v) =>
-              onChange({ occasionType: value.occasionType, isPlural: v })
-            }
-          />
+          <div className="flex gap-1.5">
+            {GROUPINGS.map(({ value: grp, label }) => (
+              <Chip
+                key={grp}
+                size="md"
+                selected={value.grouping === grp}
+                onClick={() => handleGroupingSelect(grp)}
+                className="flex-1 justify-center"
+              >
+                {label}
+              </Chip>
+            ))}
+          </div>
         </div>
       )}
+
+      {/* Category chips */}
+      <div>
+        <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          Occasion type
+        </p>
+        <div className="space-y-2">
+          {CATEGORIES.map(({ value: cat, label, description }) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => handleCategorySelect(cat)}
+              className={cn(
+                "w-full rounded-lg border px-4 py-3 text-left transition-colors",
+                value.category === cat
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-background hover:border-primary/40 hover:bg-muted/50"
+              )}
+            >
+              <p className="text-sm font-medium">{label}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {description}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
