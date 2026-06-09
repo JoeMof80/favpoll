@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useForm, useWatch } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -12,8 +12,8 @@ import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent } from "@/app/events/[id]/edit/actions"
 import { eventFormSchema, type EventFormValues } from "./schema"
-import { FormPanel } from "./form-panel"
 import { PreviewPanel } from "./preview-panel"
+import { CommandPanel } from "./command-panel"
 import type {
   Category,
   Charity,
@@ -56,6 +56,7 @@ export function EventFormV2({
       register: "",
       occasionType: "",
       isPlural: false,
+      isListed: true,
       openingLine: "",
       name: "",
       context: "",
@@ -121,6 +122,7 @@ export function EventFormV2({
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
           isPlural: values.isPlural ?? false,
+          isListed: values.isListed ?? true,
           potAmount: values.sharedFund > 0 ? values.sharedFund : null,
           poll: {
             topicId: isCustomTopic ? null : poll.topicId,
@@ -149,6 +151,7 @@ export function EventFormV2({
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
           isPlural: values.isPlural ?? false,
+          isListed: values.isListed ?? true,
           potAmount: values.sharedFund > 0 ? values.sharedFund : null,
           poll,
         })
@@ -244,98 +247,9 @@ function FormInner({
   onSubmit,
   onCancel,
 }: InnerProps) {
-  const occasionTypeValue = useWatch({
-    control: form.control,
-    name: "occasionType",
-  })
-  const topicsValue = useWatch({ control: form.control, name: "topics" })
-  const charitiesValue = useWatch({ control: form.control, name: "charities" })
-  const nameValue = useWatch({ control: form.control, name: "name" })
-
-  const missing: string[] = []
-  if (!occasionTypeValue) missing.push("Occasion")
-  if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
-    missing.push("favpoll topic")
-  if (!charitiesValue?.length) missing.push("Charity")
-  if (!nameValue) missing.push("Name")
-
-  const isPublishable = missing.length === 0
-
   return (
     <>
-      {/* Two-panel layout: flex-col on mobile, flex-row on desktop */}
-      <div className="flex flex-col bg-primary/5 md:h-[calc(100vh-3.5rem)] md:flex-row md:overflow-hidden">
-        {/* Left panel — pillars + publish bar */}
-        <div className="flex w-full flex-col bg-muted md:w-105 md:shrink-0 md:overflow-hidden md:border-r md:border-border">
-          <div className="flex-1 overflow-y-auto">
-            <FormPanel
-              charities={charities}
-              topics={topics}
-              categories={categories}
-            />
-          </div>
-
-          {/* Fixed publish bar */}
-          <div
-            className="shrink-0 border-t border-border bg-background px-5 py-4"
-            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
-          >
-            {error && (
-              <p role="alert" className="mb-3 text-sm text-destructive">
-                {error}
-              </p>
-            )}
-
-            {/* Missing fields list */}
-            {missing.length > 0 && (
-              <ul className="mb-3 space-y-0.5 text-xs text-muted-foreground">
-                {missing.map((m) => (
-                  <li key={m} className="flex items-center gap-1.5">
-                    <span className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/40" />
-                    {m}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="shrink-0 text-muted-foreground"
-                onClick={onEventSettingsOpen}
-              >
-                Settings
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex-1"
-                onClick={onCancel}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="flex-1"
-                disabled={submitting || !isPublishable}
-                onClick={onSubmit}
-              >
-                {submitting
-                  ? mode === "create"
-                    ? "Creating…"
-                    : "Saving…"
-                  : mode === "create"
-                    ? "Publish event"
-                    : "Save changes"}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right panel — live preview (stacks below on mobile, side-by-side on desktop) */}
+      <div className="flex flex-col bg-muted md:h-[calc(100vh-3.5rem)] md:overflow-hidden">
         <div className="flex-1 overflow-y-auto">
           <PreviewPanel
             charities={charities}
@@ -345,6 +259,18 @@ function FormInner({
           />
         </div>
       </div>
+
+      <CommandPanel
+        charities={charities}
+        topics={topics}
+        categories={categories}
+        mode={mode}
+        submitting={submitting}
+        error={error}
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        onEventSettingsOpen={onEventSettingsOpen}
+      />
 
       {/* Event settings overlay */}
       <ResponsiveOverlay

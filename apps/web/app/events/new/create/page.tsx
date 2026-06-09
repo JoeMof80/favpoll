@@ -110,6 +110,7 @@ export default async function CreateEventPage({ searchParams }: Props) {
     occasionType,
     register,
     isPlural,
+    isListed: register !== "remembering",
     topics: defaultTopics,
     charities: charityIds,
     closesAt,

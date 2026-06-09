@@ -233,6 +233,7 @@ export async function updateEvent(
       closes_at: newClosesAt,
       is_private: input.isPrivate,
       is_plural: input.isPlural,
+      is_listed: input.isListed,
       description: input.description,
       ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
     })
