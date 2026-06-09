@@ -20,9 +20,7 @@ import type {
   Charity,
   CanvasPollInput,
   TopicWithMeta,
-  Register,
 } from "@favpoll/types"
-import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
 
 type Props = {
   charities: Charity[]
@@ -124,10 +122,7 @@ export function EventFormV2({
             : null,
       }
 
-      const resolvedOccasionType =
-        values.occasionType ||
-        DEFAULT_OCCASION_TYPE[values.register as Register] ||
-        null
+      const resolvedOccasionType = values.occasionType || null
 
       if (mode === "create") {
         const { eventId: newId } = await createEvent({
@@ -280,13 +275,16 @@ function FormInner({
   onShowInterstitial,
   isFirstTime,
 }: InnerProps) {
-  const registerValue = useWatch({ control: form.control, name: "register" })
+  const occasionTypeValue = useWatch({
+    control: form.control,
+    name: "occasionType",
+  })
   const topicsValue = useWatch({ control: form.control, name: "topics" })
   const charitiesValue = useWatch({ control: form.control, name: "charities" })
   const nameValue = useWatch({ control: form.control, name: "name" })
 
   const missing: string[] = []
-  if (!registerValue) missing.push("Occasion")
+  if (!occasionTypeValue) missing.push("Occasion")
   if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
     missing.push("favpoll topic")
   if (!charitiesValue?.length) missing.push("Charity")

@@ -5,10 +5,10 @@ import { useFormContext } from "react-hook-form"
 import { Chip } from "@/components/ui/chip"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { cn } from "@/lib/utils"
-import { shortTopicLabel } from "@/lib/registers"
+import { shortTopicLabel, registerForOccasionType } from "@/lib/registers"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
-import { OccasionOverlay, REGISTER_CHIP_LABELS } from "./occasion-overlay"
+import { OccasionOverlay } from "./occasion-overlay"
 import { TopicPickerField } from "./topic-picker-field"
 import { CharityField } from "./charity-field"
 import {
@@ -25,7 +25,6 @@ type Props = {
 
 export function FormPanel({ charities, topics, categories }: Props) {
   const form = useFormContext<EventFormValues>()
-  const register = form.watch("register") ?? ""
   const occasionType = form.watch("occasionType") ?? ""
   const isPlural = form.watch("isPlural") ?? false
   const selectedTopics = form.watch("topics") ?? []
@@ -33,9 +32,6 @@ export function FormPanel({ charities, topics, categories }: Props) {
 
   const [occasionOpen, setOccasionOpen] = useState(false)
 
-  const registerLabel = register
-    ? (REGISTER_CHIP_LABELS[register] ?? null)
-    : null
   const topicLabel = selectedTopics[0]
     ? shortTopicLabel(selectedTopics[0].title)
     : null
@@ -62,7 +58,7 @@ export function FormPanel({ charities, topics, categories }: Props) {
           aria-haspopup="dialog"
           aria-expanded={occasionOpen}
         >
-          {registerLabel ? (
+          {occasionType ? (
             <Chip
               selected
               size="md"
@@ -71,10 +67,9 @@ export function FormPanel({ charities, topics, categories }: Props) {
                 e.stopPropagation()
                 form.reset()
               }}
-              aria-label={`Clear ${registerLabel}`}
+              aria-label={`Clear ${occasionType}`}
             >
-              {registerLabel}
-              {occasionType ? ` · ${occasionType}` : ""}
+              {occasionType}
             </Chip>
           ) : (
             <span
@@ -88,12 +83,15 @@ export function FormPanel({ charities, topics, categories }: Props) {
           )}
         </div>
         <OccasionOverlay
-          register={register}
           occasionType={occasionType}
           isPlural={isPlural}
-          onRegisterChange={(reg, oType) => {
-            form.setValue("register", reg, { shouldValidate: true })
-            form.setValue("occasionType", oType ?? "", { shouldValidate: true })
+          onOccasionChange={(oType) => {
+            const derived = registerForOccasionType(oType || null)
+            form.setValue("occasionType", oType, { shouldValidate: true })
+            form.setValue("register", derived)
+            if (derived === "celebrating_many") form.setValue("isPlural", true)
+            else if (derived === "celebrating_one")
+              form.setValue("isPlural", false)
             form.setValue("openingLine", "")
           }}
           onIsPluralChange={(v) => form.setValue("isPlural", v)}

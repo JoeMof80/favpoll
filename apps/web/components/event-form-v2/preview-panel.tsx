@@ -5,8 +5,9 @@ import { useWatch, useFormContext } from "react-hook-form"
 import { Pencil } from "lucide-react"
 import {
   DATE_LABEL_PLACEHOLDERS,
-  CONTEXT_PLACEHOLDER,
+  contextExamples,
   effectiveRegister,
+  getExampleName,
 } from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -160,7 +161,7 @@ export function PreviewPanel({
     setShowOnboarding(true)
   }
 
-  if (!register) {
+  if (!occasionType) {
     if (isFirstTime || showOnboarding) {
       return <OnboardingPanel onHowItWorks={handleHowItWorks} />
     }
@@ -211,6 +212,17 @@ export function PreviewPanel({
   }).prefix
 
   const firstTopic = selectedTopics[0]
+
+  // Persona-matched example name shown greyed when organiser hasn't typed a name
+  const firstTopicPlaceholder = firstTopicMeta?.placeholders?.[effReg]
+  const exampleName = firstTopic
+    ? getExampleName(
+        firstTopic.title ?? null,
+        firstTopicPlaceholder?.pronouns,
+        firstTopicPlaceholder?.group as "pair" | "set" | undefined,
+        effReg
+      )
+    : ""
   const firstTopicCustomLabels = firstTopic?.customLabels ?? []
 
   const isInfinite = firstTopic
@@ -365,7 +377,7 @@ export function PreviewPanel({
                   <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
                     {name || (
                       <span className="text-muted-foreground/50">
-                        Name or nickname
+                        {exampleName || "Name or nickname"}
                       </span>
                     )}
                   </h1>
@@ -385,7 +397,7 @@ export function PreviewPanel({
                 >
                   <p
                     className={cn(
-                      "truncate text-xl font-normal md:text-2xl",
+                      "truncate text-xl font-normal whitespace-normal md:text-2xl",
                       context && previewSuffix
                         ? "text-[#534AB7]"
                         : "text-muted-foreground/40"
@@ -393,7 +405,7 @@ export function PreviewPanel({
                   >
                     {previewSuffix && context
                       ? context
-                      : datePlaceholder || CONTEXT_PLACEHOLDER}
+                      : datePlaceholder || contextExamples[effReg]}
                   </p>
                   <Pencil className={PENCIL_ICON} aria-hidden />
                 </Button>
@@ -408,7 +420,7 @@ export function PreviewPanel({
                 aria-label="Edit photo"
               >
                 <ProtagonistAvatar
-                  name={name || "Name"}
+                  name={name || exampleName || "Name"}
                   photoUrl={previewPhoto ? resolvedPhotoUrl : null}
                 />
                 <Pencil
@@ -687,12 +699,12 @@ export function PreviewPanel({
             autoFocus
             placeholder={openingLinePlaceholder}
             value={openingLineDraft}
-            maxLength={60}
+            maxLength={50}
             onChange={(e) => setOpeningLineDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveOpeningLine()}
             className="bg-background"
           />
-          <CharCounter value={openingLineDraft} max={60} />
+          <CharCounter value={openingLineDraft} max={50} />
         </div>
       </ResponsiveOverlay>
 
@@ -763,7 +775,7 @@ export function PreviewPanel({
           {/* Preview */}
           <div className="flex justify-center">
             <ProtagonistAvatar
-              name={name || "Name"}
+              name={name || exampleName || "Name"}
               photoUrl={photoDraft?.previewUrl ?? resolvedPhotoUrl}
             />
           </div>
