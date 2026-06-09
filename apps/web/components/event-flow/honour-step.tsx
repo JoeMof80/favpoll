@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { EventCategory, EventGrouping } from "@favpoll/types"
 
@@ -45,21 +46,22 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
         <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
           Occasion type
         </p>
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {CATEGORIES.map(({ value: cat, label }) => (
-            <button
+            <Button
               key={cat}
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => handleCategorySelect(cat)}
               className={cn(
-                "shrink-0 whitespace-nowrap rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors",
-                value.category === cat
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                "shrink-0",
+                value.category === cat &&
+                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
               )}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -72,19 +74,20 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
           </p>
           <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
             {GROUPINGS.map(({ value: grp, label }) => (
-              <button
+              <Button
                 key={grp}
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => handleGroupingSelect(grp)}
                 className={cn(
-                  "shrink-0 whitespace-nowrap rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
-                  value.grouping === grp
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  "shrink-0",
+                  value.grouping === grp &&
+                    "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

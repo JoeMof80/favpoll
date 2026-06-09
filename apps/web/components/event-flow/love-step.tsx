@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
@@ -105,23 +106,26 @@ export function LoveStep({
         />
 
         {/* Category filter buttons */}
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {[{ id: null, label: "All" }, ...categories.map((c) => ({ id: c.id, label: c.label }))].map(
-            ({ id, label }) => (
-              <button
-                key={id ?? "__all__"}
-                type="button"
-                onClick={() => setCatFilter(id)}
-                className={cn(
-                  "shrink-0 whitespace-nowrap rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors",
-                  (id === null ? !catFilter : catFilter === id)
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                )}
-              >
-                {label}
-              </button>
-            )
+            ({ id, label }) => {
+              const active = id === null ? !catFilter : catFilter === id
+              return (
+                <Button
+                  key={id ?? "__all__"}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCatFilter(id)}
+                  className={cn(
+                    "shrink-0",
+                    active && "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
+                  )}
+                >
+                  {label}
+                </Button>
+              )
+            }
           )}
         </div>
       </div>
