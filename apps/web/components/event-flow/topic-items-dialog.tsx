@@ -114,7 +114,7 @@ export function TopicItemsDialog({
           {/* Added by you */}
           {(trimmed ? filteredAdded : addedItems).length > 0 && (
             <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#534AB7]">
+              <p className="mb-2 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
                 Added by you
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -136,20 +136,21 @@ export function TopicItemsDialog({
           )}
 
           {/* Existing items — canonical topics only */}
-          {!isNewTopic && (trimmed ? filteredExisting : existingItems).length > 0 && (
-            <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
-                Existing options
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {(trimmed ? filteredExisting : existingItems).map((item) => (
-                  <Chip key={item.id} size="sm" readOnly>
-                    {item.label}
-                  </Chip>
-                ))}
+          {!isNewTopic &&
+            (trimmed ? filteredExisting : existingItems).length > 0 && (
+              <div>
+                <p className="mb-2 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                  Existing options
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(trimmed ? filteredExisting : existingItems).map((item) => (
+                    <Chip key={item.id} size="sm" readOnly>
+                      {item.label}
+                    </Chip>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Empty state */}
           {!showAddRow &&

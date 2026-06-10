@@ -92,9 +92,7 @@ export function NewEventWizard({ data }: Props) {
               .map((i) => i.label)
               .join(", ") + (count > 3 ? "…" : "")
           const addedSuffix =
-            customLabels.length > 0
-              ? ` (+${customLabels.length} added)`
-              : ""
+            customLabels.length > 0 ? ` (+${customLabels.length} added)` : ""
           return `${count} option${count !== 1 ? "s" : ""}${addedSuffix} · ${preview}`
         })()
       : null
@@ -288,7 +286,7 @@ export function NewEventWizard({ data }: Props) {
           {step === "charity" && (
             <div className="flex min-h-48 flex-col justify-center gap-4 px-5 py-6">
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-widest text-[#534AB7]">
+                <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
                   Where pledges go
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">

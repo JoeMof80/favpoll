@@ -138,9 +138,7 @@ export function EventFormV2({
               : null,
             reveal: values.reveal || null,
             infiniteItems: isCustomTopic ? null : poll.infiniteItems,
-            addedItems: isCustomTopic
-              ? []
-              : (selectedTopic.customLabels ?? []),
+            addedItems: isCustomTopic ? [] : (selectedTopic.customLabels ?? []),
           },
         })
         router.push(`/events/${newId}`)
@@ -183,8 +181,7 @@ export function EventFormV2({
     if (!hasUnsavedDraft) return
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault()
-      e.returnValue =
-        "You have unsaved changes. Leave without publishing?"
+      e.returnValue = "You have unsaved changes. Leave without publishing?"
     }
     window.addEventListener("beforeunload", handleBeforeUnload)
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
@@ -193,9 +190,7 @@ export function EventFormV2({
   function handleCancel() {
     if (hasUnsavedDraft) {
       if (
-        !window.confirm(
-          "You have unsaved changes. Leave without publishing?"
-        )
+        !window.confirm("You have unsaved changes. Leave without publishing?")
       ) {
         return
       }
@@ -296,12 +291,20 @@ function FormInner({
       const newRaw = sessionStorage.getItem(DRAFT_ADDITIONS_KEY)
       if (newRaw) {
         const { topicRef, addedItems } = JSON.parse(newRaw) as {
-          topicRef: { kind: "new"; title: string } | { kind: "existing"; id: string }
+          topicRef:
+            | { kind: "new"; title: string }
+            | { kind: "existing"; id: string }
           addedItems: string[]
         }
         if (topicRef.kind === "new") {
           form.setValue("topics", [
-            { topicId: "", title: topicRef.title, isCustom: true, items: [], customLabels: addedItems },
+            {
+              topicId: "",
+              title: topicRef.title,
+              isCustom: true,
+              items: [],
+              customLabels: addedItems,
+            },
           ])
         } else {
           const t = topics.find((t) => t.id === topicRef.id)
