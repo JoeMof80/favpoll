@@ -60,9 +60,13 @@ const MOCK_DATA = {
 describe("NewEventWizard page component", () => {
   it("renders the category buttons on step 1", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
-    expect(screen.getByRole("button", { name: "Celebration" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: "Celebration" })
+    ).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Memorial" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Fundraiser" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: "Fundraiser" })
+    ).toBeInTheDocument()
   })
 
   it("renders step dots with correct aria roles", () => {
@@ -83,8 +87,13 @@ describe("NewEventWizard page component", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    expect(screen.getByText("Choose a favpoll topic for this event.")).toBeInTheDocument()
-    expect(screen.getAllByRole("listitem")[1]).toHaveAttribute("aria-current", "step")
+    expect(
+      screen.getByText("Choose a favpoll topic for this event.")
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")[1]).toHaveAttribute(
+      "aria-current",
+      "step"
+    )
   })
 
   it("redirects to /events/new/details when wizard is completed", () => {
