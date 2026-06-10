@@ -264,27 +264,27 @@ item_flags (
 
 ```typescript
 type Register =
-  | "remembering"       // memorial
-  | "celebrating_one"   // celebration + individual
-  | "celebrating_many"  // celebration + couple or group
-  | "cause"             // fundraiser
-  | "neutral"           // category is null
+  | "remembering" // memorial
+  | "celebrating_one" // celebration + individual
+  | "celebrating_many" // celebration + couple or group
+  | "cause" // fundraiser
+  | "neutral"; // category is null
 
-export type EventCategory = "celebration" | "memorial" | "fundraiser"
-export type EventGrouping = "individual" | "couple" | "group"
+export type EventCategory = "celebration" | "memorial" | "fundraiser";
+export type EventGrouping = "individual" | "couple" | "group";
 ```
 
 ### `deriveRegister(category: EventCategory | null, grouping: EventGrouping): Register`
 
 Pure function in `lib/registers.ts`:
 
-| category      | grouping          | register          |
-| ------------- | ----------------- | ----------------- |
-| null          | any               | neutral           |
-| memorial      | any               | remembering       |
-| fundraiser    | any               | cause             |
-| celebration   | individual        | celebrating_one   |
-| celebration   | couple or group   | celebrating_many  |
+| category    | grouping        | register         |
+| ----------- | --------------- | ---------------- |
+| null        | any             | neutral          |
+| memorial    | any             | remembering      |
+| fundraiser  | any             | cause            |
+| celebration | individual      | celebrating_one  |
+| celebration | couple or group | celebrating_many |
 
 ### HONOUR step — category + grouping are the inputs
 
@@ -308,12 +308,12 @@ neutral          → 'Honouring'
 
 ### Default poll closing period (`suggestClosingDate(category, eventDate?)` in `lib/registers.ts`)
 
-| EventCategory   | Days until close |
-| --------------- | ---------------- |
-| memorial        | 30               |
-| celebration     | 14               |
-| fundraiser      | 14               |
-| null            | 14               |
+| EventCategory | Days until close |
+| ------------- | ---------------- |
+| memorial      | 30               |
+| celebration   | 14               |
+| fundraiser    | 14               |
+| null          | 14               |
 
 ---
 
@@ -665,11 +665,11 @@ NEXT_PUBLIC_BASE_URL
 
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
-- **Item management on the event page, not the form — except for new custom topics.** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). Canonical topics: items stay read-only in the wizard and are added post-publish. **Exception:** when an organiser creates a brand-new custom topic in the wizard (step 2), the items panel becomes editable (`ItemAddField`). ≥2 items required before the wizard can proceed. The draft is carried via `sessionStorage` key `favpoll_new_topic_draft` (`{ title, items: string[] }`), with `&newTopic=1` as the SSR-safe URL signal; `FormInner` hydrates from `sessionStorage` on mount via `useEffect`. At publish, `createEvent` inserts the `topics` row (`created_by` = Clerk id, `is_active: true`, `is_finite: false`, `placeholders: {}`, no categories) and its `topic_items` (`source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`) as the first inserts in the existing sequential create chain, before event → poll → poll_items. No orphan rows — the topic is never written until publish. Custom organiser-added items land with `source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`. Guest-added items use `source: 'guest'`, `review_status: 'pending_review'`. The admin contributions queue (`apps/admin/app/contributions/`) filters on `'pending_review'`. **TODO (deferred):** cross-session `localStorage` recovery for an abandoned draft — currently, if the user closes the tab before publishing, the draft in `sessionStorage` is lost.
+- **Item management — organiser additions from the wizard (canonical and custom).** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). In the wizard (step 2), both canonical and new/custom topics expose a **"View & add"** chip trigger that opens `TopicItemsDialog` (`event-flow/topic-items-dialog.tsx`) — a search-and-add sheet. Canonical topics: existing items are shown read-only; organisers can add their own on top. New/custom topics: no existing items; ≥2 items required before the wizard can proceed. The draft is carried via `sessionStorage` key `favpoll_draft_additions` (`{ topicRef: { kind: 'new', title } | { kind: 'existing', id }, addedItems: string[] }`), with `&draftAdditions=1` as the SSR-safe URL signal; `FormInner` hydrates from `sessionStorage` on mount via `useEffect`. Legacy key `favpoll_new_topic_draft` (`{ title, items }`) is still supported as a fallback for old links. Canonical topics with **no** additions skip `sessionStorage` entirely and pass `topicId` + `topicTitle` directly in the URL. At publish, `createEvent` inserts the `topics` row for custom topics (`created_by` = Clerk id, `is_active: true`, `is_finite: false`, `placeholders: {}`, no categories) and all `topic_items` (`source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`). For canonical topics, organiser additions are inserted into `topic_items` and linked as `event_poll_items` via the `addedItems` field on `PollInput`. No orphan rows — nothing is written until publish. Guest-added items use `source: 'guest'`, `review_status: 'pending_review'`. The admin contributions queue (`apps/admin/app/contributions/`) filters on `'pending_review'`. Exit warning fires when `isCustom || customLabels.length > 0` with copy "You have unsaved changes. Leave without publishing?" **TODO (deferred):** cross-session `localStorage` recovery for an abandoned draft — currently, if the user closes the tab before publishing, the draft in `sessionStorage` is lost.
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. Step 2 (Love) shows the selected canonical topic's items in a read-only panel below the picker — items sorted by `display_order asc nulls last` then alphabetically; infinite topics show a "Guests can add their own" hint. When a new custom topic is created in step 2, the panel becomes editable (see item management decision above). Canonical topics redirect to `/events/new/details?category=...&grouping=...&topicId=...&charityIds=...`; custom topics redirect with `?newTopic=1` (draft carried via sessionStorage). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
+- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. The topic picker (step 2) and charity picker (step 3) open as `ResponsiveOverlay` sheets when the chip trigger is clicked. Step 2 shows a compact item summary below the selected topic chip (e.g. "3 options · +2 added") with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
 
 - **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 

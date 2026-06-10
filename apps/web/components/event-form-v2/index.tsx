@@ -21,7 +21,8 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 
-const NEW_TOPIC_DRAFT_KEY = "favpoll_new_topic_draft"
+const NEW_TOPIC_DRAFT_KEY = "favpoll_new_topic_draft" // legacy key — kept for old links
+const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
 type Props = {
   charities: Charity[]
@@ -111,7 +112,8 @@ export function EventFormV2({
       }
 
       if (mode === "create") {
-        if (isCustomTopic) sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
+        sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
+        sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
         const { eventId: newId } = await createEvent({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
@@ -135,7 +137,8 @@ export function EventFormV2({
                 }
               : null,
             reveal: values.reveal || null,
-            infiniteItems: poll.infiniteItems,
+            infiniteItems: isCustomTopic ? null : poll.infiniteItems,
+            addedItems: isCustomTopic ? [] : (selectedTopic.customLabels ?? []),
           },
         })
         router.push(`/events/${newId}`)
@@ -169,25 +172,30 @@ export function EventFormV2({
 
   // Watch topics reactively so the exit warning tracks the live value
   const watchedTopics = useWatch({ control: form.control, name: "topics" })
-  const hasUnsavedCustomTopic =
-    mode === "create" && (watchedTopics[0]?.isCustom ?? false)
+  const hasUnsavedDraft =
+    mode === "create" &&
+    ((watchedTopics[0]?.isCustom ?? false) ||
+      (watchedTopics[0]?.customLabels?.length ?? 0) > 0)
 
   useEffect(() => {
-    if (!hasUnsavedCustomTopic) return
+    if (!hasUnsavedDraft) return
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault()
-      e.returnValue = "You have an unsaved topic. Leave without saving?"
+      e.returnValue = "You have unsaved changes. Leave without publishing?"
     }
     window.addEventListener("beforeunload", handleBeforeUnload)
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
-  }, [hasUnsavedCustomTopic])
+  }, [hasUnsavedDraft])
 
   function handleCancel() {
-    if (hasUnsavedCustomTopic) {
-      if (!window.confirm("You have an unsaved topic. Leave without saving?")) {
+    if (hasUnsavedDraft) {
+      if (
+        !window.confirm("You have unsaved changes. Leave without publishing?")
+      ) {
         return
       }
       sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
+      sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
     }
     if (mode === "edit") router.back()
     else form.reset()
@@ -275,13 +283,49 @@ function FormInner({
   onCancel,
   hasNewTopicDraft,
 }: InnerProps) {
-  // Hydrate the custom topic draft from sessionStorage on mount (client-side only)
+  // Hydrate topic draft from sessionStorage on mount (client-side only)
   useEffect(() => {
     if (!hasNewTopicDraft) return
     try {
-      const raw = sessionStorage.getItem(NEW_TOPIC_DRAFT_KEY)
-      if (!raw) return
-      const { title, items } = JSON.parse(raw) as {
+      // New format: favpoll_draft_additions { topicRef, addedItems }
+      const newRaw = sessionStorage.getItem(DRAFT_ADDITIONS_KEY)
+      if (newRaw) {
+        const { topicRef, addedItems } = JSON.parse(newRaw) as {
+          topicRef:
+            | { kind: "new"; title: string }
+            | { kind: "existing"; id: string }
+          addedItems: string[]
+        }
+        if (topicRef.kind === "new") {
+          form.setValue("topics", [
+            {
+              topicId: "",
+              title: topicRef.title,
+              isCustom: true,
+              items: [],
+              customLabels: addedItems,
+            },
+          ])
+        } else {
+          const t = topics.find((t) => t.id === topicRef.id)
+          if (t) {
+            form.setValue("topics", [
+              {
+                topicId: t.id,
+                title: t.title,
+                isCustom: false,
+                items: t.topic_items.map((i) => ({ id: i.id, label: i.label })),
+                customLabels: addedItems,
+              },
+            ])
+          }
+        }
+        return
+      }
+      // Legacy format: favpoll_new_topic_draft { title, items }
+      const legacyRaw = sessionStorage.getItem(NEW_TOPIC_DRAFT_KEY)
+      if (!legacyRaw) return
+      const { title, items } = JSON.parse(legacyRaw) as {
         title: string
         items: string[]
       }
