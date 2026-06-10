@@ -119,7 +119,10 @@ export function TopicItemsDialog({
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {(trimmed ? filteredAdded : addedItems).map((label) => (
-                  <Chip key={label} size="sm" className="gap-1">
+                  <div
+                    key={label}
+                    className="inline-flex h-7 items-center gap-1 rounded-full border border-[#534AB7] bg-[#534AB7] px-4 text-sm font-medium text-white"
+                  >
                     {label}
                     <button
                       type="button"
@@ -129,7 +132,7 @@ export function TopicItemsDialog({
                     >
                       <X className="h-2 w-2" />
                     </button>
-                  </Chip>
+                  </div>
                 ))}
               </div>
             </div>
@@ -144,7 +147,7 @@ export function TopicItemsDialog({
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {(trimmed ? filteredExisting : existingItems).map((item) => (
-                    <Chip key={item.id} size="sm" readOnly>
+                    <Chip key={item.id} size="lg" readOnly>
                       {item.label}
                     </Chip>
                   ))}

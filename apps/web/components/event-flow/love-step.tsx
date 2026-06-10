@@ -161,7 +161,6 @@ export function LoveStep({
                 key={id ?? "__all__"}
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={() => setCatFilter(id)}
                 className={cn(
                   "shrink-0",
@@ -199,6 +198,7 @@ export function LoveStep({
               <Chip
                 key={t.id}
                 selected={t.id === selectedId || t.id === "__custom__"}
+                size="lg"
                 onClick={() => handleSelect(t.id)}
               >
                 {shortTopicLabel(t.title)}
@@ -226,7 +226,7 @@ export function LoveStep({
           </div>
           <div className="flex flex-wrap gap-1.5">
             {sortItems(selectedTopic.topic_items).map((item) => (
-              <Chip key={item.id} size="sm" readOnly>
+              <Chip key={item.id} size="lg" readOnly>
                 {item.label}
               </Chip>
             ))}
