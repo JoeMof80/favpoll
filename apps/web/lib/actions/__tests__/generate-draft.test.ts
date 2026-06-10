@@ -24,10 +24,10 @@ import {
   buildCacheKey,
   revealNamesRealItem,
   hasFabricatedStats,
-  RateLimitError,
   _rateLimitStore,
   RATE_LIMIT_MAX,
 } from "../generate-draft"
+import { RateLimitError } from "../generate-draft-errors"
 
 const TOPIC_DATA = {
   title: "Colour",

@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import type { Register } from "@favpoll/types"
+import { RateLimitError } from "./generate-draft-errors"
 
 // ---------------------------------------------------------------------------
 // Rate limiter — per organiser, 5-minute window, max 5 calls
@@ -13,13 +14,6 @@ const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000
 
 const _rateLimitStore = new Map<string, { count: number; resetAt: number }>()
-
-export class RateLimitError extends Error {
-  constructor() {
-    super("Rate limit exceeded — try again in a few minutes.")
-    this.name = "RateLimitError"
-  }
-}
 
 function checkRateLimit(userId: string): void {
   const now = Date.now()

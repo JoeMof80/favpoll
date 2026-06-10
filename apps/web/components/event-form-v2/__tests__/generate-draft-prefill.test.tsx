@@ -18,7 +18,7 @@ vi.mock("@/lib/actions/generate-draft", () => {
   }
 })
 
-import { generateDraft, RateLimitError } from "@/lib/actions/generate-draft"
+import { generateDraft } from "@/lib/actions/generate-draft"
 
 // ---------------------------------------------------------------------------
 // Shared test fixture
