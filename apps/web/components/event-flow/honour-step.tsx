@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { EventCategory, EventGrouping } from "@favpoll/types"
-import { PollTitle } from "../favpoll-card/poll-title"
+import { SectionLabel } from "../favpoll-card/section-label"
 
 const GROUPINGS: { value: EventGrouping; label: string }[] = [
   { value: "individual", label: "An individual" },
@@ -44,7 +44,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
     <div className="space-y-5">
       {/* Category — horizontal scroll row */}
       <div className="space-y-3 px-5 py-4">
-        <PollTitle title="Occasion type" size="lg" />
+        <SectionLabel title="Occasion type" size="lg" />
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {CATEGORIES.map(({ value: cat, label }) => (
             <Button
@@ -67,7 +67,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
       {/* Grouping segmented control */}
       {showGrouping && (
         <div className="space-y-3 px-5 py-4">
-          <PollTitle title="For" size="lg" />
+          <SectionLabel title="For" size="lg" />
           <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
             {GROUPINGS.map(({ value: grp, label }) => (
               <Button

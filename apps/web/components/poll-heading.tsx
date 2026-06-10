@@ -1,7 +1,7 @@
 "use client"
 
 import { Gift, ChartBarDecreasing } from "lucide-react"
-import { PollTitle } from "@/components/favpoll-card/poll-title"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 
@@ -24,7 +24,7 @@ export function PollHeading({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <PollTitle title={topicTitle} />
+          <SectionLabel title={topicTitle} />
         </div>
 
         {onResetPledge && (

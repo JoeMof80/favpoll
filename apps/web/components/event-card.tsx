@@ -8,7 +8,7 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { PledgePanel } from "@/components/pledge-panel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
-import { PollTitle } from "./favpoll-card/poll-title"
+import { SectionLabel } from "./favpoll-card/section-label"
 import { StripeCheckout } from "./stripe-checkout"
 import { AmountPresets } from "./pledge-card/amount-presets"
 import { useEventCardPledge } from "./event-card/use-event-card-pledge"
@@ -95,11 +95,11 @@ export function EventCard({
           />
         </Link>
 
-        {/* PollTitle row — with pledge-again button when in pledged state */}
+        {/* SectionLabel row — with pledge-again button when in pledged state */}
         {topicTitle && (
           <div className="flex items-center justify-between gap-1 border-t border-border px-3 pt-2">
             <div>
-              <PollTitle title={topicTitle} size="md" />
+              <SectionLabel title={topicTitle} size="md" />
               {event.description && (
                 <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
                   {event.description}

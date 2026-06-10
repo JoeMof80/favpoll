@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { PollTitle } from "../poll-title"
+import { SectionLabel } from "../section-label"
 
 const meta = {
-  title: "FavpollCard/PollTitle",
-  component: PollTitle,
+  title: "FavpollCard/SectionLabel",
+  component: SectionLabel,
   parameters: { layout: "centered" },
-} satisfies Meta<typeof PollTitle>
+} satisfies Meta<typeof SectionLabel>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -45,7 +45,7 @@ export const AllSizes: Story = {
           <span className="w-16 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
             {label}
           </span>
-          <PollTitle title="Colour" size={size} />
+          <SectionLabel title="Colour" size={size} />
         </div>
       ))}
     </div>

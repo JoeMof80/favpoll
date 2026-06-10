@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { FavpollHeader } from "@/components/favpoll-card/favpoll-header"
-import { PollTitle } from "@/components/favpoll-card/poll-title"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { EXAMPLE } from "./example"
 
 // ── Mini preview components ───────────────────────────────────────────────────
@@ -52,7 +52,7 @@ function Step2Preview() {
         </div>
       </div>
       <div className="border-t border-border pt-2.5">
-        <PollTitle title={EXAMPLE.topic.title} size="md" />
+        <SectionLabel title={EXAMPLE.topic.title} size="md" />
       </div>
     </PreviewCard>
   )
