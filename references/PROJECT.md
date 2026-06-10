@@ -233,6 +233,20 @@ item_flags (
   reason text,
   created_at timestamptz
 )
+
+generated_drafts (
+  id uuid primary key,
+  cache_key text not null unique,           -- "{register}:{topic_id}:{primary_charity_id|'none'}:{subject}"
+  register text,
+  topic_id uuid references topics(id) on delete cascade,
+  primary_charity_id uuid references charities(id) on delete cascade,  -- null for person events
+  subject text,                             -- 'someone' | 'cause'
+  about text,
+  reveal text,
+  model text,
+  status text default 'generated',         -- 'generated' | 'curated' | 'rejected'
+  created_at timestamptz default now()
+)
 ```
 
 ---
@@ -254,6 +268,7 @@ item_flags (
 20260607140000_derive_register.sql                     -- backfills occasion_type from register, then drops events.register column
 20260609000000_add_is_listed.sql                       -- ADD COLUMN is_listed boolean NOT NULL DEFAULT true
 20260609120000_add_event_category_grouping.sql         -- ADD COLUMN event_category + event_grouping; backfill from occasion_type/is_plural
+20260610120000_generated_drafts.sql                    -- generated_drafts cache table for LLM-produced About/Reveal copy
 ```
 
 ---
@@ -439,7 +454,8 @@ components/
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
-│   ├── poll-title.tsx, poll-reveal.tsx
+│   ├── section-label.tsx             -- Generic small-caps brand-purple section label (`text-[#7F77DD] uppercase tracking-[0.09em]`); used across cards, wizard steps, form preview, rankings
+│   ├── poll-reveal.tsx
 │   ├── poll-results.tsx
 ├── poll-section/
 │   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
@@ -455,7 +471,7 @@ components/
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
 │   └── event-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
-├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + PollTitle + EventCardCharityCarousel. Used on landing carousel and /my-events grid.
+├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + SectionLabel + EventCardCharityCarousel. Used on landing carousel and /my-events grid.
 ├── live-events-carousel.tsx
 ├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths) + default FavpollMark SVG
 ├── honour-love-charity-venn.tsx  -- Animated Venn SVG (three rotating rings); uses FavpollMarkGlyph at centroid
@@ -630,6 +646,8 @@ RESEND_API_KEY
 NEXT_PUBLIC_BASE_URL
 FAVPOLL_ADMIN_EMAIL
 CRON_SECRET                       -- random hex, used to authenticate cron calls
+ANTHROPIC_API_KEY                 -- Anthropic API key for generateDraft LLM calls (server-side only)
+LLM_MODEL_ID                      -- model id for generateDraft; defaults to claude-haiku-4-5-20251001
 ```
 
 ### apps/admin
@@ -665,11 +683,11 @@ NEXT_PUBLIC_BASE_URL
 
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
-- **Item management — organiser additions from the wizard (canonical and custom).** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). In the wizard (step 2), both canonical and new/custom topics expose a **"View & add"** chip trigger that opens `TopicItemsDialog` (`event-flow/topic-items-dialog.tsx`) — a search-and-add sheet. Canonical topics: existing items are shown read-only; organisers can add their own on top. New/custom topics: no existing items; ≥2 items required before the wizard can proceed. The draft is carried via `sessionStorage` key `favpoll_draft_additions` (`{ topicRef: { kind: 'new', title } | { kind: 'existing', id }, addedItems: string[] }`), with `&draftAdditions=1` as the SSR-safe URL signal; `FormInner` hydrates from `sessionStorage` on mount via `useEffect`. Legacy key `favpoll_new_topic_draft` (`{ title, items }`) is still supported as a fallback for old links. Canonical topics with **no** additions skip `sessionStorage` entirely and pass `topicId` + `topicTitle` directly in the URL. At publish, `createEvent` inserts the `topics` row for custom topics (`created_by` = Clerk id, `is_active: true`, `is_finite: false`, `placeholders: {}`, no categories) and all `topic_items` (`source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`). For canonical topics, organiser additions are inserted into `topic_items` and linked as `event_poll_items` via the `addedItems` field on `PollInput`. No orphan rows — nothing is written until publish. Guest-added items use `source: 'guest'`, `review_status: 'pending_review'`. The admin contributions queue (`apps/admin/app/contributions/`) filters on `'pending_review'`. Exit warning fires when `isCustom || customLabels.length > 0` with copy "You have unsaved changes. Leave without publishing?" **TODO (deferred):** cross-session `localStorage` recovery for an abandoned draft — currently, if the user closes the tab before publishing, the draft in `sessionStorage` is lost.
+- **Item management — organiser additions from the wizard (canonical and custom).** Organisers add poll items post-publish on the event page (`addOrganizerItem` server action). In the wizard (step 2), both canonical and new/custom topics expose a **"View & add"** chip trigger that opens `TopicItemsDialog` (`event-flow/topic-items-dialog.tsx`) — a search-and-add sheet. Canonical topics: existing items are shown read-only; organisers can add their own on top. New/custom topics: no existing items; ≥2 items required before the wizard can proceed. The draft is carried via `sessionStorage` key `favpoll_draft_additions` (`{ topicRef: { kind: 'new', title } | { kind: 'existing', id }, addedItems: string[] }`), with `&draftAdditions=1` as the SSR-safe URL signal; `FormInner` hydrates from `sessionStorage` on mount via `useEffect`. Legacy key `favpoll_new_topic_draft` (`{ title, items }`) is still supported as a fallback for old links. Canonical topics with **no** additions skip `sessionStorage` entirely and pass `topicId` + `topicTitle` directly in the URL. At publish, `createEvent` inserts the `topics` row for custom topics (`created_by` = Clerk id, `is_active: true`, `is_finite: false`, `placeholders: {}`, no categories) and all `topic_items` (`source: 'organiser'`, `is_canonical: false`, `review_status: 'pending_review'`). For canonical topics, organiser additions are inserted into `topic_items` and linked as `event_poll_items` via the `addedItems` field on `PollInput`. No orphan rows — nothing is written until publish. Guest-added items use `source: 'guest'`, `review_status: 'pending_review'`. The admin contributions queue (`apps/admin/app/contributions/`) filters on `'pending_review'`. In `TopicItemsDialog`, added-items chips use a plain `<div>` (not `<Chip>`) to avoid the button-in-button HTML violation — `Chip` renders as `<button>` and nesting the remove `<button>` inside it causes a React hydration error. Exit warning fires when `isCustom || customLabels.length > 0` with copy "You have unsaved changes. Leave without publishing?" **TODO (deferred):** cross-session `localStorage` recovery for an abandoned draft — currently, if the user closes the tab before publishing, the draft in `sessionStorage` is lost.
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. The topic picker (step 2) and charity picker (step 3) open as `ResponsiveOverlay` sheets when the chip trigger is clicked. Step 2 shows a compact item summary below the selected topic chip (e.g. "3 options · +2 added") with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
+- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. The topic picker (step 2) and charity picker (step 3) open as `ResponsiveOverlay` sheets when the chip trigger is clicked. Step 2 shows a compact item summary below the selected topic chip — rendered as readonly `Chip` components (existing canonical options in muted style; organiser additions in brand purple; overflow as "+N more") — with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
 
 - **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
@@ -698,6 +716,8 @@ NEXT_PUBLIC_BASE_URL
 - **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout (only for spacing/typography if needed).
 
 - **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Inputs below 16px font size trigger iOS auto-zoom. Do not set `text-sm` or smaller on any focusable input element.
+
+- **Charity-aware About/Reveal generation (`generateDraft`).** `apps/web/lib/actions/generate-draft.ts` is a server action that returns `{ about, reveal, fromCache }` copy pre-filled into the Set-up form's About and Reveal fields. Cache key = `"{register}:{topic_id}:{primary_charity_id|'none'}:{subject}"` (unique, stored on `generated_drafts`). Cache read always precedes any LLM call. Person events (`subject: 'someone'`) use `'none'` for the charity segment — About is charity-agnostic so one entry covers all charities. Cause events (`subject: 'cause'`) key on the primary (first-listed) charity — Reveal is grounded in `charity.description`. **About never names a specific charity** in either mode. Person Reveal MUST name a real `topic_item` label (validated via `revealNamesRealItem()`; retried once on failure — runtime equivalent of `scripts/lint-topics.mjs`). Cause Reveal must not contain invented statistics (`hasFabricatedStats()` guard; retried once on failure). Model id is read from `LLM_MODEL_ID` env (default `claude-haiku-4-5-20251001`); key from `ANTHROPIC_API_KEY`; call is server-side only. Rate-limited 5 calls / 5-minute window per organiser (in-memory; TODO: graduate to middleware-level rate limiting). Static `topics.placeholders` are **not** replaced — they remain as instant fallback hints in the UI while generation is in flight (PR B). **Person Reveal is rendered as a greyed example only** — never auto-committed — because a real person's favourite cannot be known; Cause Reveal and both Abouts pre-fill the editable fields. Deferred: admin curation surface on `generated_drafts` (PR C).
 
 - **`scripts/seed-events.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_EVENTS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from events where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots).
 
