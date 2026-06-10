@@ -66,6 +66,10 @@ export function makeSupabaseMock() {
         rec("limit", a)
         return b
       },
+      order: (...a: any[]) => {
+        rec("order", a)
+        return b
+      },
       single: () => {
         rec("single", [])
         return Promise.resolve(responses.shift() ?? { data: null, error: null })

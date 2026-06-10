@@ -130,7 +130,11 @@ protagonists (
 events (
   id uuid primary key,
   protagonist_id uuid references protagonists(id),
-  occasion_type text,               -- e.g. "Birthday", "Memorial", "Wedding". Nullable (neutral register). register is derived in code via registerForOccasionType()
+  occasion_type text,               -- Legacy: free-text occasion. Kept for backward compat; superseded by event_category.
+  event_category text               -- 'celebration' | 'memorial' | 'fundraiser'. Nullable for legacy rows. register is derived via deriveRegister(event_category, event_grouping).
+    CHECK (event_category IN ('celebration','memorial','fundraiser')),
+  event_grouping text not null default 'individual'
+    CHECK (event_grouping IN ('individual','couple','group')),
   opening_line text,
   market text not null default 'en-GB',
   created_by text references users(id),
@@ -249,50 +253,50 @@ item_flags (
 20260604120000_add_guest_pledge_columns.sql            -- guest_email, guest_token, withdrawn_at, pot_allocation_id on pledges; re-adds pledges_identity_check
 20260607140000_derive_register.sql                     -- backfills occasion_type from register, then drops events.register column
 20260609000000_add_is_listed.sql                       -- ADD COLUMN is_listed boolean NOT NULL DEFAULT true
+20260609120000_add_event_category_grouping.sql         -- ADD COLUMN event_category + event_grouping; backfill from occasion_type/is_plural
 ```
 
 ---
 
 ## Registers and Occasion Types
 
-`register` is a **code-only concept** — never stored in the DB. It is derived at runtime via `registerForOccasionType(occasionType)` in `apps/web/lib/registers.ts`.
+`register` is a **code-only concept** — never stored in the DB. It is derived at runtime via `deriveRegister(category, grouping)` in `apps/web/lib/registers.ts`.
 
 ```typescript
 type Register =
-  | "remembering"       // In memory of / tribute
-  | "celebrating_one"   // One person: birthday, retirement, graduation, etc.
-  | "celebrating_many"  // Multiple: wedding, anniversary, reunion, etc.
-  | "cause"             // Charity fundraiser / sponsored event
-  | "neutral"           // No specific occasion (occasion_type is null)
+  | "remembering"       // memorial
+  | "celebrating_one"   // celebration + individual
+  | "celebrating_many"  // celebration + couple or group
+  | "cause"             // fundraiser
+  | "neutral"           // category is null
+
+export type EventCategory = "celebration" | "memorial" | "fundraiser"
+export type EventGrouping = "individual" | "couple" | "group"
 ```
 
-### `registerForOccasionType(occasionType: string | null): Register`
+### `deriveRegister(category: EventCategory | null, grouping: EventGrouping): Register`
 
-Pure lookup in `lib/registers.ts`. Returns `"neutral"` for null or unrecognised values.
+Pure function in `lib/registers.ts`:
 
-### HONOUR step — occasion type is the sole input
+| category      | grouping          | register          |
+| ------------- | ----------------- | ----------------- |
+| null          | any               | neutral           |
+| memorial      | any               | remembering       |
+| fundraiser    | any               | cause             |
+| celebration   | individual        | celebrating_one   |
+| celebration   | couple or group   | celebrating_many  |
 
-The six register-chip step is removed. `occasion_type` is now the only HONOUR input — register is always derived from it via `registerForOccasionType(occasionType)` and auto-set in the form. `DEFAULT_OCCASION_TYPE` is retained for display/suggestion but is no longer written on chip-select.
+### HONOUR step — category + grouping are the inputs
 
-The `is_plural` Switch is shown only when the derived register is `celebrating_one` (e.g. Birthday, Retirement). For `celebrating_many` occasions (Wedding, Anniversary, etc.) `isPlural` is auto-set to `true` and the switch is hidden. For all other registers the switch is hidden.
+The Honour step shows 3 category chips (Celebration / Memorial / Fundraiser) and a grouping segmented control (An individual / A couple / A group). Selecting Fundraiser hides the grouping control and resets grouping to "individual". `register` is derived deterministically and set in the form via `form.setValue("register", deriveRegister(cat, grp))`.
 
-### `DEFAULT_OCCASION_TYPE: Record<Register, string | null>`
+`is_listed` is auto-set to `false` when `deriveRegister` returns `"remembering"`.
 
-Used for display and suggestion purposes. `Remembrance`, `Celebration`, `Joint celebration`, `Fundraiser`, `null`.
+### Legacy: `registerForOccasionType(occasionType)` and `occasion_type`
 
-### Occasion types by register (from `OCCASION_TYPES_BY_REGISTER` in `lib/registers.ts`)
-
-| Register          | Occasion types (title-cased strings stored in DB)                                                                                                           |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| remembering       | Memorial, Celebration of life, Tribute, Pet memorial, Remembrance                                                                                           |
-| celebrating_one   | Birthday, Milestone birthday, Retirement, Leaving do, Graduation, Christening, Baby shower, New baby, Bar or bat mitzvah, Recovery, New job, Promotion, Achievement, Award, Exam success, New home, Citizenship, Coming out, Divorce party, Just because, Celebration |
-| celebrating_many  | Wedding, Engagement, Anniversary, Renewal of vows, Reunion, Team celebration, Family gathering, Joint celebration                                            |
-| cause             | Fundraiser, Sponsored event, Charity night, In memoriam appeal                                                                                              |
-| neutral           | null (no occasion_type set)                                                                                                                                 |
+Kept internally for the backfill and any legacy read paths. `occasion_type` column remains on `events` and is nullable. New events write `event_category` + `event_grouping`; `occasion_type` is left null. `effectiveRegister` and `DEFAULT_OCCASION_TYPE` exports are removed.
 
 ### Display headline prefixes (from `lib/display.ts`)
-
-Occasion-specific prefixes take precedence; register-level prefixes are the fallback:
 
 ```
 remembering      → 'In memory of'
@@ -302,13 +306,14 @@ cause            → 'In support of'
 neutral          → 'Honouring'
 ```
 
-### Default poll closing period (from `lib/occasions.ts` `suggestClosingDate`)
+### Default poll closing period (`suggestClosingDate(category, eventDate?)` in `lib/registers.ts`)
 
-| Occasion type                          | Days until close |
-| -------------------------------------- | ---------------- |
-| Memorial, Remembrance                  | 30               |
-| Tribute, Retirement, Anniversary       | 21               |
-| All others                             | 14               |
+| EventCategory   | Days until close |
+| --------------- | ---------------- |
+| memorial        | 30               |
+| celebration     | 14               |
+| fundraiser      | 14               |
+| null            | 14               |
 
 ---
 
@@ -334,7 +339,8 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /                              -- Home: HeroDemoPanel + live events carousel (bg-primary/5) + CTA
 /landing-v2                    -- Alternate landing page: animated Venn hero + six-step how-it-works + CTA
 /events                        -- Live events grid (public, no auth)
-/events/new                    -- Create event (EventFormV2)
+/events/new                    -- New event wizard (3-step page: Honour → Love → Charity)
+/events/new/details            -- Create event form (EventFormV2); reached from wizard with pre-populated query params
 /events/[id]                   -- Event page — guest pledge view + edit mode toggle
 /events/[id]/edit              -- Edit event (EventFormV2)
 /events/[id]/manage            -- Management panel (organiser only)
@@ -379,6 +385,7 @@ app/
 │   ├── page.tsx
 │   ├── actions.ts
 │   ├── new/page.tsx, actions.ts, wizard-data.ts
+│   └── details/page.tsx
 │   └── [id]/
 │       ├── page.tsx
 │       ├── actions.ts
@@ -407,8 +414,8 @@ components/
 │   ├── reveal-quote.tsx
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
-├── new-event-button.tsx          -- Client button that opens NewEventWizard; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
-├── new-event-wizard.tsx          -- 3-step ResponsiveOverlay wizard (Honour → Love → Charity); fetches data lazily via getWizardData() server action; on completion redirects to /events/new?occasionType=...
+├── new-event-button.tsx          -- Client button that navigates to /events/new; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
+├── new-event-wizard.tsx          -- 3-step page component (Honour → Love → Charity); takes pre-fetched WizardData as props; two-column layout (desktop): static icon+prompt left, step content right; step dots with aria roles; on completion redirects to /events/new/details?category=...&grouping=...&topicId=...&charityIds=...
 ├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
 │   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input)
 │   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist, Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
@@ -465,8 +472,8 @@ components/
 ├── stripe-checkout.tsx, pot-banner.tsx
 
 lib/
-├── occasions.ts                  -- DATE_LABEL_PLACEHOLDERS, shortTopicLabel, suggestClosingDate
-├── registers.ts                  -- OCCASION_TYPES_BY_REGISTER, Register type, registerForOccasionType(), DEFAULT_OCCASION_TYPE
+├── occasions.ts                  -- shortTopicLabel (DATE_LABEL_PLACEHOLDERS removed)
+├── registers.ts                  -- Register type, deriveRegister(), suggestClosingDate(), getExampleName(), registerForOccasionType() (legacy), OCCASION_TYPES_BY_REGISTER (legacy)
 ├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatEventDate, getEventHeadline (register param optional — derived from occasionType if absent)
 ├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
 ├── email.ts                      -- Resend helpers
@@ -644,7 +651,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **`personal_framing` retired.** Column kept but never read/written. Auto-generated hint line replaces it.
 
-- **Topic-aware about placeholders, keyed by effective register.** `protagonists.about`. EventFormV2 preview panel reads `topic.placeholders[effectiveRegister].about/reveal` for grey placeholder text when fields are blank. `effectiveRegister(occasionType, isPlural)` in `lib/registers.ts` resolves the tone: celebrating + `is_plural` → `celebrating_many`; celebrating + !`is_plural` → `celebrating_one`; other tones ignore `is_plural`. `lib/shape-prompts.ts` deleted (replaced by register-keyed topic placeholders). `topics.placeholders` stores exactly 5 keys: `remembering`, `celebrating_one`, `celebrating_many`, `cause`, `neutral`.
+- **Topic-aware about placeholders, keyed by effective register.** `protagonists.about`. EventFormV2 preview panel reads `topic.placeholders[effReg].about/reveal` for grey placeholder text when fields are blank. `deriveRegister(category, grouping)` in `lib/registers.ts` resolves the register from `event_category` + `event_grouping`. `lib/shape-prompts.ts` deleted (replaced by register-keyed topic placeholders). `topics.placeholders` stores exactly 5 keys: `remembering`, `celebrating_one`, `celebrating_many`, `cause`, `neutral`.
 
 - **Placeholder `about` is charity-free.** Placeholder `about` strings are shared across all charities, so per-(register × topic × charity) sets are not viable. Placeholder `about` teases the topic domain only — no charity references. Charity weaving belongs in the organiser's own words (their free-text `about`) and in per-event exemplars only. Exemplars keep their charity weaving unchanged.
 
@@ -654,9 +661,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Results ranking sort order.** Primary: `all_time_pledged` desc. Secondary: `display_order asc nulls last` for finite topics, then `localeCompare` alphabetical for ties. `topic_items.display_order` (nullable integer) set only for finite topics via admin `DisplayOrderEditor`; null = alphabetical sort.
 
-- **`events.occasion_type` is nullable.** No DB check constraint. Null = neutral register. All values are title-cased strings from `OCCASION_TYPES_BY_REGISTER` in `lib/registers.ts`. `register` is never stored — always derived via `registerForOccasionType(occasion_type)`.
-
-- **`events.is_plural` persists the number axis.** A boolean (nullable) on `events` that records whether the protagonist is one person or a couple/group. Derived by default from the occasion's register (celebrating_many → true; others → false) but overridable via a Switch in the Occasion overlay for ambiguous cases (e.g. joint birthday). Used only by `effectiveRegister()` to select plural vs singular placeholder copy — never drives a separate DB column lookup.
+- **`events.event_category` + `events.event_grouping` are the canonical occasion model.** `event_category` ∈ {celebration, memorial, fundraiser} (nullable for legacy rows). `event_grouping` ∈ {individual, couple, group} (default: individual). `register` is never stored — always derived via `deriveRegister(event_category, event_grouping)`. `occasion_type` and `is_plural` columns remain on the `events` table for backward compatibility with legacy rows but are not written by new code.
 
 - **Shared fund is mandatory.** Every event gets an `event_pot` row on creation, seeded at `total_deposited: 0` if the organiser doesn't specify an initial amount. Never gate pot creation on `potAmount > 0`. The "Add to the shared fund" top-up input in `LivePledgeCard` is always rendered. `topUpFund` creates the pot lazily for events that predate this decision.
 
@@ -664,7 +669,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **New event entry point is a wizard dialog.** Clicking any "New event" button opens `NewEventWizard` — a `ResponsiveOverlay` with 3 steps (Honour → Love → Charity). Data is fetched once (lazily) via `getWizardData()` server action when the dialog first opens. On completion the user is redirected to `/events/new?occasionType=...&topicId=...&charityIds=...` which pre-populates `EventFormV2` defaultValues. The 3 prior full-page routes (`/events/new/honour`, `/love`, `/charity`, `/create`) and `FlowShell` are deleted. `NewEventButton` handles signed-out users by redirecting to `/sign-in`. The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are kept — they are used by both `NewEventWizard` and `CommandPanel`.
+- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. Step 2 (Love) shows the selected canonical topic's items in a read-only panel below the picker — items sorted by `display_order asc nulls last` then alphabetically; infinite topics show a "Guests can add their own" hint. On completion the user is redirected to `/events/new/details?category=...&grouping=...&topicId=...&charityIds=...` which pre-populates `EventFormV2` defaultValues. The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
 
 - **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
@@ -682,7 +687,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty in the DB, providing a bidirectional fail-loud guard. `celebrating_many` placeholder entries carry `group: "pair"` (default) or `group: "set"` (sport cluster, defined in `scripts/celebrating-many-groups.ts`); group tagging is applied inside `combinedPlaceholders` at seed startup.
 
-- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Eleanor" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName()` in `lib/registers.ts`. The selection varies by register/pronouns/group: she/he names for personal registers, pair/set names for group occasions, cause names for fundraisers. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
+- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Eleanor" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName(topicTitle, pronouns, grouping: EventGrouping, register)` in `lib/registers.ts`. `grouping === "couple"` → pair pool, `grouping === "group"` → set pool. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 
