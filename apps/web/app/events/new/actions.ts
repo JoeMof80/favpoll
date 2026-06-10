@@ -18,6 +18,7 @@ type PollInput = {
   customTopic: CustomTopic | null
   reveal: string | null
   infiniteItems: InfiniteItems | null
+  addedItems?: string[]
 }
 
 type CreateEventInput = {
@@ -160,6 +161,36 @@ async function createPollForEvent(
         added_by: userId,
       }))
     )
+  }
+
+  // Organiser additions for canonical topics (wizard pre-publish adds)
+  const addedItems = (poll.addedItems ?? [])
+    .map((l) => l.trim())
+    .filter(Boolean)
+  if (!poll.customTopic && addedItems.length > 0) {
+    const { data: newAdditions } = await supabase
+      .from("topic_items")
+      .insert(
+        addedItems.map((label) => ({
+          topic_id: topicId!,
+          label,
+          source: "organiser",
+          is_canonical: false,
+          review_status: "pending_review",
+        }))
+      )
+      .select("id")
+    const additionIds = (newAdditions ?? []).map((i) => i.id)
+    if (additionIds.length > 0) {
+      await supabase.from("event_poll_items").insert(
+        additionIds.map((itemId) => ({
+          event_poll_id: eventPoll.id,
+          topic_item_id: itemId,
+          is_guest_added: false,
+          added_by: userId,
+        }))
+      )
+    }
   }
 
   if (!poll.customTopic && poll.infiniteItems) {

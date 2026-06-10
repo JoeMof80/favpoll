@@ -27,6 +27,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
   const topicIsCustom = params.topicIsCustom === "true"
   const topicTitle = params.topicTitle ?? ""
   const newTopic = params.newTopic === "1"
+  const hasDraftAdditions = params.draftAdditions === "1"
   const charityIds = params.charityIds
     ? params.charityIds.split(",").filter(Boolean)
     : []
@@ -56,8 +57,9 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
   }))
 
   let defaultTopics: EventFormValues["topics"] = []
-  // newTopic=1 means draft is in sessionStorage — hydrated client-side in FormInner
-  if (!newTopic && topicIsCustom && topicTitle) {
+  // draftAdditions=1 or newTopic=1: draft in sessionStorage — hydrated client-side in FormInner
+  const deferToSessionStorage = hasDraftAdditions || newTopic
+  if (!deferToSessionStorage && topicIsCustom && topicTitle) {
     defaultTopics = [
       {
         topicId: "",
@@ -67,7 +69,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
         customLabels: [],
       },
     ]
-  } else if (!newTopic && topicId) {
+  } else if (!deferToSessionStorage && topicId) {
     const t = enrichedTopics.find((t) => t.id === topicId)
     if (t) {
       defaultTopics = [
@@ -103,7 +105,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
       defaultValues={defaultValues}
-      hasNewTopicDraft={newTopic}
+      hasNewTopicDraft={hasDraftAdditions || newTopic}
     />
   )
 }
