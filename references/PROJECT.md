@@ -233,6 +233,20 @@ item_flags (
   reason text,
   created_at timestamptz
 )
+
+generated_drafts (
+  id uuid primary key,
+  cache_key text not null unique,           -- "{register}:{topic_id}:{primary_charity_id|'none'}:{subject}"
+  register text,
+  topic_id uuid references topics(id) on delete cascade,
+  primary_charity_id uuid references charities(id) on delete cascade,  -- null for person events
+  subject text,                             -- 'someone' | 'cause'
+  about text,
+  reveal text,
+  model text,
+  status text default 'generated',         -- 'generated' | 'curated' | 'rejected'
+  created_at timestamptz default now()
+)
 ```
 
 ---
@@ -254,6 +268,7 @@ item_flags (
 20260607140000_derive_register.sql                     -- backfills occasion_type from register, then drops events.register column
 20260609000000_add_is_listed.sql                       -- ADD COLUMN is_listed boolean NOT NULL DEFAULT true
 20260609120000_add_event_category_grouping.sql         -- ADD COLUMN event_category + event_grouping; backfill from occasion_type/is_plural
+20260610120000_generated_drafts.sql                    -- generated_drafts cache table for LLM-produced About/Reveal copy
 ```
 
 ---
@@ -631,6 +646,8 @@ RESEND_API_KEY
 NEXT_PUBLIC_BASE_URL
 FAVPOLL_ADMIN_EMAIL
 CRON_SECRET                       -- random hex, used to authenticate cron calls
+ANTHROPIC_API_KEY                 -- Anthropic API key for generateDraft LLM calls (server-side only)
+LLM_MODEL_ID                      -- model id for generateDraft; defaults to claude-haiku-4-5-20251001
 ```
 
 ### apps/admin
@@ -699,6 +716,8 @@ NEXT_PUBLIC_BASE_URL
 - **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout (only for spacing/typography if needed).
 
 - **iOS input zoom prevention.** `globals.css` applies `font-size: max(16px, 1em)` to all `input, textarea, select` globally. Inputs below 16px font size trigger iOS auto-zoom. Do not set `text-sm` or smaller on any focusable input element.
+
+- **Charity-aware About/Reveal generation (`generateDraft`).** `apps/web/lib/actions/generate-draft.ts` is a server action that returns `{ about, reveal, fromCache }` copy pre-filled into the Set-up form's About and Reveal fields. Cache key = `"{register}:{topic_id}:{primary_charity_id|'none'}:{subject}"` (unique, stored on `generated_drafts`). Cache read always precedes any LLM call. Person events (`subject: 'someone'`) use `'none'` for the charity segment — About is charity-agnostic so one entry covers all charities. Cause events (`subject: 'cause'`) key on the primary (first-listed) charity — Reveal is grounded in `charity.description`. **About never names a specific charity** in either mode. Person Reveal MUST name a real `topic_item` label (validated via `revealNamesRealItem()`; retried once on failure — runtime equivalent of `scripts/lint-topics.mjs`). Cause Reveal must not contain invented statistics (`hasFabricatedStats()` guard; retried once on failure). Model id is read from `LLM_MODEL_ID` env (default `claude-haiku-4-5-20251001`); key from `ANTHROPIC_API_KEY`; call is server-side only. Rate-limited 5 calls / 5-minute window per organiser (in-memory; TODO: graduate to middleware-level rate limiting). Static `topics.placeholders` are **not** replaced — they remain as instant fallback hints in the UI while generation is in flight (PR B). **Person Reveal is rendered as a greyed example only** — never auto-committed — because a real person's favourite cannot be known; Cause Reveal and both Abouts pre-fill the editable fields. Deferred: admin curation surface on `generated_drafts` (PR C).
 
 - **`scripts/seed-events.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_EVENTS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from events where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots).
 
