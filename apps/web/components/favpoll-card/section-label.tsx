@@ -1,11 +1,11 @@
 import type { FavpollCardSize } from "./types"
 
-type PollTitleProps = {
+type SectionLabelProps = {
   title: string
   size?: FavpollCardSize
 }
 
-export function PollTitle({ title, size = "lg" }: PollTitleProps) {
+export function SectionLabel({ title, size = "lg" }: SectionLabelProps) {
   const textClass =
     size === "lg"
       ? "text-[17px]"

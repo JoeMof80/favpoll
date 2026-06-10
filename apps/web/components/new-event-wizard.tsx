@@ -20,7 +20,7 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
-import { PollTitle } from "./favpoll-card/poll-title"
+import { SectionLabel } from "./favpoll-card/section-label"
 
 const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
@@ -224,7 +224,7 @@ export function NewEventWizard({ data }: Props) {
             <div className="flex min-h-48 flex-col">
               {/* Topic trigger */}
               <div className="flex flex-col justify-center gap-3 px-5 py-6">
-                <PollTitle title="Topic" size="lg" />
+                <SectionLabel title="Topic" size="lg" />
                 <p className="text-sm text-muted-foreground">
                   Choose a topic for this event.
                 </p>
@@ -248,7 +248,7 @@ export function NewEventWizard({ data }: Props) {
               {showItemsSection && (
                 <div className="flex flex-col gap-3 border-t border-border px-5 py-6">
                   {/* Validation hint for new custom topics */}
-                  <PollTitle title="Favourites" size="lg" />
+                  <SectionLabel title="Favourites" size="lg" />
                   <p className="text-sm text-muted-foreground">
                     View or add favourites
                   </p>
@@ -304,7 +304,7 @@ export function NewEventWizard({ data }: Props) {
 
           {step === "charity" && (
             <div className="flex min-h-48 flex-col justify-center gap-4 px-5 py-6">
-              <PollTitle title="Charity" size="lg" />
+              <SectionLabel title="Charity" size="lg" />
               <p className="text-sm text-muted-foreground">
                 View or add favourites
               </p>

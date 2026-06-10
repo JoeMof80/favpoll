@@ -11,7 +11,7 @@ import {
 import { getEventHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/event-hero-avatar"
-import { PollTitle } from "@/components/favpoll-card/poll-title"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { PledgePanel } from "@/components/pledge-panel"
 import { PollResults } from "@/components/favpoll-card/poll-results"
@@ -441,7 +441,7 @@ export function PreviewPanel({
           {hasTopicSelected && (
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
-                <PollTitle title={topicTitle} />
+                <SectionLabel title={topicTitle} />
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="text-xs text-muted-foreground">
                     {showReveal ? "Post-reveal" : "Pre-reveal"}

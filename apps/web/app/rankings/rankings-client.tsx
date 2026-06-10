@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import Link from "next/link"
 import { Chip } from "@/components/ui/chip"
 import type { Category, Topic, TopicItem } from "@favpoll/types"
-import { PollTitle } from "@/components/favpoll-card/poll-title"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 
 type TopicWithItems = Topic & {
@@ -112,7 +112,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <PollTitle title={topic.title} />
+                      <SectionLabel title={topic.title} />
                       <span className="text-xs text-muted-foreground transition-colors group-hover:text-primary">
                         See all →
                       </span>

@@ -6,7 +6,7 @@ import type { Charity } from "@favpoll/types"
 import Link from "next/link"
 import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
-import { PollTitle } from "./favpoll-card/poll-title"
+import { SectionLabel } from "./favpoll-card/section-label"
 
 export type EventSummaryCardEvent = {
   id: string
@@ -62,7 +62,7 @@ export function EventSummaryCard({ event, className }: Props) {
       {/* Topic + countdown */}
       {topicTitle && (
         <div className="border-t border-border px-3 py-2">
-          <PollTitle title={topicTitle} size="md" />
+          <SectionLabel title={topicTitle} size="md" />
         </div>
       )}
 
