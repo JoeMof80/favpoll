@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,14 +11,17 @@ import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent } from "@/app/events/[id]/edit/actions"
+import { generateDraft, RateLimitError } from "@/lib/actions/generate-draft"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
+import { toast } from "sonner"
 import type {
   Category,
   Charity,
   CanvasPollInput,
   TopicWithMeta,
+  Register,
 } from "@favpoll/types"
 
 const NEW_TOPIC_DRAFT_KEY = "favpoll_new_topic_draft" // legacy key — kept for old links
@@ -283,6 +286,14 @@ function FormInner({
   onCancel,
   hasNewTopicDraft,
 }: InnerProps) {
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [personRevealExample, setPersonRevealExample] = useState<string | null>(
+    null
+  )
+  // Track last generated values to detect manual edits before regenerating
+  const lastGeneratedAbout = useRef<string | null>(null)
+  const lastGeneratedReveal = useRef<string | null>(null)
+
   // Hydrate topic draft from sessionStorage on mount (client-side only)
   useEffect(() => {
     if (!hasNewTopicDraft) return
@@ -338,6 +349,110 @@ function FormInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Generate charity-aware About/Reveal on mount for canonical topics only
+  useEffect(() => {
+    if (mode !== "create") return
+    const values = form.getValues()
+    const topic = values.topics?.[0]
+    if (!topic || topic.isCustom || !topic.topicId) return
+    const reg = values.register
+    if (!reg) return
+
+    const sub: "someone" | "cause" = reg === "cause" ? "cause" : "someone"
+    const primaryCharityId = values.charities?.[0] ?? null
+
+    setIsGenerating(true)
+    generateDraft({
+      register: reg as Register,
+      subject: sub,
+      topicId: topic.topicId,
+      primaryCharityId,
+    })
+      .then((result) => {
+        if (!form.getValues("about")) {
+          form.setValue("about", result.about)
+          lastGeneratedAbout.current = result.about
+        }
+        if (sub === "cause") {
+          if (!form.getValues("reveal")) {
+            form.setValue("reveal", result.reveal)
+            lastGeneratedReveal.current = result.reveal
+          }
+        } else {
+          setPersonRevealExample(result.reveal)
+        }
+      })
+      .catch(() => {
+        // Silent — static placeholder remains as fallback
+      })
+      .finally(() => setIsGenerating(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function handleRegenerate() {
+    const values = form.getValues()
+    const topic = values.topics?.[0]
+    if (!topic || topic.isCustom || !topic.topicId) return
+    const reg = values.register
+    if (!reg) return
+
+    const sub: "someone" | "cause" = reg === "cause" ? "cause" : "someone"
+    const primaryCharityId = values.charities?.[0] ?? null
+
+    // Confirm before overwriting manual edits
+    const currentAbout = form.getValues("about") ?? ""
+    const currentReveal = form.getValues("reveal") ?? ""
+    const hasManualAbout =
+      currentAbout && currentAbout !== lastGeneratedAbout.current
+    const hasManualReveal =
+      sub === "cause" &&
+      currentReveal &&
+      currentReveal !== lastGeneratedReveal.current
+    if (hasManualAbout || hasManualReveal) {
+      const field =
+        hasManualAbout && hasManualReveal
+          ? "about and reveal"
+          : hasManualAbout
+            ? "about"
+            : "reveal"
+      if (!window.confirm(`Replace your ${field} with a new suggestion?`))
+        return
+    }
+
+    setIsGenerating(true)
+    try {
+      const result = await generateDraft({
+        register: reg as Register,
+        subject: sub,
+        topicId: topic.topicId,
+        primaryCharityId,
+      })
+      form.setValue("about", result.about)
+      lastGeneratedAbout.current = result.about
+      if (sub === "cause") {
+        form.setValue("reveal", result.reveal)
+        lastGeneratedReveal.current = result.reveal
+      } else {
+        setPersonRevealExample(result.reveal)
+      }
+    } catch (err) {
+      if (err instanceof RateLimitError) {
+        toast.warning(
+          "Too many requests — wait a few minutes before regenerating.",
+          {
+            style: {
+              background: "#fffbeb",
+              color: "#854d0e",
+              border: "1px solid #f59e0b",
+            },
+          }
+        )
+      }
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col bg-muted md:h-[calc(100vh-3.5rem)] md:overflow-hidden">
@@ -347,6 +462,9 @@ function FormInner({
             topics={topics}
             showReveal={showReveal}
             onToggleReveal={onToggleReveal}
+            isGenerating={isGenerating}
+            personRevealExample={personRevealExample}
+            onRegenerate={handleRegenerate}
           />
         </div>
       </div>

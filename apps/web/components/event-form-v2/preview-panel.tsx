@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
-import { Pencil } from "lucide-react"
+import { Pencil, RefreshCw } from "lucide-react"
 import {
   contextExamples,
   deriveRegister,
@@ -36,6 +36,9 @@ type Props = {
   topics: TopicWithMeta[]
   showReveal: boolean
   onToggleReveal: () => void
+  isGenerating?: boolean
+  personRevealExample?: string | null
+  onRegenerate?: () => void
 }
 
 // Placeholder charities shown before the user selects any
@@ -91,6 +94,9 @@ export function PreviewPanel({
   topics,
   showReveal,
   onToggleReveal,
+  isGenerating = false,
+  personRevealExample = null,
+  onRegenerate,
 }: Props) {
   // Local preview toggles
   const [previewSuffix, setPreviewSuffix] = useState(true)
@@ -157,16 +163,22 @@ export function PreviewPanel({
     : (photoUrl ?? null)
 
   const effReg = deriveRegister(category, grouping)
+  const subject = effReg === "cause" ? "cause" : "someone"
 
   // Grey placeholder text for unfilled about — keyed by effective register + topic
   const aboutPlaceholder = !about
     ? (firstTopicMeta?.placeholders?.[effReg]?.about ?? "")
     : ""
 
-  // Grey placeholder text for unfilled reveal — keyed by effective register + topic
+  // Grey placeholder text for unfilled reveal.
+  // For person events, prefer the LLM example over the static placeholder.
   const revealPlaceholder = !reveal
-    ? (firstTopicMeta?.placeholders?.[effReg]?.reveal ?? "")
+    ? (personRevealExample ??
+      firstTopicMeta?.placeholders?.[effReg]?.reveal ??
+      "")
     : ""
+
+  const isPersonRevealExample = !reveal && !!personRevealExample
 
   // Computed opening line placeholder for the overlay
   const openingLinePlaceholder = getEventHeadline({
@@ -409,6 +421,14 @@ export function PreviewPanel({
                 <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
                   {about}
                 </p>
+              ) : isGenerating ? (
+                <div
+                  className="animate-pulse space-y-1.5"
+                  aria-label="Generating suggestion…"
+                >
+                  <div className="h-4 rounded-full bg-muted/60" />
+                  <div className="h-4 w-4/5 rounded-full bg-muted/60" />
+                </div>
               ) : aboutPlaceholder ? (
                 <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
                   {aboutPlaceholder}
@@ -489,9 +509,22 @@ export function PreviewPanel({
                     }}
                     aria-label="Add reveal"
                   >
-                    {revealPlaceholder ? (
+                    {isGenerating && subject === "cause" ? (
+                      <div
+                        className="animate-pulse space-y-1.5"
+                        aria-label="Generating suggestion…"
+                      >
+                        <div className="h-4 rounded-full bg-muted/60" />
+                        <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                      </div>
+                    ) : revealPlaceholder ? (
                       <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
                         {revealPlaceholder}
+                        {isPersonRevealExample && (
+                          <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
+                            (example — type the real one)
+                          </span>
+                        )}
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground/40">
@@ -681,6 +714,24 @@ export function PreviewPanel({
         footer={overlayFooter(saveAbout, () => setAboutOpen(false))}
       >
         <div>
+          {onRegenerate && (
+            <div className="mb-2 flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={isGenerating}
+                onClick={() => {
+                  setAboutOpen(false)
+                  onRegenerate()
+                }}
+                className="gap-1.5 text-xs text-muted-foreground"
+              >
+                <RefreshCw className="h-3 w-3" aria-hidden />
+                Regenerate suggestion
+              </Button>
+            </div>
+          )}
           <Textarea
             autoFocus
             placeholder={aboutPlaceholder || "A little about them…"}
@@ -699,10 +750,32 @@ export function PreviewPanel({
         open={revealOpen}
         onOpenChange={(o) => !o && setRevealOpen(false)}
         title="The reveal"
-        description="Disclosed after pledging — this is the payoff."
+        description={
+          isPersonRevealExample
+            ? "The example below is suggested — type the real favourite."
+            : "Disclosed after pledging — this is the payoff."
+        }
         footer={overlayFooter(saveReveal, () => setRevealOpen(false))}
       >
         <div>
+          {onRegenerate && (
+            <div className="mb-2 flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={isGenerating}
+                onClick={() => {
+                  setRevealOpen(false)
+                  onRegenerate()
+                }}
+                className="gap-1.5 text-xs text-muted-foreground"
+              >
+                <RefreshCw className="h-3 w-3" aria-hidden />
+                Regenerate suggestion
+              </Button>
+            </div>
+          )}
           <Textarea
             autoFocus
             placeholder={revealPlaceholder || "Share something they loved…"}

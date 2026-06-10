@@ -432,9 +432,9 @@ components/
 ├── new-event-button.tsx          -- Client button that navigates to /events/new; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
 ├── new-event-wizard.tsx          -- 3-step page component (Honour → Love → Charity); takes pre-fetched WizardData as props; two-column layout (desktop): static icon+prompt left, step content right; step dots with aria roles; on completion redirects to /events/new/details?category=...&grouping=...&topicId=...&charityIds=...
 ├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
-│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input)
+│   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input). On mount (create mode, canonical topics): calls generateDraft, pre-fills about for both modes, reveal for cause events, sets personRevealExample for person events (never commits to form). handleRegenerate() re-calls on demand with manual-edit confirmation + RateLimitError toast.
 │   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist, Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
-│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected.
+│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected. Accepts isGenerating, personRevealExample, onRegenerate props: shimmer (animate-pulse) shown in About while generating; cause Reveal also shimmers; person Reveal shows greyed italic example with "(example — type the real one)" label; About + Reveal overlays expose a "Regenerate suggestion" button (RefreshCw icon).
 │   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
@@ -444,7 +444,8 @@ components/
 │   ├── topic-picker-field.tsx    -- ResponsiveOverlay (internal open state); search input + filter buttons + topic chips; Enter creates custom topic
 │   ├── item-add-field.tsx        -- ResponsiveOverlay (internal open state); disabled state unchanged; NOT used in form pillar 2
 │   ├── charity-field.tsx         -- ResponsiveOverlay (internal open state); search input + charity chip grid; max 3
-│   └── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
+│   ├── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
+│   └── __tests__/generate-draft-prefill.test.tsx  -- 8 tests: shimmer→fill, person vs cause pre-fill, skip for custom/edit mode, silent failure, subject derivation
 ├── pledge-panel.tsx              -- Draft state: draftIds committed on Done, discarded on close. Sheet (mobile) + Dialog (desktop). Chips + input inline (flex-wrap); input collapses to w-0 when chips present. Backspace removes last chip. size=lg chips.
 ├── pledge-card/
 │   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix)
@@ -498,7 +499,8 @@ lib/
 └── supabase/client.ts, server.ts, admin.ts
 
 lib/actions/
-└── event-poll-items.ts           -- hideEventPollItem, showEventPollItem
+├── event-poll-items.ts           -- hideEventPollItem, showEventPollItem
+└── generate-draft.ts             -- generateDraft server action: cache-first LLM About/Reveal generation; exports RateLimitError, revealNamesRealItem, hasFabricatedStats, buildCacheKey, _rateLimitStore
 
 __mocks__/
 ├── supabase-client.ts            -- Storybook stub for @/lib/supabase/client (no-op channel/removeChannel/from)
@@ -610,7 +612,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 542 web, 35 admin.
+All tests must pass before committing. Current counts: 618 web, 35 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
