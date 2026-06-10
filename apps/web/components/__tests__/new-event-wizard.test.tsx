@@ -58,14 +58,11 @@ const MOCK_DATA = {
 }
 
 describe("NewEventWizard page component", () => {
-  it("renders the step 1 title", () => {
+  it("renders the category buttons on step 1", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
-    expect(screen.getByText("Choose the occasion")).toBeInTheDocument()
-  })
-
-  it("renders the step indicator showing step 1 of 3", () => {
-    render(<NewEventWizard data={MOCK_DATA} />)
-    expect(screen.getByText("Step 1 of 3")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Celebration" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Memorial" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Fundraiser" })).toBeInTheDocument()
   })
 
   it("renders step dots with correct aria roles", () => {
@@ -73,6 +70,7 @@ describe("NewEventWizard page component", () => {
     const dots = screen.getAllByRole("listitem")
     expect(dots).toHaveLength(3)
     expect(dots[0]).toHaveAttribute("aria-current", "step")
+    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3")
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 
@@ -85,8 +83,8 @@ describe("NewEventWizard page component", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    expect(screen.getByText("Choose a favpoll")).toBeInTheDocument()
-    expect(screen.getByText("Step 2 of 3")).toBeInTheDocument()
+    expect(screen.getByText("Choose a favpoll topic for this event.")).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")[1]).toHaveAttribute("aria-current", "step")
   })
 
   it("redirects to /events/new/details when wizard is completed", () => {
@@ -96,12 +94,16 @@ describe("NewEventWizard page component", () => {
     fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
-    // Step 2: pick a topic (Colour chip)
+    // Step 2: open Love sheet, pick topic, sheet auto-closes
+    fireEvent.click(screen.getByRole("button", { name: "Choose a favpoll" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
-    // Step 3: pick a charity
+    // Step 3: open Charity sheet, pick charity, close sheet
+    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
 
     expect(mockPush).toHaveBeenCalledWith(
