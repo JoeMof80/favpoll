@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
-import type { Category, TopicWithMeta } from "@favpoll/types"
+import type { Category, TopicItem, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
 type LoveStepProps = {
@@ -13,6 +13,15 @@ type LoveStepProps = {
   categories: Category[]
   value: EventFormValues["topics"]
   onChange: (v: EventFormValues["topics"]) => void
+}
+
+function sortItems(items: TopicItem[]): TopicItem[] {
+  return [...items].sort((a, b) => {
+    const aOrder = a.display_order ?? Infinity
+    const bOrder = b.display_order ?? Infinity
+    if (aOrder !== bOrder) return aOrder - bOrder
+    return a.label.localeCompare(b.label)
+  })
 }
 
 export function LoveStep({
@@ -26,6 +35,7 @@ export function LoveStep({
 
   const activeTopics = topics.filter((t) => t.is_active !== false)
   const selectedId = value[0]?.topicId ?? null
+  const isCustomSelected = value[0]?.isCustom ?? false
 
   // Inject any custom-created topic into the display list, sorted alphabetically
   const customEntry: TopicWithMeta | null = value[0]?.isCustom
@@ -55,6 +65,12 @@ export function LoveStep({
 
   const trimmedSearch = search.trim()
   const showCreate = trimmedSearch.length > 0 && filtered.length === 0
+
+  // Items panel: show for canonical (non-custom) selected topic
+  const selectedTopic =
+    selectedId && !isCustomSelected
+      ? (activeTopics.find((t) => t.id === selectedId) ?? null)
+      : null
 
   function handleSelect(id: string) {
     if (id === "__custom__") return
@@ -87,7 +103,7 @@ export function LoveStep({
   }
 
   return (
-    <div className="min-h-88 space-y-0">
+    <div className="min-h-64 space-y-0">
       {/* Sticky search + filter row */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
         <input
@@ -163,6 +179,32 @@ export function LoveStep({
           </div>
         )}
       </div>
+
+      {/* Read-only items panel — shown when a canonical topic is selected */}
+      {selectedTopic && (
+        <div
+          className="border-t border-border px-5 py-4"
+          data-testid="items-panel"
+        >
+          <div className="mb-3 flex items-baseline justify-between gap-2">
+            <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+              What people vote on
+            </p>
+            {!selectedTopic.is_finite && (
+              <p className="text-xs text-muted-foreground">
+                Guests can add their own
+              </p>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {sortItems(selectedTopic.topic_items).map((item) => (
+              <Chip key={item.id} size="sm" readOnly>
+                {item.label}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

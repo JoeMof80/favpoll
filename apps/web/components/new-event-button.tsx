@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import { useAuth } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { NewEventWizard } from "@/components/new-event-wizard"
 
 type Props = {
   children: React.ReactNode
@@ -23,7 +21,6 @@ export function NewEventButton({
 }: Props) {
   const { isSignedIn } = useAuth()
   const router = useRouter()
-  const [open, setOpen] = useState(false)
 
   function handleClick() {
     onBeforeOpen?.()
@@ -31,21 +28,18 @@ export function NewEventButton({
       router.push("/sign-in?redirect_url=/events/new")
       return
     }
-    setOpen(true)
+    router.push("/events/new")
   }
 
   return (
-    <>
-      <Button
-        type="button"
-        size={size}
-        variant={variant}
-        className={className}
-        onClick={handleClick}
-      >
-        {children}
-      </Button>
-      <NewEventWizard open={open} onOpenChange={setOpen} />
-    </>
+    <Button
+      type="button"
+      size={size}
+      variant={variant}
+      className={className}
+      onClick={handleClick}
+    >
+      {children}
+    </Button>
   )
 }
