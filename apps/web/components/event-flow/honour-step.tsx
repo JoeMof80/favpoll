@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { EventCategory, EventGrouping } from "@favpoll/types"
+import { PollTitle } from "../favpoll-card/poll-title"
 
 const GROUPINGS: { value: EventGrouping; label: string }[] = [
   { value: "individual", label: "An individual" },
@@ -42,17 +43,14 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
   return (
     <div className="space-y-5">
       {/* Category — horizontal scroll row */}
-      <div className="px-5 py-4">
-        <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-          Occasion type
-        </p>
+      <div className="space-y-3 px-5 py-4">
+        <PollTitle title="Occasion type" size="lg" />
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {CATEGORIES.map(({ value: cat, label }) => (
             <Button
               key={cat}
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => handleCategorySelect(cat)}
               className={cn(
                 "shrink-0",
@@ -68,17 +66,14 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
 
       {/* Grouping segmented control */}
       {showGrouping && (
-        <div className="px-5 py-4">
-          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            For
-          </p>
+        <div className="space-y-3 px-5 py-4">
+          <PollTitle title="For" size="lg" />
           <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
             {GROUPINGS.map(({ value: grp, label }) => (
               <Button
                 key={grp}
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={() => handleGroupingSelect(grp)}
                 className={cn(
                   "shrink-0",

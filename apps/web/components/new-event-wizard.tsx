@@ -20,6 +20,7 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
+import { PollTitle } from "./favpoll-card/poll-title"
 
 const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
@@ -76,26 +77,8 @@ export function NewEventWizard({ data }: Props) {
     label: i.label,
   }))
 
-  // Compact summary shown below the topic chip in step 2
-  const itemsSummary = topics[0]?.isCustom
-    ? customLabels.length === 0
-      ? "No options yet — add at least two"
-      : customLabels.length === 1
-        ? `${customLabels[0]} — add at least one more`
-        : `${customLabels.length} options · ${customLabels.slice(0, 3).join(", ")}${customLabels.length > 3 ? "…" : ""}`
-    : selectedTopic
-      ? (() => {
-          const count = sortedExistingItems.length
-          const preview =
-            sortedExistingItems
-              .slice(0, 3)
-              .map((i) => i.label)
-              .join(", ") + (count > 3 ? "…" : "")
-          const addedSuffix =
-            customLabels.length > 0 ? ` (+${customLabels.length} added)` : ""
-          return `${count} option${count !== 1 ? "s" : ""}${addedSuffix} · ${preview}`
-        })()
-      : null
+  const showItemsSection =
+    topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
   function handleAddItem(label: string) {
     const current = topics[0]
@@ -241,42 +224,78 @@ export function NewEventWizard({ data }: Props) {
             <div className="flex min-h-48 flex-col">
               {/* Topic trigger */}
               <div className="flex flex-col justify-center gap-3 px-5 py-6">
+                <PollTitle title="Topic" size="lg" />
                 <p className="text-sm text-muted-foreground">
-                  Choose a favpoll topic for this event.
+                  Choose a topic for this event.
                 </p>
                 {topics.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    <Chip selected onClick={() => setLoveOpen(true)}>
+                    <Chip size="lg" selected onClick={() => setLoveOpen(true)}>
                       {shortTopicLabel(topics[0].title)}
                     </Chip>
                   </div>
                 ) : (
-                  <Button variant="outline" onClick={() => setLoveOpen(true)}>
-                    Choose a favpoll
+                  <Button
+                    className="shrink-0"
+                    onClick={() => setLoveOpen(true)}
+                  >
+                    Choose a topic
                   </Button>
                 )}
               </div>
 
               {/* Items summary + trigger */}
-              {topics.length > 0 && itemsSummary && (
-                <div
-                  className="border-t border-border px-5 py-4"
-                  data-testid="items-summary"
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-sm text-muted-foreground">
-                      {itemsSummary}
+              {showItemsSection && (
+                <div className="flex flex-col gap-3 border-t border-border px-5 py-6">
+                  {/* Validation hint for new custom topics */}
+                  <PollTitle title="Favourites" size="lg" />
+                  <p className="text-sm text-muted-foreground">
+                    View or add favourites
+                  </p>
+                  {topics[0]?.isCustom && customLabels.length < 2 && (
+                    <p className="text-xs text-muted-foreground">
+                      {customLabels.length === 0
+                        ? "Add at least two options."
+                        : "Add at least one more option."}
                     </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="shrink-0"
-                      onClick={() => setItemsDialogOpen(true)}
-                    >
-                      {topics[0]?.isCustom && customLabels.length < 2
-                        ? "Add options"
-                        : "View & add"}
-                    </Button>
+                  )}
+                  <Button
+                    className="shrink-0"
+                    onClick={() => setItemsDialogOpen(true)}
+                  >
+                    {topics[0]?.isCustom && customLabels.length < 2
+                      ? "Add favourites"
+                      : "View or add favourites"}
+                  </Button>
+                  {/* Chip preview of items */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {topics[0]?.isCustom
+                      ? customLabels.map((label) => (
+                          <Chip key={label} size="lg" readOnly>
+                            {label}
+                          </Chip>
+                        ))
+                      : sortedExistingItems.slice(0, 5).map((item) => (
+                          <Chip key={item.id} size="lg" readOnly>
+                            {item.label}
+                          </Chip>
+                        ))}
+                    {!topics[0]?.isCustom &&
+                      customLabels.map((label) => (
+                        <Chip
+                          key={label}
+                          size="lg"
+                          readOnly
+                          className="border-[#534AB7] bg-[#534AB7] text-white"
+                        >
+                          {label}
+                        </Chip>
+                      ))}
+                    {!topics[0]?.isCustom && sortedExistingItems.length > 4 && (
+                      <span className="self-center text-xs text-muted-foreground">
+                        +{sortedExistingItems.length - 4} more
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -285,6 +304,10 @@ export function NewEventWizard({ data }: Props) {
 
           {step === "charity" && (
             <div className="flex min-h-48 flex-col justify-center gap-4 px-5 py-6">
+              <PollTitle title="Charity" size="lg" />
+              <p className="text-sm text-muted-foreground">
+                View or add favourites
+              </p>
               <div>
                 <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
                   Where pledges go
@@ -302,6 +325,7 @@ export function NewEventWizard({ data }: Props) {
                   {selectedCharities.map((c) => (
                     <Chip
                       key={c.id}
+                      size="lg"
                       selected
                       onClick={() => setCharityOpen(true)}
                     >
@@ -310,7 +334,11 @@ export function NewEventWizard({ data }: Props) {
                   ))}
                 </div>
               ) : (
-                <Button variant="outline" onClick={() => setCharityOpen(true)}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setCharityOpen(true)}
+                >
                   Choose a charity
                 </Button>
               )}
@@ -322,18 +350,18 @@ export function NewEventWizard({ data }: Props) {
       {/* Navigation */}
       <div className="mt-4 flex items-center justify-between">
         {!isFirst ? (
-          <Button variant="ghost" onClick={handleBack}>
+          <Button variant="ghost" size="lg" onClick={handleBack}>
             Back
           </Button>
         ) : (
           <span />
         )}
         {isLast ? (
-          <Button disabled={nextDisabled} onClick={handleFinish}>
+          <Button size="lg" disabled={nextDisabled} onClick={handleFinish}>
             Set up my event
           </Button>
         ) : (
-          <Button disabled={nextDisabled} onClick={handleNext}>
+          <Button size="lg" disabled={nextDisabled} onClick={handleNext}>
             Next
           </Button>
         )}
@@ -365,6 +393,7 @@ export function NewEventWizard({ data }: Props) {
         footer={
           <Button
             type="button"
+            size="lg"
             className="w-full"
             onClick={() => setCharityOpen(false)}
           >
@@ -384,7 +413,8 @@ export function NewEventWizard({ data }: Props) {
         <TopicItemsDialog
           open={itemsDialogOpen}
           onOpenChange={setItemsDialogOpen}
-          topicTitle={topics[0].title}
+          topicTitle="Select Items"
+          //topicTitle={topics[0].title}
           existingItems={dialogExistingItems}
           addedItems={customLabels}
           onAdd={handleAddItem}

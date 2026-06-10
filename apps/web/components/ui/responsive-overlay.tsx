@@ -83,7 +83,7 @@ export function ResponsiveOverlay({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
+        className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
         style={{ maxHeight: "min(600px, 80vh)" }}
       >
         <DialogHeader className="shrink-0 border-b border-border px-5 py-4">
