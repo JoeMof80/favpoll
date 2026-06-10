@@ -53,7 +53,6 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
             <Chip
               key={c.id}
               selected={value.includes(c.id)}
-              size="lg"
               disabled={!value.includes(c.id) && atMax}
               onClick={() => toggle(c.id)}
             >

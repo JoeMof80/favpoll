@@ -14,6 +14,7 @@ type LoveStepProps = {
   categories: Category[]
   value: EventFormValues["topics"]
   onChange: (v: EventFormValues["topics"]) => void
+  hideItemsPanel?: boolean
 }
 
 function sortItems(items: TopicItem[]): TopicItem[] {
@@ -30,6 +31,7 @@ export function LoveStep({
   categories,
   value,
   onChange,
+  hideItemsPanel = false,
 }: LoveStepProps) {
   const [search, setSearch] = useState("")
   const [catFilter, setCatFilter] = useState<string | null>(null)
@@ -77,6 +79,10 @@ export function LoveStep({
 
   function handleSelect(id: string) {
     if (id === "__custom__") return
+    if (id === selectedId) {
+      onChange([])
+      return
+    }
     const t = activeTopics.find((t) => t.id === id)
     if (!t) return
     onChange([
@@ -203,7 +209,7 @@ export function LoveStep({
       </div>
 
       {/* Read-only items panel — shown when a canonical topic is selected */}
-      {selectedTopic && (
+      {!hideItemsPanel && selectedTopic && (
         <div
           className="border-t border-border px-5 py-4"
           data-testid="items-panel"
@@ -229,7 +235,7 @@ export function LoveStep({
       )}
 
       {/* Editable items panel — shown when a custom (new) topic is selected */}
-      {isCustomSelected && (
+      {!hideItemsPanel && isCustomSelected && (
         <div
           className="border-t border-border px-5 py-4"
           data-testid="items-panel"
