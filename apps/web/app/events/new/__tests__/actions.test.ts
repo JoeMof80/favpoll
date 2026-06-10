@@ -244,3 +244,114 @@ describe("createEvent — custom topic", () => {
     ).toHaveLength(0)
   })
 })
+
+describe("createEvent — canonical topic with organiser additions (addedItems)", () => {
+  function queueWithAdditions() {
+    mock.queue({ id: "user-1" }) // users upsert
+    mock.queue({ id: "protagonist-1" }) // protagonists insert
+    mock.queue({ id: "event-1" }) // events insert
+    mock.queue(null) // event_charities insert
+    mock.queue({ id: "poll-1" }) // event_polls insert
+    // canonical path: no customItemIds event_poll_items insert
+    mock.queue([{ id: "add-1" }, { id: "add-2" }]) // topic_items insert (addedItems)
+    mock.queue(null) // event_poll_items insert (addedItems)
+    mock.queue(null) // event_pots insert
+  }
+
+  it("inserts added items with source:organiser, is_canonical:false, review_status:pending_review", async () => {
+    queueWithAdditions()
+    await createEvent({
+      ...BASE_INPUT,
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+        addedItems: ["Purple", "Orange"],
+      },
+    })
+    const itemsInsert = mock
+      .callsFor("topic_items")
+      .find((c) => c.method === "insert")!
+    expect(itemsInsert.args[0]).toEqual([
+      expect.objectContaining({
+        label: "Purple",
+        source: "organiser",
+        is_canonical: false,
+        review_status: "pending_review",
+      }),
+      expect.objectContaining({
+        label: "Orange",
+        source: "organiser",
+        is_canonical: false,
+        review_status: "pending_review",
+      }),
+    ])
+  })
+
+  it("links added items to the event poll as event_poll_items", async () => {
+    queueWithAdditions()
+    await createEvent({
+      ...BASE_INPUT,
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+        addedItems: ["Purple", "Orange"],
+      },
+    })
+    const pollItemsInserts = mock
+      .callsFor("event_poll_items")
+      .filter((c) => c.method === "insert")
+    // Only one event_poll_items insert for canonical + addedItems path
+    const additionsInsert = pollItemsInserts[0]
+    expect(additionsInsert.args[0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          event_poll_id: "poll-1",
+          topic_item_id: "add-1",
+          is_guest_added: false,
+        }),
+        expect.objectContaining({
+          event_poll_id: "poll-1",
+          topic_item_id: "add-2",
+          is_guest_added: false,
+        }),
+      ])
+    )
+  })
+
+  it("skips addedItems insert when addedItems is empty", async () => {
+    queueCanonicalPoll()
+    await createEvent({
+      ...BASE_INPUT,
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+        addedItems: [],
+      },
+    })
+    expect(
+      mock.callsFor("topic_items").filter((c) => c.method === "insert")
+    ).toHaveLength(0)
+  })
+
+  it("skips addedItems insert when addedItems is undefined", async () => {
+    queueCanonicalPoll()
+    await createEvent({
+      ...BASE_INPUT,
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+      },
+    })
+    expect(
+      mock.callsFor("topic_items").filter((c) => c.method === "insert")
+    ).toHaveLength(0)
+  })
+})
