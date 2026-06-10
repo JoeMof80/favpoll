@@ -88,7 +88,7 @@ describe("NewEventWizard page component", () => {
     fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
-      screen.getByText("Choose a favpoll topic for this event.")
+      screen.getByText("Choose a topic for this event.")
     ).toBeInTheDocument()
     expect(screen.getAllByRole("listitem")[1]).toHaveAttribute(
       "aria-current",
@@ -104,7 +104,7 @@ describe("NewEventWizard page component", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 2: open Love sheet, pick topic, sheet auto-closes
-    fireEvent.click(screen.getByRole("button", { name: "Choose a favpoll" }))
+    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
