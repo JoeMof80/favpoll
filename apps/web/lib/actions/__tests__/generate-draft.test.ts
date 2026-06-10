@@ -19,15 +19,15 @@ vi.mock("@anthropic-ai/sdk", () => ({
   },
 }))
 
+import { generateDraft } from "../generate-draft"
 import {
-  generateDraft,
   buildCacheKey,
   revealNamesRealItem,
   hasFabricatedStats,
-  RateLimitError,
   _rateLimitStore,
   RATE_LIMIT_MAX,
-} from "../generate-draft"
+  RateLimitError,
+} from "../generate-draft-utils"
 
 const TOPIC_DATA = {
   title: "Colour",
