@@ -108,7 +108,9 @@ describe("beforeunload exit guard", () => {
     await act(async () => {
       render(<ExitGuard active={true} />)
     })
-    const beforCalls = addSpy.mock.calls.filter(([e]) => e === "beforeunload")
+    const beforCalls = addSpy.mock.calls.filter(
+      ([e]: [string]) => e === "beforeunload"
+    )
     expect(beforCalls).toHaveLength(1)
   })
 
@@ -116,7 +118,9 @@ describe("beforeunload exit guard", () => {
     await act(async () => {
       render(<ExitGuard active={false} />)
     })
-    const beforeCalls = addSpy.mock.calls.filter(([e]) => e === "beforeunload")
+    const beforeCalls = addSpy.mock.calls.filter(
+      ([e]: [string]) => e === "beforeunload"
+    )
     expect(beforeCalls).toHaveLength(0)
   })
 
