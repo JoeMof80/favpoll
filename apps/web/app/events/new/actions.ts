@@ -108,6 +108,7 @@ async function createPollForEvent(
         created_by: userId,
         is_finite: false,
         is_active: true,
+        placeholders: {},
       })
       .select("id")
       .single()
@@ -123,6 +124,7 @@ async function createPollForEvent(
         label,
         source: "organiser",
         is_canonical: false,
+        review_status: "pending_review",
       }))
 
     if (itemsToInsert.length > 0) {

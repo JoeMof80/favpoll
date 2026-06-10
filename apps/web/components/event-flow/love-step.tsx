@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
+import { ItemAddField } from "@/components/event-form-v2/item-add-field"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { Category, TopicItem, TopicWithMeta } from "@favpoll/types"
@@ -72,6 +73,8 @@ export function LoveStep({
       ? (activeTopics.find((t) => t.id === selectedId) ?? null)
       : null
 
+  const customLabels = value[0]?.customLabels ?? []
+
   function handleSelect(id: string) {
     if (id === "__custom__") return
     const t = activeTopics.find((t) => t.id === id)
@@ -100,6 +103,25 @@ export function LoveStep({
       },
     ])
     setSearch("")
+  }
+
+  function handleAddItem(label: string) {
+    const current = value[0]
+    if (!current) return
+    const existing = current.customLabels ?? []
+    if (existing.some((l) => l.toLowerCase() === label.toLowerCase())) return
+    onChange([{ ...current, customLabels: [...existing, label] }])
+  }
+
+  function handleRemoveItem(label: string) {
+    const current = value[0]
+    if (!current) return
+    onChange([
+      {
+        ...current,
+        customLabels: (current.customLabels ?? []).filter((l) => l !== label),
+      },
+    ])
   }
 
   return (
@@ -203,6 +225,37 @@ export function LoveStep({
               </Chip>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Editable items panel — shown when a custom (new) topic is selected */}
+      {isCustomSelected && (
+        <div
+          className="border-t border-border px-5 py-4"
+          data-testid="items-panel"
+        >
+          <div className="mb-3 flex items-baseline justify-between gap-2">
+            <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+              What people can pledge against
+            </p>
+          </div>
+          <ItemAddField
+            canonicalItems={[]}
+            customLabels={customLabels}
+            topicTitle={value[0]?.title ?? ""}
+            isFinite={false}
+            onAdd={handleAddItem}
+            onRemove={handleRemoveItem}
+            size="sm"
+          />
+          {customLabels.length < 2 && (
+            <p
+              className="mt-2 text-xs text-muted-foreground"
+              data-testid="items-validation"
+            >
+              Add at least two options people can pledge against
+            </p>
+          )}
         </div>
       )}
     </div>

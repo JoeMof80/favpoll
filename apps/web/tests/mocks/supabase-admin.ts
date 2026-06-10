@@ -26,6 +26,10 @@ export function makeSupabaseMock() {
         rec("insert", a)
         return b
       },
+      upsert: (...a: any[]) => {
+        rec("upsert", a)
+        return b
+      },
       update: (...a: any[]) => {
         rec("update", a)
         return b

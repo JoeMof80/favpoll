@@ -70,6 +70,21 @@ function select(id: string, title: string): EventFormValues["topics"] {
   ]
 }
 
+function customTopic(
+  title: string,
+  customLabels: string[] = []
+): EventFormValues["topics"] {
+  return [
+    {
+      topicId: "",
+      title,
+      isCustom: true,
+      items: [],
+      customLabels,
+    },
+  ]
+}
+
 describe("LoveStep — items panel", () => {
   it("shows no items panel when nothing is selected", () => {
     render(
@@ -133,27 +148,6 @@ describe("LoveStep — items panel", () => {
     expect(screen.getByText("Guests can add their own")).toBeInTheDocument()
   })
 
-  it("does not show items panel for a custom (new) topic", () => {
-    const customValue: EventFormValues["topics"] = [
-      {
-        topicId: "",
-        title: "My Custom Topic",
-        isCustom: true,
-        items: [],
-        customLabels: [],
-      },
-    ]
-    render(
-      <LoveStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={customValue}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.queryByTestId("items-panel")).not.toBeInTheDocument()
-  })
-
   it("sorts items by display_order then alphabetically", () => {
     const topicWithMixedOrder = makeTopic(
       "t-mixed",
@@ -180,11 +174,106 @@ describe("LoveStep — items panel", () => {
       panel.querySelectorAll('[class*="Chip"], button, [role="button"]')
     )
     const labels = chips.map((el) => el.textContent)
-    // "First" (order=1) should come before "Apple" and "Zebra" (both null, alphabetical)
     const firstIdx = labels.findIndex((l) => l?.includes("First"))
     const appleIdx = labels.findIndex((l) => l?.includes("Apple"))
     const zebraIdx = labels.findIndex((l) => l?.includes("Zebra"))
     expect(firstIdx).toBeLessThan(appleIdx)
     expect(appleIdx).toBeLessThan(zebraIdx)
+  })
+})
+
+describe("LoveStep — custom topic editable items panel", () => {
+  it("shows items panel for a custom (new) topic", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={customTopic("My Topic")}
+        onChange={vi.fn()}
+      />
+    )
+    expect(screen.getByTestId("items-panel")).toBeInTheDocument()
+    expect(
+      screen.getByText("What people can pledge against")
+    ).toBeInTheDocument()
+  })
+
+  it("shows validation message when fewer than 2 items", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={customTopic("My Topic", ["One item"])}
+        onChange={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText("Add at least two options people can pledge against")
+    ).toBeInTheDocument()
+  })
+
+  it("hides validation message when 2 or more items exist", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={customTopic("My Topic", ["Item A", "Item B"])}
+        onChange={vi.fn()}
+      />
+    )
+    expect(
+      screen.queryByText("Add at least two options people can pledge against")
+    ).not.toBeInTheDocument()
+  })
+
+  it("calls onChange with new label when item is added", () => {
+    const onChange = vi.fn()
+    const initial = customTopic("My Topic", [])
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={initial}
+        onChange={onChange}
+      />
+    )
+
+    // Open the ItemAddField overlay
+    const trigger = screen.getByRole("button", { name: /add my topic items/i })
+    fireEvent.click(trigger)
+
+    // Type in the overlay input and press Enter
+    const input = screen.getByPlaceholderText(/add my topic items/i)
+    fireEvent.change(input, { target: { value: "Football" } })
+    fireEvent.keyDown(input, { key: "Enter" })
+
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ customLabels: ["Football"] }),
+    ])
+  })
+
+  it("calls onChange with label removed when item is removed", () => {
+    const onChange = vi.fn()
+    const initial = customTopic("My Topic", ["Football", "Tennis"])
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={initial}
+        onChange={onChange}
+      />
+    )
+
+    // Open the ItemAddField overlay
+    const trigger = screen.getByRole("button", { name: /add my topic items/i })
+    fireEvent.click(trigger)
+
+    // Click the remove button for "Football"
+    const removeBtn = screen.getByRole("button", { name: /remove football/i })
+    fireEvent.click(removeBtn)
+
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ customLabels: ["Tennis"] }),
+    ])
   })
 })
