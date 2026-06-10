@@ -34,7 +34,7 @@ export type TopicItem = {
   all_time_count: number;
   is_canonical: boolean;
   source: "seed" | "organiser" | "guest";
-  review_status?: "pending" | "accepted" | "rejected";
+  review_status?: "pending_review" | "accepted" | "rejected";
   rejection_reason?: string | null;
   reviewed_at?: string | null;
   reviewed_by?: string | null;

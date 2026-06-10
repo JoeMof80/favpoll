@@ -73,11 +73,18 @@ export function NewEventWizard({ data }: Props) {
   const stepIndex = STEPS.indexOf(step)
   const meta = STEP_META[step]
 
+  const customItemCount = topics[0]?.isCustom
+    ? (topics[0].customLabels ?? []).length
+    : null
+
   const nextDisabled =
     step === "honour"
       ? !category
       : step === "love"
-        ? topics.length === 0
+        ? topics.length === 0 ||
+          (topics[0]?.isCustom === true &&
+            customItemCount !== null &&
+            customItemCount < 2)
         : charityIds.length === 0
 
   function handleFinish() {
@@ -89,8 +96,15 @@ export function NewEventWizard({ data }: Props) {
     })
     if (topic) {
       if (topic.isCustom) {
-        params.set("topicIsCustom", "true")
-        params.set("topicTitle", topic.title)
+        // Carry draft via sessionStorage; only a flag goes in the URL (not readable server-side)
+        sessionStorage.setItem(
+          "favpoll_new_topic_draft",
+          JSON.stringify({
+            title: topic.title,
+            items: topic.customLabels ?? [],
+          })
+        )
+        params.set("newTopic", "1")
       } else {
         params.set("topicId", topic.topicId)
         params.set("topicTitle", topic.title)

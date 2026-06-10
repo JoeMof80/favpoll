@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,8 @@ import type {
   TopicWithMeta,
 } from "@favpoll/types"
 
+const NEW_TOPIC_DRAFT_KEY = "favpoll_new_topic_draft"
+
 type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
@@ -30,6 +32,7 @@ type Props = {
   protagonistId?: string
   existingPollId?: string
   defaultValues?: Partial<EventFormValues>
+  hasNewTopicDraft?: boolean
 }
 
 export function EventFormV2({
@@ -41,6 +44,7 @@ export function EventFormV2({
   protagonistId,
   existingPollId,
   defaultValues,
+  hasNewTopicDraft = false,
 }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -107,6 +111,7 @@ export function EventFormV2({
       }
 
       if (mode === "create") {
+        if (isCustomTopic) sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
         const { eventId: newId } = await createEvent({
           protagonistName: values.name,
           protagonistAbout: values.about || null,
@@ -162,6 +167,32 @@ export function EventFormV2({
     }
   }
 
+  // Watch topics reactively so the exit warning tracks the live value
+  const watchedTopics = useWatch({ control: form.control, name: "topics" })
+  const hasUnsavedCustomTopic =
+    mode === "create" && (watchedTopics[0]?.isCustom ?? false)
+
+  useEffect(() => {
+    if (!hasUnsavedCustomTopic) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = "You have an unsaved topic. Leave without saving?"
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [hasUnsavedCustomTopic])
+
+  function handleCancel() {
+    if (hasUnsavedCustomTopic) {
+      if (!window.confirm("You have an unsaved topic. Leave without saving?")) {
+        return
+      }
+      sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
+    }
+    if (mode === "edit") router.back()
+    else form.reset()
+  }
+
   return (
     <Form {...form}>
       <FormInner
@@ -191,10 +222,8 @@ export function EventFormV2({
         sharedFundDraft={sharedFundDraft}
         onSharedFundDraftChange={setSharedFundDraft}
         onSubmit={form.handleSubmit(onSubmit)}
-        onCancel={() => {
-          if (mode === "edit") router.back()
-          else form.reset()
-        }}
+        onCancel={handleCancel}
+        hasNewTopicDraft={hasNewTopicDraft}
       />
     </Form>
   )
@@ -221,6 +250,7 @@ type InnerProps = {
   onSharedFundDraftChange: (v: string) => void
   onSubmit: () => void
   onCancel: () => void
+  hasNewTopicDraft: boolean
 }
 
 function FormInner({
@@ -243,7 +273,27 @@ function FormInner({
   onSharedFundDraftChange,
   onSubmit,
   onCancel,
+  hasNewTopicDraft,
 }: InnerProps) {
+  // Hydrate the custom topic draft from sessionStorage on mount (client-side only)
+  useEffect(() => {
+    if (!hasNewTopicDraft) return
+    try {
+      const raw = sessionStorage.getItem(NEW_TOPIC_DRAFT_KEY)
+      if (!raw) return
+      const { title, items } = JSON.parse(raw) as {
+        title: string
+        items: string[]
+      }
+      form.setValue("topics", [
+        { topicId: "", title, isCustom: true, items: [], customLabels: items },
+      ])
+    } catch {
+      // malformed draft — leave form empty
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <>
       <div className="flex flex-col bg-muted md:h-[calc(100vh-3.5rem)] md:overflow-hidden">
