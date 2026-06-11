@@ -16,6 +16,7 @@ import type {
   Charity,
   EventCategory,
   EventGrouping,
+  EventSubject,
   TopicItem,
   TopicWithMeta,
 } from "@favpoll/types"
@@ -52,6 +53,7 @@ export function NewEventWizard({ data }: Props) {
   const [step, setStep] = useState<Step>("honour")
   const [category, setCategory] = useState<EventCategory | null>(null)
   const [grouping, setGrouping] = useState<EventGrouping>("individual")
+  const [subject, setSubject] = useState<EventSubject>("someone")
   const [topics, setTopics] = useState<EventFormValues["topics"]>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
   const [loveOpen, setLoveOpen] = useState(false)
@@ -131,10 +133,10 @@ export function NewEventWizard({ data }: Props) {
 
   const leftPrompt =
     step === "honour"
-      ? category === "memorial"
-        ? "Who would you like to remember?"
-        : category === "fundraiser"
-          ? "What cause are you supporting?"
+      ? subject === "cause"
+        ? "What cause are you supporting?"
+        : category === "memorial"
+          ? "Who would you like to remember?"
           : "Who are you celebrating?"
       : step === "love"
         ? "What are their favourites?"
@@ -155,6 +157,7 @@ export function NewEventWizard({ data }: Props) {
     const params = new URLSearchParams({
       category: category ?? "",
       grouping,
+      subject,
       charityIds: charityIds.join(","),
     })
     if (topic) {
@@ -212,10 +215,11 @@ export function NewEventWizard({ data }: Props) {
         <div className="min-h-48 flex-1">
           {step === "honour" && (
             <HonourStep
-              value={{ category, grouping }}
-              onChange={({ category: cat, grouping: grp }) => {
+              value={{ category, grouping, subject }}
+              onChange={({ category: cat, grouping: grp, subject: sub }) => {
                 setCategory(cat)
                 setGrouping(grp)
+                setSubject(sub)
               }}
             />
           )}

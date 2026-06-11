@@ -305,11 +305,13 @@ Pure function in `lib/registers.ts`:
 | celebration | individual      | celebrating_one  |
 | celebration | couple or group | celebrating_many |
 
-### HONOUR step — category + grouping are the inputs
+### HONOUR step — subject + category are the inputs
 
-The Honour step shows 3 category chips (Celebration / Memorial / Fundraiser) and a grouping segmented control (An individual / A couple / A group). Selecting Fundraiser hides the grouping control and resets grouping to "individual". `register` is derived deterministically and set in the form via `form.setValue("register", deriveRegister(cat, grp))`.
+The Honour step has two independent rows:
+1. **For** (subject row): An individual / A couple / A group / **A cause**. Selecting a person option sets `subject='someone'` + corresponding grouping. Selecting "A cause" sets `subject='cause'` (grouping is preserved but unused). A self-honour note appears below when "An individual" is active.
+2. **Occasion type** (category row): Celebration / Memorial / Fundraiser — always visible.
 
-`is_listed` is auto-set to `false` when `deriveRegister` returns `"remembering"`.
+`register` is derived deterministically from category + grouping via `deriveRegister(cat, grp)` and set in the form. `is_listed` is auto-set to `false` when `deriveRegister` returns `"remembering"`. `subject` is set separately via `form.setValue("subject", sub)`.
 
 ### Legacy: `registerForOccasionType(occasionType)` and `occasion_type`
 
@@ -447,11 +449,11 @@ components/
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
 ├── new-event-button.tsx          -- Client button that navigates to /events/new; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
-├── new-event-wizard.tsx          -- 3-step page component (Honour → Love → Charity); takes pre-fetched WizardData as props; two-column layout (desktop): static icon+prompt left, step content right; step dots with aria roles; on completion redirects to /events/new/details?category=...&grouping=...&topicId=...&charityIds=...
+├── new-event-wizard.tsx          -- 3-step page component (Honour → Love → Charity); takes pre-fetched WizardData as props; two-column layout (desktop): static icon+prompt left, step content right; step dots with aria roles; on completion redirects to /events/new/details?category=...&grouping=...&subject=...&topicId=...&charityIds=...
 ├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
 │   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input). On mount (create mode, canonical topics): calls generateDraft, pre-fills about for both modes, reveal for cause events, sets personRevealExample for person events (never commits to form). handleRegenerate() re-calls on demand with manual-edit confirmation + RateLimitError toast.
-│   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist, Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
-│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal Eye toggle (C5). Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected. Accepts isGenerating, personRevealExample, onRegenerate props: shimmer (animate-pulse) shown in About while generating; cause Reveal also shimmers; person Reveal shows greyed italic example with "(example — type the real one)" label; About + Reveal overlays expose a "Regenerate suggestion" button (RefreshCw icon).
+│   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist (shows "Name" for person events, "Cause" for cause events), Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
+│   ├── preview-panel.tsx         -- Authoring artefact: hero fields inlined with ghost Button + Pencil edit affordances → ResponsiveOverlay draft pattern. Pre/post-reveal toggle. Local state: previewSuffix, previewPhoto. Always visible on mobile (stacks below; pb-52 clears command bar). Shows OnboardingPanel when no occasion selected. Accepts isGenerating, personRevealExample, onRegenerate props. **Cause events** (subject='cause'): shows causeLabel h1 (editable, 60 chars) instead of name; hides context/photo/about/reveal — only opening line + poll remain. **Person events**: full hero (name, context, photo, about, reveal toggle). subject is read from form values (not derived from register).
 │   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel

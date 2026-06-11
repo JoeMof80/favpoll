@@ -106,6 +106,7 @@ export function PreviewPanel({
   const [pledgeAmount, setPledgeAmount] = useState("")
 
   // Overlay open states
+  const [causeLabelOpen, setCauseLabelOpen] = useState(false)
   const [nameOpen, setNameOpen] = useState(false)
   const [contextOpen, setContextOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
@@ -115,6 +116,7 @@ export function PreviewPanel({
   const [closesAtOpen, setClosesAtOpen] = useState(false)
 
   // Draft states — initialised on overlay open, discarded on cancel
+  const [causeLabelDraft, setCauseLabelDraft] = useState("")
   const [nameDraft, setNameDraft] = useState("")
   const [contextDraft, setContextDraft] = useState("")
   const [photoDraft, setPhotoDraft] = useState<{
@@ -153,17 +155,18 @@ export function PreviewPanel({
 
   if (!category) return null
 
+  const causeLabel = values.causeLabel ?? ""
+  const subject = (values.subject ?? "someone") as "someone" | "cause"
+  const effReg = deriveRegister(category, grouping)
+
   const datePlaceholder = ""
   const resolvedOpeningLine =
     openingLine ||
-    getEventHeadline({ register, occasionType: null, name: "" }).prefix
+    getEventHeadline({ register, occasionType: null, name: "", subject }).prefix
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
-
-  const effReg = deriveRegister(category, grouping)
-  const subject = effReg === "cause" ? "cause" : "someone"
 
   // Grey placeholder text for unfilled about — keyed by effective register + topic
   const aboutPlaceholder = !about
@@ -185,6 +188,7 @@ export function PreviewPanel({
     register,
     occasionType: null,
     name: "",
+    subject,
   }).prefix
 
   const firstTopic = selectedTopics[0]
@@ -254,6 +258,10 @@ export function PreviewPanel({
   const revealValue = showReveal ? reveal || null : null
 
   // Save handlers
+  function saveCauseLabel() {
+    form.setValue("causeLabel", causeLabelDraft, { shouldValidate: true })
+    setCauseLabelOpen(false)
+  }
   function saveName() {
     form.setValue("name", nameDraft, { shouldValidate: true })
     setNameOpen(false)
@@ -339,105 +347,134 @@ export function PreviewPanel({
                   <Pencil className={PENCIL_ICON} aria-hidden />
                 </Button>
 
-                {/* Name */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className={EDIT_BTN}
-                  onClick={() => {
-                    setNameDraft(name)
-                    setNameOpen(true)
-                  }}
-                  aria-label="Edit name"
-                >
-                  <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
-                    {name || (
-                      <span className="text-muted-foreground/50">
-                        {exampleName || "Name or nickname"}
-                      </span>
-                    )}
-                  </h1>
-                  <Pencil className={PENCIL_ICON} aria-hidden />
-                </Button>
-
-                {/* Context/suffix — always visible with grey placeholder when empty */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className={cn(EDIT_BTN, "mt-2")}
-                  onClick={() => {
-                    setContextDraft(context)
-                    setContextOpen(true)
-                  }}
-                  aria-label="Edit context"
-                >
-                  <p
-                    className={cn(
-                      "truncate text-xl font-normal whitespace-normal md:text-2xl",
-                      context && previewSuffix
-                        ? "text-[#534AB7]"
-                        : "text-muted-foreground/40"
-                    )}
+                {subject === "cause" ? (
+                  /* Cause label — replaces name for cause events */
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className={EDIT_BTN}
+                    onClick={() => {
+                      setCauseLabelDraft(causeLabel)
+                      setCauseLabelOpen(true)
+                    }}
+                    aria-label="Edit cause label"
                   >
-                    {previewSuffix && context
-                      ? context
-                      : datePlaceholder || contextExamples[effReg]}
-                  </p>
-                  <Pencil className={PENCIL_ICON} aria-hidden />
-                </Button>
+                    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+                      {causeLabel || (
+                        <span className="text-muted-foreground/50">
+                          What are you raising for?
+                        </span>
+                      )}
+                    </h1>
+                    <Pencil className={PENCIL_ICON} aria-hidden />
+                  </Button>
+                ) : (
+                  <>
+                    {/* Name */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className={EDIT_BTN}
+                      onClick={() => {
+                        setNameDraft(name)
+                        setNameOpen(true)
+                      }}
+                      aria-label="Edit name"
+                    >
+                      <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+                        {name || (
+                          <span className="text-muted-foreground/50">
+                            {exampleName || "Name or nickname"}
+                          </span>
+                        )}
+                      </h1>
+                      <Pencil className={PENCIL_ICON} aria-hidden />
+                    </Button>
+
+                    {/* Context/suffix */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className={cn(EDIT_BTN, "mt-2")}
+                      onClick={() => {
+                        setContextDraft(context)
+                        setContextOpen(true)
+                      }}
+                      aria-label="Edit context"
+                    >
+                      <p
+                        className={cn(
+                          "truncate text-xl font-normal whitespace-normal md:text-2xl",
+                          context && previewSuffix
+                            ? "text-[#534AB7]"
+                            : "text-muted-foreground/40"
+                        )}
+                      >
+                        {previewSuffix && context
+                          ? context
+                          : datePlaceholder || contextExamples[effReg]}
+                      </p>
+                      <Pencil className={PENCIL_ICON} aria-hidden />
+                    </Button>
+                  </>
+                )}
               </div>
 
-              {/* Photo */}
+              {/* Photo — person events only */}
+              {subject !== "cause" && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="group relative h-auto shrink-0 rounded-full p-0"
+                  onClick={() => setPhotoOpen(true)}
+                  aria-label="Edit photo"
+                >
+                  <ProtagonistAvatar
+                    name={name || exampleName || "Name"}
+                    photoUrl={previewPhoto ? resolvedPhotoUrl : null}
+                  />
+                  <Pencil
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background p-0.5 text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                    aria-hidden
+                  />
+                </Button>
+              )}
+            </div>
+
+            {/* About — person events only */}
+            {subject !== "cause" && (
               <Button
                 type="button"
                 variant="ghost"
-                className="group relative h-auto shrink-0 rounded-full p-0"
-                onClick={() => setPhotoOpen(true)}
-                aria-label="Edit photo"
+                className={cn(EDIT_BTN, "mt-4")}
+                onClick={() => {
+                  setAboutDraft(about)
+                  setAboutOpen(true)
+                }}
+                aria-label="Edit about"
               >
-                <ProtagonistAvatar
-                  name={name || exampleName || "Name"}
-                  photoUrl={previewPhoto ? resolvedPhotoUrl : null}
-                />
-                <Pencil
-                  className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background p-0.5 text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-                  aria-hidden
-                />
+                {about ? (
+                  <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+                    {about}
+                  </p>
+                ) : isGenerating ? (
+                  <div
+                    className="animate-pulse space-y-1.5"
+                    aria-label="Generating suggestion…"
+                  >
+                    <div className="h-4 rounded-full bg-muted/60" />
+                    <div className="h-4 w-4/5 rounded-full bg-muted/60" />
+                  </div>
+                ) : aboutPlaceholder ? (
+                  <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
+                    {aboutPlaceholder}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground/40">+ about</p>
+                )}
+                <Pencil className={PENCIL_ICON} aria-hidden />
               </Button>
-            </div>
-
-            {/* About */}
-            <Button
-              type="button"
-              variant="ghost"
-              className={cn(EDIT_BTN, "mt-4")}
-              onClick={() => {
-                setAboutDraft(about)
-                setAboutOpen(true)
-              }}
-              aria-label="Edit about"
-            >
-              {about ? (
-                <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
-                  {about}
-                </p>
-              ) : isGenerating ? (
-                <div
-                  className="animate-pulse space-y-1.5"
-                  aria-label="Generating suggestion…"
-                >
-                  <div className="h-4 rounded-full bg-muted/60" />
-                  <div className="h-4 w-4/5 rounded-full bg-muted/60" />
-                </div>
-              ) : aboutPlaceholder ? (
-                <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
-                  {aboutPlaceholder}
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground/40">+ about</p>
-              )}
-              <Pencil className={PENCIL_ICON} aria-hidden />
-            </Button>
+            )}
 
             <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
           </div>
@@ -462,19 +499,21 @@ export function PreviewPanel({
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <SectionLabel title={topicTitle} />
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    {showReveal ? "Post-reveal" : "Pre-reveal"}
-                  </span>
-                  <Switch
-                    checked={showReveal}
-                    onCheckedChange={(v) => {
-                      if (v !== showReveal) onToggleReveal()
-                    }}
-                  />
-                </div>
+                {subject !== "cause" && (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {showReveal ? "Post-reveal" : "Pre-reveal"}
+                    </span>
+                    <Switch
+                      checked={showReveal}
+                      onCheckedChange={(v) => {
+                        if (v !== showReveal) onToggleReveal()
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-              {revealValue && (
+              {subject !== "cause" && revealValue && (
                 <PollReveal
                   personalReveal={revealValue}
                   protagonistFirstName={protagonistFirstName}
@@ -483,72 +522,73 @@ export function PreviewPanel({
                 />
               )}
 
-              {/* Reveal edit affordance */}
-              {showReveal ? (
-                reveal ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="h-auto gap-1.5 px-0 py-0.5 text-xs text-muted-foreground hover:text-foreground"
-                    onClick={() => {
-                      setRevealDraft(reveal)
-                      setRevealOpen(true)
-                    }}
-                  >
-                    <Pencil className="h-3 w-3" aria-hidden />
-                    Edit reveal
-                  </Button>
+              {/* Reveal edit affordance — person events only */}
+              {subject !== "cause" &&
+                (showReveal ? (
+                  reveal ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-auto gap-1.5 px-0 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setRevealDraft(reveal)
+                        setRevealOpen(true)
+                      }}
+                    >
+                      <Pencil className="h-3 w-3" aria-hidden />
+                      Edit reveal
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className={cn(EDIT_BTN, "mt-1")}
+                      onClick={() => {
+                        setRevealDraft(reveal)
+                        setRevealOpen(true)
+                      }}
+                      aria-label="Add reveal"
+                    >
+                      {isGenerating ? (
+                        <div
+                          className="animate-pulse space-y-1.5"
+                          aria-label="Generating suggestion…"
+                        >
+                          <div className="h-4 rounded-full bg-muted/60" />
+                          <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                        </div>
+                      ) : revealPlaceholder ? (
+                        <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
+                          {revealPlaceholder}
+                          {isPersonRevealExample && (
+                            <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
+                              (example — type the real one)
+                            </span>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground/40">
+                          Add reveal…
+                        </p>
+                      )}
+                      <Pencil className={PENCIL_ICON} aria-hidden />
+                    </Button>
+                  )
                 ) : (
                   <Button
                     type="button"
                     variant="ghost"
-                    className={cn(EDIT_BTN, "mt-1")}
+                    className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
                     onClick={() => {
                       setRevealDraft(reveal)
                       setRevealOpen(true)
                     }}
-                    aria-label="Add reveal"
                   >
-                    {isGenerating && subject === "cause" ? (
-                      <div
-                        className="animate-pulse space-y-1.5"
-                        aria-label="Generating suggestion…"
-                      >
-                        <div className="h-4 rounded-full bg-muted/60" />
-                        <div className="h-4 w-3/4 rounded-full bg-muted/60" />
-                      </div>
-                    ) : revealPlaceholder ? (
-                      <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
-                        {revealPlaceholder}
-                        {isPersonRevealExample && (
-                          <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
-                            (example — type the real one)
-                          </span>
-                        )}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground/40">
-                        Add reveal…
-                      </p>
-                    )}
-                    <Pencil className={PENCIL_ICON} aria-hidden />
+                    Add reveal →
                   </Button>
-                )
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => {
-                    setRevealDraft(reveal)
-                    setRevealOpen(true)
-                  }}
-                >
-                  Add reveal →
-                </Button>
-              )}
+                ))}
 
-              {revealValue ? (
+              {revealValue && subject !== "cause" ? (
                 <PollResults results={pollResults} />
               ) : (
                 /* Dimmed + inert — organiser is composing, not pledging */
@@ -623,6 +663,28 @@ export function PreviewPanel({
       </div>
 
       {/* ── Overlays ───────────────────────────────────────────── */}
+
+      {/* Cause label */}
+      <ResponsiveOverlay
+        open={causeLabelOpen}
+        onOpenChange={(o) => !o && setCauseLabelOpen(false)}
+        title="Cause"
+        description="What you're raising for — shown throughout the event. 60 characters."
+        footer={overlayFooter(saveCauseLabel, () => setCauseLabelOpen(false))}
+      >
+        <div>
+          <Input
+            autoFocus
+            placeholder="e.g. dementia research, local foodbank"
+            value={causeLabelDraft}
+            maxLength={60}
+            onChange={(e) => setCauseLabelDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && saveCauseLabel()}
+            className="bg-background"
+          />
+          <CharCounter value={causeLabelDraft} max={60} />
+        </div>
+      </ResponsiveOverlay>
 
       {/* Name */}
       <ResponsiveOverlay
