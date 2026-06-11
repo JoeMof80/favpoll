@@ -202,3 +202,21 @@ export async function generateDraft(
   incrementRateLimitCount(userId)
   return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
 }
+
+// ---------------------------------------------------------------------------
+// Safe wrapper — never throws; callers receive null on any failure
+// ---------------------------------------------------------------------------
+
+export async function safeGenerateDraft(
+  input: GenerateDraftInput
+): Promise<GeneratedDraftResult | null> {
+  try {
+    return await generateDraft(input)
+  } catch (err) {
+    console.error(
+      "generateDraft failed, using fallback:",
+      err instanceof Error ? err.message : String(err)
+    )
+    return null
+  }
+}
