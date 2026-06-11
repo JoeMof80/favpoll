@@ -12,6 +12,7 @@ import type {
   Charity,
   EventCategory,
   EventGrouping,
+  EventSubject,
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
@@ -52,6 +53,10 @@ export function CommandPanel({
   const charitiesValue =
     useWatch({ control: form.control, name: "charities" }) ?? []
   const nameValue = useWatch({ control: form.control, name: "name" }) ?? ""
+  const causeLabelValue =
+    useWatch({ control: form.control, name: "causeLabel" }) ?? ""
+  const subjectValue = (useWatch({ control: form.control, name: "subject" }) ??
+    "someone") as EventSubject
   const isListed = useWatch({ control: form.control, name: "isListed" }) ?? true
 
   const [honourOpen, setHonourOpen] = useState(false)
@@ -82,7 +87,11 @@ export function CommandPanel({
   if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
     missing.push("favpoll topic")
   if (!charitiesValue?.length) missing.push("Charity")
-  if (!nameValue) missing.push("Name")
+  if (subjectValue === "cause") {
+    if (!causeLabelValue) missing.push("Cause")
+  } else {
+    if (!nameValue) missing.push("Name")
+  }
 
   const isPublishable = missing.length === 0
 
@@ -228,11 +237,12 @@ export function CommandPanel({
         }
       >
         <HonourStep
-          value={{ category, grouping }}
-          onChange={({ category: cat, grouping: grp }) => {
+          value={{ category, grouping, subject: subjectValue }}
+          onChange={({ category: cat, grouping: grp, subject: sub }) => {
             const derived = deriveRegister(cat, grp)
             form.setValue("category", cat ?? undefined)
             form.setValue("grouping", grp)
+            form.setValue("subject", sub)
             form.setValue("register", derived)
             form.setValue("openingLine", "")
             form.setValue("isListed", derived !== "remembering")

@@ -2,47 +2,89 @@
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { EventCategory, EventGrouping } from "@favpoll/types"
+import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
 import { SectionLabel } from "../favpoll-card/section-label"
 
-const GROUPINGS: { value: EventGrouping; label: string }[] = [
-  { value: "individual", label: "An individual" },
-  { value: "couple", label: "A couple" },
-  { value: "group", label: "A group" },
+type SubjectOption =
+  | { kind: "person"; value: EventGrouping; label: string }
+  | { kind: "cause"; label: string }
+
+const SUBJECT_OPTIONS: SubjectOption[] = [
+  { kind: "person", value: "individual", label: "An individual" },
+  { kind: "person", value: "couple", label: "A couple" },
+  { kind: "person", value: "group", label: "A group" },
+  { kind: "cause", label: "A cause" },
 ]
 
-const CATEGORIES: {
-  value: EventCategory
-  label: string
-}[] = [
+const CATEGORIES: { value: EventCategory; label: string }[] = [
   { value: "celebration", label: "Celebration" },
   { value: "memorial", label: "Memorial" },
   { value: "fundraiser", label: "Fundraiser" },
 ]
 
 type HonourStepProps = {
-  value: { category: EventCategory | null; grouping: EventGrouping }
+  value: {
+    category: EventCategory | null
+    grouping: EventGrouping
+    subject: EventSubject
+  }
   onChange: (v: {
     category: EventCategory | null
     grouping: EventGrouping
+    subject: EventSubject
   }) => void
 }
 
 export function HonourStep({ value, onChange }: HonourStepProps) {
-  const showGrouping = value.category !== "fundraiser"
-
-  function handleCategorySelect(cat: EventCategory) {
-    const newGrouping = cat === "fundraiser" ? "individual" : value.grouping
-    onChange({ category: cat, grouping: newGrouping })
+  function handleSubjectSelect(opt: SubjectOption) {
+    if (opt.kind === "cause") {
+      onChange({ ...value, subject: "cause" })
+    } else {
+      onChange({ ...value, subject: "someone", grouping: opt.value })
+    }
   }
 
-  function handleGroupingSelect(grp: EventGrouping) {
-    onChange({ category: value.category, grouping: grp })
+  function handleCategorySelect(cat: EventCategory) {
+    onChange({ ...value, category: cat })
+  }
+
+  function isSubjectActive(opt: SubjectOption) {
+    return opt.kind === "cause"
+      ? value.subject === "cause"
+      : value.subject !== "cause" && value.grouping === opt.value
   }
 
   return (
     <div className="space-y-5">
-      {/* Category — horizontal scroll row */}
+      {/* Subject row */}
+      <div className="space-y-3 px-5 py-4">
+        <SectionLabel title="For" size="lg" />
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {SUBJECT_OPTIONS.map((opt) => (
+            <Button
+              key={opt.kind === "cause" ? "cause" : opt.value}
+              type="button"
+              variant="outline"
+              onClick={() => handleSubjectSelect(opt)}
+              className={cn(
+                "shrink-0",
+                isSubjectActive(opt) &&
+                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </div>
+        {value.subject !== "cause" && value.grouping === "individual" && (
+          <p className="text-xs text-muted-foreground">
+            Self-honours welcome — guests won&apos;t know it&apos;s you until
+            the reveal.
+          </p>
+        )}
+      </div>
+
+      {/* Category row */}
       <div className="space-y-3 px-5 py-4">
         <SectionLabel title="Occasion type" size="lg" />
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
@@ -63,30 +105,6 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
           ))}
         </div>
       </div>
-
-      {/* Grouping segmented control */}
-      {showGrouping && (
-        <div className="space-y-3 px-5 py-4">
-          <SectionLabel title="For" size="lg" />
-          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-            {GROUPINGS.map(({ value: grp, label }) => (
-              <Button
-                key={grp}
-                type="button"
-                variant="outline"
-                onClick={() => handleGroupingSelect(grp)}
-                className={cn(
-                  "shrink-0",
-                  value.grouping === grp &&
-                    "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                {label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
