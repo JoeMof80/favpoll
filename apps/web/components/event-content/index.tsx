@@ -3,6 +3,7 @@
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EventHero } from "@/components/event-hero"
+import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeCard, LivePledgeCard } from "@/components/pledge-card"
@@ -56,6 +57,8 @@ export function EventContent({
     clerkUserId,
   })
 
+  const isCause = event.event_subject === "cause"
+
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
@@ -78,7 +81,11 @@ export function EventContent({
       <div className="grid gap-10 md:grid-cols-[1fr_300px]">
         {/* Left — hero + polls */}
         <div>
-          <EventHero event={event} protagonist={event.protagonists} />
+          {isCause ? (
+            <CauseHero event={event} />
+          ) : (
+            <EventHero event={event} protagonist={event.protagonists!} />
+          )}
 
           {pollWithItems ? (
             <PollSection
@@ -88,7 +95,11 @@ export function EventContent({
               isClosed={isClosed}
               hasPledged={hasPledged}
               pledgeJustConfirmed={pledgeConfirmed}
-              protagonistName={event.protagonists.name}
+              protagonistName={
+                isCause
+                  ? (event.cause_label ?? "")
+                  : (event.protagonists?.name ?? "")
+              }
               isOrganiser={isOrganiser}
               eventId={event.id}
               onSelectionsChange={handleSelectionsChange}
