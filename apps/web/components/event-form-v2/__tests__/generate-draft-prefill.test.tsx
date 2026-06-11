@@ -280,6 +280,54 @@ describe("generation skipped cases", () => {
     expect(screen.getByTestId("about").textContent).toBe("")
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
+
+  it("cause event — generation failure leaves fields empty and form usable", async () => {
+    mockGenerateDraft.mockRejectedValueOnce(new Error("API key missing"))
+
+    await act(async () => {
+      render(
+        <DraftGenerator
+          register="cause"
+          subject="cause"
+          topicId="topic-1"
+          isCustomTopic={false}
+          primaryCharityId="charity-1"
+        />
+      )
+    })
+
+    await waitFor(() =>
+      expect(screen.getByTestId("isGenerating").textContent).toBe("0")
+    )
+
+    expect(screen.getByTestId("about").textContent).toBe("")
+    expect(screen.getByTestId("reveal").textContent).toBe("")
+    expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
+  })
+
+  it("rate limit error also degrades gracefully", async () => {
+    const err = new Error("Rate limit exceeded — try again in a few minutes.")
+    err.name = "RateLimitError"
+    mockGenerateDraft.mockRejectedValueOnce(err)
+
+    await act(async () => {
+      render(
+        <DraftGenerator
+          register="celebrating_one"
+          topicId="topic-1"
+          isCustomTopic={false}
+          primaryCharityId={null}
+        />
+      )
+    })
+
+    await waitFor(() =>
+      expect(screen.getByTestId("isGenerating").textContent).toBe("0")
+    )
+
+    expect(screen.getByTestId("about").textContent).toBe("")
+    expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
+  })
 })
 
 describe("generateDraft call arguments", () => {

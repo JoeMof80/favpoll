@@ -23,12 +23,17 @@ export function checkRateLimit(userId: string): void {
   const entry = _rateLimitStore.get(userId)
   if (!entry || entry.resetAt <= now) {
     _rateLimitStore.set(userId, {
-      count: 1,
+      count: 0,
       resetAt: now + RATE_LIMIT_WINDOW_MS,
     })
     return
   }
   if (entry.count >= RATE_LIMIT_MAX) throw new RateLimitError()
+}
+
+export function incrementRateLimitCount(userId: string): void {
+  const entry = _rateLimitStore.get(userId)
+  if (!entry || entry.resetAt <= Date.now()) return
   entry.count++
 }
 

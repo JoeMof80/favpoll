@@ -459,6 +459,17 @@ function FormInner({
             },
           }
         )
+      } else {
+        toast.error(
+          "Couldn't generate a suggestion — you can write your own instead.",
+          {
+            style: {
+              background: "#fef2f2",
+              color: "#991b1b",
+              border: "1px solid #ef4444",
+            },
+          }
+        )
       }
     } finally {
       setIsGenerating(false)

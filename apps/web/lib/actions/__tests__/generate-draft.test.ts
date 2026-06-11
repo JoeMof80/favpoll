@@ -317,10 +317,12 @@ describe("generateDraft — cache miss, cause", () => {
 // ---------------------------------------------------------------------------
 
 describe("rate limiting", () => {
-  it(`allows ${RATE_LIMIT_MAX} calls then throws RateLimitError`, async () => {
-    // Queue RATE_LIMIT_MAX cache hits (one maybySingle pop per call)
+  it(`allows ${RATE_LIMIT_MAX} successful generations then throws RateLimitError`, async () => {
     for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue({ about: "About.", reveal: "Reveal — Red." })
+      mock.queue(null) // cache miss
+      mock.queue(TOPIC_DATA)
+      mockLLMResponse("About.", "Her favourite was always Red.")
+      mock.queue(null) // insert
     }
 
     const input = {
@@ -337,9 +339,11 @@ describe("rate limiting", () => {
   })
 
   it("throws immediately — no DB call is made when rate-limited", async () => {
-    // Exhaust the limit
     for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue({ about: "About.", reveal: "Reveal — Blue." })
+      mock.queue(null) // cache miss
+      mock.queue(TOPIC_DATA)
+      mockLLMResponse("About.", "Her favourite was always Blue.")
+      mock.queue(null) // insert
       await generateDraft({
         register: "celebrating_one",
         subject: "someone",
@@ -358,5 +362,47 @@ describe("rate limiting", () => {
     ).rejects.toBeInstanceOf(RateLimitError)
 
     expect(mock.calls.length).toBe(callsBefore) // no new DB calls
+  })
+
+  it("cache hits do not consume quota", async () => {
+    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
+      mock.queue({ about: "Cached.", reveal: "Cached — Red." })
+      await generateDraft({
+        register: "celebrating_one",
+        subject: "someone",
+        topicId: "topic-1",
+      })
+    }
+
+    // Still able to generate — cache hits consumed nothing
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA)
+    mockLLMResponse("About.", "Her favourite was always Red.")
+    mock.queue(null) // insert
+
+    await expect(
+      generateDraft({
+        register: "celebrating_one",
+        subject: "someone",
+        topicId: "topic-1",
+      })
+    ).resolves.toBeDefined()
+  })
+
+  it("failed LLM call does not consume quota", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA)
+    mockMessagesCreate.mockRejectedValueOnce(new Error("API key missing"))
+
+    await expect(
+      generateDraft({
+        register: "celebrating_one",
+        subject: "someone",
+        topicId: "topic-1",
+      })
+    ).rejects.toThrow()
+
+    const entry = _rateLimitStore.get("user-1")
+    expect(entry?.count ?? 0).toBe(0)
   })
 })
