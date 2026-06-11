@@ -26,6 +26,8 @@ function makeInput(
     photoUrl: null,
     category: "celebration",
     grouping: "individual",
+    eventSubject: "someone",
+    causeLabel: null,
     openingLine: null,
     description: null,
     isListed: true,

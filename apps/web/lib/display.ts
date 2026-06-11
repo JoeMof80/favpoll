@@ -98,7 +98,7 @@ const REGISTER_PREFIXES: Record<string, string> = {
   remembering: "In memory of",
   celebrating_one: "Celebrating",
   celebrating_many: "Celebrating",
-  cause: "In support of",
+  cause: "Honouring",
   neutral: "Honouring",
 }
 
@@ -108,15 +108,21 @@ export function getEventHeadline(params: {
   name: string
   dateLabel?: string | null
   openingLine?: string | null
+  subject?: "someone" | "cause"
 }): { prefix: string; name: string; suffix: string } {
   const { occasionType, name: personName, dateLabel, openingLine } = params
   const register = params.register ?? registerForOccasionType(occasionType)
+  const subject = params.subject ?? "someone"
+
+  const registerPrefix =
+    subject === "cause" && register === "cause"
+      ? "In support of"
+      : (REGISTER_PREFIXES[register] ?? "Honouring")
 
   const prefix =
     openingLine ||
     (occasionType && OCCASION_TYPE_PREFIXES[occasionType]) ||
-    REGISTER_PREFIXES[register] ||
-    "Honouring"
+    registerPrefix
 
   return { prefix, name: personName, suffix: dateLabel ?? "" }
 }

@@ -35,6 +35,8 @@ const BASE_INPUT = {
   dateLabel: null,
   category: "celebration" as const,
   grouping: "individual" as const,
+  eventSubject: "someone" as const,
+  causeLabel: null,
   openingLine: null,
   description: null,
   charityIds: ["charity-1"],
@@ -353,5 +355,85 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
     expect(
       mock.callsFor("topic_items").filter((c) => c.method === "insert")
     ).toHaveLength(0)
+  })
+})
+
+describe("createEvent — cause event (event_subject='cause')", () => {
+  it("skips protagonists insert and stores cause_label on the event", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    // No protagonists insert
+    mock.queue({ id: "event-1" }) // events insert
+    mock.queue(null) // event_charities insert
+    mock.queue({ id: "poll-1" }) // event_polls insert
+    mock.queue(null) // event_poll_items insert
+    mock.queue(null) // event_pots insert
+
+    const result = await createEvent({
+      ...BASE_INPUT,
+      protagonistName: "",
+      eventSubject: "cause",
+      causeLabel: "Ocean conservation across the UK coastline",
+      charityIds: ["charity-1"],
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+      },
+    })
+
+    expect(result).toEqual({ eventId: "event-1" })
+
+    expect(
+      mock.callsFor("protagonists").filter((c) => c.method === "insert")
+    ).toHaveLength(0)
+
+    const eventInsert = mock
+      .callsFor("events")
+      .find((c) => c.method === "insert")!
+    expect(eventInsert.args[0]).toMatchObject({
+      protagonist_id: null,
+      event_subject: "cause",
+      cause_label: "Ocean conservation across the UK coastline",
+    })
+  })
+})
+
+describe("createEvent — fundraiser for a person (event_subject='someone')", () => {
+  it("creates protagonist row and stores event_subject='someone'", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    mock.queue({ id: "protagonist-1" }) // protagonists insert
+    mock.queue({ id: "event-1" }) // events insert
+    mock.queue(null) // event_charities insert
+    mock.queue({ id: "poll-1" }) // event_polls insert
+    mock.queue(null) // event_poll_items insert
+    mock.queue(null) // event_pots insert
+
+    await createEvent({
+      ...BASE_INPUT,
+      protagonistName: "Joan",
+      eventSubject: "someone",
+      causeLabel: null,
+      category: "fundraiser",
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+      },
+    })
+
+    expect(
+      mock.callsFor("protagonists").filter((c) => c.method === "insert")
+    ).toHaveLength(1)
+
+    const eventInsert = mock
+      .callsFor("events")
+      .find((c) => c.method === "insert")!
+    expect(eventInsert.args[0]).toMatchObject({
+      event_subject: "someone",
+      cause_label: null,
+    })
+    expect(eventInsert.args[0].protagonist_id).toBe("protagonist-1")
   })
 })

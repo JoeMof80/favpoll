@@ -53,6 +53,7 @@ const MOCK_TOPIC = {
 
 type GeneratorProps = {
   register: Register
+  subject?: "someone" | "cause"
   topicId: string
   isCustomTopic: boolean
   primaryCharityId: string | null
@@ -68,6 +69,7 @@ type GeneratedState = {
 
 function DraftGenerator({
   register,
+  subject = "someone",
   topicId,
   isCustomTopic,
   primaryCharityId,
@@ -86,10 +88,8 @@ function DraftGenerator({
     if (mode !== "create") return
     if (isCustomTopic || !topicId) return
 
-    const sub: "someone" | "cause" = register === "cause" ? "cause" : "someone"
-
     setState((s) => ({ ...s, isGenerating: true }))
-    generateDraft({ register, subject: sub, topicId, primaryCharityId })
+    generateDraft({ register, subject, topicId, primaryCharityId })
       .then((result) => {
         setState((s) => {
           const next = { ...s, isGenerating: false }
@@ -97,7 +97,7 @@ function DraftGenerator({
             next.about = result.about
             lastGeneratedAbout.current = result.about
           }
-          if (sub === "cause") {
+          if (subject === "cause") {
             if (!s.reveal) {
               next.reveal = result.reveal
               lastGeneratedReveal.current = result.reveal
@@ -202,6 +202,7 @@ describe("generation on mount — cause event", () => {
       render(
         <DraftGenerator
           register="cause"
+          subject="cause"
           topicId="topic-1"
           isCustomTopic={false}
           primaryCharityId="charity-1"
@@ -282,13 +283,14 @@ describe("generation skipped cases", () => {
 })
 
 describe("generateDraft call arguments", () => {
-  it("derives subject=cause when register is cause", async () => {
+  it("passes subject=cause when subject prop is cause", async () => {
     mockGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
 
     await act(async () => {
       render(
         <DraftGenerator
           register="cause"
+          subject="cause"
           topicId="topic-1"
           isCustomTopic={false}
           primaryCharityId="charity-1"
@@ -308,13 +310,14 @@ describe("generateDraft call arguments", () => {
     )
   })
 
-  it("derives subject=someone for non-cause registers", async () => {
+  it("passes subject=someone for person registers", async () => {
     mockGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
 
     await act(async () => {
       render(
         <DraftGenerator
           register="remembering"
+          subject="someone"
           topicId="topic-1"
           isCustomTopic={false}
           primaryCharityId={null}
@@ -327,6 +330,31 @@ describe("generateDraft call arguments", () => {
     expect(mockGenerateDraft).toHaveBeenCalledWith(
       expect.objectContaining({
         register: "remembering",
+        subject: "someone",
+      })
+    )
+  })
+
+  it("fundraiser-person (register=cause, subject=someone) passes subject=someone", async () => {
+    mockGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
+
+    await act(async () => {
+      render(
+        <DraftGenerator
+          register="cause"
+          subject="someone"
+          topicId="topic-1"
+          isCustomTopic={false}
+          primaryCharityId="charity-1"
+        />
+      )
+    })
+
+    await waitFor(() => expect(mockGenerateDraft).toHaveBeenCalled())
+
+    expect(mockGenerateDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        register: "cause",
         subject: "someone",
       })
     )

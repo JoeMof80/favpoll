@@ -129,7 +129,10 @@ protagonists (
 
 events (
   id uuid primary key,
-  protagonist_id uuid references protagonists(id),
+  protagonist_id uuid references protagonists(id),  -- null for cause events
+  event_subject text not null default 'someone'     -- 'someone' | 'cause'; independent of register
+    CHECK (event_subject IN ('someone','cause')),
+  cause_label text,                 -- required when event_subject='cause'; up to 60 chars
   occasion_type text,               -- Legacy: free-text occasion. Kept for backward compat; superseded by event_category.
   event_category text               -- 'celebration' | 'memorial' | 'fundraiser'. Nullable for legacy rows. register is derived via deriveRegister(event_category, event_grouping).
     CHECK (event_category IN ('celebration','memorial','fundraiser')),
@@ -269,6 +272,7 @@ generated_drafts (
 20260609000000_add_is_listed.sql                       -- ADD COLUMN is_listed boolean NOT NULL DEFAULT true
 20260609120000_add_event_category_grouping.sql         -- ADD COLUMN event_category + event_grouping; backfill from occasion_type/is_plural
 20260610120000_generated_drafts.sql                    -- generated_drafts cache table for LLM-produced About/Reveal copy
+20260611000000_add_event_subject_and_cause_label.sql   -- event_subject + cause_label columns; truncates generated_drafts
 ```
 
 ---
@@ -311,15 +315,28 @@ The Honour step shows 3 category chips (Celebration / Memorial / Fundraiser) and
 
 Kept internally for the backfill and any legacy read paths. `occasion_type` column remains on `events` and is nullable. New events write `event_category` + `event_grouping`; `occasion_type` is left null. `effectiveRegister` and `DEFAULT_OCCASION_TYPE` exports are removed.
 
-### Display headline prefixes (from `lib/display.ts`)
+### Event subject
 
-```
-remembering      → 'In memory of'
-celebrating_one  → 'Celebrating'
-celebrating_many → 'Celebrating'
-cause            → 'In support of'
-neutral          → 'Honouring'
-```
+`event_subject` ('someone' | 'cause') is stored on the `events` table — independent of register.
+A fundraiser can honour a person (`event_subject='someone'`) or a cause (`event_subject='cause'`).
+When `event_subject='cause'`: no protagonist row is created; `cause_label` is stored instead.
+
+### Display headline matrix (from `lib/display.ts` `getEventHeadline`)
+
+`getEventHeadline` accepts an optional `subject?: 'someone' | 'cause'` param (defaults `'someone'`).
+When `subject` is not provided by a caller, name param is the protagonist name as before.
+When `subject='cause'`, callers pass `cause_label` as the `name` param.
+
+| register        | subject='someone'    | subject='cause'    |
+| --------------- | -------------------- | ------------------ |
+| remembering     | In memory of         | In memory of       |
+| celebrating_one | Celebrating          | Celebrating        |
+| celebrating_many| Celebrating          | Celebrating        |
+| cause           | **Honouring**        | In support of      |
+| neutral         | Honouring            | Honouring          |
+
+Occasion-type prefixes from `OCCASION_TYPE_PREFIXES` (e.g. "Fundraiser" → "In support of") continue
+to take priority over register prefix and are NOT subject-aware.
 
 ### Default poll closing period (`suggestClosingDate(category, eventDate?)` in `lib/registers.ts`)
 
@@ -438,14 +455,14 @@ components/
 │   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
 │   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
 │   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
-│   ├── schema.ts                 -- Zod schema + EventFormValues
+│   ├── schema.ts                 -- Zod schema + EventFormValues; subject/causeLabel fields + superRefine (name required iff subject='someone', causeLabel required iff subject='cause')
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button width hardcoded to CALENDAR_WIDTH = 220
 │   ├── topic-picker-field.tsx    -- ResponsiveOverlay (internal open state); search input + filter buttons + topic chips; Enter creates custom topic
 │   ├── item-add-field.tsx        -- ResponsiveOverlay (internal open state); disabled state unchanged; NOT used in form pillar 2
 │   ├── charity-field.tsx         -- ResponsiveOverlay (internal open state); search input + charity chip grid; max 3
 │   ├── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob
-│   └── __tests__/generate-draft-prefill.test.tsx  -- 8 tests: shimmer→fill, person vs cause pre-fill, skip for custom/edit mode, silent failure, subject derivation
+│   └── __tests__/generate-draft-prefill.test.tsx  -- 9 tests: shimmer→fill, person vs cause pre-fill, skip for custom/edit mode, silent failure, subject derivation; subject passed as prop (not derived from register)
 ├── pledge-panel.tsx              -- Draft state: draftIds committed on Done, discarded on close. Sheet (mobile) + Dialog (desktop). Chips + input inline (flex-wrap); input collapses to w-0 when chips present. Backspace removes last chip. size=lg chips.
 ├── pledge-card/
 │   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix)
@@ -500,7 +517,8 @@ lib/
 
 lib/actions/
 ├── event-poll-items.ts           -- hideEventPollItem, showEventPollItem
-└── generate-draft.ts             -- generateDraft server action: cache-first LLM About/Reveal generation; exports RateLimitError, revealNamesRealItem, hasFabricatedStats, buildCacheKey, _rateLimitStore
+├── generate-draft.ts             -- generateDraft async server action (only export); reads subject from GenerateDraftInput — NOT derived from register
+└── generate-draft-utils.ts       -- Non-async exports: RateLimitError, checkRateLimit, revealNamesRealItem, hasFabricatedStats, buildCacheKey, _rateLimitStore (extracted to satisfy Turbopack "use server" constraint)
 
 __mocks__/
 ├── supabase-client.ts            -- Storybook stub for @/lib/supabase/client (no-op channel/removeChannel/from)
@@ -612,7 +630,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 618 web, 35 admin.
+All tests must pass before committing. Current counts: 629 web, 35 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
