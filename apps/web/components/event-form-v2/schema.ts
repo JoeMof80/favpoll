@@ -43,10 +43,7 @@ export const eventFormSchema = z
       (!data.name || data.name.trim().length === 0)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.too_small,
-        minimum: 1,
-        type: "string",
-        inclusive: true,
+        code: z.ZodIssueCode.custom,
         path: ["name"],
         message: "Name is required",
       })
@@ -56,10 +53,7 @@ export const eventFormSchema = z
       (!data.causeLabel || data.causeLabel.trim().length === 0)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.too_small,
-        minimum: 1,
-        type: "string",
-        inclusive: true,
+        code: z.ZodIssueCode.custom,
         path: ["causeLabel"],
         message: "Please describe what you're raising for",
       })
