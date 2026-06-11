@@ -200,6 +200,33 @@ describe("generateDraft — cache miss, person", () => {
     })
   })
 
+  it("fetches charity for person event when primaryCharityId is provided", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics fetch
+    mock.queue(CHARITY_DATA) // charity fetch (person event with charity)
+    mockLLMResponse(
+      "A warm gathering in someone's honour.",
+      "Her favourite was always Blue."
+    )
+    mock.queue(null) // insert
+
+    const result = await generateDraft({
+      register: "cause",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+
+    expect(result.fromCache).toBe(false)
+    const insertCall = mock
+      .callsFor("generated_drafts")
+      .find((c) => c.method === "insert")
+    expect(insertCall?.args[0]).toMatchObject({
+      subject: "someone",
+      cache_key: "cause:topic-1:none:someone",
+    })
+  })
+
   it("retries when first reveal does not name a real item, uses retry result", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA)

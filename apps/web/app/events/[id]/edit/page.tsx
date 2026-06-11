@@ -7,6 +7,7 @@ import type {
   Charity,
   EventCategory,
   EventGrouping,
+  EventSubject,
   Topic,
   TopicItem,
   TopicWithMeta,
@@ -78,16 +79,23 @@ export default async function EditEventPage({ params }: Props) {
 
   const category = (event.event_category ?? null) as EventCategory | null
   const grouping = (event.event_grouping ?? "individual") as EventGrouping
+  const isCause = event.event_subject === "cause"
 
   const defaultValues: Partial<EventFormValues> = {
     category: category ?? undefined,
     grouping,
     register: deriveRegister(category, grouping),
-    name: event.protagonists.name ?? "",
-    context: event.protagonists.context ?? "",
+    subject: (event.event_subject ?? "someone") as EventSubject,
+    name: isCause ? "" : (event.protagonists?.name ?? ""),
+    context: isCause ? "" : (event.protagonists?.context ?? ""),
     openingLine: event.opening_line ?? "",
-    about: event.protagonists.about ?? "",
-    photoUrl: event.protagonists.photo_url ?? undefined,
+    about: isCause
+      ? (event.description ?? "")
+      : (event.protagonists?.about ?? ""),
+    photoUrl: isCause
+      ? undefined
+      : (event.protagonists?.photo_url ?? undefined),
+    causeLabel: isCause ? (event.cause_label ?? "") : "",
     closesAt: new Date(event.closes_at),
     charities: (event.event_charities ?? []).map(
       (ec: { charity_id: string }) => ec.charity_id
@@ -106,7 +114,7 @@ export default async function EditEventPage({ params }: Props) {
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
       eventId={id}
-      protagonistId={event.protagonist_id}
+      protagonistId={event.protagonist_id ?? undefined}
       existingPollId={rawPoll?.id}
       defaultValues={defaultValues}
     />

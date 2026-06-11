@@ -131,9 +131,9 @@ export function EventFormV2({
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
           eventSubject,
-          causeLabel: isCause ? (values.causeLabel ?? null) : null,
+          causeLabel: isCause ? values.causeLabel?.trim() || null : null,
           openingLine: values.openingLine ?? null,
-          description: null,
+          description: isCause ? values.about?.trim() || null : null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
@@ -154,8 +154,10 @@ export function EventFormV2({
         })
         router.push(`/events/${newId}`)
       } else {
-        if (!eventId || !protagonistId) throw new Error("Missing event data")
-        await updateEvent(eventId, protagonistId, {
+        if (!eventId) throw new Error("Missing event data")
+        if (!isCause && !protagonistId)
+          throw new Error("Missing protagonist data")
+        await updateEvent(eventId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
@@ -163,9 +165,9 @@ export function EventFormV2({
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
           eventSubject,
-          causeLabel: isCause ? (values.causeLabel ?? null) : null,
+          causeLabel: isCause ? values.causeLabel?.trim() || null : null,
           openingLine: values.openingLine ?? null,
-          description: null,
+          description: isCause ? values.about?.trim() || null : null,
           charityIds: values.charities,
           closesAt: values.closesAt.toISOString(),
           isPrivate: values.isPrivate,
