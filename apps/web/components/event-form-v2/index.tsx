@@ -11,8 +11,7 @@ import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent } from "@/app/events/[id]/edit/actions"
-import { generateDraft } from "@/lib/actions/generate-draft"
-import { RateLimitError } from "@/lib/actions/generate-draft-utils"
+import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
@@ -374,13 +373,14 @@ function FormInner({
     const primaryCharityId = values.charities?.[0] ?? null
 
     setIsGenerating(true)
-    generateDraft({
+    safeGenerateDraft({
       register: reg as Register,
       subject: sub,
       topicId: topic.topicId,
       primaryCharityId,
     })
       .then((result) => {
+        if (!result) return
         if (!form.getValues("about")) {
           form.setValue("about", result.about)
           lastGeneratedAbout.current = result.about
@@ -395,7 +395,7 @@ function FormInner({
         }
       })
       .catch(() => {
-        // Silent — static placeholder remains as fallback
+        // safeGenerateDraft shouldn't throw — defensive guard
       })
       .finally(() => setIsGenerating(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -433,33 +433,13 @@ function FormInner({
 
     setIsGenerating(true)
     try {
-      const result = await generateDraft({
+      const result = await safeGenerateDraft({
         register: reg as Register,
         subject: sub,
         topicId: topic.topicId,
         primaryCharityId,
       })
-      form.setValue("about", result.about)
-      lastGeneratedAbout.current = result.about
-      if (sub === "cause") {
-        form.setValue("reveal", result.reveal)
-        lastGeneratedReveal.current = result.reveal
-      } else {
-        setPersonRevealExample(result.reveal)
-      }
-    } catch (err) {
-      if (err instanceof RateLimitError) {
-        toast.warning(
-          "Too many requests — wait a few minutes before regenerating.",
-          {
-            style: {
-              background: "#fffbeb",
-              color: "#854d0e",
-              border: "1px solid #f59e0b",
-            },
-          }
-        )
-      } else {
+      if (!result) {
         toast.error(
           "Couldn't generate a suggestion — you can write your own instead.",
           {
@@ -470,7 +450,27 @@ function FormInner({
             },
           }
         )
+      } else {
+        form.setValue("about", result.about)
+        lastGeneratedAbout.current = result.about
+        if (sub === "cause") {
+          form.setValue("reveal", result.reveal)
+          lastGeneratedReveal.current = result.reveal
+        } else {
+          setPersonRevealExample(result.reveal)
+        }
       }
+    } catch {
+      toast.error(
+        "Couldn't generate a suggestion — you can write your own instead.",
+        {
+          style: {
+            background: "#fef2f2",
+            color: "#991b1b",
+            border: "1px solid #ef4444",
+          },
+        }
+      )
     } finally {
       setIsGenerating(false)
     }
