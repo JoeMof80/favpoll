@@ -77,7 +77,7 @@ export default async function ManageEventPage({ params }: Props) {
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium text-foreground">
-            {typedEvent.protagonists.name}
+            {typedEvent.protagonists?.name}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {typedEvent.event_charities

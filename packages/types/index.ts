@@ -174,7 +174,7 @@ export type TopicCategory = {
 
 // Joined types for UI
 export type EventWithDetails = Event & {
-  protagonists: Protagonist;
+  protagonists: Protagonist | null;
   event_charities: { charities: Charity }[];
 };
 

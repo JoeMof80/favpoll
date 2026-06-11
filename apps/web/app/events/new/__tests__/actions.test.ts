@@ -397,6 +397,39 @@ describe("createEvent — cause event (event_subject='cause')", () => {
       cause_label: "Ocean conservation across the UK coastline",
     })
   })
+
+  it("persists cause reveal as personal_reveal on the event poll", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    mock.queue({ id: "event-1" }) // events insert
+    mock.queue(null) // event_charities insert
+    mock.queue({ id: "poll-1" }) // event_polls insert
+    mock.queue(null) // event_poll_items insert
+    mock.queue(null) // event_pots insert
+
+    await createEvent({
+      ...BASE_INPUT,
+      protagonistName: "",
+      eventSubject: "cause",
+      causeLabel: "Protecting our seas",
+      description: "Together we can make a difference for ocean life.",
+      charityIds: ["charity-1"],
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal:
+          "Their ocean conservation work reflects the breadth of colour in the sea.",
+        infiniteItems: null,
+      },
+    })
+
+    const pollInsert = mock
+      .callsFor("event_polls")
+      .find((c) => c.method === "insert")!
+    expect(pollInsert.args[0]).toMatchObject({
+      personal_reveal:
+        "Their ocean conservation work reflects the breadth of colour in the sea.",
+    })
+  })
 })
 
 describe("createEvent — fundraiser for a person (event_subject='someone')", () => {
