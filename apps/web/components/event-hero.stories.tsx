@@ -61,6 +61,8 @@ function makeViewProps(sceneIndex: number): {
   const event: Event = {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
+    event_subject: "someone",
+    cause_label: null,
     occasion_type: OCCASION_TYPES[sceneIndex],
     opening_line: SCENE_EYEBROWS[sceneIndex],
     market: "en-GB",

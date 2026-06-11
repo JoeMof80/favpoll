@@ -69,10 +69,13 @@ export type Register =
 
 export type EventCategory = "celebration" | "memorial" | "fundraiser";
 export type EventGrouping = "individual" | "couple" | "group";
+export type EventSubject = "someone" | "cause";
 
 export type Event = {
   id: string;
-  protagonist_id: string;
+  protagonist_id: string | null;
+  event_subject: EventSubject;
+  cause_label: string | null;
   occasion_type: string | null;
   opening_line: string | null;
   market: string;
@@ -231,6 +234,8 @@ export type CanvasSubmitData = {
   photoUrl?: string | null;
   category: EventCategory | null;
   grouping: EventGrouping;
+  eventSubject: EventSubject;
+  causeLabel: string | null;
   openingLine: string | null;
   description: string | null;
   charityIds: string[];

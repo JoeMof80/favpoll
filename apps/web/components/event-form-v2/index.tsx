@@ -64,9 +64,11 @@ export function EventFormV2({
     defaultValues: {
       register: "",
       grouping: "individual",
+      subject: "someone",
       isListed: true,
       openingLine: "",
       name: "",
+      causeLabel: "",
       context: "",
       about: "",
       reveal: "",
@@ -115,16 +117,21 @@ export function EventFormV2({
             : null,
       }
 
+      const eventSubject = values.subject ?? "someone"
+      const isCause = eventSubject === "cause"
+
       if (mode === "create") {
         sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
         sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
         const { eventId: newId } = await createEvent({
-          protagonistName: values.name,
-          protagonistAbout: values.about || null,
-          photoUrl: resolvedPhotoUrl,
-          dateLabel: values.context || null,
+          protagonistName: isCause ? "" : (values.name ?? ""),
+          protagonistAbout: isCause ? null : values.about || null,
+          photoUrl: isCause ? null : resolvedPhotoUrl,
+          dateLabel: isCause ? null : values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
+          eventSubject,
+          causeLabel: isCause ? (values.causeLabel ?? null) : null,
           openingLine: values.openingLine ?? null,
           description: null,
           charityIds: values.charities,
@@ -149,12 +156,14 @@ export function EventFormV2({
       } else {
         if (!eventId || !protagonistId) throw new Error("Missing event data")
         await updateEvent(eventId, protagonistId, {
-          protagonistName: values.name,
-          protagonistAbout: values.about || null,
-          photoUrl: resolvedPhotoUrl,
-          dateLabel: values.context || null,
+          protagonistName: isCause ? "" : (values.name ?? ""),
+          protagonistAbout: isCause ? null : values.about || null,
+          photoUrl: isCause ? null : resolvedPhotoUrl,
+          dateLabel: isCause ? null : values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
+          eventSubject,
+          causeLabel: isCause ? (values.causeLabel ?? null) : null,
           openingLine: values.openingLine ?? null,
           description: null,
           charityIds: values.charities,
@@ -359,7 +368,7 @@ function FormInner({
     const reg = values.register
     if (!reg) return
 
-    const sub: "someone" | "cause" = reg === "cause" ? "cause" : "someone"
+    const sub = (values.subject ?? "someone") as "someone" | "cause"
     const primaryCharityId = values.charities?.[0] ?? null
 
     setIsGenerating(true)
@@ -397,7 +406,7 @@ function FormInner({
     const reg = values.register
     if (!reg) return
 
-    const sub: "someone" | "cause" = reg === "cause" ? "cause" : "someone"
+    const sub = (values.subject ?? "someone") as "someone" | "cause"
     const primaryCharityId = values.charities?.[0] ?? null
 
     // Confirm before overwriting manual edits

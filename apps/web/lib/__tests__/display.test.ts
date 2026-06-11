@@ -281,17 +281,106 @@ describe("getEventHeadline — all known occasion_types", () => {
   )
 })
 
-describe("getEventHeadline — register fallbacks (no occasion_type)", () => {
+describe("getEventHeadline — register fallbacks (no occasion_type, default subject='someone')", () => {
   it.each([
     ["remembering", "In memory of"],
     ["celebrating_one", "Celebrating"],
     ["celebrating_many", "Celebrating"],
-    ["cause", "In support of"],
+    ["cause", "Honouring"],
     ["neutral", "Honouring"],
   ])('register "%s" falls back to "%s"', (register, expectedPrefix) => {
     expect(
       getEventHeadline({ register, occasionType: null, name: "Test" }).prefix
     ).toBe(expectedPrefix)
+  })
+})
+
+describe("getEventHeadline — subject matrix", () => {
+  it("fundraiser + subject=someone → 'Honouring'", () => {
+    expect(
+      getEventHeadline({
+        register: "cause",
+        occasionType: null,
+        name: "Joan",
+        subject: "someone",
+      }).prefix
+    ).toBe("Honouring")
+  })
+
+  it("fundraiser + subject=cause → 'In support of'", () => {
+    expect(
+      getEventHeadline({
+        register: "cause",
+        occasionType: null,
+        name: "Ocean Trust",
+        subject: "cause",
+      }).prefix
+    ).toBe("In support of")
+  })
+
+  it("memorial + subject=someone → 'In memory of'", () => {
+    expect(
+      getEventHeadline({
+        register: "remembering",
+        occasionType: null,
+        name: "Bob",
+        subject: "someone",
+      }).prefix
+    ).toBe("In memory of")
+  })
+
+  it("memorial + subject=cause → 'In memory of'", () => {
+    expect(
+      getEventHeadline({
+        register: "remembering",
+        occasionType: null,
+        name: "The Shelter Fund",
+        subject: "cause",
+      }).prefix
+    ).toBe("In memory of")
+  })
+
+  it("celebration + subject=someone → 'Celebrating'", () => {
+    expect(
+      getEventHeadline({
+        register: "celebrating_one",
+        occasionType: null,
+        name: "Alice",
+        subject: "someone",
+      }).prefix
+    ).toBe("Celebrating")
+  })
+
+  it("celebration + subject=cause → 'Celebrating'", () => {
+    expect(
+      getEventHeadline({
+        register: "celebrating_one",
+        occasionType: null,
+        name: "The Arts Fund",
+        subject: "cause",
+      }).prefix
+    ).toBe("Celebrating")
+  })
+
+  it("neutral + subject=cause → 'Honouring'", () => {
+    expect(
+      getEventHeadline({
+        register: "neutral",
+        occasionType: null,
+        name: "The Green Initiative",
+        subject: "cause",
+      }).prefix
+    ).toBe("Honouring")
+  })
+
+  it("cause label is passed through as the name", () => {
+    const result = getEventHeadline({
+      register: "cause",
+      occasionType: null,
+      name: "Ocean Trust",
+      subject: "cause",
+    })
+    expect(result.name).toBe("Ocean Trust")
   })
 })
 

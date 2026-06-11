@@ -28,6 +28,8 @@ type CreateEventInput = {
   dateLabel: string | null
   category: string | null
   grouping: string
+  eventSubject: "someone" | "cause"
+  causeLabel: string | null
   openingLine: string | null
   description: string | null
   charityIds: string[]
@@ -234,22 +236,26 @@ export async function createEvent(
   const supabase = createAdminClient()
   await ensureUser(supabase, userId)
 
-  const protagonistRow: Record<string, unknown> = {
-    name: input.protagonistName.trim(),
-    about: input.protagonistAbout || null,
-    photo_url: input.photoUrl || null,
-    context: input.dateLabel || null,
-    created_by: userId,
+  let protagonistId: string | null = null
+  if (input.eventSubject === "someone") {
+    const protagonistRow: Record<string, unknown> = {
+      name: input.protagonistName.trim(),
+      about: input.protagonistAbout || null,
+      photo_url: input.photoUrl || null,
+      context: input.dateLabel || null,
+      created_by: userId,
+    }
+    const { data: protagonist, error: protagonistErr } = await supabase
+      .from("protagonists")
+      .insert(protagonistRow)
+      .select("id")
+      .single()
+    if (protagonistErr || !protagonist)
+      throw new Error(
+        `Failed to create protagonist: ${protagonistErr?.message}`
+      )
+    protagonistId = protagonist.id
   }
-
-  const { data: protagonist, error: protagonistErr } = await supabase
-    .from("protagonists")
-    .insert(protagonistRow)
-    .select("id")
-    .single()
-
-  if (protagonistErr || !protagonist)
-    throw new Error(`Failed to create protagonist: ${protagonistErr?.message}`)
 
   const closesAt = new Date(input.closesAt).toISOString()
   const hardCloseAt = new Date(input.closesAt)
@@ -258,7 +264,9 @@ export async function createEvent(
   const { data: event, error: eventErr } = await supabase
     .from("events")
     .insert({
-      protagonist_id: protagonist.id,
+      protagonist_id: protagonistId,
+      event_subject: input.eventSubject,
+      cause_label: input.causeLabel,
       event_category: input.category,
       event_grouping: input.grouping,
       is_plural: input.grouping !== "individual",

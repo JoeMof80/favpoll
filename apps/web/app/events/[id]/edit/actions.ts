@@ -213,21 +213,25 @@ export async function updateEvent(
     }
   }
 
-  // Update protagonist
-  await supabase
-    .from("protagonists")
-    .update({
-      name: input.protagonistName.trim(),
-      context: input.dateLabel,
-      about: input.protagonistAbout ?? null,
-      photo_url: input.photoUrl ?? null,
-    })
-    .eq("id", protagonistId)
+  // Update protagonist — only if this is a person event
+  if (input.eventSubject === "someone") {
+    await supabase
+      .from("protagonists")
+      .update({
+        name: input.protagonistName.trim(),
+        context: input.dateLabel,
+        about: input.protagonistAbout ?? null,
+        photo_url: input.photoUrl ?? null,
+      })
+      .eq("id", protagonistId)
+  }
 
   // Update event
   await supabase
     .from("events")
     .update({
+      event_subject: input.eventSubject,
+      cause_label: input.causeLabel,
       event_category: input.category,
       event_grouping: input.grouping,
       is_plural: input.grouping !== "individual",

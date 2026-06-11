@@ -47,6 +47,8 @@ function makeEvent(
   return {
     id: "event-1",
     protagonist_id: "prot-1",
+    event_subject: "someone" as const,
+    cause_label: null,
     occasion_type: "Birthday",
     opening_line: null,
     market: "en-GB",

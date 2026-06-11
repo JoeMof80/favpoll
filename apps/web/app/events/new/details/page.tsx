@@ -8,6 +8,7 @@ import type {
   Charity,
   EventCategory,
   EventGrouping,
+  EventSubject,
   Topic,
   TopicItem,
   TopicWithMeta,
@@ -23,6 +24,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
   const params = await searchParams
   const category = (params.category ?? "") as EventCategory | ""
   const grouping = (params.grouping ?? "individual") as EventGrouping
+  const subject = (params.subject ?? "someone") as EventSubject
   const topicId = params.topicId ?? ""
   const topicIsCustom = params.topicIsCustom === "true"
   const topicTitle = params.topicTitle ?? ""
@@ -90,6 +92,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
     ? {
         category: category as EventCategory,
         grouping,
+        subject,
         register,
         isListed: register !== "remembering",
         topics: defaultTopics,
