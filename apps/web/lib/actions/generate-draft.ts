@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import type { Register } from "@favpoll/types"
 import {
   checkRateLimit,
+  incrementRateLimitCount,
   revealNamesRealItem,
   hasFabricatedStats,
   buildCacheKey,
@@ -198,5 +199,6 @@ export async function generateDraft(
     status: "generated",
   })
 
+  incrementRateLimitCount(userId)
   return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
 }
