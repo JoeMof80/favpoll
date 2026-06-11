@@ -3,22 +3,13 @@ import { render, screen, act, waitFor } from "@testing-library/react"
 import { useState, useEffect, useRef } from "react"
 import type { Register } from "@favpoll/types"
 
-// Mock generateDraft before any imports that transitively use it
-const mockGenerateDraft = vi.hoisted(() => vi.fn())
-vi.mock("@/lib/actions/generate-draft", () => {
-  class MockRateLimitError extends Error {
-    constructor() {
-      super("Rate limit exceeded — try again in a few minutes.")
-      this.name = "RateLimitError"
-    }
-  }
-  return {
-    generateDraft: mockGenerateDraft,
-    RateLimitError: MockRateLimitError,
-  }
-})
+// Mock safeGenerateDraft before any imports that transitively use it
+const mockSafeGenerateDraft = vi.hoisted(() => vi.fn())
+vi.mock("@/lib/actions/generate-draft", () => ({
+  safeGenerateDraft: mockSafeGenerateDraft,
+}))
 
-import { generateDraft } from "@/lib/actions/generate-draft"
+import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 
 // ---------------------------------------------------------------------------
 // Shared test fixture
@@ -89,10 +80,11 @@ function DraftGenerator({
     if (isCustomTopic || !topicId) return
 
     setState((s) => ({ ...s, isGenerating: true }))
-    generateDraft({ register, subject, topicId, primaryCharityId })
+    safeGenerateDraft({ register, subject, topicId, primaryCharityId })
       .then((result) => {
         setState((s) => {
           const next = { ...s, isGenerating: false }
+          if (!result) return next
           if (!s.about) {
             next.about = result.about
             lastGeneratedAbout.current = result.about
@@ -128,7 +120,7 @@ function DraftGenerator({
 }
 
 beforeEach(() => {
-  mockGenerateDraft.mockReset()
+  mockSafeGenerateDraft.mockReset()
 })
 
 // ---------------------------------------------------------------------------
@@ -138,7 +130,7 @@ beforeEach(() => {
 describe("generation on mount — cache hit, person event", () => {
   it("shows shimmer during generation then pre-fills about", async () => {
     let resolve!: (v: typeof MOCK_RESULT) => void
-    mockGenerateDraft.mockReturnValueOnce(
+    mockSafeGenerateDraft.mockReturnValueOnce(
       new Promise<typeof MOCK_RESULT>((res) => {
         resolve = res
       })
@@ -167,7 +159,7 @@ describe("generation on mount — cache hit, person event", () => {
   })
 
   it("pre-fills about but not reveal for person events", async () => {
-    mockGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
 
     await act(async () => {
       render(
@@ -196,7 +188,7 @@ describe("generation on mount — cache hit, person event", () => {
 
 describe("generation on mount — cause event", () => {
   it("pre-fills both about and reveal for cause events", async () => {
-    mockGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
 
     await act(async () => {
       render(
@@ -239,7 +231,7 @@ describe("generation skipped cases", () => {
       )
     })
 
-    expect(mockGenerateDraft).not.toHaveBeenCalled()
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
 
@@ -256,11 +248,11 @@ describe("generation skipped cases", () => {
       )
     })
 
-    expect(mockGenerateDraft).not.toHaveBeenCalled()
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
   })
 
   it("silently falls back on generation failure", async () => {
-    mockGenerateDraft.mockRejectedValueOnce(new Error("Network error"))
+    mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
       render(
@@ -282,7 +274,7 @@ describe("generation skipped cases", () => {
   })
 
   it("cause event — generation failure leaves fields empty and form usable", async () => {
-    mockGenerateDraft.mockRejectedValueOnce(new Error("API key missing"))
+    mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
       render(
@@ -306,9 +298,7 @@ describe("generation skipped cases", () => {
   })
 
   it("rate limit error also degrades gracefully", async () => {
-    const err = new Error("Rate limit exceeded — try again in a few minutes.")
-    err.name = "RateLimitError"
-    mockGenerateDraft.mockRejectedValueOnce(err)
+    mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
       render(
@@ -332,7 +322,7 @@ describe("generation skipped cases", () => {
 
 describe("generateDraft call arguments", () => {
   it("passes subject=cause when subject prop is cause", async () => {
-    mockGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
 
     await act(async () => {
       render(
@@ -346,9 +336,9 @@ describe("generateDraft call arguments", () => {
       )
     })
 
-    await waitFor(() => expect(mockGenerateDraft).toHaveBeenCalled())
+    await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
 
-    expect(mockGenerateDraft).toHaveBeenCalledWith(
+    expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
       expect.objectContaining({
         register: "cause",
         subject: "cause",
@@ -359,7 +349,7 @@ describe("generateDraft call arguments", () => {
   })
 
   it("passes subject=someone for person registers", async () => {
-    mockGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
 
     await act(async () => {
       render(
@@ -373,9 +363,9 @@ describe("generateDraft call arguments", () => {
       )
     })
 
-    await waitFor(() => expect(mockGenerateDraft).toHaveBeenCalled())
+    await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
 
-    expect(mockGenerateDraft).toHaveBeenCalledWith(
+    expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
       expect.objectContaining({
         register: "remembering",
         subject: "someone",
@@ -384,7 +374,7 @@ describe("generateDraft call arguments", () => {
   })
 
   it("fundraiser-person (register=cause, subject=someone) passes subject=someone", async () => {
-    mockGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
 
     await act(async () => {
       render(
@@ -398,9 +388,9 @@ describe("generateDraft call arguments", () => {
       )
     })
 
-    await waitFor(() => expect(mockGenerateDraft).toHaveBeenCalled())
+    await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
 
-    expect(mockGenerateDraft).toHaveBeenCalledWith(
+    expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
       expect.objectContaining({
         register: "cause",
         subject: "someone",

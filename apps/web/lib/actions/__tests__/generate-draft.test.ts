@@ -19,7 +19,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
   },
 }))
 
-import { generateDraft } from "../generate-draft"
+import { generateDraft, safeGenerateDraft } from "../generate-draft"
 import {
   buildCacheKey,
   revealNamesRealItem,
@@ -404,5 +404,98 @@ describe("rate limiting", () => {
 
     const entry = _rateLimitStore.get("user-1")
     expect(entry?.count ?? 0).toBe(0)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// safeGenerateDraft — server-invocation resilience
+// ---------------------------------------------------------------------------
+
+describe("safeGenerateDraft", () => {
+  it("returns null and logs when LLM call throws", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics
+    mockMessagesCreate.mockRejectedValueOnce(new Error("API key missing"))
+
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    const result = await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+    })
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining("generateDraft failed, using fallback:"),
+      "API key missing"
+    )
+    consoleSpy.mockRestore()
+  })
+
+  it("returns null when unauthenticated", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null })
+
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    const result = await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+    })
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining("generateDraft failed, using fallback:"),
+      expect.any(String)
+    )
+    consoleSpy.mockRestore()
+  })
+
+  it("returns null when rate limit is exceeded", async () => {
+    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
+      mock.queue(null)
+      mock.queue(TOPIC_DATA)
+      mockLLMResponse("About.", "Her favourite was always Red.")
+      mock.queue(null)
+      await generateDraft({
+        register: "celebrating_one",
+        subject: "someone",
+        topicId: "topic-1",
+      })
+    }
+
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    const result = await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+    })
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining("generateDraft failed, using fallback:"),
+      expect.any(String)
+    )
+    consoleSpy.mockRestore()
+  })
+
+  it("returns result when generation succeeds", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null) // insert
+
+    const result = await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+    })
+
+    expect(result).not.toBeNull()
+    expect(result?.about).toBe("About.")
+    expect(result?.reveal).toBe("Her favourite was always Blue.")
+    expect(result?.fromCache).toBe(false)
   })
 })
