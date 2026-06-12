@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { render, screen, fireEvent, within } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { HonourStep } from "../honour-step"
 
 const DEFAULT_VALUE = {
@@ -9,21 +9,23 @@ const DEFAULT_VALUE = {
   causeLabel: "",
 }
 
+// ToggleGroup with type="single" renders items as role="radio" with aria-checked.
+
 describe("HonourStep — subject row", () => {
   it("renders all four subject options", () => {
     render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
     expect(
-      screen.getByRole("button", { name: "An individual" })
+      screen.getByRole("radio", { name: "An individual" })
     ).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "A couple" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "A group" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "A cause" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "A couple" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "A group" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "A cause" })).toBeInTheDocument()
   })
 
   it("calls onChange with subject='cause' when A cause is clicked", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("button", { name: "A cause" }))
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ subject: "cause" })
     )
@@ -32,7 +34,7 @@ describe("HonourStep — subject row", () => {
   it("calls onChange with subject='someone' and correct grouping when A couple is clicked", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("button", { name: "A couple" }))
+    fireEvent.click(screen.getByRole("radio", { name: "A couple" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ subject: "someone", grouping: "couple" })
     )
@@ -41,7 +43,7 @@ describe("HonourStep — subject row", () => {
   it("calls onChange with grouping='group' when A group is clicked", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("button", { name: "A group" }))
+    fireEvent.click(screen.getByRole("radio", { name: "A group" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ subject: "someone", grouping: "group" })
     )
@@ -76,24 +78,48 @@ describe("HonourStep — subject row", () => {
     )
     expect(screen.queryByText(/Self-honours welcome/)).not.toBeInTheDocument()
   })
+
+  it("An individual item has aria-checked=true when individual+someone is selected", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, grouping: "individual", subject: "someone" }}
+        onChange={() => {}}
+      />
+    )
+    const btn = screen.getByRole("radio", { name: "An individual" })
+    expect(btn).toHaveAttribute("aria-checked", "true")
+  })
+
+  it("A cause item has aria-checked=true when subject='cause'", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, subject: "cause" }}
+        onChange={() => {}}
+      />
+    )
+    expect(screen.getByRole("radio", { name: "A cause" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
+  })
 })
 
 describe("HonourStep — category row", () => {
   it("renders all three category options", () => {
     render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
     expect(
-      screen.getByRole("button", { name: "Celebration" })
+      screen.getByRole("radio", { name: "Celebration" })
     ).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Memorial" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Memorial" })).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: "Fundraiser" })
+      screen.getByRole("radio", { name: "Fundraiser" })
     ).toBeInTheDocument()
   })
 
   it("calls onChange with the selected category", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("button", { name: "Memorial" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ category: "memorial" })
     )
@@ -107,7 +133,7 @@ describe("HonourStep — category row", () => {
         onChange={onChange}
       />
     )
-    fireEvent.click(screen.getByRole("button", { name: "Fundraiser" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ subject: "cause", category: "fundraiser" })
     )
@@ -121,8 +147,25 @@ describe("HonourStep — category row", () => {
       />
     )
     expect(
-      screen.getByRole("button", { name: "Celebration" })
+      screen.getByRole("radio", { name: "Celebration" })
     ).toBeInTheDocument()
+  })
+
+  it("selected category item has aria-checked=true", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, category: "celebration" }}
+        onChange={() => {}}
+      />
+    )
+    expect(screen.getByRole("radio", { name: "Celebration" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
+    expect(screen.getByRole("radio", { name: "Memorial" })).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
   })
 })
 
@@ -190,7 +233,7 @@ describe("HonourStep — cause label input", () => {
         onChange={onChange}
       />
     )
-    fireEvent.click(screen.getByRole("button", { name: "Memorial" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: "cause",

@@ -11,6 +11,8 @@ import { LoveStep } from "@/components/event-flow/love-step"
 import { CharityStep } from "@/components/event-flow/charity-step"
 import { TopicItemsDialog } from "@/components/event-flow/topic-items-dialog"
 import { shortTopicLabel } from "@/lib/registers"
+import { getWizardCopy, type WizardStep } from "@/lib/wizard-copy"
+import { cn } from "@/lib/utils"
 import type {
   Category,
   Charity,
@@ -34,7 +36,19 @@ function sortItems(items: TopicItem[]): TopicItem[] {
   })
 }
 
-type Step = "honour" | "love" | "charity"
+const STEPS: WizardStep[] = ["honour", "charity", "love"]
+
+const STEP_LABELS: Record<WizardStep, string> = {
+  honour: "Honour",
+  charity: "Charity",
+  love: "Love",
+}
+
+const STEP_ICONS: Record<WizardStep, React.ElementType> = {
+  honour: Heart,
+  charity: Gift,
+  love: Star,
+}
 
 type WizardData = {
   charities: Charity[]
@@ -46,11 +60,9 @@ type Props = {
   data: WizardData
 }
 
-const STEPS: Step[] = ["honour", "love", "charity"]
-
 export function NewEventWizard({ data }: Props) {
   const router = useRouter()
-  const [step, setStep] = useState<Step>("honour")
+  const [step, setStep] = useState<WizardStep>("honour")
   const [category, setCategory] = useState<EventCategory | null>(null)
   const [grouping, setGrouping] = useState<EventGrouping>("individual")
   const [subject, setSubject] = useState<EventSubject>("someone")
@@ -64,6 +76,8 @@ export function NewEventWizard({ data }: Props) {
   const stepIndex = STEPS.indexOf(step)
   const isFirst = stepIndex === 0
   const isLast = stepIndex === STEPS.length - 1
+
+  const copy = getWizardCopy(subject)
 
   const customLabels = topics[0]?.customLabels ?? []
   const customItemCount = topics[0]?.isCustom ? customLabels.length : null
@@ -111,46 +125,25 @@ export function NewEventWizard({ data }: Props) {
   const nextDisabled =
     step === "honour"
       ? !category || (subject === "cause" && !causeLabel.trim())
-      : step === "love"
-        ? topics.length === 0 ||
+      : step === "charity"
+        ? charityIds.length === 0
+        : topics.length === 0 ||
           (topics[0]?.isCustom === true &&
             customItemCount !== null &&
             customItemCount < 2)
-        : charityIds.length === 0
 
   const selectedCharities = data.charities.filter((c) =>
     charityIds.includes(c.id)
   )
-  const charityCount = charityIds.length
-
-  const leftIcon =
-    step === "honour" ? (
-      <Heart className="h-8 w-8 text-muted-foreground/40" />
-    ) : step === "love" ? (
-      <Star className="h-8 w-8 text-muted-foreground/40" />
-    ) : (
-      <Gift className="h-8 w-8 text-muted-foreground/40" />
-    )
-
-  const leftPrompt =
-    step === "honour"
-      ? subject === "cause"
-        ? "What cause are you supporting?"
-        : category === "memorial"
-          ? "Who would you like to remember?"
-          : "Who are you celebrating?"
-      : step === "love"
-        ? "What are their favourites?"
-        : "Where should pledges go?"
 
   function handleNext() {
-    if (step === "honour") setStep("love")
-    else if (step === "love") setStep("charity")
+    if (step === "honour") setStep("charity")
+    else if (step === "charity") setStep("love")
   }
 
   function handleBack() {
-    if (step === "charity") setStep("love")
-    else if (step === "love") setStep("honour")
+    if (step === "love") setStep("charity")
+    else if (step === "charity") setStep("honour")
   }
 
   function handleFinish() {
@@ -186,11 +179,11 @@ export function NewEventWizard({ data }: Props) {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
-      {/* Step dots */}
+      {/* Step dots — mobile only */}
       <ol
         role="list"
         aria-label="Wizard steps"
-        className="mb-6 flex justify-center gap-2"
+        className="mb-6 flex justify-center gap-2 md:hidden"
       >
         {STEPS.map((s, i) => (
           <li
@@ -207,12 +200,46 @@ export function NewEventWizard({ data }: Props) {
 
       {/* Card */}
       <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm md:flex">
-        {/* Left: icon + prompt — desktop only */}
-        <div className="hidden w-56 shrink-0 flex-col items-center justify-center gap-4 border-r border-border px-6 py-8 md:flex">
-          {leftIcon}
-          <p className="text-center text-xs leading-relaxed text-muted-foreground">
-            {leftPrompt}
-          </p>
+        {/* Left: persistent rail — desktop only */}
+        <div className="hidden w-56 shrink-0 flex-col gap-6 border-r border-border px-6 py-8 md:flex">
+          {STEPS.map((s) => {
+            const Icon = STEP_ICONS[s]
+            const isActive = s === step
+            const isPast = STEPS.indexOf(s) < stepIndex
+            return (
+              <div
+                key={s}
+                className={cn(
+                  "space-y-1 transition-opacity",
+                  isActive
+                    ? "opacity-100"
+                    : isPast
+                      ? "opacity-50"
+                      : "opacity-30"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon
+                    className={cn(
+                      "h-3.5 w-3.5",
+                      isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                    )}
+                  />
+                  <p
+                    className={cn(
+                      "text-[11px] font-medium tracking-widest uppercase",
+                      isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                    )}
+                  >
+                    {STEP_LABELS[s]}
+                  </p>
+                </div>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {copy.rail[s]}
+                </p>
+              </div>
+            )
+          })}
         </div>
 
         {/* Step content */}
@@ -234,13 +261,45 @@ export function NewEventWizard({ data }: Props) {
             />
           )}
 
+          {step === "charity" && (
+            <div className="flex min-h-48 flex-col">
+              <div className="flex flex-col justify-center gap-3 px-5 py-6">
+                <SectionLabel title="Charity" size="lg" />
+                <p className="text-sm text-muted-foreground">
+                  {copy.charityGuidance}
+                </p>
+                {selectedCharities.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedCharities.map((c) => (
+                      <Chip
+                        key={c.id}
+                        size="lg"
+                        selected
+                        onClick={() => setCharityOpen(true)}
+                      >
+                        {c.name}
+                      </Chip>
+                    ))}
+                  </div>
+                ) : (
+                  <Button
+                    className="shrink-0"
+                    onClick={() => setCharityOpen(true)}
+                  >
+                    Choose a charity
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           {step === "love" && (
             <div className="flex min-h-48 flex-col">
               {/* Topic trigger */}
               <div className="flex flex-col justify-center gap-3 px-5 py-6">
                 <SectionLabel title="Topic" size="lg" />
                 <p className="text-sm text-muted-foreground">
-                  Choose a topic for this event.
+                  {copy.loveGuidance}
                 </p>
                 {topics.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
@@ -261,7 +320,6 @@ export function NewEventWizard({ data }: Props) {
               {/* Items summary + trigger */}
               {showItemsSection && (
                 <div className="flex flex-col gap-3 border-t border-border px-5 py-6">
-                  {/* Validation hint for new custom topics */}
                   <SectionLabel title="Favourites" size="lg" />
                   <p className="text-sm text-muted-foreground">
                     View or add favourites
@@ -281,7 +339,6 @@ export function NewEventWizard({ data }: Props) {
                       ? "Add favourites"
                       : "View or add favourites"}
                   </Button>
-                  {/* Chip preview of items */}
                   <div className="flex flex-wrap gap-1.5">
                     {topics[0]?.isCustom
                       ? customLabels.map((label) => (
@@ -312,49 +369,6 @@ export function NewEventWizard({ data }: Props) {
                     )}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-
-          {step === "charity" && (
-            <div className="flex min-h-48 flex-col justify-center gap-4 px-5 py-6">
-              <SectionLabel title="Charity" size="lg" />
-              <p className="text-sm text-muted-foreground">
-                View or add favourites
-              </p>
-              <div>
-                <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
-                  Where pledges go
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {charityCount === 0
-                    ? "Choose up to 3 charities — pledges are split equally."
-                    : charityCount === 1
-                      ? "1 of 3 selected."
-                      : `${charityCount} of 3 selected.`}
-                </p>
-              </div>
-              {selectedCharities.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedCharities.map((c) => (
-                    <Chip
-                      key={c.id}
-                      size="lg"
-                      selected
-                      onClick={() => setCharityOpen(true)}
-                    >
-                      {c.name}
-                    </Chip>
-                  ))}
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setCharityOpen(true)}
-                >
-                  Choose a charity
-                </Button>
               )}
             </div>
           )}
@@ -428,7 +442,6 @@ export function NewEventWizard({ data }: Props) {
           open={itemsDialogOpen}
           onOpenChange={setItemsDialogOpen}
           topicTitle="Select Items"
-          //topicTitle={topics[0].title}
           existingItems={dialogExistingItems}
           addedItems={customLabels}
           onAdd={handleAddItem}
