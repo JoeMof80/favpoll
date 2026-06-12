@@ -57,18 +57,11 @@ const MOCK_DATA = {
   categories: [{ id: "cat1", label: "Nature" } as Category],
 }
 
-describe("NewEventWizard page component", () => {
-  it("renders the category buttons on step 1", () => {
-    render(<NewEventWizard data={MOCK_DATA} />)
-    expect(
-      screen.getByRole("button", { name: "Celebration" })
-    ).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Memorial" })).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: "Fundraiser" })
-    ).toBeInTheDocument()
-  })
+// ─────────────────────────────────────────────────────────────────────────────
+// Basic rendering and structure
+// ─────────────────────────────────────────────────────────────────────────────
 
+describe("NewEventWizard — structure", () => {
   it("renders step dots with correct aria roles", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
     const dots = screen.getAllByRole("listitem")
@@ -82,13 +75,19 @@ describe("NewEventWizard page component", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
   })
+})
 
-  it("advances to step 2 after selecting a category", () => {
+// ─────────────────────────────────────────────────────────────────────────────
+// Step order: Honour → Charity → Love
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("NewEventWizard — step order is Honour → Charity → Love", () => {
+  it("step 2 is Charity (shows 'Choose a charity')", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
-      screen.getByText("Choose a topic for this event.")
+      screen.getByRole("button", { name: "Choose a charity" })
     ).toBeInTheDocument()
     expect(screen.getAllByRole("listitem")[1]).toHaveAttribute(
       "aria-current",
@@ -96,27 +95,167 @@ describe("NewEventWizard page component", () => {
     )
   })
 
-  it("redirects to /events/new/details when wizard is completed", () => {
+  it("step 3 is Love (shows 'Choose a topic')", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
-
-    // Step 1: pick a category
-    fireEvent.click(screen.getByRole("button", { name: "Celebration" }))
+    // Honour
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 2: open Love sheet, pick topic, sheet auto-closes
-    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
-    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
-    fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 3: open Charity sheet, pick charity, close sheet
+    // Charity: open sheet, pick, Done
     fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+    expect(
+      screen.getByRole("button", { name: "Choose a topic" })
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")[2]).toHaveAttribute(
+      "aria-current",
+      "step"
+    )
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Full redirect (person event)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("NewEventWizard — redirect", () => {
+  it("redirects to /events/new/details when wizard is completed (person)", () => {
+    render(<NewEventWizard data={MOCK_DATA} />)
+
+    // Step 1: Honour
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+
+    // Step 2: Charity
+    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+
+    // Step 3: Love
+    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
 
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
 
     expect(mockPush).toHaveBeenCalledWith(
       expect.stringContaining("/events/new/details")
     )
+  })
+
+  it("redirect URL contains subject=someone for a person event", () => {
+    mockPush.mockClear()
+    render(<NewEventWizard data={MOCK_DATA} />)
+
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
+    fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
+
+    const url: string = mockPush.mock.calls[0][0]
+    expect(url).toContain("subject=someone")
+    expect(url).toContain("grouping=individual")
+    expect(url).not.toContain("causeLabel")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GUARDRAIL — cause label capture + causeLabel handoff param
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("NewEventWizard — cause guardrail", () => {
+  it("Next is disabled on step 1 when subject=cause and causeLabel is empty", () => {
+    render(<NewEventWizard data={MOCK_DATA} />)
+    // Select cause and a category
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+  })
+
+  it("Next is enabled on step 1 when subject=cause and causeLabel is non-empty", () => {
+    render(<NewEventWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
+    fireEvent.change(screen.getByLabelText("What are you raising for?"), {
+      target: { value: "40 years of Shelter" },
+    })
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
+  })
+
+  it("redirect URL contains encoded causeLabel for a cause event", () => {
+    mockPush.mockClear()
+    render(<NewEventWizard data={MOCK_DATA} />)
+
+    // Step 1: Honour — cause
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
+    fireEvent.change(screen.getByLabelText("What are you raising for?"), {
+      target: { value: "Ocean Trust" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+
+    // Step 2: Charity
+    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+
+    // Step 3: Love
+    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
+    fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
+
+    const url: string = mockPush.mock.calls[0][0]
+    expect(url).toContain("causeLabel=Ocean+Trust")
+    expect(url).toContain("subject=cause")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Subject-aware Love copy
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("NewEventWizard — Love step copy by subject", () => {
+  function reachLoveStep(subject: "person" | "cause", causeLabel?: string) {
+    render(<NewEventWizard data={MOCK_DATA} />)
+    if (subject === "cause") {
+      fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+      fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
+      fireEvent.change(screen.getByLabelText("What are you raising for?"), {
+        target: { value: causeLabel ?? "Test Cause" },
+      })
+    } else {
+      fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  }
+
+  it("shows person-specific guidance on the Love step", () => {
+    reachLoveStep("person")
+    expect(screen.getAllByText(/What did they love/i)[0]).toBeInTheDocument()
+  })
+
+  it("shows cause-specific guidance on the Love step", () => {
+    reachLoveStep("cause")
+    expect(
+      screen.getAllByText(/relevant to your cause/i)[0]
+    ).toBeInTheDocument()
+  })
+
+  it("does not show cause copy for a person event on the Love step", () => {
+    reachLoveStep("person")
+    expect(
+      screen.queryByText(/relevant to your cause/i)
+    ).not.toBeInTheDocument()
   })
 })

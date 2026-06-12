@@ -1,19 +1,29 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
 import { SectionLabel } from "../favpoll-card/section-label"
 
-type SubjectOption =
-  | { kind: "person"; value: EventGrouping; label: string }
-  | { kind: "cause"; label: string }
-
-const SUBJECT_OPTIONS: SubjectOption[] = [
-  { kind: "person", value: "individual", label: "An individual" },
-  { kind: "person", value: "couple", label: "A couple" },
-  { kind: "person", value: "group", label: "A group" },
-  { kind: "cause", label: "A cause" },
+const SUBJECT_ITEMS: {
+  value: string
+  label: string
+  subject: EventSubject
+  grouping?: EventGrouping
+}[] = [
+  {
+    value: "individual",
+    label: "An individual",
+    subject: "someone",
+    grouping: "individual",
+  },
+  {
+    value: "couple",
+    label: "A couple",
+    subject: "someone",
+    grouping: "couple",
+  },
+  { value: "group", label: "A group", subject: "someone", grouping: "group" },
+  { value: "cause", label: "A cause", subject: "cause" },
 ]
 
 const CATEGORIES: { value: EventCategory; label: string }[] = [
@@ -21,6 +31,9 @@ const CATEGORIES: { value: EventCategory; label: string }[] = [
   { value: "memorial", label: "Memorial" },
   { value: "fundraiser", label: "Fundraiser" },
 ]
+
+const ACTIVE_ITEM_CLASS =
+  "data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:text-primary"
 
 type HonourStepProps = {
   value: {
@@ -38,26 +51,26 @@ type HonourStepProps = {
 }
 
 export function HonourStep({ value, onChange }: HonourStepProps) {
-  function handleSubjectSelect(opt: SubjectOption) {
-    if (opt.kind === "cause") {
+  const subjectKey = value.subject === "cause" ? "cause" : value.grouping
+
+  function handleSubjectChange(v: string) {
+    if (!v) return
+    const item = SUBJECT_ITEMS.find((i) => i.value === v)
+    if (!item) return
+    if (item.subject === "cause") {
       onChange({ ...value, subject: "cause" })
     } else {
-      onChange({ ...value, subject: "someone", grouping: opt.value })
+      onChange({ ...value, subject: "someone", grouping: item.grouping! })
     }
   }
 
-  function handleCategorySelect(cat: EventCategory) {
-    onChange({ ...value, category: cat })
+  function handleCategoryChange(v: string) {
+    if (!v) return
+    onChange({ ...value, category: v as EventCategory })
   }
 
   function handleCauseLabelChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange({ ...value, causeLabel: e.target.value })
-  }
-
-  function isSubjectActive(opt: SubjectOption) {
-    return opt.kind === "cause"
-      ? value.subject === "cause"
-      : value.subject !== "cause" && value.grouping === opt.value
   }
 
   return (
@@ -65,23 +78,25 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
       {/* Subject row */}
       <div className="space-y-3 px-5 py-4">
         <SectionLabel title="For" size="lg" />
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {SUBJECT_OPTIONS.map((opt) => (
-            <Button
-              key={opt.kind === "cause" ? "cause" : opt.value}
-              type="button"
+        <ToggleGroup
+          type="single"
+          value={subjectKey}
+          onValueChange={handleSubjectChange}
+          aria-label="Who is this event for?"
+          className="flex-wrap gap-1.5"
+        >
+          {SUBJECT_ITEMS.map((item) => (
+            <ToggleGroupItem
+              key={item.value}
+              value={item.value}
               variant="outline"
-              onClick={() => handleSubjectSelect(opt)}
-              className={cn(
-                "shrink-0",
-                isSubjectActive(opt) &&
-                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-              )}
+              size="lg"
+              className={ACTIVE_ITEM_CLASS}
             >
-              {opt.label}
-            </Button>
+              {item.label}
+            </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
         {value.subject !== "cause" && value.grouping === "individual" && (
           <p className="text-xs text-muted-foreground">
             Self-honours welcome — guests won&apos;t know it&apos;s you until
@@ -113,23 +128,25 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
       {/* Category row */}
       <div className="space-y-3 px-5 py-4">
         <SectionLabel title="Occasion type" size="lg" />
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        <ToggleGroup
+          type="single"
+          value={value.category ?? ""}
+          onValueChange={handleCategoryChange}
+          aria-label="Occasion type"
+          className="flex-wrap gap-1.5"
+        >
           {CATEGORIES.map(({ value: cat, label }) => (
-            <Button
+            <ToggleGroupItem
               key={cat}
-              type="button"
+              value={cat}
               variant="outline"
-              onClick={() => handleCategorySelect(cat)}
-              className={cn(
-                "shrink-0",
-                value.category === cat &&
-                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-              )}
+              size="lg"
+              className={ACTIVE_ITEM_CLASS}
             >
               {label}
-            </Button>
+            </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
       </div>
     </div>
   )
