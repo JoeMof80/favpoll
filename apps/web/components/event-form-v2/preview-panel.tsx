@@ -507,129 +507,95 @@ export function PreviewPanel({
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <SectionLabel title={topicTitle} />
-                {subject !== "cause" && (
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {showReveal ? "Post-reveal" : "Pre-reveal"}
-                    </span>
-                    <Switch
-                      checked={showReveal}
-                      onCheckedChange={(v) => {
-                        if (v !== showReveal) onToggleReveal()
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {showReveal ? "Post-reveal" : "Pre-reveal"}
+                  </span>
+                  <Switch
+                    checked={showReveal}
+                    onCheckedChange={(v) => {
+                      if (v !== showReveal) onToggleReveal()
+                    }}
+                  />
+                </div>
               </div>
-              {subject !== "cause" && revealValue && (
+              {revealValue && (
                 <PollReveal
                   personalReveal={revealValue}
-                  protagonistFirstName={protagonistFirstName}
+                  protagonistFirstName={
+                    subject === "cause" ? causeLabel : protagonistFirstName
+                  }
                   role="status"
                   aria-live="polite"
                 />
               )}
 
-              {/* Reveal — cause events */}
-              {subject === "cause" && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className={cn(EDIT_BTN, "mt-1")}
-                  onClick={() => {
-                    setRevealDraft(reveal)
-                    setRevealOpen(true)
-                  }}
-                  aria-label={reveal ? "Edit reveal" : "Add reveal"}
-                >
-                  {reveal ? (
-                    <p className="text-base leading-relaxed wrap-break-word text-muted-foreground italic">
-                      {reveal}
-                    </p>
-                  ) : isGenerating ? (
-                    <div
-                      className="animate-pulse space-y-1.5"
-                      aria-label="Generating suggestion…"
-                    >
-                      <div className="h-4 rounded-full bg-muted/60" />
-                      <div className="h-4 w-3/4 rounded-full bg-muted/60" />
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground/40">
-                      Add reveal…
-                    </p>
-                  )}
-                  <Pencil className={PENCIL_ICON} aria-hidden />
-                </Button>
-              )}
-
-              {/* Reveal edit affordance — person events only */}
-              {subject !== "cause" &&
-                (showReveal ? (
-                  reveal ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-auto gap-1.5 px-0 py-0.5 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => {
-                        setRevealDraft(reveal)
-                        setRevealOpen(true)
-                      }}
-                    >
-                      <Pencil className="h-3 w-3" aria-hidden />
-                      Edit reveal
-                    </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className={cn(EDIT_BTN, "mt-1")}
-                      onClick={() => {
-                        setRevealDraft(reveal)
-                        setRevealOpen(true)
-                      }}
-                      aria-label="Add reveal"
-                    >
-                      {isGenerating ? (
-                        <div
-                          className="animate-pulse space-y-1.5"
-                          aria-label="Generating suggestion…"
-                        >
-                          <div className="h-4 rounded-full bg-muted/60" />
-                          <div className="h-4 w-3/4 rounded-full bg-muted/60" />
-                        </div>
-                      ) : revealPlaceholder ? (
-                        <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
-                          {revealPlaceholder}
-                          {isPersonRevealExample && (
-                            <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
-                              (example — type the real one)
-                            </span>
-                          )}
-                        </p>
-                      ) : (
-                        <p className="text-sm text-muted-foreground/40">
-                          Add reveal…
-                        </p>
-                      )}
-                      <Pencil className={PENCIL_ICON} aria-hidden />
-                    </Button>
-                  )
-                ) : (
+              {/* Reveal edit affordance */}
+              {showReveal ? (
+                reveal ? (
                   <Button
                     type="button"
                     variant="ghost"
-                    className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
+                    className="h-auto gap-1.5 px-0 py-0.5 text-xs text-muted-foreground hover:text-foreground"
                     onClick={() => {
                       setRevealDraft(reveal)
                       setRevealOpen(true)
                     }}
                   >
-                    Add reveal →
+                    <Pencil className="h-3 w-3" aria-hidden />
+                    Edit reveal
                   </Button>
-                ))}
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className={cn(EDIT_BTN, "mt-1")}
+                    onClick={() => {
+                      setRevealDraft(reveal)
+                      setRevealOpen(true)
+                    }}
+                    aria-label="Add reveal"
+                  >
+                    {isGenerating ? (
+                      <div
+                        className="animate-pulse space-y-1.5"
+                        aria-label="Generating suggestion…"
+                      >
+                        <div className="h-4 rounded-full bg-muted/60" />
+                        <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                      </div>
+                    ) : revealPlaceholder ? (
+                      <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
+                        {revealPlaceholder}
+                        {isPersonRevealExample && (
+                          <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
+                            (example — type the real one)
+                          </span>
+                        )}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/40">
+                        Add reveal…
+                      </p>
+                    )}
+                    <Pencil className={PENCIL_ICON} aria-hidden />
+                  </Button>
+                )
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setRevealDraft(reveal)
+                    setRevealOpen(true)
+                  }}
+                >
+                  Add reveal →
+                </Button>
+              )}
 
-              {revealValue && subject !== "cause" ? (
+              {revealValue ? (
                 <PollResults results={pollResults} />
               ) : (
                 /* Dimmed + inert — organiser is composing, not pledging */
