@@ -27,11 +27,13 @@ type HonourStepProps = {
     category: EventCategory | null
     grouping: EventGrouping
     subject: EventSubject
+    causeLabel: string
   }
   onChange: (v: {
     category: EventCategory | null
     grouping: EventGrouping
     subject: EventSubject
+    causeLabel: string
   }) => void
 }
 
@@ -46,6 +48,10 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
 
   function handleCategorySelect(cat: EventCategory) {
     onChange({ ...value, category: cat })
+  }
+
+  function handleCauseLabelChange(e: React.ChangeEvent<HTMLInputElement>) {
+    onChange({ ...value, causeLabel: e.target.value })
   }
 
   function isSubjectActive(opt: SubjectOption) {
@@ -81,6 +87,26 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
             Self-honours welcome — guests won&apos;t know it&apos;s you until
             the reveal.
           </p>
+        )}
+        {value.subject === "cause" && (
+          <div className="space-y-1">
+            <label
+              htmlFor="honour-cause-label"
+              className="text-xs text-muted-foreground"
+            >
+              What are you raising for?
+            </label>
+            <input
+              id="honour-cause-label"
+              type="text"
+              value={value.causeLabel}
+              onChange={handleCauseLabelChange}
+              maxLength={60}
+              placeholder="e.g. 40 years of Shelter"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
+              style={{ fontSize: "16px" }}
+            />
+          </div>
         )}
       </div>
 

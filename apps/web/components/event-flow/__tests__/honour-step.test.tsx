@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, within } from "@testing-library/react"
 import { HonourStep } from "../honour-step"
 
 const DEFAULT_VALUE = {
   category: null as null,
   grouping: "individual" as const,
   subject: "someone" as const,
+  causeLabel: "",
 }
 
 describe("HonourStep — subject row", () => {
@@ -122,5 +123,80 @@ describe("HonourStep — category row", () => {
     expect(
       screen.getByRole("button", { name: "Celebration" })
     ).toBeInTheDocument()
+  })
+})
+
+describe("HonourStep — cause label input", () => {
+  it("shows cause label input when subject is cause", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, subject: "cause" }}
+        onChange={() => {}}
+      />
+    )
+    expect(
+      screen.getByLabelText("What are you raising for?")
+    ).toBeInTheDocument()
+  })
+
+  it("does not show cause label input when subject is someone", () => {
+    render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
+    expect(
+      screen.queryByLabelText("What are you raising for?")
+    ).not.toBeInTheDocument()
+  })
+
+  it("calls onChange with updated causeLabel on input change", () => {
+    const onChange = vi.fn()
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, subject: "cause", causeLabel: "" }}
+        onChange={onChange}
+      />
+    )
+    const input = screen.getByLabelText("What are you raising for?")
+    fireEvent.change(input, { target: { value: "40 years of Shelter" } })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ causeLabel: "40 years of Shelter" })
+    )
+  })
+
+  it("reflects the current causeLabel value", () => {
+    render(
+      <HonourStep
+        value={{
+          ...DEFAULT_VALUE,
+          subject: "cause",
+          causeLabel: "Ocean Trust",
+        }}
+        onChange={() => {}}
+      />
+    )
+    const input = screen.getByLabelText(
+      "What are you raising for?"
+    ) as HTMLInputElement
+    expect(input.value).toBe("Ocean Trust")
+  })
+
+  it("causeLabel is preserved when category changes", () => {
+    const onChange = vi.fn()
+    render(
+      <HonourStep
+        value={{
+          ...DEFAULT_VALUE,
+          subject: "cause",
+          causeLabel: "Save the bees",
+        }}
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Memorial" }))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: "cause",
+        causeLabel: "Save the bees",
+        category: "memorial",
+      })
+    )
   })
 })

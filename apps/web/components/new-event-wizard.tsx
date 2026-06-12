@@ -54,6 +54,7 @@ export function NewEventWizard({ data }: Props) {
   const [category, setCategory] = useState<EventCategory | null>(null)
   const [grouping, setGrouping] = useState<EventGrouping>("individual")
   const [subject, setSubject] = useState<EventSubject>("someone")
+  const [causeLabel, setCauseLabel] = useState("")
   const [topics, setTopics] = useState<EventFormValues["topics"]>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
   const [loveOpen, setLoveOpen] = useState(false)
@@ -109,7 +110,7 @@ export function NewEventWizard({ data }: Props) {
 
   const nextDisabled =
     step === "honour"
-      ? !category
+      ? !category || (subject === "cause" && !causeLabel.trim())
       : step === "love"
         ? topics.length === 0 ||
           (topics[0]?.isCustom === true &&
@@ -160,6 +161,9 @@ export function NewEventWizard({ data }: Props) {
       subject,
       charityIds: charityIds.join(","),
     })
+    if (subject === "cause" && causeLabel.trim()) {
+      params.set("causeLabel", causeLabel.trim())
+    }
     if (topic) {
       if (topic.isCustom || customLabels.length > 0) {
         sessionStorage.setItem(
@@ -215,11 +219,17 @@ export function NewEventWizard({ data }: Props) {
         <div className="min-h-48 flex-1">
           {step === "honour" && (
             <HonourStep
-              value={{ category, grouping, subject }}
-              onChange={({ category: cat, grouping: grp, subject: sub }) => {
+              value={{ category, grouping, subject, causeLabel }}
+              onChange={({
+                category: cat,
+                grouping: grp,
+                subject: sub,
+                causeLabel: cl,
+              }) => {
                 setCategory(cat)
                 setGrouping(grp)
                 setSubject(sub)
+                setCauseLabel(cl)
               }}
             />
           )}
