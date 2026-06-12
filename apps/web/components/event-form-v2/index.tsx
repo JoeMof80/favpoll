@@ -381,12 +381,13 @@ function FormInner({
     })
       .then((result) => {
         if (!result) return
-        if (!form.getValues("about")) {
+        const currentAbout = form.getValues("about")
+        if (!currentAbout) {
           form.setValue("about", result.about)
           lastGeneratedAbout.current = result.about
         }
         if (sub === "cause") {
-          if (!form.getValues("reveal")) {
+          if (!form.getValues("reveal")?.trim()) {
             form.setValue("reveal", result.reveal)
             lastGeneratedReveal.current = result.reveal
           }
