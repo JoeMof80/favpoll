@@ -441,40 +441,48 @@ export function PreviewPanel({
               )}
             </div>
 
-            {/* About — person events only */}
-            {subject !== "cause" && (
-              <Button
-                type="button"
-                variant="ghost"
-                className={cn(EDIT_BTN, "mt-4")}
-                onClick={() => {
-                  setAboutDraft(about)
-                  setAboutOpen(true)
-                }}
-                aria-label="Edit about"
-              >
-                {about ? (
-                  <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
-                    {about}
-                  </p>
-                ) : isGenerating ? (
-                  <div
-                    className="animate-pulse space-y-1.5"
-                    aria-label="Generating suggestion…"
-                  >
-                    <div className="h-4 rounded-full bg-muted/60" />
-                    <div className="h-4 w-4/5 rounded-full bg-muted/60" />
-                  </div>
-                ) : aboutPlaceholder ? (
-                  <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
-                    {aboutPlaceholder}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground/40">+ about</p>
-                )}
-                <Pencil className={PENCIL_ICON} aria-hidden />
-              </Button>
-            )}
+            {/* About */}
+            {/* DEBUG — remove after fix confirmed */}
+            {(() => {
+              console.log(
+                "[preview-about] about.length:",
+                about.length,
+                "subject:",
+                subject
+              )
+              return null
+            })()}
+            <Button
+              type="button"
+              variant="ghost"
+              className={cn(EDIT_BTN, "mt-4")}
+              onClick={() => {
+                setAboutDraft(about)
+                setAboutOpen(true)
+              }}
+              aria-label="Edit about"
+            >
+              {about ? (
+                <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+                  {about}
+                </p>
+              ) : isGenerating ? (
+                <div
+                  className="animate-pulse space-y-1.5"
+                  aria-label="Generating suggestion…"
+                >
+                  <div className="h-4 rounded-full bg-muted/60" />
+                  <div className="h-4 w-4/5 rounded-full bg-muted/60" />
+                </div>
+              ) : aboutPlaceholder ? (
+                <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
+                  {aboutPlaceholder}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground/40">+ about</p>
+              )}
+              <Pencil className={PENCIL_ICON} aria-hidden />
+            </Button>
 
             <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
           </div>

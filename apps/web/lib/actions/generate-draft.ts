@@ -137,6 +137,10 @@ export async function generateDraft(
     .maybeSingle()
 
   if (cached?.about && cached?.reveal) {
+    console.log(
+      "[generateDraft] cache hit — about.length:",
+      cached.about.length
+    )
     return { about: cached.about, reveal: cached.reveal, fromCache: true }
   }
 
@@ -200,6 +204,12 @@ export async function generateDraft(
   })
 
   incrementRateLimitCount(userId)
+  console.log(
+    "[generateDraft] LLM result — about.length:",
+    parsed.about.length,
+    "reveal.length:",
+    parsed.reveal.length
+  )
   return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
 }
 
