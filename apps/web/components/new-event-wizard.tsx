@@ -178,72 +178,78 @@ export function NewEventWizard({ data }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
-      {/* Step dots — mobile only */}
-      <ol
-        role="list"
-        aria-label="Wizard steps"
-        className="mb-6 flex justify-center gap-2 md:hidden"
-      >
-        {STEPS.map((s, i) => (
-          <li
-            key={s}
-            role="listitem"
-            aria-label={`Step ${i + 1} of ${STEPS.length}`}
-            aria-current={s === step ? "step" : undefined}
-            className={`h-2 w-2 rounded-full transition-colors ${
-              s === step ? "bg-[#534AB7]" : "bg-muted"
-            }`}
-          />
-        ))}
-      </ol>
-
-      {/* Card */}
-      <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm md:flex">
-        {/* Left: persistent rail — desktop only */}
-        <div className="hidden w-56 shrink-0 flex-col gap-6 border-r border-border px-6 py-8 md:flex">
-          {STEPS.map((s) => {
-            const Icon = STEP_ICONS[s]
-            const isActive = s === step
-            const isPast = STEPS.indexOf(s) < stepIndex
-            return (
-              <div
-                key={s}
-                className={cn(
-                  "space-y-1 transition-opacity",
-                  isActive
-                    ? "opacity-100"
-                    : isPast
-                      ? "opacity-50"
-                      : "opacity-30"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      isActive ? "text-[#534AB7]" : "text-muted-foreground"
-                    )}
-                  />
-                  <p
-                    className={cn(
-                      "text-[11px] font-medium tracking-widest uppercase",
-                      isActive ? "text-[#534AB7]" : "text-muted-foreground"
-                    )}
-                  >
-                    {STEP_LABELS[s]}
+    <main>
+      {/* Full-page two-column layout: triad rail left (md+), step content right */}
+      <div className="md:grid md:grid-cols-[280px_1fr] md:items-start">
+        {/* Left: persistent triad — desktop only */}
+        <div className="hidden flex-col gap-8 px-8 pt-12 pb-8 md:flex">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {copy.leftPrompt}
+          </p>
+          <div className="flex flex-col gap-6">
+            {STEPS.map((s) => {
+              const Icon = STEP_ICONS[s]
+              const isActive = s === step
+              const isPast = STEPS.indexOf(s) < stepIndex
+              return (
+                <div
+                  key={s}
+                  className={cn(
+                    "space-y-1 transition-opacity",
+                    isActive
+                      ? "opacity-100"
+                      : isPast
+                        ? "opacity-50"
+                        : "opacity-30"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon
+                      className={cn(
+                        "h-3.5 w-3.5 shrink-0",
+                        isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                      )}
+                    />
+                    <p
+                      className={cn(
+                        "text-[11px] font-medium tracking-widest uppercase",
+                        isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                      )}
+                    >
+                      {STEP_LABELS[s]}
+                    </p>
+                  </div>
+                  <p className="pl-[22px] text-xs leading-relaxed text-muted-foreground">
+                    {copy.rail[s]}
                   </p>
                 </div>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {copy.rail[s]}
-                </p>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
-        {/* Step content */}
-        <div className="min-h-48 flex-1">
+        {/* Right: step content + navigation */}
+        <div className="py-8 md:py-12">
+          {/* Step dots — mobile only (compact progress strip) */}
+          <ol
+            role="list"
+            aria-label="Wizard steps"
+            className="mb-8 flex justify-center gap-2 md:hidden"
+          >
+            {STEPS.map((s, i) => (
+              <li
+                key={s}
+                role="listitem"
+                aria-label={`Step ${i + 1} of ${STEPS.length}`}
+                aria-current={s === step ? "step" : undefined}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  s === step ? "bg-[#534AB7]" : "bg-muted"
+                }`}
+              />
+            ))}
+          </ol>
+
+          {/* Step content */}
           {step === "honour" && (
             <HonourStep
               value={{ category, grouping, subject, causeLabel }}
@@ -262,41 +268,39 @@ export function NewEventWizard({ data }: Props) {
           )}
 
           {step === "charity" && (
-            <div className="flex min-h-48 flex-col">
-              <div className="flex flex-col justify-center gap-3 px-5 py-6">
-                <SectionLabel title="Charity" size="lg" />
-                <p className="text-sm text-muted-foreground">
-                  {copy.charityGuidance}
-                </p>
-                {selectedCharities.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedCharities.map((c) => (
-                      <Chip
-                        key={c.id}
-                        size="lg"
-                        selected
-                        onClick={() => setCharityOpen(true)}
-                      >
-                        {c.name}
-                      </Chip>
-                    ))}
-                  </div>
-                ) : (
-                  <Button
-                    className="shrink-0"
-                    onClick={() => setCharityOpen(true)}
-                  >
-                    Choose a charity
-                  </Button>
-                )}
-              </div>
+            <div className="flex flex-col gap-3 px-5 py-6">
+              <SectionLabel title="Charity" size="lg" />
+              <p className="text-sm text-muted-foreground">
+                {copy.charityGuidance}
+              </p>
+              {selectedCharities.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCharities.map((c) => (
+                    <Chip
+                      key={c.id}
+                      size="lg"
+                      selected
+                      onClick={() => setCharityOpen(true)}
+                    >
+                      {c.name}
+                    </Chip>
+                  ))}
+                </div>
+              ) : (
+                <Button
+                  className="shrink-0"
+                  onClick={() => setCharityOpen(true)}
+                >
+                  Choose a charity
+                </Button>
+              )}
             </div>
           )}
 
           {step === "love" && (
-            <div className="flex min-h-48 flex-col">
+            <div className="flex flex-col">
               {/* Topic trigger */}
-              <div className="flex flex-col justify-center gap-3 px-5 py-6">
+              <div className="flex flex-col gap-3 px-5 py-6">
                 <SectionLabel title="Topic" size="lg" />
                 <p className="text-sm text-muted-foreground">
                   {copy.loveGuidance}
@@ -372,27 +376,27 @@ export function NewEventWizard({ data }: Props) {
               )}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="mt-4 flex items-center justify-between">
-        {!isFirst ? (
-          <Button variant="ghost" size="lg" onClick={handleBack}>
-            Back
-          </Button>
-        ) : (
-          <span />
-        )}
-        {isLast ? (
-          <Button size="lg" disabled={nextDisabled} onClick={handleFinish}>
-            Set up my event
-          </Button>
-        ) : (
-          <Button size="lg" disabled={nextDisabled} onClick={handleNext}>
-            Next
-          </Button>
-        )}
+          {/* Navigation */}
+          <div className="mt-4 flex items-center justify-between px-5">
+            {!isFirst ? (
+              <Button variant="ghost" size="lg" onClick={handleBack}>
+                Back
+              </Button>
+            ) : (
+              <span />
+            )}
+            {isLast ? (
+              <Button size="lg" disabled={nextDisabled} onClick={handleFinish}>
+                Set up my event
+              </Button>
+            ) : (
+              <Button size="lg" disabled={nextDisabled} onClick={handleNext}>
+                Next
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Love sheet */}
