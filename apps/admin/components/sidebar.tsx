@@ -9,6 +9,7 @@ import {
   Heart,
   CalendarDays,
   Users,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/placeholders", label: "Placeholders", icon: FileText },
   { href: "/contributions", label: "Contributions", icon: Gift },
   { href: "/charities", label: "Charities", icon: Heart },
+  { href: "/generated-drafts", label: "Generated Drafts", icon: Sparkles },
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/access", label: "Access", icon: Users },
 ];
