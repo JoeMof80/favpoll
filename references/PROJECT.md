@@ -308,7 +308,8 @@ Pure function in `lib/registers.ts`:
 
 ### HONOUR step — subject + category are the inputs
 
-The Honour step has two independent rows:
+The Honour step (`event-flow/honour-step.tsx`) renders two independent Radix `ToggleGroup` (`type="single"`) rows. ToggleGroup items render with `role="radio"` and `aria-checked` (not `role="button"`/`aria-pressed`) — tests must query with `getByRole("radio", { name: "..." })`.
+
 1. **For** (subject row): An individual / A couple / A group / **A cause**. Selecting a person option sets `subject='someone'` + corresponding grouping. Selecting "A cause" sets `subject='cause'` (grouping is preserved but unused). A self-honour note appears below when "An individual" is active. When "A cause" is active, a labelled text input appears ("What are you raising for?", max 60 chars, min 16px font, placeholder "e.g. 40 years of Shelter"). The Next/Set-up button is gated until this field is non-empty. The label rides the redirect as a `causeLabel` query param and hydrates into `defaultValues.causeLabel` on the details page.
 2. **Occasion type** (category row): Celebration / Memorial / Fundraiser — always visible.
 
@@ -374,7 +375,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /                              -- Home: HeroDemoPanel + live events carousel (bg-primary/5) + CTA
 /landing-v2                    -- Alternate landing page: animated Venn hero + six-step how-it-works + CTA
 /events                        -- Live events grid (public, no auth)
-/events/new                    -- New event wizard (3-step page: Honour → Love → Charity)
+/events/new                    -- New event wizard (3-step page: Honour → Charity → Love)
 /events/new/details            -- Create event form (EventFormV2); reached from wizard with pre-populated query params
 /events/[id]                   -- Event page — guest pledge view + edit mode toggle
 /events/[id]/edit              -- Edit event (EventFormV2)
@@ -441,6 +442,8 @@ components/
 ├── ui/
 │   ├── button.tsx, card.tsx, input.tsx, field.tsx
 │   ├── chip.tsx                  -- Selectable pill toggle; min-w-0 shrink whitespace-normal to allow truncation
+│   ├── toggle-group.tsx          -- shadcn ToggleGroup + ToggleGroupItem; type="single" renders items as role="radio"/aria-checked; used in HonourStep and CommandPanel
+│   ├── toggle.tsx                -- shadcn Toggle primitive
 │   ├── sheet.tsx                 -- shadcn Sheet (SlideOver drawer); used by pledge-panel on mobile
 │   ├── responsive-overlay.tsx    -- Sheet (mobile <768px) / Dialog (desktop) dual primitive; useIsMobile() hook init false (no hydration flash); props: open, onOpenChange, title, description?, footer?, children
 │   ├── occasion-tag.tsx
@@ -450,7 +453,7 @@ components/
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by event-card and poll-heading
 ├── new-event-button.tsx          -- Client button that navigates to /events/new; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
-├── new-event-wizard.tsx          -- 3-step page component (Honour → Love → Charity); takes pre-fetched WizardData as props; two-column layout (desktop): static icon+prompt left, step content right; step dots with aria roles; on completion redirects to /events/new/details?category=...&grouping=...&subject=...&charityIds=...&causeLabel=...&topicId=...&charityIds=... (causeLabel included when subject='cause' and non-empty)
+├── new-event-wizard.tsx          -- 3-step page component (Honour → Charity → Love); takes pre-fetched WizardData as props; persistent left rail on desktop (step labels + subject-aware subtext, opacity tiers: active 100% / past 50% / future 30%); step dots mobile-only (md:hidden); uses `getWizardCopy(subject)` from `lib/wizard-copy.ts` for subject-aware copy; on completion redirects to /events/new/details?category=...&grouping=...&subject=...&charityIds=...&causeLabel=...&topicId=... (causeLabel included when subject='cause' and non-empty)
 ├── event-form-v2/                -- Canonical create/edit form; preview panel full-width + floating command panel
 │   ├── index.tsx                 -- EventFormV2 (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed; Event Settings overlay (isPrivate Switch + sharedFund input). On mount (create mode, canonical topics): calls safeGenerateDraft, pre-fills about for both modes, reveal for cause events, sets personRevealExample for person events (never commits to form). handleRegenerate() re-calls on demand with manual-edit confirmation; shows error toast when result is null.
 │   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Contains: three-pick summary chips (Occasion/Topic/Charity) + 3 ResponsiveOverlay sheets, Listed/Unlisted Switch, missing-field checklist (shows "Name" for person events, "Cause" for cause events), Publish/Cancel/Settings buttons. Auto-sets isListed=false when register="remembering".
@@ -513,6 +516,7 @@ lib/
 ├── occasions.ts                  -- shortTopicLabel (DATE_LABEL_PLACEHOLDERS removed)
 ├── registers.ts                  -- Register type, deriveRegister(), suggestClosingDate(), getExampleName(), registerForOccasionType() (legacy), OCCASION_TYPES_BY_REGISTER (legacy)
 ├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatEventDate, getEventHeadline (accepts optional subject?: 'someone'|'cause' param; subject-aware prefix matrix — see Registers section for the full matrix)
+├── wizard-copy.ts                -- `getWizardCopy(subject: EventSubject)` → `{ leftPrompt, rail: { honour, charity, love }, charityGuidance, loveGuidance }`; branches on subject ('someone' | 'cause'); used by NewEventWizard to drive all step copy
 ├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
 ├── email.ts                      -- Resend helpers
 ├── edit-mode-context.tsx
@@ -637,7 +641,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 660 web, 35 admin.
+All tests must pass before committing. Current counts: 682 web, 35 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -714,7 +718,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → Love → Charity). On desktop: two-column layout (static icon + tense-aware prompt left; step content right); on mobile: single column. The topic picker (step 2) and charity picker (step 3) open as `ResponsiveOverlay` sheets when the chip trigger is clicked. Step 2 shows a compact item summary below the selected topic chip — rendered as readonly `Chip` components (existing canonical options in muted style; organiser additions in brand purple; overflow as "+N more") — with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`.
+- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → **Charity** → Love). On desktop: persistent left rail (step labels + subject-aware subtext, opacity tiers) + step content right; on mobile: step dots only. Subject-aware copy is driven by `getWizardCopy(subject)` from `lib/wizard-copy.ts`. CharityStep defaults to single preferred charity — auto-collapses after first pick; "Add another charity" quiet text link expands the picker; split note shown when 2+ selected; max 3. The topic picker (step 3) and charity picker (step 2) open as `ResponsiveOverlay` sheets. Step 3 shows a compact item summary below the selected topic chip — rendered as readonly `Chip` components (existing canonical options in muted style; organiser additions in brand purple; overflow as "+N more") — with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`. **NOTE**: app-wide triad reorder (CommandPanel, onboarding, marketing copy) is deferred — only the wizard reflects the new order for now.
 
 - **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
