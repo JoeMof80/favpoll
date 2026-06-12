@@ -530,6 +530,39 @@ export function PreviewPanel({
                 />
               )}
 
+              {/* Reveal — cause events */}
+              {subject === "cause" && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={cn(EDIT_BTN, "mt-1")}
+                  onClick={() => {
+                    setRevealDraft(reveal)
+                    setRevealOpen(true)
+                  }}
+                  aria-label={reveal ? "Edit reveal" : "Add reveal"}
+                >
+                  {reveal ? (
+                    <p className="text-base leading-relaxed wrap-break-word text-muted-foreground italic">
+                      {reveal}
+                    </p>
+                  ) : isGenerating ? (
+                    <div
+                      className="animate-pulse space-y-1.5"
+                      aria-label="Generating suggestion…"
+                    >
+                      <div className="h-4 rounded-full bg-muted/60" />
+                      <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground/40">
+                      Add reveal…
+                    </p>
+                  )}
+                  <Pencil className={PENCIL_ICON} aria-hidden />
+                </Button>
+              )}
+
               {/* Reveal edit affordance — person events only */}
               {subject !== "cause" &&
                 (showReveal ? (

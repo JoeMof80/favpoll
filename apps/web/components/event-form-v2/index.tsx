@@ -403,9 +403,20 @@ function FormInner({
           )
         }
         if (sub === "cause") {
-          if (!form.getValues("reveal")) {
+          const currentReveal = form.getValues("reveal")
+          console.log(
+            "[prefill] currentReveal:",
+            JSON.stringify(currentReveal),
+            "→ willSetValue:",
+            !currentReveal?.trim()
+          )
+          if (!currentReveal?.trim()) {
             form.setValue("reveal", result.reveal)
             lastGeneratedReveal.current = result.reveal
+            console.log(
+              "[prefill] setValue('reveal') ran — length:",
+              result.reveal.length
+            )
           }
         } else {
           setPersonRevealExample(result.reveal)
