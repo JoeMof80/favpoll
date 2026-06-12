@@ -67,7 +67,7 @@ describe("NewEventWizard — structure", () => {
     const dots = screen.getAllByRole("listitem")
     expect(dots).toHaveLength(3)
     expect(dots[0]).toHaveAttribute("aria-current", "step")
-    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3")
+    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Honour")
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 

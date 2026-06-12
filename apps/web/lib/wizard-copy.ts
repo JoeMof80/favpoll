@@ -26,9 +26,11 @@ export function getWizardCopy(subject: EventSubject): WizardCopy {
   return {
     leftPrompt: "Who are you celebrating?",
     rail: {
-      honour: "Who or what is this event for?",
-      charity: "Proceeds from every pledge go to charity.",
-      love: "What did they love? Pick a favpoll topic.",
+      honour:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      charity:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      love: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     },
     charityGuidance: "Proceeds from every pledge go to charity.",
     loveGuidance: "What did they love? Pick a favpoll topic.",

@@ -3,6 +3,7 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
 import { SectionLabel } from "../favpoll-card/section-label"
+import { Balloon, User } from "lucide-react"
 
 const SUBJECT_ITEMS: {
   value: string
@@ -33,7 +34,7 @@ const CATEGORIES: { value: EventCategory; label: string }[] = [
 ]
 
 const ACTIVE_ITEM_CLASS =
-  "data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:text-primary"
+  "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
 
 type HonourStepProps = {
   value: {
@@ -77,7 +78,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
     <div className="space-y-5">
       {/* Subject row */}
       <div className="space-y-3 px-5 py-4">
-        <SectionLabel title="For" size="lg" />
+        <SectionLabel title="Who are you honouring?" size="lg" />
         <ToggleGroup
           type="single"
           value={subjectKey}
@@ -93,6 +94,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
               size="lg"
               className={ACTIVE_ITEM_CLASS}
             >
+              <User />
               {item.label}
             </ToggleGroupItem>
           ))}
@@ -127,7 +129,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
 
       {/* Category row */}
       <div className="space-y-3 px-5 py-4">
-        <SectionLabel title="Occasion type" size="lg" />
+        <SectionLabel title="How are you honouring them?" size="lg" />
         <ToggleGroup
           type="single"
           value={value.category ?? ""}
@@ -143,6 +145,7 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
               size="lg"
               className={ACTIVE_ITEM_CLASS}
             >
+              <Balloon />
               {label}
             </ToggleGroupItem>
           ))}

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Gift, Heart, Star } from "lucide-react"
+import { Award, Gift, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -45,9 +45,9 @@ const STEP_LABELS: Record<WizardStep, string> = {
 }
 
 const STEP_ICONS: Record<WizardStep, React.ElementType> = {
-  honour: Heart,
+  honour: Award,
   charity: Gift,
-  love: Star,
+  love: Heart,
 }
 
 type WizardData = {
@@ -180,13 +180,12 @@ export function NewEventWizard({ data }: Props) {
   return (
     <main>
       {/* Full-page two-column layout: triad rail left (md+), step content right */}
-      <div className="md:grid md:grid-cols-[280px_1fr] md:items-start">
-        {/* Left: persistent triad — desktop only */}
-        <div className="hidden flex-col gap-8 px-8 pt-12 pb-8 md:flex">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {copy.leftPrompt}
-          </p>
-          <div className="flex flex-col gap-6">
+      <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
+        {/* Left: persistent triad — desktop only, full-height tinted rail */}
+        {/* Added 'h-full' to ensure the inner container can stretch and distribute space */}
+        <div className="hidden h-full flex-col gap-10 bg-primary/10 p-6 md:flex">
+          {/* CHANGED: 'content-around' to 'justify-around', added 'flex-1' to fill the vertical space */}
+          <div className="flex flex-1 flex-col justify-around gap-8">
             {STEPS.map((s) => {
               const Icon = STEP_ICONS[s]
               const isActive = s === step
@@ -195,31 +194,31 @@ export function NewEventWizard({ data }: Props) {
                 <div
                   key={s}
                   className={cn(
-                    "space-y-1 transition-opacity",
+                    "space-y-1.5 transition-opacity",
                     isActive
                       ? "opacity-100"
                       : isPast
-                        ? "opacity-50"
-                        : "opacity-30"
+                        ? "opacity-60"
+                        : "opacity-60"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <Icon
                       className={cn(
-                        "h-3.5 w-3.5 shrink-0",
+                        "h-6 w-6 shrink-0",
                         isActive ? "text-[#534AB7]" : "text-muted-foreground"
                       )}
                     />
                     <p
                       className={cn(
-                        "text-[11px] font-medium tracking-widest uppercase",
+                        "text-lg font-medium tracking-widest uppercase",
                         isActive ? "text-[#534AB7]" : "text-muted-foreground"
                       )}
                     >
                       {STEP_LABELS[s]}
                     </p>
                   </div>
-                  <p className="pl-[22px] text-xs leading-relaxed text-muted-foreground">
+                  <p className="pl-8.5 text-sm leading-relaxed text-muted-foreground">
                     {copy.rail[s]}
                   </p>
                 </div>
@@ -228,173 +227,204 @@ export function NewEventWizard({ data }: Props) {
           </div>
         </div>
 
-        {/* Right: step content + navigation */}
-        <div className="py-8 md:py-12">
-          {/* Step dots — mobile only (compact progress strip) */}
-          <ol
-            role="list"
-            aria-label="Wizard steps"
-            className="mb-8 flex justify-center gap-2 md:hidden"
-          >
-            {STEPS.map((s, i) => (
-              <li
-                key={s}
-                role="listitem"
-                aria-label={`Step ${i + 1} of ${STEPS.length}`}
-                aria-current={s === step ? "step" : undefined}
-                className={`h-2 w-2 rounded-full transition-colors ${
-                  s === step ? "bg-[#534AB7]" : "bg-muted"
-                }`}
-              />
-            ))}
-          </ol>
-
-          {/* Step content */}
-          {step === "honour" && (
-            <HonourStep
-              value={{ category, grouping, subject, causeLabel }}
-              onChange={({
-                category: cat,
-                grouping: grp,
-                subject: sub,
-                causeLabel: cl,
-              }) => {
-                setCategory(cat)
-                setGrouping(grp)
-                setSubject(sub)
-                setCauseLabel(cl)
-              }}
-            />
-          )}
-
-          {step === "charity" && (
-            <div className="flex flex-col gap-3 px-5 py-6">
-              <SectionLabel title="Charity" size="lg" />
-              <p className="text-sm text-muted-foreground">
-                {copy.charityGuidance}
-              </p>
-              {selectedCharities.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedCharities.map((c) => (
-                    <Chip
-                      key={c.id}
-                      size="lg"
-                      selected
-                      onClick={() => setCharityOpen(true)}
+        {/* Right: step content + navigation, centered column, top-aligned */}
+        <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
+          <div className="mx-auto w-full max-w-2xl">
+            {/* Step dots — mobile only (compact progress strip) */}
+            {/* Progress strip — mobile only (labelled segments) */}
+            <ol
+              role="list"
+              aria-label="Wizard steps"
+              className="mb-10 flex gap-2 md:hidden"
+            >
+              {STEPS.map((s, i) => {
+                const isActive = s === step
+                const isPast = STEPS.indexOf(s) < stepIndex
+                return (
+                  <li
+                    key={s}
+                    role="listitem"
+                    aria-label={`Step ${i + 1} of ${STEPS.length}: ${STEP_LABELS[s]}`}
+                    aria-current={isActive ? "step" : undefined}
+                    className="flex flex-1 flex-col gap-1.5"
+                  >
+                    <span
+                      className={cn(
+                        "h-1 rounded-full transition-colors",
+                        isActive || isPast ? "bg-[#534AB7]" : "bg-muted"
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "text-[11px] font-medium tracking-widest uppercase transition-colors",
+                        isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                      )}
                     >
-                      {c.name}
-                    </Chip>
-                  ))}
-                </div>
-              ) : (
-                <Button
-                  className="shrink-0"
-                  onClick={() => setCharityOpen(true)}
-                >
-                  Choose a charity
-                </Button>
-              )}
-            </div>
-          )}
+                      {STEP_LABELS[s]}
+                    </span>
+                  </li>
+                )
+              })}
+            </ol>
 
-          {step === "love" && (
-            <div className="flex flex-col">
-              {/* Topic trigger */}
-              <div className="flex flex-col gap-3 px-5 py-6">
-                <SectionLabel title="Topic" size="lg" />
+            {/* Step content */}
+            {step === "honour" && (
+              <HonourStep
+                value={{ category, grouping, subject, causeLabel }}
+                onChange={({
+                  category: cat,
+                  grouping: grp,
+                  subject: sub,
+                  causeLabel: cl,
+                }) => {
+                  setCategory(cat)
+                  setGrouping(grp)
+                  setSubject(sub)
+                  setCauseLabel(cl)
+                }}
+              />
+            )}
+
+            {step === "charity" && (
+              <div className="flex flex-col gap-3 py-6">
+                <SectionLabel title="Charity" size="lg" />
                 <p className="text-sm text-muted-foreground">
-                  {copy.loveGuidance}
+                  {copy.charityGuidance}
                 </p>
-                {topics.length > 0 ? (
+                {selectedCharities.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    <Chip size="lg" selected onClick={() => setLoveOpen(true)}>
-                      {shortTopicLabel(topics[0].title)}
-                    </Chip>
+                    {selectedCharities.map((c) => (
+                      <Chip
+                        key={c.id}
+                        size="lg"
+                        selected
+                        onClick={() => setCharityOpen(true)}
+                      >
+                        {c.name}
+                      </Chip>
+                    ))}
                   </div>
                 ) : (
                   <Button
                     className="shrink-0"
-                    onClick={() => setLoveOpen(true)}
+                    onClick={() => setCharityOpen(true)}
                   >
-                    Choose a topic
+                    Choose a charity
                   </Button>
                 )}
               </div>
+            )}
 
-              {/* Items summary + trigger */}
-              {showItemsSection && (
-                <div className="flex flex-col gap-3 border-t border-border px-5 py-6">
-                  <SectionLabel title="Favourites" size="lg" />
+            {step === "love" && (
+              <div className="flex flex-col">
+                {/* Topic trigger */}
+                <div className="flex flex-col gap-3 py-6">
+                  <SectionLabel title="Topic" size="lg" />
                   <p className="text-sm text-muted-foreground">
-                    View or add favourites
+                    {copy.loveGuidance}
                   </p>
-                  {topics[0]?.isCustom && customLabels.length < 2 && (
-                    <p className="text-xs text-muted-foreground">
-                      {customLabels.length === 0
-                        ? "Add at least two options."
-                        : "Add at least one more option."}
-                    </p>
+                  {topics.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      <Chip
+                        size="lg"
+                        selected
+                        onClick={() => setLoveOpen(true)}
+                      >
+                        {shortTopicLabel(topics[0].title)}
+                      </Chip>
+                    </div>
+                  ) : (
+                    <Button
+                      className="shrink-0"
+                      variant="secondary"
+                      onClick={() => setLoveOpen(true)}
+                    >
+                      Choose a topic
+                    </Button>
                   )}
-                  <Button
-                    className="shrink-0"
-                    onClick={() => setItemsDialogOpen(true)}
-                  >
-                    {topics[0]?.isCustom && customLabels.length < 2
-                      ? "Add favourites"
-                      : "View or add favourites"}
-                  </Button>
-                  <div className="flex flex-wrap gap-1.5">
-                    {topics[0]?.isCustom
-                      ? customLabels.map((label) => (
-                          <Chip key={label} size="lg" readOnly>
+                </div>
+
+                {/* Items summary + trigger */}
+                {showItemsSection && (
+                  <div className="flex flex-col gap-3 border-t border-border py-6">
+                    <SectionLabel title="Favourites" size="lg" />
+                    <p className="text-sm text-muted-foreground">
+                      View or add favourites
+                    </p>
+                    {topics[0]?.isCustom && customLabels.length < 2 && (
+                      <p className="text-xs text-muted-foreground">
+                        {customLabels.length === 0
+                          ? "Add at least two options."
+                          : "Add at least one more option."}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap gap-1.5">
+                      {topics[0]?.isCustom
+                        ? customLabels.map((label) => (
+                            <Chip key={label} size="lg" readOnly>
+                              {label}
+                            </Chip>
+                          ))
+                        : sortedExistingItems.slice(0, 5).map((item) => (
+                            <Chip key={item.id} size="lg" readOnly>
+                              {item.label}
+                            </Chip>
+                          ))}
+                      {!topics[0]?.isCustom &&
+                        customLabels.map((label) => (
+                          <Chip
+                            key={label}
+                            size="lg"
+                            readOnly
+                            className="border-[#534AB7] bg-[#534AB7] text-white"
+                          >
                             {label}
                           </Chip>
-                        ))
-                      : sortedExistingItems.slice(0, 5).map((item) => (
-                          <Chip key={item.id} size="lg" readOnly>
-                            {item.label}
-                          </Chip>
                         ))}
-                    {!topics[0]?.isCustom &&
-                      customLabels.map((label) => (
-                        <Chip
-                          key={label}
-                          size="lg"
-                          readOnly
-                          className="border-[#534AB7] bg-[#534AB7] text-white"
-                        >
-                          {label}
-                        </Chip>
-                      ))}
-                    {!topics[0]?.isCustom && sortedExistingItems.length > 4 && (
-                      <span className="self-center text-xs text-muted-foreground">
-                        +{sortedExistingItems.length - 4} more
-                      </span>
-                    )}
+                      {!topics[0]?.isCustom &&
+                        sortedExistingItems.length > 4 && (
+                          <Chip
+                            size="lg"
+                            onClick={() => setItemsDialogOpen(true)}
+                          >
+                            +{sortedExistingItems.length - 4} more
+                          </Chip>
+                        )}
+                    </div>
                   </div>
-                </div>
+                )}
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="mt-10 flex items-center justify-end gap-2 border-t border-border pt-2">
+              {!isFirst ? (
+                <Button variant="ghost" size="lg" onClick={handleBack}>
+                  Back
+                </Button>
+              ) : (
+                <span />
+              )}
+              {isLast ? (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  disabled={nextDisabled}
+                  onClick={handleFinish}
+                >
+                  Set up my event
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  disabled={nextDisabled}
+                  onClick={handleNext}
+                >
+                  Next
+                </Button>
               )}
             </div>
-          )}
-
-          {/* Navigation */}
-          <div className="mt-4 flex items-center justify-between px-5">
-            {!isFirst ? (
-              <Button variant="ghost" size="lg" onClick={handleBack}>
-                Back
-              </Button>
-            ) : (
-              <span />
-            )}
-            {isLast ? (
-              <Button size="lg" disabled={nextDisabled} onClick={handleFinish}>
-                Set up my event
-              </Button>
-            ) : (
-              <Button size="lg" disabled={nextDisabled} onClick={handleNext}>
-                Next
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -426,6 +456,7 @@ export function NewEventWizard({ data }: Props) {
           <Button
             type="button"
             size="lg"
+            variant="secondary"
             className="w-full"
             onClick={() => setCharityOpen(false)}
           >
