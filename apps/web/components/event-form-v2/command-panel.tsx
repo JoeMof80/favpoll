@@ -237,12 +237,23 @@ export function CommandPanel({
         }
       >
         <HonourStep
-          value={{ category, grouping, subject: subjectValue }}
-          onChange={({ category: cat, grouping: grp, subject: sub }) => {
+          value={{
+            category,
+            grouping,
+            subject: subjectValue,
+            causeLabel: causeLabelValue,
+          }}
+          onChange={({
+            category: cat,
+            grouping: grp,
+            subject: sub,
+            causeLabel: cl,
+          }) => {
             const derived = deriveRegister(cat, grp)
             form.setValue("category", cat ?? undefined)
             form.setValue("grouping", grp)
             form.setValue("subject", sub)
+            form.setValue("causeLabel", cl)
             form.setValue("register", derived)
             form.setValue("openingLine", "")
             form.setValue("isListed", derived !== "remembering")
