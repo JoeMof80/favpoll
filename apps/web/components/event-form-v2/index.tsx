@@ -380,43 +380,16 @@ function FormInner({
       primaryCharityId,
     })
       .then((result) => {
-        console.log(
-          "[prefill] result:",
-          result
-            ? `about=${result.about.length}chars reveal=${result.reveal.length}chars fromCache=${result.fromCache}`
-            : "null — no setValue will run"
-        )
         if (!result) return
         const currentAbout = form.getValues("about")
-        console.log(
-          "[prefill] currentAbout:",
-          JSON.stringify(currentAbout),
-          "→ willSetValue:",
-          !currentAbout
-        )
         if (!currentAbout) {
           form.setValue("about", result.about)
           lastGeneratedAbout.current = result.about
-          console.log(
-            "[prefill] setValue('about') ran — length:",
-            result.about.length
-          )
         }
         if (sub === "cause") {
-          const currentReveal = form.getValues("reveal")
-          console.log(
-            "[prefill] currentReveal:",
-            JSON.stringify(currentReveal),
-            "→ willSetValue:",
-            !currentReveal?.trim()
-          )
-          if (!currentReveal?.trim()) {
+          if (!form.getValues("reveal")?.trim()) {
             form.setValue("reveal", result.reveal)
             lastGeneratedReveal.current = result.reveal
-            console.log(
-              "[prefill] setValue('reveal') ran — length:",
-              result.reveal.length
-            )
           }
         } else {
           setPersonRevealExample(result.reveal)

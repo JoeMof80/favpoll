@@ -442,16 +442,6 @@ export function PreviewPanel({
             </div>
 
             {/* About */}
-            {/* DEBUG — remove after fix confirmed */}
-            {(() => {
-              console.log(
-                "[preview-about] about.length:",
-                about.length,
-                "subject:",
-                subject
-              )
-              return null
-            })()}
             <Button
               type="button"
               variant="ghost"
