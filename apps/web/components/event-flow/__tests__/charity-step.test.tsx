@@ -13,7 +13,7 @@ const makeCharity = (id: string, name: string): Charity =>
     registered_number: null,
     market: "en-GB",
     created_at: null,
-  }) as Charity
+  }) as unknown as Charity
 
 const CHARITIES = [
   makeCharity("c1", "Shelter"),
