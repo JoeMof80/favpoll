@@ -1,67 +1,75 @@
 "use client"
 
+import {
+  User,
+  Users,
+  UsersRound,
+  Heart,
+  Balloon,
+  Flower2,
+  PiggyBank,
+} from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
-import { SectionLabel } from "../favpoll-card/section-label"
-import { Balloon, User } from "lucide-react"
 
-const SUBJECT_ITEMS: {
-  value: string
-  label: string
+type HonourValue = {
+  category: EventCategory | null
+  grouping: EventGrouping
   subject: EventSubject
-  grouping?: EventGrouping
-}[] = [
-  {
-    value: "individual",
-    label: "An individual",
-    subject: "someone",
-    grouping: "individual",
-  },
-  {
-    value: "couple",
-    label: "A couple",
-    subject: "someone",
-    grouping: "couple",
-  },
-  { value: "group", label: "A group", subject: "someone", grouping: "group" },
-  { value: "cause", label: "A cause", subject: "cause" },
-]
-
-const CATEGORIES: { value: EventCategory; label: string }[] = [
-  { value: "celebration", label: "Celebration" },
-  { value: "memorial", label: "Memorial" },
-  { value: "fundraiser", label: "Fundraiser" },
-]
-
-const ACTIVE_ITEM_CLASS =
-  "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-
-type HonourStepProps = {
-  value: {
-    category: EventCategory | null
-    grouping: EventGrouping
-    subject: EventSubject
-    causeLabel: string
-  }
-  onChange: (v: {
-    category: EventCategory | null
-    grouping: EventGrouping
-    subject: EventSubject
-    causeLabel: string
-  }) => void
+  causeLabel: string
 }
 
-export function HonourStep({ value, onChange }: HonourStepProps) {
-  const subjectKey = value.subject === "cause" ? "cause" : value.grouping
+type Props = {
+  value: HonourValue
+  onChange: (value: HonourValue) => void
+}
+
+const SUBJECT_OPTIONS = [
+  { value: "individual", label: "An individual", icon: User },
+  { value: "couple", label: "A couple", icon: Users },
+  { value: "group", label: "A group", icon: UsersRound },
+  { value: "cause", label: "A cause", icon: Heart },
+] as const
+
+const CATEGORY_OPTIONS = [
+  { value: "celebration", label: "Celebration", icon: Balloon },
+  { value: "memorial", label: "Memorial", icon: Flower2 },
+  { value: "fundraiser", label: "Fundraiser", icon: PiggyBank },
+] as const
+
+const ITEM_CLASS =
+  "flex h-auto w-32 flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-[#EEEDFE] data-[state=on]:text-[#3C3489]"
+
+function subjectToGrouping(subject: string): EventGrouping {
+  if (subject === "couple") return "couple"
+  if (subject === "group") return "group"
+  return "individual"
+}
+
+function groupingToSubjectValue(
+  subject: EventSubject,
+  grouping: EventGrouping
+): string {
+  if (subject === "cause") return "cause"
+  return grouping
+}
+
+export function HonourStep({ value, onChange }: Props) {
+  const subjectToggleValue = groupingToSubjectValue(
+    value.subject,
+    value.grouping
+  )
 
   function handleSubjectChange(v: string) {
     if (!v) return
-    const item = SUBJECT_ITEMS.find((i) => i.value === v)
-    if (!item) return
-    if (item.subject === "cause") {
-      onChange({ ...value, subject: "cause" })
+    if (v === "cause") {
+      onChange({ ...value, subject: "cause", grouping: "individual" })
     } else {
-      onChange({ ...value, subject: "someone", grouping: item.grouping! })
+      onChange({
+        ...value,
+        subject: "someone",
+        grouping: subjectToGrouping(v),
+      })
     }
   }
 
@@ -70,82 +78,73 @@ export function HonourStep({ value, onChange }: HonourStepProps) {
     onChange({ ...value, category: v as EventCategory })
   }
 
-  function handleCauseLabelChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange({ ...value, causeLabel: e.target.value })
-  }
-
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-8 px-6 md:px-0">
       {/* Subject row */}
-      <div className="space-y-3 px-5 py-4">
-        <SectionLabel title="Who are you honouring?" size="lg" />
+      <div className="flex flex-col gap-3 py-6">
+        <h3 className="text-lg font-medium tracking-tight text-foreground">
+          Honour
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Who or what is this event for?
+        </p>
         <ToggleGroup
           type="single"
-          value={subjectKey}
+          value={subjectToggleValue}
           onValueChange={handleSubjectChange}
-          aria-label="Who is this event for?"
-          className="flex-wrap gap-1.5"
+          className="flex flex-wrap gap-2"
         >
-          {SUBJECT_ITEMS.map((item) => (
-            <ToggleGroupItem
-              key={item.value}
-              value={item.value}
-              variant="outline"
-              size="lg"
-              className={ACTIVE_ITEM_CLASS}
-            >
-              <User />
-              {item.label}
+          {SUBJECT_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+            <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
+              <Icon className="h-6 w-6" />
+              {label}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        {value.subject !== "cause" && value.grouping === "individual" && (
+
+        {value.subject === "someone" && value.grouping === "individual" && (
           <p className="text-xs text-muted-foreground">
             Self-honours welcome — guests won&apos;t know it&apos;s you until
             the reveal.
           </p>
         )}
+
+        {/* Cause label input */}
         {value.subject === "cause" && (
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1.5">
             <label
-              htmlFor="honour-cause-label"
-              className="text-xs text-muted-foreground"
+              htmlFor="cause-label"
+              className="text-sm text-muted-foreground"
             >
               What are you raising for?
             </label>
             <input
-              id="honour-cause-label"
+              id="cause-label"
               type="text"
-              value={value.causeLabel}
-              onChange={handleCauseLabelChange}
               maxLength={60}
               placeholder="e.g. 40 years of Shelter"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-              style={{ fontSize: "16px" }}
+              value={value.causeLabel}
+              onChange={(e) =>
+                onChange({ ...value, causeLabel: e.target.value })
+              }
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/50 focus:border-[#534AB7] focus:outline-none"
             />
           </div>
         )}
       </div>
 
       {/* Category row */}
-      <div className="space-y-3 px-5 py-4">
-        <SectionLabel title="How are you honouring them?" size="lg" />
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-muted-foreground">What is the occasion?</p>
         <ToggleGroup
           type="single"
           value={value.category ?? ""}
           onValueChange={handleCategoryChange}
-          aria-label="Occasion type"
-          className="flex-wrap gap-1.5"
+          className="flex flex-wrap gap-2"
         >
-          {CATEGORIES.map(({ value: cat, label }) => (
-            <ToggleGroupItem
-              key={cat}
-              value={cat}
-              variant="outline"
-              size="lg"
-              className={ACTIVE_ITEM_CLASS}
-            >
-              <Balloon />
+          {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+            <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
+              <Icon className="h-6 w-6" />
               {label}
             </ToggleGroupItem>
           ))}

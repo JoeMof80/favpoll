@@ -18,7 +18,7 @@ const SOMEONE: WizardCopy = {
     love: "What did they love? Guests pledge on their favourites.",
   },
   charityGuidance:
-    "Is there a charity that was special to them? If not, don't worry — there are many worthy causes to choose from.",
+    "Pick from many worthy causes, ideally a meaningful one to who you're honouring.",
   loveGuidance:
     "What did they love? Pick a topic close to their heart and let guests pledge on their favourite.",
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Award, Gift, Heart } from "lucide-react"
+import { Award, Edit, Gift, Heart, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -298,29 +298,79 @@ export function NewEventWizard({ data }: Props) {
 
             {step === "charity" && (
               <div className="flex flex-col gap-3 py-6">
-                <SectionLabel title="Charity" size="lg" />
+                <h3 className="text-lg font-medium tracking-tight text-foreground">
+                  Charity
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   {copy.charityGuidance}
                 </p>
                 {selectedCharities.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedCharities.map((c) => (
-                      <Chip
-                        key={c.id}
-                        size="lg"
-                        selected
-                        onClick={() => setCharityOpen(true)}
-                      >
-                        {c.name}
-                      </Chip>
+                  <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
+                    {selectedCharities.map((c, i) => (
+                      <div key={c.id}>
+                        <div className="flex items-start gap-3">
+                          {c.logo_url ? (
+                            <img
+                              src={c.logo_url}
+                              alt=""
+                              className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                            />
+                          ) : (
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EEEDFE] text-base text-[#534AB7]">
+                              {c.name.charAt(0)}
+                            </span>
+                          )}
+                          <span className="flex min-w-0 flex-1 flex-col">
+                            <span className="truncate text-base text-foreground">
+                              {c.name}
+                            </span>
+                            {c.registered_number && (
+                              <span className="text-sm text-muted-foreground">
+                                Charity no. {c.registered_number}
+                              </span>
+                            )}
+                          </span>
+                          <div className="flex shrink-0 items-center">
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              variant="ghost"
+                              onClick={() => setCharityOpen(true)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              variant="ghost"
+                              onClick={() =>
+                                setCharityIds((ids) =>
+                                  ids.filter((id) => id !== c.id)
+                                )
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     ))}
+                    {selectedCharities.length < 3 && (
+                      <button
+                        type="button"
+                        onClick={() => setCharityOpen(true)}
+                        className="border-t border-border pt-3 text-left text-sm text-[#534AB7] hover:underline"
+                      >
+                        + Pick another charity
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <Button
-                    className="shrink-0"
+                    variant="secondary"
                     onClick={() => setCharityOpen(true)}
                   >
-                    Choose a charity
+                    Pick a charity
                   </Button>
                 )}
               </div>
@@ -330,80 +380,95 @@ export function NewEventWizard({ data }: Props) {
               <div className="flex flex-col">
                 {/* Topic trigger */}
                 <div className="flex flex-col gap-3 py-6">
-                  <SectionLabel title="Topic" size="lg" />
+                  <h3 className="text-lg font-medium tracking-tight text-foreground">
+                    Love
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     {copy.loveGuidance}
                   </p>
                   {topics.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      <Chip
-                        size="lg"
-                        selected
-                        onClick={() => setLoveOpen(true)}
-                      >
-                        {shortTopicLabel(topics[0].title)}
-                      </Chip>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
+                        {/* Topic header row */}
+                        <div className="flex items-start justify-between gap-2">
+                          <SectionLabel
+                            title={shortTopicLabel(topics[0].title)}
+                            size="lg"
+                          />
+                          <div>
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              variant="ghost"
+                              onClick={() => setLoveOpen(true)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              variant="ghost"
+                              onClick={() => setTopics([])}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Favourites chips inside the card */}
+                        {showItemsSection && (
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {topics[0]?.isCustom
+                              ? customLabels.map((label) => (
+                                  <Chip key={label} size="lg" readOnly>
+                                    {label}
+                                  </Chip>
+                                ))
+                              : sortedExistingItems.slice(0, 5).map((item) => (
+                                  <Chip key={item.id} size="lg" readOnly>
+                                    {item.label}
+                                  </Chip>
+                                ))}
+                            {!topics[0]?.isCustom &&
+                              customLabels.map((label) => (
+                                <Chip
+                                  key={label}
+                                  size="lg"
+                                  readOnly
+                                  className="border-[#534AB7] bg-[#534AB7] text-white"
+                                >
+                                  {label}
+                                </Chip>
+                              ))}
+                            <Chip
+                              size="lg"
+                              onClick={() => setItemsDialogOpen(true)}
+                            >
+                              {!topics[0]?.isCustom &&
+                              sortedExistingItems.length > 5
+                                ? `+${sortedExistingItems.length - 5} more`
+                                : "+ Add"}
+                            </Chip>
+                            {topics[0]?.isCustom && customLabels.length < 2 && (
+                              <span className="text-xs text-muted-foreground">
+                                {customLabels.length === 0
+                                  ? "Add at least two options."
+                                  : "Add at least one more option."}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <Button
-                      className="shrink-0"
                       variant="secondary"
                       onClick={() => setLoveOpen(true)}
                     >
-                      Choose a topic
+                      Pick a topic
                     </Button>
                   )}
                 </div>
-
-                {/* Items summary + trigger */}
-                {showItemsSection && (
-                  <div className="flex flex-col gap-3 border-t border-border py-6">
-                    <SectionLabel title="Favourites" size="lg" />
-                    <p className="text-sm text-muted-foreground">
-                      View or add favourites
-                    </p>
-                    {topics[0]?.isCustom && customLabels.length < 2 && (
-                      <p className="text-xs text-muted-foreground">
-                        {customLabels.length === 0
-                          ? "Add at least two options."
-                          : "Add at least one more option."}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-1.5">
-                      {topics[0]?.isCustom
-                        ? customLabels.map((label) => (
-                            <Chip key={label} size="lg" readOnly>
-                              {label}
-                            </Chip>
-                          ))
-                        : sortedExistingItems.slice(0, 5).map((item) => (
-                            <Chip key={item.id} size="lg" readOnly>
-                              {item.label}
-                            </Chip>
-                          ))}
-                      {!topics[0]?.isCustom &&
-                        customLabels.map((label) => (
-                          <Chip
-                            key={label}
-                            size="lg"
-                            readOnly
-                            className="border-[#534AB7] bg-[#534AB7] text-white"
-                          >
-                            {label}
-                          </Chip>
-                        ))}
-                      {!topics[0]?.isCustom &&
-                        sortedExistingItems.length > 4 && (
-                          <Chip
-                            size="lg"
-                            onClick={() => setItemsDialogOpen(true)}
-                          >
-                            +{sortedExistingItems.length - 4} more
-                          </Chip>
-                        )}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -419,19 +484,13 @@ export function NewEventWizard({ data }: Props) {
               {isLast ? (
                 <Button
                   size="lg"
-                  variant="secondary"
                   disabled={nextDisabled}
                   onClick={handleFinish}
                 >
                   Set up my event
                 </Button>
               ) : (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  disabled={nextDisabled}
-                  onClick={handleNext}
-                >
+                <Button size="lg" disabled={nextDisabled} onClick={handleNext}>
                   Next
                 </Button>
               )}
