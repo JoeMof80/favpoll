@@ -237,6 +237,12 @@ item_flags (
   created_at timestamptz
 )
 
+charity_topics (
+  charity_id uuid references charities(id) on delete cascade,
+  topic_id   uuid references topics(id) on delete cascade,
+  primary key (charity_id, topic_id)
+)
+
 generated_drafts (
   id uuid primary key,
   cache_key text not null unique,           -- "{register}:{topic_id}:{primary_charity_id|'none'}:{subject}"
@@ -274,6 +280,7 @@ generated_drafts (
 20260610120000_generated_drafts.sql                    -- generated_drafts cache table for LLM-produced About/Reveal copy
 20260611000000_add_event_subject_and_cause_label.sql   -- event_subject + cause_label columns; truncates generated_drafts
 20260611120000_truncate_generated_drafts_prompt_update.sql -- truncate generated_drafts after person-prompt now gestures at charitable giving
+20260613000000_add_charity_topics.sql                  -- charity_topics join table for admin-curated topic suggestions per charity
 ```
 
 ---
@@ -568,7 +575,8 @@ lib/
 └── actions/
     ├── placeholders.ts           -- getTopics, updatePlaceholder, getTopicItems, updateItemDisplayOrder
     ├── contributions.ts          -- getPendingContributions, acceptContribution, rejectContribution
-    ├── charities.ts              -- getCharities, createCharity, updateCharity, deactivateCharity, reactivateCharity
+    ├── charities.ts              -- getCharities, createCharity, updateCharity, deactivateCharity, reactivateCharity, getCharityTopics, setCharityTopics
+    ├── topics.ts                 -- getTopics (active topics for admin use)
     └── generated-drafts.ts      -- getGeneratedDrafts(filter?), updateGeneratedDraft(id, {about?,reveal?}), setGeneratedDraftStatus(id, status)
 ```
 
@@ -641,7 +649,7 @@ pnpm --filter @favpoll/web test:run     -- web tests
 pnpm --filter @favpoll/admin test:run   -- admin tests
 ```
 
-All tests must pass before committing. Current counts: 682 web, 35 admin.
+All tests must pass before committing. Current counts: 687 web, 56 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -718,7 +726,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **No hint line on PollHeading.** The protagonist hint ("— Is it the same as [Name]'s?") has been removed. The reveal is the only mechanic for disclosing the protagonist's favourite — shown after pledging. `getPollHint` and the `pledged` prop on `PollHeading` are gone.
 
-- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories) and renders `NewEventWizard` — a client component with 3 steps (Honour → **Charity** → Love). **Full-page two-column layout** (no contained card): `md:grid md:grid-cols-[280px_1fr]`, left column = persistent triad rail with tense-aware `leftPrompt` + step labels/subtext/icons/opacity tiers, separated from step content by spacing (no `border-r`). On mobile: left column hidden, existing step-dot `<ol>` is the only progress widget (no second widget). Subject-aware copy is driven by `getWizardCopy(subject)` from `lib/wizard-copy.ts`. CharityStep defaults to single preferred charity — auto-collapses after first pick; "Add another charity" quiet text link expands the picker; split note shown when 2+ selected; max 3. The topic picker (step 3) and charity picker (step 2) open as `ResponsiveOverlay` sheets. Step 3 shows a compact item summary below the selected topic chip — rendered as readonly `Chip` components (existing canonical options in muted style; organiser additions in brand purple; overflow as "+N more") — with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`. **NOTE**: app-wide triad reorder (CommandPanel, onboarding, marketing copy) is deferred — only the wizard reflects the new order for now.
+- **New event entry point is a wizard page.** Clicking any "New event" button navigates to `/events/new` (signed-out users are redirected to `/sign-in`). `/events/new` is a server-rendered page that fetches wizard data (charities, topics, categories, and `charity_topics` suggestions map) via `getWizardData()` in `app/events/new/wizard-data.ts` and renders `NewEventWizard` — a client component with 3 steps (Honour → **Charity** → Love). **Charity-suggested topics:** admin curates a `charity_topics` join table; `getWizardData` fetches all rows in one query and builds `suggestedTopicIds: Record<charity_id, topic_id[]>`. On the Love step, `LoveStep` receives `suggestedTopics?: TopicWithMeta[]` and `primaryCharityName?: string` derived from the primary (first) charity. When suggestions exist and no search is active, a "Suggested for {charity}" section appears above the full topic chip list. If no suggestions → picker unchanged (additive only, no gate). Admin manages suggestions per charity via the "Suggested topics" expandable section in `CharityRow` (searchable, checkboxes, save → `setCharityTopics` replace-set). Command-panel picker **does not** show suggested topics (deferred). **Full-page two-column layout** (no contained card): `md:grid md:grid-cols-[280px_1fr]`, left column = persistent triad rail with tense-aware `leftPrompt` + step labels/subtext/icons/opacity tiers, separated from step content by spacing (no `border-r`). On mobile: left column hidden, existing step-dot `<ol>` is the only progress widget (no second widget). Subject-aware copy is driven by `getWizardCopy(subject)` from `lib/wizard-copy.ts`. CharityStep defaults to single preferred charity — auto-collapses after first pick; "Add another charity" quiet text link expands the picker; split note shown when 2+ selected; max 3. The topic picker (step 3) and charity picker (step 2) open as `ResponsiveOverlay` sheets. Step 3 shows a compact item summary below the selected topic chip — rendered as readonly `Chip` components (existing canonical options in muted style; organiser additions in brand purple; overflow as "+N more") — with a "View & add" button that opens `TopicItemsDialog`; canonical topics without additions redirect via `topicId` + `topicTitle`; topics with any additions (or new custom topics) redirect via `draftAdditions=1` + sessionStorage (see item management decision). The `event-flow/` step components (`HonourStep`, `LoveStep`, `CharityStep`) are used by both `NewEventWizard` and `CommandPanel`. **NOTE**: app-wide triad reorder (CommandPanel, onboarding, marketing copy) is deferred — only the wizard reflects the new order for now.
 
 - **Onboarding for first-time organisers.** On desktop, `PreviewPanel` shows `OnboardingPanel` when no occasion is selected. On mobile, `EventFormV2` renders `OnboardingInterstitial` (fixed inset-0 overlay). Both use `localStorage.favpoll_show_onboarding` (`'0'` = dismissed, `'1'` = re-show). "How favpoll works →" link sets `'1'` to re-open.
 
