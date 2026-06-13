@@ -5,6 +5,12 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 
 type Props = {
   open: boolean
@@ -71,37 +77,29 @@ export function TopicItemsDialog({
       <div>
         {/* Sticky search + add input */}
         <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                if (showAddRow) handleAdd()
-              }
-            }}
-            placeholder={`Search or add ${topicTitle.toLowerCase()} options…`}
-            autoFocus
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-          />
+          <InputGroup className="h-auto rounded-md">
+            <InputGroupInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  if (showAddRow) handleAdd()
+                }
+              }}
+              placeholder={`Search or add ${topicTitle.toLowerCase()} options…`}
+              autoFocus
+              className="h-auto px-3 py-2 md:text-base"
+            />
+            {showAddRow && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton onClick={handleAdd}>Add</InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </div>
 
         <div className="space-y-4 px-5 py-4">
-          {/* Add row — shown when search text matches nothing */}
-          {showAddRow && (
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
-            >
-              <span className="text-muted-foreground">Add</span>
-              <span className="rounded-full bg-muted px-3 py-0.5 font-medium text-muted-foreground">
-                {trimmed}
-              </span>
-            </button>
-          )}
-
           {/* Added by you */}
           {(trimmed ? filteredAdded : addedItems).length > 0 && (
             <div>
