@@ -12,6 +12,7 @@ import { WizardProgressStrip } from "./wizard-progress-strip"
 import { WizardNav } from "./wizard-nav"
 import { WizardCharityCard } from "./wizard-charity-card"
 import { WizardTopicCard } from "./wizard-topic-card"
+import { WizardStepShell } from "./wizard-step-shell"
 import type { WizardData } from "./use-wizard-state"
 
 type Props = {
@@ -32,31 +33,33 @@ export function NewEventWizard({ data }: Props) {
 
             {/* Honour step */}
             {w.step === "honour" && (
-              <HonourStep
-                value={{
-                  category: w.category,
-                  grouping: w.grouping,
-                  subject: w.subject,
-                  causeLabel: w.causeLabel,
-                }}
-                onChange={({ category, grouping, subject, causeLabel }) => {
-                  w.setCategory(category)
-                  w.setGrouping(grouping)
-                  w.setSubject(subject)
-                  w.setCauseLabel(causeLabel)
-                }}
-              />
+              <WizardStepShell
+                title="Honour"
+                guidance="Who or what is this event for?"
+              >
+                <HonourStep
+                  value={{
+                    category: w.category,
+                    grouping: w.grouping,
+                    subject: w.subject,
+                    causeLabel: w.causeLabel,
+                  }}
+                  onChange={({ category, grouping, subject, causeLabel }) => {
+                    w.setCategory(category)
+                    w.setGrouping(grouping)
+                    w.setSubject(subject)
+                    w.setCauseLabel(causeLabel)
+                  }}
+                />
+              </WizardStepShell>
             )}
 
             {/* Charity step */}
             {w.step === "charity" && (
-              <div className="flex flex-col gap-3 py-6">
-                <h3 className="text-lg font-medium tracking-tight text-foreground">
-                  Charity
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {w.copy.charityGuidance}
-                </p>
+              <WizardStepShell
+                title="Charity"
+                guidance={w.copy.charityGuidance}
+              >
                 {w.selectedCharities.length > 0 ? (
                   <WizardCharityCard
                     charities={w.selectedCharities}
@@ -74,41 +77,31 @@ export function NewEventWizard({ data }: Props) {
                     Pick a charity
                   </Button>
                 )}
-              </div>
+              </WizardStepShell>
             )}
 
             {/* Love step */}
             {w.step === "love" && (
-              <div className="flex flex-col">
-                <div className="flex flex-col gap-3 py-6">
-                  <h3 className="text-lg font-medium tracking-tight text-foreground">
-                    Love
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {w.copy.loveGuidance}
-                  </p>
-                  {w.topics.length > 0 ? (
-                    <div className="flex flex-col gap-3">
-                      <WizardTopicCard
-                        topic={w.topics[0]}
-                        sortedExistingItems={w.sortedExistingItems}
-                        customLabels={w.customLabels}
-                        showItemsSection={w.showItemsSection}
-                        onEdit={() => w.setLoveOpen(true)}
-                        onRemove={() => w.setTopics([])}
-                        onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
-                      />
-                    </div>
-                  ) : (
-                    <Button
-                      variant="secondary"
-                      onClick={() => w.setLoveOpen(true)}
-                    >
-                      Pick a topic
-                    </Button>
-                  )}
-                </div>
-              </div>
+              <WizardStepShell title="Love" guidance={w.copy.loveGuidance}>
+                {w.topics.length > 0 ? (
+                  <WizardTopicCard
+                    topic={w.topics[0]}
+                    sortedExistingItems={w.sortedExistingItems}
+                    customLabels={w.customLabels}
+                    showItemsSection={w.showItemsSection}
+                    onEdit={() => w.setLoveOpen(true)}
+                    onRemove={() => w.setTopics([])}
+                    onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
+                  />
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={() => w.setLoveOpen(true)}
+                  >
+                    Pick a topic
+                  </Button>
+                )}
+              </WizardStepShell>
             )}
 
             <WizardNav
