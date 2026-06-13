@@ -103,7 +103,7 @@ describe("TopicItemsDialog — new topic", () => {
     expect(screen.queryByText("Existing options")).not.toBeInTheDocument()
   })
 
-  it("shows ≥2 validation in footer when fewer than 2 items added", () => {
+  it("shows added item with remove button when 1 item added", () => {
     render(
       <TopicItemsDialog
         {...BASE_PROPS}
@@ -112,9 +112,8 @@ describe("TopicItemsDialog — new topic", () => {
         isNewTopic
       />
     )
-    expect(
-      screen.getByText("Add at least one more option.")
-    ).toBeInTheDocument()
+    expect(screen.getByText("Added by you")).toBeInTheDocument()
+    expect(screen.getByLabelText("Remove Cat")).toBeInTheDocument()
   })
 
   it("hides validation once 2 items are added", () => {

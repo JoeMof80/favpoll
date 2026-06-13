@@ -1,20 +1,11 @@
 "use client"
 
-// TODO(refactor): adopt ResponsiveOverlay from @/components/ui/responsive-overlay to replace the duplicate Sheet+Dialog pattern here
-
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Chip } from "@/components/ui/chip"
+import { Button } from "./ui/button"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { TopicItem } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
-import { Button } from "./ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog"
 
 type Allocation = {
   topicItemId: string
@@ -60,7 +51,6 @@ function PickerHeader({
   amount,
   isAmountValid,
   onDeselect,
-  inputRef,
   topicTitle,
 }: {
   search: string
@@ -72,7 +62,6 @@ function PickerHeader({
   amount: number
   isAmountValid: boolean
   onDeselect: (id: string) => void
-  inputRef: React.RefObject<HTMLInputElement | null>
   topicTitle?: string
 }) {
   const placeholder = topicTitle
@@ -113,7 +102,6 @@ function PickerHeader({
         )
       })}
       <input
-        ref={inputRef}
         type="text"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
@@ -131,6 +119,7 @@ function PickerHeader({
             onDeselect(selectedIds[selectedIds.length - 1])
           }
         }}
+        autoFocus
         placeholder={hasSelections ? "" : placeholder}
         className={
           hasSelections
@@ -237,13 +226,10 @@ export function PledgePanel({
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [draftIds, setDraftIds] = useState<string[]>([])
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [addingItem, setAddingItem] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
-  const sheetInputRef = useRef<HTMLInputElement>(null)
-  const dialogInputRef = useRef<HTMLInputElement>(null)
 
   const allocations = computeAllocations(selectedIds, items)
   const draftAllocations = computeAllocations(draftIds, items)
@@ -302,13 +288,17 @@ export function PledgePanel({
     setAddError(null)
   }
 
-  function trigger(className: string) {
+  function renderTrigger(className: string) {
     const buttonSize = size === "lg" ? "default" : "sm"
     if (selectedIds.length === 0) {
       return (
         <Button
           type="button"
           size={buttonSize}
+          onClick={() => {
+            handleOpen()
+            setOpen(true)
+          }}
           className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}
         >
           Select favourites
@@ -316,7 +306,21 @@ export function PledgePanel({
       )
     }
     return (
-      <div className={`flex w-full flex-wrap gap-1.5 ${className}`}>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => {
+          handleOpen()
+          setOpen(true)
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            handleOpen()
+            setOpen(true)
+          }
+        }}
+        className={`flex w-full flex-wrap gap-1.5 ${className}`}
+      >
         {selectedIds.map((id) => {
           const item = items.find((i) => i.id === id)
           if (!item) return null
@@ -376,91 +380,33 @@ export function PledgePanel({
   return (
     <fieldset>
       <legend className="sr-only">Choose your favourites</legend>
-
-      {/* Mobile: bottom sheet */}
-      <Sheet
-        open={sheetOpen}
+      {renderTrigger("md:hidden")}
+      {renderTrigger("hidden md:flex")}
+      <ResponsiveOverlay
+        open={open}
         onOpenChange={(o) => {
           if (o) handleOpen()
-          setSheetOpen(o)
+          setOpen(o)
           if (!o) handleClose()
         }}
-      >
-        <SheetTrigger asChild>{trigger("md:hidden")}</SheetTrigger>
-        <SheetContent
-          side="bottom"
-          className="flex flex-col p-0"
-          style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
-          onOpenAutoFocus={(e) => {
-            e.preventDefault()
-          }}
-        >
-          <SheetHeader className="shrink-0 border-b border-border px-4 pt-4 pb-3">
-            <SheetTitle className="sr-only">Choose your favourites</SheetTitle>
-            <PickerHeader {...pickerHeaderProps} inputRef={sheetInputRef} />
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-4">
-            <PickerItems {...pickerItemsProps} />
-          </div>
-          <div
-            className="shrink-0 border-t border-border px-4 py-3"
-            style={{
-              paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+        title="Choose your favourites"
+        header={<PickerHeader {...pickerHeaderProps} />}
+        footer={
+          <Button
+            type="button"
+            className="h-11 w-full text-base"
+            onClick={() => {
+              handleDone()
+              setOpen(false)
             }}
           >
-            <Button
-              type="button"
-              className="h-11 w-full text-base"
-              onClick={() => {
-                handleDone()
-                setSheetOpen(false)
-              }}
-            >
-              Done
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop: dialog */}
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(o) => {
-          if (o) handleOpen()
-          setDialogOpen(o)
-          if (!o) handleClose()
-        }}
+            Done
+          </Button>
+        }
+        dialogContentClassName="flex-1 overflow-y-auto p-4"
       >
-        <DialogTrigger asChild>{trigger("hidden md:flex")}</DialogTrigger>
-        <DialogContent
-          className="flex flex-col gap-0 overflow-hidden p-0"
-          style={{ maxHeight: "min(600px, 80vh)" }}
-          onOpenAutoFocus={(e) => {
-            e.preventDefault()
-            dialogInputRef.current?.focus()
-          }}
-        >
-          <DialogTitle className="sr-only">Choose your favourites</DialogTitle>
-          <div className="shrink-0 border-b border-border px-5 pt-5 pb-4">
-            <PickerHeader {...pickerHeaderProps} inputRef={dialogInputRef} />
-          </div>
-          <div className="flex-1 overflow-y-auto p-4">
-            <PickerItems {...pickerItemsProps} />
-          </div>
-          <div className="shrink-0 border-t border-border px-5 py-4">
-            <Button
-              type="button"
-              className="h-11 w-full text-base"
-              onClick={() => {
-                handleDone()
-                setDialogOpen(false)
-              }}
-            >
-              Done
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        <PickerItems {...pickerItemsProps} />
+      </ResponsiveOverlay>
     </fieldset>
   )
 }

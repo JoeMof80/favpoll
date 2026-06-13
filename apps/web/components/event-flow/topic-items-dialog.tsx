@@ -63,18 +63,9 @@ export function TopicItemsDialog({
       }}
       title={topicTitle}
       footer={
-        <div className="space-y-2">
-          {isNewTopic && addedItems.length < 2 && (
-            <p className="text-center text-xs text-muted-foreground">
-              {addedItems.length === 0
-                ? "Add at least two options."
-                : "Add at least one more option."}
-            </p>
-          )}
-          <Button type="button" className="w-full" onClick={handleClose}>
-            Done
-          </Button>
-        </div>
+        <Button type="button" className="w-full" onClick={handleClose}>
+          Done
+        </Button>
       }
     >
       <div>

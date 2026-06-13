@@ -1,7 +1,5 @@
 "use client"
 
-// TODO(refactor): pledge-panel.tsx can adopt ResponsiveOverlay
-
 import { useEffect, useState } from "react"
 import {
   Sheet,
@@ -23,6 +21,8 @@ type Props = {
   onOpenChange: (open: boolean) => void
   title: string
   description?: string
+  /** When provided, renders in place of the visible title. `title` becomes sr-only. */
+  header?: React.ReactNode
   footer?: React.ReactNode
   children: React.ReactNode
   /** Override the content wrapper class on the Dialog (desktop) variant only. */
@@ -46,6 +46,7 @@ export function ResponsiveOverlay({
   onOpenChange,
   title,
   description,
+  header,
   footer,
   children,
   dialogContentClassName,
@@ -61,8 +62,17 @@ export function ResponsiveOverlay({
           style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
         >
           <SheetHeader className="shrink-0 border-b border-border px-4 py-4">
-            <SheetTitle>{title}</SheetTitle>
-            {description && <SheetDescription>{description}</SheetDescription>}
+            {header ? (
+              <>
+                <SheetTitle className="sr-only">{title}</SheetTitle>
+                {header}
+              </>
+            ) : (
+              <SheetTitle>{title}</SheetTitle>
+            )}
+            {!header && description && (
+              <SheetDescription>{description}</SheetDescription>
+            )}
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
           {footer && (
@@ -87,8 +97,17 @@ export function ResponsiveOverlay({
         style={{ maxHeight: "min(600px, 80vh)" }}
       >
         <DialogHeader className="shrink-0 border-b border-border px-5 py-4">
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          {header ? (
+            <>
+              <DialogTitle className="sr-only">{title}</DialogTitle>
+              {header}
+            </>
+          ) : (
+            <DialogTitle>{title}</DialogTitle>
+          )}
+          {!header && description && (
+            <DialogDescription>{description}</DialogDescription>
+          )}
         </DialogHeader>
         <div className={dialogContentClassName ?? "flex-1 overflow-y-auto"}>
           {children}
