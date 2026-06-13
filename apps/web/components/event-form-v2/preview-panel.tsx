@@ -69,7 +69,7 @@ const EDIT_BTN =
   "group relative block h-auto w-full whitespace-normal rounded-sm p-0 text-left border-b-2 border-dotted border-primary/20 hover:border-primary/60 focus-visible:border-primary/60"
 
 const PENCIL_ICON =
-  "absolute top-0 right-0 h-6 w-6 rounded-full border border-border bg-background p-1.5 text-muted-foreground shadow-sm opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+  "absolute top-0 right-0 h-8 w-8 rounded-full border border-border bg-background p-2 text-muted-foreground shadow-sm opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
 
 function CharCounter({ value, max }: { value: string; max: number }) {
   const remaining = max - value.length
@@ -434,7 +434,7 @@ export function PreviewPanel({
                     photoUrl={previewPhoto ? resolvedPhotoUrl : null}
                   />
                   <Pencil
-                    className="absolute -top-1 -right-1 h-6 w-6 rounded-full border border-border bg-background p-1.5 text-muted-foreground opacity-60 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="absolute -top-1 -right-1 h-8 w-8 rounded-full border border-border bg-background p-2 text-muted-foreground opacity-60 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
                     aria-hidden
                   />
                 </Button>
@@ -606,7 +606,7 @@ export function PreviewPanel({
               <CountdownPlaceholder />
             )}
             <Pencil
-              className="absolute top-2 right-2 h-6 w-6 rounded-full border border-border bg-background p-1.5 text-muted-foreground opacity-60 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              className="absolute top-2 right-2 h-8 w-8 rounded-full border border-border bg-background p-2 text-muted-foreground opacity-60 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
               aria-hidden
             />
           </Button>
