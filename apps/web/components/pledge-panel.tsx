@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import { Button } from "./ui/button"
+import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { TopicItem } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
@@ -52,6 +53,8 @@ function PickerHeader({
   isAmountValid,
   onDeselect,
   topicTitle,
+  showCreate,
+  addingItem,
 }: {
   search: string
   onSearchChange: (v: string) => void
@@ -63,6 +66,8 @@ function PickerHeader({
   isAmountValid: boolean
   onDeselect: (id: string) => void
   topicTitle?: string
+  showCreate: boolean
+  addingItem: boolean
 }) {
   const placeholder = topicTitle
     ? `Search for your favourite ${topicTitle.toLowerCase()}…`
@@ -127,6 +132,18 @@ function PickerHeader({
             : "min-w-30 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
         }
       />
+      {showCreate && (
+        <InputGroupButton
+          onMouseDown={(e) => {
+            e.preventDefault()
+            onAdd()
+          }}
+          disabled={addingItem}
+          className="shrink-0"
+        >
+          Add
+        </InputGroupButton>
+      )}
     </div>
   )
 }
@@ -136,46 +153,24 @@ function PickerItems({
   selectedIds,
   showCreate,
   search,
-  addingItem,
   isInfinite,
   onAddItem,
   onToggle,
-  onAdd,
   addError,
 }: {
   filteredItems: TopicItem[]
   selectedIds: string[]
   showCreate: boolean
   search: string
-  addingItem: boolean
   isInfinite?: boolean
   onAddItem?: (label: string) => Promise<void>
   onToggle: (id: string) => void
-  onAdd: () => void
   addError: string | null
 }) {
   if (showCreate) {
-    return (
-      <>
-        <button
-          type="button"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            onAdd()
-          }}
-          disabled={addingItem}
-          className="flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
-        >
-          <span className="text-muted-foreground">Add</span>
-          <span className="rounded-full bg-muted px-3 py-0.5 font-medium text-muted-foreground">
-            {search.trim()}
-          </span>
-        </button>
-        {addError && (
-          <p className="mt-2 text-xs text-destructive">{addError}</p>
-        )}
-      </>
-    )
+    return addError ? (
+      <p className="text-xs text-destructive">{addError}</p>
+    ) : null
   }
   if (filteredItems.length === 0 && !search.toLowerCase().trim()) {
     return (
@@ -362,6 +357,8 @@ export function PledgePanel({
     isAmountValid,
     onDeselect: toggleDraft,
     topicTitle,
+    showCreate,
+    addingItem,
   }
 
   const pickerItemsProps = {
@@ -369,11 +366,9 @@ export function PledgePanel({
     selectedIds: draftIds,
     showCreate,
     search,
-    addingItem,
     isInfinite,
     onAddItem,
     onToggle: toggleDraft,
-    onAdd: handleAdd,
     addError,
   }
 
