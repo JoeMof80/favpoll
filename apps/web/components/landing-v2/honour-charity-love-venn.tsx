@@ -3,9 +3,9 @@
 import * as React from "react"
 
 /**
- * HonourLoveCharityVenn — the hero emblem for the alt landing page.
+ * HonourCharityLoveVenn — the hero emblem for the alt landing page.
  *
- * Three overlapping rings (Honour, Love, Charity) with the favpoll mark at
+ * Three overlapping rings (Honour, Charity, Love) with the favpoll mark at
  * their intersection. Each ring is a full circle whose stroke fades to nothing
  * toward its outer edge, so the venn is only suggested, never closed. The rings
  * rotate slowly; because each fade lives in the ring's own gradient, the fade
@@ -15,10 +15,10 @@ import * as React from "react"
  * only the size is parameterised so the hero controls how large it renders.
  *
  * Usage:
- *   <HonourLoveCharityVenn className="w-full max-w-md mx-auto" />
+ *   <HonourCharityLoveVenn className="w-full max-w-md mx-auto" />
  */
 
-export interface HonourLoveCharityVennProps extends Omit<
+export interface HonourCharityLoveVennProps extends Omit<
   React.SVGProps<SVGSVGElement>,
   "speed"
 > {
@@ -26,17 +26,17 @@ export interface HonourLoveCharityVennProps extends Omit<
   size?: number | string
   /** Slowly rotate the rings. Always paused when the user prefers reduced motion. */
   animate?: boolean
-  /** Seconds per full rotation, per ring (charity / love / honour). */
-  speed?: { charity?: number; love?: number; honour?: number }
+  /** Seconds per full rotation, per ring (honour / charity / love). */
+  speed?: { honour?: number; charity?: number; love?: number }
   /** Accessible label. */
   title?: string
 }
 
 // Ring centres + per-ring rotation period (seconds), in the SVG's 47x49 space.
 const RINGS = [
+  { key: "honour", cx: 17.5, cy: 17.5, paint: "paint2_linear_0_1", dur: 5 },
   { key: "charity", cx: 23.5, cy: 28.5, paint: "paint0_linear_0_1", dur: 9 },
   { key: "love", cx: 29.5, cy: 17.5, paint: "paint1_linear_0_1", dur: 7 },
-  { key: "honour", cx: 17.5, cy: 17.5, paint: "paint2_linear_0_1", dur: 5 },
 ] as const
 
 function usePrefersReducedMotion() {
@@ -51,13 +51,13 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-export default function HonourLoveCharityVenn({
+export default function HonourCharityLoveVenn({
   size,
   animate = true,
   speed,
-  title = "favpoll — honour, love and charity",
+  title = "favpoll — honour, charity and love",
   ...rest
-}: HonourLoveCharityVennProps) {
+}: HonourCharityLoveVennProps) {
   const reduced = usePrefersReducedMotion()
   const spinning = animate && !reduced
 

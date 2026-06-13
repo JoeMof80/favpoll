@@ -1,19 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import HonourLoveCharityVenn from "./honour-love-charity-venn"
+import HonourCharityLoveVenn from "./honour-charity-love-venn"
 
-const meta: Meta<typeof HonourLoveCharityVenn> = {
-  title: "Landing/HonourLoveCharityVenn",
-  component: HonourLoveCharityVenn,
+const meta: Meta<typeof HonourCharityLoveVenn> = {
+  title: "Landing/HonourCharityLoveVenn",
+  component: HonourCharityLoveVenn,
   parameters: { layout: "centered" },
 }
 
 export default meta
-type Story = StoryObj<typeof HonourLoveCharityVenn>
+type Story = StoryObj<typeof HonourCharityLoveVenn>
 
 export const Default: Story = {
   render: () => (
     <div className="w-[440px] rounded-xl bg-muted p-8">
-      <HonourLoveCharityVenn />
+      <HonourCharityLoveVenn />
     </div>
   ),
 }
@@ -21,7 +21,7 @@ export const Default: Story = {
 export const Narrow: Story = {
   render: () => (
     <div className="w-[280px] rounded-xl bg-muted p-6">
-      <HonourLoveCharityVenn />
+      <HonourCharityLoveVenn />
     </div>
   ),
 }

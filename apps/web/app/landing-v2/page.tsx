@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HowItWorks } from "@/components/landing-v2/how-it-works"
 import { OccasionEyebrow } from "@/components/landing-v2/occasion-eyebrow"
-import HonourLoveCharityVenn from "@/components/landing-v2/honour-love-charity-venn"
+import HonourCharityLoveVenn from "@/components/landing-v2/honour-charity-love-venn"
 
 export default function LandingV2Page() {
   return (
@@ -39,8 +39,8 @@ export default function LandingV2Page() {
 
             {/* Venn */}
             <div className="flex items-center justify-center">
-              {/* <HonourLoveCharityVenn className="w-full max-w-[440px]" /> */}
-              <HonourLoveCharityVenn />
+              {/* <HonourCharityLoveVenn className="w-full max-w-[440px]" /> */}
+              <HonourCharityLoveVenn />
             </div>
           </div>
         </div>
