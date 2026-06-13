@@ -14,6 +14,8 @@ import {
   createCharity,
   updateCharity,
   deactivateCharity,
+  getCharityTopics,
+  setCharityTopics,
 } from "@/lib/actions/charities";
 
 beforeEach(() => {
@@ -224,5 +226,91 @@ describe("deactivateCharity", () => {
     const { error } = await deactivateCharity("charity-1");
 
     expect(error).toBe("update failed");
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getCharityTopics
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getCharityTopics", () => {
+  it("returns topic ids for the given charity", async () => {
+    mock.queue([{ topic_id: "t-1" }, { topic_id: "t-2" }]);
+
+    const { data, error } = await getCharityTopics("charity-1");
+
+    expect(error).toBeNull();
+    expect(data).toEqual(["t-1", "t-2"]);
+  });
+
+  it("returns an empty array when no suggestions are set", async () => {
+    mock.queue([]);
+
+    const { data, error } = await getCharityTopics("charity-1");
+
+    expect(error).toBeNull();
+    expect(data).toEqual([]);
+  });
+
+  it("returns error on DB failure", async () => {
+    mock.queue(null, { message: "DB error" });
+
+    const { data, error } = await getCharityTopics("charity-1");
+
+    expect(data).toBeNull();
+    expect(error).toBe("DB error");
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// setCharityTopics
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("setCharityTopics", () => {
+  it("deletes then inserts the given topic ids", async () => {
+    mock.queue(null); // delete
+    mock.queue(null); // insert
+
+    const { error } = await setCharityTopics("charity-1", ["t-1", "t-2"]);
+
+    expect(error).toBeNull();
+
+    const ctCalls = mock.callsFor("charity_topics");
+    expect(ctCalls.some((c) => c.method === "delete")).toBe(true);
+    const insertCall = ctCalls.find((c) => c.method === "insert");
+    expect(insertCall).toBeDefined();
+    expect(insertCall!.args[0]).toEqual([
+      { charity_id: "charity-1", topic_id: "t-1" },
+      { charity_id: "charity-1", topic_id: "t-2" },
+    ]);
+  });
+
+  it("only deletes when topicIds is empty (no insert)", async () => {
+    mock.queue(null); // delete
+
+    const { error } = await setCharityTopics("charity-1", []);
+
+    expect(error).toBeNull();
+
+    const ctCalls = mock.callsFor("charity_topics");
+    expect(ctCalls.some((c) => c.method === "delete")).toBe(true);
+    expect(ctCalls.some((c) => c.method === "insert")).toBe(false);
+  });
+
+  it("returns error if delete fails", async () => {
+    mock.queue(null, { message: "delete failed" });
+
+    const { error } = await setCharityTopics("charity-1", ["t-1"]);
+
+    expect(error).toBe("delete failed");
+  });
+
+  it("returns error if insert fails", async () => {
+    mock.queue(null); // delete succeeds
+    mock.queue(null, { message: "insert failed" }); // insert fails
+
+    const { error } = await setCharityTopics("charity-1", ["t-1"]);
+
+    expect(error).toBe("insert failed");
   });
 });

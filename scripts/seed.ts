@@ -2295,6 +2295,71 @@ const topicItems: Record<string, string[]> = {
 // Seed functions
 // ---------------------------------------------------------------------------
 
+// charity name → topic titles (title-matched, fail-loud)
+const CHARITY_TOPIC_SEED: Record<string, string[]> = {
+  "Dogs Trust": ["Animal"],
+  "RSPCA": ["Animal", "Bird"],
+  "WWF": ["Animal", "Bird", "Landscape"],
+  "National Trust": ["Landscape", "Tree", "Way to spend Sunday"],
+  "RNLI": ["Way to travel"],
+  "Marie Curie": ["Season", "Colour"],
+  "Mind": ["Hobby"],
+  "British Heart Foundation": ["Form of exercise"],
+}
+
+async function seedCharityTopics() {
+  console.log("Seeding charity topics…")
+
+  const { data: charityRows } = await supabase
+    .from("charities")
+    .select("id, name")
+  const { data: topicRows } = await supabase
+    .from("topics")
+    .select("id, title")
+
+  const charityByName = new Map(
+    (charityRows ?? []).map((r: { id: string; name: string }) => [r.name, r.id])
+  )
+  const topicByTitle = new Map(
+    (topicRows ?? []).map((r: { id: string; title: string }) => [r.title, r.id])
+  )
+
+  let inserted = 0
+  let skipped = 0
+
+  for (const [charityName, topicTitles] of Object.entries(CHARITY_TOPIC_SEED)) {
+    const charityId = charityByName.get(charityName)
+    if (!charityId)
+      throw new Error(`seedCharityTopics: charity "${charityName}" not found`)
+
+    for (const topicTitle of topicTitles) {
+      const topicId = topicByTitle.get(topicTitle)
+      if (!topicId)
+        throw new Error(
+          `seedCharityTopics: topic "${topicTitle}" not found (charity "${charityName}")`
+        )
+
+      const { data: existing } = await supabase
+        .from("charity_topics")
+        .select("charity_id")
+        .eq("charity_id", charityId)
+        .eq("topic_id", topicId)
+        .maybeSingle()
+
+      if (existing) { skipped++; continue }
+
+      const { error } = await supabase
+        .from("charity_topics")
+        .insert({ charity_id: charityId, topic_id: topicId })
+      if (error)
+        console.error(`  ✗ ${charityName} → ${topicTitle}:`, error.message)
+      else inserted++
+    }
+  }
+
+  console.log(`  ${inserted} inserted, ${skipped} already existed`)
+}
+
 async function seedCharities() {
   console.log("Seeding charities…");
   let inserted = 0;
@@ -2686,6 +2751,7 @@ async function seed() {
   await assertAllTopicsHavePlaceholders()
   await seedTopicItems()
   await seedTopicCategories()
+  await seedCharityTopics()
   console.log("\nSeed complete.")
 }
 

@@ -9,30 +9,34 @@ export type WizardCopy = {
   loveGuidance: string
 }
 
+const SOMEONE: WizardCopy = {
+  leftPrompt:
+    "Someone you love, a cause that matters, and the things they loved — that's a favpoll.",
+  rail: {
+    honour: "Who or what is this event for?",
+    charity: "Every pledge goes to the charity you choose.",
+    love: "What did they love? Guests pledge on their favourites.",
+  },
+  charityGuidance:
+    "Is there a charity that was special to them? If not, don't worry — there are many worthy causes to choose from.",
+  loveGuidance:
+    "What did they love? Pick a topic close to their heart and let guests pledge on their favourite.",
+}
+
+const CAUSE: WizardCopy = {
+  leftPrompt:
+    "A cause that matters, and a question people will love answering — that's a favpoll.",
+  rail: {
+    honour: "Who or what is this event for?",
+    charity: "Every pledge goes to the charity you choose.",
+    love: "Pick a topic your supporters will love voting on.",
+  },
+  charityGuidance:
+    "Which charity are you raising for? Proceeds from every pledge go straight to them.",
+  loveGuidance:
+    "Pick a topic that suits your cause — something supporters will enjoy voting on.",
+}
+
 export function getWizardCopy(subject: EventSubject): WizardCopy {
-  if (subject === "cause") {
-    return {
-      leftPrompt: "What cause are you supporting?",
-      rail: {
-        honour: "Who or what is this for?",
-        charity: "Pick the charity your cause raises for.",
-        love: "Pick a topic relevant to your cause — e.g. Birds for the RSPB.",
-      },
-      charityGuidance: "Pick the charity your cause raises for.",
-      loveGuidance:
-        "Pick a topic relevant to your cause — e.g. Birds for the RSPB.",
-    }
-  }
-  return {
-    leftPrompt: "Who are you celebrating?",
-    rail: {
-      honour:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      charity:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      love: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    charityGuidance: "Proceeds from every pledge go to charity.",
-    loveGuidance: "What did they love? Pick a favpoll topic.",
-  }
+  return subject === "cause" ? CAUSE : SOMEONE
 }

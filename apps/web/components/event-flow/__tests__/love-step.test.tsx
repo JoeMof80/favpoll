@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, within } from "@testing-library/react"
 
 import { LoveStep } from "@/components/event-flow/love-step"
 import type { Category, TopicWithMeta } from "@favpoll/types"
@@ -179,6 +179,89 @@ describe("LoveStep — items panel", () => {
     const zebraIdx = labels.findIndex((l) => l?.includes("Zebra"))
     expect(firstIdx).toBeLessThan(appleIdx)
     expect(appleIdx).toBeLessThan(zebraIdx)
+  })
+})
+
+describe("LoveStep — suggested topics", () => {
+  const SUGGESTED = [makeTopic("t-colour", "Colour", [], true)]
+
+  it("shows suggested section heading when suggestedTopics is non-empty", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+        suggestedTopics={SUGGESTED}
+        primaryCharityName="Dogs Trust"
+      />
+    )
+    expect(screen.getByText("Suggested for Dogs Trust")).toBeInTheDocument()
+  })
+
+  it("does not show suggested section when suggestedTopics is empty", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+        suggestedTopics={[]}
+        primaryCharityName="Dogs Trust"
+      />
+    )
+    expect(screen.queryByText(/Suggested for/)).not.toBeInTheDocument()
+  })
+
+  it("does not show suggested section when suggestedTopics is undefined", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    expect(screen.queryByText(/Suggested for/)).not.toBeInTheDocument()
+  })
+
+  it("hides suggested section when search is active", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+        suggestedTopics={SUGGESTED}
+        primaryCharityName="Dogs Trust"
+      />
+    )
+    const input = screen.getByPlaceholderText("Search topics…")
+    fireEvent.change(input, { target: { value: "col" } })
+    expect(
+      screen.queryByText("Suggested for Dogs Trust")
+    ).not.toBeInTheDocument()
+  })
+
+  it("selecting a suggested topic calls onChange with the topic", () => {
+    const onChange = vi.fn()
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={onChange}
+        suggestedTopics={SUGGESTED}
+        primaryCharityName="Dogs Trust"
+      />
+    )
+    const heading = screen.getByText("Suggested for Dogs Trust")
+    const section = heading.closest("div")!
+    const chip = within(section).getByText("Colour")
+    fireEvent.click(chip)
+    expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ topicId: "t-colour" })])
+    )
   })
 })
 
