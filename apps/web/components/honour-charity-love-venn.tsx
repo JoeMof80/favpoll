@@ -2,9 +2,9 @@ import * as React from "react"
 import { FavpollMarkGlyph } from "./favpoll-mark"
 
 /**
- * HonourLoveCharityVenn — the hero emblem for the alt landing page.
+ * HonourCharityLoveVenn — the hero emblem for the alt landing page.
  *
- * Three overlapping rings (Honour, Love, Charity) with the favpoll mark at
+ * Three overlapping rings (Honour, Charity, Love) with the favpoll mark at
  * their intersection. Each ring is a *full circle* whose stroke fades to
  * nothing toward one side, so the venn is only ever suggested, never closed.
  * The fade is oriented per ring (outward, away from the centre) and rides
@@ -15,17 +15,17 @@ import { FavpollMarkGlyph } from "./favpoll-mark"
  * rather than baked outlines.
  *
  * Usage:
- *   <HonourLoveCharityVenn className="w-full max-w-md mx-auto" />
+ *   <HonourCharityLoveVenn className="w-full max-w-md mx-auto" />
  */
 
-export interface HonourLoveCharityVennProps extends Omit<
+export interface HonourCharityLoveVennProps extends Omit<
   React.SVGProps<SVGSVGElement>,
   "speed"
 > {
   /** Pixel size; omit to size via CSS/className. */
   size?: number | string
   /** The three ring labels. */
-  labels?: { honour: string; love: string; charity: string }
+  labels?: { honour: string; charity: string; love: string }
   /** Ring + label colour. */
   ringColor?: string
   /** Mark colour (heart full, inner strokes 60%). */
@@ -33,7 +33,7 @@ export interface HonourLoveCharityVennProps extends Omit<
   /** Slowly rotate the rings. Always paused when the user prefers reduced motion. */
   animate?: boolean
   /** Seconds per full rotation, per ring. */
-  speed?: { honour?: number; love?: number; charity?: number }
+  speed?: { honour?: number; charity?: number; love?: number }
   /** Accessible label. */
   title?: string
 }
@@ -68,22 +68,22 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-export default function HonourLoveCharityVenn({
+export default function HonourCharityLoveVenn({
   size,
-  labels = { honour: "Honour", love: "Love", charity: "Charity" },
+  labels = { honour: "Honour", charity: "Charity", love: "Love" },
   ringColor = "#423DB9",
   markColor = "#423DB3",
   animate = true,
   speed,
-  title = "favpoll — honour, love and charity",
+  title = "favpoll — honour, charity and love",
   ...rest
-}: HonourLoveCharityVennProps) {
+}: HonourCharityLoveVennProps) {
   const reduced = usePrefersReducedMotion()
   const spinning = animate && !reduced
   const dur = {
     honour: speed?.honour ?? 30,
-    love: speed?.love ?? 34,
     charity: speed?.charity ?? 38,
+    love: speed?.love ?? 34,
   }
 
   return (

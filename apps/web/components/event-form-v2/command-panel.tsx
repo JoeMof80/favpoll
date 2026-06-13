@@ -60,8 +60,8 @@ export function CommandPanel({
   const isListed = useWatch({ control: form.control, name: "isListed" }) ?? true
 
   const [honourOpen, setHonourOpen] = useState(false)
-  const [loveOpen, setLoveOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)
+  const [loveOpen, setLoveOpen] = useState(false)
 
   const categoryLabel = category
     ? category.charAt(0).toUpperCase() + category.slice(1)
@@ -84,9 +84,9 @@ export function CommandPanel({
 
   const missing: string[] = []
   if (!category) missing.push("Occasion")
+  if (!charitiesValue?.length) missing.push("Charity")
   if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
     missing.push("favpoll topic")
-  if (!charitiesValue?.length) missing.push("Charity")
   if (subjectValue === "cause") {
     if (!causeLabelValue) missing.push("Cause")
   } else {
@@ -116,13 +116,6 @@ export function CommandPanel({
               >
                 {categoryLabel || "Occasion…"}
               </Chip>
-              <Chip
-                selected={!!topicLabel}
-                size="sm"
-                onClick={() => setLoveOpen(true)}
-              >
-                {topicLabel || "Topic…"}
-              </Chip>
               {charityNames.length > 0 ? (
                 charityNames.map((name) => (
                   <Chip
@@ -139,6 +132,13 @@ export function CommandPanel({
                   Charity…
                 </Chip>
               )}
+              <Chip
+                selected={!!topicLabel}
+                size="sm"
+                onClick={() => setLoveOpen(true)}
+              >
+                {topicLabel || "Topic…"}
+              </Chip>
             </div>
           </div>
 
@@ -261,30 +261,6 @@ export function CommandPanel({
         />
       </ResponsiveOverlay>
 
-      {/* Love sheet */}
-      <ResponsiveOverlay
-        open={loveOpen}
-        onOpenChange={setLoveOpen}
-        title="favpoll topic"
-        description="Choose what everyone votes on."
-        footer={
-          <Button
-            type="button"
-            className="w-full"
-            onClick={() => setLoveOpen(false)}
-          >
-            Done
-          </Button>
-        }
-      >
-        <LoveStep
-          topics={topics}
-          categories={categories}
-          value={topicsValue}
-          onChange={(v) => form.setValue("topics", v, { shouldValidate: true })}
-        />
-      </ResponsiveOverlay>
-
       {/* Charity sheet */}
       <ResponsiveOverlay
         open={charityOpen}
@@ -307,6 +283,30 @@ export function CommandPanel({
           onChange={(v) =>
             form.setValue("charities", v, { shouldValidate: true })
           }
+        />
+      </ResponsiveOverlay>
+
+      {/* Love sheet */}
+      <ResponsiveOverlay
+        open={loveOpen}
+        onOpenChange={setLoveOpen}
+        title="favpoll topic"
+        description="Choose what everyone votes on."
+        footer={
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setLoveOpen(false)}
+          >
+            Done
+          </Button>
+        }
+      >
+        <LoveStep
+          topics={topics}
+          categories={categories}
+          value={topicsValue}
+          onChange={(v) => form.setValue("topics", v, { shouldValidate: true })}
         />
       </ResponsiveOverlay>
     </>
