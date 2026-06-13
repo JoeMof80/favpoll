@@ -79,15 +79,9 @@ export function HonourStep({ value, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-8 px-6 md:px-0">
+    <div className="flex flex-col gap-8">
       {/* Subject row */}
-      <div className="flex flex-col gap-3 py-6">
-        <h3 className="text-lg font-medium tracking-tight text-foreground">
-          Honour
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Who or what is this event for?
-        </p>
+      <div className="flex flex-col gap-3">
         <ToggleGroup
           type="single"
           value={subjectToggleValue}
