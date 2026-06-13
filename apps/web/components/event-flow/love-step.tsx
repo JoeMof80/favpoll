@@ -39,6 +39,9 @@ export function LoveStep({
 }: LoveStepProps) {
   const [search, setSearch] = useState("")
   const [catFilter, setCatFilter] = useState<string | null>(null)
+  const [typeFilter, setTypeFilter] = useState<"finite" | "infinite" | null>(
+    null
+  )
 
   const activeTopics = topics.filter((t) => t.is_active !== false)
   const selectedId = value[0]?.topicId ?? null
@@ -67,7 +70,11 @@ export function LoveStep({
       t.id === "__custom__" || !catFilter || t.category_ids.includes(catFilter)
     const matchesSearch =
       !search || t.title.toLowerCase().includes(search.toLowerCase())
-    return matchesCat && matchesSearch
+    const matchesType =
+      t.id === "__custom__" ||
+      !typeFilter ||
+      (typeFilter === "finite" ? t.is_finite : !t.is_finite)
+    return matchesCat && matchesSearch && matchesType
   })
 
   const trimmedSearch = search.trim()
@@ -136,9 +143,39 @@ export function LoveStep({
     ])
   }
 
+  const filters = [
+    {
+      key: "__all__",
+      label: "All",
+      isActive: !catFilter && !typeFilter,
+      onClick: () => {
+        setCatFilter(null)
+        setTypeFilter(null)
+      },
+    },
+    {
+      key: "__finite__",
+      label: "Finite",
+      isActive: typeFilter === "finite",
+      onClick: () => setTypeFilter("finite"),
+    },
+    {
+      key: "__infinite__",
+      label: "Infinite",
+      isActive: typeFilter === "infinite",
+      onClick: () => setTypeFilter("infinite"),
+    },
+    ...categories.map((c) => ({
+      key: c.id,
+      label: c.label,
+      isActive: catFilter === c.id,
+      onClick: () => setCatFilter(c.id),
+    })),
+  ]
+
   return (
     <div className="min-h-64 space-y-0">
-      {/* Sticky search + filter row */}
+      {/* Sticky search + filters + suggested */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
         <input
           type="text"
@@ -152,79 +189,77 @@ export function LoveStep({
           }}
           placeholder="Search topics…"
           autoFocus
-          className="mb-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
+          className="mb-3 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
         />
 
-        {/* Category filter buttons */}
+        <p className="mb-1.5 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+          Filters
+        </p>
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {[
-            { id: null, label: "All" },
-            ...categories.map((c) => ({ id: c.id, label: c.label })),
-          ].map(({ id, label }) => {
-            const active = id === null ? !catFilter : catFilter === id
-            return (
-              <Button
-                key={id ?? "__all__"}
-                type="button"
-                variant="outline"
-                onClick={() => setCatFilter(id)}
-                className={cn(
-                  "shrink-0",
-                  active &&
-                    "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                {label}
-              </Button>
-            )
-          })}
+          {filters.map(({ key, label, isActive, onClick }) => (
+            <Button
+              key={key}
+              type="button"
+              variant="outline"
+              onClick={onClick}
+              className={cn(
+                "shrink-0",
+                isActive &&
+                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
-      </div>
 
-      {/* Topic chips */}
-      <div className="px-5 py-4">
-        {filtered.length > 0 || showCreate ? (
-          <div className="space-y-4">
-            {!search && suggestedTopics && suggestedTopics.length > 0 && (
-              <div>
-                <p className="mb-2 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
-                  Suggested for {primaryCharityName}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggestedTopics.map((t) => (
-                    <Chip
-                      key={t.id}
-                      selected={t.id === selectedId}
-                      size="lg"
-                      onClick={() => handleSelect(t.id)}
-                    >
-                      {shortTopicLabel(t.title)}
-                    </Chip>
-                  ))}
-                </div>
-              </div>
-            )}
+        {suggestedTopics && suggestedTopics.length > 0 && (
+          <div className="mt-3">
+            <p className="mb-1.5 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+              Suggested for {primaryCharityName}
+            </p>
             <div className="flex flex-wrap gap-1.5">
-              {filtered.map((t) => (
+              {suggestedTopics.map((t) => (
                 <Chip
                   key={t.id}
-                  selected={t.id === selectedId || t.id === "__custom__"}
+                  selected={t.id === selectedId}
                   size="lg"
                   onClick={() => handleSelect(t.id)}
                 >
                   {shortTopicLabel(t.title)}
                 </Chip>
               ))}
-              {showCreate && (
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Topic chips */}
+      <div className="px-5 py-4">
+        {filtered.length > 0 || showCreate ? (
+          <div className="flex flex-wrap gap-1.5">
+            {filtered.map((t) => (
+              <Chip
+                key={t.id}
+                selected={t.id === selectedId || t.id === "__custom__"}
+                size="lg"
+                onClick={() => handleSelect(t.id)}
+              >
+                {shortTopicLabel(t.title)}
+              </Chip>
+            ))}
+            {showCreate && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="text-sm text-muted-foreground">Add</span>
                 <Chip
                   size="lg"
                   onClick={handleCreateTopic}
                   data-testid="create-topic-chip"
                 >
-                  <span className="opacity-60">Add</span> {trimmedSearch}
+                  {trimmedSearch}
                 </Chip>
-              )}
-            </div>
+              </span>
+            )}
           </div>
         ) : (
           <p className="py-3 text-center text-sm text-muted-foreground">
