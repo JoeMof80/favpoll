@@ -225,7 +225,7 @@ describe("LoveStep — suggested topics", () => {
     expect(screen.queryByText(/Suggested for/)).not.toBeInTheDocument()
   })
 
-  it("hides suggested section when search is active", () => {
+  it("keeps suggested section visible when search is active (pinned)", () => {
     render(
       <LoveStep
         topics={TOPICS}
@@ -238,9 +238,7 @@ describe("LoveStep — suggested topics", () => {
     )
     const input = screen.getByPlaceholderText("Search topics…")
     fireEvent.change(input, { target: { value: "col" } })
-    expect(
-      screen.queryByText("Suggested for Dogs Trust")
-    ).not.toBeInTheDocument()
+    expect(screen.getByText("Suggested for Dogs Trust")).toBeInTheDocument()
   })
 
   it("selecting a suggested topic calls onChange with the topic", () => {
@@ -262,6 +260,51 @@ describe("LoveStep — suggested topics", () => {
     expect(onChange).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ topicId: "t-colour" })])
     )
+  })
+})
+
+describe("LoveStep — finite / infinite filters", () => {
+  it("Finite filter shows only finite topics", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Finite" }))
+    expect(screen.getByText("Colour")).toBeInTheDocument()
+    expect(screen.queryByText("Biscuit")).not.toBeInTheDocument()
+  })
+
+  it("Infinite filter shows only infinite topics", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Infinite" }))
+    expect(screen.getByText("Biscuit")).toBeInTheDocument()
+    expect(screen.queryByText("Colour")).not.toBeInTheDocument()
+  })
+
+  it("All filter resets type filter", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Finite" }))
+    fireEvent.click(screen.getByRole("button", { name: "All" }))
+    expect(screen.getByText("Colour")).toBeInTheDocument()
+    expect(screen.getByText("Biscuit")).toBeInTheDocument()
   })
 })
 
