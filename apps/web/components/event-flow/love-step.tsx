@@ -3,6 +3,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { ItemAddField } from "@/components/event-form-v2/item-add-field"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
@@ -177,20 +183,31 @@ export function LoveStep({
     <div className="min-h-64 space-y-0">
       {/* Sticky search + filters + suggested */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              handleCreateTopic()
-            }
-          }}
-          placeholder="Search topics…"
-          autoFocus
-          className="mb-3 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-        />
+        <InputGroup className="mb-3 h-auto rounded-md">
+          <InputGroupInput
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                handleCreateTopic()
+              }
+            }}
+            placeholder="Search topics…"
+            autoFocus
+            className="h-auto px-3 py-2 md:text-base"
+          />
+          {showCreate && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                onClick={handleCreateTopic}
+                data-testid="create-topic-chip"
+              >
+                Add
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
+        </InputGroup>
 
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -238,7 +255,7 @@ export function LoveStep({
 
       {/* Topic chips */}
       <div className="px-5 py-4">
-        {filtered.length > 0 || showCreate ? (
+        {filtered.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {filtered.map((t) => (
               <Chip
@@ -250,20 +267,6 @@ export function LoveStep({
                 {shortTopicLabel(t.title)}
               </Chip>
             ))}
-            {showCreate && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-                  Add
-                </span>
-                <Chip
-                  size="lg"
-                  onClick={handleCreateTopic}
-                  data-testid="create-topic-chip"
-                >
-                  {trimmedSearch}
-                </Chip>
-              </span>
-            )}
           </div>
         ) : (
           <p className="py-3 text-center text-sm text-muted-foreground">

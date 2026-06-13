@@ -5,6 +5,12 @@ import { X } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
 import {
   CHIP_IN_INPUT,
@@ -137,35 +143,32 @@ export function ItemAddField({
         <div className="space-y-3">
           {/* Search / add input — only shown for infinite topics */}
           {!isFinite && (
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleCreate()
-                }
-              }}
-              placeholder={`Add ${topicTitle} items…`}
-              autoFocus
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-            />
+            <InputGroup className="h-auto rounded-md">
+              <InputGroupInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleCreate()
+                  }
+                }}
+                placeholder={`Add ${topicTitle} items…`}
+                autoFocus
+                className="h-auto px-3 py-2 md:text-base"
+              />
+              {showCreate && (
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton onClick={handleCreate}>
+                    Add
+                  </InputGroupButton>
+                </InputGroupAddon>
+              )}
+            </InputGroup>
           )}
 
           {/* Items */}
-          {showCreate ? (
-            <button
-              type="button"
-              onClick={handleCreate}
-              className="flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
-            >
-              <span className="text-muted-foreground">Add</span>
-              <span className="gap-1 rounded-full bg-muted px-3 py-0.5 font-medium text-muted-foreground">
-                {trimmed}
-              </span>
-            </button>
-          ) : showEmpty ? (
+          {showEmpty ? (
             <p className="py-3 text-center text-sm text-muted-foreground">
               {isFinite
                 ? "No items."

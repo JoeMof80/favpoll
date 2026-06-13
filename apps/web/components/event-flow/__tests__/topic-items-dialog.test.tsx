@@ -57,8 +57,7 @@ describe("TopicItemsDialog — canonical topic", () => {
     fireEvent.change(screen.getByRole("textbox"), {
       target: { value: "Purple" },
     })
-    expect(screen.getByText("Purple")).toBeInTheDocument() // in the Add button
-    expect(screen.getByRole("button", { name: /Add/ })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /^Add$/i })).toBeInTheDocument()
   })
 
   it("does not show Add row when search matches an existing item", () => {
@@ -74,7 +73,7 @@ describe("TopicItemsDialog — canonical topic", () => {
     fireEvent.change(screen.getByRole("textbox"), {
       target: { value: "Purple" },
     })
-    fireEvent.click(screen.getByRole("button", { name: /Purple/ }))
+    fireEvent.click(screen.getByRole("button", { name: /^Add$/i }))
     expect(onAdd).toHaveBeenCalledWith("Purple")
   })
 
