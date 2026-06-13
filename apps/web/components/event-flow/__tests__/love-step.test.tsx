@@ -266,7 +266,7 @@ describe("LoveStep — suggested topics", () => {
 })
 
 describe("LoveStep — create topic option", () => {
-  it("shows create when search matches nothing", () => {
+  it("shows create chip when search matches nothing", () => {
     render(
       <LoveStep
         topics={TOPICS}
@@ -278,11 +278,10 @@ describe("LoveStep — create topic option", () => {
     fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
       target: { value: "Xyz" },
     })
-    expect(screen.getByText("Add")).toBeInTheDocument()
-    expect(screen.getByText("Xyz")).toBeInTheDocument()
+    expect(screen.getByTestId("create-topic-chip")).toBeInTheDocument()
   })
 
-  it("shows create alongside matching chips when search partially matches an existing topic", () => {
+  it("shows create chip alongside matching chips when search partially matches an existing topic", () => {
     render(
       <LoveStep
         topics={TOPICS}
@@ -294,14 +293,11 @@ describe("LoveStep — create topic option", () => {
     fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
       target: { value: "Col" },
     })
-    // The matching chip is still visible
     expect(screen.getByText("Colour")).toBeInTheDocument()
-    // AND the create button appears
-    expect(screen.getByText("Add")).toBeInTheDocument()
-    expect(screen.getByText("Col")).toBeInTheDocument()
+    expect(screen.getByTestId("create-topic-chip")).toBeInTheDocument()
   })
 
-  it("hides create when search is an exact match (case-insensitive)", () => {
+  it("hides create chip when search is an exact match (case-insensitive)", () => {
     render(
       <LoveStep
         topics={TOPICS}
@@ -313,13 +309,11 @@ describe("LoveStep — create topic option", () => {
     fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
       target: { value: "colour" },
     })
-    // The matching chip is visible
     expect(screen.getByText("Colour")).toBeInTheDocument()
-    // The create button is suppressed
-    expect(screen.queryByText("Add")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("create-topic-chip")).not.toBeInTheDocument()
   })
 
-  it("calls onChange with a new custom topic on create click", () => {
+  it("calls onChange with a new custom topic when create chip is clicked", () => {
     const onChange = vi.fn()
     render(
       <LoveStep
@@ -332,7 +326,7 @@ describe("LoveStep — create topic option", () => {
     fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
       target: { value: "Memories" },
     })
-    fireEvent.click(screen.getByText("Add").closest("button")!)
+    fireEvent.click(screen.getByTestId("create-topic-chip"))
     expect(onChange).toHaveBeenCalledWith([
       expect.objectContaining({ title: "Memories", isCustom: true }),
     ])

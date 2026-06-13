@@ -183,19 +183,7 @@ export function LoveStep({
 
       {/* Topic chips */}
       <div className="px-5 py-4">
-        {showCreate && (
-          <button
-            type="button"
-            onClick={handleCreateTopic}
-            className="mb-3 flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
-          >
-            <span className="text-muted-foreground">Add</span>
-            <span className="gap-1 rounded-full bg-muted px-3 py-0.5 font-medium text-muted-foreground">
-              {trimmedSearch}
-            </span>
-          </button>
-        )}
-        {filtered.length > 0 ? (
+        {filtered.length > 0 || showCreate ? (
           <div className="space-y-4">
             {!search && suggestedTopics && suggestedTopics.length > 0 && (
               <div>
@@ -227,13 +215,22 @@ export function LoveStep({
                   {shortTopicLabel(t.title)}
                 </Chip>
               ))}
+              {showCreate && (
+                <Chip
+                  size="lg"
+                  onClick={handleCreateTopic}
+                  data-testid="create-topic-chip"
+                >
+                  <span className="opacity-60">Add</span> {trimmedSearch}
+                </Chip>
+              )}
             </div>
           </div>
-        ) : !showCreate ? (
+        ) : (
           <p className="py-3 text-center text-sm text-muted-foreground">
             No topics found.
           </p>
-        ) : null}
+        )}
       </div>
 
       {/* Read-only items panel — shown when a canonical topic is selected */}
