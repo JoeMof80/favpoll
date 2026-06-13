@@ -71,7 +71,9 @@ export function LoveStep({
   })
 
   const trimmedSearch = search.trim()
-  const showCreate = trimmedSearch.length > 0 && filtered.length === 0
+  const showCreate =
+    trimmedSearch.length > 0 &&
+    !filtered.some((t) => t.title.toLowerCase() === trimmedSearch.toLowerCase())
 
   // Items panel: show for canonical (non-custom) selected topic
   const selectedTopic =
@@ -181,22 +183,19 @@ export function LoveStep({
 
       {/* Topic chips */}
       <div className="px-5 py-4">
-        {showCreate ? (
+        {showCreate && (
           <button
             type="button"
             onClick={handleCreateTopic}
-            className="flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
+            className="mb-3 flex w-full items-center gap-1.5 rounded px-2.5 py-1.5 text-sm hover:bg-muted"
           >
             <span className="text-muted-foreground">Add</span>
             <span className="gap-1 rounded-full bg-muted px-3 py-0.5 font-medium text-muted-foreground">
               {trimmedSearch}
             </span>
           </button>
-        ) : filtered.length === 0 ? (
-          <p className="py-3 text-center text-sm text-muted-foreground">
-            No topics found.
-          </p>
-        ) : (
+        )}
+        {filtered.length > 0 ? (
           <div className="space-y-4">
             {!search && suggestedTopics && suggestedTopics.length > 0 && (
               <div>
@@ -230,7 +229,11 @@ export function LoveStep({
               ))}
             </div>
           </div>
-        )}
+        ) : !showCreate ? (
+          <p className="py-3 text-center text-sm text-muted-foreground">
+            No topics found.
+          </p>
+        ) : null}
       </div>
 
       {/* Read-only items panel — shown when a canonical topic is selected */}
