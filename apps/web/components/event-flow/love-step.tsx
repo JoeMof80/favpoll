@@ -192,33 +192,35 @@ export function LoveStep({
           className="mb-3 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
         />
 
-        <p className="mb-1.5 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-          Filters
-        </p>
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {filters.map(({ key, label, isActive, onClick }) => (
-            <Button
-              key={key}
-              type="button"
-              variant="outline"
-              onClick={onClick}
-              className={cn(
-                "shrink-0",
-                isActive &&
-                  "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
-              )}
-            >
-              {label}
-            </Button>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+            Filters
+          </span>
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
+            {filters.map(({ key, label, isActive, onClick }) => (
+              <Button
+                key={key}
+                type="button"
+                variant="outline"
+                onClick={onClick}
+                className={cn(
+                  "shrink-0",
+                  isActive &&
+                    "border-primary bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary"
+                )}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {suggestedTopics && suggestedTopics.length > 0 && (
-          <div className="mt-3">
-            <p className="mb-1.5 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+          <div className="mt-3 flex items-center gap-2">
+            <span className="shrink-0 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
               Suggested for {primaryCharityName}
-            </p>
-            <div className="flex flex-wrap gap-1.5">
+            </span>
+            <div className="flex gap-1.5 overflow-x-auto">
               {suggestedTopics.map((t) => (
                 <Chip
                   key={t.id}
@@ -250,7 +252,9 @@ export function LoveStep({
             ))}
             {showCreate && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="text-sm text-muted-foreground">Add</span>
+                <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                  Add
+                </span>
                 <Chip
                   size="lg"
                   onClick={handleCreateTopic}
