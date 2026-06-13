@@ -49,36 +49,6 @@ describe("HonourStep — subject row", () => {
     )
   })
 
-  it("shows self-honour note when individual+someone is selected", () => {
-    render(
-      <HonourStep
-        value={{ ...DEFAULT_VALUE, grouping: "individual", subject: "someone" }}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.getByText(/Self-honours welcome/)).toBeInTheDocument()
-  })
-
-  it("hides self-honour note when A cause is active", () => {
-    render(
-      <HonourStep
-        value={{ ...DEFAULT_VALUE, subject: "cause" }}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.queryByText(/Self-honours welcome/)).not.toBeInTheDocument()
-  })
-
-  it("hides self-honour note when couple is selected", () => {
-    render(
-      <HonourStep
-        value={{ ...DEFAULT_VALUE, grouping: "couple", subject: "someone" }}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.queryByText(/Self-honours welcome/)).not.toBeInTheDocument()
-  })
-
   it("An individual item has aria-checked=true when individual+someone is selected", () => {
     render(
       <HonourStep

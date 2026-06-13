@@ -4,10 +4,10 @@ import {
   User,
   Users,
   UsersRound,
-  Heart,
   Balloon,
   Flower2,
   PiggyBank,
+  Ribbon,
 } from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
@@ -28,7 +28,7 @@ const SUBJECT_OPTIONS = [
   { value: "individual", label: "An individual", icon: User },
   { value: "couple", label: "A couple", icon: Users },
   { value: "group", label: "A group", icon: UsersRound },
-  { value: "cause", label: "A cause", icon: Heart },
+  { value: "cause", label: "A cause", icon: Ribbon },
 ] as const
 
 const CATEGORY_OPTIONS = [
@@ -102,13 +102,6 @@ export function HonourStep({ value, onChange }: Props) {
           ))}
         </ToggleGroup>
 
-        {value.subject === "someone" && value.grouping === "individual" && (
-          <p className="text-xs text-muted-foreground">
-            Self-honours welcome — guests won&apos;t know it&apos;s you until
-            the reveal.
-          </p>
-        )}
-
         {/* Cause label input */}
         {value.subject === "cause" && (
           <div className="flex flex-col gap-1.5">
@@ -135,7 +128,9 @@ export function HonourStep({ value, onChange }: Props) {
 
       {/* Category row */}
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground">What is the occasion?</p>
+        <p className="text-sm text-muted-foreground">
+          What type of event is this?
+        </p>
         <ToggleGroup
           type="single"
           value={value.category ?? ""}
