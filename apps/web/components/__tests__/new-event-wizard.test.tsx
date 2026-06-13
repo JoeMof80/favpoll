@@ -87,7 +87,7 @@ describe("NewEventWizard — step order is Honour → Charity → Love", () => {
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
-      screen.getByRole("button", { name: "Choose a charity" })
+      screen.getByRole("button", { name: "Pick a charity" })
     ).toBeInTheDocument()
     expect(screen.getAllByRole("listitem")[1]).toHaveAttribute(
       "aria-current",
@@ -101,12 +101,12 @@ describe("NewEventWizard — step order is Honour → Charity → Love", () => {
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     // Charity: open sheet, pick, Done
-    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
-      screen.getByRole("button", { name: "Choose a topic" })
+      screen.getByRole("button", { name: "Pick a topic" })
     ).toBeInTheDocument()
     expect(screen.getAllByRole("listitem")[2]).toHaveAttribute(
       "aria-current",
@@ -128,13 +128,13 @@ describe("NewEventWizard — redirect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 2: Charity
-    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 3: Love
-    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
 
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
@@ -150,11 +150,11 @@ describe("NewEventWizard — redirect", () => {
 
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
 
@@ -201,13 +201,13 @@ describe("NewEventWizard — cause guardrail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 2: Charity
-    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 3: Love
-    fireEvent.click(screen.getByRole("button", { name: "Choose a topic" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
 
@@ -234,7 +234,7 @@ describe("NewEventWizard — Love step copy by subject", () => {
       fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     }
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    fireEvent.click(screen.getByRole("button", { name: "Choose a charity" }))
+    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))

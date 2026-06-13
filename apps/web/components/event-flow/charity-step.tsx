@@ -60,7 +60,7 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
             className="text-xs text-muted-foreground underline-offset-2 hover:underline"
             data-testid="add-another"
           >
-            Add another charity
+            Pick another charity
           </button>
         )}
       </div>
