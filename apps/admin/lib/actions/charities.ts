@@ -153,3 +153,47 @@ export async function reactivateCharity(
   revalidatePath("/charities");
   return { error: null };
 }
+
+export async function getCharityTopics(
+  charityId: string,
+): Promise<{ data: string[] | null; error: string | null }> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("charity_topics")
+    .select("topic_id")
+    .eq("charity_id", charityId);
+
+  if (error) return { data: null, error: error.message };
+  return {
+    data: (data ?? []).map((r: { topic_id: string }) => r.topic_id),
+    error: null,
+  };
+}
+
+export async function setCharityTopics(
+  charityId: string,
+  topicIds: string[],
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+
+  const { error: delError } = await supabase
+    .from("charity_topics")
+    .delete()
+    .eq("charity_id", charityId);
+
+  if (delError) return { error: delError.message };
+
+  if (topicIds.length > 0) {
+    const { error: insError } = await supabase
+      .from("charity_topics")
+      .insert(
+        topicIds.map((topic_id) => ({ charity_id: charityId, topic_id })),
+      );
+
+    if (insError) return { error: insError.message };
+  }
+
+  revalidatePath("/charities");
+  return { error: null };
+}

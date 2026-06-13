@@ -1,4 +1,5 @@
 import { getCharities } from "@/lib/actions/charities";
+import { getTopics } from "@/lib/actions/topics";
 import { CharityList, AddCharityForm } from "@/components/charity-list";
 
 const MARKETS = ["en-GB"];
@@ -11,7 +12,10 @@ export default async function CharitiesPage({ searchParams }: Props) {
   const { market } = await searchParams;
   const activeMarket = MARKETS.includes(market ?? "") ? market : undefined;
 
-  const { data: charities, error } = await getCharities(activeMarket);
+  const [{ data: charities, error }, { data: topics }] = await Promise.all([
+    getCharities(activeMarket),
+    getTopics(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -54,7 +58,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
-      <CharityList charities={charities ?? []} />
+      <CharityList charities={charities ?? []} allTopics={topics ?? []} />
     </div>
   );
 }

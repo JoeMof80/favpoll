@@ -54,6 +54,7 @@ type WizardData = {
   charities: Charity[]
   topics: TopicWithMeta[]
   categories: Category[]
+  suggestedTopicIds?: Record<string, string[]>
 }
 
 type Props = {
@@ -135,6 +136,16 @@ export function NewEventWizard({ data }: Props) {
   const selectedCharities = data.charities.filter((c) =>
     charityIds.includes(c.id)
   )
+
+  const primaryCharity =
+    data.charities.find((c) => c.id === charityIds[0]) ?? null
+  const suggestedTopics = (
+    primaryCharity
+      ? ((data.suggestedTopicIds ?? {})[primaryCharity.id] ?? [])
+      : []
+  )
+    .map((id) => data.topics.find((t) => t.id === id))
+    .filter((t): t is TopicWithMeta => !!t)
 
   function handleNext() {
     if (step === "honour") setStep("charity")
@@ -444,6 +455,8 @@ export function NewEventWizard({ data }: Props) {
             setLoveOpen(false)
           }}
           hideItemsPanel
+          suggestedTopics={suggestedTopics}
+          primaryCharityName={primaryCharity?.name}
         />
       </ResponsiveOverlay>
 

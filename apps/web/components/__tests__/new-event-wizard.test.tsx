@@ -247,15 +247,11 @@ describe("NewEventWizard — Love step copy by subject", () => {
 
   it("shows cause-specific guidance on the Love step", () => {
     reachLoveStep("cause")
-    expect(
-      screen.getAllByText(/relevant to your cause/i)[0]
-    ).toBeInTheDocument()
+    expect(screen.getAllByText(/suits your cause/i)[0]).toBeInTheDocument()
   })
 
   it("does not show cause copy for a person event on the Love step", () => {
     reachLoveStep("person")
-    expect(
-      screen.queryByText(/relevant to your cause/i)
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/suits your cause/i)).not.toBeInTheDocument()
   })
 })

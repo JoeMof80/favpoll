@@ -15,6 +15,8 @@ type LoveStepProps = {
   value: EventFormValues["topics"]
   onChange: (v: EventFormValues["topics"]) => void
   hideItemsPanel?: boolean
+  suggestedTopics?: TopicWithMeta[]
+  primaryCharityName?: string
 }
 
 function sortItems(items: TopicItem[]): TopicItem[] {
@@ -32,6 +34,8 @@ export function LoveStep({
   value,
   onChange,
   hideItemsPanel = false,
+  suggestedTopics,
+  primaryCharityName,
 }: LoveStepProps) {
   const [search, setSearch] = useState("")
   const [catFilter, setCatFilter] = useState<string | null>(null)
@@ -193,17 +197,38 @@ export function LoveStep({
             No topics found.
           </p>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
-            {filtered.map((t) => (
-              <Chip
-                key={t.id}
-                selected={t.id === selectedId || t.id === "__custom__"}
-                size="lg"
-                onClick={() => handleSelect(t.id)}
-              >
-                {shortTopicLabel(t.title)}
-              </Chip>
-            ))}
+          <div className="space-y-4">
+            {!search && suggestedTopics && suggestedTopics.length > 0 && (
+              <div>
+                <p className="mb-2 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+                  Suggested for {primaryCharityName}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestedTopics.map((t) => (
+                    <Chip
+                      key={t.id}
+                      selected={t.id === selectedId}
+                      size="lg"
+                      onClick={() => handleSelect(t.id)}
+                    >
+                      {shortTopicLabel(t.title)}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-1.5">
+              {filtered.map((t) => (
+                <Chip
+                  key={t.id}
+                  selected={t.id === selectedId || t.id === "__custom__"}
+                  size="lg"
+                  onClick={() => handleSelect(t.id)}
+                >
+                  {shortTopicLabel(t.title)}
+                </Chip>
+              ))}
+            </div>
           </div>
         )}
       </div>

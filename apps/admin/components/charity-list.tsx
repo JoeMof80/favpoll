@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import type { Charity } from "@/lib/actions/charities";
 import {
   createCharity,
   updateCharity,
   deactivateCharity,
   reactivateCharity,
+  getCharityTopics,
+  setCharityTopics,
 } from "@/lib/actions/charities";
+import type { AdminTopic } from "@/lib/actions/topics";
 
 const VALID_MARKETS = ["en-GB"];
 
@@ -183,7 +186,13 @@ export function AddCharityForm() {
 
 // ─── Charity row ──────────────────────────────────────────────────────────────
 
-function CharityRow({ charity }: { charity: Charity }) {
+function CharityRow({
+  charity,
+  allTopics,
+}: {
+  charity: Charity;
+  allTopics: AdminTopic[];
+}) {
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
@@ -196,6 +205,21 @@ function CharityRow({ charity }: { charity: Charity }) {
     logo_url: charity.logo_url ?? "",
     market: charity.market,
   });
+
+  // Suggested topics state
+  const [topicsOpen, setTopicsOpen] = useState(false);
+  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
+  const [topicsLoaded, setTopicsLoaded] = useState(false);
+  const [topicsSearch, setTopicsSearch] = useState("");
+  const [topicsPending, setTopicsPending] = useState(false);
+  const [topicsError, setTopicsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getCharityTopics(charity.id).then(({ data }) => {
+      setSelectedTopicIds(data ?? []);
+      setTopicsLoaded(true);
+    });
+  }, [charity.id]);
 
   function set(field: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -235,6 +259,24 @@ function CharityRow({ charity }: { charity: Charity }) {
       if (result.error) setError(result.error);
     });
   }
+
+  function handleSaveTopics() {
+    setTopicsError(null);
+    setTopicsPending(true);
+    setCharityTopics(charity.id, selectedTopicIds).then(({ error: e }) => {
+      setTopicsPending(false);
+      if (e) {
+        setTopicsError(e);
+      } else {
+        setTopicsOpen(false);
+        setTopicsSearch("");
+      }
+    });
+  }
+
+  const filteredTopics = allTopics.filter((t) =>
+    t.title.toLowerCase().includes(topicsSearch.toLowerCase()),
+  );
 
   return (
     <div
@@ -351,6 +393,99 @@ function CharityRow({ charity }: { charity: Charity }) {
         </div>
       )}
 
+      {/* Suggested topics */}
+      <div className="pt-1 border-t border-border">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-muted-foreground">
+            Suggested topics
+            {topicsLoaded && selectedTopicIds.length > 0 && (
+              <span className="ml-1 text-foreground">
+                ({selectedTopicIds.length})
+              </span>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setTopicsOpen((v) => !v);
+              setTopicsSearch("");
+              setTopicsError(null);
+            }}
+            className="rounded px-2 py-0.5 text-xs font-medium border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            {topicsOpen ? "Close" : "Edit"}
+          </button>
+        </div>
+
+        {topicsOpen && (
+          <div className="mt-2 space-y-2">
+            <input
+              type="text"
+              value={topicsSearch}
+              onChange={(e) => setTopicsSearch(e.target.value)}
+              placeholder="Search topics…"
+              className="w-full rounded border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            <div className="max-h-48 overflow-y-auto space-y-0.5">
+              {filteredTopics.map((t) => {
+                const checked = selectedTopicIds.includes(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() =>
+                      setSelectedTopicIds((prev) =>
+                        checked
+                          ? prev.filter((id) => id !== t.id)
+                          : [...prev, t.id],
+                      )
+                    }
+                    className={`flex w-full items-center gap-2 rounded px-2 py-1 text-sm text-left transition-colors hover:bg-accent ${checked ? "font-medium text-foreground" : "text-muted-foreground"}`}
+                  >
+                    <span
+                      className={`h-3.5 w-3.5 shrink-0 rounded-sm border ${checked ? "border-primary bg-primary" : "border-border"}`}
+                    />
+                    {t.title}
+                  </button>
+                );
+              })}
+              {filteredTopics.length === 0 && (
+                <p className="py-2 text-center text-xs text-muted-foreground">
+                  No topics found.
+                </p>
+              )}
+            </div>
+            {topicsError && (
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {topicsError}
+              </p>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSaveTopics}
+                disabled={topicsPending}
+                className="rounded px-3 py-1 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              >
+                {topicsPending ? "Saving…" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTopicsOpen(false);
+                  setTopicsSearch("");
+                  setTopicsError(null);
+                }}
+                disabled={topicsPending}
+                className="rounded px-3 py-1 text-sm font-medium border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Action buttons */}
       {!editing && (
         <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border">
@@ -419,7 +554,13 @@ function CharityRow({ charity }: { charity: Charity }) {
 
 // ─── Charity list ─────────────────────────────────────────────────────────────
 
-export function CharityList({ charities }: { charities: Charity[] }) {
+export function CharityList({
+  charities,
+  allTopics,
+}: {
+  charities: Charity[];
+  allTopics: AdminTopic[];
+}) {
   if (charities.length === 0) {
     return <p className="text-sm text-muted-foreground">No charities found.</p>;
   }
@@ -427,7 +568,7 @@ export function CharityList({ charities }: { charities: Charity[] }) {
   return (
     <div className="space-y-3">
       {charities.map((charity) => (
-        <CharityRow key={charity.id} charity={charity} />
+        <CharityRow key={charity.id} charity={charity} allTopics={allTopics} />
       ))}
     </div>
   );
