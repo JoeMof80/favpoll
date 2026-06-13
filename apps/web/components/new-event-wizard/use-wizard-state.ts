@@ -1,0 +1,213 @@
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { getWizardCopy, type WizardStep } from "@/lib/wizard-copy"
+import type {
+  Category,
+  Charity,
+  EventCategory,
+  EventGrouping,
+  EventSubject,
+  TopicItem,
+  TopicWithMeta,
+} from "@favpoll/types"
+import type { EventFormValues } from "@/components/event-form-v2/schema"
+
+export const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
+
+export const STEPS: WizardStep[] = ["honour", "charity", "love"]
+
+export const STEP_LABELS: Record<WizardStep, string> = {
+  honour: "Honour",
+  charity: "Charity",
+  love: "Love",
+}
+
+type WizardTopics = EventFormValues["topics"]
+
+export type WizardData = {
+  charities: Charity[]
+  topics: TopicWithMeta[]
+  categories: Category[]
+  suggestedTopicIds?: Record<string, string[]>
+}
+
+function sortTopicItems(items: TopicItem[]): TopicItem[] {
+  return [...items].sort((a, b) => {
+    const aOrder = a.display_order ?? Infinity
+    const bOrder = b.display_order ?? Infinity
+    if (aOrder !== bOrder) return aOrder - bOrder
+    return a.label.localeCompare(b.label)
+  })
+}
+
+export function useWizardState(data: WizardData) {
+  const router = useRouter()
+
+  const [step, setStep] = useState<WizardStep>("honour")
+  const [category, setCategory] = useState<EventCategory | null>(null)
+  const [grouping, setGrouping] = useState<EventGrouping>("individual")
+  const [subject, setSubject] = useState<EventSubject>("someone")
+  const [causeLabel, setCauseLabel] = useState("")
+  const [topics, setTopics] = useState<WizardTopics>([])
+  const [charityIds, setCharityIds] = useState<string[]>([])
+  const [loveOpen, setLoveOpen] = useState(false)
+  const [charityOpen, setCharityOpen] = useState(false)
+  const [itemsDialogOpen, setItemsDialogOpen] = useState(false)
+
+  const stepIndex = STEPS.indexOf(step)
+  const isFirst = stepIndex === 0
+  const isLast = stepIndex === STEPS.length - 1
+
+  const copy = getWizardCopy(subject)
+
+  const customLabels = topics[0]?.customLabels ?? []
+  const customItemCount = topics[0]?.isCustom ? customLabels.length : null
+
+  const selectedTopic =
+    topics[0] && !topics[0].isCustom
+      ? (data.topics.find((t) => t.id === topics[0].topicId) ?? null)
+      : null
+
+  const sortedExistingItems = selectedTopic
+    ? sortTopicItems(selectedTopic.topic_items)
+    : []
+
+  const dialogExistingItems = sortedExistingItems.map((i) => ({
+    id: i.id,
+    label: i.label,
+  }))
+
+  const showItemsSection =
+    topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
+
+  const nextDisabled =
+    step === "honour"
+      ? !category || (subject === "cause" && !causeLabel.trim())
+      : step === "charity"
+        ? charityIds.length === 0
+        : topics.length === 0 ||
+          (topics[0]?.isCustom === true &&
+            customItemCount !== null &&
+            customItemCount < 2)
+
+  const selectedCharities = data.charities.filter((c) =>
+    charityIds.includes(c.id)
+  )
+
+  const primaryCharity =
+    data.charities.find((c) => c.id === charityIds[0]) ?? null
+
+  const suggestedTopics = (
+    primaryCharity
+      ? ((data.suggestedTopicIds ?? {})[primaryCharity.id] ?? [])
+      : []
+  )
+    .map((id) => data.topics.find((t) => t.id === id))
+    .filter((t): t is TopicWithMeta => !!t)
+
+  function handleAddItem(label: string) {
+    const current = topics[0]
+    if (!current) return
+    const existing = current.customLabels ?? []
+    const canonicalLabels = selectedTopic?.topic_items.map((i) => i.label) ?? []
+    if (
+      [...existing, ...canonicalLabels].some(
+        (l) => l.toLowerCase() === label.toLowerCase()
+      )
+    )
+      return
+    setTopics([{ ...current, customLabels: [...existing, label] }])
+  }
+
+  function handleRemoveItem(label: string) {
+    const current = topics[0]
+    if (!current) return
+    setTopics([
+      {
+        ...current,
+        customLabels: (current.customLabels ?? []).filter((l) => l !== label),
+      },
+    ])
+  }
+
+  function handleNext() {
+    if (step === "honour") setStep("charity")
+    else if (step === "charity") setStep("love")
+  }
+
+  function handleBack() {
+    if (step === "love") setStep("charity")
+    else if (step === "charity") setStep("honour")
+  }
+
+  function handleFinish() {
+    const topic = topics[0]
+    const params = new URLSearchParams({
+      category: category ?? "",
+      grouping,
+      subject,
+      charityIds: charityIds.join(","),
+    })
+    if (subject === "cause" && causeLabel.trim()) {
+      params.set("causeLabel", causeLabel.trim())
+    }
+    if (topic) {
+      if (topic.isCustom || customLabels.length > 0) {
+        sessionStorage.setItem(
+          DRAFT_ADDITIONS_KEY,
+          JSON.stringify({
+            topicRef: topic.isCustom
+              ? { kind: "new", title: topic.title }
+              : { kind: "existing", id: topic.topicId },
+            addedItems: customLabels,
+          })
+        )
+        params.set("draftAdditions", "1")
+      } else {
+        params.set("topicId", topic.topicId)
+        params.set("topicTitle", topic.title)
+      }
+    }
+    router.push(`/events/new/details?${params}`)
+  }
+
+  return {
+    step,
+    stepIndex,
+    isFirst,
+    isLast,
+    category,
+    grouping,
+    subject,
+    causeLabel,
+    topics,
+    charityIds,
+    loveOpen,
+    setLoveOpen,
+    charityOpen,
+    setCharityOpen,
+    itemsDialogOpen,
+    setItemsDialogOpen,
+    copy,
+    customLabels,
+    selectedTopic,
+    sortedExistingItems,
+    dialogExistingItems,
+    showItemsSection,
+    nextDisabled,
+    selectedCharities,
+    primaryCharity,
+    suggestedTopics,
+    setCategory,
+    setGrouping,
+    setSubject,
+    setCauseLabel,
+    setTopics,
+    setCharityIds,
+    handleAddItem,
+    handleRemoveItem,
+    handleNext,
+    handleBack,
+    handleFinish,
+  }
+}

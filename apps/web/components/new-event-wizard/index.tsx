@@ -1,0 +1,185 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import { HonourStep } from "@/components/event-flow/honour-step"
+import { LoveStep } from "@/components/event-flow/love-step"
+import { CharityStep } from "@/components/event-flow/charity-step"
+import { TopicItemsDialog } from "@/components/event-flow/topic-items-dialog"
+import { useWizardState } from "./use-wizard-state"
+import { WizardTriadRail } from "./wizard-triad-rail"
+import { WizardProgressStrip } from "./wizard-progress-strip"
+import { WizardNav } from "./wizard-nav"
+import { WizardCharityCard } from "./wizard-charity-card"
+import { WizardTopicCard } from "./wizard-topic-card"
+import type { WizardData } from "./use-wizard-state"
+
+type Props = {
+  data: WizardData
+}
+
+export function NewEventWizard({ data }: Props) {
+  const w = useWizardState(data)
+
+  return (
+    <main>
+      <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
+        <WizardTriadRail currentStep={w.step} copy={w.copy} />
+
+        <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
+          <div className="mx-auto w-full max-w-2xl">
+            <WizardProgressStrip currentStep={w.step} />
+
+            {/* Honour step */}
+            {w.step === "honour" && (
+              <HonourStep
+                value={{
+                  category: w.category,
+                  grouping: w.grouping,
+                  subject: w.subject,
+                  causeLabel: w.causeLabel,
+                }}
+                onChange={({ category, grouping, subject, causeLabel }) => {
+                  w.setCategory(category)
+                  w.setGrouping(grouping)
+                  w.setSubject(subject)
+                  w.setCauseLabel(causeLabel)
+                }}
+              />
+            )}
+
+            {/* Charity step */}
+            {w.step === "charity" && (
+              <div className="flex flex-col gap-3 py-6">
+                <h3 className="text-lg font-medium tracking-tight text-foreground">
+                  Charity
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {w.copy.charityGuidance}
+                </p>
+                {w.selectedCharities.length > 0 ? (
+                  <WizardCharityCard
+                    charities={w.selectedCharities}
+                    onEdit={() => w.setCharityOpen(true)}
+                    onRemove={(id) =>
+                      w.setCharityIds((ids) => ids.filter((i) => i !== id))
+                    }
+                    onPickAnother={() => w.setCharityOpen(true)}
+                  />
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={() => w.setCharityOpen(true)}
+                  >
+                    Pick a charity
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Love step */}
+            {w.step === "love" && (
+              <div className="flex flex-col">
+                <div className="flex flex-col gap-3 py-6">
+                  <h3 className="text-lg font-medium tracking-tight text-foreground">
+                    Love
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {w.copy.loveGuidance}
+                  </p>
+                  {w.topics.length > 0 ? (
+                    <div className="flex flex-col gap-3">
+                      <WizardTopicCard
+                        topic={w.topics[0]}
+                        sortedExistingItems={w.sortedExistingItems}
+                        customLabels={w.customLabels}
+                        showItemsSection={w.showItemsSection}
+                        onEdit={() => w.setLoveOpen(true)}
+                        onRemove={() => w.setTopics([])}
+                        onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
+                      />
+                    </div>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      onClick={() => w.setLoveOpen(true)}
+                    >
+                      Pick a topic
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <WizardNav
+              isFirst={w.isFirst}
+              isLast={w.isLast}
+              nextDisabled={w.nextDisabled}
+              onBack={w.handleBack}
+              onNext={w.handleNext}
+              onFinish={w.handleFinish}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Love overlay */}
+      <ResponsiveOverlay
+        open={w.loveOpen}
+        onOpenChange={w.setLoveOpen}
+        title="Choose a favpoll"
+      >
+        <LoveStep
+          topics={data.topics}
+          categories={data.categories}
+          value={w.topics}
+          onChange={(v) => {
+            w.setTopics(v)
+            w.setLoveOpen(false)
+          }}
+          hideItemsPanel
+          suggestedTopics={w.suggestedTopics}
+          primaryCharityName={w.primaryCharity?.name}
+        />
+      </ResponsiveOverlay>
+
+      {/* Charity overlay */}
+      <ResponsiveOverlay
+        open={w.charityOpen}
+        onOpenChange={w.setCharityOpen}
+        title="Choose a charity"
+        footer={
+          <Button
+            type="button"
+            size="lg"
+            variant="secondary"
+            className="w-full"
+            onClick={() => w.setCharityOpen(false)}
+          >
+            Done
+          </Button>
+        }
+      >
+        <CharityStep
+          charities={data.charities}
+          value={w.charityIds}
+          onChange={w.setCharityIds}
+        />
+      </ResponsiveOverlay>
+
+      {/* Items dialog */}
+      {w.topics.length > 0 && (
+        <TopicItemsDialog
+          open={w.itemsDialogOpen}
+          onOpenChange={w.setItemsDialogOpen}
+          topicTitle="Select Items"
+          existingItems={w.dialogExistingItems}
+          addedItems={w.customLabels}
+          onAdd={w.handleAddItem}
+          onRemove={w.handleRemoveItem}
+          isNewTopic={w.topics[0].isCustom ?? false}
+        />
+      )}
+    </main>
+  )
+}
