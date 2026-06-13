@@ -265,6 +265,80 @@ describe("LoveStep — suggested topics", () => {
   })
 })
 
+describe("LoveStep — create topic option", () => {
+  it("shows create when search matches nothing", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
+      target: { value: "Xyz" },
+    })
+    expect(screen.getByText("Add")).toBeInTheDocument()
+    expect(screen.getByText("Xyz")).toBeInTheDocument()
+  })
+
+  it("shows create alongside matching chips when search partially matches an existing topic", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
+      target: { value: "Col" },
+    })
+    // The matching chip is still visible
+    expect(screen.getByText("Colour")).toBeInTheDocument()
+    // AND the create button appears
+    expect(screen.getByText("Add")).toBeInTheDocument()
+    expect(screen.getByText("Col")).toBeInTheDocument()
+  })
+
+  it("hides create when search is an exact match (case-insensitive)", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
+      target: { value: "colour" },
+    })
+    // The matching chip is visible
+    expect(screen.getByText("Colour")).toBeInTheDocument()
+    // The create button is suppressed
+    expect(screen.queryByText("Add")).not.toBeInTheDocument()
+  })
+
+  it("calls onChange with a new custom topic on create click", () => {
+    const onChange = vi.fn()
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={onChange}
+      />
+    )
+    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
+      target: { value: "Memories" },
+    })
+    fireEvent.click(screen.getByText("Add").closest("button")!)
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ title: "Memories", isCustom: true }),
+    ])
+  })
+})
+
 describe("LoveStep — custom topic editable items panel", () => {
   it("shows items panel for a custom (new) topic", () => {
     render(
