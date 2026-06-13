@@ -479,7 +479,7 @@ export function PreviewPanel({
               ) : (
                 <p className="text-sm text-muted-foreground/40">+ about</p>
               )}
-              <Pencil className={PENCIL_ICON} aria-hidden />
+              <EditBadge className="top-0 right-0" />
             </Button>
 
             <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
