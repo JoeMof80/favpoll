@@ -66,10 +66,10 @@ function CountdownPlaceholder() {
 
 // Shared edit affordance wrapper
 const EDIT_BTN =
-  "group relative block h-auto w-full whitespace-normal rounded-sm p-0 text-left border-b-2 border-dotted border-transparent hover:border-primary/40 focus-visible:border-primary/40"
+  "group relative block h-auto w-full whitespace-normal rounded-sm p-0 text-left border-b-2 border-dotted border-primary/20 hover:border-primary/60 focus-visible:border-primary/60"
 
 const PENCIL_ICON =
-  "absolute top-0 right-0 h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+  "absolute top-0 right-0 h-3 w-3 text-muted-foreground opacity-30 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
 
 function CharCounter({ value, max }: { value: string; max: number }) {
   const remaining = max - value.length
@@ -497,7 +497,7 @@ export function PreviewPanel({
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <SectionLabel title={topicTitle} />
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 shadow-sm">
                   <span className="text-xs text-muted-foreground">
                     {showReveal ? "Post-reveal" : "Pre-reveal"}
                   </span>
