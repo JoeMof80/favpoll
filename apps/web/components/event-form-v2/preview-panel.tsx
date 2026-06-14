@@ -3,6 +3,8 @@
 import { useRef, useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import { Pencil, RefreshCw } from "lucide-react"
+import { Countdown } from "@/components/countdown"
+import { DateTimePicker } from "./date-time-picker"
 import {
   contextExamples,
   deriveRegister,
@@ -37,6 +39,9 @@ type Props = {
   isGenerating?: boolean
   personRevealExample?: string | null
   onRegenerate?: () => void
+  /** ISO string; when provided shows a live countdown with an edit affordance (edit mode) */
+  closesAt?: string
+  onClosesAtChange?: (iso: string) => void
 }
 
 // Placeholder charities shown before the user selects any
@@ -106,6 +111,8 @@ export function PreviewPanel({
   isGenerating = false,
   personRevealExample = null,
   onRegenerate,
+  closesAt,
+  onClosesAtChange,
 }: Props) {
   // Local preview toggles
   const [previewSuffix, setPreviewSuffix] = useState(true)
@@ -122,6 +129,8 @@ export function PreviewPanel({
   const [aboutOpen, setAboutOpen] = useState(false)
   const [openingLineOpen, setOpeningLineOpen] = useState(false)
   const [revealOpen, setRevealOpen] = useState(false)
+  const [closesAtOpen, setClosesAtOpen] = useState(false)
+  const [closesAtDraft, setClosesAtDraft] = useState<Date | undefined>()
 
   // Draft states — initialised on overlay open, discarded on cancel
   const [causeLabelDraft, setCauseLabelDraft] = useState("")
@@ -582,8 +591,33 @@ export function PreviewPanel({
 
         {/* Right — sticky meta */}
         <div className="sticky top-20 space-y-4 self-start">
-          {/* Countdown — non-interactive; date set at publish */}
-          <CountdownPlaceholder />
+          {/* Countdown */}
+          {closesAt ? (
+            <div className="relative">
+              <div className="rounded-lg border border-border bg-card px-5 py-4">
+                {new Date(closesAt) > new Date() ? (
+                  <Countdown closesAt={closesAt} />
+                ) : (
+                  <p className="text-xs text-muted-foreground">Poll closed</p>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 h-7 w-7 p-0 opacity-60 hover:opacity-100"
+                onClick={() => {
+                  setClosesAtDraft(new Date(closesAt))
+                  setClosesAtOpen(true)
+                }}
+                aria-label="Edit closing date"
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <CountdownPlaceholder />
+          )}
 
           <CharityBanner charities={displayCharities} totalRaised={0} />
 
@@ -787,6 +821,42 @@ export function PreviewPanel({
           <CharCounter value={revealDraft} max={280} />
         </div>
       </ResponsiveOverlay>
+
+      {/* Closing date — edit mode only */}
+      {closesAt && (
+        <ResponsiveOverlay
+          open={closesAtOpen}
+          onOpenChange={(o) => !o && setClosesAtOpen(false)}
+          title="Poll closing date"
+          footer={
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={!closesAtDraft}
+                onClick={() => {
+                  if (closesAtDraft) {
+                    onClosesAtChange?.(closesAtDraft.toISOString())
+                  }
+                  setClosesAtOpen(false)
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="flex-1"
+                onClick={() => setClosesAtOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          }
+        >
+          <DateTimePicker value={closesAtDraft} onChange={setClosesAtDraft} />
+        </ResponsiveOverlay>
+      )}
 
       {/* Photo */}
       <ResponsiveOverlay
