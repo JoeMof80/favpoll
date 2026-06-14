@@ -53,6 +53,10 @@ export function EventFormV2({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showReveal, setShowReveal] = useState(false)
+  // Edit mode: tracks the current closes_at, mutable via the countdown overlay
+  const [editClosesAt, setEditClosesAt] = useState<string | undefined>(
+    initialClosesAt
+  )
 
   // Holds the closesAt chosen in the publish overlay (create mode)
   const pendingClosesAt = useRef<Date | null>(null)
@@ -154,7 +158,7 @@ export function EventFormV2({
         if (!eventId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
-        const closesAt = initialClosesAt ?? new Date().toISOString()
+        const closesAt = editClosesAt ?? new Date().toISOString()
         await updateEvent(eventId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
@@ -234,6 +238,8 @@ export function EventFormV2({
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         hasNewTopicDraft={hasNewTopicDraft}
+        closesAt={editClosesAt}
+        onClosesAtChange={setEditClosesAt}
       />
     </Form>
   )
@@ -253,6 +259,9 @@ type InnerProps = {
   onSubmit: (closesAt?: Date) => void
   onCancel: () => void
   hasNewTopicDraft: boolean
+  /** ISO string from the DB; edit mode only */
+  closesAt?: string
+  onClosesAtChange?: (iso: string) => void
 }
 
 function FormInner({
@@ -268,6 +277,8 @@ function FormInner({
   onSubmit,
   onCancel,
   hasNewTopicDraft,
+  closesAt,
+  onClosesAtChange,
 }: InnerProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [personRevealExample, setPersonRevealExample] = useState<string | null>(
@@ -461,14 +472,13 @@ function FormInner({
             isGenerating={isGenerating}
             personRevealExample={personRevealExample}
             onRegenerate={handleRegenerate}
+            closesAt={closesAt}
+            onClosesAtChange={onClosesAtChange}
           />
         </div>
       </div>
 
       <CommandPanel
-        charities={charities}
-        topics={topics}
-        categories={categories}
         mode={mode}
         submitting={submitting}
         error={error}
