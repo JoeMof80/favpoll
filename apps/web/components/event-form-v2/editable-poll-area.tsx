@@ -9,8 +9,8 @@ import { PledgePanel } from "@/components/pledge-panel"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import type { PollResultItem } from "@/components/favpoll-card/types"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
 import { cn } from "@/lib/utils"
@@ -218,42 +218,42 @@ export function EditablePollArea({
         open={revealOpen}
         onOpenChange={(o) => !o && setRevealOpen(false)}
         title="The reveal"
-        description={
-          isPersonRevealExample
-            ? "The example below is suggested — type the real favourite."
-            : "Disclosed after pledging — this is the payoff."
-        }
-        footer={overlayFooter(saveReveal, () => setRevealOpen(false))}
-      >
-        <div>
-          {onRegenerate && (
-            <div className="mb-2 flex justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={isGenerating}
-                onClick={() => {
-                  setRevealOpen(false)
-                  onRegenerate()
-                }}
-                className="gap-1.5 text-xs text-muted-foreground"
-              >
-                <RefreshCw className="h-3 w-3" aria-hidden />
-                Regenerate suggestion
-              </Button>
-            </div>
-          )}
+        header={
           <Textarea
             autoFocus
             placeholder={revealPlaceholder || "Share something they loved…"}
             value={revealDraft}
             maxLength={280}
-            rows={5}
+            rows={3}
             onChange={(e) => setRevealDraft(e.target.value)}
-            className="bg-background"
+            className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
           />
+        }
+        footer={overlayFooter(saveReveal, () => setRevealOpen(false))}
+      >
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            {isPersonRevealExample
+              ? "The example below is suggested — type the real favourite."
+              : "Disclosed after pledging — this is the payoff."}
+          </p>
           <CharCounter value={revealDraft} max={280} />
+          {onRegenerate && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={isGenerating}
+              onClick={() => {
+                setRevealOpen(false)
+                onRegenerate()
+              }}
+              className="gap-1.5 text-xs text-muted-foreground"
+            >
+              <RefreshCw className="h-3 w-3" aria-hidden />
+              Regenerate suggestion
+            </Button>
+          )}
         </div>
       </ResponsiveOverlay>
     </>

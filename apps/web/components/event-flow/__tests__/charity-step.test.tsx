@@ -23,22 +23,18 @@ const CHARITIES = [
 ]
 
 describe("CharityStep", () => {
-  it("always shows the search input", () => {
-    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
-    expect(screen.getByPlaceholderText("Search charities…")).toBeInTheDocument()
-  })
-
   it("renders all charity chips", () => {
     render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
     expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
   })
 
-  it("shows already-selected charities as selected", () => {
+  it("renders selected charities as selected", () => {
     render(
       <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
     )
-    expect(screen.getByPlaceholderText("Search charities…")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
   })
 
   it("calls onChange with new id when unselected charity is clicked", () => {
@@ -59,22 +55,30 @@ describe("CharityStep", () => {
     expect(onChange).toHaveBeenCalledWith([])
   })
 
-  it("filters chips by search query", () => {
-    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
-    fireEvent.change(screen.getByPlaceholderText("Search charities…"), {
-      target: { value: "ox" },
-    })
+  it("filters chips by search prop", () => {
+    render(
+      <CharityStep
+        charities={CHARITIES}
+        value={[]}
+        onChange={() => {}}
+        search="ox"
+      />
+    )
     expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
     expect(
       screen.queryByRole("button", { name: "Shelter" })
     ).not.toBeInTheDocument()
   })
 
-  it("shows no-results message when search matches nothing", () => {
-    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
-    fireEvent.change(screen.getByPlaceholderText("Search charities…"), {
-      target: { value: "zzz" },
-    })
+  it("shows no-results message when search prop matches nothing", () => {
+    render(
+      <CharityStep
+        charities={CHARITIES}
+        value={[]}
+        onChange={() => {}}
+        search="zzz"
+      />
+    )
     expect(screen.getByText("No results.")).toBeInTheDocument()
   })
 

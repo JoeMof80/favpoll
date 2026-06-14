@@ -23,6 +23,9 @@ type LoveStepProps = {
   hideItemsPanel?: boolean
   suggestedTopics?: TopicWithMeta[]
   primaryCharityName?: string
+  /** When provided, search state is controlled externally (input lives in the overlay header). */
+  search?: string
+  onSearchChange?: (v: string) => void
 }
 
 function sortItems(items: TopicItem[]): TopicItem[] {
@@ -42,8 +45,12 @@ export function LoveStep({
   hideItemsPanel = false,
   suggestedTopics,
   primaryCharityName,
+  search: externalSearch,
+  onSearchChange,
 }: LoveStepProps) {
-  const [search, setSearch] = useState("")
+  const [internalSearch, setInternalSearch] = useState("")
+  const search = externalSearch ?? internalSearch
+  const setSearch = onSearchChange ?? setInternalSearch
   const [catFilter, setCatFilter] = useState<string | null>(null)
   const [typeFilter, setTypeFilter] = useState<"finite" | "infinite" | null>(
     null
@@ -181,33 +188,35 @@ export function LoveStep({
 
   return (
     <div className="min-h-64 space-y-0">
-      {/* Sticky search + filters + suggested */}
+      {/* Sticky search (when uncontrolled) + filters + suggested */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
-        <InputGroup className="mb-3 h-auto rounded-md">
-          <InputGroupInput
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                handleCreateTopic()
-              }
-            }}
-            placeholder="Search topics…"
-            autoFocus
-            className="h-auto px-3 py-2 md:text-base"
-          />
-          {showCreate && (
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                onClick={handleCreateTopic}
-                data-testid="create-topic-chip"
-              >
-                Add
-              </InputGroupButton>
-            </InputGroupAddon>
-          )}
-        </InputGroup>
+        {externalSearch === undefined && (
+          <InputGroup className="mb-3 h-auto rounded-md">
+            <InputGroupInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  handleCreateTopic()
+                }
+              }}
+              placeholder="Search topics…"
+              autoFocus
+              className="h-auto px-3 py-2 md:text-base"
+            />
+            {showCreate && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  onClick={handleCreateTopic}
+                  data-testid="create-topic-chip"
+                >
+                  Add
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
+        )}
 
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">

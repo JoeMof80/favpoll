@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Chip } from "@/components/ui/chip"
 import type { Charity } from "@favpoll/types"
 
@@ -10,11 +9,15 @@ type CharityStepProps = {
   charities: Charity[]
   value: string[]
   onChange: (v: string[]) => void
+  search?: string
 }
 
-export function CharityStep({ charities, value, onChange }: CharityStepProps) {
-  const [search, setSearch] = useState("")
-
+export function CharityStep({
+  charities,
+  value,
+  onChange,
+  search,
+}: CharityStepProps) {
   const atMax = value.length >= MAX_CHARITIES
   const visible = charities.filter(
     (c) => !search || c.name.toLowerCase().includes(search.toLowerCase())
@@ -29,18 +32,7 @@ export function CharityStep({ charities, value, onChange }: CharityStepProps) {
   }
 
   return (
-    <div className="space-y-0">
-      <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search charities…"
-          autoFocus
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
+    <div>
       {visible.length === 0 ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           No results.
