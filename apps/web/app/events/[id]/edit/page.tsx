@@ -96,12 +96,9 @@ export default async function EditEventPage({ params }: Props) {
       ? undefined
       : (event.protagonists?.photo_url ?? undefined),
     causeLabel: isCause ? (event.cause_label ?? "") : "",
-    closesAt: new Date(event.closes_at),
     charities: (event.event_charities ?? []).map(
       (ec: { charity_id: string }) => ec.charity_id
     ),
-    sharedFund: pot?.total_deposited ?? 0,
-    isPrivate: event.is_private ?? false,
     isListed: event.is_listed ?? true,
     reveal: rawPoll?.personal_reveal ?? "",
     topics: preselectedTopics,
@@ -117,6 +114,7 @@ export default async function EditEventPage({ params }: Props) {
       protagonistId={event.protagonist_id ?? undefined}
       existingPollId={rawPoll?.id}
       defaultValues={defaultValues}
+      initialClosesAt={event.closes_at}
     />
   )
 }

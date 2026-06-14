@@ -16,7 +16,6 @@ import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { PledgePanel } from "@/components/pledge-panel"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import type { PollResultItem } from "@/components/favpoll-card/types"
-import { Countdown } from "@/components/countdown"
 import { CharityBanner } from "@/components/charity-banner"
 import { PledgeCard } from "@/components/pledge-card"
 import { Button } from "@/components/ui/button"
@@ -24,7 +23,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { DateTimePicker } from "./date-time-picker"
 import { PhotoCropModal } from "./photo-crop-modal"
 import { cn } from "@/lib/utils"
 import type { Charity, TopicWithMeta, TopicItem } from "@favpoll/types"
@@ -53,8 +51,8 @@ function CountdownPlaceholder() {
       <div className="flex items-end gap-3">
         {(["days", "hrs", "min", "sec"] as const).map((label) => (
           <div key={label} className="text-center">
-            <p className="text-2xl leading-none font-medium text-foreground/25 tabular-nums">
-              00
+            <p className="text-2xl leading-none font-medium text-muted-foreground tabular-nums">
+              --
             </p>
             <p className="mt-1 text-xs text-muted-foreground">{label}</p>
           </div>
@@ -124,7 +122,6 @@ export function PreviewPanel({
   const [aboutOpen, setAboutOpen] = useState(false)
   const [openingLineOpen, setOpeningLineOpen] = useState(false)
   const [revealOpen, setRevealOpen] = useState(false)
-  const [closesAtOpen, setClosesAtOpen] = useState(false)
 
   // Draft states — initialised on overlay open, discarded on cancel
   const [causeLabelDraft, setCauseLabelDraft] = useState("")
@@ -137,9 +134,6 @@ export function PreviewPanel({
   const [aboutDraft, setAboutDraft] = useState("")
   const [openingLineDraft, setOpeningLineDraft] = useState("")
   const [revealDraft, setRevealDraft] = useState("")
-  const [closesAtDraft, setClosesAtDraft] = useState<Date | undefined>(
-    undefined
-  )
   const [cropSrc, setCropSrc] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -157,7 +151,6 @@ export function PreviewPanel({
   const reveal = values.reveal ?? ""
   const photo = values.photo as File | undefined
   const photoUrl = values.photoUrl
-  const closesAt = values.closesAt
   const charityIds = values.charities ?? []
   const selectedTopics = values.topics ?? []
 
@@ -292,12 +285,6 @@ export function PreviewPanel({
   function saveReveal() {
     form.setValue("reveal", revealDraft, { shouldValidate: true })
     setRevealOpen(false)
-  }
-  function saveClosesAt() {
-    if (closesAtDraft) {
-      form.setValue("closesAt", closesAtDraft, { shouldValidate: true })
-    }
-    setClosesAtOpen(false)
   }
   function savePhoto() {
     if (photoDraft) {
@@ -595,26 +582,8 @@ export function PreviewPanel({
 
         {/* Right — sticky meta */}
         <div className="sticky top-20 space-y-4 self-start">
-          {/* Countdown — click to edit closes_at */}
-          <Button
-            type="button"
-            variant="ghost"
-            className="group relative block h-auto w-full rounded-lg p-0 text-left"
-            onClick={() => {
-              setClosesAtDraft(closesAt instanceof Date ? closesAt : undefined)
-              setClosesAtOpen(true)
-            }}
-            aria-label="Edit poll close date"
-          >
-            {closesAt instanceof Date ? (
-              <div className="rounded-lg border border-border bg-card px-5 py-4">
-                <Countdown closesAt={closesAt.toISOString()} />
-              </div>
-            ) : (
-              <CountdownPlaceholder />
-            )}
-            <EditBadge className="top-2 right-2" />
-          </Button>
+          {/* Countdown — non-interactive; date set at publish */}
+          <CountdownPlaceholder />
 
           <CharityBanner charities={displayCharities} totalRaised={0} />
 
@@ -817,16 +786,6 @@ export function PreviewPanel({
           />
           <CharCounter value={revealDraft} max={280} />
         </div>
-      </ResponsiveOverlay>
-
-      {/* Closes at */}
-      <ResponsiveOverlay
-        open={closesAtOpen}
-        onOpenChange={(o) => !o && setClosesAtOpen(false)}
-        title="Poll closes"
-        footer={overlayFooter(saveClosesAt, () => setClosesAtOpen(false))}
-      >
-        <DateTimePicker value={closesAtDraft} onChange={setClosesAtDraft} />
       </ResponsiveOverlay>
 
       {/* Photo */}

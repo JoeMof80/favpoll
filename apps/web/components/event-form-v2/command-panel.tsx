@@ -6,7 +6,12 @@ import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { shortTopicLabel, deriveRegister } from "@/lib/registers"
+import {
+  shortTopicLabel,
+  deriveRegister,
+  suggestClosingDate,
+} from "@/lib/registers"
+import { DateTimePicker } from "./date-time-picker"
 import type {
   Category,
   Charity,
@@ -27,9 +32,8 @@ type CommandPanelProps = {
   mode: "create" | "edit"
   submitting: boolean
   error: string | null
-  onSubmit: () => void
+  onSubmit: (closesAt?: Date) => void
   onCancel: () => void
-  onEventSettingsOpen: () => void
 }
 
 export function CommandPanel({
@@ -41,7 +45,6 @@ export function CommandPanel({
   error,
   onSubmit,
   onCancel,
-  onEventSettingsOpen,
 }: CommandPanelProps) {
   const form = useFormContext<EventFormValues>()
 
@@ -63,6 +66,9 @@ export function CommandPanel({
   const [charityOpen, setCharityOpen] = useState(false)
   const [loveOpen, setLoveOpen] = useState(false)
 
+  const [publishOpen, setPublishOpen] = useState(false)
+  const [publishClosesAt, setPublishClosesAt] = useState<Date | undefined>()
+
   const categoryLabel = category
     ? category.charAt(0).toUpperCase() + category.slice(1)
     : null
@@ -82,11 +88,15 @@ export function CommandPanel({
         ? "1 of 3 selected."
         : `${charityCount} of 3 selected — proceeds split equally.`
 
+  // Create mode: only Name/Cause must be filled before publishing
+  // Edit mode: all fields must be filled before saving
   const missing: string[] = []
-  if (!category) missing.push("Occasion")
-  if (!charitiesValue?.length) missing.push("Charity")
-  if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
-    missing.push("favpoll topic")
+  if (mode === "edit") {
+    if (!category) missing.push("Occasion")
+    if (!charitiesValue?.length) missing.push("Charity")
+    if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
+      missing.push("favpoll topic")
+  }
   if (subjectValue === "cause") {
     if (!causeLabelValue) missing.push("Cause")
   } else {
@@ -94,6 +104,12 @@ export function CommandPanel({
   }
 
   const isPublishable = missing.length === 0
+
+  function handlePublishClick() {
+    const suggested = suggestClosingDate(category)
+    setPublishClosesAt(new Date(suggested))
+    setPublishOpen(true)
+  }
 
   return (
     <>
@@ -108,38 +124,58 @@ export function CommandPanel({
             <p className="text-xs font-medium text-muted-foreground">
               Your event
             </p>
-            <div className="flex flex-wrap gap-1.5">
-              <Chip
-                selected={!!categoryLabel}
-                size="sm"
-                onClick={() => setHonourOpen(true)}
-              >
-                {categoryLabel || "Occasion…"}
-              </Chip>
-              {charityNames.length > 0 ? (
-                charityNames.map((name) => (
-                  <Chip
-                    key={name}
-                    selected
-                    size="sm"
-                    onClick={() => setCharityOpen(true)}
-                  >
+            {mode === "create" ? (
+              /* Read-only text summary in create mode */
+              <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                {categoryLabel && (
+                  <span className="text-sm text-foreground">
+                    {categoryLabel}
+                  </span>
+                )}
+                {charityNames.map((name) => (
+                  <span key={name} className="text-sm text-foreground">
                     {name}
-                  </Chip>
-                ))
-              ) : (
-                <Chip size="sm" onClick={() => setCharityOpen(true)}>
-                  Charity…
+                  </span>
+                ))}
+                {topicLabel && (
+                  <span className="text-sm text-foreground">{topicLabel}</span>
+                )}
+              </div>
+            ) : (
+              /* Clickable chips in edit mode */
+              <div className="flex flex-wrap gap-1.5">
+                <Chip
+                  selected={!!categoryLabel}
+                  size="sm"
+                  onClick={() => setHonourOpen(true)}
+                >
+                  {categoryLabel || "Occasion…"}
                 </Chip>
-              )}
-              <Chip
-                selected={!!topicLabel}
-                size="sm"
-                onClick={() => setLoveOpen(true)}
-              >
-                {topicLabel || "Topic…"}
-              </Chip>
-            </div>
+                {charityNames.length > 0 ? (
+                  charityNames.map((name) => (
+                    <Chip
+                      key={name}
+                      selected
+                      size="sm"
+                      onClick={() => setCharityOpen(true)}
+                    >
+                      {name}
+                    </Chip>
+                  ))
+                ) : (
+                  <Chip size="sm" onClick={() => setCharityOpen(true)}>
+                    Charity…
+                  </Chip>
+                )}
+                <Chip
+                  selected={!!topicLabel}
+                  size="sm"
+                  onClick={() => setLoveOpen(true)}
+                >
+                  {topicLabel || "Topic…"}
+                </Chip>
+              </div>
+            )}
           </div>
 
           {/* Listed / Unlisted */}
@@ -187,15 +223,6 @@ export function CommandPanel({
             <Button
               type="button"
               variant="ghost"
-              size="sm"
-              className="shrink-0 text-muted-foreground"
-              onClick={onEventSettingsOpen}
-            >
-              Settings
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
               className="flex-1"
               onClick={onCancel}
               disabled={submitting}
@@ -206,7 +233,9 @@ export function CommandPanel({
               type="button"
               className="flex-1"
               disabled={submitting || !isPublishable}
-              onClick={onSubmit}
+              onClick={
+                mode === "create" ? handlePublishClick : () => onSubmit()
+              }
             >
               {submitting
                 ? mode === "create"
@@ -220,95 +249,138 @@ export function CommandPanel({
         </div>
       </div>
 
-      {/* Honour sheet */}
-      <ResponsiveOverlay
-        open={honourOpen}
-        onOpenChange={setHonourOpen}
-        title="Occasion"
-        description="What is this event for?"
-        footer={
-          <Button
-            type="button"
-            className="w-full"
-            onClick={() => setHonourOpen(false)}
-          >
-            Done
-          </Button>
-        }
-      >
-        <HonourStep
-          value={{
-            category,
-            grouping,
-            subject: subjectValue,
-            causeLabel: causeLabelValue,
-          }}
-          onChange={({
-            category: cat,
-            grouping: grp,
-            subject: sub,
-            causeLabel: cl,
-          }) => {
-            const derived = deriveRegister(cat, grp)
-            form.setValue("category", cat ?? undefined)
-            form.setValue("grouping", grp)
-            form.setValue("subject", sub)
-            form.setValue("causeLabel", cl)
-            form.setValue("register", derived)
-            form.setValue("openingLine", "")
-            form.setValue("isListed", derived !== "remembering")
-          }}
-        />
-      </ResponsiveOverlay>
-
-      {/* Charity sheet */}
-      <ResponsiveOverlay
-        open={charityOpen}
-        onOpenChange={setCharityOpen}
-        title="Charity"
-        description={charityDescription}
-        footer={
-          <Button
-            type="button"
-            className="w-full"
-            onClick={() => setCharityOpen(false)}
-          >
-            Done
-          </Button>
-        }
-      >
-        <CharityStep
-          charities={charities}
-          value={charitiesValue}
-          onChange={(v) =>
-            form.setValue("charities", v, { shouldValidate: true })
+      {/* Publish overlay — create mode only */}
+      {mode === "create" && (
+        <ResponsiveOverlay
+          open={publishOpen}
+          onOpenChange={(o) => !o && setPublishOpen(false)}
+          title="When does the poll close?"
+          footer={
+            <div className="space-y-2">
+              <Button
+                type="button"
+                className="w-full"
+                disabled={submitting || !publishClosesAt}
+                onClick={() => {
+                  if (publishClosesAt) onSubmit(publishClosesAt)
+                }}
+              >
+                {submitting ? "Creating…" : "Publish"}
+              </Button>
+              <Button
+                type="button"
+                variant="link"
+                className="w-full text-muted-foreground"
+                onClick={() => setPublishOpen(false)}
+              >
+                ← Back
+              </Button>
+            </div>
           }
-        />
-      </ResponsiveOverlay>
+        >
+          <DateTimePicker
+            value={publishClosesAt}
+            onChange={setPublishClosesAt}
+          />
+        </ResponsiveOverlay>
+      )}
 
-      {/* Love sheet */}
-      <ResponsiveOverlay
-        open={loveOpen}
-        onOpenChange={setLoveOpen}
-        title="favpoll topic"
-        description="Choose what everyone votes on."
-        footer={
-          <Button
-            type="button"
-            className="w-full"
-            onClick={() => setLoveOpen(false)}
+      {/* Edit-mode overlays only */}
+      {mode === "edit" && (
+        <>
+          {/* Honour sheet */}
+          <ResponsiveOverlay
+            open={honourOpen}
+            onOpenChange={setHonourOpen}
+            title="Occasion"
+            description="What is this event for?"
+            footer={
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => setHonourOpen(false)}
+              >
+                Done
+              </Button>
+            }
           >
-            Done
-          </Button>
-        }
-      >
-        <LoveStep
-          topics={topics}
-          categories={categories}
-          value={topicsValue}
-          onChange={(v) => form.setValue("topics", v, { shouldValidate: true })}
-        />
-      </ResponsiveOverlay>
+            <HonourStep
+              value={{
+                category,
+                grouping,
+                subject: subjectValue,
+                causeLabel: causeLabelValue,
+              }}
+              onChange={({
+                category: cat,
+                grouping: grp,
+                subject: sub,
+                causeLabel: cl,
+              }) => {
+                const derived = deriveRegister(cat, grp)
+                form.setValue("category", cat ?? undefined)
+                form.setValue("grouping", grp)
+                form.setValue("subject", sub)
+                form.setValue("causeLabel", cl)
+                form.setValue("register", derived)
+                form.setValue("openingLine", "")
+                form.setValue("isListed", derived !== "remembering")
+              }}
+            />
+          </ResponsiveOverlay>
+
+          {/* Charity sheet */}
+          <ResponsiveOverlay
+            open={charityOpen}
+            onOpenChange={setCharityOpen}
+            title="Charity"
+            description={charityDescription}
+            footer={
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => setCharityOpen(false)}
+              >
+                Done
+              </Button>
+            }
+          >
+            <CharityStep
+              charities={charities}
+              value={charitiesValue}
+              onChange={(v) =>
+                form.setValue("charities", v, { shouldValidate: true })
+              }
+            />
+          </ResponsiveOverlay>
+
+          {/* Love sheet */}
+          <ResponsiveOverlay
+            open={loveOpen}
+            onOpenChange={setLoveOpen}
+            title="favpoll topic"
+            description="Choose what everyone votes on."
+            footer={
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => setLoveOpen(false)}
+              >
+                Done
+              </Button>
+            }
+          >
+            <LoveStep
+              topics={topics}
+              categories={categories}
+              value={topicsValue}
+              onChange={(v) =>
+                form.setValue("topics", v, { shouldValidate: true })
+              }
+            />
+          </ResponsiveOverlay>
+        </>
+      )}
     </>
   )
 }

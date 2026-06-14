@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { EventFormV2 } from "@/components/event-form-v2"
-import { deriveRegister, suggestClosingDate } from "@/lib/registers"
+import { deriveRegister } from "@/lib/registers"
 import type {
   Category,
   Charity,
@@ -99,7 +99,6 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
         isListed: register !== "remembering",
         topics: defaultTopics,
         charities: charityIds,
-        closesAt: new Date(suggestClosingDate(category as EventCategory)),
       }
     : {}
 
