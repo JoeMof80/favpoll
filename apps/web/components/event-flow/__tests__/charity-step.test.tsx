@@ -22,53 +22,35 @@ const CHARITIES = [
   makeCharity("c4", "BHF"),
 ]
 
-describe("CharityStep — empty state", () => {
-  it("shows the search picker when no charity is selected", () => {
+describe("CharityStep", () => {
+  it("always shows the search input", () => {
     render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
     expect(screen.getByPlaceholderText("Search charities…")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
   })
 
-  it("does not show the split note when no charity is selected", () => {
+  it("renders all charity chips", () => {
     render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
-    expect(screen.queryByTestId("split-note")).not.toBeInTheDocument()
-  })
-})
-
-describe("CharityStep — one charity selected", () => {
-  it("shows selected charity prominently and hides full picker", () => {
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
-    )
-    expect(
-      screen.queryByPlaceholderText("Search charities…")
-    ).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
   })
 
-  it("shows 'Add another charity' link", () => {
+  it("shows already-selected charities as selected", () => {
     render(
       <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
     )
-    expect(screen.getByTestId("add-another")).toBeInTheDocument()
-  })
-
-  it("does not show split note with one charity", () => {
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
-    )
-    expect(screen.queryByTestId("split-note")).not.toBeInTheDocument()
-  })
-
-  it("clicking 'Add another' reveals the picker", () => {
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
-    )
-    fireEvent.click(screen.getByTestId("add-another"))
     expect(screen.getByPlaceholderText("Search charities…")).toBeInTheDocument()
   })
 
-  it("removes charity when selected chip is clicked", () => {
+  it("calls onChange with new id when unselected charity is clicked", () => {
+    const onChange = vi.fn()
+    render(
+      <CharityStep charities={CHARITIES} value={["c1"]} onChange={onChange} />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Oxfam" }))
+    expect(onChange).toHaveBeenCalledWith(["c1", "c2"])
+  })
+
+  it("calls onChange without id when selected charity is clicked", () => {
     const onChange = vi.fn()
     render(
       <CharityStep charities={CHARITIES} value={["c1"]} onChange={onChange} />
@@ -76,48 +58,27 @@ describe("CharityStep — one charity selected", () => {
     fireEvent.click(screen.getByRole("button", { name: "Shelter" }))
     expect(onChange).toHaveBeenCalledWith([])
   })
-})
 
-describe("CharityStep — two charities selected", () => {
-  it("shows the split note", () => {
-    render(
-      <CharityStep
-        charities={CHARITIES}
-        value={["c1", "c2"]}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.getByTestId("split-note")).toBeInTheDocument()
-    expect(screen.getByTestId("split-note")).toHaveTextContent(
-      "Proceeds are split equally"
-    )
+  it("filters chips by search query", () => {
+    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
+    fireEvent.change(screen.getByPlaceholderText("Search charities…"), {
+      target: { value: "ox" },
+    })
+    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", { name: "Shelter" })
+    ).not.toBeInTheDocument()
   })
 
-  it("still shows 'Add another charity' when below max", () => {
-    render(
-      <CharityStep
-        charities={CHARITIES}
-        value={["c1", "c2"]}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.getByTestId("add-another")).toBeInTheDocument()
-  })
-})
-
-describe("CharityStep — three charities selected (max)", () => {
-  it("hides 'Add another charity' when at max", () => {
-    render(
-      <CharityStep
-        charities={CHARITIES}
-        value={["c1", "c2", "c3"]}
-        onChange={() => {}}
-      />
-    )
-    expect(screen.queryByTestId("add-another")).not.toBeInTheDocument()
+  it("shows no-results message when search matches nothing", () => {
+    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
+    fireEvent.change(screen.getByPlaceholderText("Search charities…"), {
+      target: { value: "zzz" },
+    })
+    expect(screen.getByText("No results.")).toBeInTheDocument()
   })
 
-  it("adding a fourth charity does nothing (onChange not called with 4)", () => {
+  it("does not call onChange when at max and an unselected charity is clicked", () => {
     const onChange = vi.fn()
     render(
       <CharityStep
@@ -126,32 +87,7 @@ describe("CharityStep — three charities selected (max)", () => {
         onChange={onChange}
       />
     )
-    // Expand picker to try adding
-    fireEvent.click(screen.getByRole("button", { name: "Shelter" }))
-    expect(onChange).toHaveBeenCalledWith(["c2", "c3"])
-  })
-})
-
-describe("CharityStep — picking first charity collapses picker", () => {
-  it("auto-collapses to selected state after first pick", () => {
-    const onChange = vi.fn()
-    const { rerender } = render(
-      <CharityStep charities={CHARITIES} value={[]} onChange={onChange} />
-    )
-    // Picker is visible
-    expect(screen.getByPlaceholderText("Search charities…")).toBeInTheDocument()
-
-    // Pick first charity
-    fireEvent.click(screen.getByRole("button", { name: "Shelter" }))
-    expect(onChange).toHaveBeenCalledWith(["c1"])
-
-    // Simulate parent updating value
-    rerender(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={onChange} />
-    )
-    // Picker should collapse
-    expect(
-      screen.queryByPlaceholderText("Search charities…")
-    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "BHF" }))
+    expect(onChange).not.toHaveBeenCalled()
   })
 })
