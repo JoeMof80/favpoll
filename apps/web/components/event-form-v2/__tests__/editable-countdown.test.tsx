@@ -6,8 +6,10 @@ const mockDateTimePicker = vi.hoisted(() => vi.fn())
 const mockResponsiveOverlay = vi.hoisted(() => vi.fn())
 
 vi.mock("@/components/countdown", () => ({
-  Countdown: (props: { closesAt: string }) => {
+  Countdown: (props: { closesAt?: string }) => {
     mockCountdown(props)
+    if (!props.closesAt)
+      return <div data-testid="countdown-placeholder">placeholder</div>
     return <div data-testid="countdown">{props.closesAt}</div>
   },
 }))
@@ -58,9 +60,9 @@ const FUTURE = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 const PAST = new Date(Date.now() - 1000).toISOString()
 
 describe("EditableCountdown — no closesAt (create mode)", () => {
-  it("renders the -- placeholder", () => {
+  it("renders the countdown placeholder with no edit button", () => {
     render(<EditableCountdown />)
-    expect(screen.getAllByText("--")).toHaveLength(4)
+    expect(screen.getByTestId("countdown-placeholder")).toBeInTheDocument()
     expect(screen.queryByTestId("countdown")).not.toBeInTheDocument()
     expect(
       screen.queryByRole("button", { name: /edit closing date/i })

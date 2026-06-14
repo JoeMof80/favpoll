@@ -19,7 +19,7 @@ const COLOUR_TOPIC: TopicWithMeta = {
     celebrating_one: {
       about: "Think of them as a human palette…",
       reveal: "Her absolute favourite was always Cobalt Blue.",
-      pronouns: "she/her",
+      pronouns: "she",
     },
   },
   created_by: null,

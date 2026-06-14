@@ -20,17 +20,7 @@ export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
   if (!closesAt) {
     return (
       <div className="rounded-lg border border-border bg-card px-5 py-4">
-        <p className="mb-2 text-xs text-muted-foreground">Poll closes in</p>
-        <div className="flex items-end gap-3">
-          {(["days", "hrs", "min", "sec"] as const).map((label) => (
-            <div key={label} className="text-center">
-              <p className="text-2xl leading-none font-medium text-muted-foreground tabular-nums">
-                --
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{label}</p>
-            </div>
-          ))}
-        </div>
+        <Countdown />
       </div>
     )
   }
