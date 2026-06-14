@@ -30,16 +30,19 @@ export function EventHero({
       <div className="flex items-start gap-4 md:gap-6">
         {/* Text */}
         <div className="min-w-0 flex-1">
-          <SectionEyebrow variant="muted" className="mb-2 truncate break-words">
+          <SectionEyebrow
+            variant="muted"
+            className="flex h-8 items-center truncate break-words"
+          >
             {headline?.prefix}
           </SectionEyebrow>
 
-          <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight break-words text-[#2C2C2A] sm:text-5xl">
+          <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
             {protagonist.name}
           </h1>
 
           {headline?.suffix && (
-            <p className="mt-2 truncate text-xl font-normal text-[#534AB7] md:text-2xl">
+            <p className="mt-2 truncate text-xl font-normal whitespace-normal text-[#534AB7] md:text-2xl">
               {headline.suffix}
             </p>
           )}
@@ -55,11 +58,11 @@ export function EventHero({
       </div>
 
       {protagonist.about ? (
-        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
+        <p className="mt-4 line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
           {protagonist.about}
         </p>
       ) : aboutPlaceholder ? (
-        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-muted-foreground/50">
+        <p className="mt-4 line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
           {aboutPlaceholder}
         </p>
       ) : null}

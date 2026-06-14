@@ -131,7 +131,7 @@ export function EditablePollArea({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2">
           <SectionLabel title={topicTitle} />
-          <div className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 shadow-sm">
+          <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">
               {showReveal ? "Post-reveal" : "Pre-reveal"}
             </span>
@@ -179,7 +179,7 @@ export function EditablePollArea({
             ) : (
               <p className="text-sm text-muted-foreground/40">Add reveal…</p>
             )}
-            <EditBadge className="top-0 right-0" />
+            <EditBadge />
           </Button>
         )}
 

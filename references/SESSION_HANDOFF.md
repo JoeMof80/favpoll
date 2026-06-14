@@ -1,3 +1,9 @@
+# Session Handoff — 2026-06-14
+
+See [`session-handoff-2026-06-14.md`](session-handoff-2026-06-14.md) for the most recent session (PRs #97–#100: preview-panel split, CharityStep simplification, dialog header input pattern).
+
+---
+
 # Session Handoff — 2026-06-04
 
 ## Branch
