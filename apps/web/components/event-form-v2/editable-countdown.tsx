@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { Countdown } from "@/components/countdown"
 import { DateTimePicker } from "./date-time-picker"
+import { EditBadge } from "./edit-helpers"
+import { cn } from "@/lib/utils"
 
 type Props = {
   /** ISO string — when provided (edit mode) shows a live countdown with edit affordance */
@@ -29,28 +30,31 @@ export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
 
   return (
     <>
-      <div className="relative">
-        <div className="rounded-lg border border-border bg-card px-5 py-4">
-          {isPast ? (
-            <p className="text-xs text-muted-foreground">Poll closed</p>
-          ) : (
-            <Countdown closesAt={closesAt} />
-          )}
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="absolute top-2 right-2 h-7 w-7 p-0 opacity-60 hover:opacity-100"
-          onClick={() => {
-            setDraft(new Date(closesAt))
-            setOpen(true)
-          }}
-          aria-label="Edit closing date"
-        >
-          <Pencil className="h-3 w-3" />
-        </Button>
-      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        className={cn(
+          "group relative block h-auto w-full rounded-xl border border-dotted border-border bg-card px-5 py-4",
+          "text-left font-normal whitespace-normal hover:bg-card focus-visible:bg-card",
+          "hover:border-solid hover:border-primary/40",
+          "focus-visible:border-solid focus-visible:border-primary/40"
+        )}
+        onClick={() => {
+          setDraft(new Date(closesAt))
+          setOpen(true)
+        }}
+        aria-label="Edit closing date"
+      >
+        {isPast ? (
+          <p className="text-xs text-muted-foreground">Poll closed</p>
+        ) : (
+          <Countdown closesAt={closesAt} />
+        )}
+        <EditBadge
+          className="top-0 bottom-auto"
+          iconClassName="group-hover:text-primary/40 group-focus-visible:text-primary/40"
+        />
+      </Button>
 
       <ResponsiveOverlay
         open={open}

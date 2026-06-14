@@ -1,9 +1,12 @@
+import { cn } from "@/lib/utils"
+
 type Props = {
   name: string
   photoUrl: string | null
+  className?: string
 }
 
-export function ProtagonistAvatar({ name, photoUrl }: Props) {
+export function ProtagonistAvatar({ name, photoUrl, className }: Props) {
   const initials = name
     .split(" ")
     .filter(Boolean)
@@ -13,7 +16,12 @@ export function ProtagonistAvatar({ name, photoUrl }: Props) {
     .toUpperCase()
 
   return (
-    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-[#D3D1C7] md:h-28 md:w-28">
+    <div
+      className={cn(
+        "relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#D3D1C7] md:h-33 md:w-33",
+        className
+      )}
+    >
       {photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={photoUrl} alt={name} className="h-full w-full object-cover" />

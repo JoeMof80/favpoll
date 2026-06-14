@@ -168,6 +168,55 @@ async function upsertPollForEvent(
   }
 }
 
+export async function updateClosesAt(eventId: string, closesAt: string) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("created_by, closes_at, hard_close_at, extension_count")
+    .eq("id", eventId)
+    .single()
+
+  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+
+  const newClosesAt = new Date(closesAt).toISOString()
+  const currentClosesAt = new Date(event.closes_at)
+  const isExtension = new Date(newClosesAt) > currentClosesAt
+
+  if (isExtension) {
+    if (new Date(newClosesAt) <= new Date()) {
+      throw new Error("Closing date must be in the future")
+    }
+    if ((event.extension_count ?? 0) >= 2) {
+      throw new Error(
+        "Maximum extensions reached. Please contact us to request a further extension."
+      )
+    }
+    if (
+      event.hard_close_at &&
+      new Date(newClosesAt) > new Date(event.hard_close_at)
+    ) {
+      const cap = new Date(event.hard_close_at).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+      throw new Error(`Closing date cannot be extended beyond ${cap}`)
+    }
+  }
+
+  await supabase
+    .from("events")
+    .update({
+      closes_at: newClosesAt,
+      ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
+    })
+    .eq("id", eventId)
+}
+
 export async function updateEvent(
   eventId: string,
   protagonistId: string,

@@ -132,7 +132,7 @@ export function EventContent({
         </div>
 
         {/* Right — sticky meta */}
-        <div className="sticky top-20 hidden space-y-4 self-start md:block">
+        <div className="sticky top-8 hidden space-y-4 self-start md:block">
           {isClosed ? (
             <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
               <SectionEyebrow variant="muted" className="font-semibold">

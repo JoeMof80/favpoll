@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
-import { updateEvent } from "@/app/events/[id]/edit/actions"
+import { updateEvent, updateClosesAt } from "@/app/events/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
@@ -225,6 +225,27 @@ export function EventFormV2({
     form.handleSubmit(onSubmit)()
   }
 
+  async function handleClosesAtChange(iso: string) {
+    if (mode === "edit" && eventId) {
+      try {
+        await updateClosesAt(eventId, iso)
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : "Failed to update closing date",
+          {
+            style: {
+              background: "#fef2f2",
+              color: "#991b1b",
+              border: "1px solid #ef4444",
+            },
+          }
+        )
+        return
+      }
+    }
+    setEditClosesAt(iso)
+  }
+
   if (seedEventId) {
     return (
       <SeedFundModal
@@ -250,7 +271,7 @@ export function EventFormV2({
         onCancel={handleCancel}
         hasNewTopicDraft={hasNewTopicDraft}
         closesAt={editClosesAt}
-        onClosesAtChange={setEditClosesAt}
+        onClosesAtChange={handleClosesAtChange}
       />
     </Form>
   )

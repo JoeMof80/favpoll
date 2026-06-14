@@ -151,7 +151,7 @@ export function EditableHero({
             <Button
               type="button"
               variant="ghost"
-              className={cn(EDIT_BTN, "mb-2")}
+              className={EDIT_BTN}
               onClick={() => {
                 setOpeningLineDraft(openingLine)
                 setOpeningLineOpen(true)
@@ -164,7 +164,7 @@ export function EditableHero({
               >
                 {resolvedOpeningLine}
               </SectionEyebrow>
-              <EditBadge className="top-0 right-0" />
+              <EditBadge />
             </Button>
 
             {subject === "cause" ? (
@@ -185,7 +185,7 @@ export function EditableHero({
                     </span>
                   )}
                 </h1>
-                <EditBadge className="top-0 right-0" />
+                <EditBadge />
               </Button>
             ) : (
               <>
@@ -206,7 +206,7 @@ export function EditableHero({
                       </span>
                     )}
                   </h1>
-                  <EditBadge className="top-0 right-0" />
+                  <EditBadge />
                 </Button>
 
                 <Button
@@ -231,7 +231,7 @@ export function EditableHero({
                       ? context
                       : contextExamples[effReg]}
                   </p>
-                  <EditBadge className="top-0 right-0" />
+                  <EditBadge />
                 </Button>
               </>
             )}
@@ -242,15 +242,16 @@ export function EditableHero({
             <Button
               type="button"
               variant="ghost"
-              className="group relative h-auto shrink-0 rounded-full p-0"
+              className="group relative h-auto shrink-0 rounded-xl border-dotted border-primary/20 p-0 hover:border-solid hover:border-primary/60 hover:bg-transparent focus-visible:border-solid focus-visible:border-primary/60 focus-visible:bg-transparent"
               onClick={() => setPhotoOpen(true)}
               aria-label="Edit photo"
             >
               <ProtagonistAvatar
                 name={name || exampleName || "Name"}
                 photoUrl={previewPhoto ? resolvedPhotoUrl : null}
+                className="border-0"
               />
-              <EditBadge className="-top-1 -right-1" />
+              <EditBadge className="right-0 bottom-0" />
             </Button>
           )}
         </div>
@@ -285,7 +286,7 @@ export function EditableHero({
           ) : (
             <p className="text-sm text-muted-foreground/40">+ about</p>
           )}
-          <EditBadge className="top-0 right-0" />
+          <EditBadge />
         </Button>
 
         <hr className="mt-4 border-[#D3D1C7] md:mt-8" />

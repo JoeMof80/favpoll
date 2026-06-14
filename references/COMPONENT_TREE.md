@@ -77,40 +77,56 @@ event-card  (client component)
           → @radix-ui/react-tooltip
 ```
 
-### `app/events/new/page.tsx` — Create event
+### `app/events/new/page.tsx` — New event wizard
 ```
-app/events/new/page.tsx  (queries events table to derive isFirstTime)
-  → event-form-v2  (EventFormV2 — split FormPanel + PreviewPanel)
-      → event-form-v2/form-panel  (thin shell — sequences 5 StepSection wrappers)
-          → event-form-v2/step-section  (StepSection, CounterWhenTyping)
-          → event-form-v2/steps/step-occasion
-              → event-form-v2/occasion-picker-field
-                  → ui/popover, ui/chip
-          → event-form-v2/steps/step-profile
-              → event-form-v2/photo-crop-modal
-                  → react-easy-crop
-              → ui/input-group
-          → event-form-v2/steps/step-topic
-              → event-form-v2/topic-picker-field
-                  → ui/popover, ui/chip
-          → event-form-v2/steps/step-reveal
-          → event-form-v2/steps/step-event
-              → event-form-v2/charity-field
-                  → ui/popover, ui/chip
-              → event-form-v2/date-time-picker
-                  → ui/calendar, ui/button
-      → event-form-v2/preview-panel  (live preview; isFirstTime prop)
-          → event-form-v2/onboarding-panel  (shown when no occasion selected, first-time or localStorage flag)
-              → ui/separator
-              → ui/button
-          → event-hero
-          → poll-heading
-              → ui/tooltip-icon-button  (onResetPledge, onViewResults)
-          → pledge-panel
-          → favpoll-card/poll-results
-          → countdown
+app/events/new/page.tsx  (server component; fetches charities, topics, categories, charity_topics via getWizardData())
+  → new-event-wizard/index.tsx  (NewEventWizard; 3-step client component)
+      → new-event-wizard/use-wizard-state  (hook: all wizard state, nextDisabled, handleNext/Back/Finish)
+      → new-event-wizard/wizard-triad-rail *  (desktop left column: Honour/Charity/Love icons + labels)
+      → new-event-wizard/wizard-progress-strip *  (mobile segmented progress strip)
+      → new-event-wizard/wizard-step-shell *  (step title + guidance wrapper)
+      → new-event-wizard/wizard-nav *  (Back + Next/Set-up-my-event buttons)
+      → event-flow/honour-step  (subject/category/grouping/causeLabel)
+      → new-event-wizard/wizard-charity-card *  (selected charity receipt card)
+      → new-event-wizard/wizard-topic-card *  (selected topic card with item chips)
+      → event-flow/charity-step  (charity chip grid; controlled search via search? prop)
+      → event-flow/love-step  (topic chip grid; controlled search via search?/onSearchChange? props)
+      → event-flow/topic-items-dialog  (add/remove poll items sheet)
+      → ui/responsive-overlay  (charity + love overlays; search input in header prop)
+      → ui/button
+```
+
+### `app/events/new/details/page.tsx` — Create event form
+```
+app/events/new/details/page.tsx  (query params pre-populate wizard choices)
+  → event-form-v2  (EventFormV2; create mode)
+      → event-form-v2/preview-panel  (coordinator; composes sub-components below)
+          → event-form-v2/editable-hero  (name/context/photo/opening-line/about overlays)
+              → event-form-v2/photo-crop-modal  → react-easy-crop
+              → ui/responsive-overlay, ui/input, ui/textarea, ui/button, ui/switch
+              → event-form-v2/edit-helpers  (EDIT_BTN, EditBadge, CharCounter, overlayFooter)
+          → event-form-v2/editable-poll-area  (reveal toggle, reveal overlay, poll preview)
+              → favpoll-card/poll-results
+              → pledge-panel
+              → ui/responsive-overlay, ui/textarea, ui/switch, ui/button
+              → event-form-v2/edit-helpers
+          → event-form-v2/editable-countdown  (Countdown placeholder in create; live in edit)
+              → countdown
+          → event-form-v2/onboarding-panel  (shown when no occasion selected)
+              → ui/separator, ui/button
           → charity-banner
-          → pledge-card  (prePublish mode; toast.warning on click)
+          → pledge-card  (prePublish mode)
+      → event-form-v2/command-panel  (floating bottom-right; publish overlay with DateTimePicker)
+          → event-form-v2/date-time-picker  → ui/calendar, ui/button
+          → event-flow/honour-step
+          → event-flow/charity-step
+          → event-flow/love-step
+          → event-flow/topic-items-dialog
+          → ui/responsive-overlay, ui/button, ui/switch
+      → event-form-v2/seed-fund-modal  (post-publish shared fund seeding)
+          → stripe-checkout
+          → pledge-card/amount-input
+          → ui/responsive-overlay, ui/button
 ```
 
 ### `app/events/[id]/page.tsx` — Event view
@@ -147,7 +163,9 @@ app/events/[id]/page.tsx
 ### `app/events/[id]/edit/page.tsx` — Edit event
 ```
 app/events/[id]/edit/page.tsx
-  → event-form-v2  (same tree as create; isFirstTime always false on edit)
+  → event-form-v2  (EventFormV2; edit mode — same tree as create/details; isFirstTime always false;
+                    initialClosesAt prop passed in; editable-countdown shows live Countdown widget;
+                    SeedFundModal never rendered in edit mode)
 ```
 
 ### `app/events/[id]/manage/page.tsx` — Manage event
@@ -217,8 +235,8 @@ app/pledges/withdraw/page.tsx
 | `calendar` | closing-date | — |
 | `card` | closing-date | — |
 | `field` | closing-date | — |
-| `input` | — (direct HTML used elsewhere) | ✓ |
-| `textarea` | closing-date | — |
+| `input` | event-form-v2/editable-hero (dialog header inputs) | ✓ |
+| `textarea` | event-form-v2/editable-hero, editable-poll-area (dialog header inputs) | — |
 | `switch` | privacy-toggle | — |
 | `separator` | onboarding-panel | — |
 | `alert` | poll-section/empty-poll-alert | — |
@@ -245,9 +263,7 @@ These are **not** a self-contained card used in the app — they are a set of sh
 
 ## Unused in production ⚠
 
-| Component | File | Notes |
-|-----------|------|-------|
-| `ui/input` | `components/ui/input.tsx` | Stories only (raw `<input>` used in production) |
+No known unused components. `ui/input` and `ui/textarea` are now used in production via the dialog header input pattern (editable-hero, editable-poll-area).
 
 > `home-carousel`, `pot-banner`, `poll-framing`, `ui/toggle` deleted in PR #24.
 > `favpoll-card` cluster + `poll-options`, `ui/dropdown-menu` deleted in PRs #25–#27.
