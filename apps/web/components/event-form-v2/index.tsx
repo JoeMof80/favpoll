@@ -12,6 +12,7 @@ import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
+import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
 import type {
   Category,
@@ -57,6 +58,7 @@ export function EventFormV2({
   const [editClosesAt, setEditClosesAt] = useState<string | undefined>(
     initialClosesAt
   )
+  const [seedEventId, setSeedEventId] = useState<string | null>(null)
 
   // Holds the closesAt chosen in the publish overlay (create mode)
   const pendingClosesAt = useRef<Date | null>(null)
@@ -153,7 +155,7 @@ export function EventFormV2({
             addedItems: isCustomTopic ? [] : (selectedTopic.customLabels ?? []),
           },
         })
-        router.push(`/events/${newId}`)
+        setSeedEventId(newId)
       } else {
         if (!eventId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
@@ -221,6 +223,15 @@ export function EventFormV2({
   function handleSubmit(closesAt?: Date) {
     if (closesAt) pendingClosesAt.current = closesAt
     form.handleSubmit(onSubmit)()
+  }
+
+  if (seedEventId) {
+    return (
+      <SeedFundModal
+        eventId={seedEventId}
+        onComplete={() => router.push(`/events/${seedEventId}`)}
+      />
+    )
   }
 
   return (
