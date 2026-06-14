@@ -16,13 +16,10 @@ export const eventFormSchema = z
     about: z.string().max(300, "Must be 300 characters or fewer").optional(),
     photo: z.instanceof(File).optional(),
     photoUrl: z.string().optional(),
-    closesAt: z.date(),
     charities: z
       .array(z.string())
       .min(1, "Select at least one charity")
       .max(3, "Maximum 3 charities"),
-    sharedFund: z.number().min(0),
-    isPrivate: z.boolean(),
     isListed: z.boolean().default(true),
     reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
     topics: z

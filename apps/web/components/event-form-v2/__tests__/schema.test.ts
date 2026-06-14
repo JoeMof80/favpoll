@@ -5,10 +5,7 @@ import { eventFormSchema } from "@/components/event-form-v2/schema"
 const VALID_BASE = {
   category: "celebration" as const,
   name: "Alice",
-  closesAt: new Date("2027-01-01"),
   charities: ["charity-1"],
-  sharedFund: 0,
-  isPrivate: false,
   topics: [
     {
       topicId: "topic-1",
@@ -188,11 +185,5 @@ describe("eventFormSchema — required fields", () => {
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path[0] === "topics")).toBe(true)
     }
-  })
-
-  it("rejects missing closesAt", () => {
-    const { closesAt: _c, ...rest } = VALID_BASE
-    const result = eventFormSchema.safeParse(rest)
-    expect(result.success).toBe(false)
   })
 })

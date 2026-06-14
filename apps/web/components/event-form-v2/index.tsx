@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent } from "@/app/events/[id]/edit/actions"
@@ -37,6 +34,7 @@ type Props = {
   existingPollId?: string
   defaultValues?: Partial<EventFormValues>
   hasNewTopicDraft?: boolean
+  initialClosesAt?: string
 }
 
 export function EventFormV2({
@@ -49,14 +47,15 @@ export function EventFormV2({
   existingPollId,
   defaultValues,
   hasNewTopicDraft = false,
+  initialClosesAt,
 }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showReveal, setShowReveal] = useState(false)
-  const [eventSettingsOpen, setEventSettingsOpen] = useState(false)
-  const [isPrivateDraft, setIsPrivateDraft] = useState(false)
-  const [sharedFundDraft, setSharedFundDraft] = useState("0")
+
+  // Holds the closesAt chosen in the publish overlay (create mode)
+  const pendingClosesAt = useRef<Date | null>(null)
 
   const form = useForm<EventFormValues, unknown, EventFormValues>({
     resolver: zodResolver(eventFormSchema as never),
@@ -72,11 +71,7 @@ export function EventFormV2({
       about: "",
       reveal: "",
       charities: [],
-      sharedFund: 0,
-      isPrivate: false,
       topics: [],
-      // Default closes_at to 30 days from now so schema validation passes on mount
-      closesAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       ...defaultValues,
     },
   })
@@ -120,6 +115,9 @@ export function EventFormV2({
       const isCause = eventSubject === "cause"
 
       if (mode === "create") {
+        const closesAt =
+          pendingClosesAt.current ??
+          new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
         sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
         const { eventId: newId } = await createEvent({
@@ -134,10 +132,10 @@ export function EventFormV2({
           openingLine: values.openingLine ?? null,
           description: isCause ? values.about?.trim() || null : null,
           charityIds: values.charities,
-          closesAt: values.closesAt.toISOString(),
-          isPrivate: values.isPrivate,
+          closesAt: closesAt.toISOString(),
+          isPrivate: false,
           isListed: values.isListed ?? true,
-          potAmount: values.sharedFund > 0 ? values.sharedFund : null,
+          potAmount: null,
           poll: {
             topicId: isCustomTopic ? null : poll.topicId,
             customTopic: isCustomTopic
@@ -156,6 +154,7 @@ export function EventFormV2({
         if (!eventId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
+        const closesAt = initialClosesAt ?? new Date().toISOString()
         await updateEvent(eventId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
@@ -168,10 +167,10 @@ export function EventFormV2({
           openingLine: values.openingLine ?? null,
           description: isCause ? values.about?.trim() || null : null,
           charityIds: values.charities,
-          closesAt: values.closesAt.toISOString(),
-          isPrivate: values.isPrivate,
+          closesAt,
+          isPrivate: false,
           isListed: values.isListed ?? true,
-          potAmount: values.sharedFund > 0 ? values.sharedFund : null,
+          potAmount: null,
           poll,
         })
         router.push(`/events/${eventId}`)
@@ -215,6 +214,11 @@ export function EventFormV2({
     else form.reset()
   }
 
+  function handleSubmit(closesAt?: Date) {
+    if (closesAt) pendingClosesAt.current = closesAt
+    form.handleSubmit(onSubmit)()
+  }
+
   return (
     <Form {...form}>
       <FormInner
@@ -227,23 +231,7 @@ export function EventFormV2({
         error={error}
         showReveal={showReveal}
         onToggleReveal={() => setShowReveal((s) => !s)}
-        eventSettingsOpen={eventSettingsOpen}
-        onEventSettingsOpen={() => {
-          setIsPrivateDraft(form.getValues("isPrivate"))
-          setSharedFundDraft(String(form.getValues("sharedFund") || 0))
-          setEventSettingsOpen(true)
-        }}
-        onEventSettingsClose={() => setEventSettingsOpen(false)}
-        onEventSettingsSave={() => {
-          form.setValue("isPrivate", isPrivateDraft)
-          form.setValue("sharedFund", parseFloat(sharedFundDraft) || 0)
-          setEventSettingsOpen(false)
-        }}
-        isPrivateDraft={isPrivateDraft}
-        onIsPrivateDraftChange={setIsPrivateDraft}
-        sharedFundDraft={sharedFundDraft}
-        onSharedFundDraftChange={setSharedFundDraft}
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={handleSubmit}
         onCancel={handleCancel}
         hasNewTopicDraft={hasNewTopicDraft}
       />
@@ -262,15 +250,7 @@ type InnerProps = {
   error: string | null
   showReveal: boolean
   onToggleReveal: () => void
-  eventSettingsOpen: boolean
-  onEventSettingsOpen: () => void
-  onEventSettingsClose: () => void
-  onEventSettingsSave: () => void
-  isPrivateDraft: boolean
-  onIsPrivateDraftChange: (v: boolean) => void
-  sharedFundDraft: string
-  onSharedFundDraftChange: (v: string) => void
-  onSubmit: () => void
+  onSubmit: (closesAt?: Date) => void
   onCancel: () => void
   hasNewTopicDraft: boolean
 }
@@ -285,14 +265,6 @@ function FormInner({
   error,
   showReveal,
   onToggleReveal,
-  eventSettingsOpen,
-  onEventSettingsOpen,
-  onEventSettingsClose,
-  onEventSettingsSave,
-  isPrivateDraft,
-  onIsPrivateDraftChange,
-  sharedFundDraft,
-  onSharedFundDraftChange,
   onSubmit,
   onCancel,
   hasNewTopicDraft,
@@ -502,72 +474,7 @@ function FormInner({
         error={error}
         onSubmit={onSubmit}
         onCancel={onCancel}
-        onEventSettingsOpen={onEventSettingsOpen}
       />
-
-      {/* Event settings overlay */}
-      <ResponsiveOverlay
-        open={eventSettingsOpen}
-        onOpenChange={(o) => !o && onEventSettingsClose()}
-        title="Event settings"
-        footer={
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              className="flex-1"
-              onClick={onEventSettingsSave}
-            >
-              Save
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1"
-              onClick={onEventSettingsClose}
-            >
-              Cancel
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3">
-            <div>
-              <p className="text-sm font-medium">
-                {isPrivateDraft ? "Private event" : "Public event"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isPrivateDraft
-                  ? "Only guests you invite can view and pledge."
-                  : "Anyone can find this event and make a pledge."}
-              </p>
-            </div>
-            <Switch
-              checked={isPrivateDraft}
-              onCheckedChange={onIsPrivateDraftChange}
-            />
-          </div>
-
-          <div>
-            <p className="mb-1 text-sm font-medium">Shared fund</p>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Seed a communal pot so guests without funds can still participate.
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">£</span>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={sharedFundDraft}
-                onChange={(e) => onSharedFundDraftChange(e.target.value)}
-                placeholder="0"
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-ring"
-              />
-            </div>
-          </div>
-        </div>
-      </ResponsiveOverlay>
     </>
   )
 }
