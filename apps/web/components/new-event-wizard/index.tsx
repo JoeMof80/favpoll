@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { HonourStep } from "@/components/event-flow/honour-step"
@@ -21,6 +22,8 @@ type Props = {
 
 export function NewEventWizard({ data }: Props) {
   const w = useWizardState(data)
+  const [loveSearch, setLoveSearch] = useState("")
+  const [charitySearch, setCharitySearch] = useState("")
 
   return (
     <main>
@@ -119,8 +122,21 @@ export function NewEventWizard({ data }: Props) {
       {/* Love overlay */}
       <ResponsiveOverlay
         open={w.loveOpen}
-        onOpenChange={w.setLoveOpen}
+        onOpenChange={(o) => {
+          w.setLoveOpen(o)
+          if (!o) setLoveSearch("")
+        }}
         title="Choose a favpoll"
+        header={
+          <input
+            type="text"
+            autoFocus
+            placeholder="Search topics…"
+            value={loveSearch}
+            onChange={(e) => setLoveSearch(e.target.value)}
+            className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+          />
+        }
       >
         <LoveStep
           topics={data.topics}
@@ -129,18 +145,34 @@ export function NewEventWizard({ data }: Props) {
           onChange={(v) => {
             w.setTopics(v)
             w.setLoveOpen(false)
+            setLoveSearch("")
           }}
           hideItemsPanel
           suggestedTopics={w.suggestedTopics}
           primaryCharityName={w.primaryCharity?.name}
+          search={loveSearch}
+          onSearchChange={setLoveSearch}
         />
       </ResponsiveOverlay>
 
       {/* Charity overlay */}
       <ResponsiveOverlay
         open={w.charityOpen}
-        onOpenChange={w.setCharityOpen}
+        onOpenChange={(o) => {
+          w.setCharityOpen(o)
+          if (!o) setCharitySearch("")
+        }}
         title="Choose a charity"
+        header={
+          <input
+            type="text"
+            autoFocus
+            placeholder="Search charities…"
+            value={charitySearch}
+            onChange={(e) => setCharitySearch(e.target.value)}
+            className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+          />
+        }
         footer={
           <Button
             type="button"
@@ -157,6 +189,7 @@ export function NewEventWizard({ data }: Props) {
           charities={data.charities}
           value={w.charityIds}
           onChange={w.setCharityIds}
+          search={charitySearch}
         />
       </ResponsiveOverlay>
 

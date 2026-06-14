@@ -297,10 +297,7 @@ export function EditableHero({
         open={causeLabelOpen}
         onOpenChange={(o) => !o && setCauseLabelOpen(false)}
         title="Cause"
-        description="What you're raising for — shown throughout the event. 60 characters."
-        footer={overlayFooter(saveCauseLabel, () => setCauseLabelOpen(false))}
-      >
-        <div>
+        header={
           <Input
             autoFocus
             placeholder="e.g. dementia research, local foodbank"
@@ -308,20 +305,22 @@ export function EditableHero({
             maxLength={60}
             onChange={(e) => setCauseLabelDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveCauseLabel()}
-            className="bg-background"
+            className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
           />
-          <CharCounter value={causeLabelDraft} max={60} />
-        </div>
+        }
+        footer={overlayFooter(saveCauseLabel, () => setCauseLabelOpen(false))}
+      >
+        <p className="text-sm text-muted-foreground">
+          What you&apos;re raising for — shown throughout the event.
+        </p>
+        <CharCounter value={causeLabelDraft} max={60} />
       </ResponsiveOverlay>
 
       <ResponsiveOverlay
         open={nameOpen}
         onOpenChange={(o) => !o && setNameOpen(false)}
         title="Name"
-        description="Shown throughout the event. 40 characters."
-        footer={overlayFooter(saveName, () => setNameOpen(false))}
-      >
-        <div>
+        header={
           <Input
             autoFocus
             placeholder="Name or nickname"
@@ -329,30 +328,39 @@ export function EditableHero({
             maxLength={40}
             onChange={(e) => setNameDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveName()}
-            className="bg-background"
+            className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
           />
-          <CharCounter value={nameDraft} max={40} />
-        </div>
+        }
+        footer={overlayFooter(saveName, () => setNameOpen(false))}
+      >
+        <p className="text-sm text-muted-foreground">
+          Shown throughout the event.
+        </p>
+        <CharCounter value={nameDraft} max={40} />
       </ResponsiveOverlay>
 
       <ResponsiveOverlay
         open={contextOpen}
         onOpenChange={(o) => !o && setContextOpen(false)}
         title="Context"
-        description="Dates, years, or other context. Optional."
+        header={
+          <Input
+            autoFocus
+            placeholder="e.g. turning 40, class of 2024"
+            value={contextDraft}
+            maxLength={40}
+            onChange={(e) => setContextDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && saveContext()}
+            className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
+          />
+        }
         footer={overlayFooter(saveContext, () => setContextOpen(false))}
       >
         <div className="space-y-4">
           <div>
-            <Input
-              autoFocus
-              placeholder="e.g. turning 40, class of 2024"
-              value={contextDraft}
-              maxLength={40}
-              onChange={(e) => setContextDraft(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveContext()}
-              className="bg-background"
-            />
+            <p className="text-sm text-muted-foreground">
+              Dates, years, or other context. Optional.
+            </p>
             <CharCounter value={contextDraft} max={40} />
           </div>
           <div className="flex items-center gap-3">
@@ -375,10 +383,7 @@ export function EditableHero({
         open={openingLineOpen}
         onOpenChange={(o) => !o && setOpeningLineOpen(false)}
         title="Opening line"
-        description="Replaces the default opening prefix. Optional."
-        footer={overlayFooter(saveOpeningLine, () => setOpeningLineOpen(false))}
-      >
-        <div>
+        header={
           <Input
             autoFocus
             placeholder={openingLinePlaceholder}
@@ -386,48 +391,55 @@ export function EditableHero({
             maxLength={50}
             onChange={(e) => setOpeningLineDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveOpeningLine()}
-            className="bg-background"
+            className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
           />
-          <CharCounter value={openingLineDraft} max={50} />
-        </div>
+        }
+        footer={overlayFooter(saveOpeningLine, () => setOpeningLineOpen(false))}
+      >
+        <p className="text-sm text-muted-foreground">
+          Replaces the default opening prefix. Optional.
+        </p>
+        <CharCounter value={openingLineDraft} max={50} />
       </ResponsiveOverlay>
 
       <ResponsiveOverlay
         open={aboutOpen}
         onOpenChange={(o) => !o && setAboutOpen(false)}
         title="About"
-        description="Tease the topic domain — save the specific favourite for the reveal."
-        footer={overlayFooter(saveAbout, () => setAboutOpen(false))}
-      >
-        <div>
-          {onRegenerate && (
-            <div className="mb-2 flex justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={isGenerating}
-                onClick={() => {
-                  setAboutOpen(false)
-                  onRegenerate()
-                }}
-                className="gap-1.5 text-xs text-muted-foreground"
-              >
-                <RefreshCw className="h-3 w-3" aria-hidden />
-                Regenerate suggestion
-              </Button>
-            </div>
-          )}
+        header={
           <Textarea
             autoFocus
             placeholder={aboutPlaceholder || "A little about them…"}
             value={aboutDraft}
             maxLength={300}
-            rows={5}
+            rows={3}
             onChange={(e) => setAboutDraft(e.target.value)}
-            className="bg-background"
+            className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
           />
+        }
+        footer={overlayFooter(saveAbout, () => setAboutOpen(false))}
+      >
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Tease the topic domain — save the specific favourite for the reveal.
+          </p>
           <CharCounter value={aboutDraft} max={300} />
+          {onRegenerate && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={isGenerating}
+              onClick={() => {
+                setAboutOpen(false)
+                onRegenerate()
+              }}
+              className="gap-1.5 text-xs text-muted-foreground"
+            >
+              <RefreshCw className="h-3 w-3" aria-hidden />
+              Regenerate suggestion
+            </Button>
+          )}
         </div>
       </ResponsiveOverlay>
 
