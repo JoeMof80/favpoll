@@ -13,30 +13,26 @@ type Props = {
   onClosesAtChange?: (iso: string) => void
 }
 
-function CountdownPlaceholder() {
-  return (
-    <div className="rounded-lg border border-border bg-card px-5 py-4">
-      <p className="mb-2 text-xs text-muted-foreground">Poll closes in</p>
-      <div className="flex items-end gap-3">
-        {(["days", "hrs", "min", "sec"] as const).map((label) => (
-          <div key={label} className="text-center">
-            <p className="text-2xl leading-none font-medium text-muted-foreground tabular-nums">
-              --
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">{label}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<Date | undefined>()
 
   if (!closesAt) {
-    return <CountdownPlaceholder />
+    return (
+      <div className="rounded-lg border border-border bg-card px-5 py-4">
+        <p className="mb-2 text-xs text-muted-foreground">Poll closes in</p>
+        <div className="flex items-end gap-3">
+          {(["days", "hrs", "min", "sec"] as const).map((label) => (
+            <div key={label} className="text-center">
+              <p className="text-2xl leading-none font-medium text-muted-foreground tabular-nums">
+                --
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   const isPast = new Date(closesAt) <= new Date()
