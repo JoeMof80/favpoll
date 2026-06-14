@@ -66,10 +66,21 @@ function CountdownPlaceholder() {
 
 // Shared edit affordance wrapper
 const EDIT_BTN =
-  "group relative block h-auto w-full whitespace-normal rounded-sm p-0 text-left border-b-2 border-dotted border-transparent hover:border-primary/40 focus-visible:border-primary/40"
+  "group relative block h-auto w-full whitespace-normal rounded-sm p-0 text-left border-b-2 border-dotted border-primary/20 hover:border-primary/60 focus-visible:border-primary/60"
 
-const PENCIL_ICON =
-  "absolute top-0 right-0 h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+function EditBadge({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background opacity-60 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100",
+        className
+      )}
+    >
+      <Pencil className="h-4 w-4 text-muted-foreground" />
+    </span>
+  )
+}
 
 function CharCounter({ value, max }: { value: string; max: number }) {
   const remaining = max - value.length
@@ -344,7 +355,7 @@ export function PreviewPanel({
                   >
                     {resolvedOpeningLine}
                   </SectionEyebrow>
-                  <Pencil className={PENCIL_ICON} aria-hidden />
+                  <EditBadge className="top-0 right-0" />
                 </Button>
 
                 {subject === "cause" ? (
@@ -366,7 +377,7 @@ export function PreviewPanel({
                         </span>
                       )}
                     </h1>
-                    <Pencil className={PENCIL_ICON} aria-hidden />
+                    <EditBadge className="top-0 right-0" />
                   </Button>
                 ) : (
                   <>
@@ -388,7 +399,7 @@ export function PreviewPanel({
                           </span>
                         )}
                       </h1>
-                      <Pencil className={PENCIL_ICON} aria-hidden />
+                      <EditBadge className="top-0 right-0" />
                     </Button>
 
                     {/* Context/suffix */}
@@ -414,7 +425,7 @@ export function PreviewPanel({
                           ? context
                           : datePlaceholder || contextExamples[effReg]}
                       </p>
-                      <Pencil className={PENCIL_ICON} aria-hidden />
+                      <EditBadge className="top-0 right-0" />
                     </Button>
                   </>
                 )}
@@ -433,10 +444,7 @@ export function PreviewPanel({
                     name={name || exampleName || "Name"}
                     photoUrl={previewPhoto ? resolvedPhotoUrl : null}
                   />
-                  <Pencil
-                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background p-0.5 text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-                    aria-hidden
-                  />
+                  <EditBadge className="-top-1 -right-1" />
                 </Button>
               )}
             </div>
@@ -471,7 +479,7 @@ export function PreviewPanel({
               ) : (
                 <p className="text-sm text-muted-foreground/40">+ about</p>
               )}
-              <Pencil className={PENCIL_ICON} aria-hidden />
+              <EditBadge className="top-0 right-0" />
             </Button>
 
             <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
@@ -497,7 +505,7 @@ export function PreviewPanel({
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <SectionLabel title={topicTitle} />
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 shadow-sm">
                   <span className="text-xs text-muted-foreground">
                     {showReveal ? "Post-reveal" : "Pre-reveal"}
                   </span>
@@ -547,7 +555,7 @@ export function PreviewPanel({
                       Add reveal…
                     </p>
                   )}
-                  <Pencil className={PENCIL_ICON} aria-hidden />
+                  <EditBadge className="top-0 right-0" />
                 </Button>
               )}
 
@@ -605,10 +613,7 @@ export function PreviewPanel({
             ) : (
               <CountdownPlaceholder />
             )}
-            <Pencil
-              className="absolute top-2 right-2 h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-              aria-hidden
-            />
+            <EditBadge className="top-2 right-2" />
           </Button>
 
           <CharityBanner charities={displayCharities} totalRaised={0} />
