@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
+const PLACEHOLDER_PARTS = ["days", "hrs", "min", "sec"] as const
+
 type Props = {
-  closesAt: string
+  closesAt?: string
   size?: FavpollCardSize
   variant?: "stacked" | "inline"
 }
@@ -29,12 +31,73 @@ export function Countdown({
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
+    if (!closesAt) return
     setTimeLeft(getTimeLeft(closesAt))
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(closesAt))
     }, 1000)
     return () => clearInterval(interval)
   }, [closesAt])
+
+  if (!closesAt) {
+    const inlineValueClass =
+      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
+    const inlineLabelClass =
+      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineHeadingClass =
+      size === "lg" ? "text-xs" : size === "md" ? "text-[10px]" : "text-[10px]"
+    if (variant === "inline") {
+      return (
+        <div>
+          <p
+            className={`mb-2 ${inlineHeadingClass} font-medium text-[#7F77DD]`}
+          >
+            Poll closes in
+          </p>
+          <div className="flex flex-wrap items-baseline justify-between gap-y-1">
+            {PLACEHOLDER_PARTS.map((label) => (
+              <span key={label} className="tabular-nums">
+                <span
+                  className={`${inlineValueClass} leading-none font-medium text-muted-foreground`}
+                >
+                  --
+                </span>
+                <span
+                  className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
+                >
+                  {label}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    const valueClass =
+      size === "lg" ? "text-base" : size === "md" ? "text-sm" : "text-xs"
+    const labelClass = size === "sm" ? "text-[10px]" : "text-xs"
+    return (
+      <div>
+        <p className={`mb-2 ${labelClass} text-muted-foreground`}>
+          Poll closes in
+        </p>
+        <div className="flex items-end justify-between">
+          {PLACEHOLDER_PARTS.map((label) => (
+            <div key={label} className="text-center">
+              <p
+                className={`${valueClass} leading-none font-medium text-muted-foreground tabular-nums`}
+              >
+                --
+              </p>
+              <p className={`mt-1 ${labelClass} text-muted-foreground`}>
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!timeLeft) return null
 
