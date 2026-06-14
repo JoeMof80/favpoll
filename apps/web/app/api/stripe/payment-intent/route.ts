@@ -9,7 +9,10 @@ export async function POST(req: Request) {
   if (!userId)
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
 
-  const { amount } = (await req.json()) as { amount: number }
+  const { amount, metadata } = (await req.json()) as {
+    amount: number
+    metadata?: Record<string, string>
+  }
 
   if (!amount || amount <= 0) {
     return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
     amount: Math.round(amount * 100), // pence
     currency: "gbp",
     automatic_payment_methods: { enabled: true },
-    metadata: { clerk_user_id: userId },
+    metadata: { clerk_user_id: userId, ...metadata },
   })
 
   return NextResponse.json({ clientSecret: paymentIntent.client_secret })

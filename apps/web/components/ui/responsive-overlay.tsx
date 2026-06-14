@@ -27,6 +27,8 @@ type Props = {
   children: React.ReactNode
   /** Override the content wrapper class on the Dialog (desktop) variant only. */
   dialogContentClassName?: string
+  /** Hides the × close button on both Sheet and Dialog. Use a skip/dismiss link in the footer instead. */
+  hideCloseButton?: boolean
 }
 
 function useIsMobile() {
@@ -50,6 +52,7 @@ export function ResponsiveOverlay({
   footer,
   children,
   dialogContentClassName,
+  hideCloseButton = false,
 }: Props) {
   const isMobile = useIsMobile()
 
@@ -60,6 +63,7 @@ export function ResponsiveOverlay({
           side="bottom"
           className="flex flex-col gap-0 p-0"
           style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
+          showCloseButton={!hideCloseButton}
         >
           <SheetHeader className="shrink-0 border-b border-border px-4 py-4">
             {header ? (
@@ -95,6 +99,7 @@ export function ResponsiveOverlay({
       <DialogContent
         className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
         style={{ maxHeight: "min(600px, 80vh)" }}
+        showCloseButton={!hideCloseButton}
       >
         <DialogHeader className="shrink-0 border-b border-border px-5 py-4">
           {header ? (
