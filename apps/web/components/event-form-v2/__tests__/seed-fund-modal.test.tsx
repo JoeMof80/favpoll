@@ -46,7 +46,6 @@ vi.mock("@/components/ui/responsive-overlay", () => ({
   ),
 }))
 
-
 import { SeedFundModal } from "../seed-fund-modal"
 
 const EVENT_ID = "event-abc"
@@ -84,9 +83,7 @@ describe("SeedFundModal — initial render", () => {
 
   it("Seed button is disabled with no amount", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
-    expect(
-      screen.getByRole("button", { name: /^seed fund$/i })
-    ).toBeDisabled()
+    expect(screen.getByRole("button", { name: /^seed fund$/i })).toBeDisabled()
   })
 })
 
@@ -100,9 +97,7 @@ describe("SeedFundModal — preset selection", () => {
   it("Seed button becomes enabled after preset selection", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
-    expect(
-      screen.getByRole("button", { name: /^seed fund$/i })
-    ).toBeEnabled()
+    expect(screen.getByRole("button", { name: /^seed fund$/i })).toBeEnabled()
   })
 })
 
@@ -124,9 +119,7 @@ describe("SeedFundModal — payment intent flow", () => {
 
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£50" }))
-    fireEvent.click(
-      screen.getByRole("button", { name: /^seed fund$/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
     await waitFor(() => {
       expect(screen.getByTestId("stripe-checkout")).toBeInTheDocument()
@@ -152,9 +145,7 @@ describe("SeedFundModal — payment intent flow", () => {
 
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£25" }))
-    fireEvent.click(
-      screen.getByRole("button", { name: /^seed fund$/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
     await waitFor(() => {
       expect(screen.getByText("Card declined")).toBeInTheDocument()
@@ -172,9 +163,7 @@ describe("SeedFundModal — post-payment", () => {
 
     render(<SeedFundModal eventId={EVENT_ID} onComplete={onComplete} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
-    fireEvent.click(
-      screen.getByRole("button", { name: /^seed fund$/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
     await waitFor(() => {
       expect(screen.getByTestId("stripe-checkout")).toBeInTheDocument()
