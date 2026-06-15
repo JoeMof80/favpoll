@@ -175,17 +175,8 @@ export function EditablePollArea({
                 <div className="h-4 rounded-full bg-muted/60" />
                 <div className="h-4 w-3/4 rounded-full bg-muted/60" />
               </div>
-            ) : revealPlaceholder ? (
-              <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
-                {revealPlaceholder}
-                {isPersonRevealExample && (
-                  <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
-                    (example — type the real one)
-                  </span>
-                )}
-              </p>
             ) : (
-              <p className="text-sm text-muted-foreground/40">Add reveal…</p>
+              <p className="text-sm text-muted-foreground/40">Reveal</p>
             )}
             <EditBadge />
           </Button>
