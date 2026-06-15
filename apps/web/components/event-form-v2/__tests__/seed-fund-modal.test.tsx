@@ -46,24 +46,6 @@ vi.mock("@/components/ui/responsive-overlay", () => ({
   ),
 }))
 
-vi.mock("@/components/pledge-card/amount-input", () => ({
-  AmountInput: ({
-    id,
-    value,
-    onChange,
-  }: {
-    id: string
-    value: string
-    onChange: (v: string) => void
-  }) => (
-    <input
-      id={id}
-      data-testid="amount-input"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  ),
-}))
 
 import { SeedFundModal } from "../seed-fund-modal"
 
@@ -92,7 +74,7 @@ describe("SeedFundModal — initial render", () => {
 
   it("renders the amount input", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
-    expect(screen.getByTestId("amount-input")).toBeInTheDocument()
+    expect(screen.getByLabelText(/amount in pounds/i)).toBeInTheDocument()
   })
 
   it("renders Skip for now link", () => {
@@ -103,7 +85,7 @@ describe("SeedFundModal — initial render", () => {
   it("Seed button is disabled with no amount", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     expect(
-      screen.getByRole("button", { name: /seed the shared fund/i })
+      screen.getByRole("button", { name: /^seed fund$/i })
     ).toBeDisabled()
   })
 })
@@ -112,14 +94,14 @@ describe("SeedFundModal — preset selection", () => {
   it("clicking £25 populates the amount input", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£25" }))
-    expect(screen.getByTestId("amount-input")).toHaveValue("25")
+    expect(screen.getByLabelText(/amount in pounds/i)).toHaveValue(25)
   })
 
   it("Seed button becomes enabled after preset selection", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
     expect(
-      screen.getByRole("button", { name: /seed the shared fund/i })
+      screen.getByRole("button", { name: /^seed fund$/i })
     ).toBeEnabled()
   })
 })
@@ -143,7 +125,7 @@ describe("SeedFundModal — payment intent flow", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£50" }))
     fireEvent.click(
-      screen.getByRole("button", { name: /seed the shared fund/i })
+      screen.getByRole("button", { name: /^seed fund$/i })
     )
 
     await waitFor(() => {
@@ -171,7 +153,7 @@ describe("SeedFundModal — payment intent flow", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£25" }))
     fireEvent.click(
-      screen.getByRole("button", { name: /seed the shared fund/i })
+      screen.getByRole("button", { name: /^seed fund$/i })
     )
 
     await waitFor(() => {
@@ -191,7 +173,7 @@ describe("SeedFundModal — post-payment", () => {
     render(<SeedFundModal eventId={EVENT_ID} onComplete={onComplete} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
     fireEvent.click(
-      screen.getByRole("button", { name: /seed the shared fund/i })
+      screen.getByRole("button", { name: /^seed fund$/i })
     )
 
     await waitFor(() => {
