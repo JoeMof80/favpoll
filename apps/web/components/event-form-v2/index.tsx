@@ -375,48 +375,6 @@ function FormInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Generate charity-aware About/Reveal on mount for canonical topics only
-  useEffect(() => {
-    if (mode !== "create") return
-    const values = form.getValues()
-    const topic = values.topics?.[0]
-    if (!topic || topic.isCustom || !topic.topicId) return
-    const reg = values.register
-    if (!reg) return
-
-    const sub = (values.subject ?? "someone") as "someone" | "cause"
-    const primaryCharityId = values.charities?.[0] ?? null
-
-    setIsGenerating(true)
-    safeGenerateDraft({
-      register: reg as Register,
-      subject: sub,
-      topicId: topic.topicId,
-      primaryCharityId,
-    })
-      .then((result) => {
-        if (!result) return
-        const currentAbout = form.getValues("about")
-        if (!currentAbout) {
-          form.setValue("about", result.about)
-          lastGeneratedAbout.current = result.about
-        }
-        if (sub === "cause") {
-          if (!form.getValues("reveal")?.trim()) {
-            form.setValue("reveal", result.reveal)
-            lastGeneratedReveal.current = result.reveal
-          }
-        } else {
-          setPersonRevealExample(result.reveal)
-        }
-      })
-      .catch(() => {
-        // safeGenerateDraft shouldn't throw — defensive guard
-      })
-      .finally(() => setIsGenerating(false))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   async function handleRegenerate() {
     const values = form.getValues()
     const topic = values.topics?.[0]

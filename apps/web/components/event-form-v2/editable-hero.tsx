@@ -388,6 +388,22 @@ export function EditableHero({
           <EditBadge />
         </Button>
 
+        {!about &&
+          !isGenerating &&
+          onRegenerate &&
+          register &&
+          selectedTopics[0]?.topicId &&
+          !selectedTopics[0]?.isCustom && (
+            <Button
+              type="button"
+              variant="link"
+              className="mt-2 h-auto px-0 py-0 text-sm text-muted-foreground hover:text-muted-foreground/70"
+              onClick={onRegenerate}
+            >
+              Generate a suggestion →
+            </Button>
+          )}
+
         <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
       </div>
 
