@@ -24,11 +24,15 @@ type Props = {
   /** When provided, renders in place of the visible title. `title` becomes sr-only. */
   header?: React.ReactNode
   footer?: React.ReactNode
-  children: React.ReactNode
+  children?: React.ReactNode
   /** Override the content wrapper class on the Dialog (desktop) variant only. */
   dialogContentClassName?: string
+  /** Override classes on the DialogContent root (e.g. to narrow the max-width). */
+  dialogClassName?: string
   /** Hides the × close button on both Sheet and Dialog. Use a skip/dismiss link in the footer instead. */
   hideCloseButton?: boolean
+  /** Override classes on the header section (e.g. "p-0" when the header slot owns its own padding). */
+  headerClassName?: string
 }
 
 function useIsMobile() {
@@ -52,7 +56,9 @@ export function ResponsiveOverlay({
   footer,
   children,
   dialogContentClassName,
+  dialogClassName,
   hideCloseButton = false,
+  headerClassName,
 }: Props) {
   const isMobile = useIsMobile()
 
@@ -65,7 +71,7 @@ export function ResponsiveOverlay({
           style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
           showCloseButton={!hideCloseButton}
         >
-          <SheetHeader className="shrink-0 border-b border-border px-4 py-4">
+          <SheetHeader className={`shrink-0 ${headerClassName ?? "px-4 py-4"}`}>
             {header ? (
               <>
                 <SheetTitle className="sr-only">{title}</SheetTitle>
@@ -78,10 +84,12 @@ export function ResponsiveOverlay({
               <SheetDescription>{description}</SheetDescription>
             )}
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+          {children != null && (
+            <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+          )}
           {footer && (
             <div
-              className="shrink-0 border-t border-border px-4 py-3"
+              className="shrink-0 px-4 py-3"
               style={{
                 paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
               }}
@@ -97,11 +105,14 @@ export function ResponsiveOverlay({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
+        className={
+          dialogClassName ??
+          "flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
+        }
         style={{ maxHeight: "min(600px, 80vh)" }}
         showCloseButton={!hideCloseButton}
       >
-        <DialogHeader className="shrink-0 border-b border-border px-5 py-4">
+        <DialogHeader className={`shrink-0 ${headerClassName ?? "px-5 py-4"}`}>
           {header ? (
             <>
               <DialogTitle className="sr-only">{title}</DialogTitle>
@@ -114,14 +125,12 @@ export function ResponsiveOverlay({
             <DialogDescription>{description}</DialogDescription>
           )}
         </DialogHeader>
-        <div className={dialogContentClassName ?? "flex-1 overflow-y-auto"}>
-          {children}
-        </div>
-        {footer && (
-          <div className="shrink-0 border-t border-border px-5 py-4">
-            {footer}
+        {children != null && (
+          <div className={dialogContentClassName ?? "flex-1 overflow-y-auto"}>
+            {children}
           </div>
         )}
+        {footer && <div className="shrink-0 px-5 py-4">{footer}</div>}
       </DialogContent>
     </Dialog>
   )

@@ -10,6 +10,7 @@ type Props = {
   onClick: () => void
   side?: "top" | "right" | "bottom" | "left"
   className?: string
+  disabled?: boolean
 }
 
 export function TooltipIconButton({
@@ -18,6 +19,7 @@ export function TooltipIconButton({
   onClick,
   side = "left",
   className,
+  disabled,
 }: Props) {
   return (
     <TooltipProvider>
@@ -26,6 +28,7 @@ export function TooltipIconButton({
           type="button"
           variant="ghost"
           size="icon"
+          disabled={disabled}
           className={
             className ?? "shrink-0 text-muted-foreground hover:text-foreground"
           }

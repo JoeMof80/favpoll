@@ -84,10 +84,21 @@ export function TopicItemsDialog({
           )}
         </div>
       }
+      hideCloseButton
       footer={
-        <Button type="button" className="w-full" onClick={handleClose}>
-          Done
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            className="flex-1"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button type="button" className="flex-1" onClick={handleClose}>
+            Done
+          </Button>
+        </div>
       }
     >
       <div>

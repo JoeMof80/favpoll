@@ -4,11 +4,10 @@ import { useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { suggestClosingDate } from "@/lib/registers"
-import { DateTimePicker } from "./date-time-picker"
 import type { EventCategory, EventSubject } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
+import { CloseDateOverlay } from "./close-date-overlay"
 
 type CommandPanelProps = {
   mode: "create" | "edit"
@@ -40,7 +39,7 @@ export function CommandPanel({
   const isListed = useWatch({ control: form.control, name: "isListed" }) ?? true
 
   const [publishOpen, setPublishOpen] = useState(false)
-  const [publishClosesAt, setPublishClosesAt] = useState<Date | undefined>()
+  const [publishInitialDate, setPublishInitialDate] = useState<Date>(new Date())
 
   // Create mode: only Name/Cause must be filled before publishing
   // Edit mode: all fields must be filled before saving
@@ -60,8 +59,7 @@ export function CommandPanel({
   const isPublishable = missing.length === 0
 
   function handlePublishClick() {
-    const suggested = suggestClosingDate(category)
-    setPublishClosesAt(new Date(suggested))
+    setPublishInitialDate(new Date(suggestClosingDate(category)))
     setPublishOpen(true)
   }
 
@@ -146,38 +144,15 @@ export function CommandPanel({
 
       {/* Publish overlay — create mode only */}
       {mode === "create" && (
-        <ResponsiveOverlay
+        <CloseDateOverlay
           open={publishOpen}
-          onOpenChange={(o) => !o && setPublishOpen(false)}
+          onOpenChange={setPublishOpen}
           title="When does the poll close?"
-          footer={
-            <div className="space-y-2">
-              <Button
-                type="button"
-                className="w-full"
-                disabled={submitting || !publishClosesAt}
-                onClick={() => {
-                  if (publishClosesAt) onSubmit(publishClosesAt)
-                }}
-              >
-                {submitting ? "Creating…" : "Publish"}
-              </Button>
-              <Button
-                type="button"
-                variant="link"
-                className="w-full text-muted-foreground"
-                onClick={() => setPublishOpen(false)}
-              >
-                ← Back
-              </Button>
-            </div>
-          }
-        >
-          <DateTimePicker
-            value={publishClosesAt}
-            onChange={setPublishClosesAt}
-          />
-        </ResponsiveOverlay>
+          initialDate={publishInitialDate}
+          saveLabel="Publish"
+          submitting={submitting}
+          onSave={(date) => onSubmit(date)}
+        />
       )}
     </>
   )

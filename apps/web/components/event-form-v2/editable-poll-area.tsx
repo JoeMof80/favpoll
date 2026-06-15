@@ -12,7 +12,15 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
+import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import type { TopicItem, TopicWithMeta } from "@favpoll/types"
@@ -218,44 +226,54 @@ export function EditablePollArea({
         open={revealOpen}
         onOpenChange={(o) => !o && setRevealOpen(false)}
         title="The reveal"
+        hideCloseButton
+        headerClassName="p-0"
+        dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
         header={
-          <Textarea
-            autoFocus
-            placeholder={revealPlaceholder || "Share something they loved…"}
-            value={revealDraft}
-            maxLength={280}
-            rows={3}
-            onChange={(e) => setRevealDraft(e.target.value)}
-            className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"
-          />
+          <InputGroup className="h-auto rounded-none border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+            <InputGroupAddon
+              align="block-start"
+              className="justify-between px-5"
+            >
+              <InputGroupText>The reveal</InputGroupText>
+              {onRegenerate && (
+                <InputGroupButton
+                  size="icon-xs"
+                  disabled={isGenerating}
+                  aria-label="Regenerate suggestion"
+                  onClick={() => {
+                    setRevealOpen(false)
+                    onRegenerate()
+                  }}
+                >
+                  <RefreshCw />
+                </InputGroupButton>
+              )}
+            </InputGroupAddon>
+            <InputGroupTextarea
+              autoFocus
+              placeholder={revealPlaceholder || "Share something they loved…"}
+              value={revealDraft}
+              maxLength={280}
+              rows={3}
+              onChange={(e) => setRevealDraft(e.target.value)}
+              className="px-5 pt-2 pb-4 text-base md:text-base"
+            />
+            <div
+              data-align="block-end"
+              className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
+            >
+              <span>
+                {isPersonRevealExample
+                  ? "The example below is suggested — type the real favourite."
+                  : "Disclosed after pledging — this is the payoff."}
+              </span>
+              <CharCounter value={revealDraft} max={280} />
+            </div>
+          </InputGroup>
         }
         footer={overlayFooter(saveReveal, () => setRevealOpen(false))}
-      >
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {isPersonRevealExample
-              ? "The example below is suggested — type the real favourite."
-              : "Disclosed after pledging — this is the payoff."}
-          </p>
-          <CharCounter value={revealDraft} max={280} />
-          {onRegenerate && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={isGenerating}
-              onClick={() => {
-                setRevealOpen(false)
-                onRegenerate()
-              }}
-              className="gap-1.5 text-xs text-muted-foreground"
-            >
-              <RefreshCw className="h-3 w-3" aria-hidden />
-              Regenerate suggestion
-            </Button>
-          )}
-        </div>
-      </ResponsiveOverlay>
+      />
     </>
   )
 }

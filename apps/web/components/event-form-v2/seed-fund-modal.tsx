@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { AmountInput } from "@/components/pledge-card/amount-input"
 import { StripeCheckout } from "@/components/stripe-checkout"
 import { topUpFund } from "@/app/events/[id]/actions"
 
@@ -81,55 +80,73 @@ export function SeedFundModal({ eventId, onComplete }: Props) {
       onOpenChange={() => {}}
       title="Give guests a head start"
       hideCloseButton
-      dialogContentClassName="flex-1 overflow-y-auto px-5 py-4"
+      dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
+      dialogContentClassName="flex-1 overflow-y-auto px-5 pt-0 pb-2"
       footer={
-        <div className="space-y-2">
+        <div className="flex flex-col gap-3">
           <Button
             type="button"
             className="w-full"
             disabled={!isValid || submitting}
             onClick={handleSeed}
           >
-            {submitting ? "Setting up payment…" : "Seed the shared fund"}
+            {submitting ? "Setting up…" : "Seed fund"}
           </Button>
-          <a
-            href="#"
-            className="block w-full text-center text-sm text-muted-foreground hover:text-foreground"
-            onClick={(e) => {
-              e.preventDefault()
-              onComplete()
-            }}
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={onComplete}
           >
             Skip for now
-          </a>
+          </Button>
         </div>
       }
     >
-      <div className="space-y-5">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          The shared fund lets guests who can&rsquo;t pledge on their own —
-          children, students, or anyone who&rsquo;d rather not — still take
-          part. Seed it with a gift and their participation is taken care of.
-        </p>
-
-        <div className="flex gap-2">
-          {PRESETS.map((preset) => (
-            <Button
-              key={preset}
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={() => setAmount(String(preset))}
-            >
-              £{preset}
-            </Button>
-          ))}
-        </div>
-
-        <AmountInput id="seed-amount" value={amount} onChange={setAmount} />
-
-        {error && <p className="text-sm text-destructive">{error}</p>}
+      {/* Amount field */}
+      <div className="flex items-baseline gap-1.5 py-4">
+        <span
+          className="text-2xl text-muted-foreground select-none"
+          aria-hidden="true"
+        >
+          £
+        </span>
+        <input
+          id="seed-amount"
+          type="number"
+          min="0.01"
+          step="0.01"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="0"
+          aria-label="Amount in pounds"
+          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
       </div>
+
+      {/* Preset buttons */}
+      <div className="flex gap-2">
+        {PRESETS.map((preset) => (
+          <Button
+            key={preset}
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={() => setAmount(String(preset))}
+          >
+            £{preset}
+          </Button>
+        ))}
+      </div>
+
+      {/* Description */}
+      <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+        The shared fund lets guests who can&rsquo;t pledge on their own —
+        children, students, or anyone who&rsquo;d rather not — still take part.
+        Seed it with a gift and their participation is taken care of.
+      </p>
+
+      {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
     </ResponsiveOverlay>
   )
 }

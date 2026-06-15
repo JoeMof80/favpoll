@@ -2,8 +2,6 @@ import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 
 const mockCountdown = vi.hoisted(() => vi.fn())
-const mockDateTimePicker = vi.hoisted(() => vi.fn())
-const mockResponsiveOverlay = vi.hoisted(() => vi.fn())
 
 vi.mock("@/components/countdown", () => ({
   Countdown: (props: { closesAt?: string }) => {
@@ -14,41 +12,30 @@ vi.mock("@/components/countdown", () => ({
   },
 }))
 
-vi.mock("../date-time-picker", () => ({
-  DateTimePicker: (props: {
-    value: Date | undefined
-    onChange: (d: Date) => void
-  }) => {
-    mockDateTimePicker(props)
-    return (
-      <button
-        data-testid="date-time-picker"
-        onClick={() => props.onChange(new Date("2026-12-31T12:00:00Z"))}
-      >
-        Pick date
-      </button>
-    )
-  },
-}))
-
-vi.mock("@/components/ui/responsive-overlay", () => ({
-  ResponsiveOverlay: ({
+vi.mock("../close-date-overlay", () => ({
+  CloseDateOverlay: ({
     open,
-    title,
-    children,
-    footer,
+    title = "Poll closing date",
+    onSave,
+    onOpenChange,
   }: {
     open: boolean
-    title: string
-    children: React.ReactNode
-    footer?: React.ReactNode
+    title?: string
+    initialDate: Date
+    onSave: (d: Date) => void
+    onOpenChange: (o: boolean) => void
   }) => {
     if (!open) return null
     return (
       <div data-testid="overlay">
         <h2>{title}</h2>
-        {children}
-        {footer}
+        <button
+          data-testid="close-date-picker"
+          onClick={() => onSave(new Date("2026-12-31T12:00:00Z"))}
+        >
+          Pick date
+        </button>
+        <button onClick={() => onOpenChange(false)}>Cancel</button>
       </div>
     )
   },
@@ -98,14 +85,11 @@ describe("EditableCountdown — with closesAt (edit mode)", () => {
     expect(screen.getByText("Poll closing date")).toBeInTheDocument()
   })
 
-  it("calls onClosesAtChange with new ISO string when Save is clicked", () => {
+  it("calls onClosesAtChange with new ISO string when a date is picked", () => {
     const onChange = vi.fn()
     render(<EditableCountdown closesAt={FUTURE} onClosesAtChange={onChange} />)
     fireEvent.click(screen.getByRole("button", { name: /edit closing date/i }))
-    // Pick a date
-    fireEvent.click(screen.getByTestId("date-time-picker"))
-    // Save
-    fireEvent.click(screen.getByRole("button", { name: /^save$/i }))
+    fireEvent.click(screen.getByTestId("close-date-picker"))
     expect(onChange).toHaveBeenCalledWith("2026-12-31T12:00:00.000Z")
   })
 
@@ -118,10 +102,9 @@ describe("EditableCountdown — with closesAt (edit mode)", () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
-  it("Save is disabled until a date is picked", () => {
+  it("overlay is visible after edit button is clicked", () => {
     render(<EditableCountdown closesAt={FUTURE} onClosesAtChange={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: /edit closing date/i }))
-    // Draft is pre-filled from closesAt on open, so Save should be enabled
-    expect(screen.getByRole("button", { name: /^save$/i })).toBeEnabled()
+    expect(screen.getByTestId("overlay")).toBeInTheDocument()
   })
 })
