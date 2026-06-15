@@ -20,7 +20,6 @@ import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
@@ -526,43 +525,42 @@ export function EditableHero({
         {...FIELD_OVERLAY_PROPS}
         header={
           <InputGroup className={INPUT_GROUP_CLS}>
-            <InputGroupAddon
-              align="block-start"
-              className="justify-between px-5"
-            >
+            <InputGroupAddon align="block-start" className="px-5">
               <InputGroupText>About</InputGroupText>
+            </InputGroupAddon>
+            <div className="relative w-full">
+              <InputGroupTextarea
+                autoFocus
+                placeholder={aboutPlaceholder || "A little about them…"}
+                value={aboutDraft}
+                maxLength={300}
+                rows={3}
+                onChange={(e) => setAboutDraft(e.target.value)}
+                className="px-5 pt-2 pr-10 pb-4 text-base md:text-base"
+              />
               {onRegenerate && (
-                <InputGroupButton
-                  size="icon-xs"
+                <TooltipIconButton
+                  icon={RefreshCw}
+                  label="Regenerate suggestion"
                   disabled={isGenerating}
-                  aria-label="Regenerate suggestion"
                   onClick={() => {
                     setAboutOpen(false)
                     onRegenerate()
                   }}
-                >
-                  <RefreshCw />
-                </InputGroupButton>
+                  className="absolute top-2 right-3 h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
+                  side="left"
+                />
               )}
-            </InputGroupAddon>
-            <InputGroupTextarea
-              autoFocus
-              placeholder={aboutPlaceholder || "A little about them…"}
-              value={aboutDraft}
-              maxLength={300}
-              rows={3}
-              onChange={(e) => setAboutDraft(e.target.value)}
-              className="px-5 pt-2 pb-4 text-base md:text-base"
-            />
+            </div>
             <div
               data-align="block-end"
-              className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
+              className="order-last flex w-full flex-col items-end gap-1 px-5 py-1.5"
             >
-              <span>
+              <CharCounter value={aboutDraft} max={300} />
+              <p className="w-full text-sm text-muted-foreground italic">
                 Tease the topic domain — save the specific favourite for the
                 reveal.
-              </span>
-              <CharCounter value={aboutDraft} max={300} />
+              </p>
             </div>
           </InputGroup>
         }
