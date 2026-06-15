@@ -127,6 +127,7 @@ export function NewEventWizard({ data }: Props) {
           if (!o) setLoveSearch("")
         }}
         title="Choose a favpoll"
+        hideCloseButton
         header={
           <input
             type="text"
@@ -136,6 +137,31 @@ export function NewEventWizard({ data }: Props) {
             onChange={(e) => setLoveSearch(e.target.value)}
             className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
           />
+        }
+        footer={
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
+                w.setLoveOpen(false)
+                setLoveSearch("")
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              onClick={() => {
+                w.setLoveOpen(false)
+                setLoveSearch("")
+              }}
+            >
+              Done
+            </Button>
+          </div>
         }
       >
         <LoveStep
@@ -163,6 +189,7 @@ export function NewEventWizard({ data }: Props) {
           if (!o) setCharitySearch("")
         }}
         title="Choose a charity"
+        hideCloseButton
         header={
           <input
             type="text"
@@ -174,15 +201,29 @@ export function NewEventWizard({ data }: Props) {
           />
         }
         footer={
-          <Button
-            type="button"
-            size="lg"
-            variant="secondary"
-            className="w-full"
-            onClick={() => w.setCharityOpen(false)}
-          >
-            Done
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
+                w.setCharityOpen(false)
+                setCharitySearch("")
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              onClick={() => {
+                w.setCharityOpen(false)
+                setCharitySearch("")
+              }}
+            >
+              Done
+            </Button>
+          </div>
         }
       >
         <CharityStep

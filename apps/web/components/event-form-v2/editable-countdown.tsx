@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { Countdown } from "@/components/countdown"
-import { DateTimePicker } from "./date-time-picker"
-import { EditBadge } from "./edit-helpers"
 import { cn } from "@/lib/utils"
+import { EditBadge } from "./edit-helpers"
+import { CloseDateOverlay } from "./close-date-overlay"
 
 type Props = {
   /** ISO string — when provided (edit mode) shows a live countdown with edit affordance */
@@ -16,7 +15,6 @@ type Props = {
 
 export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
   const [open, setOpen] = useState(false)
-  const [draft, setDraft] = useState<Date | undefined>()
 
   if (!closesAt) {
     return (
@@ -39,10 +37,7 @@ export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
           "hover:border-solid hover:border-primary/40",
           "focus-visible:border-solid focus-visible:border-primary/40"
         )}
-        onClick={() => {
-          setDraft(new Date(closesAt))
-          setOpen(true)
-        }}
+        onClick={() => setOpen(true)}
         aria-label="Edit closing date"
       >
         {isPast ? (
@@ -56,36 +51,15 @@ export function EditableCountdown({ closesAt, onClosesAtChange }: Props) {
         />
       </Button>
 
-      <ResponsiveOverlay
+      <CloseDateOverlay
         open={open}
-        onOpenChange={(o) => !o && setOpen(false)}
-        title="Poll closing date"
-        footer={
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              className="flex-1"
-              disabled={!draft}
-              onClick={() => {
-                if (draft) onClosesAtChange?.(draft.toISOString())
-                setOpen(false)
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        }
-      >
-        <DateTimePicker value={draft} onChange={setDraft} />
-      </ResponsiveOverlay>
+        onOpenChange={setOpen}
+        initialDate={new Date(closesAt)}
+        onSave={(date) => {
+          onClosesAtChange?.(date.toISOString())
+          setOpen(false)
+        }}
+      />
     </>
   )
 }
