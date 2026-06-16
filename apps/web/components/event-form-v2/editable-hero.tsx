@@ -5,7 +5,6 @@ import { useWatch, useFormContext } from "react-hook-form"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
 import { RefreshCw, Trash2, Upload } from "lucide-react"
-import { deriveRegister } from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/event-hero-avatar"
@@ -31,7 +30,6 @@ import {
 } from "./edit-helpers"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { cn } from "@/lib/utils"
-import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 
 async function getCroppedBlob(
@@ -70,17 +68,15 @@ async function getCroppedBlob(
 }
 
 type Props = {
-  topics: TopicWithMeta[]
   isGenerating?: boolean
-  personRevealExample?: string | null
   onRegenerate?: () => void
+  aboutPlaceholder?: string
 }
 
 export function EditableHero({
-  topics,
   isGenerating = false,
-  personRevealExample = null,
   onRegenerate,
+  aboutPlaceholder = "",
 }: Props) {
   const [causeLabelOpen, setCauseLabelOpen] = useState(false)
   const [nameOpen, setNameOpen] = useState(false)
@@ -117,8 +113,6 @@ export function EditableHero({
   const values = useWatch({ control: form.control })
 
   const register = values.register ?? ""
-  const category = values.category ?? null
-  const grouping = values.grouping ?? "individual"
   const name = values.name ?? ""
   const context = values.context ?? ""
   const openingLine = values.openingLine ?? ""
@@ -129,17 +123,9 @@ export function EditableHero({
   const subject = (values.subject ?? "someone") as "someone" | "cause"
   const selectedTopics = values.topics ?? []
 
-  const firstSelectedTopicId = selectedTopics[0]?.topicId
-  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-  const effReg = deriveRegister(category, grouping)
-
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
-
-  const aboutPlaceholder = !about
-    ? (firstTopicMeta?.placeholders?.[effReg]?.about ?? "")
-    : ""
 
   const openingLinePlaceholder = getEventHeadline({
     register,

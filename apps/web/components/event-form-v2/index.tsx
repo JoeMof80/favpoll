@@ -9,6 +9,8 @@ import { uploadPersonPhoto } from "@/app/events/new/actions"
 import { createEvent } from "@/app/events/new/actions"
 import { updateEvent, updateClosesAt } from "@/app/events/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
+import { getExampleName } from "@/lib/registers"
+import { getEventHeadline } from "@/lib/display"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
@@ -20,7 +22,15 @@ import type {
   CanvasPollInput,
   TopicWithMeta,
   Register,
+  EventGrouping,
 } from "@favpoll/types"
+
+// Register-keyed example context values shown when "Generate a suggestion" is triggered
+const CONTEXT_SUGGESTIONS: Partial<Record<Register, string>> = {
+  remembering: "1940 – 2025",
+  celebrating_one: "turning 40",
+  celebrating_many: "class of 2025",
+}
 
 const NEW_TOPIC_DRAFT_KEY = "favpoll_new_topic_draft" // legacy key — kept for old links
 const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
@@ -217,7 +227,10 @@ export function EventFormV2({
       sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
     }
     if (mode === "edit") router.back()
-    else form.reset()
+    else {
+      form.reset()
+      setShowReveal(false)
+    }
   }
 
   function handleSubmit(closesAt?: Date) {
@@ -313,10 +326,10 @@ function FormInner({
   onClosesAtChange,
 }: InnerProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [personRevealExample, setPersonRevealExample] = useState<string | null>(
-    null
-  )
   // Track last generated values to detect manual edits before regenerating
+  const lastGeneratedOpeningLine = useRef<string | null>(null)
+  const lastGeneratedName = useRef<string | null>(null)
+  const lastGeneratedContext = useRef<string | null>(null)
   const lastGeneratedAbout = useRef<string | null>(null)
   const lastGeneratedReveal = useRef<string | null>(null)
 
@@ -383,28 +396,73 @@ function FormInner({
     if (!reg) return
 
     const sub = (values.subject ?? "someone") as "someone" | "cause"
+    const grouping = (values.grouping ?? "individual") as EventGrouping
     const primaryCharityId = values.charities?.[0] ?? null
 
+    const topicMeta = topics.find((t) => t.id === topic.topicId)
+    const topicTitle = topicMeta?.title ?? topic.title ?? null
+
+    // Computed suggestions for static fields
+    const suggestedOpeningLine = getEventHeadline({
+      register: reg,
+      occasionType: null,
+      name: "",
+      subject: sub,
+    }).prefix
+
+    const suggestedName =
+      sub !== "cause"
+        ? getExampleName(topicTitle, undefined, grouping, reg as Register)
+        : null
+    const suggestedContext =
+      sub !== "cause" ? (CONTEXT_SUGGESTIONS[reg as Register] ?? "") : null
+
     // Confirm before overwriting manual edits
-    const currentAbout = form.getValues("about") ?? ""
-    const currentReveal = form.getValues("reveal") ?? ""
-    const hasManualAbout =
-      currentAbout && currentAbout !== lastGeneratedAbout.current
-    const hasManualReveal =
-      sub === "cause" &&
-      currentReveal &&
-      currentReveal !== lastGeneratedReveal.current
-    if (hasManualAbout || hasManualReveal) {
-      const field =
-        hasManualAbout && hasManualReveal
-          ? "about and reveal"
-          : hasManualAbout
-            ? "about"
-            : "reveal"
-      if (!window.confirm(`Replace your ${field} with a new suggestion?`))
-        return
+    const manualFields: string[] = [
+      values.openingLine &&
+      values.openingLine !== lastGeneratedOpeningLine.current
+        ? "opening line"
+        : "",
+      sub !== "cause" &&
+      values.name &&
+      values.name !== lastGeneratedName.current
+        ? "name"
+        : "",
+      sub !== "cause" &&
+      values.context &&
+      values.context !== lastGeneratedContext.current
+        ? "context"
+        : "",
+      values.about && values.about !== lastGeneratedAbout.current
+        ? "about"
+        : "",
+      values.reveal && values.reveal !== lastGeneratedReveal.current
+        ? "reveal"
+        : "",
+    ].filter(Boolean)
+
+    if (manualFields.length > 0) {
+      const list =
+        manualFields.length === 1
+          ? manualFields[0]
+          : manualFields.slice(0, -1).join(", ") + " and " + manualFields.at(-1)
+      if (!window.confirm(`Replace your ${list} with a new suggestion?`)) return
     }
 
+    // Set static/computed fields immediately (no network call needed)
+    form.setValue("openingLine", suggestedOpeningLine)
+    lastGeneratedOpeningLine.current = suggestedOpeningLine
+
+    if (suggestedName !== null) {
+      form.setValue("name", suggestedName)
+      lastGeneratedName.current = suggestedName
+    }
+    if (suggestedContext !== null) {
+      form.setValue("context", suggestedContext)
+      lastGeneratedContext.current = suggestedContext
+    }
+
+    // LLM call for about + reveal
     setIsGenerating(true)
     try {
       const result = await safeGenerateDraft({
@@ -427,12 +485,9 @@ function FormInner({
       } else {
         form.setValue("about", result.about)
         lastGeneratedAbout.current = result.about
-        if (sub === "cause") {
-          form.setValue("reveal", result.reveal)
-          lastGeneratedReveal.current = result.reveal
-        } else {
-          setPersonRevealExample(result.reveal)
-        }
+        form.setValue("reveal", result.reveal)
+        lastGeneratedReveal.current = result.reveal
+        if (!showReveal) onToggleReveal()
       }
     } catch {
       toast.error(
@@ -460,7 +515,6 @@ function FormInner({
             showReveal={showReveal}
             onToggleReveal={onToggleReveal}
             isGenerating={isGenerating}
-            personRevealExample={personRevealExample}
             onRegenerate={handleRegenerate}
             closesAt={closesAt}
             onClosesAtChange={onClosesAtChange}

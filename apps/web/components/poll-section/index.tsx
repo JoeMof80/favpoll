@@ -7,6 +7,7 @@ import { PollHeading } from "@/components/poll-heading"
 import type { EventPollWithItems } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
+import { SectionLabel } from "../favpoll-card/section-label"
 
 type Props = {
   poll: EventPollWithItems
@@ -86,7 +87,8 @@ export function PollSection({
         <>
           {showRankings && (
             <>
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-between">
+                <SectionLabel title="Results" />
                 <Tabs
                   value={rankingView}
                   onValueChange={(v: string) =>
