@@ -2622,6 +2622,10 @@ async function assertAllTopicsHavePlaceholders() {
         `"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`,
       );
     }
+    const cm = ph["celebrating_many"] as { group?: string } | undefined;
+    if (cm && !cm.group) {
+      bad.push(`"${row.title}": celebrating_many missing group field`);
+    }
   }
 
   if (bad.length > 0) {
@@ -2634,108 +2638,6 @@ async function assertAllTopicsHavePlaceholders() {
   console.log(
     "  ✓ All active topics in the map have complete 5-register placeholder sets",
   );
-}
-
-// ---------------------------------------------------------------------------
-// Placeholder application and validation
-// ---------------------------------------------------------------------------
-
-/**
- * Applies register-keyed placeholder sets to every topic row that has an
- * entry in combinedPlaceholders, regardless of which seed path created the
- * row.  Throws (with the full list) if any map title has no topic row —
- * those topics must be created first (by this seed or another).
- */
-async function applyAllPlaceholders() {
-  console.log("Applying placeholders to all topics…")
-
-  const { data: rows } = await supabase.from("topics").select("id, title")
-  const idByTitle = new Map(
-    (rows ?? []).map((r: { id: string; title: string }) => [r.title, r.id])
-  )
-
-  const missing: string[] = []
-  let patched = 0
-
-  for (const [title, placeholders] of Object.entries(combinedPlaceholders)) {
-    const id = idByTitle.get(title)
-    if (!id) {
-      missing.push(title)
-      continue
-    }
-    const { error } = await supabase
-      .from("topics")
-      .update({ placeholders })
-      .eq("id", id)
-    if (error)
-      console.error(`  ✗ placeholders for "${title}":`, error.message)
-    else patched++
-  }
-
-  if (missing.length > 0) {
-    throw new Error(
-      `Placeholder map has ${missing.length} title(s) with no topic row ` +
-        `(these topics must be created before this seed runs):\n` +
-        missing.map((t) => `  "${t}"`).join("\n")
-    )
-  }
-
-  console.log(`  ${patched} topics had placeholders applied`)
-}
-
-const ALL_REGISTER_KEYS: RegisterKey[] = [
-  "remembering",
-  "celebrating_one",
-  "celebrating_many",
-  "cause",
-  "neutral",
-]
-
-/**
- * Asserts that every active topic whose title appears in combinedPlaceholders
- * has a complete, non-empty placeholder set (all 5 register keys present, each
- * with non-empty about and reveal strings).  Throws listing every offender.
- * This is the bidirectional fail-loud guard: applyAllPlaceholders() ensures
- * the writes succeeded; this confirms what's in the DB is correct.
- */
-async function assertAllTopicsHavePlaceholders() {
-  console.log("Asserting placeholder completeness…")
-
-  const { data: rows } = await supabase
-    .from("topics")
-    .select("title, placeholders")
-    .eq("is_active", true)
-
-  const covered = new Set(Object.keys(combinedPlaceholders))
-  const bad: string[] = []
-
-  for (const row of rows ?? []) {
-    if (!covered.has(row.title)) continue // topic not in the map — skip
-    const ph = row.placeholders as Record<string, { about?: string; reveal?: string }> | null
-    if (!ph) {
-      bad.push(`"${row.title}": no placeholders`)
-      continue
-    }
-    const missingKeys = ALL_REGISTER_KEYS.filter(
-      (k) => !ph[k]?.about || !ph[k]?.reveal
-    )
-    if (missingKeys.length > 0) {
-      bad.push(`"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`)
-    }
-    const cm = ph["celebrating_many"] as { group?: string } | undefined
-    if (cm && !cm.group) {
-      bad.push(`"${row.title}": celebrating_many missing group field`)
-    }
-  }
-
-  if (bad.length > 0) {
-    throw new Error(
-      `${bad.length} active topic(s) have incomplete placeholder sets:\n` +
-        bad.map((b) => `  ${b}`).join("\n")
-    )
-  }
-
-  console.log("  ✓ All active topics in the map have complete 5-register placeholder sets")
 }
 
 // ---------------------------------------------------------------------------
