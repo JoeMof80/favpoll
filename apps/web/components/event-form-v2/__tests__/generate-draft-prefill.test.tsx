@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, act, waitFor } from "@testing-library/react"
-import { useState, useEffect, useRef } from "react"
-import type { Register } from "@favpoll/types"
+import { useState, useRef } from "react"
+import type { Register, EventGrouping } from "@favpoll/types"
+import { getExampleName } from "@/lib/registers"
+import { getEventHeadline } from "@/lib/display"
 
 // Mock safeGenerateDraft before any imports that transitively use it
 const mockSafeGenerateDraft = vi.hoisted(() => vi.fn())
@@ -27,25 +29,23 @@ const MOCK_CAUSE_RESULT = {
   fromCache: false,
 }
 
-const MOCK_TOPIC = {
-  topicId: "topic-1",
-  title: "Colour",
-  isCustom: false,
-  items: [
-    { id: "i1", label: "Red" },
-    { id: "i2", label: "Blue" },
-  ],
-  customLabels: [],
+// Register-keyed example context values (mirrors CONTEXT_SUGGESTIONS in index.tsx)
+const CONTEXT_SUGGESTIONS: Partial<Record<Register, string>> = {
+  remembering: "1940 – 2025",
+  celebrating_one: "turning 40",
+  celebrating_many: "class of 2025",
 }
 
 // ---------------------------------------------------------------------------
-// Test component — mirrors FormInner's generation useEffect
+// Test component — mirrors FormInner's opt-in generation pattern
 // ---------------------------------------------------------------------------
 
 type GeneratorProps = {
   register: Register
   subject?: "someone" | "cause"
   topicId: string
+  topicTitle?: string
+  grouping?: EventGrouping
   isCustomTopic: boolean
   primaryCharityId: string | null
   mode?: "create" | "edit"
@@ -53,33 +53,67 @@ type GeneratorProps = {
 
 type GeneratedState = {
   isGenerating: boolean
+  openingLine: string
+  name: string
+  context: string
   about: string
   reveal: string
-  personRevealExample: string | null
 }
 
 function DraftGenerator({
   register,
   subject = "someone",
   topicId,
+  topicTitle = "Colour",
+  grouping = "individual",
   isCustomTopic,
   primaryCharityId,
   mode = "create",
 }: GeneratorProps) {
   const [state, setState] = useState<GeneratedState>({
     isGenerating: false,
+    openingLine: "",
+    name: "",
+    context: "",
     about: "",
     reveal: "",
-    personRevealExample: null,
   })
+  const lastGeneratedOpeningLine = useRef<string | null>(null)
+  const lastGeneratedName = useRef<string | null>(null)
+  const lastGeneratedContext = useRef<string | null>(null)
   const lastGeneratedAbout = useRef<string | null>(null)
   const lastGeneratedReveal = useRef<string | null>(null)
 
-  useEffect(() => {
+  function handleGenerate() {
     if (mode !== "create") return
     if (isCustomTopic || !topicId) return
 
-    setState((s) => ({ ...s, isGenerating: true }))
+    const suggestedOpeningLine = getEventHeadline({
+      register,
+      occasionType: null,
+      name: "",
+      subject,
+    }).prefix
+
+    const suggestedName =
+      subject !== "cause"
+        ? getExampleName(topicTitle, undefined, grouping, register)
+        : null
+    const suggestedContext =
+      subject !== "cause" ? (CONTEXT_SUGGESTIONS[register] ?? "") : null
+
+    setState((s) => ({
+      ...s,
+      isGenerating: true,
+      openingLine: suggestedOpeningLine,
+      ...(suggestedName !== null ? { name: suggestedName } : {}),
+      ...(suggestedContext !== null ? { context: suggestedContext } : {}),
+    }))
+    lastGeneratedOpeningLine.current = suggestedOpeningLine
+    if (suggestedName !== null) lastGeneratedName.current = suggestedName
+    if (suggestedContext !== null)
+      lastGeneratedContext.current = suggestedContext
+
     safeGenerateDraft({ register, subject, topicId, primaryCharityId })
       .then((result) => {
         setState((s) => {
@@ -89,32 +123,38 @@ function DraftGenerator({
             next.about = result.about
             lastGeneratedAbout.current = result.about
           }
-          if (subject === "cause") {
-            if (!s.reveal) {
-              next.reveal = result.reveal
-              lastGeneratedReveal.current = result.reveal
-            }
-          } else {
-            next.personRevealExample = result.reveal
+          if (!s.reveal) {
+            next.reveal = result.reveal
+            lastGeneratedReveal.current = result.reveal
           }
           return next
         })
       })
       .catch(() => setState((s) => ({ ...s, isGenerating: false })))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }
+
+  const showGenerateBtn = mode === "create" && !isCustomTopic && !!topicId
 
   return (
     <div>
       {state.isGenerating && (
         <div data-testid="shimmer" aria-label="Generating suggestion…" />
       )}
+      <span data-testid="openingLine">{state.openingLine}</span>
+      <span data-testid="name">{state.name}</span>
+      <span data-testid="context">{state.context}</span>
       <span data-testid="about">{state.about}</span>
       <span data-testid="reveal">{state.reveal}</span>
-      <span data-testid="personRevealExample">
-        {state.personRevealExample ?? ""}
-      </span>
       <span data-testid="isGenerating">{state.isGenerating ? "1" : "0"}</span>
+      {showGenerateBtn && (
+        <button
+          type="button"
+          data-testid="generate-btn"
+          onClick={handleGenerate}
+        >
+          Generate a suggestion →
+        </button>
+      )}
     </div>
   )
 }
@@ -127,8 +167,8 @@ beforeEach(() => {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("generation on mount — cache hit, person event", () => {
-  it("shows shimmer during generation then pre-fills about", async () => {
+describe("generate prompt — person event", () => {
+  it("fields are empty on mount; shimmer shows during generation then all fields fill", async () => {
     let resolve!: (v: typeof MOCK_RESULT) => void
     mockSafeGenerateDraft.mockReturnValueOnce(
       new Promise<typeof MOCK_RESULT>((res) => {
@@ -141,14 +181,32 @@ describe("generation on mount — cache hit, person event", () => {
         <DraftGenerator
           register="celebrating_one"
           topicId="topic-1"
+          topicTitle="Colour"
           isCustomTopic={false}
           primaryCharityId={null}
         />
       )
     })
 
-    expect(screen.getByTestId("shimmer")).toBeInTheDocument()
+    // No auto-generation on mount
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
+    expect(screen.getByTestId("openingLine").textContent).toBe("")
+    expect(screen.getByTestId("name").textContent).toBe("")
+    expect(screen.getByTestId("context").textContent).toBe("")
     expect(screen.getByTestId("about").textContent).toBe("")
+
+    // Click the generate prompt
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
+    // Static fields fill immediately; shimmer shows while LLM runs
+    expect(screen.getByTestId("shimmer")).toBeInTheDocument()
+    expect(screen.getByTestId("openingLine").textContent).not.toBe("")
+    expect(screen.getByTestId("name").textContent).not.toBe("")
+    expect(screen.getByTestId("context").textContent).not.toBe("")
+    expect(screen.getByTestId("about").textContent).toBe("") // LLM not done yet
 
     await act(async () => {
       resolve(MOCK_RESULT)
@@ -158,7 +216,7 @@ describe("generation on mount — cache hit, person event", () => {
     expect(screen.getByTestId("about").textContent).toBe(MOCK_RESULT.about)
   })
 
-  it("pre-fills about but not reveal for person events", async () => {
+  it("fills openingLine, name, context immediately; about and reveal after LLM", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
 
     await act(async () => {
@@ -166,28 +224,66 @@ describe("generation on mount — cache hit, person event", () => {
         <DraftGenerator
           register="celebrating_one"
           topicId="topic-1"
+          topicTitle="Colour"
           isCustomTopic={false}
           primaryCharityId={null}
         />
       )
     })
 
+    // All empty on mount
+    expect(screen.getByTestId("openingLine").textContent).toBe("")
+    expect(screen.getByTestId("name").textContent).toBe("")
+    expect(screen.getByTestId("context").textContent).toBe("")
+    expect(screen.getByTestId("about").textContent).toBe("")
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
+
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() =>
       expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
 
+    expect(screen.getByTestId("openingLine").textContent).not.toBe("")
+    expect(screen.getByTestId("name").textContent).not.toBe("")
+    expect(screen.getByTestId("context").textContent).toBe("turning 40")
     expect(screen.getByTestId("about").textContent).toBe(MOCK_RESULT.about)
-    // Reveal field NOT set for person events
-    expect(screen.getByTestId("reveal").textContent).toBe("")
-    // Person reveal example IS set
-    expect(screen.getByTestId("personRevealExample").textContent).toBe(
-      MOCK_RESULT.reveal
+    expect(screen.getByTestId("reveal").textContent).toBe(MOCK_RESULT.reveal)
+  })
+
+  it("sets register-keyed opening line prefix", async () => {
+    mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_RESULT)
+
+    await act(async () => {
+      render(
+        <DraftGenerator
+          register="remembering"
+          subject="someone"
+          topicId="topic-1"
+          topicTitle="Colour"
+          isCustomTopic={false}
+          primaryCharityId={null}
+        />
+      )
+    })
+
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
+    await waitFor(() =>
+      expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
+
+    expect(screen.getByTestId("openingLine").textContent).toBe("In memory of")
+    expect(screen.getByTestId("context").textContent).toBe("1940 – 2025")
   })
 })
 
-describe("generation on mount — cause event", () => {
-  it("pre-fills both about and reveal for cause events", async () => {
+describe("generate prompt — cause event", () => {
+  it("fills openingLine, about, and reveal for cause; does NOT set name or context", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
 
     await act(async () => {
@@ -196,30 +292,40 @@ describe("generation on mount — cause event", () => {
           register="cause"
           subject="cause"
           topicId="topic-1"
+          topicTitle="Colour"
           isCustomTopic={false}
           primaryCharityId="charity-1"
         />
       )
     })
 
+    expect(screen.getByTestId("openingLine").textContent).toBe("")
+    expect(screen.getByTestId("about").textContent).toBe("")
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
+
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() =>
       expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
 
+    expect(screen.getByTestId("openingLine").textContent).toBe("In support of")
     expect(screen.getByTestId("about").textContent).toBe(
       MOCK_CAUSE_RESULT.about
     )
-    // Reveal IS set for cause events
     expect(screen.getByTestId("reveal").textContent).toBe(
       MOCK_CAUSE_RESULT.reveal
     )
-    // Person reveal example is NOT set for cause
-    expect(screen.getByTestId("personRevealExample").textContent).toBe("")
+    // Person-only fields must NOT be set for cause events
+    expect(screen.getByTestId("name").textContent).toBe("")
+    expect(screen.getByTestId("context").textContent).toBe("")
   })
 })
 
 describe("generation skipped cases", () => {
-  it("does not call generateDraft for custom topics", async () => {
+  it("does not show generate button for custom topics", async () => {
     await act(async () => {
       render(
         <DraftGenerator
@@ -233,9 +339,10 @@ describe("generation skipped cases", () => {
 
     expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("generate-btn")).not.toBeInTheDocument()
   })
 
-  it("does not call generateDraft in edit mode", async () => {
+  it("does not show generate button in edit mode", async () => {
     await act(async () => {
       render(
         <DraftGenerator
@@ -249,9 +356,10 @@ describe("generation skipped cases", () => {
     })
 
     expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("generate-btn")).not.toBeInTheDocument()
   })
 
-  it("silently falls back on generation failure", async () => {
+  it("silently falls back on generation failure — static fields still set", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
@@ -259,21 +367,30 @@ describe("generation skipped cases", () => {
         <DraftGenerator
           register="celebrating_one"
           topicId="topic-1"
+          topicTitle="Colour"
           isCustomTopic={false}
           primaryCharityId={null}
         />
       )
     })
 
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() =>
       expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
 
+    // Static fields were set before the LLM call
+    expect(screen.getByTestId("openingLine").textContent).not.toBe("")
+    expect(screen.getByTestId("name").textContent).not.toBe("")
+    // LLM-dependent field stays empty on failure
     expect(screen.getByTestId("about").textContent).toBe("")
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
 
-  it("cause event — generation failure leaves fields empty and form usable", async () => {
+  it("cause event — generation failure leaves about/reveal empty but openingLine still set", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
@@ -288,16 +405,21 @@ describe("generation skipped cases", () => {
       )
     })
 
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() =>
       expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
 
+    expect(screen.getByTestId("openingLine").textContent).toBe("In support of")
     expect(screen.getByTestId("about").textContent).toBe("")
     expect(screen.getByTestId("reveal").textContent).toBe("")
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
 
-  it("rate limit error also degrades gracefully", async () => {
+  it("rate limit error also degrades gracefully — static fields still set", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {
@@ -305,16 +427,22 @@ describe("generation skipped cases", () => {
         <DraftGenerator
           register="celebrating_one"
           topicId="topic-1"
+          topicTitle="Colour"
           isCustomTopic={false}
           primaryCharityId={null}
         />
       )
     })
 
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() =>
       expect(screen.getByTestId("isGenerating").textContent).toBe("0")
     )
 
+    expect(screen.getByTestId("openingLine").textContent).not.toBe("")
     expect(screen.getByTestId("about").textContent).toBe("")
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
@@ -334,6 +462,10 @@ describe("generateDraft call arguments", () => {
           primaryCharityId="charity-1"
         />
       )
+    })
+
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
     })
 
     await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
@@ -363,6 +495,10 @@ describe("generateDraft call arguments", () => {
       )
     })
 
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
+    })
+
     await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
 
     expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
@@ -386,6 +522,10 @@ describe("generateDraft call arguments", () => {
           primaryCharityId="charity-1"
         />
       )
+    })
+
+    await act(async () => {
+      screen.getByTestId("generate-btn").click()
     })
 
     await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())

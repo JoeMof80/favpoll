@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import type { TopicItem } from "@favpoll/types"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
 
 type RankingView = "amount" | "count"
 
@@ -57,7 +58,8 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
+      <div className="mb-4 flex items-center justify-between">
+        <SectionLabel title="Results" />
         <Tabs value={view} onValueChange={(v) => setView(v as RankingView)}>
           <TabsList className="h-7">
             <TabsTrigger value="amount" className="px-3 text-xs">

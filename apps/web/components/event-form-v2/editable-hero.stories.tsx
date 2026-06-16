@@ -40,7 +40,7 @@ const meta: Meta<typeof EditableHero> = {
   title: "EventFormV2/EditableHero",
   component: EditableHero,
   parameters: { layout: "padded" },
-  args: { topics: [], isGenerating: false, personRevealExample: null },
+  args: { isGenerating: false },
 }
 export default meta
 

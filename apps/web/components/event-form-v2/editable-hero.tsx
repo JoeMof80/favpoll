@@ -5,11 +5,6 @@ import { useWatch, useFormContext } from "react-hook-form"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
 import { RefreshCw, Trash2, Upload } from "lucide-react"
-import {
-  contextExamples,
-  deriveRegister,
-  getExampleName,
-} from "@/lib/registers"
 import { getEventHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/event-hero-avatar"
@@ -35,7 +30,6 @@ import {
 } from "./edit-helpers"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { cn } from "@/lib/utils"
-import type { TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 
 async function getCroppedBlob(
@@ -74,17 +68,15 @@ async function getCroppedBlob(
 }
 
 type Props = {
-  topics: TopicWithMeta[]
   isGenerating?: boolean
-  personRevealExample?: string | null
   onRegenerate?: () => void
+  aboutPlaceholder?: string
 }
 
 export function EditableHero({
-  topics,
   isGenerating = false,
-  personRevealExample = null,
   onRegenerate,
+  aboutPlaceholder = "",
 }: Props) {
   const [causeLabelOpen, setCauseLabelOpen] = useState(false)
   const [nameOpen, setNameOpen] = useState(false)
@@ -121,8 +113,6 @@ export function EditableHero({
   const values = useWatch({ control: form.control })
 
   const register = values.register ?? ""
-  const category = values.category ?? null
-  const grouping = values.grouping ?? "individual"
   const name = values.name ?? ""
   const context = values.context ?? ""
   const openingLine = values.openingLine ?? ""
@@ -133,21 +123,9 @@ export function EditableHero({
   const subject = (values.subject ?? "someone") as "someone" | "cause"
   const selectedTopics = values.topics ?? []
 
-  const firstSelectedTopicId = selectedTopics[0]?.topicId
-  const firstTopicMeta = topics.find((t) => t.id === firstSelectedTopicId)
-  const effReg = deriveRegister(category, grouping)
-
-  const resolvedOpeningLine =
-    openingLine ||
-    getEventHeadline({ register, occasionType: null, name: "", subject }).prefix
-
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
-
-  const aboutPlaceholder = !about
-    ? (firstTopicMeta?.placeholders?.[effReg]?.about ?? "")
-    : ""
 
   const openingLinePlaceholder = getEventHeadline({
     register,
@@ -155,17 +133,6 @@ export function EditableHero({
     name: "",
     subject,
   }).prefix
-
-  const firstTopic = selectedTopics[0]
-  const firstTopicPlaceholder = firstTopicMeta?.placeholders?.[effReg]
-  const exampleName = firstTopic
-    ? getExampleName(
-        firstTopic.title ?? null,
-        firstTopicPlaceholder?.pronouns,
-        grouping,
-        effReg
-      )
-    : ""
 
   function saveCauseLabel() {
     form.setValue("causeLabel", causeLabelDraft, { shouldValidate: true })
@@ -260,9 +227,12 @@ export function EditableHero({
             >
               <SectionEyebrow
                 variant="muted"
-                className="truncate wrap-break-word"
+                className={cn(
+                  "truncate wrap-break-word",
+                  !openingLine && "opacity-40"
+                )}
               >
-                {resolvedOpeningLine}
+                {openingLine || "Opening line"}
               </SectionEyebrow>
               <EditBadge />
             </Button>
@@ -301,9 +271,7 @@ export function EditableHero({
                 >
                   <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
                     {name || (
-                      <span className="text-muted-foreground/50">
-                        {exampleName || "Name or nickname"}
-                      </span>
+                      <span className="text-muted-foreground/50">Name</span>
                     )}
                   </h1>
                   <EditBadge />
@@ -325,7 +293,7 @@ export function EditableHero({
                       context ? "text-[#534AB7]" : "text-muted-foreground/40"
                     )}
                   >
-                    {context || contextExamples[effReg]}
+                    {context || "Context"}
                   </p>
                   <EditBadge />
                 </Button>
@@ -346,7 +314,7 @@ export function EditableHero({
               aria-label="Edit photo"
             >
               <ProtagonistAvatar
-                name={name || exampleName || "Name"}
+                name={name || "Name"}
                 photoUrl={resolvedPhotoUrl}
                 className="border-0"
               />
@@ -378,15 +346,27 @@ export function EditableHero({
               <div className="h-4 rounded-full bg-muted/60" />
               <div className="h-4 w-4/5 rounded-full bg-muted/60" />
             </div>
-          ) : aboutPlaceholder ? (
-            <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
-              {aboutPlaceholder}
-            </p>
           ) : (
-            <p className="text-sm text-muted-foreground/40">+ about</p>
+            <p className="text-sm text-muted-foreground/40">About</p>
           )}
           <EditBadge />
         </Button>
+
+        {!about &&
+          !isGenerating &&
+          onRegenerate &&
+          register &&
+          selectedTopics[0]?.topicId &&
+          !selectedTopics[0]?.isCustom && (
+            <Button
+              type="button"
+              variant="link"
+              className="mt-2 h-auto px-0 py-0 text-sm text-muted-foreground hover:text-muted-foreground/70"
+              onClick={onRegenerate}
+            >
+              Generate a suggestion →
+            </Button>
+          )}
 
         <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
       </div>
@@ -678,7 +658,7 @@ export function EditableHero({
         ) : (
           <div className="flex justify-center">
             <ProtagonistAvatar
-              name={name || exampleName || "Name"}
+              name={name || "Name"}
               photoUrl={photoDraft?.previewUrl ?? dialogPhotoUrl ?? null}
             />
           </div>

@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import { RefreshCw } from "lucide-react"
-import { deriveRegister } from "@/lib/registers"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PledgePanel } from "@/components/pledge-panel"
 import { PollResults } from "@/components/favpoll-card/poll-results"
@@ -11,6 +10,8 @@ import type { PollResultItem } from "@/components/favpoll-card/types"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { rankItems, formatAmount } from "@/components/ranking-list/utils"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   InputGroup,
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/input-group"
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import type { TopicItem, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
@@ -31,8 +31,8 @@ type Props = {
   showReveal: boolean
   onToggleReveal: () => void
   isGenerating?: boolean
-  personRevealExample?: string | null
   onRegenerate?: () => void
+  topicRevealPlaceholder?: string
 }
 
 export function EditablePollArea({
@@ -40,30 +40,23 @@ export function EditablePollArea({
   showReveal,
   onToggleReveal,
   isGenerating = false,
-  personRevealExample = null,
   onRegenerate,
+  topicRevealPlaceholder = "",
 }: Props) {
   const [revealOpen, setRevealOpen] = useState(false)
   const [revealDraft, setRevealDraft] = useState("")
+  const [rankingView, setRankingView] = useState<"amount" | "count">("amount")
 
   const form = useFormContext<EventFormValues>()
   const values = useWatch({ control: form.control })
 
-  const category = values.category ?? null
-  const grouping = values.grouping ?? "individual"
   const reveal = values.reveal ?? ""
   const selectedTopics = values.topics ?? []
 
   const firstTopic = selectedTopics[0]
   const firstTopicMeta = topics.find((t) => t.id === firstTopic?.topicId)
-  const effReg = deriveRegister(category, grouping)
 
-  const revealPlaceholder = !reveal
-    ? (personRevealExample ??
-      firstTopicMeta?.placeholders?.[effReg]?.reveal ??
-      "")
-    : ""
-  const isPersonRevealExample = !reveal && !!personRevealExample
+  const revealPlaceholder = reveal ? "" : (topicRevealPlaceholder ?? "")
 
   const topicTitle = firstTopic?.title ?? "Colour"
   const revealValue = showReveal ? reveal || null : null
@@ -75,6 +68,8 @@ export function EditablePollArea({
       : !(firstTopicMeta?.is_finite ?? true)
     : false
 
+  const catalogItems = firstTopicMeta?.topic_items ?? []
+
   const topicItems: TopicItem[] = firstTopic
     ? [
         ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
@@ -83,8 +78,11 @@ export function EditablePollArea({
               id: item.id,
               label: item.label,
               topic_id: firstTopic.topicId ?? "",
-              all_time_pledged: 0,
-              all_time_count: 0,
+              all_time_pledged:
+                catalogItems.find((c) => c.id === item.id)?.all_time_pledged ??
+                0,
+              all_time_count:
+                catalogItems.find((c) => c.id === item.id)?.all_time_count ?? 0,
               is_canonical: true,
               is_active: true,
               created_at: "",
@@ -106,10 +104,27 @@ export function EditablePollArea({
       ]
     : []
 
-  const pollResults: PollResultItem[] = topicItems.map((item) => ({
+  const rankedItems = rankItems(topicItems, rankingView)
+  const maxValue = Math.max(
+    ...rankedItems.map((i) =>
+      rankingView === "amount" ? i.all_time_pledged : i.all_time_count
+    ),
+    1
+  )
+  const pollResults: PollResultItem[] = rankedItems.map((item) => ({
     label: item.label,
-    amount: "£0",
-    widthPercent: 0,
+    amount:
+      rankingView === "amount"
+        ? formatAmount(item.all_time_pledged)
+        : `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`,
+    widthPercent:
+      maxValue > 0
+        ? ((rankingView === "amount"
+            ? item.all_time_pledged
+            : item.all_time_count) /
+            maxValue) *
+          100
+        : 0,
   }))
 
   function saveReveal() {
@@ -137,62 +152,77 @@ export function EditablePollArea({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2">
-          <SectionLabel title={topicTitle} />
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
-              {showReveal ? "Post-reveal" : "Pre-reveal"}
-            </span>
-            <Switch
-              checked={showReveal}
-              onCheckedChange={(v) => {
-                if (v !== showReveal) onToggleReveal()
-              }}
-            />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <SectionLabel title={topicTitle} />
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {showReveal ? "Post-reveal" : "Pre-reveal"}
+              </span>
+              <Switch
+                checked={showReveal}
+                onCheckedChange={(v) => {
+                  if (v !== showReveal) onToggleReveal()
+                }}
+              />
+            </div>
           </div>
+
+          {showReveal && (
+            <div className={reveal ? "pb-4" : undefined}>
+              <Button
+                type="button"
+                variant="ghost"
+                className={EDIT_BTN}
+                onClick={() => {
+                  setRevealDraft(reveal)
+                  setRevealOpen(true)
+                }}
+                aria-label={reveal ? "Edit reveal" : "Add reveal"}
+              >
+                {reveal ? (
+                  <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-[#26215C] italic">
+                    {reveal}
+                  </p>
+                ) : isGenerating ? (
+                  <div
+                    className="animate-pulse space-y-1.5"
+                    aria-label="Generating suggestion…"
+                  >
+                    <div className="h-4 rounded-full bg-muted/60" />
+                    <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground/40">Reveal</p>
+                )}
+                <EditBadge />
+              </Button>
+            </div>
+          )}
         </div>
 
-        {showReveal && (
-          <Button
-            type="button"
-            variant="ghost"
-            className={cn(EDIT_BTN, "mt-1")}
-            onClick={() => {
-              setRevealDraft(reveal)
-              setRevealOpen(true)
-            }}
-            aria-label={reveal ? "Edit reveal" : "Add reveal"}
-          >
-            {reveal ? (
-              <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-[#26215C] italic">
-                {reveal}
-              </p>
-            ) : isGenerating ? (
-              <div
-                className="animate-pulse space-y-1.5"
-                aria-label="Generating suggestion…"
-              >
-                <div className="h-4 rounded-full bg-muted/60" />
-                <div className="h-4 w-3/4 rounded-full bg-muted/60" />
-              </div>
-            ) : revealPlaceholder ? (
-              <p className="text-base leading-relaxed wrap-break-word text-muted-foreground/50 italic">
-                {revealPlaceholder}
-                {isPersonRevealExample && (
-                  <span className="ml-1 text-xs text-muted-foreground/40 not-italic">
-                    (example — type the real one)
-                  </span>
-                )}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground/40">Add reveal…</p>
-            )}
-            <EditBadge />
-          </Button>
-        )}
-
         {revealValue ? (
-          <PollResults results={pollResults} />
+          <>
+            <div className="flex items-center justify-between">
+              <SectionLabel title="Results" />
+              <Tabs
+                value={rankingView}
+                onValueChange={(v: string) =>
+                  setRankingView(v as "amount" | "count")
+                }
+              >
+                <TabsList className="h-7">
+                  <TabsTrigger value="amount" className="px-3 text-xs">
+                    By amount
+                  </TabsTrigger>
+                  <TabsTrigger value="count" className="px-3 text-xs">
+                    By pledges
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            <PollResults results={pollResults} />
+          </>
         ) : (
           <div className="pointer-events-none opacity-40">
             <PledgePanel
@@ -263,11 +293,7 @@ export function EditablePollArea({
               data-align="block-end"
               className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
             >
-              <span>
-                {isPersonRevealExample
-                  ? "The example below is suggested — type the real favourite."
-                  : "Disclosed after pledging — this is the payoff."}
-              </span>
+              <span>Disclosed after pledging — this is the payoff.</span>
               <CharCounter value={revealDraft} max={280} />
             </div>
           </InputGroup>
