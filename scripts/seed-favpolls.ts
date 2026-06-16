@@ -101,14 +101,35 @@ const EVENT_TYPE_WEIGHTS: Array<{ et: EventType; weight: number }> = [
   { et: { register: "remembering", occasionType: "Memorial" }, weight: 10 },
   { et: { register: "remembering", occasionType: "Tribute" }, weight: 4 },
   { et: { register: "celebrating_one", occasionType: "Birthday" }, weight: 12 },
-  { et: { register: "celebrating_one", occasionType: "Retirement" }, weight: 8 },
+  {
+    et: { register: "celebrating_one", occasionType: "Retirement" },
+    weight: 8,
+  },
   { et: { register: "celebrating_many", occasionType: "Wedding" }, weight: 8 },
-  { et: { register: "celebrating_many", occasionType: "Engagement" }, weight: 5 },
-  { et: { register: "celebrating_many", occasionType: "Anniversary" }, weight: 6 },
-  { et: { register: "celebrating_one", occasionType: "Leaving do" }, weight: 6 },
-  { et: { register: "celebrating_one", occasionType: "Graduation" }, weight: 6 },
-  { et: { register: "celebrating_one", occasionType: "Christening" }, weight: 4 },
-  { et: { register: "celebrating_one", occasionType: "Achievement" }, weight: 5 },
+  {
+    et: { register: "celebrating_many", occasionType: "Engagement" },
+    weight: 5,
+  },
+  {
+    et: { register: "celebrating_many", occasionType: "Anniversary" },
+    weight: 6,
+  },
+  {
+    et: { register: "celebrating_one", occasionType: "Leaving do" },
+    weight: 6,
+  },
+  {
+    et: { register: "celebrating_one", occasionType: "Graduation" },
+    weight: 6,
+  },
+  {
+    et: { register: "celebrating_one", occasionType: "Christening" },
+    weight: 4,
+  },
+  {
+    et: { register: "celebrating_one", occasionType: "Achievement" },
+    weight: 5,
+  },
   { et: { register: "celebrating_one", occasionType: "Recovery" }, weight: 4 },
   { et: { register: "celebrating_one", occasionType: "Award" }, weight: 3 },
   { et: { register: "celebrating_one", occasionType: "Promotion" }, weight: 4 },
@@ -128,7 +149,12 @@ function pickEventType(): EventType {
 
 // Default poll closing period (days) by register / occasion_type.
 function closingDays(register: string, occasionType: string | null): number {
-  if (occasionType === "Tribute" || occasionType === "Retirement" || occasionType === "Anniversary") return 21
+  if (
+    occasionType === "Tribute" ||
+    occasionType === "Retirement" ||
+    occasionType === "Anniversary"
+  )
+    return 21
   if (register === "remembering") return 30
   if (register === "cause") return 21
   return 14
@@ -229,13 +255,23 @@ function aboutFor(name: string, register: string): string {
 // Used only when an event qualifies for a guest item; deduped against the
 // existing canonical list before insert.
 const GUEST_ITEM_CANDIDATES: Record<string, string[]> = {
-  Film: ["The Wizard of Oz", "Notting Hill", "Chariots of Fire", "Billy Elliot"],
+  Film: [
+    "The Wizard of Oz",
+    "Notting Hill",
+    "Chariots of Fire",
+    "Billy Elliot",
+  ],
   Song: [
     "Caledonia — Dougie MacLean",
     "Fields of Gold — Sting",
     "Three Little Birds — Bob Marley",
   ],
-  "Comfort food": ["Sunday crumble", "Cheese toastie", "Macaroni cheese", "Sausage and mash"],
+  "Comfort food": [
+    "Sunday crumble",
+    "Cheese toastie",
+    "Macaroni cheese",
+    "Sausage and mash",
+  ],
   Hobby: ["Wild swimming", "Pottery", "Allotment", "Bell ringing"],
   Place: ["The allotment", "The lido", "The corner café"],
   Drink: ["Bovril", "Dandelion and burdock", "Builder's tea"],
@@ -287,7 +323,9 @@ function pledgeCountForEvent(): number {
 
 // Pledge amounts in pence, clustered around common round figures.
 function pledgeAmountPence(): number {
-  const pounds = pick([2, 5, 5, 10, 10, 10, 15, 20, 20, 25, 30, 50, 50, 75, 100, 100, 250])
+  const pounds = pick([
+    2, 5, 5, 10, 10, 10, 15, 20, 20, 25, 30, 50, 50, 75, 100, 100, 250,
+  ])
   // small jitter on some so totals aren't all round
   const jitter = chance(0.2) ? randInt(0, 99) : 0
   return pounds * 100 + jitter
@@ -342,10 +380,20 @@ async function loadReferenceData() {
     .select("id, title, is_finite, placeholders")
     .eq("is_active", true)
 
-  const { data: items } = await supabase
-    .from("favourites")
-    .select("id, topic_id, label")
-    .eq("is_canonical", true)
+  // PostgREST caps a single select at 1000 rows; page through favourites
+  // explicitly since the table now holds several thousand rows.
+  const items: Favourite[] = []
+  const PAGE = 1000
+  for (let offset = 0; ; offset += PAGE) {
+    const { data: page } = await supabase
+      .from("favourites")
+      .select("id, topic_id, label")
+      .eq("is_canonical", true)
+      .range(offset, offset + PAGE - 1)
+    if (!page || page.length === 0) break
+    items.push(...(page as Favourite[]))
+    if (page.length < PAGE) break
+  }
 
   const { data: charities } = await supabase
     .from("charities")
@@ -354,7 +402,7 @@ async function loadReferenceData() {
 
   return {
     topics: (topics ?? []) as Topic[],
-    items: (items ?? []) as Favourite[],
+    items,
     charityIds: (charities ?? []).map((c) => c.id as string),
   }
 }
@@ -428,7 +476,6 @@ async function createOneFavpoll(
     .from("favpolls")
     .insert({
       protagonist_id: protagonist.id,
-      register,
       occasion_type: occasionType,
       market: "en-GB",
       created_by: SEED_USER_ID,
@@ -566,7 +613,10 @@ async function createOneFavpoll(
       created_at: at,
     })
     plannedAllocations.push(
-      chosenItems.map((it, idx) => ({ itemId: it.id, amountPence: splits[idx] }))
+      chosenItems.map((it, idx) => ({
+        itemId: it.id,
+        amountPence: splits[idx],
+      }))
     )
   }
 
@@ -611,7 +661,11 @@ async function createOneFavpoll(
       .eq("id", favpoll.id)
   }
 
-  return { occasion: occasionType ?? register, topic: topic.title, pledges: pledgeRows.length }
+  return {
+    occasion: occasionType ?? register,
+    topic: topic.title,
+    pledges: pledgeRows.length,
+  }
 }
 
 async function seedFavpolls() {
