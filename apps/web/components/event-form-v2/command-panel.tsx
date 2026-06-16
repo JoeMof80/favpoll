@@ -5,7 +5,7 @@ import { useFormContext, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { suggestClosingDate } from "@/lib/registers"
-import type { EventCategory, EventSubject } from "@favpoll/types"
+import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 import { CloseDateOverlay } from "./close-date-overlay"
 
@@ -27,7 +27,7 @@ export function CommandPanel({
   const form = useFormContext<EventFormValues>()
 
   const category = (useWatch({ control: form.control, name: "category" }) ??
-    null) as EventCategory | null
+    null) as FavpollCategory | null
   const topicsValue = useWatch({ control: form.control, name: "topics" }) ?? []
   const charitiesValue =
     useWatch({ control: form.control, name: "charities" }) ?? []
@@ -35,7 +35,7 @@ export function CommandPanel({
   const causeLabelValue =
     useWatch({ control: form.control, name: "causeLabel" }) ?? ""
   const subjectValue = (useWatch({ control: form.control, name: "subject" }) ??
-    "someone") as EventSubject
+    "someone") as FavpollSubject
   const isListed = useWatch({ control: form.control, name: "isListed" }) ?? true
 
   const [publishOpen, setPublishOpen] = useState(false)

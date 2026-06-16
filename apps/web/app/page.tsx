@@ -10,7 +10,7 @@ export default async function HomePage() {
   const supabase = createAdminClient()
 
   const { data: events } = await supabase
-    .from("events")
+    .from("favpolls")
     .select(
       `
       id,
@@ -21,19 +21,19 @@ export default async function HomePage() {
       occasion_type,
       total_raised,
       protagonist:protagonists ( name ),
-      charities:event_charities (
+      charities:favpoll_charities (
         charity:charities ( id, name, logo_url, registered_number )
       ),
-      event_polls (
+      favpoll_polls (
         id,
         topic_id,
         topics (
           title,
           is_finite,
-          topic_items ( id, label )
+          favourites ( id, label )
         ),
-        event_poll_items (
-          topic_items ( id, label )
+        favpoll_poll_favourites (
+          favourites ( id, label )
         )
       )
     `
@@ -44,17 +44,17 @@ export default async function HomePage() {
     .order("created_at", { ascending: false })
     .limit(6)
 
-  type RawTopicItem = { id: string; label: string }
-  type RawEpi = { topic_items: RawTopicItem }
+  type RawFavourite = { id: string; label: string }
+  type RawEpf = { favourites: RawFavourite }
   type RawPoll = {
     id: string
     topic_id: string | null
     topics: {
       title: string
       is_finite: boolean
-      topic_items: RawTopicItem[]
+      favourites: RawFavourite[]
     } | null
-    event_poll_items: RawEpi[]
+    favpoll_poll_favourites: RawEpf[]
   }
   type RawEvent = {
     id: string
@@ -66,28 +66,28 @@ export default async function HomePage() {
     total_raised: number
     protagonist: { name: string }
     charities: { charity: import("@favpoll/types").Charity }[]
-    event_polls: RawPoll | null
+    favpoll_polls: RawPoll | null
   }
 
   const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => {
-    const rawPoll = ev.event_polls ?? null
+    const rawPoll = ev.favpoll_polls ?? null
     let poll: {
       id: string
       topic_id: string | null
-      topic: { title: string; topic_items: RawTopicItem[] } | null
+      topic: { title: string; favourites: RawFavourite[] } | null
     } | null = null
     if (rawPoll) {
       const isFinite = rawPoll.topics?.is_finite ?? false
-      const topicItems = isFinite
-        ? (rawPoll.topics?.topic_items ?? [])
-        : (rawPoll.event_poll_items ?? [])
-            .map((epi) => epi.topic_items)
+      const favourites = isFinite
+        ? (rawPoll.topics?.favourites ?? [])
+        : (rawPoll.favpoll_poll_favourites ?? [])
+            .map((epf) => epf.favourites)
             .filter(Boolean)
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
         topic: rawPoll.topics
-          ? { title: rawPoll.topics.title, topic_items: topicItems }
+          ? { title: rawPoll.topics.title, favourites }
           : null,
       }
     }
@@ -103,10 +103,10 @@ export default async function HomePage() {
         <div className="mx-auto max-w-330 px-6">
           <div className="mb-8 flex items-baseline justify-between">
             <div>
-              <SectionEyebrow className="mb-2">Live events</SectionEyebrow>
+              <SectionEyebrow className="mb-2">Live favpolls</SectionEyebrow>
             </div>
             <Button variant="ghost" asChild>
-              <Link href="/events">See all →</Link>
+              <Link href="/favpolls">See all →</Link>
             </Button>
           </div>
 
@@ -115,13 +115,13 @@ export default async function HomePage() {
           ) : (
             <div className="py-16 text-center">
               <p className="mb-2 text-[15px] font-medium text-foreground">
-                No live events yet
+                No live favpolls yet
               </p>
               <p className="mx-auto mb-6 max-w-70 text-[13px] leading-relaxed text-muted-foreground">
-                Create the first favpoll event and it will appear here.
+                Create the first favpoll and it will appear here.
               </p>
               <Button asChild size="lg">
-                <Link href="/events/new">{t("landing.cta.primary")}</Link>
+                <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
               </Button>
             </div>
           )}
@@ -135,7 +135,7 @@ export default async function HomePage() {
             {t("landing.subheader")}
           </p>
           <Button asChild size="lg">
-            <Link href="/events/new">{t("landing.cta.primary")}</Link>
+            <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
           </Button>
         </div>
       </section>

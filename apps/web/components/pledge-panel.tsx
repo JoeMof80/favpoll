@@ -5,16 +5,16 @@ import { Chip } from "@/components/ui/chip"
 import { Button } from "./ui/button"
 import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
 type Allocation = {
-  topicItemId: string
+  favouriteId: string
   percentage: number
 }
 
 type Props = {
-  items: TopicItem[]
+  items: Favourite[]
   totalAmount: string
   onSelectionsChange: (selectedIds: string[]) => void
   isInfinite?: boolean
@@ -25,18 +25,18 @@ type Props = {
 
 function computeAllocations(
   selectedIds: string[],
-  allItems: TopicItem[]
+  allItems: Favourite[]
 ): Allocation[] {
   if (selectedIds.length === 0) {
-    return allItems.map((item) => ({ topicItemId: item.id, percentage: 0 }))
+    return allItems.map((item) => ({ favouriteId: item.id, percentage: 0 }))
   }
   const equal = Math.floor(100 / selectedIds.length)
   const remainder = 100 - equal * selectedIds.length
   return allItems.map((item) => {
     const idx = selectedIds.indexOf(item.id)
-    if (idx === -1) return { topicItemId: item.id, percentage: 0 }
+    if (idx === -1) return { favouriteId: item.id, percentage: 0 }
     return {
-      topicItemId: item.id,
+      favouriteId: item.id,
       percentage: idx === 0 ? equal + remainder : equal,
     }
   })
@@ -60,7 +60,7 @@ function PickerHeader({
   onSearchChange: (v: string) => void
   onAdd: () => void
   selectedIds: string[]
-  items: TopicItem[]
+  items: Favourite[]
   allocations: Allocation[]
   amount: number
   isAmountValid: boolean
@@ -78,7 +78,7 @@ function PickerHeader({
       {selectedIds.map((id) => {
         const item = items.find((i) => i.id === id)
         if (!item) return null
-        const alloc = allocations.find((a) => a.topicItemId === id)
+        const alloc = allocations.find((a) => a.favouriteId === id)
         const pct = alloc?.percentage ?? 0
         const itemAmount =
           isAmountValid && pct > 0
@@ -158,7 +158,7 @@ function PickerItems({
   onToggle,
   addError,
 }: {
-  filteredItems: TopicItem[]
+  filteredItems: Favourite[]
   selectedIds: string[]
   showCreate: boolean
   search: string
@@ -319,7 +319,7 @@ export function PledgePanel({
         {selectedIds.map((id) => {
           const item = items.find((i) => i.id === id)
           if (!item) return null
-          const alloc = allocations.find((a) => a.topicItemId === id)
+          const alloc = allocations.find((a) => a.favouriteId === id)
           const pct = alloc?.percentage ?? 0
           const itemAmount =
             isAmountValid && pct > 0
@@ -408,13 +408,13 @@ export function PledgePanel({
 
 export function computePledgeAllocations(
   selectedIds: string[],
-  allItems: TopicItem[],
+  allItems: Favourite[],
   amount: number
 ) {
   return computeAllocations(selectedIds, allItems)
     .filter((a) => a.percentage > 0)
     .map((a) => ({
-      topicItemId: a.topicItemId,
+      favouriteId: a.favouriteId,
       amount: Math.round(((amount * a.percentage) / 100) * 100) / 100,
     }))
 }

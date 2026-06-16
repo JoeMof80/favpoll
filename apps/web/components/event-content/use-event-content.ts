@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
-import { addGuestItem, addOrganizerItem } from "@/app/events/[id]/actions"
-import type { EventWithDetails, EventPollWithItems } from "@favpoll/types"
+import { addGuestItem, addOrganizerItem } from "@/app/favpolls/[id]/actions"
+import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 
 type UseEventContentOptions = {
-  event: EventWithDetails
-  pollWithItems: EventPollWithItems | null
+  event: FavpollWithDetails
+  pollWithItems: FavpollPollWithItems | null
   isClosed: boolean
   hasPledged: boolean
   clerkUserId: string | null
@@ -41,7 +41,7 @@ export function useEventContent({
 
   // Returns an addItem handler for infinite, open polls.
   // Organiser path calls addOrganizerItem; guest path calls addGuestItem.
-  function addItemHandler(poll: EventPollWithItems) {
+  function addItemHandler(poll: FavpollPollWithItems) {
     if (poll.topics.is_finite || isClosed || !clerkUserId) return undefined
     const isOrganiser = clerkUserId === event.created_by
     if (isOrganiser) {

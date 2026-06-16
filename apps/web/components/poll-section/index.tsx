@@ -4,13 +4,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
 import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
-import type { EventPollWithItems } from "@favpoll/types"
+import type { FavpollPollWithItems } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
 import { SectionLabel } from "../favpoll-card/section-label"
 
 type Props = {
-  poll: EventPollWithItems
+  poll: FavpollPollWithItems
   clerkUserId: string | null
   pledgeAmount: string
   isClosed: boolean
@@ -106,7 +106,7 @@ export function PollSection({
                 </Tabs>
               </div>
               <RankingList
-                initialItems={poll.topics.topic_items}
+                initialItems={poll.topics.favourites}
                 eventPollId={poll.id}
                 topicId={poll.topic_id}
                 rankingView={rankingView}
@@ -126,7 +126,7 @@ export function PollSection({
             </p>
           ) : (
             <PledgePanel
-              items={poll.topics.topic_items}
+              items={poll.topics.favourites}
               totalAmount={pledgeAmount}
               onSelectionsChange={handleSelectionsChange}
               isInfinite={!poll.topics.is_finite}
@@ -137,7 +137,7 @@ export function PollSection({
         </div>
       )}
 
-      {poll.topics.topic_items.every((i) => i.is_hidden ?? false) && (
+      {poll.topics.favourites.every((i) => i.is_hidden ?? false) && (
         <EmptyPollAlert />
       )}
     </section>

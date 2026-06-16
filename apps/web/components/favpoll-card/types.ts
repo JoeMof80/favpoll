@@ -20,9 +20,9 @@ export type CardProtagonist = {
 
 /**
  * Poll data aligned to the Supabase shape:
- *   event_polls.id, event_polls.personal_reveal
+ *   favpoll_polls.id, favpoll_polls.personal_reveal
  *   → topics.title
- *   → topic_items.id + topic_items.label
+ *   → favourites.id + favourites.label
  *
  * UI-only state fields (selectedItemId, results) are appended here
  * because FavpollCard is a display-only component that receives fully
@@ -33,7 +33,7 @@ export type PollData = {
   personal_reveal: string | null
   topic: {
     title: string
-    topic_items: { id: string; label: string }[]
+    favourites: { id: string; label: string }[]
   } | null
   /** Selected item ID during choose / pledge steps */
   selectedItemId?: string | null

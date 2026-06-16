@@ -5,8 +5,8 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { StripeCheckout } from "@/components/stripe-checkout"
 import type {
-  EventPollWithItems,
-  EventPot,
+  FavpollPollWithItems,
+  FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
 import { InfoIcon } from "lucide-react"
@@ -40,8 +40,8 @@ type LiveProps = {
   eventId: string
   clerkUserId: string | null
   charityNames: string[]
-  pollWithItems: EventPollWithItems
-  pot: EventPot | null
+  pollWithItems: FavpollPollWithItems
+  pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void

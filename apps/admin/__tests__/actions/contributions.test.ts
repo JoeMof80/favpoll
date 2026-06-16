@@ -31,11 +31,11 @@ const makeRawItem = (overrides: Record<string, unknown> = {}) => ({
   created_at: "2026-01-01T00:00:00Z",
   topics: {
     title: "Food",
-    event_polls: [
+    favpoll_polls: [
       {
-        event_id: "event-1",
-        events: {
-          id: "event-1",
+        favpoll_id: "favpoll-1",
+        favpolls: {
+          id: "favpoll-1",
           opening_line: "Birthday",
           protagonists: { name: "Alex" },
         },
@@ -61,7 +61,7 @@ describe("getPendingContributions", () => {
       id: "item-1",
       label: "Pineapple",
       topic_title: "Food",
-      event_id: "event-1",
+      favpoll_id: "favpoll-1",
       protagonist_name: "Alex",
       review_status: "pending_review",
     });
@@ -125,7 +125,7 @@ describe("acceptContribution", () => {
 
     expect(error).toBeNull();
     const updateCall = mock
-      .callsFor("topic_items")
+      .callsFor("favourites")
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0]).toMatchObject({
       review_status: "accepted",
@@ -154,21 +154,21 @@ describe("rejectContribution", () => {
     expect(error).toBe("A rejection reason is required.");
   });
 
-  it("hides event_poll_items and sets review_status to rejected", async () => {
-    mock.queue(null); // event_poll_items update → await
-    mock.queue(null); // topic_items update → await
+  it("hides favpoll_poll_favourites and sets review_status to rejected", async () => {
+    mock.queue(null); // favpoll_poll_favourites update → await
+    mock.queue(null); // favourites update → await
 
     const { error } = await rejectContribution("item-1", "Spam");
 
     expect(error).toBeNull();
 
     const epiUpdate = mock
-      .callsFor("event_poll_items")
+      .callsFor("favpoll_poll_favourites")
       .find((c) => c.method === "update")!;
     expect(epiUpdate.args[0]).toMatchObject({ is_hidden: true });
 
     const tiUpdate = mock
-      .callsFor("topic_items")
+      .callsFor("favourites")
       .find((c) => c.method === "update")!;
     expect(tiUpdate.args[0]).toMatchObject({
       review_status: "rejected",
@@ -176,7 +176,7 @@ describe("rejectContribution", () => {
     });
   });
 
-  it("returns error when event_poll_items hide fails", async () => {
+  it("returns error when favpoll_poll_favourites hide fails", async () => {
     mock.queue(null, { message: "hide failed" });
 
     const { error } = await rejectContribution("item-1", "Spam");
@@ -184,7 +184,7 @@ describe("rejectContribution", () => {
     expect(error).toBe("hide failed");
   });
 
-  it("returns error when topic_items update fails", async () => {
+  it("returns error when favourites update fails", async () => {
     mock.queue(null); // hide succeeds
     mock.queue(null, { message: "reject failed" }); // update fails
 

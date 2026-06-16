@@ -14,7 +14,7 @@ const dirname =
 const sharedAliases = [
   // Must come before the "@" catch-all so specific paths win
   {
-    find: "@/app/events/new/actions",
+    find: "@/app/favpolls/new/actions",
     replacement: resolve(dirname, ".storybook/__mocks__/actions.ts"),
   },
   {
@@ -58,10 +58,10 @@ export default defineConfig({
           alias: [
             // Stub server-only modules for the browser environment
             {
-              find: "@/lib/actions/event-poll-items",
+              find: "@/lib/actions/favpoll-poll-favourites",
               replacement: resolve(
                 dirname,
-                ".storybook/__mocks__/event-poll-items.ts"
+                ".storybook/__mocks__/favpoll-poll-favourites.ts"
               ),
             },
             ...sharedAliases,

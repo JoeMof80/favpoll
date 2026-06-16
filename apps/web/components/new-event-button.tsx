@@ -25,10 +25,10 @@ export function NewEventButton({
   function handleClick() {
     onBeforeOpen?.()
     if (!isSignedIn) {
-      router.push("/sign-in?redirect_url=/events/new")
+      router.push("/sign-in?redirect_url=/favpolls/new")
       return
     }
-    router.push("/events/new")
+    router.push("/favpolls/new")
   }
 
   return (

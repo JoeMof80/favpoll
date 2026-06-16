@@ -1,9 +1,9 @@
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
-export type RankedItem = TopicItem & { rank: number; prevRank: number | null }
+export type RankedItem = Favourite & { rank: number; prevRank: number | null }
 
 export function rankItems(
-  items: TopicItem[],
+  items: Favourite[],
   view: "amount" | "count" = "amount"
 ): RankedItem[] {
   const sorted = [...items].sort((a, b) => {

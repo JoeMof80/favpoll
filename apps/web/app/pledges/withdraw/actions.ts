@@ -12,19 +12,19 @@ export async function withdrawPledge(formData: FormData) {
   // Verify pledge still exists, not withdrawn, and event is still open
   const { data: pledge } = await supabase
     .from("pledges")
-    .select("id, withdrawn_at, event_polls(events(closes_at, id))")
+    .select("id, withdrawn_at, favpoll_polls(favpolls(closes_at, id))")
     .eq("guest_token", token)
     .is("withdrawn_at", null)
     .maybeSingle()
 
   if (!pledge) redirect("/pledges/withdraw/invalid")
 
-  const eventData = (pledge.event_polls as any)?.events
+  const eventData = (pledge.favpoll_polls as any)?.favpolls
   const closesAt = eventData?.closes_at
   const eventId = eventData?.id
 
   if (closesAt && new Date(closesAt) < new Date()) {
-    redirect(`/events/${eventId}`)
+    redirect(`/favpolls/${eventId}`)
   }
 
   await supabase
@@ -32,5 +32,5 @@ export async function withdrawPledge(formData: FormData) {
     .update({ withdrawn_at: new Date().toISOString(), guest_token: null })
     .eq("id", pledge.id)
 
-  redirect(`/events/${eventId}?withdrawn=1`)
+  redirect(`/favpolls/${eventId}?withdrawn=1`)
 }

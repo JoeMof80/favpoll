@@ -66,7 +66,7 @@ function Step3Preview() {
       </div>
       <div className="rounded-md border border-border bg-muted px-3 py-2 font-mono">
         <span className="text-[11px] text-muted-foreground">
-          favpoll.com/events/
+          favpoll.com/favpolls/
         </span>
         <span className="text-[11px] font-medium text-foreground">
           belinda-hartley

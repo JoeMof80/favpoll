@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { createPledge } from "@/app/events/[id]/actions"
+import { createPledge } from "@/app/favpolls/[id]/actions"
 
 export type CardStep = "idle" | "ready" | "paying" | "pledged"
 
@@ -70,7 +70,7 @@ export function useEventCardPledge({ pollId, initialResults }: Options) {
     const equal = Math.floor(100 / selectedIds.length)
     const remainder = 100 - equal * selectedIds.length
     const allocations = selectedIds.map((id, idx) => ({
-      topicItemId: id,
+      favouriteId: id,
       amount:
         Math.round(
           ((amount * (idx === 0 ? equal + remainder : equal)) / 100) * 100

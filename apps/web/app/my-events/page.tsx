@@ -12,7 +12,7 @@ export default async function EventsPage() {
   const supabase = createAdminClient()
 
   const { data: events } = await supabase
-    .from("events")
+    .from("favpolls")
     .select(
       `
       id,
@@ -21,9 +21,9 @@ export default async function EventsPage() {
       closed_at,
       occasion_type,
       total_raised,
-      protagonists!events_protagonist_id_fkey ( name ),
-      event_charities ( charities ( id, name, logo_url, registered_number ) ),
-      event_polls ( topics ( title ) )
+      protagonists!favpolls_protagonist_id_fkey ( name ),
+      favpoll_charities ( charities ( id, name, logo_url, registered_number ) ),
+      favpoll_polls ( topics ( title ) )
     `
     )
     .eq("created_by", userId)
@@ -37,8 +37,8 @@ export default async function EventsPage() {
     occasion_type: string | null
     total_raised: number
     protagonists: { name: string }
-    event_charities: { charities: Charity }[]
-    event_polls: { topics: { title: string } | null } | null
+    favpoll_charities: { charities: Charity }[]
+    favpoll_polls: { topics: { title: string } | null } | null
   }
 
   const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => ({
@@ -49,15 +49,15 @@ export default async function EventsPage() {
     closed_at: ev.closed_at,
     total_raised: ev.total_raised,
     protagonist: { name: ev.protagonists.name },
-    charities: ev.event_charities.map((ec) => ({ charity: ec.charities })),
-    poll: ev.event_polls ? { topic: ev.event_polls.topics } : null,
+    charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
+    poll: ev.favpoll_polls ? { topic: ev.favpoll_polls.topics } : null,
   }))
 
   return (
     <main className="mx-auto max-w-330 px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-medium text-foreground">Your events</h1>
-        <NewEventButton size="lg">New event</NewEventButton>
+        <h1 className="text-2xl font-medium text-foreground">Your favpolls</h1>
+        <NewEventButton size="lg">New favpoll</NewEventButton>
       </div>
 
       {normalised.length > 0 ? (
@@ -74,10 +74,10 @@ export default async function EventsPage() {
       ) : (
         <div className="mt-16 text-center">
           <p className="text-sm text-muted-foreground">
-            You haven&apos;t created any events yet.
+            You haven&apos;t created any favpolls yet.
           </p>
           <NewEventButton className="mt-4">
-            Create your first event
+            Create your first favpoll
           </NewEventButton>
         </div>
       )}

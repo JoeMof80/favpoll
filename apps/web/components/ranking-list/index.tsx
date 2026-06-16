@@ -1,17 +1,17 @@
 "use client"
 
 import { useTransition } from "react"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import { useRankingItems } from "./use-ranking-items"
 import { formatAmount } from "./utils"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import {
-  hideEventPollItem,
-  showEventPollItem,
-} from "@/lib/actions/event-poll-items"
+  hideFavpollPollFavourite,
+  showFavpollPollFavourite,
+} from "@/lib/actions/favpoll-poll-favourites"
 
 type Props = {
-  initialItems: TopicItem[]
+  initialItems: Favourite[]
   eventPollId: string
   topicId: string
   useAllTime?: boolean
@@ -31,9 +31,9 @@ function HideToggle({
   function toggle() {
     startTransition(async () => {
       if (isHidden) {
-        await showEventPollItem(eventPollItemId)
+        await showFavpollPollFavourite(eventPollItemId)
       } else {
-        await hideEventPollItem(eventPollItemId)
+        await hideFavpollPollFavourite(eventPollItemId)
       }
     })
   }
@@ -86,7 +86,7 @@ export function RankingList({
 
           const isHidden = item.is_hidden ?? false
           const showToggle =
-            isOrganiser && !!item.is_guest_added && !!item.event_poll_item_id
+            isOrganiser && !!item.is_guest_added && !!item.favpoll_poll_item_id
 
           const labelSuffix = showToggle ? (
             <>
@@ -97,7 +97,7 @@ export function RankingList({
               )}
               <HideToggle
                 isHidden={isHidden}
-                eventPollItemId={item.event_poll_item_id!}
+                eventPollItemId={item.favpoll_poll_item_id!}
               />
             </>
           ) : undefined

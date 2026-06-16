@@ -39,7 +39,7 @@ const DATA: WizardData = {
       description: null,
       created_by: null,
       placeholders: {},
-      topic_items: [
+      favourites: [
         {
           id: "i1",
           label: "Red",

@@ -3,12 +3,12 @@
 import { useRef, useState } from "react"
 import Link from "next/link"
 import { Chip } from "@/components/ui/chip"
-import type { Category, Topic, TopicItem } from "@favpoll/types"
+import type { Category, Topic, Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 
 type TopicWithItems = Topic & {
-  topic_items: TopicItem[]
+  favourites: Favourite[]
   category_ids: string[]
 }
 
@@ -86,7 +86,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
             The record TODO: Sorting and filtering
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every pledge ever made, across every event.
+            Every pledge ever made, across every favpoll.
             {totalPledged > 0 && (
               <> {formatAmount(totalPledged)} raised in total.</>
             )}
@@ -100,7 +100,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {visibleTopics.map((topic) => {
-              const maxPledged = topic.topic_items[0]?.all_time_pledged ?? 0
+              const maxPledged = topic.favourites[0]?.all_time_pledged ?? 0
               const hasActivity = maxPledged > 0
 
               return (
@@ -117,7 +117,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
                         See all →
                       </span>
                     </div>
-                    {topic.topic_items.slice(0, 5).map((item, i) => {
+                    {topic.favourites.slice(0, 5).map((item, i) => {
                       const barWidth =
                         hasActivity && maxPledged > 0
                           ? (item.all_time_pledged / maxPledged) * 100
@@ -137,7 +137,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
                     })}
                   </div>
 
-                  {topic.topic_items.length === 0 && (
+                  {topic.favourites.length === 0 && (
                     <p className="text-sm text-muted-foreground">
                       No pledges yet.
                     </p>

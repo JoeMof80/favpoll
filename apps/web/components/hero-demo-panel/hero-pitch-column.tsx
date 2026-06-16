@@ -44,10 +44,10 @@ export function HeroPitchColumn({ sceneIndex }: Props) {
 
       <div className="flex items-center gap-3.5">
         <Button asChild size="lg">
-          <Link href="/events/new">{t("landing.cta.primary")}</Link>
+          <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
         </Button>
         <Button variant="ghost" asChild>
-          <Link href="/events">See live events →</Link>
+          <Link href="/favpolls">See live events →</Link>
         </Button>
       </div>
     </div>

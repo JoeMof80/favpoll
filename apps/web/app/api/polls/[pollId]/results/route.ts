@@ -14,12 +14,12 @@ export async function GET(
   const { pollId } = await params
   const supabase = createAdminClient()
 
-  // pledge_allocations has no event_poll_id — must join through pledges
+  // pledge_allocations has no favpoll_poll_id — must join through pledges
   // Fetch all visible items in the poll
   const { data: pollItems, error: pollItemsErr } = await supabase
-    .from("event_poll_items")
-    .select("topic_item_id, topic_items ( label )")
-    .eq("event_poll_id", pollId)
+    .from("favpoll_poll_favourites")
+    .select("favourite_id, favourites ( label )")
+    .eq("favpoll_poll_id", pollId)
     .eq("is_hidden", false)
 
   if (pollItemsErr) {
@@ -33,16 +33,15 @@ export async function GET(
   // Build a label map for all poll items
   const labelMap = new Map<string, string>()
   for (const row of pollItems) {
-    const label = (row.topic_items as unknown as { label: string } | null)
-      ?.label
-    if (label) labelMap.set(row.topic_item_id, label)
+    const label = (row.favourites as unknown as { label: string } | null)?.label
+    if (label) labelMap.set(row.favourite_id, label)
   }
 
   // Aggregate pledged amounts
   const { data: pledges } = await supabase
     .from("pledges")
     .select("id")
-    .eq("event_poll_id", pollId)
+    .eq("favpoll_poll_id", pollId)
     .is("withdrawn_at", null)
 
   const pledgeIds = (pledges ?? []).map((p) => p.id)
@@ -51,7 +50,7 @@ export async function GET(
   if (pledgeIds.length > 0) {
     const { data: allocations, error: allocErr } = await supabase
       .from("pledge_allocations")
-      .select("topic_item_id, amount")
+      .select("favourite_id, amount")
       .in("pledge_id", pledgeIds)
 
     if (allocErr) {
@@ -60,8 +59,8 @@ export async function GET(
 
     for (const row of allocations ?? []) {
       totals.set(
-        row.topic_item_id,
-        (totals.get(row.topic_item_id) ?? 0) + (row.amount ?? 0)
+        row.favourite_id,
+        (totals.get(row.favourite_id) ?? 0) + (row.amount ?? 0)
       )
     }
   }

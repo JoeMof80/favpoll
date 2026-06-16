@@ -126,7 +126,7 @@ export function NewEventWizard({ data }: Props) {
           w.setLoveOpen(o)
           if (!o) setLoveSearch("")
         }}
-        title="Choose a favpoll"
+        title="Choose a topic"
         hideCloseButton
         header={
           <input

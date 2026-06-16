@@ -53,12 +53,12 @@ describe("withdrawPledge — event is closed", () => {
     mock.queue({
       id: "pledge-1",
       withdrawn_at: null,
-      event_polls: {
-        events: { closes_at: "2020-01-01T00:00:00Z", id: "event-1" },
+      favpoll_polls: {
+        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "event-1" },
       },
     })
     await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
-      "/events/event-1"
+      "/favpolls/event-1"
     )
   })
 
@@ -66,8 +66,8 @@ describe("withdrawPledge — event is closed", () => {
     mock.queue({
       id: "pledge-1",
       withdrawn_at: null,
-      event_polls: {
-        events: { closes_at: "2020-01-01T00:00:00Z", id: "event-2" },
+      favpoll_polls: {
+        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "event-2" },
       },
     })
     try {
@@ -85,8 +85,8 @@ describe("withdrawPledge — success", () => {
     return {
       id: "pledge-1",
       withdrawn_at: null,
-      event_polls: {
-        events: { closes_at: future.toISOString(), id: eventId },
+      favpoll_polls: {
+        favpolls: { closes_at: future.toISOString(), id: eventId },
       },
     }
   }
@@ -111,12 +111,12 @@ describe("withdrawPledge — success", () => {
     })
   })
 
-  it("redirects to /events/:id?withdrawn=1 on success", async () => {
+  it("redirects to /favpolls/:id?withdrawn=1 on success", async () => {
     mock.queue(makeFuturePledge("event-42"))
     mock.queue(null) // update response
 
     await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
-      "/events/event-42?withdrawn=1"
+      "/favpolls/event-42?withdrawn=1"
     )
   })
 

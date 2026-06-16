@@ -78,7 +78,7 @@ export async function getTopicItems(topicId: string): Promise<{
 }> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .select("id, label, display_order")
     .eq("topic_id", topicId)
     .eq("is_canonical", true)
@@ -98,7 +98,7 @@ export async function updateItemDisplayOrder(
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
   const { error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .update({ display_order: displayOrder })
     .eq("id", itemId);
 

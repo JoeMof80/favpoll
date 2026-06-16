@@ -142,13 +142,13 @@ export async function generateDraft(
 
   const { data: topic, error: topicErr } = await supabase
     .from("topics")
-    .select("title, topic_items(label)")
+    .select("title, favourites(label)")
     .eq("id", input.topicId)
     .single()
 
   if (topicErr || !topic) throw new Error("Topic not found")
   const itemLabels: string[] = (
-    (topic as { topic_items: { label: string }[] }).topic_items ?? []
+    (topic as { favourites: { label: string }[] }).favourites ?? []
   ).map((i) => i.label)
 
   let charityName: string | null = null

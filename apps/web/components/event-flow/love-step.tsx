@@ -12,7 +12,7 @@ import {
 import { ItemAddField } from "@/components/event-form-v2/item-add-field"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
-import type { Category, TopicItem, TopicWithMeta } from "@favpoll/types"
+import type { Category, Favourite, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
 type LoveStepProps = {
@@ -28,7 +28,7 @@ type LoveStepProps = {
   onSearchChange?: (v: string) => void
 }
 
-function sortItems(items: TopicItem[]): TopicItem[] {
+function sortItems(items: Favourite[]): Favourite[] {
   return [...items].sort((a, b) => {
     const aOrder = a.display_order ?? Infinity
     const bOrder = b.display_order ?? Infinity
@@ -67,7 +67,7 @@ export function LoveStep({
         title: value[0].title,
         is_active: true,
         is_finite: false,
-        topic_items: [],
+        favourites: [],
         category_ids: [],
         placeholders: {},
       } as unknown as TopicWithMeta)
@@ -116,7 +116,7 @@ export function LoveStep({
         topicId: t.id,
         title: t.title,
         isCustom: false,
-        items: t.topic_items.map((i) => ({ id: i.id, label: i.label })),
+        items: t.favourites.map((i) => ({ id: i.id, label: i.label })),
         customLabels: [],
       },
     ])
@@ -301,7 +301,7 @@ export function LoveStep({
             )}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {sortItems(selectedTopic.topic_items).map((item) => (
+            {sortItems(selectedTopic.favourites).map((item) => (
               <Chip key={item.id} size="lg" readOnly>
                 {item.label}
               </Chip>

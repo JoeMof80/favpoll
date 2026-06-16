@@ -20,7 +20,7 @@ const MOCK_DATA = {
       title: "Colour",
       is_active: true,
       is_finite: true,
-      topic_items: [
+      favourites: [
         {
           id: "i1",
           label: "Red",
@@ -120,7 +120,7 @@ describe("NewEventWizard — step order is Honour → Charity → Love", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewEventWizard — redirect", () => {
-  it("redirects to /events/new/details when wizard is completed (person)", () => {
+  it("redirects to /favpolls/new/details when wizard is completed (person)", () => {
     render(<NewEventWizard data={MOCK_DATA} />)
 
     // Step 1: Honour
@@ -140,7 +140,7 @@ describe("NewEventWizard — redirect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
 
     expect(mockPush).toHaveBeenCalledWith(
-      expect.stringContaining("/events/new/details")
+      expect.stringContaining("/favpolls/new/details")
     )
   })
 

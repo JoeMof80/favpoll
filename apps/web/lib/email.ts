@@ -23,7 +23,7 @@ type ExtensionRequestParams = {
 export async function sendExtensionRequest(params: ExtensionRequestParams) {
   const { organizerEmail, organizerName, eventId, message } = params
   const supportEmail = process.env.SUPPORT_EMAIL ?? FROM_EMAIL
-  const eventUrl = `${BASE_URL}/events/${eventId}`
+  const eventUrl = `${BASE_URL}/favpolls/${eventId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -51,7 +51,7 @@ export async function sendEventClosed(params: EventClosedParams) {
     style: "currency",
     currency: "GBP",
   })
-  const resultsUrl = `${BASE_URL}/events/${eventId}`
+  const resultsUrl = `${BASE_URL}/favpolls/${eventId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -77,7 +77,7 @@ type GuestItemAddedParams = {
 export async function sendGuestItemAdded(params: GuestItemAddedParams) {
   const { to, itemLabel, topicTitle, openingLine, protagonistName, eventId } =
     params
-  const eventUrl = `${BASE_URL}/events/${eventId}`
+  const eventUrl = `${BASE_URL}/favpolls/${eventId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,

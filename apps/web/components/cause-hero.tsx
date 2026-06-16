@@ -1,19 +1,19 @@
 "use client"
 
-import { getEventHeadline } from "@/lib/display"
+import { getFavpollHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import type { Event } from "@favpoll/types"
+import type { Favpoll } from "@favpoll/types"
 
 type Props = {
-  event: Event
+  event: Favpoll
 }
 
 export function CauseHero({ event }: Props) {
-  const headline = getEventHeadline({
+  const headline = getFavpollHeadline({
     occasionType: event.occasion_type,
     openingLine: event.opening_line,
     name: event.cause_label ?? "",
-    subject: event.event_subject,
+    subject: event.subject,
   })
 
   return (

@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest"
 import { rankItems, formatAmount } from "@/components/ranking-list/utils"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
-function makeItem(id: string, pledged: number, count: number): TopicItem {
+function makeItem(id: string, pledged: number, count: number): Favourite {
   return {
     id,
     topic_id: "t1",
@@ -68,7 +68,7 @@ describe("rankItems", () => {
     expect(rankItems([])).toEqual([])
   })
 
-  it("preserves all TopicItem fields in the result", () => {
+  it("preserves all Favourite fields in the result", () => {
     const result = rankItems(items)
     expect(result[0].label).toBe("high")
     expect(result[0].is_canonical).toBe(true)

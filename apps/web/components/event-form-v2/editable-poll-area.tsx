@@ -23,7 +23,7 @@ import {
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { toast } from "sonner"
-import type { TopicItem, TopicWithMeta } from "@favpoll/types"
+import type { Favourite, TopicWithMeta } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
 
 type Props = {
@@ -68,9 +68,9 @@ export function EditablePollArea({
       : !(firstTopicMeta?.is_finite ?? true)
     : false
 
-  const catalogItems = firstTopicMeta?.topic_items ?? []
+  const catalogItems = firstTopicMeta?.favourites ?? []
 
-  const topicItems: TopicItem[] = firstTopic
+  const topicItems: Favourite[] = firstTopic
     ? [
         ...((firstTopic.items ?? []) as { id: string; label: string }[]).map(
           (item) =>
@@ -86,7 +86,7 @@ export function EditablePollArea({
               is_canonical: true,
               is_active: true,
               created_at: "",
-            }) as unknown as TopicItem
+            }) as unknown as Favourite
         ),
         ...firstTopicCustomLabels.map(
           (label, i) =>
@@ -99,7 +99,7 @@ export function EditablePollArea({
               is_canonical: false,
               is_active: true,
               created_at: "",
-            }) as unknown as TopicItem
+            }) as unknown as Favourite
         ),
       ]
     : []

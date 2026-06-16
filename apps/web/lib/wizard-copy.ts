@@ -1,4 +1,4 @@
-import type { EventSubject } from "@favpoll/types"
+import type { FavpollSubject } from "@favpoll/types"
 
 export type WizardStep = "honour" | "charity" | "love"
 
@@ -37,6 +37,6 @@ const CAUSE: WizardCopy = {
     "Pick a topic that suits your cause — something supporters will enjoy voting on.",
 }
 
-export function getWizardCopy(subject: EventSubject): WizardCopy {
+export function getWizardCopy(subject: FavpollSubject): WizardCopy {
   return subject === "cause" ? CAUSE : SOMEONE
 }

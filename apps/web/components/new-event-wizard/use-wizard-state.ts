@@ -4,10 +4,10 @@ import { getWizardCopy, type WizardStep } from "@/lib/wizard-copy"
 import type {
   Category,
   Charity,
-  EventCategory,
-  EventGrouping,
-  EventSubject,
-  TopicItem,
+  FavpollCategory,
+  FavpollGrouping,
+  FavpollSubject,
+  Favourite,
   TopicWithMeta,
 } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
@@ -31,7 +31,7 @@ export type WizardData = {
   suggestedTopicIds?: Record<string, string[]>
 }
 
-function sortTopicItems(items: TopicItem[]): TopicItem[] {
+function sortTopicItems(items: Favourite[]): Favourite[] {
   return [...items].sort((a, b) => {
     const aOrder = a.display_order ?? Infinity
     const bOrder = b.display_order ?? Infinity
@@ -44,9 +44,9 @@ export function useWizardState(data: WizardData) {
   const router = useRouter()
 
   const [step, setStep] = useState<WizardStep>("honour")
-  const [category, setCategory] = useState<EventCategory | null>(null)
-  const [grouping, setGrouping] = useState<EventGrouping>("individual")
-  const [subject, setSubject] = useState<EventSubject>("someone")
+  const [category, setCategory] = useState<FavpollCategory | null>(null)
+  const [grouping, setGrouping] = useState<FavpollGrouping>("individual")
+  const [subject, setSubject] = useState<FavpollSubject>("someone")
   const [causeLabel, setCauseLabel] = useState("")
   const [topics, setTopics] = useState<WizardTopics>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
@@ -69,7 +69,7 @@ export function useWizardState(data: WizardData) {
       : null
 
   const sortedExistingItems = selectedTopic
-    ? sortTopicItems(selectedTopic.topic_items)
+    ? sortTopicItems(selectedTopic.favourites)
     : []
 
   const dialogExistingItems = sortedExistingItems.map((i) => ({
@@ -109,7 +109,7 @@ export function useWizardState(data: WizardData) {
     const current = topics[0]
     if (!current) return
     const existing = current.customLabels ?? []
-    const canonicalLabels = selectedTopic?.topic_items.map((i) => i.label) ?? []
+    const canonicalLabels = selectedTopic?.favourites.map((i) => i.label) ?? []
     if (
       [...existing, ...canonicalLabels].some(
         (l) => l.toLowerCase() === label.toLowerCase()
@@ -168,7 +168,7 @@ export function useWizardState(data: WizardData) {
         params.set("topicTitle", topic.title)
       }
     }
-    router.push(`/events/new/details?${params}`)
+    router.push(`/favpolls/new/details?${params}`)
   }
 
   return {

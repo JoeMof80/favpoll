@@ -15,7 +15,7 @@ import { useEventCardPledge } from "./event-card/use-event-card-pledge"
 import { EventCardResults } from "./event-card/event-card-results"
 import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
 import type { CardResultItem } from "./event-card/use-event-card-pledge"
-import type { Charity, TopicItem } from "@favpoll/types"
+import type { Charity, Favourite } from "@favpoll/types"
 import { AmountInput } from "./pledge-card/amount-input"
 
 type EventCardEvent = {
@@ -33,7 +33,7 @@ type EventCardEvent = {
     topic_id: string | null
     topic: {
       title: string
-      topic_items: { id: string; label: string }[]
+      favourites: { id: string; label: string }[]
     } | null
   } | null
 }
@@ -55,7 +55,7 @@ export function EventCard({
 }: Props) {
   const poll = event.poll
   const topicTitle = poll?.topic?.title ?? ""
-  const topicItems = (poll?.topic?.topic_items ?? []) as TopicItem[]
+  const topicItems = (poll?.topic?.favourites ?? []) as Favourite[]
   const perCharity =
     event.charities.length > 0 ? event.total_raised / event.charities.length : 0
 
@@ -81,8 +81,8 @@ export function EventCard({
   return (
     <li className={cn("list-none", className)}>
       <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
-        {/* Navigable header — links to event page */}
-        <Link href={`/events/${event.id}`} className="relative block p-3">
+        {/* Navigable header — links to favpoll page */}
+        <Link href={`/favpolls/${event.id}`} className="relative block p-3">
           {event.is_exemplar && (
             <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
               Example
@@ -129,7 +129,7 @@ export function EventCard({
 
         {/* Description only — when there's no topicTitle */}
         {!topicTitle && event.description && (
-          <Link href={`/events/${event.id}`} className="block px-5">
+          <Link href={`/favpolls/${event.id}`} className="block px-5">
             <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
               {event.description}
             </p>
@@ -189,9 +189,9 @@ export function EventCard({
           </div>
         ) : (
           <div className="px-5 pb-5">
-            <Link href={`/events/${event.id}`} tabIndex={-1}>
+            <Link href={`/favpolls/${event.id}`} tabIndex={-1}>
               <Button type="button" variant="outline" className="w-full">
-                View event
+                View favpoll
               </Button>
             </Link>
           </div>

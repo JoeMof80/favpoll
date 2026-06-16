@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { renderHook, act } from "@testing-library/react"
 import type {
-  EventPollWithItems,
-  EventPot,
+  FavpollPollWithItems,
+  FavpollPot,
   PotAllocation,
-  TopicItem,
+  Favourite,
 } from "@favpoll/types"
 import {
   FUND_GREEN,
@@ -23,13 +23,13 @@ const mockActions = vi.hoisted(() => ({
 }))
 
 vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
-vi.mock("@/app/events/[id]/actions", () => mockActions)
+vi.mock("@/app/favpolls/[id]/actions", () => mockActions)
 
 import { usePledge } from "@/components/pledge-card/use-pledge"
 
 // --- fixtures ---
 
-function makeTopicItem(id: string): TopicItem {
+function makeTopicItem(id: string): Favourite {
   return {
     id,
     topic_id: "topic-1",
@@ -45,10 +45,10 @@ function makeTopicItem(id: string): TopicItem {
   }
 }
 
-function makePoll(id: string): EventPollWithItems {
+function makePoll(id: string): FavpollPollWithItems {
   return {
     id,
-    event_id: "event-1",
+    favpoll_id: "event-1",
     topic_id: "topic-1",
     personal_reveal: null,
     created_at: "2024-01-01T00:00:00Z",
@@ -60,15 +60,15 @@ function makePoll(id: string): EventPollWithItems {
       is_active: true,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
-      topic_items: [makeTopicItem("red"), makeTopicItem("blue")],
+      favourites: [makeTopicItem("red"), makeTopicItem("blue")],
     },
   }
 }
 
-function makePot(deposited: number, allocated: number): EventPot {
+function makePot(deposited: number, allocated: number): FavpollPot {
   return {
     id: "pot-1",
-    event_id: "event-1",
+    favpoll_id: "event-1",
     created_by: "user-1",
     total_deposited: deposited,
     total_allocated: allocated,
@@ -83,7 +83,7 @@ const baseOptions = {
   clerkUserId: "user-1",
   charityNames: ["Oxfam"],
   pollWithItems: poll,
-  pot: null as EventPot | null,
+  pot: null as FavpollPot | null,
   userPotAllocation: null as PotAllocation | null,
   pollSelections: {} as Record<string, string[]>,
   onPledgeAmountChange: vi.fn(),

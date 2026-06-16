@@ -16,7 +16,7 @@ const makeTopic = (
     title,
     is_active: true,
     is_finite,
-    topic_items: items.map((i) => ({
+    favourites: items.map((i) => ({
       id: i.id,
       label: i.label,
       topic_id: id,

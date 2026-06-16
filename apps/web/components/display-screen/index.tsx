@@ -5,9 +5,9 @@ import { QRCodeSVG } from "qrcode.react"
 import { createClient } from "@/lib/supabase/client"
 import { useRankingItems } from "@/components/ranking-list/use-ranking-items"
 import { formatAmount } from "@/components/ranking-list/utils"
-import { getEventHeadline } from "@/lib/display"
+import { getFavpollHeadline } from "@/lib/display"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
 const BRAND = "#534AB7"
 const ROW_HEIGHT = 72
@@ -19,7 +19,7 @@ type DisplayPoll = {
     id: string
     title: string
   }
-  items: TopicItem[]
+  items: Favourite[]
 }
 
 type Props = {
@@ -43,7 +43,7 @@ function DisplayRankingRow({
   isFirst,
   style,
 }: {
-  item: TopicItem & { rank: number }
+  item: Favourite & { rank: number }
   isColorTopic: boolean
   maxPledged: number
   isFirst: boolean
@@ -162,7 +162,7 @@ export function DisplayScreen({
           const { data } = await supabase
             .from("pledges")
             .select("total_amount")
-            .eq("event_poll_id", pollId)
+            .eq("favpoll_poll_id", pollId)
             .is("withdrawn_at", null)
           const total = (data ?? []).reduce(
             (s: number, p: { total_amount: number }) => s + p.total_amount,
@@ -177,7 +177,7 @@ export function DisplayScreen({
     }
   }, [eventId, pollId, supabase])
 
-  const headline = getEventHeadline({
+  const headline = getFavpollHeadline({
     occasionType,
     openingLine,
     name: protagonistName,

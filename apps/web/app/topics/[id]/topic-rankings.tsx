@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 
 type RankingView = "amount" | "count"
@@ -26,7 +26,7 @@ function formatAmount(amount: number): string {
 }
 
 type Props = {
-  items: TopicItem[]
+  items: Favourite[]
   topicTitle: string
   hasColourSwatch: boolean
 }

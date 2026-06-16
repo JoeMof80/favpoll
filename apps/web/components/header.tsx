@@ -53,19 +53,19 @@ export function Header() {
               Rankings
             </Link>
             <Link
-              href="/events"
+              href="/favpolls"
               className="mr-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              Live events
+              Live favpolls
             </Link>
             <Show when="signed-in">
               <Link
                 href="/my-events"
                 className="mr-2 text-sm text-muted-foreground hover:text-foreground"
               >
-                Your events
+                Your favpolls
               </Link>
-              <NewEventButton size="lg">New event</NewEventButton>
+              <NewEventButton size="lg">New favpoll</NewEventButton>
             </Show>
             <Show when="signed-out">
               <SignInButton>
@@ -111,11 +111,11 @@ export function Header() {
               Rankings
             </Link>
             <Link
-              href="/events"
+              href="/favpolls"
               className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={close}
             >
-              Live events
+              Live favpolls
             </Link>
             <Show when="signed-in">
               <Link
@@ -123,7 +123,7 @@ export function Header() {
                 className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                 onClick={close}
               >
-                Your events
+                Your favpolls
               </Link>
             </Show>
             <Show when="signed-out">
@@ -143,7 +143,7 @@ export function Header() {
             <Show when="signed-in">
               <div className="pt-3">
                 <NewEventButton className="w-full" onBeforeOpen={close}>
-                  New event
+                  New favpoll
                 </NewEventButton>
               </div>
             </Show>

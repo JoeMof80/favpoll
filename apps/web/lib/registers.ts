@@ -1,4 +1,4 @@
-import type { EventCategory, EventGrouping } from "@favpoll/types"
+import type { FavpollCategory, FavpollGrouping } from "@favpoll/types"
 
 export type Register =
   | "remembering"
@@ -122,8 +122,8 @@ export function registerForOccasionType(occasionType: string | null): Register {
  * Derive the register from the new category + grouping model.
  */
 export function deriveRegister(
-  category: EventCategory | null,
-  grouping: EventGrouping
+  category: FavpollCategory | null,
+  grouping: FavpollGrouping
 ): Register {
   if (!category) return "neutral"
   if (category === "memorial") return "remembering"
@@ -209,7 +209,7 @@ function simpleHash(s: string): number {
 export function getExampleName(
   topicTitle: string | null,
   pronouns: "she" | "he" | "they" | undefined,
-  grouping: EventGrouping,
+  grouping: FavpollGrouping,
   register: Register
 ): string {
   if (!topicTitle) return ""
@@ -245,7 +245,7 @@ export function shortTopicLabel(title: string): string {
  * Returns "YYYY-MM-DDTHH:MM"
  */
 export function suggestClosingDate(
-  category: EventCategory | null,
+  category: FavpollCategory | null,
   eventDate?: string | null
 ): string {
   const days = category === "memorial" ? 30 : 14

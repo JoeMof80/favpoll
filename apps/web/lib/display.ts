@@ -102,7 +102,7 @@ const REGISTER_PREFIXES: Record<string, string> = {
   neutral: "Honouring",
 }
 
-export function getEventHeadline(params: {
+export function getFavpollHeadline(params: {
   register?: string
   occasionType: string | null
   name: string

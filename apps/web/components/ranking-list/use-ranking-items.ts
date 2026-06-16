@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import { rankItems, type RankedItem } from "./utils"
 
 export function useRankingItems(
-  initialItems: TopicItem[],
+  initialItems: Favourite[],
   topicId: string,
   rankingView: "amount" | "count"
 ) {
@@ -45,20 +45,20 @@ export function useRankingItems(
   // Real-time subscription
   useEffect(() => {
     const channel = supabase
-      .channel(`topic_items:${topicId}`)
+      .channel(`favourites:${topicId}`)
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
-          table: "topic_items",
+          table: "favourites",
           filter: `topic_id=eq.${topicId}`,
         },
         (payload) => {
           setItems((prev) => {
             const updated = prev.map((item) =>
               item.id === payload.new.id
-                ? { ...item, ...(payload.new as TopicItem) }
+                ? { ...item, ...(payload.new as Favourite) }
                 : item
             )
             const reranked = rankItems(updated, rankingView).map((item) => ({

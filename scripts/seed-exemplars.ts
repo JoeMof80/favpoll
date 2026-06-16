@@ -1,11 +1,11 @@
 /**
  * scripts/seed-exemplars.ts
  * ---------------------------------------------------------------------------
- * Seeds a handful of hand-crafted exemplar events — closed events with
- * is_exemplar = true — used as inspiration content in the "See events like
- * this" door on the New Event form.
+ * Seeds a handful of hand-crafted exemplar favpolls — closed favpolls with
+ * is_exemplar = true — used as inspiration content in the "See favpolls like
+ * this" door on the New Favpoll form.
  *
- * Exemplars are written to be outgrown by genuine events; don't over-seed.
+ * Exemplars are written to be outgrown by genuine favpolls; don't over-seed.
  * Each has a vivid About (teases topic domain; never states the favourite),
  * populated pledge data so results render, and personal_reveal set.
  *
@@ -20,10 +20,10 @@
  * ALLOW_EVENT_SEED=1 explicitly.
  *
  * IDEMPOTENT: owned by created_by = 'user_seed_exemplar'. Re-running is a
- * no-op if the target event count is already met.
+ * no-op if the target favpoll count is already met.
  *
  * To remove:
- *   delete from events where created_by = 'user_seed_exemplar';
+ *   delete from favpolls where created_by = 'user_seed_exemplar';
  *   delete from protagonists where created_by = 'user_seed_exemplar';
  * ---------------------------------------------------------------------------
  */
@@ -190,13 +190,13 @@ async function ensureSeedUser() {
 // ─────────────────────── Main ─────────────────────────────────────────────────
 
 async function main() {
-  console.log("🌱  Seeding exemplar events…")
+  console.log("🌱  Seeding exemplar favpolls…")
 
   await ensureSeedUser()
 
   // Check how many exemplars already exist
   const { count: existing } = await supabase
-    .from("events")
+    .from("favpolls")
     .select("id", { count: "exact", head: true })
     .eq("created_by", SEED_USER_ID)
 
@@ -211,7 +211,7 @@ async function main() {
   const [{ data: topics }, { data: charities }] = await Promise.all([
     supabase
       .from("topics")
-      .select("id, title, is_finite, topic_items ( id, label )")
+      .select("id, title, is_finite, favourites ( id, label )")
       .eq("is_active", true),
     supabase.from("charities").select("id, name").eq("is_active", true),
   ])
@@ -226,7 +226,7 @@ async function main() {
   let created = 0
 
   for (const ex of EXEMPLARS) {
-    // Idempotency: skip if an event with this protagonist name already exists
+    // Idempotency: skip if a favpoll with this protagonist name already exists
     const { count: exists } = await supabase
       .from("protagonists")
       .select("id", { count: "exact", head: true })
@@ -267,9 +267,9 @@ async function main() {
       continue
     }
 
-    // 2. Event (closed, exemplar)
-    const { data: event, error: eventError } = await supabase
-      .from("events")
+    // 2. Favpoll (closed, exemplar)
+    const { data: favpoll, error: favpollError } = await supabase
+      .from("favpolls")
       .insert({
         protagonist_id: protagonist.id,
         occasion_type: ex.occasionType,
@@ -285,58 +285,58 @@ async function main() {
       .select("id")
       .single()
 
-    if (eventError || !event) {
-      console.error(`  ✗  event insert failed for ${ex.name}:`, eventError?.message)
+    if (favpollError || !favpoll) {
+      console.error(`  ✗  favpoll insert failed for ${ex.name}:`, favpollError?.message)
       continue
     }
 
-    // 3. Event charity
-    await supabase.from("event_charities").insert({
-      event_id: event.id,
+    // 3. Favpoll charity
+    await supabase.from("favpoll_charities").insert({
+      favpoll_id: favpoll.id,
       charity_id: charity.id,
     })
 
-    // 4. Event pot (mandatory — every event must have one)
-    await supabase.from("event_pots").insert({
-      event_id: event.id,
+    // 4. Favpoll pot (mandatory — every favpoll must have one)
+    await supabase.from("favpoll_pots").insert({
+      favpoll_id: favpoll.id,
       amount: 0,
       currency: "gbp",
     })
 
-    // 5. Event poll
-    const { data: eventPoll, error: pollError } = await supabase
-      .from("event_polls")
+    // 5. Favpoll poll
+    const { data: favpollPoll, error: pollError } = await supabase
+      .from("favpoll_polls")
       .insert({
-        event_id: event.id,
+        favpoll_id: favpoll.id,
         topic_id: topic.id,
         personal_reveal: ex.personal_reveal,
       })
       .select("id")
       .single()
 
-    if (pollError || !eventPoll) {
-      console.error(`  ✗  event_poll insert failed for ${ex.name}:`, pollError?.message)
+    if (pollError || !favpollPoll) {
+      console.error(`  ✗  favpoll_poll insert failed for ${ex.name}:`, pollError?.message)
       continue
     }
 
-    // 6. Event poll items (for finite topics; infinite gets event_poll_items)
-    const topicItems = (topic as { topic_items: { id: string; label: string }[] }).topic_items ?? []
+    // 6. Favpoll poll favourites (for finite topics; infinite gets favpoll_poll_favourites)
+    const favourites = (topic as { favourites: { id: string; label: string }[] }).favourites ?? []
     const isFinite = (topic as { is_finite: boolean }).is_finite
 
-    if (isFinite && topicItems.length > 0) {
-      await supabase.from("event_poll_items").insert(
-        topicItems.map((item) => ({
-          event_poll_id: eventPoll.id,
-          topic_item_id: item.id,
+    if (isFinite && favourites.length > 0) {
+      await supabase.from("favpoll_poll_favourites").insert(
+        favourites.map((item) => ({
+          favpoll_poll_id: favpollPoll.id,
+          favourite_id: item.id,
         }))
       )
     }
 
     // 7. Pledge allocations (simulated pledges to show results)
     const pledgeAmounts = ex.pledgeAmounts
-    const itemsForAlloc = isFinite && topicItems.length > 0
-      ? topicItems
-      : topicItems.slice(0, 5) // fallback for infinite
+    const itemsForAlloc = isFinite && favourites.length > 0
+      ? favourites
+      : favourites.slice(0, 5) // fallback for infinite
 
     if (itemsForAlloc.length > 0) {
       // Distribute pledge amounts: first item gets the most, spread across items
@@ -354,8 +354,8 @@ async function main() {
         const { data: pledge } = await supabase
           .from("pledges")
           .insert({
-            event_poll_id: eventPoll.id,
-            guest_token: `exemplar-${event.id}-${i}`,
+            favpoll_poll_id: favpollPoll.id,
+            guest_token: `exemplar-${favpoll.id}-${i}`,
             amount,
             currency: "gbp",
             status: "succeeded",
@@ -366,7 +366,7 @@ async function main() {
         if (pledge) {
           await supabase.from("pledge_allocations").insert({
             pledge_id: pledge.id,
-            topic_item_id: item.id,
+            favourite_id: item.id,
             amount,
           })
         }

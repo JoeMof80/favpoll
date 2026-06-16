@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest"
 import { renderHook, act } from "@testing-library/react"
 import type {
-  EventWithDetails,
-  EventPollWithItems,
+  FavpollWithDetails,
+  FavpollPollWithItems,
   Protagonist,
   Charity,
 } from "@favpoll/types"
@@ -16,7 +16,7 @@ const mockActions = vi.hoisted(() => ({
 }))
 
 vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
-vi.mock("@/app/events/[id]/actions", () => mockActions)
+vi.mock("@/app/favpolls/[id]/actions", () => mockActions)
 
 // --- fixtures ---
 
@@ -42,12 +42,12 @@ const charity: Charity = {
 }
 
 function makeEvent(
-  overrides: Partial<EventWithDetails> = {}
-): EventWithDetails {
+  overrides: Partial<FavpollWithDetails> = {}
+): FavpollWithDetails {
   return {
     id: "event-1",
     protagonist_id: "prot-1",
-    event_subject: "someone" as const,
+    subject: "someone" as const,
     cause_label: null,
     occasion_type: "Birthday",
     opening_line: null,
@@ -64,15 +64,15 @@ function makeEvent(
     description: null,
     created_at: "2024-01-01T00:00:00Z",
     protagonists: protagonist,
-    event_charities: [{ charities: charity }],
+    favpoll_charities: [{ charities: charity }],
     ...overrides,
   }
 }
 
-function makePoll(id: string, isFinite = false): EventPollWithItems {
+function makePoll(id: string, isFinite = false): FavpollPollWithItems {
   return {
     id,
-    event_id: "event-1",
+    favpoll_id: "event-1",
     topic_id: "topic-1",
     personal_reveal: null,
     created_at: "2024-01-01T00:00:00Z",
@@ -84,7 +84,7 @@ function makePoll(id: string, isFinite = false): EventPollWithItems {
       is_active: true,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
-      topic_items: [],
+      favourites: [],
     },
   }
 }
