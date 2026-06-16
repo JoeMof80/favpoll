@@ -41,7 +41,7 @@ export function DemoCard({
   showToast,
   showReveal,
 }: Props) {
-  const topicItems = scene.poll.topic.topic_items
+  const topicItems = scene.poll.topic.favourites
   const topicTitle = scene.poll.topic.title
 
   return (

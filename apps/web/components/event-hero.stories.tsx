@@ -2,7 +2,7 @@ import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { EventHero } from "./event-hero"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
-import type { Event, Protagonist, Register } from "@favpoll/types"
+import type { Favpoll, Protagonist, Register } from "@favpoll/types"
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ const BIOS: (string | null)[] = [
 ]
 
 function makeViewProps(sceneIndex: number): {
-  event: Event
+  event: Favpoll
   protagonist: Protagonist
 } {
   const scene = SCENES[sceneIndex]
@@ -58,10 +58,10 @@ function makeViewProps(sceneIndex: number): {
     created_at: "2024-01-01T00:00:00Z",
   }
 
-  const event: Event = {
+  const event: Favpoll = {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
-    event_subject: "someone",
+    subject: "someone",
     cause_label: null,
     occasion_type: OCCASION_TYPES[sceneIndex],
     opening_line: SCENE_EYEBROWS[sceneIndex],

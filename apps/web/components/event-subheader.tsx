@@ -17,7 +17,7 @@ export function EventSubheader({ eventId, isOrganiser, isClosed }: Props) {
   if (!isOrganiser) return null
 
   function handleShareResults() {
-    const url = `${window.location.origin}/events/${eventId}`
+    const url = `${window.location.origin}/favpolls/${eventId}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -53,7 +53,7 @@ export function EventSubheader({ eventId, isOrganiser, isClosed }: Props) {
           aria-label="Edit event"
           className="h-12 w-12 rounded-full shadow-lg"
         >
-          <Link href={`/events/${eventId}/edit`}>
+          <Link href={`/favpolls/${eventId}/edit`}>
             <Pencil className="h-5 w-5" />
           </Link>
         </Button>

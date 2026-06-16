@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { shortTopicLabel } from "@/lib/registers"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import type { EventFormValues } from "@/components/event-form-v2/schema"
 
 type Props = {
   topic: EventFormValues["topics"][number]
-  sortedExistingItems: TopicItem[]
+  sortedExistingItems: Favourite[]
   customLabels: string[]
   showItemsSection: boolean
   onEdit: () => void

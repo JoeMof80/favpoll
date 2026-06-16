@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { renderHook, act } from "@testing-library/react"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
 // --- Supabase realtime mock ---
 // vi.hoisted ensures these are available when vi.mock factories run
@@ -44,7 +44,7 @@ vi.mock("@/lib/supabase/client", () => ({
 
 import { useRankingItems } from "@/components/ranking-list/use-ranking-items"
 
-function makeItem(id: string, pledged: number, count: number): TopicItem {
+function makeItem(id: string, pledged: number, count: number): Favourite {
   return {
     id,
     topic_id: "topic-1",
@@ -60,7 +60,7 @@ function makeItem(id: string, pledged: number, count: number): TopicItem {
   }
 }
 
-const initialItems: TopicItem[] = [
+const initialItems: Favourite[] = [
   makeItem("red", 30, 3),
   makeItem("blue", 50, 5),
   makeItem("green", 10, 1),
@@ -177,7 +177,7 @@ describe("useRankingItems — rankingView change", () => {
 describe("useRankingItems — Supabase subscription setup", () => {
   it("subscribes to the correct topic channel on mount", () => {
     renderHook(() => useRankingItems(initialItems, "topic-99", "amount"))
-    expect(supabaseMocks.channel).toHaveBeenCalledWith("topic_items:topic-99")
+    expect(supabaseMocks.channel).toHaveBeenCalledWith("favourites:topic-99")
   })
 
   it("calls subscribe() on the channel", () => {

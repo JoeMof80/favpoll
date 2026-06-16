@@ -10,12 +10,16 @@ import {
   Ribbon,
 } from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import type { EventCategory, EventGrouping, EventSubject } from "@favpoll/types"
+import type {
+  FavpollCategory,
+  FavpollGrouping,
+  FavpollSubject,
+} from "@favpoll/types"
 
 type HonourValue = {
-  category: EventCategory | null
-  grouping: EventGrouping
-  subject: EventSubject
+  category: FavpollCategory | null
+  grouping: FavpollGrouping
+  subject: FavpollSubject
   causeLabel: string
 }
 
@@ -40,15 +44,15 @@ const CATEGORY_OPTIONS = [
 const ITEM_CLASS =
   "flex h-auto w-32 flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-[#EEEDFE] data-[state=on]:text-[#3C3489]"
 
-function subjectToGrouping(subject: string): EventGrouping {
+function subjectToGrouping(subject: string): FavpollGrouping {
   if (subject === "couple") return "couple"
   if (subject === "group") return "group"
   return "individual"
 }
 
 function groupingToSubjectValue(
-  subject: EventSubject,
-  grouping: EventGrouping
+  subject: FavpollSubject,
+  grouping: FavpollGrouping
 ): string {
   if (subject === "cause") return "cause"
   return grouping
@@ -75,7 +79,7 @@ export function HonourStep({ value, onChange }: Props) {
 
   function handleCategoryChange(v: string) {
     if (!v) return
-    onChange({ ...value, category: v as EventCategory })
+    onChange({ ...value, category: v as FavpollCategory })
   }
 
   return (
@@ -123,7 +127,7 @@ export function HonourStep({ value, onChange }: Props) {
       {/* Category row */}
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
-          What type of event is this?
+          What type of favpoll is this?
         </p>
         <ToggleGroup
           type="single"

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import type {
-  EventWithDetails,
-  EventPollWithItems,
+  FavpollWithDetails,
+  FavpollPollWithItems,
   Charity,
 } from "@favpoll/types"
 
@@ -43,7 +43,7 @@ vi.mock("@/components/event-card/event-card-charity-carousel", () => ({
   EventCardCharityCarousel: () => null,
 }))
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }))
-vi.mock("@/app/events/[id]/actions", () => ({
+vi.mock("@/app/favpolls/[id]/actions", () => ({
   addGuestItem: vi.fn(),
   addOrganizerItem: vi.fn(),
 }))
@@ -78,25 +78,25 @@ const BASE_EVENT = {
   is_private: false,
   is_plural: null,
   is_listed: true,
-  event_category: "fundraiser" as const,
-  event_grouping: "individual" as const,
+  category: "fundraiser" as const,
+  grouping: "individual" as const,
   created_at: "2024-01-01T00:00:00Z",
-  event_charities: [{ charities: CHARITY }],
+  favpoll_charities: [{ charities: CHARITY }],
 }
 
-const CAUSE_EVENT: EventWithDetails = {
+const CAUSE_EVENT: FavpollWithDetails = {
   ...BASE_EVENT,
   protagonist_id: null,
-  event_subject: "cause",
+  subject: "cause",
   cause_label: "Protecting our seas",
   description: "Together we can make a difference for ocean life.",
   protagonists: null,
 }
 
-const PERSON_EVENT: EventWithDetails = {
+const PERSON_EVENT: FavpollWithDetails = {
   ...BASE_EVENT,
   protagonist_id: "prot-1",
-  event_subject: "someone",
+  subject: "someone",
   cause_label: null,
   description: null,
   protagonists: {
@@ -110,9 +110,9 @@ const PERSON_EVENT: EventWithDetails = {
   },
 }
 
-const POLL: EventPollWithItems = {
+const POLL: FavpollPollWithItems = {
   id: "poll-1",
-  event_id: "event-1",
+  favpoll_id: "event-1",
   topic_id: "topic-1",
   personal_reveal: "Their ocean work is as vivid and varied as colour itself.",
   created_at: "2024-01-01T00:00:00Z",
@@ -124,12 +124,12 @@ const POLL: EventPollWithItems = {
     is_active: true,
     created_by: null,
     created_at: "2024-01-01T00:00:00Z",
-    topic_items: [],
+    favourites: [],
   },
 }
 
 function renderContent(
-  event: EventWithDetails,
+  event: FavpollWithDetails,
   opts: { hasPledged?: boolean } = {}
 ) {
   return render(

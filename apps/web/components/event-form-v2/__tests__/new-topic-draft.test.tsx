@@ -143,7 +143,7 @@ const MOCK_TOPICS = [
   {
     id: "t1",
     title: "Colour",
-    topic_items: [
+    favourites: [
       { id: "i1", label: "Red" },
       { id: "i2", label: "Blue" },
     ],

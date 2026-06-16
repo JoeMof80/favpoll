@@ -5,7 +5,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 const mockTopUpFund = vi.hoisted(() => vi.fn())
 const mockFetch = vi.hoisted(() => vi.fn())
 
-vi.mock("@/app/events/[id]/actions", () => ({
+vi.mock("@/app/favpolls/[id]/actions", () => ({
   topUpFund: mockTopUpFund,
 }))
 

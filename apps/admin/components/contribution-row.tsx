@@ -65,7 +65,7 @@ export function ContributionRow({ item }: { item: Contribution }) {
           <p className="font-medium text-foreground truncate">"{item.label}"</p>
           <p className="text-sm text-muted-foreground mt-0.5">
             {item.topic_title} ·{" "}
-            {item.protagonist_name || item.event_title || item.event_id}
+            {item.protagonist_name || item.favpoll_title || item.favpoll_id}
           </p>
           {item.rejection_reason && (
             <p className="text-xs text-muted-foreground mt-1 italic">

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, act, waitFor } from "@testing-library/react"
 import { useState, useRef } from "react"
-import type { Register, EventGrouping } from "@favpoll/types"
+import type { Register, FavpollGrouping } from "@favpoll/types"
 import { getExampleName } from "@/lib/registers"
-import { getEventHeadline } from "@/lib/display"
+import { getFavpollHeadline } from "@/lib/display"
 
 // Mock safeGenerateDraft before any imports that transitively use it
 const mockSafeGenerateDraft = vi.hoisted(() => vi.fn())
@@ -45,7 +45,7 @@ type GeneratorProps = {
   subject?: "someone" | "cause"
   topicId: string
   topicTitle?: string
-  grouping?: EventGrouping
+  grouping?: FavpollGrouping
   isCustomTopic: boolean
   primaryCharityId: string | null
   mode?: "create" | "edit"
@@ -88,7 +88,7 @@ function DraftGenerator({
     if (mode !== "create") return
     if (isCustomTopic || !topicId) return
 
-    const suggestedOpeningLine = getEventHeadline({
+    const suggestedOpeningLine = getFavpollHeadline({
       register,
       occasionType: null,
       name: "",

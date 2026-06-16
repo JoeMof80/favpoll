@@ -126,7 +126,7 @@ describe("POST /api/cron/close-events — closes events", () => {
     // 2. pledges select (totals)
     mock.queue([
       {
-        event_polls: { event_id: eventId },
+        favpoll_polls: { favpoll_id: eventId },
         total_amount: totalRaised,
       },
     ])
@@ -146,7 +146,7 @@ describe("POST /api/cron/close-events — closes events", () => {
     await POST(makeRequest("Bearer test-secret"))
 
     const eventsUpdate = mock
-      .callsFor("events")
+      .callsFor("favpolls")
       .find((c) => c.method === "update")!
     expect(eventsUpdate.args[0]).toMatchObject({
       total_raised: 200,
@@ -235,9 +235,9 @@ describe("POST /api/cron/close-events — closes events", () => {
     ])
     // Multiple pledge rows for the same event
     mock.queue([
-      { event_polls: { event_id: eventId }, total_amount: 50 },
-      { event_polls: { event_id: eventId }, total_amount: 30 },
-      { event_polls: { event_id: eventId }, total_amount: 20 },
+      { favpoll_polls: { favpoll_id: eventId }, total_amount: 50 },
+      { favpoll_polls: { favpoll_id: eventId }, total_amount: 30 },
+      { favpoll_polls: { favpoll_id: eventId }, total_amount: 20 },
     ])
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
     mock.queue(null) // update
@@ -245,7 +245,7 @@ describe("POST /api/cron/close-events — closes events", () => {
     await POST(makeRequest("Bearer test-secret"))
 
     const eventsUpdate = mock
-      .callsFor("events")
+      .callsFor("favpolls")
       .find((c) => c.method === "update")!
     expect(eventsUpdate.args[0].total_raised).toBe(100)
   })

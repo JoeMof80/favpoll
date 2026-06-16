@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
-import { topUpFund } from "@/app/events/[id]/actions"
+import { topUpFund } from "@/app/favpolls/[id]/actions"
 
 const PRESETS = [10, 25, 50]
 

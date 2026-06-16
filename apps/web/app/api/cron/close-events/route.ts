@@ -12,8 +12,8 @@ export async function POST(request: Request) {
 
   // Find all events that have passed closes_at but haven't been closed yet
   const { data: events, error } = await supabase
-    .from("events")
-    .select("id, created_by, protagonists!events_protagonist_id_fkey(name)")
+    .from("favpolls")
+    .select("id, created_by, protagonists!favpolls_protagonist_id_fkey(name)")
     .lte("closes_at", now)
     .is("closed_at", null)
 
@@ -31,14 +31,14 @@ export async function POST(request: Request) {
   // Sum non-withdrawn pledges per event
   const { data: pledgeTotals } = await supabase
     .from("pledges")
-    .select("event_polls!inner(event_id), total_amount")
-    .in("event_polls.event_id", eventIds)
+    .select("favpoll_polls!inner(favpoll_id), total_amount")
+    .in("favpoll_polls.favpoll_id", eventIds)
     .is("withdrawn_at", null)
 
   const raisedByEvent: Record<string, number> = {}
   for (const row of pledgeTotals ?? []) {
-    const eventId = (row.event_polls as unknown as { event_id: string })
-      .event_id
+    const eventId = (row.favpoll_polls as unknown as { favpoll_id: string })
+      .favpoll_id
     raisedByEvent[eventId] =
       (raisedByEvent[eventId] ?? 0) + (row.total_amount ?? 0)
   }
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       "someone special"
 
     const { error: updateErr } = await supabase
-      .from("events")
+      .from("favpolls")
       .update({ closed_at: now, total_raised: totalRaised })
       .eq("id", event.id)
 

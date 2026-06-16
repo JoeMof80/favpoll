@@ -199,7 +199,7 @@ const categories = [
 //   2. About second — topic area without naming the answer
 //   3. Check: does about leak the reveal? If yes, rewrite.
 //
-// All reveal answers must exist in the topic_items list.
+// All reveal answers must exist in the favourites list.
 // Marcus Webb (achievement) — marathon runner; placeholder about is charity-free.
 // ---------------------------------------------------------------------------
 
@@ -2450,7 +2450,7 @@ async function seedTopicItems() {
     }
 
     const { data: existing } = await supabase
-      .from("topic_items")
+      .from("favourites")
       .select("label")
       .eq("topic_id", topicId);
     const existingLabels = new Set(
@@ -2473,7 +2473,7 @@ async function seedTopicItems() {
 
     if (toInsert.length === 0) continue;
 
-    const { error } = await supabase.from("topic_items").insert(toInsert);
+    const { error } = await supabase.from("favourites").insert(toInsert);
     if (error) console.error(`  ✗ Items for "${title}":`, error.message);
     else inserted += toInsert.length;
   }

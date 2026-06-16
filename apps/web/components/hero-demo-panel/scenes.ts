@@ -15,8 +15,8 @@ export type Phase =
  *
  * Data fields mirror the actual DB shape used by EventCard / FavpollCard:
  *   - protagonist → protagonists row
- *   - poll        → event_polls row + topics + topic_items
- *   - charities   → charities rows via event_charities
+ *   - poll        → favpoll_polls row + topics + favourites
+ *   - charities   → charities rows via favpoll_charities
  *
  * Demo-only fields (avatarColor, selectedIndex, pledgeAmount, tagline,
  * results, total) carry animation or display data that has no DB equivalent.
@@ -33,7 +33,7 @@ export type HeroScene = {
     personal_reveal: string
     topic: {
       title: string
-      topic_items: { id: string; label: string }[]
+      favourites: { id: string; label: string }[]
     }
   }
   charities: {
@@ -46,7 +46,7 @@ export type HeroScene = {
   // ── Demo-only ─────────────────────────────────────────────────────────────
   /** Background colour for the avatar circle in the demo card */
   avatarColor: string
-  /** Index into poll.topic.topic_items — the item selected in the animation */
+  /** Index into poll.topic.favourites — the item selected in the animation */
   selectedIndex: number
   /** Pledge amount shown in the demo animation e.g. "£10" */
   pledgeAmount: string
@@ -70,7 +70,7 @@ export const SCENES: HeroScene[] = [
         "Mine was purple. I wore it to every occasion that mattered.",
       topic: {
         title: "Colour",
-        topic_items: [
+        favourites: [
           { id: "c-black", label: "Black" },
           { id: "c-blue", label: "Blue" },
           { id: "c-brown", label: "Brown" },
@@ -118,7 +118,7 @@ export const SCENES: HeroScene[] = [
         "Mint choc chip, of course. What do you mean you didn't know?",
       topic: {
         title: "Ice cream",
-        topic_items: [
+        favourites: [
           { id: "ic-banana", label: "Banana" },
           { id: "ic-blackcurr", label: "Blackcurrant" },
           { id: "ic-brownbread", label: "Brown bread" },
@@ -185,7 +185,7 @@ export const SCENES: HeroScene[] = [
         "Autumn, always. Childhood memories of walking through leaves.",
       topic: {
         title: "Season",
-        topic_items: [
+        favourites: [
           { id: "s-autumn", label: "Autumn" },
           { id: "s-spring", label: "Spring" },
           { id: "s-summer", label: "Summer" },
@@ -222,7 +222,7 @@ export const SCENES: HeroScene[] = [
         "The giant panda. They met at a conservation centre in Chengdu. Did you really need to ask?",
       topic: {
         title: "Animal",
-        topic_items: [
+        favourites: [
           { id: "a-afrelephant", label: "African elephant" },
           { id: "a-arcticfox", label: "Arctic fox" },
           { id: "a-barnowl", label: "Barn owl" },
@@ -292,7 +292,7 @@ export const SCENES: HeroScene[] = [
         "Bourbon. He kept a not-so-secret stash in his desk drawer.",
       topic: {
         title: "Biscuit",
-        topic_items: [
+        favourites: [
           { id: "b-biscoff", label: "Biscoff" },
           { id: "b-bourbon", label: "Bourbon" },
           { id: "b-carwafer", label: "Caramel wafer" },
@@ -359,7 +359,7 @@ export const SCENES: HeroScene[] = [
       personal_reveal: "Jurassic Park.",
       topic: {
         title: "Film",
-        topic_items: [
+        favourites: [
           { id: "f-2001", label: "2001: A Space Odyssey" },
           { id: "f-alien", label: "Alien" },
           { id: "f-amadeus", label: "Amadeus" },

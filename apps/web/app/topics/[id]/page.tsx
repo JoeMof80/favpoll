@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { createAdminClient } from "@/lib/supabase/admin"
-import type { Topic, TopicItem } from "@favpoll/types"
+import type { Topic, Favourite } from "@favpoll/types"
 import { TopicRankings } from "./topic-rankings"
 
 type Props = {
@@ -33,14 +33,14 @@ export default async function TopicPage({ params }: Props) {
 
   const { data: topic } = await supabase
     .from("topics")
-    .select("*, topic_items(*)")
+    .select("*, favourites(*)")
     .eq("id", id)
     .single()
 
   if (!topic) notFound()
 
-  const items: TopicItem[] = [
-    ...((topic.topic_items ?? []) as TopicItem[]),
+  const items: Favourite[] = [
+    ...((topic.favourites ?? []) as Favourite[]),
   ].sort((a, b) => b.all_time_pledged - a.all_time_pledged)
 
   const typedTopic = topic as Topic
@@ -129,7 +129,7 @@ export default async function TopicPage({ params }: Props) {
 
           <div className="rounded-lg border border-border bg-card px-5 py-5">
             <p className="text-sm font-medium text-foreground">
-              Use this topic in an event
+              Use this topic in a favpoll
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Ask your guests what their favourite{" "}
@@ -137,7 +137,7 @@ export default async function TopicPage({ params }: Props) {
               and turn their pledges into funds for a charity you care about.
             </p>
             <Button asChild className="mt-4">
-              <Link href={`/events/new?topic=${id}`}>Create an event</Link>
+              <Link href={`/favpolls/new?topic=${id}`}>Create a favpoll</Link>
             </Button>
           </div>
         </div>

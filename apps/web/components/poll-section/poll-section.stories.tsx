@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { PollSection } from "./index"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
-import type { EventPollWithItems } from "@favpoll/types"
-import type { TopicItem } from "@favpoll/types"
+import type { FavpollPollWithItems } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
 // ─── Mock data helpers ────────────────────────────────────────────────────────
 
@@ -11,11 +11,11 @@ function parseGBP(s: string): number {
 }
 
 /**
- * Build a mock EventPollWithItems from a scene index.
+ * Build a mock FavpollPollWithItems from a scene index.
  * Items with pledging data come from results; all scene options are included
  * so PledgePanel has a full list to select from.
  */
-function makePoll(sceneIndex: number): EventPollWithItems {
+function makePoll(sceneIndex: number): FavpollPollWithItems {
   const scene = SCENES[sceneIndex]
   const topicId = `topic-${sceneIndex}`
   const pollId = `poll-${sceneIndex}`
@@ -31,25 +31,23 @@ function makePoll(sceneIndex: number): EventPollWithItems {
     ])
   )
 
-  const topic_items: TopicItem[] = scene.poll.topic.topic_items.map(
-    (opt, i) => ({
-      id: `item-${sceneIndex}-${i}`,
-      topic_id: topicId,
-      label: opt.label,
-      all_time_pledged: pledgeByLabel[opt.label]?.all_time_pledged ?? 0,
-      all_time_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
-      is_canonical: true,
-      source: "seed" as const,
-      markets: ["en-GB"],
-      event_count: 1,
-      total_pledge_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
-      created_at: "2024-01-01T00:00:00Z",
-    })
-  )
+  const favourites: Favourite[] = scene.poll.topic.favourites.map((opt, i) => ({
+    id: `item-${sceneIndex}-${i}`,
+    topic_id: topicId,
+    label: opt.label,
+    all_time_pledged: pledgeByLabel[opt.label]?.all_time_pledged ?? 0,
+    all_time_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
+    is_canonical: true,
+    source: "seed" as const,
+    markets: ["en-GB"],
+    event_count: 1,
+    total_pledge_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
+    created_at: "2024-01-01T00:00:00Z",
+  }))
 
   return {
     id: pollId,
-    event_id: "event-demo",
+    favpoll_id: "event-demo",
     topic_id: topicId,
     personal_reveal: scene.poll.personal_reveal,
     created_at: "2024-01-01T00:00:00Z",
@@ -61,7 +59,7 @@ function makePoll(sceneIndex: number): EventPollWithItems {
       is_active: true,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
-      topic_items,
+      favourites,
     },
   }
 }

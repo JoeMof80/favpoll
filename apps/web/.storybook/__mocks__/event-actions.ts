@@ -1,4 +1,4 @@
-// Stub for app/events/[id]/actions — prevents Clerk server modules from
+// Stub for app/favpolls/[id]/actions — prevents Clerk server modules from
 // being imported in the Storybook/Vitest browser environment.
 export async function createPledge(): Promise<void> {}
 export async function createGuestPledge(): Promise<string> {
@@ -6,6 +6,6 @@ export async function createGuestPledge(): Promise<string> {
 }
 export async function addGuestItem(): Promise<void> {}
 export async function addOrganizerItem(): Promise<void> {}
-export async function removeEventPollItem(): Promise<void> {}
+export async function removeFavpollPollFavourite(): Promise<void> {}
 export async function pledgeFromFund(): Promise<void> {}
 export async function topUpFund(): Promise<void> {}

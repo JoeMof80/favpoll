@@ -11,7 +11,7 @@ import { SectionLabel } from "./favpoll-card/section-label"
 export type EventSummaryCardEvent = {
   id: string
   occasion_type: string | null
-  event_category?: string | null
+  category?: string | null
   opening_line: string
   closes_at: string
   closed_at?: string | null
@@ -34,7 +34,7 @@ export function EventSummaryCard({ event, className }: Props) {
 
   return (
     <Link
-      href={`/events/${event.id}`}
+      href={`/favpolls/${event.id}`}
       className={cn(
         "block rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]",
         className
@@ -50,9 +50,8 @@ export function EventSummaryCard({ event, className }: Props) {
         <FavpollHeader
           protagonist={{ name: event.protagonist.name }}
           eyebrow={
-            event.event_category
-              ? event.event_category.charAt(0).toUpperCase() +
-                event.event_category.slice(1)
+            event.category
+              ? event.category.charAt(0).toUpperCase() + event.category.slice(1)
               : (event.occasion_type ?? "")
           }
           size="md"

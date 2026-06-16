@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { WizardTopicCard } from "./wizard-topic-card"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
-const ITEMS: TopicItem[] = [
+const ITEMS: Favourite[] = [
   {
     id: "i1",
     label: "Red",

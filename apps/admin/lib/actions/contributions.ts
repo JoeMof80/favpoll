@@ -8,8 +8,8 @@ export type Contribution = {
   label: string;
   topic_id: string;
   topic_title: string;
-  event_title: string;
-  event_id: string;
+  favpoll_title: string;
+  favpoll_id: string;
   protagonist_name: string;
   review_status: "pending_review" | "accepted" | "rejected";
   rejection_reason: string | null;
@@ -25,10 +25,10 @@ export async function getPendingContributions(): Promise<{
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
+       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`,
     )
     .eq("review_status", "pending_review")
     .eq("source", "guest")
@@ -41,10 +41,10 @@ export async function getPendingContributions(): Promise<{
     label: item.label,
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? "",
-    event_id: item.topics?.event_polls?.[0]?.events?.id ?? "",
-    event_title: item.topics?.event_polls?.[0]?.events?.opening_line ?? "",
+    favpoll_id: item.topics?.favpoll_polls?.[0]?.favpolls?.id ?? "",
+    favpoll_title: item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
     protagonist_name:
-      item.topics?.event_polls?.[0]?.events?.protagonists?.name ?? "",
+      item.topics?.favpoll_polls?.[0]?.favpolls?.protagonists?.name ?? "",
     review_status: item.review_status,
     rejection_reason: item.rejection_reason,
     reviewed_at: item.reviewed_at,
@@ -62,10 +62,10 @@ export async function getReviewedContributions(): Promise<{
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, event_polls!inner(event_id, events!inner(id, opening_line, protagonists!events_protagonist_id_fkey(name))))`,
+       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`,
     )
     .neq("review_status", "pending_review")
     .eq("source", "guest")
@@ -78,10 +78,10 @@ export async function getReviewedContributions(): Promise<{
     label: item.label,
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? "",
-    event_id: item.topics?.event_polls?.[0]?.events?.id ?? "",
-    event_title: item.topics?.event_polls?.[0]?.events?.opening_line ?? "",
+    favpoll_id: item.topics?.favpoll_polls?.[0]?.favpolls?.id ?? "",
+    favpoll_title: item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
     protagonist_name:
-      item.topics?.event_polls?.[0]?.events?.protagonists?.name ?? "",
+      item.topics?.favpoll_polls?.[0]?.favpolls?.protagonists?.name ?? "",
     review_status: item.review_status,
     rejection_reason: item.rejection_reason,
     reviewed_at: item.reviewed_at,
@@ -98,7 +98,7 @@ export async function acceptContribution(
   const supabase = createAdminClient();
 
   const { error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .update({
       review_status: "accepted",
       is_canonical: true,
@@ -123,16 +123,16 @@ export async function rejectContribution(
 
   const supabase = createAdminClient();
 
-  // Hide on all event poll items for this topic item so it's not shown to guests
+  // Hide on all favpoll poll favourites for this favourite so it's not shown to guests
   const { error: hideError } = await supabase
-    .from("event_poll_items")
+    .from("favpoll_poll_favourites")
     .update({ is_hidden: true, hidden_at: new Date().toISOString() })
-    .eq("topic_item_id", itemId);
+    .eq("favourite_id", itemId);
 
   if (hideError) return { error: hideError.message };
 
   const { error } = await supabase
-    .from("topic_items")
+    .from("favourites")
     .update({
       review_status: "rejected",
       rejection_reason: trimmedReason,

@@ -24,11 +24,11 @@ const COLOUR_TOPIC: TopicWithMeta = {
   },
   created_by: null,
   created_at: "",
-  topic_items: [
+  favourites: [
     { id: "i1", label: "Red" },
     { id: "i2", label: "Blue" },
     { id: "i3", label: "Green" },
-  ] as TopicWithMeta["topic_items"],
+  ] as TopicWithMeta["favourites"],
   category_ids: [],
 }
 

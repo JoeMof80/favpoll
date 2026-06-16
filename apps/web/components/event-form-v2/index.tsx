@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
-import { uploadPersonPhoto } from "@/app/events/new/actions"
-import { createEvent } from "@/app/events/new/actions"
-import { updateEvent, updateClosesAt } from "@/app/events/[id]/edit/actions"
+import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
+import { createEvent } from "@/app/favpolls/new/actions"
+import { updateEvent, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { getExampleName } from "@/lib/registers"
-import { getEventHeadline } from "@/lib/display"
+import { getFavpollHeadline } from "@/lib/display"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
@@ -22,7 +22,7 @@ import type {
   CanvasPollInput,
   TopicWithMeta,
   Register,
-  EventGrouping,
+  FavpollGrouping,
 } from "@favpoll/types"
 
 // Register-keyed example context values shown when "Generate a suggestion" is triggered
@@ -119,7 +119,7 @@ export function EventFormV2({
         infiniteItems:
           !isCustomTopic && topicMeta && !topicMeta.is_finite
             ? {
-                canonicalItemIds: topicMeta.topic_items
+                canonicalItemIds: topicMeta.favourites
                   .filter((i) => i.is_canonical)
                   .map((i) => i.id),
                 customLabels: selectedTopic.customLabels ?? [],
@@ -127,8 +127,8 @@ export function EventFormV2({
             : null,
       }
 
-      const eventSubject = values.subject ?? "someone"
-      const isCause = eventSubject === "cause"
+      const subject = values.subject ?? "someone"
+      const isCause = subject === "cause"
 
       if (mode === "create") {
         const closesAt =
@@ -143,7 +143,7 @@ export function EventFormV2({
           dateLabel: isCause ? null : values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
-          eventSubject,
+          subject,
           causeLabel: isCause ? values.causeLabel?.trim() || null : null,
           openingLine: values.openingLine ?? null,
           description: isCause ? values.about?.trim() || null : null,
@@ -178,7 +178,7 @@ export function EventFormV2({
           dateLabel: isCause ? null : values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
-          eventSubject,
+          subject,
           causeLabel: isCause ? values.causeLabel?.trim() || null : null,
           openingLine: values.openingLine ?? null,
           description: isCause ? values.about?.trim() || null : null,
@@ -189,7 +189,7 @@ export function EventFormV2({
           potAmount: null,
           poll,
         })
-        router.push(`/events/${eventId}`)
+        router.push(`/favpolls/${eventId}`)
       }
     } catch (err) {
       if (!(err instanceof Error)) throw err
@@ -263,7 +263,7 @@ export function EventFormV2({
     return (
       <SeedFundModal
         eventId={seedEventId}
-        onComplete={() => router.push(`/events/${seedEventId}`)}
+        onComplete={() => router.push(`/favpolls/${seedEventId}`)}
       />
     )
   }
@@ -364,7 +364,7 @@ function FormInner({
                 topicId: t.id,
                 title: t.title,
                 isCustom: false,
-                items: t.topic_items.map((i) => ({ id: i.id, label: i.label })),
+                items: t.favourites.map((i) => ({ id: i.id, label: i.label })),
                 customLabels: addedItems,
               },
             ])
@@ -396,14 +396,14 @@ function FormInner({
     if (!reg) return
 
     const sub = (values.subject ?? "someone") as "someone" | "cause"
-    const grouping = (values.grouping ?? "individual") as EventGrouping
+    const grouping = (values.grouping ?? "individual") as FavpollGrouping
     const primaryCharityId = values.charities?.[0] ?? null
 
     const topicMeta = topics.find((t) => t.id === topic.topicId)
     const topicTitle = topicMeta?.title ?? topic.title ?? null
 
     // Computed suggestions for static fields
-    const suggestedOpeningLine = getEventHeadline({
+    const suggestedOpeningLine = getFavpollHeadline({
       register: reg,
       occasionType: null,
       name: "",

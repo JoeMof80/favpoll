@@ -26,7 +26,7 @@ export type Topic = {
   created_at: string;
 };
 
-export type TopicItem = {
+export type Favourite = {
   id: string;
   topic_id: string;
   label: string;
@@ -43,9 +43,9 @@ export type TopicItem = {
   total_pledge_count: number;
   created_at: string;
   display_order?: number | null;
-  // Present when fetched via event_poll_items (infinite topics in event context)
-  event_poll_item_id?: string;
-  // Visibility state per event poll — set when fetched via event_poll_items join
+  // Present when fetched via favpoll_poll_favourites (infinite topics in favpoll context)
+  favpoll_poll_item_id?: string;
+  // Visibility state per favpoll poll — set when fetched via favpoll_poll_favourites join
   is_hidden?: boolean;
   is_guest_added?: boolean;
 };
@@ -67,14 +67,14 @@ export type Register =
   | "cause"
   | "neutral";
 
-export type EventCategory = "celebration" | "memorial" | "fundraiser";
-export type EventGrouping = "individual" | "couple" | "group";
-export type EventSubject = "someone" | "cause";
+export type FavpollCategory = "celebration" | "memorial" | "fundraiser";
+export type FavpollGrouping = "individual" | "couple" | "group";
+export type FavpollSubject = "someone" | "cause";
 
-export type Event = {
+export type Favpoll = {
   id: string;
   protagonist_id: string | null;
-  event_subject: EventSubject;
+  subject: FavpollSubject;
   cause_label: string | null;
   occasion_type: string | null;
   opening_line: string | null;
@@ -90,15 +90,15 @@ export type Event = {
   is_plural: boolean | null;
   is_exemplar?: boolean;
   is_listed?: boolean;
-  event_category?: EventCategory | null;
-  event_grouping?: EventGrouping;
+  category?: FavpollCategory | null;
+  grouping?: FavpollGrouping;
   description: string | null;
   created_at: string;
 };
 
-export type EventPoll = {
+export type FavpollPoll = {
   id: string;
-  event_id: string;
+  favpoll_id: string;
   topic_id: string;
   personal_reveal: string | null;
   created_at: string;
@@ -106,7 +106,7 @@ export type EventPoll = {
 
 export type Pledge = {
   id: string;
-  event_poll_id: string;
+  favpoll_poll_id: string;
   clerk_user_id: string | null;
   guest_email: string | null;
   guest_token: string | null;
@@ -120,13 +120,13 @@ export type Pledge = {
 export type PledgeAllocation = {
   id: string;
   pledge_id: string;
-  topic_item_id: string;
+  favourite_id: string;
   amount: number;
 };
 
-export type EventPot = {
+export type FavpollPot = {
   id: string;
-  event_id: string;
+  favpoll_id: string;
   created_by: string;
   total_deposited: number;
   total_allocated: number;
@@ -141,17 +141,17 @@ export type PotAllocation = {
   created_at: string;
 };
 
-export type EventInvite = {
+export type FavpollInvite = {
   id: string;
-  event_id: string;
+  favpoll_id: string;
   email: string;
   created_at: string;
 };
 
-export type EventPollItem = {
+export type FavpollPollFavourite = {
   id: string;
-  event_poll_id: string;
-  topic_item_id: string;
+  favpoll_poll_id: string;
+  favourite_id: string;
   is_guest_added: boolean;
   added_by: string | null;
   is_hidden: boolean;
@@ -173,13 +173,13 @@ export type TopicCategory = {
 };
 
 // Joined types for UI
-export type EventWithDetails = Event & {
+export type FavpollWithDetails = Favpoll & {
   protagonists: Protagonist | null;
-  event_charities: { charities: Charity }[];
+  favpoll_charities: { charities: Charity }[];
 };
 
-export type EventPollWithItems = EventPoll & {
-  topics: Topic & { topic_items: TopicItem[] };
+export type FavpollPollWithItems = FavpollPoll & {
+  topics: Topic & { favourites: Favourite[] };
 };
 
 export type PledgeWithAllocations = Pledge & {
@@ -198,7 +198,7 @@ export type TopicPlaceholders = Record<
 >;
 
 export type TopicWithMeta = Topic & {
-  topic_items: TopicItem[];
+  favourites: Favourite[];
   category_ids: string[];
   placeholders?: TopicPlaceholders;
 };
@@ -232,9 +232,9 @@ export type CanvasSubmitData = {
   protagonistAbout?: string | null;
   dateLabel: string | null;
   photoUrl?: string | null;
-  category: EventCategory | null;
-  grouping: EventGrouping;
-  eventSubject: EventSubject;
+  category: FavpollCategory | null;
+  grouping: FavpollGrouping;
+  subject: FavpollSubject;
   causeLabel: string | null;
   openingLine: string | null;
   description: string | null;

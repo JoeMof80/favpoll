@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { DisplayScreen } from "./index"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
-import type { TopicItem } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 
 function parseGBP(s: string): number {
   return parseInt(s.replace(/[^0-9]/g, ""), 10) || 0
 }
 
-function makeItems(scene: (typeof SCENES)[0], topicId: string): TopicItem[] {
+function makeItems(scene: (typeof SCENES)[0], topicId: string): Favourite[] {
   const pledgeByLabel = Object.fromEntries(
     scene.results.map((r) => [
       r.label,
@@ -17,7 +17,7 @@ function makeItems(scene: (typeof SCENES)[0], topicId: string): TopicItem[] {
       },
     ])
   )
-  return scene.poll.topic.topic_items.map((item, i) => ({
+  return scene.poll.topic.favourites.map((item, i) => ({
     id: `${topicId}-item-${i}`,
     topic_id: topicId,
     label: item.label,
@@ -82,7 +82,7 @@ export const Memorial: Story = {
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
     pollId: "poll-memorial",
-    eventUrl: "https://favpoll.com/events/demo-memorial",
+    eventUrl: "https://favpoll.com/favpolls/demo-memorial",
   },
 }
 
@@ -98,7 +98,7 @@ export const Birthday: Story = {
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
     pollId: "poll-birthday",
-    eventUrl: "https://favpoll.com/events/demo-birthday",
+    eventUrl: "https://favpoll.com/favpolls/demo-birthday",
   },
 }
 
@@ -115,7 +115,7 @@ export const Retirement: Story = {
     poll: RETIREMENT_POLL,
     initialTotalRaised: 700,
     pollId: "poll-retirement",
-    eventUrl: "https://favpoll.com/events/demo-retirement",
+    eventUrl: "https://favpoll.com/favpolls/demo-retirement",
   },
 }
 
@@ -132,6 +132,6 @@ export const Graduation: Story = {
     poll: GRADUATION_POLL,
     initialTotalRaised: 1730,
     pollId: "poll-graduation",
-    eventUrl: "https://favpoll.com/events/demo-graduation",
+    eventUrl: "https://favpoll.com/favpolls/demo-graduation",
   },
 }

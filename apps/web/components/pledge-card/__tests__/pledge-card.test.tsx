@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react"
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
-vi.mock("@/app/events/[id]/actions", () => ({
+vi.mock("@/app/favpolls/[id]/actions", () => ({
   createPledge: vi.fn(),
   createGuestPledge: vi.fn(),
   topUpFund: vi.fn(),

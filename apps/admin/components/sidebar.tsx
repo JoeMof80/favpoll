@@ -19,7 +19,7 @@ const NAV_ITEMS = [
   { href: "/contributions", label: "Contributions", icon: Gift },
   { href: "/charities", label: "Charities", icon: Heart },
   { href: "/generated-drafts", label: "Generated Drafts", icon: Sparkles },
-  { href: "/events", label: "Events", icon: CalendarDays },
+  { href: "/favpolls", label: "Favpolls", icon: CalendarDays },
   { href: "/access", label: "Access", icon: Users },
 ];
 

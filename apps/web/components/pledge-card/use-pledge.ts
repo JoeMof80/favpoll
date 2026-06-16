@@ -5,11 +5,11 @@ import {
   createGuestPledge,
   topUpFund,
   pledgeFromFund,
-} from "@/app/events/[id]/actions"
+} from "@/app/favpolls/[id]/actions"
 import { computePledgeAllocations } from "@/components/pledge-panel"
 import type {
-  EventPollWithItems,
-  EventPot,
+  FavpollPollWithItems,
+  FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
 import {
@@ -25,8 +25,8 @@ export type UsePledgeOptions = {
   eventId: string
   clerkUserId: string | null
   charityNames: string[]
-  pollWithItems: EventPollWithItems
-  pot: EventPot | null
+  pollWithItems: FavpollPollWithItems
+  pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
@@ -142,7 +142,7 @@ export function usePledge({
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
           selections,
-          pollWithItems.topics.topic_items,
+          pollWithItems.topics.favourites,
           numericPledge
         ),
       })
@@ -154,7 +154,7 @@ export function usePledge({
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
           selections,
-          pollWithItems.topics.topic_items,
+          pollWithItems.topics.favourites,
           numericPledge
         ),
       })
@@ -193,7 +193,7 @@ export function usePledge({
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
           pollSelections[pollWithItems.id] ?? [],
-          pollWithItems.topics.topic_items,
+          pollWithItems.topics.favourites,
           numericPledge
         ),
       })

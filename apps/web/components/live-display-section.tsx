@@ -13,8 +13,8 @@ export function LiveDisplaySection({ eventId }: Props) {
 
   const displayUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/events/${eventId}/display`
-      : `/events/${eventId}/display`
+      ? `${window.location.origin}/favpolls/${eventId}/display`
+      : `/favpolls/${eventId}/display`
 
   function handleCopy() {
     navigator.clipboard.writeText(displayUrl).then(() => {

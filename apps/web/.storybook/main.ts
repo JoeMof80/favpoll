@@ -22,11 +22,11 @@ const config: StorybookConfig = {
         ...(config.resolve?.alias ?? {}),
         // Prevent Clerk server-side modules from being bundled in the browser
         // environment. uploadPersonPhoto is edit-mode only; stories use view mode.
-        "@/app/events/new/actions": path.resolve(
+        "@/app/favpolls/new/actions": path.resolve(
           __dirname,
           "./__mocks__/actions.ts"
         ),
-        "@/app/events/[id]/actions": path.resolve(
+        "@/app/favpolls/[id]/actions": path.resolve(
           __dirname,
           "./__mocks__/event-actions.ts"
         ),

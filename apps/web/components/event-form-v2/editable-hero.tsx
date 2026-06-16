@@ -5,7 +5,7 @@ import { useWatch, useFormContext } from "react-hook-form"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
 import { RefreshCw, Trash2, Upload } from "lucide-react"
-import { getEventHeadline } from "@/lib/display"
+import { getFavpollHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/event-hero-avatar"
 import { Button } from "@/components/ui/button"
@@ -127,7 +127,7 @@ export function EditableHero({
     ? URL.createObjectURL(photo)
     : (photoUrl ?? null)
 
-  const openingLinePlaceholder = getEventHeadline({
+  const openingLinePlaceholder = getFavpollHeadline({
     register,
     occasionType: null,
     name: "",

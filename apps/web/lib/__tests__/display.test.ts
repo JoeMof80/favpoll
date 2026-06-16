@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import {
   ordinal,
   formatEventDate,
-  getEventHeadline,
+  getFavpollHeadline,
   charityNames,
   formatAmount,
   formatRelativeDate,
@@ -66,9 +66,9 @@ describe("formatEventDate", () => {
   })
 })
 
-describe("getEventHeadline", () => {
+describe("getFavpollHeadline", () => {
   it("returns the correct prefix for Birthday occasion_type", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "celebrating_one",
       occasionType: "Birthday",
       name: "Alice",
@@ -81,7 +81,7 @@ describe("getEventHeadline", () => {
   })
 
   it("returns the correct prefix for Memorial occasion_type", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "remembering",
       occasionType: "Memorial",
       name: "Bob",
@@ -90,7 +90,7 @@ describe("getEventHeadline", () => {
   })
 
   it("returns the correct prefix for Wedding occasion_type", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "celebrating_many",
       occasionType: "Wedding",
       name: "Emma & James",
@@ -99,7 +99,7 @@ describe("getEventHeadline", () => {
   })
 
   it("falls back to register prefix when occasionType is null", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "neutral",
       occasionType: null,
       name: "Carol",
@@ -108,7 +108,7 @@ describe("getEventHeadline", () => {
   })
 
   it("falls back to 'Honouring' for unknown register with no occasionType", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "unknown_register",
       occasionType: null,
       name: "Carol",
@@ -117,7 +117,7 @@ describe("getEventHeadline", () => {
   })
 
   it("openingLine overrides prefix lookup", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "celebrating_one",
       occasionType: "Birthday",
       name: "Dave",
@@ -127,7 +127,7 @@ describe("getEventHeadline", () => {
   })
 
   it("returns empty string suffix when dateLabel is omitted", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "celebrating_one",
       occasionType: "Birthday",
       name: "Eve",
@@ -136,7 +136,7 @@ describe("getEventHeadline", () => {
   })
 
   it("returns empty string suffix when dateLabel is null", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "celebrating_one",
       occasionType: "Birthday",
       name: "Eve",
@@ -146,7 +146,7 @@ describe("getEventHeadline", () => {
   })
 
   it("returns dateLabel as suffix when provided", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "remembering",
       occasionType: "Memorial",
       name: "Fred",
@@ -156,7 +156,7 @@ describe("getEventHeadline", () => {
   })
 
   it("passes name through unchanged", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "neutral",
       occasionType: null,
       name: "Grace & Henry",
@@ -238,7 +238,7 @@ describe("formatEventDate — locale parameter", () => {
   })
 })
 
-describe("getEventHeadline — all known occasion_types", () => {
+describe("getFavpollHeadline — all known occasion_types", () => {
   it.each([
     ["Tribute", "remembering", "In honour of"],
     ["Celebration of life", "remembering", "Celebrating the life of"],
@@ -275,13 +275,13 @@ describe("getEventHeadline — all known occasion_types", () => {
     'occasion_type "%s" returns prefix "%s"',
     (occasionType, register, expectedPrefix) => {
       expect(
-        getEventHeadline({ register, occasionType, name: "Test" }).prefix
+        getFavpollHeadline({ register, occasionType, name: "Test" }).prefix
       ).toBe(expectedPrefix)
     }
   )
 })
 
-describe("getEventHeadline — register fallbacks (no occasion_type, default subject='someone')", () => {
+describe("getFavpollHeadline — register fallbacks (no occasion_type, default subject='someone')", () => {
   it.each([
     ["remembering", "In memory of"],
     ["celebrating_one", "Celebrating"],
@@ -290,15 +290,15 @@ describe("getEventHeadline — register fallbacks (no occasion_type, default sub
     ["neutral", "Honouring"],
   ])('register "%s" falls back to "%s"', (register, expectedPrefix) => {
     expect(
-      getEventHeadline({ register, occasionType: null, name: "Test" }).prefix
+      getFavpollHeadline({ register, occasionType: null, name: "Test" }).prefix
     ).toBe(expectedPrefix)
   })
 })
 
-describe("getEventHeadline — subject matrix", () => {
+describe("getFavpollHeadline — subject matrix", () => {
   it("fundraiser + subject=someone → 'Honouring'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "cause",
         occasionType: null,
         name: "Joan",
@@ -309,7 +309,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("fundraiser + subject=cause → 'In support of'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "cause",
         occasionType: null,
         name: "Ocean Trust",
@@ -320,7 +320,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("memorial + subject=someone → 'In memory of'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "remembering",
         occasionType: null,
         name: "Bob",
@@ -331,7 +331,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("memorial + subject=cause → 'In memory of'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "remembering",
         occasionType: null,
         name: "The Shelter Fund",
@@ -342,7 +342,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("celebration + subject=someone → 'Celebrating'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "celebrating_one",
         occasionType: null,
         name: "Alice",
@@ -353,7 +353,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("celebration + subject=cause → 'Celebrating'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "celebrating_one",
         occasionType: null,
         name: "The Arts Fund",
@@ -364,7 +364,7 @@ describe("getEventHeadline — subject matrix", () => {
 
   it("neutral + subject=cause → 'Honouring'", () => {
     expect(
-      getEventHeadline({
+      getFavpollHeadline({
         register: "neutral",
         occasionType: null,
         name: "The Green Initiative",
@@ -374,7 +374,7 @@ describe("getEventHeadline — subject matrix", () => {
   })
 
   it("cause label is passed through as the name", () => {
-    const result = getEventHeadline({
+    const result = getFavpollHeadline({
       register: "cause",
       occasionType: null,
       name: "Ocean Trust",

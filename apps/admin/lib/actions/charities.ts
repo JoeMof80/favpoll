@@ -112,7 +112,7 @@ export async function deactivateCharity(
   const supabase = createAdminClient();
 
   const { data: usages, error: countError } = await supabase
-    .from("event_charities")
+    .from("favpoll_charities")
     .select("id")
     .eq("charity_id", id);
 

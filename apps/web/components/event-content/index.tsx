@@ -8,18 +8,18 @@ import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeCard, LivePledgeCard } from "@/components/pledge-card"
 import type {
-  EventWithDetails,
-  EventPollWithItems,
-  EventPot,
+  FavpollWithDetails,
+  FavpollPollWithItems,
+  FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
 import { useEventContent } from "./use-event-content"
 import { EventCardCharityCarousel } from "../event-card/event-card-charity-carousel"
 
 type Props = {
-  event: EventWithDetails
-  pollWithItems: EventPollWithItems | null
-  pot: EventPot | null
+  event: FavpollWithDetails
+  pollWithItems: FavpollPollWithItems | null
+  pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   hasPledged: boolean
   totalRaised: number
@@ -57,7 +57,7 @@ export function EventContent({
     clerkUserId,
   })
 
-  const isCause = event.event_subject === "cause"
+  const isCause = event.subject === "cause"
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -72,8 +72,8 @@ export function EventContent({
     : null
 
   const perCharity =
-    event.event_charities.length > 0
-      ? totalRaised / event.event_charities.length
+    event.favpoll_charities.length > 0
+      ? totalRaised / event.favpoll_charities.length
       : 0
 
   return (
@@ -117,7 +117,7 @@ export function EventContent({
               <LivePledgeCard
                 eventId={event.id}
                 clerkUserId={clerkUserId}
-                charityNames={event.event_charities.map(
+                charityNames={event.favpoll_charities.map(
                   (ec) => ec.charities.name
                 )}
                 pollWithItems={pollWithItems}
@@ -152,14 +152,14 @@ export function EventContent({
             </div>
           )}
           <CharityBanner
-            charities={event.event_charities.map((ec) => ec.charities)}
+            charities={event.favpoll_charities.map((ec) => ec.charities)}
             totalRaised={totalRaised}
           />
           {!isClosed && showPledgeCard && pollWithItems && (
             <PledgeCard
               eventId={event.id}
               clerkUserId={clerkUserId}
-              charityNames={event.event_charities.map(
+              charityNames={event.favpoll_charities.map(
                 (ec) => ec.charities.name
               )}
               pollWithItems={pollWithItems}
@@ -174,13 +174,13 @@ export function EventContent({
       </div>
 
       {/* Fixed charity carousel — mobile only, always visible */}
-      {event.event_charities.length > 0 && (
+      {event.favpoll_charities.length > 0 && (
         <div
           className="fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <EventCardCharityCarousel
-            charities={event.event_charities.map((ec) => ({
+            charities={event.favpoll_charities.map((ec) => ({
               charity: ec.charities,
             }))}
             perCharity={perCharity}

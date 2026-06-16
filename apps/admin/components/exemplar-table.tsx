@@ -18,7 +18,9 @@ export function ExemplarTable({ events }: Props) {
   }
 
   if (events.length === 0) {
-    return <p className="text-sm text-neutral-500">No closed events found.</p>;
+    return (
+      <p className="text-sm text-neutral-500">No closed favpolls found.</p>
+    );
   }
 
   return (

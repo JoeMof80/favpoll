@@ -1,9 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { RankingsClient } from "./rankings-client"
-import type { Category, Topic, TopicItem } from "@favpoll/types"
+import type { Category, Topic, Favourite } from "@favpoll/types"
 
 type TopicWithItems = Topic & {
-  topic_items: TopicItem[]
+  favourites: Favourite[]
   category_ids: string[]
 }
 
@@ -14,13 +14,13 @@ export default async function RankingsPage() {
     supabase.from("categories").select("*").order("label"),
     supabase
       .from("topics")
-      .select("*, topic_items(*), topic_categories(category_id)")
+      .select("*, favourites(*), topic_categories(category_id)")
       .order("title"),
   ])
 
   const rankedTopics: TopicWithItems[] = (topics ?? []).map((topic) => ({
     ...(topic as Topic),
-    topic_items: [...((topic.topic_items ?? []) as TopicItem[])].sort(
+    favourites: [...((topic.favourites ?? []) as Favourite[])].sort(
       (a, b) => b.all_time_pledged - a.all_time_pledged
     ),
     category_ids: (topic.topic_categories ?? []).map(
@@ -29,7 +29,7 @@ export default async function RankingsPage() {
   }))
 
   const totalPledged = rankedTopics
-    .flatMap((t) => t.topic_items)
+    .flatMap((t) => t.favourites)
     .reduce((sum, i) => sum + i.all_time_pledged, 0)
 
   return (

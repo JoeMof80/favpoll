@@ -7,12 +7,12 @@ type Props = {
   searchParams: Promise<{ token?: string }>
 }
 
-type EventPollRow = {
-  event_id: string
-  events: {
+type FavpollPollRow = {
+  favpoll_id: string
+  favpolls: {
     closes_at: string | null
     protagonists: { name: string } | null
-    event_charities: { charities: { name: string } }[]
+    favpoll_charities: { charities: { name: string } }[]
   } | null
 } | null
 
@@ -35,12 +35,12 @@ export default async function WithdrawPage({ searchParams }: Props) {
       total_amount,
       withdrawn_at,
       guest_token,
-      event_polls(
-        event_id,
-        events(
+      favpoll_polls(
+        favpoll_id,
+        favpolls(
           closes_at,
           protagonists(name),
-          event_charities(charities(name))
+          favpoll_charities(charities(name))
         )
       )
     `
@@ -50,11 +50,11 @@ export default async function WithdrawPage({ searchParams }: Props) {
 
   if (!pledge) notFound()
 
-  const eventPoll = pledge.event_polls as unknown as EventPollRow
-  const eventData = eventPoll?.events
+  const eventPoll = pledge.favpoll_polls as unknown as FavpollPollRow
+  const eventData = eventPoll?.favpolls
   const protagonistName: string = eventData?.protagonists?.name ?? "this event"
   const closesAt: string = eventData?.closes_at ?? ""
-  const charityNames: string[] = (eventData?.event_charities ?? []).map(
+  const charityNames: string[] = (eventData?.favpoll_charities ?? []).map(
     (ec) => ec.charities.name
   )
   const charityLabel =
@@ -67,7 +67,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
   const isClosed = closesAt ? new Date(closesAt) < new Date() : false
   const isWithdrawn = !!pledge.withdrawn_at
 
-  const eventId = eventPoll?.event_id
+  const eventId = eventPoll?.favpoll_id
 
   if (isWithdrawn) {
     return (
@@ -117,7 +117,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
         </form>
         {eventId && (
           <a
-            href={`/events/${eventId}`}
+            href={`/favpolls/${eventId}`}
             className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted focus:ring-2 focus:ring-ring focus:outline-none"
           >
             Keep my pledge

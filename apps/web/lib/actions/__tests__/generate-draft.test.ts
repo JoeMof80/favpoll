@@ -31,7 +31,7 @@ import {
 
 const TOPIC_DATA = {
   title: "Colour",
-  topic_items: [
+  favourites: [
     { label: "Red" },
     { label: "Blue" },
     { label: "Green" },

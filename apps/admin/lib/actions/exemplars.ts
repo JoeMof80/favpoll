@@ -21,7 +21,7 @@ export async function getClosedEvents(): Promise<{
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
-    .from("events")
+    .from("favpolls")
     .select(
       `id, register, occasion_type, opening_line, is_exemplar, closed_at,
        total_raised, protagonist:protagonists ( name )`,
@@ -56,12 +56,12 @@ export async function setExemplar(
   const supabase = createAdminClient();
 
   const { error } = await supabase
-    .from("events")
+    .from("favpolls")
     .update({ is_exemplar: value })
     .eq("id", eventId);
 
   if (error) return { error: error.message };
 
-  revalidatePath("/events");
+  revalidatePath("/favpolls");
   return { error: null };
 }
