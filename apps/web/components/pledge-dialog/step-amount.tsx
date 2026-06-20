@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { InfoIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -90,7 +89,6 @@ type Props = {
   guestEmail: string
   useSharedFund: boolean
   error: string | null
-  submitting: boolean
   available: number
   hasFund: boolean
   numericPledge: number
@@ -98,9 +96,6 @@ type Props = {
   fundOverAvailable: boolean
   fundBarPct: number
   fundBarColor: string
-  ownCharge: number
-  canOwnConfirm: boolean
-  canFundConfirm: boolean
   ownBreakdown: {
     lines: BreakdownLine[]
     total: { label: string; amount: number }
@@ -110,8 +105,6 @@ type Props = {
     total: { label: string; amount: number }
   } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
-  charityBreakdown: FavouriteBreakdownLine[]
-  charityNames: string[]
   clerkUserId: string | null
   setTopUpAmount: (v: string) => void
   setGuestEmail: (v: string) => void
@@ -123,7 +116,6 @@ export function StepAmount({
   guestEmail,
   useSharedFund,
   error,
-  submitting,
   available,
   hasFund,
   numericPledge,
@@ -131,75 +123,32 @@ export function StepAmount({
   fundOverAvailable,
   fundBarPct,
   fundBarColor,
-  ownCharge,
-  canOwnConfirm,
-  canFundConfirm,
   ownBreakdown,
   fundBreakdown,
   favouriteBreakdown,
-  charityBreakdown,
-  charityNames,
   clerkUserId,
   setTopUpAmount,
   setGuestEmail,
   toggleFund,
 }: Props) {
-  const [showCharityBreakdown, setShowCharityBreakdown] = useState(false)
-
   return (
-    <div className="space-y-4 px-5 py-4">
+    <div className="space-y-5 px-5 py-4">
       {/* Per-favourite breakdown */}
       {favouriteBreakdown.length > 0 && (
-        <div className="space-y-1.5 border-t border-border pt-3 text-xs">
-          {favouriteBreakdown.map((line, i) => (
-            <div key={i} className="flex justify-between">
-              <span className="text-muted-foreground">{line.label}</span>
-              <span className="font-medium tabular-nums">
-                {GBP.format(line.amount)}
-              </span>
-            </div>
-          ))}
-
-          {/* Per-charity secondary (collapsible, only when 2+ charities) */}
-          {charityBreakdown.length > 0 && (
-            <div className="pt-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                className="h-auto p-0 text-xs text-muted-foreground"
-                onClick={() => setShowCharityBreakdown((v) => !v)}
-              >
-                {showCharityBreakdown ? (
-                  <>
-                    Hide <ChevronUpIcon className="ml-1 h-3 w-3" />
-                  </>
-                ) : (
-                  <>
-                    See how this is split{" "}
-                    <ChevronDownIcon className="ml-1 h-3 w-3" />
-                  </>
-                )}
-              </Button>
-              {showCharityBreakdown && (
-                <div className="mt-2 space-y-1">
-                  {charityBreakdown.map((line, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        {line.label}
-                      </span>
-                      <span className="font-medium tabular-nums">
-                        {GBP.format(line.amount)}
-                      </span>
-                    </div>
-                  ))}
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Split equally between {charityNames.length} charities
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+        <div className="space-y-2">
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            Your favourites
+          </p>
+          <div className="space-y-2">
+            {favouriteBreakdown.map((line, i) => (
+              <div key={i} className="flex justify-between">
+                <span className="text-sm">{line.label}</span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {GBP.format(line.amount)}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

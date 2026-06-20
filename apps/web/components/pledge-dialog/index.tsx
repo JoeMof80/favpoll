@@ -59,7 +59,8 @@ export function PledgeDialog({
   const triggerButton = (
     <Button
       type="button"
-      className="h-11 w-full text-base"
+      variant="secondary"
+      className="w-full text-base"
       onClick={() => setOpen(true)}
     >
       Pledge favourites
@@ -243,7 +244,6 @@ export function PledgeDialog({
             guestEmail={dialog.guestEmail}
             useSharedFund={dialog.useSharedFund}
             error={dialog.error}
-            submitting={dialog.submitting}
             available={dialog.available}
             hasFund={dialog.hasFund}
             numericPledge={dialog.numericPledge}
@@ -251,14 +251,9 @@ export function PledgeDialog({
             fundOverAvailable={dialog.fundOverAvailable}
             fundBarPct={dialog.fundBarPct}
             fundBarColor={dialog.fundBarColor}
-            ownCharge={dialog.ownCharge}
-            canOwnConfirm={dialog.canOwnConfirm}
-            canFundConfirm={dialog.canFundConfirm}
             ownBreakdown={dialog.ownBreakdown}
             fundBreakdown={dialog.fundBreakdown}
             favouriteBreakdown={dialog.favouriteBreakdown}
-            charityBreakdown={dialog.charityBreakdown}
-            charityNames={charityNames}
             clerkUserId={clerkUserId}
             setTopUpAmount={dialog.setTopUpAmount}
             setGuestEmail={dialog.setGuestEmail}
