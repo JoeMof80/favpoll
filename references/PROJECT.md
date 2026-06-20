@@ -339,13 +339,13 @@ When `subject='cause'`: no protagonist row is created; `cause_label` is stored i
 When `subject` is not provided by a caller, name param is the protagonist name as before.
 When `subject='cause'`, callers pass `cause_label` as the `name` param.
 
-| register        | subject='someone'    | subject='cause'    |
-| --------------- | -------------------- | ------------------ |
-| remembering     | In memory of         | In memory of       |
-| celebrating_one | Celebrating          | Celebrating        |
-| celebrating_many| Celebrating          | Celebrating        |
-| cause           | **Honouring**        | In support of      |
-| neutral         | Honouring            | Honouring          |
+| register         | subject='someone' | subject='cause' |
+| ---------------- | ----------------- | --------------- |
+| remembering      | In memory of      | In memory of    |
+| celebrating_one  | Celebrating       | Celebrating     |
+| celebrating_many | Celebrating       | Celebrating     |
+| cause            | **Honouring**     | In support of   |
+| neutral          | Honouring         | Honouring       |
 
 Occasion-type prefixes from `OCCASION_TYPE_PREFIXES` (e.g. "Fundraiser" → "In support of") continue
 to take priority over register prefix and are NOT subject-aware.
@@ -353,11 +353,11 @@ to take priority over register prefix and are NOT subject-aware.
 ### Default poll closing period (`suggestClosingDate(category, eventDate?)` in `lib/registers.ts`)
 
 | FavpollCategory | Days until close |
-| ------------- | ---------------- |
-| memorial      | 30               |
-| celebration   | 14               |
-| fundraiser    | 14               |
-| null          | 14               |
+| --------------- | ---------------- |
+| memorial        | 30               |
+| celebration     | 14               |
+| fundraiser      | 14               |
+| null            | 14               |
 
 ---
 
@@ -762,9 +762,9 @@ NEXT_PUBLIC_BASE_URL
 
 - **Admin app auth.** All routes protected by Clerk. Non-admin authenticated users → `/access-denied`. `createAdminClient()` uses service role key, bypasses RLS.
 
-- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty in the DB, providing a bidirectional fail-loud guard. `celebrating_many` placeholder entries carry `group: "pair"` (default) or `group: "set"` (sport cluster, defined in `scripts/celebrating-many-groups.ts`); group tagging is applied inside `combinedPlaceholders` at seed startup.
+- **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty (`about`/`reveal` only — no `pronouns` check; none of the six placeholder batch files populate it) in the DB, providing a bidirectional fail-loud guard. `celebrating_many` placeholder entries carry `group: "pair"` (default) or `group: "set"` (sport cluster, defined in `scripts/celebrating-many-groups.ts`); group tagging is applied inside `combinedPlaceholders` at seed startup.
 
-- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Eleanor" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName(topicTitle, pronouns, grouping: FavpollGrouping, register)` in `lib/registers.ts`. `grouping === "couple"` → pair pool, `grouping === "group"` → set pool. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
+- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Elizabeth" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName(topicTitle, pronouns, grouping: FavpollGrouping, register)` in `lib/registers.ts`. `grouping === "couple"` → pair pool, `grouping === "group"` → set pool. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 
@@ -781,7 +781,7 @@ NEXT_PUBLIC_BASE_URL
 - **`favpolls.description` — cause About storage.** For cause favpolls (`subject='cause'`), the generated or edited About text is stored in `favpolls.description` (existing nullable column; no migration needed). `onSubmit` passes `description: isCause ? values.about?.trim() || null : null` for both create and edit modes. The edit page pre-fills `about` from `event.description` for cause favpolls. Person favpolls do not use `favpolls.description`. **`CauseHero` reads `event.description` for the body** — write location and read location are both `favpolls.description`.
 - **Cause favpoll page rendering.** The published favpoll page (`/favpolls/[id]`) renders `CauseHero` (not `EventHero`) when `event.subject === 'cause'`. `FavpollWithDetails.protagonists` is typed `Protagonist | null` — null for cause favpolls, non-null for person favpolls. `EventHero` is passed `event.protagonists!` (always safe because the branch only reaches `EventHero` when `subject` is `'someone'`). Cause Reveal is stored as `favpoll_polls.personal_reveal` (the same column as person reveal) and surfaces post-pledge via `PollSection` → `PollHeading` → `PollReveal` — no separate column or path needed.
 
-- **`scripts/seed-favpolls.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_FAVPOLLS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from favpolls where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots).
+- **`scripts/seed-favpolls.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_FAVPOLLS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from favpolls where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots). The `favpolls` insert must never set a `register` field — that column was dropped by `20260607140000_derive_register.sql`; `register` is local-variable-only inside this script (used for `closingDays`/`aboutFor`/the result summary), never written to the DB. `loadReferenceData()` paginates the `favourites` fetch via `.range()` in 1000-row pages — PostgREST caps an unranged `.select()` at 1000 rows, and `favourites` now holds ~3300 rows after the full topic-library seed, so a plain select would silently starve `itemsByTopic` for most topics and `createOneFavpoll()` would skip them with no logged error (its `allItems.length === 0` early-return is silent by design, unlike its sibling error sites).
 
 - **Dialog header input pattern.** When an overlay needs a primary text input (search, name, long-form field), place it in the `header` prop of `ResponsiveOverlay`; the `title` goes `sr-only`. The body holds secondary content (description, char counter, regenerate button). Use shadcn `Input` for single-line with `className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"` and shadcn `Textarea` for multi-line with `className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"`. Never switch to raw `<input>`/`<textarea>` when using this pattern — the shadcn components are required so that global theming and accessibility plumbing are preserved. The pledge-panel favourite-picker is the canonical example of this pattern.
 

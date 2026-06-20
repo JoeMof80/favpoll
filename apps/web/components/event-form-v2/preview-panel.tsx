@@ -80,7 +80,7 @@ export function PreviewPanel({
         </div>
 
         {/* Right — sticky meta */}
-        <div className="sticky top-20 space-y-4 self-start">
+        <div className="sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16">
           <EditableCountdown
             closesAt={closesAt}
             onClosesAtChange={onClosesAtChange}

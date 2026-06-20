@@ -31,7 +31,7 @@ export const WithoutReveal: Story = {
   args: {
     topicTitle: "Season",
     reveal: null,
-    protagonistFirstName: "Margaret",
+    protagonistFirstName: "Gretchen",
   },
 }
 

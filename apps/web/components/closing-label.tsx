@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
+import { Clock } from "lucide-react"
 
 type Urgency = "normal" | "warning" | "urgent" | "closed"
 
@@ -82,14 +83,10 @@ export function ClosingLabel({ closesAt, className }: Props) {
       className={cn("flex items-baseline gap-1.5", className)}
       aria-live="off"
     >
-      {!closed && (
-        <span className="text-[10px] font-medium text-muted-foreground">
-          Closes in
-        </span>
-      )}
+      {!closed && <Clock size={10} aria-hidden="true" />}
       <span
         className={cn(
-          "text-sm font-semibold tabular-nums",
+          "text-xs font-semibold tabular-nums",
           urgencyClass[timeLeft.urgency]
         )}
       >

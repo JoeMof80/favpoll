@@ -8,6 +8,9 @@ import type { FavpollPollWithItems } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
 import { SectionLabel } from "../favpoll-card/section-label"
+import { PollReveal } from "../favpoll-card/poll-reveal"
+
+type RankingView = "amount" | "count"
 
 type Props = {
   poll: FavpollPollWithItems
@@ -72,27 +75,39 @@ export function PollSection({
       ? () => changeView("results")
       : undefined
 
+  const reveal = pledged ? (poll.personal_reveal ?? null) : null
+
   return (
     <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
-      <PollHeading
-        topicTitle={poll.topics.title}
-        reveal={pledged ? (poll.personal_reveal ?? null) : null}
-        protagonistFirstName={personFirstName}
-        onResetPledge={onResetPledge}
-        onViewResults={onViewResults}
-      />
+      <div className="sticky top-40 z-20 md:top-55">
+        <PollHeading
+          topicTitle={poll.topics.title}
+          reveal={pledged ? (poll.personal_reveal ?? null) : null}
+          protagonistFirstName={personFirstName}
+          onResetPledge={onResetPledge}
+          onViewResults={onViewResults}
+        />
+      </div>
+
+      {reveal && (
+        <PollReveal
+          personalReveal={reveal}
+          protagonistFirstName={personFirstName}
+          role="status"
+          aria-live="polite"
+        />
+      )}
 
       {/* Results view */}
       {view === "results" && (
         <>
           {showRankings && (
             <>
-              <div className="flex items-center justify-between">
-                <SectionLabel title="Results" />
+              <div className="sticky top-40 z-20 flex items-center justify-end md:top-55">
                 <Tabs
                   value={rankingView}
                   onValueChange={(v: string) =>
-                    setRankingView(v as "amount" | "count")
+                    setRankingView(v as RankingView)
                   }
                 >
                   <TabsList className="h-7">

@@ -18,11 +18,11 @@ export function CauseHero({ event }: Props) {
 
   return (
     <div className="mb-5 md:mb-10">
-      <SectionEyebrow variant="muted" className="mb-2 truncate break-words">
+      <SectionEyebrow variant="muted" className="mb-2 truncate wrap-break-word">
         {headline.prefix}
       </SectionEyebrow>
 
-      <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight break-words text-[#2C2C2A] sm:text-5xl">
+      <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
         {event.cause_label}
       </h1>
 

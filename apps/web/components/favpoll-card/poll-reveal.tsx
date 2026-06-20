@@ -17,7 +17,6 @@ export function PollReveal({
 
   return (
     <div
-      className="pb-4"
       aria-label={ariaLabel ?? `${protagonistFirstName ?? "Their"}'s reveal`}
     >
       <blockquote

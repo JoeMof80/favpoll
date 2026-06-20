@@ -36,7 +36,7 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      className="relative sticky top-0 z-40 border-b border-border bg-background"
+      className="sticky top-0 z-40 border-b border-border bg-background"
     >
       <div className="mx-auto flex h-14 items-center justify-between px-6">
         <Link href="/" aria-label="favpoll home">
@@ -46,35 +46,24 @@ export function Header() {
         <div className="flex items-center gap-2">
           {/* Desktop nav — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
-            <Link
-              href="/rankings"
-              className="mr-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Rankings
-            </Link>
-            <Link
-              href="/favpolls"
-              className="mr-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Live favpolls
-            </Link>
+            <Button asChild variant="ghost" className="text-muted-foreground">
+              <Link href="/rankings">Rankings</Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-muted-foreground">
+              <Link href="/favpolls">Live favpolls</Link>
+            </Button>
             <Show when="signed-in">
-              <Link
-                href="/my-events"
-                className="mr-2 text-sm text-muted-foreground hover:text-foreground"
-              >
-                Your favpolls
-              </Link>
-              <NewEventButton size="lg">New favpoll</NewEventButton>
+              <Button asChild variant="ghost" className="text-muted-foreground">
+                <Link href="/my-events">Your favpolls</Link>
+              </Button>
+              <NewEventButton>New favpoll</NewEventButton>
             </Show>
             <Show when="signed-out">
               <SignInButton>
-                <Button variant="ghost" size="sm">
-                  Sign in
-                </Button>
+                <Button variant="ghost">Sign in</Button>
               </SignInButton>
               <SignUpButton>
-                <Button size="sm">Sign up</Button>
+                <Button>Sign up</Button>
               </SignUpButton>
             </Show>
             <MenuButton />

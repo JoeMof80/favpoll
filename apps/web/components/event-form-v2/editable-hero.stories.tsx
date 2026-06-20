@@ -54,11 +54,11 @@ export const PersonFilled: Story = {
         category: "celebration",
         subject: "someone",
         register: "celebrating_one",
-        name: "Margaret Hobbs",
+        name: "Gretchen Hobbs",
         context: "turning 80",
         openingLine: "Join us for",
         about:
-          "Margaret has spent forty years as a librarian and secret crime-fiction addict.",
+          "Gretchen has spent forty years as a librarian and secret crime-fiction addict.",
       }}
     >
       <EditableHero {...args} />

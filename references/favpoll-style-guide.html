@@ -1,615 +1,1807 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>favpoll — Brand & Style Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>favpoll — Brand & Style Guide</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  :root {
-    --purple-50: #EEEDFE;
-    --purple-100: #CECBF6;
-    --purple-200: #AFA9EC;
-    --purple-400: #7F77DD;
-    --purple-600: #534AB7;
-    --purple-800: #3C3489;
-    --purple-900: #26215C;
-    --green-50: #E1F5EE;
-    --green-400: #1D9E75;
-    --green-800: #085041;
-    --gray-50: #F1EFE8;
-    --gray-100: #D3D1C7;
-    --gray-200: #B4B2A9;
-    --gray-400: #888780;
-    --gray-600: #5F5E5A;
-    --gray-800: #444441;
-    --gray-900: #2C2C2A;
-    --amber-400: #EF9F27;
-    --red-400: #E24B4A;
-    --blue-400: #378ADD;
-  }
+      :root {
+        --purple-50: #eeedfe;
+        --purple-100: #cecbf6;
+        --purple-200: #afa9ec;
+        --purple-400: #7f77dd;
+        --purple-600: #534ab7;
+        --purple-800: #3c3489;
+        --purple-900: #26215c;
+        --green-50: #e1f5ee;
+        --green-400: #1d9e75;
+        --green-800: #085041;
+        --gray-50: #f1efe8;
+        --gray-100: #d3d1c7;
+        --gray-200: #b4b2a9;
+        --gray-400: #888780;
+        --gray-600: #5f5e5a;
+        --gray-800: #444441;
+        --gray-900: #2c2c2a;
+        --amber-400: #ef9f27;
+        --red-400: #e24b4a;
+        --blue-400: #378add;
+      }
 
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: var(--gray-900);
-    background: #fff;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: var(--gray-900);
+        background: #fff;
+        font-size: 15px;
+        line-height: 1.6;
+      }
 
-  /* Layout */
-  .page { max-width: 860px; margin: 0 auto; padding: 0 2rem 6rem; }
+      /* Layout */
+      .page {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 2rem 6rem;
+      }
 
-  /* Cover */
-  .cover {
-    padding: 5rem 0 4rem;
-    border-bottom: 0.5px solid var(--gray-100);
-    margin-bottom: 4rem;
-  }
-  .cover-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 2.5rem; }
-  .cover-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.5rem; }
-  .cover-name { font-size: 42px; font-weight: 300; color: var(--gray-900); letter-spacing: -0.02em; line-height: 1.1; }
-  .cover-name strong { font-weight: 500; }
-  .cover-version { font-size: 12px; color: var(--gray-400); margin-top: 1.5rem; }
+      /* Cover */
+      .cover {
+        padding: 5rem 0 4rem;
+        border-bottom: 0.5px solid var(--gray-100);
+        margin-bottom: 4rem;
+      }
+      .cover-logo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 2.5rem;
+      }
+      .cover-title {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.5rem;
+      }
+      .cover-name {
+        font-size: 42px;
+        font-weight: 300;
+        color: var(--gray-900);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .cover-name strong {
+        font-weight: 500;
+      }
+      .cover-version {
+        font-size: 12px;
+        color: var(--gray-400);
+        margin-top: 1.5rem;
+      }
 
-  /* Sections */
-  .section { margin-bottom: 5rem; }
-  .section-label {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--purple-600); margin-bottom: 0.5rem;
-  }
-  .section-title { font-size: 26px; font-weight: 500; color: var(--gray-900); margin-bottom: 0.5rem; letter-spacing: -0.01em; }
-  .section-intro { font-size: 15px; color: var(--gray-600); line-height: 1.7; margin-bottom: 2.5rem; max-width: 600px; }
-  .divider { height: 0.5px; background: var(--gray-100); margin: 3rem 0; }
+      /* Sections */
+      .section {
+        margin-bottom: 5rem;
+      }
+      .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--purple-600);
+        margin-bottom: 0.5rem;
+      }
+      .section-title {
+        font-size: 26px;
+        font-weight: 500;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.01em;
+      }
+      .section-intro {
+        font-size: 15px;
+        color: var(--gray-600);
+        line-height: 1.7;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+      }
+      .divider {
+        height: 0.5px;
+        background: var(--gray-100);
+        margin: 3rem 0;
+      }
 
-  /* Subsections */
-  .sub-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1rem; }
+      /* Subsections */
+      .sub-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 1rem;
+      }
 
-  /* Logo section */
-  .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray-100); border: 0.5px solid var(--gray-100); border-radius: 12px; overflow: hidden; margin-bottom: 2rem; }
-  .logo-cell { padding: 2.5rem; display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; background: #fff; }
-  .logo-cell.dark { background: var(--purple-600); }
-  .logo-cell.light-purple { background: var(--purple-50); }
-  .logo-cell-label { font-size: 11px; color: var(--gray-400); }
-  .logo-cell.dark .logo-cell-label { color: rgba(255,255,255,0.4); }
-  .logo-cell.light-purple .logo-cell-label { color: var(--purple-400); }
+      /* Logo section */
+      .logo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--gray-100);
+        border: 0.5px solid var(--gray-100);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+      }
+      .logo-cell {
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+        background: #fff;
+      }
+      .logo-cell.dark {
+        background: var(--purple-600);
+      }
+      .logo-cell.light-purple {
+        background: var(--purple-50);
+      }
+      .logo-cell-label {
+        font-size: 11px;
+        color: var(--gray-400);
+      }
+      .logo-cell.dark .logo-cell-label {
+        color: rgba(255, 255, 255, 0.4);
+      }
+      .logo-cell.light-purple .logo-cell-label {
+        color: var(--purple-400);
+      }
 
-  /* Do/Don't */
-  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
-  .do-box, .dont-box { padding: 1.5rem; border-radius: 10px; }
-  .do-box { background: var(--green-50); border: 0.5px solid #9FE1CB; }
-  .dont-box { background: #FCEBEB; border: 0.5px solid #F7C1C1; }
-  .do-badge { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green-800); margin-bottom: 0.875rem; }
-  .dont-badge { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #A32D2D; margin-bottom: 0.875rem; }
-  .do-box p, .dont-box p { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
+      /* Do/Don't */
+      .do-dont {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .do-box,
+      .dont-box {
+        padding: 1.5rem;
+        border-radius: 10px;
+      }
+      .do-box {
+        background: var(--green-50);
+        border: 0.5px solid #9fe1cb;
+      }
+      .dont-box {
+        background: #fcebeb;
+        border: 0.5px solid #f7c1c1;
+      }
+      .do-badge {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--green-800);
+        margin-bottom: 0.875rem;
+      }
+      .dont-badge {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #a32d2d;
+        margin-bottom: 0.875rem;
+      }
+      .do-box p,
+      .dont-box p {
+        font-size: 13px;
+        color: var(--gray-600);
+        line-height: 1.5;
+      }
 
-  /* Colour palette */
-  .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 2rem; }
-  .swatch-card { border-radius: 10px; overflow: hidden; border: 0.5px solid var(--gray-100); }
-  .swatch-main { height: 72px; }
-  .swatch-info { padding: 0.75rem; background: #fff; }
-  .swatch-name { font-size: 12px; font-weight: 500; color: var(--gray-900); margin-bottom: 2px; }
-  .swatch-hex { font-size: 11px; color: var(--gray-400); font-family: monospace; }
-  .swatch-role { font-size: 11px; color: var(--gray-600); margin-top: 4px; line-height: 1.4; }
-  .palette-full { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
-  .palette-stop { height: 28px; }
-  .palette-row { margin-bottom: 1.5rem; }
-  .palette-row-label { font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 0.5rem; }
-  .palette-stops-label { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .palette-stop-label { font-size: 10px; color: var(--gray-400); text-align: center; font-family: monospace; }
+      /* Colour palette */
+      .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+      }
+      .swatch-card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 0.5px solid var(--gray-100);
+      }
+      .swatch-main {
+        height: 72px;
+      }
+      .swatch-info {
+        padding: 0.75rem;
+        background: #fff;
+      }
+      .swatch-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--gray-900);
+        margin-bottom: 2px;
+      }
+      .swatch-hex {
+        font-size: 11px;
+        color: var(--gray-400);
+        font-family: monospace;
+      }
+      .swatch-role {
+        font-size: 11px;
+        color: var(--gray-600);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+      .palette-full {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+      .palette-stop {
+        height: 28px;
+      }
+      .palette-row {
+        margin-bottom: 1.5rem;
+      }
+      .palette-row-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+      }
+      .palette-stops-label {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+      }
+      .palette-stop-label {
+        font-size: 10px;
+        color: var(--gray-400);
+        text-align: center;
+        font-family: monospace;
+      }
 
-  /* Typography */
-  .type-specimen { margin-bottom: 2rem; padding: 2rem; border: 0.5px solid var(--gray-100); border-radius: 12px; }
-  .type-meta { font-size: 11px; color: var(--gray-400); margin-bottom: 0.5rem; }
-  .type-scale { display: flex; flex-direction: column; gap: 1.5rem; }
-  .type-row { display: flex; align-items: baseline; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 0.5px solid var(--gray-100); }
-  .type-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .type-row-meta { min-width: 120px; font-size: 11px; color: var(--gray-400); line-height: 1.5; flex-shrink: 0; }
-  .type-row-sample { color: var(--gray-900); }
+      /* Typography */
+      .type-specimen {
+        margin-bottom: 2rem;
+        padding: 2rem;
+        border: 0.5px solid var(--gray-100);
+        border-radius: 12px;
+      }
+      .type-meta {
+        font-size: 11px;
+        color: var(--gray-400);
+        margin-bottom: 0.5rem;
+      }
+      .type-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 0.5px solid var(--gray-100);
+      }
+      .type-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .type-row-meta {
+        min-width: 120px;
+        font-size: 11px;
+        color: var(--gray-400);
+        line-height: 1.5;
+        flex-shrink: 0;
+      }
+      .type-row-sample {
+        color: var(--gray-900);
+      }
 
-  /* Tone */
-  .tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
-  .tone-card { padding: 1.25rem; border: 0.5px solid var(--gray-100); border-radius: 10px; }
-  .tone-card-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.75rem; }
-  .tone-card p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
-  .tone-example { padding: 1.25rem; background: var(--purple-50); border-left: 3px solid var(--purple-200); border-radius: 0 8px 8px 0; margin-bottom: 1rem; }
-  .tone-example p { font-size: 14px; color: var(--purple-800); line-height: 1.6; font-style: italic; }
-  .tone-example-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-400); margin-bottom: 0.5rem; }
-  .tone-bad { padding: 1.25rem; background: #FCEBEB; border-left: 3px solid #F7C1C1; border-radius: 0 8px 8px 0; margin-bottom: 1rem; }
-  .tone-bad p { font-size: 14px; color: #A32D2D; line-height: 1.6; font-style: italic; }
+      /* Tone */
+      .tone-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .tone-card {
+        padding: 1.25rem;
+        border: 0.5px solid var(--gray-100);
+        border-radius: 10px;
+      }
+      .tone-card-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.75rem;
+      }
+      .tone-card p {
+        font-size: 13px;
+        color: var(--gray-600);
+        line-height: 1.6;
+      }
+      .tone-example {
+        padding: 1.25rem;
+        background: var(--purple-50);
+        border-left: 3px solid var(--purple-200);
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1rem;
+      }
+      .tone-example p {
+        font-size: 14px;
+        color: var(--purple-800);
+        line-height: 1.6;
+        font-style: italic;
+      }
+      .tone-example-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple-400);
+        margin-bottom: 0.5rem;
+      }
+      .tone-bad {
+        padding: 1.25rem;
+        background: #fcebeb;
+        border-left: 3px solid #f7c1c1;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1rem;
+      }
+      .tone-bad p {
+        font-size: 14px;
+        color: #a32d2d;
+        line-height: 1.6;
+        font-style: italic;
+      }
 
-  /* Reveal */
-  .reveal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
-  .reveal-card { padding: 1.5rem; border: 0.5px solid var(--gray-100); border-radius: 10px; }
-  .reveal-card-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.875rem; }
-  .reveal-occasion { font-size: 11px; color: var(--purple-600); background: var(--purple-50); padding: 2px 8px; border-radius: 99px; display: inline-block; margin-bottom: 0.75rem; }
-  .reveal-framing { font-size: 14px; color: var(--gray-900); line-height: 1.5; margin-bottom: 0.75rem; }
-  .reveal-answer { font-size: 13px; color: var(--purple-600); font-style: italic; line-height: 1.5; padding: 0.75rem 1rem; background: var(--purple-50); border-radius: 8px; }
+      /* Reveal */
+      .reveal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .reveal-card {
+        padding: 1.5rem;
+        border: 0.5px solid var(--gray-100);
+        border-radius: 10px;
+      }
+      .reveal-card-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.875rem;
+      }
+      .reveal-occasion {
+        font-size: 11px;
+        color: var(--purple-600);
+        background: var(--purple-50);
+        padding: 2px 8px;
+        border-radius: 99px;
+        display: inline-block;
+        margin-bottom: 0.75rem;
+      }
+      .reveal-framing {
+        font-size: 14px;
+        color: var(--gray-900);
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+      }
+      .reveal-answer {
+        font-size: 13px;
+        color: var(--purple-600);
+        font-style: italic;
+        line-height: 1.5;
+        padding: 0.75rem 1rem;
+        background: var(--purple-50);
+        border-radius: 8px;
+      }
 
-  /* UI elements */
-  .ui-strip { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
-  .btn-primary { background: var(--purple-600); color: #fff; border: none; padding: 9px 20px; border-radius: 7px; font-size: 14px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
-  .btn-ghost { background: transparent; color: var(--purple-600); border: 0.5px solid var(--purple-200); padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
-  .btn-text { background: none; border: none; color: var(--gray-400); font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; padding: 8px 4px; text-decoration: underline; text-decoration-color: transparent; }
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 500; }
-  .badge-purple { background: var(--purple-50); color: var(--purple-800); }
-  .badge-green { background: var(--green-50); color: var(--green-800); }
-  .badge-gray { background: var(--gray-50); color: var(--gray-600); }
+      /* UI elements */
+      .ui-strip {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      .btn-primary {
+        background: var(--purple-600);
+        color: #fff;
+        border: none;
+        padding: 9px 20px;
+        border-radius: 7px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        cursor: pointer;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--purple-600);
+        border: 0.5px solid var(--purple-200);
+        padding: 8px 16px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        cursor: pointer;
+      }
+      .btn-text {
+        background: none;
+        border: none;
+        color: var(--gray-400);
+        font-size: 13px;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        cursor: pointer;
+        padding: 8px 4px;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-weight: 500;
+      }
+      .badge-purple {
+        background: var(--purple-50);
+        color: var(--purple-800);
+      }
+      .badge-green {
+        background: var(--green-50);
+        color: var(--green-800);
+      }
+      .badge-gray {
+        background: var(--gray-50);
+        color: var(--gray-600);
+      }
 
-  /* Spacing */
-  .spacing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
-  .spacing-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-  .spacing-bar { background: var(--purple-200); border-radius: 2px; width: 100%; }
-  .spacing-label { font-size: 11px; color: var(--gray-400); font-family: monospace; }
+      /* Spacing */
+      .spacing-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+      }
+      .spacing-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .spacing-bar {
+        background: var(--purple-200);
+        border-radius: 2px;
+        width: 100%;
+      }
+      .spacing-label {
+        font-size: 11px;
+        color: var(--gray-400);
+        font-family: monospace;
+      }
 
-  /* Clear space rule */
-  .clearspace { display: inline-flex; align-items: center; gap: 0; border: 1px dashed var(--purple-200); padding: 20px; border-radius: 8px; margin-bottom: 2rem; position: relative; }
-  .clearspace-label { position: absolute; top: 4px; right: 8px; font-size: 10px; color: var(--purple-400); }
+      /* Clear space rule */
+      .clearspace {
+        display: inline-flex;
+        align-items: center;
+        gap: 0;
+        border: 1px dashed var(--purple-200);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        position: relative;
+      }
+      .clearspace-label {
+        position: absolute;
+        top: 4px;
+        right: 8px;
+        font-size: 10px;
+        color: var(--purple-400);
+      }
 
-  /* Footer */
-  .guide-footer { padding-top: 3rem; border-top: 0.5px solid var(--gray-100); display: flex; justify-content: space-between; align-items: center; }
-  .guide-footer p { font-size: 12px; color: var(--gray-400); }
+      /* Footer */
+      .guide-footer {
+        padding-top: 3rem;
+        border-top: 0.5px solid var(--gray-100);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .guide-footer p {
+        font-size: 12px;
+        color: var(--gray-400);
+      }
 
-  /* Tables */
-  table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 13px; }
-  th { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-400); text-align: left; padding: 8px 12px; border-bottom: 0.5px solid var(--gray-100); }
-  td { padding: 10px 12px; border-bottom: 0.5px solid var(--gray-100); color: var(--gray-600); vertical-align: top; line-height: 1.5; }
-  td:first-child { color: var(--gray-900); font-weight: 500; }
-  tr:last-child td { border-bottom: none; }
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1.5rem;
+        font-size: 13px;
+      }
+      th {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 0.5px solid var(--gray-100);
+      }
+      td {
+        padding: 10px 12px;
+        border-bottom: 0.5px solid var(--gray-100);
+        color: var(--gray-600);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+      td:first-child {
+        color: var(--gray-900);
+        font-weight: 500;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
 
-  code { font-family: monospace; font-size: 12px; background: var(--gray-50); padding: 1px 5px; border-radius: 4px; color: var(--purple-800); }
-</style>
-</head>
-<body>
-<div class="page">
+      code {
+        font-family: monospace;
+        font-size: 12px;
+        background: var(--gray-50);
+        padding: 1px 5px;
+        border-radius: 4px;
+        color: var(--purple-800);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Cover -->
+      <div class="cover">
+        <div class="cover-logo">
+          <svg
+            width="55"
+            height="17"
+            viewBox="0 0 55 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+              fill="#534BB7"
+              fill-opacity="0.6"
+            />
+            <path
+              d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+              fill="#534BB7"
+              fill-opacity="0.6"
+            />
+            <path
+              d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+              fill="#534BB7"
+              fill-opacity="0.6"
+            />
+            <path
+              d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+              fill="#534BB7"
+            />
+            <path
+              d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+              fill="#534BB7"
+              fill-opacity="0.6"
+            />
+            <path
+              d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+              fill="#534BB7"
+            />
+          </svg>
+        </div>
+        <div class="cover-title">Brand & Style Guide</div>
+        <div class="cover-name">
+          Built with <strong>love</strong>,<br />guided by
+          <strong>data</strong>.
+        </div>
+        <div class="cover-version">
+          Version 1.0 · May 2026 · For internal use and approved partners
+        </div>
+      </div>
 
-  <!-- Cover -->
-  <div class="cover">
-    <div class="cover-logo">
-      <svg width="55" height="17" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="#534BB7" fill-opacity="0.6"/>
-        <path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="#534BB7" fill-opacity="0.6"/>
-        <path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="#534BB7" fill-opacity="0.6"/>
-        <path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="#534BB7"/>
-        <path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="#534BB7" fill-opacity="0.6"/>
-        <path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="#534BB7"/>
-      </svg>
-    </div>
-    <div class="cover-title">Brand & Style Guide</div>
-    <div class="cover-name">Built with <strong>love</strong>,<br>guided by <strong>data</strong>.</div>
-    <div class="cover-version">Version 1.0 · May 2026 · For internal use and approved partners</div>
-  </div>
+      <!-- 01 Logo -->
+      <div class="section">
+        <div class="section-label">01</div>
+        <div class="section-title">Logo</div>
+        <div class="section-intro">
+          The favpoll mark combines a half-heart — rotated 45° to suggest both
+          love and direction — with three horizontal bars that echo the
+          product's ranking UI. The icon and wordmark always appear together.
+          Never separate them.
+        </div>
 
-  <!-- 01 Logo -->
-  <div class="section">
-    <div class="section-label">01</div>
-    <div class="section-title">Logo</div>
-    <div class="section-intro">The favpoll mark combines a half-heart — rotated 45° to suggest both love and direction — with three horizontal bars that echo the product's ranking UI. The icon and wordmark always appear together. Never separate them.</div>
+        <div class="sub-label">Logo on backgrounds</div>
+        <div class="logo-grid">
+          <div class="logo-cell">
+            <svg
+              width="82"
+              height="25"
+              viewBox="0 0 55 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+                fill="#534BB7"
+              />
+              <path
+                d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+                fill="#534BB7"
+              />
+            </svg>
+            <div class="logo-cell-label">On white</div>
+          </div>
+          <div class="logo-cell light-purple">
+            <svg
+              width="82"
+              height="25"
+              viewBox="0 0 55 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+                fill="#534BB7"
+              />
+              <path
+                d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+                fill="#534BB7"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+                fill="#534BB7"
+              />
+            </svg>
+            <div class="logo-cell-label">On light purple</div>
+          </div>
+          <div class="logo-cell dark">
+            <svg
+              width="82"
+              height="25"
+              viewBox="0 0 55 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+                fill="white"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+                fill="white"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+                fill="white"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+                fill="white"
+              />
+              <path
+                d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+                fill="white"
+                fill-opacity="0.6"
+              />
+              <path
+                d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+                fill="white"
+              />
+            </svg>
+            <div class="logo-cell-label">On purple (reversed)</div>
+          </div>
+          <div class="logo-cell" style="background: var(--gray-900)">
+            <svg
+              width="82"
+              height="25"
+              viewBox="0 0 55 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+                fill="white"
+                fill-opacity="0.5"
+              />
+              <path
+                d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+                fill="white"
+                fill-opacity="0.5"
+              />
+              <path
+                d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+                fill="white"
+                fill-opacity="0.5"
+              />
+              <path
+                d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+                fill="white"
+              />
+              <path
+                d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+                fill="white"
+                fill-opacity="0.5"
+              />
+              <path
+                d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+                fill="white"
+              />
+            </svg>
+            <div
+              class="logo-cell-label"
+              style="color: rgba(255, 255, 255, 0.4)"
+            >
+              On dark (email headers etc.)
+            </div>
+          </div>
+        </div>
 
-    <div class="sub-label">Logo on backgrounds</div>
-    <div class="logo-grid">
-      <div class="logo-cell">
-        <svg width="82" height="25" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="#534BB7" fill-opacity="0.6"/><path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="#534BB7"/><path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="#534BB7" fill-opacity="0.6"/><path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="#534BB7"/>
+        <div class="do-dont">
+          <div class="do-box">
+            <div class="do-badge">✓ Do</div>
+            <p>
+              Use the logo at its native size or larger. Always use the supplied
+              SVG file. Maintain clear space equal to the height of the wordmark
+              on all sides. Use on white, light purple, purple, or dark
+              backgrounds only.
+            </p>
+          </div>
+          <div class="dont-box">
+            <div class="dont-badge">✗ Don't</div>
+            <p>
+              Don't stretch, rotate, recolour, or add effects to the logo. Don't
+              separate the icon from the wordmark. Don't place on photographic
+              backgrounds. Don't recreate the logo in another typeface.
+            </p>
+          </div>
+        </div>
+
+        <div class="sub-label">Minimum size</div>
+        <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 1rem">
+          The logo should never appear smaller than 55px wide in digital
+          contexts, or 18mm wide in print. Below this size use the icon mark
+          only (the half-heart + bars element).
+        </p>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 02 Colour -->
+      <div class="section">
+        <div class="section-label">02</div>
+        <div class="section-title">Colour</div>
+        <div class="section-intro">
+          Purple is favpoll's primary colour. It was chosen deliberately — warm
+          without being aggressive, associated with dignity and remembrance,
+          distinctive without demanding attention. Green signals shared fund and
+          positive states. All other colours are used sparingly for data and UI
+          feedback.
+        </div>
+
+        <div class="sub-label">Primary palette</div>
+        <div class="palette-grid">
+          <div class="swatch-card">
+            <div class="swatch-main" style="background: #534ab7"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Purple</div>
+              <div class="swatch-hex">#534AB7</div>
+              <div class="swatch-role">
+                Primary actions, logo, links, brand moments
+              </div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-main" style="background: #7f77dd"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Purple mid</div>
+              <div class="swatch-hex">#7F77DD</div>
+              <div class="swatch-role">Ranking bars, progress indicators</div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div
+              class="swatch-main"
+              style="background: #eeedfe; border-bottom: 0.5px solid #d3d1c7"
+            ></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Purple light</div>
+              <div class="swatch-hex">#EEEDFE</div>
+              <div class="swatch-role">
+                Backgrounds, reveals, selected states
+              </div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-main" style="background: #afa9ec"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Purple border</div>
+              <div class="swatch-hex">#AFA9EC</div>
+              <div class="swatch-role">Borders on purple-tinted surfaces</div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-main" style="background: #1d9e75"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Green</div>
+              <div class="swatch-hex">#1D9E75</div>
+              <div class="swatch-role">
+                Shared fund, positive states, availability
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-label" style="margin-top: 2rem">Full purple ramp</div>
+        <div class="palette-row">
+          <div class="palette-full">
+            <div class="palette-stop" style="background: #eeedfe"></div>
+            <div class="palette-stop" style="background: #cecbf6"></div>
+            <div class="palette-stop" style="background: #afa9ec"></div>
+            <div class="palette-stop" style="background: #7f77dd"></div>
+            <div class="palette-stop" style="background: #534ab7"></div>
+            <div class="palette-stop" style="background: #3c3489"></div>
+            <div class="palette-stop" style="background: #26215c"></div>
+          </div>
+          <div class="palette-stops-label">
+            <div class="palette-stop-label">50</div>
+            <div class="palette-stop-label">100</div>
+            <div class="palette-stop-label">200</div>
+            <div class="palette-stop-label">400</div>
+            <div class="palette-stop-label">600</div>
+            <div class="palette-stop-label">800</div>
+            <div class="palette-stop-label">900</div>
+          </div>
+        </div>
+
+        <div class="sub-label" style="margin-top: 1.5rem">
+          Neutral ramp (greys)
+        </div>
+        <div class="palette-row">
+          <div class="palette-full">
+            <div class="palette-stop" style="background: #f1efe8"></div>
+            <div class="palette-stop" style="background: #d3d1c7"></div>
+            <div class="palette-stop" style="background: #b4b2a9"></div>
+            <div class="palette-stop" style="background: #888780"></div>
+            <div class="palette-stop" style="background: #5f5e5a"></div>
+            <div class="palette-stop" style="background: #444441"></div>
+            <div class="palette-stop" style="background: #2c2c2a"></div>
+          </div>
+          <div class="palette-stops-label">
+            <div class="palette-stop-label">50</div>
+            <div class="palette-stop-label">100</div>
+            <div class="palette-stop-label">200</div>
+            <div class="palette-stop-label">400</div>
+            <div class="palette-stop-label">600</div>
+            <div class="palette-stop-label">800</div>
+            <div class="palette-stop-label">900</div>
+          </div>
+        </div>
+
+        <div class="sub-label" style="margin-top: 1.5rem">
+          Semantic colours (used sparingly)
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #1d9e75;
+                flex-shrink: 0;
+              "
+            ></div>
+            <div>
+              <div
+                style="
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: var(--gray-900);
+                "
+              >
+                Success
+              </div>
+              <div
+                style="
+                  font-size: 11px;
+                  color: var(--gray-400);
+                  font-family: monospace;
+                "
+              >
+                #1D9E75
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #ef9f27;
+                flex-shrink: 0;
+              "
+            ></div>
+            <div>
+              <div
+                style="
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: var(--gray-900);
+                "
+              >
+                Warning
+              </div>
+              <div
+                style="
+                  font-size: 11px;
+                  color: var(--gray-400);
+                  font-family: monospace;
+                "
+              >
+                #EF9F27
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #e24b4a;
+                flex-shrink: 0;
+              "
+            ></div>
+            <div>
+              <div
+                style="
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: var(--gray-900);
+                "
+              >
+                Error
+              </div>
+              <div
+                style="
+                  font-size: 11px;
+                  color: var(--gray-400);
+                  font-family: monospace;
+                "
+              >
+                #E24B4A
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #378add;
+                flex-shrink: 0;
+              "
+            ></div>
+            <div>
+              <div
+                style="
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: var(--gray-900);
+                "
+              >
+                Info
+              </div>
+              <div
+                style="
+                  font-size: 11px;
+                  color: var(--gray-400);
+                  font-family: monospace;
+                "
+              >
+                #378ADD
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 03 Typography -->
+      <div class="section">
+        <div class="section-label">03</div>
+        <div class="section-title">Typography</div>
+        <div class="section-intro">
+          Plus Jakarta Sans is favpoll's typeface. It carries more personality
+          than Inter or Helvetica without sacrificing warmth or legibility. Two
+          weights only: 400 for body, 500 for headings and emphasis. Never use
+          600 or 700 — they read as heavy against the product's quiet dignity.
+        </div>
+
+        <div class="type-specimen">
+          <div class="type-meta">Plus Jakarta Sans · Google Fonts · Free</div>
+          <div class="type-scale">
+            <div class="type-row">
+              <div class="type-row-meta">
+                Display<br />48px / 500<br />letter-spacing: -0.02em
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 48px;
+                  font-weight: 500;
+                  letter-spacing: -0.02em;
+                  line-height: 1.1;
+                "
+              >
+                Belinda Johnson
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Heading 1<br />32px / 500<br />letter-spacing: -0.01em
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 32px;
+                  font-weight: 500;
+                  letter-spacing: -0.01em;
+                  line-height: 1.2;
+                "
+              >
+                In memory of
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Heading 2<br />22px / 500<br />letter-spacing: -0.01em
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 22px;
+                  font-weight: 500;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Favourite comfort food
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">Heading 3<br />17px / 500</div>
+              <div
+                class="type-row-sample"
+                style="font-size: 17px; font-weight: 500"
+              >
+                Marie Curie · Charity no. 207994
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Body<br />15px / 400<br />line-height: 1.7
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 15px;
+                  font-weight: 400;
+                  line-height: 1.7;
+                  max-width: 480px;
+                "
+              >
+                A beloved mother, teacher, and friend who spent her life
+                bringing people together and always had time for a long
+                conversation over tea.
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Small<br />13px / 400<br />line-height: 1.5
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 13px;
+                  font-weight: 400;
+                  color: var(--gray-600);
+                  line-height: 1.5;
+                "
+              >
+                Poll closes in 6 days · 43 guests · All pledges are anonymous
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Label<br />11px / 500<br />letter-spacing: 0.08em<br />UPPERCASE
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 11px;
+                  font-weight: 500;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: var(--purple-600);
+                "
+              >
+                In memory of
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-row-meta">
+                Quote / Reveal<br />14px / 400<br />italic<br />color:
+                purple-800
+              </div>
+              <div
+                class="type-row-sample"
+                style="
+                  font-size: 14px;
+                  font-weight: 400;
+                  font-style: italic;
+                  color: var(--purple-800);
+                  border-left: 3px solid var(--purple-200);
+                  padding-left: 12px;
+                  line-height: 1.6;
+                "
+              >
+                "Mine was purple. I wore it to every occasion that mattered."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 04 Voice -->
+      <div class="section">
+        <div class="section-label">04</div>
+        <div class="section-title">Voice & tone</div>
+        <div class="section-intro">
+          favpoll speaks with warmth and quiet dignity. It is never corporate,
+          never salesy, never cute. The tone shifts with the occasion — measured
+          at a memorial, lighter at a birthday — but the character is constant:
+          thoughtful, human, honest.
+        </div>
+
+        <div class="sub-label">Tone by occasion</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Occasion</th>
+              <th>Tone</th>
+              <th>Avoid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Memorial / Funeral</td>
+              <td>
+                Quiet, dignified, unhurried. No upbeat language. No exclamation
+                marks.
+              </td>
+              <td>Cheerful language, "celebrate", "exciting"</td>
+            </tr>
+            <tr>
+              <td>Birthday</td>
+              <td>Warm, personal, can be playful. Light humour welcome.</td>
+              <td>Saccharine, hollow enthusiasm</td>
+            </tr>
+            <tr>
+              <td>Retirement</td>
+              <td>Respectful, celebratory, reflective.</td>
+              <td>Corporate language, career clichés</td>
+            </tr>
+            <tr>
+              <td>Wedding</td>
+              <td>Joyful, romantic, a little elevated.</td>
+              <td>Overworked wedding tropes</td>
+            </tr>
+            <tr>
+              <td>Get well soon</td>
+              <td>Warm, gentle, hopeful. Never presumptuous about recovery.</td>
+              <td>Forced positivity, medical language</td>
+            </tr>
+            <tr>
+              <td>General / platform</td>
+              <td>
+                Clear, purposeful, human. Acknowledge the full range of
+                occasions without leading with death.
+              </td>
+              <td>Fundraising clichés, tech jargon</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-label" style="margin-top: 2rem">Words we use</div>
+        <div
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem"
+        >
+          <span class="badge badge-purple">pledge</span>
+          <span class="badge badge-purple">guests</span>
+          <span class="badge badge-purple">honour</span>
+          <span class="badge badge-purple">in memory of</span>
+          <span class="badge badge-purple">favourite</span>
+          <span class="badge badge-purple">reveal</span>
+          <span class="badge badge-purple">shared fund</span>
+          <span class="badge badge-purple">proceeds</span>
+          <span class="badge badge-gray">favpoll</span>
+          <span class="badge badge-gray">event</span>
+          <span class="badge badge-gray">organiser</span>
+        </div>
+
+        <div class="sub-label">Words we avoid</div>
+        <div
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem"
+        >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >donate</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >users</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >seamless</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >innovative</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >simply</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >leverage</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >make a difference</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >every penny counts</span
+          >
+          <span class="badge" style="background: #fcebeb; color: #a32d2d"
+            >participants</span
+          >
+        </div>
+
+        <div class="sub-label">Examples</div>
+        <div class="tone-example-label">Good — memorial</div>
+        <div class="tone-example">
+          <p>
+            A beloved mother, teacher, and gardener who spent her life bringing
+            people together and always had time for a long conversation over
+            tea.
+          </p>
+        </div>
+        <div class="tone-bad">
+          <p>
+            Celebrate the life of Belinda Johnson and help raise money for a
+            great cause! Every donation makes a difference.
+          </p>
+        </div>
+        <div style="height: 1rem"></div>
+        <div class="tone-example-label">Good — birthday</div>
+        <div class="tone-example">
+          <p>
+            Dave turns 30 this year — a man who has strong opinions about
+            biscuits and will defend them at length.
+          </p>
+        </div>
+        <div class="tone-bad">
+          <p>
+            Help us celebrate Dave's amazing 30th birthday! Donate now and make
+            his day extra special!
+          </p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 05 The Reveal -->
+      <div class="section">
+        <div class="section-label">05</div>
+        <div class="section-title">The framing and reveal</div>
+        <div class="section-intro">
+          Every favpoll question has two parts: a framing that withholds the
+          protagonist's favourite, and a reveal shown after the guest pledges.
+          The reveal is the emotional heart of the product. Its tone changes
+          completely with the occasion.
+        </div>
+
+        <div class="sub-label">Memorial — measured, first person</div>
+        <div class="reveal-grid">
+          <div class="reveal-card">
+            <div class="reveal-card-label">Question (framing)</div>
+            <div class="reveal-framing">
+              "Belinda had a colour she returned to all her life — what's
+              yours?"
+            </div>
+          </div>
+          <div
+            class="reveal-card"
+            style="
+              background: var(--purple-50);
+              border-color: var(--purple-200);
+            "
+          >
+            <div class="reveal-card-label">After pledging (reveal)</div>
+            <div class="reveal-answer">
+              "Mine was purple. I wore it to every occasion that mattered."
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-label">Birthday — warm, playful</div>
+        <div class="reveal-grid">
+          <div class="reveal-card">
+            <div class="reveal-card-label">Question (framing)</div>
+            <div class="reveal-framing">
+              "Tell us your favourite flavour ice cream to find out Poppy's."
+            </div>
+          </div>
+          <div
+            class="reveal-card"
+            style="
+              background: var(--purple-50);
+              border-color: var(--purple-200);
+            "
+          >
+            <div class="reveal-card-label">After pledging (reveal)</div>
+            <div class="reveal-answer">
+              "Mint choc chip, obviously. (What do you mean you don't know that
+              already?)"
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-label">Retirement — reflective</div>
+        <div class="reveal-grid">
+          <div class="reveal-card">
+            <div class="reveal-card-label">Question (framing)</div>
+            <div class="reveal-framing">
+              "Gretchen had a season she always loved most — which is yours?"
+            </div>
+          </div>
+          <div
+            class="reveal-card"
+            style="
+              background: var(--purple-50);
+              border-color: var(--purple-200);
+            "
+          >
+            <div class="reveal-card-label">After pledging (reveal)</div>
+            <div class="reveal-answer">
+              "Autumn. She said it always felt like the world was making itself
+              beautiful one last time."
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-label" style="margin-top: 2rem">
+          Rules for framing and reveal copy
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>The framing withholds</td>
+              <td>
+                Don't reveal the protagonist's favourite in the question. The
+                mystery is the mechanic.
+              </td>
+            </tr>
+            <tr>
+              <td>The reveal is specific</td>
+              <td>
+                Not "she loved purple" — "Mine was purple. I wore it to every
+                occasion that mattered." Specific details are what people
+                remember.
+              </td>
+            </tr>
+            <tr>
+              <td>Memorial reveals are first person where possible</td>
+              <td>
+                If the protagonist wrote their own reveal, their voice lives on.
+                Encourage this in the organiser flow.
+              </td>
+            </tr>
+            <tr>
+              <td>Birthday reveals can use humour</td>
+              <td>
+                A parenthetical aside, a mock-outrage. The reveal earns the joke
+                because the guest has already pledged.
+              </td>
+            </tr>
+            <tr>
+              <td>Never crowbar a topic</td>
+              <td>
+                If the organiser can't write a natural framing, the topic
+                probably doesn't fit the occasion. The friction is the filter.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 06 UI Conventions -->
+      <div class="section">
+        <div class="section-label">06</div>
+        <div class="section-title">UI conventions</div>
+        <div class="section-intro">
+          favpoll's interface is quiet. White surfaces, hairline borders,
+          generous whitespace. Nothing competes with the human content — the
+          names, the questions, the rankings.
+        </div>
+
+        <div class="sub-label">Buttons</div>
+        <div class="ui-strip">
+          <button class="btn-primary">Pledge £10.30</button>
+          <button class="btn-ghost">or use the shared fund</button>
+          <button class="btn-text">Cancel</button>
+        </div>
+        <table style="margin-bottom: 2rem">
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>Use</th>
+              <th>Class</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Primary (solid purple)</td>
+              <td>One per panel. The single most important action.</td>
+              <td><code>Button</code> default</td>
+            </tr>
+            <tr>
+              <td>Ghost (bordered)</td>
+              <td>Secondary actions. Never more prominent than primary.</td>
+              <td><code>Button variant="outline"</code></td>
+            </tr>
+            <tr>
+              <td>Text / link</td>
+              <td>Quiet actions — cancel, skip, change. Never competes.</td>
+              <td><code>Button variant="ghost" size="sm"</code></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-label">Badges and labels</div>
+        <div class="ui-strip" style="margin-bottom: 1.5rem">
+          <span class="badge badge-purple">In memory of</span>
+          <span class="badge badge-purple">Memorial</span>
+          <span class="badge badge-green">Shared fund available</span>
+          <span class="badge badge-gray">Poll closed</span>
+          <span
+            class="badge"
+            style="
+              background: var(--purple-50);
+              color: var(--purple-800);
+              border: 0.5px solid var(--purple-200);
+            "
+            >Finite topic</span
+          >
+        </div>
+
+        <div class="sub-label">Surfaces and borders</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Element</th>
+              <th>Style</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cards</td>
+              <td>
+                White background, <code>0.5px solid #D3D1C7</code>,
+                <code>border-radius: 10px</code>, padding 1.25rem
+              </td>
+            </tr>
+            <tr>
+              <td>Dividers</td>
+              <td><code>0.5px solid #D3D1C7</code> — never thicker</td>
+            </tr>
+            <tr>
+              <td>Edit mode fields</td>
+              <td>
+                <code>border-bottom: 1.5px solid #AFA9EC</code> persistent
+                underline. Turns <code>#534AB7</code> on focus.
+              </td>
+            </tr>
+            <tr>
+              <td>Reveal card</td>
+              <td>
+                Background <code>#EEEDFE</code>, border <code>#AFA9EC</code>,
+                border-radius 8px, italic text <code>#3C3489</code>
+              </td>
+            </tr>
+            <tr>
+              <td>Quote / blockquote</td>
+              <td>
+                Border-left <code>3px solid #AFA9EC</code>, padding-left 12px,
+                italic, color <code>#3C3489</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-label" style="margin-top: 1.5rem">Spacing scale</div>
+        <div class="spacing-grid">
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 4px"></div>
+            <div class="spacing-label">4px</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 8px"></div>
+            <div class="spacing-label">8px</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 12px"></div>
+            <div class="spacing-label">12px</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 16px"></div>
+            <div class="spacing-label">16px</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 24px"></div>
+            <div class="spacing-label">24px</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="height: 32px"></div>
+            <div class="spacing-label">32px</div>
+          </div>
+        </div>
+        <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 2rem">
+          Use 4–8px for component internals, 12–16px for element gaps, 24–32px
+          for section spacing. The product should breathe — emotional content
+          needs space.
+        </p>
+
+        <div class="sub-label">Accessibility</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Standard</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Text contrast</td>
+              <td>
+                WCAG AA minimum. Body text on white: verified. Purple text on
+                white: verified.
+              </td>
+            </tr>
+            <tr>
+              <td>Focus states</td>
+              <td>
+                Visible on all interactive elements. Purple focus ring
+                <code>0 0 0 3px #EEEDFE</code>.
+              </td>
+            </tr>
+            <tr>
+              <td>Live regions</td>
+              <td>
+                <code>aria-live="polite"</code> on all ranking updates, totals,
+                and validation messages.
+              </td>
+            </tr>
+            <tr>
+              <td>Touch targets</td>
+              <td>Minimum 44×44px for all interactive elements.</td>
+            </tr>
+            <tr>
+              <td>Reduced motion</td>
+              <td>
+                All animations respect <code>prefers-reduced-motion</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 07 Writing conventions -->
+      <div class="section">
+        <div class="section-label">07</div>
+        <div class="section-title">Writing conventions</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Convention</th>
+              <th>Rule</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Product name</td>
+              <td>
+                Always lowercase: <strong>favpoll</strong>. Never FavPoll,
+                FAVPOLL, or Favpoll.
+              </td>
+              <td>favpoll closes automatically after 90 days.</td>
+            </tr>
+            <tr>
+              <td>Spelling</td>
+              <td>
+                UK English in all UI copy. American spelling in code only
+                (<code>color</code>, <code>organize</code>).
+              </td>
+              <td>favourite, honour, colour, organisation</td>
+            </tr>
+            <tr>
+              <td>Dates</td>
+              <td>Ordinal format: 13th May 2026. Never 05/13/26 or May 13.</td>
+              <td>Closes 13th May 2026 at 23:59</td>
+            </tr>
+            <tr>
+              <td>Currency</td>
+              <td>
+                £ prefix, no space. Two decimal places in summaries, round in
+                headlines.
+              </td>
+              <td>£10.30 in summary · £340 in ranking</td>
+            </tr>
+            <tr>
+              <td>Sentence case</td>
+              <td>
+                All headings and labels in sentence case. Never Title Case or
+                ALL CAPS in UI.
+              </td>
+              <td>"Favourite comfort food" not "Favourite Comfort Food"</td>
+            </tr>
+            <tr>
+              <td>Percentages</td>
+              <td>No space before %.</td>
+              <td>60%</td>
+            </tr>
+            <tr>
+              <td>Em dashes</td>
+              <td>Use — (em dash) with spaces either side in copy.</td>
+              <td>Belinda had a colour she loved — what's yours?</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div class="guide-footer">
+        <svg
+          width="55"
+          height="17"
+          viewBox="0 0 55 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z"
+            fill="#534BB7"
+            fill-opacity="0.6"
+          />
+          <path
+            d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z"
+            fill="#534BB7"
+            fill-opacity="0.6"
+          />
+          <path
+            d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z"
+            fill="#534BB7"
+            fill-opacity="0.6"
+          />
+          <path
+            d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z"
+            fill="#534BB7"
+          />
+          <path
+            d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z"
+            fill="#534BB7"
+            fill-opacity="0.6"
+          />
+          <path
+            d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z"
+            fill="#534BB7"
+          />
         </svg>
-        <div class="logo-cell-label">On white</div>
-      </div>
-      <div class="logo-cell light-purple">
-        <svg width="82" height="25" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="#534BB7" fill-opacity="0.6"/><path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="#534BB7"/><path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="#534BB7" fill-opacity="0.6"/><path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="#534BB7"/>
-        </svg>
-        <div class="logo-cell-label">On light purple</div>
-      </div>
-      <div class="logo-cell dark">
-        <svg width="82" height="25" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="white" fill-opacity="0.6"/><path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="white" fill-opacity="0.6"/><path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="white" fill-opacity="0.6"/><path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="white"/><path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="white" fill-opacity="0.6"/><path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="white"/>
-        </svg>
-        <div class="logo-cell-label">On purple (reversed)</div>
-      </div>
-      <div class="logo-cell" style="background: var(--gray-900);">
-        <svg width="82" height="25" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="white" fill-opacity="0.5"/><path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="white" fill-opacity="0.5"/><path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="white" fill-opacity="0.5"/><path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="white"/><path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="white" fill-opacity="0.5"/><path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="white"/>
-        </svg>
-        <div class="logo-cell-label" style="color:rgba(255,255,255,0.4);">On dark (email headers etc.)</div>
+        <p>© favpoll 2026 · Version 1.0 · favpoll.com</p>
       </div>
     </div>
-
-    <div class="do-dont">
-      <div class="do-box">
-        <div class="do-badge">✓ Do</div>
-        <p>Use the logo at its native size or larger. Always use the supplied SVG file. Maintain clear space equal to the height of the wordmark on all sides. Use on white, light purple, purple, or dark backgrounds only.</p>
-      </div>
-      <div class="dont-box">
-        <div class="dont-badge">✗ Don't</div>
-        <p>Don't stretch, rotate, recolour, or add effects to the logo. Don't separate the icon from the wordmark. Don't place on photographic backgrounds. Don't recreate the logo in another typeface.</p>
-      </div>
-    </div>
-
-    <div class="sub-label">Minimum size</div>
-    <p style="font-size:13px;color:var(--gray-600);margin-bottom:1rem;">The logo should never appear smaller than 55px wide in digital contexts, or 18mm wide in print. Below this size use the icon mark only (the half-heart + bars element).</p>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 02 Colour -->
-  <div class="section">
-    <div class="section-label">02</div>
-    <div class="section-title">Colour</div>
-    <div class="section-intro">Purple is favpoll's primary colour. It was chosen deliberately — warm without being aggressive, associated with dignity and remembrance, distinctive without demanding attention. Green signals shared fund and positive states. All other colours are used sparingly for data and UI feedback.</div>
-
-    <div class="sub-label">Primary palette</div>
-    <div class="palette-grid">
-      <div class="swatch-card">
-        <div class="swatch-main" style="background:#534AB7;"></div>
-        <div class="swatch-info">
-          <div class="swatch-name">Purple</div>
-          <div class="swatch-hex">#534AB7</div>
-          <div class="swatch-role">Primary actions, logo, links, brand moments</div>
-        </div>
-      </div>
-      <div class="swatch-card">
-        <div class="swatch-main" style="background:#7F77DD;"></div>
-        <div class="swatch-info">
-          <div class="swatch-name">Purple mid</div>
-          <div class="swatch-hex">#7F77DD</div>
-          <div class="swatch-role">Ranking bars, progress indicators</div>
-        </div>
-      </div>
-      <div class="swatch-card">
-        <div class="swatch-main" style="background:#EEEDFE; border-bottom:0.5px solid #D3D1C7;"></div>
-        <div class="swatch-info">
-          <div class="swatch-name">Purple light</div>
-          <div class="swatch-hex">#EEEDFE</div>
-          <div class="swatch-role">Backgrounds, reveals, selected states</div>
-        </div>
-      </div>
-      <div class="swatch-card">
-        <div class="swatch-main" style="background:#AFA9EC;"></div>
-        <div class="swatch-info">
-          <div class="swatch-name">Purple border</div>
-          <div class="swatch-hex">#AFA9EC</div>
-          <div class="swatch-role">Borders on purple-tinted surfaces</div>
-        </div>
-      </div>
-      <div class="swatch-card">
-        <div class="swatch-main" style="background:#1D9E75;"></div>
-        <div class="swatch-info">
-          <div class="swatch-name">Green</div>
-          <div class="swatch-hex">#1D9E75</div>
-          <div class="swatch-role">Shared fund, positive states, availability</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sub-label" style="margin-top:2rem;">Full purple ramp</div>
-    <div class="palette-row">
-      <div class="palette-full">
-        <div class="palette-stop" style="background:#EEEDFE;"></div>
-        <div class="palette-stop" style="background:#CECBF6;"></div>
-        <div class="palette-stop" style="background:#AFA9EC;"></div>
-        <div class="palette-stop" style="background:#7F77DD;"></div>
-        <div class="palette-stop" style="background:#534AB7;"></div>
-        <div class="palette-stop" style="background:#3C3489;"></div>
-        <div class="palette-stop" style="background:#26215C;"></div>
-      </div>
-      <div class="palette-stops-label">
-        <div class="palette-stop-label">50</div>
-        <div class="palette-stop-label">100</div>
-        <div class="palette-stop-label">200</div>
-        <div class="palette-stop-label">400</div>
-        <div class="palette-stop-label">600</div>
-        <div class="palette-stop-label">800</div>
-        <div class="palette-stop-label">900</div>
-      </div>
-    </div>
-
-    <div class="sub-label" style="margin-top:1.5rem;">Neutral ramp (greys)</div>
-    <div class="palette-row">
-      <div class="palette-full">
-        <div class="palette-stop" style="background:#F1EFE8;"></div>
-        <div class="palette-stop" style="background:#D3D1C7;"></div>
-        <div class="palette-stop" style="background:#B4B2A9;"></div>
-        <div class="palette-stop" style="background:#888780;"></div>
-        <div class="palette-stop" style="background:#5F5E5A;"></div>
-        <div class="palette-stop" style="background:#444441;"></div>
-        <div class="palette-stop" style="background:#2C2C2A;"></div>
-      </div>
-      <div class="palette-stops-label">
-        <div class="palette-stop-label">50</div>
-        <div class="palette-stop-label">100</div>
-        <div class="palette-stop-label">200</div>
-        <div class="palette-stop-label">400</div>
-        <div class="palette-stop-label">600</div>
-        <div class="palette-stop-label">800</div>
-        <div class="palette-stop-label">900</div>
-      </div>
-    </div>
-
-    <div class="sub-label" style="margin-top:1.5rem;">Semantic colours (used sparingly)</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:2rem;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:6px;background:#1D9E75;flex-shrink:0;"></div>
-        <div><div style="font-size:12px;font-weight:500;color:var(--gray-900);">Success</div><div style="font-size:11px;color:var(--gray-400);font-family:monospace;">#1D9E75</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:6px;background:#EF9F27;flex-shrink:0;"></div>
-        <div><div style="font-size:12px;font-weight:500;color:var(--gray-900);">Warning</div><div style="font-size:11px;color:var(--gray-400);font-family:monospace;">#EF9F27</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:6px;background:#E24B4A;flex-shrink:0;"></div>
-        <div><div style="font-size:12px;font-weight:500;color:var(--gray-900);">Error</div><div style="font-size:11px;color:var(--gray-400);font-family:monospace;">#E24B4A</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:6px;background:#378ADD;flex-shrink:0;"></div>
-        <div><div style="font-size:12px;font-weight:500;color:var(--gray-900);">Info</div><div style="font-size:11px;color:var(--gray-400);font-family:monospace;">#378ADD</div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 03 Typography -->
-  <div class="section">
-    <div class="section-label">03</div>
-    <div class="section-title">Typography</div>
-    <div class="section-intro">Plus Jakarta Sans is favpoll's typeface. It carries more personality than Inter or Helvetica without sacrificing warmth or legibility. Two weights only: 400 for body, 500 for headings and emphasis. Never use 600 or 700 — they read as heavy against the product's quiet dignity.</div>
-
-    <div class="type-specimen">
-      <div class="type-meta">Plus Jakarta Sans · Google Fonts · Free</div>
-      <div class="type-scale">
-        <div class="type-row">
-          <div class="type-row-meta">Display<br>48px / 500<br>letter-spacing: -0.02em</div>
-          <div class="type-row-sample" style="font-size:48px;font-weight:500;letter-spacing:-0.02em;line-height:1.1;">Belinda Johnson</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Heading 1<br>32px / 500<br>letter-spacing: -0.01em</div>
-          <div class="type-row-sample" style="font-size:32px;font-weight:500;letter-spacing:-0.01em;line-height:1.2;">In memory of</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Heading 2<br>22px / 500<br>letter-spacing: -0.01em</div>
-          <div class="type-row-sample" style="font-size:22px;font-weight:500;letter-spacing:-0.01em;">Favourite comfort food</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Heading 3<br>17px / 500</div>
-          <div class="type-row-sample" style="font-size:17px;font-weight:500;">Marie Curie · Charity no. 207994</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Body<br>15px / 400<br>line-height: 1.7</div>
-          <div class="type-row-sample" style="font-size:15px;font-weight:400;line-height:1.7;max-width:480px;">A beloved mother, teacher, and friend who spent her life bringing people together and always had time for a long conversation over tea.</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Small<br>13px / 400<br>line-height: 1.5</div>
-          <div class="type-row-sample" style="font-size:13px;font-weight:400;color:var(--gray-600);line-height:1.5;">Poll closes in 6 days · 43 guests · All pledges are anonymous</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Label<br>11px / 500<br>letter-spacing: 0.08em<br>UPPERCASE</div>
-          <div class="type-row-sample" style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--purple-600);">In memory of</div>
-        </div>
-        <div class="type-row">
-          <div class="type-row-meta">Quote / Reveal<br>14px / 400<br>italic<br>color: purple-800</div>
-          <div class="type-row-sample" style="font-size:14px;font-weight:400;font-style:italic;color:var(--purple-800);border-left:3px solid var(--purple-200);padding-left:12px;line-height:1.6;">"Mine was purple. I wore it to every occasion that mattered."</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 04 Voice -->
-  <div class="section">
-    <div class="section-label">04</div>
-    <div class="section-title">Voice & tone</div>
-    <div class="section-intro">favpoll speaks with warmth and quiet dignity. It is never corporate, never salesy, never cute. The tone shifts with the occasion — measured at a memorial, lighter at a birthday — but the character is constant: thoughtful, human, honest.</div>
-
-    <div class="sub-label">Tone by occasion</div>
-    <table>
-      <thead>
-        <tr><th>Occasion</th><th>Tone</th><th>Avoid</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Memorial / Funeral</td><td>Quiet, dignified, unhurried. No upbeat language. No exclamation marks.</td><td>Cheerful language, "celebrate", "exciting"</td></tr>
-        <tr><td>Birthday</td><td>Warm, personal, can be playful. Light humour welcome.</td><td>Saccharine, hollow enthusiasm</td></tr>
-        <tr><td>Retirement</td><td>Respectful, celebratory, reflective.</td><td>Corporate language, career clichés</td></tr>
-        <tr><td>Wedding</td><td>Joyful, romantic, a little elevated.</td><td>Overworked wedding tropes</td></tr>
-        <tr><td>Get well soon</td><td>Warm, gentle, hopeful. Never presumptuous about recovery.</td><td>Forced positivity, medical language</td></tr>
-        <tr><td>General / platform</td><td>Clear, purposeful, human. Acknowledge the full range of occasions without leading with death.</td><td>Fundraising clichés, tech jargon</td></tr>
-      </tbody>
-    </table>
-
-    <div class="sub-label" style="margin-top:2rem;">Words we use</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;">
-      <span class="badge badge-purple">pledge</span>
-      <span class="badge badge-purple">guests</span>
-      <span class="badge badge-purple">honour</span>
-      <span class="badge badge-purple">in memory of</span>
-      <span class="badge badge-purple">favourite</span>
-      <span class="badge badge-purple">reveal</span>
-      <span class="badge badge-purple">shared fund</span>
-      <span class="badge badge-purple">proceeds</span>
-      <span class="badge badge-gray">favpoll</span>
-      <span class="badge badge-gray">event</span>
-      <span class="badge badge-gray">organiser</span>
-    </div>
-
-    <div class="sub-label">Words we avoid</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;">
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">donate</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">users</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">seamless</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">innovative</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">simply</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">leverage</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">make a difference</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">every penny counts</span>
-      <span class="badge" style="background:#FCEBEB;color:#A32D2D;">participants</span>
-    </div>
-
-    <div class="sub-label">Examples</div>
-    <div class="tone-example-label">Good — memorial</div>
-    <div class="tone-example"><p>A beloved mother, teacher, and gardener who spent her life bringing people together and always had time for a long conversation over tea.</p></div>
-    <div class="tone-bad"><p>Celebrate the life of Belinda Johnson and help raise money for a great cause! Every donation makes a difference.</p></div>
-    <div style="height:1rem;"></div>
-    <div class="tone-example-label">Good — birthday</div>
-    <div class="tone-example"><p>Dave turns 30 this year — a man who has strong opinions about biscuits and will defend them at length.</p></div>
-    <div class="tone-bad"><p>Help us celebrate Dave's amazing 30th birthday! Donate now and make his day extra special!</p></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 05 The Reveal -->
-  <div class="section">
-    <div class="section-label">05</div>
-    <div class="section-title">The framing and reveal</div>
-    <div class="section-intro">Every favpoll question has two parts: a framing that withholds the protagonist's favourite, and a reveal shown after the guest pledges. The reveal is the emotional heart of the product. Its tone changes completely with the occasion.</div>
-
-    <div class="sub-label">Memorial — measured, first person</div>
-    <div class="reveal-grid">
-      <div class="reveal-card">
-        <div class="reveal-card-label">Question (framing)</div>
-        <div class="reveal-framing">"Belinda had a colour she returned to all her life — what's yours?"</div>
-      </div>
-      <div class="reveal-card" style="background:var(--purple-50);border-color:var(--purple-200);">
-        <div class="reveal-card-label">After pledging (reveal)</div>
-        <div class="reveal-answer">"Mine was purple. I wore it to every occasion that mattered."</div>
-      </div>
-    </div>
-
-    <div class="sub-label">Birthday — warm, playful</div>
-    <div class="reveal-grid">
-      <div class="reveal-card">
-        <div class="reveal-card-label">Question (framing)</div>
-        <div class="reveal-framing">"Tell us your favourite flavour ice cream to find out Poppy's."</div>
-      </div>
-      <div class="reveal-card" style="background:var(--purple-50);border-color:var(--purple-200);">
-        <div class="reveal-card-label">After pledging (reveal)</div>
-        <div class="reveal-answer">"Mint choc chip, obviously. (What do you mean you don't know that already?)"</div>
-      </div>
-    </div>
-
-    <div class="sub-label">Retirement — reflective</div>
-    <div class="reveal-grid">
-      <div class="reveal-card">
-        <div class="reveal-card-label">Question (framing)</div>
-        <div class="reveal-framing">"Margaret had a season she always loved most — which is yours?"</div>
-      </div>
-      <div class="reveal-card" style="background:var(--purple-50);border-color:var(--purple-200);">
-        <div class="reveal-card-label">After pledging (reveal)</div>
-        <div class="reveal-answer">"Autumn. She said it always felt like the world was making itself beautiful one last time."</div>
-      </div>
-    </div>
-
-    <div class="sub-label" style="margin-top:2rem;">Rules for framing and reveal copy</div>
-    <table>
-      <thead><tr><th>Rule</th><th>Why</th></tr></thead>
-      <tbody>
-        <tr><td>The framing withholds</td><td>Don't reveal the protagonist's favourite in the question. The mystery is the mechanic.</td></tr>
-        <tr><td>The reveal is specific</td><td>Not "she loved purple" — "Mine was purple. I wore it to every occasion that mattered." Specific details are what people remember.</td></tr>
-        <tr><td>Memorial reveals are first person where possible</td><td>If the protagonist wrote their own reveal, their voice lives on. Encourage this in the organiser flow.</td></tr>
-        <tr><td>Birthday reveals can use humour</td><td>A parenthetical aside, a mock-outrage. The reveal earns the joke because the guest has already pledged.</td></tr>
-        <tr><td>Never crowbar a topic</td><td>If the organiser can't write a natural framing, the topic probably doesn't fit the occasion. The friction is the filter.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 06 UI Conventions -->
-  <div class="section">
-    <div class="section-label">06</div>
-    <div class="section-title">UI conventions</div>
-    <div class="section-intro">favpoll's interface is quiet. White surfaces, hairline borders, generous whitespace. Nothing competes with the human content — the names, the questions, the rankings.</div>
-
-    <div class="sub-label">Buttons</div>
-    <div class="ui-strip">
-      <button class="btn-primary">Pledge £10.30</button>
-      <button class="btn-ghost">or use the shared fund</button>
-      <button class="btn-text">Cancel</button>
-    </div>
-    <table style="margin-bottom:2rem;">
-      <thead><tr><th>Variant</th><th>Use</th><th>Class</th></tr></thead>
-      <tbody>
-        <tr><td>Primary (solid purple)</td><td>One per panel. The single most important action.</td><td><code>Button</code> default</td></tr>
-        <tr><td>Ghost (bordered)</td><td>Secondary actions. Never more prominent than primary.</td><td><code>Button variant="outline"</code></td></tr>
-        <tr><td>Text / link</td><td>Quiet actions — cancel, skip, change. Never competes.</td><td><code>Button variant="ghost" size="sm"</code></td></tr>
-      </tbody>
-    </table>
-
-    <div class="sub-label">Badges and labels</div>
-    <div class="ui-strip" style="margin-bottom:1.5rem;">
-      <span class="badge badge-purple">In memory of</span>
-      <span class="badge badge-purple">Memorial</span>
-      <span class="badge badge-green">Shared fund available</span>
-      <span class="badge badge-gray">Poll closed</span>
-      <span class="badge" style="background:var(--purple-50);color:var(--purple-800);border:0.5px solid var(--purple-200);">Finite topic</span>
-    </div>
-
-    <div class="sub-label">Surfaces and borders</div>
-    <table>
-      <thead><tr><th>Element</th><th>Style</th></tr></thead>
-      <tbody>
-        <tr><td>Cards</td><td>White background, <code>0.5px solid #D3D1C7</code>, <code>border-radius: 10px</code>, padding 1.25rem</td></tr>
-        <tr><td>Dividers</td><td><code>0.5px solid #D3D1C7</code> — never thicker</td></tr>
-        <tr><td>Edit mode fields</td><td><code>border-bottom: 1.5px solid #AFA9EC</code> persistent underline. Turns <code>#534AB7</code> on focus.</td></tr>
-        <tr><td>Reveal card</td><td>Background <code>#EEEDFE</code>, border <code>#AFA9EC</code>, border-radius 8px, italic text <code>#3C3489</code></td></tr>
-        <tr><td>Quote / blockquote</td><td>Border-left <code>3px solid #AFA9EC</code>, padding-left 12px, italic, color <code>#3C3489</code></td></tr>
-      </tbody>
-    </table>
-
-    <div class="sub-label" style="margin-top:1.5rem;">Spacing scale</div>
-    <div class="spacing-grid">
-      <div class="spacing-item"><div class="spacing-bar" style="height:4px;"></div><div class="spacing-label">4px</div></div>
-      <div class="spacing-item"><div class="spacing-bar" style="height:8px;"></div><div class="spacing-label">8px</div></div>
-      <div class="spacing-item"><div class="spacing-bar" style="height:12px;"></div><div class="spacing-label">12px</div></div>
-      <div class="spacing-item"><div class="spacing-bar" style="height:16px;"></div><div class="spacing-label">16px</div></div>
-      <div class="spacing-item"><div class="spacing-bar" style="height:24px;"></div><div class="spacing-label">24px</div></div>
-      <div class="spacing-item"><div class="spacing-bar" style="height:32px;"></div><div class="spacing-label">32px</div></div>
-    </div>
-    <p style="font-size:13px;color:var(--gray-600);margin-bottom:2rem;">Use 4–8px for component internals, 12–16px for element gaps, 24–32px for section spacing. The product should breathe — emotional content needs space.</p>
-
-    <div class="sub-label">Accessibility</div>
-    <table>
-      <thead><tr><th>Requirement</th><th>Standard</th></tr></thead>
-      <tbody>
-        <tr><td>Text contrast</td><td>WCAG AA minimum. Body text on white: verified. Purple text on white: verified.</td></tr>
-        <tr><td>Focus states</td><td>Visible on all interactive elements. Purple focus ring <code>0 0 0 3px #EEEDFE</code>.</td></tr>
-        <tr><td>Live regions</td><td><code>aria-live="polite"</code> on all ranking updates, totals, and validation messages.</td></tr>
-        <tr><td>Touch targets</td><td>Minimum 44×44px for all interactive elements.</td></tr>
-        <tr><td>Reduced motion</td><td>All animations respect <code>prefers-reduced-motion</code>.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- 07 Writing conventions -->
-  <div class="section">
-    <div class="section-label">07</div>
-    <div class="section-title">Writing conventions</div>
-
-    <table>
-      <thead><tr><th>Convention</th><th>Rule</th><th>Example</th></tr></thead>
-      <tbody>
-        <tr><td>Product name</td><td>Always lowercase: <strong>favpoll</strong>. Never FavPoll, FAVPOLL, or Favpoll.</td><td>favpoll closes automatically after 90 days.</td></tr>
-        <tr><td>Spelling</td><td>UK English in all UI copy. American spelling in code only (<code>color</code>, <code>organize</code>).</td><td>favourite, honour, colour, organisation</td></tr>
-        <tr><td>Dates</td><td>Ordinal format: 13th May 2026. Never 05/13/26 or May 13.</td><td>Closes 13th May 2026 at 23:59</td></tr>
-        <tr><td>Currency</td><td>£ prefix, no space. Two decimal places in summaries, round in headlines.</td><td>£10.30 in summary · £340 in ranking</td></tr>
-        <tr><td>Sentence case</td><td>All headings and labels in sentence case. Never Title Case or ALL CAPS in UI.</td><td>"Favourite comfort food" not "Favourite Comfort Food"</td></tr>
-        <tr><td>Percentages</td><td>No space before %.</td><td>60%</td></tr>
-        <tr><td>Em dashes</td><td>Use — (em dash) with spaces either side in copy.</td><td>Belinda had a colour she loved — what's yours?</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Footer -->
-  <div class="guide-footer">
-    <svg width="55" height="17" viewBox="0 0 55 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10.4 10C10.7314 10 11 9.77614 11 9.5C11 9.22386 10.7314 9 10.4 9L8 9L8 10L10.4 10Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 8L8 7L12.3342 7.00055C12.7019 7.00055 13 7.22428 13 7.50027C13 7.77627 12.7019 8 12.3342 8L8 8Z" fill="#534BB7" fill-opacity="0.6"/><path d="M8 11L8.5004 11C8.77632 11 9 11.2239 9 11.5C9 11.7761 8.77632 12 8.5004 12L8 12L8 11Z" fill="#534BB7" fill-opacity="0.6"/><path d="M18.584 12V6.468H17.3V5.568H18.584V4.992C18.584 4.544 18.684 4.168 18.884 3.864C19.084 3.552 19.348 3.316 19.676 3.156C20.004 2.996 20.356 2.916 20.732 2.916C20.812 2.916 20.904 2.924 21.008 2.94C21.112 2.948 21.196 2.96 21.26 2.976V3.792C21.204 3.776 21.128 3.768 21.032 3.768C20.936 3.76 20.868 3.756 20.828 3.756C20.444 3.756 20.124 3.848 19.868 4.032C19.612 4.216 19.484 4.536 19.484 4.992V5.568H21.056V6.468H19.484V12H18.584ZM23.6517 12.144C23.2437 12.144 22.8797 12.068 22.5597 11.916C22.2397 11.756 21.9877 11.54 21.8037 11.268C21.6197 10.996 21.5277 10.684 21.5277 10.332C21.5277 9.996 21.5997 9.692 21.7437 9.42C21.8877 9.14 22.1117 8.904 22.4157 8.712C22.7197 8.52 23.1077 8.384 23.5797 8.304L26.0997 7.884V8.7L23.7957 9.084C23.3317 9.164 22.9957 9.312 22.7877 9.528C22.5877 9.744 22.4877 10 22.4877 10.296C22.4877 10.584 22.5997 10.828 22.8237 11.028C23.0557 11.228 23.3517 11.328 23.7117 11.328C24.1517 11.328 24.5357 11.236 24.8637 11.052C25.1917 10.86 25.4477 10.604 25.6317 10.284C25.8157 9.964 25.9077 9.608 25.9077 9.216V7.584C25.9077 7.2 25.7677 6.888 25.4877 6.648C25.2077 6.408 24.8437 6.288 24.3957 6.288C24.0037 6.288 23.6597 6.388 23.3637 6.588C23.0677 6.78 22.8477 7.032 22.7037 7.344L21.8877 6.9C22.0077 6.628 22.1957 6.38 22.4517 6.156C22.7157 5.932 23.0157 5.756 23.3517 5.628C23.6877 5.492 24.0357 5.424 24.3957 5.424C24.8677 5.424 25.2837 5.516 25.6437 5.7C26.0117 5.884 26.2957 6.14 26.4957 6.468C26.7037 6.788 26.8077 7.16 26.8077 7.584V12H25.9077V10.716L26.0397 10.848C25.9277 11.088 25.7517 11.308 25.5117 11.508C25.2797 11.7 25.0037 11.856 24.6837 11.976C24.3717 12.088 24.0277 12.144 23.6517 12.144ZM29.7777 12L27.2697 5.568H28.2777L30.3897 11.208H30.0657L32.1897 5.568H33.2097L30.6777 12H29.7777Z" fill="#534BB7"/><path d="M33.7809 14.4V5.568H34.6809V7.008L34.5369 6.756C34.7929 6.348 35.1329 6.024 35.5569 5.784C35.9889 5.544 36.4809 5.424 37.0329 5.424C37.6409 5.424 38.1809 5.572 38.6529 5.868C39.1329 6.156 39.5089 6.552 39.7809 7.056C40.0609 7.56 40.2009 8.136 40.2009 8.784C40.2009 9.424 40.0609 10 39.7809 10.512C39.5089 11.016 39.1329 11.416 38.6529 11.712C38.1809 12 37.6409 12.144 37.0329 12.144C36.4809 12.144 35.9809 12.02 35.5329 11.772C35.0929 11.516 34.7609 11.156 34.5369 10.692L34.6809 10.56V14.4H33.7809ZM36.9849 11.244C37.4169 11.244 37.8009 11.136 38.1369 10.92C38.4809 10.704 38.7489 10.412 38.9409 10.044C39.1409 9.668 39.2409 9.248 39.2409 8.784C39.2409 8.312 39.1409 7.892 38.9409 7.524C38.7489 7.156 38.4809 6.864 38.1369 6.648C37.8009 6.432 37.4169 6.324 36.9849 6.324C36.5529 6.324 36.1609 6.432 35.8089 6.648C35.4649 6.864 35.1889 7.16 34.9809 7.536C34.7809 7.904 34.6809 8.32 34.6809 8.784C34.6809 9.248 34.7809 9.668 34.9809 10.044C35.1889 10.412 35.4649 10.704 35.8089 10.92C36.1609 11.136 36.5529 11.244 36.9849 11.244ZM44.3168 12.144C43.7088 12.144 43.1568 12 42.6608 11.712C42.1648 11.416 41.7688 11.016 41.4728 10.512C41.1848 10 41.0408 9.42 41.0408 8.772C41.0408 8.132 41.1848 7.56 41.4728 7.056C41.7608 6.552 42.1488 6.156 42.6368 5.868C43.1328 5.572 43.6928 5.424 44.3168 5.424C44.9408 5.424 45.4968 5.568 45.9848 5.856C46.4808 6.144 46.8688 6.54 47.1488 7.044C47.4368 7.548 47.5808 8.124 47.5808 8.772C47.5808 9.428 47.4328 10.012 47.1368 10.524C46.8408 11.028 46.4448 11.424 45.9488 11.712C45.4608 12 44.9168 12.144 44.3168 12.144ZM44.3168 11.244C44.7488 11.244 45.1368 11.136 45.4808 10.92C45.8328 10.704 46.1088 10.408 46.3088 10.032C46.5168 9.656 46.6208 9.236 46.6208 8.772C46.6208 8.308 46.5168 7.892 46.3088 7.524C46.1088 7.156 45.8328 6.864 45.4808 6.648C45.1368 6.432 44.7488 6.324 44.3168 6.324C43.8848 6.324 43.4928 6.432 43.1408 6.648C42.7968 6.864 42.5208 7.156 42.3128 7.524C42.1048 7.892 42.0008 8.308 42.0008 8.772C42.0008 9.236 42.1048 9.656 42.3128 10.032C42.5208 10.408 42.7968 10.704 43.1408 10.92C43.4928 11.136 43.8848 11.244 44.3168 11.244ZM48.6881 12V2.916H49.5881V12H48.6881ZM50.9502 12V2.916H51.8502V12H50.9502Z" fill="#534BB7" fill-opacity="0.6"/><path d="M12.1426 3.84462C10.9988 2.71859 9.14384 2.71859 8.00001 3.84462L7.89064 3.74208C6.74088 2.71951 4.96548 2.75381 3.85744 3.84462L3.75392 3.95204C2.71529 5.08377 2.74981 6.83091 3.85744 7.92177L7.00001 10.9999V9.59657L4.55958 7.20985C3.81376 6.47562 3.81385 5.2918 4.55958 4.55751C5.31419 3.81464 6.54424 3.81464 7.29884 4.55751L8.00001 5.24794L8.70119 4.55751C9.4558 3.81463 10.6859 3.81465 11.4404 4.55751C11.8347 4.94577 12.0186 5.4553 11.9981 5.95888C11.9975 5.97255 11.9968 5.98622 11.9959 5.99989H12.9981C13.0298 5.22374 12.7444 4.43725 12.1426 3.84462Z" fill="#534BB7"/>
-    </svg>
-    <p>© favpoll 2026 · Version 1.0 · favpoll.com</p>
-  </div>
-
-</div>
-</body>
+  </body>
 </html>

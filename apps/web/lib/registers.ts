@@ -177,13 +177,13 @@ export function isPluralByDefault(occasionType: string | null): boolean {
 // ---------------------------------------------------------------------------
 
 const exampleNames = {
-  she: ["Margaret", "Eleanor", "Joan", "Sylvia", "Patricia", "Vera"],
+  she: ["Gretchen", "Elizabeth", "Joan", "Sylvia", "Penny", "Vera"],
   he: ["Arthur", "George", "Frank", "Raymond", "Donald", "Stanley"],
   pair: [
     "Joan & Arthur",
-    "Margaret & George",
+    "Gretchen & George",
     "Sylvia & Frank",
-    "Eleanor & Raymond",
+    "Elizabeth & Raymond",
   ],
   set: [
     "The Wednesday Walkers",
