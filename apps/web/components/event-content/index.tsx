@@ -158,9 +158,7 @@ export function EventContent({
         <PledgeCard
           eventId={event.id}
           clerkUserId={clerkUserId}
-          charityNames={event.favpoll_charities.map(
-            (ec) => ec.charities.name
-          )}
+          charityNames={event.favpoll_charities.map((ec) => ec.charities.name)}
           pollWithItems={pollWithItems}
           pot={pot}
           userPotAllocation={userPotAllocation}
