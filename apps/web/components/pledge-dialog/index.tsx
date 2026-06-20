@@ -240,6 +240,8 @@ export function PledgeDialog({
 
         {dialog.step === 2 && (
           <StepAmount
+            pledgeAmount={dialog.pledgeAmount}
+            updatePledgeAmount={dialog.updatePledgeAmount}
             topUpAmount={dialog.topUpAmount}
             guestEmail={dialog.guestEmail}
             useSharedFund={dialog.useSharedFund}
