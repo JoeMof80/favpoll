@@ -147,8 +147,8 @@ export function StepAmount({
             ))}
           </div>
 
-          {/* Top-up — own funds, fund exists */}
-          {!useSharedFund && hasFund && (
+          {/* Top-up — shown whenever paying with own funds */}
+          {!useSharedFund && (
             <div className="rounded-md bg-muted p-3">
               <div className="flex items-center justify-between gap-1.5">
                 <label
