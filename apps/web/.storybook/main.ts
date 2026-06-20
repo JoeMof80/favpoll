@@ -36,6 +36,11 @@ const config: StorybookConfig = {
           "../__mocks__/supabase-client.ts"
         ),
         "@stripe/stripe-js": path.resolve(__dirname, "../__mocks__/stripe.ts"),
+        // next/navigation requires App Router context not available in Storybook browser tests
+        "next/navigation": path.resolve(
+          __dirname,
+          "./__mocks__/next-navigation.ts"
+        ),
         "@/components/new-event-button": path.resolve(
           __dirname,
           "./__mocks__/new-event-button.tsx"

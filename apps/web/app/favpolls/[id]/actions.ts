@@ -374,6 +374,25 @@ export async function pledgeFromFund(input: {
   if (allocErr) throw new Error(allocErr.message)
 }
 
+export async function topUpFundAsGuest(eventId: string, amount: number) {
+  const supabase = createAdminClient()
+
+  const { data: pot } = await supabase
+    .from("favpoll_pots")
+    .select("id, total_deposited")
+    .eq("favpoll_id", eventId)
+    .single()
+
+  if (!pot) throw new Error("No shared fund found for this favpoll")
+
+  const { error } = await supabase
+    .from("favpoll_pots")
+    .update({ total_deposited: pot.total_deposited + amount })
+    .eq("id", pot.id)
+
+  if (error) throw new Error(error.message)
+}
+
 export async function topUpFund(eventId: string, amount: number) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
@@ -405,6 +424,28 @@ export async function topUpFund(eventId: string, amount: number) {
     .from("favpoll_pots")
     .update({ total_deposited: pot.total_deposited + amount })
     .eq("id", pot.id)
+
+  if (error) throw new Error(error.message)
+}
+
+export async function setFavpollListed(eventId: string, isListed: boolean) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: event } = await supabase
+    .from("favpolls")
+    .select("created_by")
+    .eq("id", eventId)
+    .single()
+
+  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from("favpolls")
+    .update({ is_listed: isListed })
+    .eq("id", eventId)
 
   if (error) throw new Error(error.message)
 }

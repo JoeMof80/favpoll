@@ -495,12 +495,20 @@ components/
 │   ├── charity-field.tsx         -- ResponsiveOverlay (internal open state); search input + charity chip grid; max 3
 │   ├── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob (superseded — inline crop logic now lives in `editable-hero.tsx`; this file is unused)
 │   └── __tests__/generate-draft-prefill.test.tsx  -- 9 tests: empty-on-mount, shimmer→fill after generate trigger, person vs cause pre-fill, skip for custom/edit mode, silent failure, subject derivation; subject passed as prop (not derived from register)
-├── pledge-panel.tsx              -- Draft state: draftIds committed on Done, discarded on close. Sheet (mobile) + Dialog (desktop). Chips + input inline (flex-wrap); input collapses to w-0 when chips present. Backspace removes last chip. size=lg chips.
+├── pledge-panel.tsx              -- Still used by editable-poll-area.tsx in the create/edit form preview (organiser only). No longer on the guest event page — picker is now step 1 of PledgeDialog.
 ├── pledge-card/
-│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix)
+│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix). LivePledgeCard is no longer rendered on the guest event page — superseded by PledgeDialog.
 │   ├── use-pledge.ts, amount-input.tsx
 │   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
 │   └── __tests__/pledge-card.test.tsx, use-pledge.test.ts, utils.test.ts
+├── pledge-dialog/                -- Unified 3-step pledge dialog replacing the separate PledgePanel + PledgeCard surfaces on the guest event page.
+│   ├── index.tsx                 -- PledgeDialog: self-contained trigger button + ResponsiveOverlay; step 1 = pick favourites, step 2 = amount + breakdown, step 3 = inline Stripe payment.
+│   ├── use-pledge-dialog.ts      -- Wraps usePledge (step 2/3 state) + own draft state (step 1). Auto-advances to step 3 when pledgeClientSecret is set. Back from step 3 clears it.
+│   ├── step-pick-favourites.tsx  -- PickerHeader (chip+search field) + PickerItems (chip grid); extracted from pledge-panel.tsx.
+│   ├── step-amount.tsx           -- AmountInput + AmountPresets + per-favourite breakdown (primary) + per-charity collapsible (secondary, 2+ charities only) + shared fund toggle + fee/total line.
+│   ├── step-pay.tsx              -- Inline StripeCheckout (inline prop) for step 3.
+│   ├── pledge-dialog.stories.tsx -- Stories: SignedIn, WithSharedFund, TwoCharities, Guest, InfinitePoll.
+│   └── __tests__/use-pledge-dialog.test.ts  -- 17 tests: step nav, draft state, breakdowns, shared fund path, payment success.
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
@@ -511,8 +519,8 @@ components/
 │   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
 │   ├── use-poll-section.ts   -- fires onViewChange on mount (initial view) and all view transitions
 ├── event-content/
-│   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; branches on subject: cause → CauseHero, person → EventHero; protagonistName to PollSection = cause_label or protagonist.name; LivePledgeCard mobile (md:hidden); charity carousel fixed bottom mobile
-│   └── use-event-content.ts  -- pollView state tracks pledge/results view; showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView==="pledge"
+│   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; branches on subject: cause → CauseHero, person → EventHero; PledgeDialog (self-contained) in right column (desktop) and below PollSection (mobile); charity carousel fixed bottom mobile
+│   └── use-event-content.ts  -- pollView state tracks pledge/results view; showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView==="pledge"; no longer manages pledgeAmount/pollSelections (dialog-owned)
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
@@ -770,7 +778,12 @@ NEXT_PUBLIC_BASE_URL
 
 - **Pledge panel draft state.** Selections are not committed until the user clicks Done. Opening the Sheet/Dialog initialises `draftIds` from the current `selectedIds`. Closing/dismissing without Done discards the draft. This prevents partial selections appearing in the trigger display.
 
-- **Pledge card visibility.** `showPledgeCard` in `useEventContent` is `!isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`. `pollView` is initialised from `hasPledged || isClosed` and updated via `onViewChange` callback from `PollSection`. No `!hasPledged` check — Reset Pledge correctly re-shows the card for previously-pledged users who switch back to pledge view.
+- **Pledge card visibility.** `showPledgeCard` in `useEventContent` is `!isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`. `pollView` is initialised from `hasPledged || isClosed` and updated via `onViewChange` callback from `PollSection`. No `!hasPledged` check — Reset Pledge correctly re-shows the dialog trigger for previously-pledged users who switch back to pledge view.
+- **Unified pledge dialog.** The guest pledge flow is one self-contained 3-step `ResponsiveOverlay` (`pledge-dialog/`): step 1 = pick favourites (chip picker), step 2 = amount + breakdown + funding path selector, step 3 = inline Stripe payment. A single "Pledge favourites" button replaces the old separate `PledgePanel` trigger and `PledgeCard`. `PledgePanel` is kept for the organiser form preview; `PledgeCard`/`LivePledgeCard` are kept but no longer rendered on the guest event page. `StripeCheckout` gained an `inline` prop (no fixed overlay) for embedding in step 3.
+
+- **Pledge dialog funding paths.** Step 2 shows a "Pay with card / Use shared fund" tab selector at the top of the body when `hasFund` is true (pot exists, available > 0, user signed in). Path A = card payment, advances to step 3 (Stripe). Path C = shared fund, calls `pledgeFromFund` directly with no Stripe step. Guest email capture is deferred to step 3 (Stripe form) via `showEmailCapture` prop on `StripeCheckout`; step 2 no longer shows an email field. `handlePledgePaymentSuccess` accepts optional `email?: string` (from Stripe form) and passes it to `createGuestPledge`. A listed-favpoll notice is shown in step 2 right column when `useSharedFund && isListed`.
+
+- **Guest shared fund contribution (Path B).** `EventContent` right column shows a "Help others take part" card when `!isClosed && pot.total_deposited > 0`. Clicking "Add to the shared fund" opens `SeedFundModal` with `variant="guest"`. `SeedFundModal` gains `variant?: "organiser"|"guest"`, `isListed?: boolean`, and `onCancel?: () => void` props. The guest variant uses different copy, shows "No thanks" cancel instead of "Skip for now", and calls `topUpFundAsGuest` (no-auth server action). `topUpFundAsGuest` in `app/favpolls/[id]/actions.ts` requires no auth and updates an existing pot's `total_deposited` only — it never creates a new pot row (pot is always present per the mandatory-fund decision).
 
 - **Mobile breakpoint is `md` (768px) throughout.** All responsive grid/layout changes use `md:` prefix. Do not introduce new `lg:` breakpoints for layout (only for spacing/typography if needed).
 
@@ -783,7 +796,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **`scripts/seed-favpolls.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_FAVPOLLS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from favpolls where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots). The `favpolls` insert must never set a `register` field — that column was dropped by `20260607140000_derive_register.sql`; `register` is local-variable-only inside this script (used for `closingDays`/`aboutFor`/the result summary), never written to the DB. `loadReferenceData()` paginates the `favourites` fetch via `.range()` in 1000-row pages — PostgREST caps an unranged `.select()` at 1000 rows, and `favourites` now holds ~3300 rows after the full topic-library seed, so a plain select would silently starve `itemsByTopic` for most topics and `createOneFavpoll()` would skip them with no logged error (its `allItems.length === 0` early-return is silent by design, unlike its sibling error sites).
 
-- **Dialog header input pattern.** When an overlay needs a primary text input (search, name, long-form field), place it in the `header` prop of `ResponsiveOverlay`; the `title` goes `sr-only`. The body holds secondary content (description, char counter, regenerate button). Use shadcn `Input` for single-line with `className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"` and shadcn `Textarea` for multi-line with `className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"`. Never switch to raw `<input>`/`<textarea>` when using this pattern — the shadcn components are required so that global theming and accessibility plumbing are preserved. The pledge-panel favourite-picker is the canonical example of this pattern.
+- **Dialog header input pattern.** When an overlay needs a primary text input (search, name, long-form field), place it in the `header` prop of `ResponsiveOverlay`; the `title` goes `sr-only`. The body holds secondary content (description, char counter, regenerate button). Use shadcn `Input` for single-line with `className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"` and shadcn `Textarea` for multi-line with `className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"`. Never switch to raw `<input>`/`<textarea>` when using this pattern — the shadcn components are required so that global theming and accessibility plumbing are preserved. The pledge-dialog step-1 picker header (`pledge-dialog/step-pick-favourites.tsx`) and pledge-panel are canonical examples of this pattern.
 
 - **`Countdown.closesAt` is optional.** When `closesAt` is absent, `Countdown` renders a `--` placeholder in the same variant layout with `text-muted-foreground`. The `useEffect` guard skips the timer when `closesAt` is undefined. Use `<Countdown />` (no prop) for the create-mode preview (date not yet set); use `<Countdown closesAt={iso} />` for the live widget.
 

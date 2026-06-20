@@ -64,6 +64,15 @@ export default defineConfig({
                 ".storybook/__mocks__/favpoll-poll-favourites.ts"
               ),
             },
+            // next/navigation requires App Router context which isn't set up in the
+            // vitest-browser runner — stub the hooks that stories need.
+            {
+              find: "next/navigation",
+              replacement: resolve(
+                dirname,
+                ".storybook/__mocks__/next-navigation.ts"
+              ),
+            },
             ...sharedAliases,
           ],
         },

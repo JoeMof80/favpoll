@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
 import { suggestClosingDate } from "@/lib/registers"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import type { EventFormValues } from "./schema"
@@ -36,8 +35,6 @@ export function CommandPanel({
     useWatch({ control: form.control, name: "causeLabel" }) ?? ""
   const subjectValue = (useWatch({ control: form.control, name: "subject" }) ??
     "someone") as FavpollSubject
-  const isListed = useWatch({ control: form.control, name: "isListed" }) ?? true
-
   const [publishOpen, setPublishOpen] = useState(false)
   const [publishInitialDate, setPublishInitialDate] = useState<Date>(new Date())
 
@@ -71,24 +68,6 @@ export function CommandPanel({
           className="space-y-3 p-4"
           style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
         >
-          {/* Listed / Unlisted */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium">
-                {isListed ? "Listed" : "Unlisted"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isListed
-                  ? "Appears on the live events page."
-                  : "Only reachable by people you give the link to."}
-              </p>
-            </div>
-            <Switch
-              checked={isListed}
-              onCheckedChange={(v) => form.setValue("isListed", v)}
-            />
-          </div>
-
           {/* Missing fields */}
           {missing.length > 0 && (
             <ul className="space-y-0.5">

@@ -206,10 +206,10 @@ export function usePledge({
     }
   }
 
-  async function handlePledgePaymentSuccess() {
+  async function handlePledgePaymentSuccess(email?: string) {
     setPledgeClientSecret(null)
     try {
-      await savePledge(guestEmail)
+      await savePledge(email ?? guestEmail)
       if (pendingTopUp) await topUpFund(eventId, numericTopUp)
       setPendingTopUp(false)
       onPledgeSuccess?.()

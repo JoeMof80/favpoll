@@ -83,7 +83,6 @@ const meta = {
   ],
   args: {
     clerkUserId: null,
-    pledgeAmount: "10",
     isClosed: false,
     hasPledged: false,
     pledgeJustConfirmed: false,
@@ -91,8 +90,6 @@ const meta = {
     poll: MEMORIAL_POLL,
     isOrganiser: false,
     eventId: "event-demo",
-    onSelectionsChange: () => {},
-    onAddItem: undefined,
   },
 } satisfies Meta<typeof PollSection>
 

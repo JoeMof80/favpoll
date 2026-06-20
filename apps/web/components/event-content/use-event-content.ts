@@ -19,19 +19,9 @@ export function useEventContent({
   clerkUserId,
 }: UseEventContentOptions) {
   const router = useRouter()
-  const [pledgeAmount, setPledgeAmount] = useState("")
-  const [pollSelections, setPollSelections] = useState<
-    Record<string, string[]>
-  >({})
   const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
   const [pollView, setPollView] = useState<"pledge" | "results">(
     hasPledged || isClosed ? "results" : "pledge"
-  )
-
-  const handleSelectionsChange = useCallback(
-    (pollId: string, selectedIds: string[]) =>
-      setPollSelections((prev) => ({ ...prev, [pollId]: selectedIds })),
-    []
   )
 
   const handlePledgeSuccess = useCallback(() => {
@@ -59,15 +49,22 @@ export function useEventContent({
   const showPledgeCard =
     !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"
 
+  // Must be stable (useCallback + [] deps) — usePollSection's effects include
+  // onViewChange in their deps and have cleanup that cancels timeouts; an
+  // unstable reference causes re-fires that cancel the showRankings timer.
+  const handleViewChange = useCallback(
+    (view: "pledge" | "results") => {
+      if (view === "pledge") setPledgeConfirmed(false)
+      setPollView(view)
+    },
+    [] // setPledgeConfirmed and setPollView are stable state setters
+  )
+
   return {
-    pledgeAmount,
-    setPledgeAmount,
-    pollSelections,
-    handleSelectionsChange,
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    setPollView,
+    handleViewChange,
   }
 }

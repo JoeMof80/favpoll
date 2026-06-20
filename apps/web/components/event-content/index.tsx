@@ -1,12 +1,16 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EventHero } from "@/components/event-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
-import { PledgeCard, LivePledgeCard } from "@/components/pledge-card"
+import { PledgeDialog } from "@/components/pledge-dialog"
+import { SeedFundModal } from "@/components/event-form-v2/seed-fund-modal"
 import type {
   FavpollWithDetails,
   FavpollPollWithItems,
@@ -16,6 +20,7 @@ import type {
 import { useEventContent } from "./use-event-content"
 import { EventCardCharityCarousel } from "../event-card/event-card-charity-carousel"
 import { PageLayout } from "../page-layout"
+import { Gift } from "lucide-react"
 
 type Props = {
   event: FavpollWithDetails
@@ -40,16 +45,15 @@ export function EventContent({
   clerkUserId,
   isOrganiser,
 }: Props) {
+  const router = useRouter()
+  const [showGuestFund, setShowGuestFund] = useState(false)
+
   const {
-    pledgeAmount,
-    setPledgeAmount,
-    pollSelections,
-    handleSelectionsChange,
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    setPollView,
+    handleViewChange,
   } = useEventContent({
     event,
     pollWithItems,
@@ -59,6 +63,8 @@ export function EventContent({
   })
 
   const isCause = event.subject === "cause"
+  const isListed = event.is_listed ?? true
+  const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -77,6 +83,23 @@ export function EventContent({
       ? totalRaised / event.favpoll_charities.length
       : 0
 
+  const charityNames = event.favpoll_charities.map((ec) => ec.charities.name)
+
+  const pledgeDialog =
+    !isClosed && showPledgeCard && pollWithItems ? (
+      <PledgeDialog
+        eventId={event.id}
+        clerkUserId={clerkUserId}
+        charityNames={charityNames}
+        pollWithItems={pollWithItems}
+        pot={pot}
+        userPotAllocation={userPotAllocation}
+        onPledgeSuccess={handlePledgeSuccess}
+        onAddItem={addItemHandler(pollWithItems)}
+        isListed={isListed}
+      />
+    ) : null
+
   const left = (
     <>
       {isCause ? (
@@ -89,7 +112,6 @@ export function EventContent({
         <PollSection
           poll={pollWithItems}
           clerkUserId={clerkUserId}
-          pledgeAmount={pledgeAmount}
           isClosed={isClosed}
           hasPledged={hasPledged}
           pledgeJustConfirmed={pledgeConfirmed}
@@ -100,32 +122,13 @@ export function EventContent({
           }
           isOrganiser={isOrganiser}
           eventId={event.id}
-          onSelectionsChange={handleSelectionsChange}
-          onAddItem={addItemHandler(pollWithItems)}
-          onViewChange={setPollView}
+          onViewChange={handleViewChange}
+          pledgeTrigger={pledgeDialog}
         />
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
           No poll has been set up for this event yet.
         </p>
-      )}
-
-      {!isClosed && showPledgeCard && pollWithItems && (
-        <div className="mt-6 md:hidden">
-          <LivePledgeCard
-            eventId={event.id}
-            clerkUserId={clerkUserId}
-            charityNames={event.favpoll_charities.map(
-              (ec) => ec.charities.name
-            )}
-            pollWithItems={pollWithItems}
-            pot={pot}
-            userPotAllocation={userPotAllocation}
-            pollSelections={pollSelections}
-            onPledgeAmountChange={setPledgeAmount}
-            onPledgeSuccess={handlePledgeSuccess}
-          />
-        </div>
       )}
     </>
   )
@@ -150,28 +153,48 @@ export function EventContent({
           <Countdown closesAt={event.closes_at} />
         </div>
       )}
+
       <CharityBanner
         charities={event.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
       />
-      {!isClosed && showPledgeCard && pollWithItems && (
-        <PledgeCard
-          eventId={event.id}
-          clerkUserId={clerkUserId}
-          charityNames={event.favpoll_charities.map((ec) => ec.charities.name)}
-          pollWithItems={pollWithItems}
-          pot={pot}
-          userPotAllocation={userPotAllocation}
-          pollSelections={pollSelections}
-          onPledgeAmountChange={setPledgeAmount}
-          onPledgeSuccess={handlePledgeSuccess}
-        />
+
+      {/* Guest shared fund contribution card — always shown on open favpolls */}
+      {!isClosed && pot && (
+        <div className="rounded-lg border border-border bg-background px-5 py-4">
+          <p className="mt-1 text-sm text-muted-foreground">
+            <b>{GBP.format(fundAvailable)}</b> available for guests who need
+            help to pledge.
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-3 flex w-full"
+            onClick={() => setShowGuestFund(true)}
+          >
+            <Gift size={4} />
+            Add to the shared fund
+          </Button>
+        </div>
       )}
     </>
   )
 
   return (
     <PageLayout left={left} right={right}>
+      {showGuestFund && (
+        <SeedFundModal
+          eventId={event.id}
+          variant="guest"
+          isListed={isListed}
+          onComplete={() => {
+            setShowGuestFund(false)
+            router.refresh()
+          }}
+          onCancel={() => setShowGuestFund(false)}
+        />
+      )}
       {/* Fixed charity carousel — mobile only, always visible */}
       {event.favpoll_charities.length > 0 && (
         <div
