@@ -98,11 +98,17 @@ export function PledgeDialog({
 
   const topicTitle = pollWithItems.topics.title
 
-  // Step 2 header: amount input + presets (always visible, doesn't scroll)
+  // Step 2 header: amount input with block-start label and block-end fund status
   const step2Header = (
     <StepAmountHeader
       pledgeAmount={dialog.pledgeAmount}
       updatePledgeAmount={dialog.updatePledgeAmount}
+      useSharedFund={dialog.useSharedFund}
+      available={dialog.available}
+      numericPledge={dialog.numericPledge}
+      isPledgeValid={dialog.isPledgeValid}
+      fundOverAvailable={dialog.fundOverAvailable}
+      error={dialog.error}
     />
   )
 
@@ -137,11 +143,7 @@ export function PledgeDialog({
   const isNextDisabled = dialog.useSharedFund
     ? !dialog.canFundConfirm
     : !dialog.canOwnConfirm
-  const nextLabel = dialog.submitting
-    ? "Processing…"
-    : dialog.useSharedFund
-      ? "Pledge"
-      : "Next →"
+  const nextLabel = dialog.submitting ? "Processing…" : "Pledge"
 
   const step2Footer = (
     <div className="flex gap-3">
@@ -173,7 +175,7 @@ export function PledgeDialog({
         disabled={stripeSubmitting}
         onClick={dialog.handleBack}
       >
-        Cancel
+        ← Back
       </Button>
       <Button
         type="submit"
@@ -214,19 +216,17 @@ export function PledgeDialog({
               : undefined
         }
         footer={currentFooter}
-        headerClassName={dialog.step === 1 ? "px-4 py-3" : "px-5 py-4"}
+        headerClassName={
+          dialog.step === 1
+            ? "px-4 py-3"
+            : dialog.step === 2
+              ? "p-0"
+              : "px-5 py-4"
+        }
         dialogContentClassName="flex-1 overflow-y-auto"
       >
         {dialog.step === 1 && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs text-muted-foreground">
-                {dialog.draftIds.length === 0
-                  ? "Select one or more"
-                  : `${dialog.draftIds.length} selected`}
-              </span>
-              <StepIndicator step={1} />
-            </div>
+          <div className="flex flex-col gap-2 px-5 py-4">
             <PickerItems
               filteredItems={dialog.filteredItems}
               draftIds={dialog.draftIds}
@@ -244,20 +244,11 @@ export function PledgeDialog({
           <StepAmount
             pledgeAmount={dialog.pledgeAmount}
             updatePledgeAmount={dialog.updatePledgeAmount}
-            topUpAmount={dialog.topUpAmount}
             useSharedFund={dialog.useSharedFund}
-            error={dialog.error}
-            available={dialog.available}
             hasFund={dialog.hasFund}
-            numericPledge={dialog.numericPledge}
-            isPledgeValid={dialog.isPledgeValid}
-            fundOverAvailable={dialog.fundOverAvailable}
-            fundBarPct={dialog.fundBarPct}
-            fundBarColor={dialog.fundBarColor}
             ownBreakdown={dialog.ownBreakdown}
             fundBreakdown={dialog.fundBreakdown}
             favouriteBreakdown={dialog.favouriteBreakdown}
-            setTopUpAmount={dialog.setTopUpAmount}
             toggleFund={dialog.toggleFund}
             isListed={isListed}
           />

@@ -272,6 +272,7 @@ export function EventFormV2({
     return (
       <SeedFundModal
         eventId={seedEventId}
+        isListed={form.getValues("isListed") ?? true}
         onComplete={() => router.push(`/favpolls/${seedEventId}`)}
       />
     )

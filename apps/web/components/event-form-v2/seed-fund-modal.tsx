@@ -2,9 +2,14 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
-import { topUpFund, topUpFundAsGuest } from "@/app/favpolls/[id]/actions"
+import {
+  topUpFund,
+  topUpFundAsGuest,
+  setFavpollListed,
+} from "@/app/favpolls/[id]/actions"
 
 const PRESETS = [10, 25, 50]
 
@@ -30,11 +35,21 @@ export function SeedFundModal({
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [listingState, setListingState] = useState(isListed ?? true)
+
+  const isGuest = variant === "guest"
+
+  async function handleToggleListed(value: boolean) {
+    setListingState(value)
+    try {
+      await setFavpollListed(eventId, value)
+    } catch {
+      setListingState(!value)
+    }
+  }
 
   const numeric = parseFloat(amount)
   const isValid = !isNaN(numeric) && numeric > 0
-
-  const isGuest = variant === "guest"
 
   async function handleSeed() {
     if (!isValid) return
@@ -198,7 +213,23 @@ export function SeedFundModal({
 
       {description}
 
-      {isListed && (
+      {!isGuest && (
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">
+              {listingState ? "Listed" : "Unlisted"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {listingState
+                ? "Appears on the live events page."
+                : "Only reachable by people you give the link to."}
+            </p>
+          </div>
+          <Switch checked={listingState} onCheckedChange={handleToggleListed} />
+        </div>
+      )}
+
+      {isGuest && listingState && (
         <p className="mt-3 text-[11px] text-muted-foreground">
           This favpoll is publicly listed. Your contribution is always private.
         </p>

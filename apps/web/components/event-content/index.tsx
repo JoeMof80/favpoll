@@ -20,6 +20,7 @@ import type {
 import { useEventContent } from "./use-event-content"
 import { EventCardCharityCarousel } from "../event-card/event-card-charity-carousel"
 import { PageLayout } from "../page-layout"
+import { Gift } from "lucide-react"
 
 type Props = {
   event: FavpollWithDetails
@@ -63,10 +64,7 @@ export function EventContent({
 
   const isCause = event.subject === "cause"
   const isListed = event.is_listed ?? true
-  const fundAvailable =
-    pot && pot.total_deposited > 0
-      ? pot.total_deposited - pot.total_allocated
-      : 0
+  const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -156,33 +154,30 @@ export function EventContent({
         </div>
       )}
 
-      {/* Guest shared fund contribution card */}
-      {!isClosed && pot && pot.total_deposited > 0 && (
-        <div className="rounded-lg border border-border bg-card px-5 py-4">
-          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            Help others take part
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {fundAvailable > 0
-              ? `${GBP.format(fundAvailable)} is available for guests who can't pledge on their own.`
-              : "There's a shared fund for this favpoll."}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-3 w-full"
-            onClick={() => setShowGuestFund(true)}
-          >
-            Add to the shared fund
-          </Button>
-        </div>
-      )}
-
       <CharityBanner
         charities={event.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
       />
+
+      {/* Guest shared fund contribution card — always shown on open favpolls */}
+      {!isClosed && pot && (
+        <div className="rounded-lg border border-border bg-background px-5 py-4">
+          <p className="mt-1 text-sm text-muted-foreground">
+            <b>{GBP.format(fundAvailable)}</b> available for guests who need
+            help to pledge.
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-3 flex w-full"
+            onClick={() => setShowGuestFund(true)}
+          >
+            <Gift size={4} />
+            Add to the shared fund
+          </Button>
+        </div>
+      )}
     </>
   )
 

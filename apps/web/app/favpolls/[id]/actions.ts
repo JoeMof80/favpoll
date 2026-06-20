@@ -427,3 +427,25 @@ export async function topUpFund(eventId: string, amount: number) {
 
   if (error) throw new Error(error.message)
 }
+
+export async function setFavpollListed(eventId: string, isListed: boolean) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: event } = await supabase
+    .from("favpolls")
+    .select("created_by")
+    .eq("id", eventId)
+    .single()
+
+  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from("favpolls")
+    .update({ is_listed: isListed })
+    .eq("id", eventId)
+
+  if (error) throw new Error(error.message)
+}
