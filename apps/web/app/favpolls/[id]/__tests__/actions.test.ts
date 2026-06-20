@@ -21,6 +21,7 @@ import {
   createPledge,
   createGuestPledge,
   addOrganizerItem,
+  topUpFundAsGuest,
 } from "@/app/favpolls/[id]/actions"
 
 beforeEach(() => {
@@ -398,6 +399,41 @@ describe("addOrganizerItem", () => {
   it("throws 'Label is required' for blank label", async () => {
     await expect(addOrganizerItem(eventId, "   ")).rejects.toThrow(
       "Label is required"
+    )
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// topUpFundAsGuest
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("topUpFundAsGuest", () => {
+  it("throws when no pot exists for the favpoll", async () => {
+    mock.queue(null) // no pot returned (maybeSingle → null via single)
+
+    await expect(topUpFundAsGuest("event-1", 10)).rejects.toThrow(
+      "No shared fund found for this favpoll"
+    )
+  })
+
+  it("updates total_deposited by adding the amount to the existing balance", async () => {
+    mock.queue({ id: "pot-1", total_deposited: 50 }) // pot select
+    mock.queue(null) // pot update
+
+    await topUpFundAsGuest("event-1", 10)
+
+    const potUpdate = mock
+      .callsFor("favpoll_pots")
+      .find((c) => c.method === "update")!
+    expect(potUpdate.args[0]).toEqual({ total_deposited: 60 })
+  })
+
+  it("throws when the update fails", async () => {
+    mock.queue({ id: "pot-1", total_deposited: 50 })
+    mock.queue(null, { message: "update failed" })
+
+    await expect(topUpFundAsGuest("event-1", 10)).rejects.toThrow(
+      "update failed"
     )
   })
 })

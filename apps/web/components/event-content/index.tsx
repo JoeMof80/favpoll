@@ -1,5 +1,8 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EventHero } from "@/components/event-hero"
@@ -7,6 +10,7 @@ import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
+import { SeedFundModal } from "@/components/event-form-v2/seed-fund-modal"
 import type {
   FavpollWithDetails,
   FavpollPollWithItems,
@@ -40,6 +44,9 @@ export function EventContent({
   clerkUserId,
   isOrganiser,
 }: Props) {
+  const router = useRouter()
+  const [showGuestFund, setShowGuestFund] = useState(false)
+
   const {
     handlePledgeSuccess,
     pledgeConfirmed,
@@ -55,6 +62,11 @@ export function EventContent({
   })
 
   const isCause = event.subject === "cause"
+  const isListed = event.is_listed ?? true
+  const fundAvailable =
+    pot && pot.total_deposited > 0
+      ? pot.total_deposited - pot.total_allocated
+      : 0
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -86,6 +98,7 @@ export function EventContent({
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}
         onAddItem={addItemHandler(pollWithItems)}
+        isListed={isListed}
       />
     ) : null
 
@@ -142,6 +155,30 @@ export function EventContent({
           <Countdown closesAt={event.closes_at} />
         </div>
       )}
+
+      {/* Guest shared fund contribution card */}
+      {!isClosed && pot && pot.total_deposited > 0 && (
+        <div className="rounded-lg border border-border bg-card px-5 py-4">
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            Help others take part
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {fundAvailable > 0
+              ? `${GBP.format(fundAvailable)} is available for guests who can't pledge on their own.`
+              : "There's a shared fund for this favpoll."}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3 w-full"
+            onClick={() => setShowGuestFund(true)}
+          >
+            Add to the shared fund
+          </Button>
+        </div>
+      )}
+
       <CharityBanner
         charities={event.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
@@ -151,6 +188,18 @@ export function EventContent({
 
   return (
     <PageLayout left={left} right={right}>
+      {showGuestFund && (
+        <SeedFundModal
+          eventId={event.id}
+          variant="guest"
+          isListed={isListed}
+          onComplete={() => {
+            setShowGuestFund(false)
+            router.refresh()
+          }}
+          onCancel={() => setShowGuestFund(false)}
+        />
+      )}
       {/* Fixed charity carousel — mobile only, always visible */}
       {event.favpoll_charities.length > 0 && (
         <div

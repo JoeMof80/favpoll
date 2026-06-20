@@ -22,6 +22,7 @@ type Props = {
   userPotAllocation: PotAllocation | null
   onPledgeSuccess?: () => void
   onAddItem?: (label: string) => Promise<void>
+  isListed?: boolean
 }
 
 function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
@@ -51,6 +52,7 @@ export function PledgeDialog({
   userPotAllocation,
   onPledgeSuccess,
   onAddItem,
+  isListed,
 }: Props) {
   const [open, setOpen] = useState(false)
   const [stripeSubmitting, setStripeSubmitting] = useState(false)
@@ -243,7 +245,6 @@ export function PledgeDialog({
             pledgeAmount={dialog.pledgeAmount}
             updatePledgeAmount={dialog.updatePledgeAmount}
             topUpAmount={dialog.topUpAmount}
-            guestEmail={dialog.guestEmail}
             useSharedFund={dialog.useSharedFund}
             error={dialog.error}
             available={dialog.available}
@@ -256,10 +257,9 @@ export function PledgeDialog({
             ownBreakdown={dialog.ownBreakdown}
             fundBreakdown={dialog.fundBreakdown}
             favouriteBreakdown={dialog.favouriteBreakdown}
-            clerkUserId={clerkUserId}
             setTopUpAmount={dialog.setTopUpAmount}
-            setGuestEmail={dialog.setGuestEmail}
             toggleFund={dialog.toggleFund}
+            isListed={isListed}
           />
         )}
 
@@ -272,6 +272,7 @@ export function PledgeDialog({
             onBack={dialog.handleBack}
             onSubmittingChange={setStripeSubmitting}
             onStripeReadyChange={setStripeReady}
+            showEmailCapture={!clerkUserId}
           />
         )}
       </ResponsiveOverlay>

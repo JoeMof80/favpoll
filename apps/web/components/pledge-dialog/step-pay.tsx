@@ -6,10 +6,11 @@ type Props = {
   clientSecret: string
   chargeAmount: number
   charityAmount: number
-  onSuccess: () => void
+  onSuccess: (email?: string) => void
   onBack: () => void
   onSubmittingChange?: (v: boolean) => void
   onStripeReadyChange?: (ready: boolean) => void
+  showEmailCapture?: boolean
 }
 
 export function StepPay({
@@ -20,6 +21,7 @@ export function StepPay({
   onBack,
   onSubmittingChange,
   onStripeReadyChange,
+  showEmailCapture,
 }: Props) {
   return (
     <div className="px-5 py-4">
@@ -33,6 +35,7 @@ export function StepPay({
         onClose={onBack}
         onSubmittingChange={onSubmittingChange}
         onStripeReadyChange={onStripeReadyChange}
+        showEmailCapture={showEmailCapture}
       />
     </div>
   )

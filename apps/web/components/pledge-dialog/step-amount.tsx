@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -78,7 +77,6 @@ type Props = {
   pledgeAmount: string
   updatePledgeAmount: (v: string) => void
   topUpAmount: string
-  guestEmail: string
   useSharedFund: boolean
   error: string | null
   available: number
@@ -97,17 +95,15 @@ type Props = {
     total: { label: string; amount: number }
   } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
-  clerkUserId: string | null
   setTopUpAmount: (v: string) => void
-  setGuestEmail: (v: string) => void
   toggleFund: () => void
+  isListed?: boolean
 }
 
 export function StepAmount({
   pledgeAmount,
   updatePledgeAmount,
   topUpAmount,
-  guestEmail,
   useSharedFund,
   error,
   available,
@@ -120,13 +116,40 @@ export function StepAmount({
   ownBreakdown,
   fundBreakdown,
   favouriteBreakdown,
-  clerkUserId,
   setTopUpAmount,
-  setGuestEmail,
   toggleFund,
+  isListed,
 }: Props) {
   return (
     <div className="px-5 py-4">
+      {/* ── Path selector: only shown when shared fund is available ── */}
+      {hasFund && (
+        <div className="mb-4 flex gap-2">
+          <Button
+            type="button"
+            variant={!useSharedFund ? "default" : "outline"}
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              if (useSharedFund) toggleFund()
+            }}
+          >
+            Pay with card
+          </Button>
+          <Button
+            type="button"
+            variant={useSharedFund ? "default" : "outline"}
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              if (!useSharedFund) toggleFund()
+            }}
+          >
+            Use shared fund
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-5">
         {/* ── Left column: presets + fund controls ── */}
         <div className="flex flex-col gap-3 sm:col-span-2">
@@ -177,6 +200,9 @@ export function StepAmount({
                   </PopoverContent>
                 </Popover>
               </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Help guests who can&apos;t pledge on their own still take part.
+              </p>
               <div className="mt-2 flex items-baseline gap-1">
                 <span
                   className="text-sm text-muted-foreground"
@@ -226,24 +252,6 @@ export function StepAmount({
               )}
             </div>
           )}
-
-          {/* Fund toggle */}
-          {hasFund && (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={toggleFund}
-              aria-label={
-                useSharedFund
-                  ? "Use your own funds instead"
-                  : "Use the shared fund instead"
-              }
-              className="w-full text-xs text-muted-foreground hover:text-primary"
-            >
-              {useSharedFund ? "Use your own funds" : "Use the shared fund"}
-            </Button>
-          )}
         </div>
 
         {/* ── Right column: breakdown + fee ── */}
@@ -270,37 +278,15 @@ export function StepAmount({
             <PledgeBreakdown {...(ownBreakdown ?? fundBreakdown)!} />
           )}
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
-
-          {!clerkUserId && (
-            <div>
-              <label
-                htmlFor="dialog-guest-email"
-                className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
-              >
-                Your email
-              </label>
-              <input
-                id="dialog-guest-email"
-                type="email"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                placeholder="for your receipt and withdrawal link"
-                className="mt-1 w-full border-b border-border bg-transparent py-1 text-base outline-none focus:border-primary"
-                aria-label="Email address for receipt and withdrawal link"
-              />
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                No account needed.{" "}
-                <Link
-                  href="/sign-in"
-                  className="text-primary underline-offset-2 hover:underline"
-                >
-                  Sign in
-                </Link>{" "}
-                to track your pledges over time.
-              </p>
-            </div>
+          {/* Listed-favpoll notice — shown when using the shared fund */}
+          {useSharedFund && isListed && (
+            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
+              This is a public favpoll. Your pledge amount and identity are
+              always private.
+            </p>
           )}
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
       </div>
     </div>

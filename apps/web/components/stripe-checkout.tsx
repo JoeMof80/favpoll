@@ -15,7 +15,7 @@ const stripePromise = loadStripe(
 )
 
 type CheckoutFormProps = {
-  onSuccess: () => void
+  onSuccess: (email?: string) => void
   onCancel: () => void
   submitting: boolean
   setSubmitting: (v: boolean) => void
@@ -27,6 +27,8 @@ type CheckoutFormProps = {
   formId?: string
   /** Called when Stripe Elements finish loading (ready to submit). */
   onStripeReadyChange?: (ready: boolean) => void
+  /** When true, renders an email input above PaymentElement for guest pledge email capture. */
+  showEmailCapture?: boolean
 }
 
 function CheckoutForm({
@@ -39,9 +41,11 @@ function CheckoutForm({
   showButtons,
   formId,
   onStripeReadyChange,
+  showEmailCapture,
 }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
+  const [email, setEmail] = useState("")
 
   const onReadyRef = useRef(onStripeReadyChange)
   useEffect(() => {
@@ -54,6 +58,10 @@ function CheckoutForm({
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!stripe || !elements) return
+    if (showEmailCapture && !email.trim()) {
+      setError("Please enter your email address")
+      return
+    }
 
     setSubmitting(true)
     setError(null)
@@ -62,6 +70,7 @@ function CheckoutForm({
       elements,
       confirmParams: {
         return_url: window.location.href,
+        ...(showEmailCapture && email ? { receipt_email: email } : {}),
       },
       redirect: "if_required",
     })
@@ -72,11 +81,33 @@ function CheckoutForm({
       return
     }
 
-    onSuccess()
+    onSuccess(showEmailCapture ? email : undefined)
   }
 
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-4">
+      {showEmailCapture && (
+        <div className="space-y-1">
+          <label
+            htmlFor="checkout-email"
+            className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+          >
+            Your email
+          </label>
+          <input
+            id="checkout-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="for your receipt and withdrawal link"
+            className="w-full border-b border-border bg-transparent py-1 text-base outline-none focus:border-primary"
+            aria-label="Email address for receipt and withdrawal link"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            No account needed.
+          </p>
+        </div>
+      )}
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
       {showButtons && (
@@ -112,7 +143,7 @@ type Props = {
   clientSecret: string
   chargeAmount: number
   charityAmount?: number // if provided, shows breakdown; omit for fund top-ups
-  onSuccess: () => void
+  onSuccess: (email?: string) => void
   onClose: () => void
   /** Render inline (no fixed overlay). Use inside a dialog's step 3. */
   inline?: boolean
@@ -122,6 +153,8 @@ type Props = {
   onSubmittingChange?: (submitting: boolean) => void
   /** Called when Stripe Elements finish loading (lets an external submit button disable until ready). */
   onStripeReadyChange?: (ready: boolean) => void
+  /** When true, renders an email input for guest pledge email capture. */
+  showEmailCapture?: boolean
 }
 
 export function StripeCheckout({
@@ -134,6 +167,7 @@ export function StripeCheckout({
   formId,
   onSubmittingChange,
   onStripeReadyChange,
+  showEmailCapture,
 }: Props) {
   const [submitting, setSubmittingRaw] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -170,6 +204,7 @@ export function StripeCheckout({
           showButtons={!inline}
           formId={formId}
           onStripeReadyChange={onStripeReadyChange}
+          showEmailCapture={showEmailCapture}
         />
       </Elements>
     </>
