@@ -95,6 +95,8 @@ type Props = {
   charityAmount?: number // if provided, shows breakdown; omit for fund top-ups
   onSuccess: () => void
   onClose: () => void
+  /** Render inline (no fixed overlay). Use inside a dialog's step 3. */
+  inline?: boolean
 }
 
 export function StripeCheckout({
@@ -103,9 +105,41 @@ export function StripeCheckout({
   charityAmount,
   onSuccess,
   onClose,
+  inline = false,
 }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const inner = (
+    <>
+      <p className="mb-1 text-sm text-muted-foreground">
+        You will be charged{" "}
+        <span className="font-medium text-foreground">{gbp(chargeAmount)}</span>
+      </p>
+      {charityAmount !== undefined && (
+        <p className="mb-5 text-xs text-muted-foreground">
+          {gbp(charityAmount)} to charity ·{" "}
+          {gbp(chargeAmount - charityAmount)} platform fee
+        </p>
+      )}
+      {charityAmount === undefined && <div className="mb-5" />}
+      <Elements
+        stripe={stripePromise}
+        options={{ clientSecret, appearance: { theme: "stripe" } }}
+      >
+        <CheckoutForm
+          onSuccess={onSuccess}
+          onCancel={onClose}
+          submitting={submitting}
+          setSubmitting={setSubmitting}
+          error={error}
+          setError={setError}
+        />
+      </Elements>
+    </>
+  )
+
+  if (inline) return <div className="space-y-1">{inner}</div>
 
   return (
     <div
@@ -118,32 +152,7 @@ export function StripeCheckout({
         <h2 className="mb-1 text-lg font-medium text-foreground">
           Complete your pledge
         </h2>
-        <p className="mb-1 text-sm text-muted-foreground">
-          You will be charged{" "}
-          <span className="font-medium text-foreground">
-            {gbp(chargeAmount)}
-          </span>
-        </p>
-        {charityAmount !== undefined && (
-          <p className="mb-5 text-xs text-muted-foreground">
-            {gbp(charityAmount)} to charity ·{" "}
-            {gbp(chargeAmount - charityAmount)} platform fee
-          </p>
-        )}
-        {charityAmount === undefined && <div className="mb-5" />}
-        <Elements
-          stripe={stripePromise}
-          options={{ clientSecret, appearance: { theme: "stripe" } }}
-        >
-          <CheckoutForm
-            onSuccess={onSuccess}
-            onCancel={onClose}
-            submitting={submitting}
-            setSubmitting={setSubmitting}
-            error={error}
-            setError={setError}
-          />
-        </Elements>
+        {inner}
       </div>
     </div>
   )
