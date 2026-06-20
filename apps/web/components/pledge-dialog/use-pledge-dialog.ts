@@ -102,7 +102,13 @@ export function usePledgeDialog({
   const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
 
   function getFavouriteBreakdown() {
-    if (!isPledgeValid || selectedIds.length === 0) return []
+    if (selectedIds.length === 0) return []
+    if (!isPledgeValid) {
+      return selectedIds.map((id) => {
+        const item = pollWithItems.topics.favourites.find((f) => f.id === id)
+        return { label: item?.label ?? id, amount: 0 }
+      })
+    }
     return computePledgeAllocations(
       selectedIds,
       pollWithItems.topics.favourites,

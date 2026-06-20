@@ -9,8 +9,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { AmountInput } from "@/components/pledge-card/amount-input"
-import { AmountPresets } from "@/components/pledge-card/amount-presets"
 import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
 import type { BreakdownLine } from "@/components/pledge-card/pledge-breakdown"
 import { GBP } from "@/components/pledge-card/utils"
@@ -51,16 +49,38 @@ export function StepAmountHeader({
           </PopoverContent>
         </Popover>
       </div>
-      <AmountInput
-        id="dialog-pledge-amount"
-        value={pledgeAmount}
-        onChange={updatePledgeAmount}
-      />
-      <AmountPresets
-        amounts={[5, 10, 20, 50]}
-        value={pledgeAmount}
-        onChange={updatePledgeAmount}
-      />
+      <div className="flex items-baseline gap-1.5">
+        <span
+          className="text-2xl text-muted-foreground select-none"
+          aria-hidden="true"
+        >
+          £
+        </span>
+        <input
+          id="dialog-pledge-amount"
+          type="number"
+          min="0.01"
+          step="0.01"
+          value={pledgeAmount}
+          onChange={(e) => updatePledgeAmount(e.target.value)}
+          placeholder="0"
+          aria-label="Pledge amount in pounds"
+          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+      </div>
+      <div className="flex gap-2">
+        {[5, 10, 20, 50].map((preset) => (
+          <Button
+            key={preset}
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={() => updatePledgeAmount(String(preset))}
+          >
+            £{preset}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }
@@ -128,8 +148,8 @@ export function StepAmount({
 
   return (
     <div className="space-y-4 px-5 py-4">
-      {/* Per-favourite breakdown (primary, always visible when amount set) */}
-      {isPledgeValid && favouriteBreakdown.length > 0 && (
+      {/* Per-favourite breakdown */}
+      {favouriteBreakdown.length > 0 && (
         <div className="space-y-1.5 border-t border-border pt-3 text-xs">
           {favouriteBreakdown.map((line, i) => (
             <div key={i} className="flex justify-between">
