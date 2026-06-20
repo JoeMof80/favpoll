@@ -34,8 +34,14 @@ type Props = {
   ownCharge: number
   canOwnConfirm: boolean
   canFundConfirm: boolean
-  ownBreakdown: { lines: BreakdownLine[]; total: { label: string; amount: number } } | null
-  fundBreakdown: { lines: BreakdownLine[]; total: { label: string; amount: number } } | null
+  ownBreakdown: {
+    lines: BreakdownLine[]
+    total: { label: string; amount: number }
+  } | null
+  fundBreakdown: {
+    lines: BreakdownLine[]
+    total: { label: string; amount: number }
+  } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
   charityBreakdown: FavouriteBreakdownLine[]
   charityNames: string[]
@@ -161,7 +167,9 @@ export function StepAmount({
                 <div className="mt-2 space-y-1">
                   {charityBreakdown.map((line, i) => (
                     <div key={i} className="flex justify-between">
-                      <span className="text-muted-foreground">{line.label}</span>
+                      <span className="text-muted-foreground">
+                        {line.label}
+                      </span>
                       <span className="font-medium tabular-nums">
                         {GBP.format(line.amount)}
                       </span>

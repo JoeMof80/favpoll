@@ -118,8 +118,8 @@ export function StripeCheckout({
       </p>
       {charityAmount !== undefined && (
         <p className="mb-5 text-xs text-muted-foreground">
-          {gbp(charityAmount)} to charity ·{" "}
-          {gbp(chargeAmount - charityAmount)} platform fee
+          {gbp(charityAmount)} to charity · {gbp(chargeAmount - charityAmount)}{" "}
+          platform fee
         </p>
       )}
       {charityAmount === undefined && <div className="mb-5" />}

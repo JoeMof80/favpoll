@@ -119,9 +119,7 @@ export function EventContent({
         </p>
       )}
 
-      {pledgeDialog && (
-        <div className="mt-6 md:hidden">{pledgeDialog}</div>
-      )}
+      {pledgeDialog && <div className="mt-6 md:hidden">{pledgeDialog}</div>}
     </>
   )
 

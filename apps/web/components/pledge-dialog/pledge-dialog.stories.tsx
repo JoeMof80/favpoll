@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { PledgeDialog } from "./index"
-import type { FavpollPollWithItems, FavpollPot, Favourite } from "@favpoll/types"
+import type {
+  FavpollPollWithItems,
+  FavpollPot,
+  Favourite,
+} from "@favpoll/types"
 
 function makeFavourite(id: string, label: string): Favourite {
   return {

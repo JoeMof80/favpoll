@@ -179,71 +179,71 @@ export function PledgeDialog({
         headerClassName={dialog.step === 1 ? "px-4 py-3" : "px-5 py-4"}
         dialogContentClassName="flex-1 overflow-y-auto"
       >
-      {dialog.step === 1 && (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs text-muted-foreground">
-              {dialog.draftIds.length === 0
-                ? "Select one or more"
-                : `${dialog.draftIds.length} selected`}
-            </span>
-            <StepIndicator step={1} />
+        {dialog.step === 1 && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs text-muted-foreground">
+                {dialog.draftIds.length === 0
+                  ? "Select one or more"
+                  : `${dialog.draftIds.length} selected`}
+              </span>
+              <StepIndicator step={1} />
+            </div>
+            <PickerItems
+              filteredItems={dialog.filteredItems}
+              draftIds={dialog.draftIds}
+              showCreate={dialog.showCreate}
+              search={dialog.search}
+              isInfinite={!pollWithItems.topics.is_finite}
+              hasAddItem={!!onAddItem}
+              onToggle={dialog.toggleDraft}
+              addError={dialog.addError}
+            />
           </div>
-          <PickerItems
-            filteredItems={dialog.filteredItems}
-            draftIds={dialog.draftIds}
-            showCreate={dialog.showCreate}
-            search={dialog.search}
-            isInfinite={!pollWithItems.topics.is_finite}
-            hasAddItem={!!onAddItem}
-            onToggle={dialog.toggleDraft}
-            addError={dialog.addError}
+        )}
+
+        {dialog.step === 2 && (
+          <StepAmount
+            pledgeAmount={dialog.pledgeAmount}
+            topUpAmount={dialog.topUpAmount}
+            guestEmail={dialog.guestEmail}
+            useSharedFund={dialog.useSharedFund}
+            error={dialog.error}
+            submitting={dialog.submitting}
+            available={dialog.available}
+            hasFund={dialog.hasFund}
+            numericPledge={dialog.numericPledge}
+            isPledgeValid={dialog.isPledgeValid}
+            fundOverAvailable={dialog.fundOverAvailable}
+            fundBarPct={dialog.fundBarPct}
+            fundBarColor={dialog.fundBarColor}
+            ownCharge={dialog.ownCharge}
+            canOwnConfirm={dialog.canOwnConfirm}
+            canFundConfirm={dialog.canFundConfirm}
+            ownBreakdown={dialog.ownBreakdown}
+            fundBreakdown={dialog.fundBreakdown}
+            favouriteBreakdown={dialog.favouriteBreakdown}
+            charityBreakdown={dialog.charityBreakdown}
+            charityNames={charityNames}
+            clerkUserId={clerkUserId}
+            updatePledgeAmount={dialog.updatePledgeAmount}
+            setTopUpAmount={dialog.setTopUpAmount}
+            setGuestEmail={dialog.setGuestEmail}
+            toggleFund={dialog.toggleFund}
+            onNext={() => dialog.handleNext()}
           />
-        </div>
-      )}
+        )}
 
-      {dialog.step === 2 && (
-        <StepAmount
-          pledgeAmount={dialog.pledgeAmount}
-          topUpAmount={dialog.topUpAmount}
-          guestEmail={dialog.guestEmail}
-          useSharedFund={dialog.useSharedFund}
-          error={dialog.error}
-          submitting={dialog.submitting}
-          available={dialog.available}
-          hasFund={dialog.hasFund}
-          numericPledge={dialog.numericPledge}
-          isPledgeValid={dialog.isPledgeValid}
-          fundOverAvailable={dialog.fundOverAvailable}
-          fundBarPct={dialog.fundBarPct}
-          fundBarColor={dialog.fundBarColor}
-          ownCharge={dialog.ownCharge}
-          canOwnConfirm={dialog.canOwnConfirm}
-          canFundConfirm={dialog.canFundConfirm}
-          ownBreakdown={dialog.ownBreakdown}
-          fundBreakdown={dialog.fundBreakdown}
-          favouriteBreakdown={dialog.favouriteBreakdown}
-          charityBreakdown={dialog.charityBreakdown}
-          charityNames={charityNames}
-          clerkUserId={clerkUserId}
-          updatePledgeAmount={dialog.updatePledgeAmount}
-          setTopUpAmount={dialog.setTopUpAmount}
-          setGuestEmail={dialog.setGuestEmail}
-          toggleFund={dialog.toggleFund}
-          onNext={() => dialog.handleNext()}
-        />
-      )}
-
-      {dialog.step === 3 && dialog.pledgeClientSecret && (
-        <StepPay
-          clientSecret={dialog.pledgeClientSecret}
-          chargeAmount={dialog.ownCharge}
-          charityAmount={dialog.numericPledge}
-          onSuccess={dialog.handlePledgePaymentSuccess}
-          onBack={dialog.handleBack}
-        />
-      )}
-    </ResponsiveOverlay>
+        {dialog.step === 3 && dialog.pledgeClientSecret && (
+          <StepPay
+            clientSecret={dialog.pledgeClientSecret}
+            chargeAmount={dialog.ownCharge}
+            charityAmount={dialog.numericPledge}
+            onSuccess={dialog.handlePledgePaymentSuccess}
+            onBack={dialog.handleBack}
+          />
+        )}
+      </ResponsiveOverlay>
     </>
   )
 }
