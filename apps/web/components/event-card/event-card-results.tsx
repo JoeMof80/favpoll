@@ -14,7 +14,7 @@ export function EventCardResults({ results }: Props) {
   }))
 
   return (
-    <div className="max-h-48 overflow-y-auto">
+    <div className="max-h-38 overflow-y-auto">
       <PollResults results={pollResults} />
     </div>
   )

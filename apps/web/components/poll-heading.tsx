@@ -42,15 +42,6 @@ export function PollHeading({
           />
         )}
       </div>
-
-      {reveal && (
-        <PollReveal
-          personalReveal={reveal}
-          protagonistFirstName={protagonistFirstName}
-          role="status"
-          aria-live="polite"
-        />
-      )}
     </div>
   )
 }

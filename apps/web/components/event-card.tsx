@@ -90,7 +90,7 @@ export function EventCard({
           )}
           <FavpollHeader
             protagonist={{ name: event.protagonist.name }}
-            eyebrow={event.occasion_type ?? ""}
+            eyebrow={event.opening_line ?? ""}
             size={size}
           />
         </Link>
@@ -150,7 +150,7 @@ export function EventCard({
                     size={size}
                   />
                 </div>
-                <div className="space-y-2 border-t border-border px-3 py-2">
+                <div className="space-y-2 px-3 py-2">
                   <AmountInput
                     id="pledge-amount"
                     value={amount !== null ? String(amount) : ""}
@@ -182,7 +182,7 @@ export function EventCard({
                 </div>
               </>
             ) : (
-              <div className="border-t border-border px-3 py-2">
+              <div className="px-3 py-2">
                 <EventCardResults results={results ?? []} />
               </div>
             )}

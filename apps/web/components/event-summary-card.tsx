@@ -52,7 +52,7 @@ export function EventSummaryCard({ event, className }: Props) {
           eyebrow={
             event.category
               ? event.category.charAt(0).toUpperCase() + event.category.slice(1)
-              : (event.occasion_type ?? "")
+              : (event.opening_line ?? "")
           }
           size="md"
         />
@@ -60,14 +60,11 @@ export function EventSummaryCard({ event, className }: Props) {
 
       {/* Topic + countdown */}
       {topicTitle && (
-        <div className="border-t border-border px-3 py-2">
+        <div className="flex items-center justify-between border-t border-border px-3 py-2">
           <SectionLabel title={topicTitle} size="md" />
+          <ClosingLabel closesAt={event.closes_at} />
         </div>
       )}
-
-      <div className="border-t border-border px-3 py-2">
-        <ClosingLabel closesAt={event.closes_at} />
-      </div>
 
       {/* Charity */}
       {event.charities.length > 0 && (

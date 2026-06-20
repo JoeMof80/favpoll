@@ -339,13 +339,13 @@ When `subject='cause'`: no protagonist row is created; `cause_label` is stored i
 When `subject` is not provided by a caller, name param is the protagonist name as before.
 When `subject='cause'`, callers pass `cause_label` as the `name` param.
 
-| register        | subject='someone'    | subject='cause'    |
-| --------------- | -------------------- | ------------------ |
-| remembering     | In memory of         | In memory of       |
-| celebrating_one | Celebrating          | Celebrating        |
-| celebrating_many| Celebrating          | Celebrating        |
-| cause           | **Honouring**        | In support of      |
-| neutral         | Honouring            | Honouring          |
+| register         | subject='someone' | subject='cause' |
+| ---------------- | ----------------- | --------------- |
+| remembering      | In memory of      | In memory of    |
+| celebrating_one  | Celebrating       | Celebrating     |
+| celebrating_many | Celebrating       | Celebrating     |
+| cause            | **Honouring**     | In support of   |
+| neutral          | Honouring         | Honouring       |
 
 Occasion-type prefixes from `OCCASION_TYPE_PREFIXES` (e.g. "Fundraiser" → "In support of") continue
 to take priority over register prefix and are NOT subject-aware.
@@ -353,11 +353,11 @@ to take priority over register prefix and are NOT subject-aware.
 ### Default poll closing period (`suggestClosingDate(category, eventDate?)` in `lib/registers.ts`)
 
 | FavpollCategory | Days until close |
-| ------------- | ---------------- |
-| memorial      | 30               |
-| celebration   | 14               |
-| fundraiser    | 14               |
-| null          | 14               |
+| --------------- | ---------------- |
+| memorial        | 30               |
+| celebration     | 14               |
+| fundraiser      | 14               |
+| null            | 14               |
 
 ---
 
@@ -764,7 +764,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Seed command.** `pnpm seed` from root runs `scripts/seed.ts` via `apps/web` filter. To seed staging: `cd apps/web && NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx ../../scripts/seed.ts`. Topic placeholders are stored **register-keyed** (5 keys per topic); no occasion→register routing at write time. The six `scripts/placeholders-regenerated*.ts` batch files are the source of truth — `scripts/apply-placeholders.ts` (run with `tsx`) merges them into the inline `topics` array when batch files change. `seed.ts` imports all six batches at startup (duplicate title → throw). **`applyAllPlaceholders()`** runs after all topic rows exist: iterates every entry in `combinedPlaceholders`, fetches topic rows by title, writes `placeholders` to each — covering all ~118 topics regardless of which seed path created the row. Throws listing any map title with no DB row. **`assertAllTopicsHavePlaceholders()`** then validates every active topic in the map has all 5 register keys non-empty (`about`/`reveal` only — no `pronouns` check; none of the six placeholder batch files populate it) in the DB, providing a bidirectional fail-loud guard. `celebrating_many` placeholder entries carry `group: "pair"` (default) or `group: "set"` (sport cluster, defined in `scripts/celebrating-many-groups.ts`); group tagging is applied inside `combinedPlaceholders` at seed startup.
 
-- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Eleanor" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName(topicTitle, pronouns, grouping: FavpollGrouping, register)` in `lib/registers.ts`. `grouping === "couple"` → pair pool, `grouping === "group"` → set pool. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
+- **Preview example name.** When the organiser hasn't typed a name, the preview renders a greyed persona-matched example name (e.g. "Elizabeth" for she-persona, "Joan & Arthur" for a pair) selected stably by djb2 hash of the topic title via `getExampleName(topicTitle, pronouns, grouping: FavpollGrouping, register)` in `lib/registers.ts`. `grouping === "couple"` → pair pool, `grouping === "group"` → set pool. Name substitution into persona `about`/`reveal` prose is explicitly NOT a feature. `contextExamples` in `registers.ts` is register-keyed (`Record<Register, string>`) and used as the greyed context-line placeholder.
 
 - **Chip vs pickerfield threshold.** Under 12 canonical items → render as chips. 12 or over → render as pickerfield (searchable combobox). Threshold stored as named constant `PICKERFIELD_THRESHOLD = 12`. Applies to guest pledge view (infinite topics) and organiser form item preview. Organiser form item _addition_ always uses ItemAddField pickerfield regardless of count.
 

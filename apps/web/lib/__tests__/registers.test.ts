@@ -162,11 +162,11 @@ describe("getExampleName", () => {
       "celebrating_one"
     )
     expect([
-      "Margaret",
-      "Eleanor",
+      "Gretchen",
+      "Elizabeth",
       "Joan",
       "Sylvia",
-      "Patricia",
+      "Penny",
       "Vera",
     ]).toContain(name)
     // Stable: same inputs produce the same output
@@ -191,9 +191,9 @@ describe("getExampleName", () => {
     const name = getExampleName("Colour", "they", "couple", "celebrating_many")
     expect([
       "Joan & Arthur",
-      "Margaret & George",
+      "Gretchen & George",
       "Sylvia & Frank",
-      "Eleanor & Raymond",
+      "Elizabeth & Raymond",
     ]).toContain(name)
   })
 
@@ -218,9 +218,9 @@ describe("getExampleName", () => {
     )
     expect([
       "Joan & Arthur",
-      "Margaret & George",
+      "Gretchen & George",
       "Sylvia & Frank",
-      "Eleanor & Raymond",
+      "Elizabeth & Raymond",
     ]).toContain(name)
   })
 
@@ -246,11 +246,11 @@ describe("getExampleName", () => {
       "remembering"
     )
     expect([
-      "Margaret",
-      "Eleanor",
+      "Gretchen",
+      "Elizabeth",
       "Joan",
       "Sylvia",
-      "Patricia",
+      "Penny",
       "Vera",
     ]).toContain(name)
   })

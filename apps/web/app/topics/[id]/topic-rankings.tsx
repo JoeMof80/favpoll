@@ -5,6 +5,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import type { Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 
 type RankingView = "amount" | "count"
 
@@ -57,19 +60,28 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
   }
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <SectionLabel title="Results" />
-        <Tabs value={view} onValueChange={(v) => setView(v as RankingView)}>
-          <TabsList className="h-7">
-            <TabsTrigger value="amount" className="px-3 text-xs">
-              By amount
-            </TabsTrigger>
-            <TabsTrigger value="count" className="px-3 text-xs">
-              By pledges
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+    <section className="space-y-4">
+      <div className="sticky top-14 z-20 bg-background pt-6 md:pt-16">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Button asChild variant="ghost" size="icon-sm">
+              <Link href="/rankings" className="hover:text-foreground">
+                <ArrowLeft size={4} />
+              </Link>
+            </Button>
+            <SectionLabel title={topicTitle} />
+          </div>
+          <Tabs value={view} onValueChange={(v) => setView(v as RankingView)}>
+            <TabsList className="h-7">
+              <TabsTrigger value="amount" className="px-3 text-xs">
+                By amount
+              </TabsTrigger>
+              <TabsTrigger value="count" className="px-3 text-xs">
+                By pledges
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       <ul
@@ -121,6 +133,6 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
           No pledges have been made on this topic yet.
         </p>
       )}
-    </div>
+    </section>
   )
 }
