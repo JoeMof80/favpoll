@@ -94,32 +94,6 @@ const poll = makePoll("poll-1")
 const finitePoll = makePoll("finite-poll", true)
 
 describe("useEventContent — initial state", () => {
-  it("starts with empty pledgeAmount", () => {
-    const { result } = renderHook(() =>
-      useEventContent({
-        event,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
-    expect(result.current.pledgeAmount).toBe("")
-  })
-
-  it("starts with empty pollSelections", () => {
-    const { result } = renderHook(() =>
-      useEventContent({
-        event,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
-    expect(result.current.pollSelections).toEqual({})
-  })
-
   it("starts with pledgeConfirmed as false", () => {
     const { result } = renderHook(() =>
       useEventContent({
@@ -131,49 +105,6 @@ describe("useEventContent — initial state", () => {
       })
     )
     expect(result.current.pledgeConfirmed).toBe(false)
-  })
-})
-
-describe("useEventContent — handleSelectionsChange", () => {
-  it("updates pollSelections for a given pollId", () => {
-    const { result } = renderHook(() =>
-      useEventContent({
-        event,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
-    act(() => {
-      result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
-    })
-    expect(result.current.pollSelections["poll-1"]).toEqual([
-      "item-a",
-      "item-b",
-    ])
-  })
-
-  it("allows updating the poll's selections multiple times", () => {
-    const { result } = renderHook(() =>
-      useEventContent({
-        event,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
-    act(() => {
-      result.current.handleSelectionsChange("poll-1", ["item-a"])
-    })
-    act(() => {
-      result.current.handleSelectionsChange("poll-1", ["item-a", "item-b"])
-    })
-    expect(result.current.pollSelections["poll-1"]).toEqual([
-      "item-a",
-      "item-b",
-    ])
   })
 })
 

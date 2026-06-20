@@ -2,12 +2,10 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
-import { PledgePanel } from "@/components/pledge-panel"
 import { PollHeading } from "@/components/poll-heading"
 import type { FavpollPollWithItems } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
-import { SectionLabel } from "../favpoll-card/section-label"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 
 type RankingView = "amount" | "count"
@@ -15,29 +13,22 @@ type RankingView = "amount" | "count"
 type Props = {
   poll: FavpollPollWithItems
   clerkUserId: string | null
-  pledgeAmount: string
   isClosed: boolean
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
   protagonistName: string
   isOrganiser: boolean
   eventId: string
-  onSelectionsChange: (pollId: string, selectedIds: string[]) => void
-  onAddItem?: (label: string) => Promise<void>
   onViewChange?: (view: "pledge" | "results") => void
 }
 
 export function PollSection({
   poll,
-  pledgeAmount,
   isClosed,
   hasPledged,
   pledgeJustConfirmed,
   protagonistName,
   isOrganiser,
-  eventId,
-  onSelectionsChange,
-  onAddItem,
   onViewChange,
 }: Props) {
   const {
@@ -47,13 +38,12 @@ export function PollSection({
     setRankingView,
     pledgeConfirmed,
     showRankings,
-    handleSelectionsChange,
   } = usePollSection({
     pollId: poll.id,
     hasPledged,
     isClosed,
     pledgeJustConfirmed,
-    onSelectionsChange,
+    onSelectionsChange: () => {},
     onViewChange,
   })
 
@@ -135,19 +125,10 @@ export function PollSection({
       {/* Pledge view */}
       {view === "pledge" && (
         <div className="space-y-5">
-          {isClosed ? (
+          {isClosed && (
             <p className="text-sm text-muted-foreground">
               This poll has closed.
             </p>
-          ) : (
-            <PledgePanel
-              items={poll.topics.favourites}
-              totalAmount={pledgeAmount}
-              onSelectionsChange={handleSelectionsChange}
-              isInfinite={!poll.topics.is_finite}
-              onAddItem={onAddItem}
-              topicTitle={poll.topics.title}
-            />
           )}
         </div>
       )}

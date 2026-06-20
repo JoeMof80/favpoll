@@ -19,19 +19,9 @@ export function useEventContent({
   clerkUserId,
 }: UseEventContentOptions) {
   const router = useRouter()
-  const [pledgeAmount, setPledgeAmount] = useState("")
-  const [pollSelections, setPollSelections] = useState<
-    Record<string, string[]>
-  >({})
   const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
   const [pollView, setPollView] = useState<"pledge" | "results">(
     hasPledged || isClosed ? "results" : "pledge"
-  )
-
-  const handleSelectionsChange = useCallback(
-    (pollId: string, selectedIds: string[]) =>
-      setPollSelections((prev) => ({ ...prev, [pollId]: selectedIds })),
-    []
   )
 
   const handlePledgeSuccess = useCallback(() => {
@@ -60,10 +50,6 @@ export function useEventContent({
     !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"
 
   return {
-    pledgeAmount,
-    setPledgeAmount,
-    pollSelections,
-    handleSelectionsChange,
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,

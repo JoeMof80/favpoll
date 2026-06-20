@@ -6,7 +6,7 @@ import { EventHero } from "@/components/event-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
-import { PledgeCard, LivePledgeCard } from "@/components/pledge-card"
+import { PledgeDialog } from "@/components/pledge-dialog"
 import type {
   FavpollWithDetails,
   FavpollPollWithItems,
@@ -41,10 +41,6 @@ export function EventContent({
   isOrganiser,
 }: Props) {
   const {
-    pledgeAmount,
-    setPledgeAmount,
-    pollSelections,
-    handleSelectionsChange,
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
@@ -77,6 +73,22 @@ export function EventContent({
       ? totalRaised / event.favpoll_charities.length
       : 0
 
+  const charityNames = event.favpoll_charities.map((ec) => ec.charities.name)
+
+  const pledgeDialog =
+    !isClosed && showPledgeCard && pollWithItems ? (
+      <PledgeDialog
+        eventId={event.id}
+        clerkUserId={clerkUserId}
+        charityNames={charityNames}
+        pollWithItems={pollWithItems}
+        pot={pot}
+        userPotAllocation={userPotAllocation}
+        onPledgeSuccess={handlePledgeSuccess}
+        onAddItem={addItemHandler(pollWithItems)}
+      />
+    ) : null
+
   const left = (
     <>
       {isCause ? (
@@ -89,7 +101,6 @@ export function EventContent({
         <PollSection
           poll={pollWithItems}
           clerkUserId={clerkUserId}
-          pledgeAmount={pledgeAmount}
           isClosed={isClosed}
           hasPledged={hasPledged}
           pledgeJustConfirmed={pledgeConfirmed}
@@ -100,8 +111,6 @@ export function EventContent({
           }
           isOrganiser={isOrganiser}
           eventId={event.id}
-          onSelectionsChange={handleSelectionsChange}
-          onAddItem={addItemHandler(pollWithItems)}
           onViewChange={setPollView}
         />
       ) : (
@@ -110,22 +119,8 @@ export function EventContent({
         </p>
       )}
 
-      {!isClosed && showPledgeCard && pollWithItems && (
-        <div className="mt-6 md:hidden">
-          <LivePledgeCard
-            eventId={event.id}
-            clerkUserId={clerkUserId}
-            charityNames={event.favpoll_charities.map(
-              (ec) => ec.charities.name
-            )}
-            pollWithItems={pollWithItems}
-            pot={pot}
-            userPotAllocation={userPotAllocation}
-            pollSelections={pollSelections}
-            onPledgeAmountChange={setPledgeAmount}
-            onPledgeSuccess={handlePledgeSuccess}
-          />
-        </div>
+      {pledgeDialog && (
+        <div className="mt-6 md:hidden">{pledgeDialog}</div>
       )}
     </>
   )
@@ -154,19 +149,7 @@ export function EventContent({
         charities={event.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
       />
-      {!isClosed && showPledgeCard && pollWithItems && (
-        <PledgeCard
-          eventId={event.id}
-          clerkUserId={clerkUserId}
-          charityNames={event.favpoll_charities.map((ec) => ec.charities.name)}
-          pollWithItems={pollWithItems}
-          pot={pot}
-          userPotAllocation={userPotAllocation}
-          pollSelections={pollSelections}
-          onPledgeAmountChange={setPledgeAmount}
-          onPledgeSuccess={handlePledgeSuccess}
-        />
-      )}
+      {pledgeDialog && <div className="hidden md:block">{pledgeDialog}</div>}
     </>
   )
 
