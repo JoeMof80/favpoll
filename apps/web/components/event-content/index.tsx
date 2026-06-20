@@ -45,7 +45,7 @@ export function EventContent({
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    setPollView,
+    handleViewChange,
   } = useEventContent({
     event,
     pollWithItems,
@@ -111,7 +111,7 @@ export function EventContent({
           }
           isOrganiser={isOrganiser}
           eventId={event.id}
-          onViewChange={setPollView}
+          onViewChange={handleViewChange}
           pledgeTrigger={pledgeDialog}
         />
       ) : (

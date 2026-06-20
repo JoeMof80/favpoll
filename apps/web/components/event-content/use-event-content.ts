@@ -49,11 +49,16 @@ export function useEventContent({
   const showPledgeCard =
     !isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"
 
+  function handleViewChange(view: "pledge" | "results") {
+    if (view === "pledge") setPledgeConfirmed(false)
+    setPollView(view)
+  }
+
   return {
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
     showPledgeCard,
-    setPollView,
+    handleViewChange,
   }
 }
