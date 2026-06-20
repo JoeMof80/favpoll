@@ -27,7 +27,7 @@ export function TooltipIconButton({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           disabled={disabled}
           className={
             className ?? "shrink-0 text-muted-foreground hover:text-foreground"

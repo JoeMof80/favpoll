@@ -5,12 +5,6 @@ import { useWatch, useFormContext } from "react-hook-form"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
 import { RefreshCw, Trash2, Upload } from "lucide-react"
-import { getFavpollHeadline } from "@/lib/display"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { ProtagonistAvatar } from "@/components/event-hero-avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   InputGroup,
@@ -21,16 +15,17 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group"
 import {
-  EDIT_BTN,
   FIELD_OVERLAY_PROPS,
   INPUT_GROUP_CLS,
   EditBadge,
   CharCounter,
   overlayFooter,
 } from "./edit-helpers"
-import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
-import { cn } from "@/lib/utils"
 import type { EventFormValues } from "./schema"
+import { ProtagonistAvatar } from "@/components/event-hero-avatar"
+import { Button } from "@/components/ui/button"
+import { BaseEventHero } from "../heroes/base-event-hero"
+import { getFavpollHeadline } from "@/lib/display"
 
 async function getCroppedBlob(
   imageSrc: string,
@@ -94,13 +89,13 @@ export function EditableHero({
   } | null>(null)
   const [aboutDraft, setAboutDraft] = useState("")
   const [openingLineDraft, setOpeningLineDraft] = useState("")
+
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [savingCrop, setSavingCrop] = useState(false)
   const [originalFilename, setOriginalFilename] = useState("")
-  // null = dialog closed; "" = no photo / photo deleted; string = active photo URL
   const [dialogPhotoUrl, setDialogPhotoUrl] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -130,10 +125,11 @@ export function EditableHero({
   const openingLinePlaceholder = getFavpollHeadline({
     register,
     occasionType: null,
-    name: "",
+    name: name || causeLabel,
     subject,
   }).prefix
 
+  // Save functions
   function saveCauseLabel() {
     form.setValue("causeLabel", causeLabelDraft, { shouldValidate: true })
     setCauseLabelOpen(false)
@@ -210,99 +206,13 @@ export function EditableHero({
 
   return (
     <>
-      <div className="mb-5 md:mb-10">
-        <div className="flex items-start gap-4 md:gap-6">
-          {/* Text column */}
-          <div className="min-w-0 flex-1">
-            {/* Opening line (eyebrow) */}
-            <Button
-              type="button"
-              variant="ghost"
-              className={EDIT_BTN}
-              onClick={() => {
-                setOpeningLineDraft(openingLine)
-                setOpeningLineOpen(true)
-              }}
-              aria-label="Edit opening line"
-            >
-              <SectionEyebrow
-                variant="muted"
-                className={cn(
-                  "truncate wrap-break-word",
-                  !openingLine && "opacity-40"
-                )}
-              >
-                {openingLine || "Opening line"}
-              </SectionEyebrow>
-              <EditBadge />
-            </Button>
-
-            {subject === "cause" ? (
-              <Button
-                type="button"
-                variant="ghost"
-                className={EDIT_BTN}
-                onClick={() => {
-                  setCauseLabelDraft(causeLabel)
-                  setCauseLabelOpen(true)
-                }}
-                aria-label="Edit cause label"
-              >
-                <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
-                  {causeLabel || (
-                    <span className="text-muted-foreground/50">
-                      What are you raising for?
-                    </span>
-                  )}
-                </h1>
-                <EditBadge />
-              </Button>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className={EDIT_BTN}
-                  onClick={() => {
-                    setNameDraft(name)
-                    setNameOpen(true)
-                  }}
-                  aria-label="Edit name"
-                >
-                  <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
-                    {name || (
-                      <span className="text-muted-foreground/50">Name</span>
-                    )}
-                  </h1>
-                  <EditBadge />
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className={cn(EDIT_BTN, "mt-2")}
-                  onClick={() => {
-                    setContextDraft(context)
-                    setContextOpen(true)
-                  }}
-                  aria-label="Edit context"
-                >
-                  <p
-                    className={cn(
-                      "truncate text-xl font-normal whitespace-normal md:text-2xl",
-                      context ? "text-[#534AB7]" : "text-muted-foreground/40"
-                    )}
-                  >
-                    {context || "Context"}
-                  </p>
-                  <EditBadge />
-                </Button>
-              </>
-            )}
-          </div>
-
-          {/* Photo — person events only */}
-          {subject !== "cause" && (
+      <BaseEventHero
+        isEdit={true}
+        formValues={values}
+        isGenerating={isGenerating}
+        onRegenerate={onRegenerate}
+        editAvatar={
+          subject !== "cause" ? (
             <Button
               type="button"
               variant="ghost"
@@ -311,7 +221,6 @@ export function EditableHero({
                 setDialogPhotoUrl(resolvedPhotoUrl ?? "")
                 setPhotoOpen(true)
               }}
-              aria-label="Edit photo"
             >
               <ProtagonistAvatar
                 name={name || "Name"}
@@ -320,59 +229,13 @@ export function EditableHero({
               />
               <EditBadge className="right-0 bottom-0" />
             </Button>
-          )}
-        </div>
+          ) : undefined
+        }
+      />
 
-        {/* About */}
-        <Button
-          type="button"
-          variant="ghost"
-          className={cn(EDIT_BTN, "mt-4")}
-          onClick={() => {
-            setAboutDraft(about)
-            setAboutOpen(true)
-          }}
-          aria-label="Edit about"
-        >
-          {about ? (
-            <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
-              {about}
-            </p>
-          ) : isGenerating ? (
-            <div
-              className="animate-pulse space-y-1.5"
-              aria-label="Generating suggestion…"
-            >
-              <div className="h-4 rounded-full bg-muted/60" />
-              <div className="h-4 w-4/5 rounded-full bg-muted/60" />
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground/40">About</p>
-          )}
-          <EditBadge />
-        </Button>
+      {/* All your ResponsiveOverlay components stay exactly the same */}
 
-        {!about &&
-          !isGenerating &&
-          onRegenerate &&
-          register &&
-          selectedTopics[0]?.topicId &&
-          !selectedTopics[0]?.isCustom && (
-            <Button
-              type="button"
-              variant="link"
-              className="mt-2 h-auto px-0 py-0 text-sm text-muted-foreground hover:text-muted-foreground/70"
-              onClick={onRegenerate}
-            >
-              Generate a suggestion →
-            </Button>
-          )}
-
-        <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
-      </div>
-
-      {/* ── Overlays ─────────────────────────────────────────── */}
-
+      {/* Cause Label Overlay */}
       <ResponsiveOverlay
         open={causeLabelOpen}
         onOpenChange={(o) => !o && setCauseLabelOpen(false)}
@@ -406,6 +269,7 @@ export function EditableHero({
         footer={overlayFooter(saveCauseLabel, () => setCauseLabelOpen(false))}
       />
 
+      {/* Name Overlay */}
       <ResponsiveOverlay
         open={nameOpen}
         onOpenChange={(o) => !o && setNameOpen(false)}
@@ -437,6 +301,7 @@ export function EditableHero({
         footer={overlayFooter(saveName, () => setNameOpen(false))}
       />
 
+      {/* Context Overlay */}
       <ResponsiveOverlay
         open={contextOpen}
         onOpenChange={(o) => !o && setContextOpen(false)}
@@ -468,6 +333,7 @@ export function EditableHero({
         footer={overlayFooter(saveContext, () => setContextOpen(false))}
       />
 
+      {/* Opening Line Overlay */}
       <ResponsiveOverlay
         open={openingLineOpen}
         onOpenChange={(o) => !o && setOpeningLineOpen(false)}
@@ -499,6 +365,7 @@ export function EditableHero({
         footer={overlayFooter(saveOpeningLine, () => setOpeningLineOpen(false))}
       />
 
+      {/* About Overlay */}
       <ResponsiveOverlay
         open={aboutOpen}
         onOpenChange={(o) => !o && setAboutOpen(false)}
@@ -549,6 +416,7 @@ export function EditableHero({
         footer={overlayFooter(saveAbout, () => setAboutOpen(false))}
       />
 
+      {/* Photo Overlay */}
       <ResponsiveOverlay
         open={photoOpen}
         onOpenChange={(o) => {

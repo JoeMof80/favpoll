@@ -152,59 +152,62 @@ export function EditablePollArea({
   return (
     <>
       <div className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <SectionLabel title={topicTitle} />
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
-                {showReveal ? "Post-reveal" : "Pre-reveal"}
-              </span>
-              <Switch
-                checked={showReveal}
-                onCheckedChange={(v) => {
-                  if (v !== showReveal) onToggleReveal()
-                }}
-              />
+        <div className="sticky top-40 z-20 md:top-55">
+          <div className="space-y-3 py-1">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <SectionLabel title={topicTitle} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {showReveal ? "Post-reveal" : "Pre-reveal"}
+                </span>
+                <Switch
+                  checked={showReveal}
+                  onCheckedChange={(v) => {
+                    if (v !== showReveal) onToggleReveal()
+                  }}
+                />
+              </div>
             </div>
           </div>
-
-          {showReveal && (
-            <div className={reveal ? "pb-4" : undefined}>
-              <Button
-                type="button"
-                variant="ghost"
-                className={EDIT_BTN}
-                onClick={() => {
-                  setRevealDraft(reveal)
-                  setRevealOpen(true)
-                }}
-                aria-label={reveal ? "Edit reveal" : "Add reveal"}
-              >
-                {reveal ? (
-                  <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-[#26215C] italic">
-                    {reveal}
-                  </p>
-                ) : isGenerating ? (
-                  <div
-                    className="animate-pulse space-y-1.5"
-                    aria-label="Generating suggestion…"
-                  >
-                    <div className="h-4 rounded-full bg-muted/60" />
-                    <div className="h-4 w-3/4 rounded-full bg-muted/60" />
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground/40">Reveal</p>
-                )}
-                <EditBadge />
-              </Button>
-            </div>
-          )}
         </div>
+
+        {showReveal && (
+          <div className={reveal ? "pb-4" : undefined}>
+            <Button
+              type="button"
+              variant="ghost"
+              className={EDIT_BTN}
+              onClick={() => {
+                setRevealDraft(reveal)
+                setRevealOpen(true)
+              }}
+              aria-label={reveal ? "Edit reveal" : "Add reveal"}
+            >
+              {reveal ? (
+                <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-[#26215C] italic">
+                  {reveal}
+                </p>
+              ) : isGenerating ? (
+                <div
+                  className="animate-pulse space-y-1.5"
+                  aria-label="Generating suggestion…"
+                >
+                  <div className="h-4 rounded-full bg-muted/60" />
+                  <div className="h-4 w-3/4 rounded-full bg-muted/60" />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground/40">Reveal</p>
+              )}
+              <EditBadge />
+            </Button>
+          </div>
+        )}
 
         {revealValue ? (
           <>
-            <div className="flex items-center justify-between">
-              <SectionLabel title="Results" />
+            <div className="sticky top-40 z-20 flex items-center justify-end md:top-55">
               <Tabs
                 value={rankingView}
                 onValueChange={(v: string) =>

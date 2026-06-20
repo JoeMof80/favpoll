@@ -46,7 +46,7 @@ function FormWrapper({
       grouping: "individual",
       subject: "someone",
       category: "celebration",
-      name: "Margaret",
+      name: "Gretchen",
       causeLabel: "",
       context: "",
       openingLine: "",

@@ -9,7 +9,7 @@ import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { createEvent } from "@/app/favpolls/new/actions"
 import { updateEvent, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
-import { getExampleName } from "@/lib/registers"
+import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import { eventFormSchema, type EventFormValues } from "./schema"
 import { PreviewPanel } from "./preview-panel"
@@ -24,6 +24,15 @@ import type {
   Register,
   FavpollGrouping,
 } from "@favpoll/types"
+import { EditableHero } from "./editable-hero"
+import { EditablePollArea } from "./editable-poll-area"
+import { EditableCountdown } from "./editable-countdown"
+import { CharityBanner } from "../charity-banner"
+import { PledgeCard } from "../pledge-card"
+
+const PLACEHOLDER_CHARITIES: Charity[] = [
+  { id: "ch-1", name: "Chosen charity", is_active: true },
+] as unknown as Charity[]
 
 // Register-keyed example context values shown when "Generate a suggestion" is triggered
 const CONTEXT_SUGGESTIONS: Partial<Record<Register, string>> = {
@@ -505,21 +514,67 @@ function FormInner({
     }
   }
 
+  const category = useWatch({ control: form.control, name: "category" })
+  const charityIds =
+    useWatch({ control: form.control, name: "charities" }) ?? []
+  const selectedTopics =
+    useWatch({ control: form.control, name: "topics" }) ?? []
+  const grouping =
+    useWatch({ control: form.control, name: "grouping" }) ?? "individual"
+
+  // Don't render until an occasion is chosen — nothing meaningful to preview
+  if (!category) return null
+
+  const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
+  const displayCharities =
+    selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
+
+  const firstTopicMeta = topics.find((t) => t.id === selectedTopics[0]?.topicId)
+  const effReg = deriveRegister(category ?? null, grouping)
+  const aboutPlaceholder = firstTopicMeta?.placeholders?.[effReg]?.about ?? ""
+  const topicRevealPlaceholder =
+    firstTopicMeta?.placeholders?.[effReg]?.reveal ?? ""
+
   return (
     <>
-      <div className="flex flex-col bg-muted md:h-[calc(100vh-3.5rem)] md:overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
-          <PreviewPanel
-            charities={charities}
-            topics={topics}
-            showReveal={showReveal}
-            onToggleReveal={onToggleReveal}
-            isGenerating={isGenerating}
-            onRegenerate={handleRegenerate}
-            closesAt={closesAt}
-            onClosesAtChange={onClosesAtChange}
-          />
-        </div>
+      <div className="overflow-x-clip bg-primary/5">
+        <main className="mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background px-6 pb-24 md:px-16 md:pt-0 md:pb-24 md:drop-shadow-lg">
+          <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+            {/* Left — hero + poll */}
+            <div>
+              <EditableHero
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+                aboutPlaceholder={aboutPlaceholder}
+              />
+              <EditablePollArea
+                topics={topics}
+                showReveal={showReveal}
+                onToggleReveal={onToggleReveal}
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+                topicRevealPlaceholder={topicRevealPlaceholder}
+              />
+            </div>
+
+            {/* Right — sticky meta */}
+            <div className="sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16">
+              <EditableCountdown
+                closesAt={closesAt}
+                onClosesAtChange={onClosesAtChange}
+              />
+              <CharityBanner charities={displayCharities} totalRaised={0} />
+              <div className="pointer-events-none opacity-40">
+                <PledgeCard
+                  prePublish
+                  pledgeAmount=""
+                  onPledgeAmountChange={() => {}}
+                  charityNames={selectedCharities.map((c) => c.name)}
+                />
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
 
       <CommandPanel

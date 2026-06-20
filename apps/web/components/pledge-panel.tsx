@@ -290,13 +290,14 @@ export function PledgePanel({
         <Button
           type="button"
           size={buttonSize}
+          variant="secondary"
           onClick={() => {
             handleOpen()
             setOpen(true)
           }}
           className={`w-full ${size === "lg" ? "text-base" : ""} ${className}`}
         >
-          Select favourites
+          Pick favourites
         </Button>
       )
     }
@@ -389,7 +390,7 @@ export function PledgePanel({
         footer={
           <Button
             type="button"
-            className="h-11 w-full text-base"
+            className="w-full text-base"
             onClick={() => {
               handleDone()
               setOpen(false)
