@@ -17,8 +17,55 @@ import { GBP } from "@/components/pledge-card/utils"
 
 type FavouriteBreakdownLine = { label: string; amount: number }
 
-type Props = {
+export function StepAmountHeader({
+  pledgeAmount,
+  updatePledgeAmount,
+}: {
   pledgeAmount: string
+  updatePledgeAmount: (v: string) => void
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-1.5">
+        <label
+          htmlFor="dialog-pledge-amount"
+          className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+        >
+          Your pledge
+        </label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              aria-label="About pledging"
+              className="h-4 w-4 rounded-full"
+            >
+              <InfoIcon className="h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-56 text-xs leading-relaxed">
+            Pledge the amount that reflects how strongly you feel about your
+            favourites. All pledges are anonymous.
+          </PopoverContent>
+        </Popover>
+      </div>
+      <AmountInput
+        id="dialog-pledge-amount"
+        value={pledgeAmount}
+        onChange={updatePledgeAmount}
+      />
+      <AmountPresets
+        amounts={[5, 10, 20, 50]}
+        value={pledgeAmount}
+        onChange={updatePledgeAmount}
+      />
+    </div>
+  )
+}
+
+type Props = {
   topUpAmount: string
   guestEmail: string
   useSharedFund: boolean
@@ -46,15 +93,12 @@ type Props = {
   charityBreakdown: FavouriteBreakdownLine[]
   charityNames: string[]
   clerkUserId: string | null
-  updatePledgeAmount: (v: string) => void
   setTopUpAmount: (v: string) => void
   setGuestEmail: (v: string) => void
   toggleFund: () => void
-  onNext: () => void
 }
 
 export function StepAmount({
-  pledgeAmount,
   topUpAmount,
   guestEmail,
   useSharedFund,
@@ -76,60 +120,14 @@ export function StepAmount({
   charityBreakdown,
   charityNames,
   clerkUserId,
-  updatePledgeAmount,
   setTopUpAmount,
   setGuestEmail,
   toggleFund,
-  onNext,
 }: Props) {
   const [showCharityBreakdown, setShowCharityBreakdown] = useState(false)
 
-  const isNextDisabled = useSharedFund ? !canFundConfirm : !canOwnConfirm
-  const nextLabel = submitting
-    ? "Processing…"
-    : useSharedFund
-      ? "Pledge"
-      : "Next →"
-
   return (
     <div className="space-y-4 px-5 py-4">
-      <div className="flex items-center justify-between gap-1.5">
-        <label
-          htmlFor="dialog-pledge-amount"
-          className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
-        >
-          Your pledge
-        </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              aria-label="About pledging"
-              className="h-4 w-4 rounded-full"
-            >
-              <InfoIcon className="h-3 w-3" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-56 text-xs leading-relaxed">
-            Pledge the amount that reflects how strongly you feel about your
-            favourites. All pledges are anonymous.
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      <AmountInput
-        id="dialog-pledge-amount"
-        value={pledgeAmount}
-        onChange={updatePledgeAmount}
-      />
-      <AmountPresets
-        amounts={[5, 10, 20, 50]}
-        value={pledgeAmount}
-        onChange={updatePledgeAmount}
-      />
-
       {/* Per-favourite breakdown (primary, always visible when amount set) */}
       {isPledgeValid && favouriteBreakdown.length > 0 && (
         <div className="space-y-1.5 border-t border-border pt-3 text-xs">
@@ -329,16 +327,6 @@ export function StepAmount({
           </Button>
         </div>
       )}
-
-      {/* Footer next button rendered here for mobile sheet (dialog uses footer slot) */}
-      <Button
-        type="button"
-        className="h-11 w-full text-base md:hidden"
-        disabled={isNextDisabled}
-        onClick={onNext}
-      >
-        {nextLabel}
-      </Button>
     </div>
   )
 }

@@ -10,7 +10,7 @@ import type {
 } from "@favpoll/types"
 import { usePledgeDialog } from "./use-pledge-dialog"
 import { PickerHeader, PickerItems } from "./step-pick-favourites"
-import { StepAmount } from "./step-amount"
+import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 
 type Props = {
@@ -84,6 +84,14 @@ export function PledgeDialog({
   }
 
   const topicTitle = pollWithItems.topics.title
+
+  // Step 2 header: amount input + presets (always visible, doesn't scroll)
+  const step2Header = (
+    <StepAmountHeader
+      pledgeAmount={dialog.pledgeAmount}
+      updatePledgeAmount={dialog.updatePledgeAmount}
+    />
+  )
 
   // Step 1 header: the chip+search picker field
   const step1Header = (
@@ -174,7 +182,13 @@ export function PledgeDialog({
         open={open}
         onOpenChange={handleOpenChange}
         title={titleByStep[dialog.step]}
-        header={dialog.step === 1 ? step1Header : undefined}
+        header={
+          dialog.step === 1
+            ? step1Header
+            : dialog.step === 2
+              ? step2Header
+              : undefined
+        }
         footer={currentFooter}
         headerClassName={dialog.step === 1 ? "px-4 py-3" : "px-5 py-4"}
         dialogContentClassName="flex-1 overflow-y-auto"
@@ -204,7 +218,6 @@ export function PledgeDialog({
 
         {dialog.step === 2 && (
           <StepAmount
-            pledgeAmount={dialog.pledgeAmount}
             topUpAmount={dialog.topUpAmount}
             guestEmail={dialog.guestEmail}
             useSharedFund={dialog.useSharedFund}
@@ -226,11 +239,9 @@ export function PledgeDialog({
             charityBreakdown={dialog.charityBreakdown}
             charityNames={charityNames}
             clerkUserId={clerkUserId}
-            updatePledgeAmount={dialog.updatePledgeAmount}
             setTopUpAmount={dialog.setTopUpAmount}
             setGuestEmail={dialog.setGuestEmail}
             toggleFund={dialog.toggleFund}
-            onNext={() => dialog.handleNext()}
           />
         )}
 
