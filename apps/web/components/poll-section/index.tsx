@@ -20,6 +20,8 @@ type Props = {
   isOrganiser: boolean
   eventId: string
   onViewChange?: (view: "pledge" | "results") => void
+  /** Rendered in the pledge view in place of the old PledgePanel trigger. */
+  pledgeTrigger?: React.ReactNode
 }
 
 export function PollSection({
@@ -30,6 +32,7 @@ export function PollSection({
   protagonistName,
   isOrganiser,
   onViewChange,
+  pledgeTrigger,
 }: Props) {
   const {
     view,
@@ -125,10 +128,12 @@ export function PollSection({
       {/* Pledge view */}
       {view === "pledge" && (
         <div className="space-y-5">
-          {isClosed && (
+          {isClosed ? (
             <p className="text-sm text-muted-foreground">
               This poll has closed.
             </p>
+          ) : (
+            (pledgeTrigger ?? null)
           )}
         </div>
       )}

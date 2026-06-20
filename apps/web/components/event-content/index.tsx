@@ -112,14 +112,13 @@ export function EventContent({
           isOrganiser={isOrganiser}
           eventId={event.id}
           onViewChange={setPollView}
+          pledgeTrigger={pledgeDialog}
         />
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
           No poll has been set up for this event yet.
         </p>
       )}
-
-      {pledgeDialog && <div className="mt-6 md:hidden">{pledgeDialog}</div>}
     </>
   )
 
@@ -147,7 +146,6 @@ export function EventContent({
         charities={event.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
       />
-      {pledgeDialog && <div className="hidden md:block">{pledgeDialog}</div>}
     </>
   )
 
