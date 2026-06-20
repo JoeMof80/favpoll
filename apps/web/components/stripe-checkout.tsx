@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { loadStripe } from "@stripe/stripe-js"
 import {
@@ -21,6 +21,12 @@ type CheckoutFormProps = {
   setSubmitting: (v: boolean) => void
   setError: (v: string | null) => void
   error: string | null
+  /** When false, Cancel/Pay buttons are omitted (caller renders them in a footer). */
+  showButtons: boolean
+  /** Sets the form's id so an external submit button can use form="<id>". */
+  formId?: string
+  /** Called when Stripe Elements finish loading (ready to submit). */
+  onStripeReadyChange?: (ready: boolean) => void
 }
 
 function CheckoutForm({
@@ -30,9 +36,20 @@ function CheckoutForm({
   setSubmitting,
   setError,
   error,
+  showButtons,
+  formId,
+  onStripeReadyChange,
 }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
+
+  const onReadyRef = useRef(onStripeReadyChange)
+  useEffect(() => {
+    onReadyRef.current = onStripeReadyChange
+  })
+  useEffect(() => {
+    onReadyRef.current?.(!!stripe && !!elements)
+  }, [stripe, elements])
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -59,27 +76,29 @@ function CheckoutForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <div className="flex gap-3 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={submitting}
-          className="flex-1"
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={submitting || !stripe}
-          className="flex-1"
-        >
-          {submitting ? "Processing…" : "Pay now"}
-        </Button>
-      </div>
+      {showButtons && (
+        <div className="flex gap-3 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={submitting}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={submitting || !stripe}
+            className="flex-1"
+          >
+            {submitting ? "Processing…" : "Pay now"}
+          </Button>
+        </div>
+      )}
     </form>
   )
 }
@@ -97,6 +116,12 @@ type Props = {
   onClose: () => void
   /** Render inline (no fixed overlay). Use inside a dialog's step 3. */
   inline?: boolean
+  /** Sets the form's id so an external footer button can submit it via form="<id>". */
+  formId?: string
+  /** Called when submitting state changes (lets an external footer button reflect state). */
+  onSubmittingChange?: (submitting: boolean) => void
+  /** Called when Stripe Elements finish loading (lets an external submit button disable until ready). */
+  onStripeReadyChange?: (ready: boolean) => void
 }
 
 export function StripeCheckout({
@@ -106,9 +131,17 @@ export function StripeCheckout({
   onSuccess,
   onClose,
   inline = false,
+  formId,
+  onSubmittingChange,
+  onStripeReadyChange,
 }: Props) {
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmittingRaw] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  function setSubmitting(v: boolean) {
+    setSubmittingRaw(v)
+    onSubmittingChange?.(v)
+  }
 
   const inner = (
     <>
@@ -134,6 +167,9 @@ export function StripeCheckout({
           setSubmitting={setSubmitting}
           error={error}
           setError={setError}
+          showButtons={!inline}
+          formId={formId}
+          onStripeReadyChange={onStripeReadyChange}
         />
       </Elements>
     </>

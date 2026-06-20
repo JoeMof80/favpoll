@@ -8,6 +8,8 @@ type Props = {
   charityAmount: number
   onSuccess: () => void
   onBack: () => void
+  onSubmittingChange?: (v: boolean) => void
+  onStripeReadyChange?: (ready: boolean) => void
 }
 
 export function StepPay({
@@ -16,16 +18,21 @@ export function StepPay({
   charityAmount,
   onSuccess,
   onBack,
+  onSubmittingChange,
+  onStripeReadyChange,
 }: Props) {
   return (
     <div className="px-5 py-4">
       <StripeCheckout
         inline
+        formId="pledge-checkout-form"
         clientSecret={clientSecret}
         chargeAmount={chargeAmount}
         charityAmount={charityAmount}
         onSuccess={onSuccess}
         onClose={onBack}
+        onSubmittingChange={onSubmittingChange}
+        onStripeReadyChange={onStripeReadyChange}
       />
     </div>
   )

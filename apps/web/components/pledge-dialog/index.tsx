@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type {
@@ -53,6 +53,8 @@ export function PledgeDialog({
   onAddItem,
 }: Props) {
   const [open, setOpen] = useState(false)
+  const [stripeSubmitting, setStripeSubmitting] = useState(false)
+  const [stripeReady, setStripeReady] = useState(false)
 
   const triggerButton = (
     <Button
@@ -77,6 +79,14 @@ export function PledgeDialog({
     },
     onAddItem,
   })
+
+  // Reset Stripe state whenever we leave step 3 (back or re-entry)
+  useEffect(() => {
+    if (dialog.step !== 3) {
+      setStripeSubmitting(false)
+      setStripeReady(false)
+    }
+  }, [dialog.step])
 
   function handleOpenChange(o: boolean) {
     if (!o) dialog.handleClose()
@@ -152,14 +162,25 @@ export function PledgeDialog({
   )
 
   const step3Footer = (
-    <Button
-      type="button"
-      variant="outline"
-      className="w-full"
-      onClick={dialog.handleBack}
-    >
-      ← Back
-    </Button>
+    <div className="flex gap-3">
+      <Button
+        type="button"
+        variant="outline"
+        className="flex-1"
+        disabled={stripeSubmitting}
+        onClick={dialog.handleBack}
+      >
+        Cancel
+      </Button>
+      <Button
+        type="submit"
+        form="pledge-checkout-form"
+        className="flex-1"
+        disabled={stripeSubmitting || !stripeReady}
+      >
+        {stripeSubmitting ? "Processing…" : "Pay now"}
+      </Button>
+    </div>
   )
 
   const titleByStep = {
@@ -252,6 +273,8 @@ export function PledgeDialog({
             charityAmount={dialog.numericPledge}
             onSuccess={dialog.handlePledgePaymentSuccess}
             onBack={dialog.handleBack}
+            onSubmittingChange={setStripeSubmitting}
+            onStripeReadyChange={setStripeReady}
           />
         )}
       </ResponsiveOverlay>
