@@ -16,6 +16,8 @@ export const metadata = {
 
 const FAVPOLL_SELECT = `
   id,
+  subject,
+  cause_label,
   opening_line,
   description,
   closes_at,
@@ -55,6 +57,8 @@ type RawPoll = {
 }
 type RawFavpoll = {
   id: string
+  subject: string
+  cause_label: string | null
   opening_line: string
   description: string | null
   closes_at: string
@@ -62,7 +66,7 @@ type RawFavpoll = {
   occasion_type: string | null
   total_raised: number
   is_exemplar: boolean
-  protagonist: { name: string }
+  protagonist: { name: string } | null
   charities: { charity: import("@favpoll/types").Charity }[]
   favpoll_polls: RawPoll | null
 }
