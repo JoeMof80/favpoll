@@ -12,7 +12,7 @@ import {
 
 type Props = {
   initialItems: Favourite[]
-  eventPollId: string
+  favpollPollId: string
   topicId: string
   useAllTime?: boolean
   rankingView?: "amount" | "count"
@@ -21,19 +21,19 @@ type Props = {
 
 function HideToggle({
   isHidden,
-  eventPollItemId,
+  favouriteId,
 }: {
   isHidden: boolean
-  eventPollItemId: string
+  favouriteId: string
 }) {
   const [isPending, startTransition] = useTransition()
 
   function toggle() {
     startTransition(async () => {
       if (isHidden) {
-        await showFavpollPollFavourite(eventPollItemId)
+        await showFavpollPollFavourite(favouriteId)
       } else {
-        await hideFavpollPollFavourite(eventPollItemId)
+        await hideFavpollPollFavourite(favouriteId)
       }
     })
   }
@@ -97,7 +97,7 @@ export function RankingList({
               )}
               <HideToggle
                 isHidden={isHidden}
-                eventPollItemId={item.favpoll_poll_item_id!}
+                favouriteId={item.favpoll_poll_item_id!}
               />
             </>
           ) : undefined

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 async function verifyOrganiser(
-  eventPollItemId: string,
+  favouriteId: string,
   userId: string
 ): Promise<string> {
   const supabase = createAdminClient()
@@ -15,7 +15,7 @@ async function verifyOrganiser(
     .select(
       "favpoll_poll_id, favpoll_polls!inner(favpoll_id, favpolls!inner(id, created_by))"
     )
-    .eq("id", eventPollItemId)
+    .eq("id", favouriteId)
     .single()
 
   if (error || !data) throw new Error("Favpoll poll favourite not found")
@@ -30,11 +30,11 @@ async function verifyOrganiser(
   return favpollData.id as string
 }
 
-export async function hideFavpollPollFavourite(eventPollItemId: string) {
+export async function hideFavpollPollFavourite(favouriteId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const eventId = await verifyOrganiser(eventPollItemId, userId)
+  const favpollId = await verifyOrganiser(favouriteId, userId)
 
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -44,18 +44,18 @@ export async function hideFavpollPollFavourite(eventPollItemId: string) {
       hidden_at: new Date().toISOString(),
       hidden_by: userId,
     })
-    .eq("id", eventPollItemId)
+    .eq("id", favouriteId)
 
   if (error) throw new Error(error.message)
 
-  revalidatePath(`/favpolls/${eventId}`)
+  revalidatePath(`/favpolls/${favpollId}`)
 }
 
-export async function showFavpollPollFavourite(eventPollItemId: string) {
+export async function showFavpollPollFavourite(favouriteId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const eventId = await verifyOrganiser(eventPollItemId, userId)
+  const favpollId = await verifyOrganiser(favouriteId, userId)
 
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -65,9 +65,9 @@ export async function showFavpollPollFavourite(eventPollItemId: string) {
       hidden_at: null,
       hidden_by: null,
     })
-    .eq("id", eventPollItemId)
+    .eq("id", favouriteId)
 
   if (error) throw new Error(error.message)
 
-  revalidatePath(`/favpolls/${eventId}`)
+  revalidatePath(`/favpolls/${favpollId}`)
 }

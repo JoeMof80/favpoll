@@ -15,7 +15,7 @@ export default async function MyFavpollsPage() {
 
   const supabase = createAdminClient()
 
-  const { data: events } = await supabase
+  const { data: rawFavpolls } = await supabase
     .from("favpolls")
     .select(
       `
@@ -41,7 +41,7 @@ export default async function MyFavpollsPage() {
     .order("created_at", { ascending: false })
 
   type RawPot = { total_deposited: number; total_allocated: number }
-  type RawEvent = {
+  type RawFavpoll = {
     id: string
     opening_line: string
     closes_at: string
@@ -70,7 +70,7 @@ export default async function MyFavpollsPage() {
   }
 
   const favpolls: OrganizerCardFavpoll[] = (
-    (events ?? []) as unknown as RawEvent[]
+    (rawFavpolls ?? []) as unknown as RawFavpoll[]
   ).map((ev) => ({
     id: ev.id,
     opening_line: ev.opening_line,

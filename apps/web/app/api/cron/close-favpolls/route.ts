@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const now = new Date().toISOString()
 
   // Find all events that have passed closes_at but haven't been closed yet
-  const { data: events, error } = await supabase
+  const { data: favpolls, error } = await supabase
     .from("favpolls")
     .select("id, created_by, protagonists!favpolls_protagonist_id_fkey(name)")
     .lte("closes_at", now)
@@ -22,29 +22,29 @@ export async function POST(request: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  if (!events || events.length === 0) {
+  if (!favpolls || favpolls.length === 0) {
     return Response.json({ closed: 0 })
   }
 
-  const eventIds = events.map((e) => e.id)
+  const favpollIds = favpolls.map((e) => e.id)
 
-  // Sum non-withdrawn pledges per event
+  // Sum non-withdrawn pledges per favpoll
   const { data: pledgeTotals } = await supabase
     .from("pledges")
     .select("favpoll_polls!inner(favpoll_id), total_amount")
-    .in("favpoll_polls.favpoll_id", eventIds)
+    .in("favpoll_polls.favpoll_id", favpollIds)
     .is("withdrawn_at", null)
 
-  const raisedByEvent: Record<string, number> = {}
+  const raisedByFavpoll: Record<string, number> = {}
   for (const row of pledgeTotals ?? []) {
-    const eventId = (row.favpoll_polls as unknown as { favpoll_id: string })
+    const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string })
       .favpoll_id
-    raisedByEvent[eventId] =
-      (raisedByEvent[eventId] ?? 0) + (row.total_amount ?? 0)
+    raisedByFavpoll[favpollId] =
+      (raisedByFavpoll[favpollId] ?? 0) + (row.total_amount ?? 0)
   }
 
   // Get organiser emails
-  const userIds = [...new Set(events.map((e) => e.created_by))]
+  const userIds = [...new Set(favpolls.map((e) => e.created_by))]
   const { data: users } = await supabase
     .from("users")
     .select("id, email, display_name")
@@ -55,35 +55,35 @@ export async function POST(request: Request) {
   let closed = 0
   const errors: string[] = []
 
-  for (const event of events) {
-    const totalRaised = raisedByEvent[event.id] ?? 0
+  for (const favpoll of favpolls) {
+    const totalRaised = raisedByFavpoll[favpoll.id] ?? 0
     const protagonistName =
-      (event.protagonists as unknown as { name: string } | null)?.name ??
+      (favpoll.protagonists as unknown as { name: string } | null)?.name ??
       "someone special"
 
     const { error: updateErr } = await supabase
       .from("favpolls")
       .update({ closed_at: now, total_raised: totalRaised })
-      .eq("id", event.id)
+      .eq("id", favpoll.id)
 
     if (updateErr) {
-      errors.push(`${event.id}: ${updateErr.message}`)
+      errors.push(`${favpoll.id}: ${updateErr.message}`)
       continue
     }
 
-    const organiser = userMap[event.created_by]
+    const organiser = userMap[favpoll.created_by]
     if (organiser?.email) {
       try {
         await sendFavpollClosed({
           to: organiser.email,
           protagonistName,
           totalRaised,
-          eventId: event.id,
+          favpollId: favpoll.id,
         })
       } catch (emailErr) {
         // Don't fail the whole batch for an email error
         console.error(
-          `[close-favpolls] email failed for ${event.id}:`,
+          `[close-favpolls] email failed for ${favpoll.id}:`,
           emailErr
         )
       }

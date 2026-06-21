@@ -71,7 +71,7 @@ type Story = StoryObj<typeof meta>
 
 export const Memorial: Story = {
   args: {
-    eventId: "demo-memorial",
+    favpollId: "demo-memorial",
     protagonistName: SCENES[0].protagonist.name,
     dateLabel: "1943–2024",
     openingLine: "In memory of",
@@ -82,13 +82,13 @@ export const Memorial: Story = {
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
     pollId: "poll-memorial",
-    eventUrl: "https://favpoll.com/favpolls/demo-memorial",
+    favpollUrl: "https://favpoll.com/favpolls/demo-memorial",
   },
 }
 
 export const Birthday: Story = {
   args: {
-    eventId: "demo-birthday",
+    favpollId: "demo-birthday",
     protagonistName: SCENES[1].protagonist.name,
     dateLabel: "30th May 2026",
     openingLine: "Birthday",
@@ -98,13 +98,13 @@ export const Birthday: Story = {
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
     pollId: "poll-birthday",
-    eventUrl: "https://favpoll.com/favpolls/demo-birthday",
+    favpollUrl: "https://favpoll.com/favpolls/demo-birthday",
   },
 }
 
 export const Retirement: Story = {
   args: {
-    eventId: "demo-retirement",
+    favpollId: "demo-retirement",
     protagonistName: SCENES[2].protagonist.name,
     dateLabel: null,
     openingLine: "After a lifetime of good work",
@@ -115,13 +115,13 @@ export const Retirement: Story = {
     poll: RETIREMENT_POLL,
     initialTotalRaised: 700,
     pollId: "poll-retirement",
-    eventUrl: "https://favpoll.com/favpolls/demo-retirement",
+    favpollUrl: "https://favpoll.com/favpolls/demo-retirement",
   },
 }
 
 export const Graduation: Story = {
   args: {
-    eventId: "demo-graduation",
+    favpollId: "demo-graduation",
     protagonistName: SCENES[5].protagonist.name,
     dateLabel: "13th June 2026",
     openingLine: "Congratulations",
@@ -132,6 +132,6 @@ export const Graduation: Story = {
     poll: GRADUATION_POLL,
     initialTotalRaised: 1730,
     pollId: "poll-graduation",
-    eventUrl: "https://favpoll.com/favpolls/demo-graduation",
+    favpollUrl: "https://favpoll.com/favpolls/demo-graduation",
   },
 }

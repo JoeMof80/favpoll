@@ -21,7 +21,7 @@ type PollInput = {
   addedItems?: string[]
 }
 
-type CreateEventInput = {
+type CreateFavpollInput = {
   protagonistName: string
   protagonistAbout: string | null
   photoUrl: string | null
@@ -94,9 +94,9 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
   return data.publicUrl
 }
 
-async function createPollForEvent(
+async function createPollForFavpoll(
   supabase: ReturnType<typeof createAdminClient>,
-  eventId: string,
+  favpollId: string,
   userId: string,
   poll: PollInput
 ) {
@@ -144,7 +144,7 @@ async function createPollForEvent(
   const { data: favpollPoll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
-      favpoll_id: eventId,
+      favpoll_id: favpollId,
       topic_id: topicId,
       personal_reveal: poll.reveal?.trim() || null,
     })
@@ -227,9 +227,9 @@ async function createPollForEvent(
   }
 }
 
-export async function createEvent(
-  input: CreateEventInput
-): Promise<{ eventId: string }> {
+export async function createFavpoll(
+  input: CreateFavpollInput
+): Promise<{ favpollId: string }> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -284,7 +284,7 @@ export async function createEvent(
     .single()
 
   if (eventErr || !event)
-    throw new Error(`Failed to create event: ${eventErr?.message}`)
+    throw new Error(`Failed to create favpoll: ${eventErr?.message}`)
 
   if (input.charityIds.length > 0) {
     await supabase.from("favpoll_charities").insert(
@@ -296,7 +296,7 @@ export async function createEvent(
     )
   }
 
-  await createPollForEvent(supabase, event.id, userId, input.poll)
+  await createPollForFavpoll(supabase, event.id, userId, input.poll)
 
   const { error: potErr } = await supabase.from("favpoll_pots").insert({
     favpoll_id: event.id,
@@ -305,5 +305,5 @@ export async function createEvent(
   })
   if (potErr) throw new Error(`Failed to create fund: ${potErr?.message}`)
 
-  return { eventId: event.id }
+  return { favpollId: event.id }
 }

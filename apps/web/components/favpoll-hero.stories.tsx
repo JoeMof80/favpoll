@@ -43,7 +43,7 @@ const BIOS: (string | null)[] = [
 ]
 
 function makeViewProps(sceneIndex: number): {
-  event: Favpoll
+  favpoll: Favpoll
   protagonist: Protagonist
 } {
   const scene = SCENES[sceneIndex]
@@ -58,7 +58,7 @@ function makeViewProps(sceneIndex: number): {
     created_at: "2024-01-01T00:00:00Z",
   }
 
-  const event: Favpoll = {
+  const favpoll: Favpoll = {
     id: `e-${sceneIndex}`,
     protagonist_id: protagonist.id,
     subject: "someone",
@@ -79,7 +79,7 @@ function makeViewProps(sceneIndex: number): {
     created_at: "2024-01-01T00:00:00Z",
   }
 
-  return { event, protagonist }
+  return { favpoll, protagonist }
 }
 
 // ─── Meta ─────────────────────────────────────────────────────────────────────

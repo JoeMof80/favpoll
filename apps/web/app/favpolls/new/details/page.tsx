@@ -17,7 +17,7 @@ import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 type Props = { searchParams: Promise<Record<string, string>> }
 
-export default async function NewEventDetailsPage({ searchParams }: Props) {
+export default async function NewFavpollDetailsPage({ searchParams }: Props) {
   const { userId } = await auth()
   if (!userId) redirect("/sign-in?redirect_url=/favpolls/new")
 

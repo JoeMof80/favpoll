@@ -23,7 +23,7 @@ type DisplayPoll = {
 }
 
 type Props = {
-  eventId: string
+  favpollId: string
   protagonistName: string
   dateLabel: string | null
   openingLine: string | null
@@ -33,7 +33,7 @@ type Props = {
   poll: DisplayPoll | null
   initialTotalRaised: number
   pollId: string | null
-  eventUrl: string
+  favpollUrl: string
 }
 
 function DisplayRankingRow({
@@ -136,7 +136,7 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
 }
 
 export function DisplayScreen({
-  eventId,
+  favpollId,
   protagonistName,
   dateLabel,
   openingLine,
@@ -146,14 +146,14 @@ export function DisplayScreen({
   poll,
   initialTotalRaised,
   pollId,
-  eventUrl,
+  favpollUrl,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   const supabase = createClient()
 
   useEffect(() => {
     const channel = supabase
-      .channel(`display-pledges-${eventId}`)
+      .channel(`display-pledges-${favpollId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "pledges" },
@@ -175,7 +175,7 @@ export function DisplayScreen({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [eventId, pollId, supabase])
+  }, [favpollId, pollId, supabase])
 
   const headline = getFavpollHeadline({
     occasionType,
@@ -237,7 +237,7 @@ export function DisplayScreen({
         {/* QR code */}
         <div className="mt-8 flex flex-col items-center gap-3 border-t border-border pt-8">
           <QRCodeSVG
-            value={eventUrl}
+            value={favpollUrl}
             size={120}
             fgColor={BRAND}
             bgColor="transparent"

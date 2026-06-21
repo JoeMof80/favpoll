@@ -23,18 +23,20 @@ export type FavpollSummaryCardFavpoll = {
 }
 
 type Props = {
-  event: FavpollSummaryCardFavpoll
+  favpoll: FavpollSummaryCardFavpoll
   className?: string
 }
 
-export function FavpollSummaryCard({ event, className }: Props) {
-  const topicTitle = event.poll?.topic?.title ?? null
+export function FavpollSummaryCard({ favpoll, className }: Props) {
+  const topicTitle = favpoll.poll?.topic?.title ?? null
   const perCharity =
-    event.charities.length > 0 ? event.total_raised / event.charities.length : 0
+    favpoll.charities.length > 0
+      ? favpoll.total_raised / favpoll.charities.length
+      : 0
 
   return (
     <Link
-      href={`/favpolls/${event.id}`}
+      href={`/favpolls/${favpoll.id}`}
       className={cn(
         "block rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]",
         className
@@ -42,17 +44,18 @@ export function FavpollSummaryCard({ event, className }: Props) {
     >
       {/* Header */}
       <div className="relative p-3">
-        {event.is_exemplar && (
+        {favpoll.is_exemplar && (
           <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
             Example
           </span>
         )}
         <FavpollHeader
-          protagonist={{ name: event.protagonist.name }}
+          protagonist={{ name: favpoll.protagonist.name }}
           eyebrow={
-            event.category
-              ? event.category.charAt(0).toUpperCase() + event.category.slice(1)
-              : (event.opening_line ?? "")
+            favpoll.category
+              ? favpoll.category.charAt(0).toUpperCase() +
+                favpoll.category.slice(1)
+              : (favpoll.opening_line ?? "")
           }
           size="md"
         />
@@ -62,15 +65,15 @@ export function FavpollSummaryCard({ event, className }: Props) {
       {topicTitle && (
         <div className="flex items-center justify-between border-t border-border px-3 py-2">
           <SectionLabel title={topicTitle} size="md" />
-          <ClosingLabel closesAt={event.closes_at} />
+          <ClosingLabel closesAt={favpoll.closes_at} />
         </div>
       )}
 
       {/* Charity */}
-      {event.charities.length > 0 && (
+      {favpoll.charities.length > 0 && (
         <div className="border-t border-border px-3 py-2">
           <FavpollListCardCharityCarousel
-            charities={event.charities}
+            charities={favpoll.charities}
             perCharity={perCharity}
             size="sm"
           />

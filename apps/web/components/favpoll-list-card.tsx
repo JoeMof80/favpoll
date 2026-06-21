@@ -38,7 +38,7 @@ type FavpollListCardFavpoll = {
 
 type Props = {
   size?: FavpollCardSize
-  event: FavpollListCardFavpoll
+  favpoll: FavpollListCardFavpoll
   className?: string
   clerkUserId?: string | null
   initialResults?: CardResultItem[]
@@ -46,16 +46,18 @@ type Props = {
 
 export function FavpollListCard({
   size = "sm",
-  event,
+  favpoll,
   className,
   clerkUserId = null,
   initialResults,
 }: Props) {
-  const poll = event.poll
+  const poll = favpoll.poll
   const topicTitle = poll?.topic?.title ?? ""
   const topicItems = poll?.topic?.favourites ?? []
   const perCharity =
-    event.charities.length > 0 ? event.total_raised / event.charities.length : 0
+    favpoll.charities.length > 0
+      ? favpoll.total_raised / favpoll.charities.length
+      : 0
 
   const [hasPledged, setHasPledged] = useState(!!initialResults)
   const [results, setResults] = useState<CardResultItem[] | null>(
@@ -83,7 +85,7 @@ export function FavpollListCard({
     poll && poll.topic
       ? ({
           id: poll.id,
-          favpoll_id: event.id,
+          favpoll_id: favpoll.id,
           topic_id: poll.topic_id ?? "",
           personal_reveal: null,
           created_at: "",
@@ -104,15 +106,15 @@ export function FavpollListCard({
     <li className={cn("list-none", className)}>
       <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
         {/* Navigable header — links to favpoll page */}
-        <Link href={`/favpolls/${event.id}`} className="relative block p-3">
-          {event.is_exemplar && (
+        <Link href={`/favpolls/${favpoll.id}`} className="relative block p-3">
+          {favpoll.is_exemplar && (
             <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
               Example
             </span>
           )}
           <FavpollHeader
-            protagonist={{ name: event.protagonist.name }}
-            eyebrow={event.opening_line ?? ""}
+            protagonist={{ name: favpoll.protagonist.name }}
+            eyebrow={favpoll.opening_line ?? ""}
             size={size}
           />
         </Link>
@@ -122,9 +124,9 @@ export function FavpollListCard({
           <div className="flex items-center justify-between gap-1 border-t border-border px-3 pt-2">
             <div>
               <SectionLabel title={topicTitle} size="md" />
-              {event.description && (
+              {favpoll.description && (
                 <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-                  {event.description}
+                  {favpoll.description}
                 </p>
               )}
             </div>
@@ -150,10 +152,10 @@ export function FavpollListCard({
         )}
 
         {/* Description only — when there's no topicTitle */}
-        {!topicTitle && event.description && (
-          <Link href={`/favpolls/${event.id}`} className="block px-5">
+        {!topicTitle && favpoll.description && (
+          <Link href={`/favpolls/${favpoll.id}`} className="block px-5">
             <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-              {event.description}
+              {favpoll.description}
             </p>
           </Link>
         )}
@@ -165,9 +167,9 @@ export function FavpollListCard({
               <FavpollListCardResults results={results ?? []} />
             ) : (
               <PledgeDialog
-                eventId={event.id}
+                favpollId={favpoll.id}
                 clerkUserId={clerkUserId}
-                charityNames={event.charities.map((c) => c.charity.name)}
+                charityNames={favpoll.charities.map((c) => c.charity.name)}
                 pollWithItems={pollWithItems}
                 pot={null}
                 userPotAllocation={null}
@@ -178,7 +180,7 @@ export function FavpollListCard({
           </div>
         ) : (
           <div className="px-5 pb-5">
-            <Link href={`/favpolls/${event.id}`} tabIndex={-1}>
+            <Link href={`/favpolls/${favpoll.id}`} tabIndex={-1}>
               <Button type="button" variant="outline" className="w-full">
                 View favpoll
               </Button>
@@ -187,10 +189,10 @@ export function FavpollListCard({
         )}
 
         {/* Charity footer */}
-        {event.charities.length > 0 && (
+        {favpoll.charities.length > 0 && (
           <div className="mt-auto border-t border-border px-4 py-3">
             <FavpollListCardCharityCarousel
-              charities={event.charities}
+              charities={favpoll.charities}
               perCharity={perCharity}
               size="sm"
             />

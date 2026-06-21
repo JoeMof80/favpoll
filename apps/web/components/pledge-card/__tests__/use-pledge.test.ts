@@ -79,7 +79,7 @@ function makePot(deposited: number, allocated: number): FavpollPot {
 const poll = makePoll("poll-1")
 
 const baseOptions = {
-  eventId: "event-1",
+  favpollId: "event-1",
   clerkUserId: "user-1",
   charityNames: ["Oxfam"],
   pollWithItems: poll,
@@ -722,7 +722,7 @@ describe("usePledge — handleFundConfirm", () => {
 
     expect(mockActions.pledgeFromFund).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventPollId: "poll-1",
+        favpollPollId: "poll-1",
         potId: "pot-1",
         totalAmount: 10,
       })
@@ -801,7 +801,7 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     })
 
     expect(mockActions.createPledge).toHaveBeenCalledWith(
-      expect.objectContaining({ eventPollId: "poll-1", totalAmount: 10 })
+      expect.objectContaining({ favpollPollId: "poll-1", totalAmount: 10 })
     )
     expect(onPledgeSuccess).toHaveBeenCalled()
     expect(mockRouter.refresh).toHaveBeenCalled()
@@ -826,7 +826,7 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
 
     expect(mockActions.createGuestPledge).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventPollId: "poll-1",
+        favpollPollId: "poll-1",
         guestEmail: "guest@example.com",
         totalAmount: 10,
       })

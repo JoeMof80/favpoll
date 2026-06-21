@@ -350,7 +350,7 @@ export default async function FavpollsPage({
               return (
                 <FavpollListCard
                   key={fp.id}
-                  event={{ ...fp, poll }}
+                  favpoll={{ ...fp, poll }}
                   clerkUserId={userId}
                   initialResults={initialResults}
                 />

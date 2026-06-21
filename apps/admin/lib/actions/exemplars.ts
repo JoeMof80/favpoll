@@ -50,7 +50,7 @@ export async function getClosedFavpolls(): Promise<{
 }
 
 export async function setExemplar(
-  eventId: string,
+  favpollId: string,
   value: boolean,
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
@@ -58,7 +58,7 @@ export async function setExemplar(
   const { error } = await supabase
     .from("favpolls")
     .update({ is_exemplar: value })
-    .eq("id", eventId);
+    .eq("id", favpollId);
 
   if (error) return { error: error.message };
 

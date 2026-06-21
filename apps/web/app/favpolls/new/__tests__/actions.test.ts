@@ -26,7 +26,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 }))
 
 // Use relative path to bypass the Storybook mock alias in vitest.config.ts
-import { createEvent } from "../actions"
+import { createFavpoll } from "../actions"
 
 const BASE_INPUT = {
   protagonistName: "Joan",
@@ -61,11 +61,11 @@ beforeEach(() => {
   mockAuth.mockResolvedValue({ userId: "user-1" })
 })
 
-describe("createEvent — canonical topic", () => {
-  it("returns eventId and inserts in correct order", async () => {
+describe("createFavpoll — canonical topic", () => {
+  it("returns favpollId and inserts in correct order", async () => {
     queueCanonicalPoll()
 
-    const result = await createEvent({
+    const result = await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: "topic-1",
@@ -75,7 +75,7 @@ describe("createEvent — canonical topic", () => {
       },
     })
 
-    expect(result).toEqual({ eventId: "event-1" })
+    expect(result).toEqual({ favpollId: "event-1" })
     expect(
       mock.callsFor("favpolls").find((c) => c.method === "insert")
     ).toBeTruthy()
@@ -87,7 +87,7 @@ describe("createEvent — canonical topic", () => {
   it("throws when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
     await expect(
-      createEvent({
+      createFavpoll({
         ...BASE_INPUT,
         poll: {
           topicId: "topic-1",
@@ -100,7 +100,7 @@ describe("createEvent — canonical topic", () => {
   })
 })
 
-describe("createEvent — custom topic", () => {
+describe("createFavpoll — custom topic", () => {
   it("inserts topic with placeholders:{} and is_active:true, is_finite:false", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
@@ -112,7 +112,7 @@ describe("createEvent — custom topic", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: null,
@@ -145,7 +145,7 @@ describe("createEvent — custom topic", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: null,
@@ -185,7 +185,7 @@ describe("createEvent — custom topic", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: null,
@@ -231,7 +231,7 @@ describe("createEvent — custom topic", () => {
     // No favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: null,
@@ -247,7 +247,7 @@ describe("createEvent — custom topic", () => {
   })
 })
 
-describe("createEvent — canonical topic with organiser additions (addedItems)", () => {
+describe("createFavpoll — canonical topic with organiser additions (addedItems)", () => {
   function queueWithAdditions() {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
@@ -262,7 +262,7 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
 
   it("inserts added items with source:organiser, is_canonical:false, review_status:pending_review", async () => {
     queueWithAdditions()
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: "topic-1",
@@ -293,7 +293,7 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
 
   it("links added items to the favpoll poll as favpoll_poll_favourites", async () => {
     queueWithAdditions()
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: "topic-1",
@@ -326,7 +326,7 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
 
   it("skips addedItems insert when addedItems is empty", async () => {
     queueCanonicalPoll()
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: "topic-1",
@@ -343,7 +343,7 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
 
   it("skips addedItems insert when addedItems is undefined", async () => {
     queueCanonicalPoll()
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       poll: {
         topicId: "topic-1",
@@ -358,7 +358,7 @@ describe("createEvent — canonical topic with organiser additions (addedItems)"
   })
 })
 
-describe("createEvent — cause event (subject='cause')", () => {
+describe("createFavpoll — cause event (subject='cause')", () => {
   it("skips protagonists insert and stores cause_label on the event", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     // No protagonists insert
@@ -368,7 +368,7 @@ describe("createEvent — cause event (subject='cause')", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    const result = await createEvent({
+    const result = await createFavpoll({
       ...BASE_INPUT,
       protagonistName: "",
       subject: "cause",
@@ -382,7 +382,7 @@ describe("createEvent — cause event (subject='cause')", () => {
       },
     })
 
-    expect(result).toEqual({ eventId: "event-1" })
+    expect(result).toEqual({ favpollId: "event-1" })
 
     expect(
       mock.callsFor("protagonists").filter((c) => c.method === "insert")
@@ -406,7 +406,7 @@ describe("createEvent — cause event (subject='cause')", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       protagonistName: "",
       subject: "cause",
@@ -432,7 +432,7 @@ describe("createEvent — cause event (subject='cause')", () => {
   })
 })
 
-describe("createEvent — fundraiser for a person (subject='someone')", () => {
+describe("createFavpoll — fundraiser for a person (subject='someone')", () => {
   it("creates protagonist row and stores subject='someone'", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
@@ -442,7 +442,7 @@ describe("createEvent — fundraiser for a person (subject='someone')", () => {
     mock.queue(null) // favpoll_poll_favourites insert
     mock.queue(null) // favpoll_pots insert
 
-    await createEvent({
+    await createFavpoll({
       ...BASE_INPUT,
       protagonistName: "Joan",
       subject: "someone",

@@ -23,7 +23,7 @@ import { PageLayout } from "../page-layout"
 import { Gift } from "lucide-react"
 
 type Props = {
-  event: FavpollWithDetails
+  favpoll: FavpollWithDetails
   pollWithItems: FavpollPollWithItems | null
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
@@ -35,7 +35,7 @@ type Props = {
 }
 
 export function FavpollContent({
-  event,
+  favpoll,
   pollWithItems,
   pot,
   userPotAllocation,
@@ -55,23 +55,23 @@ export function FavpollContent({
     showPledgeCard,
     handleViewChange,
   } = useFavpollContent({
-    event,
+    favpoll,
     pollWithItems,
     isClosed,
     hasPledged,
     clerkUserId,
   })
 
-  const isCause = event.subject === "cause"
-  const isListed = event.is_listed ?? true
+  const isCause = favpoll.subject === "cause"
+  const isListed = favpoll.is_listed ?? true
   const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
   })
-  const closedAt = event.closed_at
-    ? new Date(event.closed_at).toLocaleDateString("en-GB", {
+  const closedAt = favpoll.closed_at
+    ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -79,16 +79,16 @@ export function FavpollContent({
     : null
 
   const perCharity =
-    event.favpoll_charities.length > 0
-      ? totalRaised / event.favpoll_charities.length
+    favpoll.favpoll_charities.length > 0
+      ? totalRaised / favpoll.favpoll_charities.length
       : 0
 
-  const charityNames = event.favpoll_charities.map((ec) => ec.charities.name)
+  const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
 
   const pledgeDialog =
     !isClosed && showPledgeCard && pollWithItems ? (
       <PledgeDialog
-        eventId={event.id}
+        favpollId={favpoll.id}
         clerkUserId={clerkUserId}
         charityNames={charityNames}
         pollWithItems={pollWithItems}
@@ -103,9 +103,9 @@ export function FavpollContent({
   const left = (
     <>
       {isCause ? (
-        <CauseHero event={event} />
+        <CauseHero favpoll={favpoll} />
       ) : (
-        <FavpollHero event={event} protagonist={event.protagonists!} />
+        <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
       )}
 
       {pollWithItems ? (
@@ -117,11 +117,11 @@ export function FavpollContent({
           pledgeJustConfirmed={pledgeConfirmed}
           protagonistName={
             isCause
-              ? (event.cause_label ?? "")
-              : (event.protagonists?.name ?? "")
+              ? (favpoll.cause_label ?? "")
+              : (favpoll.protagonists?.name ?? "")
           }
           isOrganiser={isOrganiser}
-          eventId={event.id}
+          favpollId={favpoll.id}
           onViewChange={handleViewChange}
           pledgeTrigger={pledgeDialog}
         />
@@ -144,18 +144,18 @@ export function FavpollContent({
             <p className="text-sm text-muted-foreground">{closedAt}</p>
           )}
           <p className="text-xl font-medium text-primary">
-            {GBP.format(event.total_raised ?? totalRaised)}
+            {GBP.format(favpoll.total_raised ?? totalRaised)}
           </p>
           <p className="text-xs text-muted-foreground">raised in total</p>
         </div>
       ) : (
         <div className="rounded-lg border border-border bg-card px-5 py-4">
-          <Countdown closesAt={event.closes_at} />
+          <Countdown closesAt={favpoll.closes_at} />
         </div>
       )}
 
       <CharityBanner
-        charities={event.favpoll_charities.map((ec) => ec.charities)}
+        charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
       />
 
@@ -185,7 +185,7 @@ export function FavpollContent({
     <PageLayout left={left} right={right}>
       {showGuestFund && (
         <SeedFundModal
-          eventId={event.id}
+          favpollId={favpoll.id}
           variant="guest"
           isListed={isListed}
           onComplete={() => {
@@ -196,7 +196,7 @@ export function FavpollContent({
         />
       )}
       {/* Fixed charity carousel — mobile only, always visible */}
-      {event.favpoll_charities.length > 0 && (
+      {favpoll.favpoll_charities.length > 0 && (
         <div
           className="fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
           style={{
@@ -204,7 +204,7 @@ export function FavpollContent({
           }}
         >
           <FavpollListCardCharityCarousel
-            charities={event.favpoll_charities.map((ec) => ({
+            charities={favpoll.favpoll_charities.map((ec) => ({
               charity: ec.charities,
             }))}
             perCharity={perCharity}

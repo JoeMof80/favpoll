@@ -118,7 +118,7 @@ export default async function EditFavpollPage({ params }: Props) {
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
-      eventId={id}
+      favpollId={id}
       protagonistId={event.protagonist_id ?? undefined}
       existingPollId={rawPoll?.id}
       defaultValues={defaultValues}

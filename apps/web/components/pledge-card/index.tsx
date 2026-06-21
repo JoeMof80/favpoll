@@ -37,7 +37,7 @@ type PrePublishProps = {
 
 type LiveProps = {
   prePublish?: false | undefined
-  eventId: string
+  favpollId: string
   clerkUserId: string | null
   charityNames: string[]
   pollWithItems: FavpollPollWithItems

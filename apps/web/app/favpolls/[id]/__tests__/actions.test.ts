@@ -36,7 +36,7 @@ beforeEach(() => {
 
 describe("createPledge", () => {
   const input = {
-    eventPollId: "poll-1",
+    favpollPollId: "poll-1",
     potAllocationId: null,
     totalAmount: 10,
     allocations: [
@@ -156,7 +156,7 @@ describe("createPledge", () => {
 
 describe("createGuestPledge", () => {
   const input = {
-    eventPollId: "poll-1",
+    favpollPollId: "poll-1",
     guestEmail: "guest@example.com",
     totalAmount: 10,
     allocations: [{ favouriteId: "item-a", amount: 10 }],
@@ -281,12 +281,12 @@ describe("createGuestPledge", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("addOrganizerItem", () => {
-  const eventId = "event-1"
+  const favpollId = "event-1"
   const label = "Red"
 
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+    await expect(addOrganizerItem(favpollId, label)).rejects.toThrow(
       "Not authenticated"
     )
   })
@@ -294,7 +294,7 @@ describe("addOrganizerItem", () => {
   it("throws 'Unauthorized' when user is not the favpoll creator", async () => {
     mock.queue({ created_by: "other-user" }) // favpolls select
 
-    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+    await expect(addOrganizerItem(favpollId, label)).rejects.toThrow(
       "Unauthorized"
     )
   })
@@ -307,7 +307,7 @@ describe("addOrganizerItem", () => {
       topics: { is_finite: true },
     }) // favpoll_polls select
 
-    await expect(addOrganizerItem(eventId, label)).rejects.toThrow(
+    await expect(addOrganizerItem(favpollId, label)).rejects.toThrow(
       "Cannot add favourites to a finite topic"
     )
   })
@@ -323,7 +323,7 @@ describe("addOrganizerItem", () => {
     mock.queue(null) // no existing favpoll_poll_favourite
     mock.queue(null) // favpoll_poll_favourites insert
 
-    await addOrganizerItem(eventId, label)
+    await addOrganizerItem(favpollId, label)
 
     // Should NOT have inserted a new favourite
     const topicItemInserts = mock
@@ -354,7 +354,7 @@ describe("addOrganizerItem", () => {
     mock.queue(null) // no existing favpoll_poll_favourite
     mock.queue(null) // favpoll_poll_favourites insert
 
-    await addOrganizerItem(eventId, label)
+    await addOrganizerItem(favpollId, label)
 
     const topicItemInsert = mock
       .callsFor("favourites")
@@ -388,7 +388,7 @@ describe("addOrganizerItem", () => {
     mock.queue({ id: "item-existing" }) // favourites ilike match
     mock.queue({ id: "epi-1" }) // favpoll_poll_favourites already exists
 
-    await addOrganizerItem(eventId, label)
+    await addOrganizerItem(favpollId, label)
 
     const epiInserts = mock
       .callsFor("favpoll_poll_favourites")
@@ -397,7 +397,7 @@ describe("addOrganizerItem", () => {
   })
 
   it("throws 'Label is required' for blank label", async () => {
-    await expect(addOrganizerItem(eventId, "   ")).rejects.toThrow(
+    await expect(addOrganizerItem(favpollId, "   ")).rejects.toThrow(
       "Label is required"
     )
   })

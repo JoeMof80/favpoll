@@ -5,10 +5,10 @@ import { setExemplar } from "@/lib/actions/exemplars";
 import type { ExemplarFavpoll } from "@/lib/actions/exemplars";
 
 type Props = {
-  events: ExemplarFavpoll[];
+  favpolls: ExemplarFavpoll[];
 };
 
-export function ExemplarTable({ events }: Props) {
+export function ExemplarTable({ favpolls }: Props) {
   const [isPending, startTransition] = useTransition();
 
   function toggle(id: string, current: boolean) {
@@ -17,7 +17,7 @@ export function ExemplarTable({ events }: Props) {
     });
   }
 
-  if (events.length === 0) {
+  if (favpolls.length === 0) {
     return (
       <p className="text-sm text-neutral-500">No closed favpolls found.</p>
     );
@@ -36,7 +36,7 @@ export function ExemplarTable({ events }: Props) {
           </tr>
         </thead>
         <tbody>
-          {events.map((ev) => (
+          {favpolls.map((ev) => (
             <tr
               key={ev.id}
               className="border-b border-neutral-100 last:border-0"

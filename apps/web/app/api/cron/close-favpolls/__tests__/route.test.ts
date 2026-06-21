@@ -98,7 +98,7 @@ describe("POST /api/cron/close-favpolls — DB error", () => {
 describe("POST /api/cron/close-favpolls — closes events", () => {
   function queueForOneEvent(
     options: {
-      eventId?: string
+      favpollId?: string
       userId?: string
       protagonistName?: string
       totalRaised?: number
@@ -107,7 +107,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     } = {}
   ) {
     const {
-      eventId = "event-1",
+      favpollId = "event-1",
       userId = "user-1",
       protagonistName = "Alice",
       totalRaised = 150,
@@ -118,7 +118,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     // 1. events select
     mock.queue([
       {
-        id: eventId,
+        id: favpollId,
         created_by: userId,
         protagonists: { name: protagonistName },
       },
@@ -126,7 +126,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     // 2. pledges select (totals)
     mock.queue([
       {
-        favpoll_polls: { favpoll_id: eventId },
+        favpoll_polls: { favpoll_id: favpollId },
         total_amount: totalRaised,
       },
     ])
@@ -164,7 +164,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
 
   it("sends sendFavpollClosed to the organiser email", async () => {
     queueForOneEvent({
-      eventId: "event-1",
+      favpollId: "event-1",
       protagonistName: "Bob",
       totalRaised: 75,
       organiserEmail: "bob@example.com",
@@ -177,7 +177,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
         to: "bob@example.com",
         protagonistName: "Bob",
         totalRaised: 75,
-        eventId: "event-1",
+        favpollId: "event-1",
       })
     )
   })
@@ -202,13 +202,13 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
 
   it("lists event update errors but still closes others", async () => {
     // Two events: first fails to update, second succeeds
-    const eventId1 = "event-fail"
-    const eventId2 = "event-ok"
+    const favpollId1 = "event-fail"
+    const favpollId2 = "event-ok"
     const userId = "user-1"
 
     mock.queue([
-      { id: eventId1, created_by: userId, protagonists: { name: "A" } },
-      { id: eventId2, created_by: userId, protagonists: { name: "B" } },
+      { id: favpollId1, created_by: userId, protagonists: { name: "A" } },
+      { id: favpollId2, created_by: userId, protagonists: { name: "B" } },
     ])
     mock.queue([]) // no pledges
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
@@ -222,22 +222,22 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
 
     expect(body.closed).toBe(1)
     expect(body.errors).toEqual(
-      expect.arrayContaining([expect.stringContaining(eventId1)])
+      expect.arrayContaining([expect.stringContaining(favpollId1)])
     )
   })
 
   it("sums pledge totals correctly from pledgeTotals rows", async () => {
-    const eventId = "event-1"
+    const favpollId = "event-1"
     const userId = "user-1"
 
     mock.queue([
-      { id: eventId, created_by: userId, protagonists: { name: "A" } },
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
     ])
     // Multiple pledge rows for the same event
     mock.queue([
-      { favpoll_polls: { favpoll_id: eventId }, total_amount: 50 },
-      { favpoll_polls: { favpoll_id: eventId }, total_amount: 30 },
-      { favpoll_polls: { favpoll_id: eventId }, total_amount: 20 },
+      { favpoll_polls: { favpoll_id: favpollId }, total_amount: 50 },
+      { favpoll_polls: { favpoll_id: favpollId }, total_amount: 30 },
+      { favpoll_polls: { favpoll_id: favpollId }, total_amount: 20 },
     ])
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
     mock.queue(null) // update

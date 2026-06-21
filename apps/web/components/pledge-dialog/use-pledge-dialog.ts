@@ -13,7 +13,7 @@ import type {
 export type PledgeDialogStep = 1 | 2 | 3
 
 export type UsePledgeDialogOptions = {
-  eventId: string
+  favpollId: string
   clerkUserId: string | null
   charityNames: string[]
   pollWithItems: FavpollPollWithItems
@@ -24,7 +24,7 @@ export type UsePledgeDialogOptions = {
 }
 
 export function usePledgeDialog({
-  eventId,
+  favpollId,
   clerkUserId,
   charityNames,
   pollWithItems,
@@ -79,7 +79,7 @@ export function usePledgeDialog({
 
   // --- step 2/3: pledge state via usePledge ---
   const pledge = usePledge({
-    eventId,
+    favpollId,
     clerkUserId,
     charityNames,
     pollWithItems,

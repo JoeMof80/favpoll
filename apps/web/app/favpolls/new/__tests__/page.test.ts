@@ -24,18 +24,18 @@ vi.mock("@/components/new-favpoll-wizard", () => ({
   NewFavpollWizard: () => null,
 }))
 
-import NewEventPage from "@/app/favpolls/new/page"
+import NewFavpollPage from "@/app/favpolls/new/page"
 
 beforeEach(() => {
   mock = makeSupabaseMock()
   mockAuth.mockResolvedValue({ userId: "user-1" })
 })
 
-describe("NewEventPage — /favpolls/new", () => {
+describe("NewFavpollPage — /favpolls/new", () => {
   it("redirects to /sign-in when the user is not authenticated", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
 
-    await expect(NewEventPage()).rejects.toThrow(
+    await expect(NewFavpollPage()).rejects.toThrow(
       "/sign-in?redirect_url=/favpolls/new"
     )
   })
@@ -46,6 +46,6 @@ describe("NewEventPage — /favpolls/new", () => {
     mock.queue([]) // topics (with favourites + topic_categories joins)
     mock.queue([]) // categories
 
-    await expect(NewEventPage()).resolves.not.toThrow()
+    await expect(NewFavpollPage()).resolves.not.toThrow()
   })
 })

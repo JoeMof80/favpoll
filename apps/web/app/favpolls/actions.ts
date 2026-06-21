@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 
-export async function deleteEvent(eventId: string) {
+export async function deleteFavpoll(favpollId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -14,13 +14,13 @@ export async function deleteEvent(eventId: string) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select("id")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .eq("created_by", userId)
     .single()
 
   if (!favpoll) throw new Error("Favpoll not found or not yours")
 
-  const { error } = await supabase.from("favpolls").delete().eq("id", eventId)
+  const { error } = await supabase.from("favpolls").delete().eq("id", favpollId)
   if (error) throw new Error(error.message)
 
   redirect("/favpolls")

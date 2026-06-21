@@ -79,7 +79,7 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
 
     try {
       await createPledge({
-        eventPollId: pollId,
+        favpollPollId: pollId,
         potAllocationId: null,
         totalAmount: amount,
         allocations,

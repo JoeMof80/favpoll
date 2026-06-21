@@ -28,7 +28,7 @@ const config: StorybookConfig = {
         ),
         "@/app/favpolls/[id]/actions": path.resolve(
           __dirname,
-          "./__mocks__/event-actions.ts"
+          "./__mocks__/favpoll-actions.ts"
         ),
         // Prevent real Supabase/Stripe clients from running in Storybook (no env vars in CI)
         "@/lib/supabase/client": path.resolve(

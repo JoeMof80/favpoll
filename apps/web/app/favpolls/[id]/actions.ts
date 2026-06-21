@@ -10,7 +10,7 @@ type PledgeAllocationInput = {
 }
 
 type CreatePledgeInput = {
-  eventPollId: string
+  favpollPollId: string
   potAllocationId: string | null
   totalAmount: number
   allocations: PledgeAllocationInput[]
@@ -28,7 +28,7 @@ export async function createPledge(input: CreatePledgeInput) {
   const { data: pledge, error: pledgeErr } = await supabase
     .from("pledges")
     .insert({
-      favpoll_poll_id: input.eventPollId,
+      favpoll_poll_id: input.favpollPollId,
       clerk_user_id: userId,
       pot_allocation_id: input.potAllocationId,
       total_amount: input.totalAmount,
@@ -54,7 +54,7 @@ export async function createPledge(input: CreatePledgeInput) {
 }
 
 type CreateGuestPledgeInput = {
-  eventPollId: string
+  favpollPollId: string
   guestEmail: string
   totalAmount: number
   allocations: PledgeAllocationInput[]
@@ -70,7 +70,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   const { data: existing } = await supabase
     .from("pledges")
     .select("id")
-    .eq("favpoll_poll_id", input.eventPollId)
+    .eq("favpoll_poll_id", input.favpollPollId)
     .eq("guest_email", input.guestEmail)
     .is("withdrawn_at", null)
     .maybeSingle()
@@ -86,7 +86,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   const { data: pledge, error: pledgeErr } = await supabase
     .from("pledges")
     .insert({
-      favpoll_poll_id: input.eventPollId,
+      favpoll_poll_id: input.favpollPollId,
       clerk_user_id: null,
       guest_email: input.guestEmail,
       guest_token,
@@ -118,15 +118,15 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
     .select(
       "favpoll_id, favpolls(closes_at, protagonists(name), favpoll_charities(charities(name)))"
     )
-    .eq("id", input.eventPollId)
+    .eq("id", input.favpollPollId)
     .single()
 
   try {
-    const eventData = pollData?.favpolls as any
+    const favpollData = pollData?.favpolls as any
     const protagonistName: string =
-      eventData?.protagonists?.name ?? "this event"
-    const closesAt: string = eventData?.closes_at ?? ""
-    const charityNames: string[] = (eventData?.favpoll_charities ?? []).map(
+      favpollData?.protagonists?.name ?? "this event"
+    const closesAt: string = favpollData?.closes_at ?? ""
+    const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
       (ec: any) => ec.charities.name
     )
 
@@ -146,7 +146,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
 }
 
 export async function addGuestItem(
-  eventPollId: string,
+  favpollPollId: string,
   topicId: string,
   label: string
 ) {
@@ -189,7 +189,7 @@ export async function addGuestItem(
   const { error: epiErr } = await supabase
     .from("favpoll_poll_favourites")
     .insert({
-      favpoll_poll_id: eventPollId,
+      favpoll_poll_id: favpollPollId,
       favourite_id: favouriteId,
       is_guest_added: true,
       added_by: userId,
@@ -203,12 +203,12 @@ export async function addGuestItem(
       .select(
         "favpoll_id, favpolls(id, occasion_type, created_by, protagonists(name)), topics(title)"
       )
-      .eq("id", eventPollId)
+      .eq("id", favpollPollId)
       .single()
 
-    const eventData = pollData?.favpolls as any
+    const favpollData = pollData?.favpolls as any
     const topicData = pollData?.topics as any
-    const organizerUserId: string | null = eventData?.created_by ?? null
+    const organizerUserId: string | null = favpollData?.created_by ?? null
 
     if (organizerUserId) {
       const { data: organizer } = await supabase
@@ -222,9 +222,9 @@ export async function addGuestItem(
           to: organizer.email,
           itemLabel: trimmed,
           topicTitle: topicData?.title ?? "poll",
-          openingLine: eventData?.occasion_type ?? "event",
-          protagonistName: eventData?.protagonists?.name ?? "your event",
-          eventId: pollData?.favpoll_id ?? "",
+          openingLine: favpollData?.occasion_type ?? "event",
+          protagonistName: favpollData?.protagonists?.name ?? "your event",
+          favpollId: pollData?.favpoll_id ?? "",
         })
       } else {
         console.warn(
@@ -240,7 +240,7 @@ export async function addGuestItem(
   }
 }
 
-export async function addOrganizerItem(eventId: string, label: string) {
+export async function addOrganizerItem(favpollId: string, label: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -252,7 +252,7 @@ export async function addOrganizerItem(eventId: string, label: string) {
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
 
@@ -260,7 +260,7 @@ export async function addOrganizerItem(eventId: string, label: string) {
   const { data: poll } = await supabase
     .from("favpoll_polls")
     .select("id, topic_id, topics(is_finite)")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
   if (!poll) throw new Error("No poll found")
   const topicMeta = Array.isArray(poll.topics) ? poll.topics[0] : poll.topics
@@ -331,7 +331,7 @@ export async function removeFavpollPollFavourite(id: string) {
 }
 
 export async function pledgeFromFund(input: {
-  eventPollId: string
+  favpollPollId: string
   potId: string
   potCurrentAllocated: number
   totalAmount: number
@@ -351,7 +351,7 @@ export async function pledgeFromFund(input: {
   const { data: pledge, error: pledgeErr } = await supabase
     .from("pledges")
     .insert({
-      favpoll_poll_id: input.eventPollId,
+      favpoll_poll_id: input.favpollPollId,
       clerk_user_id: userId,
       pot_allocation_id: input.potId,
       total_amount: input.totalAmount,
@@ -374,13 +374,13 @@ export async function pledgeFromFund(input: {
   if (allocErr) throw new Error(allocErr.message)
 }
 
-export async function topUpFundAsGuest(eventId: string, amount: number) {
+export async function topUpFundAsGuest(favpollId: string, amount: number) {
   const supabase = createAdminClient()
 
   const { data: pot } = await supabase
     .from("favpoll_pots")
     .select("id, total_deposited")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
 
   if (!pot) throw new Error("No shared fund found for this favpoll")
@@ -393,7 +393,7 @@ export async function topUpFundAsGuest(eventId: string, amount: number) {
   if (error) throw new Error(error.message)
 }
 
-export async function topUpFund(eventId: string, amount: number) {
+export async function topUpFund(favpollId: string, amount: number) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -402,17 +402,17 @@ export async function topUpFund(eventId: string, amount: number) {
   const { data: pot } = await supabase
     .from("favpoll_pots")
     .select("id, total_deposited")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
 
   if (!pot) {
     const { data: organiserData } = await supabase
       .from("favpolls")
       .select("created_by")
-      .eq("id", eventId)
+      .eq("id", favpollId)
       .single()
     const { error: createErr } = await supabase.from("favpoll_pots").insert({
-      favpoll_id: eventId,
+      favpoll_id: favpollId,
       created_by: organiserData?.created_by ?? userId,
       total_deposited: amount,
     })
@@ -428,7 +428,7 @@ export async function topUpFund(eventId: string, amount: number) {
   if (error) throw new Error(error.message)
 }
 
-export async function setFavpollListed(eventId: string, isListed: boolean) {
+export async function setFavpollListed(favpollId: string, isListed: boolean) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -437,7 +437,7 @@ export async function setFavpollListed(eventId: string, isListed: boolean) {
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
 
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
@@ -445,7 +445,7 @@ export async function setFavpollListed(eventId: string, isListed: boolean) {
   const { error } = await supabase
     .from("favpolls")
     .update({ is_listed: isListed })
-    .eq("id", eventId)
+    .eq("id", favpollId)
 
   if (error) throw new Error(error.message)
 }

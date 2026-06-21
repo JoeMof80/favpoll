@@ -9,7 +9,7 @@ import { t } from "@/lib/i18n"
 export default async function HomePage() {
   const supabase = createAdminClient()
 
-  const { data: events } = await supabase
+  const { data: favpolls } = await supabase
     .from("favpolls")
     .select(
       `
@@ -55,7 +55,7 @@ export default async function HomePage() {
     } | null
     favpoll_poll_favourites: RawEpf[]
   }
-  type RawEvent = {
+  type RawFavpoll = {
     id: string
     opening_line: string
     description: string | null
@@ -67,7 +67,7 @@ export default async function HomePage() {
     favpoll_polls: RawPoll | null
   }
 
-  const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => {
+  const normalised = ((favpolls ?? []) as unknown as RawFavpoll[]).map((ev) => {
     const rawPoll = ev.favpoll_polls ?? null
     let poll: {
       id: string
@@ -109,7 +109,7 @@ export default async function HomePage() {
           </div>
 
           {normalised.length > 0 ? (
-            <LiveFavpollsCarousel events={normalised} />
+            <LiveFavpollsCarousel favpolls={normalised} />
           ) : (
             <div className="py-16 text-center">
               <p className="mb-2 text-[15px] font-medium text-foreground">

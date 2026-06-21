@@ -18,7 +18,7 @@ type Props = {
   pledgeJustConfirmed?: boolean
   protagonistName: string
   isOrganiser: boolean
-  eventId: string
+  favpollId: string
   onViewChange?: (view: "pledge" | "results") => void
   /** Rendered in the pledge view in place of the old PledgePanel trigger. */
   pledgeTrigger?: React.ReactNode
@@ -115,7 +115,7 @@ export function PollSection({
               </div>
               <RankingList
                 initialItems={poll.topics.favourites}
-                eventPollId={poll.id}
+                favpollPollId={poll.id}
                 topicId={poll.topic_id}
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}

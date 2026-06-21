@@ -22,7 +22,7 @@ import {
 import type { BreakdownLine } from "./pledge-breakdown"
 
 export type UsePledgeOptions = {
-  eventId: string
+  favpollId: string
   clerkUserId: string | null
   charityNames: string[]
   pollWithItems: FavpollPollWithItems
@@ -34,7 +34,7 @@ export type UsePledgeOptions = {
 }
 
 export function usePledge({
-  eventId,
+  favpollId,
   clerkUserId,
   charityNames,
   pollWithItems,
@@ -137,7 +137,7 @@ export function usePledge({
     const selections = pollSelections[pollWithItems.id] ?? []
     if (clerkUserId) {
       await createPledge({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         potAllocationId: userPotAllocation?.id ?? null,
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
@@ -149,7 +149,7 @@ export function usePledge({
     } else {
       const email = guestEmailParam ?? guestEmail
       await createGuestPledge({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         guestEmail: email,
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
@@ -187,7 +187,7 @@ export function usePledge({
     setSubmitting(true)
     try {
       await pledgeFromFund({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         potId: pot.id,
         potCurrentAllocated: pot.total_allocated,
         totalAmount: numericPledge,
@@ -210,7 +210,7 @@ export function usePledge({
     setPledgeClientSecret(null)
     try {
       await savePledge(email ?? guestEmail)
-      if (pendingTopUp) await topUpFund(eventId, numericTopUp)
+      if (pendingTopUp) await topUpFund(favpollId, numericTopUp)
       setPendingTopUp(false)
       onPledgeSuccess?.()
       router.refresh()

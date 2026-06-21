@@ -19,12 +19,12 @@ export async function withdrawPledge(formData: FormData) {
 
   if (!pledge) redirect("/pledges/withdraw/invalid")
 
-  const eventData = (pledge.favpoll_polls as any)?.favpolls
-  const closesAt = eventData?.closes_at
-  const eventId = eventData?.id
+  const favpollData = (pledge.favpoll_polls as any)?.favpolls
+  const closesAt = favpollData?.closes_at
+  const favpollId = favpollData?.id
 
   if (closesAt && new Date(closesAt) < new Date()) {
-    redirect(`/favpolls/${eventId}`)
+    redirect(`/favpolls/${favpollId}`)
   }
 
   await supabase
@@ -32,5 +32,5 @@ export async function withdrawPledge(formData: FormData) {
     .update({ withdrawn_at: new Date().toISOString(), guest_token: null })
     .eq("id", pledge.id)
 
-  redirect(`/favpolls/${eventId}?withdrawn=1`)
+  redirect(`/favpolls/${favpollId}?withdrawn=1`)
 }

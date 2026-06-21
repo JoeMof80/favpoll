@@ -6,8 +6,8 @@ import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
-import { createEvent } from "@/app/favpolls/new/actions"
-import { updateEvent, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
+import { createFavpoll } from "@/app/favpolls/new/actions"
+import { updateFavpoll, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
@@ -48,7 +48,7 @@ type Props = {
   topics: TopicWithMeta[]
   categories: Category[]
   mode: "create" | "edit"
-  eventId?: string
+  favpollId?: string
   protagonistId?: string
   existingPollId?: string
   defaultValues?: Partial<FavpollFormValues>
@@ -61,7 +61,7 @@ export function FavpollForm({
   topics,
   categories,
   mode,
-  eventId,
+  favpollId,
   protagonistId,
   existingPollId,
   defaultValues,
@@ -76,7 +76,7 @@ export function FavpollForm({
   const [editClosesAt, setEditClosesAt] = useState<string | undefined>(
     initialClosesAt
   )
-  const [seedEventId, setSeedEventId] = useState<string | null>(null)
+  const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
 
   // Holds the closesAt chosen in the publish overlay (create mode)
   const pendingClosesAt = useRef<Date | null>(null)
@@ -144,7 +144,7 @@ export function FavpollForm({
           new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
         sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
-        const { eventId: newId } = await createEvent({
+        const { favpollId: newId } = await createFavpoll({
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
@@ -173,13 +173,13 @@ export function FavpollForm({
             addedItems: isCustomTopic ? [] : (selectedTopic.customLabels ?? []),
           },
         })
-        setSeedEventId(newId)
+        setSeedFavpollId(newId)
       } else {
-        if (!eventId) throw new Error("Missing event data")
+        if (!favpollId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
         const closesAt = editClosesAt ?? new Date().toISOString()
-        await updateEvent(eventId, protagonistId ?? "", {
+        await updateFavpoll(favpollId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
@@ -197,7 +197,7 @@ export function FavpollForm({
           potAmount: null,
           poll,
         })
-        router.push(`/favpolls/${eventId}`)
+        router.push(`/favpolls/${favpollId}`)
       }
     } catch (err) {
       if (!(err instanceof Error)) throw err
@@ -247,9 +247,9 @@ export function FavpollForm({
   }
 
   async function handleClosesAtChange(iso: string) {
-    if (mode === "edit" && eventId) {
+    if (mode === "edit" && favpollId) {
       try {
-        await updateClosesAt(eventId, iso)
+        await updateClosesAt(favpollId, iso)
       } catch (err) {
         toast.error(
           err instanceof Error ? err.message : "Failed to update closing date",
@@ -267,12 +267,12 @@ export function FavpollForm({
     setEditClosesAt(iso)
   }
 
-  if (seedEventId) {
+  if (seedFavpollId) {
     return (
       <SeedFundModal
-        eventId={seedEventId}
+        favpollId={seedFavpollId}
         isListed={form.getValues("isListed") ?? true}
-        onComplete={() => router.push(`/favpolls/${seedEventId}`)}
+        onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
       />
     )
   }
