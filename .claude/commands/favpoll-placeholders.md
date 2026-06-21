@@ -235,8 +235,8 @@ The `TopicPlaceholders` type in `scripts/seed.ts` is:
 
 ```typescript
 type TopicPlaceholders = {
-  [occasion: string]: { about: string; reveal: string }
-}
+  [occasion: string]: { about: string; reveal: string };
+};
 ```
 
 There is no `framing` field. Do not add one.

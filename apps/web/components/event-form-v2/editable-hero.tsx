@@ -24,8 +24,10 @@ import {
 import type { EventFormValues } from "./schema"
 import { ProtagonistAvatar } from "@/components/event-hero-avatar"
 import { Button } from "@/components/ui/button"
-import { BaseEventHero } from "../heroes/base-event-hero"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { EditableField } from "@/components/editable-field"
 import { getFavpollHeadline } from "@/lib/display"
+import { cn } from "@/lib/utils"
 
 async function getCroppedBlob(
   imageSrc: string,
@@ -116,7 +118,6 @@ export function EditableHero({
   const photoUrl = values.photoUrl
   const causeLabel = values.causeLabel ?? ""
   const subject = (values.subject ?? "someone") as "someone" | "cause"
-  const selectedTopics = values.topics ?? []
 
   const resolvedPhotoUrl = photo
     ? URL.createObjectURL(photo)
@@ -129,7 +130,35 @@ export function EditableHero({
     subject,
   }).prefix
 
-  // Save functions
+  // ── Openers (seed draft from current value) ────────────────────────────────
+
+  function openOpeningLine() {
+    setOpeningLineDraft(openingLine)
+    setOpeningLineOpen(true)
+  }
+  function openName() {
+    setNameDraft(name)
+    setNameOpen(true)
+  }
+  function openCauseLabel() {
+    setCauseLabelDraft(causeLabel)
+    setCauseLabelOpen(true)
+  }
+  function openContext() {
+    setContextDraft(context)
+    setContextOpen(true)
+  }
+  function openAbout() {
+    setAboutDraft(about)
+    setAboutOpen(true)
+  }
+  function openPhoto() {
+    setDialogPhotoUrl(resolvedPhotoUrl ?? "")
+    setPhotoOpen(true)
+  }
+
+  // ── Savers ─────────────────────────────────────────────────────────────────
+
   function saveCauseLabel() {
     form.setValue("causeLabel", causeLabelDraft, { shouldValidate: true })
     setCauseLabelOpen(false)
@@ -206,21 +235,59 @@ export function EditableHero({
 
   return (
     <>
-      <BaseEventHero
-        isEdit={true}
-        formValues={values}
-        isGenerating={isGenerating}
-        onRegenerate={onRegenerate}
-        editAvatar={
-          subject !== "cause" ? (
+      {/* ── Hero (static — no scroll animations in edit mode) ─────────────── */}
+      <div className="pt-6 md:pt-16">
+        <div className="flex items-start gap-4 md:gap-6">
+          <div className="min-w-0 flex-1">
+            {/* Opening line */}
+            <EditableField onClick={openOpeningLine} className="w-full">
+              <SectionEyebrow
+                variant="muted"
+                className="flex h-8 items-center truncate wrap-break-word"
+              >
+                {openingLine || "Opening line"}
+              </SectionEyebrow>
+            </EditableField>
+
+            {/* Name / Cause label */}
+            <EditableField
+              onClick={subject === "cause" ? openCauseLabel : openName}
+            >
+              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+                {subject === "cause"
+                  ? causeLabel || (
+                      <span className="text-muted-foreground/50">
+                        What are you raising for?
+                      </span>
+                    )
+                  : name || (
+                      <span className="text-muted-foreground/50">Name</span>
+                    )}
+              </h1>
+            </EditableField>
+
+            {/* Context */}
+            {subject !== "cause" && (
+              <EditableField onClick={openContext} className="mt-2">
+                <p
+                  className={cn(
+                    "truncate text-xl font-normal whitespace-normal md:text-2xl",
+                    context ? "text-[#534AB7]" : "text-muted-foreground/40"
+                  )}
+                >
+                  {context || "Context"}
+                </p>
+              </EditableField>
+            )}
+          </div>
+
+          {/* Avatar */}
+          {subject !== "cause" && (
             <Button
               type="button"
               variant="ghost"
               className="group relative h-auto shrink-0 rounded-xl border-dotted border-primary/20 p-0 hover:border-solid hover:border-primary/60 hover:bg-transparent focus-visible:border-solid focus-visible:border-primary/60 focus-visible:bg-transparent"
-              onClick={() => {
-                setDialogPhotoUrl(resolvedPhotoUrl ?? "")
-                setPhotoOpen(true)
-              }}
+              onClick={openPhoto}
             >
               <ProtagonistAvatar
                 name={name || "Name"}
@@ -229,13 +296,46 @@ export function EditableHero({
               />
               <EditBadge className="right-0 bottom-0" />
             </Button>
-          ) : undefined
-        }
-      />
+          )}
+        </div>
+      </div>
 
-      {/* All your ResponsiveOverlay components stay exactly the same */}
+      {/* About */}
+      <div className="relative z-0 mt-4 mb-5 md:mb-10">
+        <div className="flex w-full flex-col items-start">
+          <EditableField onClick={openAbout} className="w-full text-left">
+            {about ? (
+              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+                {about}
+              </p>
+            ) : isGenerating ? (
+              <div className="w-full animate-pulse space-y-1.5">
+                <div className="h-4 w-full rounded-full bg-muted/60" />
+                <div className="h-4 w-4/5 rounded-full bg-muted/60" />
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground/40">
+                {aboutPlaceholder || "About"}
+              </p>
+            )}
+          </EditableField>
 
-      {/* Cause Label Overlay */}
+          {!about && !isGenerating && onRegenerate && (
+            <Button
+              type="button"
+              variant="link"
+              className="mt-2 h-auto px-0 py-0 text-sm text-muted-foreground hover:text-muted-foreground/70"
+              onClick={onRegenerate}
+            >
+              Generate a suggestion →
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Field overlays ────────────────────────────────────────────────── */}
+
+      {/* Cause Label */}
       <ResponsiveOverlay
         open={causeLabelOpen}
         onOpenChange={(o) => !o && setCauseLabelOpen(false)}
@@ -269,7 +369,7 @@ export function EditableHero({
         footer={overlayFooter(saveCauseLabel, () => setCauseLabelOpen(false))}
       />
 
-      {/* Name Overlay */}
+      {/* Name */}
       <ResponsiveOverlay
         open={nameOpen}
         onOpenChange={(o) => !o && setNameOpen(false)}
@@ -301,7 +401,7 @@ export function EditableHero({
         footer={overlayFooter(saveName, () => setNameOpen(false))}
       />
 
-      {/* Context Overlay */}
+      {/* Context */}
       <ResponsiveOverlay
         open={contextOpen}
         onOpenChange={(o) => !o && setContextOpen(false)}
@@ -333,7 +433,7 @@ export function EditableHero({
         footer={overlayFooter(saveContext, () => setContextOpen(false))}
       />
 
-      {/* Opening Line Overlay */}
+      {/* Opening Line */}
       <ResponsiveOverlay
         open={openingLineOpen}
         onOpenChange={(o) => !o && setOpeningLineOpen(false)}
@@ -365,7 +465,7 @@ export function EditableHero({
         footer={overlayFooter(saveOpeningLine, () => setOpeningLineOpen(false))}
       />
 
-      {/* About Overlay */}
+      {/* About */}
       <ResponsiveOverlay
         open={aboutOpen}
         onOpenChange={(o) => !o && setAboutOpen(false)}
@@ -416,7 +516,7 @@ export function EditableHero({
         footer={overlayFooter(saveAbout, () => setAboutOpen(false))}
       />
 
-      {/* Photo Overlay */}
+      {/* Photo */}
       <ResponsiveOverlay
         open={photoOpen}
         onOpenChange={(o) => {

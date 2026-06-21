@@ -37,28 +37,29 @@ If `is_finite: true`, also produce a matching entry for `topicItems` with a sens
 
 ## Persona per occasion
 
-| Occasion | Persona |
-|---|---|
-| memorial | Belinda Johnson — beloved mother, teacher, friend; gardener, tea drinker, Radio 4 |
-| tribute | David Osei — mentor to dozens, jazz lover, always knew what to say |
-| birthday | Sarah Mitchell — turning 40, cheese lover, hiker, meticulous city-break planner |
-| retirement | David Clarke — 35 years in engineering, golfer, kept a photo of the Dordogne on his desk |
-| wedding | Emma & James — met at a rainy festival 2019, strong coffee, ongoing argument about the best pizza in Naples |
-| anniversary | Mum & Dad — 40 years together, same cup of tea every morning, good biscuits in the tin |
-| leaving | Priya Sharma — starting her own studio after 6 years, leaves trail of good work and better jokes |
-| graduation | Tom Ellis — architecture at Manchester, first class honours, zero sleep, excellent scale models |
-| christening | Lily Rose — born on a Tuesday in March, already looking unimpressed |
+| Occasion    | Persona                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| memorial    | Belinda Johnson — beloved mother, teacher, friend; gardener, tea drinker, Radio 4                                         |
+| tribute     | David Osei — mentor to dozens, jazz lover, always knew what to say                                                        |
+| birthday    | Sarah Mitchell — turning 40, cheese lover, hiker, meticulous city-break planner                                           |
+| retirement  | David Clarke — 35 years in engineering, golfer, kept a photo of the Dordogne on his desk                                  |
+| wedding     | Emma & James — met at a rainy festival 2019, strong coffee, ongoing argument about the best pizza in Naples               |
+| anniversary | Mum & Dad — 40 years together, same cup of tea every morning, good biscuits in the tin                                    |
+| leaving     | Priya Sharma — starting her own studio after 6 years, leaves trail of good work and better jokes                          |
+| graduation  | Tom Ellis — architecture at Manchester, first class honours, zero sleep, excellent scale models                           |
+| christening | Lily Rose — born on a Tuesday in March, already looking unimpressed                                                       |
 | achievement | Marcus Webb — ran his first marathon, raised £4,000 for the RNLI, trained 8 months mostly in the dark, mostly in the rain |
-| recovery | Claire Hennessy — completed treatment, one year recovery, says music got her through |
-| award | Dr. Amelia Grant — Teacher of the Year, turns her classroom into the most inspiring place in the county |
-| promotion | Kwame Asante — 3 years going above and beyond, now Head of Product |
-| celebration | Generic/open — warm, inviting |
-| other | Generic/open — warm, inviting |
-| default | Generic fallback — no persona |
+| recovery    | Claire Hennessy — completed treatment, one year recovery, says music got her through                                      |
+| award       | Dr. Amelia Grant — Teacher of the Year, turns her classroom into the most inspiring place in the county                   |
+| promotion   | Kwame Asante — 3 years going above and beyond, now Head of Product                                                        |
+| celebration | Generic/open — warm, inviting                                                                                             |
+| other       | Generic/open — warm, inviting                                                                                             |
+| default     | Generic fallback — no persona                                                                                             |
 
 ## Placeholder pattern
 
 **framing:** Connect the persona to the topic with a specific believable detail, then invite the guest to share their own.
+
 - Format: "[Persona] loved/had/always [specific detail] — which [topic] do you love?"
 - The detail must be concrete and characteristic of the persona, not generic.
 
