@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { Coins, Monitor, Copy, Check, ExternalLink } from "lucide-react"
+import { Clock, Monitor, Copy, Check, ExternalLink } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { FavpollHeader } from "@/components/favpoll-card/favpoll-header"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
-import { EventCardCharityCarousel } from "@/components/event-card/event-card-charity-carousel"
 import {
   type OrganizerCardFavpoll,
   WARNING_THRESHOLD_DAYS,
@@ -20,12 +19,6 @@ import {
 } from "./utils"
 
 const BRAND = "#534AB7"
-
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL
-  if (typeof window !== "undefined") return window.location.origin
-  return ""
-}
 
 type Props = {
   favpoll: OrganizerCardFavpoll
@@ -38,29 +31,28 @@ export function OrganizerCard({ favpoll }: Props) {
 
   const [listed, setListed] = useState(favpoll.is_listed)
   const [listingPending, setListingPending] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [baseUrl, setBaseUrl] = useState(process.env.NEXT_PUBLIC_BASE_URL ?? "")
+  const [copiedGuest, setCopiedGuest] = useState(false)
+  const [copiedDisplay, setCopiedDisplay] = useState(false)
 
-  useEffect(() => {
-    if (!baseUrl) setBaseUrl(window.location.origin)
-  }, [baseUrl])
+  // Computed once per render; `typeof window` guard handles SSR pass.
+  // URL spans carry suppressHydrationWarning to silence the server/client diff.
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "")
 
-  const guestUrl = `${baseUrl}/favpolls/${favpoll.id}`
+  const guestUrl = baseUrl
+    ? `${baseUrl}/favpolls/${favpoll.id}`
+    : `/favpolls/${favpoll.id}`
+  const displayUrl = baseUrl
+    ? `${baseUrl}/favpolls/${favpoll.id}/display`
+    : `/favpolls/${favpoll.id}/display`
 
   const topicTitle = favpoll.poll?.topic?.title
-  const potRemaining =
-    (favpoll.pot?.total_deposited ?? 0) - (favpoll.pot?.total_allocated ?? 0)
-  const potTotal = favpoll.pot?.total_deposited ?? 0
-
   const protagonistName =
     favpoll.subject === "cause"
       ? (favpoll.cause_label ?? "")
       : (favpoll.protagonist?.name ?? "")
-
-  const perCharity =
-    favpoll.charities.length > 0
-      ? favpoll.total_raised / favpoll.charities.length
-      : 0
+  const charity = favpoll.charities[0]?.charity ?? null
 
   async function handleToggleListed(value: boolean) {
     setListed(value)
@@ -74,14 +66,19 @@ export function OrganizerCard({ favpoll }: Props) {
     }
   }
 
-  function handleCopy() {
+  function handleCopyGuest() {
     navigator.clipboard.writeText(guestUrl).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setCopiedGuest(true)
+      setTimeout(() => setCopiedGuest(false), 2000)
     })
   }
 
-  const displayUrl = `${getBaseUrl()}/favpolls/${favpoll.id}/display`
+  function handleCopyDisplay() {
+    navigator.clipboard.writeText(displayUrl).then(() => {
+      setCopiedDisplay(true)
+      setTimeout(() => setCopiedDisplay(false), 2000)
+    })
+  }
 
   return (
     <div
@@ -91,35 +88,11 @@ export function OrganizerCard({ favpoll }: Props) {
       )}
       data-testid="organizer-card"
     >
-      {/* 1. Identity row + status badge */}
+      {/* 1. Identity */}
       <Link
         href={`/favpolls/${favpoll.id}`}
-        className="relative block p-3 transition-colors hover:bg-muted/30"
+        className="block p-3 transition-colors hover:bg-muted/30"
       >
-        <div className="absolute top-3 right-3">
-          {isClosed ? (
-            <span
-              className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-              data-testid="status-badge-closed"
-            >
-              Closed
-            </span>
-          ) : (
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                isWarning
-                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                  : "bg-muted text-muted-foreground"
-              )}
-              data-testid="status-badge-active"
-            >
-              {days <= 0
-                ? "closing"
-                : `${days} day${days === 1 ? "" : "s"} left`}
-            </span>
-          )}
-        </div>
         <FavpollHeader
           protagonist={{ name: protagonistName }}
           eyebrow={favpoll.opening_line ?? ""}
@@ -127,52 +100,37 @@ export function OrganizerCard({ favpoll }: Props) {
         />
       </Link>
 
-      {/* 2. Total raised */}
-      <div className="flex items-baseline gap-2 border-t border-border px-4 py-3">
-        <span
-          className={cn(
-            "text-2xl font-medium tabular-nums",
-            favpoll.total_raised === 0
-              ? "text-muted-foreground"
-              : "text-foreground"
-          )}
-          aria-live="polite"
-        >
-          {formatAmount(favpoll.total_raised)}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {isClosed ? "Closed" : "Active"}
-        </span>
-      </div>
-
-      {/* 3. Poll row */}
+      {/* 2. Topic + countdown */}
       {topicTitle && (
-        <div className="flex items-center justify-between border-t border-border px-4 py-2">
+        <div className="flex items-center justify-between border-t border-border px-3 py-2">
           <SectionLabel title={topicTitle} size="md" />
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {formatAmount(favpoll.total_raised)}
-          </span>
+          <div className="flex shrink-0 items-center gap-1.5 pl-2">
+            <Clock
+              size={12}
+              className="text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span
+              className={cn(
+                "text-xs tabular-nums",
+                isWarning
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-muted-foreground"
+              )}
+              data-testid={isClosed ? "countdown-closed" : "countdown-active"}
+            >
+              {isClosed
+                ? "Closed"
+                : days <= 0
+                  ? "closing"
+                  : `${days} day${days === 1 ? "" : "s"}`}
+            </span>
+          </div>
         </div>
       )}
 
-      {/* 4. Shared fund row */}
-      <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-sm">
-        <Coins
-          className="h-3.5 w-3.5 shrink-0 text-[#1D9E75]"
-          aria-hidden="true"
-        />
-        <span className="text-muted-foreground">
-          <span className="font-medium text-foreground">
-            {formatAmount(potRemaining)}
-          </span>
-          {" of "}
-          <span>{formatAmount(potTotal)}</span>
-          {" left in shared fund"}
-        </span>
-      </div>
-
-      {/* 5. Listed/Unlisted switch */}
-      <div className="flex items-center justify-between border-t border-border px-4 py-3">
+      {/* 3. Listed/Unlisted */}
+      <div className="flex items-center justify-between border-t border-border px-3 py-3">
         <div className="min-w-0">
           <p className="text-sm font-medium">
             {listed ? "Listed" : "Unlisted"}
@@ -193,70 +151,112 @@ export function OrganizerCard({ favpoll }: Props) {
         />
       </div>
 
-      {/* 6. Share block */}
-      <div className="flex gap-4 border-t border-border px-4 py-4">
-        <div className="shrink-0" data-testid="qr-code">
+      {/* 4. Share block */}
+      <div className="flex gap-3 border-t border-border px-3 py-3">
+        <div
+          data-testid="qr-code"
+          className="shrink-0"
+          suppressHydrationWarning
+        >
           <QRCodeSVG
-            value={guestUrl || `/favpolls/${favpoll.id}`}
-            size={72}
+            value={guestUrl}
+            size={96}
             fgColor={BRAND}
             bgColor="transparent"
             aria-label="QR code for the guest-facing favpoll page"
           />
         </div>
-        <div className="min-w-0 flex-1">
-          <p
-            className="mb-2 truncate font-mono text-xs text-muted-foreground"
-            title={guestUrl}
-          >
-            {guestUrl || `/favpolls/${favpoll.id}`}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            data-testid="copy-link-button"
-          >
-            {copied ? (
-              <Check className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-            ) : (
-              <Copy className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-            )}
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5">
+          {/* Guest URL */}
+          <div className="flex items-center gap-1.5">
+            <ExternalLink
+              size={12}
+              className="shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+              title={guestUrl}
+              suppressHydrationWarning
+            >
+              {guestUrl}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={handleCopyGuest}
+              aria-label="Copy guest link"
+              data-testid="copy-guest-button"
+            >
+              {copiedGuest ? (
+                <Check size={12} aria-hidden="true" />
+              ) : (
+                <Copy size={12} aria-hidden="true" />
+              )}
+            </Button>
+          </div>
+          {/* Display URL */}
+          <div className="flex items-center gap-1.5">
+            <Monitor
+              size={12}
+              className="shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+              title={displayUrl}
+              suppressHydrationWarning
+            >
+              {displayUrl}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={handleCopyDisplay}
+              aria-label="Copy display link"
+              data-testid="copy-display-button"
+            >
+              {copiedDisplay ? (
+                <Check size={12} aria-hidden="true" />
+              ) : (
+                <Copy size={12} aria-hidden="true" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* 7. Footer — charities + live display */}
-      {favpoll.charities.length > 0 && (
-        <div className="mt-auto flex items-center justify-between border-t border-border px-4 py-2.5">
-          <div className="min-w-0 flex-1 overflow-hidden">
-            <EventCardCharityCarousel
-              charities={favpoll.charities}
-              perCharity={perCharity}
-              size="sm"
+      {/* 5. Charity footer */}
+      {charity && (
+        <div className="flex items-center gap-3 border-t border-border px-3 py-2.5">
+          {charity.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={charity.logo_url}
+              alt={charity.name}
+              className="h-9 w-9 shrink-0 rounded object-contain"
             />
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="ml-2 shrink-0 gap-1.5 text-xs text-muted-foreground"
-            asChild
-          >
-            <a
-              href={displayUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open live display in new tab"
-              data-testid="live-display-button"
+          ) : (
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-[#EEEDFE] text-sm font-medium text-[#534AB7]"
+              aria-hidden="true"
             >
-              <Monitor className="h-3.5 w-3.5" aria-hidden="true" />
-              Live display
-              <ExternalLink className="h-3 w-3" aria-hidden="true" />
-            </a>
-          </Button>
+              {charity.name.charAt(0)}
+            </div>
+          )}
+          <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+            {charity.name}
+          </span>
+          <span
+            className="shrink-0 text-sm font-medium text-[#534AB7]"
+            aria-live="polite"
+          >
+            {formatAmount(favpoll.total_raised)}
+          </span>
         </div>
       )}
     </div>
