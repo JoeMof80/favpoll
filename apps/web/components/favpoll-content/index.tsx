@@ -88,7 +88,7 @@ export function FavpollContent({
   const pledgeDialog =
     !isClosed && showPledgeCard && pollWithItems ? (
       <PledgeDialog
-        eventId={event.id}
+        favpollId={event.id}
         clerkUserId={clerkUserId}
         charityNames={charityNames}
         pollWithItems={pollWithItems}
@@ -121,7 +121,7 @@ export function FavpollContent({
               : (event.protagonists?.name ?? "")
           }
           isOrganiser={isOrganiser}
-          eventId={event.id}
+          favpollId={event.id}
           onViewChange={handleViewChange}
           pledgeTrigger={pledgeDialog}
         />
@@ -185,7 +185,7 @@ export function FavpollContent({
     <PageLayout left={left} right={right}>
       {showGuestFund && (
         <SeedFundModal
-          eventId={event.id}
+          favpollId={event.id}
           variant="guest"
           isListed={isListed}
           onComplete={() => {

@@ -48,7 +48,7 @@ type Props = {
   topics: TopicWithMeta[]
   categories: Category[]
   mode: "create" | "edit"
-  eventId?: string
+  favpollId?: string
   protagonistId?: string
   existingPollId?: string
   defaultValues?: Partial<FavpollFormValues>
@@ -61,7 +61,7 @@ export function FavpollForm({
   topics,
   categories,
   mode,
-  eventId,
+  favpollId,
   protagonistId,
   existingPollId,
   defaultValues,
@@ -175,11 +175,11 @@ export function FavpollForm({
         })
         setSeedEventId(newId)
       } else {
-        if (!eventId) throw new Error("Missing event data")
+        if (!favpollId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
         const closesAt = editClosesAt ?? new Date().toISOString()
-        await updateFavpoll(eventId, protagonistId ?? "", {
+        await updateFavpoll(favpollId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
@@ -197,7 +197,7 @@ export function FavpollForm({
           potAmount: null,
           poll,
         })
-        router.push(`/favpolls/${eventId}`)
+        router.push(`/favpolls/${favpollId}`)
       }
     } catch (err) {
       if (!(err instanceof Error)) throw err
@@ -247,9 +247,9 @@ export function FavpollForm({
   }
 
   async function handleClosesAtChange(iso: string) {
-    if (mode === "edit" && eventId) {
+    if (mode === "edit" && favpollId) {
       try {
-        await updateClosesAt(eventId, iso)
+        await updateClosesAt(favpollId, iso)
       } catch (err) {
         toast.error(
           err instanceof Error ? err.message : "Failed to update closing date",
@@ -270,7 +270,7 @@ export function FavpollForm({
   if (seedEventId) {
     return (
       <SeedFundModal
-        eventId={seedEventId}
+        favpollId={seedEventId}
         isListed={form.getValues("isListed") ?? true}
         onComplete={() => router.push(`/favpolls/${seedEventId}`)}
       />

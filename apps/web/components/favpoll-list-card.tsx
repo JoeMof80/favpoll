@@ -165,7 +165,7 @@ export function FavpollListCard({
               <FavpollListCardResults results={results ?? []} />
             ) : (
               <PledgeDialog
-                eventId={event.id}
+                favpollId={event.id}
                 clerkUserId={clerkUserId}
                 charityNames={event.charities.map((c) => c.charity.name)}
                 pollWithItems={pollWithItems}

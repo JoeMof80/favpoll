@@ -14,7 +14,7 @@ import {
 const PRESETS = [10, 25, 50]
 
 type Props = {
-  eventId: string
+  favpollId: string
   onComplete: () => void
   /** Called when the guest variant is closed without completing. */
   onCancel?: () => void
@@ -25,7 +25,7 @@ type Props = {
 }
 
 export function SeedFundModal({
-  eventId,
+  favpollId,
   onComplete,
   onCancel,
   variant = "organiser",
@@ -42,7 +42,7 @@ export function SeedFundModal({
   async function handleToggleListed(value: boolean) {
     setListingState(value)
     try {
-      await setFavpollListed(eventId, value)
+      await setFavpollListed(favpollId, value)
     } catch {
       setListingState(!value)
     }
@@ -61,7 +61,7 @@ export function SeedFundModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: numeric,
-          metadata: { type: "pot_top_up", event_id: eventId },
+          metadata: { type: "pot_top_up", event_id: favpollId },
         }),
       })
       const data = (await res.json()) as {
@@ -80,9 +80,9 @@ export function SeedFundModal({
   async function handlePaymentSuccess() {
     try {
       if (isGuest) {
-        await topUpFundAsGuest(eventId, numeric)
+        await topUpFundAsGuest(favpollId, numeric)
       } else {
-        await topUpFund(eventId, numeric)
+        await topUpFund(favpollId, numeric)
       }
     } catch {
       // Fund recording failed — continue regardless

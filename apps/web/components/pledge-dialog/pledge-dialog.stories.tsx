@@ -73,7 +73,7 @@ type Story = StoryObj<typeof meta>
 
 export const SignedIn: Story = {
   args: {
-    eventId: "event-1",
+    favpollId: "event-1",
     clerkUserId: "user-1",
     charityNames: ["Oxfam"],
     pollWithItems: poll,

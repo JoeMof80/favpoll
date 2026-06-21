@@ -2,9 +2,9 @@
 
 import { useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { deleteEvent } from "./actions"
+import { deleteFavpoll } from "./actions"
 
-export function DeleteFavpollButton({ eventId }: { eventId: string }) {
+export function DeleteFavpollButton({ favpollId }: { favpollId: string }) {
   const [pending, startTransition] = useTransition()
 
   return (
@@ -17,7 +17,7 @@ export function DeleteFavpollButton({ eventId }: { eventId: string }) {
         e.preventDefault()
         e.stopPropagation()
         if (!confirm("Delete this favpoll? This cannot be undone.")) return
-        startTransition(() => deleteEvent(eventId))
+        startTransition(() => deleteFavpoll(favpollId))
       }}
       className="shrink-0 px-2.5 py-1 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
     >

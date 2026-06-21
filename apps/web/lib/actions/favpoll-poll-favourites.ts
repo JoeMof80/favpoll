@@ -34,7 +34,7 @@ export async function hideFavpollPollFavourite(eventPollItemId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const eventId = await verifyOrganiser(eventPollItemId, userId)
+  const favpollId = await verifyOrganiser(eventPollItemId, userId)
 
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -48,14 +48,14 @@ export async function hideFavpollPollFavourite(eventPollItemId: string) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath(`/favpolls/${eventId}`)
+  revalidatePath(`/favpolls/${favpollId}`)
 }
 
 export async function showFavpollPollFavourite(eventPollItemId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const eventId = await verifyOrganiser(eventPollItemId, userId)
+  const favpollId = await verifyOrganiser(eventPollItemId, userId)
 
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -69,5 +69,5 @@ export async function showFavpollPollFavourite(eventPollItemId: string) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath(`/favpolls/${eventId}`)
+  revalidatePath(`/favpolls/${favpollId}`)
 }

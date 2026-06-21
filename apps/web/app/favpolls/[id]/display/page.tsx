@@ -12,7 +12,7 @@ export default async function DisplayPage({ params }: Props) {
   const { id } = await params
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
       "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(name))"
@@ -20,7 +20,7 @@ export default async function DisplayPage({ params }: Props) {
     .eq("id", id)
     .single()
 
-  if (!event) notFound()
+  if (!favpoll) notFound()
 
   const { data: rawPoll } = await supabase
     .from("favpoll_polls")
@@ -50,7 +50,7 @@ export default async function DisplayPage({ params }: Props) {
   )
 
   const charityName =
-    (event.favpoll_charities as { charities: { name: string } }[])?.[0]
+    (favpoll.favpoll_charities as { charities: { name: string } }[])?.[0]
       ?.charities?.name ?? null
 
   const displayPoll = rawPoll
@@ -77,17 +77,17 @@ export default async function DisplayPage({ params }: Props) {
 
   return (
     <DisplayScreen
-      eventId={id}
-      protagonistName={event.protagonists.name}
-      dateLabel={event.protagonists.context ?? null}
-      openingLine={event.opening_line ?? null}
-      description={event.description ?? null}
-      occasionType={event.occasion_type ?? null}
+      favpollId={id}
+      protagonistName={favpoll.protagonists.name}
+      dateLabel={favpoll.protagonists.context ?? null}
+      openingLine={favpoll.opening_line ?? null}
+      description={favpoll.description ?? null}
+      occasionType={favpoll.occasion_type ?? null}
       charityName={charityName}
       poll={displayPoll}
       initialTotalRaised={initialTotalRaised}
       pollId={pollId}
-      eventUrl={`${baseUrl}/favpolls/${id}`}
+      favpollUrl={`${baseUrl}/favpolls/${id}`}
     />
   )
 }

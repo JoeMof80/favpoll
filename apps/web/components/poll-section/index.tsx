@@ -18,7 +18,7 @@ type Props = {
   pledgeJustConfirmed?: boolean
   protagonistName: string
   isOrganiser: boolean
-  eventId: string
+  favpollId: string
   onViewChange?: (view: "pledge" | "results") => void
   /** Rendered in the pledge view in place of the old PledgePanel trigger. */
   pledgeTrigger?: React.ReactNode

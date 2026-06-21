@@ -79,14 +79,14 @@ describe("withdrawPledge — event is closed", () => {
 })
 
 describe("withdrawPledge — success", () => {
-  function makeFuturePledge(eventId = "event-1") {
+  function makeFuturePledge(favpollId = "event-1") {
     const future = new Date()
     future.setFullYear(future.getFullYear() + 1)
     return {
       id: "pledge-1",
       withdrawn_at: null,
       favpoll_polls: {
-        favpolls: { closes_at: future.toISOString(), id: eventId },
+        favpolls: { closes_at: future.toISOString(), id: favpollId },
       },
     }
   }

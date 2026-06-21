@@ -6,18 +6,18 @@ import { Pencil, Share2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type Props = {
-  eventId: string
+  favpollId: string
   isOrganiser: boolean
   isClosed?: boolean
 }
 
-export function FavpollSubheader({ eventId, isOrganiser, isClosed }: Props) {
+export function FavpollSubheader({ favpollId, isOrganiser, isClosed }: Props) {
   const [copied, setCopied] = useState(false)
 
   if (!isOrganiser) return null
 
   function handleShareResults() {
-    const url = `${window.location.origin}/favpolls/${eventId}`
+    const url = `${window.location.origin}/favpolls/${favpollId}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -53,7 +53,7 @@ export function FavpollSubheader({ eventId, isOrganiser, isClosed }: Props) {
           aria-label="Edit event"
           className="h-12 w-12 rounded-full shadow-lg"
         >
-          <Link href={`/favpolls/${eventId}/edit`}>
+          <Link href={`/favpolls/${favpollId}/edit`}>
             <Pencil className="h-5 w-5" />
           </Link>
         </Button>

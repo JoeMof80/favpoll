@@ -26,21 +26,21 @@ export async function POST(request: Request) {
     return Response.json({ closed: 0 })
   }
 
-  const eventIds = events.map((e) => e.id)
+  const favpollIds = events.map((e) => e.id)
 
   // Sum non-withdrawn pledges per event
   const { data: pledgeTotals } = await supabase
     .from("pledges")
     .select("favpoll_polls!inner(favpoll_id), total_amount")
-    .in("favpoll_polls.favpoll_id", eventIds)
+    .in("favpoll_polls.favpoll_id", favpollIds)
     .is("withdrawn_at", null)
 
   const raisedByEvent: Record<string, number> = {}
   for (const row of pledgeTotals ?? []) {
-    const eventId = (row.favpoll_polls as unknown as { favpoll_id: string })
+    const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string })
       .favpoll_id
-    raisedByEvent[eventId] =
-      (raisedByEvent[eventId] ?? 0) + (row.total_amount ?? 0)
+    raisedByEvent[favpollId] =
+      (raisedByEvent[favpollId] ?? 0) + (row.total_amount ?? 0)
   }
 
   // Get organiser emails
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
           to: organiser.email,
           protagonistName,
           totalRaised,
-          eventId: event.id,
+          favpollId: event.id,
         })
       } catch (emailErr) {
         // Don't fail the whole batch for an email error

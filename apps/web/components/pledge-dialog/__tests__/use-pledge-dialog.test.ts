@@ -85,7 +85,7 @@ function makePot(deposited: number, allocated: number): FavpollPot {
 const poll = makePoll()
 
 const baseOptions = {
-  eventId: "event-1",
+  favpollId: "event-1",
   clerkUserId: "user-1",
   charityNames: ["Oxfam"],
   pollWithItems: poll,

@@ -46,7 +46,7 @@ export async function POST(
   await sendExtensionRequest({
     organizerEmail: primaryEmail,
     organizerName: displayName,
-    eventId: id,
+    favpollId: id,
     message,
   })
 

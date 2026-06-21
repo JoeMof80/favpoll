@@ -224,7 +224,7 @@ export async function addGuestItem(
           topicTitle: topicData?.title ?? "poll",
           openingLine: eventData?.occasion_type ?? "event",
           protagonistName: eventData?.protagonists?.name ?? "your event",
-          eventId: pollData?.favpoll_id ?? "",
+          favpollId: pollData?.favpoll_id ?? "",
         })
       } else {
         console.warn(
@@ -240,7 +240,7 @@ export async function addGuestItem(
   }
 }
 
-export async function addOrganizerItem(eventId: string, label: string) {
+export async function addOrganizerItem(favpollId: string, label: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -252,7 +252,7 @@ export async function addOrganizerItem(eventId: string, label: string) {
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
 
@@ -260,7 +260,7 @@ export async function addOrganizerItem(eventId: string, label: string) {
   const { data: poll } = await supabase
     .from("favpoll_polls")
     .select("id, topic_id, topics(is_finite)")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
   if (!poll) throw new Error("No poll found")
   const topicMeta = Array.isArray(poll.topics) ? poll.topics[0] : poll.topics
@@ -374,13 +374,13 @@ export async function pledgeFromFund(input: {
   if (allocErr) throw new Error(allocErr.message)
 }
 
-export async function topUpFundAsGuest(eventId: string, amount: number) {
+export async function topUpFundAsGuest(favpollId: string, amount: number) {
   const supabase = createAdminClient()
 
   const { data: pot } = await supabase
     .from("favpoll_pots")
     .select("id, total_deposited")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
 
   if (!pot) throw new Error("No shared fund found for this favpoll")
@@ -393,7 +393,7 @@ export async function topUpFundAsGuest(eventId: string, amount: number) {
   if (error) throw new Error(error.message)
 }
 
-export async function topUpFund(eventId: string, amount: number) {
+export async function topUpFund(favpollId: string, amount: number) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -402,17 +402,17 @@ export async function topUpFund(eventId: string, amount: number) {
   const { data: pot } = await supabase
     .from("favpoll_pots")
     .select("id, total_deposited")
-    .eq("favpoll_id", eventId)
+    .eq("favpoll_id", favpollId)
     .single()
 
   if (!pot) {
     const { data: organiserData } = await supabase
       .from("favpolls")
       .select("created_by")
-      .eq("id", eventId)
+      .eq("id", favpollId)
       .single()
     const { error: createErr } = await supabase.from("favpoll_pots").insert({
-      favpoll_id: eventId,
+      favpoll_id: favpollId,
       created_by: organiserData?.created_by ?? userId,
       total_deposited: amount,
     })
@@ -428,7 +428,7 @@ export async function topUpFund(eventId: string, amount: number) {
   if (error) throw new Error(error.message)
 }
 
-export async function setFavpollListed(eventId: string, isListed: boolean) {
+export async function setFavpollListed(favpollId: string, isListed: boolean) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -437,7 +437,7 @@ export async function setFavpollListed(eventId: string, isListed: boolean) {
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
 
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
@@ -445,7 +445,7 @@ export async function setFavpollListed(eventId: string, isListed: boolean) {
   const { error } = await supabase
     .from("favpolls")
     .update({ is_listed: isListed })
-    .eq("id", eventId)
+    .eq("id", favpollId)
 
   if (error) throw new Error(error.message)
 }

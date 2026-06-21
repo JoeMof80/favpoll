@@ -14,7 +14,7 @@ import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 
 type Props = {
-  eventId: string
+  favpollId: string
   clerkUserId: string | null
   charityNames: string[]
   pollWithItems: FavpollPollWithItems
@@ -44,7 +44,7 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
 }
 
 export function PledgeDialog({
-  eventId,
+  favpollId,
   clerkUserId,
   charityNames,
   pollWithItems,
@@ -70,7 +70,7 @@ export function PledgeDialog({
   )
 
   const dialog = usePledgeDialog({
-    eventId,
+    favpollId,
     clerkUserId,
     charityNames,
     pollWithItems,

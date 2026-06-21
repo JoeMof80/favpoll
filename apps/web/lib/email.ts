@@ -16,19 +16,19 @@ type PledgeConfirmationParams = {
 type ExtensionRequestParams = {
   organizerEmail: string
   organizerName: string | null
-  eventId: string
+  favpollId: string
   message: string
 }
 
 export async function sendExtensionRequest(params: ExtensionRequestParams) {
-  const { organizerEmail, organizerName, eventId, message } = params
+  const { organizerEmail, organizerName, favpollId, message } = params
   const supportEmail = process.env.SUPPORT_EMAIL ?? FROM_EMAIL
-  const eventUrl = `${BASE_URL}/favpolls/${eventId}`
+  const eventUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
     to: supportEmail,
-    subject: `Extension request — event ${eventId}`,
+    subject: `Extension request — event ${favpollId}`,
     html: `
       <p><strong>Organiser:</strong> ${organizerName ?? "Unknown"} (${organizerEmail})</p>
       <p><strong>Event:</strong> <a href="${eventUrl}">${eventUrl}</a></p>
@@ -42,16 +42,16 @@ type FavpollClosedParams = {
   to: string
   protagonistName: string
   totalRaised: number
-  eventId: string
+  favpollId: string
 }
 
 export async function sendFavpollClosed(params: FavpollClosedParams) {
-  const { to, protagonistName, totalRaised, eventId } = params
+  const { to, protagonistName, totalRaised, favpollId } = params
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
   })
-  const resultsUrl = `${BASE_URL}/favpolls/${eventId}`
+  const resultsUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -71,13 +71,13 @@ type GuestItemAddedParams = {
   topicTitle: string
   openingLine: string
   protagonistName: string
-  eventId: string
+  favpollId: string
 }
 
 export async function sendGuestItemAdded(params: GuestItemAddedParams) {
-  const { to, itemLabel, topicTitle, openingLine, protagonistName, eventId } =
+  const { to, itemLabel, topicTitle, openingLine, protagonistName, favpollId } =
     params
-  const eventUrl = `${BASE_URL}/favpolls/${eventId}`
+  const eventUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,

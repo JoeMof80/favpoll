@@ -67,7 +67,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
   const isClosed = closesAt ? new Date(closesAt) < new Date() : false
   const isWithdrawn = !!pledge.withdrawn_at
 
-  const eventId = eventPoll?.favpoll_id
+  const favpollId = eventPoll?.favpoll_id
 
   if (isWithdrawn) {
     return (
@@ -115,9 +115,9 @@ export default async function WithdrawPage({ searchParams }: Props) {
             Withdraw my pledge
           </Button>
         </form>
-        {eventId && (
+        {favpollId && (
           <a
-            href={`/favpolls/${eventId}`}
+            href={`/favpolls/${favpollId}`}
             className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted focus:ring-2 focus:ring-ring focus:outline-none"
           >
             Keep my pledge

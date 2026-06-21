@@ -5,16 +5,16 @@ import { Monitor, Copy, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type Props = {
-  eventId: string
+  favpollId: string
 }
 
-export function LiveDisplaySection({ eventId }: Props) {
+export function LiveDisplaySection({ favpollId }: Props) {
   const [copied, setCopied] = useState(false)
 
   const displayUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/favpolls/${eventId}/display`
-      : `/favpolls/${eventId}/display`
+      ? `${window.location.origin}/favpolls/${favpollId}/display`
+      : `/favpolls/${favpollId}/display`
 
   function handleCopy() {
     navigator.clipboard.writeText(displayUrl).then(() => {

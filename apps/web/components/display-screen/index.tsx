@@ -23,7 +23,7 @@ type DisplayPoll = {
 }
 
 type Props = {
-  eventId: string
+  favpollId: string
   protagonistName: string
   dateLabel: string | null
   openingLine: string | null
@@ -136,7 +136,7 @@ function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
 }
 
 export function DisplayScreen({
-  eventId,
+  favpollId,
   protagonistName,
   dateLabel,
   openingLine,
@@ -153,7 +153,7 @@ export function DisplayScreen({
 
   useEffect(() => {
     const channel = supabase
-      .channel(`display-pledges-${eventId}`)
+      .channel(`display-pledges-${favpollId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "pledges" },
@@ -175,7 +175,7 @@ export function DisplayScreen({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [eventId, pollId, supabase])
+  }, [favpollId, pollId, supabase])
 
   const headline = getFavpollHeadline({
     occasionType,

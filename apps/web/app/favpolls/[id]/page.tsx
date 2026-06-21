@@ -167,7 +167,7 @@ export default async function FavpollPage({ params }: Props) {
   return (
     <>
       <FavpollSubheader
-        eventId={id}
+        favpollId={id}
         isOrganiser={isOrganiser}
         isClosed={isClosed}
       />

@@ -89,7 +89,7 @@ const meta = {
     protagonistName: SCENES[0].protagonist.name,
     poll: MEMORIAL_POLL,
     isOrganiser: false,
-    eventId: "event-demo",
+    favpollId: "event-demo",
   },
 } satisfies Meta<typeof PollSection>
 

@@ -6,9 +6,9 @@ import type { CanvasSubmitData } from "@favpoll/types"
 
 type PollInput = CanvasSubmitData["poll"]
 
-async function upsertPollForEvent(
+async function upsertPollForFavpoll(
   supabase: ReturnType<typeof createAdminClient>,
-  eventId: string,
+  favpollId: string,
   userId: string,
   poll: PollInput
 ) {
@@ -115,7 +115,7 @@ async function upsertPollForEvent(
   const { data: eventPoll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
-      favpoll_id: eventId,
+      favpoll_id: favpollId,
       topic_id: topicId,
       personal_reveal: poll.reveal?.trim() || null,
     })
@@ -168,7 +168,7 @@ async function upsertPollForEvent(
   }
 }
 
-export async function updateClosesAt(eventId: string, closesAt: string) {
+export async function updateClosesAt(favpollId: string, closesAt: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -177,7 +177,7 @@ export async function updateClosesAt(eventId: string, closesAt: string) {
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by, closes_at, hard_close_at, extension_count")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
 
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
@@ -214,11 +214,11 @@ export async function updateClosesAt(eventId: string, closesAt: string) {
       closes_at: newClosesAt,
       ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
     })
-    .eq("id", eventId)
+    .eq("id", favpollId)
 }
 
 export async function updateFavpoll(
-  eventId: string,
+  favpollId: string,
   protagonistId: string,
   input: CanvasSubmitData
 ) {
@@ -231,7 +231,7 @@ export async function updateFavpoll(
   const { data: event } = await supabase
     .from("favpolls")
     .select("created_by, closes_at, hard_close_at, extension_count")
-    .eq("id", eventId)
+    .eq("id", favpollId)
     .single()
 
   if (!event || event.created_by !== userId) throw new Error("Unauthorized")
@@ -291,14 +291,14 @@ export async function updateFavpoll(
       description: input.description,
       ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
     })
-    .eq("id", eventId)
+    .eq("id", favpollId)
 
   // Replace charities
-  await supabase.from("favpoll_charities").delete().eq("favpoll_id", eventId)
+  await supabase.from("favpoll_charities").delete().eq("favpoll_id", favpollId)
   if (input.charityIds.length > 0) {
     await supabase.from("favpoll_charities").insert(
       input.charityIds.map((charityId, i) => ({
-        favpoll_id: eventId,
+        favpoll_id: favpollId,
         charity_id: charityId,
         display_order: i,
       }))
@@ -306,5 +306,5 @@ export async function updateFavpoll(
   }
 
   // Upsert the single event poll
-  await upsertPollForEvent(supabase, eventId, userId, input.poll)
+  await upsertPollForFavpoll(supabase, favpollId, userId, input.poll)
 }
