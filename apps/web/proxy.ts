@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 
 const isPrivateRoute = createRouteMatcher([
   "/favpolls/new(.*)",
-  "/favpolls/:id/manage(.*)",
+  "/my-events(.*)",
 ])
 
 export default clerkMiddleware(async (auth, req) => {
