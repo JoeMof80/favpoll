@@ -17,13 +17,15 @@ import type { Charity, FavpollPollWithItems } from "@favpoll/types"
 
 type FavpollListCardFavpoll = {
   id: string
+  subject?: string
+  cause_label?: string | null
   occasion_type: string | null
   opening_line: string
   description: string | null
   closes_at: string
   total_raised: number
   is_exemplar?: boolean
-  protagonist: { name: string }
+  protagonist: { name: string } | null
   charities: { charity: Charity }[]
   poll: {
     id: string
@@ -113,7 +115,12 @@ export function FavpollListCard({
             </span>
           )}
           <FavpollHeader
-            protagonist={{ name: favpoll.protagonist.name }}
+            protagonist={{
+              name:
+                favpoll.subject === "cause"
+                  ? (favpoll.cause_label ?? "")
+                  : (favpoll.protagonist?.name ?? ""),
+            }}
             eyebrow={favpoll.opening_line ?? ""}
             size={size}
           />
