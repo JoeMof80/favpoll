@@ -1,6 +1,6 @@
 "use client"
 
-import { BaseEventHero } from "./heroes/base-event-hero"
+import { BaseFavpollHero } from "./heroes/base-favpoll-hero"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
 type Props = {
@@ -10,14 +10,14 @@ type Props = {
   aboutPlaceholder?: string
 }
 
-export function EventHero({
+export function FavpollHero({
   event,
   protagonist,
   hideAvatar,
   aboutPlaceholder,
 }: Props) {
   return (
-    <BaseEventHero
+    <BaseFavpollHero
       event={event}
       protagonist={protagonist}
       hideAvatar={hideAvatar}

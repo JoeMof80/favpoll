@@ -1,9 +1,9 @@
 import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { ProtagonistAvatar } from "./event-hero-avatar"
+import { ProtagonistAvatar } from "./favpoll-hero-avatar"
 
 const meta = {
-  title: "EventHero/ProtagonistAvatar",
+  title: "FavpollHero/ProtagonistAvatar",
   component: ProtagonistAvatar,
   parameters: { layout: "centered" },
 } satisfies Meta<typeof ProtagonistAvatar>

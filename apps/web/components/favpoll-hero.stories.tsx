@@ -1,6 +1,6 @@
 import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { EventHero } from "./event-hero"
+import { FavpollHero } from "./favpoll-hero"
 import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
 import type { Favpoll, Protagonist, Register } from "@favpoll/types"
 
@@ -85,8 +85,8 @@ function makeViewProps(sceneIndex: number): {
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: "EventHero/EventHero",
-  component: EventHero,
+  title: "FavpollHero/FavpollHero",
+  component: FavpollHero,
   parameters: { layout: "padded" },
   decorators: [
     (Story) => (

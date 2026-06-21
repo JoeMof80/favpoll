@@ -2,23 +2,23 @@
 
 import { HeroLayout } from "../hero-layout"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { ProtagonistAvatar } from "@/components/event-hero-avatar"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
-type BaseEventHeroProps = {
+type BaseFavpollHeroProps = {
   event: Favpoll
   protagonist: Protagonist
   hideAvatar?: boolean
   aboutPlaceholder?: string
 }
 
-export function BaseEventHero({
+export function BaseFavpollHero({
   event,
   protagonist,
   hideAvatar,
   aboutPlaceholder,
-}: BaseEventHeroProps) {
+}: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: event.occasion_type ?? null,
     name:

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventContent } from "@/components/event-content"
+import { FavpollContent } from "@/components/favpoll-content"
 import { FavpollSubheader } from "@/components/favpoll-subheader"
 import type {
   FavpollWithDetails,
@@ -171,7 +171,7 @@ export default async function EventPage({ params }: Props) {
         isOrganiser={isOrganiser}
         isClosed={isClosed}
       />
-      <EventContent
+      <FavpollContent
         event={typedEvent}
         pollWithItems={visiblePoll}
         pot={pot ?? null}
