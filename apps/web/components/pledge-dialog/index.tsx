@@ -62,7 +62,7 @@ export function PledgeDialog({
     <Button
       type="button"
       variant="secondary"
-      className="w-full text-base"
+      className="w-full"
       onClick={() => setOpen(true)}
     >
       Pledge favourites

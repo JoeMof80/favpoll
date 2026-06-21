@@ -1,22 +1,19 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { Gift, ChartBarDecreasing } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
-import { PledgePanel } from "@/components/pledge-panel"
+import { PledgeDialog } from "@/components/pledge-dialog"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
 import { SectionLabel } from "./favpoll-card/section-label"
-import { StripeCheckout } from "./stripe-checkout"
-import { AmountPresets } from "./pledge-card/amount-presets"
-import { useEventCardPledge } from "./event-card/use-event-card-pledge"
 import { EventCardResults } from "./event-card/event-card-results"
 import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
 import type { CardResultItem } from "./event-card/use-event-card-pledge"
-import type { Charity, Favourite } from "@favpoll/types"
-import { AmountInput } from "./pledge-card/amount-input"
+import type { Charity, FavpollPollWithItems } from "@favpoll/types"
 
 type EventCardEvent = {
   id: string
@@ -33,6 +30,7 @@ type EventCardEvent = {
     topic_id: string | null
     topic: {
       title: string
+      is_finite: boolean
       favourites: { id: string; label: string }[]
     } | null
   } | null
@@ -42,41 +40,65 @@ type Props = {
   size?: FavpollCardSize
   event: EventCardEvent
   className?: string
+  clerkUserId?: string | null
   initialResults?: CardResultItem[]
 }
-
-const PRESET_AMOUNTS = [5, 10, 20, 50]
 
 export function EventCard({
   size = "sm",
   event,
   className,
+  clerkUserId = null,
   initialResults,
 }: Props) {
   const poll = event.poll
   const topicTitle = poll?.topic?.title ?? ""
-  const topicItems = (poll?.topic?.favourites ?? []) as Favourite[]
+  const topicItems = poll?.topic?.favourites ?? []
   const perCharity =
     event.charities.length > 0 ? event.total_raised / event.charities.length : 0
 
-  const {
-    selectedIds,
-    setSelectedIds,
-    amount,
-    step,
-    clientSecret,
-    results,
-    error,
-    selectAmount,
-    initPayment,
-    onPaymentSuccess,
-    closePayment,
-    resetPledge,
-    viewResults,
-  } = useEventCardPledge({
-    pollId: poll?.id ?? "",
-    initialResults,
-  })
+  const [hasPledged, setHasPledged] = useState(!!initialResults)
+  const [results, setResults] = useState<CardResultItem[] | null>(
+    initialResults ?? null
+  )
+
+  async function handlePledgeSuccess() {
+    setHasPledged(true)
+    if (!poll) return
+    try {
+      const res = await fetch(`/api/polls/${poll.id}/results`)
+      if (res.ok) {
+        const { results: fetched } = (await res.json()) as {
+          results: CardResultItem[]
+        }
+        if (fetched.length > 0) setResults(fetched)
+      }
+    } catch {
+      // Non-fatal — pledged state shown without results
+    }
+  }
+
+  // Construct FavpollPollWithItems from the card's poll data
+  const pollWithItems: FavpollPollWithItems | null =
+    poll && poll.topic
+      ? ({
+          id: poll.id,
+          favpoll_id: event.id,
+          topic_id: poll.topic_id ?? "",
+          personal_reveal: null,
+          created_at: "",
+          topics: {
+            id: poll.topic_id ?? "",
+            title: poll.topic.title,
+            is_finite: poll.topic.is_finite,
+            is_active: true,
+            description: null,
+            created_by: null,
+            created_at: "",
+            favourites: topicItems,
+          },
+        } as unknown as FavpollPollWithItems)
+      : null
 
   return (
     <li className={cn("list-none", className)}>
@@ -95,7 +117,7 @@ export function EventCard({
           />
         </Link>
 
-        {/* SectionLabel row — with pledge-again button when in pledged state */}
+        {/* SectionLabel row — with pledge-again / view-results button */}
         {topicTitle && (
           <div className="flex items-center justify-between gap-1 border-t border-border px-3 pt-2">
             <div>
@@ -109,17 +131,17 @@ export function EventCard({
 
             {poll && topicItems.length > 0 && (
               <>
-                {step === "pledged" ? (
+                {hasPledged ? (
                   <TooltipIconButton
                     icon={Gift}
                     label="Pledge again"
-                    onClick={resetPledge}
+                    onClick={() => setHasPledged(false)}
                   />
                 ) : results !== null ? (
                   <TooltipIconButton
                     icon={ChartBarDecreasing}
                     label="View results"
-                    onClick={viewResults}
+                    onClick={() => setHasPledged(true)}
                   />
                 ) : null}
               </>
@@ -136,55 +158,22 @@ export function EventCard({
           </Link>
         )}
 
-        {/* Pledge section — not inside Link */}
-        {poll && topicItems.length > 0 ? (
-          <div>
-            {step !== "pledged" ? (
-              <>
-                <div className="px-3 py-2">
-                  <PledgePanel
-                    items={topicItems}
-                    totalAmount={amount !== null ? String(amount) : ""}
-                    onSelectionsChange={setSelectedIds}
-                    topicTitle={topicTitle}
-                    size={size}
-                  />
-                </div>
-                <div className="space-y-2 px-3 py-2">
-                  <AmountInput
-                    id="pledge-amount"
-                    value={amount !== null ? String(amount) : ""}
-                    onChange={(v) => selectAmount(Number(v))}
-                    size={size}
-                  />
-
-                  <AmountPresets
-                    amounts={PRESET_AMOUNTS}
-                    value={amount !== null ? String(amount) : ""}
-                    onChange={(v) => selectAmount(Number(v))}
-                  />
-
-                  {error && (
-                    <p className="text-xs text-destructive" role="alert">
-                      {error}
-                    </p>
-                  )}
-
-                  <Button
-                    type="button"
-                    size={size === "lg" ? "default" : "sm"}
-                    className="w-full"
-                    disabled={step !== "ready"}
-                    onClick={initPayment}
-                  >
-                    Pledge favourites
-                  </Button>
-                </div>
-              </>
+        {/* Pledge section */}
+        {pollWithItems && topicItems.length > 0 ? (
+          <div className="px-3 py-2">
+            {hasPledged ? (
+              <EventCardResults results={results ?? []} />
             ) : (
-              <div className="px-3 py-2">
-                <EventCardResults results={results ?? []} />
-              </div>
+              <PledgeDialog
+                eventId={event.id}
+                clerkUserId={clerkUserId}
+                charityNames={event.charities.map((c) => c.charity.name)}
+                pollWithItems={pollWithItems}
+                pot={null}
+                userPotAllocation={null}
+                onPledgeSuccess={handlePledgeSuccess}
+                isListed
+              />
             )}
           </div>
         ) : (
@@ -197,7 +186,7 @@ export function EventCard({
           </div>
         )}
 
-        {/* Charity footer — inside the card so it doesn't overflow the grid cell */}
+        {/* Charity footer */}
         {event.charities.length > 0 && (
           <div className="mt-auto border-t border-border px-4 py-3">
             <EventCardCharityCarousel
@@ -208,16 +197,6 @@ export function EventCard({
           </div>
         )}
       </div>
-
-      {/* Stripe payment modal */}
-      {step === "paying" && clientSecret && (
-        <StripeCheckout
-          clientSecret={clientSecret}
-          chargeAmount={amount ?? 0}
-          onSuccess={onPaymentSuccess}
-          onClose={closePayment}
-        />
-      )}
     </li>
   )
 }

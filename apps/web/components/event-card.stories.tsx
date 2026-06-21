@@ -41,7 +41,7 @@ const baseEvent = {
   poll: {
     id: "poll-1",
     topic_id: "topic-1",
-    topic: { title: "Colour", favourites: COLOUR_ITEMS },
+    topic: { title: "Colour", is_finite: true, favourites: COLOUR_ITEMS },
   },
 }
 
@@ -89,7 +89,7 @@ export const Birthday: Story = {
       poll: {
         id: "poll-2",
         topic_id: "topic-2",
-        topic: { title: "Ice cream", favourites: ICE_CREAM_ITEMS },
+        topic: { title: "Ice cream", is_finite: true, favourites: ICE_CREAM_ITEMS },
       },
     },
   },

@@ -319,7 +319,11 @@ export default async function FavpollsPage({
               let poll: {
                 id: string
                 topic_id: string | null
-                topic: { title: string; favourites: RawFavourite[] } | null
+                topic: {
+                  title: string
+                  is_finite: boolean
+                  favourites: RawFavourite[]
+                } | null
               } | null = null
               if (rawPoll) {
                 const isFinite = rawPoll.topics?.is_finite ?? false
@@ -332,7 +336,11 @@ export default async function FavpollsPage({
                   id: rawPoll.id,
                   topic_id: rawPoll.topic_id,
                   topic: rawPoll.topics
-                    ? { title: rawPoll.topics.title, favourites }
+                    ? {
+                        title: rawPoll.topics.title,
+                        is_finite: isFinite,
+                        favourites,
+                      }
                     : null,
                 }
               }
@@ -343,6 +351,7 @@ export default async function FavpollsPage({
                 <EventCard
                   key={fp.id}
                   event={{ ...fp, poll }}
+                  clerkUserId={userId}
                   initialResults={initialResults}
                 />
               )
