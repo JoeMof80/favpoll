@@ -21,7 +21,7 @@ type PollInput = {
   addedItems?: string[]
 }
 
-type CreateEventInput = {
+type CreateFavpollInput = {
   protagonistName: string
   protagonistAbout: string | null
   photoUrl: string | null
@@ -228,7 +228,7 @@ async function createPollForFavpoll(
 }
 
 export async function createFavpoll(
-  input: CreateEventInput
+  input: CreateFavpollInput
 ): Promise<{ favpollId: string }> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")

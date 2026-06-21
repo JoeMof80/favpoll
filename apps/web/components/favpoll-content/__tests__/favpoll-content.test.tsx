@@ -14,13 +14,13 @@ vi.mock("@/components/favpoll-hero", () => ({
 }))
 vi.mock("@/components/cause-hero", () => ({
   CauseHero: ({
-    event,
+    favpoll,
   }: {
-    event: { cause_label: string | null; description: string | null }
+    favpoll: { cause_label: string | null; description: string | null }
   }) => (
     <div data-testid="cause-hero">
-      <span data-testid="cause-label">{event.cause_label ?? ""}</span>
-      <span data-testid="cause-about">{event.description ?? ""}</span>
+      <span data-testid="cause-label">{favpoll.cause_label ?? ""}</span>
+      <span data-testid="cause-about">{favpoll.description ?? ""}</span>
     </div>
   ),
 }))
@@ -130,12 +130,12 @@ const POLL: FavpollPollWithItems = {
 }
 
 function renderContent(
-  event: FavpollWithDetails,
+  favpoll: FavpollWithDetails,
   opts: { hasPledged?: boolean } = {}
 ) {
   return render(
     <FavpollContent
-      event={event}
+      favpoll={favpoll}
       pollWithItems={POLL}
       pot={null}
       userPotAllocation={null}

@@ -36,7 +36,7 @@ beforeEach(() => {
 
 describe("createPledge", () => {
   const input = {
-    eventPollId: "poll-1",
+    favpollPollId: "poll-1",
     potAllocationId: null,
     totalAmount: 10,
     allocations: [
@@ -156,7 +156,7 @@ describe("createPledge", () => {
 
 describe("createGuestPledge", () => {
   const input = {
-    eventPollId: "poll-1",
+    favpollPollId: "poll-1",
     guestEmail: "guest@example.com",
     totalAmount: 10,
     allocations: [{ favouriteId: "item-a", amount: 10 }],

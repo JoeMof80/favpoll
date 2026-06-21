@@ -4,21 +4,21 @@ import { BaseFavpollHero } from "./heroes/base-favpoll-hero"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
 type Props = {
-  event: Favpoll
+  favpoll: Favpoll
   protagonist: Protagonist
   hideAvatar?: boolean
   aboutPlaceholder?: string
 }
 
 export function FavpollHero({
-  event,
+  favpoll,
   protagonist,
   hideAvatar,
   aboutPlaceholder,
 }: Props) {
   return (
     <BaseFavpollHero
-      event={event}
+      favpoll={favpoll}
       protagonist={protagonist}
       hideAvatar={hideAvatar}
       aboutPlaceholder={aboutPlaceholder}

@@ -78,7 +78,7 @@ export const PersonEmpty: Story = {
 }
 
 /** Cause event */
-export const CauseEvent: Story = {
+export const CauseFavpoll: Story = {
   render: (args) => (
     <FormWrapper
       defaultValues={{

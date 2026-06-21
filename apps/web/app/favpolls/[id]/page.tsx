@@ -172,7 +172,7 @@ export default async function FavpollPage({ params }: Props) {
         isClosed={isClosed}
       />
       <FavpollContent
-        event={typedEvent}
+        favpoll={typedEvent}
         pollWithItems={visiblePoll}
         pot={pot ?? null}
         userPotAllocation={userPotAllocation}

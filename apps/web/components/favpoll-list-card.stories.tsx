@@ -62,12 +62,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Memorial: Story = {
-  args: { event: baseEvent },
+  args: { favpoll: baseEvent },
 }
 
 export const Birthday: Story = {
   args: {
-    event: {
+    favpoll: {
       ...baseEvent,
       id: "2",
       opening_line: "Birthday",
@@ -101,7 +101,7 @@ export const Birthday: Story = {
 
 export const Retirement: Story = {
   args: {
-    event: {
+    favpoll: {
       ...baseEvent,
       id: "3",
       opening_line: "After a lifetime of good work",
@@ -137,13 +137,13 @@ export const Retirement: Story = {
 
 export const NoPoll: Story = {
   args: {
-    event: { ...baseEvent, poll: null },
+    favpoll: { ...baseEvent, poll: null },
   },
 }
 
 export const ClosingSoon: Story = {
   args: {
-    event: {
+    favpoll: {
       ...baseEvent,
       closes_at: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
     },

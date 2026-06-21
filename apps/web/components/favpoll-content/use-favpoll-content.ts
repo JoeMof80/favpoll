@@ -4,7 +4,7 @@ import { addGuestItem, addOrganizerItem } from "@/app/favpolls/[id]/actions"
 import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 
 type UseFavpollContentOptions = {
-  event: FavpollWithDetails
+  favpoll: FavpollWithDetails
   pollWithItems: FavpollPollWithItems | null
   isClosed: boolean
   hasPledged: boolean
@@ -12,7 +12,7 @@ type UseFavpollContentOptions = {
 }
 
 export function useFavpollContent({
-  event,
+  favpoll,
   pollWithItems,
   isClosed,
   hasPledged,
@@ -33,10 +33,10 @@ export function useFavpollContent({
   // Organiser path calls addOrganizerItem; guest path calls addGuestItem.
   function addItemHandler(poll: FavpollPollWithItems) {
     if (poll.topics.is_finite || isClosed || !clerkUserId) return undefined
-    const isOrganiser = clerkUserId === event.created_by
+    const isOrganiser = clerkUserId === favpoll.created_by
     if (isOrganiser) {
       return async (label: string) => {
-        await addOrganizerItem(event.id, label)
+        await addOrganizerItem(favpoll.id, label)
         router.refresh()
       }
     }

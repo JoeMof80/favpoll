@@ -19,9 +19,9 @@ export async function withdrawPledge(formData: FormData) {
 
   if (!pledge) redirect("/pledges/withdraw/invalid")
 
-  const eventData = (pledge.favpoll_polls as any)?.favpolls
-  const closesAt = eventData?.closes_at
-  const favpollId = eventData?.id
+  const favpollData = (pledge.favpoll_polls as any)?.favpolls
+  const closesAt = favpollData?.closes_at
+  const favpollId = favpollData?.id
 
   if (closesAt && new Date(closesAt) < new Date()) {
     redirect(`/favpolls/${favpollId}`)

@@ -80,25 +80,25 @@ beforeEach(() => {
 describe("updateFavpoll — auth & ownership", () => {
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(updateFavpoll("event-1", "prot-1", makeInput())).rejects.toThrow(
-      "Not authenticated"
-    )
+    await expect(
+      updateFavpoll("event-1", "prot-1", makeInput())
+    ).rejects.toThrow("Not authenticated")
   })
 
   it("throws 'Unauthorized' when event belongs to a different user", async () => {
     mock.queue({ ...makeEventRow(), created_by: "other-user" })
 
-    await expect(updateFavpoll("event-1", "prot-1", makeInput())).rejects.toThrow(
-      "Unauthorized"
-    )
+    await expect(
+      updateFavpoll("event-1", "prot-1", makeInput())
+    ).rejects.toThrow("Unauthorized")
   })
 
   it("throws when event is not found", async () => {
     mock.queue(null) // no event row
 
-    await expect(updateFavpoll("event-1", "prot-1", makeInput())).rejects.toThrow(
-      "Unauthorized"
-    )
+    await expect(
+      updateFavpoll("event-1", "prot-1", makeInput())
+    ).rejects.toThrow("Unauthorized")
   })
 })
 

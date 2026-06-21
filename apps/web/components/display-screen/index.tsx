@@ -33,7 +33,7 @@ type Props = {
   poll: DisplayPoll | null
   initialTotalRaised: number
   pollId: string | null
-  eventUrl: string
+  favpollUrl: string
 }
 
 function DisplayRankingRow({
@@ -146,7 +146,7 @@ export function DisplayScreen({
   poll,
   initialTotalRaised,
   pollId,
-  eventUrl,
+  favpollUrl,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   const supabase = createClient()
@@ -237,7 +237,7 @@ export function DisplayScreen({
         {/* QR code */}
         <div className="mt-8 flex flex-col items-center gap-3 border-t border-border pt-8">
           <QRCodeSVG
-            value={eventUrl}
+            value={favpollUrl}
             size={120}
             fgColor={BRAND}
             bgColor="transparent"

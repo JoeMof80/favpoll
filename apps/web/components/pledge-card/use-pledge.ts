@@ -137,7 +137,7 @@ export function usePledge({
     const selections = pollSelections[pollWithItems.id] ?? []
     if (clerkUserId) {
       await createPledge({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         potAllocationId: userPotAllocation?.id ?? null,
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
@@ -149,7 +149,7 @@ export function usePledge({
     } else {
       const email = guestEmailParam ?? guestEmail
       await createGuestPledge({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         guestEmail: email,
         totalAmount: numericPledge,
         allocations: computePledgeAllocations(
@@ -187,7 +187,7 @@ export function usePledge({
     setSubmitting(true)
     try {
       await pledgeFromFund({
-        eventPollId: pollWithItems.id,
+        favpollPollId: pollWithItems.id,
         potId: pot.id,
         potCurrentAllocated: pot.total_allocated,
         totalAmount: numericPledge,

@@ -115,7 +115,7 @@ export function PollSection({
               </div>
               <RankingList
                 initialItems={poll.topics.favourites}
-                eventPollId={poll.id}
+                favpollPollId={poll.id}
                 topicId={poll.topic_id}
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}

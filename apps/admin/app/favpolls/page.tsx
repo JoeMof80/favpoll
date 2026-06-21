@@ -2,7 +2,7 @@ import { getClosedFavpolls } from "@/lib/actions/exemplars";
 import { ExemplarTable } from "@/components/exemplar-table";
 
 export default async function FavpollsPage() {
-  const { data: events, error } = await getClosedFavpolls();
+  const { data: favpolls, error } = await getClosedFavpolls();
 
   return (
     <div>
@@ -15,7 +15,7 @@ export default async function FavpollsPage() {
       {error ? (
         <p className="text-sm text-red-600">{error}</p>
       ) : (
-        <ExemplarTable events={events ?? []} />
+        <ExemplarTable favpolls={favpolls ?? []} />
       )}
     </div>
   );

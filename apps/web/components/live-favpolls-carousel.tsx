@@ -9,10 +9,10 @@ import { FavpollSummaryCard } from "@/components/favpoll-summary-card"
 import type { FavpollSummaryCardFavpoll } from "@/components/favpoll-summary-card"
 
 type Props = {
-  events: FavpollSummaryCardFavpoll[]
+  favpolls: FavpollSummaryCardFavpoll[]
 }
 
-export function LiveFavpollsCarousel({ events }: Props) {
+export function LiveFavpollsCarousel({ favpolls }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: false, align: "start" },
     [Autoplay({ delay: 5000, stopOnInteraction: true })]
@@ -42,9 +42,9 @@ export function LiveFavpollsCarousel({ events }: Props) {
     <div className="relative">
       <div className="overflow-hidden" ref={emblaRef}>
         <ul className="flex gap-4" role="list">
-          {events.map((event) => (
-            <li key={event.id} className="w-[306px] shrink-0 list-none">
-              <FavpollSummaryCard event={event} className="h-full" />
+          {favpolls.map((favpoll) => (
+            <li key={favpoll.id} className="w-[306px] shrink-0 list-none">
+              <FavpollSummaryCard favpoll={favpoll} className="h-full" />
             </li>
           ))}
         </ul>

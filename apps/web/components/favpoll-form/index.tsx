@@ -76,7 +76,7 @@ export function FavpollForm({
   const [editClosesAt, setEditClosesAt] = useState<string | undefined>(
     initialClosesAt
   )
-  const [seedEventId, setSeedEventId] = useState<string | null>(null)
+  const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
 
   // Holds the closesAt chosen in the publish overlay (create mode)
   const pendingClosesAt = useRef<Date | null>(null)
@@ -173,7 +173,7 @@ export function FavpollForm({
             addedItems: isCustomTopic ? [] : (selectedTopic.customLabels ?? []),
           },
         })
-        setSeedEventId(newId)
+        setSeedFavpollId(newId)
       } else {
         if (!favpollId) throw new Error("Missing event data")
         if (!isCause && !protagonistId)
@@ -267,12 +267,12 @@ export function FavpollForm({
     setEditClosesAt(iso)
   }
 
-  if (seedEventId) {
+  if (seedFavpollId) {
     return (
       <SeedFundModal
-        favpollId={seedEventId}
+        favpollId={seedFavpollId}
         isListed={form.getValues("isListed") ?? true}
-        onComplete={() => router.push(`/favpolls/${seedEventId}`)}
+        onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
       />
     )
   }

@@ -50,11 +50,12 @@ export default async function WithdrawPage({ searchParams }: Props) {
 
   if (!pledge) notFound()
 
-  const eventPoll = pledge.favpoll_polls as unknown as FavpollPollRow
-  const eventData = eventPoll?.favpolls
-  const protagonistName: string = eventData?.protagonists?.name ?? "this event"
-  const closesAt: string = eventData?.closes_at ?? ""
-  const charityNames: string[] = (eventData?.favpoll_charities ?? []).map(
+  const favpollPoll = pledge.favpoll_polls as unknown as FavpollPollRow
+  const favpollData = favpollPoll?.favpolls
+  const protagonistName: string =
+    favpollData?.protagonists?.name ?? "this event"
+  const closesAt: string = favpollData?.closes_at ?? ""
+  const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
     (ec) => ec.charities.name
   )
   const charityLabel =
@@ -67,7 +68,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
   const isClosed = closesAt ? new Date(closesAt) < new Date() : false
   const isWithdrawn = !!pledge.withdrawn_at
 
-  const favpollId = eventPoll?.favpoll_id
+  const favpollId = favpollPoll?.favpoll_id
 
   if (isWithdrawn) {
     return (

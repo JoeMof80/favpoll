@@ -82,7 +82,7 @@ export const Memorial: Story = {
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
     pollId: "poll-memorial",
-    eventUrl: "https://favpoll.com/favpolls/demo-memorial",
+    favpollUrl: "https://favpoll.com/favpolls/demo-memorial",
   },
 }
 
@@ -98,7 +98,7 @@ export const Birthday: Story = {
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
     pollId: "poll-birthday",
-    eventUrl: "https://favpoll.com/favpolls/demo-birthday",
+    favpollUrl: "https://favpoll.com/favpolls/demo-birthday",
   },
 }
 
@@ -115,7 +115,7 @@ export const Retirement: Story = {
     poll: RETIREMENT_POLL,
     initialTotalRaised: 700,
     pollId: "poll-retirement",
-    eventUrl: "https://favpoll.com/favpolls/demo-retirement",
+    favpollUrl: "https://favpoll.com/favpolls/demo-retirement",
   },
 }
 
@@ -132,6 +132,6 @@ export const Graduation: Story = {
     poll: GRADUATION_POLL,
     initialTotalRaised: 1730,
     pollId: "poll-graduation",
-    eventUrl: "https://favpoll.com/favpolls/demo-graduation",
+    favpollUrl: "https://favpoll.com/favpolls/demo-graduation",
   },
 }

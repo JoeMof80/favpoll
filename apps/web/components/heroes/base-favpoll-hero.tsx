@@ -7,25 +7,27 @@ import { getFavpollHeadline } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
 type BaseFavpollHeroProps = {
-  event: Favpoll
+  favpoll: Favpoll
   protagonist: Protagonist
   hideAvatar?: boolean
   aboutPlaceholder?: string
 }
 
 export function BaseFavpollHero({
-  event,
+  favpoll,
   protagonist,
   hideAvatar,
   aboutPlaceholder,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
-    occasionType: event.occasion_type ?? null,
+    occasionType: favpoll.occasion_type ?? null,
     name:
-      event.subject === "cause" ? (event.cause_label ?? "") : protagonist.name,
+      favpoll.subject === "cause"
+        ? (favpoll.cause_label ?? "")
+        : protagonist.name,
     dateLabel: protagonist.context ?? null,
-    openingLine: event.opening_line ?? null,
-    subject: event.subject,
+    openingLine: favpoll.opening_line ?? null,
+    subject: favpoll.subject,
   })
 
   const eyebrowText = (
@@ -39,7 +41,7 @@ export function BaseFavpollHero({
 
   const title = (
     <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
-      {event.subject === "cause" ? event.cause_label : protagonist.name}
+      {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
   )
 
@@ -50,7 +52,7 @@ export function BaseFavpollHero({
   ) : undefined
 
   const avatar =
-    !hideAvatar && event.subject !== "cause" ? (
+    !hideAvatar && favpoll.subject !== "cause" ? (
       <ProtagonistAvatar
         name={protagonist.name}
         photoUrl={protagonist.photo_url ?? null}

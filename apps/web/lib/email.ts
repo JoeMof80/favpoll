@@ -23,7 +23,7 @@ type ExtensionRequestParams = {
 export async function sendExtensionRequest(params: ExtensionRequestParams) {
   const { organizerEmail, organizerName, favpollId, message } = params
   const supportEmail = process.env.SUPPORT_EMAIL ?? FROM_EMAIL
-  const eventUrl = `${BASE_URL}/favpolls/${favpollId}`
+  const favpollUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -31,7 +31,7 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
     subject: `Extension request — event ${favpollId}`,
     html: `
       <p><strong>Organiser:</strong> ${organizerName ?? "Unknown"} (${organizerEmail})</p>
-      <p><strong>Event:</strong> <a href="${eventUrl}">${eventUrl}</a></p>
+      <p><strong>Event:</strong> <a href="${favpollUrl}">${favpollUrl}</a></p>
       <p><strong>Message:</strong></p>
       <p>${message.replace(/\n/g, "<br>")}</p>
     `,
@@ -77,7 +77,7 @@ type GuestItemAddedParams = {
 export async function sendGuestItemAdded(params: GuestItemAddedParams) {
   const { to, itemLabel, topicTitle, openingLine, protagonistName, favpollId } =
     params
-  const eventUrl = `${BASE_URL}/favpolls/${favpollId}`
+  const favpollUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -85,7 +85,7 @@ export async function sendGuestItemAdded(params: GuestItemAddedParams) {
     subject: `New item added to your ${topicTitle} poll`,
     html: `
       <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${openingLine} for ${protagonistName}.</p>
-      <p><a href="${eventUrl}">View your event</a></p>
+      <p><a href="${favpollUrl}">View your event</a></p>
     `,
   })
 }
