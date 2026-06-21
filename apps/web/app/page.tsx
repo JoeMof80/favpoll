@@ -17,7 +17,6 @@ export default async function HomePage() {
       opening_line,
       description,
       closes_at,
-      register,
       occasion_type,
       total_raised,
       protagonist:protagonists ( name ),
@@ -61,7 +60,6 @@ export default async function HomePage() {
     opening_line: string
     description: string | null
     closes_at: string
-    register: string
     occasion_type: string | null
     total_raised: number
     protagonist: { name: string }
