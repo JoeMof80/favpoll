@@ -21,7 +21,8 @@ export function BaseEventHero({
 }: BaseEventHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: event.occasion_type ?? null,
-    name: event.subject === "cause" ? (event.cause_label ?? "") : protagonist.name,
+    name:
+      event.subject === "cause" ? (event.cause_label ?? "") : protagonist.name,
     dateLabel: protagonist.context ?? null,
     openingLine: event.opening_line ?? null,
     subject: event.subject,
@@ -48,12 +49,13 @@ export function BaseEventHero({
     </p>
   ) : undefined
 
-  const avatar = !hideAvatar && event.subject !== "cause" ? (
-    <ProtagonistAvatar
-      name={protagonist.name}
-      photoUrl={protagonist.photo_url ?? null}
-    />
-  ) : undefined
+  const avatar =
+    !hideAvatar && event.subject !== "cause" ? (
+      <ProtagonistAvatar
+        name={protagonist.name}
+        photoUrl={protagonist.photo_url ?? null}
+      />
+    ) : undefined
 
   const about =
     protagonist.about || aboutPlaceholder ? (
