@@ -16,7 +16,7 @@ type Options = {
   initialResults?: CardResultItem[]
 }
 
-export function useEventCardPledge({ pollId, initialResults }: Options) {
+export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
   const [selectedIds, setSelectedIdsState] = useState<string[]>([])
   const [amount, setAmount] = useState<number | null>(null) // pounds
   const [step, setStep] = useState<CardStep>(

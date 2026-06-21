@@ -22,7 +22,7 @@ import {
   overlayFooter,
 } from "./edit-helpers"
 import type { EventFormValues } from "./schema"
-import { ProtagonistAvatar } from "@/components/event-hero-avatar"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EditableField } from "@/components/editable-field"

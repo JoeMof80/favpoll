@@ -7,16 +7,18 @@ vi.mock("@/app/favpolls/[id]/actions", () => ({
   createPledge: mockCreatePledge,
 }))
 
-import { useEventCardPledge } from "@/components/event-card/use-event-card-pledge"
-import type { CardResultItem } from "@/components/event-card/use-event-card-pledge"
+import { useFavpollListCardPledge } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
+import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 
 const RESULTS: CardResultItem[] = [
   { label: "Red", amountPence: 1000, widthPercent: 100 },
 ]
 
-describe("useEventCardPledge — initial state", () => {
+describe("useFavpollListCardPledge — initial state", () => {
   it("starts at idle with no initial results", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     expect(result.current.step).toBe("idle")
     expect(result.current.selectedIds).toEqual([])
     expect(result.current.amount).toBeNull()
@@ -26,30 +28,36 @@ describe("useEventCardPledge — initial state", () => {
 
   it("starts at pledged when initialResults provided", () => {
     const { result } = renderHook(() =>
-      useEventCardPledge({ pollId: "p1", initialResults: RESULTS })
+      useFavpollListCardPledge({ pollId: "p1", initialResults: RESULTS })
     )
     expect(result.current.step).toBe("pledged")
     expect(result.current.results).toEqual(RESULTS)
   })
 })
 
-describe("useEventCardPledge — setSelectedIds", () => {
+describe("useFavpollListCardPledge — setSelectedIds", () => {
   it("stores ids and stays idle when no amount set", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.setSelectedIds(["item-1"]))
     expect(result.current.selectedIds).toEqual(["item-1"])
     expect(result.current.step).toBe("idle")
   })
 
   it("moves to ready when amount is already set", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.selectAmount(10))
     act(() => result.current.setSelectedIds(["item-1"]))
     expect(result.current.step).toBe("ready")
   })
 
   it("returns to idle when selections cleared", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.selectAmount(10))
     act(() => result.current.setSelectedIds(["item-1"]))
     act(() => result.current.setSelectedIds([]))
@@ -57,31 +65,39 @@ describe("useEventCardPledge — setSelectedIds", () => {
   })
 
   it("supports multiple selected ids", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.setSelectedIds(["item-1", "item-2", "item-3"]))
     expect(result.current.selectedIds).toHaveLength(3)
   })
 })
 
-describe("useEventCardPledge — selectAmount", () => {
+describe("useFavpollListCardPledge — selectAmount", () => {
   it("stores amount but stays idle when no item selected", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.selectAmount(20))
     expect(result.current.amount).toBe(20)
     expect(result.current.step).toBe("idle")
   })
 
   it("moves to ready when item is already selected", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.setSelectedIds(["item-1"]))
     act(() => result.current.selectAmount(20))
     expect(result.current.step).toBe("ready")
   })
 })
 
-describe("useEventCardPledge — navigation actions", () => {
+describe("useFavpollListCardPledge — navigation actions", () => {
   it("closePayment returns to ready from paying", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.setSelectedIds(["item-1"]))
     act(() => result.current.selectAmount(10))
     act(() => result.current.closePayment())
@@ -90,13 +106,17 @@ describe("useEventCardPledge — navigation actions", () => {
   })
 
   it("viewResults moves to pledged", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.viewResults())
     expect(result.current.step).toBe("pledged")
   })
 
   it("resetPledge clears all state back to idle", () => {
-    const { result } = renderHook(() => useEventCardPledge({ pollId: "p1" }))
+    const { result } = renderHook(() =>
+      useFavpollListCardPledge({ pollId: "p1" })
+    )
     act(() => result.current.setSelectedIds(["item-1"]))
     act(() => result.current.selectAmount(10))
     act(() => result.current.resetPledge())

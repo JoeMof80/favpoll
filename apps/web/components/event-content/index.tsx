@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { EventHero } from "@/components/event-hero"
+import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
@@ -105,7 +105,7 @@ export function EventContent({
       {isCause ? (
         <CauseHero event={event} />
       ) : (
-        <EventHero event={event} protagonist={event.protagonists!} />
+        <FavpollHero event={event} protagonist={event.protagonists!} />
       )}
 
       {pollWithItems ? (

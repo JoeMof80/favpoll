@@ -10,12 +10,12 @@ import { PledgeDialog } from "@/components/pledge-dialog"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
 import { SectionLabel } from "./favpoll-card/section-label"
-import { EventCardResults } from "./event-card/event-card-results"
-import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
-import type { CardResultItem } from "./event-card/use-event-card-pledge"
+import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-results"
+import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
+import type { CardResultItem } from "./favpoll-list-card/use-favpoll-list-card-pledge"
 import type { Charity, FavpollPollWithItems } from "@favpoll/types"
 
-type EventCardEvent = {
+type FavpollListCardFavpoll = {
   id: string
   occasion_type: string | null
   opening_line: string
@@ -38,13 +38,13 @@ type EventCardEvent = {
 
 type Props = {
   size?: FavpollCardSize
-  event: EventCardEvent
+  event: FavpollListCardFavpoll
   className?: string
   clerkUserId?: string | null
   initialResults?: CardResultItem[]
 }
 
-export function EventCard({
+export function FavpollListCard({
   size = "sm",
   event,
   className,
@@ -162,7 +162,7 @@ export function EventCard({
         {pollWithItems && topicItems.length > 0 ? (
           <div className="px-3 py-2">
             {hasPledged ? (
-              <EventCardResults results={results ?? []} />
+              <FavpollListCardResults results={results ?? []} />
             ) : (
               <PledgeDialog
                 eventId={event.id}
@@ -189,7 +189,7 @@ export function EventCard({
         {/* Charity footer */}
         {event.charities.length > 0 && (
           <div className="mt-auto border-t border-border px-4 py-3">
-            <EventCardCharityCarousel
+            <FavpollListCardCharityCarousel
               charities={event.charities}
               perCharity={perCharity}
               size="sm"

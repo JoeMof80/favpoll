@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { EventCard } from "./event-card"
+import { FavpollListCard } from "./favpoll-list-card"
 
 const COLOUR_ITEMS = [
   { id: "item-1", label: "Purple" },
@@ -46,8 +46,8 @@ const baseEvent = {
 }
 
 const meta = {
-  title: "Components/EventCard",
-  component: EventCard,
+  title: "Components/FavpollListCard",
+  component: FavpollListCard,
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
@@ -56,7 +56,7 @@ const meta = {
       </ul>
     ),
   ],
-} satisfies Meta<typeof EventCard>
+} satisfies Meta<typeof FavpollListCard>
 
 export default meta
 type Story = StoryObj<typeof meta>

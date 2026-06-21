@@ -7,8 +7,8 @@ import type {
 } from "@favpoll/types"
 
 // Stub out sub-components that require complex providers or Supabase
-vi.mock("@/components/event-hero", () => ({
-  EventHero: ({ protagonist }: { protagonist: { name: string } }) => (
+vi.mock("@/components/favpoll-hero", () => ({
+  FavpollHero: ({ protagonist }: { protagonist: { name: string } }) => (
     <div data-testid="event-hero">{protagonist.name}</div>
   ),
 }))
@@ -185,7 +185,7 @@ describe("EventContent — cause event", () => {
 })
 
 describe("EventContent — person event", () => {
-  it("renders EventHero with protagonist name, not CauseHero", () => {
+  it("renders FavpollHero with protagonist name, not CauseHero", () => {
     renderContent(PERSON_EVENT)
 
     expect(screen.getByTestId("event-hero")).toBeInTheDocument()

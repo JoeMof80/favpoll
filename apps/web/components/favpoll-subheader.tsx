@@ -11,7 +11,7 @@ type Props = {
   isClosed?: boolean
 }
 
-export function EventSubheader({ eventId, isOrganiser, isClosed }: Props) {
+export function FavpollSubheader({ eventId, isOrganiser, isClosed }: Props) {
   const [copied, setCopied] = useState(false)
 
   if (!isOrganiser) return null

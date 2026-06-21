@@ -1,6 +1,6 @@
 import { NewEventButton } from "@/components/new-event-button"
 
-export function EventCardEmpty() {
+export function FavpollListCardEmpty() {
   return (
     <div className="col-span-full py-20 text-center">
       <p className="mb-4 text-[32px]">🕯</p>

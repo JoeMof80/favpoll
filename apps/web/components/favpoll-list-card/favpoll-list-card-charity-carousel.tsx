@@ -12,7 +12,7 @@ type Props = {
   size?: FavpollCardSize
 }
 
-export function EventCardCharityCarousel({
+export function FavpollListCardCharityCarousel({
   charities,
   perCharity,
   size,

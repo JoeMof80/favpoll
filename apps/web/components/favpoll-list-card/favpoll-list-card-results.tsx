@@ -1,12 +1,12 @@
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import { formatCurrency } from "@/lib/i18n"
-import type { CardResultItem } from "./use-event-card-pledge"
+import type { CardResultItem } from "./use-favpoll-list-card-pledge"
 
 type Props = {
   results: CardResultItem[]
 }
 
-export function EventCardResults({ results }: Props) {
+export function FavpollListCardResults({ results }: Props) {
   const pollResults = results.map((item) => ({
     label: item.label,
     amount: item.amountPence > 0 ? formatCurrency(item.amountPence) : "—",
