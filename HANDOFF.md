@@ -1,32 +1,42 @@
-# Session handoff — 2026-06-16
+# Session handoff — 2026-06-21
 
 ## What shipped
 
-### PR #107 — `feat: seed full favpoll topic library (94 new topics, ~3200 items)` (merged)
-Applied every batch file's new topics/items into `scripts/seed.ts` per `scripts/LIBRARY-MANIFEST.md`:
-- All gap-fill batches (places, culture, misc) + `orphans-batch.ts` + `comic-topic-fix.ts`.
-- `corrections.ts` applied last, overriding batch equivalents for `Island`, `County`, `Crisps`, `Toy`, `Cartoon`, and `topicItemDisplayOrder`.
-- Placeholder *content* enrichment was explicitly skipped — placeholders are now generated on-request (separate feature), not authored in bulk.
-- `assertAllTopicsHavePlaceholders()` no longer requires a `pronouns` field on each register — none of the six `placeholders-regenerated*.ts` files have ever populated it. Only `about`/`reveal` non-empty is checked now.
-- `pnpm seed` against staging now creates 118 topics / ~3289 items / 181 category links / 14 charity-topics.
-- All scratch batch source files (`*-batch.ts`, `corrections.ts`, `comic-topic-fix.ts`, `LIBRARY-MANIFEST.md`, `favpoll-topic-rules-additions.md`) have been deleted from the repo now that their content lives in `seed.ts` — they were one-time inputs, not ongoing references.
+### PR #110 — `feat: Framer Motion hero animations, PageLayout wrapper, example name updates` (merged, previous session)
+Context only — this PR introduced `HeroLayout` (Framer Motion scroll animations on the live favpoll page) and `BaseEventHero` with an `isEdit` branching prop. The edit path's `onClick={() => {}}` no-ops on all `EditableField`s were the root cause of the work in PR #112.
 
-### PR #108 — `fix: seed-favpolls.ts register column + favourites pagination` (merged)
-Triggered by the user running `scripts/seed-favpolls.ts` right after #107 landed and hitting total failure. Two bugs, both in `loadReferenceData()` / the `favpolls` insert:
+### PR #111 — `feat: unified pledge dialog — collapse pick/amount/pay into one 3-step ResponsiveOverlay` (merged, previous session)
+Context only — introduced `pledge-dialog/` with `PledgeDialog`, `usePledgeDialog`, step components, and stories. PR #113 wired this into `EventCard`.
 
-1. **Dropped column write.** The `favpolls` insert still set a `register` field. That column was intentionally dropped by `supabase/migrations/20260607140000_derive_register.sql` — register is derived in app code only (`deriveRegister` / `registerForOccasionType`), never stored. Fix: removed the field from the insert. `register` remains a local variable elsewhere in the script (closing-period logic, About text, result summary) — that's fine, only the DB write was wrong.
-2. **Silent 1000-row cap.** `favourites` now holds ~3300 rows post-#107. The unranged `.select()` in `loadReferenceData()` was capped at 1000 by PostgREST, so `itemsByTopic` was missing items for most topics. `createOneFavpoll()`'s `if (allItems.length === 0) return null` early-return is silent by design (no `console.error`, unlike its sibling error sites), so three manual runs each silently created only ~half the requested count (18/40, 10/22, 6/12) with no visible error. Fix: paginate the `favourites` fetch with `.range()` in 1000-row chunks.
+### PR #112 — `refactor: simplify EditableHero, wire overlay triggers, replace PledgeCard preview` (merged)
+Three changes bundled:
 
-Verified: re-ran `seed-favpolls.ts` against staging after the fix — topped up cleanly to the full `TARGET_FAVPOLLS = 40` with zero errors. `pnpm typecheck`, `pnpm test:run` (755 passed), and `prettier --check` all green before opening the PR.
+1. **EditableHero rewrite.** `editable-hero.tsx` no longer delegates to `BaseEventHero`. It renders its own static hero JSX (no Framer Motion) and owns all overlay state directly. Each `EditableField` has a named `open*()` function (e.g. `openName`, `openAbout`) that seeds the draft from the current form value before opening — closing without Save discards the draft and the form value is unchanged. Previously all `onClick` handlers were `() => {}` no-ops inherited from `BaseEventHero`'s edit-mode branch.
 
-## Docs updated
-`references/PROJECT.md`:
-- Noted the dropped `pronouns` check in `assertAllTopicsHavePlaceholders()`.
-- Added the `register`-column and pagination caveats to the `scripts/seed-favpolls.ts` behaviour bullet, so the next person touching that script doesn't reintroduce either bug.
+2. **BaseEventHero stripped to read-only.** Removed `isEdit`, `formValues`, `isGenerating`, `onRegenerate`, `editAvatar` props — the component is now purely a view renderer used by `EventHero` on the live favpoll page. `register` was also removed from the props/call (column was dropped in migration `20260607140000_derive_register.sql`; headline now derived from `occasion_type` directly via `getFavpollHeadline`). `EventHero` had its `isEdit={false}` prop removed (no longer accepted).
+
+3. **Shared fund card in form preview.** `event-form-v2/preview-panel.tsx` and `event-form-v2/index.tsx` (FormInner sidebar) now show the same `rounded-lg border border-border bg-background px-5 py-4` card structure as the live `/favpolls/[id]` page, wrapped in `pointer-events-none opacity-40`. `PledgeCard` is no longer rendered in the form — it's kept for the organiser preview inside `editable-poll-area.tsx` only.
+
+### PR #113 — `feat: EventCard uses PledgeDialog, fix homepage register column error` (merged)
+Two changes:
+
+1. **EventCard → PledgeDialog.** `event-card.tsx` now constructs a `FavpollPollWithItems` inline from the card's poll data and renders `PledgeDialog` (multi-step) instead of the old `PledgePanel` + inline amount inputs. Added `clerkUserId?: string | null` prop (passed from server page). On pledge success: fetches `/api/polls/[pollId]/results` and switches to `EventCardResults` view. `favpolls/page.tsx` passes `clerkUserId={userId}` and `is_finite` to each card.
+
+2. **Homepage silent empty results fix.** `app/page.tsx` was selecting the `register` column from Supabase. That column was dropped by `20260607140000_derive_register.sql`. Supabase silently returns `{ data: null }` when any unknown column is selected — causing the homepage to always show "No live favpolls yet" regardless of DB contents. Fix: removed `register` from both the `.select()` string and the `RawEvent` type.
+
+### PR #114 — `docs: update PROJECT.md for PRs #112 and #113` (open, awaiting CI)
+Pending merge at time of writing. Docs only — no code changes.
+
+## Key bugs to know about
+
+**Dropped `register` column.** The `favpolls.register` column was dropped in migration `20260607140000_derive_register.sql`. Supabase returns `{ data: null }` (not an error) when a dropped column is selected — no Supabase error is raised, the entire query result is null. Any query that still selects `register` will silently return empty results. Both `app/page.tsx` (homepage) and any future query against `favpolls` must not include `register` in the select string. `register` exists only as a runtime-derived value in app code via `deriveRegister(category, grouping)`.
+
+**Framer Motion only on live page.** `HeroLayout` (Framer Motion scroll animations) is used only on `app/favpolls/[id]/page.tsx`. `EditableHero` has its own static layout — do not re-introduce motion primitives there. `BaseEventHero` (read-only, used by `EventHero` on the live page) is also static; `HeroLayout` wraps it externally on the page.
 
 ## Repo state
-- `main` is clean and up to date with both PRs merged and squashed, feature branches deleted.
-- All topic-library scratch files removed from `scripts/`; only `seed.ts` and `seed-favpolls.ts` remain as the durable seed scripts.
 
-## Nothing pending
-No open PRs, no outstanding TODOs from this session. Project-wide outstanding TODOs (webhooks, Stripe Connect, rankings threshold, etc.) are unchanged — see `references/PROJECT.md` § Outstanding TODO.
+`main` is clean. PR #114 (docs) is the only open PR; CI should pass (docs-only change). Branch `docs/pr-112-113-project-update` will be deleted after merge. Current working branch context: the session ended on `docs/pr-112-113-project-update`.
+
+## Nothing else pending
+
+No outstanding work from this session beyond merging PR #114. Project-wide outstanding TODOs (webhooks, Stripe Connect, rankings threshold, etc.) are unchanged — see `references/PROJECT.md` § Outstanding TODO.
