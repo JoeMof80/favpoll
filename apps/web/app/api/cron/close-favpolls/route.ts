@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { sendEventClosed } from "@/lib/email"
+import { sendFavpollClosed } from "@/lib/email"
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization")
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     .is("closed_at", null)
 
   if (error) {
-    console.error("[close-events] fetch error:", error.message)
+    console.error("[close-favpolls] fetch error:", error.message)
     return Response.json({ error: error.message }, { status: 500 })
   }
 
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     const organiser = userMap[event.created_by]
     if (organiser?.email) {
       try {
-        await sendEventClosed({
+        await sendFavpollClosed({
           to: organiser.email,
           protagonistName,
           totalRaised,
@@ -82,7 +82,10 @@ export async function POST(request: Request) {
         })
       } catch (emailErr) {
         // Don't fail the whole batch for an email error
-        console.error(`[close-events] email failed for ${event.id}:`, emailErr)
+        console.error(
+          `[close-favpolls] email failed for ${event.id}:`,
+          emailErr
+        )
       }
     }
 

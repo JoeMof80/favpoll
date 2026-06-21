@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { makeSupabaseMock } from "@/tests/mocks/supabase-admin"
 
 const mockEmail = vi.hoisted(() => ({
-  sendEventClosed: vi.fn().mockResolvedValue(undefined),
+  sendFavpollClosed: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock("@/lib/email", () => mockEmail)
@@ -13,12 +13,12 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
 
-import { POST } from "@/app/api/cron/close-events/route"
+import { POST } from "@/app/api/cron/close-favpolls/route"
 
 function makeRequest(authHeader?: string): Request {
   const headers = new Headers()
   if (authHeader !== undefined) headers.set("authorization", authHeader)
-  return new Request("http://localhost/api/cron/close-events", {
+  return new Request("http://localhost/api/cron/close-favpolls", {
     method: "POST",
     headers,
   })
@@ -26,7 +26,7 @@ function makeRequest(authHeader?: string): Request {
 
 beforeEach(() => {
   mock = makeSupabaseMock()
-  mockEmail.sendEventClosed.mockResolvedValue(undefined)
+  mockEmail.sendFavpollClosed.mockResolvedValue(undefined)
   process.env.CRON_SECRET = "test-secret"
 })
 
@@ -34,7 +34,7 @@ beforeEach(() => {
 // Auth
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-events — auth", () => {
+describe("POST /api/cron/close-favpolls — auth", () => {
   it("returns 401 when Authorization header is missing", async () => {
     const res = await POST(makeRequest())
     expect(res.status).toBe(401)
@@ -58,7 +58,7 @@ describe("POST /api/cron/close-events — auth", () => {
 // No events to close
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-events — no events", () => {
+describe("POST /api/cron/close-favpolls — no events", () => {
   it("returns { closed: 0 } when events array is empty", async () => {
     mock.queue([])
 
@@ -80,7 +80,7 @@ describe("POST /api/cron/close-events — no events", () => {
 // DB error
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-events — DB error", () => {
+describe("POST /api/cron/close-favpolls — DB error", () => {
   it("returns 500 when events fetch fails", async () => {
     mock.queue(null, { message: "connection refused" })
 
@@ -95,7 +95,7 @@ describe("POST /api/cron/close-events — DB error", () => {
 // Happy path — events closed
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-events — closes events", () => {
+describe("POST /api/cron/close-favpolls — closes events", () => {
   function queueForOneEvent(
     options: {
       eventId?: string
@@ -162,7 +162,7 @@ describe("POST /api/cron/close-events — closes events", () => {
     expect(body.closed).toBe(1)
   })
 
-  it("sends sendEventClosed to the organiser email", async () => {
+  it("sends sendFavpollClosed to the organiser email", async () => {
     queueForOneEvent({
       eventId: "event-1",
       protagonistName: "Bob",
@@ -172,7 +172,7 @@ describe("POST /api/cron/close-events — closes events", () => {
 
     await POST(makeRequest("Bearer test-secret"))
 
-    expect(mockEmail.sendEventClosed).toHaveBeenCalledWith(
+    expect(mockEmail.sendFavpollClosed).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "bob@example.com",
         protagonistName: "Bob",
@@ -184,16 +184,16 @@ describe("POST /api/cron/close-events — closes events", () => {
 
   it("does not send email when organiser has no email address", async () => {
     queueForOneEvent({ organiserEmail: null })
-    mockEmail.sendEventClosed.mockClear()
+    mockEmail.sendFavpollClosed.mockClear()
 
     await POST(makeRequest("Bearer test-secret"))
 
-    expect(mockEmail.sendEventClosed).not.toHaveBeenCalled()
+    expect(mockEmail.sendFavpollClosed).not.toHaveBeenCalled()
   })
 
   it("still increments closed count when email send fails", async () => {
     queueForOneEvent()
-    mockEmail.sendEventClosed.mockRejectedValueOnce(new Error("email down"))
+    mockEmail.sendFavpollClosed.mockRejectedValueOnce(new Error("email down"))
 
     const res = await POST(makeRequest("Bearer test-secret"))
     const body = await res.json()

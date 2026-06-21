@@ -2,10 +2,10 @@
 
 import { useTransition } from "react";
 import { setExemplar } from "@/lib/actions/exemplars";
-import type { ExemplarEvent } from "@/lib/actions/exemplars";
+import type { ExemplarFavpoll } from "@/lib/actions/exemplars";
 
 type Props = {
-  events: ExemplarEvent[];
+  events: ExemplarFavpoll[];
 };
 
 export function ExemplarTable({ events }: Props) {

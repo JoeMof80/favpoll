@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import { getWizardData } from "./wizard-data"
 
-export default async function NewEventPage() {
+export default async function NewFavpollPage() {
   const { userId } = await auth()
   if (!userId) redirect("/sign-in?redirect_url=/favpolls/new")
 

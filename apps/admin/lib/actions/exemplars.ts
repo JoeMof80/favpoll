@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export type ExemplarEvent = {
+export type ExemplarFavpoll = {
   id: string;
   register: string;
   occasion_type: string | null;
@@ -14,8 +14,8 @@ export type ExemplarEvent = {
   protagonist_name: string | null;
 };
 
-export async function getClosedEvents(): Promise<{
-  data: ExemplarEvent[] | null;
+export async function getClosedFavpolls(): Promise<{
+  data: ExemplarFavpoll[] | null;
   error: string | null;
 }> {
   const supabase = createAdminClient();

@@ -41,7 +41,7 @@ export function formatRelativeDate(
   return `${ordinal(date.getDate(), locale)} ${date.toLocaleString(locale, { month: "long" })}`
 }
 
-export function formatEventDate(
+export function formatFavpollDate(
   date: string | Date,
   locale: string = "en-GB"
 ): string {

@@ -17,7 +17,7 @@ import { deriveRegister } from "@/lib/registers"
 
 type Props = { params: Promise<{ id: string }> }
 
-export default async function EditEventPage({ params }: Props) {
+export default async function EditFavpollPage({ params }: Props) {
   const { id } = await params
   const { userId } = await auth()
   if (!userId) redirect(`/sign-in?redirect_url=/favpolls/${id}/edit`)

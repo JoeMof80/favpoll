@@ -54,7 +54,7 @@ export function Header() {
             </Button>
             <Show when="signed-in">
               <Button asChild variant="ghost" className="text-muted-foreground">
-                <Link href="/my-events">Your favpolls</Link>
+                <Link href="/my-favpolls">Your favpolls</Link>
               </Button>
               <NewFavpollButton>New favpoll</NewFavpollButton>
             </Show>
@@ -108,7 +108,7 @@ export function Header() {
             </Link>
             <Show when="signed-in">
               <Link
-                href="/my-events"
+                href="/my-favpolls"
                 className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                 onClick={close}
               >

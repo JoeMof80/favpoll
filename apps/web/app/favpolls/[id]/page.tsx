@@ -15,7 +15,7 @@ type Props = {
   params: Promise<{ id: string }>
 }
 
-export default async function EventPage({ params }: Props) {
+export default async function FavpollPage({ params }: Props) {
   const { id } = await params
   const { userId } = await auth()
 

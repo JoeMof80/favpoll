@@ -38,14 +38,14 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
   })
 }
 
-type EventClosedParams = {
+type FavpollClosedParams = {
   to: string
   protagonistName: string
   totalRaised: number
   eventId: string
 }
 
-export async function sendEventClosed(params: EventClosedParams) {
+export async function sendFavpollClosed(params: FavpollClosedParams) {
   const { to, protagonistName, totalRaised, eventId } = params
   const GBP = new Intl.NumberFormat("en-GB", {
     style: "currency",

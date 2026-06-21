@@ -9,7 +9,7 @@ export const metadata = {
   title: "Your favpolls — favpoll",
 }
 
-export default async function MyEventsPage() {
+export default async function MyFavpollsPage() {
   const { userId } = await auth()
   if (!userId) redirect("/sign-in")
 
