@@ -34,7 +34,7 @@ function DraftReader({ active }: { active: boolean }) {
 }
 
 // ─── Exit guard component ─────────────────────────────────────────────────────
-// Mirrors the useEffect in EventFormV2 that registers beforeunload.
+// Mirrors the useEffect in FavpollForm that registers beforeunload.
 
 function ExitGuard({ active }: { active: boolean }) {
   useEffect(() => {

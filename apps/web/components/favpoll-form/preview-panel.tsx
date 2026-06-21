@@ -8,7 +8,7 @@ import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
 import type { Charity, TopicWithMeta } from "@favpoll/types"
-import type { EventFormValues } from "./schema"
+import type { FavpollFormValues } from "./schema"
 
 // Shown in the sidebar before any charities are selected
 const PLACEHOLDER_CHARITIES: Charity[] = [
@@ -37,7 +37,7 @@ export function PreviewPanel({
   closesAt,
   onClosesAtChange,
 }: Props) {
-  const form = useFormContext<EventFormValues>()
+  const form = useFormContext<FavpollFormValues>()
   const category = useWatch({ control: form.control, name: "category" })
   const charityIds =
     useWatch({ control: form.control, name: "charities" }) ?? []

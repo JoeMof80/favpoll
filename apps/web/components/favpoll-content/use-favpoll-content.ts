@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 import { addGuestItem, addOrganizerItem } from "@/app/favpolls/[id]/actions"
 import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 
-type UseEventContentOptions = {
+type UseFavpollContentOptions = {
   event: FavpollWithDetails
   pollWithItems: FavpollPollWithItems | null
   isClosed: boolean
@@ -11,13 +11,13 @@ type UseEventContentOptions = {
   clerkUserId: string | null
 }
 
-export function useEventContent({
+export function useFavpollContent({
   event,
   pollWithItems,
   isClosed,
   hasPledged,
   clerkUserId,
-}: UseEventContentOptions) {
+}: UseFavpollContentOptions) {
   const router = useRouter()
   const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
   const [pollView, setPollView] = useState<"pledge" | "results">(

@@ -21,7 +21,7 @@ import {
   CharCounter,
   overlayFooter,
 } from "./edit-helpers"
-import type { EventFormValues } from "./schema"
+import type { FavpollFormValues } from "./schema"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -106,7 +106,7 @@ export function EditableHero({
     setCroppedAreaPixels(pixels)
   }, [])
 
-  const form = useFormContext<EventFormValues>()
+  const form = useFormContext<FavpollFormValues>()
   const values = useWatch({ control: form.control })
 
   const register = values.register ?? ""

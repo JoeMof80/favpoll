@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventFormV2 } from "@/components/event-form-v2"
+import { FavpollForm } from "@/components/favpoll-form"
 import type {
   Category,
   Charity,
@@ -12,7 +12,7 @@ import type {
   Favourite,
   TopicWithMeta,
 } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 import { deriveRegister } from "@/lib/registers"
 
 type Props = { params: Promise<{ id: string }> }
@@ -69,7 +69,7 @@ export default async function EditEventPage({ params }: Props) {
   }))
 
   // Build the pre-selected topic for the form
-  let preselectedTopics: EventFormValues["topics"] = []
+  let preselectedTopics: FavpollFormValues["topics"] = []
   if (rawPoll?.topic_id) {
     const topic = enrichedTopics.find((t) => t.id === rawPoll.topic_id)
     if (topic) {
@@ -89,7 +89,7 @@ export default async function EditEventPage({ params }: Props) {
   const grouping = (event.grouping ?? "individual") as FavpollGrouping
   const isCause = event.subject === "cause"
 
-  const defaultValues: Partial<EventFormValues> = {
+  const defaultValues: Partial<FavpollFormValues> = {
     category: category ?? undefined,
     grouping,
     register: deriveRegister(category, grouping),
@@ -113,7 +113,7 @@ export default async function EditEventPage({ params }: Props) {
   }
 
   return (
-    <EventFormV2
+    <FavpollForm
       mode="edit"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}

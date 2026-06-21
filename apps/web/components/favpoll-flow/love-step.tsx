@@ -9,17 +9,17 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { ItemAddField } from "@/components/event-form-v2/item-add-field"
+import { ItemAddField } from "@/components/favpoll-form/item-add-field"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { Category, Favourite, TopicWithMeta } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 type LoveStepProps = {
   topics: TopicWithMeta[]
   categories: Category[]
-  value: EventFormValues["topics"]
-  onChange: (v: EventFormValues["topics"]) => void
+  value: FavpollFormValues["topics"]
+  onChange: (v: FavpollFormValues["topics"]) => void
   hideItemsPanel?: boolean
   suggestedTopics?: TopicWithMeta[]
   primaryCharityName?: string

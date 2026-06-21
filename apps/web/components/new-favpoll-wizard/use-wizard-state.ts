@@ -10,7 +10,7 @@ import type {
   Favourite,
   TopicWithMeta,
 } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 export const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
@@ -22,7 +22,7 @@ export const STEP_LABELS: Record<WizardStep, string> = {
   love: "Love",
 }
 
-type WizardTopics = EventFormValues["topics"]
+type WizardTopics = FavpollFormValues["topics"]
 
 export type WizardData = {
   charities: Charity[]

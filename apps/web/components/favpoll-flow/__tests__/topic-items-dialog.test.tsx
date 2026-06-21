@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
-import { TopicItemsDialog } from "@/components/event-flow/topic-items-dialog"
+import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 
 const BASE_PROPS = {
   open: true,

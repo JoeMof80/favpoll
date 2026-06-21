@@ -20,7 +20,7 @@ vi.mock("@/app/favpolls/[id]/actions", () => mockActions)
 
 // --- fixtures ---
 
-import { useEventContent } from "@/components/event-content/use-event-content"
+import { useFavpollContent } from "@/components/favpoll-content/use-favpoll-content"
 
 const protagonist: Protagonist = {
   id: "prot-1",
@@ -93,10 +93,10 @@ const event = makeEvent()
 const poll = makePoll("poll-1")
 const finitePoll = makePoll("finite-poll", true)
 
-describe("useEventContent — initial state", () => {
+describe("useFavpollContent — initial state", () => {
   it("starts with pledgeConfirmed as false", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -108,10 +108,10 @@ describe("useEventContent — initial state", () => {
   })
 })
 
-describe("useEventContent — handlePledgeSuccess", () => {
+describe("useFavpollContent — handlePledgeSuccess", () => {
   it("sets pledgeConfirmed to true", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -126,10 +126,10 @@ describe("useEventContent — handlePledgeSuccess", () => {
   })
 })
 
-describe("useEventContent — addItemHandler", () => {
+describe("useFavpollContent — addItemHandler", () => {
   it("returns undefined for a finite topic", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: finitePoll,
         isClosed: false,
@@ -142,7 +142,7 @@ describe("useEventContent — addItemHandler", () => {
 
   it("returns undefined when event is closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: true,
@@ -155,7 +155,7 @@ describe("useEventContent — addItemHandler", () => {
 
   it("returns undefined when clerkUserId is null (guest)", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -172,7 +172,7 @@ describe("useEventContent — addItemHandler", () => {
 
     // event.created_by is "user-1" — same as clerkUserId means organiser
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -196,7 +196,7 @@ describe("useEventContent — addItemHandler", () => {
 
   it("returns a function for an infinite, open poll with a non-organiser logged-in user", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -212,7 +212,7 @@ describe("useEventContent — addItemHandler", () => {
     mockActions.addGuestItem.mockClear()
 
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -234,10 +234,10 @@ describe("useEventContent — addItemHandler", () => {
   })
 })
 
-describe("useEventContent — derived values", () => {
+describe("useFavpollContent — derived values", () => {
   it("showPledgeCard is true when not closed and poll is set", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: false,
@@ -250,7 +250,7 @@ describe("useEventContent — derived values", () => {
 
   it("showPledgeCard is false when closed", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: poll,
         isClosed: true,
@@ -263,7 +263,7 @@ describe("useEventContent — derived values", () => {
 
   it("showPledgeCard is false when pollWithItems is null", () => {
     const { result } = renderHook(() =>
-      useEventContent({
+      useFavpollContent({
         event,
         pollWithItems: null,
         isClosed: false,

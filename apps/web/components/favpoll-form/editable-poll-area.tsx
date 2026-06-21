@@ -24,7 +24,7 @@ import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { toast } from "sonner"
 import type { Favourite, TopicWithMeta } from "@favpoll/types"
-import type { EventFormValues } from "./schema"
+import type { FavpollFormValues } from "./schema"
 
 type Props = {
   topics: TopicWithMeta[]
@@ -47,7 +47,7 @@ export function EditablePollArea({
   const [revealDraft, setRevealDraft] = useState("")
   const [rankingView, setRankingView] = useState<"amount" | "count">("amount")
 
-  const form = useFormContext<EventFormValues>()
+  const form = useFormContext<FavpollFormValues>()
   const values = useWatch({ control: form.control })
 
   const reveal = values.reveal ?? ""

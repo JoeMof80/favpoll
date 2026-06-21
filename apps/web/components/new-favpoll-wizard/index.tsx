@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { HonourStep } from "@/components/event-flow/honour-step"
-import { LoveStep } from "@/components/event-flow/love-step"
-import { CharityStep } from "@/components/event-flow/charity-step"
-import { TopicItemsDialog } from "@/components/event-flow/topic-items-dialog"
+import { HonourStep } from "@/components/favpoll-flow/honour-step"
+import { LoveStep } from "@/components/favpoll-flow/love-step"
+import { CharityStep } from "@/components/favpoll-flow/charity-step"
+import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { useWizardState } from "./use-wizard-state"
 import { WizardTriadRail } from "./wizard-triad-rail"
 import { WizardProgressStrip } from "./wizard-progress-strip"
@@ -20,7 +20,7 @@ type Props = {
   data: WizardData
 }
 
-export function NewEventWizard({ data }: Props) {
+export function NewFavpollWizard({ data }: Props) {
   const w = useWizardState(data)
   const [loveSearch, setLoveSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")

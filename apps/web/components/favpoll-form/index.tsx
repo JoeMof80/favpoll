@@ -11,7 +11,7 @@ import { updateEvent, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
-import { eventFormSchema, type EventFormValues } from "./schema"
+import { eventFormSchema, type FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
 import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
@@ -51,12 +51,12 @@ type Props = {
   eventId?: string
   protagonistId?: string
   existingPollId?: string
-  defaultValues?: Partial<EventFormValues>
+  defaultValues?: Partial<FavpollFormValues>
   hasNewTopicDraft?: boolean
   initialClosesAt?: string
 }
 
-export function EventFormV2({
+export function FavpollForm({
   charities,
   topics,
   categories,
@@ -81,7 +81,7 @@ export function EventFormV2({
   // Holds the closesAt chosen in the publish overlay (create mode)
   const pendingClosesAt = useRef<Date | null>(null)
 
-  const form = useForm<EventFormValues, unknown, EventFormValues>({
+  const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
     resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       register: "",
@@ -100,7 +100,7 @@ export function EventFormV2({
     },
   })
 
-  async function onSubmit(values: EventFormValues) {
+  async function onSubmit(values: FavpollFormValues) {
     setError(null)
     setSubmitting(true)
     try {
@@ -301,7 +301,9 @@ export function EventFormV2({
 
 // Must be a child of <Form> so useWatch can access FormContext
 type InnerProps = {
-  form: ReturnType<typeof useForm<EventFormValues, unknown, EventFormValues>>
+  form: ReturnType<
+    typeof useForm<FavpollFormValues, unknown, FavpollFormValues>
+  >
   charities: Charity[]
   topics: TopicWithMeta[]
   categories: Category[]

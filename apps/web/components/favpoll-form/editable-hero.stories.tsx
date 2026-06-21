@@ -5,16 +5,16 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { EditableHero } from "./editable-hero"
-import { eventFormSchema, type EventFormValues } from "./schema"
+import { eventFormSchema, type FavpollFormValues } from "./schema"
 
 function FormWrapper({
   defaultValues,
   children,
 }: {
-  defaultValues: Partial<EventFormValues>
+  defaultValues: Partial<FavpollFormValues>
   children: React.ReactNode
 }) {
-  const form = useForm<EventFormValues, unknown, EventFormValues>({
+  const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
     resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       register: "celebrating_one",
@@ -37,7 +37,7 @@ function FormWrapper({
 }
 
 const meta: Meta<typeof EditableHero> = {
-  title: "EventFormV2/EditableHero",
+  title: "FavpollForm/EditableHero",
   component: EditableHero,
   parameters: { layout: "padded" },
   args: { isGenerating: false },

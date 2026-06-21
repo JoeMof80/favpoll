@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { EditableCountdown } from "./editable-countdown"
 
 const meta: Meta<typeof EditableCountdown> = {
-  title: "EventFormV2/EditableCountdown",
+  title: "FavpollForm/EditableCountdown",
   component: EditableCountdown,
   parameters: { layout: "padded" },
 }

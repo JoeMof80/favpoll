@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventFormV2 } from "@/components/event-form-v2"
+import { FavpollForm } from "@/components/favpoll-form"
 import { deriveRegister } from "@/lib/registers"
 import type {
   Category,
@@ -13,7 +13,7 @@ import type {
   Topic,
   TopicWithMeta,
 } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 type Props = { searchParams: Promise<Record<string, string>> }
 
@@ -59,7 +59,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
     ),
   }))
 
-  let defaultTopics: EventFormValues["topics"] = []
+  let defaultTopics: FavpollFormValues["topics"] = []
   // draftAdditions=1 or newTopic=1: draft in sessionStorage — hydrated client-side in FormInner
   const deferToSessionStorage = hasDraftAdditions || newTopic
   if (!deferToSessionStorage && topicIsCustom && topicTitle) {
@@ -89,7 +89,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
 
   const register = deriveRegister(category || null, grouping)
 
-  const defaultValues: Partial<EventFormValues> = category
+  const defaultValues: Partial<FavpollFormValues> = category
     ? {
         category: category as FavpollCategory,
         grouping,
@@ -103,7 +103,7 @@ export default async function NewEventDetailsPage({ searchParams }: Props) {
     : {}
 
   return (
-    <EventFormV2
+    <FavpollForm
       mode="create"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}

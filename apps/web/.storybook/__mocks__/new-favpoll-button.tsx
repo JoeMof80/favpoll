@@ -9,7 +9,12 @@ type Props = {
   onBeforeOpen?: () => void
 }
 
-export function NewEventButton({ children, size, variant, className }: Props) {
+export function NewFavpollButton({
+  children,
+  size,
+  variant,
+  className,
+}: Props) {
   return (
     <Button size={size} variant={variant} className={className} type="button">
       {children}

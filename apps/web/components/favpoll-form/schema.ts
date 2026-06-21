@@ -57,4 +57,4 @@ export const eventFormSchema = z
     }
   })
 
-export type EventFormValues = z.infer<typeof eventFormSchema>
+export type FavpollFormValues = z.infer<typeof eventFormSchema>

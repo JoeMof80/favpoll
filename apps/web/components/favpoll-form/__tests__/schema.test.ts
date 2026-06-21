@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { eventFormSchema } from "@/components/event-form-v2/schema"
+import { eventFormSchema } from "@/components/favpoll-form/schema"
 
 // Minimal valid input — only required fields
 const VALID_BASE = {

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { EditablePollArea } from "./editable-poll-area"
-import { eventFormSchema, type EventFormValues } from "./schema"
+import { eventFormSchema, type FavpollFormValues } from "./schema"
 import type { TopicWithMeta } from "@favpoll/types"
 
 const COLOUR_TOPIC: TopicWithMeta = {
@@ -36,10 +36,10 @@ function FormWrapper({
   defaultValues,
   children,
 }: {
-  defaultValues: Partial<EventFormValues>
+  defaultValues: Partial<FavpollFormValues>
   children: React.ReactNode
 }) {
-  const form = useForm<EventFormValues, unknown, EventFormValues>({
+  const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
     resolver: zodResolver(eventFormSchema as never),
     defaultValues: {
       register: "celebrating_one",
@@ -64,7 +64,7 @@ function FormWrapper({
 function Controlled(
   props: {
     topics: TopicWithMeta[]
-    defaultValues: Partial<EventFormValues>
+    defaultValues: Partial<FavpollFormValues>
   } & Omit<
     React.ComponentProps<typeof EditablePollArea>,
     "showReveal" | "onToggleReveal"
@@ -85,7 +85,7 @@ function Controlled(
 }
 
 const meta: Meta<typeof EditablePollArea> = {
-  title: "EventFormV2/EditablePollArea",
+  title: "FavpollForm/EditablePollArea",
   component: EditablePollArea,
   parameters: { layout: "padded" },
 }

@@ -5,14 +5,14 @@ import Autoplay from "embla-carousel-autoplay"
 import { useCallback, useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { EventSummaryCard } from "@/components/event-summary-card"
-import type { EventSummaryCardEvent } from "@/components/event-summary-card"
+import { FavpollSummaryCard } from "@/components/favpoll-summary-card"
+import type { FavpollSummaryCardFavpoll } from "@/components/favpoll-summary-card"
 
 type Props = {
-  events: EventSummaryCardEvent[]
+  events: FavpollSummaryCardFavpoll[]
 }
 
-export function LiveEventsCarousel({ events }: Props) {
+export function LiveFavpollsCarousel({ events }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: false, align: "start" },
     [Autoplay({ delay: 5000, stopOnInteraction: true })]
@@ -44,7 +44,7 @@ export function LiveEventsCarousel({ events }: Props) {
         <ul className="flex gap-4" role="list">
           {events.map((event) => (
             <li key={event.id} className="w-[306px] shrink-0 list-none">
-              <EventSummaryCard event={event} className="h-full" />
+              <FavpollSummaryCard event={event} className="h-full" />
             </li>
           ))}
         </ul>

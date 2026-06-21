@@ -6,10 +6,10 @@ import { Chip } from "@/components/ui/chip"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { shortTopicLabel } from "@/lib/registers"
 import type { Favourite } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 type Props = {
-  topic: EventFormValues["topics"][number]
+  topic: FavpollFormValues["topics"][number]
   sortedExistingItems: Favourite[]
   customLabels: string[]
   showItemsSection: boolean

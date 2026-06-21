@@ -20,8 +20,8 @@ vi.mock("@/lib/supabase/admin", () => ({
 }))
 
 // Stub out the client component — server component test only cares about auth + data fetch
-vi.mock("@/components/new-event-wizard", () => ({
-  NewEventWizard: () => null,
+vi.mock("@/components/new-favpoll-wizard", () => ({
+  NewFavpollWizard: () => null,
 }))
 
 import NewEventPage from "@/app/favpolls/new/page"

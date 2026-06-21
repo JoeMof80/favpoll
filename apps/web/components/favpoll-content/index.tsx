@@ -10,14 +10,14 @@ import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
-import { SeedFundModal } from "@/components/event-form-v2/seed-fund-modal"
+import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
 import type {
   FavpollWithDetails,
   FavpollPollWithItems,
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
-import { useEventContent } from "./use-event-content"
+import { useFavpollContent } from "./use-favpoll-content"
 import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
 import { PageLayout } from "../page-layout"
 import { Gift } from "lucide-react"
@@ -34,7 +34,7 @@ type Props = {
   isOrganiser: boolean
 }
 
-export function EventContent({
+export function FavpollContent({
   event,
   pollWithItems,
   pot,
@@ -54,7 +54,7 @@ export function EventContent({
     addItemHandler,
     showPledgeCard,
     handleViewChange,
-  } = useEventContent({
+  } = useFavpollContent({
     event,
     pollWithItems,
     isClosed,

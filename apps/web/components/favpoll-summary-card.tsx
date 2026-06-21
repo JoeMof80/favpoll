@@ -8,7 +8,7 @@ import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import { SectionLabel } from "./favpoll-card/section-label"
 
-export type EventSummaryCardEvent = {
+export type FavpollSummaryCardFavpoll = {
   id: string
   occasion_type: string | null
   category?: string | null
@@ -23,11 +23,11 @@ export type EventSummaryCardEvent = {
 }
 
 type Props = {
-  event: EventSummaryCardEvent
+  event: FavpollSummaryCardFavpoll
   className?: string
 }
 
-export function EventSummaryCard({ event, className }: Props) {
+export function FavpollSummaryCard({ event, className }: Props) {
   const topicTitle = event.poll?.topic?.title ?? null
   const perCharity =
     event.charities.length > 0 ? event.total_raised / event.charities.length : 0

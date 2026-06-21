@@ -39,16 +39,17 @@ vi.mock("@/components/charity-banner", () => ({
 vi.mock("@/components/countdown", () => ({
   Countdown: () => null,
 }))
-vi.mock("@/components/event-card/event-card-charity-carousel", () => ({
-  EventCardCharityCarousel: () => null,
-}))
+vi.mock(
+  "@/components/favpoll-list-card/favpoll-list-card-charity-carousel",
+  () => ({ FavpollListCardCharityCarousel: () => null })
+)
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }))
 vi.mock("@/app/favpolls/[id]/actions", () => ({
   addGuestItem: vi.fn(),
   addOrganizerItem: vi.fn(),
 }))
 
-import { EventContent } from "@/components/event-content"
+import { FavpollContent } from "@/components/favpoll-content"
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -133,7 +134,7 @@ function renderContent(
   opts: { hasPledged?: boolean } = {}
 ) {
   return render(
-    <EventContent
+    <FavpollContent
       event={event}
       pollWithItems={POLL}
       pot={null}
@@ -151,7 +152,7 @@ function renderContent(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("EventContent — cause event", () => {
+describe("FavpollContent — cause event", () => {
   it("renders CauseHero with cause_label and About from description", () => {
     renderContent(CAUSE_EVENT)
 
@@ -184,7 +185,7 @@ describe("EventContent — cause event", () => {
   })
 })
 
-describe("EventContent — person event", () => {
+describe("FavpollContent — person event", () => {
   it("renders FavpollHero with protagonist name, not CauseHero", () => {
     renderContent(PERSON_EVENT)
 

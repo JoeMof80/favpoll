@@ -12,7 +12,7 @@ type Props = {
   onBeforeOpen?: () => void
 }
 
-export function NewEventButton({
+export function NewFavpollButton({
   children,
   size,
   variant,

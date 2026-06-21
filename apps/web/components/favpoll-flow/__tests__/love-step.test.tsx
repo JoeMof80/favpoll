@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent, within } from "@testing-library/react"
 
-import { LoveStep } from "@/components/event-flow/love-step"
+import { LoveStep } from "@/components/favpoll-flow/love-step"
 import type { Category, TopicWithMeta } from "@favpoll/types"
-import type { EventFormValues } from "@/components/event-form-v2/schema"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 const makeTopic = (
   id: string,
@@ -56,9 +56,9 @@ const TOPICS: TopicWithMeta[] = [
 ]
 const CATEGORIES: Category[] = [{ id: "cat1", label: "Food" } as Category]
 
-const EMPTY_VALUE: EventFormValues["topics"] = []
+const EMPTY_VALUE: FavpollFormValues["topics"] = []
 
-function select(id: string, title: string): EventFormValues["topics"] {
+function select(id: string, title: string): FavpollFormValues["topics"] {
   return [
     {
       topicId: id,
@@ -73,7 +73,7 @@ function select(id: string, title: string): EventFormValues["topics"] {
 function customTopic(
   title: string,
   customLabels: string[] = []
-): EventFormValues["topics"] {
+): FavpollFormValues["topics"] {
   return [
     {
       topicId: "",

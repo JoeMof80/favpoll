@@ -5,7 +5,7 @@ import { useFormContext, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { suggestClosingDate } from "@/lib/registers"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import type { EventFormValues } from "./schema"
+import type { FavpollFormValues } from "./schema"
 import { CloseDateOverlay } from "./close-date-overlay"
 
 type CommandPanelProps = {
@@ -23,7 +23,7 @@ export function CommandPanel({
   onSubmit,
   onCancel,
 }: CommandPanelProps) {
-  const form = useFormContext<EventFormValues>()
+  const form = useFormContext<FavpollFormValues>()
 
   const category = (useWatch({ control: form.control, name: "category" }) ??
     null) as FavpollCategory | null

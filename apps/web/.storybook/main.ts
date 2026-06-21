@@ -41,9 +41,9 @@ const config: StorybookConfig = {
           __dirname,
           "./__mocks__/next-navigation.ts"
         ),
-        "@/components/new-event-button": path.resolve(
+        "@/components/new-favpoll-button": path.resolve(
           __dirname,
-          "./__mocks__/new-event-button.tsx"
+          "./__mocks__/new-favpoll-button.tsx"
         ),
       },
     }

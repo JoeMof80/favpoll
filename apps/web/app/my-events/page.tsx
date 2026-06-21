@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import { NewEventButton } from "@/components/new-event-button"
+import { NewFavpollButton } from "@/components/new-favpoll-button"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OrganizerPageClient } from "./organizer-page-client"
 import type { OrganizerCardFavpoll } from "@/components/organizer-card/utils"
@@ -96,7 +96,7 @@ export default async function MyEventsPage() {
     <main className="mx-auto max-w-330 px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-medium text-foreground">Your favpolls</h1>
-        <NewEventButton size="lg">New favpoll</NewEventButton>
+        <NewFavpollButton size="lg">New favpoll</NewFavpollButton>
       </div>
 
       {favpolls.length > 0 ? (
@@ -106,9 +106,9 @@ export default async function MyEventsPage() {
           <p className="text-sm text-muted-foreground">
             You haven&apos;t created any favpolls yet.
           </p>
-          <NewEventButton className="mt-4">
+          <NewFavpollButton className="mt-4">
             Create your first favpoll
-          </NewEventButton>
+          </NewFavpollButton>
         </div>
       )}
     </main>

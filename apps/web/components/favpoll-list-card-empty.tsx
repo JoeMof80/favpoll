@@ -1,4 +1,4 @@
-import { NewEventButton } from "@/components/new-event-button"
+import { NewFavpollButton } from "@/components/new-favpoll-button"
 
 export function FavpollListCardEmpty() {
   return (
@@ -10,7 +10,7 @@ export function FavpollListCardEmpty() {
       <p className="mx-auto mb-6 max-w-[280px] text-[13px] text-muted-foreground">
         Be the first to create a favpoll event and it will appear here.
       </p>
-      <NewEventButton size="lg">Create an event</NewEventButton>
+      <NewFavpollButton size="lg">Create an event</NewFavpollButton>
     </div>
   )
 }
