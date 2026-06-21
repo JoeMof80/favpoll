@@ -217,7 +217,7 @@ export async function updateClosesAt(eventId: string, closesAt: string) {
     .eq("id", eventId)
 }
 
-export async function updateEvent(
+export async function updateFavpoll(
   eventId: string,
   protagonistId: string,
   input: CanvasSubmitData

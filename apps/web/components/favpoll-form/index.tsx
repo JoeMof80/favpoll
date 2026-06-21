@@ -6,8 +6,8 @@ import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
-import { createEvent } from "@/app/favpolls/new/actions"
-import { updateEvent, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
+import { createFavpoll } from "@/app/favpolls/new/actions"
+import { updateFavpoll, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
@@ -144,7 +144,7 @@ export function FavpollForm({
           new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
         sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
-        const { eventId: newId } = await createEvent({
+        const { favpollId: newId } = await createFavpoll({
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
@@ -179,7 +179,7 @@ export function FavpollForm({
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
         const closesAt = editClosesAt ?? new Date().toISOString()
-        await updateEvent(eventId, protagonistId ?? "", {
+        await updateFavpoll(eventId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
           photoUrl: isCause ? null : resolvedPhotoUrl,
