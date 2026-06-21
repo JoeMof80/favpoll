@@ -16,7 +16,7 @@ const ICE_CREAM_ITEMS = [
   { id: "item-4", label: "Mint choc chip" },
 ]
 
-const baseEvent = {
+const baseFavpoll = {
   id: "1",
   register: "remembering",
   occasion_type: "Memorial",
@@ -62,13 +62,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Memorial: Story = {
-  args: { favpoll: baseEvent },
+  args: { favpoll: baseFavpoll },
 }
 
 export const Birthday: Story = {
   args: {
     favpoll: {
-      ...baseEvent,
+      ...baseFavpoll,
       id: "2",
       opening_line: "Birthday",
       description: null,
@@ -102,7 +102,7 @@ export const Birthday: Story = {
 export const Retirement: Story = {
   args: {
     favpoll: {
-      ...baseEvent,
+      ...baseFavpoll,
       id: "3",
       opening_line: "After a lifetime of good work",
       description:
@@ -137,14 +137,14 @@ export const Retirement: Story = {
 
 export const NoPoll: Story = {
   args: {
-    favpoll: { ...baseEvent, poll: null },
+    favpoll: { ...baseFavpoll, poll: null },
   },
 }
 
 export const ClosingSoon: Story = {
   args: {
     favpoll: {
-      ...baseEvent,
+      ...baseFavpoll,
       closes_at: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
     },
   },

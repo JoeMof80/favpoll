@@ -48,26 +48,26 @@ describe("withdrawPledge — pledge not found", () => {
   })
 })
 
-describe("withdrawPledge — event is closed", () => {
-  it("redirects to the event page when closes_at is in the past", async () => {
+describe("withdrawPledge — favpoll is closed", () => {
+  it("redirects to the favpoll page when closes_at is in the past", async () => {
     mock.queue({
       id: "pledge-1",
       withdrawn_at: null,
       favpoll_polls: {
-        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "event-1" },
+        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "favpoll-1" },
       },
     })
     await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
-      "/favpolls/event-1"
+      "/favpolls/favpoll-1"
     )
   })
 
-  it("does not redirect to ?withdrawn=1 when event is closed", async () => {
+  it("does not redirect to ?withdrawn=1 when favpoll is closed", async () => {
     mock.queue({
       id: "pledge-1",
       withdrawn_at: null,
       favpoll_polls: {
-        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "event-2" },
+        favpolls: { closes_at: "2020-01-01T00:00:00Z", id: "favpoll-2" },
       },
     })
     try {
@@ -79,7 +79,7 @@ describe("withdrawPledge — event is closed", () => {
 })
 
 describe("withdrawPledge — success", () => {
-  function makeFuturePledge(favpollId = "event-1") {
+  function makeFuturePledge(favpollId = "favpoll-1") {
     const future = new Date()
     future.setFullYear(future.getFullYear() + 1)
     return {
@@ -112,11 +112,11 @@ describe("withdrawPledge — success", () => {
   })
 
   it("redirects to /favpolls/:id?withdrawn=1 on success", async () => {
-    mock.queue(makeFuturePledge("event-42"))
+    mock.queue(makeFuturePledge("favpoll-42"))
     mock.queue(null) // update response
 
     await expect(withdrawPledge(makeFormData("valid-token"))).rejects.toThrow(
-      "/favpolls/event-42?withdrawn=1"
+      "/favpolls/favpoll-42?withdrawn=1"
     )
   })
 

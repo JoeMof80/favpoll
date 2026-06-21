@@ -47,16 +47,16 @@ Full definitions in `references/GLOSSARY.md`.
 | Domain concept                   | Code name                             | UI label              |
 | -------------------------------- | ------------------------------------- | --------------------- |
 | Individual/couple/group honoured | `protagonist`                         | shown by name only    |
-| Top-level occasion               | `event`                               | "event"               |
+| Top-level occasion               | `favpoll`                             | "favpoll"             |
 | Question category                | `topic`                               | "favpoll" (picker UI) |
-| Topic in an event                | `event_poll`                          | shown by topic title  |
-| Answer option                    | `topic_item`                          | shown as pill         |
-| Item in event poll               | `event_poll_item`                     | not labelled          |
+| Topic in a favpoll               | `favpoll_poll`                        | shown by topic title  |
+| Answer option                    | `favourite`                           | shown as pill         |
+| Item in favpoll poll             | `favpoll_poll_favourite`              | not labelled          |
 | Financial commitment             | `pledge`                              | "pledge"              |
 | Pledge split                     | `pledge_allocation`                   | not shown             |
 | Organiser's question             | `personal_framing`                    | "Question"            |
 | Post-pledge secret               | `personal_reveal`                     | "The reveal"          |
-| Communal pot                     | `event_pot`                           | "shared fund"         |
+| Communal pot                     | `favpoll_pot`                         | "shared fund"         |
 | Fund draw                        | `pot_allocation`                      | not shown             |
 | Projector screen                 | `live_display`                        | "Live display"        |
 | Fixed item list                  | `finite` (topic)                      | "Finite" (filter)     |
@@ -70,9 +70,12 @@ Full definitions in `references/GLOSSARY.md`.
 ### Critical naming rules
 
 - `persons` table renamed to `protagonists` — never use `persons` or `person`
-- `event_polls.personal_quote` renamed to `personal_reveal` — never use `personal_quote`
+- `events` table renamed to `favpolls` — never use `events` or `event` as the entity name
+- `topic_items` table renamed to `favourites` — never use `topic_items` or `topic_item`
+- `event_polls` renamed to `favpoll_polls`, `event_poll_items` → `favpoll_poll_favourites`
+- `favpoll_polls.personal_quote` renamed to `personal_reveal` — never use `personal_quote`
 - `graduate_topic_items()` renamed to `include_topic_items()`
-- `topic_items.is_master` renamed to `topic_items.is_canonical`
+- `favourites.is_master` renamed to `favourites.is_canonical`
 - Topic titles have no "Favourite" prefix — stored as "Colour" not "Favourite colour"
 - The product is always "favpoll" lowercase — never FavPoll in code or UI
 - "pledge" not "donation" or "vote" in all UI copy
@@ -80,8 +83,8 @@ Full definitions in `references/GLOSSARY.md`.
 
 ### Terms that must never appear in UI copy
 
-`topic`, `event_poll`, `topic_item`, `pledge_allocation`, `pot_allocation`,
-`event_pot`, `hard_close`, `inclusion`, `is_canonical`, `is_finite`,
+`favpoll_poll`, `favourite` (table name), `pledge_allocation`, `pot_allocation`,
+`favpoll_pot`, `hard_close`, `inclusion`, `is_canonical`, `is_finite`,
 `all_time_pledged`, `clerk_user_id`, `guest_token`, `protagonist`
 
 ## Key conventions to always follow
@@ -101,9 +104,9 @@ Full definitions in `references/GLOSSARY.md`.
 ### Localisation
 
 - Never hardcode `£` or currency symbols — use `formatCurrency()` from `@/lib/i18n`
-- Never hardcode locale-specific date strings — use `formatEventDate()` from `@/lib/display`
+- Never hardcode locale-specific date strings — use `formatFavpollDate()` from `@/lib/display`
 - UI strings in new components go in `messages/en-GB.json` and are accessed via `t()` from `@/lib/i18n`
-- `events.market` defaults to `'en-GB'` — pass it through to any formatting functions that accept a locale
+- `favpolls.market` defaults to `'en-GB'` — pass it through to any formatting functions that accept a locale
 - American spelling in code, UK English in `messages/en-GB.json` copy strings
 
 ## Component conventions
@@ -142,7 +145,7 @@ Import from `@/components/ui/...` as usual.
 Read `src/components/` before building anything new. Components that already
 exist must be composed rather than reimplemented:
 
-- `event-card.tsx` — event listing card
+- `favpoll-list-card.tsx` — favpoll listing card (was `event-card.tsx`)
 - `hero-demo-panel.tsx` — animated hero demo
 
 ### Accessibility

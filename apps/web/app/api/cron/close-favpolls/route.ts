@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const supabase = createAdminClient()
   const now = new Date().toISOString()
 
-  // Find all events that have passed closes_at but haven't been closed yet
+  // Find all favpolls that have passed closes_at but haven't been closed yet
   const { data: favpolls, error } = await supabase
     .from("favpolls")
     .select("id, created_by, protagonists!favpolls_protagonist_id_fkey(name)")

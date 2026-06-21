@@ -29,10 +29,10 @@ export default function LandingV2Page() {
 
               <div className="flex items-center gap-3.5">
                 <Button asChild size="lg">
-                  <Link href="/favpolls/new">Create an event</Link>
+                  <Link href="/favpolls/new">Create a favpoll</Link>
                 </Button>
                 <Button variant="ghost" asChild>
-                  <Link href="/favpolls">See live events →</Link>
+                  <Link href="/favpolls">See live favpolls →</Link>
                 </Button>
               </div>
             </div>
@@ -61,7 +61,7 @@ export default function LandingV2Page() {
       <section className="py-20 text-center">
         <div className="mx-auto max-w-lg px-6">
           <Button asChild size="lg">
-            <Link href="/favpolls/new">Create an event</Link>
+            <Link href="/favpolls/new">Create a favpoll</Link>
           </Button>
           <p className="mt-5 text-[13px] leading-relaxed text-muted-foreground">
             No account needed to pledge. A 5% fee keeps favpoll running — 95%

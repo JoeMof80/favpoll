@@ -95,7 +95,7 @@ const meta = {
       </div>
     ),
   ],
-  // EventHero uses a discriminated union prop — Meta<typeof EventHero> produces
+  // FavpollHero uses a discriminated union prop — Meta<typeof FavpollHero> produces
   // 'never' for args in StoryObj. Use Meta without the generic to avoid that.
 } satisfies Meta
 

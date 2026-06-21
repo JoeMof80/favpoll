@@ -48,7 +48,7 @@ vi.mock("@/components/ui/responsive-overlay", () => ({
 
 import { SeedFundModal } from "../seed-fund-modal"
 
-const EVENT_ID = "event-abc"
+const FAVPOLL_ID = "favpoll-abc"
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -57,7 +57,7 @@ beforeEach(() => {
 
 describe("SeedFundModal — initial render", () => {
   it("shows headline and body copy", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     expect(
       screen.getByRole("heading", { name: "Give guests a head start" })
     ).toBeInTheDocument()
@@ -65,37 +65,37 @@ describe("SeedFundModal — initial render", () => {
   })
 
   it("renders preset amount buttons", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     expect(screen.getByRole("button", { name: "£10" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "£25" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "£50" })).toBeInTheDocument()
   })
 
   it("renders the amount input", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     expect(screen.getByLabelText(/amount in pounds/i)).toBeInTheDocument()
   })
 
   it("renders Skip for now link", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     expect(screen.getByText("Skip for now")).toBeInTheDocument()
   })
 
   it("Seed button is disabled with no amount", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     expect(screen.getByRole("button", { name: /^seed fund$/i })).toBeDisabled()
   })
 })
 
 describe("SeedFundModal — preset selection", () => {
   it("clicking £25 populates the amount input", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£25" }))
     expect(screen.getByLabelText(/amount in pounds/i)).toHaveValue(25)
   })
 
   it("Seed button becomes enabled after preset selection", () => {
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
     expect(screen.getByRole("button", { name: /^seed fund$/i })).toBeEnabled()
   })
@@ -104,7 +104,7 @@ describe("SeedFundModal — preset selection", () => {
 describe("SeedFundModal — skip", () => {
   it("calls onComplete when Skip is clicked", () => {
     const onComplete = vi.fn()
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={onComplete} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={onComplete} />)
     fireEvent.click(screen.getByText("Skip for now"))
     expect(onComplete).toHaveBeenCalledTimes(1)
   })
@@ -117,7 +117,7 @@ describe("SeedFundModal — payment intent flow", () => {
       json: async () => ({ clientSecret: "pi_test_secret" }),
     })
 
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£50" }))
     fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
@@ -131,7 +131,7 @@ describe("SeedFundModal — payment intent flow", () => {
         method: "POST",
         body: JSON.stringify({
           amount: 50,
-          metadata: { type: "pot_top_up", event_id: EVENT_ID },
+          metadata: { type: "pot_top_up", favpoll_id: FAVPOLL_ID },
         }),
       })
     )
@@ -143,7 +143,7 @@ describe("SeedFundModal — payment intent flow", () => {
       json: async () => ({ error: "Card declined" }),
     })
 
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={() => {}} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={() => {}} />)
     fireEvent.click(screen.getByRole("button", { name: "£25" }))
     fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
@@ -161,7 +161,7 @@ describe("SeedFundModal — post-payment", () => {
       json: async () => ({ clientSecret: "pi_secret" }),
     })
 
-    render(<SeedFundModal favpollId={EVENT_ID} onComplete={onComplete} />)
+    render(<SeedFundModal favpollId={FAVPOLL_ID} onComplete={onComplete} />)
     fireEvent.click(screen.getByRole("button", { name: "£10" }))
     fireEvent.click(screen.getByRole("button", { name: /^seed fund$/i }))
 
@@ -178,7 +178,7 @@ describe("SeedFundModal — post-payment", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pay" }))
 
     await waitFor(() => {
-      expect(mockTopUpFund).toHaveBeenCalledWith(EVENT_ID, 10)
+      expect(mockTopUpFund).toHaveBeenCalledWith(FAVPOLL_ID, 10)
     })
     expect(onComplete).toHaveBeenCalledTimes(1)
   })

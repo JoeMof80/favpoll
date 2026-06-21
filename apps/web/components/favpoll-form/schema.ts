@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const eventFormSchema = z
+export const favpollFormSchema = z
   .object({
     register: z.string().optional().default(""),
     category: z.enum(["celebration", "memorial", "fundraiser"]).optional(),
@@ -57,4 +57,4 @@ export const eventFormSchema = z
     }
   })
 
-export type FavpollFormValues = z.infer<typeof eventFormSchema>
+export type FavpollFormValues = z.infer<typeof favpollFormSchema>

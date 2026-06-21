@@ -96,7 +96,7 @@ export default async function HomePage() {
     <main className="flex flex-col">
       <HeroDemoPanel />
 
-      {/* Live events */}
+      {/* Live favpolls */}
       <section className="border-t border-border bg-primary/5 py-16">
         <div className="mx-auto max-w-330 px-6">
           <div className="mb-8 flex items-baseline justify-between">

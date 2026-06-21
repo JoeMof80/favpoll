@@ -127,7 +127,7 @@ export function FavpollContent({
         />
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
-          No poll has been set up for this event yet.
+          No poll has been set up for this favpoll yet.
         </p>
       )}
     </>

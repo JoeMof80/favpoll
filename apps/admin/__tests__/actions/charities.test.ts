@@ -182,7 +182,7 @@ describe("updateCharity", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("deactivateCharity", () => {
-  it("returns success without warning if charity is used in zero events", async () => {
+  it("returns success without warning if charity is used in zero favpolls", async () => {
     mock.queue([]); // favpoll_charities select → empty
     mock.queue(null); // charities update
 
@@ -192,23 +192,23 @@ describe("deactivateCharity", () => {
     expect(warning).toBeUndefined();
   });
 
-  it("returns success with warning if charity is used in one or more events", async () => {
+  it("returns success with warning if charity is used in one or more favpolls", async () => {
     mock.queue([{ id: "ec-1" }, { id: "ec-2" }]); // favpoll_charities select → 2 rows
     mock.queue(null); // charities update
 
     const { error, warning } = await deactivateCharity("charity-1");
 
     expect(error).toBeNull();
-    expect(warning).toMatch(/2 events/);
+    expect(warning).toMatch(/2 favpolls/);
   });
 
-  it('uses singular "event" when used in exactly one event', async () => {
+  it('uses singular "favpoll" when used in exactly one favpoll', async () => {
     mock.queue([{ id: "ec-1" }]); // favpoll_charities select → 1 row
     mock.queue(null); // charities update
 
     const { warning } = await deactivateCharity("charity-1");
 
-    expect(warning).toMatch(/1 event[^s]/);
+    expect(warning).toMatch(/1 favpoll[^s]/);
   });
 
   it("returns error if favpoll_charities query fails", async () => {

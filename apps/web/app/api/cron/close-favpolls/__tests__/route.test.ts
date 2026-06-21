@@ -48,18 +48,18 @@ describe("POST /api/cron/close-favpolls — auth", () => {
   })
 
   it("proceeds when Authorization header matches CRON_SECRET", async () => {
-    mock.queue([]) // events select → no events
+    mock.queue([]) // favpolls select → no favpolls
     const res = await POST(makeRequest("Bearer test-secret"))
     expect(res.status).not.toBe(401)
   })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// No events to close
+// No favpolls to close
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — no events", () => {
-  it("returns { closed: 0 } when events array is empty", async () => {
+describe("POST /api/cron/close-favpolls — no favpolls", () => {
+  it("returns { closed: 0 } when favpolls array is empty", async () => {
     mock.queue([])
 
     const res = await POST(makeRequest("Bearer test-secret"))
@@ -67,7 +67,7 @@ describe("POST /api/cron/close-favpolls — no events", () => {
     expect(body).toEqual({ closed: 0 })
   })
 
-  it("returns { closed: 0 } when events query returns null", async () => {
+  it("returns { closed: 0 } when favpolls query returns null", async () => {
     mock.queue(null)
 
     const res = await POST(makeRequest("Bearer test-secret"))
@@ -81,7 +81,7 @@ describe("POST /api/cron/close-favpolls — no events", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("POST /api/cron/close-favpolls — DB error", () => {
-  it("returns 500 when events fetch fails", async () => {
+  it("returns 500 when favpolls fetch fails", async () => {
     mock.queue(null, { message: "connection refused" })
 
     const res = await POST(makeRequest("Bearer test-secret"))
@@ -92,11 +92,11 @@ describe("POST /api/cron/close-favpolls — DB error", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Happy path — events closed
+// Happy path — favpolls closed
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — closes events", () => {
-  function queueForOneEvent(
+describe("POST /api/cron/close-favpolls — closes favpolls", () => {
+  function queueForOneFavpoll(
     options: {
       favpollId?: string
       userId?: string
@@ -107,7 +107,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     } = {}
   ) {
     const {
-      favpollId = "event-1",
+      favpollId = "favpoll-1",
       userId = "user-1",
       protagonistName = "Alice",
       totalRaised = 150,
@@ -115,7 +115,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
       updateError = null,
     } = options
 
-    // 1. events select
+    // 1. favpolls select
     mock.queue([
       {
         id: favpollId,
@@ -136,26 +136,26 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
         ? [{ id: userId, email: organiserEmail, display_name: "Organiser" }]
         : [{ id: userId, email: null, display_name: null }]
     )
-    // 4. events update (per event in loop)
+    // 4. favpolls update (per favpoll in loop)
     mock.queue(null, updateError)
   }
 
-  it("closes the event with closed_at and total_raised", async () => {
-    queueForOneEvent({ totalRaised: 200 })
+  it("closes the favpoll with closed_at and total_raised", async () => {
+    queueForOneFavpoll({ totalRaised: 200 })
 
     await POST(makeRequest("Bearer test-secret"))
 
-    const eventsUpdate = mock
+    const favpollsUpdate = mock
       .callsFor("favpolls")
       .find((c) => c.method === "update")!
-    expect(eventsUpdate.args[0]).toMatchObject({
+    expect(favpollsUpdate.args[0]).toMatchObject({
       total_raised: 200,
       closed_at: expect.any(String),
     })
   })
 
-  it("returns { closed: 1 } for a single successfully closed event", async () => {
-    queueForOneEvent()
+  it("returns { closed: 1 } for a single successfully closed favpoll", async () => {
+    queueForOneFavpoll()
 
     const res = await POST(makeRequest("Bearer test-secret"))
     const body = await res.json()
@@ -163,8 +163,8 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
   })
 
   it("sends sendFavpollClosed to the organiser email", async () => {
-    queueForOneEvent({
-      favpollId: "event-1",
+    queueForOneFavpoll({
+      favpollId: "favpoll-1",
       protagonistName: "Bob",
       totalRaised: 75,
       organiserEmail: "bob@example.com",
@@ -177,13 +177,13 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
         to: "bob@example.com",
         protagonistName: "Bob",
         totalRaised: 75,
-        favpollId: "event-1",
+        favpollId: "favpoll-1",
       })
     )
   })
 
   it("does not send email when organiser has no email address", async () => {
-    queueForOneEvent({ organiserEmail: null })
+    queueForOneFavpoll({ organiserEmail: null })
     mockEmail.sendFavpollClosed.mockClear()
 
     await POST(makeRequest("Bearer test-secret"))
@@ -192,7 +192,7 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
   })
 
   it("still increments closed count when email send fails", async () => {
-    queueForOneEvent()
+    queueForOneFavpoll()
     mockEmail.sendFavpollClosed.mockRejectedValueOnce(new Error("email down"))
 
     const res = await POST(makeRequest("Bearer test-secret"))
@@ -200,10 +200,10 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     expect(body.closed).toBe(1)
   })
 
-  it("lists event update errors but still closes others", async () => {
-    // Two events: first fails to update, second succeeds
-    const favpollId1 = "event-fail"
-    const favpollId2 = "event-ok"
+  it("lists favpoll update errors but still closes others", async () => {
+    // Two favpolls: first fails to update, second succeeds
+    const favpollId1 = "favpoll-fail"
+    const favpollId2 = "favpoll-ok"
     const userId = "user-1"
 
     mock.queue([
@@ -212,9 +212,9 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
     ])
     mock.queue([]) // no pledges
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
-    // First event update → error
+    // First favpoll update → error
     mock.queue(null, { message: "update failed" })
-    // Second event update → success
+    // Second favpoll update → success
     mock.queue(null)
 
     const res = await POST(makeRequest("Bearer test-secret"))
@@ -227,13 +227,13 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
   })
 
   it("sums pledge totals correctly from pledgeTotals rows", async () => {
-    const favpollId = "event-1"
+    const favpollId = "favpoll-1"
     const userId = "user-1"
 
     mock.queue([
       { id: favpollId, created_by: userId, protagonists: { name: "A" } },
     ])
-    // Multiple pledge rows for the same event
+    // Multiple pledge rows for the same favpoll
     mock.queue([
       { favpoll_polls: { favpoll_id: favpollId }, total_amount: 50 },
       { favpoll_polls: { favpoll_id: favpollId }, total_amount: 30 },
@@ -244,9 +244,9 @@ describe("POST /api/cron/close-favpolls — closes events", () => {
 
     await POST(makeRequest("Bearer test-secret"))
 
-    const eventsUpdate = mock
+    const favpollsUpdate = mock
       .callsFor("favpolls")
       .find((c) => c.method === "update")!
-    expect(eventsUpdate.args[0].total_raised).toBe(100)
+    expect(favpollsUpdate.args[0].total_raised).toBe(100)
   })
 })

@@ -68,9 +68,9 @@ export function hasFabricatedStats(text: string): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Person events always use 'none' as the charity segment so a single cached
+ * Person favpolls always use 'none' as the charity segment so a single cached
  * entry covers all charity combinations (About is charity-agnostic).
- * Cause events key on the primary charity so the reveal is charity-specific.
+ * Cause favpolls key on the primary charity so the reveal is charity-specific.
  */
 export function buildCacheKey(
   register: Register,

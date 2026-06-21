@@ -26,7 +26,7 @@ function makeItems(scene: (typeof SCENES)[0], topicId: string): Favourite[] {
     is_canonical: true,
     source: "seed" as const,
     markets: ["en-GB"],
-    event_count: 1,
+    favpoll_count: 1,
     total_pledge_count: pledgeByLabel[item.label]?.all_time_count ?? 0,
     created_at: "2024-01-01T00:00:00Z",
   }))

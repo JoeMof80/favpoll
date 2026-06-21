@@ -112,7 +112,7 @@ async function upsertPollForFavpoll(
 
   if (!topicId) return
 
-  const { data: eventPoll, error: pollErr } = await supabase
+  const { data: favpollPoll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
       favpoll_id: favpollId,
@@ -122,13 +122,13 @@ async function upsertPollForFavpoll(
     .select("id")
     .single()
 
-  if (pollErr || !eventPoll)
+  if (pollErr || !favpollPoll)
     throw new Error(`Failed to create poll: ${pollErr?.message}`)
 
   if (customItemIds.length > 0) {
     await supabase.from("favpoll_poll_favourites").insert(
       customItemIds.map((itemId) => ({
-        favpoll_poll_id: eventPoll.id,
+        favpoll_poll_id: favpollPoll.id,
         favourite_id: itemId,
         is_guest_added: false,
         added_by: userId,
@@ -158,7 +158,7 @@ async function upsertPollForFavpoll(
     if (allItemIds.length > 0) {
       await supabase.from("favpoll_poll_favourites").insert(
         allItemIds.map((itemId) => ({
-          favpoll_poll_id: eventPoll.id,
+          favpoll_poll_id: favpollPoll.id,
           favourite_id: itemId,
           is_guest_added: false,
           added_by: userId,
@@ -174,32 +174,32 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select("created_by, closes_at, hard_close_at, extension_count")
     .eq("id", favpollId)
     .single()
 
-  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   const newClosesAt = new Date(closesAt).toISOString()
-  const currentClosesAt = new Date(event.closes_at)
+  const currentClosesAt = new Date(favpoll.closes_at)
   const isExtension = new Date(newClosesAt) > currentClosesAt
 
   if (isExtension) {
     if (new Date(newClosesAt) <= new Date()) {
       throw new Error("Closing date must be in the future")
     }
-    if ((event.extension_count ?? 0) >= 2) {
+    if ((favpoll.extension_count ?? 0) >= 2) {
       throw new Error(
         "Maximum extensions reached. Please contact us to request a further extension."
       )
     }
     if (
-      event.hard_close_at &&
-      new Date(newClosesAt) > new Date(event.hard_close_at)
+      favpoll.hard_close_at &&
+      new Date(newClosesAt) > new Date(favpoll.hard_close_at)
     ) {
-      const cap = new Date(event.hard_close_at).toLocaleDateString("en-GB", {
+      const cap = new Date(favpoll.hard_close_at).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -212,7 +212,9 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
     .from("favpolls")
     .update({
       closes_at: newClosesAt,
-      ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
+      ...(isExtension && {
+        extension_count: (favpoll.extension_count ?? 0) + 1,
+      }),
     })
     .eq("id", favpollId)
 }
@@ -228,32 +230,32 @@ export async function updateFavpoll(
   const supabase = createAdminClient()
 
   // Verify ownership and fetch current closes_at/extension fields
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select("created_by, closes_at, hard_close_at, extension_count")
     .eq("id", favpollId)
     .single()
 
-  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   const newClosesAt = new Date(input.closesAt).toISOString()
-  const currentClosesAt = new Date(event.closes_at)
+  const currentClosesAt = new Date(favpoll.closes_at)
   const isExtension = new Date(newClosesAt) > currentClosesAt
 
   if (isExtension) {
     if (new Date(newClosesAt) <= new Date()) {
       throw new Error("Closing date must be in the future")
     }
-    if ((event.extension_count ?? 0) >= 2) {
+    if ((favpoll.extension_count ?? 0) >= 2) {
       throw new Error(
         "Maximum extensions reached. Please contact us to request a further extension."
       )
     }
     if (
-      event.hard_close_at &&
-      new Date(newClosesAt) > new Date(event.hard_close_at)
+      favpoll.hard_close_at &&
+      new Date(newClosesAt) > new Date(favpoll.hard_close_at)
     ) {
-      const cap = new Date(event.hard_close_at).toLocaleDateString("en-GB", {
+      const cap = new Date(favpoll.hard_close_at).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -262,7 +264,7 @@ export async function updateFavpoll(
     }
   }
 
-  // Update protagonist — only if this is a person event
+  // Update protagonist — only if this is a person favpoll
   if (input.subject === "someone") {
     await supabase
       .from("protagonists")
@@ -275,7 +277,7 @@ export async function updateFavpoll(
       .eq("id", protagonistId)
   }
 
-  // Update event
+  // Update favpoll
   await supabase
     .from("favpolls")
     .update({
@@ -289,7 +291,9 @@ export async function updateFavpoll(
       is_private: input.isPrivate,
       is_listed: input.isListed,
       description: input.description,
-      ...(isExtension && { extension_count: (event.extension_count ?? 0) + 1 }),
+      ...(isExtension && {
+        extension_count: (favpoll.extension_count ?? 0) + 1,
+      }),
     })
     .eq("id", favpollId)
 
@@ -305,6 +309,6 @@ export async function updateFavpoll(
     )
   }
 
-  // Upsert the single event poll
+  // Upsert the single favpoll poll
   await upsertPollForFavpoll(supabase, favpollId, userId, input.poll)
 }

@@ -24,7 +24,7 @@ export default async function EditFavpollPage({ params }: Props) {
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
       "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charity_id)"
@@ -32,8 +32,8 @@ export default async function EditFavpollPage({ params }: Props) {
     .eq("id", id)
     .single()
 
-  if (!event) notFound()
-  if (event.created_by !== userId) redirect(`/favpolls/${id}`)
+  if (!favpoll) notFound()
+  if (favpoll.created_by !== userId) redirect(`/favpolls/${id}`)
 
   const [
     { data: rawPoll },
@@ -85,29 +85,29 @@ export default async function EditFavpollPage({ params }: Props) {
     }
   }
 
-  const category = (event.category ?? null) as FavpollCategory | null
-  const grouping = (event.grouping ?? "individual") as FavpollGrouping
-  const isCause = event.subject === "cause"
+  const category = (favpoll.category ?? null) as FavpollCategory | null
+  const grouping = (favpoll.grouping ?? "individual") as FavpollGrouping
+  const isCause = favpoll.subject === "cause"
 
   const defaultValues: Partial<FavpollFormValues> = {
     category: category ?? undefined,
     grouping,
     register: deriveRegister(category, grouping),
-    subject: (event.subject ?? "someone") as FavpollSubject,
-    name: isCause ? "" : (event.protagonists?.name ?? ""),
-    context: isCause ? "" : (event.protagonists?.context ?? ""),
-    openingLine: event.opening_line ?? "",
+    subject: (favpoll.subject ?? "someone") as FavpollSubject,
+    name: isCause ? "" : (favpoll.protagonists?.name ?? ""),
+    context: isCause ? "" : (favpoll.protagonists?.context ?? ""),
+    openingLine: favpoll.opening_line ?? "",
     about: isCause
-      ? (event.description ?? "")
-      : (event.protagonists?.about ?? ""),
+      ? (favpoll.description ?? "")
+      : (favpoll.protagonists?.about ?? ""),
     photoUrl: isCause
       ? undefined
-      : (event.protagonists?.photo_url ?? undefined),
-    causeLabel: isCause ? (event.cause_label ?? "") : "",
-    charities: (event.favpoll_charities ?? []).map(
+      : (favpoll.protagonists?.photo_url ?? undefined),
+    causeLabel: isCause ? (favpoll.cause_label ?? "") : "",
+    charities: (favpoll.favpoll_charities ?? []).map(
       (ec: { charity_id: string }) => ec.charity_id
     ),
-    isListed: event.is_listed ?? true,
+    isListed: favpoll.is_listed ?? true,
     reveal: rawPoll?.personal_reveal ?? "",
     topics: preselectedTopics,
   }
@@ -119,10 +119,10 @@ export default async function EditFavpollPage({ params }: Props) {
       topics={enrichedTopics}
       categories={(categories ?? []) as Category[]}
       favpollId={id}
-      protagonistId={event.protagonist_id ?? undefined}
+      protagonistId={favpoll.protagonist_id ?? undefined}
       existingPollId={rawPoll?.id}
       defaultValues={defaultValues}
-      initialClosesAt={event.closes_at}
+      initialClosesAt={favpoll.closes_at}
     />
   )
 }

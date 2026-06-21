@@ -235,7 +235,7 @@ export function EditablePollArea({
                 isInfinite
                   ? async () => {
                       toast.warning(
-                        "Items added here won't be saved — add them to your event after publishing.",
+                        "Items added here won't be saved — add them to your favpoll after publishing.",
                         {
                           style: {
                             background: "#fffbeb",

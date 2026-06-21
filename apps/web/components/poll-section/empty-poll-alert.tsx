@@ -6,7 +6,7 @@ export function EmptyPollAlert() {
     <Alert className="border-amber-500 text-sm text-amber-500">
       <CircleAlert />
       <AlertDescription className="text-amber-500">
-        Add some items before sharing your event link.
+        Add some items before sharing your favpoll link.
       </AlertDescription>
     </Alert>
   )

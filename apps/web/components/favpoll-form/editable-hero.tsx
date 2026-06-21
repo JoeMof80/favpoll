@@ -360,7 +360,7 @@ export function EditableHero({
               className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
             >
               <span>
-                What you&apos;re raising for — shown throughout the event.
+                What you&apos;re raising for — shown throughout the favpoll.
               </span>
               <CharCounter value={causeLabelDraft} max={60} />
             </div>
@@ -393,7 +393,7 @@ export function EditableHero({
               data-align="block-end"
               className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
             >
-              <span>Shown throughout the event.</span>
+              <span>Shown throughout the favpoll.</span>
               <CharCounter value={nameDraft} max={40} />
             </div>
           </InputGroup>

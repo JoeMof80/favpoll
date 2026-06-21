@@ -200,10 +200,10 @@ describe("generateDraft — cache miss, person", () => {
     })
   })
 
-  it("fetches charity for person event when primaryCharityId is provided", async () => {
+  it("fetches charity for person favpoll when primaryCharityId is provided", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA) // topics fetch
-    mock.queue(CHARITY_DATA) // charity fetch (person event with charity)
+    mock.queue(CHARITY_DATA) // charity fetch (person favpoll with charity)
     mockLLMResponse(
       "A warm gathering in someone's honour.",
       "Her favourite was always Blue."

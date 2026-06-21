@@ -9,7 +9,7 @@ export async function withdrawPledge(formData: FormData) {
 
   const supabase = createAdminClient()
 
-  // Verify pledge still exists, not withdrawn, and event is still open
+  // Verify pledge still exists, not withdrawn, and favpoll is still open
   const { data: pledge } = await supabase
     .from("pledges")
     .select("id, withdrawn_at, favpoll_polls(favpolls(closes_at, id))")

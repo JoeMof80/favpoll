@@ -20,7 +20,7 @@ export default function SignUpPage() {
               },
               {
                 heading: "A permanent record of favourites",
-                body: "Each event feeds the record of human favourites — a gentle, growing picture of what people love.",
+                body: "Each favpoll feeds the record of human favourites — a gentle, growing picture of what people love.",
               },
             ].map((item) => (
               <li key={item.heading}>

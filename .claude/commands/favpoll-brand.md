@@ -34,7 +34,7 @@ This is favpoll's foundational brand statement. It appears in the founding story
 favpoll sits at the intersection of three things that rarely appear together:
 
 - **Charity** — every pledge goes to a cause chosen in someone's name
-- **Honour** — every event is an act of remembrance or celebration
+- **Honour** — every favpoll is an act of remembrance or celebration
 - **Love** — every answer is a small piece of what someone genuinely cares about
 
 Use this as an internal design principle when evaluating copy or features: does this serve charity, honour, or love? If it serves none of them, it probably doesn't belong.
@@ -55,7 +55,7 @@ favpoll speaks with warmth and quiet dignity. It is never corporate, never sales
 A charitable polling platform for life events. Guests pledge real money against their favourite things. Rankings update live. Proceeds go to charity. Every pledge contributes to a permanent record of human favourites.
 
 **The reveal mechanic:**
-The quote field on each event poll is a reveal — shown to guests only after they have pledged. The framing question withholds the protagonist's favourite; the reveal discloses it after payment. The pledge becomes a two-way act: the guest shares something of themselves, the person being honoured shares something back.
+The reveal field on each favpoll poll is shown to guests only after they have pledged. The framing question withholds the protagonist's favourite; the reveal discloses it after payment. The pledge becomes a two-way act: the guest shares something of themselves, the person being honoured shares something back.
 
 This is not a "pay to unlock" mechanic. Frame it as something waiting for them, not something gated.
 
@@ -65,7 +65,7 @@ favpoll is genuinely both things simultaneously — a fundraising platform and a
 **Fee model:**
 5% platform fee, deducted before disbursement. 95% reaches the charity. Stripe processes payments. Fee always shown to donors before confirmation. Never hide it, never apologise for it — frame it as what makes the platform sustainable.
 
-**Maximum 3 charities per event.** Proceeds split equally.
+**Maximum 3 charities per favpoll.** Proceeds split equally.
 
 **Poll maximum duration:** 90 days from creation. Automatic disbursement on close.
 
@@ -142,7 +142,7 @@ The reveal is shown after pledging. The voice depends on who wrote it:
 
 - **Written by an executor following will instructions** — either voice, depending on what was left
 
-The first-person version is particularly powerful and should be encouraged when the organiser indicates the event is will-directed. It gives guests the experience of hearing the person's own voice after they are gone.
+The first-person version is particularly powerful and should be encouraged when the organiser indicates the favpoll is will-directed. It gives guests the experience of hearing the person's own voice after they are gone.
 
 **Framing placeholder copy by topic:**
 
@@ -188,7 +188,7 @@ Way to spend Sunday:
   reveal:  "e.g. Tom's was a long walk followed by a roast. Every week without fail."
 ```
 
-**Will-directed event placeholder copy** — encourage first person:
+**Will-directed favpoll placeholder copy** — encourage first person:
 
 ```
 Colour:

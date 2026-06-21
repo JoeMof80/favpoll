@@ -53,7 +53,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
   const favpollPoll = pledge.favpoll_polls as unknown as FavpollPollRow
   const favpollData = favpollPoll?.favpolls
   const protagonistName: string =
-    favpollData?.protagonists?.name ?? "this event"
+    favpollData?.protagonists?.name ?? "this favpoll"
   const closesAt: string = favpollData?.closes_at ?? ""
   const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
     (ec) => ec.charities.name
@@ -87,9 +87,9 @@ export default async function WithdrawPage({ searchParams }: Props) {
   if (isClosed) {
     return (
       <main className="mx-auto max-w-md px-6 pt-16 pb-16 text-center">
-        <h1 className="text-xl font-medium text-foreground">Event closed</h1>
+        <h1 className="text-xl font-medium text-foreground">favpoll closed</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This event has closed and pledges can no longer be withdrawn.
+          This favpoll has closed and pledges can no longer be withdrawn.
         </p>
       </main>
     )

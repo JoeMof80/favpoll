@@ -41,11 +41,11 @@ const charity: Charity = {
   created_at: "2024-01-01T00:00:00Z",
 }
 
-function makeEvent(
+function makeFavpoll(
   overrides: Partial<FavpollWithDetails> = {}
 ): FavpollWithDetails {
   return {
-    id: "event-1",
+    id: "favpoll-1",
     protagonist_id: "prot-1",
     subject: "someone" as const,
     cause_label: null,
@@ -72,7 +72,7 @@ function makeEvent(
 function makePoll(id: string, isFinite = false): FavpollPollWithItems {
   return {
     id,
-    favpoll_id: "event-1",
+    favpoll_id: "favpoll-1",
     topic_id: "topic-1",
     personal_reveal: null,
     created_at: "2024-01-01T00:00:00Z",
@@ -89,7 +89,7 @@ function makePoll(id: string, isFinite = false): FavpollPollWithItems {
   }
 }
 
-const event = makeEvent()
+const favpoll = makeFavpoll()
 const poll = makePoll("poll-1")
 const finitePoll = makePoll("finite-poll", true)
 
@@ -97,7 +97,7 @@ describe("useFavpollContent — initial state", () => {
   it("starts with pledgeConfirmed as false", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
@@ -112,7 +112,7 @@ describe("useFavpollContent — handlePledgeSuccess", () => {
   it("sets pledgeConfirmed to true", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
@@ -130,7 +130,7 @@ describe("useFavpollContent — addItemHandler", () => {
   it("returns undefined for a finite topic", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: finitePoll,
         isClosed: false,
         hasPledged: false,
@@ -140,10 +140,10 @@ describe("useFavpollContent — addItemHandler", () => {
     expect(result.current.addItemHandler(finitePoll)).toBeUndefined()
   })
 
-  it("returns undefined when event is closed", () => {
+  it("returns undefined when favpoll is closed", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: true,
         hasPledged: false,
@@ -156,7 +156,7 @@ describe("useFavpollContent — addItemHandler", () => {
   it("returns undefined when clerkUserId is null (guest)", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
@@ -170,10 +170,10 @@ describe("useFavpollContent — addItemHandler", () => {
     mockRouter.refresh.mockClear()
     mockActions.addOrganizerItem.mockClear()
 
-    // event.created_by is "user-1" — same as clerkUserId means organiser
+    // favpoll.created_by is "user-1" — same as clerkUserId means organiser
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
@@ -188,7 +188,7 @@ describe("useFavpollContent — addItemHandler", () => {
     })
 
     expect(mockActions.addOrganizerItem).toHaveBeenCalledWith(
-      "event-1",
+      "favpoll-1",
       "Scarlet"
     )
     expect(mockRouter.refresh).toHaveBeenCalled()
@@ -197,11 +197,11 @@ describe("useFavpollContent — addItemHandler", () => {
   it("returns a function for an infinite, open poll with a non-organiser logged-in user", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
-        clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
+        clerkUserId: "user-2", // guest — different from favpoll.created_by ("user-1")
       })
     )
     expect(typeof result.current.addItemHandler(poll)).toBe("function")
@@ -213,11 +213,11 @@ describe("useFavpollContent — addItemHandler", () => {
 
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
-        clerkUserId: "user-2", // guest — different from event.created_by ("user-1")
+        clerkUserId: "user-2", // guest — different from favpoll.created_by ("user-1")
       })
     )
     const handler = result.current.addItemHandler(poll)!
@@ -238,7 +238,7 @@ describe("useFavpollContent — derived values", () => {
   it("showPledgeCard is true when not closed and poll is set", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: false,
         hasPledged: false,
@@ -251,7 +251,7 @@ describe("useFavpollContent — derived values", () => {
   it("showPledgeCard is false when closed", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: poll,
         isClosed: true,
         hasPledged: false,
@@ -264,7 +264,7 @@ describe("useFavpollContent — derived values", () => {
   it("showPledgeCard is false when pollWithItems is null", () => {
     const { result } = renderHook(() =>
       useFavpollContent({
-        favpoll: event,
+        favpoll: favpoll,
         pollWithItems: null,
         isClosed: false,
         hasPledged: false,

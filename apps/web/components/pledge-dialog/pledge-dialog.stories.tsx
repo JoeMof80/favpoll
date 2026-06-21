@@ -16,7 +16,7 @@ function makeFavourite(id: string, label: string): Favourite {
     is_canonical: true,
     source: "seed",
     markets: ["en-GB"],
-    event_count: 0,
+    favpoll_count: 0,
     total_pledge_count: 0,
     created_at: "2024-01-01T00:00:00Z",
   }
@@ -24,7 +24,7 @@ function makeFavourite(id: string, label: string): Favourite {
 
 const poll: FavpollPollWithItems = {
   id: "poll-1",
-  favpoll_id: "event-1",
+  favpoll_id: "favpoll-1",
   topic_id: "topic-1",
   personal_reveal: null,
   created_at: "2024-01-01T00:00:00Z",
@@ -48,7 +48,7 @@ const poll: FavpollPollWithItems = {
 
 const pot: FavpollPot = {
   id: "pot-1",
-  favpoll_id: "event-1",
+  favpoll_id: "favpoll-1",
   created_by: "user-1",
   total_deposited: 100,
   total_allocated: 20,
@@ -73,7 +73,7 @@ type Story = StoryObj<typeof meta>
 
 export const SignedIn: Story = {
   args: {
-    favpollId: "event-1",
+    favpollId: "favpoll-1",
     clerkUserId: "user-1",
     charityNames: ["Oxfam"],
     pollWithItems: poll,

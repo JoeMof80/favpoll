@@ -239,14 +239,14 @@ export function shortTopicLabel(title: string): string {
 
 /**
  * Suggest a closing date for a poll.
- * - With eventDate: closes N days before the event (min: today + N days)
- * - Without eventDate: closes N days from today
+ * - With favpollDate: closes N days before the favpoll (min: today + N days)
+ * - Without favpollDate: closes N days from today
  * N is 30 days for memorials, 14 days otherwise.
  * Returns "YYYY-MM-DDTHH:MM"
  */
 export function suggestClosingDate(
   category: FavpollCategory | null,
-  eventDate?: string | null
+  favpollDate?: string | null
 ): string {
   const days = category === "memorial" ? 30 : 14
 
@@ -254,8 +254,8 @@ export function suggestClosingDate(
   today.setHours(0, 0, 0, 0)
 
   let target: Date
-  if (eventDate) {
-    target = new Date(eventDate + "T12:00:00")
+  if (favpollDate) {
+    target = new Date(favpollDate + "T12:00:00")
     target.setDate(target.getDate() - days)
     if (target <= today) {
       target = new Date(today)

@@ -29,9 +29,9 @@ export default async function GeneratedDraftsPage({ searchParams }: Props) {
         <h1 className="text-2xl font-semibold">Generated Drafts</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Review LLM-generated About and Reveal copy. Editing or updating status
-          here does not change what new events receive — the cache continues to
-          serve the stored copy regardless of status. Curated status is reserved
-          for future admin-first lookup.
+          here does not change what new favpolls receive — the cache continues
+          to serve the stored copy regardless of status. Curated status is
+          reserved for future admin-first lookup.
         </p>
       </div>
 

@@ -1,13 +1,15 @@
 # favpoll
 
-A charitable polling platform where guests share their favourite things while pledging donations to charity. Organisers create events for special occasions — memorials, birthdays, retirements, weddings — each with a customised poll question. Guests pledge money and split it across their favourite answers, building a permanent record of what people love most while raising funds for good causes.
+> **⚠ This README is outdated.** The schema, file structure, and component names below reflect the early project state before the ubiquitous-language rename. For the current schema, routes, environment variables, and component tree see `references/PROJECT.md` (the canonical reference).
+
+A charitable polling platform where guests share their favourite things while pledging donations to charity. Organisers create favpolls for special occasions — memorials, birthdays, retirements, weddings — each with a customised poll question. Guests pledge money and split it across their favourite answers, building a permanent record of what people love most while raising funds for good causes.
 
 ---
 
 ## How it works
 
-1. **Organiser creates an event** — chooses an occasion, uploads a photo, writes a short bio, selects up to 3 charities, and sets up a poll (e.g. "What was Belinda's favourite film?")
-2. **Guests receive a link** — they browse the event, pick their favourites, and pledge an amount split across their choices
+1. **Organiser creates a favpoll** — chooses an occasion, uploads a photo, writes a short bio, selects up to 3 charities, and sets up a poll (e.g. "What was Belinda's favourite film?")
+2. **Guests receive a link** — they browse the favpoll, pick their favourites, and pledge an amount split across their choices
 3. **Donations flow to charity** — all pledges go directly to the selected charities with no platform cut
 4. **Rankings persist** — every pledge contributes to all-time global rankings, creating a lasting tribute
 

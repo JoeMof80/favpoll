@@ -6,7 +6,7 @@ Read `.claude/commands/favpoll-context.md` and `.claude/commands/favpoll-brand.m
 
 ---
 
-We are building a `FavpollCard` component — the canonical, recognisable shape of a favpoll. It must be consistent whether it appears on the event page, in the hero demo panel, as an embed, or on the live display. Build it as a set of composable sub-components, each with their own Storybook stories.
+We are building a `FavpollCard` component — the canonical, recognisable shape of a favpoll. It must be consistent whether it appears on the favpoll page, in the hero demo panel, as an embed, or on the live display. Build it as a set of composable sub-components, each with their own Storybook stories.
 
 ---
 
@@ -100,7 +100,7 @@ Amount buttons follow the same `role="radiogroup"` + `role="radio"` + `aria-chec
 
 | size    | context           | protagonist name | avatar | showSteps | pledge panel |
 | ------- | ----------------- | ---------------- | ------ | --------- | ------------ |
-| `full`  | event page        | text-[22px]      | 56px   | false     | inline       |
+| `full`  | favpoll page      | text-[22px]      | 56px   | false     | inline       |
 | `demo`  | hero demo panel   | text-[16px]      | 36px   | true      | inline       |
 | `embed` | third-party embed | text-[14px]      | 32px   | false     | hidden       |
 

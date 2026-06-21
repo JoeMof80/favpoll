@@ -55,7 +55,7 @@ export type CardCharity = {
 export type FavpollCardProps = {
   size?: FavpollCardSize
   protagonist: CardProtagonist
-  /** Maps to event.opening_line */
+  /** Maps to favpoll.opening_line */
   eyebrow?: string
   charities: CardCharity[]
   /** charity id → formatted amount string shown next to each charity row */

@@ -11,10 +11,10 @@ configuration problem, not a rewrite.
 
 ## Current state (en-GB only)
 
-- `events.market` text column, default `'en-GB'`
-- `topic_items.markets` text array, default `['en-GB']`
+- `favpolls.market` text column, default `'en-GB'`
+- `favourites.markets` text array, default `['en-GB']`
 - `formatCurrency()` in `lib/i18n.ts` — locale and currency-aware
-- `formatEventDate()` and `ordinal()` in `lib/display.ts` — Intl-based, accept optional locale param
+- `formatFavpollDate()` and `ordinal()` in `lib/display.ts` — Intl-based, accept optional locale param
 - `messages/en-GB.json` — UI strings, growing incrementally
 - `t()` helper in `lib/i18n.ts` — interim until next-intl migration
 

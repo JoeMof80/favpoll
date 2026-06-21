@@ -9,7 +9,7 @@ import type {
 // Stub out sub-components that require complex providers or Supabase
 vi.mock("@/components/favpoll-hero", () => ({
   FavpollHero: ({ protagonist }: { protagonist: { name: string } }) => (
-    <div data-testid="event-hero">{protagonist.name}</div>
+    <div data-testid="favpoll-hero">{protagonist.name}</div>
   ),
 }))
 vi.mock("@/components/cause-hero", () => ({
@@ -64,8 +64,8 @@ const CHARITY: Charity = {
   created_at: "2024-01-01T00:00:00Z",
 }
 
-const BASE_EVENT = {
-  id: "event-1",
+const BASE_FAVPOLL = {
+  id: "favpoll-1",
   occasion_type: null,
   opening_line: null,
   market: "en-GB",
@@ -85,8 +85,8 @@ const BASE_EVENT = {
   favpoll_charities: [{ charities: CHARITY }],
 }
 
-const CAUSE_EVENT: FavpollWithDetails = {
-  ...BASE_EVENT,
+const CAUSE_FAVPOLL: FavpollWithDetails = {
+  ...BASE_FAVPOLL,
   protagonist_id: null,
   subject: "cause",
   cause_label: "Protecting our seas",
@@ -94,8 +94,8 @@ const CAUSE_EVENT: FavpollWithDetails = {
   protagonists: null,
 }
 
-const PERSON_EVENT: FavpollWithDetails = {
-  ...BASE_EVENT,
+const PERSON_FAVPOLL: FavpollWithDetails = {
+  ...BASE_FAVPOLL,
   protagonist_id: "prot-1",
   subject: "someone",
   cause_label: null,
@@ -113,7 +113,7 @@ const PERSON_EVENT: FavpollWithDetails = {
 
 const POLL: FavpollPollWithItems = {
   id: "poll-1",
-  favpoll_id: "event-1",
+  favpoll_id: "favpoll-1",
   topic_id: "topic-1",
   personal_reveal: "Their ocean work is as vivid and varied as colour itself.",
   created_at: "2024-01-01T00:00:00Z",
@@ -152,9 +152,9 @@ function renderContent(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("FavpollContent — cause event", () => {
+describe("FavpollContent — cause favpoll", () => {
   it("renders CauseHero with cause_label and About from description", () => {
-    renderContent(CAUSE_EVENT)
+    renderContent(CAUSE_FAVPOLL)
 
     expect(screen.getByTestId("cause-hero")).toBeInTheDocument()
     expect(screen.getByTestId("cause-label").textContent).toBe(
@@ -163,11 +163,11 @@ describe("FavpollContent — cause event", () => {
     expect(screen.getByTestId("cause-about").textContent).toBe(
       "Together we can make a difference for ocean life."
     )
-    expect(screen.queryByTestId("event-hero")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("favpoll-hero")).not.toBeInTheDocument()
   })
 
   it("passes cause_label as protagonistName to PollSection", () => {
-    renderContent(CAUSE_EVENT)
+    renderContent(CAUSE_FAVPOLL)
 
     const pollSection = screen.getByTestId("poll-section")
     expect(pollSection.dataset.protagonistName).toBe("Protecting our seas")
@@ -175,27 +175,27 @@ describe("FavpollContent — cause event", () => {
 
   it("renders cleanly when description and reveal are empty", () => {
     renderContent({
-      ...CAUSE_EVENT,
+      ...CAUSE_FAVPOLL,
       description: null,
     })
 
     expect(screen.getByTestId("cause-hero")).toBeInTheDocument()
-    expect(screen.queryByTestId("event-hero")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("favpoll-hero")).not.toBeInTheDocument()
     expect(screen.getByTestId("poll-section")).toBeInTheDocument()
   })
 })
 
-describe("FavpollContent — person event", () => {
+describe("FavpollContent — person favpoll", () => {
   it("renders FavpollHero with protagonist name, not CauseHero", () => {
-    renderContent(PERSON_EVENT)
+    renderContent(PERSON_FAVPOLL)
 
-    expect(screen.getByTestId("event-hero")).toBeInTheDocument()
-    expect(screen.getByTestId("event-hero").textContent).toBe("Alice")
+    expect(screen.getByTestId("favpoll-hero")).toBeInTheDocument()
+    expect(screen.getByTestId("favpoll-hero").textContent).toBe("Alice")
     expect(screen.queryByTestId("cause-hero")).not.toBeInTheDocument()
   })
 
   it("passes protagonist name to PollSection", () => {
-    renderContent(PERSON_EVENT)
+    renderContent(PERSON_FAVPOLL)
 
     const pollSection = screen.getByTestId("poll-section")
     expect(pollSection.dataset.protagonistName).toBe("Alice")

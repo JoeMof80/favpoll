@@ -49,7 +49,7 @@ const BASE_INPUT = {
 function queueCanonicalPoll() {
   mock.queue({ id: "user-1" }) // users upsert
   mock.queue({ id: "protagonist-1" }) // protagonists insert
-  mock.queue({ id: "event-1" }) // favpolls insert
+  mock.queue({ id: "favpoll-1" }) // favpolls insert
   mock.queue(null) // favpoll_charities insert
   mock.queue({ id: "poll-1" }) // favpoll_polls insert
   mock.queue(null) // favpoll_poll_favourites insert
@@ -75,7 +75,7 @@ describe("createFavpoll — canonical topic", () => {
       },
     })
 
-    expect(result).toEqual({ favpollId: "event-1" })
+    expect(result).toEqual({ favpollId: "favpoll-1" })
     expect(
       mock.callsFor("favpolls").find((c) => c.method === "insert")
     ).toBeTruthy()
@@ -104,7 +104,7 @@ describe("createFavpoll — custom topic", () => {
   it("inserts topic with placeholders:{} and is_active:true, is_finite:false", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "new-topic-1" }) // topics insert
     mock.queue([{ id: "item-1" }, { id: "item-2" }]) // favourites insert
@@ -137,7 +137,7 @@ describe("createFavpoll — custom topic", () => {
   it("inserts favourites with source:organiser, is_canonical:false, review_status:pending_review", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "new-topic-1" }) // topics insert
     mock.queue([{ id: "item-1" }, { id: "item-2" }]) // favourites insert
@@ -174,10 +174,10 @@ describe("createFavpoll — custom topic", () => {
     ])
   })
 
-  it("wires the new topic and items to the event poll and poll_items", async () => {
+  it("wires the new topic and items to the favpoll poll and poll_items", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "new-topic-99" }) // topics insert
     mock.queue([{ id: "item-a" }, { id: "item-b" }]) // favourites insert
@@ -199,7 +199,7 @@ describe("createFavpoll — custom topic", () => {
       .callsFor("favpoll_polls")
       .find((c) => c.method === "insert")!
     expect(pollInsert.args[0]).toMatchObject({
-      favpoll_id: "event-1",
+      favpoll_id: "favpoll-1",
       topic_id: "new-topic-99",
     })
 
@@ -223,7 +223,7 @@ describe("createFavpoll — custom topic", () => {
   it("skips favourites insert when no items are provided", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "new-topic-1" }) // topics insert
     // No favourites insert
@@ -251,7 +251,7 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
   function queueWithAdditions() {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "poll-1" }) // favpoll_polls insert
     // canonical path: no customItemIds favpoll_poll_favourites insert
@@ -358,11 +358,11 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
   })
 })
 
-describe("createFavpoll — cause event (subject='cause')", () => {
-  it("skips protagonists insert and stores cause_label on the event", async () => {
+describe("createFavpoll — cause favpoll (subject='cause')", () => {
+  it("skips protagonists insert and stores cause_label on the favpoll", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     // No protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "poll-1" }) // favpoll_polls insert
     mock.queue(null) // favpoll_poll_favourites insert
@@ -382,25 +382,25 @@ describe("createFavpoll — cause event (subject='cause')", () => {
       },
     })
 
-    expect(result).toEqual({ favpollId: "event-1" })
+    expect(result).toEqual({ favpollId: "favpoll-1" })
 
     expect(
       mock.callsFor("protagonists").filter((c) => c.method === "insert")
     ).toHaveLength(0)
 
-    const eventInsert = mock
+    const favpollInsert = mock
       .callsFor("favpolls")
       .find((c) => c.method === "insert")!
-    expect(eventInsert.args[0]).toMatchObject({
+    expect(favpollInsert.args[0]).toMatchObject({
       protagonist_id: null,
       subject: "cause",
       cause_label: "Ocean conservation across the UK coastline",
     })
   })
 
-  it("persists cause reveal as personal_reveal on the event poll", async () => {
+  it("persists cause reveal as personal_reveal on the favpoll poll", async () => {
     mock.queue({ id: "user-1" }) // users upsert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "poll-1" }) // favpoll_polls insert
     mock.queue(null) // favpoll_poll_favourites insert
@@ -436,7 +436,7 @@ describe("createFavpoll — fundraiser for a person (subject='someone')", () => 
   it("creates protagonist row and stores subject='someone'", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "protagonist-1" }) // protagonists insert
-    mock.queue({ id: "event-1" }) // favpolls insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
     mock.queue({ id: "poll-1" }) // favpoll_polls insert
     mock.queue(null) // favpoll_poll_favourites insert
@@ -460,13 +460,13 @@ describe("createFavpoll — fundraiser for a person (subject='someone')", () => 
       mock.callsFor("protagonists").filter((c) => c.method === "insert")
     ).toHaveLength(1)
 
-    const eventInsert = mock
+    const favpollInsert = mock
       .callsFor("favpolls")
       .find((c) => c.method === "insert")!
-    expect(eventInsert.args[0]).toMatchObject({
+    expect(favpollInsert.args[0]).toMatchObject({
       subject: "someone",
       cause_label: null,
     })
-    expect(eventInsert.args[0].protagonist_id).toBe("protagonist-1")
+    expect(favpollInsert.args[0].protagonist_id).toBe("protagonist-1")
   })
 })

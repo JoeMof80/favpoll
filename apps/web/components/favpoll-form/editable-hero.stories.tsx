@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { EditableHero } from "./editable-hero"
-import { eventFormSchema, type FavpollFormValues } from "./schema"
+import { favpollFormSchema, type FavpollFormValues } from "./schema"
 
 function FormWrapper({
   defaultValues,
@@ -15,7 +15,7 @@ function FormWrapper({
   children: React.ReactNode
 }) {
   const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
-    resolver: zodResolver(eventFormSchema as never),
+    resolver: zodResolver(favpollFormSchema as never),
     defaultValues: {
       register: "celebrating_one",
       grouping: "individual",
@@ -46,7 +46,7 @@ export default meta
 
 type Story = StoryObj<typeof EditableHero>
 
-/** Person event with all fields filled */
+/** Person favpoll with all fields filled */
 export const PersonFilled: Story = {
   render: (args) => (
     <FormWrapper
@@ -66,7 +66,7 @@ export const PersonFilled: Story = {
   ),
 }
 
-/** Person event with nothing filled — shows placeholders */
+/** Person favpoll with nothing filled — shows placeholders */
 export const PersonEmpty: Story = {
   render: (args) => (
     <FormWrapper
@@ -77,7 +77,7 @@ export const PersonEmpty: Story = {
   ),
 }
 
-/** Cause event */
+/** Cause favpoll */
 export const CauseFavpoll: Story = {
   render: (args) => (
     <FormWrapper

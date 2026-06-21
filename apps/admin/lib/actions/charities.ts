@@ -127,11 +127,11 @@ export async function deactivateCharity(
 
   revalidatePath("/charities");
 
-  const eventCount = usages?.length ?? 0;
-  if (eventCount > 0) {
+  const favpollCount = usages?.length ?? 0;
+  if (favpollCount > 0) {
     return {
       error: null,
-      warning: `This charity is used in ${eventCount} event${eventCount === 1 ? "" : "s"}. It will no longer appear as an option for new events.`,
+      warning: `This charity is used in ${favpollCount} favpoll${favpollCount === 1 ? "" : "s"}. It will no longer appear as an option for new favpolls.`,
     };
   }
 

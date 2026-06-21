@@ -51,19 +51,19 @@ function buildPrompt(opts: {
         : charityName
           ? `\nCharity: ${charityName}.`
           : ""
-    instructions = `Write for a charity fundraiser event (${REGISTER_LABEL[register]}).
+    instructions = `Write for a charity fundraiser favpoll (${REGISTER_LABEL[register]}).
 - "about": 1–2 sentences about the spirit of gathering and giving; do NOT name any specific charity.
 - "reveal": 1 sentence that connects the charity's work to the poll topic. Ground it in the charity description${charityCtx ? " below" : ""}; do not invent statistics, specific numerical claims, or quotations.${charityCtx}`
   } else {
     const charityHint = charityName
-      ? `\nThis event raises funds for charity (do not name the charity).`
+      ? `\nThis favpoll raises funds for charity (do not name the charity).`
       : ""
-    instructions = `Write for a person-honoured event (${REGISTER_LABEL[register]}).
+    instructions = `Write for a person-honoured favpoll (${REGISTER_LABEL[register]}).
 - "about": 1–2 sentences evoking the warmth of coming together and giving in someone's honour; do NOT name any specific charity.${charityHint}
 - "reveal": 1 sentence that names the person's favourite from the poll options. You MUST use a real option from the list above — do not invent one.`
   }
 
-  return `You are writing short copy for a charitable polling event.
+  return `You are writing short copy for a charitable polling favpoll.
 ${topicContext}
 
 ${instructions}

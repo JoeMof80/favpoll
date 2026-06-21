@@ -89,7 +89,7 @@ describe("OrganizerCard", () => {
       render(<OrganizerCard favpoll={makeFavpoll({ is_listed: true })} />)
       expect(screen.getByText("Listed")).toBeInTheDocument()
       expect(
-        screen.getByText(/Appears on the live events page/)
+        screen.getByText(/Appears on the live favpolls page/)
       ).toBeInTheDocument()
     })
 

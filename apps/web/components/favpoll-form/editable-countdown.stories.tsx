@@ -18,7 +18,7 @@ export const Placeholder: Story = {
   args: {},
 }
 
-/** Edit mode — event still open */
+/** Edit mode — favpoll still open */
 export const LiveCountdown: Story = {
   args: {
     closesAt: FUTURE,
@@ -26,7 +26,7 @@ export const LiveCountdown: Story = {
   },
 }
 
-/** Edit mode — event already closed */
+/** Edit mode — favpoll already closed */
 export const Closed: Story = {
   args: {
     closesAt: PAST,

@@ -28,19 +28,19 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: "Create an event" },
+  args: { children: "Create a favpoll" },
 }
 
 export const Ghost: Story = {
-  args: { children: "See live events →", variant: "ghost" },
+  args: { children: "See live favpolls →", variant: "ghost" },
 }
 
 export const Outline: Story = {
-  args: { children: "Edit event", variant: "outline" },
+  args: { children: "Edit favpoll", variant: "outline" },
 }
 
 export const Destructive: Story = {
-  args: { children: "Delete event", variant: "destructive" },
+  args: { children: "Delete favpoll", variant: "destructive" },
 }
 
 export const Link: Story = {
@@ -52,7 +52,7 @@ export const Small: Story = {
 }
 
 export const Large: Story = {
-  args: { children: "Create an event", size: "lg" },
+  args: { children: "Create an favpoll", size: "lg" },
 }
 
 export const Disabled: Story = {

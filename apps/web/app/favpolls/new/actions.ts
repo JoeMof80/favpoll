@@ -261,7 +261,7 @@ export async function createFavpoll(
   const hardCloseAt = new Date(input.closesAt)
   hardCloseAt.setDate(hardCloseAt.getDate() + 90)
 
-  const { data: event, error: eventErr } = await supabase
+  const { data: favpoll, error: favpollErr } = await supabase
     .from("favpolls")
     .insert({
       protagonist_id: protagonistId,
@@ -283,27 +283,27 @@ export async function createFavpoll(
     .select("id")
     .single()
 
-  if (eventErr || !event)
-    throw new Error(`Failed to create favpoll: ${eventErr?.message}`)
+  if (favpollErr || !favpoll)
+    throw new Error(`Failed to create favpoll: ${favpollErr?.message}`)
 
   if (input.charityIds.length > 0) {
     await supabase.from("favpoll_charities").insert(
       input.charityIds.map((charityId, i) => ({
-        favpoll_id: event.id,
+        favpoll_id: favpoll.id,
         charity_id: charityId,
         display_order: i,
       }))
     )
   }
 
-  await createPollForFavpoll(supabase, event.id, userId, input.poll)
+  await createPollForFavpoll(supabase, favpoll.id, userId, input.poll)
 
   const { error: potErr } = await supabase.from("favpoll_pots").insert({
-    favpoll_id: event.id,
+    favpoll_id: favpoll.id,
     created_by: userId,
     total_deposited: input.potAmount ?? 0,
   })
   if (potErr) throw new Error(`Failed to create fund: ${potErr?.message}`)
 
-  return { favpollId: event.id }
+  return { favpollId: favpoll.id }
 }

@@ -137,7 +137,7 @@ export function OrganizerCard({ favpoll }: Props) {
           </p>
           <p className="text-xs text-muted-foreground">
             {listed
-              ? "Appears on the live events page."
+              ? "Appears on the live favpolls page."
               : "Only reachable by people you give the link to."}
           </p>
         </div>
