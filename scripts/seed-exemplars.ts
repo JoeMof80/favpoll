@@ -157,6 +157,75 @@ const EXEMPLARS = [
   },
 ];
 
+// ─────────────────────── Lookup tables ───────────────────────────────────────
+
+// Mirror of OCCASION_TYPE_PREFIXES in apps/web/lib/display.ts — duplication
+// risk: if display.ts changes these, update here too.
+const OPENING_LINE_PREFIXES: Record<string, string> = {
+  Memorial: "In memory of",
+  Tribute: "In honour of",
+  Birthday: "Happy birthday",
+  Retirement: "Celebrating the retirement of",
+  Wedding: "Congratulations to",
+  Engagement: "Congratulations to",
+  Anniversary: "Happy anniversary",
+  "Leaving do": "Farewell",
+  Graduation: "Congratulations to",
+  Christening: "Welcome",
+  Achievement: "Well done",
+  Recovery: "Wishing a speedy recovery to",
+  Award: "Congratulations to",
+  Promotion: "Congratulations to",
+  Fundraiser: "In support of",
+};
+
+// Hand-built register → DB occasion model mapping. Duplication risk: if
+// lib/registers.ts deriveRegister() changes, update this table too.
+function registerToOccasionModel(register: string): {
+  category: string | null;
+  grouping: string;
+  subject: string;
+  is_listed: boolean;
+} {
+  switch (register) {
+    case "remembering":
+      return {
+        category: "memorial",
+        grouping: "individual",
+        subject: "someone",
+        is_listed: false,
+      };
+    case "celebrating_one":
+      return {
+        category: "celebration",
+        grouping: "individual",
+        subject: "someone",
+        is_listed: true,
+      };
+    case "celebrating_many":
+      return {
+        category: "celebration",
+        grouping: "couple",
+        subject: "someone",
+        is_listed: true,
+      };
+    case "cause":
+      return {
+        category: "fundraiser",
+        grouping: "individual",
+        subject: "cause",
+        is_listed: true,
+      };
+    default: // neutral
+      return {
+        category: null,
+        grouping: "individual",
+        subject: "someone",
+        is_listed: true,
+      };
+  }
+}
+
 // ─────────────────────── Helpers ─────────────────────────────────────────────
 
 function daysAgo(n: number): string {
@@ -218,16 +287,34 @@ async function main() {
   let created = 0;
 
   for (const ex of EXEMPLARS) {
-    // Idempotency: skip if a favpoll with this protagonist name already exists
-    const { count: exists } = await supabase
-      .from("protagonists")
-      .select("id", { count: "exact", head: true })
-      .eq("name", ex.name)
-      .eq("created_by", SEED_USER_ID);
+    const isCause = ex.register === "cause";
+    const occasionModel = registerToOccasionModel(ex.register);
+    const openingLine = ex.occasionType
+      ? (OPENING_LINE_PREFIXES[ex.occasionType] ?? null)
+      : null;
 
-    if ((exists ?? 0) > 0) {
-      console.log(`  ↳ skip  ${ex.name} (already seeded)`);
-      continue;
+    // Idempotency: cause exemplars have no protagonist — check favpolls by
+    // cause_label; person exemplars check protagonists by name.
+    if (isCause) {
+      const { count: exists } = await supabase
+        .from("favpolls")
+        .select("id", { count: "exact", head: true })
+        .eq("cause_label", ex.name)
+        .eq("created_by", SEED_USER_ID);
+      if ((exists ?? 0) > 0) {
+        console.log(`  ↳ skip  ${ex.name} (already seeded)`);
+        continue;
+      }
+    } else {
+      const { count: exists } = await supabase
+        .from("protagonists")
+        .select("id", { count: "exact", head: true })
+        .eq("name", ex.name)
+        .eq("created_by", SEED_USER_ID);
+      if ((exists ?? 0) > 0) {
+        console.log(`  ↳ skip  ${ex.name} (already seeded)`);
+        continue;
+      }
     }
 
     const topic = topicByTitle.get(ex.topicTitle);
@@ -246,33 +333,43 @@ async function main() {
       continue;
     }
 
-    // 1. Protagonist
-    const { data: protagonist, error: protError } = await supabase
-      .from("protagonists")
-      .insert({
-        name: ex.name,
-        about: ex.about,
-        context: ex.context,
-        created_by: SEED_USER_ID,
-      })
-      .select("id")
-      .single();
+    // 1. Protagonist (skipped for cause favpolls — no individual honoured)
+    let protagonistId: string | null = null;
+    if (!isCause) {
+      const { data: protagonist, error: protError } = await supabase
+        .from("protagonists")
+        .insert({
+          name: ex.name,
+          about: ex.about,
+          context: ex.context,
+          created_by: SEED_USER_ID,
+        })
+        .select("id")
+        .single();
 
-    if (protError || !protagonist) {
-      console.error(
-        `  ✗  protagonist insert failed for ${ex.name}:`,
-        protError?.message,
-      );
-      continue;
+      if (protError || !protagonist) {
+        console.error(
+          `  ✗  protagonist insert failed for ${ex.name}:`,
+          protError?.message,
+        );
+        continue;
+      }
+      protagonistId = protagonist.id;
     }
 
     // 2. Favpoll (closed, exemplar)
     const { data: favpoll, error: favpollError } = await supabase
       .from("favpolls")
       .insert({
-        protagonist_id: protagonist.id,
+        protagonist_id: protagonistId,
+        cause_label: isCause ? ex.name : null,
+        description: isCause ? ex.about : null,
         occasion_type: ex.occasionType,
-        opening_line: null,
+        opening_line: openingLine,
+        category: occasionModel.category,
+        grouping: occasionModel.grouping,
+        subject: occasionModel.subject,
+        is_listed: occasionModel.is_listed,
         market: "en-GB",
         created_by: SEED_USER_ID,
         closes_at: closingDate(ex.closedDaysAgo),

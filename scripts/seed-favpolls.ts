@@ -73,6 +73,73 @@ const GUEST_ITEM_EVENT_FRACTION = 0.15; // share of infinite-topic favpolls that
 
 const FEE_RATE = 0.05; // 5% platform fee (brand fact)
 
+// Mirror of OCCASION_TYPE_PREFIXES in apps/web/lib/display.ts — duplication
+// risk: if display.ts changes these, update here too.
+const OPENING_LINE_PREFIXES: Record<string, string> = {
+  Memorial: "In memory of",
+  Tribute: "In honour of",
+  Birthday: "Happy birthday",
+  Retirement: "Celebrating the retirement of",
+  Wedding: "Congratulations to",
+  Engagement: "Congratulations to",
+  Anniversary: "Happy anniversary",
+  "Leaving do": "Farewell",
+  Graduation: "Congratulations to",
+  Christening: "Welcome",
+  Achievement: "Well done",
+  Recovery: "Wishing a speedy recovery to",
+  Award: "Congratulations to",
+  Promotion: "Congratulations to",
+  Fundraiser: "In support of",
+};
+
+// Hand-built register → DB occasion model mapping. Duplication risk: if
+// lib/registers.ts deriveRegister() changes, update this table too.
+function registerToOccasionModel(register: string): {
+  category: string | null;
+  grouping: string;
+  subject: string;
+  is_listed: boolean;
+} {
+  switch (register) {
+    case "remembering":
+      return {
+        category: "memorial",
+        grouping: "individual",
+        subject: "someone",
+        is_listed: false,
+      };
+    case "celebrating_one":
+      return {
+        category: "celebration",
+        grouping: "individual",
+        subject: "someone",
+        is_listed: true,
+      };
+    case "celebrating_many":
+      return {
+        category: "celebration",
+        grouping: "couple",
+        subject: "someone",
+        is_listed: true,
+      };
+    case "cause":
+      return {
+        category: "fundraiser",
+        grouping: "individual",
+        subject: "cause",
+        is_listed: true,
+      };
+    default: // neutral
+      return {
+        category: null,
+        grouping: "individual",
+        subject: "someone",
+        is_listed: true,
+      };
+  }
+}
+
 // A small pool of signed-in "users" so authed pledges and my-favpolls have data.
 const SEED_USERS = Array.from({ length: 8 }, (_, i) => ({
   id: `user_seed_${String(i + 1).padStart(3, "0")}`,
@@ -472,11 +539,20 @@ async function createOneFavpoll(
   }
 
   // 2) favpoll
+  const occasionModel = registerToOccasionModel(register);
+  const openingLine = occasionType
+    ? (OPENING_LINE_PREFIXES[occasionType] ?? null)
+    : null;
   const { data: favpoll, error: eErr } = await supabase
     .from("favpolls")
     .insert({
       protagonist_id: protagonist.id,
       occasion_type: occasionType,
+      opening_line: openingLine,
+      category: occasionModel.category,
+      grouping: occasionModel.grouping,
+      subject: occasionModel.subject,
+      is_listed: occasionModel.is_listed,
       market: "en-GB",
       created_by: SEED_USER_ID,
       closes_at: closesAt,
@@ -514,10 +590,7 @@ async function createOneFavpoll(
   );
 
   // 5) favpoll poll (one per favpoll; reveal from placeholder copy; no framing)
-  const reveal =
-    (occasionType && topic.placeholders?.[occasionType]?.reveal) ??
-    topic.placeholders?.["default"]?.reveal ??
-    null;
+  const reveal = topic.placeholders?.[register]?.reveal ?? null;
   const { data: poll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
