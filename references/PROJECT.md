@@ -387,9 +387,8 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /favpolls/new/details          -- Create favpoll form (EventFormV2); reached from wizard with pre-populated query params
 /favpolls/[id]                 -- Favpoll page — guest pledge view + edit mode toggle
 /favpolls/[id]/edit            -- Edit favpoll (EventFormV2)
-/favpolls/[id]/manage          -- Management panel (organiser only)
 /favpolls/[id]/display         -- Live display for projector screen
-/my-events                     -- Organiser's created favpolls (auth required)
+/my-events                     -- Organiser's favpoll management surface (auth required). OrganizerPageClient handles filter (All/Active/Closed) and sort (Closing soonest / Recently created / Highest raised) client-side. Each OrganizerCard shows: identity row + status badge (amber warning ≤7 days), total raised, poll topic row, shared fund row, Listed/Unlisted toggle, QR + share link block, charity footer + Live display button. Manage page (/favpolls/[id]/manage) was retired — this card is the single management surface. WARNING_THRESHOLD_DAYS = 7.
 /rankings                      -- Global all-time rankings
 /topics/[id]                   -- Individual topic rankings
 /pledges/withdraw              -- Guest pledge withdrawal via token
@@ -532,7 +531,11 @@ components/
 ├── event-card/
 │   ├── use-event-card-pledge.ts, event-card-results.tsx
 │   └── event-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
-├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + SectionLabel + EventCardCharityCarousel. Used on landing carousel and /my-events grid.
+├── event-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + SectionLabel + EventCardCharityCarousel. Used on landing carousel (EventSummaryCard).
+├── organizer-card/
+│   ├── index.tsx                 -- OrganizerCard: rich management card used on /my-events. Client component. Renders identity + status badge, total raised, poll row, shared fund row, Listed/Unlisted switch (calls setFavpollListed), QR code (qrcode.react QRCodeSVG), share link + copy button, footer with charity carousel + Live display ExternalLink button. Status badge turns amber when ≤7 days remaining (WARNING_THRESHOLD_DAYS). Closed cards render at opacity-70.
+│   ├── utils.ts                  -- OrganizerCardFavpoll type, StatusFilter, SortKey, WARNING_THRESHOLD_DAYS=7, isFavpollClosed(), daysRemaining(), filterAndSort() (pure functions, fully tested)
+│   └── __tests__/               -- organizer-card.test.tsx + utils.test.ts (37 tests total)
 ├── live-events-carousel.tsx
 ├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths) + default FavpollMark SVG
 ├── honour-charity-love-venn.tsx  -- Animated Venn SVG (three rotating rings); uses FavpollMarkGlyph at centroid
@@ -805,6 +808,8 @@ NEXT_PUBLIC_BASE_URL
 - **`preview-panel` is a coordinator.** The create/edit form preview panel (`event-form-v2/preview-panel.tsx`) is a ~90-line orchestrator that composes four focused sub-components: `EditableHero` (hero text + photo editing), `EditablePollArea` (poll topic, reveal toggle, reveal editing), `EditableCountdown` (countdown placeholder / live countdown wrapper), and the shared `CharityBanner`/`PledgeCard`. Sub-components read form state via `useFormContext<EventFormValues>()` — no prop-drilling of form values. Only truly external deps (topics array, isGenerating, callbacks) are props. Each sub-component is independently testable and storybookable.
 
 ---
+
+- **Manage page retired.** `/favpolls/[id]/manage` was deleted. The `OrganizerCard` on `/my-events` is now the single management surface — it carries everything the manage page showed (total raised, poll topic, shared fund, live display link, share link) plus Listed/Unlisted toggle and a QR code. The `LiveDisplaySection` component and `setFavpollListed` server action are both still live; `LiveDisplaySection` is no longer used (could be deleted in a future cleanup), but `setFavpollListed` is used by `OrganizerCard`. The middleware route protection for `/favpolls/:id/manage` was also removed; `/my-events` was added instead.
 
 - **Ubiquitous-language rename: `events` → `favpolls`.** favpoll is both the brand name and the top-level entity, so the `events` table, `topic_items` table, and every dependent column/trigger/RLS policy/route/type were renamed to match (`events`→`favpolls`, `topic_items`→`favourites`, `event_polls`→`favpoll_polls`, `event_poll_items`→`favpoll_poll_favourites`, `event_charities`→`favpoll_charities`, `event_pots`→`favpoll_pots`, `event_invites`→`favpoll_invites`, `event_category`/`event_grouping`/`event_subject`→`category`/`grouping`/`subject`). Pure rename — no behaviour change. All data was junk pre-rename, so the migration truncates everything and the live project was reseeded via `pnpm seed`. File/component names that predate the rename (`event-form-v2/`, `event-card.tsx`, `event-hero.tsx`, `cause-hero.tsx`, the `/my-events` route, the `close-events` cron folder name) were deliberately left as-is — they're file/job names, not the renamed domain concept. See `references/GLOSSARY.md` for the full updated vocabulary, including the new intentional divergence (`favpolls` table → "favpoll" in UI, replacing the old `topic`→"favpoll" divergence).
 

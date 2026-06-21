@@ -1,11 +1,15 @@
 import { auth } from "@clerk/nextjs/server"
-import { NewEventButton } from "@/components/new-event-button"
 import { redirect } from "next/navigation"
+import { NewEventButton } from "@/components/new-event-button"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventSummaryCard } from "@/components/event-summary-card"
-import type { Charity } from "@favpoll/types"
+import { OrganizerPageClient } from "./organizer-page-client"
+import type { OrganizerCardFavpoll } from "@/components/organizer-card/utils"
 
-export default async function EventsPage() {
+export const metadata = {
+  title: "Your favpolls — favpoll",
+}
+
+export default async function MyEventsPage() {
   const { userId } = await auth()
   if (!userId) redirect("/sign-in")
 
@@ -20,37 +24,72 @@ export default async function EventsPage() {
       closes_at,
       closed_at,
       occasion_type,
+      category,
+      grouping,
+      subject,
+      cause_label,
       total_raised,
+      is_listed,
+      created_at,
       protagonists!favpolls_protagonist_id_fkey ( name ),
-      favpoll_charities ( charities ( id, name, logo_url, registered_number ) ),
-      favpoll_polls ( topics ( title ) )
+      favpoll_charities ( charities ( id, name, logo_url, registered_number, description ) ),
+      favpoll_polls ( id, topics ( title ) ),
+      favpoll_pots ( total_deposited, total_allocated )
     `
     )
     .eq("created_by", userId)
     .order("created_at", { ascending: false })
 
+  type RawPot = { total_deposited: number; total_allocated: number }
   type RawEvent = {
     id: string
     opening_line: string
     closes_at: string
     closed_at: string | null
     occasion_type: string | null
+    category: string | null
+    grouping: string | null
+    subject: string
+    cause_label: string | null
     total_raised: number
-    protagonists: { name: string }
-    favpoll_charities: { charities: Charity }[]
-    favpoll_polls: { topics: { title: string } | null } | null
+    is_listed: boolean
+    created_at: string
+    protagonists: { name: string } | null
+    favpoll_charities: {
+      charities: {
+        id: string
+        name: string
+        logo_url: string | null
+        registered_number: string | null
+        description: string | null
+        created_at: string
+      }
+    }[]
+    favpoll_polls: { id: string; topics: { title: string } | null } | null
+    favpoll_pots: RawPot | null
   }
 
-  const normalised = ((events ?? []) as unknown as RawEvent[]).map((ev) => ({
+  const favpolls: OrganizerCardFavpoll[] = (
+    (events ?? []) as unknown as RawEvent[]
+  ).map((ev) => ({
     id: ev.id,
-    occasion_type: ev.occasion_type,
     opening_line: ev.opening_line,
     closes_at: ev.closes_at,
     closed_at: ev.closed_at,
+    occasion_type: ev.occasion_type,
+    category: ev.category,
+    grouping: ev.grouping,
+    subject: ev.subject,
+    cause_label: ev.cause_label,
     total_raised: ev.total_raised,
-    protagonist: { name: ev.protagonists.name },
+    is_listed: ev.is_listed ?? true,
+    created_at: ev.created_at,
+    protagonist: ev.protagonists ?? null,
     charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
-    poll: ev.favpoll_polls ? { topic: ev.favpoll_polls.topics } : null,
+    poll: ev.favpoll_polls
+      ? { id: ev.favpoll_polls.id, topic: ev.favpoll_polls.topics ?? null }
+      : null,
+    pot: ev.favpoll_pots ?? null,
   }))
 
   return (
@@ -60,17 +99,8 @@ export default async function EventsPage() {
         <NewEventButton size="lg">New favpoll</NewEventButton>
       </div>
 
-      {normalised.length > 0 ? (
-        <ul
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          role="list"
-        >
-          {normalised.map((ev) => (
-            <li key={ev.id} className="list-none">
-              <EventSummaryCard event={ev} className="h-full" />
-            </li>
-          ))}
-        </ul>
+      {favpolls.length > 0 ? (
+        <OrganizerPageClient favpolls={favpolls} />
       ) : (
         <div className="mt-16 text-center">
           <p className="text-sm text-muted-foreground">
