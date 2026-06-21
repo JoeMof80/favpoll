@@ -89,7 +89,11 @@ export const Birthday: Story = {
       poll: {
         id: "poll-2",
         topic_id: "topic-2",
-        topic: { title: "Ice cream", is_finite: true, favourites: ICE_CREAM_ITEMS },
+        topic: {
+          title: "Ice cream",
+          is_finite: true,
+          favourites: ICE_CREAM_ITEMS,
+        },
       },
     },
   },
