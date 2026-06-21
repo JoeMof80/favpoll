@@ -51,7 +51,7 @@ protagonist. Every element of the copy should be traceable back to it.
 ```
 Name:              [full name, or couple/group name]
 Age / life stage:  [e.g. "79, retired headmistress" or "22, just graduated"]
-Occasion:          [the event type]
+Occasion:          [the occasion type]
 Key detail:        [one specific, concrete fact about this person]
 Charity:           [name + one sentence explaining why this charity, not another]
 Topic:             [the poll topic]
@@ -109,7 +109,7 @@ Three valid structures. No two adjacent examples should use the same one.
 > David is finally retiring. Ask anyone who worked with him what kind of music
 > was always playing."
 
-**Occasion-forward** — grounds the about in the event before reaching the topic:
+**Occasion-forward** — grounds the about in the favpoll before reaching the topic:
 
 > "Sarah is turning 40 and has never made a neutral choice about anything. The
 > flat has one wall that's been repainted twice and still isn't right."

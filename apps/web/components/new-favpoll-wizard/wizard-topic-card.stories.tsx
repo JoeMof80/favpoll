@@ -14,7 +14,7 @@ const ITEMS: Favourite[] = [
     source: "seed",
     all_time_pledged: 0,
     all_time_count: 0,
-    event_count: 0,
+    favpoll_count: 0,
     total_pledge_count: 0,
   },
   {
@@ -28,7 +28,7 @@ const ITEMS: Favourite[] = [
     source: "seed",
     all_time_pledged: 0,
     all_time_count: 0,
-    event_count: 0,
+    favpoll_count: 0,
     total_pledge_count: 0,
   },
   {
@@ -42,7 +42,7 @@ const ITEMS: Favourite[] = [
     source: "seed",
     all_time_pledged: 0,
     all_time_count: 0,
-    event_count: 0,
+    favpoll_count: 0,
     total_pledge_count: 0,
   },
 ]

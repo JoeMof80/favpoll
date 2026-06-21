@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { EditablePollArea } from "./editable-poll-area"
-import { eventFormSchema, type FavpollFormValues } from "./schema"
+import { favpollFormSchema, type FavpollFormValues } from "./schema"
 import type { TopicWithMeta } from "@favpoll/types"
 
 const COLOUR_TOPIC: TopicWithMeta = {
@@ -40,7 +40,7 @@ function FormWrapper({
   children: React.ReactNode
 }) {
   const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
-    resolver: zodResolver(eventFormSchema as never),
+    resolver: zodResolver(favpollFormSchema as never),
     defaultValues: {
       register: "celebrating_one",
       grouping: "individual",

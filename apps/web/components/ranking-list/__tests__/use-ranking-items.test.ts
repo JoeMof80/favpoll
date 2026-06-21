@@ -54,7 +54,7 @@ function makeItem(id: string, pledged: number, count: number): Favourite {
     is_canonical: true,
     source: "seed",
     markets: ["en-GB"],
-    event_count: 0,
+    favpoll_count: 0,
     total_pledge_count: 0,
     created_at: "2024-01-01T00:00:00Z",
   }

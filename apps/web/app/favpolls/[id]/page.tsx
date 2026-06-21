@@ -21,7 +21,7 @@ export default async function FavpollPage({ params }: Props) {
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
       "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*))"
@@ -29,13 +29,13 @@ export default async function FavpollPage({ params }: Props) {
     .eq("id", id)
     .single()
 
-  if (!event) notFound()
+  if (!favpoll) notFound()
 
-  if (event.is_private && !userId) {
+  if (favpoll.is_private && !userId) {
     redirect(`/sign-in?redirect_url=/favpolls/${id}`)
   }
 
-  const isOrganiser = userId === event.created_by
+  const isOrganiser = userId === favpoll.created_by
 
   const { data: rawPoll } = await supabase
     .from("favpoll_polls")
@@ -155,8 +155,9 @@ export default async function FavpollPage({ params }: Props) {
     0
   )
 
-  const typedEvent = event as FavpollWithDetails
-  const isClosed = !!event.closed_at || new Date(event.closes_at) < new Date()
+  const typedFavpoll = favpoll as FavpollWithDetails
+  const isClosed =
+    !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
   // Hide poll with unvetted custom topic from non-organisers
   const visiblePoll =
@@ -172,7 +173,7 @@ export default async function FavpollPage({ params }: Props) {
         isClosed={isClosed}
       />
       <FavpollContent
-        favpoll={typedEvent}
+        favpoll={typedFavpoll}
         pollWithItems={visiblePoll}
         pot={pot ?? null}
         userPotAllocation={userPotAllocation}

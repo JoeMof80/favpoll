@@ -20,9 +20,9 @@ export default async function PlaceholdersPage() {
       <h1 className="text-2xl font-semibold mb-6">Placeholders</h1>
       <div className="mb-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         <strong>Dormant.</strong> Per-occasion placeholders are no longer used
-        by the New Event form — field prompts are now generated from the event
-        register. This data will be repurposed as exemplar event content in a
-        future release.
+        by the New Favpoll form — field prompts are now generated from the
+        favpoll register. This data will be repurposed as exemplar favpoll
+        content in a future release.
       </div>
       <p className="text-sm text-neutral-500 mb-6">
         Select a topic to view its stored placeholder text.

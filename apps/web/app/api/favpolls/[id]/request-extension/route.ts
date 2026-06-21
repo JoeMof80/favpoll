@@ -13,17 +13,17 @@ export async function POST(
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select("created_by, extension_count")
     .eq("id", id)
     .single()
 
-  if (!event)
+  if (!favpoll)
     return Response.json({ error: "Favpoll not found" }, { status: 404 })
-  if (event.created_by !== userId)
+  if (favpoll.created_by !== userId)
     return Response.json({ error: "Unauthorized" }, { status: 403 })
-  if ((event.extension_count ?? 0) < 2) {
+  if ((favpoll.extension_count ?? 0) < 2) {
     return Response.json(
       { error: "Extensions still available" },
       { status: 400 }

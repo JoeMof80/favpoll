@@ -40,14 +40,14 @@ function makePoll(sceneIndex: number): FavpollPollWithItems {
     is_canonical: true,
     source: "seed" as const,
     markets: ["en-GB"],
-    event_count: 1,
+    favpoll_count: 1,
     total_pledge_count: pledgeByLabel[opt.label]?.all_time_count ?? 0,
     created_at: "2024-01-01T00:00:00Z",
   }))
 
   return {
     id: pollId,
-    favpoll_id: "event-demo",
+    favpoll_id: "favpoll-demo",
     topic_id: topicId,
     personal_reveal: scene.poll.personal_reveal,
     created_at: "2024-01-01T00:00:00Z",
@@ -89,7 +89,7 @@ const meta = {
     protagonistName: SCENES[0].protagonist.name,
     poll: MEMORIAL_POLL,
     isOrganiser: false,
-    favpollId: "event-demo",
+    favpollId: "favpoll-demo",
   },
 } satisfies Meta<typeof PollSection>
 

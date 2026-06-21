@@ -167,7 +167,7 @@ beforeEach(() => {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("generate prompt — person event", () => {
+describe("generate prompt — person favpoll", () => {
   it("fields are empty on mount; shimmer shows during generation then all fields fill", async () => {
     let resolve!: (v: typeof MOCK_RESULT) => void
     mockSafeGenerateDraft.mockReturnValueOnce(
@@ -282,7 +282,7 @@ describe("generate prompt — person event", () => {
   })
 })
 
-describe("generate prompt — cause event", () => {
+describe("generate prompt — cause favpoll", () => {
   it("fills openingLine, about, and reveal for cause; does NOT set name or context", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(MOCK_CAUSE_RESULT)
 
@@ -318,7 +318,7 @@ describe("generate prompt — cause event", () => {
     expect(screen.getByTestId("reveal").textContent).toBe(
       MOCK_CAUSE_RESULT.reveal
     )
-    // Person-only fields must NOT be set for cause events
+    // Person-only fields must NOT be set for cause favpolls
     expect(screen.getByTestId("name").textContent).toBe("")
     expect(screen.getByTestId("context").textContent).toBe("")
   })
@@ -390,7 +390,7 @@ describe("generation skipped cases", () => {
     expect(screen.queryByTestId("shimmer")).not.toBeInTheDocument()
   })
 
-  it("cause event — generation failure leaves about/reveal empty but openingLine still set", async () => {
+  it("cause favpoll — generation failure leaves about/reveal empty but openingLine still set", async () => {
     mockSafeGenerateDraft.mockResolvedValueOnce(null)
 
     await act(async () => {

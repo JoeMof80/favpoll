@@ -50,7 +50,7 @@ export function FavpollSubheader({ favpollId, isOrganiser, isClosed }: Props) {
         <Button
           asChild
           size="icon"
-          aria-label="Edit event"
+          aria-label="Edit Favpoll"
           className="h-12 w-12 rounded-full shadow-lg"
         >
           <Link href={`/favpolls/${favpollId}/edit`}>

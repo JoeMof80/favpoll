@@ -47,7 +47,7 @@ export function HeroPitchColumn({ sceneIndex }: Props) {
           <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
         </Button>
         <Button variant="ghost" asChild>
-          <Link href="/favpolls">See live events →</Link>
+          <Link href="/favpolls">See live favpolls →</Link>
         </Button>
       </div>
     </div>

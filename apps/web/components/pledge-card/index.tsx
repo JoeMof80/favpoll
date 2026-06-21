@@ -218,7 +218,7 @@ function PreviewPledgeCard({
           type="button"
           className="h-11 w-full text-base"
           onClick={() =>
-            toast.warning("Publish your event to start receiving pledges.", {
+            toast.warning("Publish your favpoll to start receiving pledges.", {
               style: {
                 background: "#fffbeb",
                 color: "#f59e0b",

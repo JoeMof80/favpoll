@@ -48,7 +48,7 @@ function makeInput(
   }
 }
 
-function makeEventRow(overrides: Record<string, any> = {}) {
+function makeFavpollRow(overrides: Record<string, any> = {}) {
   return {
     created_by: "user-1",
     closes_at: "2025-01-01T00:00:00Z",
@@ -59,8 +59,8 @@ function makeEventRow(overrides: Record<string, any> = {}) {
 }
 
 /** Queue all responses for a minimal happy-path updateFavpoll (1 poll with id, 1 charity) */
-function queueHappyPath(eventRow = makeEventRow()) {
-  mock.queue(eventRow) // favpolls select → single
+function queueHappyPath(favpollRow = makeFavpollRow()) {
+  mock.queue(favpollRow) // favpolls select → single
   mock.queue(null) // protagonists update → await
   mock.queue(null) // favpolls update → await
   mock.queue(null) // favpoll_charities delete → await
@@ -81,23 +81,23 @@ describe("updateFavpoll — auth & ownership", () => {
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
     await expect(
-      updateFavpoll("event-1", "prot-1", makeInput())
+      updateFavpoll("favpoll-1", "prot-1", makeInput())
     ).rejects.toThrow("Not authenticated")
   })
 
-  it("throws 'Unauthorized' when event belongs to a different user", async () => {
-    mock.queue({ ...makeEventRow(), created_by: "other-user" })
+  it("throws 'Unauthorized' when favpoll belongs to a different user", async () => {
+    mock.queue({ ...makeFavpollRow(), created_by: "other-user" })
 
     await expect(
-      updateFavpoll("event-1", "prot-1", makeInput())
+      updateFavpoll("favpoll-1", "prot-1", makeInput())
     ).rejects.toThrow("Unauthorized")
   })
 
-  it("throws when event is not found", async () => {
-    mock.queue(null) // no event row
+  it("throws when favpoll is not found", async () => {
+    mock.queue(null) // no favpoll row
 
     await expect(
-      updateFavpoll("event-1", "prot-1", makeInput())
+      updateFavpoll("favpoll-1", "prot-1", makeInput())
     ).rejects.toThrow("Unauthorized")
   })
 })
@@ -108,14 +108,14 @@ describe("updateFavpoll — auth & ownership", () => {
 
 describe("updateFavpoll — extension validation", () => {
   it("throws when extension_count is already 2", async () => {
-    // closesAt is later than event.closes_at → isExtension = true
+    // closesAt is later than favpoll.closes_at → isExtension = true
     mock.queue(
-      makeEventRow({ extension_count: 2, closes_at: "2025-01-01T00:00:00Z" })
+      makeFavpollRow({ extension_count: 2, closes_at: "2025-01-01T00:00:00Z" })
     )
 
     await expect(
       updateFavpoll(
-        "event-1",
+        "favpoll-1",
         "prot-1",
         makeInput({ closesAt: "2028-01-01T00:00" })
       )
@@ -123,11 +123,11 @@ describe("updateFavpoll — extension validation", () => {
   })
 
   it("throws when new closing date is in the past", async () => {
-    mock.queue(makeEventRow({ closes_at: "2020-01-01T00:00:00Z" }))
+    mock.queue(makeFavpollRow({ closes_at: "2020-01-01T00:00:00Z" }))
 
     await expect(
       updateFavpoll(
-        "event-1",
+        "favpoll-1",
         "prot-1",
         makeInput({ closesAt: "2021-01-01T00:00" })
       )
@@ -136,7 +136,7 @@ describe("updateFavpoll — extension validation", () => {
 
   it("throws when new closing date exceeds hard_close_at", async () => {
     mock.queue(
-      makeEventRow({
+      makeFavpollRow({
         closes_at: "2025-01-01T00:00:00Z",
         hard_close_at: "2026-12-01T00:00:00Z",
       })
@@ -144,7 +144,7 @@ describe("updateFavpoll — extension validation", () => {
 
     await expect(
       updateFavpoll(
-        "event-1",
+        "favpoll-1",
         "prot-1",
         makeInput({ closesAt: "2027-06-01T00:00" })
       )
@@ -153,49 +153,49 @@ describe("updateFavpoll — extension validation", () => {
 
   it("does NOT throw when extension_count is 1 (one extension still allowed)", async () => {
     queueHappyPath(
-      makeEventRow({ extension_count: 1, closes_at: "2025-01-01T00:00:00Z" })
+      makeFavpollRow({ extension_count: 1, closes_at: "2025-01-01T00:00:00Z" })
     )
 
     await expect(
       updateFavpoll(
-        "event-1",
+        "favpoll-1",
         "prot-1",
         makeInput({ closesAt: "2028-01-01T00:00" })
       )
     ).resolves.not.toThrow()
   })
 
-  it("increments extension_count in the event update when extending", async () => {
+  it("increments extension_count in the favpoll update when extending", async () => {
     queueHappyPath(
-      makeEventRow({ extension_count: 1, closes_at: "2025-01-01T00:00:00Z" })
+      makeFavpollRow({ extension_count: 1, closes_at: "2025-01-01T00:00:00Z" })
     )
 
     await updateFavpoll(
-      "event-1",
+      "favpoll-1",
       "prot-1",
       makeInput({ closesAt: "2028-01-01T00:00" })
     )
 
-    const eventsUpdate = mock
+    const favpollsUpdate = mock
       .callsFor("favpolls")
       .find((c) => c.method === "update")!
-    expect(eventsUpdate.args[0].extension_count).toBe(2)
+    expect(favpollsUpdate.args[0].extension_count).toBe(2)
   })
 
   it("does NOT include extension_count in update when not extending", async () => {
     // closesAt same as closes_at → not an extension
-    queueHappyPath(makeEventRow({ closes_at: "2028-01-01T00:00:00Z" }))
+    queueHappyPath(makeFavpollRow({ closes_at: "2028-01-01T00:00:00Z" }))
 
     await updateFavpoll(
-      "event-1",
+      "favpoll-1",
       "prot-1",
       makeInput({ closesAt: "2028-01-01T00:00" }) // same date → no extension
     )
 
-    const eventsUpdate = mock
+    const favpollsUpdate = mock
       .callsFor("favpolls")
       .find((c) => c.method === "update")!
-    expect(eventsUpdate.args[0]).not.toHaveProperty("extension_count")
+    expect(favpollsUpdate.args[0]).not.toHaveProperty("extension_count")
   })
 })
 
@@ -208,7 +208,7 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "event-1",
+      "favpoll-1",
       "prot-1",
       makeInput({
         protagonistName: "  Bob  ",
@@ -231,7 +231,7 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "event-1",
+      "favpoll-1",
       "prot-1",
       makeInput({ charityIds: ["c-1", "c-2"] })
     )
@@ -257,14 +257,14 @@ describe("updateFavpoll — DB writes", () => {
 
   it("skips charity insert when charityIds is empty", async () => {
     // Re-queue without charity insert response
-    mock.queue(makeEventRow()) // favpolls select
+    mock.queue(makeFavpollRow()) // favpolls select
     mock.queue(null) // protagonists update
     mock.queue(null) // favpolls update
     mock.queue(null) // favpoll_charities delete
     // No charity insert since charityIds is empty
     mock.queue([]) // favpoll_polls select
 
-    await updateFavpoll("event-1", "prot-1", makeInput({ charityIds: [] }))
+    await updateFavpoll("favpoll-1", "prot-1", makeInput({ charityIds: [] }))
 
     const charityInserts = mock
       .callsFor("favpoll_charities")

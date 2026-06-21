@@ -163,7 +163,7 @@ const PHASES: { label: string; steps: Step[] }[] = [
         n: 1,
         title: "Name the person.",
         description:
-          "Create an event for someone special — a memorial, birthday, retirement, or any milestone worth celebrating.",
+          "Create a favpoll for someone special — a memorial, birthday, retirement, or any milestone worth celebrating.",
         preview: <Step1Preview />,
       },
       {
@@ -201,7 +201,7 @@ const PHASES: { label: string; steps: Step[] }[] = [
         n: 5,
         title: "The poll closes.",
         description:
-          "Once the event ends, the results are locked and the total raised is confirmed. No more pledges.",
+          "Once the favpoll ends, the results are locked and the total raised is confirmed. No more pledges.",
         preview: <Step5Preview />,
       },
       {

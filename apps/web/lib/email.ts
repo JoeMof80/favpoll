@@ -28,10 +28,10 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: supportEmail,
-    subject: `Extension request — event ${favpollId}`,
+    subject: `Extension request — favpoll ${favpollId}`,
     html: `
       <p><strong>Organiser:</strong> ${organizerName ?? "Unknown"} (${organizerEmail})</p>
-      <p><strong>Event:</strong> <a href="${favpollUrl}">${favpollUrl}</a></p>
+      <p><strong>Favpoll:</strong> <a href="${favpollUrl}">${favpollUrl}</a></p>
       <p><strong>Message:</strong></p>
       <p>${message.replace(/\n/g, "<br>")}</p>
     `,
@@ -85,7 +85,7 @@ export async function sendGuestItemAdded(params: GuestItemAddedParams) {
     subject: `New item added to your ${topicTitle} poll`,
     html: `
       <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${openingLine} for ${protagonistName}.</p>
-      <p><a href="${favpollUrl}">View your event</a></p>
+      <p><a href="${favpollUrl}">View your favpoll</a></p>
     `,
   })
 }

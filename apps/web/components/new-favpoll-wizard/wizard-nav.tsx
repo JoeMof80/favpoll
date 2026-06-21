@@ -30,7 +30,7 @@ export function WizardNav({
       )}
       {isLast ? (
         <Button size="lg" disabled={nextDisabled} onClick={onFinish}>
-          Set up my event
+          Set up my favpoll
         </Button>
       ) : (
         <Button size="lg" disabled={nextDisabled} onClick={onNext}>

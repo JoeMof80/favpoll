@@ -59,7 +59,7 @@ export function LiveFavpollsCarousel({ favpolls }: Props) {
           className="h-8 w-8 rounded-lg"
           onClick={() => emblaApi?.scrollPrev()}
           disabled={!canScrollPrev}
-          aria-label="Previous event"
+          aria-label="Previous favpoll"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -70,7 +70,7 @@ export function LiveFavpollsCarousel({ favpolls }: Props) {
           className="h-8 w-8 rounded-lg"
           onClick={() => emblaApi?.scrollNext()}
           disabled={!canScrollNext}
-          aria-label="Next event"
+          aria-label="Next favpoll"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

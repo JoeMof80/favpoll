@@ -16,7 +16,7 @@ Use them as anchors when generating new copy.
   pupil's name by the end of the first week. Often wore purple — naturally,
   not as a statement.
 - Charity: Marie Curie — their nurses visited Belinda at home in her final
-  weeks. Her daughter Rachel created the event.
+  weeks. Her daughter Rachel created the favpoll.
 - Topic: Colour (finite)
 - Their answer: Purple
 - Reveal note: Written in Belinda's voice — Rachel found a note written for
@@ -150,7 +150,7 @@ not a sentiment. Comic Relief is earned — he did the collection every year.
   funded a summer engineering programme — the thing that made him apply to
   university. Going into renewable energy.
 - Charity: The Prince's Trust — direct. The Trust helped make this graduation
-  possible. The event is created by his mum.
+  possible. The favpoll is created by his mum.
 - Topic: Film (infinite)
 - Their answer: Jurassic Park
 - Reveal note: Third person, specific to his story. The reveal should connect

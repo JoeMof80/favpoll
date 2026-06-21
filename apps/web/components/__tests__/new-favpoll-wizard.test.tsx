@@ -31,7 +31,7 @@ const MOCK_DATA = {
           markets: ["en-GB"],
           all_time_pledged: 0,
           all_time_count: 0,
-          event_count: 0,
+          favpoll_count: 0,
           total_pledge_count: 0,
           created_at: null,
         },
@@ -45,7 +45,7 @@ const MOCK_DATA = {
           markets: ["en-GB"],
           all_time_pledged: 0,
           all_time_count: 0,
-          event_count: 0,
+          favpoll_count: 0,
           total_pledge_count: 0,
           created_at: null,
         },
@@ -116,7 +116,7 @@ describe("NewFavpollWizard — step order is Honour → Charity → Love", () =>
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Full redirect (person event)
+// Full redirect (person favpoll)
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — redirect", () => {
@@ -137,14 +137,14 @@ describe("NewFavpollWizard — redirect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
 
-    fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
+    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
 
     expect(mockPush).toHaveBeenCalledWith(
       expect.stringContaining("/favpolls/new/details")
     )
   })
 
-  it("redirect URL contains subject=someone for a person event", () => {
+  it("redirect URL contains subject=someone for a person favpoll", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
@@ -156,7 +156,7 @@ describe("NewFavpollWizard — redirect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
-    fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
+    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
 
     const url: string = mockPush.mock.calls[0][0]
     expect(url).toContain("subject=someone")
@@ -188,7 +188,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("redirect URL contains encoded causeLabel for a cause event", () => {
+  it("redirect URL contains encoded causeLabel for a cause favpoll", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
@@ -209,7 +209,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
     // Step 3: Love
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
-    fireEvent.click(screen.getByRole("button", { name: "Set up my event" }))
+    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
 
     const url: string = mockPush.mock.calls[0][0]
     expect(url).toContain("causeLabel=Ocean+Trust")
@@ -250,7 +250,7 @@ describe("NewFavpollWizard — Love step copy by subject", () => {
     expect(screen.getAllByText(/suits your cause/i)[0]).toBeInTheDocument()
   })
 
-  it("does not show cause copy for a person event on the Love step", () => {
+  it("does not show cause copy for a person favpoll on the Love step", () => {
     reachLoveStep("person")
     expect(screen.queryByText(/suits your cause/i)).not.toBeInTheDocument()
   })

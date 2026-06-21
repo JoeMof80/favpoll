@@ -17,7 +17,7 @@
  *     pnpm tsx ../../scripts/seed-exemplars.ts
  *
  * SAFETY: refuses to run unless the target looks like staging, or you set
- * ALLOW_EVENT_SEED=1 explicitly.
+ * ALLOW_FAVPOLL_SEED=1 explicitly.
  *
  * IDEMPOTENT: owned by created_by = 'user_seed_exemplar'. Re-running is a
  * no-op if the target favpoll count is already met.
@@ -28,30 +28,30 @@
  * ---------------------------------------------------------------------------
  */
 
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
 
-const SEED_USER_ID = "user_seed_exemplar"
+const SEED_USER_ID = "user_seed_exemplar";
 
 // ─────────────────────── Safety guard ────────────────────────────────────────
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
-const STAGING_REF = "eotqyintgusvzidymumb"
-const isStaging = SUPABASE_URL.includes(STAGING_REF)
-const allowOverride = process.env.ALLOW_EVENT_SEED === "1"
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const STAGING_REF = "eotqyintgusvzidymumb";
+const isStaging = SUPABASE_URL.includes(STAGING_REF);
+const allowOverride = process.env.ALLOW_FAVPOLL_SEED === "1";
 
 if (!isStaging && !allowOverride) {
   console.error(
     `\n🚫  Refusing to seed exemplars.\n` +
       `    URL: ${SUPABASE_URL}\n` +
       `    Expected staging ref: ${STAGING_REF}\n` +
-      `    Set ALLOW_EVENT_SEED=1 to override.\n`
-  )
-  process.exit(1)
+      `    Set ALLOW_FAVPOLL_SEED=1 to override.\n`,
+  );
+  process.exit(1);
 }
 
 // ─────────────────────── Exemplar definitions ────────────────────────────────
@@ -155,19 +155,17 @@ const EXEMPLARS = [
     pledgeAmounts: [30, 20, 15, 15, 10, 5],
     closedDaysAgo: 60,
   },
-]
+];
 
 // ─────────────────────── Helpers ─────────────────────────────────────────────
 
 function daysAgo(n: number): string {
-  return new Date(Date.now() - n * 86400000).toISOString()
+  return new Date(Date.now() - n * 86400000).toISOString();
 }
 
 function closingDate(closedDaysAgo: number): string {
-  // closes_at was set before the event closed
-  return new Date(
-    Date.now() - (closedDaysAgo + 3) * 86400000
-  ).toISOString()
+  // closes_at was set before the favpoll closed
+  return new Date(Date.now() - (closedDaysAgo + 3) * 86400000).toISOString();
 }
 
 // ─────────────────────── Helpers ─────────────────────────────────────────────
@@ -177,34 +175,32 @@ async function ensureSeedUser() {
     .from("users")
     .select("id")
     .eq("id", SEED_USER_ID)
-    .maybeSingle()
-  if (existing) return
+    .maybeSingle();
+  if (existing) return;
   const { error } = await supabase.from("users").insert({
     id: SEED_USER_ID,
     email: "exemplar.organiser@example.test",
     display_name: "Exemplar Organiser",
-  })
-  if (error) console.error("  ✗ user insert:", error.message)
+  });
+  if (error) console.error("  ✗ user insert:", error.message);
 }
 
 // ─────────────────────── Main ─────────────────────────────────────────────────
 
 async function main() {
-  console.log("🌱  Seeding exemplar favpolls…")
+  console.log("🌱  Seeding exemplar favpolls…");
 
-  await ensureSeedUser()
+  await ensureSeedUser();
 
   // Check how many exemplars already exist
   const { count: existing } = await supabase
     .from("favpolls")
     .select("id", { count: "exact", head: true })
-    .eq("created_by", SEED_USER_ID)
+    .eq("created_by", SEED_USER_ID);
 
   if ((existing ?? 0) >= EXEMPLARS.length) {
-    console.log(
-      `✓  ${existing} exemplar(s) already exist — nothing to do.`
-    )
-    return
+    console.log(`✓  ${existing} exemplar(s) already exist — nothing to do.`);
+    return;
   }
 
   // Fetch topics and charities for ID lookup
@@ -214,16 +210,12 @@ async function main() {
       .select("id, title, is_finite, favourites ( id, label )")
       .eq("is_active", true),
     supabase.from("charities").select("id, name").eq("is_active", true),
-  ])
+  ]);
 
-  const topicByTitle = new Map(
-    (topics ?? []).map((t) => [t.title, t])
-  )
-  const charityByName = new Map(
-    (charities ?? []).map((c) => [c.name, c])
-  )
+  const topicByTitle = new Map((topics ?? []).map((t) => [t.title, t]));
+  const charityByName = new Map((charities ?? []).map((c) => [c.name, c]));
 
-  let created = 0
+  let created = 0;
 
   for (const ex of EXEMPLARS) {
     // Idempotency: skip if a favpoll with this protagonist name already exists
@@ -231,23 +223,27 @@ async function main() {
       .from("protagonists")
       .select("id", { count: "exact", head: true })
       .eq("name", ex.name)
-      .eq("created_by", SEED_USER_ID)
+      .eq("created_by", SEED_USER_ID);
 
     if ((exists ?? 0) > 0) {
-      console.log(`  ↳ skip  ${ex.name} (already seeded)`)
-      continue
+      console.log(`  ↳ skip  ${ex.name} (already seeded)`);
+      continue;
     }
 
-    const topic = topicByTitle.get(ex.topicTitle)
+    const topic = topicByTitle.get(ex.topicTitle);
     if (!topic) {
-      console.warn(`  ⚠  Topic not found: "${ex.topicTitle}" — skipping ${ex.name}`)
-      continue
+      console.warn(
+        `  ⚠  Topic not found: "${ex.topicTitle}" — skipping ${ex.name}`,
+      );
+      continue;
     }
 
-    const charity = charityByName.get(ex.charityName)
+    const charity = charityByName.get(ex.charityName);
     if (!charity) {
-      console.warn(`  ⚠  Charity not found: "${ex.charityName}" — skipping ${ex.name}`)
-      continue
+      console.warn(
+        `  ⚠  Charity not found: "${ex.charityName}" — skipping ${ex.name}`,
+      );
+      continue;
     }
 
     // 1. Protagonist
@@ -260,11 +256,14 @@ async function main() {
         created_by: SEED_USER_ID,
       })
       .select("id")
-      .single()
+      .single();
 
     if (protError || !protagonist) {
-      console.error(`  ✗  protagonist insert failed for ${ex.name}:`, protError?.message)
-      continue
+      console.error(
+        `  ✗  protagonist insert failed for ${ex.name}:`,
+        protError?.message,
+      );
+      continue;
     }
 
     // 2. Favpoll (closed, exemplar)
@@ -283,25 +282,28 @@ async function main() {
         total_raised: ex.pledgeAmounts.reduce((a, b) => a + b, 0),
       })
       .select("id")
-      .single()
+      .single();
 
     if (favpollError || !favpoll) {
-      console.error(`  ✗  favpoll insert failed for ${ex.name}:`, favpollError?.message)
-      continue
+      console.error(
+        `  ✗  favpoll insert failed for ${ex.name}:`,
+        favpollError?.message,
+      );
+      continue;
     }
 
     // 3. Favpoll charity
     await supabase.from("favpoll_charities").insert({
       favpoll_id: favpoll.id,
       charity_id: charity.id,
-    })
+    });
 
     // 4. Favpoll pot (mandatory — every favpoll must have one)
     await supabase.from("favpoll_pots").insert({
       favpoll_id: favpoll.id,
       amount: 0,
       currency: "gbp",
-    })
+    });
 
     // 5. Favpoll poll
     const { data: favpollPoll, error: pollError } = await supabase
@@ -312,44 +314,53 @@ async function main() {
         personal_reveal: ex.personal_reveal,
       })
       .select("id")
-      .single()
+      .single();
 
     if (pollError || !favpollPoll) {
-      console.error(`  ✗  favpoll_poll insert failed for ${ex.name}:`, pollError?.message)
-      continue
+      console.error(
+        `  ✗  favpoll_poll insert failed for ${ex.name}:`,
+        pollError?.message,
+      );
+      continue;
     }
 
     // 6. Favpoll poll favourites (for finite topics; infinite gets favpoll_poll_favourites)
-    const favourites = (topic as { favourites: { id: string; label: string }[] }).favourites ?? []
-    const isFinite = (topic as { is_finite: boolean }).is_finite
+    const favourites =
+      (topic as { favourites: { id: string; label: string }[] }).favourites ??
+      [];
+    const isFinite = (topic as { is_finite: boolean }).is_finite;
 
     if (isFinite && favourites.length > 0) {
       await supabase.from("favpoll_poll_favourites").insert(
         favourites.map((item) => ({
           favpoll_poll_id: favpollPoll.id,
           favourite_id: item.id,
-        }))
-      )
+        })),
+      );
     }
 
     // 7. Pledge allocations (simulated pledges to show results)
-    const pledgeAmounts = ex.pledgeAmounts
-    const itemsForAlloc = isFinite && favourites.length > 0
-      ? favourites
-      : favourites.slice(0, 5) // fallback for infinite
+    const pledgeAmounts = ex.pledgeAmounts;
+    const itemsForAlloc =
+      isFinite && favourites.length > 0 ? favourites : favourites.slice(0, 5); // fallback for infinite
 
     if (itemsForAlloc.length > 0) {
       // Distribute pledge amounts: first item gets the most, spread across items
-      const guestId = "user_seed_exemplar_guest"
+      const guestId = "user_seed_exemplar_guest";
 
       for (let i = 0; i < pledgeAmounts.length; i++) {
-        const amount = pledgeAmounts[i]
+        const amount = pledgeAmounts[i];
         // Assign to item in a top-heavy distribution (0,0,1,1,2,2,…)
         const itemIndex = Math.min(
-          Math.floor(i / Math.ceil(pledgeAmounts.length / Math.max(itemsForAlloc.length, 1))),
-          itemsForAlloc.length - 1
-        )
-        const item = itemsForAlloc[itemIndex]
+          Math.floor(
+            i /
+              Math.ceil(
+                pledgeAmounts.length / Math.max(itemsForAlloc.length, 1),
+              ),
+          ),
+          itemsForAlloc.length - 1,
+        );
+        const item = itemsForAlloc[itemIndex];
 
         const { data: pledge } = await supabase
           .from("pledges")
@@ -361,28 +372,28 @@ async function main() {
             status: "succeeded",
           })
           .select("id")
-          .single()
+          .single();
 
         if (pledge) {
           await supabase.from("pledge_allocations").insert({
             pledge_id: pledge.id,
             favourite_id: item.id,
             amount,
-          })
+          });
         }
       }
     }
 
     console.log(
-      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle})`
-    )
-    created++
+      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle})`,
+    );
+    created++;
   }
 
-  console.log(`\n✅  Done — ${created} exemplar(s) created.`)
+  console.log(`\n✅  Done — ${created} exemplar(s) created.`);
 }
 
 main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+  console.error(err);
+  process.exit(1);
+});

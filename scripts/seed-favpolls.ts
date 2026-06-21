@@ -17,7 +17,7 @@
  *     pnpm tsx ../../scripts/seed-favpolls.ts
  *
  * SAFETY: refuses to run unless the target looks like staging, or you set
- * ALLOW_EVENT_SEED=1 explicitly. Fake favpolls in production would be bad.
+ * ALLOW_FAVPOLL_SEED=1 explicitly. Fake favpolls in production would be bad.
  *
  * IDEMPOTENT / ADDITIVE: every row it creates is owned by SEED_USER_ID. On
  * each run it tops the favpoll count up to TARGET_FAVPOLLS — it never deletes.
@@ -62,25 +62,25 @@ const supabase = createClient(
 const SEED_USER_ID = "user_seed_scale";
 const TARGET_FAVPOLLS = 40; // "dozens"
 
-const CLOSED_FRACTION = 0.4; // share of events already closed
+const CLOSED_FRACTION = 0.4; // share of favpolls already closed
 const PRIVATE_FRACTION = 0.1; // share marked is_private
 const SHARED_FUND_FRACTION = 0.25; // share with a non-zero shared fund
 const AUTH_PLEDGE_FRACTION = 0.2; // share of pledges from signed-in users
 const WITHDRAWN_FRACTION = 0.0; // see CAVEATS — keep 0 to protect the record
-const GUEST_ITEM_EVENT_FRACTION = 0.15; // share of infinite-topic events that
+const GUEST_ITEM_EVENT_FRACTION = 0.15; // share of infinite-topic favpolls that
 //                                        get one guest-suggested item (feeds
 //                                        the admin contributions queue)
 
 const FEE_RATE = 0.05; // 5% platform fee (brand fact)
 
-// A small pool of signed-in "users" so authed pledges and my-events have data.
+// A small pool of signed-in "users" so authed pledges and my-favpolls have data.
 const SEED_USERS = Array.from({ length: 8 }, (_, i) => ({
   id: `user_seed_${String(i + 1).padStart(3, "0")}`,
   email: `seed.guest${i + 1}@example.test`,
   display_name: `Seed Guest ${i + 1}`,
 }));
 
-// Topics that recur more often, so their items accumulate across many events
+// Topics that recur more often, so their items accumulate across many favpolls
 // (this is what stresses the record, rankings, and the inclusion threshold).
 const POPULAR_TOPICS = new Set([
   "Colour",
@@ -95,9 +95,9 @@ const POPULAR_TOPICS = new Set([
   "Flower",
 ]);
 
-// Event type mix — weighted {register, occasionType} pairs.
-type EventType = { register: string; occasionType: string | null };
-const EVENT_TYPE_WEIGHTS: Array<{ et: EventType; weight: number }> = [
+// Favpoll type mix — weighted {register, occasionType} pairs.
+type FavpollType = { register: string; occasionType: string | null };
+const FAVPOLL_TYPE_WEIGHTS: Array<{ et: FavpollType; weight: number }> = [
   { et: { register: "remembering", occasionType: "Memorial" }, weight: 10 },
   { et: { register: "remembering", occasionType: "Tribute" }, weight: 4 },
   { et: { register: "celebrating_one", occasionType: "Birthday" }, weight: 12 },
@@ -137,14 +137,14 @@ const EVENT_TYPE_WEIGHTS: Array<{ et: EventType; weight: number }> = [
   { et: { register: "neutral", occasionType: null }, weight: 3 },
 ];
 
-function pickEventType(): EventType {
-  const total = EVENT_TYPE_WEIGHTS.reduce((s, e) => s + e.weight, 0);
+function pickFavpollType(): FavpollType {
+  const total = FAVPOLL_TYPE_WEIGHTS.reduce((s, e) => s + e.weight, 0);
   let r = Math.random() * total;
-  for (const { et, weight } of EVENT_TYPE_WEIGHTS) {
+  for (const { et, weight } of FAVPOLL_TYPE_WEIGHTS) {
     r -= weight;
     if (r <= 0) return et;
   }
-  return EVENT_TYPE_WEIGHTS[0].et;
+  return FAVPOLL_TYPE_WEIGHTS[0].et;
 }
 
 // Default poll closing period (days) by register / occasion_type.
@@ -252,7 +252,7 @@ function aboutFor(name: string, register: string): string {
 }
 
 // Extra candidate guest-suggested items for a few common infinite topics.
-// Used only when an event qualifies for a guest item; deduped against the
+// Used only when a favpoll qualifies for a guest item; deduped against the
 // existing canonical list before insert.
 const GUEST_ITEM_CANDIDATES: Record<string, string[]> = {
   Film: [
@@ -312,8 +312,8 @@ function weightedPickKey(weights: Record<string, number>): string {
   return Object.keys(weights)[0];
 }
 
-// Realistic, long-tailed pledge count per event: most modest, a few busy.
-function pledgeCountForEvent(): number {
+// Realistic, long-tailed pledge count per favpoll: most modest, a few busy.
+function pledgeCountForFavpoll(): number {
   const roll = Math.random();
   if (roll < 0.15) return randInt(0, 3); // sparse / nearly-empty polls
   if (roll < 0.75) return randInt(4, 30); // typical
@@ -412,9 +412,9 @@ async function createOneFavpoll(
   itemsByTopic: Map<string, Favourite[]>,
   charityIds: string[],
 ) {
-  const { register, occasionType } = pickEventType();
+  const { register, occasionType } = pickFavpollType();
 
-  // Pick a topic, weighting the popular core so items recur across events.
+  // Pick a topic, weighting the popular core so items recur across favpolls.
   const weightedTopics = topics.flatMap((t) =>
     Array(POPULAR_TOPICS.has(t.title) ? 4 : 1).fill(t),
   );
@@ -583,7 +583,7 @@ async function createOneFavpoll(
   }
 
   // 7) pledges + allocations
-  const pledgeCount = pledgeCountForEvent();
+  const pledgeCount = pledgeCountForFavpoll();
   const upperBound = closedAt ? new Date(closedAt).getTime() : Date.now();
   const lowerBound = new Date(createdAt).getTime();
 
@@ -671,10 +671,10 @@ async function createOneFavpoll(
 async function seedFavpolls() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const STAGING_REF = "eotqyintgusvzidymumb"; // from PROJECT.md
-  if (!url.includes(STAGING_REF) && process.env.ALLOW_EVENT_SEED !== "1") {
+  if (!url.includes(STAGING_REF) && process.env.ALLOW_FAVPOLL_SEED !== "1") {
     console.error(
       "Refusing to seed favpolls: target does not look like staging.\n" +
-        "Set ALLOW_EVENT_SEED=1 to override (do NOT do this against production).",
+        "Set ALLOW_FAVPOLL_SEED=1 to override (do NOT do this against production).",
     );
     process.exit(1);
   }

@@ -281,7 +281,7 @@ describe("createGuestPledge", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("addOrganizerItem", () => {
-  const favpollId = "event-1"
+  const favpollId = "favpoll-1"
   const label = "Red"
 
   it("throws 'Not authenticated' when userId is null", async () => {
@@ -411,7 +411,7 @@ describe("topUpFundAsGuest", () => {
   it("throws when no pot exists for the favpoll", async () => {
     mock.queue(null) // no pot returned (maybeSingle → null via single)
 
-    await expect(topUpFundAsGuest("event-1", 10)).rejects.toThrow(
+    await expect(topUpFundAsGuest("favpoll-1", 10)).rejects.toThrow(
       "No shared fund found for this favpoll"
     )
   })
@@ -420,7 +420,7 @@ describe("topUpFundAsGuest", () => {
     mock.queue({ id: "pot-1", total_deposited: 50 }) // pot select
     mock.queue(null) // pot update
 
-    await topUpFundAsGuest("event-1", 10)
+    await topUpFundAsGuest("favpoll-1", 10)
 
     const potUpdate = mock
       .callsFor("favpoll_pots")
@@ -432,7 +432,7 @@ describe("topUpFundAsGuest", () => {
     mock.queue({ id: "pot-1", total_deposited: 50 })
     mock.queue(null, { message: "update failed" })
 
-    await expect(topUpFundAsGuest("event-1", 10)).rejects.toThrow(
+    await expect(topUpFundAsGuest("favpoll-1", 10)).rejects.toThrow(
       "update failed"
     )
   })

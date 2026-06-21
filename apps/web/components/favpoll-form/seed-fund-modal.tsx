@@ -61,7 +61,7 @@ export function SeedFundModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: numeric,
-          metadata: { type: "pot_top_up", event_id: favpollId },
+          metadata: { type: "pot_top_up", favpoll_id: favpollId },
         }),
       })
       const data = (await res.json()) as {
@@ -221,7 +221,7 @@ export function SeedFundModal({
             </p>
             <p className="text-xs text-muted-foreground">
               {listingState
-                ? "Appears on the live events page."
+                ? "Appears on the live favpolls page."
                 : "Only reachable by people you give the link to."}
             </p>
           </div>

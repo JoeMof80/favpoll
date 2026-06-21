@@ -93,15 +93,15 @@ describe("suggestClosingDate", () => {
     expect(suggestClosingDate(null)).toBe("2025-06-15T23:59")
   })
 
-  it("closes n days before eventDate when event is far enough in future", () => {
-    // celebration = 14 days before event; event 2025-09-01 → close 2025-08-18
+  it("closes n days before favpollDate when favpoll is far enough in future", () => {
+    // celebration = 14 days before favpoll; favpoll 2025-09-01 → close 2025-08-18
     expect(suggestClosingDate("celebration", "2025-09-01")).toBe(
       "2025-08-18T23:59"
     )
   })
 
-  it("falls back to today + n days when eventDate - n is in the past", () => {
-    // celebration = 14 days; event tomorrow (2025-06-02) → target past → fallback
+  it("falls back to today + n days when favpollDate - n is in the past", () => {
+    // celebration = 14 days; favpoll tomorrow (2025-06-02) → target past → fallback
     expect(suggestClosingDate("celebration", "2025-06-02")).toBe(
       "2025-06-15T23:59"
     )

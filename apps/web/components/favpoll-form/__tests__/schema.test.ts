@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { eventFormSchema } from "@/components/favpoll-form/schema"
+import { favpollFormSchema } from "@/components/favpoll-form/schema"
 
 // Minimal valid input — only required fields
 const VALID_BASE = {
@@ -17,14 +17,14 @@ const VALID_BASE = {
   ],
 }
 
-describe("eventFormSchema — valid inputs", () => {
+describe("favpollFormSchema — valid inputs", () => {
   it("accepts a minimal valid input", () => {
-    const result = eventFormSchema.safeParse(VALID_BASE)
+    const result = favpollFormSchema.safeParse(VALID_BASE)
     expect(result.success).toBe(true)
   })
 
   it("accepts all optional fields populated", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       openingLine: "Celebrating",
       context: "Born 1990",
@@ -35,7 +35,7 @@ describe("eventFormSchema — valid inputs", () => {
   })
 
   it("accepts up to 3 charities", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       charities: ["c1", "c2", "c3"],
     })
@@ -44,15 +44,15 @@ describe("eventFormSchema — valid inputs", () => {
 
   it("accepts grouping values", () => {
     for (const grouping of ["individual", "couple", "group"] as const) {
-      const result = eventFormSchema.safeParse({ ...VALID_BASE, grouping })
+      const result = favpollFormSchema.safeParse({ ...VALID_BASE, grouping })
       expect(result.success).toBe(true)
     }
   })
 })
 
-describe("eventFormSchema — field length limits", () => {
+describe("favpollFormSchema — field length limits", () => {
   it("rejects name exceeding 40 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       name: "A".repeat(41),
     })
@@ -64,7 +64,7 @@ describe("eventFormSchema — field length limits", () => {
   })
 
   it("accepts name at exactly 40 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       name: "A".repeat(40),
     })
@@ -72,7 +72,7 @@ describe("eventFormSchema — field length limits", () => {
   })
 
   it("rejects context exceeding 40 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       context: "A".repeat(41),
     })
@@ -85,7 +85,7 @@ describe("eventFormSchema — field length limits", () => {
   })
 
   it("rejects openingLine exceeding 50 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       openingLine: "A".repeat(51),
     })
@@ -98,7 +98,7 @@ describe("eventFormSchema — field length limits", () => {
   })
 
   it("rejects about exceeding 300 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       about: "A".repeat(301),
     })
@@ -109,7 +109,7 @@ describe("eventFormSchema — field length limits", () => {
   })
 
   it("rejects reveal exceeding 280 characters", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       reveal: "A".repeat(281),
     })
@@ -120,23 +120,23 @@ describe("eventFormSchema — field length limits", () => {
   })
 })
 
-describe("eventFormSchema — required fields", () => {
+describe("favpollFormSchema — required fields", () => {
   it("accepts missing register (register is optional)", () => {
     const { register: _r, ...rest } = VALID_BASE as typeof VALID_BASE & {
       register?: string
     }
-    const result = eventFormSchema.safeParse(rest)
+    const result = favpollFormSchema.safeParse(rest)
     expect(result.success).toBe(true)
   })
 
   it("accepts missing category (category is optional)", () => {
     const { category: _c, ...rest } = VALID_BASE
-    const result = eventFormSchema.safeParse(rest)
+    const result = favpollFormSchema.safeParse(rest)
     expect(result.success).toBe(true)
   })
 
   it("rejects an invalid category value", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       category: "party",
     })
@@ -149,7 +149,7 @@ describe("eventFormSchema — required fields", () => {
   })
 
   it("rejects empty name", () => {
-    const result = eventFormSchema.safeParse({ ...VALID_BASE, name: "" })
+    const result = favpollFormSchema.safeParse({ ...VALID_BASE, name: "" })
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path[0] === "name")).toBe(true)
@@ -157,7 +157,7 @@ describe("eventFormSchema — required fields", () => {
   })
 
   it("rejects empty charities array", () => {
-    const result = eventFormSchema.safeParse({ ...VALID_BASE, charities: [] })
+    const result = favpollFormSchema.safeParse({ ...VALID_BASE, charities: [] })
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path[0] === "charities")).toBe(
@@ -167,7 +167,7 @@ describe("eventFormSchema — required fields", () => {
   })
 
   it("rejects more than 3 charities", () => {
-    const result = eventFormSchema.safeParse({
+    const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
       charities: ["c1", "c2", "c3", "c4"],
     })
@@ -180,7 +180,7 @@ describe("eventFormSchema — required fields", () => {
   })
 
   it("rejects empty topics array", () => {
-    const result = eventFormSchema.safeParse({ ...VALID_BASE, topics: [] })
+    const result = favpollFormSchema.safeParse({ ...VALID_BASE, topics: [] })
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path[0] === "topics")).toBe(true)

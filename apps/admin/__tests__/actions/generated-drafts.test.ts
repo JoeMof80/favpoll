@@ -84,7 +84,7 @@ describe("getGeneratedDrafts", () => {
     expect(data![0].status).toBe("curated");
   });
 
-  it("sets charity_name to null when charities is null (person event)", async () => {
+  it("sets charity_name to null when charities is null (person favpoll)", async () => {
     mock.queue([makeRawDraft({ charities: null, subject: "someone" })]);
 
     const { data } = await getGeneratedDrafts();

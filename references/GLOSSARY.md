@@ -230,7 +230,7 @@ favpoll closes automatically regardless of the organiser's chosen closing date.
 auto-close, `closed_at` is set, `total_raised` is recorded, and the charity
 disbursement is triggered.
 
-**Code:** `apps/web/app/api/cron/close-events/route.ts`; `favpolls.closed_at`
+**Code:** `apps/web/app/api/cron/close-favpolls/route.ts`; `favpolls.closed_at`
 **UI:** "Poll closes in…" countdown; "Poll closed on…" after closure
 **Not:** expiry, timeout, scheduled close
 

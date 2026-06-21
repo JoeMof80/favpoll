@@ -1,5 +1,7 @@
 # Component Tree
 
+> **⚠ Outdated snapshot** — this tree reflects the pre-ubiquitous-language-rename architecture (pre-Pass 2). Routes, component names, and file paths have changed significantly. See `references/PROJECT.md` §"Key Files" for the current structure. This document is retained as a historical reference.
+
 ## Legend
 
 ```

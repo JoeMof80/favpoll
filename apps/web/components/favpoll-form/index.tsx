@@ -11,7 +11,7 @@ import { updateFavpoll, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
-import { eventFormSchema, type FavpollFormValues } from "./schema"
+import { favpollFormSchema, type FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
 import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
@@ -82,7 +82,7 @@ export function FavpollForm({
   const pendingClosesAt = useRef<Date | null>(null)
 
   const form = useForm<FavpollFormValues, unknown, FavpollFormValues>({
-    resolver: zodResolver(eventFormSchema as never),
+    resolver: zodResolver(favpollFormSchema as never),
     defaultValues: {
       register: "",
       grouping: "individual",
@@ -175,7 +175,7 @@ export function FavpollForm({
         })
         setSeedFavpollId(newId)
       } else {
-        if (!favpollId) throw new Error("Missing event data")
+        if (!favpollId) throw new Error("Missing favpoll data")
         if (!isCause && !protagonistId)
           throw new Error("Missing protagonist data")
         const closesAt = editClosesAt ?? new Date().toISOString()

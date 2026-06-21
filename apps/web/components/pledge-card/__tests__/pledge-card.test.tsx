@@ -39,7 +39,7 @@ describe("PledgeCard prePublish", () => {
     render(<PledgeCard prePublish />)
     fireEvent.click(screen.getByRole("button", { name: /pledge favourites/i }))
     expect(toast.warning).toHaveBeenCalledWith(
-      "Publish your event to start receiving pledges.",
+      "Publish your favpoll to start receiving pledges.",
       expect.objectContaining({ style: expect.any(Object) })
     )
   })

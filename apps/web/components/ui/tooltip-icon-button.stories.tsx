@@ -34,7 +34,7 @@ export const ViewResults: Story = {
 export const Share: Story = {
   args: {
     icon: Share2,
-    label: "Share event",
+    label: "Share favpoll",
     side: "bottom",
   },
 }

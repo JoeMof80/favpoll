@@ -1,4 +1,4 @@
-/** Valid keys for topics.placeholders — the 5 event registers. */
+/** Valid keys for topics.placeholders — the 5 favpoll registers. */
 export const VALID_REGISTERS = [
   "remembering",
   "celebrating_one",

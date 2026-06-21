@@ -124,7 +124,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   try {
     const favpollData = pollData?.favpolls as any
     const protagonistName: string =
-      favpollData?.protagonists?.name ?? "this event"
+      favpollData?.protagonists?.name ?? "this favpoll"
     const closesAt: string = favpollData?.closes_at ?? ""
     const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
       (ec: any) => ec.charities.name
@@ -222,8 +222,8 @@ export async function addGuestItem(
           to: organizer.email,
           itemLabel: trimmed,
           topicTitle: topicData?.title ?? "poll",
-          openingLine: favpollData?.occasion_type ?? "event",
-          protagonistName: favpollData?.protagonists?.name ?? "your event",
+          openingLine: favpollData?.occasion_type ?? "favpoll",
+          protagonistName: favpollData?.protagonists?.name ?? "your favpoll",
           favpollId: pollData?.favpoll_id ?? "",
         })
       } else {
@@ -249,12 +249,12 @@ export async function addOrganizerItem(favpollId: string, label: string) {
   if (!trimmed) throw new Error("Label is required")
 
   // Verify ownership
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select("created_by")
     .eq("id", favpollId)
     .single()
-  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   // Fetch poll + topic, verify infinite
   const { data: poll } = await supabase
@@ -434,13 +434,13 @@ export async function setFavpollListed(favpollId: string, isListed: boolean) {
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase
+  const { data: favpoll } = await supabase
     .from("favpolls")
     .select("created_by")
     .eq("id", favpollId)
     .single()
 
-  if (!event || event.created_by !== userId) throw new Error("Unauthorized")
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   const { error } = await supabase
     .from("favpolls")

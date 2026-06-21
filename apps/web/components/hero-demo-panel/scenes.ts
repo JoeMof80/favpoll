@@ -13,7 +13,7 @@ export type Phase =
 /**
  * Supabase-aligned demo scene.
  *
- * Data fields mirror the actual DB shape used by EventCard / FavpollCard:
+ * Data fields mirror the actual DB shape used by FavpollCard:
  *   - protagonist → protagonists row
  *   - poll        → favpoll_polls row + topics + favourites
  *   - charities   → charities rows via favpoll_charities

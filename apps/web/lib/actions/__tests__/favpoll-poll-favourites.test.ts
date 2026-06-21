@@ -21,15 +21,15 @@ import {
 } from "@/lib/actions/favpoll-poll-favourites"
 
 const ITEM_ID = "epi-1"
-const EVENT_ID = "event-1"
+const FAVPOLL_ID = "favpoll-1"
 const ORGANISER_ID = "user-1"
 const OTHER_USER_ID = "user-2"
 
 const organiserLookup = {
   favpoll_poll_id: "poll-1",
   favpoll_polls: {
-    favpoll_id: EVENT_ID,
-    favpolls: { id: EVENT_ID, created_by: ORGANISER_ID },
+    favpoll_id: FAVPOLL_ID,
+    favpolls: { id: FAVPOLL_ID, created_by: ORGANISER_ID },
   },
 }
 
@@ -64,7 +64,7 @@ describe("hideFavpollPollFavourite", () => {
       ...organiserLookup,
       favpoll_polls: {
         ...organiserLookup.favpoll_polls,
-        favpolls: { id: EVENT_ID, created_by: ORGANISER_ID },
+        favpolls: { id: FAVPOLL_ID, created_by: ORGANISER_ID },
       },
     })
     await expect(hideFavpollPollFavourite(ITEM_ID)).rejects.toThrow(
@@ -94,7 +94,7 @@ describe("hideFavpollPollFavourite", () => {
 
     await hideFavpollPollFavourite(ITEM_ID)
 
-    expect(mockRevalidatePath).toHaveBeenCalledWith(`/favpolls/${EVENT_ID}`)
+    expect(mockRevalidatePath).toHaveBeenCalledWith(`/favpolls/${FAVPOLL_ID}`)
   })
 
   it("throws when update fails", async () => {
@@ -125,7 +125,7 @@ describe("showFavpollPollFavourite", () => {
       ...organiserLookup,
       favpoll_polls: {
         ...organiserLookup.favpoll_polls,
-        favpolls: { id: EVENT_ID, created_by: ORGANISER_ID },
+        favpolls: { id: FAVPOLL_ID, created_by: ORGANISER_ID },
       },
     })
     await expect(showFavpollPollFavourite(ITEM_ID)).rejects.toThrow(
@@ -155,6 +155,6 @@ describe("showFavpollPollFavourite", () => {
 
     await showFavpollPollFavourite(ITEM_ID)
 
-    expect(mockRevalidatePath).toHaveBeenCalledWith(`/favpolls/${EVENT_ID}`)
+    expect(mockRevalidatePath).toHaveBeenCalledWith(`/favpolls/${FAVPOLL_ID}`)
   })
 })

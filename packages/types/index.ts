@@ -39,7 +39,7 @@ export type Favourite = {
   reviewed_at?: string | null;
   reviewed_by?: string | null;
   markets: string[];
-  event_count: number;
+  favpoll_count: number;
   total_pledge_count: number;
   created_at: string;
   display_order?: number | null;
