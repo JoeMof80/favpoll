@@ -42,7 +42,8 @@ export async function getPendingContributions(): Promise<{
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? "",
     favpoll_id: item.topics?.favpoll_polls?.[0]?.favpolls?.id ?? "",
-    favpoll_title: item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
+    favpoll_title:
+      item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
     protagonist_name:
       item.topics?.favpoll_polls?.[0]?.favpolls?.protagonists?.name ?? "",
     review_status: item.review_status,
@@ -79,7 +80,8 @@ export async function getReviewedContributions(): Promise<{
     topic_id: item.topic_id,
     topic_title: item.topics?.title ?? "",
     favpoll_id: item.topics?.favpoll_polls?.[0]?.favpolls?.id ?? "",
-    favpoll_title: item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
+    favpoll_title:
+      item.topics?.favpoll_polls?.[0]?.favpolls?.opening_line ?? "",
     protagonist_name:
       item.topics?.favpoll_polls?.[0]?.favpolls?.protagonists?.name ?? "",
     review_status: item.review_status,

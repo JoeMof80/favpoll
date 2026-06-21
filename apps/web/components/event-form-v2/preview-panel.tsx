@@ -3,7 +3,7 @@
 import { useWatch, useFormContext } from "react-hook-form"
 import { deriveRegister } from "@/lib/registers"
 import { CharityBanner } from "@/components/charity-banner"
-import { PledgeCard } from "@/components/pledge-card"
+import { Button } from "@/components/ui/button"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
@@ -87,12 +87,19 @@ export function PreviewPanel({
           />
           <CharityBanner charities={displayCharities} totalRaised={0} />
           <div className="pointer-events-none opacity-40">
-            <PledgeCard
-              prePublish
-              pledgeAmount=""
-              onPledgeAmountChange={() => {}}
-              charityNames={selectedCharities.map((c) => c.name)}
-            />
+            <div className="rounded-lg border border-border bg-background px-5 py-4">
+              <p className="mt-1 text-sm text-muted-foreground">
+                <b>£0.00</b> available for guests who need help to pledge.
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="mt-3 flex w-full"
+              >
+                Add to the shared fund
+              </Button>
+            </div>
           </div>
         </div>
       </div>

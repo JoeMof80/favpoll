@@ -152,23 +152,21 @@ export function EditablePollArea({
   return (
     <>
       <div className="space-y-4">
-        <div className="sticky top-40 z-20 md:top-55">
-          <div className="space-y-3 py-1">
+        <div className="space-y-3 py-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <SectionLabel title={topicTitle} />
+            </div>
             <div className="flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <SectionLabel title={topicTitle} />
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {showReveal ? "Post-reveal" : "Pre-reveal"}
-                </span>
-                <Switch
-                  checked={showReveal}
-                  onCheckedChange={(v) => {
-                    if (v !== showReveal) onToggleReveal()
-                  }}
-                />
-              </div>
+              <span className="text-xs text-muted-foreground">
+                {showReveal ? "Post-reveal" : "Pre-reveal"}
+              </span>
+              <Switch
+                checked={showReveal}
+                onCheckedChange={(v) => {
+                  if (v !== showReveal) onToggleReveal()
+                }}
+              />
             </div>
           </div>
         </div>
@@ -207,7 +205,7 @@ export function EditablePollArea({
 
         {revealValue ? (
           <>
-            <div className="sticky top-40 z-20 flex items-center justify-end md:top-55">
+            <div className="flex items-center justify-end">
               <Tabs
                 value={rankingView}
                 onValueChange={(v: string) =>

@@ -17,6 +17,7 @@ ALTER TABLE table_name ADD COLUMN IF NOT EXISTS column_name TYPE DEFAULT value;
 ## Common migrations in this project
 
 These have already been applied — do not re-suggest them:
+
 - `event_poll_items.is_hidden BOOLEAN DEFAULT FALSE`
 - `persons.date_label TEXT DEFAULT NULL`
 - `events.occasion_label TEXT DEFAULT NULL`

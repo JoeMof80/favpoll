@@ -22,7 +22,6 @@ export function EventHero({
       protagonist={protagonist}
       hideAvatar={hideAvatar}
       aboutPlaceholder={aboutPlaceholder}
-      isEdit={false}
     />
   )
 }

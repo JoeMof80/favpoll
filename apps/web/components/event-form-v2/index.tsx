@@ -12,7 +12,6 @@ import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import { eventFormSchema, type EventFormValues } from "./schema"
-import { PreviewPanel } from "./preview-panel"
 import { CommandPanel } from "./command-panel"
 import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
@@ -28,7 +27,7 @@ import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
 import { CharityBanner } from "../charity-banner"
-import { PledgeCard } from "../pledge-card"
+import { Button } from "@/components/ui/button"
 
 const PLACEHOLDER_CHARITIES: Charity[] = [
   { id: "ch-1", name: "Chosen charity", is_active: true },
@@ -566,12 +565,19 @@ function FormInner({
               />
               <CharityBanner charities={displayCharities} totalRaised={0} />
               <div className="pointer-events-none opacity-40">
-                <PledgeCard
-                  prePublish
-                  pledgeAmount=""
-                  onPledgeAmountChange={() => {}}
-                  charityNames={selectedCharities.map((c) => c.name)}
-                />
+                <div className="rounded-lg border border-border bg-background px-5 py-4">
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    <b>£0.00</b> available for guests who need help to pledge.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 flex w-full"
+                  >
+                    Add to the shared fund
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
