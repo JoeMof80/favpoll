@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import {
   ordinal,
-  formatEventDate,
+  formatFavpollDate,
   getFavpollHeadline,
   charityNames,
   formatAmount,
@@ -32,36 +32,36 @@ describe("ordinal", () => {
   })
 })
 
-describe("formatEventDate", () => {
+describe("formatFavpollDate", () => {
   it("formats a date string to ordinal day month year", () => {
     // T12:00:00 is appended internally — won't cross day boundaries in any timezone
-    expect(formatEventDate("2025-06-15")).toBe("15th June 2025")
+    expect(formatFavpollDate("2025-06-15")).toBe("15th June 2025")
   })
 
   it("handles 1st of a month", () => {
-    expect(formatEventDate("2025-03-01")).toBe("1st March 2025")
+    expect(formatFavpollDate("2025-03-01")).toBe("1st March 2025")
   })
 
   it("handles 2nd of a month", () => {
-    expect(formatEventDate("2025-03-02")).toBe("2nd March 2025")
+    expect(formatFavpollDate("2025-03-02")).toBe("2nd March 2025")
   })
 
   it("handles 3rd of a month", () => {
-    expect(formatEventDate("2025-03-03")).toBe("3rd March 2025")
+    expect(formatFavpollDate("2025-03-03")).toBe("3rd March 2025")
   })
 
   it("handles 11th — th not st", () => {
-    expect(formatEventDate("2025-01-11")).toBe("11th January 2025")
+    expect(formatFavpollDate("2025-01-11")).toBe("11th January 2025")
   })
 
   it("handles 21st", () => {
-    expect(formatEventDate("2025-01-21")).toBe("21st January 2025")
+    expect(formatFavpollDate("2025-01-21")).toBe("21st January 2025")
   })
 
   it("accepts a Date object", () => {
     // noon UTC avoids any timezone day-shift
     const date = new Date("2024-12-25T12:00:00Z")
-    const result = formatEventDate(date)
+    const result = formatFavpollDate(date)
     expect(result).toMatch(/25th December 2024/)
   })
 })
@@ -228,13 +228,13 @@ describe("ordinal — locale parameter", () => {
   })
 })
 
-describe("formatEventDate — locale parameter", () => {
+describe("formatFavpollDate — locale parameter", () => {
   it("defaults to en-GB output", () => {
-    expect(formatEventDate("2025-06-15")).toBe("15th June 2025")
+    expect(formatFavpollDate("2025-06-15")).toBe("15th June 2025")
   })
 
   it("accepts an explicit locale matching en-GB output", () => {
-    expect(formatEventDate("2025-06-15", "en-GB")).toBe("15th June 2025")
+    expect(formatFavpollDate("2025-06-15", "en-GB")).toBe("15th June 2025")
   })
 })
 

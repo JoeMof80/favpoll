@@ -8,7 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
-import { NewEventButton } from "@/components/new-event-button"
+import { NewFavpollButton } from "@/components/new-favpoll-button"
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -54,9 +54,9 @@ export function Header() {
             </Button>
             <Show when="signed-in">
               <Button asChild variant="ghost" className="text-muted-foreground">
-                <Link href="/my-events">Your favpolls</Link>
+                <Link href="/my-favpolls">Your favpolls</Link>
               </Button>
-              <NewEventButton>New favpoll</NewEventButton>
+              <NewFavpollButton>New favpoll</NewFavpollButton>
             </Show>
             <Show when="signed-out">
               <SignInButton>
@@ -108,7 +108,7 @@ export function Header() {
             </Link>
             <Show when="signed-in">
               <Link
-                href="/my-events"
+                href="/my-favpolls"
                 className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                 onClick={close}
               >
@@ -131,9 +131,9 @@ export function Header() {
             </Show>
             <Show when="signed-in">
               <div className="pt-3">
-                <NewEventButton className="w-full" onBeforeOpen={close}>
+                <NewFavpollButton className="w-full" onBeforeOpen={close}>
                   New favpoll
-                </NewEventButton>
+                </NewFavpollButton>
               </div>
             </Show>
           </nav>

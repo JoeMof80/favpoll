@@ -1,8 +1,8 @@
-import { getClosedEvents } from "@/lib/actions/exemplars";
+import { getClosedFavpolls } from "@/lib/actions/exemplars";
 import { ExemplarTable } from "@/components/exemplar-table";
 
 export default async function FavpollsPage() {
-  const { data: events, error } = await getClosedEvents();
+  const { data: events, error } = await getClosedFavpolls();
 
   return (
     <div>

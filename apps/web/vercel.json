@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/close-events",
+      "path": "/api/cron/close-favpolls",
       "schedule": "0 * * * *"
     }
   ]

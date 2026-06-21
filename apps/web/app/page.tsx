@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { HeroDemoPanel } from "@/components/hero-demo-panel"
-import { LiveEventsCarousel } from "@/components/live-events-carousel"
+import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -109,7 +109,7 @@ export default async function HomePage() {
           </div>
 
           {normalised.length > 0 ? (
-            <LiveEventsCarousel events={normalised} />
+            <LiveFavpollsCarousel events={normalised} />
           ) : (
             <div className="py-16 text-center">
               <p className="mb-2 text-[15px] font-medium text-foreground">

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { EDIT_BTN, EditBadge } from "./event-form-v2/edit-helpers"
+import { EDIT_BTN, EditBadge } from "./favpoll-form/edit-helpers"
 
 export function EditableField({
   children,
