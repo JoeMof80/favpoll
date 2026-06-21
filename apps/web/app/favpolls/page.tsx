@@ -1,10 +1,10 @@
 import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { EventCard } from "@/components/event-card"
-import { EventCardEmpty } from "@/components/event-card-empty"
+import { FavpollListCard } from "@/components/favpoll-list-card"
+import { FavpollListCardEmpty } from "@/components/favpoll-list-card-empty"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import type { CardResultItem } from "@/components/event-card/use-event-card-pledge"
+import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { cn } from "@/lib/utils"
 import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
 
@@ -308,7 +308,7 @@ export default async function FavpollsPage({
         )}
 
         {displayFavpolls.length === 0 ? (
-          <EventCardEmpty />
+          <FavpollListCardEmpty />
         ) : (
           <ul
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
@@ -348,7 +348,7 @@ export default async function FavpollsPage({
                 ? pledgedResultsByPollId.get(poll.id)
                 : undefined
               return (
-                <EventCard
+                <FavpollListCard
                   key={fp.id}
                   event={{ ...fp, poll }}
                   clerkUserId={userId}

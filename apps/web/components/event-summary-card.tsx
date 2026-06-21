@@ -4,7 +4,7 @@ import { ClosingLabel } from "@/components/closing-label"
 import { cn } from "@/lib/utils"
 import type { Charity } from "@favpoll/types"
 import Link from "next/link"
-import { EventCardCharityCarousel } from "./event-card/event-card-charity-carousel"
+import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import { SectionLabel } from "./favpoll-card/section-label"
 
@@ -69,7 +69,7 @@ export function EventSummaryCard({ event, className }: Props) {
       {/* Charity */}
       {event.charities.length > 0 && (
         <div className="border-t border-border px-3 py-2">
-          <EventCardCharityCarousel
+          <FavpollListCardCharityCarousel
             charities={event.charities}
             perCharity={perCharity}
             size="sm"

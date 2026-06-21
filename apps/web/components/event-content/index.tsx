@@ -18,7 +18,7 @@ import type {
   PotAllocation,
 } from "@favpoll/types"
 import { useEventContent } from "./use-event-content"
-import { EventCardCharityCarousel } from "../event-card/event-card-charity-carousel"
+import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
 import { PageLayout } from "../page-layout"
 import { Gift } from "lucide-react"
 
@@ -203,7 +203,7 @@ export function EventContent({
             paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
           }}
         >
-          <EventCardCharityCarousel
+          <FavpollListCardCharityCarousel
             charities={event.favpoll_charities.map((ec) => ({
               charity: ec.charities,
             }))}
