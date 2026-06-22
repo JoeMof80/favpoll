@@ -118,33 +118,85 @@ test.describe("reveal after pledge", () => {
     await expect(emailInput).toBeVisible({ timeout: 15_000 })
     await emailInput.fill("e2e-test@playwright.test")
 
-    // Stripe PaymentElement renders inside an iframe.
-    // In test mode, the card payment form is the default payment method.
-    // Selector covers both Stripe Elements v2 and v3 iframe naming.
-    const stripeFrame = page
-      .frameLocator('iframe[title="Secure payment input frame"]')
-      .first()
+    // ── Stripe PaymentElement iframes ──────────────────────────────────────
+    // Stripe renders card fields inside hosted iframes. The iframe title and
+    // layout vary by Stripe.js version:
+    //   • Unified (old CardElement / some PaymentElement):
+    //       1 iframe titled "Secure payment input frame" — all fields inside
+    //   • Split-field (modern PaymentElement):
+    //       3 iframes per field, each titled "Secure card number input frame",
+    //       "Secure expiry date input frame", "Secure CVC input frame" etc.
+    // We wait for any "Secure *" iframe and use count to detect the layout.
 
-    const cardNumberInput = stripeFrame
+    // Broad wait — any iframe whose title starts with "Secure"
+    await page
+      .locator('iframe[title*="Secure"]')
+      .first()
+      .waitFor({ timeout: 25_000 })
+      .catch(async () => {
+        const iframes = await page.$$eval("iframe", (els) =>
+          (els as HTMLIFrameElement[]).map((el) => ({
+            t: el.title,
+            n: el.name.substring(0, 60),
+            s: el.src.substring(0, 80),
+          }))
+        )
+        console.error("[e2e] No Stripe iframe found after 25s.")
+        console.error("[e2e] All iframes on page:", JSON.stringify(iframes))
+        console.error(
+          "[e2e] Check that NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is set to a valid " +
+            "Stripe test-mode publishable key in the Vercel Preview environment."
+        )
+        throw new Error(
+          "[e2e] Stripe PaymentElement iframe not found — see log above"
+        )
+      })
+
+    // Log actual iframe titles for CI diagnostics on any future mismatch
+    const iframeInfo = await page.$$eval("iframe", (els) =>
+      (els as HTMLIFrameElement[]).map((el) => ({
+        t: el.title,
+        n: el.name.substring(0, 60),
+      }))
+    )
+    console.log("[e2e] Stripe iframes:", JSON.stringify(iframeInfo))
+
+    // Count "Secure *" iframes to detect layout (1 = unified, 3+ = split-field)
+    const secureIframes = page.locator('iframe[title*="Secure"]')
+    const secureCount = await secureIframes.count()
+    console.log(`[e2e] Secure iframe count: ${secureCount}`)
+
+    // Card number is always in the first "Secure *" iframe
+    const cardNumberFrame = secureIframes.first().contentFrame()
+    const cardNumberInput = cardNumberFrame
       .getByPlaceholder("1234 1234 1234 1234")
-      .or(stripeFrame.getByLabel(/card number/i))
-    await expect(cardNumberInput).toBeVisible({ timeout: 20_000 })
+      .or(cardNumberFrame.getByLabel(/card number/i))
+      .or(cardNumberFrame.locator('[autocomplete="cc-number"]'))
+    await expect(cardNumberInput).toBeVisible({ timeout: 10_000 })
     await cardNumberInput.fill("4242424242424242")
 
-    await stripeFrame
+    // Expiry: second "Secure *" iframe in split-field mode, same in unified
+    const expiryFrame =
+      secureCount >= 2 ? secureIframes.nth(1).contentFrame() : cardNumberFrame
+    await expiryFrame
       .getByPlaceholder("MM / YY")
-      .or(stripeFrame.getByLabel(/expir/i))
+      .or(expiryFrame.getByLabel(/expir/i))
+      .or(expiryFrame.locator('[autocomplete="cc-exp"]'))
       .fill("12/34")
 
-    await stripeFrame
+    // CVC: third "Secure *" iframe in split-field mode, same in unified
+    const cvcFrame =
+      secureCount >= 3 ? secureIframes.nth(2).contentFrame() : cardNumberFrame
+    await cvcFrame
       .getByPlaceholder("CVC")
-      .or(stripeFrame.getByLabel(/cvc|security code/i))
+      .or(cvcFrame.getByLabel(/cvc|security code/i))
+      .or(cvcFrame.locator('[autocomplete="cc-csc"]'))
       .fill("123")
 
-    // Postal code — present in some Stripe configurations
-    const postalInput = stripeFrame
+    // Postal code — optional; may appear in unified-mode configurations
+    const postalInput = cardNumberFrame
       .getByPlaceholder("ZIP")
-      .or(stripeFrame.getByLabel(/postal/i))
+      .or(cardNumberFrame.getByLabel(/postal/i))
     if (await postalInput.count().then((n) => n > 0)) {
       const visible = await postalInput
         .first()
