@@ -141,118 +141,58 @@ test.describe("reveal after pledge", () => {
         throw new Error("[e2e] Stripe PaymentElement iframe not found")
       })
 
-    // Find the elements-inner-easel frame by URL (the actual card form)
-    let easelFrame: Frame | undefined
-    const easelDeadline = Date.now() + 20_000
-    while (Date.now() < easelDeadline && !easelFrame) {
-      easelFrame = page
-        .frames()
-        .find((f) => f.url().includes("elements-inner-easel"))
-      if (!easelFrame) await page.waitForTimeout(500)
+    // Screenshot confirmed the card form IS rendered with standard inputs
+    // (placeholders "1234 1234 1234 1234", "MM / YY", "CVC"). They are NOT
+    // in the elements-inner-easel frame (that is the outer PaymentElement
+    // shell); they live in another Stripe frame — likely elements-inner-
+    // accessory-target. Scan every stripe.com frame for any <input>.
+    let cardFrame: Frame | undefined
+    let cardInputCount = 0
+    const cardDeadline = Date.now() + 25_000
+    while (Date.now() < cardDeadline && !cardFrame) {
+      for (const frame of page.frames()) {
+        if (
+          !frame.url().includes("stripe.com") &&
+          !frame.url().includes("stripe.network")
+        )
+          continue
+        try {
+          const n = await frame.locator("input").count()
+          if (n > 0) {
+            cardFrame = frame
+            cardInputCount = n
+            console.log(
+              `[e2e] Card inputs (${n}) found in: ${frame.url().substring(0, 80)}`
+            )
+            break
+          }
+        } catch {
+          /* frame detached during traversal */
+        }
+      }
+      if (!cardFrame) await page.waitForTimeout(500)
     }
 
-    if (!easelFrame) {
+    if (!cardFrame) {
       console.error(
-        "[e2e] elements-inner-easel frame not found. All frames:",
+        "[e2e] All frames at deadline:",
         JSON.stringify(
           page.frames().map((f) => ({
-            name: f.name().substring(0, 50),
+            name: f.name().substring(0, 40),
             url: f.url().substring(0, 80),
           }))
         )
       )
-      throw new Error("[e2e] Stripe elements-inner-easel frame not found")
+      throw new Error(
+        "[e2e] No card inputs found in any Stripe frame after 25s"
+      )
     }
 
-    console.log(`[e2e] Easel frame: ${easelFrame.url().substring(0, 80)}`)
-
-    // Dump easel HTML immediately — always runs before the poll so we get
-    // diagnostic data even when the poll exhausts.
-    try {
-      const easelHTML = await easelFrame.content()
-      console.log("[e2e] Easel HTML:", easelHTML.substring(0, 3000))
-    } catch {
-      // frame.content() may fail for cross-origin frames — fall back to evaluate
-      try {
-        const dump = await easelFrame.evaluate(() => ({
-          readyState: document.readyState,
-          inputs: document.querySelectorAll("input").length,
-          ce: document.querySelectorAll("[contenteditable=true]").length,
-          elems: document.querySelectorAll("*").length,
-          body: document.body?.innerHTML?.substring(0, 1500) ?? "no body",
-        }))
-        console.log("[e2e] Easel dump:", JSON.stringify(dump))
-      } catch (e2) {
-        console.error(
-          "[e2e] Cannot inspect easel:",
-          String(e2).substring(0, 200)
-        )
-      }
-    }
-
-    // Poll for card fields. Stripe's PaymentElement may render either
-    // <input> elements or [contenteditable=true] divs depending on version.
-    // Log errors from count() so silent catch-0 doesn't hide frame issues.
-    type FieldType = "input" | "contenteditable" | "none"
-    let fieldType: FieldType = "none"
-    let fieldCount = 0
-    const fieldDeadline = Date.now() + 25_000
-    while (Date.now() < fieldDeadline && fieldType === "none") {
-      const iCount = await easelFrame
-        .locator("input")
-        .count()
-        .catch((e: Error) => {
-          console.error(
-            "[e2e] input count error:",
-            e.message?.substring(0, 100)
-          )
-          return 0
-        })
-      if (iCount > 0) {
-        fieldType = "input"
-        fieldCount = iCount
-        break
-      }
-      const ceCount = await easelFrame
-        .locator("[contenteditable=true]")
-        .count()
-        .catch(() => 0)
-      if (ceCount > 0) {
-        fieldType = "contenteditable"
-        fieldCount = ceCount
-        break
-      }
-      await page.waitForTimeout(500)
-    }
-
-    console.log(`[e2e] Easel field type: ${fieldType}, count: ${fieldCount}`)
-
-    if (fieldType === "input") {
-      const inputInfo = await easelFrame
-        .$$eval("input", (els) =>
-          (els as HTMLInputElement[]).map((el) => ({
-            n: el.name,
-            ph: el.placeholder,
-            ac: el.autocomplete,
-            al: el.getAttribute("aria-label"),
-            t: el.type,
-          }))
-        )
-        .catch(() => [])
-      console.log("[e2e] Easel inputs:", JSON.stringify(inputInfo))
-    }
-
-    if (fieldType === "none") {
-      throw new Error("[e2e] No card fields in Stripe easel frame after 25s")
-    }
-
-    const fieldSel = fieldType === "input" ? "input" : "[contenteditable=true]"
-
-    // Fill by DOM position: card number → expiry → CVC (Stripe's standard order)
-    await easelFrame.locator(fieldSel).nth(0).fill("4242424242424242")
-    if (fieldCount >= 2) await easelFrame.locator(fieldSel).nth(1).fill("12/34")
-    if (fieldCount >= 3) await easelFrame.locator(fieldSel).nth(2).fill("123")
-    if (fieldCount >= 4) await easelFrame.locator(fieldSel).nth(3).fill("10001")
+    // Fill by DOM position: card number → expiry → CVC (→ ZIP if present)
+    await cardFrame.locator("input").nth(0).fill("4242424242424242")
+    if (cardInputCount >= 2)
+      await cardFrame.locator("input").nth(1).fill("12/34")
+    if (cardInputCount >= 3) await cardFrame.locator("input").nth(2).fill("123")
 
     // Submit via the external "Pay now" button in the dialog footer.
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
