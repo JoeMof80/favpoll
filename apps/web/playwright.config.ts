@@ -19,6 +19,9 @@ export default defineConfig({
   reporter: process.env.CI
     ? [["github"], ["html", { open: "never" }]]
     : [["html", { open: "never" }]],
+  // Full guest pledge → Stripe payment → reveal can take 60s+ on CI:
+  // Stripe init, dialog steps, PaymentIntent round-trip, confirmation.
+  timeout: 90_000,
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
     trace: "on-first-retry",

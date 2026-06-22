@@ -119,16 +119,13 @@ test.describe("reveal after pledge", () => {
     await emailInput.fill("e2e-test@playwright.test")
 
     // ── Stripe PaymentElement: fill card fields ───────────────────────────
-    // The PaymentElement renders an outer "Secure payment input frame" that
-    // itself contains nested sub-iframes for each card field. A Link/wallet
-    // check iframe (also titled "Secure payment input frame") may appear
-    // briefly then vanish. Using contentFrame().locator("input") only
-    // searches the first-level document and misses nested sub-frames.
-    //
-    // page.frames() traverses the FULL frame tree including nested iframes,
-    // so we use it to poll until the card number input is found anywhere.
+    // Stripe renders card inputs inside an "elements-inner-easel" iframe
+    // (identified by URL). A Link/wallet-check iframe (also titled "Secure
+    // payment input frame") may appear first and then vanish — ignore it.
+    // Attribute selectors (autocomplete, aria-label, placeholder) are
+    // Stripe-version-dependent; fill by DOM position instead.
 
-    // Wait for any Stripe-hosted "Secure *" iframe to appear first
+    // Wait for the first Secure iframe to signal Elements has mounted
     await page
       .locator('iframe[title*="Secure"]')
       .first()
@@ -144,133 +141,65 @@ test.describe("reveal after pledge", () => {
         throw new Error("[e2e] Stripe PaymentElement iframe not found")
       })
 
-    // Log top-level iframe titles AND the full frame tree for diagnostics
-    const topIframes = await page.$$eval("iframe", (els) =>
-      (els as HTMLIFrameElement[]).map((el) => ({
-        t: el.title,
-        n: el.name.substring(0, 50),
-      }))
-    )
-    console.log("[e2e] Top-level iframes:", JSON.stringify(topIframes))
-    console.log(
-      "[e2e] All frames (incl. nested):",
-      JSON.stringify(
-        page.frames().map((f) => ({
-          name: f.name().substring(0, 50),
-          url: f.url().substring(0, 70),
-        }))
-      )
-    )
-
-    const CARD_SEL =
-      '[autocomplete="cc-number"], input[aria-label="Card number"], ' +
-      'input[placeholder="1234 1234 1234 1234"], input[placeholder="Card number"]'
-    const EXPIRY_SEL =
-      '[autocomplete="cc-exp"], input[placeholder="MM / YY"], input[placeholder="MM/YY"]'
-    const CVC_SEL =
-      '[autocomplete="cc-csc"], input[placeholder="CVC"], input[placeholder="CVV"]'
-
-    // Poll page.frames() (full tree) until the card number input appears
-    let cardFrameRef: Frame | undefined
-    const scanDeadline = Date.now() + 25_000
-    while (Date.now() < scanDeadline && !cardFrameRef) {
-      for (const frame of page.frames()) {
-        try {
-          if ((await frame.locator(CARD_SEL).count()) > 0) {
-            cardFrameRef = frame
-            console.log(`[e2e] Card input in frame "${frame.name()}"`)
-            break
-          }
-        } catch {
-          // Frame detached during traversal — skip
-        }
-      }
-      if (!cardFrameRef) await page.waitForTimeout(500)
+    // Find the elements-inner-easel frame by URL (the actual card form)
+    let easelFrame: Frame | undefined
+    const easelDeadline = Date.now() + 20_000
+    while (Date.now() < easelDeadline && !easelFrame) {
+      easelFrame = page
+        .frames()
+        .find((f) => f.url().includes("elements-inner-easel"))
+      if (!easelFrame) await page.waitForTimeout(500)
     }
 
-    if (!cardFrameRef) {
-      // Dump all frame inputs so we can see what Stripe actually rendered
+    if (!easelFrame) {
       console.error(
-        "[e2e] All frames at timeout:",
+        "[e2e] elements-inner-easel frame not found. All frames:",
         JSON.stringify(
           page.frames().map((f) => ({
             name: f.name().substring(0, 50),
-            url: f.url().substring(0, 70),
+            url: f.url().substring(0, 80),
           }))
         )
       )
-      for (const frame of page.frames()) {
-        try {
-          const inputs = await frame.$$eval("input", (els) =>
-            (els as HTMLInputElement[]).map((el) => ({
-              n: el.name,
-              ph: el.placeholder,
-              ac: el.autocomplete,
-              al: el.getAttribute("aria-label"),
-            }))
-          )
-          if (inputs.length > 0) {
-            console.error(
-              `[e2e] "${frame.name()}" inputs:`,
-              JSON.stringify(inputs)
-            )
-          }
-        } catch {
-          // ignore detached frames
-        }
-      }
-      throw new Error(
-        "[e2e] Card number not found in any frame after 25s — check logs above"
+      throw new Error("[e2e] Stripe elements-inner-easel frame not found")
+    }
+
+    console.log(`[e2e] Easel frame: ${easelFrame.url().substring(0, 80)}`)
+
+    // Wait for inputs to appear in the easel frame (React may not have
+    // mounted card fields yet even though the frame itself is registered)
+    let inputCount = 0
+    const inputDeadline = Date.now() + 25_000
+    while (Date.now() < inputDeadline && inputCount === 0) {
+      inputCount = await easelFrame.locator("input").count().catch(() => 0)
+      if (inputCount === 0) await page.waitForTimeout(500)
+    }
+
+    // Log all inputs for CI diagnostics
+    try {
+      const inputInfo = await easelFrame.$$eval("input", (els) =>
+        (els as HTMLInputElement[]).map((el) => ({
+          n: el.name,
+          ph: el.placeholder,
+          ac: el.autocomplete,
+          al: el.getAttribute("aria-label"),
+          t: el.type,
+        }))
       )
+      console.log(`[e2e] Easel inputs (${inputCount}):`, JSON.stringify(inputInfo))
+    } catch (diagErr) {
+      console.error("[e2e] Could not inspect easel inputs:", diagErr)
     }
 
-    // Fill card number, expiry, and CVC
-    // All three may be in the same frame (unified) or separate frames (split-field).
-    await cardFrameRef.locator(CARD_SEL).first().fill("4242424242424242")
-
-    // Try expiry in the same frame first; fall back to scanning other frames
-    let expiryFilled = (await cardFrameRef.locator(EXPIRY_SEL).count()) > 0
-    if (expiryFilled) {
-      await cardFrameRef.locator(EXPIRY_SEL).first().fill("12/34")
-    } else {
-      for (const frame of page.frames()) {
-        try {
-          if ((await frame.locator(EXPIRY_SEL).count()) > 0) {
-            await frame.locator(EXPIRY_SEL).first().fill("12/34")
-            expiryFilled = true
-            break
-          }
-        } catch {
-          /* skip */
-        }
-      }
+    if (inputCount === 0) {
+      throw new Error("[e2e] No inputs in Stripe easel frame after 25s")
     }
 
-    let cvcFilled = (await cardFrameRef.locator(CVC_SEL).count()) > 0
-    if (cvcFilled) {
-      await cardFrameRef.locator(CVC_SEL).first().fill("123")
-    } else {
-      for (const frame of page.frames()) {
-        try {
-          if ((await frame.locator(CVC_SEL).count()) > 0) {
-            await frame.locator(CVC_SEL).first().fill("123")
-            cvcFilled = true
-            break
-          }
-        } catch {
-          /* skip */
-        }
-      }
-    }
-
-    // Postal code — optional
-    const postalInput = cardFrameRef.locator('input[placeholder="ZIP"]').first()
-    if (
-      (await postalInput.count()) > 0 &&
-      (await postalInput.isVisible().catch(() => false))
-    ) {
-      await postalInput.fill("10001")
-    }
+    // Fill by DOM position: card number → expiry → CVC (Stripe's standard order)
+    await easelFrame.locator("input").nth(0).fill("4242424242424242")
+    if (inputCount >= 2) await easelFrame.locator("input").nth(1).fill("12/34")
+    if (inputCount >= 3) await easelFrame.locator("input").nth(2).fill("123")
+    if (inputCount >= 4) await easelFrame.locator("input").nth(3).fill("10001")
 
     // Submit via the external "Pay now" button in the dialog footer.
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
