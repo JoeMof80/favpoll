@@ -116,7 +116,8 @@ test.describe("reveal after pledge", () => {
       "Email address for receipt and withdrawal link"
     )
     await expect(emailInput).toBeVisible({ timeout: 15_000 })
-    await emailInput.fill("e2e-test@playwright.test")
+    // Unique per attempt so retries don't hit the "already pledged" duplicate check
+    await emailInput.fill(`e2e-test-${Date.now()}@playwright.test`)
 
     // ── Stripe PaymentElement: fill card fields ───────────────────────────
     // Stripe renders card inputs inside an "elements-inner-easel" iframe
