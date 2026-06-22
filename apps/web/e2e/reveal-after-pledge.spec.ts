@@ -188,11 +188,18 @@ test.describe("reveal after pledge", () => {
       )
     }
 
-    // Fill by DOM position: card number → expiry → CVC (→ ZIP if present)
-    await cardFrame.locator("input").nth(0).fill("4242424242424242")
-    if (cardInputCount >= 2)
-      await cardFrame.locator("input").nth(1).fill("12/34")
-    if (cardInputCount >= 3) await cardFrame.locator("input").nth(2).fill("123")
+    // The accessory-target frame has ~15 inputs total (card fields + Stripe
+    // hidden internals). Filter to visible inputs only so nth() positions
+    // reliably map to: 0=card number, 1=expiry, 2=CVC, 3=ZIP (if shown).
+    // Stripe geolocates CI as US and shows a required ZIP code field —
+    // leaving it empty causes "Your ZIP is invalid." and blocks submission.
+    const vis = cardFrame.locator("input").filter({ visible: true })
+    const visCount = await vis.count()
+    console.log(`[e2e] Visible card inputs: ${visCount}`)
+    await vis.nth(0).fill("4242424242424242") // card number
+    if (visCount >= 2) await vis.nth(1).fill("12/34") // expiry
+    if (visCount >= 3) await vis.nth(2).fill("123") // CVC
+    if (visCount >= 4) await vis.nth(3).fill("10001") // ZIP (NYC — any valid US ZIP)
 
     // Submit via the external "Pay now" button in the dialog footer.
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
