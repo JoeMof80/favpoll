@@ -59,10 +59,10 @@ setup("authenticate as test organiser", async ({ page }) => {
     .or(page.locator('[type="password"]'))
 
   await passwordInput.fill(password)
-  await page
-    .getByRole("button", { name: /^sign in$/i })
-    .or(page.getByRole("button", { name: /^continue$/i }))
-    .click()
+  // Target Clerk's primary form submit button via its stable data attribute.
+  // Using getByRole("button") with a name pattern here risks matching the
+  // site header's "Sign in" nav button, which is also visible at this step.
+  await page.locator('[data-localization-key="formButtonPrimary"]').click()
 
   // ── Verify auth succeeded ───────────────────────────────────────────────────
   // Wait until we're redirected away from the sign-in page
