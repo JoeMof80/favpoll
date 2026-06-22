@@ -259,7 +259,7 @@ test.describe("reveal after pledge", () => {
 
     // ── 9. Confirm results ranking is visible ─────────────────────────────────
     // After pledging, the poll switches to results view and renders a RankingList
-    const rankingList = page.getByRole("list", { name: /results/i })
+    const rankingList = page.getByRole("list", { name: /rankings/i })
     await expect(rankingList).toBeVisible({ timeout: 10_000 })
   })
 })
