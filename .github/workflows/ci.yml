@@ -43,7 +43,8 @@ jobs:
   # continue-on-error: true means a failure here does NOT block merge.
   # Promote to a required check once the suite has proven stable over a few PRs.
   #
-  # Required GitHub secrets (set under repo Settings → Secrets → Actions):
+  # Required secrets (stored in the "Preview – favpoll-web" GitHub environment,
+  # which the job references via `environment:` above):
   #   E2E_BASE_URL                 — staging app URL (e.g. https://favpoll-web-gamma.vercel.app)
   #   E2E_SUPABASE_URL             — staging Supabase project URL
   #   E2E_SUPABASE_SERVICE_ROLE_KEY — staging service role key (bypasses RLS)
@@ -51,13 +52,11 @@ jobs:
   #   E2E_TEST_EMAIL               — email of Clerk test account (email + password auth)
   #   E2E_TEST_PASSWORD            — password of Clerk test account
   #   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY — Clerk publishable key (same as dev/preview)
-  #
-  # Until secrets are configured, this job will fail gracefully (most tests
-  # skip themselves when credentials are absent).
   e2e:
     name: E2E Tests (advisory)
     runs-on: ubuntu-latest
     continue-on-error: true
+    environment: "Preview – favpoll-web"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
