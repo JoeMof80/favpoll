@@ -84,25 +84,24 @@ test.describe("reveal after pledge", () => {
     await expect(dialog).toContainText(/choose your favourite/i)
 
     // ── 4. Step 1: Pick a favourite ───────────────────────────────────────────
-    // Colour is a finite topic — favourites render as radio chips inside the dialog
-    const chips = dialog.getByRole("radio")
+    // Colour is a finite topic. Chips render as <button aria-pressed="false|true">,
+    // not radio inputs — use [aria-pressed] to locate them.
+    const chips = dialog.locator("[aria-pressed]")
     const firstChip = chips.first()
     await expect(firstChip).toBeVisible({ timeout: 10_000 })
     await firstChip.click()
-    await expect(firstChip).toBeChecked()
+    await expect(firstChip).toHaveAttribute("aria-pressed", "true")
 
     // Advance to step 2
     await dialog.getByRole("button", { name: /next/i }).click()
 
     // ── 5. Step 2: Set pledge amount ──────────────────────────────────────────
-    // StepAmount renders amount presets as radio buttons.
-    // Pick the first preset (smallest available amount).
+    // Preset amounts render as plain <Button> elements (£5, £10, £20, £50).
+    // Click the smallest preset; no checked state to assert.
     await expect(dialog).toContainText(/your pledge/i, { timeout: 10_000 })
-    const amountPresets = dialog.getByRole("radio")
-    const firstPreset = amountPresets.first()
+    const firstPreset = dialog.getByRole("button", { name: "£5" })
     await expect(firstPreset).toBeVisible()
     await firstPreset.click()
-    await expect(firstPreset).toBeChecked()
 
     // "Pledge" button creates the Stripe PaymentIntent and advances to step 3
     await dialog.getByRole("button", { name: /^pledge$/i }).click()

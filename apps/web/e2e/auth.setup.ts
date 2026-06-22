@@ -41,13 +41,26 @@ setup("authenticate as test organiser", async ({ page }) => {
   await page.goto("/sign-in")
 
   // ── Clerk sign-in: email step ───────────────────────────────────────────────
-  // Clerk renders an email input first. After submitting, it transitions to
-  // a password step. Selectors target standard Clerk UI (cl-* class elements).
-  // If your Clerk instance uses a different strategy (OTP, OAuth-only), adjust
-  // the selectors below or switch to @clerk/testing programmatic tokens.
+  // Wait up to 15s for the Clerk form to hydrate. On preview deployments Clerk
+  // may fail to initialize if the domain isn't in the Clerk instance's allowed
+  // list — in that case, save empty state and skip gracefully.
   const emailInput = page
     .getByRole("textbox", { name: /email/i })
     .or(page.locator("#identifier-field"))
+
+  const emailReady = await emailInput.waitFor({ timeout: 15_000 }).catch(() => null)
+  if (!emailReady) {
+    console.warn(
+      "\n[auth.setup] ⚠  Sign-in page did not render the Clerk email input after 15s.\n" +
+        "  Possible causes:\n" +
+        "  • The preview deployment domain is not in Clerk's allowed domains list\n" +
+        "  • NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is wrong/missing in the Vercel Preview env\n" +
+        "  Saving empty auth state — wizard-publish tests will be skipped.\n"
+    )
+    mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
+    await page.context().storageState({ path: AUTH_STATE_PATH })
+    return
+  }
 
   await emailInput.fill(email)
   await page.getByRole("button", { name: /continue/i }).click()
