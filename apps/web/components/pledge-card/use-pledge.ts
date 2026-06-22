@@ -162,7 +162,10 @@ export function usePledge({
   }
 
   async function handleOwnConfirm() {
-    if (!canOwnConfirm) return
+    // Guard on baseCanConfirm (not canOwnConfirm) so this works from PledgeDialog
+    // where guest email is captured in step 3, not step 2.
+    // canOwnConfirm's email gate is enforced at the UI level by pledge-card.
+    if (!baseCanConfirm) return
     setError(null)
     setSubmitting(true)
     try {

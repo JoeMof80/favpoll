@@ -38,6 +38,117 @@ jobs:
       - name: Run admin tests
         run: pnpm --filter @favpoll/admin test:run
 
+  # ── E2E tests (advisory — non-blocking) ────────────────────────────────────
+  # Targets the Vercel preview deployment for this branch (Preview environment
+  # variables = staging Supabase). The preview URL is auto-computed from the
+  # branch alias pattern — no static URL secret needed for PR runs.
+  # continue-on-error: true means a failure here does NOT block merge.
+  # Promote to a required check once the suite has proven stable over a few PRs.
+  #
+  # Required secrets (stored in the "Preview – favpoll-web" GitHub environment,
+  # which the job references via `environment:` above):
+  #   E2E_SUPABASE_URL              — staging Supabase project URL
+  #   E2E_SUPABASE_SERVICE_ROLE_KEY — staging service role key (bypasses RLS)
+  #   E2E_STRIPE_PUBLISHABLE_KEY    — Stripe test-mode publishable key
+  #   E2E_TEST_EMAIL                — email of Clerk test account (no 2FA)
+  #   E2E_TEST_PASSWORD             — password of Clerk test account
+  #   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY — Clerk publishable key (same as dev/preview)
+  #   E2E_VERCEL_BYPASS_SECRET      — Vercel automation bypass secret (see below)
+  #   E2E_BASE_URL (optional)       — override the computed preview URL
+  #
+  # Vercel Automation Bypass setup (one-time):
+  #   1. Vercel Project → Settings → Security → Deployment Protection
+  #   2. Enable "Protection Bypass for Automation" — copy the generated secret
+  #   3. Add it to GitHub "Preview – favpoll-web" environment as E2E_VERCEL_BYPASS_SECRET
+  #   Playwright sends the secret as x-vercel-protection-bypass header on every
+  #   request, bypassing the Vercel SSO wall on preview deployments.
+  e2e:
+    name: E2E Tests (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    environment: "Preview – favpoll-web"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compute Vercel preview URL
+        id: preview
+        run: |
+          # PR runs: compute the branch alias URL (uses Preview env = staging Supabase).
+          # Vercel slugifies branch names: lowercase, [/._] → -, collapse runs, strip edges.
+          BRANCH="${{ github.head_ref }}"
+          if [ -n "$BRANCH" ]; then
+            SLUG=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | tr '/._' '-' | sed 's/-\{2,\}/-/g' | sed 's/^-//;s/-$//')
+            COMPUTED="https://favpoll-web-git-${SLUG}-favpoll.vercel.app"
+          fi
+          # Prefer computed URL; fall back to the E2E_BASE_URL secret override.
+          URL="${COMPUTED:-${{ secrets.E2E_BASE_URL }}}"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "[e2e] Base URL: $URL"
+
+      - name: Wait for Vercel deployment to be ready
+        if: steps.preview.outputs.url != ''
+        env:
+          E2E_VERCEL_BYPASS_SECRET: ${{ secrets.E2E_VERCEL_BYPASS_SECRET }}
+        run: |
+          URL="${{ steps.preview.outputs.url }}"
+          echo "[e2e] Waiting for $URL to respond..."
+          for i in $(seq 1 18); do
+            # Send bypass header when set so the check isn't redirected to Vercel login.
+            if [ -n "$E2E_VERCEL_BYPASS_SECRET" ]; then
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+                -H "x-vercel-protection-bypass: $E2E_VERCEL_BYPASS_SECRET" "$URL")
+            else
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL")
+            fi
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+              echo "[e2e] Deployment ready (attempt $i, status $STATUS)"
+              exit 0
+            fi
+            echo "[e2e] Not ready yet (status $STATUS), waiting 10s (attempt $i/18)..."
+            sleep 10
+          done
+          echo "[e2e] Deployment did not respond after 3 minutes — tests may fail"
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: apps/web
+
+      - name: Run E2E tests
+        run: pnpm --filter @favpoll/web test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_BASE_URL: ${{ steps.preview.outputs.url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.E2E_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_VERCEL_BYPASS_SECRET: ${{ secrets.E2E_VERCEL_BYPASS_SECRET }}
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14
+
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest

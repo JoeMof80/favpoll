@@ -677,11 +677,11 @@ Gray 100:  #D3D1C7   — borders, dividers
 Run from repo root:
 
 ```
-pnpm --filter @favpoll/web test:run     -- web tests
-pnpm --filter @favpoll/admin test:run   -- admin tests
+pnpm --filter @favpoll/web test:run     -- web tests (Vitest)
+pnpm --filter @favpoll/admin test:run   -- admin tests (Vitest)
 ```
 
-All tests must pass before committing. Current counts: 755 web, 56 admin.
+All tests must pass before committing. Current counts: 811 web, 56 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -692,6 +692,93 @@ Co-located `__tests__/` directories. Environments:
 Supabase mock: `makeSupabaseMock()` from `@/tests/mocks/supabase-admin`.
 `vi.hoisted()` required for mock variables inside `vi.mock()` factories.
 `redirect()` must throw — mock as `vi.fn().mockImplementation((url) => { throw new Error(url) })`.
+
+---
+
+## End-to-end testing
+
+Playwright (`@playwright/test@^1.61.0`) installed in `apps/web`. Config: `apps/web/playwright.config.ts`. Tests live in `apps/web/e2e/`.
+
+### Running locally
+
+```bash
+# From repo root — starts local dev server automatically (if not already running)
+pnpm --filter @favpoll/web test:e2e
+
+# Run a specific test file
+pnpm --filter @favpoll/web test:e2e -- reveal-after-pledge.spec.ts
+
+# Open HTML report
+pnpm --filter @favpoll/web test:e2e:report
+```
+
+Requires `.env.local` in `apps/web/` with `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and Stripe test-mode keys. The playwright config loads `.env.local` automatically via `process.loadEnvFile`.
+
+### CI environment decision: staging
+
+E2E tests in CI run against the staging Vercel deployment (`PLAYWRIGHT_BASE_URL` = staging URL). **Not local Supabase.** Reasoning:
+
+1. No local Supabase setup exists in this repo (no `supabase/config.toml`, no Docker Compose). Wiring Docker-based Supabase would be a significant CI infrastructure investment not justified by this brief.
+2. Staging already has seeded reference data (Colour topic, Marie Curie charity) that the fixture setup depends on.
+3. Stripe test-mode keys already work on staging.
+4. Risk — shared staging state: mitigated by the test favpoll being owned by `user_e2e_playwright` (distinct, identifiable) and `is_listed: false` (invisible to real users).
+
+Trade-off acknowledged: staging is faster to wire but means CI e2e tests share state with manual testing. If test data accumulates or conflicts with manual work, a dedicated Supabase project for CI is the next step.
+
+### Test data convention
+
+The global setup (`e2e/global-setup.ts`) creates a single open test favpoll once per environment via the Supabase admin client. It is **idempotent** — re-running finds the existing row by `created_by = 'user_e2e_playwright'` and reuses it. The test favpoll:
+
+- Protagonist: "E2E Playwright Test"
+- Topic: Colour (finite, all canonical items linked)
+- Charity: Marie Curie
+- `personal_reveal`: "Cornflower blue. She kept a pot of cornflowers on the windowsill every summer."
+- `closes_at`: 90 days from first-run (always open)
+- `is_listed: false`
+
+The exemplar favpolls (from `seed-exemplars.ts`) are **closed** (`closed_at` set in the past) and cannot be pledged to, which is why a separate e2e fixture is used rather than reusing Belinda Johnson.
+
+To delete the e2e test data: `delete from favpolls where created_by = 'user_e2e_playwright';` (cascades to all child rows).
+
+### Stripe test card convention
+
+All e2e tests use Stripe test card `4242 4242 4242 4242`, expiry `12/34`, CVC `123`. This card always succeeds in test mode with no 3DS challenge. Do not introduce new Stripe credentials for tests — the same `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` used for development applies.
+
+### Covered flows (as of PR #123)
+
+| Test | File | Auth |
+|------|------|------|
+| Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts` | None (guest) |
+| Wizard → publish → verify public page | `wizard-publish.spec.ts` | Clerk organiser |
+
+**TODO (follow-up):** Shared fund paths (Part 4 from the brief):
+- Path B (guest contribute to fund via SeedFundModal guest variant)
+- Path C (pledge using shared fund, no Stripe step)
+- Over-allocation guard
+
+### Organiser auth setup
+
+The wizard test requires a signed-in Clerk organiser. The `auth.setup.ts` Playwright project navigates to `/sign-in` and signs in with credentials from `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD`. The session is saved to `e2e/.auth/user.json` (gitignored) and loaded by the wizard test project via `storageState`.
+
+The test account must use **email + password auth** (not OAuth-only) in Clerk. Create it via the sign-up page, then add credentials to `.env.local` locally and to GitHub Actions secrets in CI. If these env vars are absent, auth setup saves an empty state and wizard tests skip gracefully.
+
+### Advisory CI job
+
+The `e2e` job in `.github/workflows/ci.yml` runs with `continue-on-error: true` — it is **advisory, not blocking**. A failure does not block merge. Promote to a required check once the suite has proven stable over a few PRs (suggest after 5–10 successful runs).
+
+Required GitHub Actions secrets (set under repo Settings → Secrets → Actions):
+
+```
+E2E_BASE_URL                    -- staging Vercel URL
+E2E_SUPABASE_URL                -- staging Supabase project URL
+E2E_SUPABASE_SERVICE_ROLE_KEY   -- staging service role key
+E2E_STRIPE_PUBLISHABLE_KEY      -- Stripe test-mode publishable key
+E2E_TEST_EMAIL                  -- Clerk test account email
+E2E_TEST_PASSWORD               -- Clerk test account password
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY -- Clerk publishable key (same as dev/preview)
+```
+
+Until these are configured, the e2e CI job will skip most tests gracefully (credential guards are in global-setup.ts and auth.setup.ts). The Playwright HTML report is uploaded as a CI artifact (`playwright-report`) with 14-day retention.
 
 ---
 

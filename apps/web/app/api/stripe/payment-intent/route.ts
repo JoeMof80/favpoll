@@ -5,9 +5,10 @@ import { auth } from "@clerk/nextjs/server"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: Request) {
+  // Guests (userId === null) are allowed — the whole pledge-dialog flow supports
+  // unauthenticated pledging. Email is captured at checkout and passed to the
+  // webhook-driven savePledge call.
   const { userId } = await auth()
-  if (!userId)
-    return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
 
   const { amount, metadata } = (await req.json()) as {
     amount: number
@@ -21,8 +22,12 @@ export async function POST(req: Request) {
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(amount * 100), // pence
     currency: "gbp",
-    automatic_payment_methods: { enabled: true },
-    metadata: { clerk_user_id: userId, ...metadata },
+    // Restrict to card only so the PaymentElement renders the card form
+    // directly, bypassing Stripe's adaptive payment-method selector.
+    // Apple Pay / Google Pay require additional domain verification and
+    // are not supported in E2E or headless environments.
+    payment_method_types: ["card"],
+    metadata: { ...(userId ? { clerk_user_id: userId } : {}), ...metadata },
   })
 
   return NextResponse.json({ clientSecret: paymentIntent.client_secret })
