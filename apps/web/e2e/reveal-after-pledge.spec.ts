@@ -147,7 +147,6 @@ test.describe("reveal after pledge", () => {
     // shell); they live in another Stripe frame — likely elements-inner-
     // accessory-target. Scan every stripe.com frame for any <input>.
     let cardFrame: Frame | undefined
-    let cardInputCount = 0
     const cardDeadline = Date.now() + 25_000
     while (Date.now() < cardDeadline && !cardFrame) {
       for (const frame of page.frames()) {
@@ -160,7 +159,6 @@ test.describe("reveal after pledge", () => {
           const n = await frame.locator("input").count()
           if (n > 0) {
             cardFrame = frame
-            cardInputCount = n
             console.log(
               `[e2e] Card inputs (${n}) found in: ${frame.url().substring(0, 80)}`
             )
@@ -188,18 +186,49 @@ test.describe("reveal after pledge", () => {
       )
     }
 
-    // The accessory-target frame has ~15 inputs total (card fields + Stripe
-    // hidden internals). Filter to visible inputs only so nth() positions
-    // reliably map to: 0=card number, 1=expiry, 2=CVC, 3=ZIP (if shown).
-    // Stripe geolocates CI as US and shows a required ZIP code field —
-    // leaving it empty causes "Your ZIP is invalid." and blocks submission.
-    const vis = cardFrame.locator("input").filter({ visible: true })
-    const visCount = await vis.count()
-    console.log(`[e2e] Visible card inputs: ${visCount}`)
-    await vis.nth(0).fill("4242424242424242") // card number
-    if (visCount >= 2) await vis.nth(1).fill("12/34") // expiry
-    if (visCount >= 3) await vis.nth(2).fill("123") // CVC
-    if (visCount >= 4) await vis.nth(3).fill("10001") // ZIP (NYC — any valid US ZIP)
+    // Target card fields by placeholder to avoid positional ambiguity.
+    // The PaymentElement can render a Link email field above card inputs,
+    // which shifts nth() positions and causes fill of wrong fields.
+    // pressSequentially fires real key events so Stripe's formatters work.
+    const cardNumberInput = cardFrame.locator(
+      'input[placeholder="1234 1234 1234 1234"]'
+    )
+    const expiryInput = cardFrame.locator('input[placeholder="MM / YY"]')
+    const cvcInput = cardFrame.locator('input[placeholder="CVC"]')
+
+    // Log all visible input placeholders for debugging
+    const allInputs = cardFrame.locator("input").filter({ visible: true })
+    const visCount = await allInputs.count()
+    const placeholders: string[] = []
+    for (let i = 0; i < visCount; i++) {
+      placeholders.push(
+        (await allInputs.nth(i).getAttribute("placeholder")) ?? "(none)"
+      )
+    }
+    console.log(
+      `[e2e] Visible inputs (${visCount}):`,
+      JSON.stringify(placeholders)
+    )
+
+    await expect(cardNumberInput).toBeVisible({ timeout: 10_000 })
+    await cardNumberInput.click()
+    await cardNumberInput.pressSequentially("4242424242424242")
+
+    await expiryInput.click()
+    await expiryInput.pressSequentially("1234")
+
+    await cvcInput.click()
+    await cvcInput.pressSequentially("123")
+
+    // ZIP is required when Stripe geolocates the runner as US.
+    // Stripe uses placeholder "ZIP Code" for the billing ZIP input.
+    const zipInput = cardFrame.locator(
+      'input[placeholder*="ZIP"], input[placeholder*="zip"], input[placeholder*="Postal"], input[placeholder*="postal"]'
+    )
+    if ((await zipInput.count()) > 0) {
+      await zipInput.first().click()
+      await zipInput.first().pressSequentially("10001")
+    }
 
     // Submit via the external "Pay now" button in the dialog footer.
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
