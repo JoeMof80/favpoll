@@ -221,9 +221,9 @@ test.describe("reveal after pledge", () => {
     await cvcInput.pressSequentially("123")
 
     // ZIP is required when Stripe geolocates the runner as US.
-    // Stripe uses placeholder "ZIP Code" for the billing ZIP input.
+    // Stripe's billing ZIP input uses placeholder "12345" (a sample ZIP).
     const zipInput = cardFrame.locator(
-      'input[placeholder*="ZIP"], input[placeholder*="zip"], input[placeholder*="Postal"], input[placeholder*="postal"]'
+      'input[placeholder="12345"], input[placeholder*="ZIP"], input[placeholder*="Postal"]'
     )
     if ((await zipInput.count()) > 0) {
       await zipInput.first().click()
