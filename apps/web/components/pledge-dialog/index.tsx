@@ -140,9 +140,12 @@ export function PledgeDialog({
   )
 
   // Step 2/3 footer (desktop dialog only — mobile renders its own button in step body)
+  // Guest email is captured in step 3 (StripeCheckout), not step 2, so we can't
+  // use canOwnConfirm here — it requires isGuestEmailValid which is always false
+  // at this point. Check isPledgeValid + !submitting directly instead.
   const isNextDisabled = dialog.useSharedFund
     ? !dialog.canFundConfirm
-    : !dialog.canOwnConfirm
+    : !dialog.isPledgeValid || dialog.submitting
   const nextLabel = dialog.submitting ? "Processing…" : "Pledge"
 
   const step2Footer = (
