@@ -161,48 +161,99 @@ test.describe("reveal after pledge", () => {
     )
     console.log("[e2e] Stripe iframes:", JSON.stringify(iframeInfo))
 
-    // Count "Secure *" iframes to detect layout (1 = unified, 3+ = split-field)
+    // Stripe renders 1–3 "Secure *" iframes. A Link/wallet selector iframe
+    // (also titled "Secure payment input frame") may appear BEFORE the actual
+    // card-form iframe. Scan each Secure iframe until the card number field
+    // is found, polling up to 20s for all iframes to fully mount.
     const secureIframes = page.locator('iframe[title*="Secure"]')
-    const secureCount = await secureIframes.count()
-    console.log(`[e2e] Secure iframe count: ${secureCount}`)
 
-    // Card number is always in the first "Secure *" iframe
-    const cardNumberFrame = secureIframes.first().contentFrame()
-    const cardNumberInput = cardNumberFrame
-      .getByPlaceholder("1234 1234 1234 1234")
-      .or(cardNumberFrame.getByLabel(/card number/i))
-      .or(cardNumberFrame.locator('[autocomplete="cc-number"]'))
-    await expect(cardNumberInput).toBeVisible({ timeout: 10_000 })
-    await cardNumberInput.fill("4242424242424242")
+    // Selectors used to identify which iframe has the card number field
+    const CARD_SEL =
+      '[autocomplete="cc-number"], input[aria-label="Card number"], ' +
+      'input[placeholder="1234 1234 1234 1234"], input[placeholder="Card number"]'
 
-    // Expiry: second "Secure *" iframe in split-field mode, same in unified
+    let cardFrameIdx = -1
+    const scanDeadline = Date.now() + 20_000
+    while (Date.now() < scanDeadline && cardFrameIdx < 0) {
+      const n = await secureIframes.count()
+      console.log(`[e2e] Scanning ${n} Secure iframe(s) for card number input`)
+      for (let i = 0; i < n; i++) {
+        const hasCard = await secureIframes
+          .nth(i)
+          .contentFrame()
+          .locator(CARD_SEL)
+          .count()
+          .then((c) => c > 0)
+          .catch(() => false)
+        if (hasCard) {
+          cardFrameIdx = i
+          console.log(`[e2e] Card number found in Secure iframe ${i} of ${n}`)
+          break
+        }
+      }
+      if (cardFrameIdx < 0) await page.waitForTimeout(500)
+    }
+
+    if (cardFrameIdx < 0) {
+      // Dump inputs from every Secure iframe to diagnose the mismatch
+      const n = await secureIframes.count()
+      for (let i = 0; i < n; i++) {
+        const inputs = await secureIframes
+          .nth(i)
+          .contentFrame()
+          .locator("input")
+          .evaluateAll((els) =>
+            (els as HTMLInputElement[]).map((el) => ({
+              n: el.name,
+              ph: el.placeholder,
+              ac: el.autocomplete,
+              al: el.getAttribute("aria-label"),
+            }))
+          )
+          .catch(() => [])
+        console.error(
+          `[e2e] Secure iframe ${i} inputs:`,
+          JSON.stringify(inputs)
+        )
+      }
+      throw new Error(
+        "[e2e] Card number not found in any Secure iframe after 20s — check logs above"
+      )
+    }
+
+    const cardFrame = secureIframes.nth(cardFrameIdx).contentFrame()
+    const secureTotal = await secureIframes.count()
+
+    // Fill card number
+    await cardFrame.locator(CARD_SEL).first().fill("4242424242424242")
+
+    // Expiry: same iframe (unified) or next iframe (split-field)
     const expiryFrame =
-      secureCount >= 2 ? secureIframes.nth(1).contentFrame() : cardNumberFrame
+      secureTotal > cardFrameIdx + 1
+        ? secureIframes.nth(cardFrameIdx + 1).contentFrame()
+        : cardFrame
     await expiryFrame
-      .getByPlaceholder("MM / YY")
-      .or(expiryFrame.getByLabel(/expir/i))
-      .or(expiryFrame.locator('[autocomplete="cc-exp"]'))
+      .locator('[autocomplete="cc-exp"], input[placeholder="MM / YY"]')
+      .first()
       .fill("12/34")
 
-    // CVC: third "Secure *" iframe in split-field mode, same in unified
+    // CVC: same iframe (unified) or next+1 iframe (split-field)
     const cvcFrame =
-      secureCount >= 3 ? secureIframes.nth(2).contentFrame() : cardNumberFrame
+      secureTotal > cardFrameIdx + 2
+        ? secureIframes.nth(cardFrameIdx + 2).contentFrame()
+        : cardFrame
     await cvcFrame
-      .getByPlaceholder("CVC")
-      .or(cvcFrame.getByLabel(/cvc|security code/i))
-      .or(cvcFrame.locator('[autocomplete="cc-csc"]'))
+      .locator('[autocomplete="cc-csc"], input[placeholder="CVC"]')
+      .first()
       .fill("123")
 
-    // Postal code — optional; may appear in unified-mode configurations
-    const postalInput = cardNumberFrame
-      .getByPlaceholder("ZIP")
-      .or(cardNumberFrame.getByLabel(/postal/i))
-    if (await postalInput.count().then((n) => n > 0)) {
-      const visible = await postalInput
-        .first()
-        .isVisible()
-        .catch(() => false)
-      if (visible) await postalInput.first().fill("10001")
+    // Postal code — optional
+    const postalInput = cardFrame.locator('input[placeholder="ZIP"]').first()
+    if (
+      (await postalInput.count()) > 0 &&
+      (await postalInput.isVisible().catch(() => false))
+    ) {
+      await postalInput.fill("10001")
     }
 
     // Submit via the external "Pay now" button in the dialog footer.
