@@ -171,7 +171,10 @@ test.describe("reveal after pledge", () => {
     let inputCount = 0
     const inputDeadline = Date.now() + 25_000
     while (Date.now() < inputDeadline && inputCount === 0) {
-      inputCount = await easelFrame.locator("input").count().catch(() => 0)
+      inputCount = await easelFrame
+        .locator("input")
+        .count()
+        .catch(() => 0)
       if (inputCount === 0) await page.waitForTimeout(500)
     }
 
@@ -186,7 +189,10 @@ test.describe("reveal after pledge", () => {
           t: el.type,
         }))
       )
-      console.log(`[e2e] Easel inputs (${inputCount}):`, JSON.stringify(inputInfo))
+      console.log(
+        `[e2e] Easel inputs (${inputCount}):`,
+        JSON.stringify(inputInfo)
+      )
     } catch (diagErr) {
       console.error("[e2e] Could not inspect easel inputs:", diagErr)
     }

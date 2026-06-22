@@ -22,7 +22,11 @@ export async function POST(req: Request) {
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(amount * 100), // pence
     currency: "gbp",
-    automatic_payment_methods: { enabled: true },
+    // Restrict to card only so the PaymentElement renders the card form
+    // directly, bypassing Stripe's adaptive payment-method selector.
+    // Apple Pay / Google Pay require additional domain verification and
+    // are not supported in E2E or headless environments.
+    payment_method_types: ["card"],
     metadata: { ...(userId ? { clerk_user_id: userId } : {}), ...metadata },
   })
 
