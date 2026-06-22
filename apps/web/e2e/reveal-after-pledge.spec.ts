@@ -99,7 +99,7 @@ test.describe("reveal after pledge", () => {
     // Preset amounts render as plain <Button> elements (£5, £10, £20, £50).
     // Click the smallest preset; no checked state to assert.
     await expect(dialog).toContainText(/your pledge/i, { timeout: 10_000 })
-    const firstPreset = dialog.getByRole("button", { name: "£5" })
+    const firstPreset = dialog.getByRole("button", { name: "£5", exact: true })
     await expect(firstPreset).toBeVisible()
     await firstPreset.click()
 

@@ -48,7 +48,9 @@ setup("authenticate as test organiser", async ({ page }) => {
     .getByRole("textbox", { name: /email/i })
     .or(page.locator("#identifier-field"))
 
-  const emailReady = await emailInput.waitFor({ timeout: 15_000 }).catch(() => null)
+  const emailReady = await emailInput
+    .waitFor({ timeout: 15_000 })
+    .catch(() => null)
   if (!emailReady) {
     console.warn(
       "\n[auth.setup] ⚠  Sign-in page did not render the Clerk email input after 15s.\n" +
