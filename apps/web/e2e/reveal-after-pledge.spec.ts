@@ -26,7 +26,7 @@
  *   - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY must be a Stripe test-mode key
  */
 
-import { test, expect } from "@playwright/test"
+import { test, expect, type Frame } from "@playwright/test"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 
@@ -118,17 +118,17 @@ test.describe("reveal after pledge", () => {
     await expect(emailInput).toBeVisible({ timeout: 15_000 })
     await emailInput.fill("e2e-test@playwright.test")
 
-    // ── Stripe PaymentElement iframes ──────────────────────────────────────
-    // Stripe renders card fields inside hosted iframes. The iframe title and
-    // layout vary by Stripe.js version:
-    //   • Unified (old CardElement / some PaymentElement):
-    //       1 iframe titled "Secure payment input frame" — all fields inside
-    //   • Split-field (modern PaymentElement):
-    //       3 iframes per field, each titled "Secure card number input frame",
-    //       "Secure expiry date input frame", "Secure CVC input frame" etc.
-    // We wait for any "Secure *" iframe and use count to detect the layout.
+    // ── Stripe PaymentElement: fill card fields ───────────────────────────
+    // The PaymentElement renders an outer "Secure payment input frame" that
+    // itself contains nested sub-iframes for each card field. A Link/wallet
+    // check iframe (also titled "Secure payment input frame") may appear
+    // briefly then vanish. Using contentFrame().locator("input") only
+    // searches the first-level document and misses nested sub-frames.
+    //
+    // page.frames() traverses the FULL frame tree including nested iframes,
+    // so we use it to poll until the card number input is found anywhere.
 
-    // Broad wait — any iframe whose title starts with "Secure"
+    // Wait for any Stripe-hosted "Secure *" iframe to appear first
     await page
       .locator('iframe[title*="Secure"]')
       .first()
@@ -138,71 +138,70 @@ test.describe("reveal after pledge", () => {
           (els as HTMLIFrameElement[]).map((el) => ({
             t: el.title,
             n: el.name.substring(0, 60),
-            s: el.src.substring(0, 80),
           }))
         )
-        console.error("[e2e] No Stripe iframe found after 25s.")
-        console.error("[e2e] All iframes on page:", JSON.stringify(iframes))
-        console.error(
-          "[e2e] Check that NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is set to a valid " +
-            "Stripe test-mode publishable key in the Vercel Preview environment."
-        )
-        throw new Error(
-          "[e2e] Stripe PaymentElement iframe not found — see log above"
-        )
+        console.error("[e2e] No Stripe iframe appeared after 25s:", iframes)
+        throw new Error("[e2e] Stripe PaymentElement iframe not found")
       })
 
-    // Log actual iframe titles for CI diagnostics on any future mismatch
-    const iframeInfo = await page.$$eval("iframe", (els) =>
+    // Log top-level iframe titles AND the full frame tree for diagnostics
+    const topIframes = await page.$$eval("iframe", (els) =>
       (els as HTMLIFrameElement[]).map((el) => ({
         t: el.title,
-        n: el.name.substring(0, 60),
+        n: el.name.substring(0, 50),
       }))
     )
-    console.log("[e2e] Stripe iframes:", JSON.stringify(iframeInfo))
+    console.log("[e2e] Top-level iframes:", JSON.stringify(topIframes))
+    console.log(
+      "[e2e] All frames (incl. nested):",
+      JSON.stringify(
+        page.frames().map((f) => ({
+          name: f.name().substring(0, 50),
+          url: f.url().substring(0, 70),
+        }))
+      )
+    )
 
-    // Stripe renders 1–3 "Secure *" iframes. A Link/wallet selector iframe
-    // (also titled "Secure payment input frame") may appear BEFORE the actual
-    // card-form iframe. Scan each Secure iframe until the card number field
-    // is found, polling up to 20s for all iframes to fully mount.
-    const secureIframes = page.locator('iframe[title*="Secure"]')
-
-    // Selectors used to identify which iframe has the card number field
     const CARD_SEL =
       '[autocomplete="cc-number"], input[aria-label="Card number"], ' +
       'input[placeholder="1234 1234 1234 1234"], input[placeholder="Card number"]'
+    const EXPIRY_SEL =
+      '[autocomplete="cc-exp"], input[placeholder="MM / YY"], input[placeholder="MM/YY"]'
+    const CVC_SEL =
+      '[autocomplete="cc-csc"], input[placeholder="CVC"], input[placeholder="CVV"]'
 
-    let cardFrameIdx = -1
-    const scanDeadline = Date.now() + 20_000
-    while (Date.now() < scanDeadline && cardFrameIdx < 0) {
-      const n = await secureIframes.count()
-      console.log(`[e2e] Scanning ${n} Secure iframe(s) for card number input`)
-      for (let i = 0; i < n; i++) {
-        const hasCard = await secureIframes
-          .nth(i)
-          .contentFrame()
-          .locator(CARD_SEL)
-          .count()
-          .then((c) => c > 0)
-          .catch(() => false)
-        if (hasCard) {
-          cardFrameIdx = i
-          console.log(`[e2e] Card number found in Secure iframe ${i} of ${n}`)
-          break
+    // Poll page.frames() (full tree) until the card number input appears
+    let cardFrameRef: Frame | undefined
+    const scanDeadline = Date.now() + 25_000
+    while (Date.now() < scanDeadline && !cardFrameRef) {
+      for (const frame of page.frames()) {
+        try {
+          if ((await frame.locator(CARD_SEL).count()) > 0) {
+            cardFrameRef = frame
+            console.log(`[e2e] Card input in frame "${frame.name()}"`)
+            break
+          }
+        } catch {
+          // Frame detached during traversal — skip
         }
       }
-      if (cardFrameIdx < 0) await page.waitForTimeout(500)
+      if (!cardFrameRef) await page.waitForTimeout(500)
     }
 
-    if (cardFrameIdx < 0) {
-      // Dump inputs from every Secure iframe to diagnose the mismatch
-      const n = await secureIframes.count()
-      for (let i = 0; i < n; i++) {
-        const inputs = await secureIframes
-          .nth(i)
-          .contentFrame()
-          .locator("input")
-          .evaluateAll((els) =>
+    if (!cardFrameRef) {
+      // Dump all frame inputs so we can see what Stripe actually rendered
+      console.error(
+        "[e2e] All frames at timeout:",
+        JSON.stringify(
+          page.frames().map((f) => ({
+            name: f.name().substring(0, 50),
+            url: f.url().substring(0, 70),
+          }))
+        )
+      )
+      for (const frame of page.frames()) {
+        try {
+          const inputs = await frame.$$eval("input", (els) =>
             (els as HTMLInputElement[]).map((el) => ({
               n: el.name,
               ph: el.placeholder,
@@ -210,45 +209,62 @@ test.describe("reveal after pledge", () => {
               al: el.getAttribute("aria-label"),
             }))
           )
-          .catch(() => [])
-        console.error(
-          `[e2e] Secure iframe ${i} inputs:`,
-          JSON.stringify(inputs)
-        )
+          if (inputs.length > 0) {
+            console.error(
+              `[e2e] "${frame.name()}" inputs:`,
+              JSON.stringify(inputs)
+            )
+          }
+        } catch {
+          // ignore detached frames
+        }
       }
       throw new Error(
-        "[e2e] Card number not found in any Secure iframe after 20s — check logs above"
+        "[e2e] Card number not found in any frame after 25s — check logs above"
       )
     }
 
-    const cardFrame = secureIframes.nth(cardFrameIdx).contentFrame()
-    const secureTotal = await secureIframes.count()
+    // Fill card number, expiry, and CVC
+    // All three may be in the same frame (unified) or separate frames (split-field).
+    await cardFrameRef.locator(CARD_SEL).first().fill("4242424242424242")
 
-    // Fill card number
-    await cardFrame.locator(CARD_SEL).first().fill("4242424242424242")
+    // Try expiry in the same frame first; fall back to scanning other frames
+    let expiryFilled = (await cardFrameRef.locator(EXPIRY_SEL).count()) > 0
+    if (expiryFilled) {
+      await cardFrameRef.locator(EXPIRY_SEL).first().fill("12/34")
+    } else {
+      for (const frame of page.frames()) {
+        try {
+          if ((await frame.locator(EXPIRY_SEL).count()) > 0) {
+            await frame.locator(EXPIRY_SEL).first().fill("12/34")
+            expiryFilled = true
+            break
+          }
+        } catch {
+          /* skip */
+        }
+      }
+    }
 
-    // Expiry: same iframe (unified) or next iframe (split-field)
-    const expiryFrame =
-      secureTotal > cardFrameIdx + 1
-        ? secureIframes.nth(cardFrameIdx + 1).contentFrame()
-        : cardFrame
-    await expiryFrame
-      .locator('[autocomplete="cc-exp"], input[placeholder="MM / YY"]')
-      .first()
-      .fill("12/34")
-
-    // CVC: same iframe (unified) or next+1 iframe (split-field)
-    const cvcFrame =
-      secureTotal > cardFrameIdx + 2
-        ? secureIframes.nth(cardFrameIdx + 2).contentFrame()
-        : cardFrame
-    await cvcFrame
-      .locator('[autocomplete="cc-csc"], input[placeholder="CVC"]')
-      .first()
-      .fill("123")
+    let cvcFilled = (await cardFrameRef.locator(CVC_SEL).count()) > 0
+    if (cvcFilled) {
+      await cardFrameRef.locator(CVC_SEL).first().fill("123")
+    } else {
+      for (const frame of page.frames()) {
+        try {
+          if ((await frame.locator(CVC_SEL).count()) > 0) {
+            await frame.locator(CVC_SEL).first().fill("123")
+            cvcFilled = true
+            break
+          }
+        } catch {
+          /* skip */
+        }
+      }
+    }
 
     // Postal code — optional
-    const postalInput = cardFrame.locator('input[placeholder="ZIP"]').first()
+    const postalInput = cardFrameRef.locator('input[placeholder="ZIP"]').first()
     if (
       (await postalInput.count()) > 0 &&
       (await postalInput.isVisible().catch(() => false))
