@@ -50,10 +50,18 @@ jobs:
   #   E2E_SUPABASE_URL              — staging Supabase project URL
   #   E2E_SUPABASE_SERVICE_ROLE_KEY — staging service role key (bypasses RLS)
   #   E2E_STRIPE_PUBLISHABLE_KEY    — Stripe test-mode publishable key
-  #   E2E_TEST_EMAIL                — email of Clerk test account (email + password auth)
+  #   E2E_TEST_EMAIL                — email of Clerk test account (no 2FA)
   #   E2E_TEST_PASSWORD             — password of Clerk test account
   #   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY — Clerk publishable key (same as dev/preview)
-  #   E2E_BASE_URL (optional)       — override the computed preview URL (e.g. for main-branch runs)
+  #   E2E_VERCEL_BYPASS_SECRET      — Vercel automation bypass secret (see below)
+  #   E2E_BASE_URL (optional)       — override the computed preview URL
+  #
+  # Vercel Automation Bypass setup (one-time):
+  #   1. Vercel Project → Settings → Security → Deployment Protection
+  #   2. Enable "Protection Bypass for Automation" — copy the generated secret
+  #   3. Add it to GitHub "Preview – favpoll-web" environment as E2E_VERCEL_BYPASS_SECRET
+  #   Playwright sends the secret as x-vercel-protection-bypass header on every
+  #   request, bypassing the Vercel SSO wall on preview deployments.
   e2e:
     name: E2E Tests (advisory)
     runs-on: ubuntu-latest
@@ -94,15 +102,24 @@ jobs:
 
       - name: Wait for Vercel deployment to be ready
         if: steps.preview.outputs.url != ''
+        env:
+          E2E_VERCEL_BYPASS_SECRET: ${{ secrets.E2E_VERCEL_BYPASS_SECRET }}
         run: |
           URL="${{ steps.preview.outputs.url }}"
           echo "[e2e] Waiting for $URL to respond..."
           for i in $(seq 1 18); do
-            if curl -sf --max-time 10 "$URL" -o /dev/null; then
-              echo "[e2e] Deployment ready (attempt $i)"
+            # Send bypass header when set so the check isn't redirected to Vercel login.
+            if [ -n "$E2E_VERCEL_BYPASS_SECRET" ]; then
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+                -H "x-vercel-protection-bypass: $E2E_VERCEL_BYPASS_SECRET" "$URL")
+            else
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL")
+            fi
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+              echo "[e2e] Deployment ready (attempt $i, status $STATUS)"
               exit 0
             fi
-            echo "[e2e] Not ready yet, waiting 10s (attempt $i/18)..."
+            echo "[e2e] Not ready yet (status $STATUS), waiting 10s (attempt $i/18)..."
             sleep 10
           done
           echo "[e2e] Deployment did not respond after 3 minutes — tests may fail"
@@ -122,6 +139,7 @@ jobs:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_VERCEL_BYPASS_SECRET: ${{ secrets.E2E_VERCEL_BYPASS_SECRET }}
 
       - name: Upload Playwright report
         if: always()

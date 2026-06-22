@@ -23,6 +23,14 @@ export default defineConfig({
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    // Bypass Vercel preview deployment protection when running against a
+    // preview URL. Secret comes from Vercel Project Settings → Security →
+    // Deployment Protection → "Protection Bypass for Automation".
+    // Stored as E2E_VERCEL_BYPASS_SECRET in the GitHub environment secrets.
+    // Has no effect when running against localhost (header is simply ignored).
+    extraHTTPHeaders: process.env.E2E_VERCEL_BYPASS_SECRET
+      ? { "x-vercel-protection-bypass": process.env.E2E_VERCEL_BYPASS_SECRET }
+      : {},
   },
   projects: [
     // ── Auth setup ────────────────────────────────────────────────────────────
