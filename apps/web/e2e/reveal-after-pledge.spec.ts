@@ -217,7 +217,7 @@ test.describe("reveal after pledge", () => {
     //
     // THIS IS THE ASSERTION THAT WOULD HAVE CAUGHT PR #120's BUG.
     // personal_reveal was null → PollReveal returns null → no blockquote rendered.
-    const revealBlock = page.getByRole("status")
+    const revealBlock = page.locator('blockquote[role="status"]')
     await expect(revealBlock).toBeVisible({ timeout: 10_000 })
     await expect(revealBlock).not.toBeEmpty()
 
