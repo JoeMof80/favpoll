@@ -143,6 +143,7 @@ app/favpolls/[id]/page.tsx
               → favpoll-card/poll-reveal.tsx  (PollReveal) *  — purple-tinted reveal card post-pledge
               → ui/tooltip-icon-button.tsx *
           → ranking-list/index.tsx  (RankingList)
+              → ranking-list/hide-toggle.tsx  (HideToggle)
               → ranking-list/use-ranking-items.ts  (useRankingItems)
               → ui/ranking-bar.tsx *
           → poll-section/empty-poll-alert.tsx  (EmptyPollAlert) *  — amber alert when all items hidden
@@ -180,6 +181,8 @@ Server component. Renders full-screen projector view.
 ```
 app/favpolls/[id]/display/page.tsx
   → display-screen/index.tsx  (DisplayScreen) *
+      → display-screen/display-poll-section.tsx  (DisplayPollSection)
+          → display-screen/display-ranking-row.tsx  (DisplayRankingRow)
       → ranking-list/use-ranking-items.ts  (useRankingItems)
           — real-time Supabase subscription (channel per favpoll poll)
       → ui/ranking-bar.tsx
@@ -257,6 +260,13 @@ Server component. Animated Venn hero + six-step how-it-works + CTA.
 ```
 app/landing-v2/page.tsx
   → landing-v2/how-it-works.tsx  (HowItWorks)
+      → landing-v2/how-it-works-step1-preview.tsx  (Step1Preview)
+      → landing-v2/how-it-works-step2-preview.tsx  (Step2Preview)
+      → landing-v2/how-it-works-step3-preview.tsx  (Step3Preview)
+      → landing-v2/how-it-works-step4-preview.tsx  (Step4Preview)
+      → landing-v2/how-it-works-step5-preview.tsx  (Step5Preview)
+      → landing-v2/how-it-works-step6-preview.tsx  (Step6Preview)
+      — step previews use landing-v2/how-it-works-preview-card.tsx  (PreviewCard)
   → landing-v2/occasion-eyebrow.tsx  (OccasionEyebrow)  — cycles occasion names every 2.8s
   → landing-v2/honour-charity-love-venn.tsx  (HonourCharityLoveVenn) *
       — three rotating SVG rings; baked path coords, no FavpollMarkGlyph import
@@ -273,53 +283,61 @@ app/landing-v2/page.tsx
 Used by `app/favpolls/new/details/page.tsx` (create) and `app/favpolls/[id]/edit/page.tsx` (edit).
 
 ```
-FavpollForm
-  → favpoll-form/command-panel.tsx  (CommandPanel)
-      — floating fixed bottom-4 right-4 w-72 desktop; full-width bottom bar mobile
-      → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — create mode: Publish overlay
-          → favpoll-form/date-time-picker.tsx  (DateTimePicker) *
-              → ui/calendar.tsx
-              → ui/popover.tsx
-              → ui/card.tsx
-              → ui/input-group.tsx
-      → favpoll-flow/honour-step.tsx  (HonourStep)  — edit mode: Occasion overlay
-      → favpoll-flow/charity-step.tsx  (CharityStep)  — edit mode: Charity overlay
-      → favpoll-flow/love-step.tsx  (LoveStep)  — edit mode: Topic overlay
-      → favpoll-flow/topic-items-dialog.tsx  (TopicItemsDialog)  — edit mode
-      → ui/responsive-overlay.tsx
-      → ui/button.tsx
-      → ui/switch.tsx  — Listed/Unlisted toggle
-  → favpoll-form/preview-panel.tsx  (PreviewPanel)  — ~90-line coordinator
-      → favpoll-form/editable-hero.tsx  (EditableHero) *
-          — hero text + photo editing; owns overlays (name/context/photo/opening-line/about/cause-label)
-          → favpoll-hero-avatar.tsx  (ProtagonistAvatar) *
-          → editable-field.tsx  (EditableField)
+FavpollForm  (favpoll-form/index.tsx)
+  → favpoll-form/form-inner.tsx  (FormInner)  — layout, generation logic, session storage hydration
+      → favpoll-form/command-panel.tsx  (CommandPanel)
+          — floating fixed bottom-4 right-4 w-72 desktop; full-width bottom bar mobile
+          → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — create mode: Publish overlay
+              → favpoll-form/date-time-picker.tsx  (DateTimePicker) *
+                  → ui/calendar.tsx
+                  → ui/popover.tsx
+                  → ui/card.tsx
+                  → ui/input-group.tsx
+          → favpoll-flow/honour-step.tsx  (HonourStep)  — edit mode: Occasion overlay
+          → favpoll-flow/charity-step.tsx  (CharityStep)  — edit mode: Charity overlay
+          → favpoll-flow/love-step.tsx  (LoveStep)  — edit mode: Topic overlay
+          → favpoll-flow/topic-items-dialog.tsx  (TopicItemsDialog)  — edit mode
           → ui/responsive-overlay.tsx
-          → ui/input.tsx *  — border-stripped in header prop
-          → ui/section-eyebrow.tsx
           → ui/button.tsx
-          → Cropper  (react-easy-crop)  — inline 1:1 rounded-rect crop; JPEG Blob output
-      → favpoll-form/editable-poll-area.tsx  (EditablePollArea) *
-          — poll topic label, reveal toggle, reveal overlay, pledge/results preview
-          → pledge-panel.tsx  (PledgePanel)  — organiser form preview only
-              → ui/chip.tsx
+          → ui/switch.tsx  — Listed/Unlisted toggle
+      → favpoll-form/preview-panel.tsx  (PreviewPanel)  — ~90-line coordinator
+          → favpoll-form/editable-hero.tsx  (EditableHero) *
+              — thin orchestrator; delegates all editing to overlay sub-components
+              → favpoll-form/hero-name-overlay.tsx  (HeroNameOverlay)
+              → favpoll-form/hero-context-overlay.tsx  (HeroContextOverlay)
+              → favpoll-form/hero-cause-label-overlay.tsx  (HeroCauseLabelOverlay)
+              → favpoll-form/hero-opening-line-overlay.tsx  (HeroOpeningLineOverlay)
+              → favpoll-form/hero-about-overlay.tsx  (HeroAboutOverlay)
+              → favpoll-form/hero-photo-overlay.tsx  (HeroPhotoOverlay)
+                  — Cropper (react-easy-crop) + getCroppedBlob canvas utility; 3-phase flow
+              → favpoll-hero-avatar.tsx  (ProtagonistAvatar) *
+              → editable-field.tsx  (EditableField)
+              → ui/section-eyebrow.tsx
               → ui/button.tsx
-              → ui/input-group.tsx
+          → favpoll-form/editable-poll-area.tsx  (EditablePollArea) *
+              — poll topic label, reveal toggle, reveal overlay, pledge/results preview
+              → pledge-panel.tsx  (PledgePanel)  — organiser form preview only
+                  → pledge-panel-picker-header.tsx  (PledgePanelPickerHeader)
+                  → pledge-panel-picker-items.tsx  (PledgePanelPickerItems)
+                  → ui/chip.tsx
+                  → ui/button.tsx
+                  → ui/input-group.tsx
+                  → ui/responsive-overlay.tsx
+              → favpoll-card/poll-results.tsx  (PollResults)
+              → favpoll-card/section-label.tsx  (SectionLabel)
               → ui/responsive-overlay.tsx
-          → favpoll-card/poll-results.tsx  (PollResults)
-          → favpoll-card/section-label.tsx  (SectionLabel)
-          → ui/responsive-overlay.tsx
-          → ui/tabs.tsx
-          → ui/switch.tsx
-          → ui/button.tsx
-          → ui/tooltip-icon-button.tsx
-      → favpoll-form/editable-countdown.tsx  (EditableCountdown) *
-          → countdown.tsx  (Countdown) *
-          → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — edit mode only
-      → charity-banner.tsx  (CharityBanner) *
-          → charity-row.tsx  (CharityRow) *
+              → ui/tabs.tsx
+              → ui/switch.tsx
+              → ui/button.tsx
+              → ui/tooltip-icon-button.tsx
+          → favpoll-form/editable-countdown.tsx  (EditableCountdown) *
+              → countdown.tsx  (Countdown) *
+              → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — edit mode only
+          → charity-banner.tsx  (CharityBanner) *
+              → charity-row.tsx  (CharityRow) *
   → favpoll-form/seed-fund-modal.tsx  (SeedFundModal)  — create mode only, post-publish
       → stripe-checkout.tsx  (StripeCheckout)  — inline prop (no overlay wrapper)
+          → checkout-form.tsx  (CheckoutForm)  — must render inside Stripe Elements provider
       → ui/responsive-overlay.tsx  — hideCloseButton; no × button
       → ui/button.tsx
       → ui/switch.tsx
@@ -338,17 +356,19 @@ PledgeDialog *
       → pledge-card/use-pledge.ts  (usePledge)
       → computePledgeAllocations  (pledge-panel.tsx)
   → pledge-dialog/step-pick-favourites.tsx
-      PickerHeader  — chip + search field in overlay header prop
-      PickerItems   — chip grid; Chip per favourite
+      PickerHeader  — chip + search field in overlay header prop (inline)
+      PickerItems   — chip grid; Chip per favourite (inline)
   → pledge-dialog/step-amount.tsx
-      StepAmountHeader  — rendered in overlay header prop
-      StepAmount  — AmountInput + breakdown + funding path (card/shared-fund tabs)
+      StepAmountHeader  — rendered in overlay header prop (inline)
+      StepAmount  — AmountInput + breakdown + funding path (card/shared-fund tabs) (inline)
           → pledge-card/pledge-breakdown.tsx  (PledgeBreakdown) *
           → ui/input-group.tsx
           → ui/tabs.tsx
           → ui/button.tsx
   → pledge-dialog/step-pay.tsx  (StepPay)  — step 3
       → stripe-checkout.tsx  (StripeCheckout)
+          → checkout-form.tsx  (CheckoutForm)
+  → pledge-dialog/step-indicator.tsx  (StepIndicator)  ⚠ extracted but never imported — dead code
   → ui/responsive-overlay.tsx  — Sheet mobile / Dialog desktop
   → ui/button.tsx
 ```
@@ -412,7 +432,10 @@ The hooks and utilities in this directory are still in use; the rendered compone
 | `use-pledge.ts`  (usePledge) | ✓ Used by `pledge-dialog/use-pledge-dialog.ts` |
 | `utils.ts`  (GBP, FUND_GREEN/AMBER/RED, formatCharityLabel) | ✓ Used by `pledge-dialog/step-amount.tsx` |
 | `pledge-breakdown.tsx`  (PledgeBreakdown) | ✓ Used by `pledge-dialog/step-amount.tsx` |
-| `index.tsx`  (PledgeCard, LivePledgeCard, PledgeCardWrapper) | ⚠ No production importers — superseded by PledgeDialog |
+| `index.tsx`  (PledgeCard) | ⚠ No production importers — superseded by PledgeDialog |
+| `pledge-card-wrapper.tsx`  (PledgeCardWrapper) | ⚠ No production importers — re-exported from index |
+| `live-pledge-card.tsx`  (LivePledgeCard) | ⚠ No production importers — re-exported from index |
+| `preview-pledge-card.tsx`  (PreviewPledgeCard) | ⚠ No production importers — composed in index |
 | `amount-input.tsx`  (AmountInput) | ⚠ No production importers — amount input is now inline in step-amount |
 | `amount-presets.tsx`  (AmountPresets) | ⚠ No production importers — presets are now inline in step-amount |
 
@@ -427,7 +450,10 @@ Components with no non-story, non-test importers:
 | `ui/occasion-tag.tsx` | No production importers found |
 | `honour-charity-love-venn.tsx` (root-level) | Superseded by `landing-v2/honour-charity-love-venn.tsx`; `landing-v2/page.tsx` imports the scoped variant |
 | `landing-v2/favpoll-mark.tsx` | `landing-v2/honour-charity-love-venn.tsx` embeds its own paths inline; this file is never imported |
-| `pledge-card/index.tsx` (`PledgeCard`, `LivePledgeCard`, `PledgeCardWrapper`) | Superseded by `PledgeDialog`; no importers outside the pledge-card directory |
+| `pledge-card/index.tsx` (`PledgeCard`) | Superseded by `PledgeDialog`; no importers outside the pledge-card directory |
+| `pledge-card/pledge-card-wrapper.tsx` | No importers outside pledge-card directory |
+| `pledge-card/live-pledge-card.tsx` | No importers outside pledge-card directory |
+| `pledge-card/preview-pledge-card.tsx` | No importers outside pledge-card directory |
 | `pledge-card/amount-input.tsx` | Amount input now inline in `pledge-dialog/step-amount.tsx` |
 | `pledge-card/amount-presets.tsx` | Presets now inline in `pledge-dialog/step-amount.tsx` |
 
