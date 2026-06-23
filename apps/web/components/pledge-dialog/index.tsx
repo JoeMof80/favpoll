@@ -25,24 +25,6 @@ type Props = {
   isListed?: boolean
 }
 
-function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
-  return (
-    <ol role="list" aria-label="Progress" className="flex gap-1.5">
-      {([1, 2, 3] as const).map((n) => (
-        <li
-          key={n}
-          role="listitem"
-          aria-label={`Step ${n} of 3`}
-          aria-current={step === n ? "step" : undefined}
-          className={`text-sm ${step === n ? "text-primary" : "text-muted-foreground/40"}`}
-        >
-          {step === n ? "●" : "○"}
-        </li>
-      ))}
-    </ol>
-  )
-}
-
 export function PledgeDialog({
   favpollId,
   clerkUserId,
@@ -139,10 +121,6 @@ export function PledgeDialog({
     </Button>
   )
 
-  // Step 2/3 footer (desktop dialog only — mobile renders its own button in step body)
-  // Guest email is captured in step 3 (StripeCheckout), not step 2, so we can't
-  // use canOwnConfirm here — it requires isGuestEmailValid which is always false
-  // at this point. Check isPledgeValid + !submitting directly instead.
   const isNextDisabled = dialog.useSharedFund
     ? !dialog.canFundConfirm
     : !dialog.isPledgeValid || dialog.submitting

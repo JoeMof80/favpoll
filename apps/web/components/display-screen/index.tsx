@@ -3,24 +3,11 @@
 import { useEffect, useState } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { createClient } from "@/lib/supabase/client"
-import { useRankingItems } from "@/components/ranking-list/use-ranking-items"
-import { formatAmount } from "@/components/ranking-list/utils"
 import { getFavpollHeadline } from "@/lib/display"
-import { RankingBar } from "@/components/ui/ranking-bar"
-import type { Favourite } from "@favpoll/types"
+import { DisplayPollSection } from "./display-poll-section"
+import type { DisplayPoll } from "./display-poll-section"
 
 const BRAND = "#534AB7"
-const ROW_HEIGHT = 72
-
-type DisplayPoll = {
-  id: string
-  personal_reveal: string | null
-  topic: {
-    id: string
-    title: string
-  }
-  items: Favourite[]
-}
 
 type Props = {
   favpollId: string
@@ -34,105 +21,6 @@ type Props = {
   initialTotalRaised: number
   pollId: string | null
   favpollUrl: string
-}
-
-function DisplayRankingRow({
-  item,
-  isColorTopic,
-  maxPledged,
-  isFirst,
-  style,
-}: {
-  item: Favourite & { rank: number }
-  isColorTopic: boolean
-  maxPledged: number
-  isFirst: boolean
-  style?: React.CSSProperties
-}) {
-  const barWidth =
-    maxPledged > 0 ? (item.all_time_pledged / maxPledged) * 100 : 0
-  const amountStr = formatAmount(item.all_time_pledged)
-
-  return (
-    <li
-      aria-label={`${item.label}, rank ${item.rank}, ${amountStr}`}
-      className="absolute w-full transition-transform duration-500 ease-in-out"
-      style={style}
-    >
-      <RankingBar
-        label={item.label}
-        amount={amountStr}
-        widthPercent={barWidth}
-        barStyle={{ background: isFirst ? BRAND : "#AFA9EC" }}
-        labelSuffix={
-          isColorTopic ? (
-            <span
-              className="inline-block h-3 w-3 shrink-0 rounded-full border border-black/10"
-              style={{ backgroundColor: item.label.toLowerCase() }}
-              aria-hidden="true"
-            />
-          ) : undefined
-        }
-      />
-    </li>
-  )
-}
-
-function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
-  const { items, announcement, maxValue } = useRankingItems(
-    poll.items,
-    poll.topic.id,
-    "amount"
-  )
-  const isColorTopic =
-    poll.topic.title.toLowerCase().includes("colour") ||
-    poll.topic.title.toLowerCase().includes("color")
-
-  return (
-    <section className="mb-10" aria-labelledby={`poll-${poll.id}-heading`}>
-      <h2
-        id={`poll-${poll.id}-heading`}
-        className="mb-1 text-lg font-medium text-foreground"
-      >
-        {poll.topic.title}
-      </h2>
-      {poll.personal_reveal && (
-        <p
-          className="mb-4 border-l-2 pl-3 text-sm text-muted-foreground italic"
-          style={{ borderColor: "#EEEDFE" }}
-        >
-          {poll.personal_reveal}
-        </p>
-      )}
-      <span
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {announcement}
-      </span>
-      <ol
-        aria-label={`${poll.topic.title} rankings`}
-        aria-live="polite"
-        className="relative"
-        style={{ height: items.length * ROW_HEIGHT }}
-      >
-        {items.map((item) => (
-          <DisplayRankingRow
-            key={item.id}
-            item={item}
-            isColorTopic={isColorTopic}
-            maxPledged={maxValue}
-            isFirst={item.rank === 1}
-            style={{
-              transform: `translateY(${(item.rank - 1) * ROW_HEIGHT}px)`,
-            }}
-          />
-        ))}
-      </ol>
-    </section>
-  )
 }
 
 export function DisplayScreen({

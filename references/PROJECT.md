@@ -434,8 +434,7 @@ app/
 │       ├── page.tsx
 │       ├── actions.ts
 │       ├── display/page.tsx
-│       ├── edit/page.tsx, actions.ts
-│       └── manage/page.tsx
+│       └── edit/page.tsx, actions.ts
 ├── my-favpolls/page.tsx
 ├── rankings/page.tsx
 ├── topics/[id]/page.tsx
@@ -476,29 +475,25 @@ components/
 │   ├── index.tsx                 -- FavpollForm (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed. No Settings overlay. initialClosesAt prop (ISO string) carries existing closes_at for edit mode; closesAt is not a form field — captured locally in the publish overlay (create) or passed through from initialClosesAt (edit). isPrivate always false; potAmount always null. After createEvent: sets seedEventId state → renders SeedFundModal instead of redirecting immediately. Generation is opt-in: no auto-call on mount. handleRegenerate() fires safeGenerateDraft on demand (via the "Generate a suggestion →" prompt or the Regenerate button in the About overlay), pre-fills about for both modes and reveal for cause favpolls, sets personRevealExample for person favpolls (never commits); manual-edit confirmation before overwrite; shows error toast when result is null.
 │   ├── seed-fund-modal.tsx       -- Post-publish shared fund seeding modal. Props: eventId, onComplete. States: amount (number), clientSecret, error, submitting. Preset buttons £10/£25/£50 set amount. "Seed fund" button (disabled when no amount) → POST /api/stripe/payment-intent with pot_top_up metadata → StripeCheckout. On success: topUpFund() then onComplete(). topUpFund failure swallowed. Cancel: returns to modal with error. "Skip for now" link calls onComplete() immediately. hideCloseButton on ResponsiveOverlay (no × button).
 │   ├── command-panel.tsx         -- Floating command panel: fixed bottom-4 right-4 w-72 on desktop, full-width bottom bar on mobile. Create mode: missing list checks Name/Cause only; Publish opens `CloseDateOverlay` pre-filled via `suggestClosingDate(category)`. Edit mode: missing list checks Occasion/Charity/Topic; Save calls `onSubmit()` directly. Both modes: Listed/Unlisted Switch; no chips or overlay sheets in edit mode — fields are edited via the preview panel's editable sub-components.
-│   ├── preview-panel.tsx         -- ~90-line coordinator; composes EditableHero + EditablePollArea + EditableCountdown + CharityBanner + inline shared fund card (pointer-events-none opacity-40 — same card layout as /favpolls/[id] page). PledgeCard removed from the form preview; FormInner also renders the same inline card. Shows OnboardingPanel when no occasion selected. Always visible on mobile (stacks below command bar; pb-52 clears command bar).
+│   ├── preview-panel.tsx         -- ~90-line coordinator; composes EditableHero + EditablePollArea + EditableCountdown + CharityBanner. PledgeCard removed from the form preview. Always visible on mobile (stacks below command bar; pb-52 clears command bar).
 │   ├── edit-helpers.tsx          -- Shared helpers used by editable sub-components: `EDIT_BTN` className string (ghost Button base), `EditBadge` (pencil badge positioned at corner), `CharCounter` (remaining count with colour), `overlayFooter(onSave, onCancel)` (Save/Cancel footer for all overlays). Also exports `INPUT_GROUP_CLS` (h-auto rounded-none border-0 ring-0 shared across all field overlay InputGroups) and `FIELD_OVERLAY_PROPS` (hideCloseButton/headerClassName/dialogClassName spread onto all field `ResponsiveOverlay` instances).
 │   ├── editable-hero.tsx         -- Hero editing: static layout (no Framer Motion, no BaseFavpollHero); renders its own JSX so it owns both form state and edit overlays. Each `EditableField` has a named `open*()` function that seeds the draft from the current form value before opening, preventing stale-draft bugs. Overlays: name/context/photo/opening-line/about for person favpolls; cause-label for cause favpolls. Uses `useFormContext<FavpollFormValues>()` internally. Each overlay: shadcn `Input`/`Textarea` in `header` prop with border-stripping className; Save/Cancel in `footer`. Photo overlay is a three-state inline crop dialog: no-file (Upload icon, "No file chosen") → cropping (inline `Cropper` with zoom slider, rounded-rect `cropShape="rect"`, "Crop" footer) → avatar preview ("Current photo" + Trash, "Save" footer). `dialogPhotoUrl` staging state decouples dialog visual state from committed form state so delete takes immediate effect without writing to form. `getCroppedBlob` function does canvas-based crop to JPEG Blob. "Generate a suggestion →" prompt (`text-sm text-muted-foreground`) shown below the About placeholder when about is empty, not generating, and the topic is canonical — clicking fires `onRegenerate`; prompt hides once about is filled or generation is in flight.
 │   ├── editable-poll-area.tsx    -- Poll area editing: topic label, pre/post-reveal Switch toggle, reveal edit overlay (Textarea in `header`), PledgePanel (pre-reveal) or PollResults (post-reveal). Uses `useFormContext<FavpollFormValues>()` internally.
 │   ├── editable-countdown.tsx    -- Countdown widget wrapper: when `closesAt` is set (edit mode), renders `<Countdown closesAt={...} />` in a clickable card that opens `CloseDateOverlay`; when absent (create mode), renders `<Countdown />` placeholder only (no edit affordance).
-│   ├── occasion-overlay.tsx      -- All occasion types grouped under register-labelled section headers (no register chip prerequisite); free-text input always shown; Switch shown only for celebrating_one; Footer: Done + Clear; controlled-open
-│   ├── onboarding-panel.tsx      -- Desktop: three-section panel (Honour/Love/Charity) with labelled form mockups; accepts onHowItWorks callback
-│   ├── onboarding-interstitial.tsx -- Mobile-only: fixed inset-0 full-screen overlay for first-time organisers; same localStorage key as onboarding-panel
 │   ├── schema.ts                 -- Zod schema + FavpollFormValues; subject/causeLabel fields + superRefine (name required iff subject='someone', causeLabel required iff subject='cause')
 │   ├── constants.ts              -- PickerSize, INPUT_SIZE, TEXTAREA_SIZE, CHIP_IN_INPUT_* maps
 │   ├── date-helpers.ts           -- Shared date utilities: `addDays(date, n)`, `ordinalSuffix(n)`, `CLOSE_DATE_PRESETS` (Tomorrow/3d/1w/2w/1m/6w/3m/6m label+days array); consumed by `CloseDateOverlay`
 │   ├── close-date-overlay.tsx    -- Shared `CloseDateOverlay` component used by both `editable-countdown` and `command-panel`; props: `open, onOpenChange, title?, initialDate, saveLabel?, submitting?, onSave`; `prevOpenRef` pattern prevents re-init on every render when `initialDate` is a new object reference each render
 │   ├── date-time-picker.tsx      -- Side-by-side date button (opens calendar) + time InputGroup; button width hardcoded to CALENDAR_WIDTH = 220
-│   ├── topic-picker-field.tsx    -- ResponsiveOverlay (internal open state); search input + filter buttons + topic chips; Enter creates custom topic
-│   ├── item-add-field.tsx        -- ResponsiveOverlay (internal open state); disabled state unchanged; NOT used in form pillar 2
-│   ├── charity-field.tsx         -- ResponsiveOverlay (internal open state); search input + charity chip grid; max 3
-│   ├── photo-crop-modal.tsx      -- react-easy-crop circular 1:1 crop → JPEG Blob (superseded — inline crop logic now lives in `editable-hero.tsx`; this file is unused)
+│   ├── item-add-field.tsx        -- ResponsiveOverlay (internal open state); item addition for edit-mode topic management; NOT used in create wizard (wizard uses TopicItemsDialog)
 │   └── __tests__/generate-draft-prefill.test.tsx  -- 9 tests: empty-on-mount, shimmer→fill after generate trigger, person vs cause pre-fill, skip for custom/edit mode, silent failure, subject derivation; subject passed as prop (not derived from register)
-├── pledge-panel.tsx              -- Still used by editable-poll-area.tsx in the create/edit form preview (organiser only). No longer on the guest event page — picker is now step 1 of PledgeDialog.
+├── pledge-panel.tsx              -- Still used by editable-poll-area.tsx in the create/edit form preview (organiser only). No longer on the guest event page — picker is now step 1 of PledgeDialog. Also exports computePledgeAllocations() utility used by pledge-card/use-pledge.ts and pledge-dialog/use-pledge-dialog.ts.
 ├── pledge-card/
-│   ├── index.tsx                 -- PledgeCard dispatcher → PreviewPledgeCard (prePublish, fully interactive except pledge) | LivePledgeCard; all inputs text-base (iOS zoom fix). LivePledgeCard is no longer rendered on the guest event page — superseded by PledgeDialog.
-│   ├── use-pledge.ts, amount-input.tsx
-│   ├── amount-presets.tsx, pledge-breakdown.tsx, utils.ts
+│   ├── index.tsx                 -- ⚠ No production importers — PledgeCard/LivePledgeCard/PledgeCardWrapper superseded by PledgeDialog; files retained for reference and test coverage.
+│   ├── use-pledge.ts             -- ✓ Used by pledge-dialog/use-pledge-dialog.ts
+│   ├── pledge-breakdown.tsx      -- ✓ Used by pledge-dialog/step-amount.tsx
+│   ├── utils.ts                  -- ✓ Used by pledge-dialog/step-amount.tsx (GBP, FUND_GREEN/AMBER/RED)
+│   ├── amount-input.tsx, amount-presets.tsx  -- ⚠ No production importers; amount/presets now inline in step-amount.tsx
 │   └── __tests__/pledge-card.test.tsx, use-pledge.test.ts, utils.test.ts
 ├── pledge-dialog/                -- Unified 3-step pledge dialog replacing the separate PledgePanel + PledgeCard surfaces on the guest event page.
 │   ├── index.tsx                 -- PledgeDialog: self-contained trigger button + ResponsiveOverlay; step 1 = pick favourites, step 2 = amount + breakdown, step 3 = inline Stripe payment.
@@ -527,7 +522,7 @@ components/
 ├── favpoll-hero.tsx               -- view-only: favpoll + protagonist props, hideAvatar?, aboutPlaceholder? (renders grey when about is blank); requires non-null protagonist; no isEdit prop (edit mode is handled entirely by editable-hero.tsx)
 ├── heroes/
 │   └── base-favpoll-hero.tsx      -- read-only hero layout shared by favpoll-hero.tsx; no Framer Motion; no edit props (isEdit/formValues/isGenerating/onRegenerate all removed — PR #112). HeroLayout (Framer Motion scroll animations) is a separate component used only on the live favpoll page. register is not a prop — headline derived from occasion_type via getFavpollHeadline. Never select the dropped `register` column from Supabase (removed by migration 20260607140000_derive_register.sql; selecting it causes Supabase to return `{ data: null }` silently).
-├── favpoll-list-card.tsx               -- List card used on /favpolls and homepage carousel. Props: size, event, className, clerkUserId (optional), initialResults. Constructs FavpollPollWithItems inline from card-query data. Renders PledgeDialog (multi-step) or FavpollListCardResults; hasPledged toggle controlled locally. On pledge success: fetches /api/polls/[pollId]/results and shows results view. No PledgePanel or AmountInput — those live inside PledgeDialog.
+├── favpoll-list-card.tsx               -- List card used on /favpolls. Props: size, event, className, clerkUserId (optional), initialResults. Constructs FavpollPollWithItems inline from card-query data. Renders PledgeDialog (multi-step) or FavpollListCardResults; hasPledged toggle controlled locally. On pledge success: fetches /api/polls/[pollId]/results and shows results view. No PledgePanel or AmountInput — those live inside PledgeDialog. (Homepage carousel uses FavpollSummaryCard instead.)
 ├── favpoll-list-card/
 │   ├── use-favpoll-list-card-pledge.ts, favpoll-list-card-results.tsx
 │   └── favpoll-list-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
@@ -537,19 +532,19 @@ components/
 │   ├── utils.ts                  -- OrganizerCardFavpoll type, StatusFilter, SortKey, WARNING_THRESHOLD_DAYS=7, isFavpollClosed(), daysRemaining(), filterAndSort() (pure functions, fully tested)
 │   └── __tests__/               -- organizer-card.test.tsx + utils.test.ts (37 tests total)
 ├── live-favpolls-carousel.tsx
-├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths) + default FavpollMark SVG
-├── honour-charity-love-venn.tsx  -- Animated Venn SVG (three rotating rings); uses FavpollMarkGlyph at centroid
+├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths, used by root-level honour-charity-love-venn) + default FavpollMark SVG (no production importers)
+├── honour-charity-love-venn.tsx  -- ⚠ No production importers — superseded by landing-v2/honour-charity-love-venn.tsx; uses FavpollMarkGlyph at centroid
 ├── landing-v2/
 │   ├── example.ts               -- Belinda Hartley thread: EXAMPLE data + OCCASIONS list
 │   ├── occasion-eyebrow.tsx     -- Client: cycles occasion names every 2.8s with framer-motion fade
-│   ├── honour-charity-love-venn.tsx  -- See root-level; this is the landing-v2-scoped variant (baked SVG label paths)
+│   ├── honour-charity-love-venn.tsx  -- Active production variant; baked SVG label paths inline (no FavpollMarkGlyph import); used by landing-v2/page.tsx
 │   ├── honour-charity-love-venn.stories.tsx
 │   ├── how-it-works.tsx         -- Six-step timeline (Create/Share/Reveal phases) with mini preview cards
-│   └── favpoll-mark.tsx         -- landing-v2-scoped FavpollMark with native design-source coordinates
+│   └── favpoll-mark.tsx         -- ⚠ No production importers — landing-v2/honour-charity-love-venn.tsx embeds paths inline and does not import from here
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes; uses NewFavpollButton (passes onBeforeOpen={close} in mobile menu)
 ├── poll-heading.tsx             -- view-only: topicTitle, reveal, protagonistFirstName?; onResetPledge/onViewResults render TooltipIconButton; no hint line
-├── stripe-checkout.tsx, pot-banner.tsx
+├── stripe-checkout.tsx
 
 lib/
 ├── occasions.ts                  -- shortTopicLabel (DATE_LABEL_PLACEHOLDERS removed)
@@ -744,6 +739,33 @@ To delete the e2e test data: `delete from favpolls where created_by = 'user_e2e_
 
 All e2e tests use Stripe test card `4242 4242 4242 4242`, expiry `12/34`, CVC `123`. This card always succeeds in test mode with no 3DS challenge. Do not introduce new Stripe credentials for tests — the same `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` used for development applies.
 
+### Stripe PaymentElement fill technique
+
+Stripe renders card inputs inside an iframe that can only be found by scanning every `stripe.com` / `stripe.network` frame for any `<input>` element — do not hardcode a frame name or title. The frame with inputs is `elements-inner-accessory-target` but this is an internal detail that can change.
+
+Target card fields **by placeholder**, not by `nth()` position. A Link email field can appear above the card fields and shift positional indices:
+
+```
+input[placeholder="1234 1234 1234 1234"]  → card number
+input[placeholder="MM / YY"]              → expiry
+input[placeholder="CVC"]                  → CVC
+input[placeholder="12345"]               → billing ZIP (only shown when Stripe geolocates US)
+```
+
+Use `pressSequentially()` (not `fill()`) for all Stripe inputs — Stripe's formatted inputs require real key events to trigger their formatters. `fill()` bypasses the keydown/keyup handlers and leaves fields empty or malformed.
+
+**`payment_method_types: ["card"]`** must be set on `POST /api/stripe/payment-intent`. Without it, Stripe's adaptive payment-method selector may render Apple Pay / Google Pay buttons instead of the card form, which are incompatible with headless CI (no OS wallet, domain verification required).
+
+### Guest email uniqueness in E2E tests
+
+`createGuestPledge` (in `app/favpolls/[id]/actions.ts`) throws "You've already pledged" if the same email + poll combination already exists. Staging DB is persistent across CI runs, so each test attempt must use a unique email:
+
+```typescript
+await emailInput.fill(`e2e-test-${Date.now()}@playwright.test`)
+```
+
+Never hardcode a test email — it will fail on every CI run after the first.
+
 ### Covered flows (as of PR #123)
 
 | Test | File | Auth |
@@ -764,7 +786,7 @@ The test account must use **email + password auth** (not OAuth-only) in Clerk. C
 
 ### Advisory CI job
 
-The `e2e` job in `.github/workflows/ci.yml` runs with `continue-on-error: true` — it is **advisory, not blocking**. A failure does not block merge. Promote to a required check once the suite has proven stable over a few PRs (suggest after 5–10 successful runs).
+The `e2e` job in `.github/workflows/ci.yml` runs with `continue-on-error: true` — it is **advisory, not blocking**. A failure does not block merge. The suite was verified passing for the first time in CI on 2026-06-23 (PR #123). Promote to a required check after 5–10 successful CI runs.
 
 Required GitHub Actions secrets (set under repo Settings → Secrets → Actions):
 
@@ -773,6 +795,7 @@ E2E_BASE_URL                    -- staging Vercel URL
 E2E_SUPABASE_URL                -- staging Supabase project URL
 E2E_SUPABASE_SERVICE_ROLE_KEY   -- staging service role key
 E2E_STRIPE_PUBLISHABLE_KEY      -- Stripe test-mode publishable key
+E2E_VERCEL_BYPASS_SECRET        -- Vercel deployment protection bypass secret (Project Settings → Security → Deployment Protection)
 E2E_TEST_EMAIL                  -- Clerk test account email
 E2E_TEST_PASSWORD               -- Clerk test account password
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY -- Clerk publishable key (same as dev/preview)

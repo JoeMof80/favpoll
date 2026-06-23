@@ -1,17 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Chip } from "@/components/ui/chip"
 import { Button } from "./ui/button"
-import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { Favourite } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
-
-type Allocation = {
-  favouriteId: string
-  percentage: number
-}
+import { Chip } from "@/components/ui/chip"
+import { PledgePanelPickerHeader } from "./pledge-panel-picker-header"
+import type { Allocation } from "./pledge-panel-picker-header"
+import { PledgePanelPickerItems } from "./pledge-panel-picker-items"
 
 type Props = {
   items: Favourite[]
@@ -40,174 +37,6 @@ function computeAllocations(
       percentage: idx === 0 ? equal + remainder : equal,
     }
   })
-}
-
-function PickerHeader({
-  search,
-  onSearchChange,
-  onAdd,
-  selectedIds,
-  items,
-  allocations,
-  amount,
-  isAmountValid,
-  onDeselect,
-  topicTitle,
-  showCreate,
-  addingItem,
-}: {
-  search: string
-  onSearchChange: (v: string) => void
-  onAdd: () => void
-  selectedIds: string[]
-  items: Favourite[]
-  allocations: Allocation[]
-  amount: number
-  isAmountValid: boolean
-  onDeselect: (id: string) => void
-  topicTitle?: string
-  showCreate: boolean
-  addingItem: boolean
-}) {
-  const placeholder = topicTitle
-    ? `Search for your favourite ${topicTitle.toLowerCase()}…`
-    : "Search options…"
-  const hasSelections = selectedIds.length > 0
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {selectedIds.map((id) => {
-        const item = items.find((i) => i.id === id)
-        if (!item) return null
-        const alloc = allocations.find((a) => a.favouriteId === id)
-        const pct = alloc?.percentage ?? 0
-        const itemAmount =
-          isAmountValid && pct > 0
-            ? new Intl.NumberFormat("en-GB", {
-                style: "currency",
-                currency: "GBP",
-              }).format(Math.round(((amount * pct) / 100) * 100) / 100)
-            : null
-        return (
-          <Chip
-            key={id}
-            size="lg"
-            selected
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onDeselect(id)
-            }}
-          >
-            {item.label}
-            {pct > 0 && (
-              <span className="ml-1.5 tabular-nums opacity-80">
-                {pct}%{itemAmount ? ` · ${itemAmount}` : ""}
-              </span>
-            )}
-          </Chip>
-        )
-      })}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            onAdd()
-          }
-          if (
-            (e.key === "Backspace" || e.key === "Delete") &&
-            search === "" &&
-            selectedIds.length > 0
-          ) {
-            e.preventDefault()
-            onDeselect(selectedIds[selectedIds.length - 1])
-          }
-        }}
-        autoFocus
-        placeholder={hasSelections ? "" : placeholder}
-        className={
-          hasSelections
-            ? "w-0 overflow-hidden bg-transparent text-base outline-none"
-            : "min-w-30 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
-        }
-      />
-      {showCreate && (
-        <InputGroupButton
-          onMouseDown={(e) => {
-            e.preventDefault()
-            onAdd()
-          }}
-          disabled={addingItem}
-          className="shrink-0"
-        >
-          Add
-        </InputGroupButton>
-      )}
-    </div>
-  )
-}
-
-function PickerItems({
-  filteredItems,
-  selectedIds,
-  showCreate,
-  search,
-  isInfinite,
-  onAddItem,
-  onToggle,
-  addError,
-}: {
-  filteredItems: Favourite[]
-  selectedIds: string[]
-  showCreate: boolean
-  search: string
-  isInfinite?: boolean
-  onAddItem?: (label: string) => Promise<void>
-  onToggle: (id: string) => void
-  addError: string | null
-}) {
-  if (showCreate) {
-    return addError ? (
-      <p className="text-xs text-destructive">{addError}</p>
-    ) : null
-  }
-  if (filteredItems.length === 0 && !search.toLowerCase().trim()) {
-    return (
-      <p className="py-3 text-center text-sm text-muted-foreground">
-        {isInfinite && onAddItem
-          ? "No items yet — start typing to add one."
-          : "No items."}
-      </p>
-    )
-  }
-  if (filteredItems.length === 0) {
-    return (
-      <p className="py-3 text-center text-sm text-muted-foreground">
-        No options found.
-      </p>
-    )
-  }
-  return (
-    <>
-      <div className="flex flex-wrap gap-2">
-        {filteredItems.map((item) => (
-          <Chip
-            key={item.id}
-            size="lg"
-            selected={selectedIds.includes(item.id)}
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onToggle(item.id)
-            }}
-          >
-            {item.label}
-          </Chip>
-        ))}
-      </div>
-      {addError && <p className="mt-2 text-xs text-destructive">{addError}</p>}
-    </>
-  )
 }
 
 export function PledgePanel({
@@ -386,7 +215,7 @@ export function PledgePanel({
           if (!o) handleClose()
         }}
         title="Choose your favourites"
-        header={<PickerHeader {...pickerHeaderProps} />}
+        header={<PledgePanelPickerHeader {...pickerHeaderProps} />}
         footer={
           <Button
             type="button"
@@ -401,7 +230,7 @@ export function PledgePanel({
         }
         dialogContentClassName="flex-1 overflow-y-auto p-4"
       >
-        <PickerItems {...pickerItemsProps} />
+        <PledgePanelPickerItems {...pickerItemsProps} />
       </ResponsiveOverlay>
     </fieldset>
   )
