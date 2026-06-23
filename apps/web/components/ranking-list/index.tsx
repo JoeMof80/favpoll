@@ -1,14 +1,10 @@
 "use client"
 
-import { useTransition } from "react"
 import type { Favourite } from "@favpoll/types"
 import { useRankingItems } from "./use-ranking-items"
 import { formatAmount } from "./utils"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import {
-  hideFavpollPollFavourite,
-  showFavpollPollFavourite,
-} from "@/lib/actions/favpoll-poll-favourites"
+import { HideToggle } from "./hide-toggle"
 
 type Props = {
   initialItems: Favourite[]
@@ -17,37 +13,6 @@ type Props = {
   useAllTime?: boolean
   rankingView?: "amount" | "count"
   isOrganiser?: boolean
-}
-
-function HideToggle({
-  isHidden,
-  favouriteId,
-}: {
-  isHidden: boolean
-  favouriteId: string
-}) {
-  const [isPending, startTransition] = useTransition()
-
-  function toggle() {
-    startTransition(async () => {
-      if (isHidden) {
-        await showFavpollPollFavourite(favouriteId)
-      } else {
-        await hideFavpollPollFavourite(favouriteId)
-      }
-    })
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      disabled={isPending}
-      className="ml-2 shrink-0 rounded border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-    >
-      {isPending ? "…" : isHidden ? "Show" : "Hide"}
-    </button>
-  )
 }
 
 export function RankingList({
