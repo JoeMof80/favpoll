@@ -425,11 +425,6 @@ export const SCENES: HeroScene[] = [
   },
 ]
 
-export const OCCASION_CHIPS = SCENES.map((s, i) => ({
-  label: s.opening_line,
-  index: i,
-}))
-
 export const PLEDGE_AMOUNTS = ["£5", "£10", "£20", "£50"]
 
 export const SCENE_EYEBROWS = [

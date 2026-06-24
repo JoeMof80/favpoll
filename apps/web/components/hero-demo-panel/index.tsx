@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Chip } from "@/components/ui/chip"
 import type { Phase } from "./scenes"
-import { SCENES, OCCASION_CHIPS } from "./scenes"
+import { SCENES } from "./scenes"
 import { HeroPitchColumn } from "./hero-pitch-column"
 import { DemoCard } from "./demo-card"
 
@@ -74,18 +73,6 @@ export function HeroDemoPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneIndex])
 
-  const handleOccasionClick = (index: number) => {
-    if (index === sceneIndex) return
-    clearAll()
-    setFading(true)
-    setTimeout(() => {
-      setPhase("arriving")
-      setBarWidths(SCENES[index].results.map(() => 0))
-      setFading(false)
-      setSceneIndex(index)
-    }, 400)
-  }
-
   const scene = SCENES[sceneIndex]
 
   const showOptions = phase === "arriving" || phase === "selected"
@@ -120,25 +107,9 @@ export function HeroDemoPanel() {
             className="hidden h-158 flex-col p-5 md:flex"
             style={{ flex: "0.95" }}
           >
-            {/* Occasion chips */}
-            <div className="mb-3 flex shrink-0 flex-wrap gap-1.25">
-              {OCCASION_CHIPS.map(({ label, index }) => (
-                <Chip
-                  key={label}
-                  selected={index === sceneIndex}
-                  onClick={() => handleOccasionClick(index)}
-                  className="py-1 text-[11px]"
-                >
-                  {label}
-                </Chip>
-              ))}
-            </div>
-
             <span className="sr-only">
-              Animated demonstration of how favpoll works, showing a{" "}
-              {scene.opening_line.toLowerCase()} favpoll. The demonstration
-              cycles through occasion types automatically. Use the buttons above
-              to jump to a specific occasion.
+              Animated demonstration of how favpoll works. The demonstration
+              cycles through different occasions automatically.
             </span>
 
             <div
