@@ -4,21 +4,15 @@ import { Check } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import { RevealQuote } from "@/components/ui/reveal-quote"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { SectionLabel } from "@/components/favpoll-card/section-label"
+import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import type { HeroScene, Phase } from "./scenes"
 import { PLEDGE_AMOUNTS } from "./scenes"
 import { fadeUp, fadeIn, revealVariant, FAST, MEDIUM, SLOW } from "./variants"
-
-function getInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-}
 
 type Props = {
   scene: HeroScene
@@ -43,46 +37,49 @@ export function DemoCard({
 }: Props) {
   const topicItems = scene.poll.topic.favourites
   const topicTitle = scene.poll.topic.title
+  const firstName = scene.protagonist.name.split(" ")[0]
 
   return (
     <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
       <div className="space-y-4">
-        {/* Protagonist avatar + name + about */}
+        {/* Hero — mirrors BaseFavpollHero / HeroLayout: text LEFT, avatar RIGHT */}
         <motion.div
           key={`protagonist-${scene.protagonist.name}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.08 }}
-          className="flex items-start gap-4 border-b pb-4"
+          className="border-b pb-4"
         >
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-medium text-white"
-            style={{ backgroundColor: scene.avatarColor }}
-            aria-hidden="true"
-          >
-            {getInitials(scene.protagonist.name)}
+          <div className="flex items-start gap-4 md:gap-6">
+            <div className="min-w-0 flex-1">
+              <SectionEyebrow variant="muted" className="flex h-8 items-center">
+                {scene.heroEyebrow}
+              </SectionEyebrow>
+              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-[#2C2C2A]">
+                {scene.protagonist.name}
+              </h1>
+            </div>
+            <ProtagonistAvatar
+              name={scene.protagonist.name}
+              photoUrl={scene.protagonist.photo_url}
+            />
           </div>
-          <div className="min-w-0">
-            <p className="text-xl leading-tight font-medium tracking-tight text-foreground">
-              {scene.protagonist.name}
-            </p>
-            <p className="mt-1 text-sm leading-snug text-muted-foreground">
+          {scene.about && (
+            <p className="mt-4 text-base leading-relaxed text-[#5F5E5A]">
               {scene.about}
             </p>
-          </div>
+          )}
         </motion.div>
 
-        {/* Topic title */}
+        {/* Poll topic heading */}
         <motion.div
           key={`title-${topicTitle}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.2 }}
         >
-          <h2 className="text-2xl font-medium tracking-tight text-foreground">
-            {topicTitle}
-          </h2>
+          <SectionLabel title={topicTitle} />
         </motion.div>
 
-        {/* Poll options */}
+        {/* Poll options — real Chip components */}
         <AnimatePresence>
           {showOptions && (
             <motion.div
@@ -112,14 +109,15 @@ export function DemoCard({
                           delay: phase === "arriving" ? 0.3 + i * 0.08 : 0,
                         }
                   }
-                  className={cn(
-                    "h-auto rounded-full border px-3 py-1.5 text-xs transition-all duration-200",
-                    phase !== "arriving" && i === scene.selectedIndex
-                      ? "border-[#534AB7] bg-[#534AB7] font-medium text-white"
-                      : "border-border bg-background font-normal text-muted-foreground shadow-none"
-                  )}
                 >
-                  {opt.label}
+                  <Chip
+                    size="md"
+                    selected={phase !== "arriving" && i === scene.selectedIndex}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  >
+                    {opt.label}
+                  </Chip>
                 </motion.div>
               ))}
             </motion.div>
@@ -194,7 +192,7 @@ export function DemoCard({
           )}
         </AnimatePresence>
 
-        {/* Reveal quote */}
+        {/* Reveal — real PollReveal */}
         <AnimatePresence>
           {showReveal && (
             <motion.div
@@ -202,10 +200,11 @@ export function DemoCard({
               {...revealVariant}
               transition={prefersReducedMotion ? FAST : SLOW}
             >
-              <RevealQuote
-                text={scene.poll.personal_reveal}
-                aria-live="polite"
+              <PollReveal
+                personalReveal={scene.poll.personal_reveal}
+                protagonistFirstName={firstName}
                 role="status"
+                aria-live="polite"
               />
             </motion.div>
           )}

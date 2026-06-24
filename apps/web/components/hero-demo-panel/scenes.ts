@@ -18,7 +18,7 @@ export type Phase =
  *   - poll        → favpoll_polls row + topics + favourites
  *   - charities   → charities rows via favpoll_charities
  *
- * Demo-only fields (avatarColor, selectedIndex, pledgeAmount, tagline,
+ * Demo-only fields (heroEyebrow, selectedIndex, pledgeAmount, about,
  * results, total) carry animation or display data that has no DB equivalent.
  */
 export type HeroScene = {
@@ -44,8 +44,8 @@ export type HeroScene = {
   }[]
 
   // ── Demo-only ─────────────────────────────────────────────────────────────
-  /** Background colour for the avatar circle in the demo card */
-  avatarColor: string
+  /** Hero eyebrow prefix — matches what getFavpollHeadline returns for this occasion */
+  heroEyebrow: string
   /** Index into poll.topic.favourites — the item selected in the animation */
   selectedIndex: number
   /** Pledge amount shown in the demo animation e.g. "£10" */
@@ -95,7 +95,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "207994",
       },
     ],
-    avatarColor: "#7F77DD",
+    heroEyebrow: "In memory of",
     selectedIndex: 1,
     pledgeAmount: "£10",
     about: "Belinda had a colour she always wore — do you?",
@@ -162,7 +162,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "235825",
       },
     ],
-    avatarColor: "#E87D6A",
+    heroEyebrow: "Happy birthday",
     selectedIndex: 15,
     pledgeAmount: "£20",
     about: "Tell us your favourite ice cream to find out Poppy's.",
@@ -200,7 +200,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "294344",
       },
     ],
-    avatarColor: "#4AAB8A",
+    heroEyebrow: "Celebrating the retirement of",
     selectedIndex: 2,
     pledgeAmount: "£50",
     about: "Ros had a favourite season — which is yours?",
@@ -268,7 +268,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "1081247",
       },
     ],
-    avatarColor: "#D4936B",
+    heroEyebrow: "Congratulations to",
     selectedIndex: 4,
     pledgeAmount: "£20",
     about: "What's your favourite animal? Alex & Jordan have one…",
@@ -335,7 +335,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "326568",
       },
     ],
-    avatarColor: "#534AB7",
+    heroEyebrow: "Farewell",
     selectedIndex: 7,
     pledgeAmount: "£10",
     about:
@@ -408,7 +408,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "1079675",
       },
     ],
-    avatarColor: "#5B9BD5",
+    heroEyebrow: "Congratulations to",
     selectedIndex: 12,
     pledgeAmount: "£20",
     about:
