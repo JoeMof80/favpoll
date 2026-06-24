@@ -50,8 +50,8 @@ export type HeroScene = {
   selectedIndex: number
   /** Pledge amount shown in the demo animation e.g. "£10" */
   pledgeAmount: string
-  /** Custom framing line shown above the option grid in the demo */
-  tagline: string
+  /** About text shown in the protagonist intro — withholds their favourite */
+  about: string
   /** Results snapshot shown during the reveal phase */
   results: PollResultItem[]
   /** Formatted total raised e.g. "£1,005" */
@@ -98,7 +98,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#7F77DD",
     selectedIndex: 1,
     pledgeAmount: "£10",
-    tagline: "Belinda had a colour she always wore — do you?",
+    about: "Belinda had a colour she always wore — do you?",
     results: [
       { label: "Purple", amount: "£350", widthPercent: 78 },
       { label: "Blue", amount: "£220", widthPercent: 51 },
@@ -165,7 +165,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#E87D6A",
     selectedIndex: 15,
     pledgeAmount: "£20",
-    tagline: "Tell us your favourite ice cream to find out Poppy's.",
+    about: "Tell us your favourite ice cream to find out Poppy's.",
     results: [
       { label: "Vanilla", amount: "£210", widthPercent: 84 },
       { label: "Chocolate", amount: "£175", widthPercent: 71 },
@@ -181,8 +181,7 @@ export const SCENES: HeroScene[] = [
     protagonist: { name: "Ros Turner", photo_url: null },
     poll: {
       id: "demo-poll-2",
-      personal_reveal:
-        "Autumn, always. Childhood memories of walking through leaves.",
+      personal_reveal: "Autumn, always. She never needed a reason.",
       topic: {
         title: "Season",
         favourites: [
@@ -204,7 +203,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#4AAB8A",
     selectedIndex: 2,
     pledgeAmount: "£50",
-    tagline: "Which time of year do you love? Is it the same as Ros's?",
+    about: "Ros had a favourite season — which is yours?",
     results: [
       { label: "Spring", amount: "£290", widthPercent: 71 },
       { label: "Summer", amount: "£195", widthPercent: 48 },
@@ -272,7 +271,7 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#D4936B",
     selectedIndex: 4,
     pledgeAmount: "£20",
-    tagline: "What's your favourite animal? Alex & Jordan have one…",
+    about: "What's your favourite animal? Alex & Jordan have one…",
     results: [
       { label: "Giant panda", amount: "£310", widthPercent: 74 },
       { label: "African elephant", amount: "£200", widthPercent: 48 },
@@ -289,7 +288,7 @@ export const SCENES: HeroScene[] = [
     poll: {
       id: "demo-poll-4",
       personal_reveal:
-        "Bourbon. He kept a not-so-secret stash in his desk drawer.",
+        "Bourbon. He kept a secret stash in his desk drawer and everyone knew.",
       topic: {
         title: "Biscuit",
         favourites: [
@@ -339,8 +338,8 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#534AB7",
     selectedIndex: 7,
     pledgeAmount: "£10",
-    tagline:
-      "We've had eight years of Dave's biscuit opinions. What about yours?",
+    about:
+      "Dave has had strong opinions about biscuits for eight years — what's your opinion?",
     results: [
       { label: "Bourbon", amount: "£185", widthPercent: 69 },
       { label: "Digestive", amount: "£145", widthPercent: 54 },
@@ -356,7 +355,8 @@ export const SCENES: HeroScene[] = [
     protagonist: { name: "James Okafor", photo_url: null },
     poll: {
       id: "demo-poll-5",
-      personal_reveal: "Jurassic Park.",
+      personal_reveal:
+        "Jurassic Park. He said it was the reason he applied to study engineering. His housemates were not surprised.",
       topic: {
         title: "Film",
         favourites: [
@@ -411,8 +411,8 @@ export const SCENES: HeroScene[] = [
     avatarColor: "#5B9BD5",
     selectedIndex: 12,
     pledgeAmount: "£20",
-    tagline:
-      "James' favourite film was the reason he applied to study engineering — what's yours?",
+    about:
+      "James has a favourite film he could watch again and again — do you?",
     results: [
       { label: "The Shawshank Redemption", amount: "£280", widthPercent: 72 },
       { label: "Jurassic Park", amount: "£240", widthPercent: 61 },

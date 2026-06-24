@@ -86,8 +86,13 @@ favpoll is genuinely both things simultaneously — a fundraising platform and a
 ### Headline — fixed across all occasions
 
 ```
-Introducing a new way to honour them.
+Honour them through what they loved — for the causes they cared about.
 ```
+
+The previous headline ("Introducing a new way to honour them.") is retired as
+of 2026-06-24. The new headline explains the mechanic (favourites + charitable
+giving) while keeping the "honour them" emotional core. The eyebrow still
+rotates to set occasion context; the headline remains constant.
 
 ### Brand subheader — fixed
 

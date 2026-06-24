@@ -47,23 +47,28 @@ export function DemoCard({
   return (
     <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-5">
       <div className="space-y-4">
-        {/* Protagonist avatar + name */}
+        {/* Protagonist avatar + name + about */}
         <motion.div
           key={`protagonist-${scene.protagonist.name}`}
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.08 }}
-          className="flex items-center gap-4 border-b pb-4"
+          className="flex items-start gap-4 border-b pb-4"
         >
           <div
-            className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full text-xl font-medium text-white"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-medium text-white"
             style={{ backgroundColor: scene.avatarColor }}
             aria-hidden="true"
           >
             {getInitials(scene.protagonist.name)}
           </div>
-          <span className="text-4xl leading-tight font-medium tracking-tight text-foreground">
-            {scene.protagonist.name}
-          </span>
+          <div className="min-w-0">
+            <p className="text-xl leading-tight font-medium tracking-tight text-foreground">
+              {scene.protagonist.name}
+            </p>
+            <p className="mt-1 text-sm leading-snug text-muted-foreground">
+              {scene.about}
+            </p>
+          </div>
         </motion.div>
 
         {/* Topic title */}
@@ -72,20 +77,10 @@ export function DemoCard({
           {...fadeUp}
           transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.2 }}
         >
-          <h2 className="text-3xl font-medium tracking-tight text-foreground">
+          <h2 className="text-2xl font-medium tracking-tight text-foreground">
             {topicTitle}
           </h2>
         </motion.div>
-
-        {/* Framing question */}
-        <motion.p
-          key={`framing-${scene.protagonist.name}`}
-          {...fadeUp}
-          transition={prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.32 }}
-          className="text-lg leading-7 text-muted-foreground"
-        >
-          {scene.tagline}
-        </motion.p>
 
         {/* Poll options */}
         <AnimatePresence>
