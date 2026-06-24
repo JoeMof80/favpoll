@@ -12,13 +12,13 @@ export function HeroDemoPanel() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const [sceneIndex, setSceneIndex] = useState(0)
-  const [phase, setPhase] = useState<Phase>(
-    prefersReducedMotion ? "reveal" : "arriving"
-  )
+
+  // Start in the resolved state so the reveal is visible on first paint.
+  // The loop then replays the withhold → pick → pledge → results → reveal
+  // arc for visitors who stay, without holding the payoff hostage.
+  const [phase, setPhase] = useState<Phase>("reveal")
   const [barWidths, setBarWidths] = useState<number[]>(
-    prefersReducedMotion
-      ? SCENES[0].results.map((r) => r.widthPercent)
-      : SCENES[0].results.map(() => 0)
+    SCENES[0].results.map((r) => r.widthPercent)
   )
   const [fading, setFading] = useState(false)
 
@@ -30,24 +30,39 @@ export function HeroDemoPanel() {
   const addT = (fn: () => void, ms: number) =>
     timeouts.current.push(setTimeout(fn, ms))
 
+  // isFirstRun tracks whether this is the initial mount; the first run holds
+  // on the reveal state briefly before starting the loop, subsequent scene
+  // changes go straight into "arriving".
+  const isFirstRun = useRef(true)
+
   useEffect(() => {
     if (prefersReducedMotion) return
     clearAll()
 
+    const INITIAL_HOLD = isFirstRun.current ? 2500 : 0
+    isFirstRun.current = false
+
     const scene = SCENES[sceneIndex]
-    // Wait for all options to stagger in (300ms start + 80ms per item) then give
-    // 1.5s viewing time before auto-selecting, so long lists don't feel rushed.
+    // Wait for all options to stagger in (300ms start + 80ms per item) then
+    // give 1.2s viewing time before auto-selecting.
     const optionStaggerMs = 300 + (scene.poll.topic.favourites.length - 1) * 80
-    const selectedAt = optionStaggerMs + 1500
+    const selectedAt = optionStaggerMs + 1200
 
-    addT(() => setPhase("selected"), selectedAt)
-    addT(() => setPhase("pledge-panel"), selectedAt + 2000)
-    addT(() => setPhase("amount-picked"), selectedAt + 3800)
-    addT(() => setPhase("pledging"), selectedAt + 5200)
-    addT(() => setPhase("confirmed"), selectedAt + 5500)
-    addT(() => setPhase("clearing"), selectedAt + 6800)
-    addT(() => setPhase("reveal"), selectedAt + 7400)
+    // Transition to the withholding state, then replay the full arc.
+    addT(() => {
+      setPhase("arriving")
+      setBarWidths(SCENES[sceneIndex].results.map(() => 0))
+    }, INITIAL_HOLD)
 
+    addT(() => setPhase("selected"), INITIAL_HOLD + selectedAt)
+    addT(() => setPhase("pledge-panel"), INITIAL_HOLD + selectedAt + 1500)
+    addT(() => setPhase("amount-picked"), INITIAL_HOLD + selectedAt + 2800)
+    addT(() => setPhase("pledging"), INITIAL_HOLD + selectedAt + 3800)
+    addT(() => setPhase("confirmed"), INITIAL_HOLD + selectedAt + 4000)
+    addT(() => setPhase("clearing"), INITIAL_HOLD + selectedAt + 5000)
+
+    // Results beat — bars climb before the reveal lands.
+    addT(() => setPhase("results"), INITIAL_HOLD + selectedAt + 5600)
     scene.results.forEach((result, i) => {
       addT(
         () =>
@@ -56,18 +71,25 @@ export function HeroDemoPanel() {
             next[i] = result.widthPercent
             return next
           }),
-        selectedAt + 8000 + i * 200
+        INITIAL_HOLD + selectedAt + 6200 + i * 200
       )
     })
 
-    addT(() => setFading(true), selectedAt + 16000)
-    addT(() => {
-      const nextIndex = (sceneIndex + 1) % SCENES.length
-      setPhase("arriving")
-      setBarWidths(SCENES[nextIndex].results.map(() => 0))
-      setFading(false)
-      setSceneIndex(nextIndex)
-    }, selectedAt + 16500)
+    // Reveal lands after bars have populated.
+    addT(() => setPhase("reveal"), INITIAL_HOLD + selectedAt + 8500)
+
+    // Hold on the reveal — it's the emotional payoff, not a frame to rush past.
+    addT(() => setFading(true), INITIAL_HOLD + selectedAt + 14000)
+    addT(
+      () => {
+        const nextIndex = (sceneIndex + 1) % SCENES.length
+        setPhase("arriving")
+        setBarWidths(SCENES[nextIndex].results.map(() => 0))
+        setFading(false)
+        setSceneIndex(nextIndex)
+      },
+      INITIAL_HOLD + selectedAt + 14500
+    )
 
     return clearAll
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,6 +104,9 @@ export function HeroDemoPanel() {
     phase === "pledging" ||
     phase === "confirmed"
   const showToast = phase === "confirmed"
+  // Results (ranking bars) appear in both the results beat and the reveal phase.
+  const showResults = phase === "results" || phase === "reveal"
+  // The personal reveal only shows in the final phase.
   const showReveal = phase === "reveal"
 
   const stepLabels: Record<Phase, string> = {
@@ -92,6 +117,7 @@ export function HeroDemoPanel() {
     pledging: "Pledging…",
     confirmed: "Pledged ✓",
     clearing: "",
+    results: "Guests' picks",
     reveal: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
   }
 
@@ -125,6 +151,7 @@ export function HeroDemoPanel() {
                 showOptions={showOptions}
                 showPledgePanel={showPledgePanel}
                 showToast={showToast}
+                showResults={showResults}
                 showReveal={showReveal}
               />
               <p className="mt-2.5 h-3.5 shrink-0 text-center text-[10px] font-medium tracking-[0.07em] text-muted-foreground uppercase">

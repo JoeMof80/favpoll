@@ -12,7 +12,14 @@ import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import type { HeroScene, Phase } from "./scenes"
 import { PLEDGE_AMOUNTS } from "./scenes"
-import { fadeUp, fadeIn, revealVariant, FAST, MEDIUM, SLOW } from "./variants"
+import {
+  fadeUp,
+  fadeIn,
+  revealVariant,
+  FAST,
+  MEDIUM,
+  DELIBERATE,
+} from "./variants"
 
 type Props = {
   scene: HeroScene
@@ -22,6 +29,7 @@ type Props = {
   showOptions: boolean
   showPledgePanel: boolean
   showToast: boolean
+  showResults: boolean
   showReveal: boolean
 }
 
@@ -33,6 +41,7 @@ export function DemoCard({
   showOptions,
   showPledgePanel,
   showToast,
+  showResults,
   showReveal,
 }: Props) {
   const topicItems = scene.poll.topic.favourites
@@ -192,13 +201,13 @@ export function DemoCard({
           )}
         </AnimatePresence>
 
-        {/* Reveal — real PollReveal */}
+        {/* Reveal — real PollReveal; slides up and settles */}
         <AnimatePresence>
           {showReveal && (
             <motion.div
               key="reveal"
               {...revealVariant}
-              transition={prefersReducedMotion ? FAST : SLOW}
+              transition={prefersReducedMotion ? FAST : DELIBERATE}
             >
               <PollReveal
                 personalReveal={scene.poll.personal_reveal}
@@ -210,15 +219,19 @@ export function DemoCard({
           )}
         </AnimatePresence>
 
-        {/* Rankings */}
+        {/* Rankings — appear in the results beat, dim when the reveal lands */}
         <AnimatePresence>
-          {showReveal && (
+          {showResults && (
             <motion.div
               key="rankings"
               initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: showReveal ? 0.4 : 1, y: 0 }}
               transition={
-                prefersReducedMotion ? FAST : { ...MEDIUM, delay: 0.3 }
+                prefersReducedMotion
+                  ? FAST
+                  : showReveal
+                    ? { duration: 0.5, ease: "easeInOut" }
+                    : { ...MEDIUM, delay: 0.2 }
               }
             >
               <ol className="space-y-2.5" aria-label="Current rankings">
@@ -246,9 +259,9 @@ export function DemoCard({
       {/* Bottom fade — fades ranking bars into the charity line */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-background to-transparent" />
 
-      {/* Charity / total — pinned to card bottom, always visible in reveal */}
+      {/* Charity / total — visible throughout the results beat and reveal */}
       <AnimatePresence>
-        {showReveal && (
+        {showResults && (
           <motion.div
             key="charity-total"
             initial={{ opacity: 0 }}

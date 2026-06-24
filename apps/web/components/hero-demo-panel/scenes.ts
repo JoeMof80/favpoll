@@ -8,7 +8,8 @@ export type Phase =
   | "pledging" // step 5 — button depressed
   | "confirmed" // step 5 — toast visible
   | "clearing" // step 6 — fade transition
-  | "reveal" // step 7–9 — reveal + results
+  | "results" // step 7 — ranking bars climb
+  | "reveal" // step 8 — personal reveal slides up
 
 /**
  * Supabase-aligned demo scene.
