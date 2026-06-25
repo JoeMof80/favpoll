@@ -161,7 +161,7 @@ export function OrganizerCard({ favpoll }: Props) {
           <QRCodeSVG
             value={guestUrl}
             size={96}
-            fgColor={BRAND}
+            // fgColor={BRAND}
             bgColor="transparent"
             aria-label="QR code for the guest-facing favpoll page"
           />
