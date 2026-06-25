@@ -20,9 +20,12 @@ type Props = {
   pollWithItems: FavpollPollWithItems
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  onPledgeSuccess?: () => void
+  onPledgeSuccess?: (guestToken?: string) => void
   onAddItem?: (label: string) => Promise<void>
   isListed?: boolean
+  /** Controlled mode — if provided, the internal trigger button is suppressed */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function PledgeDialog({
@@ -35,12 +38,24 @@ export function PledgeDialog({
   onPledgeSuccess,
   onAddItem,
   isListed,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: Props) {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
   const [stripeSubmitting, setStripeSubmitting] = useState(false)
   const [stripeReady, setStripeReady] = useState(false)
 
-  const triggerButton = (
+  function setOpen(o: boolean) {
+    if (isControlled) {
+      controlledOnOpenChange?.(o)
+    } else {
+      setInternalOpen(o)
+    }
+  }
+
+  const triggerButton = !isControlled ? (
     <Button
       type="button"
       variant="secondary"
@@ -49,7 +64,7 @@ export function PledgeDialog({
     >
       Pledge favourites
     </Button>
-  )
+  ) : null
 
   const dialog = usePledgeDialog({
     favpollId,
@@ -58,8 +73,8 @@ export function PledgeDialog({
     pollWithItems,
     pot,
     userPotAllocation,
-    onPledgeSuccess: () => {
-      onPledgeSuccess?.()
+    onPledgeSuccess: (guestToken) => {
+      onPledgeSuccess?.(guestToken)
       setOpen(false)
     },
     onAddItem,
@@ -77,6 +92,14 @@ export function PledgeDialog({
     if (!o) dialog.handleClose()
     setOpen(o)
   }
+
+  // Reset step state when dialog opens fresh (controlled mode re-open after close)
+  useEffect(() => {
+    if (isControlled && open && dialog.step !== 1) {
+      dialog.handleClose()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isControlled])
 
   const topicTitle = pollWithItems.topics.title
 

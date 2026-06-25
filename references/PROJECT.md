@@ -339,13 +339,14 @@ When `subject='cause'`: no protagonist row is created; `cause_label` is stored i
 When `subject` is not provided by a caller, name param is the protagonist name as before.
 When `subject='cause'`, callers pass `cause_label` as the `name` param.
 
-| register         | subject='someone' | subject='cause' |
+| register | subject='someone' | subject='cause' |
+
 | ---------------- | ----------------- | --------------- |
-| remembering      | In memory of      | In memory of    |
-| celebrating_one  | Celebrating       | Celebrating     |
-| celebrating_many | Celebrating       | Celebrating     |
-| cause            | **Honouring**     | In support of   |
-| neutral          | Honouring         | Honouring       |
+| remembering | In memory of | In memory of |
+| celebrating_one | Celebrating | Celebrating |
+| celebrating_many | Celebrating | Celebrating |
+| cause | **Honouring** | In support of |
+| neutral | Honouring | Honouring |
 
 Occasion-type prefixes from `OCCASION_TYPE_PREFIXES` (e.g. "Fundraiser" → "In support of") continue
 to take priority over register prefix and are NOT subject-aware.
@@ -400,6 +401,7 @@ API:
 /api/webhooks/clerk            -- Clerk user sync webhook
 /api/favpolls/[id]/request-extension -- Sends extension request email to admin
 /api/polls/[pollId]/results    -- Ranked pledge totals for a poll (admin client)
+/api/polls/[pollId]/reveal     -- Gated: returns real personal_reveal + favourites with real amounts. Verifies Clerk userId or guest_token has a non-withdrawn pledge, or poll is closed. 403 otherwise.
 NOTE: /api/exemplar removed (PR-B) — example pane replaced by grey placeholder preview
 ```
 
@@ -510,11 +512,12 @@ components/
 │   ├── poll-reveal.tsx
 │   ├── poll-results.tsx
 ├── poll-section/
-│   ├── index.tsx             -- renders amber Alert when all items are hidden (empty-poll warning for organiser)
+│   ├── index.tsx             -- permanent blur/reveal layout: decoy bars pre-pledge (blur-sm, aria-hidden), real PollReveal+RankingList post-pledge; accepts entitled/personalReveal/initialItems/onOpenPledgeDialog props; RankingList NOT mounted pre-pledge (Realtime leak prevention)
+│   ├── decoy-results.tsx     -- static fake reveal card + alphabetically-sorted bars (widths [85,62,48,33,19]%); aria-hidden; no Supabase subscription
 │   ├── use-poll-section.ts   -- fires onViewChange on mount (initial view) and all view transitions
 ├── favpoll-content/
-│   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; branches on subject: cause → CauseHero, person → FavpollHero; PledgeDialog (self-contained) in right column (desktop) and below PollSection (mobile); charity carousel fixed bottom mobile
-│   └── use-favpoll-content.ts  -- pollView state tracks pledge/results view; showPledgeCard = !isClosed && !!pollWithItems && !pledgeConfirmed && pollView==="pledge"; no longer manages pledgeAmount/pollSelections (dialog-owned)
+│   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; PledgeDialog controlled (pledgeDialogOpen state); passes localEntitled/effectiveReveal/effectiveItems to PollSection
+│   └── use-favpoll-content.ts  -- localEntitled state (syncs from server entitled prop); handlePledgeSuccess(guestToken?): signed-in → router.refresh(); guest → /api/polls/[pollId]/reveal fetch → setLocalReveal/setLocalItems/setLocalEntitled; effectiveReveal/effectiveItems fall back to server values for signed-in
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
@@ -761,19 +764,20 @@ Use `pressSequentially()` (not `fill()`) for all Stripe inputs — Stripe's form
 `createGuestPledge` (in `app/favpolls/[id]/actions.ts`) throws "You've already pledged" if the same email + poll combination already exists. Staging DB is persistent across CI runs, so each test attempt must use a unique email:
 
 ```typescript
-await emailInput.fill(`e2e-test-${Date.now()}@playwright.test`)
+await emailInput.fill(`e2e-test-${Date.now()}@playwright.test`);
 ```
 
 Never hardcode a test email — it will fail on every CI run after the first.
 
 ### Covered flows (as of PR #123)
 
-| Test | File | Auth |
-|------|------|------|
-| Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts` | None (guest) |
-| Wizard → publish → verify public page | `wizard-publish.spec.ts` | Clerk organiser |
+| Test                                                 | File                          | Auth            |
+| ---------------------------------------------------- | ----------------------------- | --------------- |
+| Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts` | None (guest)    |
+| Wizard → publish → verify public page                | `wizard-publish.spec.ts`      | Clerk organiser |
 
 **TODO (follow-up):** Shared fund paths (Part 4 from the brief):
+
 - Path B (guest contribute to fund via SeedFundModal guest variant)
 - Path C (pledge using shared fund, no Stripe step)
 - Over-allocation guard
@@ -893,7 +897,9 @@ NEXT_PUBLIC_BASE_URL
 
 - **Pledge panel draft state.** Selections are not committed until the user clicks Done. Opening the Sheet/Dialog initialises `draftIds` from the current `selectedIds`. Closing/dismissing without Done discards the draft. This prevents partial selections appearing in the trigger display.
 
-- **Pledge card visibility.** `showPledgeCard` in `useFavpollContent` is `!isClosed && !!pollWithItems && !pledgeConfirmed && pollView === "pledge"`. `pollView` is initialised from `hasPledged || isClosed` and updated via `onViewChange` callback from `PollSection`. No `!hasPledged` check — Reset Pledge correctly re-shows the dialog trigger for previously-pledged users who switch back to pledge view.
+- **Server-side data gating for un-pledged viewers.** `app/favpolls/[id]/page.tsx` computes `entitled = hasPledged || isClosed || isOrganiser`. When `!entitled`, the page nulls `personal_reveal` and zeros `all_time_pledged`/`all_time_count` on all favourites before passing to `FavpollContent`. The gated `/api/polls/[pollId]/reveal` endpoint then provides the real data post-pledge. **`RankingList` must not be mounted pre-pledge** — `useRankingItems` subscribes to Supabase Realtime (`favourites:{topicId}`), which would deliver real amounts even if the server sent zeroed values. `PollSection` enforces this: `RankingList` is only rendered when `entitled=true`; pre-pledge shows `DecoyResults` (static, no Realtime, `aria-hidden`). Guest entitlement: `onPledgeSuccess(guestToken?)` in `useFavpollContent` fetches `/api/polls/.../reveal?guest_token=X`, sets `localReveal`/`localItems`/`localEntitled`. Signed-in entitlement: `router.refresh()` re-runs page with `hasPledged=true`, `entitled=true` flows down via the `useEffect` sync.
+
+- **Pledge card visibility.** `showPledgeCard` in `useFavpollContent` is `!isClosed && !!pollWithItems && !pledgeConfirmed && !localEntitled`. `localEntitled` starts from the server `entitled` prop and is set true client-side after pledge success (guests) or on server refresh (signed-in). When `showPledgeCard` is true, `FavpollContent` passes `onOpenPledgeDialog` to `PollSection`, which renders the "Pledge to reveal" button beneath the blurred decoy.
 - **Unified pledge dialog.** The guest pledge flow is one self-contained 3-step `ResponsiveOverlay` (`pledge-dialog/`): step 1 = pick favourites (chip picker), step 2 = amount + breakdown + funding path selector, step 3 = inline Stripe payment. A single "Pledge favourites" button replaces the old separate `PledgePanel` trigger and `PledgeCard`. `PledgePanel` is kept for the organiser form preview; `PledgeCard`/`LivePledgeCard` are kept but no longer rendered on the guest event page. `StripeCheckout` gained an `inline` prop (no fixed overlay) for embedding in step 3.
 
 - **Pledge dialog funding paths.** Step 2 shows a "Pay with card / Use shared fund" tab selector at the top of the body when `hasFund` is true (pot exists, available > 0, user signed in). Path A = card payment, advances to step 3 (Stripe). Path C = shared fund, calls `pledgeFromFund` directly with no Stripe step. Guest email capture is deferred to step 3 (Stripe form) via `showEmailCapture` prop on `StripeCheckout`; step 2 no longer shows an email field. `handlePledgePaymentSuccess` accepts optional `email?: string` (from Stripe form) and passes it to `createGuestPledge`. A listed-favpoll notice is shown in step 2 right column when `useSharedFund && isListed`.
@@ -911,7 +917,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Cause favpoll listing card rendering.** `FavpollListCard` handles cause favpolls: `protagonist` is typed `{ name: string } | null`; when `subject === 'cause'`, `cause_label` is passed as the name to `FavpollHeader`. The `/favpolls` listing query (`FAVPOLL_SELECT`) selects `subject` and `cause_label` alongside `protagonist:protagonists ( name )`. Neutral-register favpolls (no `occasion_type`) have no `opening_line` set by the seed scripts — this is correct; the eyebrow is intentionally blank for unclassified occasions.
 
-- **`scripts/seed-favpolls.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_FAVPOLLS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from favpolls where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots). The `favpolls` insert must never set a `register` field — that column was dropped by `20260607140000_derive_register.sql`; `register` is local-variable-only inside this script (used for `closingDays`/`aboutFor`/the result summary), never written to the DB. `loadReferenceData()` paginates the `favourites` fetch via `.range()` in 1000-row pages — PostgREST caps an unranged `.select()` at 1000 rows, and `favourites` now holds ~3300 rows after the full topic-library seed, so a plain select would silently starve `itemsByTopic` for most topics and `createOneFavpoll()` would skip them with no logged error (its `allItems.length === 0` early-return is silent by design, unlike its sibling error sites). **Occasion model fields written:** `opening_line` is populated from a local `OPENING_LINE_PREFIXES` map (mirror of `OCCASION_TYPE_PREFIXES` in `lib/display.ts` — update both if occasion prefixes change); `category`, `grouping`, `subject`, and `is_listed` are set via a local `registerToOccasionModel()` helper using the hand-built mapping (remembering→memorial/individual/someone/unlisted; celebrating_one→celebration/individual/someone/listed; celebrating_many→celebration/couple/someone/listed; neutral→null/individual/someone/listed). **`personal_reveal`** is keyed by `register` from `topic.placeholders[register].reveal` — _not_ by `occasionType`. Bug history: the original script incorrectly used `topic.placeholders[occasionType]` (wrong key) so all reveals were null; also omitted `opening_line`/`category`/`grouping`/`subject`/`is_listed`, leaving the DB occasion model blank. Both bugs were fixed in PR #120; existing seeded rows require a re-seed (delete + re-run) to get the corrected data — no retroactive backfill was applied. **`scripts/seed-exemplars.ts`** applies the same occasion model fields. The Hargreaves Memorial Fund exemplar is seeded as a cause favpoll: no protagonist row is created, `subject='cause'`, `cause_label='The Hargreaves Memorial Fund'`, `description=ex.about`; idempotency check uses `favpolls.cause_label` instead of `protagonists.name` for this exemplar.
+- **`scripts/seed-favpolls.ts` behaviour.** Owns all rows via `created_by = 'user_seed_scale'` (organisers `user_seed_001`–`008` for guest pledges). Tops up to `TARGET_FAVPOLLS = 40` idempotently; never deletes. Inserting `pledge_allocations` fires the record trigger, so each run **shifts staging's `all_time_pledged` / `all_time_count`** — relevant when building the `/rankings` data threshold logic, which will be tested against synthetic numbers. `event_count` / `total_pledge_count` are intentionally left at 0 (no trigger; reserved for future inclusion-promotion). Cleanup: `delete from favpolls where created_by = 'user_seed_scale';` (cascades to polls, items, pledges, allocations, pots). The `favpolls` insert must never set a `register` field — that column was dropped by `20260607140000_derive_register.sql`; `register` is local-variable-only inside this script (used for `closingDays`/`aboutFor`/the result summary), never written to the DB. `loadReferenceData()` paginates the `favourites` fetch via `.range()` in 1000-row pages — PostgREST caps an unranged `.select()` at 1000 rows, and `favourites` now holds ~3300 rows after the full topic-library seed, so a plain select would silently starve `itemsByTopic` for most topics and `createOneFavpoll()` would skip them with no logged error (its `allItems.length === 0` early-return is silent by design, unlike its sibling error sites). **Occasion model fields written:** `opening_line` is populated from a local `OPENING_LINE_PREFIXES` map (mirror of `OCCASION_TYPE_PREFIXES` in `lib/display.ts` — update both if occasion prefixes change); `category`, `grouping`, `subject`, and `is_listed` are set via a local `registerToOccasionModel()` helper using the hand-built mapping (remembering→memorial/individual/someone/unlisted; celebrating*one→celebration/individual/someone/listed; celebrating_many→celebration/couple/someone/listed; neutral→null/individual/someone/listed). **`personal_reveal`** is keyed by `register` from `topic.placeholders[register].reveal` — \_not* by `occasionType`. Bug history: the original script incorrectly used `topic.placeholders[occasionType]` (wrong key) so all reveals were null; also omitted `opening_line`/`category`/`grouping`/`subject`/`is_listed`, leaving the DB occasion model blank. Both bugs were fixed in PR #120; existing seeded rows require a re-seed (delete + re-run) to get the corrected data — no retroactive backfill was applied. **`scripts/seed-exemplars.ts`** applies the same occasion model fields. The Hargreaves Memorial Fund exemplar is seeded as a cause favpoll: no protagonist row is created, `subject='cause'`, `cause_label='The Hargreaves Memorial Fund'`, `description=ex.about`; idempotency check uses `favpolls.cause_label` instead of `protagonists.name` for this exemplar.
 
 - **Dialog header input pattern.** When an overlay needs a primary text input (search, name, long-form field), place it in the `header` prop of `ResponsiveOverlay`; the `title` goes `sr-only`. The body holds secondary content (description, char counter, regenerate button). Use shadcn `Input` for single-line with `className="h-auto rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"` and shadcn `Textarea` for multi-line with `className="min-h-0 rounded-none border-0 px-0 py-0 text-base shadow-none focus-visible:ring-0"`. Never switch to raw `<input>`/`<textarea>` when using this pattern — the shadcn components are required so that global theming and accessibility plumbing are preserved. The pledge-dialog step-1 picker header (`pledge-dialog/step-pick-favourites.tsx`) and pledge-panel are canonical examples of this pattern.
 

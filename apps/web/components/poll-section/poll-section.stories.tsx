@@ -90,6 +90,9 @@ const meta = {
     poll: MEMORIAL_POLL,
     isOrganiser: false,
     favpollId: "favpoll-demo",
+    entitled: false,
+    personalReveal: null,
+    initialItems: MEMORIAL_POLL.topics.favourites,
   },
 } satisfies Meta<typeof PollSection>
 
@@ -124,6 +127,9 @@ export const ResultsWithReveal: Story = {
     poll: MEMORIAL_POLL,
     protagonistName: SCENES[0].protagonist.name,
     hasPledged: true,
+    entitled: true,
+    personalReveal: MEMORIAL_POLL.personal_reveal,
+    initialItems: MEMORIAL_POLL.topics.favourites,
   },
 }
 
@@ -133,6 +139,9 @@ export const ResultsWithRevealRetirement: Story = {
     poll: RETIREMENT_POLL,
     protagonistName: SCENES[2].protagonist.name,
     hasPledged: true,
+    entitled: true,
+    personalReveal: RETIREMENT_POLL.personal_reveal,
+    initialItems: RETIREMENT_POLL.topics.favourites,
   },
 }
 
@@ -145,5 +154,8 @@ export const Closed: Story = {
     protagonistName: SCENES[0].protagonist.name,
     isClosed: true,
     hasPledged: false,
+    entitled: true,
+    personalReveal: MEMORIAL_POLL.personal_reveal,
+    initialItems: MEMORIAL_POLL.topics.favourites,
   },
 }

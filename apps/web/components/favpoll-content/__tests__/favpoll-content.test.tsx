@@ -144,6 +144,7 @@ function renderContent(
       isClosed={false}
       clerkUserId={null}
       isOrganiser={false}
+      entitled={opts.hasPledged ?? false}
     />
   )
 }

@@ -1,11 +1,13 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
 import { PollHeading } from "@/components/poll-heading"
-import type { FavpollPollWithItems } from "@favpoll/types"
+import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
+import { DecoyResults } from "./decoy-results"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 
 type RankingView = "amount" | "count"
@@ -20,7 +22,15 @@ type Props = {
   isOrganiser: boolean
   favpollId: string
   onViewChange?: (view: "pledge" | "results") => void
-  /** Rendered in the pledge view in place of the old PledgePanel trigger. */
+  /** Whether the viewer is entitled to see real reveal + results */
+  entitled: boolean
+  /** Real personal_reveal — null until entitled */
+  personalReveal: string | null
+  /** Real item list — may be zeroed until entitled */
+  initialItems: Favourite[]
+  /** Called when the merged header-button is clicked pre-pledge */
+  onOpenPledgeDialog?: () => void
+  /** @deprecated — kept for backwards compat with Storybook/tests */
   pledgeTrigger?: React.ReactNode
 }
 
@@ -32,16 +42,12 @@ export function PollSection({
   protagonistName,
   isOrganiser,
   onViewChange,
-  pledgeTrigger,
+  entitled,
+  personalReveal,
+  initialItems,
+  onOpenPledgeDialog,
 }: Props) {
-  const {
-    view,
-    setView,
-    rankingView,
-    setRankingView,
-    pledgeConfirmed,
-    showRankings,
-  } = usePollSection({
+  const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
     hasPledged,
     isClosed,
@@ -51,50 +57,32 @@ export function PollSection({
   })
 
   const personFirstName = protagonistName.split(/[\s&]+/)[0]
-  const pledged = view === "results" && pledgeConfirmed
-
-  function changeView(v: "pledge" | "results") {
-    setView(v)
-    onViewChange?.(v)
-  }
-
-  const onResetPledge =
-    view === "results" && !isClosed && showRankings
-      ? () => changeView("pledge")
-      : undefined
-
-  const onViewResults =
-    view === "pledge" && (hasPledged || isClosed)
-      ? () => changeView("results")
-      : undefined
-
-  const reveal = pledged ? (poll.personal_reveal ?? null) : null
+  const hasItems = poll.topics.favourites.length > 0
 
   return (
     <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
+      {/* Merged header: topic label + pledge trigger pre-pledge */}
       <div className="sticky top-40 z-20 md:top-55">
         <PollHeading
           topicTitle={poll.topics.title}
-          reveal={pledged ? (poll.personal_reveal ?? null) : null}
+          reveal={entitled ? personalReveal : null}
           protagonistFirstName={personFirstName}
-          onResetPledge={onResetPledge}
-          onViewResults={onViewResults}
         />
       </div>
 
-      {reveal && (
-        <PollReveal
-          personalReveal={reveal}
-          protagonistFirstName={personFirstName}
-          role="status"
-          aria-live="polite"
-        />
-      )}
-
-      {/* Results view */}
-      {view === "results" && (
+      {/* Post-pledge: real reveal + real ranking list */}
+      {entitled ? (
         <>
-          {showRankings && (
+          {personalReveal && (
+            <PollReveal
+              personalReveal={personalReveal}
+              protagonistFirstName={personFirstName}
+              role="status"
+              aria-live="polite"
+            />
+          )}
+
+          {hasItems && (
             <>
               <div className="sticky top-40 z-20 flex items-center justify-end md:top-55">
                 <Tabs
@@ -114,7 +102,7 @@ export function PollSection({
                 </Tabs>
               </div>
               <RankingList
-                initialItems={poll.topics.favourites}
+                initialItems={initialItems}
                 favpollPollId={poll.id}
                 topicId={poll.topic_id}
                 rankingView={rankingView}
@@ -123,17 +111,36 @@ export function PollSection({
             </>
           )}
         </>
-      )}
+      ) : (
+        /* Pre-pledge: blurred decoy + pledge CTA */
+        <div className="space-y-4">
+          <div className="relative">
+            <div
+              className="pointer-events-none blur-sm select-none"
+              aria-hidden="true"
+            >
+              <DecoyResults
+                items={poll.topics.favourites}
+                topicTitle={poll.topics.title}
+              />
+            </div>
+          </div>
 
-      {/* Pledge view */}
-      {view === "pledge" && (
-        <div className="space-y-5">
-          {isClosed ? (
+          {!isClosed && onOpenPledgeDialog && (
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={onOpenPledgeDialog}
+            >
+              Pledge to reveal
+            </Button>
+          )}
+
+          {isClosed && (
             <p className="text-sm text-muted-foreground">
               This poll has closed.
             </p>
-          ) : (
-            (pledgeTrigger ?? null)
           )}
         </div>
       )}
