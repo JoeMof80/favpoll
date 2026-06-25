@@ -67,7 +67,7 @@ export function PollSection({
       <div className="sticky top-40 z-20 md:top-55">
         <PollHeading
           topicTitle={poll.topics.title}
-          onPledge={!entitled && !isClosed ? onOpenPledgeDialog : undefined}
+          onPledge={onOpenPledgeDialog}
         />
       </div>
 

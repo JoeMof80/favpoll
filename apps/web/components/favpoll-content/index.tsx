@@ -55,7 +55,6 @@ export function FavpollContent({
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
-    showPledgeCard,
     handleViewChange,
     localEntitled,
     effectiveReveal,
@@ -92,7 +91,7 @@ export function FavpollContent({
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
 
   const pledgeDialog =
-    !isClosed && showPledgeCard && pollWithItems ? (
+    !isClosed && pollWithItems ? (
       <PledgeDialog
         favpollId={favpoll.id}
         clerkUserId={clerkUserId}
@@ -136,7 +135,7 @@ export function FavpollContent({
             personalReveal={effectiveReveal}
             initialItems={effectiveItems}
             onOpenPledgeDialog={
-              showPledgeCard ? () => setPledgeDialogOpen(true) : undefined
+              !isClosed ? () => setPledgeDialogOpen(true) : undefined
             }
           />
           {pledgeDialog}
