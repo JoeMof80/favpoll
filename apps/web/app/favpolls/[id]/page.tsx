@@ -196,7 +196,6 @@ export default async function FavpollPage({ params }: Props) {
         pollWithItems={visiblePoll}
         pot={pot ?? null}
         userPotAllocation={userPotAllocation}
-        hasPledged={!!hasPledged}
         totalRaised={totalRaised}
         isClosed={isClosed}
         clerkUserId={userId}

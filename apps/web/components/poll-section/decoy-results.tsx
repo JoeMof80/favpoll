@@ -1,4 +1,6 @@
 import type { Favourite } from "@favpoll/types"
+import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { RankingBar } from "@/components/ui/ranking-bar"
 
 type Props = {
   items: Favourite[]
@@ -7,36 +9,25 @@ type Props = {
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
 export function DecoyResults({ items }: Props) {
-  // Sort alphabetically to avoid leaking real ranking order
+  // Sort alphabetically — avoids leaking real ranking order
   const sorted = [...items]
     .sort((a, b) => a.label.localeCompare(b.label))
     .slice(0, 5)
 
   return (
     <div aria-hidden="true" tabIndex={-1}>
-      {/* Fake reveal card — blurred, content not meaningful */}
-      <div className="mb-4 rounded-lg border border-[#AFA9EC] bg-[#EEEDFE] px-4 py-3">
-        <p className="text-sm text-[#26215C] italic">
-          Pledge to see their reveal.
-        </p>
-      </div>
-
-      {/* Fake ranking bars — fixed widths, alphabetical, no real data */}
-      <ul role="list" aria-label="Results" className="space-y-3" tabIndex={-1}>
+      <PollReveal personalReveal="Pledge to see their reveal." />
+      <ol aria-label="Rankings" className="mt-4 space-y-3">
         {sorted.map((item, i) => (
-          <li key={item.id} className="flex items-center gap-3">
-            <span className="w-20 shrink-0 truncate text-sm text-[#5F5E5A]">
-              {item.label}
-            </span>
-            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[#EEEDFE]">
-              <div
-                className="h-full rounded-full bg-[#7F77DD]"
-                style={{ width: `${DECOY_WIDTHS[i] ?? 10}%` }}
-              />
-            </div>
+          <li key={item.id}>
+            <RankingBar
+              label={item.label}
+              amount="—"
+              widthPercent={DECOY_WIDTHS[i] ?? 10}
+            />
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   )
 }

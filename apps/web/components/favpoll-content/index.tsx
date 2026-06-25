@@ -27,7 +27,6 @@ type Props = {
   pollWithItems: FavpollPollWithItems | null
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  hasPledged: boolean
   totalRaised: number
   isClosed: boolean
   clerkUserId: string | null
@@ -40,7 +39,6 @@ export function FavpollContent({
   pollWithItems,
   pot,
   userPotAllocation,
-  hasPledged: _hasPledged,
   totalRaised,
   isClosed,
   clerkUserId,

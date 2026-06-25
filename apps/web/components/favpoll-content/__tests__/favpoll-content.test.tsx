@@ -131,7 +131,7 @@ const POLL: FavpollPollWithItems = {
 
 function renderContent(
   favpoll: FavpollWithDetails,
-  opts: { hasPledged?: boolean } = {}
+  opts: { entitled?: boolean } = {}
 ) {
   return render(
     <FavpollContent
@@ -139,12 +139,11 @@ function renderContent(
       pollWithItems={POLL}
       pot={null}
       userPotAllocation={null}
-      hasPledged={opts.hasPledged ?? false}
       totalRaised={0}
       isClosed={false}
       clerkUserId={null}
       isOrganiser={false}
-      entitled={opts.hasPledged ?? false}
+      entitled={opts.entitled ?? false}
     />
   )
 }
