@@ -2,27 +2,26 @@ import type { Favourite } from "@favpoll/types"
 
 type Props = {
   items: Favourite[]
-  topicTitle: string
 }
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
-export function DecoyResults({ items, topicTitle }: Props) {
+export function DecoyResults({ items }: Props) {
   // Sort alphabetically to avoid leaking real ranking order
   const sorted = [...items]
     .sort((a, b) => a.label.localeCompare(b.label))
     .slice(0, 5)
 
-  const decoyReveal = `${topicTitle} — pledge to see ${topicTitle.toLowerCase()}'s reveal`
-
   return (
     <div aria-hidden="true" tabIndex={-1}>
-      {/* Fake reveal card */}
+      {/* Fake reveal card — blurred, content not meaningful */}
       <div className="mb-4 rounded-lg border border-[#AFA9EC] bg-[#EEEDFE] px-4 py-3">
-        <p className="text-sm text-[#26215C] italic">{decoyReveal}</p>
+        <p className="text-sm text-[#26215C] italic">
+          Pledge to see their reveal.
+        </p>
       </div>
 
-      {/* Fake ranking bars */}
+      {/* Fake ranking bars — fixed widths, alphabetical, no real data */}
       <ul role="list" aria-label="Results" className="space-y-3" tabIndex={-1}>
         {sorted.map((item, i) => (
           <li key={item.id} className="flex items-center gap-3">

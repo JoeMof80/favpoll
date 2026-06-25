@@ -17,28 +17,24 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const WithReveal: Story = {
-  name: "With reveal",
+export const Static: Story = {
+  name: "Static (post-pledge)",
   args: {
     topicTitle: "Colour",
-    reveal: "Belinda's was purple. She wore it to every important occasion.",
-    protagonistFirstName: "Belinda",
   },
 }
 
-export const WithoutReveal: Story = {
-  name: "Without reveal",
+export const AsButton: Story = {
+  name: "As pledge button (pre-pledge)",
   args: {
-    topicTitle: "Season",
-    reveal: null,
-    protagonistFirstName: "Gretchen",
+    topicTitle: "Colour",
+    onPledge: () => {},
   },
 }
 
 export const TitleOnly: Story = {
-  name: "Title only (no protagonist)",
+  name: "Title only — no actions",
   args: {
     topicTitle: "Film",
-    reveal: null,
   },
 }

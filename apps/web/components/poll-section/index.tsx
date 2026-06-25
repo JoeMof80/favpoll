@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
 import { PollHeading } from "@/components/poll-heading"
@@ -60,13 +59,15 @@ export function PollSection({
   const hasItems = poll.topics.favourites.length > 0
 
   return (
-    <section aria-label={`${poll.topics.title} poll`} className="space-y-4">
-      {/* Merged header: topic label + pledge trigger pre-pledge */}
+    <section
+      aria-label={`Favourite ${poll.topics.title} poll`}
+      className="space-y-4"
+    >
+      {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
       <div className="sticky top-40 z-20 md:top-55">
         <PollHeading
           topicTitle={poll.topics.title}
-          reveal={entitled ? personalReveal : null}
-          protagonistFirstName={personFirstName}
+          onPledge={!entitled && !isClosed ? onOpenPledgeDialog : undefined}
         />
       </div>
 
@@ -119,23 +120,9 @@ export function PollSection({
               className="pointer-events-none blur-sm select-none"
               aria-hidden="true"
             >
-              <DecoyResults
-                items={poll.topics.favourites}
-                topicTitle={poll.topics.title}
-              />
+              <DecoyResults items={poll.topics.favourites} />
             </div>
           </div>
-
-          {!isClosed && onOpenPledgeDialog && (
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={onOpenPledgeDialog}
-            >
-              Pledge to reveal
-            </Button>
-          )}
 
           {isClosed && (
             <p className="text-sm text-muted-foreground">
