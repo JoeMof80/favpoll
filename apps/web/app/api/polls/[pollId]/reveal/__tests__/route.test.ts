@@ -24,7 +24,10 @@ const POLL_ROW = {
 }
 
 const OPEN_FAVPOLL = { closed_at: null, closes_at: FUTURE_DATE }
-const CLOSED_FAVPOLL = { closed_at: "2024-06-01T00:00:00Z", closes_at: PAST_DATE }
+const CLOSED_FAVPOLL = {
+  closed_at: "2024-06-01T00:00:00Z",
+  closes_at: PAST_DATE,
+}
 
 const ITEMS = [
   { id: "fav-1", label: "Red", all_time_pledged: 50, all_time_count: 2 },
@@ -65,9 +68,9 @@ describe("GET /api/polls/[pollId]/reveal — not found", () => {
 
 describe("GET /api/polls/[pollId]/reveal — closed poll", () => {
   it("returns 200 for any unauthenticated viewer when poll is closed", async () => {
-    mock.queue(POLL_ROW)       // favpoll_polls
+    mock.queue(POLL_ROW) // favpoll_polls
     mock.queue(CLOSED_FAVPOLL) // favpolls
-    mock.queue(ITEMS)          // favourites
+    mock.queue(ITEMS) // favourites
 
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
@@ -83,8 +86,8 @@ describe("GET /api/polls/[pollId]/reveal — closed poll", () => {
 
 describe("GET /api/polls/[pollId]/reveal — open poll, not entitled", () => {
   it("returns 403 for unauthenticated visitor with no guest token", async () => {
-    mock.queue(POLL_ROW)      // favpoll_polls
-    mock.queue(OPEN_FAVPOLL)  // favpolls
+    mock.queue(POLL_ROW) // favpoll_polls
+    mock.queue(OPEN_FAVPOLL) // favpolls
     // no pledge rows for unauth
 
     const res = await GET(makeRequest(), makeParams())
@@ -93,18 +96,18 @@ describe("GET /api/polls/[pollId]/reveal — open poll, not entitled", () => {
 
   it("returns 403 for signed-in user without a pledge", async () => {
     mockAuth.userId = "user-99"
-    mock.queue(POLL_ROW)      // favpoll_polls
-    mock.queue(OPEN_FAVPOLL)  // favpolls
-    mock.queue([])             // pledges by clerk_user_id → empty
+    mock.queue(POLL_ROW) // favpoll_polls
+    mock.queue(OPEN_FAVPOLL) // favpolls
+    mock.queue([]) // pledges by clerk_user_id → empty
 
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(403)
   })
 
   it("returns 403 for guest token that has no matching pledge", async () => {
-    mock.queue(POLL_ROW)      // favpoll_polls
-    mock.queue(OPEN_FAVPOLL)  // favpolls
-    mock.queue([])             // pledges by guest_token → empty
+    mock.queue(POLL_ROW) // favpoll_polls
+    mock.queue(OPEN_FAVPOLL) // favpolls
+    mock.queue([]) // pledges by guest_token → empty
 
     const res = await GET(makeRequest("bad-token"), makeParams())
     expect(res.status).toBe(403)
@@ -118,10 +121,10 @@ describe("GET /api/polls/[pollId]/reveal — open poll, not entitled", () => {
 describe("GET /api/polls/[pollId]/reveal — signed-in with pledge", () => {
   it("returns 200 with real reveal and items", async () => {
     mockAuth.userId = "user-1"
-    mock.queue(POLL_ROW)              // favpoll_polls
-    mock.queue(OPEN_FAVPOLL)          // favpolls
-    mock.queue([{ id: "pledge-1" }])  // pledges by clerk_user_id → found
-    mock.queue(ITEMS)                 // favourites
+    mock.queue(POLL_ROW) // favpoll_polls
+    mock.queue(OPEN_FAVPOLL) // favpolls
+    mock.queue([{ id: "pledge-1" }]) // pledges by clerk_user_id → found
+    mock.queue(ITEMS) // favourites
 
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
@@ -137,10 +140,10 @@ describe("GET /api/polls/[pollId]/reveal — signed-in with pledge", () => {
 
 describe("GET /api/polls/[pollId]/reveal — guest with valid token", () => {
   it("returns 200 with real reveal and items", async () => {
-    mock.queue(POLL_ROW)              // favpoll_polls
-    mock.queue(OPEN_FAVPOLL)          // favpolls
-    mock.queue([{ id: "pledge-2" }])  // pledges by guest_token → found
-    mock.queue(ITEMS)                 // favourites
+    mock.queue(POLL_ROW) // favpoll_polls
+    mock.queue(OPEN_FAVPOLL) // favpolls
+    mock.queue([{ id: "pledge-2" }]) // pledges by guest_token → found
+    mock.queue(ITEMS) // favourites
 
     const res = await GET(makeRequest("valid-guest-token"), makeParams())
     expect(res.status).toBe(200)

@@ -213,7 +213,6 @@ export function FavpollForm({
     if (mode === "edit") router.back()
     else {
       form.reset()
-      setShowReveal(false)
     }
   }
 
