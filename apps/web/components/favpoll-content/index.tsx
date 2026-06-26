@@ -126,6 +126,7 @@ export function FavpollContent({
                 ? (favpoll.cause_label ?? "")
                 : (favpoll.protagonists?.name ?? "")
             }
+            isCause={isCause}
             isOrganiser={isOrganiser}
             favpollId={favpoll.id}
             onViewChange={handleViewChange}

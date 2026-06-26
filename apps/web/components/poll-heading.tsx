@@ -3,6 +3,7 @@
 import { Gift, ChartBarDecreasing } from "lucide-react"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
+import { Button } from "./ui/button"
 
 type Props = {
   topicTitle: string
@@ -23,19 +24,19 @@ export function PollHeading({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
+        <>
           {onPledge ? (
-            <button
+            <Button
               type="button"
+              className="flex-1 text-[17px] font-medium tracking-[0.09em] uppercase"
               onClick={onPledge}
-              className="cursor-pointer text-left text-[17px] font-medium tracking-[0.09em] text-[#7F77DD] uppercase transition-opacity hover:opacity-70"
             >
               {label}
-            </button>
+            </Button>
           ) : (
             <SectionLabel title={label} />
           )}
-        </div>
+        </>
 
         {onResetPledge && (
           <TooltipIconButton

@@ -44,8 +44,6 @@ export type FormInnerProps = {
   mode: "create" | "edit"
   submitting: boolean
   error: string | null
-  showReveal: boolean
-  onToggleReveal: () => void
   onSubmit: (closesAt?: Date) => void
   onCancel: () => void
   hasNewTopicDraft: boolean
@@ -62,8 +60,6 @@ export function FormInner({
   mode,
   submitting,
   error,
-  showReveal,
-  onToggleReveal,
   onSubmit,
   onCancel,
   hasNewTopicDraft,
@@ -224,7 +220,6 @@ export function FormInner({
         lastGeneratedAbout.current = result.about
         form.setValue("reveal", result.reveal)
         lastGeneratedReveal.current = result.reveal
-        if (!showReveal) onToggleReveal()
       }
     } catch {
       toast.error(
@@ -276,8 +271,6 @@ export function FormInner({
               />
               <EditablePollArea
                 topics={topics}
-                showReveal={showReveal}
-                onToggleReveal={onToggleReveal}
                 isGenerating={isGenerating}
                 onRegenerate={handleRegenerate}
                 topicRevealPlaceholder={topicRevealPlaceholder}

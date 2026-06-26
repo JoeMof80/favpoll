@@ -18,8 +18,6 @@ const PLACEHOLDER_CHARITIES: Charity[] = [
 type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
-  showReveal: boolean
-  onToggleReveal: () => void
   isGenerating?: boolean
   onRegenerate?: () => void
   /** ISO string; when provided shows a live countdown with an edit affordance (edit mode) */
@@ -30,8 +28,6 @@ type Props = {
 export function PreviewPanel({
   charities,
   topics,
-  showReveal,
-  onToggleReveal,
   isGenerating,
   onRegenerate,
   closesAt,
@@ -71,8 +67,6 @@ export function PreviewPanel({
           />
           <EditablePollArea
             topics={topics}
-            showReveal={showReveal}
-            onToggleReveal={onToggleReveal}
             isGenerating={isGenerating}
             onRegenerate={onRegenerate}
             topicRevealPlaceholder={topicRevealPlaceholder}

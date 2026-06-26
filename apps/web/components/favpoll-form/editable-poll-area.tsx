@@ -3,13 +3,10 @@
 import { useState } from "react"
 import { useWatch, useFormContext } from "react-hook-form"
 import { RefreshCw } from "lucide-react"
-import { SectionLabel } from "@/components/favpoll-card/section-label"
-import { PledgePanel } from "@/components/pledge-panel"
+import { PollHeading } from "@/components/poll-heading"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import type { PollResultItem } from "@/components/favpoll-card/types"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { rankItems, formatAmount } from "@/components/ranking-list/utils"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -21,15 +18,11 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
-import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
-import { toast } from "sonner"
 import type { Favourite, TopicWithMeta } from "@favpoll/types"
 import type { FavpollFormValues } from "./schema"
 
 type Props = {
   topics: TopicWithMeta[]
-  showReveal: boolean
-  onToggleReveal: () => void
   isGenerating?: boolean
   onRegenerate?: () => void
   topicRevealPlaceholder?: string
@@ -37,8 +30,6 @@ type Props = {
 
 export function EditablePollArea({
   topics,
-  showReveal,
-  onToggleReveal,
   isGenerating = false,
   onRegenerate,
   topicRevealPlaceholder = "",
@@ -59,15 +50,8 @@ export function EditablePollArea({
   const revealPlaceholder = reveal ? "" : (topicRevealPlaceholder ?? "")
 
   const topicTitle = firstTopic?.title ?? "Colour"
-  const revealValue = showReveal ? reveal || null : null
 
   const firstTopicCustomLabels = firstTopic?.customLabels ?? []
-  const isInfinite = firstTopic
-    ? firstTopic.isCustom
-      ? true
-      : !(firstTopicMeta?.is_finite ?? true)
-    : false
-
   const catalogItems = firstTopicMeta?.favourites ?? []
 
   const topicItems: Favourite[] = firstTopic
@@ -153,25 +137,16 @@ export function EditablePollArea({
     <>
       <div className="space-y-4">
         <div className="space-y-3 py-1">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <SectionLabel title={topicTitle} />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-muted-foreground">
-                {showReveal ? "Post-reveal" : "Pre-reveal"}
-              </span>
-              <Switch
-                checked={showReveal}
-                onCheckedChange={(v) => {
-                  if (v !== showReveal) onToggleReveal()
-                }}
-              />
-            </div>
-          </div>
+          <PollHeading
+            topicTitle={topicTitle}
+            onPledge={() => {
+              setRevealDraft(reveal)
+              setRevealOpen(true)
+            }}
+          />
         </div>
 
-        {showReveal && (
+        <div className="space-y-4">
           <div className={reveal ? "pb-4" : undefined}>
             <Button
               type="button"
@@ -196,61 +171,32 @@ export function EditablePollArea({
                   <div className="h-4 w-3/4 rounded-full bg-muted/60" />
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground/40">Reveal</p>
+                <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
+                  Reveal
+                </p>
               )}
               <EditBadge />
             </Button>
           </div>
-        )}
-
-        {revealValue ? (
-          <>
-            <div className="flex items-center justify-end">
-              <Tabs
-                value={rankingView}
-                onValueChange={(v: string) =>
-                  setRankingView(v as "amount" | "count")
-                }
-              >
-                <TabsList className="h-7">
-                  <TabsTrigger value="amount" className="px-3 text-xs">
-                    By amount
-                  </TabsTrigger>
-                  <TabsTrigger value="count" className="px-3 text-xs">
-                    By pledges
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <PollResults results={pollResults} />
-          </>
-        ) : (
-          <div className="pointer-events-none opacity-40">
-            <PledgePanel
-              items={topicItems}
-              totalAmount=""
-              onSelectionsChange={() => {}}
-              isInfinite={isInfinite}
-              onAddItem={
-                isInfinite
-                  ? async () => {
-                      toast.warning(
-                        "Items added here won't be saved — add them to your favpoll after publishing.",
-                        {
-                          style: {
-                            background: "#fffbeb",
-                            color: "#f59e0b",
-                            border: "1px solid #f59e0b",
-                          },
-                          position: "top-center",
-                        }
-                      )
-                    }
-                  : undefined
+          <div className="flex items-center justify-end">
+            <Tabs
+              value={rankingView}
+              onValueChange={(v: string) =>
+                setRankingView(v as "amount" | "count")
               }
-            />
+            >
+              <TabsList className="h-7">
+                <TabsTrigger value="amount" className="px-3 text-xs">
+                  By amount
+                </TabsTrigger>
+                <TabsTrigger value="count" className="px-3 text-xs">
+                  By pledges
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-        )}
+          <PollResults results={pollResults} />
+        </div>
       </div>
 
       <ResponsiveOverlay
@@ -286,7 +232,7 @@ export function EditablePollArea({
               placeholder={revealPlaceholder || "Share something they loved…"}
               value={revealDraft}
               maxLength={280}
-              rows={3}
+              rows={2}
               onChange={(e) => setRevealDraft(e.target.value)}
               className="px-5 pt-2 pb-4 text-base md:text-base"
             />

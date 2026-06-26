@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -65,21 +64,12 @@ function Controlled(
   props: {
     topics: TopicWithMeta[]
     defaultValues: Partial<FavpollFormValues>
-  } & Omit<
-    React.ComponentProps<typeof EditablePollArea>,
-    "showReveal" | "onToggleReveal"
-  >
+  } & React.ComponentProps<typeof EditablePollArea>
 ) {
   const { topics, defaultValues, ...rest } = props
-  const [showReveal, setShowReveal] = useState(false)
   return (
     <FormWrapper defaultValues={defaultValues}>
-      <EditablePollArea
-        topics={topics}
-        showReveal={showReveal}
-        onToggleReveal={() => setShowReveal((s) => !s)}
-        {...rest}
-      />
+      <EditablePollArea topics={topics} {...rest} />
     </FormWrapper>
   )
 }
@@ -126,34 +116,26 @@ export const PreReveal: Story = {
 
 /** Post-reveal view — PollResults shown */
 export const PostReveal: Story = {
-  render: () => {
-    const [showReveal, setShowReveal] = useState(true)
-    return (
-      <FormWrapper
-        defaultValues={{
-          category: "celebration",
-          topics: [
-            {
-              topicId: "topic-colour",
-              title: "Colour",
-              isCustom: false,
-              items: [
-                { id: "i1", label: "Red" },
-                { id: "i2", label: "Blue" },
-              ],
-              customLabels: [],
-            },
-          ],
-          reveal: "She always said Blue — every single time.",
-          charities: ["ch-1"],
-        }}
-      >
-        <EditablePollArea
-          topics={[COLOUR_TOPIC]}
-          showReveal={showReveal}
-          onToggleReveal={() => setShowReveal((s) => !s)}
-        />
-      </FormWrapper>
-    )
-  },
+  render: () => (
+    <Controlled
+      topics={[COLOUR_TOPIC]}
+      defaultValues={{
+        category: "celebration",
+        topics: [
+          {
+            topicId: "topic-colour",
+            title: "Colour",
+            isCustom: false,
+            items: [
+              { id: "i1", label: "Red" },
+              { id: "i2", label: "Blue" },
+            ],
+            customLabels: [],
+          },
+        ],
+        reveal: "She always said Blue — every single time.",
+        charities: ["ch-1"],
+      }}
+    />
+  ),
 }

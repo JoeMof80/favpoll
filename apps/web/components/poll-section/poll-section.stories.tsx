@@ -87,6 +87,7 @@ const meta = {
     hasPledged: false,
     pledgeJustConfirmed: false,
     protagonistName: SCENES[0].protagonist.name,
+    isCause: false,
     poll: MEMORIAL_POLL,
     isOrganiser: false,
     favpollId: "favpoll-demo",
