@@ -19,7 +19,7 @@ export type UsePledgeDialogOptions = {
   pollWithItems: FavpollPollWithItems
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  onPledgeSuccess?: () => void
+  onPledgeSuccess?: (guestToken?: string) => void
   onAddItem?: (label: string) => Promise<void>
 }
 

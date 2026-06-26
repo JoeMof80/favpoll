@@ -93,32 +93,24 @@ const favpoll = makeFavpoll()
 const poll = makePoll("poll-1")
 const finitePoll = makePoll("finite-poll", true)
 
+const defaults = {
+  favpoll,
+  pollWithItems: poll,
+  isClosed: false,
+  clerkUserId: "user-1",
+  entitled: false,
+}
+
 describe("useFavpollContent — initial state", () => {
   it("starts with pledgeConfirmed as false", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
+    const { result } = renderHook(() => useFavpollContent(defaults))
     expect(result.current.pledgeConfirmed).toBe(false)
   })
 })
 
 describe("useFavpollContent — handlePledgeSuccess", () => {
   it("sets pledgeConfirmed to true", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
+    const { result } = renderHook(() => useFavpollContent(defaults))
     act(() => {
       result.current.handlePledgeSuccess()
     })
@@ -129,39 +121,21 @@ describe("useFavpollContent — handlePledgeSuccess", () => {
 describe("useFavpollContent — addItemHandler", () => {
   it("returns undefined for a finite topic", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: finitePoll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
+      useFavpollContent({ ...defaults, pollWithItems: finitePoll })
     )
     expect(result.current.addItemHandler(finitePoll)).toBeUndefined()
   })
 
   it("returns undefined when favpoll is closed", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: true,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
+      useFavpollContent({ ...defaults, isClosed: true })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
   it("returns undefined when clerkUserId is null (guest)", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: null,
-      })
+      useFavpollContent({ ...defaults, clerkUserId: null })
     )
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
@@ -171,15 +145,7 @@ describe("useFavpollContent — addItemHandler", () => {
     mockActions.addOrganizerItem.mockClear()
 
     // favpoll.created_by is "user-1" — same as clerkUserId means organiser
-    const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
+    const { result } = renderHook(() => useFavpollContent(defaults))
     const handler = result.current.addItemHandler(poll)!
     expect(typeof handler).toBe("function")
 
@@ -196,13 +162,7 @@ describe("useFavpollContent — addItemHandler", () => {
 
   it("returns a function for an infinite, open poll with a non-organiser logged-in user", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-2", // guest — different from favpoll.created_by ("user-1")
-      })
+      useFavpollContent({ ...defaults, clerkUserId: "user-2" })
     )
     expect(typeof result.current.addItemHandler(poll)).toBe("function")
   })
@@ -212,13 +172,7 @@ describe("useFavpollContent — addItemHandler", () => {
     mockActions.addGuestItem.mockClear()
 
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-2", // guest — different from favpoll.created_by ("user-1")
-      })
+      useFavpollContent({ ...defaults, clerkUserId: "user-2" })
     )
     const handler = result.current.addItemHandler(poll)!
     await act(async () => {
@@ -235,42 +189,36 @@ describe("useFavpollContent — addItemHandler", () => {
 })
 
 describe("useFavpollContent — derived values", () => {
-  it("showPledgeCard is true when not closed and poll is set", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
-    )
+  it("showPledgeCard is true when not closed, poll is set, and not entitled", () => {
+    const { result } = renderHook(() => useFavpollContent(defaults))
     expect(result.current.showPledgeCard).toBe(true)
   })
 
   it("showPledgeCard is false when closed", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: poll,
-        isClosed: true,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
+      useFavpollContent({ ...defaults, isClosed: true })
     )
     expect(result.current.showPledgeCard).toBe(false)
   })
 
   it("showPledgeCard is false when pollWithItems is null", () => {
     const { result } = renderHook(() =>
-      useFavpollContent({
-        favpoll: favpoll,
-        pollWithItems: null,
-        isClosed: false,
-        hasPledged: false,
-        clerkUserId: "user-1",
-      })
+      useFavpollContent({ ...defaults, pollWithItems: null })
     )
     expect(result.current.showPledgeCard).toBe(false)
+  })
+
+  it("showPledgeCard is false when entitled", () => {
+    const { result } = renderHook(() =>
+      useFavpollContent({ ...defaults, entitled: true })
+    )
+    expect(result.current.showPledgeCard).toBe(false)
+  })
+
+  it("localEntitled starts as the entitled prop value", () => {
+    const { result } = renderHook(() =>
+      useFavpollContent({ ...defaults, entitled: true })
+    )
+    expect(result.current.localEntitled).toBe(true)
   })
 })

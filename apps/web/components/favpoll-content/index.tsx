@@ -27,11 +27,11 @@ type Props = {
   pollWithItems: FavpollPollWithItems | null
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  hasPledged: boolean
   totalRaised: number
   isClosed: boolean
   clerkUserId: string | null
   isOrganiser: boolean
+  entitled: boolean
 }
 
 export function FavpollContent({
@@ -39,27 +39,30 @@ export function FavpollContent({
   pollWithItems,
   pot,
   userPotAllocation,
-  hasPledged,
   totalRaised,
   isClosed,
   clerkUserId,
   isOrganiser,
+  entitled,
 }: Props) {
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
+  const [pledgeDialogOpen, setPledgeDialogOpen] = useState(false)
 
   const {
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
-    showPledgeCard,
     handleViewChange,
+    localEntitled,
+    effectiveReveal,
+    effectiveItems,
   } = useFavpollContent({
     favpoll,
     pollWithItems,
     isClosed,
-    hasPledged,
     clerkUserId,
+    entitled,
   })
 
   const isCause = favpoll.subject === "cause"
@@ -86,7 +89,7 @@ export function FavpollContent({
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
 
   const pledgeDialog =
-    !isClosed && showPledgeCard && pollWithItems ? (
+    !isClosed && pollWithItems ? (
       <PledgeDialog
         favpollId={favpoll.id}
         clerkUserId={clerkUserId}
@@ -97,6 +100,8 @@ export function FavpollContent({
         onPledgeSuccess={handlePledgeSuccess}
         onAddItem={addItemHandler(pollWithItems)}
         isListed={isListed}
+        open={pledgeDialogOpen}
+        onOpenChange={setPledgeDialogOpen}
       />
     ) : null
 
@@ -109,22 +114,31 @@ export function FavpollContent({
       )}
 
       {pollWithItems ? (
-        <PollSection
-          poll={pollWithItems}
-          clerkUserId={clerkUserId}
-          isClosed={isClosed}
-          hasPledged={hasPledged}
-          pledgeJustConfirmed={pledgeConfirmed}
-          protagonistName={
-            isCause
-              ? (favpoll.cause_label ?? "")
-              : (favpoll.protagonists?.name ?? "")
-          }
-          isOrganiser={isOrganiser}
-          favpollId={favpoll.id}
-          onViewChange={handleViewChange}
-          pledgeTrigger={pledgeDialog}
-        />
+        <>
+          <PollSection
+            poll={pollWithItems}
+            clerkUserId={clerkUserId}
+            isClosed={isClosed}
+            hasPledged={localEntitled}
+            pledgeJustConfirmed={pledgeConfirmed}
+            protagonistName={
+              isCause
+                ? (favpoll.cause_label ?? "")
+                : (favpoll.protagonists?.name ?? "")
+            }
+            isCause={isCause}
+            isOrganiser={isOrganiser}
+            favpollId={favpoll.id}
+            onViewChange={handleViewChange}
+            entitled={localEntitled}
+            personalReveal={effectiveReveal}
+            initialItems={effectiveItems}
+            onOpenPledgeDialog={
+              !isClosed ? () => setPledgeDialogOpen(true) : undefined
+            }
+          />
+          {pledgeDialog}
+        </>
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
           No poll has been set up for this favpoll yet.

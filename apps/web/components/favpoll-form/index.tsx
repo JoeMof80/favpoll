@@ -51,7 +51,6 @@ export function FavpollForm({
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showReveal, setShowReveal] = useState(false)
   const [editClosesAt, setEditClosesAt] = useState<string | undefined>(
     initialClosesAt
   )
@@ -214,7 +213,6 @@ export function FavpollForm({
     if (mode === "edit") router.back()
     else {
       form.reset()
-      setShowReveal(false)
     }
   }
 
@@ -264,8 +262,6 @@ export function FavpollForm({
         mode={mode}
         submitting={submitting}
         error={error}
-        showReveal={showReveal}
-        onToggleReveal={() => setShowReveal((s) => !s)}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         hasNewTopicDraft={hasNewTopicDraft}

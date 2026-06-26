@@ -159,6 +159,25 @@ export default async function FavpollPage({ params }: Props) {
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
+  // Entitlement: viewer may see real reveal + real per-favourite amounts
+  const entitled = !!hasPledged || isClosed || isOrganiser
+
+  // Gate sensitive data server-side for un-entitled viewers of open polls
+  if (!entitled && pollWithItems) {
+    pollWithItems = {
+      ...pollWithItems,
+      personal_reveal: null,
+      topics: {
+        ...pollWithItems.topics,
+        favourites: pollWithItems.topics.favourites.map((f) => ({
+          ...f,
+          all_time_pledged: 0,
+          all_time_count: 0,
+        })),
+      },
+    }
+  }
+
   // Hide poll with unvetted custom topic from non-organisers
   const visiblePoll =
     isOrganiser || pollWithItems?.topics.is_active !== false
@@ -177,11 +196,11 @@ export default async function FavpollPage({ params }: Props) {
         pollWithItems={visiblePoll}
         pot={pot ?? null}
         userPotAllocation={userPotAllocation}
-        hasPledged={!!hasPledged}
         totalRaised={totalRaised}
         isClosed={isClosed}
         clerkUserId={userId}
         isOrganiser={isOrganiser}
+        entitled={entitled}
       />
     </>
   )

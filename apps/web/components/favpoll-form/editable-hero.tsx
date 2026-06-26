@@ -144,7 +144,7 @@ export function EditableHero({
                 <div className="h-4 w-4/5 rounded-full bg-muted/60" />
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground/40">
+              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/40">
                 {aboutPlaceholder || "About"}
               </p>
             )}

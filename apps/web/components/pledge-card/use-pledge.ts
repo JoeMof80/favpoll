@@ -30,7 +30,7 @@ export type UsePledgeOptions = {
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
-  onPledgeSuccess?: () => void
+  onPledgeSuccess?: (guestToken?: string) => void
 }
 
 export function usePledge({
@@ -133,7 +133,9 @@ export function usePledge({
         }
       : null
 
-  async function savePledge(guestEmailParam?: string) {
+  async function savePledge(
+    guestEmailParam?: string
+  ): Promise<string | undefined> {
     const selections = pollSelections[pollWithItems.id] ?? []
     if (clerkUserId) {
       await createPledge({
@@ -146,9 +148,10 @@ export function usePledge({
           numericPledge
         ),
       })
+      return undefined
     } else {
       const email = guestEmailParam ?? guestEmail
-      await createGuestPledge({
+      const token = await createGuestPledge({
         favpollPollId: pollWithItems.id,
         guestEmail: email,
         totalAmount: numericPledge,
@@ -158,6 +161,7 @@ export function usePledge({
           numericPledge
         ),
       })
+      return token
     }
   }
 
@@ -212,10 +216,10 @@ export function usePledge({
   async function handlePledgePaymentSuccess(email?: string) {
     setPledgeClientSecret(null)
     try {
-      await savePledge(email ?? guestEmail)
+      const guestToken = await savePledge(email ?? guestEmail)
       if (pendingTopUp) await topUpFund(favpollId, numericTopUp)
       setPendingTopUp(false)
-      onPledgeSuccess?.()
+      onPledgeSuccess?.(guestToken)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")
