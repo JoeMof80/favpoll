@@ -66,14 +66,27 @@ test.describe("reveal after pledge", () => {
     await page.waitForLoadState("domcontentloaded")
 
     // ── 2. Confirm reveal is NOT visible before pledging ─────────────────────
-    // The reveal blockquote has role="status" and is conditionally rendered
-    // only after a pledge is confirmed (PollSection's pledged state).
+    // PR #127: PollSection now shows a blurred decoy + lock card overlay
+    // pre-pledge instead of simply hiding the reveal. The real PollReveal
+    // (role="status") is not mounted until entitled=true (server-gated).
+    // The decoy is aria-hidden so getByRole("status") correctly finds nothing.
     await expect(page.getByRole("status")).not.toBeVisible()
     await expect(page.getByText("Cornflower blue")).not.toBeVisible()
+    // Positive check: the lock card overlay is visible pre-pledge
+    await expect(
+      page.getByText(
+        "Pledge to see the reveal — and how the pledges are landing."
+      )
+    ).toBeVisible()
 
     // ── 3. Open the pledge dialog ─────────────────────────────────────────────
+    // PR #127 replaced the old "Pledge favourites" PledgeCard button with the
+    // merged "FAVOURITE {topic}" pill (PollHeading rendered as a primary Button).
+    // PledgeDialog runs in controlled mode on the favpoll page — its own
+    // internal "Pledge favourites" trigger button is suppressed (isControlled=true).
+    // The fixture topic is Colour → accessible name "Favourite Colour".
     const pledgeButton = page.getByRole("button", {
-      name: /pledge favourites/i,
+      name: /favourite colour/i,
     })
     await expect(pledgeButton).toBeVisible()
     await pledgeButton.click()
