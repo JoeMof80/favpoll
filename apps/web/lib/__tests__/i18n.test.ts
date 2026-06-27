@@ -45,7 +45,9 @@ describe("MARKET_DEFAULTS", () => {
 
 describe("t", () => {
   it("returns the correct string for a known key", () => {
-    expect(t("landing.headline")).toBe("Introducing a new way to honour them.")
+    expect(t("landing.headline")).toBe(
+      "Honour them through what they loved — for the causes they cared about."
+    )
   })
 
   it("returns the brand subheader", () => {
