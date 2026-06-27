@@ -81,15 +81,15 @@ export const SCENES: HeroScene[] = [
     opening_line: null,
     protagonist: {
       name: "Belinda Hartley",
-      context: "1945 – 2024",
+      context: "1945 - 2024",
       about:
-        "A headmistress for forty-one years who knew every pupil's name by the end of the first week. She wore one colour more than any other — naturally, never as a statement.",
+        "A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved.",
       photo_url: null,
     },
     poll: {
       id: "demo-poll-0",
       personal_reveal:
-        "Mine was purple. I wore it to every occasion that mattered.",
+        "Belinda said: My favourite colour was purple. I wore it to every occasion that mattered.",
       topic: {
         title: "Colour",
         favourites: [
@@ -134,15 +134,15 @@ export const SCENES: HeroScene[] = [
     opening_line: null,
     protagonist: {
       name: "Poppy Chen",
-      context: "Turning 30",
+      context: "Sweet Sixteen",
       about:
-        "Turning thirty, and as opinionated about food as she is about everything else. Ask her about ice cream and she'll tell you exactly where she stands — she always has.",
+        "Poppy wants to celebrate with ice cream. She has strong opinions about the best flavour. All proceeds go to St Ormond Street, who took such good care of her little brother.",
       photo_url: null,
     },
     poll: {
       id: "demo-poll-1",
       personal_reveal:
-        "Mint choc chip, of course. What do you mean you didn't know?",
+        "Mint choc chip is the best, of course. What do you mean you don't agree?",
       topic: {
         title: "Ice cream",
         favourites: [
@@ -208,12 +208,13 @@ export const SCENES: HeroScene[] = [
       name: "Ros Turner",
       context: "After 35 years",
       about:
-        "Retiring after thirty-five years in the school library. Fond of long walks and not remotely sentimental about leaving — though there's one time of year she's always loved best.",
+        "Retiring after thirty-five years in the school library. Fond of long walks any time of year but one season in particular.",
       photo_url: null,
     },
     poll: {
       id: "demo-poll-2",
-      personal_reveal: "Autumn, always. She never needed a reason.",
+      personal_reveal:
+        "Ros's favourite has always been Autumn. Childhood memories of kicking through leaves.",
       topic: {
         title: "Season",
         favourites: [
@@ -249,7 +250,7 @@ export const SCENES: HeroScene[] = [
       name: "Alex & Jordan",
       context: "Together since 2019",
       about:
-        "Newly engaged, and rarely apart since they met volunteering abroad in 2019. There's one animal they'll both talk about given the slightest excuse.",
+        "Newly engaged, and rarely apart since they met in 2024. They share a favourite animal that they know everything about.",
       photo_url: null,
     },
     poll: {
@@ -324,13 +325,13 @@ export const SCENES: HeroScene[] = [
       name: "Dave Kowalski",
       context: "Moving on",
       about:
-        "Eight years at the agency and universally liked. He has strong, well-documented opinions about biscuits — and was never shy about sharing them.",
+        "Dave is moving on after eight years at the company. He has strong opinions about biscuits and hopes you do too. Pledge your favourite to Comic Relief",
       photo_url: null,
     },
     poll: {
       id: "demo-poll-4",
       personal_reveal:
-        "Bourbon. He kept a secret stash in his desk drawer and everyone knew.",
+        "The Bourbon is Dave's favourite. Everyone knows about the supply in his desk drawer.",
       topic: {
         title: "Biscuit",
         favourites: [
@@ -396,13 +397,13 @@ export const SCENES: HeroScene[] = [
       name: "James Okafor",
       context: "Class of 2026",
       about:
-        "Just finished engineering at Leeds, the first in his family to go to university. There's one film he could watch again and again — and a reason behind it.",
+        "The first in his family to go to university, making them proud. There's a film he watches again and again. The Prince's Trust helped James on his way, so let's help return the favour.",
       photo_url: null,
     },
     poll: {
       id: "demo-poll-5",
       personal_reveal:
-        "Jurassic Park. He said it was the reason he applied to study engineering. His housemates were not surprised.",
+        "Jurassic Park. It is the reason James applied to study archeology.",
       topic: {
         title: "Film",
         favourites: [

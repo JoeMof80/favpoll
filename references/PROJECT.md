@@ -381,8 +381,8 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ### apps/web
 
 ```
-/                              -- Home: HeroDemoPanel + live favpolls carousel (bg-primary/5) + CTA. Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
-/landing-v2                    -- Alternate landing page: animated Venn hero + six-step how-it-works + CTA
+/                              -- Home: seven-section reveal-first landing page. Section 1 = HeroDemoPanel (blur/unblur reveal sequence). Section 2 = HowItWorksThreeBeat (withhold→pledge→disclose). Section 3 = live favpolls carousel (bg-primary/5, is_listed=true only). Section 4 = the record (gated: hidden until RECORD_THRESHOLD_GBP = £500 total pledged and ≥3 items — coupled to open /rankings threshold TODO). Section 5 = fee model / where money goes. Section 6 = written-in-advance (will/letter of wishes). Section 7 = Honour·Charity·Love Venn + final CTA. Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
+/landing-v2                    -- RETIRED (PR feat/landing-reveal-first-reconciled). Route (app/landing-v2/page.tsx) deleted; reusable components (honour-charity-love-venn.tsx, occasion-eyebrow.tsx, how-it-works.tsx) kept in components/landing-v2/ — the Venn is imported by the home page.
 /favpolls                      -- Live favpolls grid (public, no auth)
 /favpolls/new                  -- New favpoll wizard (3-step page: Honour → Charity → Love)
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
@@ -937,6 +937,10 @@ NEXT_PUBLIC_BASE_URL
   - **Pass 5 — docs and seed scripts:** `references/GLOSSARY.md`, `references/LOCALISATION.md`, `references/EXAMPLES.md`, `.claude/commands/favpoll-context.md` updated. `scripts/seed-favpolls.ts` identifiers renamed (`EventType`→`FavpollType`, `EVENT_TYPE_WEIGHTS`→`FAVPOLL_TYPE_WEIGHTS`, `pickEventType`→`pickFavpollType`, `pledgeCountForEvent`→`pledgeCountForFavpoll`, `ALLOW_EVENT_SEED`→`ALLOW_FAVPOLL_SEED`). `scripts/seed-exemplars.ts` `ALLOW_EVENT_SEED`→`ALLOW_FAVPOLL_SEED`. `README.md` and `references/COMPONENT_TREE.md` marked as outdated snapshots (both are too stale to rewrite; they point to this document as canonical). Historical handoff docs and marketing copy are explicitly excluded — "event" in those contexts is either historical record or "life event" domain language (correct usage).
   - **Documented exclusions (not renames):** `HANDOFF.md`, `references/SESSION_HANDOFF.md`, `references/session-handoff-2026-*.md` (historical records); `references/charity-pitch.md`, `founding-story.md`, `organiser-pitch.md`, `will-writers-pitch.md` ("event" = "life event" — correct domain usage); `scripts/run-migrations.ts`, `scripts/run-sql-migrations.mjs` (SQL strings reference old table names to detect pre-rename schema state — intentional); `scripts/seed.ts:281 "Sponsored event"` (legacy register key — changing would break backward compat with old DB rows); `favourites.event_count` column references (actual DB column name, not renamed).
   - Any future stray "event" reference found in the codebase should be checked against this exclusion list before assuming it is a gap. See `references/GLOSSARY.md` for the full vocabulary.
+
+- **Landing headline updated (2026-06-24).** The fixed headline changed from "Introducing a new way to honour them." to "Honour them through what they loved — for the causes they cared about." The new headline explains the mechanic (favourites + charitable giving) while keeping the "honour them" emotional core. The `favpoll-brand` skill has been updated to match — the old headline is retired. The eyebrow-rotation system is unchanged. The i18n test for `landing.headline` was updated to assert the new string.
+
+- **New favpoll form About/Reveal helper text (DEFERRED).** Teaching organisers the withhold/disclose craft at the moment they write the About and Reveal fields (`favpoll-form/editable-hero.tsx`, `editable-poll-area.tsx`) is the natural companion to the landing page rebuild. Not yet implemented. The insertion points are the About and Reveal overlays in the editable hero and poll area sub-components.
 
 ## Outstanding TODO
 
