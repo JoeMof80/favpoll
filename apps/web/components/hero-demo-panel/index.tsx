@@ -84,16 +84,13 @@ export function HeroDemoPanel() {
     addT(() => setPhase("reveal"), HOLD + 9400) // settled
 
     addT(() => setFading(true), HOLD + 12800)
-    addT(
-      () => {
-        const nextIndex = (sceneIndex + 1) % SCENES.length
-        setPhase("arriving")
-        setBarWidths(decoyFor(SCENES[nextIndex]))
-        setFading(false)
-        setSceneIndex(nextIndex)
-      },
-      HOLD + 13300
-    )
+    addT(() => {
+      const nextIndex = (sceneIndex + 1) % SCENES.length
+      setPhase("arriving")
+      setBarWidths(decoyFor(SCENES[nextIndex]))
+      setFading(false)
+      setSceneIndex(nextIndex)
+    }, HOLD + 13300)
 
     return clearAll
     // eslint-disable-next-line react-hooks/exhaustive-deps

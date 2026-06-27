@@ -107,7 +107,9 @@ export function DemoCard({
     phase === "pledge-hover" ||
     phase === "pledging"
   const amountActive =
-    phase === "amount-picked" || phase === "pledge-hover" || phase === "pledging"
+    phase === "amount-picked" ||
+    phase === "pledge-hover" ||
+    phase === "pledging"
   const pledgeHover = phase === "pledge-hover"
   const pledgePressed = phase === "pledging"
 
@@ -236,7 +238,7 @@ export function DemoCard({
           <Button
             type="button"
             className={cn(
-              "w-full uppercase tracking-[0.09em] transition-all duration-150",
+              "w-full tracking-[0.09em] uppercase transition-all duration-150",
               triggerHover && !triggerPressed
                 ? "ring-2 ring-primary/30 brightness-105"
                 : "",
@@ -430,7 +432,11 @@ export function DemoCard({
                     <div className="min-h-0 flex-1 overflow-y-auto">
                       {renderAmountStep(dispAmount, dispAmountStr)}
                     </div>
-                    {renderPledgeFooter(amountActive, pledgeHover, pledgePressed)}
+                    {renderPledgeFooter(
+                      amountActive,
+                      pledgeHover,
+                      pledgePressed
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
