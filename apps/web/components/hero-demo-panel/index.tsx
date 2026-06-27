@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Chip } from "@/components/ui/chip"
 import type { Phase } from "./scenes"
-import { SCENES, OCCASION_CHIPS } from "./scenes"
+import { SCENES } from "./scenes"
 import { HeroPitchColumn } from "./hero-pitch-column"
 import { DemoCard } from "./demo-card"
+
+// Arbitrary, varied widths for the blurred decoy bars — they reveal nothing
+// about the true ranking (mirrors the live page's DECOY_WIDTHS).
+const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
 export function HeroDemoPanel() {
   const prefersReducedMotion =
@@ -13,13 +16,12 @@ export function HeroDemoPanel() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const [sceneIndex, setSceneIndex] = useState(0)
-  const [phase, setPhase] = useState<Phase>(
-    prefersReducedMotion ? "reveal" : "arriving"
-  )
+
+  // Start resolved — results populated + reveal unblurred — so the payoff is
+  // visible on first paint. The loop then replays the full arc from locked.
+  const [phase, setPhase] = useState<Phase>("reveal")
   const [barWidths, setBarWidths] = useState<number[]>(
-    prefersReducedMotion
-      ? SCENES[0].results.map((r) => r.widthPercent)
-      : SCENES[0].results.map(() => 0)
+    SCENES[0].results.map((r) => r.widthPercent)
   )
   const [fading, setFading] = useState(false)
 
@@ -31,24 +33,41 @@ export function HeroDemoPanel() {
   const addT = (fn: () => void, ms: number) =>
     timeouts.current.push(setTimeout(fn, ms))
 
+  const isFirstRun = useRef(true)
+
+  const decoyFor = (scene: (typeof SCENES)[number]) =>
+    scene.results.map((_, i) => DECOY_WIDTHS[i] ?? 12)
+
   useEffect(() => {
     if (prefersReducedMotion) return
     clearAll()
 
+    const HOLD = isFirstRun.current ? 2500 : 0
+    isFirstRun.current = false
+
     const scene = SCENES[sceneIndex]
-    // Wait for all options to stagger in (300ms start + 80ms per item) then give
-    // 1.5s viewing time before auto-selecting, so long lists don't feel rushed.
-    const optionStaggerMs = 300 + (scene.poll.topic.favourites.length - 1) * 80
-    const selectedAt = optionStaggerMs + 1500
 
-    addT(() => setPhase("selected"), selectedAt)
-    addT(() => setPhase("pledge-panel"), selectedAt + 2000)
-    addT(() => setPhase("amount-picked"), selectedAt + 3800)
-    addT(() => setPhase("pledging"), selectedAt + 5200)
-    addT(() => setPhase("confirmed"), selectedAt + 5500)
-    addT(() => setPhase("clearing"), selectedAt + 6800)
-    addT(() => setPhase("reveal"), selectedAt + 7400)
+    // Locked: blurred decoy bars hold arbitrary widths behind the lock card.
+    addT(() => {
+      setPhase("arriving")
+      setBarWidths(decoyFor(scene))
+    }, HOLD)
 
+    addT(() => setPhase("trigger-hover"), HOLD + 900) // pill hover
+    addT(() => setPhase("triggering"), HOLD + 1200) // pill press
+    addT(() => setPhase("picking"), HOLD + 1550) // picker opens, browsing
+    addT(() => setPhase("selected"), HOLD + 2750) // a favourite is selected
+    addT(() => setPhase("next-hover"), HOLD + 3450) // Next hover
+    addT(() => setPhase("next-pressed"), HOLD + 3750) // Next pressed
+    addT(() => setPhase("pledge-panel"), HOLD + 4100) // amount step, Pledge off
+    addT(() => setPhase("amount-picked"), HOLD + 5100) // preset picked, Pledge on
+    addT(() => setPhase("pledge-hover"), HOLD + 6000) // Pledge hover
+    addT(() => setPhase("pledging"), HOLD + 6300) // Pledge pressed
+    addT(() => setPhase("confirmed"), HOLD + 6600) // confirmation in dialog
+
+    // Pledge confirmed → dialog closes, the blur lifts, and the decoy bars
+    // climb to their real widths — the disclosure, all in one motion.
+    addT(() => setPhase("clearing"), HOLD + 7800)
     scene.results.forEach((result, i) => {
       addT(
         () =>
@@ -57,88 +76,61 @@ export function HeroDemoPanel() {
             next[i] = result.widthPercent
             return next
           }),
-        selectedAt + 8000 + i * 200
+        HOLD + 7900 + i * 180
       )
     })
 
-    addT(() => setFading(true), selectedAt + 16000)
+    addT(() => setPhase("results"), HOLD + 8300) // bars mid-climb
+    addT(() => setPhase("reveal"), HOLD + 9400) // settled
+
+    addT(() => setFading(true), HOLD + 12800)
     addT(() => {
       const nextIndex = (sceneIndex + 1) % SCENES.length
       setPhase("arriving")
-      setBarWidths(SCENES[nextIndex].results.map(() => 0))
+      setBarWidths(decoyFor(SCENES[nextIndex]))
       setFading(false)
       setSceneIndex(nextIndex)
-    }, selectedAt + 16500)
+    }, HOLD + 13300)
 
     return clearAll
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneIndex])
 
-  const handleOccasionClick = (index: number) => {
-    if (index === sceneIndex) return
-    clearAll()
-    setFading(true)
-    setTimeout(() => {
-      setPhase("arriving")
-      setBarWidths(SCENES[index].results.map(() => 0))
-      setFading(false)
-      setSceneIndex(index)
-    }, 400)
-  }
-
   const scene = SCENES[sceneIndex]
-
-  const showOptions = phase === "arriving" || phase === "selected"
-  const showPledgePanel =
-    phase === "pledge-panel" ||
-    phase === "amount-picked" ||
-    phase === "pledging" ||
-    phase === "confirmed"
-  const showToast = phase === "confirmed"
-  const showReveal = phase === "reveal"
 
   const stepLabels: Record<Phase, string> = {
     arriving: "Choose your favourite",
-    selected: "Your choice",
+    "trigger-hover": "Choose your favourite",
+    triggering: "Choose your favourite",
+    picking: "Choose your favourite",
+    selected: "A favourite is picked",
+    "next-hover": "A favourite is picked",
+    "next-pressed": "A favourite is picked",
     "pledge-panel": "Choose an amount",
     "amount-picked": "Ready to pledge",
+    "pledge-hover": "Ready to pledge",
     pledging: "Pledging…",
     confirmed: "Pledged ✓",
-    clearing: "",
+    clearing: "Unlocking…",
+    results: "Unlocking…",
     reveal: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
   }
 
   return (
     <section id="how-it-works" className="border-b border-border bg-muted">
       <div className="mx-auto max-w-330">
-        <div className="mx-auto flex h-158 w-full max-w-330">
+        <div className="mx-auto flex h-176 w-full max-w-330">
           {/* Left — pitch copy */}
           <HeroPitchColumn sceneIndex={sceneIndex} />
 
           {/* Right — demo card (desktop only) */}
           <div
-            className="hidden h-158 flex-col p-5 md:flex"
+            className="hidden h-176 flex-col p-5 md:flex"
             style={{ flex: "0.95" }}
           >
-            {/* Occasion chips */}
-            <div className="mb-3 flex shrink-0 flex-wrap gap-1.25">
-              {OCCASION_CHIPS.map(({ label, index }) => (
-                <Chip
-                  key={label}
-                  selected={index === sceneIndex}
-                  onClick={() => handleOccasionClick(index)}
-                  className="py-1 text-[11px]"
-                >
-                  {label}
-                </Chip>
-              ))}
-            </div>
-
             <span className="sr-only">
-              Animated demonstration of how favpoll works, showing a{" "}
-              {scene.opening_line.toLowerCase()} favpoll. The demonstration
-              cycles through occasion types automatically. Use the buttons above
-              to jump to a specific occasion.
+              Animated demonstration of how favpoll works. The demonstration
+              cycles through different occasions automatically.
             </span>
 
             <div
@@ -151,10 +143,6 @@ export function HeroDemoPanel() {
                 phase={phase}
                 barWidths={barWidths}
                 prefersReducedMotion={prefersReducedMotion}
-                showOptions={showOptions}
-                showPledgePanel={showPledgePanel}
-                showToast={showToast}
-                showReveal={showReveal}
               />
               <p className="mt-2.5 h-3.5 shrink-0 text-center text-[10px] font-medium tracking-[0.07em] text-muted-foreground uppercase">
                 {stepLabels[phase]}

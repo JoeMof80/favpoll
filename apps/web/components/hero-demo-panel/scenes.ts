@@ -1,31 +1,50 @@
 import type { PollResultItem } from "@/components/favpoll-card/types"
 
 export type Phase =
-  | "arriving" // step 1 — options stagger in
-  | "selected" // step 2 — one option highlighted
-  | "pledge-panel" // step 3 — amount buttons appear
-  | "amount-picked" // step 4 — amount highlighted
-  | "pledging" // step 5 — button depressed
-  | "confirmed" // step 5 — toast visible
-  | "clearing" // step 6 — fade transition
-  | "reveal" // step 7–9 — reveal + results
+  | "arriving" // trigger button shown
+  | "trigger-hover" // trigger button hovered
+  | "triggering" // trigger button pressed
+  | "picking" // picker open, browsing, nothing selected
+  | "selected" // a favourite is selected
+  | "next-hover" // Next button hovered
+  | "next-pressed" // Next button pressed
+  | "pledge-panel" // amount step shown, nothing chosen, Pledge disabled
+  | "amount-picked" // preset selected, £ updates, Pledge enabled
+  | "pledge-hover" // Pledge button hovered
+  | "pledging" // Pledge button pressed
+  | "confirmed" // confirmation shown inside the dialog
+  | "clearing" // dialog closes
+  | "results" // ranking bars climb, reveal skeleton holds
+  | "reveal" // personal reveal types out last
 
 /**
  * Supabase-aligned demo scene.
+ *
+ * occasion_type + opening_line drive the headline through the REAL
+ * getFavpollHeadline (same path the live favpoll page uses) — the eyebrow is
+ * no longer hardcoded. about + context live on protagonist, mirroring the
+ * real Protagonist row, and the About *withholds* the favourite (it must
+ * never name or imply the reveal answer).
  *
  * Data fields mirror the actual DB shape used by FavpollCard:
  *   - protagonist → protagonists row
  *   - poll        → favpoll_polls row + topics + favourites
  *   - charities   → charities rows via favpoll_charities
  *
- * Demo-only fields (avatarColor, selectedIndex, pledgeAmount, tagline,
- * results, total) carry animation or display data that has no DB equivalent.
+ * Demo-only fields (selectedIndex, pledgeAmount, results, total) carry
+ * animation or display data that has no DB equivalent.
  */
 export type HeroScene = {
   // ── Supabase-aligned ──────────────────────────────────────────────────────
-  opening_line: string
+  /** Drives the headline prefix via getFavpollHeadline (e.g. "Memorial") */
+  occasion_type: string
+  /** Custom opening line override; null = derive prefix from occasion_type */
+  opening_line: string | null
   protagonist: {
     name: string
+    context: string | null
+    /** Withholding intro — introduces the person, never names the favourite */
+    about: string
     photo_url: string | null
   }
   poll: {
@@ -44,15 +63,11 @@ export type HeroScene = {
   }[]
 
   // ── Demo-only ─────────────────────────────────────────────────────────────
-  /** Background colour for the avatar circle in the demo card */
-  avatarColor: string
   /** Index into poll.topic.favourites — the item selected in the animation */
   selectedIndex: number
   /** Pledge amount shown in the demo animation e.g. "£10" */
   pledgeAmount: string
-  /** Custom framing line shown above the option grid in the demo */
-  tagline: string
-  /** Results snapshot shown during the reveal phase */
+  /** Results snapshot shown during the results + reveal phases */
   results: PollResultItem[]
   /** Formatted total raised e.g. "£1,005" */
   total: string
@@ -62,8 +77,15 @@ export type HeroScene = {
 
 export const SCENES: HeroScene[] = [
   {
-    opening_line: "Memorial",
-    protagonist: { name: "Belinda Hartley", photo_url: null },
+    occasion_type: "Memorial",
+    opening_line: null,
+    protagonist: {
+      name: "Belinda Hartley",
+      context: "1945 – 2024",
+      about:
+        "A headmistress for forty-one years who knew every pupil's name by the end of the first week. She wore one colour more than any other — naturally, never as a statement.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-0",
       personal_reveal:
@@ -95,10 +117,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "207994",
       },
     ],
-    avatarColor: "#7F77DD",
     selectedIndex: 1,
     pledgeAmount: "£10",
-    tagline: "Belinda had a colour she always wore — do you?",
     results: [
       { label: "Purple", amount: "£350", widthPercent: 78 },
       { label: "Blue", amount: "£220", widthPercent: 51 },
@@ -110,8 +130,15 @@ export const SCENES: HeroScene[] = [
     total: "£1,005",
   },
   {
-    opening_line: "Birthday",
-    protagonist: { name: "Poppy Chen", photo_url: null },
+    occasion_type: "Birthday",
+    opening_line: null,
+    protagonist: {
+      name: "Poppy Chen",
+      context: "Turning 30",
+      about:
+        "Turning thirty, and as opinionated about food as she is about everything else. Ask her about ice cream and she'll tell you exactly where she stands — she always has.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-1",
       personal_reveal:
@@ -162,10 +189,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "235825",
       },
     ],
-    avatarColor: "#E87D6A",
     selectedIndex: 15,
     pledgeAmount: "£20",
-    tagline: "Tell us your favourite ice cream to find out Poppy's.",
     results: [
       { label: "Vanilla", amount: "£210", widthPercent: 84 },
       { label: "Chocolate", amount: "£175", widthPercent: 71 },
@@ -177,12 +202,18 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
-    opening_line: "Retirement",
-    protagonist: { name: "Ros Turner", photo_url: null },
+    occasion_type: "Retirement",
+    opening_line: null,
+    protagonist: {
+      name: "Ros Turner",
+      context: "After 35 years",
+      about:
+        "Retiring after thirty-five years in the school library. Fond of long walks and not remotely sentimental about leaving — though there's one time of year she's always loved best.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-2",
-      personal_reveal:
-        "Autumn, always. Childhood memories of walking through leaves.",
+      personal_reveal: "Autumn, always. She never needed a reason.",
       topic: {
         title: "Season",
         favourites: [
@@ -201,10 +232,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "294344",
       },
     ],
-    avatarColor: "#4AAB8A",
     selectedIndex: 2,
     pledgeAmount: "£50",
-    tagline: "Which time of year do you love? Is it the same as Ros's?",
     results: [
       { label: "Spring", amount: "£290", widthPercent: 71 },
       { label: "Summer", amount: "£195", widthPercent: 48 },
@@ -214,8 +243,15 @@ export const SCENES: HeroScene[] = [
     total: "£700",
   },
   {
-    opening_line: "Engagement",
-    protagonist: { name: "Alex & Jordan", photo_url: null },
+    occasion_type: "Engagement",
+    opening_line: null,
+    protagonist: {
+      name: "Alex & Jordan",
+      context: "Together since 2019",
+      about:
+        "Newly engaged, and rarely apart since they met volunteering abroad in 2019. There's one animal they'll both talk about given the slightest excuse.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-3",
       personal_reveal:
@@ -269,10 +305,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "1081247",
       },
     ],
-    avatarColor: "#D4936B",
     selectedIndex: 4,
     pledgeAmount: "£20",
-    tagline: "What's your favourite animal? Alex & Jordan have one…",
     results: [
       { label: "Giant panda", amount: "£310", widthPercent: 74 },
       { label: "African elephant", amount: "£200", widthPercent: 48 },
@@ -284,12 +318,19 @@ export const SCENES: HeroScene[] = [
     total: "£950",
   },
   {
-    opening_line: "Leaving do",
-    protagonist: { name: "Dave Kowalski", photo_url: null },
+    occasion_type: "Leaving do",
+    opening_line: null,
+    protagonist: {
+      name: "Dave Kowalski",
+      context: "Moving on",
+      about:
+        "Eight years at the agency and universally liked. He has strong, well-documented opinions about biscuits — and was never shy about sharing them.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-4",
       personal_reveal:
-        "Bourbon. He kept a not-so-secret stash in his desk drawer.",
+        "Bourbon. He kept a secret stash in his desk drawer and everyone knew.",
       topic: {
         title: "Biscuit",
         favourites: [
@@ -336,11 +377,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "326568",
       },
     ],
-    avatarColor: "#534AB7",
     selectedIndex: 7,
     pledgeAmount: "£10",
-    tagline:
-      "We've had eight years of Dave's biscuit opinions. What about yours?",
     results: [
       { label: "Bourbon", amount: "£185", widthPercent: 69 },
       { label: "Digestive", amount: "£145", widthPercent: 54 },
@@ -352,11 +390,19 @@ export const SCENES: HeroScene[] = [
     total: "£585",
   },
   {
-    opening_line: "Graduation",
-    protagonist: { name: "James Okafor", photo_url: null },
+    occasion_type: "Graduation",
+    opening_line: null,
+    protagonist: {
+      name: "James Okafor",
+      context: "Class of 2026",
+      about:
+        "Just finished engineering at Leeds, the first in his family to go to university. There's one film he could watch again and again — and a reason behind it.",
+      photo_url: null,
+    },
     poll: {
       id: "demo-poll-5",
-      personal_reveal: "Jurassic Park.",
+      personal_reveal:
+        "Jurassic Park. He said it was the reason he applied to study engineering. His housemates were not surprised.",
       topic: {
         title: "Film",
         favourites: [
@@ -408,11 +454,8 @@ export const SCENES: HeroScene[] = [
         registered_number: "1079675",
       },
     ],
-    avatarColor: "#5B9BD5",
     selectedIndex: 12,
     pledgeAmount: "£20",
-    tagline:
-      "James' favourite film was the reason he applied to study engineering — what's yours?",
     results: [
       { label: "The Shawshank Redemption", amount: "£280", widthPercent: 72 },
       { label: "Jurassic Park", amount: "£240", widthPercent: 61 },
@@ -424,11 +467,6 @@ export const SCENES: HeroScene[] = [
     total: "£1,030",
   },
 ]
-
-export const OCCASION_CHIPS = SCENES.map((s, i) => ({
-  label: s.opening_line,
-  index: i,
-}))
 
 export const PLEDGE_AMOUNTS = ["£5", "£10", "£20", "£50"]
 
