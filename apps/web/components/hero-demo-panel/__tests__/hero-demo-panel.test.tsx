@@ -41,11 +41,26 @@ vi.mock("@/components/favpoll-hero-avatar", () => ({
   ProtagonistAvatar: () => <div data-testid="protagonist-avatar" />,
 }))
 
+// Stubs expose draftIds.length via data-draft-count so we can assert the
+// "no chip in search bar" invariant without the real Chip implementation.
 vi.mock("@/components/pledge-dialog/step-pick-favourites", () => ({
-  PickerHeader: ({ topicTitle }: { topicTitle: string }) => (
-    <div data-testid="picker-header">Choose your favourite {topicTitle}</div>
+  PickerHeader: ({
+    topicTitle,
+    draftIds,
+  }: {
+    topicTitle: string
+    draftIds: string[]
+  }) => (
+    <div data-testid="picker-header" data-draft-count={String(draftIds.length)}>
+      Choose your favourite {topicTitle}
+    </div>
   ),
-  PickerItems: () => <div data-testid="picker-items" />,
+  PickerItems: ({ draftIds }: { draftIds: string[] }) => (
+    <div
+      data-testid="picker-items"
+      data-draft-count={String(draftIds.length)}
+    />
+  ),
 }))
 
 vi.mock("@/components/pledge-dialog/step-amount", () => ({
@@ -64,7 +79,8 @@ const LOCK_CARD_COPY =
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
-const scene = SCENES[0] // Belinda · Colour
+const scene = SCENES[0] // Belinda · Colour · Marie Curie
+const charity = scene.charities[0]
 const realWidths = scene.results.slice(0, 5).map((r) => r.widthPercent)
 
 function renderCard(
@@ -108,11 +124,21 @@ describe("DemoCard — locked phases", () => {
     }
   )
 
-  it("the reveal+results wrapper is blurred and aria-hidden when locked", () => {
+  it("the reveal is blurred and aria-hidden when locked", () => {
     const { container } = renderCard("arriving")
     const blurred = container.querySelector(".blur-xs")
     expect(blurred).toBeInTheDocument()
     expect(blurred).toHaveAttribute("aria-hidden", "true")
+  })
+
+  it("About text is present via reserve copy in a locked phase", () => {
+    renderCard("arriving")
+    // The reserve <p> always carries the full About text (the typed copy starts
+    // as NBSP). getByText traverses textContent regardless of aria-hidden.
+    const aboutEls = screen.getAllByText(scene.protagonist.about, {
+      exact: false,
+    })
+    expect(aboutEls.length).toBeGreaterThanOrEqual(1)
   })
 })
 
@@ -123,34 +149,48 @@ const UNLOCKED_PHASES: Phase[] = ["clearing", "results", "reveal"]
 describe("DemoCard — unlocked phases", () => {
   it.each(UNLOCKED_PHASES)("lock card is absent in '%s' phase", (phase) => {
     renderCard(phase, realWidths)
-    expect(screen.queryByText(LOCK_CARD_COPY)).not.toBeInTheDocument()
+    expect(screen.queryByText(LOCK_CARD_COPY)).toBeNull()
   })
 
-  it("wrapper has no blur-xs and no aria-hidden when unlocked", () => {
+  it("no blur-xs present when unlocked", () => {
     const { container } = renderCard("reveal", realWidths)
-    expect(container.querySelector(".blur-xs")).not.toBeInTheDocument()
+    expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
   it.each(UNLOCKED_PHASES)(
-    "real reveal text is visible in '%s' phase",
+    "reveal text accessible via reserve copy in '%s' phase",
     (phase) => {
       renderCard(phase, realWidths)
-      expect(screen.getByTestId("poll-reveal")).toHaveTextContent(
-        scene.poll.personal_reveal
-      )
+      // Two PollReveal nodes render when unlocked: an invisible reserve (full
+      // text, always present) and a typed copy (fills via setInterval — starts
+      // as NBSP in synchronous tests). The reserve is first in DOM order.
+      const reveals = screen.getAllByTestId("poll-reveal")
+      expect(reveals.length).toBeGreaterThanOrEqual(2)
+      expect(reveals[0]).toHaveTextContent(scene.poll.personal_reveal)
     }
   )
 })
 
-// ── Topic pill (merged header + trigger) ──────────────────────────────────────
+// ── Topic pill (merged header + pledge trigger) ───────────────────────────────
 
 describe("DemoCard — topic pill", () => {
-  it("renders 'FAVOURITE {topic}' in every phase", () => {
+  it("renders 'Favourite {topic}' in every phase", () => {
     for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
       const { unmount } = renderCard(phase)
       expect(
         screen.getByText(`Favourite ${scene.poll.topic.title}`)
       ).toBeInTheDocument()
+      unmount()
+    }
+  })
+
+  it("uses default variant (bg-primary) throughout — never secondary", () => {
+    for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
+      const { unmount } = renderCard(phase)
+      const pill = screen
+        .getByText(`Favourite ${scene.poll.topic.title}`)
+        .closest("button")
+      expect(pill).toHaveAttribute("data-variant", "default")
       unmount()
     }
   })
@@ -210,35 +250,82 @@ describe("DemoCard — dialog mimics", () => {
     )
   })
 
-  // shows amount step in pledge-panel phase
+  it("picker header receives empty draftIds in all picker phases (no chip in search bar)", () => {
+    const pickerPhases: Phase[] = [
+      "picking",
+      "selected",
+      "next-hover",
+      "next-pressed",
+    ]
+    for (const phase of pickerPhases) {
+      const { unmount } = renderCard(phase)
+      expect(screen.getByTestId("picker-header")).toHaveAttribute(
+        "data-draft-count",
+        "0"
+      )
+      unmount()
+    }
+  })
+
+  it("picker items receive real draftIds in selected phase (grid highlights)", () => {
+    renderCard("selected")
+    // One favourite selected → draftIds passed to PickerItems has length 1
+    expect(screen.getByTestId("picker-items")).toHaveAttribute(
+      "data-draft-count",
+      "1"
+    )
+  })
+
+  it("Next uses secondary variant while browsing (picking), default once selected", () => {
+    const { unmount: u1 } = renderCard("picking")
+    const nextBrowsing = screen.getAllByRole("button", {
+      name: /^Next/,
+      hidden: true,
+    })
+    expect(nextBrowsing[nextBrowsing.length - 1]).toHaveAttribute(
+      "data-variant",
+      "secondary"
+    )
+    u1()
+
+    const { unmount: u2 } = renderCard("selected")
+    const nextSelected = screen.getAllByRole("button", {
+      name: /^Next/,
+      hidden: true,
+    })
+    expect(nextSelected[nextSelected.length - 1]).toHaveAttribute(
+      "data-variant",
+      "default"
+    )
+    u2()
+  })
+
   it("shows amount step in pledge-panel phase", () => {
     renderCard("pledge-panel")
     // Two step-amount nodes exist (one in the hidden height measurer); the
-    // visible one is the last in document order.
+    // live one is last in document order.
     const steps = screen.getAllByTestId("step-amount")
     expect(steps[steps.length - 1]).toBeInTheDocument()
   })
 
-  // has opacity-50 (no amount) in pledge-panel phase
-  it("Pledge button has opacity-50 (no amount) in pledge-panel phase", () => {
+  it("Pledge uses secondary variant (no amount chosen) in pledge-panel phase", () => {
     renderCard("pledge-panel")
     const pledgeBtns = screen.getAllByRole("button", {
       name: /^Pledge$/,
       hidden: true,
     })
     const liveBtn = pledgeBtns[pledgeBtns.length - 1]
-    expect(liveBtn.classList.contains("opacity-50")).toBe(true)
+    expect(liveBtn).toHaveAttribute("data-variant", "secondary")
   })
 
-  // lacks opacity-50 (amount picked) in amount-picked phase
-  it("Pledge button lacks opacity-50 (amount picked) in amount-picked phase", () => {
+  it("Pledge uses default variant (amount picked, Pledge enabled) in amount-picked phase", () => {
     renderCard("amount-picked")
     const pledgeBtns = screen.getAllByRole("button", {
       name: /^Pledge$/,
       hidden: true,
     })
     const liveBtn = pledgeBtns[pledgeBtns.length - 1]
-    expect(liveBtn.classList.contains("opacity-50")).toBe(false)
+    expect(liveBtn).toHaveAttribute("data-variant", "default")
   })
 
   it("shows confirmation tick and amount in confirmed phase", () => {
@@ -251,7 +338,30 @@ describe("DemoCard — dialog mimics", () => {
 
   it("picker not shown in amount phases", () => {
     renderCard("pledge-panel")
-    expect(screen.queryByTestId("picker-header")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("picker-header")).toBeNull()
+  })
+})
+
+// ── Footer (CharityRow mirror) ────────────────────────────────────────────────
+
+describe("DemoCard — footer", () => {
+  it("renders the charity name", () => {
+    // Test in unlocked phase so the footer is not aria-hidden.
+    renderCard("reveal", realWidths)
+    expect(screen.getByText(charity.name)).toBeInTheDocument()
+  })
+
+  it("renders the charity registration number", () => {
+    renderCard("reveal", realWidths)
+    expect(
+      screen.getByText(`Charity no. ${charity.registered_number}`)
+    ).toBeInTheDocument()
+  })
+
+  it("renders the GBP-formatted total raised", () => {
+    renderCard("reveal", realWidths)
+    // scene.total = "£1,005" → raisedNum = 1005 → GBP.format(1005) = "£1,005"
+    expect(screen.getByText(scene.total)).toBeInTheDocument()
   })
 })
 
@@ -277,14 +387,16 @@ describe("HeroDemoPanel — reduced motion", () => {
   it("renders the resolved reveal state — no lock card, no blur", () => {
     const { container } = render(<HeroDemoPanel />)
     // Phase stays at 'reveal' — the loop never fires.
-    expect(screen.queryByText(LOCK_CARD_COPY)).not.toBeInTheDocument()
-    expect(container.querySelector(".blur-xs")).not.toBeInTheDocument()
+    expect(screen.queryByText(LOCK_CARD_COPY)).toBeNull()
+    expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
   it("shows the real reveal text in the resolved state", () => {
     render(<HeroDemoPanel />)
-    expect(screen.getByTestId("poll-reveal")).toHaveTextContent(
-      SCENES[0].poll.personal_reveal
-    )
+    // With prefersReducedMotion=true, useTyped returns full text immediately,
+    // so both the reserve and typed PollReveal nodes carry the full text.
+    const reveals = screen.getAllByTestId("poll-reveal")
+    expect(reveals.length).toBeGreaterThanOrEqual(1)
+    expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
   })
 })

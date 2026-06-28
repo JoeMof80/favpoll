@@ -47,27 +47,29 @@ export function HeroDemoPanel() {
 
     const scene = SCENES[sceneIndex]
 
-    // Locked: blurred decoy bars hold arbitrary widths behind the lock card.
+    // Locked: blurred decoy bars + lock card; About types out on arrival.
     addT(() => {
       setPhase("arriving")
       setBarWidths(decoyFor(scene))
     }, HOLD)
 
-    addT(() => setPhase("trigger-hover"), HOLD + 900) // pill hover
-    addT(() => setPhase("triggering"), HOLD + 1200) // pill press
-    addT(() => setPhase("picking"), HOLD + 1550) // picker opens, browsing
-    addT(() => setPhase("selected"), HOLD + 2750) // a favourite is selected
-    addT(() => setPhase("next-hover"), HOLD + 3450) // Next hover
-    addT(() => setPhase("next-pressed"), HOLD + 3750) // Next pressed
-    addT(() => setPhase("pledge-panel"), HOLD + 4100) // amount step, Pledge off
-    addT(() => setPhase("amount-picked"), HOLD + 5100) // preset picked, Pledge on
-    addT(() => setPhase("pledge-hover"), HOLD + 6000) // Pledge hover
-    addT(() => setPhase("pledging"), HOLD + 6300) // Pledge pressed
-    addT(() => setPhase("confirmed"), HOLD + 6600) // confirmation in dialog
+    addT(() => setPhase("trigger-hover"), HOLD + 2400) // (About has typed)
+    addT(() => setPhase("triggering"), HOLD + 2700) // pill press
+    addT(() => setPhase("picking"), HOLD + 3050) // picker opens, browsing
+    addT(() => setPhase("selected"), HOLD + 4250) // a favourite is selected
+    addT(() => setPhase("next-hover"), HOLD + 4950) // Next hover (now enabled)
+    addT(() => setPhase("next-pressed"), HOLD + 5250) // Next pressed
+    addT(() => setPhase("pledge-panel"), HOLD + 5600) // amount step, Pledge off
+    addT(() => setPhase("amount-picked"), HOLD + 6600) // preset picked, Pledge on
+    addT(() => setPhase("pledge-hover"), HOLD + 7500) // Pledge hover
+    addT(() => setPhase("pledging"), HOLD + 7800) // Pledge pressed
+    addT(() => setPhase("confirmed"), HOLD + 8100) // confirmation in dialog
 
-    // Pledge confirmed → dialog closes, the blur lifts, and the decoy bars
-    // climb to their real widths — the disclosure, all in one motion.
-    addT(() => setPhase("clearing"), HOLD + 7800)
+    // Disclosure: dialog closes → reveal types out + bars climb from zero.
+    addT(() => {
+      setPhase("clearing")
+      setBarWidths(scene.results.map(() => 0))
+    }, HOLD + 9300)
     scene.results.forEach((result, i) => {
       addT(
         () =>
@@ -76,21 +78,22 @@ export function HeroDemoPanel() {
             next[i] = result.widthPercent
             return next
           }),
-        HOLD + 7900 + i * 180
+        HOLD + 9400 + i * 180
       )
     })
 
-    addT(() => setPhase("results"), HOLD + 8300) // bars mid-climb
-    addT(() => setPhase("reveal"), HOLD + 9400) // settled
+    addT(() => setPhase("results"), HOLD + 9800) // bars mid-climb
+    addT(() => setPhase("reveal"), HOLD + 11200) // settled — reveal fully typed
 
-    addT(() => setFading(true), HOLD + 12800)
+    addT(() => setFading(true), HOLD + 13700)
     addT(() => {
       const nextIndex = (sceneIndex + 1) % SCENES.length
+      // New scene fades in already locked — no reveal/results glimpse.
       setPhase("arriving")
       setBarWidths(decoyFor(SCENES[nextIndex]))
       setFading(false)
       setSceneIndex(nextIndex)
-    }, HOLD + 13300)
+    }, HOLD + 14200)
 
     return clearAll
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,21 +114,21 @@ export function HeroDemoPanel() {
     "pledge-hover": "Ready to pledge",
     pledging: "Pledging…",
     confirmed: "Pledged ✓",
-    clearing: "Unlocking…",
-    results: "Unlocking…",
+    clearing: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
+    results: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
     reveal: `${scene.protagonist.name.split(" ")[0]}'s reveal`,
   }
 
   return (
     <section id="how-it-works" className="border-b border-border bg-muted">
       <div className="mx-auto max-w-330">
-        <div className="mx-auto flex h-176 w-full max-w-330">
+        <div className="mx-auto flex h-158 w-full max-w-330">
           {/* Left — pitch copy */}
           <HeroPitchColumn sceneIndex={sceneIndex} />
 
           {/* Right — demo card (desktop only) */}
           <div
-            className="hidden h-176 flex-col p-5 md:flex"
+            className="hidden h-158 flex-col p-5 md:flex"
             style={{ flex: "0.95" }}
           >
             <span className="sr-only">
