@@ -679,7 +679,7 @@ pnpm --filter @favpoll/web test:run     -- web tests (Vitest)
 pnpm --filter @favpoll/admin test:run   -- admin tests (Vitest)
 ```
 
-All tests must pass before committing. Current counts: 828 web, 56 admin.
+All tests must pass before committing. Current counts: 870 web, 56 admin.
 Run `pnpm --filter @favpoll/web exec prettier --write .` from `apps/web` after changes (never from repo root — strips TS generics in .tsx).
 
 Co-located `__tests__/` directories. Environments:
@@ -939,6 +939,16 @@ NEXT_PUBLIC_BASE_URL
   - Any future stray "event" reference found in the codebase should be checked against this exclusion list before assuming it is a gap. See `references/GLOSSARY.md` for the full vocabulary.
 
 - **Landing headline updated (2026-06-24).** The fixed headline changed from "Introducing a new way to honour them." to "Honour them through what they loved — for the causes they cared about." The new headline explains the mechanic (favourites + charitable giving) while keeping the "honour them" emotional core. The `favpoll-brand` skill has been updated to match — the old headline is retired. The eyebrow-rotation system is unchanged. The i18n test for `landing.headline` was updated to assert the new string.
+
+- **Hero demo panel mechanics (implemented, PR feat/hero-demo-typewriter-disclosure).** `HeroDemoPanel` (`components/hero-demo-panel/`) runs a 15-phase loop (`Phase` union in `scenes.ts`). Key mechanics:
+  - **Typewriter disclosure:** `useTyped(text, active, reduced, targetMs)` types text character-by-character via `setInterval`. Returns full text immediately when `reduced=true` or `active=false`. Both About and the personal reveal use dual-render: an invisible reserve `<p>` (stable height) + absolutely-positioned typed `<p>`. The reserve always carries the full text; the typed copy animates. Tests must use `getAllByTestId("poll-reveal")` (not `getByTestId`) and assert on the first element (reserve).
+  - **Lock card:** `AnimatePresence` renders the fixed lock card ("Pledge to see the reveal — and how the pledges are landing.") in all locked phases; it unmounts on entering `clearing`.
+  - **Blurred decoy:** locked phases show a `blur-xs aria-hidden="true"` wrapper around both `PollReveal` and the results list. Real results are never rendered when locked.
+  - **Bars climb from zero:** at `clearing`, `barWidths` resets to all-zeros; individual `setTimeout` calls then raise each bar to its real `widthPercent` over ~900 ms.
+  - **Variant-based enable state:** Next and Pledge buttons use `variant="default"` (enabled) / `variant="secondary"` (disabled) with `pointer-events-none tabIndex={-1}`. No `disabled` attribute — do not assert `opacity-50`.
+  - **No chip in search bar:** `PickerHeader` always receives `draftIds=[]`; `PickerItems` receives the real `draftIds` (empty or one item). The grid highlights the selection; the search bar shows no chip.
+  - **CharityRow footer** is blurred (`blur-xs aria-hidden`) when locked; visible in unlocked phases.
+  - `h-158` total panel height; loop starts at `reveal` on first paint.
 
 - **New favpoll form About/Reveal helper text (DEFERRED).** Teaching organisers the withhold/disclose craft at the moment they write the About and Reveal fields (`favpoll-form/editable-hero.tsx`, `editable-poll-area.tsx`) is the natural companion to the landing page rebuild. Not yet implemented. The insertion points are the About and Reveal overlays in the editable hero and poll area sub-components.
 
