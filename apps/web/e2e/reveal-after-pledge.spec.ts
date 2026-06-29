@@ -255,12 +255,15 @@ test.describe("reveal after pledge", () => {
 
     // ── 8. Confirm the reveal is now visible ──────────────────────────────────
     // PledgeDialog.onPledgeSuccess → FavpollContent.handlePledgeSuccess →
-    // pledgeConfirmed = true → PollSection switches to results view →
-    // PollReveal renders with role="status" aria-live="polite".
+    // pledgeConfirmed = true → TypedReveal mounts and types the reveal out.
     //
     // THIS IS THE ASSERTION THAT WOULD HAVE CAUGHT PR #120's BUG.
-    // personal_reveal was null → PollReveal returns null → no blockquote rendered.
-    const revealBlock = page.locator('blockquote[role="status"]')
+    // personal_reveal was null → TypedReveal never mounts → no blockquote.
+    //
+    // TypedReveal animated path: blockquote is aria-hidden (AT gets a sr-only
+    // polite announcement instead). Playwright's toBeVisible() is CSS-based,
+    // not ARIA-based, so the visually rendered blockquote still passes.
+    const revealBlock = page.locator("blockquote").first()
     await expect(revealBlock).toBeVisible({ timeout: 10_000 })
     await expect(revealBlock).not.toBeEmpty()
 

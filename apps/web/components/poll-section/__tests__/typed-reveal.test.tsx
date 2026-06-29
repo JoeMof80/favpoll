@@ -9,7 +9,7 @@ vi.mock("@/components/favpoll-card/poll-reveal", () => ({
   }: {
     personalReveal: string
     role?: string
-    "aria-live"?: string
+    "aria-live"?: "off" | "assertive" | "polite"
   }) => (
     <blockquote data-testid="poll-reveal" role={role} aria-live={ariaLive}>
       {personalReveal}
