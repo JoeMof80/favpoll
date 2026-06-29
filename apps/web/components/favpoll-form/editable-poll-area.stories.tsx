@@ -6,30 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { EditablePollArea } from "./editable-poll-area"
 import { favpollFormSchema, type FavpollFormValues } from "./schema"
-import type { TopicWithMeta } from "@favpoll/types"
-
-const COLOUR_TOPIC: TopicWithMeta = {
-  id: "topic-colour",
-  title: "Colour",
-  is_finite: true,
-  is_active: true,
-  description: null,
-  placeholders: {
-    celebrating_one: {
-      about: "Think of them as a human palette…",
-      reveal: "Her absolute favourite was always Cobalt Blue.",
-      pronouns: "she",
-    },
-  },
-  created_by: null,
-  created_at: "",
-  favourites: [
-    { id: "i1", label: "Red" },
-    { id: "i2", label: "Blue" },
-    { id: "i3", label: "Green" },
-  ] as TopicWithMeta["favourites"],
-  category_ids: [],
-}
 
 function FormWrapper({
   defaultValues,
@@ -62,14 +38,13 @@ function FormWrapper({
 
 function Controlled(
   props: {
-    topics: TopicWithMeta[]
     defaultValues: Partial<FavpollFormValues>
   } & React.ComponentProps<typeof EditablePollArea>
 ) {
-  const { topics, defaultValues, ...rest } = props
+  const { defaultValues, ...rest } = props
   return (
     <FormWrapper defaultValues={defaultValues}>
-      <EditablePollArea topics={topics} {...rest} />
+      <EditablePollArea {...rest} />
     </FormWrapper>
   )
 }
@@ -85,16 +60,13 @@ type Story = StoryObj<typeof EditablePollArea>
 
 /** No topic selected — skeleton placeholder */
 export const NoTopicSelected: Story = {
-  render: () => (
-    <Controlled topics={[COLOUR_TOPIC]} defaultValues={{ topics: [] }} />
-  ),
+  render: () => <Controlled defaultValues={{ topics: [] }} />,
 }
 
 /** Topic selected, pre-reveal view (PledgePanel dimmed) */
 export const PreReveal: Story = {
   render: () => (
     <Controlled
-      topics={[COLOUR_TOPIC]}
       defaultValues={{
         topics: [
           {
@@ -118,7 +90,6 @@ export const PreReveal: Story = {
 export const PostReveal: Story = {
   render: () => (
     <Controlled
-      topics={[COLOUR_TOPIC]}
       defaultValues={{
         category: "celebration",
         topics: [

@@ -1,6 +1,6 @@
 # Component Tree
 
-Rebuilt 2026-06-23 from source. Replaces the pre-ubiquitous-language-rename snapshot.
+Rebuilt 2026-06-23 from source. Last updated 2026-06-29 (PR #132 — TypedReveal).
 
 ## Legend
 
@@ -142,6 +142,8 @@ app/favpolls/[id]/page.tsx
               → favpoll-card/section-label.tsx  (SectionLabel)
               → favpoll-card/poll-reveal.tsx  (PollReveal) *  — purple-tinted reveal card post-pledge
               → ui/tooltip-icon-button.tsx *
+          → poll-section/typed-reveal.tsx  (TypedReveal)  — post-pledge typewriter; wraps PollReveal
+              → favpoll-card/poll-reveal.tsx  (PollReveal)  — non-animated / SSR path delegates here
           → ranking-list/index.tsx  (RankingList)
               → ranking-list/hide-toggle.tsx  (HideToggle)
               → ranking-list/use-ranking-items.ts  (useRankingItems)

@@ -1,6 +1,7 @@
 "use client"
 
 import { useWatch, useFormContext } from "react-hook-form"
+import { Sparkles } from "lucide-react"
 import { deriveRegister } from "@/lib/registers"
 import { CharityBanner } from "@/components/charity-banner"
 import { Button } from "@/components/ui/button"
@@ -66,11 +67,25 @@ export function PreviewPanel({
             aboutPlaceholder={aboutPlaceholder}
           />
           <EditablePollArea
-            topics={topics}
             isGenerating={isGenerating}
             onRegenerate={onRegenerate}
             topicRevealPlaceholder={topicRevealPlaceholder}
           />
+          {onRegenerate && (
+            <div className="sticky bottom-24 z-30 mt-8 flex justify-center md:bottom-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isGenerating}
+                onClick={onRegenerate}
+                className="gap-2 rounded-full px-4 shadow-md"
+              >
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                {isGenerating ? "Generating…" : "Generate a suggestion"}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Right — sticky meta */}

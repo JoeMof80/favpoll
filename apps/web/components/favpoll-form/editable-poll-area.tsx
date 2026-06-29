@@ -18,18 +18,16 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
-import type { Favourite, TopicWithMeta } from "@favpoll/types"
+import type { Favourite } from "@favpoll/types"
 import type { FavpollFormValues } from "./schema"
 
 type Props = {
-  topics: TopicWithMeta[]
   isGenerating?: boolean
   onRegenerate?: () => void
   topicRevealPlaceholder?: string
 }
 
 export function EditablePollArea({
-  topics,
   isGenerating = false,
   onRegenerate,
   topicRevealPlaceholder = "",
@@ -45,14 +43,11 @@ export function EditablePollArea({
   const selectedTopics = values.topics ?? []
 
   const firstTopic = selectedTopics[0]
-  const firstTopicMeta = topics.find((t) => t.id === firstTopic?.topicId)
-
   const revealPlaceholder = reveal ? "" : (topicRevealPlaceholder ?? "")
 
   const topicTitle = firstTopic?.title ?? "Colour"
 
   const firstTopicCustomLabels = firstTopic?.customLabels ?? []
-  const catalogItems = firstTopicMeta?.favourites ?? []
 
   const topicItems: Favourite[] = firstTopic
     ? [
@@ -62,11 +57,8 @@ export function EditablePollArea({
               id: item.id,
               label: item.label,
               topic_id: firstTopic.topicId ?? "",
-              all_time_pledged:
-                catalogItems.find((c) => c.id === item.id)?.all_time_pledged ??
-                0,
-              all_time_count:
-                catalogItems.find((c) => c.id === item.id)?.all_time_count ?? 0,
+              all_time_pledged: 0,
+              all_time_count: 0,
               is_canonical: true,
               is_active: true,
               created_at: "",
@@ -229,6 +221,7 @@ export function EditablePollArea({
             </InputGroupAddon>
             <InputGroupTextarea
               autoFocus
+              aria-describedby="reveal-helper"
               placeholder={revealPlaceholder || "Share something they loved…"}
               value={revealDraft}
               maxLength={280}
@@ -240,7 +233,10 @@ export function EditablePollArea({
               data-align="block-end"
               className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
             >
-              <span>Disclosed after pledging — this is the payoff.</span>
+              <span id="reveal-helper">
+                Name the thing they loved — and a detail only you&apos;d know.
+                The personal touch is what makes it land.
+              </span>
               <CharCounter value={revealDraft} max={280} />
             </div>
           </InputGroup>

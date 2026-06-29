@@ -41,10 +41,14 @@ pnpm-debug.log*
 
 # env files
 .env*.local
+.env.preview
 .env.staging-web
 .env.staging-admin
 .env.production-web
 .env.production-admin
+
+# reference binaries
+references/*.pdf
 
 # typescript
 *.tsbuildinfo
