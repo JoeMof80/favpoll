@@ -9,6 +9,7 @@ import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
+import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
@@ -88,24 +89,23 @@ export function PollSection({
       {entitled ? (
         <>
           {personalReveal && (
-            <PollReveal
-              personalReveal={personalReveal}
+            <TypedReveal
+              text={personalReveal}
+              active={pledgeJustConfirmed ?? false}
               protagonistFirstName={personFirstName}
-              role="status"
-              aria-live="polite"
             />
           )}
 
           {hasItems && (
             <>
-              <div className="sticky top-40 z-20 flex items-center justify-end md:top-55">
+              <div className="sticky top-40 z-20 flex items-center justify-end md:top-67">
                 <Tabs
                   value={rankingView}
                   onValueChange={(v: string) =>
                     setRankingView(v as RankingView)
                   }
                 >
-                  <TabsList className="h-7">
+                  <TabsList className="h-7 shadow">
                     <TabsTrigger value="amount" className="px-3 text-xs">
                       By amount
                     </TabsTrigger>

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { render, screen, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 
@@ -206,5 +206,118 @@ describe("PollSection — decoy region accessibility", () => {
       '[aria-hidden="true"].pointer-events-none'
     )
     expect(decoys.length).toBeGreaterThan(0)
+  })
+})
+
+// ─── TypedReveal integration ──────────────────────────────────────────────────
+
+const REVEAL_TEXT =
+  "Yusuf said: My favourite colour was blue. I wore it to every occasion that mattered."
+
+describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed=true)", () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockReturnValue({ matches: false }),
+    })
+  })
+  afterEach(() => vi.useRealTimers())
+
+  it("renders an aria-hidden typed copy (not the full text yet) when pledgeJustConfirmed", () => {
+    const { container } = render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled={true}
+        personalReveal={REVEAL_TEXT}
+        pledgeJustConfirmed={true}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    // Animated path: typing copy is aria-hidden
+    const typed = container.querySelector('[aria-hidden="true"]')
+    expect(typed).not.toBeNull()
+    // Has not yet typed the full text
+    expect(typed?.textContent).not.toBe(REVEAL_TEXT)
+  })
+
+  it("exposes full reveal to AT via sr-only immediately on unlock", () => {
+    const { container } = render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled={true}
+        personalReveal={REVEAL_TEXT}
+        pledgeJustConfirmed={true}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    const srEl = container.querySelector(".sr-only")
+    expect(srEl).toHaveTextContent(REVEAL_TEXT)
+    expect(srEl).toHaveAttribute("role", "status")
+    expect(srEl).toHaveAttribute("aria-live", "polite")
+  })
+
+  it("types the full reveal after the interval completes", () => {
+    const { container } = render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled={true}
+        personalReveal={REVEAL_TEXT}
+        pledgeJustConfirmed={true}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    act(() => vi.runAllTimers())
+    const typed = container.querySelector('[aria-hidden="true"]')
+    expect(typed).toHaveTextContent(REVEAL_TEXT)
+  })
+})
+
+describe("PollSection — reveal for returning pledger (pledgeJustConfirmed=false)", () => {
+  beforeEach(() => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockReturnValue({ matches: false }),
+    })
+  })
+
+  it("renders full reveal immediately with no aria-hidden typing copy", () => {
+    const { container } = render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled={true}
+        personalReveal={REVEAL_TEXT}
+        pledgeJustConfirmed={false}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    // No animated path — PollReveal renders directly
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull()
+    // Full text is in the document
+    expect(screen.getByText(REVEAL_TEXT)).toBeInTheDocument()
+  })
+})
+
+describe("PollSection — gating: real reveal absent when not entitled", () => {
+  it("the real personal_reveal string is not present in the pre-pledge DOM", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled={false}
+        personalReveal={null}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(screen.queryByText(REVEAL_TEXT)).toBeNull()
   })
 })
