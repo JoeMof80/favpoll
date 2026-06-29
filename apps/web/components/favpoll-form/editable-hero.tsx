@@ -65,7 +65,7 @@ export function EditableHero({
                 variant="muted"
                 className="flex h-8 items-center truncate wrap-break-word"
               >
-                {openingLine || "Opening line"}
+                {openingLine || "Enter opening line"}
               </SectionEyebrow>
             </EditableField>
 
@@ -85,7 +85,9 @@ export function EditableHero({
                       </span>
                     )
                   : name || (
-                      <span className="text-muted-foreground/50">Name</span>
+                      <span className="text-muted-foreground/50">
+                        Enter Name
+                      </span>
                     )}
               </h1>
             </EditableField>
@@ -102,7 +104,7 @@ export function EditableHero({
                     context ? "text-[#534AB7]" : "text-muted-foreground/40"
                   )}
                 >
-                  {context || "Context"}
+                  {context || "Enter dates or other context"}
                 </p>
               </EditableField>
             )}

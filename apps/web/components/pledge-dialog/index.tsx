@@ -12,6 +12,7 @@ import { usePledgeDialog } from "./use-pledge-dialog"
 import { PickerHeader, PickerItems } from "./step-pick-favourites"
 import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
+import { PollHeading } from "../poll-heading"
 
 type Props = {
   favpollId: string
@@ -56,14 +57,11 @@ export function PledgeDialog({
   }
 
   const triggerButton = !isControlled ? (
-    <Button
-      type="button"
-      variant="secondary"
-      className="w-full"
-      onClick={() => setOpen(true)}
-    >
-      Pledge favourites
-    </Button>
+    <PollHeading
+      topicTitle={pollWithItems.topics.title}
+      size="md"
+      onPledge={() => setOpen(true)}
+    />
   ) : null
 
   const dialog = usePledgeDialog({
