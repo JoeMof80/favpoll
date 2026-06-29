@@ -35,7 +35,7 @@ type Props = {
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
-  onOpenPledgeDialog: () => void
+  onOpenPledgeDialog?: () => void
   /** @deprecated — kept for backwards compat with Storybook/tests */
   pledgeTrigger?: React.ReactNode
 }
