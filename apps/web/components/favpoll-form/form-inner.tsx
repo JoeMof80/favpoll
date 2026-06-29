@@ -270,7 +270,6 @@ export function FormInner({
                 aboutPlaceholder={aboutPlaceholder}
               />
               <EditablePollArea
-                topics={topics}
                 isGenerating={isGenerating}
                 onRegenerate={handleRegenerate}
                 topicRevealPlaceholder={topicRevealPlaceholder}

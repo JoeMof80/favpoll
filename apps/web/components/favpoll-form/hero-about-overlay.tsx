@@ -36,6 +36,8 @@ export function HeroAboutOverlay({
 }: Props) {
   const form = useFormContext<FavpollFormValues>()
   const about = useWatch({ control: form.control, name: "about" }) ?? ""
+  const subject =
+    useWatch({ control: form.control, name: "subject" }) ?? "someone"
   const aboutRef = useRef(about)
   aboutRef.current = about
 
@@ -76,6 +78,7 @@ export function HeroAboutOverlay({
           </InputGroupAddon>
           <InputGroupTextarea
             autoFocus
+            aria-describedby="about-helper"
             placeholder={aboutPlaceholder || "A little about them…"}
             value={draft}
             maxLength={300}
@@ -87,9 +90,10 @@ export function HeroAboutOverlay({
             data-align="block-end"
             className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
           >
-            <span>
-              Tease the topic domain — save the specific favourite for the
-              reveal.
+            <span id="about-helper">
+              {subject === "cause"
+                ? "What you're raising for — and why it matters to you."
+                : "Introduce them in a sentence or two. Specific, personal details land harder than a list of facts."}
             </span>
             <CharCounter value={draft} max={300} />
           </div>

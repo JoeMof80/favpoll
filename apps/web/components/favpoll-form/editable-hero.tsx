@@ -149,17 +149,6 @@ export function EditableHero({
               </p>
             )}
           </EditableField>
-
-          {!about && !isGenerating && onRegenerate && (
-            <Button
-              type="button"
-              variant="link"
-              className="mt-2 h-auto px-0 py-0 text-sm text-muted-foreground hover:text-muted-foreground/70"
-              onClick={onRegenerate}
-            >
-              Generate a suggestion →
-            </Button>
-          )}
         </div>
       </div>
 
