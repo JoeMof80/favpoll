@@ -2,18 +2,17 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Gift, ChartBarDecreasing } from "lucide-react"
+import { Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { TooltipIconButton } from "@/components/ui/tooltip-icon-button"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
-import { SectionLabel } from "./favpoll-card/section-label"
 import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-results"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import type { CardResultItem } from "./favpoll-list-card/use-favpoll-list-card-pledge"
 import type { Charity, FavpollPollWithItems } from "@favpoll/types"
+
+const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
 type FavpollListCardFavpoll = {
   id: string
@@ -23,6 +22,7 @@ type FavpollListCardFavpoll = {
   opening_line: string
   description: string | null
   closes_at: string
+  closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
   protagonist: { name: string } | null
@@ -54,7 +54,6 @@ export function FavpollListCard({
   initialResults,
 }: Props) {
   const poll = favpoll.poll
-  const topicTitle = poll?.topic?.title ?? ""
   const topicItems = poll?.topic?.favourites ?? []
   const perCharity =
     favpoll.charities.length > 0
@@ -65,6 +64,18 @@ export function FavpollListCard({
   const [results, setResults] = useState<CardResultItem[] | null>(
     initialResults ?? null
   )
+
+  const isClosed = !!favpoll.closed_at
+  const entitled = hasPledged || isClosed
+
+  const decoyResults: CardResultItem[] = [...topicItems]
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .slice(0, 4)
+    .map((item, i) => ({
+      label: item.label,
+      amountPence: 0,
+      widthPercent: DECOY_WIDTHS[i % DECOY_WIDTHS.length],
+    }))
 
   async function handlePledgeSuccess() {
     setHasPledged(true)
@@ -82,7 +93,6 @@ export function FavpollListCard({
     }
   }
 
-  // Construct FavpollPollWithItems from the card's poll data
   const pollWithItems: FavpollPollWithItems | null =
     poll && poll.topic
       ? ({
@@ -107,7 +117,6 @@ export function FavpollListCard({
   return (
     <li className={cn("list-none", className)}>
       <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]">
-        {/* Navigable header — links to favpoll page */}
         <Link href={`/favpolls/${favpoll.id}`} className="relative block p-3">
           {favpoll.is_exemplar && (
             <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
@@ -126,76 +135,43 @@ export function FavpollListCard({
           />
         </Link>
 
-        {/* SectionLabel row — with pledge-again / view-results button */}
-        {topicTitle && (
-          <div className="flex items-center justify-between gap-1 border-t border-border px-3 pt-2">
-            <div>
-              <SectionLabel title={topicTitle} size="md" />
-              {favpoll.description && (
-                <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-                  {favpoll.description}
-                </p>
-              )}
-            </div>
-
-            {poll && topicItems.length > 0 && (
-              <>
-                {hasPledged ? (
-                  <TooltipIconButton
-                    icon={Gift}
-                    label="Pledge again"
-                    onClick={() => setHasPledged(false)}
-                  />
-                ) : results !== null ? (
-                  <TooltipIconButton
-                    icon={ChartBarDecreasing}
-                    label="View results"
-                    onClick={() => setHasPledged(true)}
-                  />
-                ) : null}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Description only — when there's no topicTitle */}
-        {!topicTitle && favpoll.description && (
-          <Link href={`/favpolls/${favpoll.id}`} className="block px-5">
-            <p className="mt-2 mb-3 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-              {favpoll.description}
-            </p>
-          </Link>
-        )}
-
-        {/* Pledge section */}
-        {pollWithItems && topicItems.length > 0 ? (
-          <div className="px-3 py-2">
-            {hasPledged ? (
+        {pollWithItems && topicItems.length > 0 && (
+          <div className="border-t border-border px-3 py-2">
+            <PledgeDialog
+              favpollId={favpoll.id}
+              clerkUserId={clerkUserId}
+              charityNames={favpoll.charities.map((c) => c.charity.name)}
+              pollWithItems={pollWithItems}
+              pot={null}
+              userPotAllocation={null}
+              onPledgeSuccess={handlePledgeSuccess}
+              isListed
+            />
+            {entitled ? (
               <FavpollListCardResults results={results ?? []} />
             ) : (
-              <PledgeDialog
-                favpollId={favpoll.id}
-                clerkUserId={clerkUserId}
-                charityNames={favpoll.charities.map((c) => c.charity.name)}
-                pollWithItems={pollWithItems}
-                pot={null}
-                userPotAllocation={null}
-                onPledgeSuccess={handlePledgeSuccess}
-                isListed
-              />
+              <div className="relative mt-1">
+                <div
+                  className="pointer-events-none blur-xs select-none"
+                  aria-hidden="true"
+                  data-testid="list-card-decoy"
+                >
+                  <FavpollListCardResults results={decoyResults} />
+                </div>
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <span className="flex items-center gap-1.5 rounded-full bg-background/95 px-2.5 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+                    <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
+                    Pledge to see how the pledges are landing.
+                  </span>
+                </div>
+              </div>
             )}
-          </div>
-        ) : (
-          <div className="px-5 pb-5">
-            <Link href={`/favpolls/${favpoll.id}`} tabIndex={-1}>
-              <Button type="button" variant="outline" className="w-full">
-                View favpoll
-              </Button>
-            </Link>
           </div>
         )}
 
-        {/* Charity footer */}
         {favpoll.charities.length > 0 && (
           <div className="mt-auto border-t border-border px-4 py-3">
             <FavpollListCardCharityCarousel

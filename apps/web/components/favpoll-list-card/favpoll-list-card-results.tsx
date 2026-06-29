@@ -14,7 +14,7 @@ export function FavpollListCardResults({ results }: Props) {
   }))
 
   return (
-    <div className="max-h-8 overflow-y-auto">
+    <div className="max-h-24 overflow-y-auto">
       <PollResults results={pollResults} />
     </div>
   )
