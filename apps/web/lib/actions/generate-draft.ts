@@ -103,8 +103,13 @@ async function callLLM(
 export type GenerateDraftInput = {
   register: Register
   subject: "someone" | "cause"
+  /** Empty string for custom (organiser-created) topics. */
   topicId: string
   primaryCharityId?: string | null
+  /** Required when topicId is empty — the organiser's custom topic title. */
+  topicTitle?: string
+  /** Required when topicId is empty — the organiser's custom item labels. */
+  itemLabels?: string[]
 }
 
 export type GeneratedDraftResult = {
@@ -121,6 +126,58 @@ export async function generateDraft(
 
   checkRateLimit(userId)
 
+  const isCustomTopic = !input.topicId
+
+  // ── Custom topic: skip cache + DB fetch, call Claude directly ──────────────
+  if (isCustomTopic) {
+    const topicTitle = input.topicTitle
+    if (!topicTitle) throw new Error("topicTitle required for custom topics")
+    const itemLabels = input.itemLabels ?? []
+
+    const supabase = createAdminClient()
+    let charityName: string | null = null
+    let charityDescription: string | null = null
+    if (input.primaryCharityId) {
+      const { data: charity } = await supabase
+        .from("charities")
+        .select("name, description")
+        .eq("id", input.primaryCharityId)
+        .single()
+      charityName = charity?.name ?? null
+      charityDescription = charity?.description ?? null
+    }
+
+    const modelId = process.env.LLM_MODEL_ID ?? "claude-haiku-4-5-20251001"
+    const prompt = buildPrompt({
+      register: input.register,
+      subject: input.subject,
+      topicTitle,
+      itemLabels,
+      charityName,
+      charityDescription,
+    })
+
+    let parsed = await callLLM(prompt, modelId)
+
+    // Only retry fabricated-stats check; skip item-name check when labels are
+    // empty (no canonical list to validate against).
+    if (input.subject === "cause" && hasFabricatedStats(parsed.reveal)) {
+      const retry = await callLLM(prompt, modelId).catch(() => null)
+      if (retry && !hasFabricatedStats(retry.reveal)) parsed = retry
+    } else if (
+      input.subject === "someone" &&
+      itemLabels.length > 0 &&
+      !revealNamesRealItem(parsed.reveal, itemLabels)
+    ) {
+      const retry = await callLLM(prompt, modelId).catch(() => null)
+      if (retry && revealNamesRealItem(retry.reveal, itemLabels)) parsed = retry
+    }
+
+    incrementRateLimitCount(userId)
+    return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
+  }
+
+  // ── Canonical topic: cache lookup → DB fetch → generate → cache write ──────
   const supabase = createAdminClient()
   const cacheKey = buildCacheKey(
     input.register,

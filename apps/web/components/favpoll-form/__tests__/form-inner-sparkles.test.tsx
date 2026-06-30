@@ -74,7 +74,7 @@ describe("FormInner — Sparkles button reachability", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("is absent when a custom topic is selected", () => {
+  it("is present when a custom topic with a title is selected", () => {
     render(
       <Wrapper
         defaultValues={{
@@ -82,6 +82,27 @@ describe("FormInner — Sparkles button reachability", () => {
             {
               topicId: "",
               title: "My topic",
+              isCustom: true,
+              items: [],
+              customLabels: [],
+            },
+          ],
+        }}
+      />
+    )
+    expect(
+      screen.getByRole("button", { name: /generate a suggestion/i })
+    ).toBeInTheDocument()
+  })
+
+  it("is absent when a custom topic has no title", () => {
+    render(
+      <Wrapper
+        defaultValues={{
+          topics: [
+            {
+              topicId: "",
+              title: "",
               isCustom: true,
               items: [],
               customLabels: [],
@@ -102,7 +123,7 @@ describe("FormInner — Sparkles button reachability", () => {
     ).toBeInTheDocument()
   })
 
-  it("invokes safeGenerateDraft with correct args when clicked", async () => {
+  it("invokes safeGenerateDraft with topicId for canonical topic", async () => {
     mockSafeGenerateDraft.mockResolvedValue({
       about: "generated about",
       reveal: "generated reveal",
@@ -118,6 +139,42 @@ describe("FormInner — Sparkles button reachability", () => {
         subject: "someone",
         topicId: "topic-1",
         primaryCharityId: null,
+      })
+    )
+  })
+
+  it("invokes safeGenerateDraft with topicTitle/itemLabels for custom topic", async () => {
+    mockSafeGenerateDraft.mockResolvedValue({
+      about: "generated about",
+      reveal: "generated reveal",
+      fromCache: false,
+    })
+    render(
+      <Wrapper
+        defaultValues={{
+          topics: [
+            {
+              topicId: "",
+              title: "Thing",
+              isCustom: true,
+              items: [],
+              customLabels: ["Hat", "Scarf"],
+            },
+          ],
+        }}
+      />
+    )
+    fireEvent.click(
+      screen.getByRole("button", { name: /generate a suggestion/i })
+    )
+    await waitFor(() =>
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith({
+        register: "celebrating_one",
+        subject: "someone",
+        topicId: "",
+        primaryCharityId: null,
+        topicTitle: "Thing",
+        itemLabels: ["Hat", "Scarf"],
       })
     )
   })
