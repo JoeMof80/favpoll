@@ -261,16 +261,15 @@ export function FormInner({
         <main className="mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background px-6 pb-24 md:px-16 md:pt-0 md:pb-24 md:drop-shadow-lg">
           <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
             {/* Left — hero + poll */}
-            <div className="relative">
+            <div>
               {showSparkles && (
-                <div className="pointer-events-none absolute inset-x-0 top-6 z-30 flex justify-center md:top-16">
+                <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
                   <Button
                     type="button"
-                    variant="outline"
-                    size="sm"
+                    variant="ghost"
                     disabled={isGenerating}
                     onClick={handleRegenerate}
-                    className="pointer-events-auto gap-2 rounded-full px-4 shadow-md"
+                    className="gap-2 rounded-full bg-background px-4 shadow-md"
                   >
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                     {isGenerating ? "Generating…" : "Generate a suggestion"}
