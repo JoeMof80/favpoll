@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useWatch, useForm } from "react-hook-form"
+import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { deriveRegister, getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
@@ -245,6 +246,9 @@ export function FormInner({
   const grouping =
     useWatch({ control: form.control, name: "grouping" }) ?? "individual"
 
+  const showSparkles =
+    !!selectedTopics[0]?.topicId && !selectedTopics[0]?.isCustom
+
   if (!category) return null
 
   const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
@@ -274,6 +278,21 @@ export function FormInner({
                 onRegenerate={handleRegenerate}
                 topicRevealPlaceholder={topicRevealPlaceholder}
               />
+              {showSparkles && (
+                <div className="sticky bottom-24 z-30 mt-8 flex justify-center md:bottom-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isGenerating}
+                    onClick={handleRegenerate}
+                    className="gap-2 rounded-full px-4 shadow-md"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                    {isGenerating ? "Generating…" : "Generate a suggestion"}
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Right — sticky meta */}
