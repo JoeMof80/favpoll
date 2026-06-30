@@ -69,8 +69,12 @@ test.describe("reveal after pledge", () => {
     // PR #127: PollSection now shows a blurred decoy + lock card overlay
     // pre-pledge instead of simply hiding the reveal. The real PollReveal
     // (role="status") is not mounted until entitled=true (server-gated).
-    // The decoy is aria-hidden so getByRole("status") correctly finds nothing.
-    await expect(page.getByRole("status")).not.toBeVisible()
+    // Use [aria-live="polite"] to select only the TypedReveal sr-only node —
+    // page loading spinners also carry role="status" and would match the
+    // generic getByRole("status") selector.
+    await expect(
+      page.locator('[role="status"][aria-live="polite"]')
+    ).not.toBeVisible()
     await expect(page.getByText("Cornflower blue")).not.toBeVisible()
     // Positive check: the lock card overlay is visible pre-pledge
     await expect(

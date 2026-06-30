@@ -62,7 +62,9 @@ describe("EditableHero — About instructional placeholder", () => {
 
   it("shows cause instructional text when subject=cause and about is empty", () => {
     render(<Wrap defaultValues={{ subject: "cause", about: "" }} />)
-    expect(screen.getByText(/Tease the topic and why it matters/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Tease the topic and why it matters/)
+    ).toBeInTheDocument()
   })
 
   it("shows the typed about text when about is non-empty", () => {
