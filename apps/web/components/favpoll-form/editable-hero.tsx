@@ -19,14 +19,9 @@ import { HeroPhotoOverlay } from "./hero-photo-overlay"
 type Props = {
   isGenerating?: boolean
   onRegenerate?: () => void
-  aboutPlaceholder?: string
 }
 
-export function EditableHero({
-  isGenerating = false,
-  onRegenerate,
-  aboutPlaceholder = "",
-}: Props) {
+export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
   const [causeLabelOpen, setCauseLabelOpen] = useState(false)
   const [nameOpen, setNameOpen] = useState(false)
   const [contextOpen, setContextOpen] = useState(false)
@@ -147,7 +142,9 @@ export function EditableHero({
               </div>
             ) : (
               <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/40">
-                {aboutPlaceholder || "About"}
+                {subject === "cause"
+                  ? "What are you raising for? Tease the topic and why it matters — but don't give it all away."
+                  : "Enter a short biography — tease the topic and the cause, but don't give too much away."}
               </p>
             )}
           </EditableField>
@@ -171,7 +168,6 @@ export function EditableHero({
         onOpenChange={setAboutOpen}
         isGenerating={isGenerating}
         onRegenerate={onRegenerate}
-        aboutPlaceholder={aboutPlaceholder}
       />
       <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
     </>

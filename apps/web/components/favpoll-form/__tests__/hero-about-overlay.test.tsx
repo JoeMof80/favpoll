@@ -140,6 +140,23 @@ describe("HeroAboutOverlay — helper text", () => {
     expect(document.getElementById("about-helper")).toBeInTheDocument()
   })
 
+  it("dialog textarea uses a short generic placeholder, not a long instructional string", () => {
+    render(
+      <Wrap>
+        <HeroAboutOverlay
+          open={true}
+          onOpenChange={() => {}}
+          isGenerating={false}
+        />
+      </Wrap>
+    )
+    const textarea = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute("placeholder", "Write a few lines…")
+    expect(textarea.getAttribute("placeholder")).not.toMatch(
+      /Enter a short biography/
+    )
+  })
+
   it("does not render the overlay when open=false", () => {
     render(
       <Wrap>

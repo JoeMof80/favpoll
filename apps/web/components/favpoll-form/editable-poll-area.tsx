@@ -24,13 +24,11 @@ import type { FavpollFormValues } from "./schema"
 type Props = {
   isGenerating?: boolean
   onRegenerate?: () => void
-  topicRevealPlaceholder?: string
 }
 
 export function EditablePollArea({
   isGenerating = false,
   onRegenerate,
-  topicRevealPlaceholder = "",
 }: Props) {
   const [revealOpen, setRevealOpen] = useState(false)
   const [revealDraft, setRevealDraft] = useState("")
@@ -43,7 +41,6 @@ export function EditablePollArea({
   const selectedTopics = values.topics ?? []
 
   const firstTopic = selectedTopics[0]
-  const revealPlaceholder = reveal ? "" : (topicRevealPlaceholder ?? "")
 
   const topicTitle = firstTopic?.title ?? "Colour"
 
@@ -164,7 +161,8 @@ export function EditablePollArea({
                 </div>
               ) : (
                 <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
-                  Reveal
+                  What did they love? Name it, and the detail only you&apos;d
+                  know.
                 </p>
               )}
               <EditBadge />
@@ -222,7 +220,7 @@ export function EditablePollArea({
             <InputGroupTextarea
               autoFocus
               aria-describedby="reveal-helper"
-              placeholder={revealPlaceholder || "Share something they loved…"}
+              placeholder="Share something they loved…"
               value={revealDraft}
               maxLength={280}
               rows={2}

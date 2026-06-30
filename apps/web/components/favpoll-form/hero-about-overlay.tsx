@@ -24,7 +24,6 @@ type Props = {
   onOpenChange: (open: boolean) => void
   isGenerating: boolean
   onRegenerate?: () => void
-  aboutPlaceholder?: string
 }
 
 export function HeroAboutOverlay({
@@ -32,7 +31,6 @@ export function HeroAboutOverlay({
   onOpenChange,
   isGenerating,
   onRegenerate,
-  aboutPlaceholder = "",
 }: Props) {
   const form = useFormContext<FavpollFormValues>()
   const about = useWatch({ control: form.control, name: "about" }) ?? ""
@@ -79,7 +77,7 @@ export function HeroAboutOverlay({
           <InputGroupTextarea
             autoFocus
             aria-describedby="about-helper"
-            placeholder={aboutPlaceholder || "A little about them…"}
+            placeholder="Write a few lines…"
             value={draft}
             maxLength={300}
             rows={3}
