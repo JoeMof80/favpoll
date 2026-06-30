@@ -137,6 +137,29 @@ function openRevealOverlay() {
   fireEvent.click(screen.getByRole("button", { name: /add reveal/i }))
 }
 
+// ── Reveal instructional placeholder (page level) ────────────────────────────
+
+describe("EditablePollArea — reveal instructional placeholder", () => {
+  it("shows fixed instructional text when reveal is empty", () => {
+    render(
+      <Wrap>
+        <EditablePollArea />
+      </Wrap>
+    )
+    expect(screen.getByText(/What did they love\? Name it/)).toBeInTheDocument()
+  })
+
+  it("shows the reveal text when reveal is non-empty", () => {
+    render(
+      <Wrap reveal="She always chose Blue.">
+        <EditablePollArea />
+      </Wrap>
+    )
+    expect(screen.getByText("She always chose Blue.")).toBeInTheDocument()
+    expect(screen.queryByText(/What did they love/)).not.toBeInTheDocument()
+  })
+})
+
 // ── Reveal overlay helper text ─────────────────────────────────────────────────
 
 describe("EditablePollArea — reveal overlay helper text", () => {
@@ -149,6 +172,23 @@ describe("EditablePollArea — reveal overlay helper text", () => {
     openRevealOverlay()
     expect(screen.getByText(/Name the thing they loved/)).toBeInTheDocument()
     expect(screen.getByText(/a detail only you/)).toBeInTheDocument()
+  })
+
+  it("reveal dialog textarea uses short placeholder, not the page instructional string", () => {
+    render(
+      <Wrap>
+        <EditablePollArea />
+      </Wrap>
+    )
+    openRevealOverlay()
+    const textarea = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute(
+      "placeholder",
+      "Share something they loved…"
+    )
+    expect(textarea.getAttribute("placeholder")).not.toMatch(
+      /What did they love/
+    )
   })
 
   it("reveal textarea has aria-describedby pointing at #reveal-helper", () => {

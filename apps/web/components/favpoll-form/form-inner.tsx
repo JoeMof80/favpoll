@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useWatch, useForm } from "react-hook-form"
 import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
-import { deriveRegister, getExampleName } from "@/lib/registers"
+import { getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
@@ -255,12 +255,6 @@ export function FormInner({
   const displayCharities =
     selectedCharities.length > 0 ? selectedCharities : PLACEHOLDER_CHARITIES
 
-  const firstTopicMeta = topics.find((t) => t.id === selectedTopics[0]?.topicId)
-  const effReg = deriveRegister(category ?? null, grouping)
-  const aboutPlaceholder = firstTopicMeta?.placeholders?.[effReg]?.about ?? ""
-  const topicRevealPlaceholder =
-    firstTopicMeta?.placeholders?.[effReg]?.reveal ?? ""
-
   return (
     <>
       <div className="overflow-x-clip bg-primary/5">
@@ -268,31 +262,28 @@ export function FormInner({
           <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
             {/* Left — hero + poll */}
             <div>
-              <EditableHero
-                isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
-                aboutPlaceholder={aboutPlaceholder}
-              />
-              <EditablePollArea
-                isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
-                topicRevealPlaceholder={topicRevealPlaceholder}
-              />
               {showSparkles && (
-                <div className="sticky bottom-24 z-30 mt-8 flex justify-center md:bottom-4">
+                <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
                   <Button
                     type="button"
-                    variant="outline"
-                    size="sm"
+                    variant="ghost"
                     disabled={isGenerating}
                     onClick={handleRegenerate}
-                    className="gap-2 rounded-full px-4 shadow-md"
+                    className="gap-2 rounded-full bg-background px-4 shadow-md"
                   >
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                     {isGenerating ? "Generating…" : "Generate a suggestion"}
                   </Button>
                 </div>
               )}
+              <EditableHero
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+              />
+              <EditablePollArea
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+              />
             </div>
 
             {/* Right — sticky meta */}
