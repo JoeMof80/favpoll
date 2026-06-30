@@ -262,16 +262,8 @@ export function FormInner({
           <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
             {/* Left — hero + poll */}
             <div>
-              <EditableHero
-                isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
-              />
-              <EditablePollArea
-                isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
-              />
               {showSparkles && (
-                <div className="sticky bottom-24 z-30 mt-8 flex justify-center md:bottom-4">
+                <div className="flex justify-end pt-6 md:pt-16">
                   <Button
                     type="button"
                     variant="outline"
@@ -285,6 +277,14 @@ export function FormInner({
                   </Button>
                 </div>
               )}
+              <EditableHero
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+              />
+              <EditablePollArea
+                isGenerating={isGenerating}
+                onRegenerate={handleRegenerate}
+              />
             </div>
 
             {/* Right — sticky meta */}
