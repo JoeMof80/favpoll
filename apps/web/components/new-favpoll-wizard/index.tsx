@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { HonourStep } from "@/components/favpoll-flow/honour-step"
 import { LoveStep } from "@/components/favpoll-flow/love-step"
@@ -24,6 +25,28 @@ export function NewFavpollWizard({ data }: Props) {
   const w = useWizardState(data)
   const [loveSearch, setLoveSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
+
+  const trimmedLoveSearch = loveSearch.trim()
+  const loveShowCreate =
+    trimmedLoveSearch.length > 0 &&
+    !data.topics
+      .filter((t) => t.is_active !== false)
+      .some((t) => t.title.toLowerCase() === trimmedLoveSearch.toLowerCase())
+
+  function handleCreateLoveTopic() {
+    if (!trimmedLoveSearch) return
+    w.setTopics([
+      {
+        topicId: "",
+        title: trimmedLoveSearch,
+        isCustom: true,
+        items: [],
+        customLabels: [],
+      },
+    ])
+    w.setLoveOpen(false)
+    setLoveSearch("")
+  }
 
   return (
     <main>
@@ -129,14 +152,27 @@ export function NewFavpollWizard({ data }: Props) {
         title="Choose a topic"
         hideCloseButton
         header={
-          <input
-            type="text"
-            autoFocus
-            placeholder="Search topics…"
-            value={loveSearch}
-            onChange={(e) => setLoveSearch(e.target.value)}
-            className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Search topics…"
+              value={loveSearch}
+              onChange={(e) => setLoveSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && loveShowCreate) {
+                  e.preventDefault()
+                  handleCreateLoveTopic()
+                }
+              }}
+              className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+            />
+            {loveShowCreate && (
+              <InputGroupButton onClick={handleCreateLoveTopic}>
+                Add
+              </InputGroupButton>
+            )}
+          </div>
         }
         footer={
           <div className="flex gap-2">
