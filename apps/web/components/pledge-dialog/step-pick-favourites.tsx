@@ -123,8 +123,8 @@ export function PickerItems({
     return (
       <p className="py-3 text-center text-sm text-muted-foreground">
         {isInfinite && hasAddItem
-          ? "No items yet — start typing to add one."
-          : "No items."}
+          ? "No options yet — start typing to add one."
+          : "No options available for this topic."}
       </p>
     )
   }

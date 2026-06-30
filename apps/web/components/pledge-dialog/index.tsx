@@ -210,6 +210,7 @@ export function PledgeDialog({
         open={open}
         onOpenChange={handleOpenChange}
         title={titleByStep[dialog.step]}
+        hideCloseButton
         header={
           dialog.step === 1
             ? step1Header

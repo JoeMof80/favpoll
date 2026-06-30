@@ -1,4 +1,5 @@
 import * as React from "react"
+import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -6,6 +7,10 @@ type ChipProps = React.ComponentProps<"button"> & {
   selected?: boolean
   readOnly?: boolean
   size?: "sm" | "md" | "lg"
+  /** When provided, renders a × button inside the chip and the chip is non-interactive. */
+  onRemove?: () => void
+  /** aria-label for the × button. Defaults to "Remove". */
+  removeLabel?: string
 }
 
 const chipSizeClasses: Record<NonNullable<ChipProps["size"]>, string> = {
@@ -19,8 +24,34 @@ function Chip({
   readOnly = false,
   size = "md",
   className,
+  onRemove,
+  removeLabel = "Remove",
+  children,
   ...props
 }: ChipProps) {
+  if (onRemove) {
+    return (
+      <div
+        className={cn(
+          "inline-flex min-w-0 shrink items-center gap-1 rounded-full border font-medium whitespace-normal",
+          chipSizeClasses[size],
+          "border-[#534AB7] bg-[#534AB7] text-white",
+          className
+        )}
+      >
+        <span className="min-w-0 truncate">{children}</span>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="-mr-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full hover:opacity-70"
+          aria-label={removeLabel}
+        >
+          <X className="h-3 w-3" />
+        </button>
+      </div>
+    )
+  }
+
   return (
     <Button
       type="button"
@@ -36,7 +67,9 @@ function Chip({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </Button>
   )
 }
 

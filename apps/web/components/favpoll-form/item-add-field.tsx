@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { X } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -178,17 +177,13 @@ export function ItemAddField({
             <div className="flex flex-wrap gap-1.5">
               {filteredItems.map((item) =>
                 !isFinite && item.isCustom ? (
-                  <Chip key={item.id} size="lg" className="gap-1">
+                  <Chip
+                    key={item.id}
+                    size="lg"
+                    onRemove={() => onRemove(item.label)}
+                    removeLabel={`Remove ${item.label}`}
+                  >
                     {item.label}
-                    <span
-                      role="button"
-                      tabIndex={-1}
-                      onClick={() => onRemove(item.label)}
-                      className="hover:text-white/70"
-                      aria-label={`Remove ${item.label}`}
-                    >
-                      <X className="h-2 w-2" />
-                    </span>
                   </Chip>
                 ) : (
                   <Chip key={item.id} size="lg" readOnly>
