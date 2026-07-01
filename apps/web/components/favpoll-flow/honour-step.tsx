@@ -14,13 +14,14 @@ import type {
   FavpollCategory,
   FavpollGrouping,
   FavpollSubject,
+  Pronoun,
 } from "@favpoll/types"
 
 type HonourValue = {
   category: FavpollCategory | null
   grouping: FavpollGrouping
   subject: FavpollSubject
-  causeLabel: string
+  pronoun: Pronoun | undefined
 }
 
 type Props = {
@@ -28,8 +29,10 @@ type Props = {
   onChange: (value: HonourValue) => void
 }
 
-const SUBJECT_OPTIONS = [
-  { value: "individual", label: "An individual", icon: User },
+const WHO_OPTIONS = [
+  { value: "he", label: "He", icon: User },
+  { value: "she", label: "She", icon: User },
+  { value: "they", label: "They", icon: User },
   { value: "couple", label: "A couple", icon: Users },
   { value: "group", label: "A group", icon: UsersRound },
   { value: "cause", label: "A cause", icon: Ribbon },
@@ -41,38 +44,60 @@ const CATEGORY_OPTIONS = [
   { value: "fundraiser", label: "Fundraiser", icon: PiggyBank },
 ] as const
 
-const ITEM_CLASS =
+const WHO_ITEM_CLASS =
+  "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-[#EEEDFE] data-[state=on]:text-[#3C3489]"
+
+const CATEGORY_ITEM_CLASS =
   "flex h-auto w-32 flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-[#EEEDFE] data-[state=on]:text-[#3C3489]"
 
-function subjectToGrouping(subject: string): FavpollGrouping {
-  if (subject === "couple") return "couple"
-  if (subject === "group") return "group"
-  return "individual"
-}
-
-function groupingToSubjectValue(
+function deriveToggleValue(
   subject: FavpollSubject,
-  grouping: FavpollGrouping
+  grouping: FavpollGrouping,
+  pronoun: Pronoun | undefined
 ): string {
   if (subject === "cause") return "cause"
-  return grouping
+  if (grouping === "couple") return "couple"
+  if (grouping === "group") return "group"
+  if (pronoun) return pronoun
+  return ""
 }
 
 export function HonourStep({ value, onChange }: Props) {
-  const subjectToggleValue = groupingToSubjectValue(
+  const whoToggleValue = deriveToggleValue(
     value.subject,
-    value.grouping
+    value.grouping,
+    value.pronoun
   )
 
-  function handleSubjectChange(v: string) {
+  function handleWhoChange(v: string) {
     if (!v) return
     if (v === "cause") {
-      onChange({ ...value, subject: "cause", grouping: "individual" })
+      onChange({
+        ...value,
+        subject: "cause",
+        grouping: "individual",
+        pronoun: undefined,
+      })
+    } else if (v === "couple") {
+      onChange({
+        ...value,
+        subject: "someone",
+        grouping: "couple",
+        pronoun: undefined,
+      })
+    } else if (v === "group") {
+      onChange({
+        ...value,
+        subject: "someone",
+        grouping: "group",
+        pronoun: undefined,
+      })
     } else {
       onChange({
         ...value,
         subject: "someone",
-        grouping: subjectToGrouping(v),
+        grouping: "individual",
+        pronoun: v as Pronoun,
       })
     }
   }
@@ -84,45 +109,20 @@ export function HonourStep({ value, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Subject row */}
-      <div className="flex flex-col gap-3">
-        <ToggleGroup
-          type="single"
-          value={subjectToggleValue}
-          onValueChange={handleSubjectChange}
-          className="flex flex-wrap gap-2"
-        >
-          {SUBJECT_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-            <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
-              <Icon className="h-6 w-6" />
-              {label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-
-        {/* Cause label input */}
-        {value.subject === "cause" && (
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="cause-label"
-              className="text-sm text-muted-foreground"
-            >
-              What are you raising for?
-            </label>
-            <input
-              id="cause-label"
-              type="text"
-              maxLength={60}
-              placeholder="e.g. 40 years of Shelter"
-              value={value.causeLabel}
-              onChange={(e) =>
-                onChange({ ...value, causeLabel: e.target.value })
-              }
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/50 focus:border-[#534AB7] focus:outline-none"
-            />
-          </div>
-        )}
-      </div>
+      {/* Who row */}
+      <ToggleGroup
+        type="single"
+        value={whoToggleValue}
+        onValueChange={handleWhoChange}
+        className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+      >
+        {WHO_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+          <ToggleGroupItem key={v} value={v} className={WHO_ITEM_CLASS}>
+            <Icon className="h-6 w-6" />
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
 
       {/* Category row */}
       <div className="flex flex-col gap-3">
@@ -136,7 +136,7 @@ export function HonourStep({ value, onChange }: Props) {
           className="flex flex-wrap gap-2"
         >
           {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-            <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
+            <ToggleGroupItem key={v} value={v} className={CATEGORY_ITEM_CLASS}>
               <Icon className="h-6 w-6" />
               {label}
             </ToggleGroupItem>

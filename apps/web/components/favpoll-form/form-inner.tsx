@@ -137,6 +137,7 @@ export function FormInner({
 
     const sub = (values.subject ?? "someone") as "someone" | "cause"
     const grouping = (values.grouping ?? "individual") as FavpollGrouping
+    const pronoun = sub !== "cause" ? (values.pronoun ?? undefined) : undefined
     const primaryCharityId = values.charities?.[0] ?? null
 
     const topicMeta = topics.find((t) => t.id === topic.topicId)
@@ -151,7 +152,7 @@ export function FormInner({
 
     const suggestedName =
       sub !== "cause"
-        ? getExampleName(topicTitle, undefined, grouping, reg as Register)
+        ? getExampleName(topicTitle, pronoun, grouping, reg as Register)
         : null
     const suggestedContext =
       sub !== "cause" ? (CONTEXT_SUGGESTIONS[reg as Register] ?? "") : null
@@ -206,6 +207,7 @@ export function FormInner({
         subject: sub,
         topicId: topic.isCustom ? "" : topic.topicId,
         primaryCharityId,
+        pronoun: sub === "someone" ? pronoun : undefined,
         ...(topic.isCustom && {
           topicTitle: topic.title,
           itemLabels: topic.customLabels ?? [],
@@ -249,9 +251,6 @@ export function FormInner({
     useWatch({ control: form.control, name: "charities" }) ?? []
   const selectedTopics =
     useWatch({ control: form.control, name: "topics" }) ?? []
-  const grouping =
-    useWatch({ control: form.control, name: "grouping" }) ?? "individual"
-
   const showSparkles = selectedTopics[0]?.isCustom
     ? !!selectedTopics[0]?.title
     : !!selectedTopics[0]?.topicId

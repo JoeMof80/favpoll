@@ -66,13 +66,24 @@ export default async function globalSetup() {
   if (existing) {
     const polls = existing.favpoll_polls as { id: string }[] | null
     const pollId = polls && polls.length > 0 ? polls[0].id : null
+
+    // Always extend closes_at so the favpoll is never stale-closed when the
+    // test suite runs against a long-lived staging row.
+    const closesAt = new Date(
+      Date.now() + 90 * 24 * 60 * 60 * 1000
+    ).toISOString()
+    await supabase
+      .from("favpolls")
+      .update({ closes_at: closesAt })
+      .eq("id", existing.id)
+
     writeState({
       openFavpollId: existing.id,
       openPollId: pollId,
       revealText: E2E_REVEAL_TEXT,
     })
     console.log(
-      `[e2e/global-setup] ✓ Reusing existing test favpoll: ${existing.id}`
+      `[e2e/global-setup] ✓ Reusing existing test favpoll: ${existing.id} (closes_at extended)`
     )
     return
   }

@@ -273,6 +273,7 @@ export async function updateFavpoll(
         context: input.dateLabel,
         about: input.protagonistAbout ?? null,
         photo_url: input.photoUrl ?? null,
+        pronoun: input.pronoun ?? null,
       })
       .eq("id", protagonistId)
   }

@@ -68,13 +68,13 @@ export function NewFavpollWizard({ data }: Props) {
                     category: w.category,
                     grouping: w.grouping,
                     subject: w.subject,
-                    causeLabel: w.causeLabel,
+                    pronoun: w.pronoun,
                   }}
-                  onChange={({ category, grouping, subject, causeLabel }) => {
+                  onChange={({ category, grouping, subject, pronoun }) => {
                     w.setCategory(category)
                     w.setGrouping(grouping)
                     w.setSubject(subject)
-                    w.setCauseLabel(causeLabel)
+                    w.setPronoun(pronoun)
                   }}
                 />
               </WizardStepShell>

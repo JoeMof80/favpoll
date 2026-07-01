@@ -8,6 +8,7 @@ import type {
   FavpollGrouping,
   FavpollSubject,
   Favourite,
+  Pronoun,
   TopicWithMeta,
 } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
@@ -47,7 +48,7 @@ export function useWizardState(data: WizardData) {
   const [category, setCategory] = useState<FavpollCategory | null>(null)
   const [grouping, setGrouping] = useState<FavpollGrouping>("individual")
   const [subject, setSubject] = useState<FavpollSubject>("someone")
-  const [causeLabel, setCauseLabel] = useState("")
+  const [pronoun, setPronoun] = useState<Pronoun | undefined>(undefined)
   const [topics, setTopics] = useState<WizardTopics>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
   const [loveOpen, setLoveOpen] = useState(false)
@@ -80,9 +81,12 @@ export function useWizardState(data: WizardData) {
   const showItemsSection =
     topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
+  const whoSelected =
+    grouping !== "individual" || subject === "cause" || pronoun !== undefined
+
   const nextDisabled =
     step === "honour"
-      ? !category || (subject === "cause" && !causeLabel.trim())
+      ? !category || !whoSelected
       : step === "charity"
         ? charityIds.length === 0
         : topics.length === 0 ||
@@ -148,8 +152,8 @@ export function useWizardState(data: WizardData) {
       subject,
       charityIds: charityIds.join(","),
     })
-    if (subject === "cause" && causeLabel.trim()) {
-      params.set("causeLabel", causeLabel.trim())
+    if (pronoun) {
+      params.set("pronoun", pronoun)
     }
     if (topic) {
       if (topic.isCustom || customLabels.length > 0) {
@@ -179,7 +183,7 @@ export function useWizardState(data: WizardData) {
     category,
     grouping,
     subject,
-    causeLabel,
+    pronoun,
     topics,
     charityIds,
     loveOpen,
@@ -201,7 +205,7 @@ export function useWizardState(data: WizardData) {
     setCategory,
     setGrouping,
     setSubject,
-    setCauseLabel,
+    setPronoun,
     setTopics,
     setCharityIds,
     handleAddItem,

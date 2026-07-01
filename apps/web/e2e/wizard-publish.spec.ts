@@ -11,7 +11,7 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Honour step: An individual + Memorial
+ *   3. Honour step: She + Memorial
  *   4. Charity step: Marie Curie
  *   5. Love step: Colour topic
  *   6. Details page: fill protagonist name
@@ -73,14 +73,12 @@ test.describe("wizard → publish flow", () => {
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
     // ── 2. Honour step ────────────────────────────────────────────────────────
-    // Two ToggleGroup rows render with role="radio" (per PROJECT.md convention).
-    // Subject row: "An individual" is the default; confirm it's checked.
-    // Category row: select "Memorial".
-    const individualRadio = page.getByRole("radio", { name: /an individual/i })
-    await expect(individualRadio).toBeVisible({ timeout: 10_000 })
-    // "An individual" should be the default selection
-    // Click it explicitly to be safe
-    await individualRadio.click()
+    // Two ToggleGroup rows: who row (He/She/They/couple/group/cause) and
+    // category row (Celebration/Memorial/Fundraiser). Both must be selected
+    // before Next is enabled. Select "She" + "Memorial".
+    const sheRadio = page.getByRole("radio", { name: /^she$/i })
+    await expect(sheRadio).toBeVisible({ timeout: 10_000 })
+    await sheRadio.click()
 
     const memorialRadio = page.getByRole("radio", { name: /memorial/i })
     await expect(memorialRadio).toBeVisible()

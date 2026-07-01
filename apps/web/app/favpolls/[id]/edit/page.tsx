@@ -8,6 +8,7 @@ import type {
   FavpollCategory,
   FavpollGrouping,
   FavpollSubject,
+  Pronoun,
   Topic,
   Favourite,
   TopicWithMeta,
@@ -104,6 +105,9 @@ export default async function EditFavpollPage({ params }: Props) {
       ? undefined
       : (favpoll.protagonists?.photo_url ?? undefined),
     causeLabel: isCause ? (favpoll.cause_label ?? "") : "",
+    pronoun: isCause
+      ? undefined
+      : ((favpoll.protagonists?.pronoun ?? undefined) as Pronoun | undefined),
     charities: (favpoll.favpoll_charities ?? []).map(
       (ec: { charity_id: string }) => ec.charity_id
     ),

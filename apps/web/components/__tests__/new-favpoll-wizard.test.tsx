@@ -71,9 +71,28 @@ describe("NewFavpollWizard — structure", () => {
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 
-  it("Next button is disabled when no category is selected on step 1", () => {
+  it("Next button is disabled when no category or who is selected on step 1", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+  })
+
+  it("Next button is still disabled when only a category is selected (no who)", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+  })
+
+  it("Next button is still disabled when only a who option is selected (no category)", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "He" }))
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+  })
+
+  it("Next button is enabled when both category and who are selected", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "He" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 })
 
@@ -84,6 +103,7 @@ describe("NewFavpollWizard — structure", () => {
 describe("NewFavpollWizard — step order is Honour → Charity → Love", () => {
   it("step 2 is Charity (shows 'Choose a charity')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
@@ -98,6 +118,7 @@ describe("NewFavpollWizard — step order is Honour → Charity → Love", () =>
   it("step 3 is Love (shows 'Choose a topic')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     // Honour
+    fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     // Charity: open sheet, pick, Done
@@ -124,6 +145,7 @@ describe("NewFavpollWizard — redirect", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
     // Step 1: Honour
+    fireEvent.click(screen.getByRole("radio", { name: "She" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
@@ -144,10 +166,11 @@ describe("NewFavpollWizard — redirect", () => {
     )
   })
 
-  it("redirect URL contains subject=someone for a person favpoll", () => {
+  it("redirect URL contains subject=someone and pronoun=she for a person favpoll", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
+    fireEvent.click(screen.getByRole("radio", { name: "She" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
@@ -161,43 +184,44 @@ describe("NewFavpollWizard — redirect", () => {
     const url: string = mockPush.mock.calls[0][0]
     expect(url).toContain("subject=someone")
     expect(url).toContain("grouping=individual")
+    expect(url).toContain("pronoun=she")
     expect(url).not.toContain("causeLabel")
   })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GUARDRAIL — cause label capture + causeLabel handoff param
+// GUARDRAIL — cause: category required, no causeLabel capture in wizard
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — cause guardrail", () => {
-  it("Next is disabled on step 1 when subject=cause and causeLabel is empty", () => {
+  it("Next is disabled on step 1 when only A cause is selected (no category)", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    // Select cause and a category
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
   })
 
-  it("Next is enabled on step 1 when subject=cause and causeLabel is non-empty", () => {
+  it("Next is enabled on step 1 when A cause and a category are selected", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
-    fireEvent.change(screen.getByLabelText("What are you raising for?"), {
-      target: { value: "40 years of Shelter" },
-    })
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("redirect URL contains encoded causeLabel for a cause favpoll", () => {
+  it("wizard does not show a cause label input on step 1", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    expect(
+      screen.queryByLabelText("What are you raising for?")
+    ).not.toBeInTheDocument()
+  })
+
+  it("redirect URL contains subject=cause and no pronoun for a cause favpoll", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
     // Step 1: Honour — cause
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
-    fireEvent.change(screen.getByLabelText("What are you raising for?"), {
-      target: { value: "Ocean Trust" },
-    })
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 2: Charity
@@ -212,8 +236,9 @@ describe("NewFavpollWizard — cause guardrail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
 
     const url: string = mockPush.mock.calls[0][0]
-    expect(url).toContain("causeLabel=Ocean+Trust")
     expect(url).toContain("subject=cause")
+    expect(url).not.toContain("pronoun=")
+    expect(url).not.toContain("causeLabel")
   })
 })
 
@@ -222,15 +247,13 @@ describe("NewFavpollWizard — cause guardrail", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — Love step copy by subject", () => {
-  function reachLoveStep(subject: "person" | "cause", causeLabel?: string) {
+  function reachLoveStep(subject: "person" | "cause") {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     if (subject === "cause") {
       fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
       fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
-      fireEvent.change(screen.getByLabelText("What are you raising for?"), {
-        target: { value: causeLabel ?? "Test Cause" },
-      })
     } else {
+      fireEvent.click(screen.getByRole("radio", { name: "He" }))
       fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     }
     fireEvent.click(screen.getByRole("button", { name: "Next" }))

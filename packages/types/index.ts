@@ -56,6 +56,7 @@ export type Protagonist = {
   context: string | null;
   about: string | null;
   photo_url: string | null;
+  pronoun: Pronoun | null;
   created_by: string | null;
   created_at: string;
 };
@@ -70,6 +71,7 @@ export type Register =
 export type FavpollCategory = "celebration" | "memorial" | "fundraiser";
 export type FavpollGrouping = "individual" | "couple" | "group";
 export type FavpollSubject = "someone" | "cause";
+export type Pronoun = "he" | "she" | "they";
 
 export type Favpoll = {
   id: string;
@@ -236,6 +238,7 @@ export type CanvasSubmitData = {
   grouping: FavpollGrouping;
   subject: FavpollSubject;
   causeLabel: string | null;
+  pronoun?: Pronoun | null;
   openingLine: string | null;
   description: string | null;
   charityIds: string[];

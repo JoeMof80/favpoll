@@ -30,6 +30,7 @@ type CreateFavpollInput = {
   grouping: string
   subject: "someone" | "cause"
   causeLabel: string | null
+  pronoun?: string | null
   openingLine: string | null
   description: string | null
   charityIds: string[]
@@ -243,6 +244,7 @@ export async function createFavpoll(
       about: input.protagonistAbout || null,
       photo_url: input.photoUrl || null,
       context: input.dateLabel || null,
+      pronoun: input.pronoun ?? null,
       created_by: userId,
     }
     const { data: protagonist, error: protagonistErr } = await supabase

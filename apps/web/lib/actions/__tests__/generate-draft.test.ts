@@ -126,17 +126,33 @@ describe("buildCacheKey", () => {
       "someone",
       "charity-1"
     )
-    expect(key).toBe("celebrating_one:topic-1:none:someone")
+    expect(key).toBe("celebrating_one:topic-1:none:someone:none")
+  })
+
+  it("uses 'he' pronoun segment when pronoun is provided for someone", () => {
+    const key = buildCacheKey(
+      "celebrating_one",
+      "topic-1",
+      "someone",
+      null,
+      "he"
+    )
+    expect(key).toBe("celebrating_one:topic-1:none:someone:he")
   })
 
   it("uses charity id when subject is cause", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1")
-    expect(key).toBe("cause:topic-1:charity-1:cause")
+    expect(key).toBe("cause:topic-1:charity-1:cause:none")
   })
 
   it("falls back to 'none' when cause has no charity", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", null)
-    expect(key).toBe("cause:topic-1:none:cause")
+    expect(key).toBe("cause:topic-1:none:cause:none")
+  })
+
+  it("ignores pronoun for cause favpolls", () => {
+    const key = buildCacheKey("cause", "topic-1", "cause", "charity-1", "she")
+    expect(key).toBe("cause:topic-1:charity-1:cause:none")
   })
 })
 
@@ -223,7 +239,7 @@ describe("generateDraft — cache miss, person", () => {
       .find((c) => c.method === "insert")
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
-      cache_key: "cause:topic-1:none:someone",
+      cache_key: "cause:topic-1:none:someone:none",
     })
   })
 
@@ -280,7 +296,7 @@ describe("generateDraft — cache miss, cause", () => {
     expect(insertCall?.args[0]).toMatchObject({
       primary_charity_id: "charity-1",
       subject: "cause",
-      cache_key: "cause:topic-1:charity-1:cause",
+      cache_key: "cause:topic-1:charity-1:cause:none",
     })
   })
 

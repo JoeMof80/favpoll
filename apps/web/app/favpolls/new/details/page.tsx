@@ -10,6 +10,7 @@ import type {
   FavpollCategory,
   FavpollGrouping,
   FavpollSubject,
+  Pronoun,
   Topic,
   TopicWithMeta,
 } from "@favpoll/types"
@@ -25,7 +26,7 @@ export default async function NewFavpollDetailsPage({ searchParams }: Props) {
   const category = (params.category ?? "") as FavpollCategory | ""
   const grouping = (params.grouping ?? "individual") as FavpollGrouping
   const subject = (params.subject ?? "someone") as FavpollSubject
-  const causeLabel = params.causeLabel ?? ""
+  const pronoun = (params.pronoun ?? undefined) as Pronoun | undefined
   const topicId = params.topicId ?? ""
   const topicIsCustom = params.topicIsCustom === "true"
   const topicTitle = params.topicTitle ?? ""
@@ -94,7 +95,7 @@ export default async function NewFavpollDetailsPage({ searchParams }: Props) {
         category: category as FavpollCategory,
         grouping,
         subject,
-        ...(subject === "cause" && causeLabel ? { causeLabel } : {}),
+        ...(pronoun ? { pronoun } : {}),
         register,
         isListed: register !== "remembering",
         topics: defaultTopics,
