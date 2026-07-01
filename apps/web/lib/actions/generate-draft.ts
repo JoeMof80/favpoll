@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import type { Register } from "@favpoll/types"
+import type { Pronoun, Register } from "@favpoll/types"
 import {
   checkRateLimit,
   incrementRateLimitCount,
@@ -31,6 +31,7 @@ function buildPrompt(opts: {
   itemLabels: string[]
   charityName: string | null
   charityDescription: string | null
+  pronoun?: Pronoun
 }): string {
   const {
     register,
@@ -39,6 +40,7 @@ function buildPrompt(opts: {
     itemLabels,
     charityName,
     charityDescription,
+    pronoun,
   } = opts
 
   const topicContext = `Poll topic: "${topicTitle}". Options: ${itemLabels.slice(0, 12).join(", ")}.`
@@ -58,8 +60,11 @@ function buildPrompt(opts: {
     const charityHint = charityName
       ? `\nThis favpoll raises funds for charity (do not name the charity).`
       : ""
+    const pronounHint = pronoun
+      ? `\nUse "${pronoun}" pronouns when referring to the person being honoured.`
+      : ""
     instructions = `Write for a person-honoured favpoll (${REGISTER_LABEL[register]}).
-- "about": 1–2 sentences evoking the warmth of coming together and giving in someone's honour; do NOT name any specific charity.${charityHint}
+- "about": 1–2 sentences evoking the warmth of coming together and giving in someone's honour; do NOT name any specific charity.${charityHint}${pronounHint}
 - "reveal": 1 sentence that names the person's favourite from the poll options. You MUST use a real option from the list above — do not invent one.`
   }
 
@@ -110,6 +115,7 @@ export type GenerateDraftInput = {
   topicTitle?: string
   /** Required when topicId is empty — the organiser's custom item labels. */
   itemLabels?: string[]
+  pronoun?: Pronoun
 }
 
 export type GeneratedDraftResult = {
@@ -155,6 +161,7 @@ export async function generateDraft(
       itemLabels,
       charityName,
       charityDescription,
+      pronoun: input.subject === "someone" ? input.pronoun : undefined,
     })
 
     let parsed = await callLLM(prompt, modelId)
@@ -183,7 +190,8 @@ export async function generateDraft(
     input.register,
     input.topicId,
     input.subject,
-    input.primaryCharityId
+    input.primaryCharityId,
+    input.pronoun
   )
 
   const { data: cached } = await supabase
@@ -228,6 +236,7 @@ export async function generateDraft(
     itemLabels,
     charityName,
     charityDescription,
+    pronoun: input.subject === "someone" ? input.pronoun : undefined,
   })
 
   let parsed = await callLLM(prompt, modelId)

@@ -68,17 +68,18 @@ export function hasFabricatedStats(text: string): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Person favpolls always use 'none' as the charity segment so a single cached
- * entry covers all charity combinations (About is charity-agnostic).
- * Cause favpolls key on the primary charity so the reveal is charity-specific.
+ * Person favpolls key on pronoun so each pronoun yields distinct copy.
+ * Cause favpolls key on the primary charity; pronoun is always 'none'.
  */
 export function buildCacheKey(
   register: Register,
   topicId: string,
   subject: "someone" | "cause",
-  primaryCharityId?: string | null
+  primaryCharityId?: string | null,
+  pronoun?: string | null
 ): string {
   const charityPart =
     subject === "cause" ? (primaryCharityId ?? "none") : "none"
-  return `${register}:${topicId}:${charityPart}:${subject}`
+  const pronounPart = subject === "someone" ? (pronoun ?? "none") : "none"
+  return `${register}:${topicId}:${charityPart}:${subject}:${pronounPart}`
 }

@@ -82,27 +82,41 @@ describe("useWizardState — initial state", () => {
 })
 
 describe("useWizardState — honour step nextDisabled gate", () => {
-  it("nextDisabled false once category is set", () => {
+  it("nextDisabled true with category but no who selection", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
-    expect(result.current.nextDisabled).toBe(false)
-  })
-
-  it("nextDisabled true for cause subject without causeLabel", () => {
-    const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("fundraiser")
-      result.current.setSubject("cause")
-    })
     expect(result.current.nextDisabled).toBe(true)
   })
 
-  it("nextDisabled false for cause subject with causeLabel", () => {
+  it("nextDisabled false once category and pronoun are set", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => {
+      result.current.setCategory("celebration")
+      result.current.setPronoun("she")
+    })
+    expect(result.current.nextDisabled).toBe(false)
+  })
+
+  it("nextDisabled false for couple grouping + category", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => {
+      result.current.setCategory("celebration")
+      result.current.setGrouping("couple")
+    })
+    expect(result.current.nextDisabled).toBe(false)
+  })
+
+  it("nextDisabled true for cause subject without category", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.setSubject("cause"))
+    expect(result.current.nextDisabled).toBe(true)
+  })
+
+  it("nextDisabled false for cause subject with category", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
       result.current.setCategory("fundraiser")
       result.current.setSubject("cause")
-      result.current.setCauseLabel("40 years of Shelter")
     })
     expect(result.current.nextDisabled).toBe(false)
   })
@@ -264,12 +278,11 @@ describe("useWizardState — handleFinish", () => {
     expect(url).toContain("category=celebration")
   })
 
-  it("includes causeLabel in URL when subject is cause", () => {
+  it("includes pronoun in URL when pronoun is set", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
-      result.current.setCategory("fundraiser")
-      result.current.setSubject("cause")
-      result.current.setCauseLabel("40 years of Shelter")
+      result.current.setCategory("celebration")
+      result.current.setPronoun("she")
     })
     act(() => result.current.handleNext())
     act(() => result.current.setCharityIds(["c1"]))
@@ -287,7 +300,35 @@ describe("useWizardState — handleFinish", () => {
     )
     act(() => result.current.handleFinish())
     const url = mockPush.mock.calls[0][0] as string
-    expect(url).toContain("causeLabel=40+years+of+Shelter")
+    expect(url).toContain("pronoun=she")
+    expect(url).not.toContain("causeLabel")
+  })
+
+  it("does not include pronoun in URL for cause favpoll", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => {
+      result.current.setCategory("fundraiser")
+      result.current.setSubject("cause")
+    })
+    act(() => result.current.handleNext())
+    act(() => result.current.setCharityIds(["c1"]))
+    act(() => result.current.handleNext())
+    act(() =>
+      result.current.setTopics([
+        {
+          topicId: "t1",
+          title: "Colour",
+          isCustom: false,
+          items: [],
+          customLabels: [],
+        },
+      ])
+    )
+    act(() => result.current.handleFinish())
+    const url = mockPush.mock.calls[0][0] as string
+    expect(url).toContain("subject=cause")
+    expect(url).not.toContain("pronoun=")
+    expect(url).not.toContain("causeLabel")
   })
 
   it("writes sessionStorage and sets draftAdditions=1 for custom topic", () => {

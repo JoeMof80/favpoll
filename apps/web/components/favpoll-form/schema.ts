@@ -6,6 +6,7 @@ export const favpollFormSchema = z
     category: z.enum(["celebration", "memorial", "fundraiser"]).optional(),
     grouping: z.enum(["individual", "couple", "group"]).default("individual"),
     subject: z.enum(["someone", "cause"]).default("someone"),
+    pronoun: z.enum(["he", "she", "they"]).optional(),
     openingLine: z
       .string()
       .max(50, "Must be 50 characters or fewer")
