@@ -69,7 +69,9 @@ export default async function globalSetup() {
 
     // Always extend closes_at so the favpoll is never stale-closed when the
     // test suite runs against a long-lived staging row.
-    const closesAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+    const closesAt = new Date(
+      Date.now() + 90 * 24 * 60 * 60 * 1000
+    ).toISOString()
     await supabase
       .from("favpolls")
       .update({ closes_at: closesAt })
