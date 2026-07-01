@@ -106,6 +106,7 @@ const PERSON_FAVPOLL: FavpollWithDetails = {
     context: null,
     about: null,
     photo_url: null,
+    pronoun: null,
     created_by: "user-1",
     created_at: "2024-01-01T00:00:00Z",
   },
