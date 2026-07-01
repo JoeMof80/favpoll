@@ -126,13 +126,7 @@ export function EditablePollArea({
     <>
       <div className="space-y-4">
         <div className="space-y-3 py-1">
-          <PollHeading
-            topicTitle={topicTitle}
-            onPledge={() => {
-              setRevealDraft(reveal)
-              setRevealOpen(true)
-            }}
-          />
+          <PollHeading topicTitle={topicTitle} />
         </div>
 
         <div className="space-y-4">
