@@ -108,6 +108,21 @@ export const OccasionChips: Story = {
   },
 }
 
+export const Removable: Story = {
+  render: () => {
+    const labels = ["Oat So Simple", "Lucky Charms", "Shreddies"]
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        {labels.map((label) => (
+          <Chip key={label} size="lg" onRemove={() => {}}>
+            {label}
+          </Chip>
+        ))}
+      </div>
+    )
+  },
+}
+
 export const TopicChips: Story = {
   render: () => {
     const topics = ["Colour", "Season", "Ice cream", "Film", "Biscuit", "Book"]

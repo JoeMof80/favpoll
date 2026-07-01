@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -111,20 +110,14 @@ export function TopicItemsDialog({
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {(trimmed ? filteredAdded : addedItems).map((label) => (
-                  <div
+                  <Chip
                     key={label}
-                    className="inline-flex h-7 items-center gap-1 rounded-full border border-[#534AB7] bg-[#534AB7] px-4 text-sm font-medium text-white"
+                    size="lg"
+                    onRemove={() => onRemove(label)}
+                    removeLabel={`Remove ${label}`}
                   >
                     {label}
-                    <button
-                      type="button"
-                      onClick={() => onRemove(label)}
-                      className="hover:text-white/70"
-                      aria-label={`Remove ${label}`}
-                    >
-                      <X className="h-2 w-2" />
-                    </button>
-                  </div>
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -150,11 +143,16 @@ export function TopicItemsDialog({
           {/* Empty state */}
           {!showAddRow &&
             addedItems.length === 0 &&
-            (isNewTopic || existingItems.length === 0) && (
+            existingItems.length === 0 &&
+            (isNewTopic ? (
               <p className="py-2 text-sm text-muted-foreground">
                 Start typing to add options.
               </p>
-            )}
+            ) : (
+              <p className="py-2 text-sm text-muted-foreground">
+                No options available for this topic.
+              </p>
+            ))}
         </div>
       </div>
     </ResponsiveOverlay>

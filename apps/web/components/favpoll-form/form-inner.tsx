@@ -129,7 +129,9 @@ export function FormInner({
   async function handleRegenerate() {
     const values = form.getValues()
     const topic = values.topics?.[0]
-    if (!topic || topic.isCustom || !topic.topicId) return
+    if (!topic) return
+    if (!topic.isCustom && !topic.topicId) return
+    if (topic.isCustom && !topic.title) return
     const reg = values.register
     if (!reg) return
 
@@ -202,8 +204,12 @@ export function FormInner({
       const result = await safeGenerateDraft({
         register: reg as Register,
         subject: sub,
-        topicId: topic.topicId,
+        topicId: topic.isCustom ? "" : topic.topicId,
         primaryCharityId,
+        ...(topic.isCustom && {
+          topicTitle: topic.title,
+          itemLabels: topic.customLabels ?? [],
+        }),
       })
       if (!result) {
         toast.error(
@@ -246,8 +252,9 @@ export function FormInner({
   const grouping =
     useWatch({ control: form.control, name: "grouping" }) ?? "individual"
 
-  const showSparkles =
-    !!selectedTopics[0]?.topicId && !selectedTopics[0]?.isCustom
+  const showSparkles = selectedTopics[0]?.isCustom
+    ? !!selectedTopics[0]?.title
+    : !!selectedTopics[0]?.topicId
 
   if (!category) return null
 
