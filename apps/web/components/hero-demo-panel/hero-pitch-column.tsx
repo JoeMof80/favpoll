@@ -15,10 +15,7 @@ export function HeroPitchColumn({ sceneIndex }: Props) {
   const eyebrow = SCENE_EYEBROWS[sceneIndex]
 
   return (
-    <div
-      className="flex flex-col justify-center px-9 py-11"
-      style={{ flex: "1.05", borderRight: "0.5px solid var(--border)" }}
-    >
+    <div className="flex flex-[1.05] flex-col justify-center border-r-[0.5px] border-border px-9 py-11">
       {/* Eyebrow — updates with scene */}
       <div className="mb-2 h-3.5">
         <AnimatePresence mode="wait">

@@ -127,10 +127,7 @@ export function HeroDemoPanel() {
           <HeroPitchColumn sceneIndex={sceneIndex} />
 
           {/* Right — demo card (desktop only) */}
-          <div
-            className="hidden h-158 flex-col p-5 md:flex"
-            style={{ flex: "0.95" }}
-          >
+          <div className="hidden h-158 flex-[0.95] flex-col p-5 md:flex">
             <span className="sr-only">
               Animated demonstration of how favpoll works. The demonstration
               cycles through different occasions automatically.
@@ -147,7 +144,7 @@ export function HeroDemoPanel() {
                 barWidths={barWidths}
                 prefersReducedMotion={prefersReducedMotion}
               />
-              <p className="mt-2.5 h-3.5 shrink-0 text-center text-[10px] font-medium tracking-[0.07em] text-muted-foreground uppercase">
+              <p className="mt-2.5 h-4 shrink-0 text-center text-xs font-medium tracking-[0.07em] text-muted-foreground uppercase">
                 {stepLabels[phase]}
               </p>
             </div>
