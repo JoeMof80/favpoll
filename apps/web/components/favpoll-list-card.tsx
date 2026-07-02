@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
@@ -119,9 +120,9 @@ export function FavpollListCard({
       <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-border-strong">
         <Link href={`/favpolls/${favpoll.id}`} className="relative block p-3">
           {favpoll.is_exemplar && (
-            <span className="absolute top-3 right-3 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+            <Badge variant="secondary" className="absolute top-3 right-3">
               Example
-            </span>
+            </Badge>
           )}
           <FavpollHeader
             protagonist={{
