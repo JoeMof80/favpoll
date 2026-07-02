@@ -1,6 +1,7 @@
 "use client"
 
 import { ClosingLabel } from "@/components/closing-label"
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { Charity } from "@favpoll/types"
 import Link from "next/link"
@@ -45,9 +46,9 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
       {/* Header */}
       <div className="relative p-3">
         {favpoll.is_exemplar && (
-          <span className="absolute top-3 right-3 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+          <Badge variant="secondary" className="absolute top-3 right-3">
             Example
-          </span>
+          </Badge>
         )}
         <FavpollHeader
           protagonist={{ name: favpoll.protagonist.name }}

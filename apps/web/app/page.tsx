@@ -2,9 +2,10 @@ import Link from "next/link"
 import { HeroDemoPanel } from "@/components/hero-demo-panel"
 import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
-import HonourCharityLoveVenn from "@/components/landing-v2/honour-charity-love-venn"
+import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { SectionHeader } from "@/components/landing/section-header"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
@@ -148,15 +149,12 @@ export default async function HomePage() {
       {/* ── Section 2: How it works ── */}
       <section className="border-b border-border py-16">
         <div className="mx-auto max-w-330 px-6">
-          <SectionEyebrow className="mb-2">How it works</SectionEyebrow>
-          <h2 className="mb-3 text-[28px] font-light tracking-tight text-foreground">
-            A question that withholds. A reveal that discloses.
-          </h2>
-          <p className="mb-10 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            The withhold-then-disclose mechanic is what makes a favpoll
-            different from a collection. Guests give something first. Then they
-            receive.
-          </p>
+          <SectionHeader
+            className="mb-10"
+            eyebrow="How it works"
+            title="A question that withholds. A reveal that discloses."
+            lede="The withhold-then-disclose mechanic is what makes a favpoll different from a collection. Guests give something first. Then they receive."
+          />
           <HowItWorksThreeBeat />
         </div>
       </section>
@@ -175,10 +173,10 @@ export default async function HomePage() {
             <LiveFavpollsCarousel favpolls={normalised} />
           ) : (
             <div className="py-16 text-center">
-              <p className="mb-2 text-[15px] font-medium text-foreground">
+              <p className="mb-2 text-base font-medium text-foreground">
                 No live favpolls yet
               </p>
-              <p className="mx-auto mb-6 max-w-70 text-[13px] leading-relaxed text-muted-foreground">
+              <p className="mx-auto mb-6 max-w-70 text-sm leading-relaxed text-muted-foreground">
                 Create the first favpoll and it will appear here.
               </p>
               <Button asChild size="lg">
@@ -193,15 +191,12 @@ export default async function HomePage() {
       {showRecord && (
         <section className="border-b border-border py-16">
           <div className="mx-auto max-w-330 px-6">
-            <SectionEyebrow className="mb-2">The record</SectionEyebrow>
-            <h2 className="mb-3 text-[28px] font-light tracking-tight text-foreground">
-              A lasting, collectively funded measure of what people love most.
-            </h2>
-            <p className="mb-10 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-              Every pledge contributes to a permanent ranking of human
-              favourites. Not a dataset — a record, built through acts of
-              generosity.
-            </p>
+            <SectionHeader
+              className="mb-10"
+              eyebrow="The record"
+              title="A lasting, collectively funded measure of what people love most."
+              lede="Every pledge contributes to a permanent ranking of human favourites. Not a dataset — a record, built through acts of generosity."
+            />
             <ol
               className="max-w-lg space-y-3"
               aria-label="Top all-time favourites"
@@ -220,7 +215,7 @@ export default async function HomePage() {
                     barClassName="bg-chart-2"
                   />
                   {item.topics?.title && (
-                    <p className="mt-0.5 text-[11px] tracking-[0.07em] text-muted-foreground uppercase">
+                    <p className="mt-0.5 text-xs tracking-[0.07em] text-muted-foreground uppercase">
                       {item.topics.title}
                     </p>
                   )}
@@ -239,18 +234,14 @@ export default async function HomePage() {
       {/* ── Section 5: Where the money goes ── */}
       <section className="border-b border-border py-16">
         <div className="mx-auto max-w-330 px-6">
-          <SectionEyebrow className="mb-2">Where the money goes</SectionEyebrow>
-          <h2 className="mb-3 text-[28px] font-light tracking-tight text-foreground">
-            95% reaches your chosen charity.
-          </h2>
-          <p className="mb-6 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            A 5% platform fee covers favpoll's costs. The remaining 95% reaches
-            your chosen charity in full, processed directly through Stripe. You
-            choose up to three charities per favpoll — the pledged total is
-            split equally between them.
-          </p>
+          <SectionHeader
+            className="mb-6"
+            eyebrow="Where the money goes"
+            title="95% reaches your chosen charity."
+            lede="A 5% platform fee covers favpoll's costs. The remaining 95% reaches your chosen charity in full, processed directly through Stripe. You choose up to three charities per favpoll — the pledged total is split equally between them."
+          />
           {charities && charities.length > 0 && (
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Charities on favpoll include{" "}
               {charities.map((c) => (c as { name: string }).name).join(", ")}{" "}
               and more.
@@ -262,17 +253,11 @@ export default async function HomePage() {
       {/* ── Section 6: Written in advance ── */}
       <section className="border-b border-border py-16">
         <div className="mx-auto max-w-330 px-6">
-          <SectionEyebrow className="mb-2">Written in advance</SectionEyebrow>
-          <h2 className="mb-3 text-[28px] font-light tracking-tight text-foreground">
-            A favpoll can be part of a will.
-          </h2>
-          <p className="max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            The questions and the reveals can be written in advance — by you, in
-            your own words — and kept in a will or letter of wishes. An executor
-            creates the favpoll when the time comes. Guests receive your answer
-            in your voice, after they have pledged. It is one of the quietest
-            and most lasting things this platform makes possible.
-          </p>
+          <SectionHeader
+            eyebrow="Written in advance"
+            title="A favpoll can be part of a will."
+            lede="The questions and the reveals can be written in advance — by you, in your own words — and kept in a will or letter of wishes. An executor creates the favpoll when the time comes. Guests receive your answer in your voice, after they have pledged. It is one of the quietest and most lasting things this platform makes possible."
+          />
         </div>
       </section>
 
@@ -281,16 +266,12 @@ export default async function HomePage() {
         <div className="mx-auto max-w-330 px-6">
           <div className="grid items-center gap-12 md:grid-cols-[1fr_auto]">
             <div>
-              <SectionEyebrow className="mb-2">
-                Honour · Charity · Love
-              </SectionEyebrow>
-              <h2 className="mb-4 text-[28px] font-light tracking-tight text-foreground">
-                {t("landing.subheader")}
-              </h2>
-              <p className="mb-8 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
-                Every favpoll sits at the intersection of three things that
-                rarely appear together. That is what makes it different.
-              </p>
+              <SectionHeader
+                className="mb-8"
+                eyebrow="Honour · Charity · Love"
+                title={t("landing.subheader")}
+                lede="Every favpoll sits at the intersection of three things that rarely appear together. That is what makes it different."
+              />
               <div className="flex flex-wrap items-center gap-3.5">
                 <Button asChild size="lg">
                   <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
@@ -299,7 +280,7 @@ export default async function HomePage() {
                   <Link href="/favpolls">See live favpolls →</Link>
                 </Button>
               </div>
-              <p className="mt-4 text-[12px] text-muted-foreground">
+              <p className="mt-4 text-xs text-muted-foreground">
                 {t("landing.cta.caption")}
               </p>
             </div>

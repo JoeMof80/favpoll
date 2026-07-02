@@ -16,23 +16,7 @@ const SCAN_DIRS = [
   "apps/admin/lib",
 ];
 
-// Dead code scheduled for deletion in the landing polish PR — remove these
-// entries when those files are deleted.
-const ALLOWLIST = [
-  "apps/web/components/landing-v2/example.ts",
-  "apps/web/components/landing-v2/how-it-works.tsx",
-  "apps/web/components/landing-v2/how-it-works-preview-card.tsx",
-  "apps/web/components/landing-v2/how-it-works-step1-preview.tsx",
-  "apps/web/components/landing-v2/how-it-works-step2-preview.tsx",
-  "apps/web/components/landing-v2/how-it-works-step3-preview.tsx",
-  "apps/web/components/landing-v2/how-it-works-step4-preview.tsx",
-  "apps/web/components/landing-v2/how-it-works-step5-preview.tsx",
-  "apps/web/components/landing-v2/how-it-works-step6-preview.tsx",
-  "apps/web/components/landing-v2/occasion-eyebrow.tsx",
-  "apps/web/components/landing-v2/favpoll-mark.tsx",
-  "apps/web/components/honour-charity-love-venn.tsx",
-  "apps/web/components/favpoll-mark.tsx",
-];
+const ALLOWLIST = [];
 
 // Bracketed Tailwind hex utilities: bg-[#...], text-[#...], border-[#...], …
 const UTILITY_HEX =

@@ -387,7 +387,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 
 ```
 /                              -- Home: seven-section reveal-first landing page. Section 1 = HeroDemoPanel (blur/unblur reveal sequence). Section 2 = HowItWorksThreeBeat (withhold→pledge→disclose). Section 3 = live favpolls carousel (bg-primary/5, is_listed=true only). Section 4 = the record (gated: hidden until RECORD_THRESHOLD_GBP = £500 total pledged and ≥3 items — coupled to open /rankings threshold TODO). Section 5 = fee model / where money goes. Section 6 = written-in-advance (will/letter of wishes). Section 7 = Honour·Charity·Love Venn + final CTA. Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
-/landing-v2                    -- RETIRED (PR feat/landing-reveal-first-reconciled). Route (app/landing-v2/page.tsx) deleted; reusable components (honour-charity-love-venn.tsx, occasion-eyebrow.tsx, how-it-works.tsx) kept in components/landing-v2/ — the Venn is imported by the home page.
+/landing-v2                    -- RETIRED. Route and the whole components/landing-v2/ directory are deleted (PR feat/landing-polish); the surviving Venn lives at components/landing/honour-charity-love-venn.tsx. The unused root-level honour-charity-love-venn.tsx and favpoll-mark.tsx were deleted in the same pass.
 /favpolls                      -- Live favpolls grid (public, no auth)
 /favpolls/new                  -- New favpoll wizard (3-step page: Honour → Charity → Love)
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
@@ -455,6 +455,7 @@ app/
 components/
 ├── ui/
 │   ├── button.tsx, card.tsx, input.tsx, field.tsx
+│   ├── badge.tsx                 -- shadcn Badge (cva variants: default/secondary/outline/destructive, rounded-full text-xs); use for pills like the "Example" card badge — never a raw styled <span>
 │   ├── chip.tsx                  -- Selectable pill toggle; min-w-0 shrink whitespace-normal to allow truncation. `onRemove?: () => void` + `removeLabel?: string` (default "Remove") props: when provided, renders as `div` wrapper (not `Button`) containing a `<span>` + `<button aria-label={removeLabel}>` with `X className="h-3 w-3"` inside a `h-4 w-4` hit target. Avoids nested-button HTML violation. Storybook: `Removable` story added.
 │   ├── toggle-group.tsx          -- shadcn ToggleGroup + ToggleGroupItem; type="single" renders items as role="radio"/aria-checked; used in HonourStep and CommandPanel
 │   ├── toggle.tsx                -- shadcn Toggle primitive
@@ -528,6 +529,7 @@ components/
 ├── hero-demo-panel/
 │   ├── index.tsx, scenes.ts, variants.ts
 │   ├── hero-pitch-column.tsx, demo-card.tsx
+│   ├── *.stories.tsx             -- hero-demo-panel (animated loop), hero-pitch-column, demo-card (static phase snapshots: Locked/PickerOpen/AmountStep/Confirmed/Reveal with prefersReducedMotion forced)
 ├── cause-hero.tsx               -- view-only: cause favpoll hero; shows getFavpollHeadline prefix + cause_label as h1 + favpolls.description as body; no avatar, no protagonist fields
 ├── favpoll-hero.tsx               -- view-only: favpoll + protagonist props, hideAvatar?, aboutPlaceholder? (renders grey when about is blank); requires non-null protagonist; no isEdit prop (edit mode is handled entirely by editable-hero.tsx)
 ├── heroes/
@@ -536,21 +538,16 @@ components/
 ├── favpoll-list-card/
 │   ├── use-favpoll-list-card-pledge.ts, favpoll-list-card-results.tsx
 │   └── favpoll-list-card-charity-carousel.tsx  -- also used as fixed bottom mobile bar on event page
-├── favpoll-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + SectionLabel + FavpollListCardCharityCarousel. Used on landing carousel (FavpollSummaryCard).
+├── favpoll-summary-card.tsx        -- Compact read-only card (no pledge UI): FavpollHeader + Countdown + SectionLabel + FavpollListCardCharityCarousel. Used on landing carousel (FavpollSummaryCard). + .stories.tsx
 ├── organizer-card/
 │   ├── index.tsx                 -- OrganizerCard: rich management card used on /my-favpolls. Client component. Renders identity + status badge, total raised, poll row, shared fund row, Listed/Unlisted switch (calls setFavpollListed), QR code (qrcode.react QRCodeSVG), share link + copy button, footer with charity carousel + Live display ExternalLink button. Status badge turns amber when ≤7 days remaining (WARNING_THRESHOLD_DAYS). Closed cards render at opacity-70.
 │   ├── utils.ts                  -- OrganizerCardFavpoll type, StatusFilter, SortKey, WARNING_THRESHOLD_DAYS=7, isFavpollClosed(), daysRemaining(), filterAndSort() (pure functions, fully tested)
 │   └── __tests__/               -- organizer-card.test.tsx + utils.test.ts (37 tests total)
-├── live-favpolls-carousel.tsx
-├── favpoll-mark.tsx              -- Symbol-only mark (no wordmark); exports FavpollMarkGlyph (<g> of paths, used by root-level honour-charity-love-venn) + default FavpollMark SVG (no production importers)
-├── honour-charity-love-venn.tsx  -- ⚠ No production importers — superseded by landing-v2/honour-charity-love-venn.tsx; uses FavpollMarkGlyph at centroid
-├── landing-v2/
-│   ├── example.ts               -- Belinda Hartley thread: EXAMPLE data + OCCASIONS list
-│   ├── occasion-eyebrow.tsx     -- Client: cycles occasion names every 2.8s with framer-motion fade
-│   ├── honour-charity-love-venn.tsx  -- Active production variant; baked SVG label paths inline (no FavpollMarkGlyph import); used by landing-v2/page.tsx
-│   ├── honour-charity-love-venn.stories.tsx
-│   ├── how-it-works.tsx         -- Six-step timeline (Create/Share/Reveal phases) with mini preview cards
-│   └── favpoll-mark.tsx         -- ⚠ No production importers — landing-v2/honour-charity-love-venn.tsx embeds paths inline and does not import from here
+├── live-favpolls-carousel.tsx    -- + .stories.tsx
+├── landing/
+│   ├── honour-charity-love-venn.tsx  -- Rotating three-ring Venn SVG (currentColor fills, text-primary); used by home page section 7; + .stories.tsx
+│   ├── how-it-works-three-beat.tsx   -- 3-column numbered steps for home section 2; + .stories.tsx
+│   └── section-header.tsx       -- Eyebrow + h2 (text-3xl font-light) + optional lede (max-w-lg text-base text-muted-foreground); enforces the landing type scale across home sections 2–7
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes; uses NewFavpollButton (passes onBeforeOpen={close} in mobile menu)
 ├── poll-heading.tsx             -- topicTitle + optional onPledge/onResetPledge/onViewResults. When onPledge is set renders a shadcn primary Button (flex-1, uppercase, tracking-[0.09em]); otherwise renders SectionLabel. onResetPledge/onViewResults each render a TooltipIconButton. No hint line. Used on event page (onPledge → pledge dialog) and form edit/preview (no onPledge — renders as non-interactive SectionLabel; reveal editing uses the dedicated edit Button).
