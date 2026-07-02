@@ -18,7 +18,7 @@ export function ProtagonistAvatar({ name, photoUrl, className }: Props) {
   return (
     <div
       className={cn(
-        "relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#D3D1C7] md:h-33 md:w-33",
+        "relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border md:h-33 md:w-33",
         className
       )}
     >
@@ -28,7 +28,7 @@ export function ProtagonistAvatar({ name, photoUrl, className }: Props) {
       ) : (
         <>
           <svg
-            className="absolute inset-0 h-full w-full text-[#D3D1C7]"
+            className="absolute inset-0 h-full w-full text-border"
             aria-hidden="true"
           >
             <defs>
@@ -52,7 +52,7 @@ export function ProtagonistAvatar({ name, photoUrl, className }: Props) {
             <rect width="100%" height="100%" fill="url(#hatch)" />
           </svg>
           <span
-            className="absolute inset-0 flex items-center justify-center text-sm font-medium text-[#888780]"
+            className="absolute inset-0 flex items-center justify-center text-sm font-medium text-muted-foreground"
             aria-label={name}
           >
             <span aria-hidden="true">{initials}</span>

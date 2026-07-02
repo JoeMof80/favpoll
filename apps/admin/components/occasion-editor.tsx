@@ -71,7 +71,7 @@ function RegisterRow({
             setAbout(e.target.value);
             setStatus("idle");
           }}
-          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30 focus:border-[#534AB7]"
+          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           placeholder="Placeholder text shown in the protagonist about field…"
         />
       </div>
@@ -87,7 +87,7 @@ function RegisterRow({
             setReveal(e.target.value);
             setStatus("idle");
           }}
-          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30 focus:border-[#534AB7]"
+          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           placeholder="Placeholder text shown in the poll reveal field…"
         />
       </div>
@@ -97,7 +97,7 @@ function RegisterRow({
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="inline-flex items-center rounded-md bg-[#534AB7] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#3C3489] disabled:opacity-50 transition-colors"
+          className="inline-flex items-center rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {status === "saving"
             ? "Saving…"

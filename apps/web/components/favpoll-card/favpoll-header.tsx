@@ -25,10 +25,10 @@ export function FavpollHeader({
   const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
   const nameClass =
     size === "lg"
-      ? "text-[22px] font-medium text-[#2C2C2A]"
+      ? "text-[22px] font-medium text-foreground"
       : size === "md"
-        ? "text-[16px] font-medium text-[#2C2C2A]"
-        : "text-[14px] font-medium text-[#2C2C2A]"
+        ? "text-[16px] font-medium text-foreground"
+        : "text-[14px] font-medium text-foreground"
   const initialsTextClass =
     size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
 
@@ -39,13 +39,13 @@ export function FavpollHeader({
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
           {eyebrow && (
-            <span className="text-[11px] font-medium tracking-[0.08em] text-[#888780] uppercase">
+            <span className="text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
               {eyebrow}
             </span>
           )}
           <span className={nameClass}>{protagonist.name}</span>
           {protagonist.context && (
-            <span className="text-[12px] text-[#888780]">
+            <span className="text-[12px] text-muted-foreground">
               {protagonist.context}
             </span>
           )}
@@ -64,11 +64,11 @@ export function FavpollHeader({
             />
           ) : (
             <div
-              className="flex h-full w-full items-center justify-center rounded-full border border-[#AFA9EC] bg-[#EEEDFE]"
+              className="flex h-full w-full items-center justify-center rounded-full border border-border-strong bg-secondary"
               aria-label={protagonist.name}
             >
               <span
-                className={`font-medium text-[#534AB7] ${initialsTextClass}`}
+                className={`font-medium text-primary ${initialsTextClass}`}
                 aria-hidden="true"
               >
                 {initials}
@@ -77,8 +77,6 @@ export function FavpollHeader({
           )}
         </div>
       </div>
-
-      {/* <div className="mt-3 mb-4 border-b border-[#D3D1C7]" /> */}
     </div>
   )
 }

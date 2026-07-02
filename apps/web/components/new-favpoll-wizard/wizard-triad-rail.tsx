@@ -38,13 +38,13 @@ export function WizardTriadRail({ currentStep, copy }: Props) {
                 <Icon
                   className={cn(
                     "h-6 w-6 shrink-0",
-                    isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 />
                 <p
                   className={cn(
                     "text-lg font-medium tracking-widest uppercase",
-                    isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
                   {STEP_LABELS[s]}

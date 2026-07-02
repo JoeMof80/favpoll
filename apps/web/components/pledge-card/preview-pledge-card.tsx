@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
+import { TOAST_WARNING_STYLE } from "@/lib/toast-styles"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -195,11 +196,7 @@ export function PreviewPledgeCard({
               toast.warning(
                 "Publish your favpoll to start receiving pledges.",
                 {
-                  style: {
-                    background: "#fffbeb",
-                    color: "#f59e0b",
-                    border: "1px solid #f59e0b",
-                  },
+                  style: TOAST_WARNING_STYLE,
                   position: "top-center",
                 }
               )

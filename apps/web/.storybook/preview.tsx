@@ -10,6 +10,8 @@ const preview: Preview = {
       },
     },
     backgrounds: {
+      // Storybook backgrounds need literal values — these mirror the design
+      // tokens: warm canvas (legacy gray-50), --background, --primary.
       default: "light",
       values: [
         { name: "light", value: "#F1EFE8" },

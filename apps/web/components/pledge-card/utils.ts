@@ -3,9 +3,11 @@ export const GBP = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
 })
 
-export const FUND_GREEN = "#1D9E75"
-export const FUND_AMBER = "#EF9F27"
-export const FUND_RED = "#E24B4A"
+// Fund-bar colours read design tokens so they follow theme changes; CSS
+// custom properties resolve inside the inline `style` props these feed.
+export const FUND_GREEN = "var(--success)"
+export const FUND_AMBER = "var(--warning)"
+export const FUND_RED = "var(--destructive)"
 
 export function formatCharityLabel(charityNames: string[]): string {
   if (charityNames.length === 0) return "charity"

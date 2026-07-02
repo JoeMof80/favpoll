@@ -23,7 +23,7 @@ export function HowItWorksThreeBeat() {
     <div className="grid gap-8 md:grid-cols-3">
       {STEPS.map((step) => (
         <div key={step.n} className="flex flex-col gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#534AB7] text-[13px] font-medium text-[#534AB7]">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary text-[13px] font-medium text-primary">
             {step.n}
           </div>
           <h3 className="text-[17px] font-medium tracking-tight text-foreground">

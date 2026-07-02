@@ -105,7 +105,7 @@ export function TopicItemsDialog({
           {/* Added by you */}
           {(trimmed ? filteredAdded : addedItems).length > 0 && (
             <div>
-              <p className="mb-2 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+              <p className="mb-2 text-[11px] font-medium tracking-widest text-primary uppercase">
                 Added by you
               </p>
               <div className="flex flex-wrap gap-1.5">

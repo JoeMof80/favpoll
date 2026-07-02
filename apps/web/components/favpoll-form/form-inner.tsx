@@ -14,6 +14,7 @@ import { EditableCountdown } from "./editable-countdown"
 import { CharityBanner } from "../charity-banner"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import type {
   Charity,
   TopicWithMeta,
@@ -216,13 +217,7 @@ export function FormInner({
       if (!result) {
         toast.error(
           "Couldn't generate a suggestion — you can write your own instead.",
-          {
-            style: {
-              background: "#fef2f2",
-              color: "#991b1b",
-              border: "1px solid #ef4444",
-            },
-          }
+          { style: TOAST_ERROR_STYLE }
         )
       } else {
         form.setValue("about", result.about)
@@ -233,13 +228,7 @@ export function FormInner({
     } catch {
       toast.error(
         "Couldn't generate a suggestion — you can write your own instead.",
-        {
-          style: {
-            background: "#fef2f2",
-            color: "#991b1b",
-            border: "1px solid #ef4444",
-          },
-        }
+        { style: TOAST_ERROR_STYLE }
       )
     } finally {
       setIsGenerating(false)

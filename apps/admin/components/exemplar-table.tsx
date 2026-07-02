@@ -60,7 +60,7 @@ export function ExemplarTable({ favpolls }: Props) {
                   onClick={() => toggle(ev.id, ev.is_exemplar)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                     ev.is_exemplar
-                      ? "bg-[#EEEDFE] text-[#534AB7] hover:bg-[#dddcfd]"
+                      ? "bg-secondary text-secondary-foreground hover:bg-accent"
                       : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
                   }`}
                 >

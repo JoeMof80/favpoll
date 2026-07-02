@@ -38,14 +38,14 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
     <Link
       href={`/favpolls/${favpoll.id}`}
       className={cn(
-        "block rounded-xl border border-border bg-background transition-colors duration-200 hover:border-[#AFA9EC]",
+        "block rounded-xl border border-border bg-background transition-colors duration-200 hover:border-border-strong",
         className
       )}
     >
       {/* Header */}
       <div className="relative p-3">
         {favpoll.is_exemplar && (
-          <span className="absolute top-3 right-3 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-medium text-[#534AB7]">
+          <span className="absolute top-3 right-3 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
             Example
           </span>
         )}

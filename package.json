@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "seed": "pnpm --filter @favpoll/web seed",
-    "test": "pnpm --filter @favpoll/web test:run"
+    "test": "pnpm --filter @favpoll/web test:run",
+    "lint:colors": "node scripts/check-hex-colors.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4"

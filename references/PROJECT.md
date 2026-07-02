@@ -513,7 +513,7 @@ components/
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts
 ├── favpoll-card/
-│   ├── section-label.tsx             -- Generic small-caps brand-purple section label (`text-[#7F77DD] uppercase tracking-[0.09em]`); used across cards, wizard steps, form preview, rankings
+│   ├── section-label.tsx             -- Generic small-caps brand-purple section label (`text-primary-muted uppercase tracking-[0.09em]`); used across cards, wizard steps, form preview, rankings
 │   ├── poll-reveal.tsx
 │   ├── poll-results.tsx
 ├── poll-section/
@@ -633,24 +633,30 @@ lib/
 
 ## Design System
 
-### Brand colours
+### Colour tokens
 
-```
-Primary:   #534AB7   — buttons, logo, links
-Mid:       #7F77DD   — ranking bars
-Light:     #EEEDFE   — selected states, reveal backgrounds
-Border:    #AFA9EC   — purple-tinted borders, edit underlines
-Dark:      #3C3489   — text on purple surfaces
-Green:     #1D9E75   — shared fund, positive states
-Gray 50:   #F1EFE8   — page background
-Gray 100:  #D3D1C7   — borders, dividers
-```
+**Never hardcode hex colours** — all colours are design tokens defined in each app's `globals.css` (`:root` + `.dark`, mapped to utilities via `@theme inline`). CI enforces this via `node scripts/check-hex-colors.mjs` (`pnpm lint:colors`). Use the Tailwind utility (`text-primary`, `bg-secondary`, …); for inline `style` props (rare — dynamic values only), use `var(--token)`.
+
+| Token                                       | Value (light)         | Usage                                                                        |
+| ------------------------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `--primary`                                 | #534AB7               | buttons, logo, links, brand text, leader ranking bar                          |
+| `--primary-muted`                           | #7F77DD               | section labels, countdown label, reveal-quote left border                     |
+| `--secondary` / `--muted`                   | #EEEDFE               | pills, avatar circles, selected states (`text-secondary-foreground` on top)   |
+| `--border`                                  | oklch(0.91 0.02 278)  | default borders, dividers                                                     |
+| `--border-strong`                           | #AFA9EC               | hover borders, avatar rings, edit underlines                                  |
+| `--reveal-foreground`                       | #26215C               | reveal/quote ink                                                              |
+| `--success` (+ `--success-foreground`)      | #1D9E75               | shared fund healthy, pledge confirmations                                     |
+| `--warning` (+ `--warning-muted` surface)   | #EF9F27 / #FFFBEB     | fund near limit, warning toasts                                               |
+| `--destructive` (+ `-muted`, `-strong`)     | shadcn red family     | errors; `-muted` = soft surface #FEF2F2, `-strong` = text on it #991B1B       |
+| `--chart-1…5`                               | purple ramp           | ranking bars: leader `bg-primary`, others `bg-chart-3`, record bars `bg-chart-2` |
+
+Ranking bars: pass `barClassName` to `RankingBar` (never `barStyle` background). Toast styling: import `TOAST_ERROR_STYLE` / `TOAST_WARNING_STYLE` from `lib/toast-styles.ts` (styles must stay inline per toast call — see toast decision). Fund-bar colours: `FUND_GREEN/AMBER/RED` in `pledge-card/utils.ts` are `var(--success)`/`var(--warning)`/`var(--destructive)`. The legacy warm greys (#2C2C2A, #5F5E5A, #888780, #D3D1C7, #F1EFE8) were consolidated onto `foreground`/`muted-foreground`/`border` in PR feat/design-tokens; #F1EFE8 survives only as the Storybook "light" background.
 
 ### Typography
 
 - Typeface: Plus Jakarta Sans, weights 400/500 only (never 600/700)
-- Reveal/quote: 18px italic `leading-relaxed text-[#26215C] border-l-[2.5px] border-[#7F77DD]`
-- Section eyebrow (brand): 11px medium `tracking-widest uppercase text-[#534AB7]`
+- Reveal/quote: 18px italic `leading-relaxed text-reveal-foreground border-l-[2.5px] border-primary-muted`
+- Section eyebrow (brand): 11px medium `tracking-widest uppercase text-primary`
 
 ### Edit mode field treatment
 
@@ -883,7 +889,7 @@ NEXT_PUBLIC_BASE_URL
 
 - **Onboarding for first-time organisers.** On desktop, `FormInner` returns `null` when no occasion is selected (no onboarding panel rendered). On mobile, `FavpollForm` renders `OnboardingInterstitial` (fixed inset-0 overlay) when `localStorage.favpoll_show_onboarding !== '0'`. "How favpoll works →" link sets `'1'` to re-open.
 
-- **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Use `toast.warning()` with explicit `style: { background, color, border }` props — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them.
+- **Toast notifications via sonner.** `<Toaster position="bottom-center" />` is wired in `app/layout.tsx`. Pass explicit `style` props on each toast call — do not rely on `classNames.warning` or CSS variables on `<Toaster>` as sonner's inline styles override them. Import `TOAST_ERROR_STYLE` / `TOAST_WARNING_STYLE` from `lib/toast-styles.ts` (they reference `var(--destructive-*)` / `var(--warning-*)` tokens, which resolve fine inside inline styles).
 
 - **Command panel + publish flow.** The floating `CommandPanel` (`fixed bottom-4 right-4 w-72` desktop; full-width bottom bar mobile). In **create mode**: the wizard pre-sets Occasion/Charity/Topic; those are shown as read-only text in the panel. Clicking Publish opens a `ResponsiveOverlay` with a `DateTimePicker` pre-filled via `suggestClosingDate(category)` (30 days for memorial, 14 days otherwise). The overlay footer has a "Publish" button (calls `createEvent`) and a "Back" link that dismisses. `is_listed` is set via the Listed/Unlisted switch before publishing. `is_private` is always `false`; `potAmount` is always `null`. In **edit mode**: chips are clickable (open Honour/Charity/Love overlays); Save calls `updateEvent` immediately; `closesAt` is passed through unchanged from `initialClosesAt` prop. Settings overlay and sharedFund input are removed entirely. `form-panel.tsx` is deleted.
 - **Post-publish shared fund seeding (`SeedFundModal`).** After `createEvent` succeeds in create mode, `FavpollForm` renders `SeedFundModal` (instead of immediately redirecting) — `seedEventId` state holds the new event ID. The modal (`favpoll-form/seed-fund-modal.tsx`) shows headline "Give guests a head start", body copy, three preset buttons (£10/£25/£50), a number `<input aria-label="Amount in pounds">`, and a "Skip for now" plain text link (no × close button — `hideCloseButton` on `ResponsiveOverlay`). "Seed fund" button (disabled until amount > 0) calls `POST /api/stripe/payment-intent` with `metadata: { type: 'pot_top_up', event_id }`, then shows `StripeCheckout`. On payment success: calls `topUpFund(eventId, amount)` then redirects to `/favpolls/[id]`. `topUpFund` failures are swallowed — redirect always fires. On payment cancel: returns to the modal with "Payment was cancelled." inline error; "Skip for now" still available. Edit mode is unchanged (modal never shown on save).

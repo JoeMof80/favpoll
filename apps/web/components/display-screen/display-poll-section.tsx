@@ -35,10 +35,7 @@ export function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
         {poll.topic.title}
       </h2>
       {poll.personal_reveal && (
-        <p
-          className="mb-4 border-l-2 pl-3 text-sm text-muted-foreground italic"
-          style={{ borderColor: "#EEEDFE" }}
-        >
+        <p className="mb-4 border-l-2 border-secondary pl-3 text-sm text-muted-foreground italic">
           {poll.personal_reveal}
         </p>
       )}

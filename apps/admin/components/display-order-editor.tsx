@@ -52,7 +52,7 @@ function ItemRow({ topicId, item }: { topicId: string; item: Item }) {
         }}
         onBlur={handleSave}
         placeholder="—"
-        className="w-16 rounded border border-neutral-200 px-2 py-1 text-center text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30 focus:border-[#534AB7]"
+        className="w-16 rounded border border-neutral-200 px-2 py-1 text-center text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
       />
       {status === "saving" || isPending ? (
         <span className="text-xs text-neutral-400 w-12">Saving…</span>

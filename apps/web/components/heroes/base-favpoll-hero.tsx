@@ -40,13 +40,13 @@ export function BaseFavpollHero({
   )
 
   const title = (
-    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
   )
 
   const subtitle = headline.suffix ? (
-    <p className="mt-2 truncate text-xl font-normal whitespace-normal text-[#534AB7] md:text-2xl">
+    <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
       {headline.suffix}
     </p>
   ) : undefined
@@ -61,7 +61,7 @@ export function BaseFavpollHero({
 
   const about =
     protagonist.about || aboutPlaceholder ? (
-      <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+      <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
         {protagonist.about || aboutPlaceholder}
       </p>
     ) : undefined

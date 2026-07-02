@@ -7,8 +7,6 @@ import { getFavpollHeadline } from "@/lib/display"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 
-const BRAND = "#534AB7"
-
 type Props = {
   favpollId: string
   protagonistName: string
@@ -78,10 +76,7 @@ export function DisplayScreen({
         {/* Hero */}
         <div className="mb-12 text-center">
           {headline.prefix && (
-            <p
-              className="mb-3 text-sm font-medium tracking-widest uppercase"
-              style={{ color: BRAND }}
-            >
+            <p className="mb-3 text-sm font-medium tracking-widest text-primary uppercase">
               {headline.prefix}
             </p>
           )}
@@ -89,9 +84,7 @@ export function DisplayScreen({
             {protagonistName}
           </h1>
           {headline.suffix && (
-            <p className="text-lg" style={{ color: BRAND }}>
-              {headline.suffix}
-            </p>
+            <p className="text-lg text-primary">{headline.suffix}</p>
           )}
           {description && (
             <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-muted-foreground">

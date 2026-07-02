@@ -15,7 +15,7 @@ export function SectionLabel({ title, size = "lg" }: SectionLabelProps) {
 
   return (
     <h3
-      className={`${textClass} font-medium tracking-[0.09em] text-[#7F77DD] uppercase`}
+      className={`${textClass} font-medium tracking-[0.09em] text-primary-muted uppercase`}
     >
       {title}
     </h3>

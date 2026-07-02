@@ -46,7 +46,7 @@ export default async function PlaceholdersPage() {
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     topic.is_finite
-                      ? "bg-[#EEEDFE] text-[#534AB7]"
+                      ? "bg-secondary text-secondary-foreground"
                       : "bg-neutral-100 text-neutral-600"
                   }`}
                 >

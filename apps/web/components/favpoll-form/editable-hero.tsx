@@ -72,7 +72,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                   : () => setNameOpen(true)
               }
             >
-              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
                 {subject === "cause"
                   ? causeLabel || (
                       <span className="text-muted-foreground/50">
@@ -96,7 +96,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                 <p
                   className={cn(
                     "truncate text-xl font-normal whitespace-normal md:text-2xl",
-                    context ? "text-[#534AB7]" : "text-muted-foreground/40"
+                    context ? "text-primary" : "text-muted-foreground/40"
                   )}
                 >
                   {context || "Enter dates or other context"}
@@ -132,7 +132,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
             className="w-full text-left"
           >
             {about ? (
-              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
                 {about}
               </p>
             ) : isGenerating ? (
