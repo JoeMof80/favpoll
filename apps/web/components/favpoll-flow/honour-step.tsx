@@ -1,13 +1,15 @@
 "use client"
 
 import {
-  User,
   Users,
   UsersRound,
   Balloon,
   Flower2,
   PiggyBank,
   Ribbon,
+  Mars,
+  Venus,
+  NonBinary,
 } from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type {
@@ -30,9 +32,9 @@ type Props = {
 }
 
 const WHO_OPTIONS = [
-  { value: "he", label: "He", icon: User },
-  { value: "she", label: "She", icon: User },
-  { value: "they", label: "They", icon: User },
+  { value: "he", label: "He", icon: Mars },
+  { value: "she", label: "She", icon: Venus },
+  { value: "they", label: "They", icon: NonBinary },
   { value: "couple", label: "A couple", icon: Users },
   { value: "group", label: "A group", icon: UsersRound },
   { value: "cause", label: "A cause", icon: Ribbon },
