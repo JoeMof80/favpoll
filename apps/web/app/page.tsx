@@ -217,7 +217,7 @@ export default async function HomePage() {
                     widthPercent={Math.round(
                       (item.all_time_pledged / recordMax) * 100
                     )}
-                    barStyle={{ background: "#7F77DD" }}
+                    barClassName="bg-chart-2"
                   />
                   {item.topics?.title && (
                     <p className="mt-0.5 text-[11px] tracking-[0.07em] text-muted-foreground uppercase">

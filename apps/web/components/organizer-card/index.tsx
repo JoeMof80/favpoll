@@ -18,8 +18,6 @@ import {
   daysRemaining,
 } from "./utils"
 
-const BRAND = "#534AB7"
-
 type Props = {
   favpoll: OrganizerCardFavpoll
 }
@@ -250,7 +248,7 @@ export function OrganizerCard({ favpoll }: Props) {
             />
           ) : (
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-[#EEEDFE] text-sm font-medium text-[#534AB7]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary text-sm font-medium text-secondary-foreground"
               aria-hidden="true"
             >
               {charity.name.charAt(0)}
@@ -260,7 +258,7 @@ export function OrganizerCard({ favpoll }: Props) {
             {charity.name}
           </span>
           <span
-            className="shrink-0 text-sm font-medium text-[#534AB7]"
+            className="shrink-0 text-sm font-medium text-primary"
             aria-live="polite"
           >
             {formatAmount(favpoll.total_raised)}

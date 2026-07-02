@@ -15,7 +15,7 @@ export function SectionEyebrow({
     <p
       className={cn(
         "text-xs font-medium tracking-widest uppercase",
-        variant === "brand" ? "text-[#534AB7]" : "text-muted-foreground",
+        variant === "brand" ? "text-primary" : "text-muted-foreground",
         className
       )}
     >

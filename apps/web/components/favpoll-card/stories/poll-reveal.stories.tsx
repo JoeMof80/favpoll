@@ -35,7 +35,7 @@ export const Empty: Story = {
     (Story) => (
       <div>
         <Story />
-        <p className="mt-2 text-[12px] text-[#888780]">
+        <p className="mt-2 text-[12px] text-muted-foreground">
           (renders nothing when personalReveal is null)
         </p>
       </div>

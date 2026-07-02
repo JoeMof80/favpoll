@@ -243,7 +243,7 @@ export function LoveStep({
 
         {suggestedTopics && suggestedTopics.length > 0 && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="shrink-0 text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+            <span className="shrink-0 text-[11px] font-medium tracking-widest text-primary uppercase">
               Suggested for {primaryCharityName}
             </span>
             <div className="flex gap-1.5 overflow-x-auto">
@@ -291,7 +291,7 @@ export function LoveStep({
           data-testid="items-panel"
         >
           <div className="mb-3 flex items-baseline justify-between gap-2">
-            <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
               What people vote on
             </p>
             {!selectedTopic.is_finite && (
@@ -317,7 +317,7 @@ export function LoveStep({
           data-testid="items-panel"
         >
           <div className="mb-3 flex items-baseline justify-between gap-2">
-            <p className="text-[11px] font-medium tracking-widest text-[#534AB7] uppercase">
+            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
               What people can pledge against
             </p>
           </div>

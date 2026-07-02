@@ -45,7 +45,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
                 href={`/placeholders/${t.id}`}
                 className={`flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
                   isActive
-                    ? "bg-[#EEEDFE] text-[#534AB7] font-medium"
+                    ? "bg-secondary text-secondary-foreground font-medium"
                     : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
                 }`}
               >
@@ -55,7 +55,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
                   <span
                     className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none ${
                       t.is_finite
-                        ? "bg-[#EEEDFE] text-[#534AB7]"
+                        ? "bg-secondary text-secondary-foreground"
                         : "bg-neutral-100 text-neutral-500"
                     }`}
                   >
@@ -75,7 +75,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
               topic.is_finite
-                ? "bg-[#EEEDFE] text-[#534AB7]"
+                ? "bg-secondary text-secondary-foreground"
                 : "bg-neutral-100 text-neutral-600"
             }`}
           >

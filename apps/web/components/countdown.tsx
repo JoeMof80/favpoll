@@ -50,7 +50,7 @@ export function Countdown({
       return (
         <div>
           <p
-            className={`mb-2 ${inlineHeadingClass} font-medium text-[#7F77DD]`}
+            className={`mb-2 ${inlineHeadingClass} font-medium text-primary-muted`}
           >
             Poll closes in
           </p>
@@ -131,7 +131,9 @@ export function Countdown({
       size === "lg" ? "text-xs" : size === "md" ? "text-[10px]" : "text-[10px]"
     return (
       <div aria-live="off">
-        <p className={`mb-2 ${inlineHeadingClass} font-medium text-[#7F77DD]`}>
+        <p
+          className={`mb-2 ${inlineHeadingClass} font-medium text-primary-muted`}
+        >
           Poll closes in
         </p>
         <div

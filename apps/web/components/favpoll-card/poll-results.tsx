@@ -14,7 +14,7 @@ export function PollResults({ results }: PollResultsProps) {
             label={r.label}
             amount={r.amount}
             widthPercent={r.widthPercent}
-            barStyle={{ background: i === 0 ? "#534AB7" : "#AFA9EC" }}
+            barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
           />
         </li>
       ))}

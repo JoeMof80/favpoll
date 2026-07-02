@@ -13,6 +13,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-input: var(--input);
@@ -27,6 +29,9 @@
   --card-foreground: oklch(0.2 0.02 280);
   --primary: oklch(0.44 0.18 278);
   --primary-foreground: oklch(0.99 0 0);
+  /* Secondary: #EEEDFE */
+  --secondary: oklch(0.96 0.03 278);
+  --secondary-foreground: oklch(0.44 0.18 278);
   --muted: oklch(0.96 0.03 278);
   --muted-foreground: oklch(0.52 0.06 278);
   --accent: oklch(0.92 0.05 278);
@@ -45,6 +50,8 @@
   --card-foreground: oklch(0.97 0.01 278);
   --primary: oklch(0.75 0.1 278);
   --primary-foreground: oklch(0.15 0.02 278);
+  --secondary: oklch(0.28 0.04 278);
+  --secondary-foreground: oklch(0.97 0.01 278);
   --muted: oklch(0.25 0.03 278);
   --muted-foreground: oklch(0.7 0.05 278);
   --accent: oklch(0.28 0.04 278);

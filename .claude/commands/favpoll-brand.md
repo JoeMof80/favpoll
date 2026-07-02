@@ -304,26 +304,23 @@ These are the canonical values from the favpoll style guide. Use them whenever b
 
 ### Colours
 
+In code, **never hardcode these hexes** — use the design tokens defined in `globals.css` (CI blocks bracketed hexes via `pnpm lint:colors`). The hexes below are the brand reference values behind the tokens.
+
 ```
-Purple primary:   #534AB7   — buttons, logo, links, brand moments
-Purple mid:       #7F77DD   — ranking bars, progress indicators
-Purple light:     #EEEDFE   — backgrounds, reveals, selected states
-Purple border:    #AFA9EC   — borders on purple-tinted surfaces
-Purple dark:      #3C3489   — text on purple-tinted surfaces
-Purple 900:       #26215C   — darkest purple, rarely needed
+Purple primary:   #534AB7   — token: --primary          — buttons, logo, links, brand moments
+Purple mid:       #7F77DD   — token: --primary-muted    — section labels, reveal border (--chart-2 for record bars)
+Purple light:     #EEEDFE   — token: --secondary/--muted — backgrounds, reveals, selected states
+Purple border:    #AFA9EC   — token: --border-strong    — borders on purple-tinted surfaces
+Purple dark:      #3C3489   — retired; use --secondary-foreground on purple surfaces
+Purple 900:       #26215C   — token: --reveal-foreground — reveal/quote ink
 
-Green:            #1D9E75   — shared fund, positive states, availability
-Green light:      #E1F5EE   — shared fund backgrounds
+Green:            #1D9E75   — token: --success          — shared fund, positive states
 
-Gray 50:          #F1EFE8   — page background, subtle surfaces
-Gray 100:         #D3D1C7   — borders, dividers
-Gray 400:         #888780   — placeholder text, tertiary labels
-Gray 600:         #5F5E5A   — secondary body text
-Gray 900:         #2C2C2A   — primary text
+Warm greys (#F1EFE8, #D3D1C7, #888780, #5F5E5A, #2C2C2A) are retired —
+use --background, --border, --muted-foreground, --foreground instead.
 
-Amber:            #EF9F27   — warnings, progress near limit
-Red:              #E24B4A   — errors, validation failures
-Blue:             #378ADD   — informational states
+Amber:            #EF9F27   — token: --warning          — warnings, progress near limit
+Red:                         token: --destructive       — errors, validation failures
 ```
 
 ### Typography
@@ -339,16 +336,16 @@ Heading 3:        17px / 500
 Body:             15px / 400 / line-height: 1.7
 Small:            13px / 400 / line-height: 1.5 / color: gray-600
 Label:            11px / 500 / letter-spacing: 0.08em / UPPERCASE / color: purple-600
-Quote/Reveal:     18px / 400 / italic / leading-relaxed / color: #26215C / border-left: 2.5px solid #7F77DD
+Quote/Reveal:     18px / 400 / italic / leading-relaxed / text-reveal-foreground / border-left: 2.5px solid --primary-muted
 ```
 
 ### Borders and surfaces
 
 ```
-Cards:            background white, border 0.5px solid #D3D1C7, border-radius 10px
-Dividers:         0.5px solid #D3D1C7 — never thicker
+Cards:            background white, border 0.5px solid --border, border-radius 10px
+Dividers:         0.5px solid --border — never thicker
 Edit fields:      absolute border-b-2 border-dotted div below input/textarea (peer pattern); resting: border-border; focus: border-primary/40. Zero layout height impact.
-Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
+Reveal card:      bg-secondary, border-border-strong, border-radius 8px
 ```
 
 ### Spacing scale
@@ -365,9 +362,9 @@ Reveal card:      background #EEEDFE, border #AFA9EC, border-radius 8px
 ### Button hierarchy
 
 ```
-Primary:   solid #534AB7, white text, border-radius 7px — one per panel
-Ghost:     transparent, border 0.5px solid #AFA9EC, purple text — secondary actions
-Text:      no border, no background, gray-400 text — quiet actions (cancel, skip)
+Primary:   solid bg-primary, white text, border-radius 7px — one per panel
+Ghost:     transparent, border 0.5px solid --border-strong, purple text — secondary actions
+Text:      no border, no background, text-muted-foreground — quiet actions (cancel, skip)
 ```
 
 ### Writing conventions

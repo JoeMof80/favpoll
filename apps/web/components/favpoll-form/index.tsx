@@ -16,6 +16,7 @@ import {
 } from "./form-inner"
 import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
+import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import type {
   Category,
   Charity,
@@ -230,13 +231,7 @@ export function FavpollForm({
       } catch (err) {
         toast.error(
           err instanceof Error ? err.message : "Failed to update closing date",
-          {
-            style: {
-              background: "#fef2f2",
-              color: "#991b1b",
-              border: "1px solid #ef4444",
-            },
-          }
+          { style: TOAST_ERROR_STYLE }
         )
         return
       }

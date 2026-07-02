@@ -290,7 +290,7 @@ export default async function FavpollsPage({
           </Link>
           {filterLabel && (
             <div className="flex items-center gap-1.5">
-              <span className="rounded-full bg-[#EEEDFE] px-3 py-1.5 text-sm font-medium text-[#534AB7]">
+              <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
                 {filterLabel}
               </span>
               <Link

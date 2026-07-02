@@ -110,9 +110,9 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
                 label={item.label}
                 amount={valueLabel}
                 widthPercent={barWidth}
-                barStyle={{
-                  background: i === 0 && hasActivity ? "#534AB7" : "#AFA9EC",
-                }}
+                barClassName={
+                  i === 0 && hasActivity ? "bg-primary" : "bg-chart-3"
+                }
                 labelSuffix={
                   hasColourSwatch ? (
                     <span

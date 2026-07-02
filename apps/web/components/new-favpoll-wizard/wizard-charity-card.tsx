@@ -29,7 +29,7 @@ export function WizardCharityCard({
                 className="h-10 w-10 shrink-0 rounded-lg object-cover"
               />
             ) : (
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EEEDFE] text-base text-[#534AB7]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-base text-secondary-foreground">
                 {c.name.charAt(0)}
               </span>
             )}
@@ -68,7 +68,7 @@ export function WizardCharityCard({
         <button
           type="button"
           onClick={onPickAnother}
-          className="border-t border-border pt-3 text-left text-sm text-[#534AB7] hover:underline"
+          className="border-t border-border pt-3 text-left text-sm text-primary hover:underline"
         >
           + Pick another charity
         </button>

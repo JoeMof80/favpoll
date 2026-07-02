@@ -142,7 +142,7 @@ export function EditablePollArea({
               aria-label={reveal ? "Edit reveal" : "Add reveal"}
             >
               {reveal ? (
-                <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-[#26215C] italic">
+                <p className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic">
                   {reveal}
                 </p>
               ) : isGenerating ? (
@@ -154,7 +154,7 @@ export function EditablePollArea({
                   <div className="h-4 w-3/4 rounded-full bg-muted/60" />
                 </div>
               ) : (
-                <p className="border-l-[2.5px] border-[#7F77DD] pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
+                <p className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
                   What did they love? Name it, and the detail only you&apos;d
                   know.
                 </p>

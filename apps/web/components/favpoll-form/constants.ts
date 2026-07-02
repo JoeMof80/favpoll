@@ -16,7 +16,7 @@ export const CHIP_IN_INPUT_TEXT: Record<PickerSize, string> = {
 }
 
 export const SECTION_LABEL =
-  "text-[11px] font-medium uppercase tracking-[0.08em] text-[#534AB7]"
+  "text-[11px] font-medium uppercase tracking-[0.08em] text-primary"
 
 export const MAX_CHARITIES = 3
 

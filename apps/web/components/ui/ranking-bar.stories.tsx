@@ -22,7 +22,6 @@ export const Leader: Story = {
     label: "Purple",
     amount: "£350",
     widthPercent: 78,
-    barStyle: { background: "#534AB7" },
   },
 }
 
@@ -31,7 +30,7 @@ export const NonLeader: Story = {
     label: "Blue",
     amount: "£220",
     widthPercent: 51,
-    barStyle: { background: "#AFA9EC" },
+    barClassName: "bg-chart-3",
   },
 }
 
@@ -57,7 +56,7 @@ export const FullRankings = {
             label={item.label}
             amount={item.amount}
             widthPercent={item.width}
-            barStyle={{ background: item.leader ? "#534AB7" : "#AFA9EC" }}
+            barClassName={item.leader ? "bg-primary" : "bg-chart-3"}
           />
         </li>
       ))}

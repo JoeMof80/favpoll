@@ -226,8 +226,8 @@ export function DemoCard({
             label={result.label}
             amount={result.amount}
             widthPercent={barWidths[i] ?? 0}
+            barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
             barStyle={{
-              background: i === 0 ? "#534AB7" : "#AFA9EC",
               transition:
                 animate && !prefersReducedMotion
                   ? `width ${700 + i * 80}ms ease-out`
@@ -309,11 +309,11 @@ export function DemoCard({
             >
               {headline.prefix}
             </SectionEyebrow>
-            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A]">
+            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground">
               {scene.protagonist.name}
             </h1>
             {headline.suffix && (
-              <p className="mt-2 truncate text-xl font-normal whitespace-normal text-[#534AB7]">
+              <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary">
                 {headline.suffix}
               </p>
             )}
@@ -327,7 +327,7 @@ export function DemoCard({
               >
                 {aboutText}
               </p>
-              <p className="absolute inset-0 line-clamp-4 text-base leading-relaxed wrap-break-word text-[#5F5E5A]">
+              <p className="absolute inset-0 line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
                 {aboutShown || "\u00A0"}
               </p>
             </div>
@@ -479,8 +479,8 @@ export function DemoCard({
                     transition={{ duration: 0.18 }}
                     className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1D9E75]">
-                      <Check className="h-5 w-5 text-white" />
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-success">
+                      <Check className="h-5 w-5 text-success-foreground" />
                     </div>
                     <p className="text-base font-medium text-foreground">
                       Pledge confirmed

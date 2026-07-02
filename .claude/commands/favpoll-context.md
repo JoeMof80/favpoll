@@ -90,7 +90,7 @@ Full definitions in `references/GLOSSARY.md`.
 ## Key conventions to always follow
 
 - Use shadcn `Button` component, never raw `<button>`
-- All editable fields in edit mode: `border-b border-[#AFA9EC]` persistent underline
+- All editable fields in edit mode: `border-b border-border-strong` persistent underline
 - Guest view: no underlines, no placeholders, no edit controls
 - `aria-live="polite"` on all live-updating values
 - Supabase browser client from `@/lib/supabase/client`
@@ -122,8 +122,11 @@ Full definitions in `references/GLOSSARY.md`.
 ### Styling
 
 - Use Tailwind 4 utility classes for all layout, spacing, and typography
-- Use `className` with bracket notation for brand colour values that have no
-  Tailwind equivalent: `bg-[#EEEDFE]`, `border-[#AFA9EC]`, `text-[#534AB7]`
+- Never hardcode hex colours — use the design tokens defined in `globals.css`:
+  `text-primary`, `bg-secondary`, `border-border-strong`, `text-primary-muted`,
+  `text-reveal-foreground`, `bg-success`, `text-warning`, etc. (full table in
+  `references/PROJECT.md` → Design System). CI blocks bracketed hexes via
+  `pnpm lint:colors`.
 - Never write a CSS-in-JS style block or a `.css` file for a new component
   unless there is genuinely no Tailwind alternative
 - Use `cn()` from `@/lib/utils` to compose conditional classNames

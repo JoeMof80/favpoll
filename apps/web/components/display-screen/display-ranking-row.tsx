@@ -4,8 +4,6 @@ import { formatAmount } from "@/components/ranking-list/utils"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import type { Favourite } from "@favpoll/types"
 
-const BRAND = "#534AB7"
-
 type Props = {
   item: Favourite & { rank: number }
   isColorTopic: boolean
@@ -35,7 +33,7 @@ export function DisplayRankingRow({
         label={item.label}
         amount={amountStr}
         widthPercent={barWidth}
-        barStyle={{ background: isFirst ? BRAND : "#AFA9EC" }}
+        barClassName={isFirst ? "bg-primary" : "bg-chart-3"}
         labelSuffix={
           isColorTopic ? (
             <span

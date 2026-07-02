@@ -30,13 +30,13 @@ export function WizardProgressStrip({ currentStep }: Props) {
             <span
               className={cn(
                 "h-1 rounded-full transition-colors",
-                isActive || isPast ? "bg-[#534AB7]" : "bg-muted"
+                isActive || isPast ? "bg-primary" : "bg-muted"
               )}
             />
             <span
               className={cn(
                 "text-[11px] font-medium tracking-widest uppercase transition-colors",
-                isActive ? "text-[#534AB7]" : "text-muted-foreground"
+                isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
               {STEP_LABELS[s]}

@@ -22,17 +22,17 @@ export function CauseHero({ favpoll }: Props) {
         {headline.prefix}
       </SectionEyebrow>
 
-      <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-[#2C2C2A] sm:text-5xl">
+      <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
         {favpoll.cause_label}
       </h1>
 
       {favpoll.description && (
-        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-[#5F5E5A]">
+        <p className="mt-4 line-clamp-4 text-base leading-relaxed text-muted-foreground">
           {favpoll.description}
         </p>
       )}
 
-      <hr className="mt-4 border-[#D3D1C7] md:mt-8" />
+      <hr className="mt-4 border-border md:mt-8" />
     </div>
   )
 }
