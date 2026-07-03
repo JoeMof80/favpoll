@@ -304,6 +304,27 @@ const SOLEMN_REGISTERS = new Set(["remembering"]);
 
 // Neutral about templates — never name a favourite (so they can't leak a
 // reveal), coherent with the generated name, varied length for layout testing.
+// Cause labels for register "cause" favpolls (subject='cause' — no
+// protagonist row; the label is the h1 and the about goes to
+// favpolls.description). Person names must never be used here.
+const CAUSE_POOL = [
+  "The Sunshine Appeal",
+  "Helping Hands Fund",
+  "The Riverside Appeal",
+  "The Village Hall Roof Fund",
+  "Meals for Neighbours",
+  "The Community Garden Appeal",
+  "Warm This Winter",
+  "The Library Restoration Fund",
+];
+
+function causeAboutFor(label: string): string {
+  const short = `${label} is raising money for the causes below — every pledge counts twice.`;
+  const medium = `${label} brings people together around the things they love. Pledge your favourite and the money goes straight to the causes below.`;
+  const long = `${label} is a community effort. Everyone who pledges adds their own favourite to the poll, and every pound goes to the causes below. Add yours — quietly, generously, together.`;
+  return clamp(pick([short, medium, medium, long]), LIMITS.about);
+}
+
 function aboutFor(name: string, register: string): string {
   const solemn = SOLEMN_REGISTERS.has(register);
   const short = solemn
@@ -520,33 +541,42 @@ async function createOneFavpoll(
     new Date(createdAt).getTime() + 90 * 86400000,
   ).toISOString();
 
-  const name = clamp(pick(NAME_POOL), LIMITS.name);
+  const occasionModel = registerToOccasionModel(register);
+  const isCause = occasionModel.subject === "cause";
+  const name = clamp(pick(isCause ? CAUSE_POOL : NAME_POOL), LIMITS.name);
 
-  // 1) protagonist
-  const { data: protagonist, error: pErr } = await supabase
-    .from("protagonists")
-    .insert({
-      name,
-      context: contextFor(occasionType),
-      about: aboutFor(name, register),
-      created_by: SEED_USER_ID,
-    })
-    .select("id")
-    .single();
-  if (pErr || !protagonist) {
-    console.error("  ✗ protagonist:", pErr?.message);
-    return null;
+  // 1) protagonist — person favpolls only. Cause favpolls have no
+  // protagonist row: the cause_label is the h1 and the about is stored in
+  // favpolls.description (see the cause About storage decision).
+  let protagonistId: string | null = null;
+  if (!isCause) {
+    const { data: protagonist, error: pErr } = await supabase
+      .from("protagonists")
+      .insert({
+        name,
+        context: contextFor(occasionType),
+        about: aboutFor(name, register),
+        created_by: SEED_USER_ID,
+      })
+      .select("id")
+      .single();
+    if (pErr || !protagonist) {
+      console.error("  ✗ protagonist:", pErr?.message);
+      return null;
+    }
+    protagonistId = protagonist.id;
   }
 
   // 2) favpoll
-  const occasionModel = registerToOccasionModel(register);
   const openingLine = occasionType
     ? (OPENING_LINE_PREFIXES[occasionType] ?? null)
     : null;
   const { data: favpoll, error: eErr } = await supabase
     .from("favpolls")
     .insert({
-      protagonist_id: protagonist.id,
+      protagonist_id: protagonistId,
+      cause_label: isCause ? name : null,
+      description: isCause ? causeAboutFor(name) : null,
       occasion_type: occasionType,
       opening_line: openingLine,
       category: occasionModel.category,
