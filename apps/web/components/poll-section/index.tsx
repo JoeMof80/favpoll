@@ -175,8 +175,10 @@ export function PollSection({
               variant="ghost"
               onClick={onOpenPledgeDialog}
               aria-label={unlockAriaLabel}
-              className="absolute inset-0 z-10 h-auto w-full items-center justify-center rounded-none hover:bg-transparent"
+              className="absolute inset-0 z-10 h-auto w-full flex-col items-center justify-start rounded-none pt-4 hover:bg-transparent"
             >
+              {/* pt-4 sits the pill over the centre of the decoy reveal
+                  quote — the lock guards the reveal, not the results */}
               <RevealLockPill label={revealLockLabel(displayFirstName)} />
             </Button>
           )}
