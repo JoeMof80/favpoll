@@ -56,10 +56,6 @@ export function FavpollForm({
     initialClosesAt
   )
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
-  // Shared-fund amount staged from the preview card pre-publish; the payment
-  // itself still happens post-create in SeedFundModal (it needs the favpoll
-  // id for the Stripe metadata) — this just pre-fills it.
-  const [plannedSeed, setPlannedSeed] = useState<number | null>(null)
 
   const pendingClosesAt = useRef<Date | null>(null)
 
@@ -232,7 +228,6 @@ export function FavpollForm({
       <SeedFundModal
         favpollId={seedFavpollId}
         isListed={form.getValues("isListed") ?? true}
-        initialAmount={plannedSeed ?? undefined}
         onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
       />
     )
@@ -252,8 +247,6 @@ export function FavpollForm({
         hasNewTopicDraft={hasNewTopicDraft}
         closesAt={editClosesAt}
         onClosesAtChange={handleClosesAtChange}
-        plannedSeed={plannedSeed}
-        onPlannedSeedChange={setPlannedSeed}
       />
     </Form>
   )
