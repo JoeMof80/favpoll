@@ -8,6 +8,7 @@ import { getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
+import { FundPlanCard } from "./fund-plan-card"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
@@ -47,11 +48,13 @@ export type FormInnerProps = {
   submitting: boolean
   error: string | null
   onSubmit: (closesAt?: Date) => void
-  onCancel: () => void
   hasNewTopicDraft: boolean
   /** ISO string from the DB; edit mode only */
   closesAt?: string
   onClosesAtChange?: (iso: string) => void
+  /** Shared-fund amount staged pre-publish (create mode); paid in SeedFundModal after create. */
+  plannedSeed?: number | null
+  onPlannedSeedChange?: (amount: number | null) => void
 }
 
 export function FormInner({
@@ -63,10 +66,11 @@ export function FormInner({
   submitting,
   error,
   onSubmit,
-  onCancel,
   hasNewTopicDraft,
   closesAt,
   onClosesAtChange,
+  plannedSeed = null,
+  onPlannedSeedChange,
 }: FormInnerProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const lastGeneratedOpeningLine = useRef<string | null>(null)
@@ -288,21 +292,28 @@ export function FormInner({
                 onClosesAtChange={onClosesAtChange}
               />
               <CharityBanner charities={displayCharities} totalRaised={0} />
-              <div className="pointer-events-none opacity-40">
-                <div className="rounded-lg border border-border bg-background px-5 py-4">
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    <b>£0.00</b> available for guests who need help to pledge.
-                  </p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="mt-3 flex w-full"
-                  >
-                    Add to the shared fund
-                  </Button>
+              {mode === "create" && onPlannedSeedChange ? (
+                <FundPlanCard
+                  plannedSeed={plannedSeed}
+                  onChange={onPlannedSeedChange}
+                />
+              ) : (
+                <div className="pointer-events-none opacity-40">
+                  <div className="rounded-lg border border-border bg-background px-5 py-4">
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      <b>£0.00</b> available for guests who need help to pledge.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3 flex w-full"
+                    >
+                      Add to the shared fund
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </main>
@@ -313,7 +324,6 @@ export function FormInner({
         submitting={submitting}
         error={error}
         onSubmit={onSubmit}
-        onCancel={onCancel}
       />
     </>
   )

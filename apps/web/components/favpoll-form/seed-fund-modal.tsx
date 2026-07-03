@@ -22,6 +22,8 @@ type Props = {
   variant?: "organiser" | "guest"
   /** When true, shows an informational notice that this is a public favpoll. */
   isListed?: boolean
+  /** Pre-fills the amount — set when the organiser staged a seed amount on the create form. */
+  initialAmount?: number
 }
 
 export function SeedFundModal({
@@ -30,8 +32,11 @@ export function SeedFundModal({
   onCancel,
   variant = "organiser",
   isListed,
+  initialAmount,
 }: Props) {
-  const [amount, setAmount] = useState("")
+  const [amount, setAmount] = useState(
+    initialAmount && initialAmount > 0 ? String(initialAmount) : ""
+  )
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -192,7 +197,7 @@ export function SeedFundModal({
           onChange={(e) => setAmount(e.target.value)}
           placeholder="0"
           aria-label="Amount in pounds"
-          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       </div>
 

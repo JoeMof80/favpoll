@@ -17,7 +17,13 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { EDIT_BTN, EditBadge, CharCounter, overlayFooter } from "./edit-helpers"
+import {
+  EDIT_BTN,
+  INPUT_GROUP_CLS,
+  EditBadge,
+  CharCounter,
+  overlayFooter,
+} from "./edit-helpers"
 import type { Favourite } from "@favpoll/types"
 import type { FavpollFormValues } from "./schema"
 
@@ -126,7 +132,7 @@ export function EditablePollArea({
     <>
       <div className="space-y-4">
         <div className="space-y-3 py-1">
-          <PollHeading topicTitle={topicTitle} />
+          <PollHeading topicTitle={topicTitle} previewPill />
         </div>
 
         <div className="space-y-4">
@@ -191,7 +197,7 @@ export function EditablePollArea({
         headerClassName="p-0"
         dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
         header={
-          <InputGroup className="h-auto rounded-none border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+          <InputGroup className={INPUT_GROUP_CLS}>
             <InputGroupAddon
               align="block-start"
               className="justify-between px-5"
