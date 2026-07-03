@@ -1,8 +1,7 @@
 "use client"
 
-// PROTOTYPE — the HeroDemoPanel animation loop, extracted as a hook so the
-// split-variant hero can drive DemoCard itself. On fold-in this replaces the
-// inline loop in components/hero-demo-panel/index.tsx.
+// The hero demo animation loop: a timeout state machine that walks DemoCard
+// through the 15-phase choose → pledge → reveal arc across the six scenes.
 import { useEffect, useRef, useState } from "react"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
 import { SCENES } from "@/components/hero-demo-panel/scenes"

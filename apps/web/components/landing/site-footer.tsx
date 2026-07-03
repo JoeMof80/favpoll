@@ -1,6 +1,7 @@
-// PROTOTYPE — site footer (promote to components/landing/ at fold-in and
-// mount in the root layout). Carries the trust content moved off the landing
-// body: where the money goes, written in advance.
+// Site footer. Carries the trust content that lives below the fold app-wide:
+// where the money goes, written in advance. Rendered by the landing page;
+// mounting app-wide via the root layout is a follow-up (projector/display
+// routes must opt out).
 import Link from "next/link"
 
 const EXPLORE = [

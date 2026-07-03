@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — interactive demonstration of the withhold-then-disclose
+// Interactive demonstration of the withhold-then-disclose
 // mechanic. The visitor clicks a demo pledge; the reveal unblurs and types
 // out, exactly as it does on a live favpoll page. Uses a celebration scene
 // (Poppy's birthday) to balance the memorial-led hero.

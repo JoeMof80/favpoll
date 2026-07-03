@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — the record as a record book, not a race: one holder per topic,
+// The record as a record book, not a race: one holder per topic,
 // no comparative bars (bars across different questions imply a shared scale
 // that doesn't exist). Tiles fade up in sequence; amounts count up on view.
 import { CountUp } from "./count-up"

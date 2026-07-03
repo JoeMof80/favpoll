@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — counts a number up from zero the first time it scrolls into
+// Counts a number up from zero the first time it scrolls into
 // view. Respects prefers-reduced-motion (renders the final value directly).
 import { useEffect, useRef, useState } from "react"
 

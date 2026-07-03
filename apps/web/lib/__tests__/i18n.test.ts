@@ -44,10 +44,24 @@ describe("MARKET_DEFAULTS", () => {
 })
 
 describe("t", () => {
-  it("returns the correct string for a known key", () => {
-    expect(t("landing.headline")).toBe(
+  it("returns the canonical memorial headline", () => {
+    expect(t("landing.headline.memorial")).toBe(
       "Honour them through what they loved — for the causes they cared about."
     )
+  })
+
+  it("has a headline for every hero scene register", () => {
+    for (const key of [
+      "landing.headline.memorial",
+      "landing.headline.birthday",
+      "landing.headline.retirement",
+      "landing.headline.engagement",
+      "landing.headline.leaving_do",
+      "landing.headline.graduation",
+    ] as const) {
+      expect(t(key)).toContain("what they love")
+      expect(t(key)).toContain("causes they care")
+    }
   })
 
   it("returns the brand subheader", () => {
