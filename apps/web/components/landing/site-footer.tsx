@@ -8,6 +8,7 @@ const EXPLORE = [
   ["/favpolls", "Live favpolls"],
   ["/rankings", "The record"],
   ["/favpolls/new", "Create a favpoll"],
+  ["/about", "About favpoll"],
 ] as const
 
 const ACCOUNT = [
@@ -68,21 +69,27 @@ export function SiteFooter() {
             </ul>
           </nav>
 
-          {/* Trust blurbs — moved off the landing body */}
+          {/* Trust blurbs — the full versions live on /about */}
           <div className="flex flex-col gap-6">
             <div>
-              <p className="mb-2 text-xs font-medium tracking-widest text-primary uppercase">
+              <Link
+                href="/about#money"
+                className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
+              >
                 Where the money goes
-              </p>
+              </Link>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 A 5% platform fee covers favpoll's costs. The remaining 95%
                 reaches your chosen charity in full.
               </p>
             </div>
             <div>
-              <p className="mb-2 text-xs font-medium tracking-widest text-primary uppercase">
+              <Link
+                href="/about#wills"
+                className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
+              >
                 Written in advance
-              </p>
+              </Link>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 A favpoll can be kept in a will or letter of wishes — the
                 questions and reveals written in advance, in your own words.
