@@ -8,6 +8,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Card, CardContent } from "@/components/ui/card"
 import { LandingHero } from "@/components/landing/hero"
 import { RevealMechanicDemo } from "@/components/landing/reveal-mechanic-demo"
+import { InTheRoom } from "@/components/landing/in-the-room"
 import { RailNav } from "@/components/landing/rail-nav"
 import { RecordHolders } from "@/components/landing/record-holders"
 import { FadeIn } from "@/components/landing/fade-in"
@@ -17,6 +18,7 @@ const RECORD_THRESHOLD_GBP = 500
 
 const NAV = [
   ["#reveal", "The reveal"],
+  ["#room", "In the room"],
   ["#live", "Live right now"],
   ["#record", "The record"],
   ["#how", "How it works"],
@@ -191,6 +193,22 @@ export default async function HomePage() {
               </FadeIn>
               <FadeIn delay={0.1}>
                 <RevealMechanicDemo />
+              </FadeIn>
+            </section>
+
+            <section id="room" className="scroll-mt-20">
+              <FadeIn>
+                <SectionEyebrow className="mb-2">In the room</SectionEyebrow>
+                <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
+                  Runs on a link. Comes alive in the room.
+                </h2>
+                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+                  Every favpoll is complete on its own — and made for the day
+                  itself when there is one.
+                </p>
+              </FadeIn>
+              <FadeIn delay={0.1}>
+                <InTheRoom />
               </FadeIn>
             </section>
 
