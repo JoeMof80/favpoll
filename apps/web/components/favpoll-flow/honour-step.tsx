@@ -116,7 +116,7 @@ export function HonourStep({ value, onChange }: Props) {
         type="single"
         value={whoToggleValue}
         onValueChange={handleWhoChange}
-        className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+        className="grid grid-cols-2 gap-2 sm:grid-cols-6"
       >
         {WHO_OPTIONS.map(({ value: v, label, icon: Icon }) => (
           <ToggleGroupItem key={v} value={v} className={WHO_ITEM_CLASS}>
