@@ -59,7 +59,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               </motion.p>
             </AnimatePresence>
           </div>
-          <h1 className="mb-6 min-h-[10.5rem] max-w-xl text-5xl leading-[1.12] font-light tracking-tight">
+          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:min-h-[10.5rem] md:text-5xl">
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
                 key={`headline-${sceneIndex}`}
@@ -126,10 +126,11 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           </dl>
         </div>
 
-        {/* Right — live demo in a browser-style frame (desktop only).
-            Rendered at full logical size (nothing cropped) and optically
-            scaled to 80%. */}
-        <div className="hidden md:block">
+        {/* Right — live demo in a browser-style frame. Rendered at full
+            logical size (nothing cropped — the real experience) and optically
+            scaled: 80% on md+, 68% on phones so the same card fits a
+            ~360px-wide screen. Stacks below the pitch on mobile. */}
+        <div className="mx-auto md:mx-0">
           <span className="sr-only">
             Animated demonstration of how favpoll works. The demonstration
             cycles through different occasions automatically.
@@ -139,8 +140,8 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             style={{ opacity: fading ? 0 : 1 }}
             aria-live="polite"
           >
-            <div className="h-[34.8rem] w-100">
-              <div className="h-[43.5rem] w-125 origin-top-left scale-80 text-foreground">
+            <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
+              <div className="h-[43.5rem] w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
                 <div className="flex h-full flex-col rounded-xl shadow-2xl">
                   {/* Traffic-light window bar — signals this is a demo */}
                   <div
@@ -168,7 +169,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             </div>
             {/* Beat indicator: which of the three beats the loop is in */}
             <div
-              className="mt-3 flex w-100 items-center justify-center gap-4"
+              className="mt-3 flex w-[19.4rem] items-center justify-center gap-4 sm:w-100"
               aria-hidden="true"
             >
               {BEATS.map((label, i) => (
