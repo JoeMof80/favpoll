@@ -388,6 +388,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ```
 /                              -- Home (redesigned 2026-07-03, "split" layout — PR feat/landing-fold-in). Purple hero band: LandingHero (components/landing/hero.tsx) — live 15-phase demo loop in a traffic-light browser frame ("favpoll.com · demo"), cycling occasion eyebrow + per-occasion headline (landing.headline.* i18n keys), monogram shimmer texture, count-up stats. Body: sticky rail (scrollspy RailNav + CTA card) beside stacked sections — interactive RevealMechanicDemo (#reveal), live grid of FavpollSummaryCards (#live, is_listed=true only), RecordHolders tiles (#record, gated until RECORD_THRESHOLD_GBP = £500 total pledged and ≥3 items — coupled to open /rankings threshold TODO; one champion per topic, never cross-topic comparative bars), HowItWorksThreeBeat (#how), Venn + final CTA. SiteFooter renders after main (money/wills trust blurbs live there, not in the body). The hero demo shows on all viewports: full logical size (500×696px + frame) optically scaled — `scale-80` from `sm`, `scale-[0.62]` below (fits 360px screens with the page's px-6); on mobile it stacks below the pitch/stats; headline steps down to `text-4xl` below `md`. Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
 /landing-v2                    -- RETIRED. Route and the whole components/landing-v2/ directory are deleted (PR feat/landing-polish); the surviving Venn lives at components/landing/honour-charity-love-venn.tsx. The unused root-level honour-charity-love-venn.tsx and favpoll-mark.tsx were deleted in the same pass.
+/about                         -- About page (2026-07-03): brand-statement hero (purple band + monogram texture), condensed founding story ("Data with soul." pull-quote), Honour·Charity·Love triad + Venn, register sections (#memorials with nested #wills card, #celebrations, #fundraisers), #money (full fee copy), the record, CTA + SiteFooter. Footer trust-blurb headings deep-link to /about#money and /about#wills; "About favpoll" added to the footer Explore column. Static server component; copy sourced from references/founding-story.md in the favpoll-brand voice.
 /favpolls                      -- Live favpolls grid (public, no auth)
 /favpolls/new                  -- New favpoll wizard (3-step page: Honour → Charity → Love)
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
@@ -550,7 +551,7 @@ components/
 │   ├── reveal-mechanic-demo.tsx  -- interactive withhold→disclose demo: blurred quote + lock, demo-pledge click → unblur + typewriter; uses SCENES[1] (Poppy, celebration)
 │   ├── record-holders.tsx        -- record as tiles, one champion per topic (deduped); never cross-topic bars
 │   ├── rail-nav.tsx              -- sticky rail nav with IntersectionObserver scrollspy
-│   ├── site-footer.tsx           -- brand statement, Explore/Your account links, money+wills blurbs, © + Stripe bar; landing-only for now (app-wide mount is a TODO — display/projector routes must opt out)
+│   ├── site-footer.tsx           -- brand statement, Explore/Your account links (incl. About favpoll), money+wills blurbs (headings deep-link to /about#money and /about#wills), © + Stripe bar; rendered by / and /about (app-wide mount is a TODO — display/projector routes must opt out)
 │   ├── count-up.tsx, fade-in.tsx -- in-view count-up stat / once-only fade-up (both reduced-motion aware)
 │   ├── types.ts                  -- RecordItem
 │   ├── honour-charity-love-venn.tsx  -- Rotating three-ring Venn SVG (currentColor, text-primary; slow 16/24/22s rotations + staggered stroke-opacity breathing; labels scaled 1.5×); home closing section; + .stories.tsx
@@ -982,5 +983,5 @@ NEXT_PUBLIC_BASE_URL
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep.
-- **Landing follow-ups** — james.jpg demo portrait (quota-limited; same style block, wire `photo_url` in scenes.ts ~L401); mount SiteFooter app-wide via route groups (display/projector routes opt out); about page divided into register sections (memorials / celebrations / fundraisers) — long-term home for the money/wills content now in the footer.
+- **Landing follow-ups** — james.jpg demo portrait (quota-limited; same style block, wire `photo_url` in scenes.ts ~L401); mount SiteFooter app-wide via route groups (display/projector routes opt out).
 - **Mobile app** — future.
