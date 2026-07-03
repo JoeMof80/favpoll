@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — subtle once-only fade-up when scrolled into view. Under
+// Subtle once-only fade-up when scrolled into view. Under
 // prefers-reduced-motion the y-shift is dropped (opacity only).
 import { motion, useReducedMotion } from "framer-motion"
 

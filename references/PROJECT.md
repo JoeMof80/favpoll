@@ -386,7 +386,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 ### apps/web
 
 ```
-/                              -- Home: seven-section reveal-first landing page. Section 1 = HeroDemoPanel (blur/unblur reveal sequence). Section 2 = HowItWorksThreeBeat (withhold→pledge→disclose). Section 3 = live favpolls carousel (bg-primary/5, is_listed=true only). Section 4 = the record (gated: hidden until RECORD_THRESHOLD_GBP = £500 total pledged and ≥3 items — coupled to open /rankings threshold TODO). Section 5 = fee model / where money goes. Section 6 = written-in-advance (will/letter of wishes). Section 7 = Honour·Charity·Love Venn + final CTA. Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
+/                              -- Home (redesigned 2026-07-03, "split" layout — PR feat/landing-fold-in). Purple hero band: LandingHero (components/landing/hero.tsx) — live 15-phase demo loop in a traffic-light browser frame ("favpoll.com · demo"), cycling occasion eyebrow + per-occasion headline (landing.headline.* i18n keys), monogram shimmer texture, count-up stats. Body: sticky rail (scrollspy RailNav + CTA card) beside stacked sections — interactive RevealMechanicDemo (#reveal), live grid of FavpollSummaryCards (#live, is_listed=true only), RecordHolders tiles (#record, gated until RECORD_THRESHOLD_GBP = £500 total pledged and ≥3 items — coupled to open /rankings threshold TODO; one champion per topic, never cross-topic comparative bars), HowItWorksThreeBeat (#how), Venn + final CTA. SiteFooter renders after main (money/wills trust blurbs live there, not in the body). Hero demo hidden < md (mobile treatment TODO). Supabase query must NOT select `register` (dropped column — causes Supabase to return `{ data: null }` silently, showing "No live favpolls yet").
 /landing-v2                    -- RETIRED. Route and the whole components/landing-v2/ directory are deleted (PR feat/landing-polish); the surviving Venn lives at components/landing/honour-charity-love-venn.tsx. The unused root-level honour-charity-love-venn.tsx and favpoll-mark.tsx were deleted in the same pass.
 /favpolls                      -- Live favpolls grid (public, no auth)
 /favpolls/new                  -- New favpoll wizard (3-step page: Honour → Charity → Love)
@@ -526,10 +526,9 @@ components/
 ├── favpoll-content/
 │   ├── index.tsx             -- grid md:grid-cols-[1fr_300px]; PledgeDialog controlled (pledgeDialogOpen state); passes localEntitled/effectiveReveal/effectiveItems/isCause to PollSection
 │   └── use-favpoll-content.ts  -- localEntitled state (syncs from server entitled prop); handlePledgeSuccess(guestToken?): signed-in → router.refresh(); guest → /api/polls/[pollId]/reveal fetch → setLocalReveal/setLocalItems/setLocalEntitled; effectiveReveal/effectiveItems fall back to server values for signed-in
-├── hero-demo-panel/
-│   ├── index.tsx, scenes.ts, variants.ts
-│   ├── hero-pitch-column.tsx, demo-card.tsx
-│   ├── *.stories.tsx             -- hero-demo-panel (animated loop), hero-pitch-column, demo-card (static phase snapshots: Locked/PickerOpen/AmountStep/Confirmed/Reveal with prefersReducedMotion forced)
+├── hero-demo-panel/              -- demo card + scene data only (the old two-column HeroDemoPanel index.tsx and hero-pitch-column.tsx retired in the landing fold-in; the loop lives in landing/use-demo-loop.ts)
+│   ├── demo-card.tsx             -- accepts className (landing hero passes rounded-t-none border-t-0 under the traffic-light frame); scenes.ts (SCENES, SCENE_EYEBROWS, photo_url → /demo/*.jpg portraits); variants.ts
+│   ├── demo-card.stories.tsx     -- static phase snapshots: Locked/PickerOpen/AmountStep/Confirmed/Reveal with prefersReducedMotion forced
 ├── cause-hero.tsx               -- view-only: cause favpoll hero; shows getFavpollHeadline prefix + cause_label as h1 + favpolls.description as body; no avatar, no protagonist fields
 ├── favpoll-hero.tsx               -- view-only: favpoll + protagonist props, hideAvatar?, aboutPlaceholder? (renders grey when about is blank); requires non-null protagonist; no isEdit prop (edit mode is handled entirely by editable-hero.tsx)
 ├── heroes/
@@ -544,10 +543,18 @@ components/
 │   ├── utils.ts                  -- OrganizerCardFavpoll type, StatusFilter, SortKey, WARNING_THRESHOLD_DAYS=7, isFavpollClosed(), daysRemaining(), filterAndSort() (pure functions, fully tested)
 │   └── __tests__/               -- organizer-card.test.tsx + utils.test.ts (37 tests total)
 ├── live-favpolls-carousel.tsx    -- + .stories.tsx
-├── landing/
-│   ├── honour-charity-love-venn.tsx  -- Rotating three-ring Venn SVG (currentColor fills, text-primary); used by home page section 7; + .stories.tsx
-│   ├── how-it-works-three-beat.tsx   -- 3-column numbered steps for home section 2; + .stories.tsx
-│   └── section-header.tsx       -- Eyebrow + h2 (text-3xl font-light) + optional lede (max-w-lg text-base text-muted-foreground); enforces the landing type scale across home sections 2–7
+├── landing/                      -- the redesigned home page's components (promoted from the prototype at fold-in)
+│   ├── hero.tsx                  -- LandingHero: purple band, HeroTexture, cycling eyebrow + per-occasion headline (SCENE_HEADLINE_KEYS → landing.headline.*), demo card in traffic-light frame (full-size, scale-80), count-up stats, Choose/Pledge/Reveal beat indicator
+│   ├── use-demo-loop.ts          -- the 15-phase demo timeline as a hook (useDemoLoop + beatForPhase); reduced motion → static reveal state
+│   ├── hero-texture.tsx          -- FavpollMonogramGlyph (founder-authored interlocked-pair SVG, currentColor) tiled half-drop with 90°-alternating rows + diamond accents; slow masked shimmer sweep; glyph/tile self-contained for future merch
+│   ├── reveal-mechanic-demo.tsx  -- interactive withhold→disclose demo: blurred quote + lock, demo-pledge click → unblur + typewriter; uses SCENES[1] (Poppy, celebration)
+│   ├── record-holders.tsx        -- record as tiles, one champion per topic (deduped); never cross-topic bars
+│   ├── rail-nav.tsx              -- sticky rail nav with IntersectionObserver scrollspy
+│   ├── site-footer.tsx           -- brand statement, Explore/Your account links, money+wills blurbs, © + Stripe bar; landing-only for now (app-wide mount is a TODO — display/projector routes must opt out)
+│   ├── count-up.tsx, fade-in.tsx -- in-view count-up stat / once-only fade-up (both reduced-motion aware)
+│   ├── types.ts                  -- RecordItem
+│   ├── honour-charity-love-venn.tsx  -- Rotating three-ring Venn SVG (currentColor, text-primary; slow 16/24/22s rotations + staggered stroke-opacity breathing; labels scaled 1.5×); home closing section; + .stories.tsx
+│   └── how-it-works-three-beat.tsx   -- 3-column numbered steps (#how section); + .stories.tsx
 ├── charity-banner.tsx, countdown.tsx
 ├── header.tsx                   -- "use client"; hamburger menu on mobile (md:hidden); click-outside closes; uses NewFavpollButton (passes onBeforeOpen={close} in mobile menu)
 ├── poll-heading.tsx             -- topicTitle + optional onPledge/onResetPledge/onViewResults. When onPledge is set renders a shadcn primary Button (flex-1, uppercase, tracking-[0.09em]); otherwise renders SectionLabel. onResetPledge/onViewResults each render a TooltipIconButton. No hint line. Used on event page (onPledge → pledge dialog) and form edit/preview (no onPledge — renders as non-interactive SectionLabel; reveal editing uses the dedicated edit Button).
@@ -950,9 +957,11 @@ NEXT_PUBLIC_BASE_URL
   - **Documented exclusions (not renames):** `HANDOFF.md`, `references/SESSION_HANDOFF.md`, `references/session-handoff-2026-*.md` (historical records); `references/charity-pitch.md`, `founding-story.md`, `organiser-pitch.md`, `will-writers-pitch.md` ("event" = "life event" — correct domain usage); `scripts/run-migrations.ts`, `scripts/run-sql-migrations.mjs` (SQL strings reference old table names to detect pre-rename schema state — intentional); `scripts/seed.ts:281 "Sponsored event"` (legacy register key — changing would break backward compat with old DB rows); `favourites.event_count` column references (actual DB column name, not renamed).
   - Any future stray "event" reference found in the codebase should be checked against this exclusion list before assuming it is a gap. See `references/GLOSSARY.md` for the full vocabulary.
 
-- **Landing headline updated (2026-06-24).** The fixed headline changed from "Introducing a new way to honour them." to "Honour them through what they loved — for the causes they cared about." The new headline explains the mechanic (favourites + charitable giving) while keeping the "honour them" emotional core. The `favpoll-brand` skill has been updated to match — the old headline is retired. The eyebrow-rotation system is unchanged. The i18n test for `landing.headline` was updated to assert the new string.
+- **Per-occasion landing headlines (2026-07-03, supersedes the fixed-headline rule of 2026-06-24).** The hero headline cycles with the demo scene, in sync with the eyebrow — six variants under `landing.headline.*` in `messages/en-GB.json` (memorial/birthday/retirement/engagement/leaving_do/graduation). All share the "<verb> them … what they love — for the causes they care about." rhythm; only the memorial line (the canonical 2026-06-24 headline) is past tense and must never change. The `favpoll-brand` skill documents the set and the rhythm rule; the old single `landing.headline` key is removed and the i18n test asserts the memorial variant + rhythm across all six.
 
-- **Hero demo panel mechanics (implemented, PR feat/hero-demo-typewriter-disclosure).** `HeroDemoPanel` (`components/hero-demo-panel/`) runs a 15-phase loop (`Phase` union in `scenes.ts`). Key mechanics:
+- **Landing redesign fold-in (2026-07-03, PR feat/landing-fold-in).** The "split" prototype variant became the real home page; the prototype directory, variant switcher, and losing variants (`current`/`stage`/`editorial`) were deleted (decision log lived in the prototype's NOTES.md — outcome captured here). The old two-column `HeroDemoPanel` (`hero-demo-panel/index.tsx`) and `hero-pitch-column.tsx` retired; `demo-card.tsx` + `scenes.ts` survive and are driven by `landing/use-demo-loop.ts`. The demo card sits in a traffic-light browser frame captioned "favpoll.com · demo" to signal demo-ness. Deferred from the fold-in: mobile hero treatment (demo hidden < md), app-wide footer mount (display/projector routes must opt out), about page with register sections, james.jpg portrait.
+
+- **Hero demo card mechanics (implemented, PR feat/hero-demo-typewriter-disclosure; loop now in `landing/use-demo-loop.ts`).** The demo runs a 15-phase loop (`Phase` union in `scenes.ts`). Key mechanics:
   - **Typewriter disclosure:** `useTyped(text, active, reduced, targetMs)` types text character-by-character via `setInterval`. Returns full text immediately when `reduced=true` or `active=false`. Both About and the personal reveal use dual-render: an invisible reserve `<p>` (stable height) + absolutely-positioned typed `<p>`. The reserve always carries the full text; the typed copy animates. Tests must use `getAllByTestId("poll-reveal")` (not `getByTestId`) and assert on the first element (reserve).
   - **Lock card:** `AnimatePresence` renders the fixed lock card ("Pledge to see the reveal — and how the pledges are landing.") in all locked phases; it unmounts on entering `clearing`.
   - **Blurred decoy:** locked phases show a `blur-xs aria-hidden="true"` wrapper around both `PollReveal` and the results list. Real results are never rendered when locked.
@@ -960,7 +969,8 @@ NEXT_PUBLIC_BASE_URL
   - **Variant-based enable state:** Next and Pledge buttons use `variant="default"` (enabled) / `variant="secondary"` (disabled) with `pointer-events-none tabIndex={-1}`. No `disabled` attribute — do not assert `opacity-50`.
   - **No chip in search bar:** `PickerHeader` always receives `draftIds=[]`; `PickerItems` receives the real `draftIds` (empty or one item). The grid highlights the selection; the search bar shows no chip.
   - **CharityRow footer** is blurred (`blur-xs aria-hidden`) when locked; visible in unlocked phases.
-  - `h-158` total panel height; loop starts at `reveal` on first paint.
+  - Loop starts at `reveal` on first paint; under `prefers-reduced-motion` the loop never runs (static resolved state).
+  - **Scene portraits:** `protagonists.photo_url`-shaped `photo_url` fields point at `public/demo/*.jpg` (founder-generated, 800px JPEG). james.jpg pending.
 
 ## Outstanding TODO
 
@@ -972,4 +982,5 @@ NEXT_PUBLIC_BASE_URL
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
 - **Localisation next steps** — `next-intl`, string extraction, US market prep.
+- **Landing follow-ups** — james.jpg demo portrait (quota-limited; same style block, wire `photo_url` in scenes.ts ~L401); mobile hero demo treatment (hidden < md today); mount SiteFooter app-wide via route groups (display/projector routes opt out); about page divided into register sections (memorials / celebrations / fundraisers) — long-term home for the money/wills content now in the footer.
 - **Mobile app** — future.

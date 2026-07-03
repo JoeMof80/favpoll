@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — monogram texture for the purple hero band. Two favpoll marks
+// Monogram texture for the purple hero band. Two favpoll marks
 // interlocked point-symmetrically (the classic luxury-monogram move) on a
 // half-drop canvas with small diamond accents, tiled at ~5% opacity. A slow
 // diagonal shimmer band sweeps across and momentarily reveals the pattern

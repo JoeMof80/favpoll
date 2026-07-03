@@ -37,6 +37,7 @@ type Props = {
   phase: Phase
   barWidths: number[]
   prefersReducedMotion: boolean
+  className?: string
 }
 
 // Types `text` out character by character while `active`; shows full text
@@ -103,6 +104,7 @@ export function DemoCard({
   phase,
   barWidths,
   prefersReducedMotion,
+  className,
 }: Props) {
   const favourites = scene.poll.topic.favourites
   const selected = favourites[scene.selectedIndex]
@@ -285,7 +287,12 @@ export function DemoCard({
   }, [scene.poll.id, amountStr, charityName, selected.label])
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-background p-5">
+    <div
+      className={cn(
+        "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-background p-5",
+        className
+      )}
+    >
       {/* Hidden measurer — same width as where the dialog renders. */}
       <div
         ref={measureRef}

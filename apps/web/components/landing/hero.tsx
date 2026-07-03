@@ -1,11 +1,10 @@
 "use client"
 
-// PROTOTYPE — split-variant hero: purple band with monogram shimmer texture,
-// cycling occasion eyebrow + per-occasion headline (synced to the demo
-// scene), live animated DemoCard rendered full-size and optically scaled to
-// 80%, count-up stats. NOTE: per-occasion headlines contradict the brand
-// skill's "never change the headline" rule — if this wins, the brand doc and
-// landing.headline i18n key both need updating on fold-in.
+// Landing hero: purple band with monogram shimmer texture, cycling occasion
+// eyebrow + per-occasion headline (synced to the demo scene), and the live
+// animated demo card in a browser-style frame (traffic lights signal that
+// it's a demo). The card renders at full logical size and is optically
+// scaled to 80%.
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
@@ -20,22 +19,22 @@ const BEATS = ["Choose", "Pledge", "Reveal"] as const
 
 // One headline per scene (Memorial, Birthday, Retirement, Engagement,
 // Leaving do, Graduation) — same rhythm, the verb carries the register.
-// Index 0 is the canonical brand headline, unchanged.
-const SCENE_HEADLINES = [
-  "Honour them through what they loved — for the causes they cared about.",
-  "Celebrate them through what they love — for the causes they care about.",
-  "Thank them through what they love — for the causes they care about.",
-  "Toast them through what they love — for the causes they care about.",
-  "Send them off with what they love — for the causes they care about.",
-  "Cheer them on through what they love — for the causes they care about.",
-]
+// The memorial line is the canonical brand headline.
+const SCENE_HEADLINE_KEYS = [
+  "landing.headline.memorial",
+  "landing.headline.birthday",
+  "landing.headline.retirement",
+  "landing.headline.engagement",
+  "landing.headline.leaving_do",
+  "landing.headline.graduation",
+] as const
 
 type Props = {
   liveCount: number
   totalLive: number
 }
 
-export function SplitHero({ liveCount, totalLive }: Props) {
+export function LandingHero({ liveCount, totalLive }: Props) {
   const { scene, sceneIndex, phase, barWidths, fading, prefersReducedMotion } =
     useDemoLoop()
   const beat = beatForPhase(phase)
@@ -70,7 +69,7 @@ export function SplitHero({ liveCount, totalLive }: Props) {
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="block"
               >
-                {SCENE_HEADLINES[sceneIndex]}
+                {t(SCENE_HEADLINE_KEYS[sceneIndex])}
               </motion.span>
             </AnimatePresence>
           </h1>
@@ -127,9 +126,9 @@ export function SplitHero({ liveCount, totalLive }: Props) {
           </dl>
         </div>
 
-        {/* Right — live demo card on the purple stage (desktop only).
-            Rendered at its full size (31.25rem × 41.25rem — the real card
-            experience, nothing cropped) and optically scaled to 80%. */}
+        {/* Right — live demo in a browser-style frame (desktop only).
+            Rendered at full logical size (nothing cropped) and optically
+            scaled to 80%. */}
         <div className="hidden md:block">
           <span className="sr-only">
             Animated demonstration of how favpoll works. The demonstration
@@ -140,14 +139,29 @@ export function SplitHero({ liveCount, totalLive }: Props) {
             style={{ opacity: fading ? 0 : 1 }}
             aria-live="polite"
           >
-            <div className="h-[33rem] w-100">
-              <div className="h-[41.25rem] w-125 origin-top-left scale-80 text-foreground">
+            <div className="h-[34.8rem] w-100">
+              <div className="h-[43.5rem] w-125 origin-top-left scale-80 text-foreground">
                 <div className="flex h-full flex-col rounded-xl shadow-2xl">
+                  {/* Traffic-light window bar — signals this is a demo */}
+                  <div
+                    className="flex h-9 shrink-0 items-center gap-1.5 rounded-t-xl border border-b-0 border-border bg-muted px-3.5"
+                    aria-hidden="true"
+                  >
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                    <span className="flex-1 text-center text-xs text-muted-foreground">
+                      favpoll.com · demo
+                    </span>
+                    {/* Balance the dots so the label centres optically */}
+                    <span className="w-9" />
+                  </div>
                   <DemoCard
                     scene={scene}
                     phase={phase}
                     barWidths={barWidths}
                     prefersReducedMotion={prefersReducedMotion}
+                    className="rounded-t-none border-t-0"
                   />
                 </div>
               </div>

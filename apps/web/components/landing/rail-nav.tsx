@@ -1,6 +1,6 @@
 "use client"
 
-// PROTOTYPE — sticky rail nav with a scrollspy highlight on the section
+// Sticky rail nav with a scrollspy highlight on the section
 // currently in view.
 import { useEffect, useState } from "react"
 import Link from "next/link"

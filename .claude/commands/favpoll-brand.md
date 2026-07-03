@@ -83,16 +83,28 @@ favpoll is genuinely both things simultaneously — a fundraising platform and a
 
 ## Landing page — headline and eyebrow copy
 
-### Headline — fixed across all occasions
+### Headline — one per occasion, cycling with the hero demo scene
+
+As of 2026-07-03 (landing redesign) the headline cycles with the occasion,
+in step with the eyebrow and the demo scene. All six share one rhythm — the
+verb carries the register. The memorial line is the canonical original and
+must never change:
 
 ```
-Honour them through what they loved — for the causes they cared about.
+Memorial:    Honour them through what they loved — for the causes they cared about.
+Birthday:    Celebrate them through what they love — for the causes they care about.
+Retirement:  Thank them through what they love — for the causes they care about.
+Engagement:  Toast them through what they love — for the causes they care about.
+Leaving do:  Send them off with what they love — for the causes they care about.
+Graduation:  Cheer them on through what they love — for the causes they care about.
 ```
 
-The previous headline ("Introducing a new way to honour them.") is retired as
-of 2026-06-24. The new headline explains the mechanic (favourites + charitable
-giving) while keeping the "honour them" emotional core. The eyebrow still
-rotates to set occasion context; the headline remains constant.
+Canonical strings live in `messages/en-GB.json` under `landing.headline.*` —
+edit there, never inline. Only the memorial line uses past tense. Any new
+occasion headline must keep the "<verb> them … what they love — for the
+causes they care about." rhythm. (History: a single fixed headline was the
+rule from 2026-06-24 to 2026-07-03; before that, "Introducing a new way to
+honour them.")
 
 ### Brand subheader — fixed
 
@@ -111,8 +123,8 @@ Engagement: The yes that changes everything
 Graduation: As they take their next step
 ```
 
-Never show the headline without an eyebrow. Never change the headline to match
-the occasion — only the eyebrow changes.
+Never show the headline without an eyebrow. Headline and eyebrow must always
+agree on the occasion — they change together, in sync with the demo scene.
 
 ### Supporting line — fixed
 

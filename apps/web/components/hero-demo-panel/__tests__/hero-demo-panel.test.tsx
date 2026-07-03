@@ -23,10 +23,11 @@ vi.mock("framer-motion", () => {
     </div>
   )
   return {
-    motion: { div },
+    motion: { div, p: div, span: div },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => (
       <>{children}</>
     ),
+    useReducedMotion: () => true,
   }
 })
 
@@ -68,7 +69,7 @@ vi.mock("@/components/pledge-dialog/step-amount", () => ({
 }))
 
 import { DemoCard } from "../demo-card"
-import { HeroDemoPanel } from "../index"
+import { LandingHero } from "@/components/landing/hero"
 import { SCENES } from "../scenes"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -367,7 +368,7 @@ describe("DemoCard — footer", () => {
 
 // ── Reduced motion ────────────────────────────────────────────────────────────
 
-describe("HeroDemoPanel — reduced motion", () => {
+describe("LandingHero — reduced motion", () => {
   beforeEach(() => {
     Object.defineProperty(window, "matchMedia", {
       writable: true,
@@ -385,14 +386,14 @@ describe("HeroDemoPanel — reduced motion", () => {
   })
 
   it("renders the resolved reveal state — no lock card, no blur", () => {
-    const { container } = render(<HeroDemoPanel />)
+    const { container } = render(<LandingHero liveCount={6} totalLive={0} />)
     // Phase stays at 'reveal' — the loop never fires.
     expect(screen.queryByText(LOCK_CARD_COPY)).toBeNull()
     expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
   it("shows the real reveal text in the resolved state", () => {
-    render(<HeroDemoPanel />)
+    render(<LandingHero liveCount={6} totalLive={0} />)
     // With prefersReducedMotion=true, useTyped returns full text immediately,
     // so both the reserve and typed PollReveal nodes carry the full text.
     const reveals = screen.getAllByTestId("poll-reveal")
