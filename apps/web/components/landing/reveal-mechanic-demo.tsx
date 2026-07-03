@@ -5,8 +5,9 @@
 // out, exactly as it does on a live favpoll page. Uses a celebration scene
 // (Poppy's birthday) to balance the memorial-led hero.
 import { useEffect, useRef, useState } from "react"
-import { Lock, RotateCcw } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { RevealLockButton } from "@/components/reveal-lock"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 
 const scene = SCENES[1] // Poppy Chen — Sweet Sixteen, Ice cream
@@ -83,14 +84,10 @@ export function RevealMechanicDemo() {
 
         {!pledged && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <Button
-              type="button"
+            <RevealLockButton
+              label={`Pledge £5 to see ${FIRST_NAME}'s reveal`}
               onClick={() => setPledged(true)}
-              className="shadow-md"
-            >
-              <Lock className="h-4 w-4" data-icon="inline-start" />
-              Pledge £5 to see {FIRST_NAME}'s reveal
-            </Button>
+            />
           </div>
         )}
       </div>

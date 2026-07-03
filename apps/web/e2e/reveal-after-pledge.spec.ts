@@ -76,11 +76,13 @@ test.describe("reveal after pledge", () => {
       page.locator('[role="status"][aria-live="polite"]')
     ).not.toBeVisible()
     await expect(page.getByText("Cornflower blue")).not.toBeVisible()
-    // Positive check: the lock card overlay is visible pre-pledge
+    // Positive check: the reveal-lock overlay is visible pre-pledge.
+    // Assert via the aria-label (stable, personalised) rather than the
+    // visible pill label — fixture protagonist is "E2E Playwright Test".
     await expect(
-      page.getByText(
-        "Pledge to see the reveal — and how the pledges are landing."
-      )
+      page.getByRole("button", {
+        name: /Pledge to reveal E2E's favourite and see the results/i,
+      })
     ).toBeVisible()
 
     // ── 3. Open the pledge dialog ─────────────────────────────────────────────

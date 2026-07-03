@@ -74,9 +74,9 @@ import { SCENES } from "../scenes"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-// Page-copy verbatim — keep in sync with LOCK_CARD_COPY in demo-card.tsx.
-const LOCK_CARD_COPY =
-  "Pledge to see the reveal — and how the pledges are landing."
+// Page-copy verbatim — matches revealLockLabel(firstName) for SCENES[0]
+// (the normalised reveal-lock pill; see components/reveal-lock.tsx).
+const LOCK_CARD_COPY = "Pledge to see Belinda's reveal"
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 

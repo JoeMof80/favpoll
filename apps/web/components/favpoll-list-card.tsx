@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Lock } from "lucide-react"
+import { RevealLockPill } from "@/components/reveal-lock"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { PledgeDialog } from "@/components/pledge-dialog"
@@ -163,10 +163,10 @@ export function FavpollListCard({
                   className="absolute inset-0 flex items-center justify-center"
                   aria-hidden="true"
                 >
-                  <span className="flex items-center gap-1.5 rounded-full bg-background/95 px-2.5 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-                    <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
-                    Pledge to see how the pledges are landing.
-                  </span>
+                  <RevealLockPill
+                    size="sm"
+                    label="Pledge to see how the pledges are landing."
+                  />
                 </div>
               </div>
             )}
