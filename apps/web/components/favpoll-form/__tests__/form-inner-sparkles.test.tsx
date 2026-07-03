@@ -47,7 +47,6 @@ function Wrapper({
       submitting={false}
       error={null}
       onSubmit={vi.fn()}
-      onCancel={vi.fn()}
       hasNewTopicDraft={false}
     />
   )

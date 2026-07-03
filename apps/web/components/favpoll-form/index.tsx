@@ -56,6 +56,10 @@ export function FavpollForm({
     initialClosesAt
   )
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
+  // Shared-fund amount staged from the preview card pre-publish; the payment
+  // itself still happens post-create in SeedFundModal (it needs the favpoll
+  // id for the Stripe metadata) — this just pre-fills it.
+  const [plannedSeed, setPlannedSeed] = useState<number | null>(null)
 
   const pendingClosesAt = useRef<Date | null>(null)
 
@@ -203,22 +207,6 @@ export function FavpollForm({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
   }, [hasUnsavedDraft])
 
-  function handleCancel() {
-    if (hasUnsavedDraft) {
-      if (
-        !window.confirm("You have unsaved changes. Leave without publishing?")
-      ) {
-        return
-      }
-      sessionStorage.removeItem(NEW_TOPIC_DRAFT_KEY)
-      sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
-    }
-    if (mode === "edit") router.back()
-    else {
-      form.reset()
-    }
-  }
-
   function handleSubmit(closesAt?: Date) {
     if (closesAt) pendingClosesAt.current = closesAt
     form.handleSubmit(onSubmit)()
@@ -244,6 +232,7 @@ export function FavpollForm({
       <SeedFundModal
         favpollId={seedFavpollId}
         isListed={form.getValues("isListed") ?? true}
+        initialAmount={plannedSeed ?? undefined}
         onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
       />
     )
@@ -260,10 +249,11 @@ export function FavpollForm({
         submitting={submitting}
         error={error}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         hasNewTopicDraft={hasNewTopicDraft}
         closesAt={editClosesAt}
         onClosesAtChange={handleClosesAtChange}
+        plannedSeed={plannedSeed}
+        onPlannedSeedChange={setPlannedSeed}
       />
     </Form>
   )

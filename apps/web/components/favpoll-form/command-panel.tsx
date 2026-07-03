@@ -1,8 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
+import { Check, Send } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { TOAST_ERROR_STYLE, TOAST_WARNING_STYLE } from "@/lib/toast-styles"
 import { suggestClosingDate } from "@/lib/registers"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import type { FavpollFormValues } from "./schema"
@@ -13,15 +16,16 @@ type CommandPanelProps = {
   submitting: boolean
   error: string | null
   onSubmit: (closesAt?: Date) => void
-  onCancel: () => void
 }
 
+// Floating action button — the form's single command. Clicking with
+// required fields missing raises a warning toast naming them instead of
+// disabling the button (a disabled FAB can't explain itself).
 export function CommandPanel({
   mode,
   submitting,
   error,
   onSubmit,
-  onCancel,
 }: CommandPanelProps) {
   const form = useFormContext<FavpollFormValues>()
 
@@ -38,87 +42,71 @@ export function CommandPanel({
   const [publishOpen, setPublishOpen] = useState(false)
   const [publishInitialDate, setPublishInitialDate] = useState<Date>(new Date())
 
+  // Surface submit errors as toasts — the FAB has no panel to print into.
+  useEffect(() => {
+    if (error) toast.error(error, { style: TOAST_ERROR_STYLE })
+  }, [error])
+
   // Create mode: only Name/Cause must be filled before publishing
   // Edit mode: all fields must be filled before saving
   const missing: string[] = []
   if (mode === "edit") {
-    if (!category) missing.push("Occasion")
-    if (!charitiesValue?.length) missing.push("Charity")
+    if (!category) missing.push("occasion")
+    if (!charitiesValue?.length) missing.push("charity")
     if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
       missing.push("favpoll topic")
   }
   if (subjectValue === "cause") {
-    if (!causeLabelValue) missing.push("Cause")
+    if (!causeLabelValue) missing.push("cause")
   } else {
-    if (!nameValue) missing.push("Name")
+    if (!nameValue) missing.push("name")
   }
 
-  const isPublishable = missing.length === 0
-
-  function handlePublishClick() {
-    setPublishInitialDate(new Date(suggestClosingDate(category)))
-    setPublishOpen(true)
+  function handleClick() {
+    if (missing.length > 0) {
+      const list = missing.join(" · ")
+      toast.warning(
+        mode === "create"
+          ? `Still needed before publishing: ${list}`
+          : `Still needed before saving: ${list}`,
+        { style: TOAST_WARNING_STYLE }
+      )
+      return
+    }
+    if (mode === "create") {
+      setPublishInitialDate(new Date(suggestClosingDate(category)))
+      setPublishOpen(true)
+    } else {
+      onSubmit()
+    }
   }
 
   return (
     <>
-      {/* Floating command panel */}
-      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-border bg-background md:right-4 md:bottom-4 md:left-auto md:w-72 md:rounded-xl md:border md:shadow-lg">
-        <div
-          className="space-y-3 p-4"
-          style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      <div
+        className="fixed right-4 z-50 md:right-6"
+        style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      >
+        <Button
+          type="button"
+          size="lg"
+          disabled={submitting}
+          onClick={handleClick}
+          className="h-12 rounded-full px-6 text-base shadow-lg"
         >
-          {/* Missing fields */}
-          {missing.length > 0 && (
-            <ul className="space-y-0.5">
-              {missing.map((m) => (
-                <li
-                  key={m}
-                  className="flex items-center gap-1.5 text-xs text-muted-foreground"
-                >
-                  <span className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/40" />
-                  {m}
-                </li>
-              ))}
-            </ul>
+          {mode === "create" ? (
+            <Send data-icon="inline-start" aria-hidden="true" />
+          ) : (
+            <Check data-icon="inline-start" aria-hidden="true" />
           )}
-
-          {/* Error */}
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
-
-          {/* Buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1"
-              onClick={onCancel}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              className="flex-1"
-              disabled={submitting || !isPublishable}
-              onClick={
-                mode === "create" ? handlePublishClick : () => onSubmit()
-              }
-            >
-              {submitting
-                ? mode === "create"
-                  ? "Creating…"
-                  : "Saving…"
-                : mode === "create"
-                  ? "Publish"
-                  : "Save"}
-            </Button>
-          </div>
-        </div>
+          {submitting
+            ? mode === "create"
+              ? "Publishing…"
+              : "Saving…"
+            : mode === "create"
+              ? "Publish"
+              : "Save"}
+        </Button>
       </div>
 
       {/* Publish overlay — create mode only */}
