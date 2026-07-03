@@ -446,14 +446,17 @@ export function DemoCard({
         {charityRow}
       </div>
 
-      {/* ── Mimicked pledge dialog ── */}
+      {/* ── Mimicked pledge dialog ──
+          Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
+          radius of its own — the card's overflow-hidden clips it to the card
+          shape (square top under the browser frame, rounded bottom). */}
       <AnimatePresence>
         {sheetOpen && (
           <motion.div
             key="scrim"
             {...scrimVariant}
             transition={prefersReducedMotion ? FAST : { duration: 0.25 }}
-            className="absolute inset-0 z-10 rounded-xl bg-foreground/15"
+            className="absolute inset-0 z-10 bg-black/50"
             aria-hidden="true"
           />
         )}
