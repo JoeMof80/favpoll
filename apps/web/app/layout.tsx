@@ -4,6 +4,7 @@ import { ClerkProvider } from "@/components/clerk-provider"
 import { ThemeProvider } from "@favpoll/ui"
 import { EditModeProvider } from "@/lib/edit-mode-context"
 import { Header } from "@/components/header"
+import { SiteFooterMount } from "@/components/site-footer-mount"
 import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
 
@@ -39,6 +40,7 @@ export default function RootLayout({
             <EditModeProvider>
               <Header />
               {children}
+              <SiteFooterMount />
             </EditModeProvider>
             <Toaster position="bottom-center" />
           </ThemeProvider>
