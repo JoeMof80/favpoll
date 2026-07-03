@@ -22,8 +22,6 @@ type Props = {
   variant?: "organiser" | "guest"
   /** When true, shows an informational notice that this is a public favpoll. */
   isListed?: boolean
-  /** Pre-fills the amount — set when the organiser staged a seed amount on the create form. */
-  initialAmount?: number
 }
 
 export function SeedFundModal({
@@ -32,11 +30,8 @@ export function SeedFundModal({
   onCancel,
   variant = "organiser",
   isListed,
-  initialAmount,
 }: Props) {
-  const [amount, setAmount] = useState(
-    initialAmount && initialAmount > 0 ? String(initialAmount) : ""
-  )
+  const [amount, setAmount] = useState("")
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)

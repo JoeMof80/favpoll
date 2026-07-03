@@ -18,7 +18,7 @@ export const FIELD_OVERLAY_PROPS = {
 
 /** Class string for the ghost edit-affordance button wrapper applied to every editable field. */
 export const EDIT_BTN =
-  "group relative block h-auto min-h-8 w-full whitespace-normal rounded-none p-0 text-left border-0 transition-colors hover:bg-secondary/40 focus-visible:bg-secondary/40 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:border-b after:[border-bottom-style:dotted] after:border-primary/20 hover:after:[border-bottom-style:solid] hover:after:border-primary/60 focus-visible:after:[border-bottom-style:solid] focus-visible:after:border-primary/60"
+  "group relative block h-auto min-h-8 w-full whitespace-normal rounded-none p-0 text-left border-0 hover:bg-transparent focus-visible:bg-transparent after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:border-b after:[border-bottom-style:dotted] after:border-primary/20 hover:after:[border-bottom-style:solid] hover:after:border-primary/60 focus-visible:after:[border-bottom-style:solid] focus-visible:after:border-primary/60"
 
 export function EditBadge({
   className,
