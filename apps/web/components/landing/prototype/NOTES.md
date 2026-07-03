@@ -100,9 +100,16 @@ It has since been evolved to **v2** with these decisions baked in:
 - **Venn labels 1.5×**: each baked label path wrapped in a scale transform
   around its own centroid (shared component — live landing benefits too).
 
+**v2.5 (2026-07-03): protagonist photos.** Founder-generated portraits
+(consistent warm editorial style) live in `apps/web/public/demo/` (800px
+JPEGs) and are wired into `scenes.ts` `photo_url` for five of six scenes.
+**james.jpg is still missing** (generation quota) — his scene falls back to
+initials; wire it the same way when generated. Also fixed the Alex & Jordan
+2019/2024 copy inconsistency and deleted the unreferenced copyrighted
+`public/mary-poppins.png`.
+
 Open questions before fold-in: final say on `stage`/`editorial` deletion;
 mobile treatment of the hero demo (currently hidden < md); whether the
-old two-column HeroDemoPanel retires entirely; protagonist photos for the
-six demo scenes (initials boxes are the weakest pixel); about page with
-register sections; footer should mount app-wide (root layout), not just
-on the landing page.
+old two-column HeroDemoPanel retires entirely; **james.jpg** (see above);
+about page with register sections; footer should mount app-wide (root
+layout), not just on the landing page.

@@ -84,7 +84,7 @@ export const SCENES: HeroScene[] = [
       context: "1945 - 2024",
       about:
         "A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved.",
-      photo_url: null,
+      photo_url: "/demo/belinda.jpg",
     },
     poll: {
       id: "demo-poll-0",
@@ -137,7 +137,7 @@ export const SCENES: HeroScene[] = [
       context: "Sweet Sixteen",
       about:
         "Poppy wants to celebrate with ice cream. She has strong opinions about the best flavour. All proceeds go to St Ormond Street, who took such good care of her little brother.",
-      photo_url: null,
+      photo_url: "/demo/poppy.jpg",
     },
     poll: {
       id: "demo-poll-1",
@@ -209,7 +209,7 @@ export const SCENES: HeroScene[] = [
       context: "After 35 years",
       about:
         "Retiring after thirty-five years in the school library. Fond of long walks any time of year but one season in particular.",
-      photo_url: null,
+      photo_url: "/demo/ros.jpg",
     },
     poll: {
       id: "demo-poll-2",
@@ -250,8 +250,8 @@ export const SCENES: HeroScene[] = [
       name: "Alex & Jordan",
       context: "Together since 2019",
       about:
-        "Newly engaged, and rarely apart since they met in 2024. They share a favourite animal that they know everything about.",
-      photo_url: null,
+        "Newly engaged, and rarely apart since they met in 2019. They share a favourite animal that they know everything about.",
+      photo_url: "/demo/alex-jordan.jpg",
     },
     poll: {
       id: "demo-poll-3",
@@ -326,7 +326,7 @@ export const SCENES: HeroScene[] = [
       context: "Moving on",
       about:
         "Dave is moving on after eight years at the company. He has strong opinions about biscuits and hopes you do too. Pledge your favourite to Comic Relief",
-      photo_url: null,
+      photo_url: "/demo/dave.jpg",
     },
     poll: {
       id: "demo-poll-4",
