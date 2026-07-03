@@ -1,6 +1,5 @@
 "use client"
 
-import { Lock } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
 import { RankingBar } from "@/components/ui/ranking-bar"
@@ -11,6 +10,7 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
+import { RevealLockPill, revealLockLabel } from "../reveal-lock"
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
@@ -175,17 +175,9 @@ export function PollSection({
               variant="ghost"
               onClick={onOpenPledgeDialog}
               aria-label={unlockAriaLabel}
-              className="absolute inset-0 z-10 h-auto w-full flex-col justify-start gap-0 rounded-none pt-6 hover:bg-transparent"
+              className="absolute inset-0 z-10 h-auto w-full items-center justify-center rounded-none hover:bg-transparent"
             >
-              <span className="flex max-w-60 flex-col items-center gap-2 rounded-xl bg-background/95 px-5 py-3 shadow-md backdrop-blur-sm">
-                <Lock
-                  className="h-4 w-4 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <span className="text-center text-sm font-medium whitespace-normal text-foreground">
-                  Pledge to see the reveal — and how the pledges are landing.
-                </span>
-              </span>
+              <RevealLockPill label={revealLockLabel(displayFirstName)} />
             </Button>
           )}
         </div>

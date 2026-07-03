@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Check, Lock } from "lucide-react"
+import { Check } from "lucide-react"
+import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,10 +21,6 @@ import type { HeroScene, Phase } from "./scenes"
 import { FAST } from "./variants"
 
 const RESULTS_SHOWN = 5
-
-// Mirrors the live favpoll page's lock-card copy verbatim.
-const LOCK_CARD_COPY =
-  "Pledge to see the reveal — and how the pledges are landing."
 
 // Mirrors CharityRow's GBP formatting (favpoll-card/charity-row.tsx).
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -409,12 +406,11 @@ export function DemoCard({
                 className="absolute inset-0 z-[1] flex items-center justify-center"
                 aria-hidden="true"
               >
-                <div className="flex max-w-[90%] flex-col items-center gap-2 rounded-xl border border-border bg-background/95 px-5 py-4 text-center shadow-sm">
-                  <Lock className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm leading-snug text-muted-foreground">
-                    {LOCK_CARD_COPY}
-                  </p>
-                </div>
+                <RevealLockPill
+                  label={revealLockLabel(
+                    scene.protagonist.name.split(/[\s&]+/)[0]
+                  )}
+                />
               </motion.div>
             )}
           </AnimatePresence>
