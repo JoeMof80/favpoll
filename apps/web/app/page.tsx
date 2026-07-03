@@ -102,7 +102,7 @@ export default async function HomePage() {
     total_raised: number
     subject: string | null
     cause_label: string | null
-    protagonist: { name: string }
+    protagonist: { name: string } | null // null for cause favpolls
     charities: { charity: import("@favpoll/types").Charity }[]
     favpoll_polls: RawPoll | null
   }

@@ -13,12 +13,14 @@ export type FavpollSummaryCardFavpoll = {
   id: string
   occasion_type: string | null
   category?: string | null
+  subject?: string | null
+  cause_label?: string | null
   opening_line: string
   closes_at: string
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
-  protagonist: { name: string }
+  protagonist: { name: string } | null // null for cause favpolls
   charities: { charity: Charity }[]
   poll: { topic: { title: string } | null } | null
 }
@@ -30,6 +32,11 @@ type Props = {
 
 export function FavpollSummaryCard({ favpoll, className }: Props) {
   const topicTitle = favpoll.poll?.topic?.title ?? null
+  // Cause favpolls have no protagonist row — the cause label is the name.
+  const displayName =
+    favpoll.subject === "cause"
+      ? (favpoll.cause_label ?? "")
+      : (favpoll.protagonist?.name ?? "")
   const perCharity =
     favpoll.charities.length > 0
       ? favpoll.total_raised / favpoll.charities.length
@@ -51,7 +58,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
           </Badge>
         )}
         <FavpollHeader
-          protagonist={{ name: favpoll.protagonist.name }}
+          protagonist={{ name: displayName }}
           eyebrow={
             favpoll.category
               ? favpoll.category.charAt(0).toUpperCase() +
