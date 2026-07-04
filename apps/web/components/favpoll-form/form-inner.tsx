@@ -235,6 +235,7 @@ export function FormInner({
   }
 
   const category = useWatch({ control: form.control, name: "category" })
+  const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
   const charityIds =
     useWatch({ control: form.control, name: "charities" }) ?? []
   const selectedTopics =
@@ -286,7 +287,11 @@ export function FormInner({
                 closesAt={closesAt}
                 onClosesAtChange={onClosesAtChange}
               />
-              <CharityBanner charities={displayCharities} totalRaised={0} />
+              <CharityBanner
+                charities={displayCharities}
+                totalRaised={0}
+                goalAmount={goalAmount ?? null}
+              />
               <GoalCard />
               <div className="pointer-events-none opacity-40">
                 <div className="rounded-lg border border-border bg-background px-5 py-4">
