@@ -50,11 +50,11 @@ describe("createPledge", () => {
     await expect(createPledge(input)).rejects.toThrow("Not authenticated")
   })
 
-  it("inserts pledge row with correct fee (3% of totalAmount)", async () => {
+  it("inserts pledge row with zero fee and the tip recorded separately", async () => {
     mock.queue({ id: "pledge-1" }) // pledge insert → single()
     mock.queue(null) // allocations insert → await
 
-    await createPledge(input)
+    await createPledge({ ...input, tipAmount: 1 })
 
     const pledgeInsert = mock
       .callsFor("pledges")
@@ -62,8 +62,9 @@ describe("createPledge", () => {
     expect(pledgeInsert.args[0]).toMatchObject({
       favpoll_poll_id: "poll-1",
       clerk_user_id: "user-1",
-      total_amount: 10,
-      fee: 0.3, // Math.round(10 * 0.03 * 100) / 100
+      total_amount: 10, // charity money only — tip never inflates it
+      fee: 0,
+      tip_amount: 1,
     })
   })
 
@@ -136,7 +137,7 @@ describe("createPledge", () => {
     await expect(createPledge(input)).rejects.toThrow("FK violation")
   })
 
-  it("calculates fee correctly for £25 pledge", async () => {
+  it("defaults tip_amount to 0 when no tip is passed", async () => {
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
@@ -145,8 +146,8 @@ describe("createPledge", () => {
     const pledgeInsert = mock
       .callsFor("pledges")
       .find((c) => c.method === "insert")!
-    // Math.round(25 * 0.03 * 100) / 100 = Math.round(75) / 100 = 0.75
-    expect(pledgeInsert.args[0].fee).toBe(0.75)
+    expect(pledgeInsert.args[0].fee).toBe(0)
+    expect(pledgeInsert.args[0].tip_amount).toBe(0)
   })
 })
 
@@ -176,7 +177,7 @@ describe("createGuestPledge", () => {
     )
   })
 
-  it("inserts pledge with clerk_user_id: null, a UUID guest_token, and fee", async () => {
+  it("inserts pledge with clerk_user_id: null, a UUID guest_token, zero fee", async () => {
     mock.queue(null) // no existing pledge (maybeSingle)
     mock.queue({ id: "pledge-1" }) // pledge insert (single)
     mock.queue(null) // allocations insert (await)
@@ -197,7 +198,7 @@ describe("createGuestPledge", () => {
     const row = pledgeInsert.args[0]
     expect(row.clerk_user_id).toBeNull()
     expect(row.guest_email).toBe("guest@example.com")
-    expect(row.fee).toBe(0.3)
+    expect(row.fee).toBe(0)
     // guest_token is a UUID
     expect(row.guest_token).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

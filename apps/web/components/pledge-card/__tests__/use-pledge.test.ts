@@ -88,6 +88,7 @@ const baseOptions = {
   pollSelections: {} as Record<string, string[]>,
   onPledgeAmountChange: vi.fn(),
   onPledgeSuccess: vi.fn(),
+  defaultTip: 0,
 }
 
 beforeEach(() => {
@@ -246,6 +247,67 @@ describe("usePledge — pledge amount validation", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // Fee & charge calculation
 // ─────────────────────────────────────────────────────────────────────────────
+
+describe("usePledge — optional contribution (tip)", () => {
+  it("defaults tipAmount to 1 when defaultTip is not passed", () => {
+    const { defaultTip: _omit, ...rest } = baseOptions
+    const { result } = renderHook(() => usePledge(rest))
+    expect(result.current.tipAmount).toBe(1)
+  })
+
+  it("respects defaultTip 0 (memorial register)", () => {
+    const { result } = renderHook(() => usePledge(baseOptions))
+    expect(result.current.tipAmount).toBe(0)
+  })
+
+  it("adds the tip to ownCharge and the breakdown once a pledge is entered", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, defaultTip: 1 })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
+    expect(result.current.ownCharge).toBe(11)
+    const tipLine = result.current.ownBreakdown!.lines.find(
+      (l) => l.label === "For favpoll"
+    )
+    expect(tipLine).toMatchObject({ amount: 1, hidden: false })
+  })
+
+  it("setTipAmount(0) removes the tip from charge and hides the line", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, defaultTip: 1 })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+      result.current.setTipAmount(0)
+    })
+    expect(result.current.ownCharge).toBe(10)
+    const tipLine = result.current.ownBreakdown!.lines.find(
+      (l) => l.label === "For favpoll"
+    )
+    expect(tipLine).toMatchObject({ hidden: true })
+  })
+
+  it("never touches the charity amount — total_amount stays the pledge", async () => {
+    const { result } = renderHook(() =>
+      usePledge({
+        ...baseOptions,
+        defaultTip: 2,
+        pollSelections: { "poll-1": ["red"] },
+      })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
+    expect(mockActions.createPledge).toHaveBeenCalledWith(
+      expect.objectContaining({ totalAmount: 10, tipAmount: 2 })
+    )
+  })
+})
 
 describe("usePledge — ownCharge", () => {
   it("ownCharge is 0 when no pledge amount", () => {

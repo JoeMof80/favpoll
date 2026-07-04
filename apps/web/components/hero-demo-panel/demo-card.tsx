@@ -190,6 +190,8 @@ export function DemoCard({
       fundBreakdown={null}
       favouriteBreakdown={[{ label: selected.label, amount: amt }]}
       toggleFund={() => {}}
+      tipAmount={0}
+      setTipAmount={() => {}}
       isListed={false}
     />
   )

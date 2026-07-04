@@ -31,6 +31,10 @@ export type UsePledgeOptions = {
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
   onPledgeSuccess?: (guestToken?: string) => void
+  /** Preselected optional contribution to favpoll (pounds); 0 = none.
+   *  Memorial favpolls pass 0 — the quietest ask for the most
+   *  sensitive register. */
+  defaultTip?: number
 }
 
 export function usePledge({
@@ -43,6 +47,7 @@ export function usePledge({
   pollSelections,
   onPledgeAmountChange,
   onPledgeSuccess,
+  defaultTip = 1,
 }: UsePledgeOptions) {
   const router = useRouter()
 
@@ -51,6 +56,7 @@ export function usePledge({
   const hasFund = pot !== null && available > 0 && !!clerkUserId
 
   const [pledgeAmount, setPledgeAmount] = useState("")
+  const [tipAmount, setTipAmount] = useState(defaultTip)
   const [topUpAmount, setTopUpAmount] = useState("")
   const [guestEmail, setGuestEmail] = useState("")
   const [useSharedFund, setUseSharedFund] = useState(false)
@@ -79,8 +85,11 @@ export function usePledge({
 
   const ownBase = isPledgeValid ? numericPledge : 0
   const ownTopUp = isTopUpValid ? numericTopUp : 0
-  // No platform fee — 100% of the pledge goes to charity (decided 2026-07)
-  const ownCharge = Math.round((ownBase + ownTopUp) * 100) / 100
+  // No platform fee — 100% of the pledge goes to charity (decided 2026-07).
+  // The optional contribution rides the same charge but is favpoll's, not
+  // the charity's: it lives in tip_amount, never total_amount.
+  const ownTip = ownBase > 0 ? tipAmount : 0
+  const ownCharge = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
 
   const fundBarPct =
     isPledgeValid && available > 0 ? numericPledge / available : 0
@@ -110,6 +119,11 @@ export function usePledge({
               amount: numericTopUp,
               hidden: !isTopUpValid,
             },
+            {
+              label: "For favpoll",
+              amount: ownTip,
+              hidden: ownTip <= 0,
+            },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }
@@ -138,6 +152,7 @@ export function usePledge({
         favpollPollId: pollWithItems.id,
         potAllocationId: userPotAllocation?.id ?? null,
         totalAmount: numericPledge,
+        tipAmount: ownTip,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -151,6 +166,7 @@ export function usePledge({
         favpollPollId: pollWithItems.id,
         guestEmail: email,
         totalAmount: numericPledge,
+        tipAmount: ownTip,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -236,6 +252,8 @@ export function usePledge({
     // setters
     updatePledgeAmount,
     setTopUpAmount,
+    tipAmount,
+    setTipAmount,
     setGuestEmail,
     toggleFund,
     setPledgeClientSecret,
