@@ -3,9 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
+  searchRegister,
   verifyCharityNumber,
+  type RegisterSearchResult,
   type VerificationStatus,
 } from "@/lib/charity-commission";
+
+/** Live search of the Register of Charities for the admin typeahead. */
+export async function searchCharityRegister(
+  query: string,
+): Promise<RegisterSearchResult[]> {
+  return searchRegister(query);
+}
 
 const VALID_MARKETS = ["en-GB"];
 

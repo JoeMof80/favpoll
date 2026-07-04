@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import type { Charity } from "@/lib/actions/charities";
 import {
   createCharity,
@@ -10,7 +10,9 @@ import {
   reactivateCharity,
   getCharityTopics,
   setCharityTopics,
+  searchCharityRegister,
 } from "@/lib/actions/charities";
+import type { RegisterSearchResult } from "@/lib/charity-commission";
 import type { AdminTopic } from "@/lib/actions/topics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,6 +115,93 @@ type CharityFormValues = {
   market: string;
 };
 
+// ─── Register typeahead ───────────────────────────────────────────────────────
+
+function RegisterSearch({
+  onPick,
+}: {
+  onPick: (result: RegisterSearchResult) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<RegisterSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 3) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+    let cancelled = false;
+    setSearching(true);
+    const timer = setTimeout(() => {
+      searchCharityRegister(q).then((rows) => {
+        if (cancelled) return;
+        setResults(rows);
+        setSearching(false);
+      });
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  const showEmpty =
+    !searching && query.trim().length >= 3 && results.length === 0;
+
+  return (
+    <div>
+      <label className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Search className="size-3" aria-hidden="true" />
+        Add from the Register of Charities
+      </label>
+      <Input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by charity name — fills name and number, pre-verified"
+        aria-label="Search the Register of Charities"
+      />
+      {(results.length > 0 || searching || showEmpty) && (
+        <div className="mt-1 rounded-lg border border-border bg-card p-1">
+          {searching && (
+            <p className="px-2 py-1.5 text-xs text-muted-foreground">
+              Searching the register…
+            </p>
+          )}
+          {showEmpty && (
+            <p className="px-2 py-1.5 text-xs text-muted-foreground">
+              No registered charities found — check the spelling or enter
+              details manually below.
+            </p>
+          )}
+          {!searching &&
+            results.map((r) => (
+              <Button
+                key={r.registeredNumber}
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between font-normal"
+                onClick={() => {
+                  onPick(r);
+                  setQuery("");
+                  setResults([]);
+                }}
+              >
+                <span className="truncate">{r.displayName}</span>
+                <span className="ml-2 shrink-0 text-xs text-muted-foreground">
+                  {r.registeredNumber}
+                </span>
+              </Button>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CharityFields({
   form,
   set,
@@ -121,39 +210,50 @@ function CharityFields({
   set: (field: keyof CharityFormValues, value: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <Field label="Name *">
-        <Input
-          value={form.name}
-          onChange={(e) => set("name", e.target.value)}
-          placeholder="Cancer Research UK"
-        />
-      </Field>
-      <Field label="Registered number">
-        <Input
-          value={form.registered_number}
-          onChange={(e) => set("registered_number", e.target.value)}
-          placeholder="1089464"
-        />
-      </Field>
-      <Field label="Description" className="sm:col-span-2">
-        <Textarea
-          value={form.description}
-          onChange={(e) => set("description", e.target.value)}
-          rows={2}
-          className="resize-none"
-        />
-      </Field>
-      <Field label="Logo URL">
-        <Input
-          value={form.logo_url}
-          onChange={(e) => set("logo_url", e.target.value)}
-          placeholder="https://…"
-        />
-      </Field>
-      <Field label="Market">
-        <MarketSelect value={form.market} onChange={(v) => set("market", v)} />
-      </Field>
+    <div className="space-y-3">
+      <RegisterSearch
+        onPick={(r) => {
+          set("name", r.displayName);
+          set("registered_number", r.registeredNumber);
+        }}
+      />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Field label="Name *">
+          <Input
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            placeholder="Cancer Research UK"
+          />
+        </Field>
+        <Field label="Registered number">
+          <Input
+            value={form.registered_number}
+            onChange={(e) => set("registered_number", e.target.value)}
+            placeholder="1089464"
+          />
+        </Field>
+        <Field label="Description" className="sm:col-span-2">
+          <Textarea
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+            rows={2}
+            className="resize-none"
+          />
+        </Field>
+        <Field label="Logo URL">
+          <Input
+            value={form.logo_url}
+            onChange={(e) => set("logo_url", e.target.value)}
+            placeholder="https://…"
+          />
+        </Field>
+        <Field label="Market">
+          <MarketSelect
+            value={form.market}
+            onChange={(v) => set("market", v)}
+          />
+        </Field>
+      </div>
     </div>
   );
 }

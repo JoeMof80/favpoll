@@ -76,3 +76,145 @@ export async function verifyCharityNumber(
     return { status: "error", registeredName: null };
   }
 }
+
+// ─── Register search (admin "Add from register" typeahead) ───────────────────
+
+export type RegisterSearchResult = {
+  registeredNumber: string;
+  /** The register's name, ALL CAPS as stored there. */
+  registeredName: string;
+  /** Suggested display name for the favpoll charity list. */
+  displayName: string;
+};
+
+type RegisterSearchRow = {
+  reg_charity_number: number;
+  charity_name: string;
+  reg_status: string;
+  group_subsid_suffix: number;
+};
+
+/**
+ * Title-case a register name (stored ALL CAPS) for use as a display-name
+ * suggestion. Tokens of up to 4 letters read as acronyms (RNLI, WWF, UK)
+ * unless they are common words (St, Fund, Age...). Only a suggestion --
+ * admin can always edit the result.
+ */
+const COMMON_SHORT_WORDS = new Set([
+  "a",
+  "age",
+  "aid",
+  "air",
+  "and",
+  "art",
+  "arts",
+  "at",
+  "band",
+  "bank",
+  "blue",
+  "boys",
+  "care",
+  "cats",
+  "city",
+  "club",
+  "de",
+  "dogs",
+  "du",
+  "east",
+  "farm",
+  "food",
+  "for",
+  "fund",
+  "gift",
+  "girl",
+  "good",
+  "hall",
+  "hand",
+  "help",
+  "home",
+  "hope",
+  "in",
+  "kids",
+  "land",
+  "life",
+  "link",
+  "love",
+  "mind",
+  "new",
+  "of",
+  "old",
+  "on",
+  "open",
+  "our",
+  "park",
+  "play",
+  "red",
+  "road",
+  "safe",
+  "save",
+  "sea",
+  "song",
+  "sons",
+  "st",
+  "star",
+  "team",
+  "the",
+  "to",
+  "town",
+  "tree",
+  "west",
+  "york",
+]);
+
+export function titleCaseCharityName(name: string): string {
+  return name.toLowerCase().replace(/[a-z']+/g, (w) => {
+    if (!COMMON_SHORT_WORDS.has(w)) {
+      const shortAcronym = w.length <= 4;
+      const vowelless = !/[aeiou]/.test(w); // NSPCC and friends
+      if (shortAcronym || vowelless) return w.toUpperCase();
+    }
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  });
+}
+
+/**
+ * Search the Register of Charities by name. Never throws — returns []
+ * on upstream failure; the caller falls back to manual entry. Only
+ * currently-registered main charities (suffix 0) are returned.
+ */
+export async function searchRegister(
+  query: string,
+): Promise<RegisterSearchResult[]> {
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
+  const trimmed = query.trim();
+  if (!apiKey || trimmed.length < 3) return [];
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/searchCharityName/${encodeURIComponent(trimmed)}`,
+      {
+        headers: { "Ocp-Apim-Subscription-Key": apiKey },
+        cache: "no-store",
+      },
+    );
+
+    if (res.status === 404) return []; // the API 404s on "no matches"
+    if (!res.ok) {
+      console.error(`[charity-commission] search failed: HTTP ${res.status}`);
+      return [];
+    }
+
+    const rows = (await res.json()) as RegisterSearchRow[];
+    return rows
+      .filter((r) => r.reg_status === "R" && r.group_subsid_suffix === 0)
+      .slice(0, 8)
+      .map((r) => ({
+        registeredNumber: String(r.reg_charity_number),
+        registeredName: r.charity_name,
+        displayName: titleCaseCharityName(r.charity_name),
+      }));
+  } catch (err) {
+    console.error("[charity-commission] search error:", err);
+    return [];
+  }
+}

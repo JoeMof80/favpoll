@@ -138,3 +138,117 @@ describe("verifyCharityNumber", () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 });
+
+// ─── searchRegister + titleCaseCharityName ────────────────────────────────────
+
+import { searchRegister, titleCaseCharityName } from "@/lib/charity-commission";
+
+describe("titleCaseCharityName", () => {
+  it("title-cases ordinary words", () => {
+    expect(titleCaseCharityName("HOSPICE UK")).toBe("Hospice UK");
+    expect(
+      titleCaseCharityName("THE ROYAL NATIONAL LIFEBOAT INSTITUTION"),
+    ).toBe("The Royal National Lifeboat Institution");
+  });
+
+  it("keeps vowel-less acronyms upper-case", () => {
+    expect(titleCaseCharityName("RNLI")).toBe("RNLI");
+    expect(titleCaseCharityName("NSPCC")).toBe("NSPCC");
+    expect(titleCaseCharityName("WWF - UK")).toBe("WWF - UK");
+  });
+
+  it("does not treat short common words as acronyms", () => {
+    expect(titleCaseCharityName("ST RICHARDS HOSPICE FOUNDATION")).toBe(
+      "St Richards Hospice Foundation",
+    );
+    expect(titleCaseCharityName("FRIENDS OF THE EARTH")).toBe(
+      "Friends Of The Earth",
+    );
+  });
+});
+
+describe("searchRegister", () => {
+  function searchRow(overrides: Record<string, unknown> = {}) {
+    return {
+      reg_charity_number: 1128267,
+      charity_name: "AGE UK",
+      reg_status: "R",
+      group_subsid_suffix: 0,
+      ...overrides,
+    };
+  }
+
+  it("returns mapped results for registered main charities", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [searchRow()],
+    });
+
+    const results = await searchRegister("age uk");
+
+    expect(results).toEqual([
+      {
+        registeredNumber: "1128267",
+        registeredName: "AGE UK",
+        displayName: "Age UK",
+      },
+    ]);
+    expect(mockFetch.mock.calls[0][0]).toContain("/searchCharityName/age%20uk");
+  });
+
+  it("filters out removed charities and group members", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [
+        searchRow(),
+        searchRow({ reg_charity_number: 2, reg_status: "RM" }),
+        searchRow({ reg_charity_number: 3, group_subsid_suffix: 1 }),
+      ],
+    });
+
+    const results = await searchRegister("age");
+
+    expect(results).toHaveLength(1);
+  });
+
+  it("caps results at 8", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () =>
+        Array.from({ length: 20 }, (_, i) =>
+          searchRow({ reg_charity_number: i + 1 }),
+        ),
+    });
+
+    const results = await searchRegister("charity");
+
+    expect(results).toHaveLength(8);
+  });
+
+  it("returns [] on 404 (the API's no-matches response)", async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 404 });
+
+    expect(await searchRegister("zzqxzzqx")).toEqual([]);
+  });
+
+  it("returns [] for short queries without calling the API", async () => {
+    expect(await searchRegister("ab")).toEqual([]);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("returns [] on upstream failure", async () => {
+    mockFetch.mockRejectedValue(new Error("network down"));
+
+    expect(await searchRegister("age uk")).toEqual([]);
+  });
+
+  it("returns [] when the API key is missing", async () => {
+    vi.stubEnv("CHARITY_COMMISSION_API_KEY", "");
+
+    expect(await searchRegister("age uk")).toEqual([]);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+});
