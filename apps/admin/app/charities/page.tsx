@@ -1,6 +1,6 @@
 import { getCharities } from "@/lib/actions/charities";
 import { getTopics } from "@/lib/actions/topics";
-import { CharityList, AddCharityForm } from "@/components/charity-list";
+import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
 
 const MARKETS = ["en-GB"];
 
@@ -54,11 +54,9 @@ export default async function CharitiesPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <CharityList charities={charities ?? []} allTopics={topics ?? []} />
+      <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
     </div>
   );
 }

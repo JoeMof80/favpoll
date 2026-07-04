@@ -2,7 +2,10 @@ import {
   getPendingContributions,
   getReviewedContributions,
 } from "@/lib/actions/contributions";
-import { ContributionRow } from "@/components/contribution-row";
+import {
+  PendingContributionsTable,
+  ReviewedContributionsTable,
+} from "@/components/contributions-table";
 
 export default async function ContributionsPage() {
   const [pending, reviewed] = await Promise.all([
@@ -28,20 +31,15 @@ export default async function ContributionsPage() {
           Pending ({pendingItems.length})
         </h2>
         {pending.error && (
-          <p className="text-sm text-red-600 dark:text-red-400">
-            {pending.error}
-          </p>
+          <p className="text-sm text-destructive">{pending.error}</p>
         )}
-        {pendingItems.length === 0 && !pending.error && (
+        {pendingItems.length === 0 && !pending.error ? (
           <p className="text-sm text-muted-foreground">
             No pending contributions.
           </p>
+        ) : (
+          <PendingContributionsTable items={pendingItems} />
         )}
-        <div className="space-y-3">
-          {pendingItems.map((item) => (
-            <ContributionRow key={item.id} item={item} />
-          ))}
-        </div>
       </section>
 
       {/* Accepted */}
@@ -52,11 +50,7 @@ export default async function ContributionsPage() {
         {acceptedItems.length === 0 ? (
           <p className="text-sm text-muted-foreground">None yet.</p>
         ) : (
-          <div className="space-y-3">
-            {acceptedItems.map((item) => (
-              <ContributionRow key={item.id} item={item} />
-            ))}
-          </div>
+          <ReviewedContributionsTable items={acceptedItems} />
         )}
       </section>
 
@@ -68,11 +62,7 @@ export default async function ContributionsPage() {
         {rejectedItems.length === 0 ? (
           <p className="text-sm text-muted-foreground">None yet.</p>
         ) : (
-          <div className="space-y-3">
-            {rejectedItems.map((item) => (
-              <ContributionRow key={item.id} item={item} />
-            ))}
-          </div>
+          <ReviewedContributionsTable items={rejectedItems} />
         )}
       </section>
     </div>

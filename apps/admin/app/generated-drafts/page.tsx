@@ -2,7 +2,7 @@ import {
   getGeneratedDrafts,
   type DraftStatus,
 } from "@/lib/actions/generated-drafts";
-import { DraftRow } from "@/components/draft-row";
+import { DraftsTable } from "@/components/drafts-table";
 import { cn } from "@/lib/utils";
 
 const STATUS_OPTIONS: { value: DraftStatus; label: string }[] = [
@@ -53,19 +53,13 @@ export default async function GeneratedDraftsPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {drafts.length === 0 && !error && (
         <p className="text-sm text-muted-foreground">No {filter} drafts.</p>
       )}
 
-      <div className="space-y-3">
-        {drafts.map((draft) => (
-          <DraftRow key={draft.id} draft={draft} />
-        ))}
-      </div>
+      {drafts.length > 0 && <DraftsTable drafts={drafts} />}
     </div>
   );
 }

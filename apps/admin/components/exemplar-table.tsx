@@ -3,6 +3,15 @@
 import { useTransition } from "react";
 import { setExemplar } from "@/lib/actions/exemplars";
 import type { ExemplarFavpoll } from "@/lib/actions/exemplars";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type Props = {
   favpolls: ExemplarFavpoll[];
@@ -19,60 +28,54 @@ export function ExemplarTable({ favpolls }: Props) {
 
   if (favpolls.length === 0) {
     return (
-      <p className="text-sm text-neutral-500">No closed favpolls found.</p>
+      <p className="text-sm text-muted-foreground">No closed favpolls found.</p>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
-            <th className="pb-2 pr-4 font-medium">Name</th>
-            <th className="pb-2 pr-4 font-medium">Occasion</th>
-            <th className="pb-2 pr-4 font-medium">Category</th>
-            <th className="pb-2 pr-4 font-medium">Closed</th>
-            <th className="pb-2 font-medium">Exemplar</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="rounded-lg border border-border">
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead>Name</TableHead>
+            <TableHead>Occasion</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Closed</TableHead>
+            <TableHead className="text-right">Exemplar</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {favpolls.map((ev) => (
-            <tr
-              key={ev.id}
-              className="border-b border-neutral-100 last:border-0"
-            >
-              <td className="py-2 pr-4 font-medium text-neutral-900">
+            <TableRow key={ev.id}>
+              <TableCell className="font-medium text-foreground">
                 {ev.display_name ?? "—"}
-              </td>
-              <td className="py-2 pr-4 text-neutral-600">
+              </TableCell>
+              <TableCell className="text-muted-foreground">
                 {ev.occasion_type ?? ev.opening_line ?? "—"}
-              </td>
-              <td className="py-2 pr-4 text-neutral-500">
+              </TableCell>
+              <TableCell className="text-muted-foreground">
                 {ev.category ?? "—"}
-              </td>
-              <td className="py-2 pr-4 text-neutral-400">
+              </TableCell>
+              <TableCell className="text-muted-foreground">
                 {ev.closed_at
                   ? new Date(ev.closed_at).toLocaleDateString("en-GB")
                   : "—"}
-              </td>
-              <td className="py-2">
-                <button
+              </TableCell>
+              <TableCell className="text-right">
+                <Button
                   type="button"
+                  size="xs"
+                  variant={ev.is_exemplar ? "secondary" : "ghost"}
                   disabled={isPending}
                   onClick={() => toggle(ev.id, ev.is_exemplar)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    ev.is_exemplar
-                      ? "bg-secondary text-secondary-foreground hover:bg-accent"
-                      : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
-                  }`}
                 >
                   {ev.is_exemplar ? "Exemplar ✓" : "Set exemplar"}
-                </button>
-              </td>
-            </tr>
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

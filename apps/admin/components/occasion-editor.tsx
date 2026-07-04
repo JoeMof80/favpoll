@@ -8,6 +8,8 @@ import {
   type RegisterKey,
 } from "@/lib/occasions";
 import { updatePlaceholder } from "@/lib/actions/placeholders";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Single register row
@@ -48,68 +50,64 @@ function RegisterRow({
   }
 
   return (
-    <div className="border border-neutral-200 rounded-lg p-5 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-neutral-900">
-            {REGISTER_LABELS[register]}
-          </h3>
-          <p className="text-xs text-neutral-400 font-mono mt-0.5">
-            {register}
-          </p>
-        </div>
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
+      <div>
+        <h3 className="text-sm font-medium text-foreground">
+          {REGISTER_LABELS[register]}
+        </h3>
+        <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+          {register}
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
+        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           About
         </label>
-        <textarea
+        <Textarea
           rows={4}
           value={about}
           onChange={(e) => {
             setAbout(e.target.value);
             setStatus("idle");
           }}
-          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           placeholder="Placeholder text shown in the protagonist about field…"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
+        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Reveal
         </label>
-        <textarea
+        <Textarea
           rows={3}
           value={reveal}
           onChange={(e) => {
             setReveal(e.target.value);
             setStatus("idle");
           }}
-          className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           placeholder="Placeholder text shown in the poll reveal field…"
         />
       </div>
 
       <div className="flex items-center gap-3">
-        <button
+        <Button
           type="button"
-          onClick={handleSave}
+          size="sm"
           disabled={isPending}
-          className="inline-flex items-center rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          onClick={handleSave}
         >
           {status === "saving"
             ? "Saving…"
             : status === "saved"
               ? "Saved"
               : "Save"}
-        </button>
+        </Button>
         {status === "saved" && (
-          <span className="text-xs text-green-600">Changes saved</span>
+          <span className="text-xs text-success">Changes saved</span>
         )}
         {status === "error" && (
-          <span className="text-xs text-red-600">{errorMsg}</span>
+          <span className="text-xs text-destructive">{errorMsg}</span>
         )}
       </div>
     </div>
