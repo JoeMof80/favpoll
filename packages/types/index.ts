@@ -13,6 +13,16 @@ export type Charity = {
   description: string | null;
   logo_url: string | null;
   registered_number: string | null;
+  /** Charity Commission check, written by the admin app; null = never checked */
+  verification_status?:
+    | "verified"
+    | "name_mismatch"
+    | "not_found"
+    | "removed"
+    | "error"
+    | null;
+  verified_name?: string | null;
+  verified_at?: string | null;
   created_at: string;
 };
 

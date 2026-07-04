@@ -40,6 +40,14 @@ export function makeSupabaseMock() {
         rec("is", a);
         return b;
       },
+      not: (...a: any[]) => {
+        rec("not", a);
+        return b;
+      },
+      or: (...a: any[]) => {
+        rec("or", a);
+        return b;
+      },
       ilike: (...a: any[]) => {
         rec("ilike", a);
         return b;

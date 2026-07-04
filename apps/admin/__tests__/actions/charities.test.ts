@@ -4,6 +4,11 @@ import { makeSupabaseMock } from "@/tests/mocks/supabase-admin";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
+const mockVerify = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/charity-commission", () => ({
+  verifyCharityNumber: mockVerify,
+}));
+
 let mock = makeSupabaseMock();
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
@@ -20,6 +25,11 @@ import {
 
 beforeEach(() => {
   mock = makeSupabaseMock();
+  mockVerify.mockReset();
+  mockVerify.mockResolvedValue({
+    status: "verified",
+    registeredName: "AGE UK",
+  });
 });
 
 const makeCharity = (overrides: Record<string, unknown> = {}) => ({
@@ -133,6 +143,63 @@ describe("createCharity", () => {
 
     expect(error).toBe("insert failed");
   });
+
+  it("verifies against the Charity Commission when a number is given", async () => {
+    mock.queue(null); // insert
+
+    const { error } = await createCharity({
+      name: "Age UK",
+      registered_number: "1128267",
+      market: "en-GB",
+    });
+
+    expect(error).toBeNull();
+    expect(mockVerify).toHaveBeenCalledWith("1128267", "Age UK");
+    const insertCall = mock
+      .callsFor("charities")
+      .find((c) => c.method === "insert")!;
+    expect(insertCall.args[0]).toMatchObject({
+      verification_status: "verified",
+      verified_name: "AGE UK",
+      verified_at: expect.any(String),
+    });
+  });
+
+  it("does not call the Charity Commission without a number", async () => {
+    mock.queue(null); // insert
+
+    await createCharity({ name: "Macmillan", market: "en-GB" });
+
+    expect(mockVerify).not.toHaveBeenCalled();
+    const insertCall = mock
+      .callsFor("charities")
+      .find((c) => c.method === "insert")!;
+    expect(insertCall.args[0]).toMatchObject({
+      verification_status: null,
+      verified_name: null,
+      verified_at: null,
+    });
+  });
+
+  it("stores the error status when verification fails", async () => {
+    mockVerify.mockResolvedValue({ status: "error", registeredName: null });
+    mock.queue(null); // insert
+
+    const { error } = await createCharity({
+      name: "Age UK",
+      registered_number: "1128267",
+      market: "en-GB",
+    });
+
+    expect(error).toBeNull();
+    const insertCall = mock
+      .callsFor("charities")
+      .find((c) => c.method === "insert")!;
+    expect(insertCall.args[0]).toMatchObject({
+      verification_status: "error",
+      verified_name: null,
+    });
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -174,6 +241,63 @@ describe("updateCharity", () => {
     const { error } = await updateCharity("charity-1", { name: "Valid Name" });
 
     expect(error).toBe("update failed");
+  });
+
+  it("re-verifies when the registered number changes", async () => {
+    mock.queue(null); // update
+
+    const { error } = await updateCharity("charity-1", {
+      name: "Age UK",
+      registered_number: "1128267",
+    });
+
+    expect(error).toBeNull();
+    expect(mockVerify).toHaveBeenCalledWith("1128267", "Age UK");
+    const updateCall = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(updateCall.args[0]).toMatchObject({
+      registered_number: "1128267",
+      verification_status: "verified",
+      verified_name: "AGE UK",
+    });
+  });
+
+  it("fetches the stored name when re-verifying without a name in the update", async () => {
+    mock.queue({ name: "Age UK" }); // select existing name
+    mock.queue(null); // update
+
+    await updateCharity("charity-1", { registered_number: "1128267" });
+
+    expect(mockVerify).toHaveBeenCalledWith("1128267", "Age UK");
+  });
+
+  it("clears verification when the number is removed", async () => {
+    mock.queue(null); // update
+
+    const { error } = await updateCharity("charity-1", {
+      registered_number: "",
+    });
+
+    expect(error).toBeNull();
+    expect(mockVerify).not.toHaveBeenCalled();
+    const updateCall = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(updateCall.args[0]).toMatchObject({
+      registered_number: null,
+      verification_status: null,
+      verified_name: null,
+      verified_at: null,
+    });
+  });
+
+  it("does not re-verify when the number is not part of the update", async () => {
+    mock.queue(null); // update
+
+    await updateCharity("charity-1", { name: "Updated Name" });
+
+    expect(mockVerify).not.toHaveBeenCalled();
   });
 });
 

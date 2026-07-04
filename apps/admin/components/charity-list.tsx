@@ -36,6 +36,58 @@ function MarketBadge({ market }: { market: string }) {
   );
 }
 
+const VERIFICATION_BADGES: Record<
+  string,
+  { label: string; className: string }
+> = {
+  verified: {
+    label: "Verified",
+    className:
+      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  },
+  name_mismatch: {
+    label: "Name mismatch",
+    className:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+  },
+  not_found: {
+    label: "Not on register",
+    className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  },
+  removed: {
+    label: "Removed from register",
+    className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  },
+  error: {
+    label: "Check failed",
+    className: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+  },
+};
+
+function VerificationBadge({
+  status,
+  verifiedName,
+}: {
+  status: string | null;
+  verifiedName: string | null;
+}) {
+  if (!status) return null;
+  const badge = VERIFICATION_BADGES[status];
+  if (!badge) return null;
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}
+      title={
+        status === "name_mismatch" && verifiedName
+          ? `Register name: ${verifiedName}`
+          : undefined
+      }
+    >
+      {badge.label}
+    </span>
+  );
+}
+
 // ─── Add charity form ─────────────────────────────────────────────────────────
 
 export function AddCharityForm() {
@@ -291,6 +343,10 @@ function CharityRow({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <VerificationBadge
+            status={charity.verification_status}
+            verifiedName={charity.verified_name}
+          />
           <MarketBadge market={charity.market} />
           <ActiveBadge active={charity.is_active} />
         </div>

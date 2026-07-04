@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  verifyCharityNumber,
+  type VerificationStatus,
+} from "@/lib/charity-commission";
 
 const VALID_MARKETS = ["en-GB"];
 
@@ -11,10 +15,37 @@ export type Charity = {
   description: string | null;
   logo_url: string | null;
   registered_number: string | null;
+  verification_status: VerificationStatus | null;
+  verified_name: string | null;
+  verified_at: string | null;
   is_active: boolean;
   market: string;
   created_at: string;
 };
+
+/** Charity Commission fields for an insert/update, from a (name, number) pair. */
+async function verificationFields(
+  name: string,
+  registeredNumber: string | null,
+): Promise<{
+  verification_status: VerificationStatus | null;
+  verified_name: string | null;
+  verified_at: string | null;
+}> {
+  if (!registeredNumber) {
+    return {
+      verification_status: null,
+      verified_name: null,
+      verified_at: null,
+    };
+  }
+  const result = await verifyCharityNumber(registeredNumber, name);
+  return {
+    verification_status: result.status,
+    verified_name: result.registeredName,
+    verified_at: new Date().toISOString(),
+  };
+}
 
 export async function getCharities(
   market?: string,
@@ -24,7 +55,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, registered_number, is_active, market, created_at",
+      "id, name, description, logo_url, registered_number, verification_status, verified_name, verified_at, is_active, market, created_at",
     )
     .order("name", { ascending: true });
 
@@ -54,13 +85,17 @@ export async function createCharity(input: {
 
   const supabase = createAdminClient();
 
+  const name = input.name.trim();
+  const registeredNumber = input.registered_number?.trim() || null;
+
   const { error } = await supabase.from("charities").insert({
-    name: input.name.trim(),
+    name,
     description: input.description?.trim() || null,
-    registered_number: input.registered_number?.trim() || null,
+    registered_number: registeredNumber,
     logo_url: input.logo_url?.trim() || null,
     market: input.market,
     is_active: true,
+    ...(await verificationFields(name, registeredNumber)),
   });
 
   if (error) return { error: error.message };
@@ -94,6 +129,25 @@ export async function updateCharity(
   if (data.market !== undefined) updates.market = data.market;
 
   const supabase = createAdminClient();
+
+  // Re-verify against the Charity Commission whenever the number changes.
+  // The name for the mismatch check comes from this update or, failing
+  // that, the stored row.
+  if (data.registered_number !== undefined) {
+    let name = data.name?.trim();
+    if (!name && updates.registered_number) {
+      const { data: existing } = await supabase
+        .from("charities")
+        .select("name")
+        .eq("id", id)
+        .single();
+      name = (existing as { name: string } | null)?.name ?? "";
+    }
+    Object.assign(
+      updates,
+      await verificationFields(name ?? "", updates.registered_number),
+    );
+  }
 
   const { error } = await supabase
     .from("charities")

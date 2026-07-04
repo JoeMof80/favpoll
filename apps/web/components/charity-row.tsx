@@ -1,3 +1,4 @@
+import { BadgeCheck } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
@@ -40,8 +41,15 @@ export function CharityRow({ charity, amountRaised, size = "lg" }: Props) {
           {charity.name}
         </p>
         {charity.registered_number && size === "lg" && (
-          <p className="text-xs text-muted-foreground">
+          <p className="flex items-center gap-1 text-xs text-muted-foreground">
             Charity no. {charity.registered_number}
+            {charity.verification_status === "verified" && (
+              <BadgeCheck
+                className="size-3.5 shrink-0 text-primary"
+                role="img"
+                aria-label="Verified with the Charity Commission"
+              />
+            )}
           </p>
         )}
       </div>
