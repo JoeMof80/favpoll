@@ -11,6 +11,15 @@ type FavouriteBreakdownLine = { label: string; amount: number }
 
 const PRESETS = [5, 10, 20, 50]
 
+// Optional contribution to favpoll — flat amounts, never percentages
+// (pledges are small; percentage prompts read absurd at £5).
+const TIP_OPTIONS = [
+  { value: 0, label: "None" },
+  { value: 0.5, label: "50p" },
+  { value: 1, label: "£1" },
+  { value: 2, label: "£2" },
+]
+
 type HeaderProps = {
   pledgeAmount: string
   updatePledgeAmount: (v: string) => void
@@ -109,6 +118,8 @@ type Props = {
   } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
   toggleFund: () => void
+  tipAmount: number
+  setTipAmount: (v: number) => void
   isListed?: boolean
 }
 
@@ -121,6 +132,8 @@ export function StepAmount({
   fundBreakdown,
   favouriteBreakdown,
   toggleFund,
+  tipAmount,
+  setTipAmount,
   isListed,
 }: Props) {
   return (
@@ -187,6 +200,38 @@ export function StepAmount({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {!useSharedFund && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                For favpoll
+              </p>
+              <div
+                className="flex gap-2"
+                role="radiogroup"
+                aria-label="Optional contribution to favpoll"
+              >
+                {TIP_OPTIONS.map(({ value, label }) => (
+                  <Button
+                    key={value}
+                    type="button"
+                    size="sm"
+                    role="radio"
+                    aria-checked={tipAmount === value}
+                    variant={tipAmount === value ? "secondary" : "ghost"}
+                    className="flex-1"
+                    onClick={() => setTipAmount(value)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Optional — nothing is taken from your pledge. Contributions are
+                what keep favpoll running.
+              </p>
             </div>
           )}
 

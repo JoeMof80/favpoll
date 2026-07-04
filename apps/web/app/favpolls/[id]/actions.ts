@@ -13,16 +13,15 @@ type CreatePledgeInput = {
   favpollPollId: string
   potAllocationId: string | null
   totalAmount: number
+  /** Optional contribution to favpoll (pounds) — never charity money */
+  tipAmount?: number
   allocations: PledgeAllocationInput[]
 }
-
-const FEE_RATE = 0.03
 
 export async function createPledge(input: CreatePledgeInput) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const fee = Math.round(input.totalAmount * FEE_RATE * 100) / 100
   const supabase = createAdminClient()
 
   const { data: pledge, error: pledgeErr } = await supabase
@@ -32,7 +31,8 @@ export async function createPledge(input: CreatePledgeInput) {
       clerk_user_id: userId,
       pot_allocation_id: input.potAllocationId,
       total_amount: input.totalAmount,
-      fee,
+      fee: 0,
+      tip_amount: input.tipAmount ?? 0,
     })
     .select("id")
     .single()
@@ -57,13 +57,14 @@ type CreateGuestPledgeInput = {
   favpollPollId: string
   guestEmail: string
   totalAmount: number
+  /** Optional contribution to favpoll (pounds) — never charity money */
+  tipAmount?: number
   allocations: PledgeAllocationInput[]
 }
 
 export async function createGuestPledge(input: CreateGuestPledgeInput) {
   if (!input.guestEmail) throw new Error("Email is required")
 
-  const fee = Math.round(input.totalAmount * FEE_RATE * 100) / 100
   const supabase = createAdminClient()
 
   // Check for existing active pledge from same email on same poll
@@ -92,7 +93,8 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       guest_token,
       pot_allocation_id: null,
       total_amount: input.totalAmount,
-      fee,
+      fee: 0,
+      tip_amount: input.tipAmount ?? 0,
     })
     .select("id")
     .single()
