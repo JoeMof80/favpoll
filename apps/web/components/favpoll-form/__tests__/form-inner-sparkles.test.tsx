@@ -14,7 +14,7 @@ vi.mock("../editable-poll-area", () => ({
   EditablePollArea: () => <div data-testid="editable-poll-area" />,
 }))
 vi.mock("../editable-countdown", () => ({ EditableCountdown: () => null }))
-vi.mock("../goal-card", () => ({ GoalCard: () => null }))
+vi.mock("../goal-overlay", () => ({ GoalOverlay: () => null }))
 vi.mock("@/components/charity-banner", () => ({ CharityBanner: () => null }))
 vi.mock("sonner", () => ({ toast: { error: vi.fn() } }))
 vi.mock("@/lib/actions/generate-draft", () => ({
