@@ -62,8 +62,8 @@ This is not a "pay to unlock" mechanic. Frame it as something waiting for them, 
 **The dual purpose:**
 favpoll is genuinely both things simultaneously — a fundraising platform and a data project. Neither is a pretence. In user-facing copy, lead with whichever is more relevant to the audience. For organisers and guests: fundraising and experience. For press or investors: the data story.
 
-**Fee model:**
-5% platform fee, deducted before disbursement. 95% reaches the charity. Stripe processes payments. Fee always shown to donors before confirmation. Never hide it, never apologise for it — frame it as what makes the platform sustainable.
+**Fee model (decided July 2026 — replaces the earlier 5% fee):**
+favpoll charges no platform fee. 100% of every pledge reaches the charity; Stripe processes payments. favpoll's costs are never taken from donations — the platform is sustained by optional guest contributions and, in future, physical stationery and partner services. State the 0% plainly and proudly; never frame the optional contribution apologetically — it is what keeps favpoll running.
 
 **Maximum 3 charities per favpoll.** Proceeds split equally.
 
@@ -293,8 +293,10 @@ When writing for the platform generally: acknowledge the full range without lead
 
 Always transparent, never apologetic:
 
-✓ "A 5% platform fee covers favpoll's costs. The remaining 95% reaches your chosen charity in full."
-✗ "We take a small fee to keep the lights on." (too casual)
+✓ "favpoll takes no fee from donations. 100% of every pledge reaches your chosen charity in full."
+✓ "favpoll is supported by optional contributions — never by your pledge."
+✗ "We take a small fee to keep the lights on." (there is no fee; never imply one)
+✗ "100% goes to charity!!" (no exclamation marks, no hard sell — state it quietly)
 
 ---
 

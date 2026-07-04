@@ -40,7 +40,7 @@ This is a new kind of fundraising moment that no other platform offers.
 
 ## Fees and compliance
 
-**Platform fee:** 5% of each donation, deducted before disbursement. The remaining 95% reaches your charity in full. Donors are shown the fee clearly before confirming their pledge — nothing is hidden.
+**Platform fee:** none. 100% of each donation reaches your charity — favpoll deducts nothing. favpoll is sustained by optional contributions guests choose to make to the platform, separately from their pledge.
 
 **Payment processing:** handled by Stripe, a PCI-compliant payment provider used by thousands of charities worldwide. Card data never touches favpoll's servers.
 

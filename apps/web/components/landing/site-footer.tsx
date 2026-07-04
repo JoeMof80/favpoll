@@ -79,7 +79,7 @@ export function SiteFooter() {
                 Where the money goes
               </Link>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                A 5% platform fee covers favpoll's costs. The remaining 95%
+                favpoll takes no fee from donations. 100% of every pledge
                 reaches your chosen charity in full.
               </p>
             </div>

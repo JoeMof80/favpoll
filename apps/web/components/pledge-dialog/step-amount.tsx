@@ -70,8 +70,8 @@ export function StepAmountHeader({
         <div className="w-full space-y-1.5">
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
-              Processed securely by Stripe. A small platform fee is included in
-              your total.
+              Processed securely by Stripe. favpoll takes no fee — 100% of your
+              pledge goes to charity.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (

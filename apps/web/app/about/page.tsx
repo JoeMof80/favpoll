@@ -207,14 +207,14 @@ export default function AboutPage() {
               Where the money goes
             </SectionEyebrow>
             <h2 className="mb-3 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              95% reaches your chosen charity.
+              100% reaches your chosen charity.
             </h2>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-              A 5% platform fee covers favpoll's costs. The remaining 95%
-              reaches your chosen charity in full, processed directly through
-              Stripe. You choose up to three charities per favpoll — the pledged
-              total is split equally between them — and the fee is always shown
-              to guests before they confirm.
+              favpoll takes no fee from donations. 100% of every pledge reaches
+              your chosen charity, processed securely through Stripe — favpoll's
+              own costs are never taken from what guests give. You choose up to
+              three charities per favpoll, and the pledged total is split
+              equally between them.
             </p>
           </FadeIn>
         </section>
