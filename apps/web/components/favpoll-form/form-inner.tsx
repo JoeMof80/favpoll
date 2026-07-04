@@ -8,7 +8,7 @@ import { getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
-import { GoalCard } from "./goal-card"
+import { GoalOverlay } from "./goal-overlay"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
@@ -68,6 +68,7 @@ export function FormInner({
   onClosesAtChange,
 }: FormInnerProps) {
   const [isGenerating, setIsGenerating] = useState(false)
+  const [goalOpen, setGoalOpen] = useState(false)
   const lastGeneratedOpeningLine = useRef<string | null>(null)
   const lastGeneratedName = useRef<string | null>(null)
   const lastGeneratedContext = useRef<string | null>(null)
@@ -291,8 +292,9 @@ export function FormInner({
                 charities={displayCharities}
                 totalRaised={0}
                 goalAmount={goalAmount ?? null}
+                onEditGoal={() => setGoalOpen(true)}
               />
-              <GoalCard />
+              <GoalOverlay open={goalOpen} onOpenChange={setGoalOpen} />
               <div className="pointer-events-none opacity-40">
                 <div className="rounded-lg border border-border bg-background px-5 py-4">
                   <p className="mt-1 text-sm text-muted-foreground">

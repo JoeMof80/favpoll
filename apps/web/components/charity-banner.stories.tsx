@@ -71,3 +71,28 @@ export const NoRaised: Story = {
     totalRaised: 0,
   },
 }
+
+export const WithGoal: Story = {
+  args: {
+    charities: [ageUK],
+    totalRaised: 320,
+    goalAmount: 500,
+  },
+}
+
+export const EditableNoGoal: Story = {
+  args: {
+    charities: [ageUK],
+    totalRaised: 0,
+    onEditGoal: () => {},
+  },
+}
+
+export const EditableWithGoal: Story = {
+  args: {
+    charities: [ageUK],
+    totalRaised: 320,
+    goalAmount: 500,
+    onEditGoal: () => {},
+  },
+}

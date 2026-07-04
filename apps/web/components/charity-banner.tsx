@@ -1,4 +1,6 @@
+import { Pencil, Target } from "lucide-react"
 import type { Charity } from "@favpoll/types"
+import { Button } from "@/components/ui/button"
 import { CharityRow } from "./charity-row"
 
 type Props = {
@@ -6,6 +8,12 @@ type Props = {
   totalRaised: number
   /** Optional pledge goal in pounds — renders an understated progress bar. */
   goalAmount?: number | null
+  /**
+   * Organiser form only: makes the goal editable in place — a "Set a goal"
+   * button when unset, a pencil beside the progress caption when set. The
+   * guest page omits this and the banner stays read-only.
+   */
+  onEditGoal?: () => void
 }
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -14,7 +22,12 @@ const GBP = new Intl.NumberFormat("en-GB", {
   minimumFractionDigits: 0,
 })
 
-export function CharityBanner({ charities, totalRaised, goalAmount }: Props) {
+export function CharityBanner({
+  charities,
+  totalRaised,
+  goalAmount,
+  onEditGoal,
+}: Props) {
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
   return (
@@ -32,10 +45,22 @@ export function CharityBanner({ charities, totalRaised, goalAmount }: Props) {
         <p className="text-lg font-medium text-primary">
           {GBP.format(totalRaised)}
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
           {goalAmount
             ? `raised of the ${GBP.format(goalAmount)} goal`
             : "raised so far"}
+          {goalAmount && onEditGoal ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Edit the pledge goal"
+              onClick={onEditGoal}
+            >
+              <Pencil />
+            </Button>
+          ) : null}
         </p>
         {goalAmount ? (
           <div
@@ -53,6 +78,18 @@ export function CharityBanner({ charities, totalRaised, goalAmount }: Props) {
               }}
             />
           </div>
+        ) : null}
+        {!goalAmount && onEditGoal ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-2 flex w-full"
+            onClick={onEditGoal}
+          >
+            <Target data-icon="inline-start" aria-hidden="true" />
+            Set a goal
+          </Button>
         ) : null}
       </div>
     </div>
