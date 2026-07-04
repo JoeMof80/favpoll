@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/verify-charities",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

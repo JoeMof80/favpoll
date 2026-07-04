@@ -50,6 +50,18 @@ export const NoAmount: Story = {
   },
 }
 
+export const Verified: Story = {
+  args: {
+    charity: {
+      ...ageUK,
+      verification_status: "verified",
+      verified_name: "AGE UK",
+      verified_at: "2026-07-04T00:00:00Z",
+    },
+    amountRaised: 750,
+  },
+}
+
 export const Large: Story = {
   args: { charity: ageUK, amountRaised: 750 },
   render: () => (
