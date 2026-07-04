@@ -213,11 +213,11 @@ describe("OrganizerCard", () => {
   })
 
   describe("copy display link", () => {
-    it("calls clipboard.writeText with the display URL", () => {
+    it("calls clipboard.writeText with the live display URL", () => {
       render(<OrganizerCard favpoll={makeFavpoll()} />)
       fireEvent.click(screen.getByTestId("copy-display-button"))
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining("/favpolls/fp-1/display")
+        expect.stringContaining("/favpolls/fp-1/live")
       )
     })
   })

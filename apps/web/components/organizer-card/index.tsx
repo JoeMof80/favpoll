@@ -42,8 +42,8 @@ export function OrganizerCard({ favpoll }: Props) {
     ? `${baseUrl}/favpolls/${favpoll.id}`
     : `/favpolls/${favpoll.id}`
   const displayUrl = baseUrl
-    ? `${baseUrl}/favpolls/${favpoll.id}/display`
-    : `/favpolls/${favpoll.id}/display`
+    ? `${baseUrl}/favpolls/${favpoll.id}/live`
+    : `/favpolls/${favpoll.id}/live`
 
   const topicTitle = favpoll.poll?.topic?.title
   const protagonistName =
