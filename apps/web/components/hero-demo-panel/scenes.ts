@@ -398,7 +398,7 @@ export const SCENES: HeroScene[] = [
       context: "Class of 2026",
       about:
         "The first in his family to go to university, making them proud. There's a film he watches again and again. The Prince's Trust helped James on his way, so let's help return the favour.",
-      photo_url: null,
+      photo_url: "/demo/james.jpg",
     },
     poll: {
       id: "demo-poll-5",
