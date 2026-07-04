@@ -13,13 +13,12 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
 
-import { POST } from "@/app/api/cron/close-favpolls/route"
+import { GET } from "@/app/api/cron/close-favpolls/route"
 
 function makeRequest(authHeader?: string): Request {
   const headers = new Headers()
   if (authHeader !== undefined) headers.set("authorization", authHeader)
   return new Request("http://localhost/api/cron/close-favpolls", {
-    method: "POST",
     headers,
   })
 }
@@ -34,22 +33,22 @@ beforeEach(() => {
 // Auth
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — auth", () => {
+describe("GET /api/cron/close-favpolls — auth", () => {
   it("returns 401 when Authorization header is missing", async () => {
-    const res = await POST(makeRequest())
+    const res = await GET(makeRequest())
     expect(res.status).toBe(401)
     const body = await res.json()
     expect(body.error).toBe("Unauthorized")
   })
 
   it("returns 401 when bearer token is wrong", async () => {
-    const res = await POST(makeRequest("Bearer wrong-secret"))
+    const res = await GET(makeRequest("Bearer wrong-secret"))
     expect(res.status).toBe(401)
   })
 
   it("proceeds when Authorization header matches CRON_SECRET", async () => {
     mock.queue([]) // favpolls select → no favpolls
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     expect(res.status).not.toBe(401)
   })
 })
@@ -58,11 +57,11 @@ describe("POST /api/cron/close-favpolls — auth", () => {
 // No favpolls to close
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — no favpolls", () => {
+describe("GET /api/cron/close-favpolls — no favpolls", () => {
   it("returns { closed: 0 } when favpolls array is empty", async () => {
     mock.queue([])
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     const body = await res.json()
     expect(body).toEqual({ closed: 0 })
   })
@@ -70,7 +69,7 @@ describe("POST /api/cron/close-favpolls — no favpolls", () => {
   it("returns { closed: 0 } when favpolls query returns null", async () => {
     mock.queue(null)
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     const body = await res.json()
     expect(body).toEqual({ closed: 0 })
   })
@@ -80,11 +79,11 @@ describe("POST /api/cron/close-favpolls — no favpolls", () => {
 // DB error
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — DB error", () => {
+describe("GET /api/cron/close-favpolls — DB error", () => {
   it("returns 500 when favpolls fetch fails", async () => {
     mock.queue(null, { message: "connection refused" })
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     expect(res.status).toBe(500)
     const body = await res.json()
     expect(body.error).toBe("connection refused")
@@ -95,7 +94,7 @@ describe("POST /api/cron/close-favpolls — DB error", () => {
 // Happy path — favpolls closed
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("POST /api/cron/close-favpolls — closes favpolls", () => {
+describe("GET /api/cron/close-favpolls — closes favpolls", () => {
   function queueForOneFavpoll(
     options: {
       favpollId?: string
@@ -143,7 +142,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
   it("closes the favpoll with closed_at and total_raised", async () => {
     queueForOneFavpoll({ totalRaised: 200 })
 
-    await POST(makeRequest("Bearer test-secret"))
+    await GET(makeRequest("Bearer test-secret"))
 
     const favpollsUpdate = mock
       .callsFor("favpolls")
@@ -157,7 +156,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
   it("returns { closed: 1 } for a single successfully closed favpoll", async () => {
     queueForOneFavpoll()
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     const body = await res.json()
     expect(body.closed).toBe(1)
   })
@@ -170,7 +169,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
       organiserEmail: "bob@example.com",
     })
 
-    await POST(makeRequest("Bearer test-secret"))
+    await GET(makeRequest("Bearer test-secret"))
 
     expect(mockEmail.sendFavpollClosed).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -186,7 +185,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
     queueForOneFavpoll({ organiserEmail: null })
     mockEmail.sendFavpollClosed.mockClear()
 
-    await POST(makeRequest("Bearer test-secret"))
+    await GET(makeRequest("Bearer test-secret"))
 
     expect(mockEmail.sendFavpollClosed).not.toHaveBeenCalled()
   })
@@ -195,7 +194,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
     queueForOneFavpoll()
     mockEmail.sendFavpollClosed.mockRejectedValueOnce(new Error("email down"))
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     const body = await res.json()
     expect(body.closed).toBe(1)
   })
@@ -217,7 +216,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
     // Second favpoll update → success
     mock.queue(null)
 
-    const res = await POST(makeRequest("Bearer test-secret"))
+    const res = await GET(makeRequest("Bearer test-secret"))
     const body = await res.json()
 
     expect(body.closed).toBe(1)
@@ -242,7 +241,7 @@ describe("POST /api/cron/close-favpolls — closes favpolls", () => {
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
     mock.queue(null) // update
 
-    await POST(makeRequest("Bearer test-secret"))
+    await GET(makeRequest("Bearer test-secret"))
 
     const favpollsUpdate = mock
       .callsFor("favpolls")

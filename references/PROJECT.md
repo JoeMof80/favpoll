@@ -985,7 +985,7 @@ CHARITY_COMMISSION_API_KEY        -- Register of Charities API (api-portal.chari
 ## Outstanding TODO
 
 - **Webhooks not configured** — `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET` are blank in Vercel. Configure endpoints at Clerk and Stripe dashboards.
-- **close-favpolls cron is a POST handler** — Vercel cron invocations are GET requests, so the scheduled job in `apps/web/vercel.json` likely never fires the handler. Convert `app/api/cron/close-favpolls/route.ts` to GET (as `verify-charities` already is) and verify a scheduled run in the Vercel dashboard.
+- **Verify cron schedules fire** — both cron handlers are now GET (close-favpolls was POST until 2026-07-05, so its schedule never fired). After the next deploy, confirm a scheduled run of each in the Vercel dashboard (Cron Jobs tab), and expect the first real close-favpolls run to close any backlog of favpolls past `closes_at` in one batch (organiser emails go out per favpoll).
 - **Clerk production keys** — using `pk_test_` on Vercel until `favpoll.com` points at the app. Swap to `pk_live_` when domain is switched.
 - **Stripe Connect** — disbursement not wired. Cron has placeholder. Connect application pending approval.
 - **All-time rankings** — `/rankings` exists but needs data threshold logic.
