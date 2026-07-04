@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/landing/site-footer"
 
 // Full-screen surfaces that must not carry the site footer.
 const EXCLUDED = [
-  /^\/favpolls\/[^/]+\/display$/, // projector live display
+  /^\/favpolls\/[^/]+\/live$/, // projector live display
 ]
 
 // App-wide footer, mounted in the root layout. A client pathname check is

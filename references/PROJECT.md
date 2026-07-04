@@ -394,7 +394,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
 /favpolls/[id]                 -- Favpoll page — guest pledge view + edit mode toggle
 /favpolls/[id]/edit            -- Edit favpoll (FavpollForm)
-/favpolls/[id]/display         -- Live display for projector screen
+/favpolls/[id]/live            -- Live display for projector screen (renamed from /display 2026-07-04 to match the glossary's live_display; /favpolls/[id]/display permanentRedirects here). Cause-aware (cause_label shown when subject='cause' — protagonists.name crashed cause favpolls before). Rankings and total are both realtime: DisplayPollSection uses the same useRankingItems Supabase channel as RankingList (animated row reordering); DisplayScreen subscribes to pledges for the running total.
 /my-favpolls                     -- Organiser's favpoll management surface (auth required). OrganizerPageClient handles filter (All/Active/Closed) and sort (Closing soonest / Recently created / Highest raised) client-side. Each OrganizerCard shows: identity row + status badge (amber warning ≤7 days), total raised, poll topic row, shared fund row, Listed/Unlisted toggle, QR + share link block, charity footer + Live display button. Manage page (/favpolls/[id]/manage) was retired — this card is the single management surface. WARNING_THRESHOLD_DAYS = 7.
 /rankings                      -- Global all-time rankings
 /topics/[id]                   -- Individual topic rankings
@@ -551,7 +551,7 @@ components/
 │   ├── reveal-mechanic-demo.tsx  -- interactive withhold→disclose demo: blurred quote + lock, demo-pledge click → unblur + typewriter; uses SCENES[1] (Poppy, celebration)
 │   ├── record-holders.tsx        -- record as tiles, one champion per topic (deduped); never cross-topic bars
 │   ├── rail-nav.tsx              -- sticky rail nav with IntersectionObserver scrollspy
-│   ├── site-footer.tsx           -- brand statement, Explore/Your account links (incl. About favpoll), money+wills blurbs (headings deep-link to /about#money and /about#wills), © + Stripe bar. Mounted app-wide via components/site-footer-mount.tsx ("use client", usePathname) in the root layout — a pathname check rather than route groups because the excluded /favpolls/[id]/display projector route is nested inside favpolls/[id]/; add new full-screen routes to its EXCLUDED list
+│   ├── site-footer.tsx           -- brand statement, Explore/Your account links (incl. About favpoll), money+wills blurbs (headings deep-link to /about#money and /about#wills), © + Stripe bar. Mounted app-wide via components/site-footer-mount.tsx ("use client", usePathname) in the root layout — a pathname check rather than route groups because the excluded /favpolls/[id]/live projector route is nested inside favpolls/[id]/; add new full-screen routes to its EXCLUDED list
 │   ├── count-up.tsx, fade-in.tsx -- in-view count-up stat / once-only fade-up (both reduced-motion aware)
 │   ├── types.ts                  -- RecordItem
 │   ├── honour-charity-love-venn.tsx  -- Rotating three-ring Venn SVG (currentColor, text-primary; slow 16/24/22s rotations + staggered stroke-opacity breathing; labels scaled 1.5×); home closing section; + .stories.tsx
