@@ -1,7 +1,14 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/access-denied"]);
+// /api/cron routes authenticate themselves with the CRON_SECRET bearer
+// token — Vercel cron requests carry no Clerk session, so they must not
+// be redirected to sign-in here.
+const isPublicRoute = createRouteMatcher([
+  "/sign-in(.*)",
+  "/access-denied",
+  "/api/cron(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicRoute(req)) return NextResponse.next();
