@@ -120,7 +120,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
                 Reaches charity
               </dt>
               <dd className="mt-1 text-3xl font-light tabular-nums">
-                <CountUp value={95} format={(n) => `${Math.round(n)}%`} />
+                <CountUp value={100} format={(n) => `${Math.round(n)}%`} />
               </dd>
             </div>
           </dl>
