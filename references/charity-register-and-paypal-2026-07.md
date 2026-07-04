@@ -111,6 +111,13 @@ still pending). The choice for the open-register future is:
 
 ## 3. The 0% fee question (tip-based revenue)
 
+**DECIDED (founder, 2026-07-04): favpoll charges no platform fee — 100%
+of every pledge goes to charity.** Implemented in the app and brand docs
+the same day (fee removed from the pledge charge, copy updated
+everywhere). Open sub-decisions: processing-fee treatment (favpoll
+covers vs deducted — awaiting the PPGF answer) and the contribution/tip
+prompt itself, which is not yet built.
+
 ### The premise is correct
 
 Both major platforms run 0% platform fees funded by voluntary tips

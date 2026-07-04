@@ -19,10 +19,7 @@ type Story = StoryObj<typeof meta>
 
 export const SingleCharity: Story = {
   args: {
-    lines: [
-      { label: "Age UK", amount: 9.7 },
-      { label: "Platform fee (5%)", amount: 0.3 },
-    ],
+    lines: [{ label: "Age UK", amount: 10.0 }],
     total: { label: "Total charge", amount: 10.0 },
   },
 }
@@ -30,10 +27,9 @@ export const SingleCharity: Story = {
 export const ThreeCharities: Story = {
   args: {
     lines: [
-      { label: "Age UK", amount: 6.33 },
-      { label: "Macmillan", amount: 6.33 },
-      { label: "RNLI", amount: 6.34 },
-      { label: "Platform fee (5%)", amount: 1.0 },
+      { label: "Age UK", amount: 6.66 },
+      { label: "Macmillan", amount: 6.66 },
+      { label: "RNLI", amount: 6.68 },
     ],
     total: { label: "Total charge", amount: 20.0 },
   },
@@ -42,8 +38,7 @@ export const ThreeCharities: Story = {
 export const WithHiddenLine: Story = {
   args: {
     lines: [
-      { label: "Age UK", amount: 19.0 },
-      { label: "Platform fee (5%)", amount: 1.0 },
+      { label: "Age UK", amount: 20.0 },
       { label: "Hidden note", amount: 0, hidden: true },
     ],
     total: { label: "Total charge", amount: 20.0 },

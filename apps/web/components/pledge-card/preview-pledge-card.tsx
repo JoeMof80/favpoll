@@ -49,12 +49,8 @@ export function PreviewPledgeCard({
     fundBarPct <= 0.8 ? FUND_GREEN : fundBarPct <= 1.0 ? FUND_AMBER : FUND_RED
   const fundOverAvailable = available > 0 && numericPledge > available
 
-  const ownCharge =
-    numericPledge + numericTopUp > 0
-      ? Math.round((numericPledge + numericTopUp) * 1.03 * 100) / 100
-      : 0
-  const ownFee =
-    Math.round((ownCharge - (numericPledge + numericTopUp)) * 100) / 100
+  // No platform fee — 100% of the pledge goes to charity
+  const ownCharge = Math.round((numericPledge + numericTopUp) * 100) / 100
   const charityLabel = formatCharityLabel(charityNames)
 
   const ownBreakdown =
@@ -67,7 +63,6 @@ export function PreviewPledgeCard({
               amount: numericTopUp,
               hidden: !isTopUpValid,
             },
-            { label: "Platform fee (3%)", amount: ownFee },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }

@@ -79,11 +79,8 @@ export function usePledge({
 
   const ownBase = isPledgeValid ? numericPledge : 0
   const ownTopUp = isTopUpValid ? numericTopUp : 0
-  const ownCharge =
-    ownBase + ownTopUp > 0
-      ? Math.round((ownBase + ownTopUp) * 1.03 * 100) / 100
-      : 0
-  const ownFee = Math.round((ownCharge - (ownBase + ownTopUp)) * 100) / 100
+  // No platform fee — 100% of the pledge goes to charity (decided 2026-07)
+  const ownCharge = Math.round((ownBase + ownTopUp) * 100) / 100
 
   const fundBarPct =
     isPledgeValid && available > 0 ? numericPledge / available : 0
@@ -113,7 +110,6 @@ export function usePledge({
               amount: numericTopUp,
               hidden: !isTopUpValid,
             },
-            { label: "Platform fee (3%)", amount: ownFee },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }

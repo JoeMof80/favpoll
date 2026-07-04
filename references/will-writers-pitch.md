@@ -65,7 +65,7 @@ Your client can write as many or as few questions as they like. favpoll also wor
 
 If your client is leaving charitable bequests in their will, favpoll complements rather than replaces them. A bequest is a private financial gift. A favpoll is a public, communal act — guests choosing to give in someone's memory. Many families find both meaningful.
 
-For clients who want their memorial collection to support a specific charity, favpoll provides a structured, transparent way to do this — with automatic disbursement, full reporting, and a 5% platform fee that covers operational costs.
+For clients who want their memorial collection to support a specific charity, favpoll provides a structured, transparent way to do this — with automatic disbursement, full reporting, and no platform fee: 100% of donations reach the charity.
 
 ---
 
@@ -83,4 +83,4 @@ Please contact us at partnerships@favpoll.com.
 
 If your client is writing their own will through an online service, they can include a favpoll instruction in their letter of wishes using the template above. No partnership or special arrangement is needed — the executor simply follows the instructions when the time comes.
 
-favpoll is free to create. A 5% platform fee is deducted from donations before disbursement to the charity.
+favpoll is free to create, and charges no platform fee — 100% of donations reach the charity.

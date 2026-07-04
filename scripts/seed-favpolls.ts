@@ -71,7 +71,7 @@ const GUEST_ITEM_EVENT_FRACTION = 0.15; // share of infinite-topic favpolls that
 //                                        get one guest-suggested item (feeds
 //                                        the admin contributions queue)
 
-const FEE_RATE = 0.05; // 5% platform fee (brand fact)
+const FEE_RATE = 0; // no platform fee — 100% of pledges to charity (2026-07)
 
 // Mirror of OCCASION_TYPE_PREFIXES in apps/web/lib/display.ts — duplication
 // risk: if display.ts changes these, update here too.

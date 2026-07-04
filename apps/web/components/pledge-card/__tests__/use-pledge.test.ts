@@ -247,39 +247,36 @@ describe("usePledge — pledge amount validation", () => {
 // Fee & charge calculation
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("usePledge — ownCharge & ownFee", () => {
+describe("usePledge — ownCharge", () => {
   it("ownCharge is 0 when no pledge amount", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     expect(result.current.ownCharge).toBe(0)
   })
 
-  it("ownCharge = pledge * 1.03 when no topUp", () => {
+  it("ownCharge equals the pledge exactly — no platform fee", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
     })
-    // 10 * 1.03 = 10.30
-    expect(result.current.ownCharge).toBe(10.3)
+    expect(result.current.ownCharge).toBe(10)
   })
 
-  it("ownCharge includes topUp before applying 3% fee", () => {
+  it("ownCharge = pledge + topUp with no fee applied", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
       result.current.setTopUpAmount("5")
     })
-    // (10 + 5) * 1.03 = 15.45
-    expect(result.current.ownCharge).toBe(15.45)
+    expect(result.current.ownCharge).toBe(15)
   })
 
-  it("ownFee (3% of pledge, rounded) appears in ownBreakdown.lines[2]", () => {
-    // ownFee is internal; observable via ownBreakdown lines
+  it("ownBreakdown has no fee line", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
     })
-    // fee line is index 2: "Platform fee (3%)"
-    expect(result.current.ownBreakdown!.lines[2].amount).toBe(0.3)
+    const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
+    expect(labels.join(" ")).not.toMatch(/fee/i)
   })
 
   it("fundOverAvailable is false when pledge is within available balance", () => {
@@ -493,7 +490,7 @@ describe("usePledge — ownBreakdown", () => {
     expect(result.current.ownBreakdown).toBeNull()
   })
 
-  it("includes charity, fee, and total lines when valid", () => {
+  it("includes charity and total lines when valid — total equals the pledge", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
@@ -502,8 +499,7 @@ describe("usePledge — ownBreakdown", () => {
     expect(result.current.ownBreakdown).not.toBeNull()
     const lines = result.current.ownBreakdown!.lines
     expect(lines[0]).toMatchObject({ label: "To Oxfam", amount: 10 })
-    expect(lines[2]).toMatchObject({ label: "Platform fee (3%)", amount: 0.3 })
-    expect(result.current.ownBreakdown!.total).toMatchObject({ amount: 10.3 })
+    expect(result.current.ownBreakdown!.total).toMatchObject({ amount: 10 })
   })
 
   it("marks the top-up line as hidden when no topUp is entered", () => {
@@ -635,7 +631,7 @@ describe("usePledge — handleOwnConfirm", () => {
       "/api/stripe/payment-intent",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ amount: 10.3 }),
+        body: JSON.stringify({ amount: 10 }),
       })
     )
   })

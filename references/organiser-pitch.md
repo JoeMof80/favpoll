@@ -56,7 +56,7 @@ If you're helping to carry out someone's wishes, favpoll is designed for exactly
 
 You choose a charity that mattered to the person you're honouring — or simply one you believe in. Up to three charities can share the proceeds. When the poll closes, the money goes to them automatically. You receive a full summary of what was raised.
 
-A 5% platform fee covers favpoll's costs. The remaining 95% reaches your chosen charity in full.
+favpoll takes no fee from donations. 100% of every pledge reaches your chosen charity in full.
 
 ---
 
