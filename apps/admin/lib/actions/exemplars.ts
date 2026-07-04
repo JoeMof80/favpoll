@@ -5,13 +5,14 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ExemplarFavpoll = {
   id: string;
-  register: string;
+  category: string | null;
   occasion_type: string | null;
   opening_line: string | null;
   is_exemplar: boolean;
   closed_at: string | null;
   total_raised: number;
-  protagonist_name: string | null;
+  /** Protagonist name, or cause_label for cause favpolls */
+  display_name: string | null;
 };
 
 export async function getClosedFavpolls(): Promise<{
@@ -23,8 +24,8 @@ export async function getClosedFavpolls(): Promise<{
   const { data, error } = await supabase
     .from("favpolls")
     .select(
-      `id, register, occasion_type, opening_line, is_exemplar, closed_at,
-       total_raised, protagonist:protagonists ( name )`,
+      `id, category, occasion_type, opening_line, is_exemplar, closed_at,
+       total_raised, cause_label, protagonist:protagonists ( name )`,
     )
     .eq("is_private", false)
     .not("closed_at", "is", null)
@@ -36,14 +37,14 @@ export async function getClosedFavpolls(): Promise<{
 
   const rows = (data ?? []).map((ev) => ({
     id: ev.id,
-    register: ev.register,
+    category: ev.category,
     occasion_type: ev.occasion_type,
     opening_line: ev.opening_line,
     is_exemplar: ev.is_exemplar,
     closed_at: ev.closed_at,
     total_raised: ev.total_raised,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    protagonist_name: (ev.protagonist as any)?.name ?? null,
+    display_name: (ev.protagonist as any)?.name ?? ev.cause_label ?? null,
   }));
 
   return { data: rows, error: null };

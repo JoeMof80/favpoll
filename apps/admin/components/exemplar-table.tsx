@@ -28,9 +28,9 @@ export function ExemplarTable({ favpolls }: Props) {
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
-            <th className="pb-2 pr-4 font-medium">Protagonist</th>
+            <th className="pb-2 pr-4 font-medium">Name</th>
             <th className="pb-2 pr-4 font-medium">Occasion</th>
-            <th className="pb-2 pr-4 font-medium">Register</th>
+            <th className="pb-2 pr-4 font-medium">Category</th>
             <th className="pb-2 pr-4 font-medium">Closed</th>
             <th className="pb-2 font-medium">Exemplar</th>
           </tr>
@@ -42,12 +42,14 @@ export function ExemplarTable({ favpolls }: Props) {
               className="border-b border-neutral-100 last:border-0"
             >
               <td className="py-2 pr-4 font-medium text-neutral-900">
-                {ev.protagonist_name ?? "—"}
+                {ev.display_name ?? "—"}
               </td>
               <td className="py-2 pr-4 text-neutral-600">
                 {ev.occasion_type ?? ev.opening_line ?? "—"}
               </td>
-              <td className="py-2 pr-4 text-neutral-500">{ev.register}</td>
+              <td className="py-2 pr-4 text-neutral-500">
+                {ev.category ?? "—"}
+              </td>
               <td className="py-2 pr-4 text-neutral-400">
                 {ev.closed_at
                   ? new Date(ev.closed_at).toLocaleDateString("en-GB")
