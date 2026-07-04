@@ -139,6 +139,7 @@ export function FavpollForm({
           isPrivate: false,
           isListed: values.isListed ?? true,
           potAmount: null,
+          goalAmount: values.goalAmount ?? null,
           poll: {
             topicId: isCustomTopic ? null : poll.topicId,
             customTopic: isCustomTopic
@@ -175,6 +176,7 @@ export function FavpollForm({
           isPrivate: false,
           isListed: values.isListed ?? true,
           potAmount: null,
+          goalAmount: values.goalAmount ?? null,
           poll,
         })
         router.push(`/favpolls/${favpollId}`)

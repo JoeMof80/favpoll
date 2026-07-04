@@ -38,6 +38,7 @@ type CreateFavpollInput = {
   isPrivate: boolean
   isListed: boolean
   potAmount: number | null
+  goalAmount?: number | null
   poll: PollInput
 }
 
@@ -281,6 +282,7 @@ export async function createFavpoll(
       is_private: input.isPrivate,
       is_listed: input.isListed,
       description: input.description,
+      goal_amount: input.goalAmount ?? null,
     })
     .select("id")
     .single()

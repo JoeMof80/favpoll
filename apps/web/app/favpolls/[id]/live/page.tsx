@@ -90,6 +90,7 @@ export default async function LiveDisplayPage({ params }: Props) {
       description={favpoll.description ?? null}
       occasionType={favpoll.occasion_type ?? null}
       charityName={charityName}
+      goalAmount={favpoll.goal_amount ?? null}
       poll={displayPoll}
       initialTotalRaised={initialTotalRaised}
       pollId={pollId}

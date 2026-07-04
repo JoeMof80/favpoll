@@ -8,6 +8,7 @@ import { getExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
+import { GoalCard } from "./goal-card"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
 import { EditableCountdown } from "./editable-countdown"
@@ -286,6 +287,7 @@ export function FormInner({
                 onClosesAtChange={onClosesAtChange}
               />
               <CharityBanner charities={displayCharities} totalRaised={0} />
+              <GoalCard />
               <div className="pointer-events-none opacity-40">
                 <div className="rounded-lg border border-border bg-background px-5 py-4">
                   <p className="mt-1 text-sm text-muted-foreground">

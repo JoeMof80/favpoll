@@ -112,6 +112,7 @@ export default async function EditFavpollPage({ params }: Props) {
       (ec: { charity_id: string }) => ec.charity_id
     ),
     isListed: favpoll.is_listed ?? true,
+    goalAmount: favpoll.goal_amount ?? undefined,
     reveal: rawPoll?.personal_reveal ?? "",
     topics: preselectedTopics,
   }

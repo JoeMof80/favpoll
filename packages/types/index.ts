@@ -88,6 +88,8 @@ export type Favpoll = {
   extension_count: number;
   closed_at: string | null;
   total_raised: number;
+  /** Optional pledge goal in pounds (same unit as total_raised); null = no goal. */
+  goal_amount?: number | null;
   is_private: boolean;
   is_plural: boolean | null;
   is_exemplar?: boolean;
@@ -246,5 +248,7 @@ export type CanvasSubmitData = {
   isPrivate: boolean;
   isListed: boolean;
   potAmount: number | null;
+  /** Optional pledge goal in pounds; null = no goal. */
+  goalAmount?: number | null;
   poll: CanvasPollInput;
 };
