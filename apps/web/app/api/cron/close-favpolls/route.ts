@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendFavpollClosed } from "@/lib/email"
 
-export async function POST(request: Request) {
+// Vercel cron (see vercel.json) — cron invocations are GET requests, so this
+// must be a GET handler or the schedule silently never fires.
+export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization")
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
