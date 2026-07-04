@@ -22,6 +22,10 @@ export const favpollFormSchema = z
       .min(1, "Select at least one charity")
       .max(3, "Maximum 3 charities"),
     isListed: z.boolean().default(true),
+    goalAmount: z
+      .number()
+      .positive("Goal must be greater than zero")
+      .optional(),
     reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
     topics: z
       .array(

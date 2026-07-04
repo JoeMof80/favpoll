@@ -15,6 +15,7 @@ type Props = {
   description: string | null
   occasionType: string | null
   charityName: string | null
+  goalAmount?: number | null
   poll: DisplayPoll | null
   initialTotalRaised: number
   pollId: string | null
@@ -29,6 +30,7 @@ export function DisplayScreen({
   description,
   occasionType,
   charityName,
+  goalAmount = null,
   poll,
   initialTotalRaised,
   pollId,
@@ -112,6 +114,34 @@ export function DisplayScreen({
                 minimumFractionDigits: 2,
               }).format(totalRaised)}
             </p>
+            {goalAmount ? (
+              <div className="mx-auto mt-4 max-w-sm">
+                <div
+                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Progress towards the pledge goal"
+                  aria-valuemin={0}
+                  aria-valuemax={goalAmount}
+                  aria-valuenow={Math.min(totalRaised, goalAmount)}
+                >
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
+                    }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  of the{" "}
+                  {new Intl.NumberFormat("en-GB", {
+                    style: "currency",
+                    currency: "GBP",
+                    minimumFractionDigits: 0,
+                  }).format(goalAmount)}{" "}
+                  goal
+                </p>
+              </div>
+            ) : null}
           </div>
         )}
 

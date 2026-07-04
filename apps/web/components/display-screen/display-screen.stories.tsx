@@ -86,6 +86,14 @@ export const Memorial: Story = {
   },
 }
 
+export const WithGoal: Story = {
+  args: {
+    ...Memorial.args,
+    favpollId: "demo-goal",
+    goalAmount: 1500,
+  },
+}
+
 export const Birthday: Story = {
   args: {
     favpollId: "demo-birthday",

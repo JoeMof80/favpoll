@@ -171,6 +171,7 @@ export function FavpollContent({
       <CharityBanner
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
+        goalAmount={favpoll.goal_amount ?? null}
       />
 
       {/* Guest shared fund contribution card — always shown on open favpolls */}

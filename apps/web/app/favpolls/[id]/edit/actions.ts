@@ -292,6 +292,7 @@ export async function updateFavpoll(
       is_private: input.isPrivate,
       is_listed: input.isListed,
       description: input.description,
+      goal_amount: input.goalAmount ?? null,
       ...(isExtension && {
         extension_count: (favpoll.extension_count ?? 0) + 1,
       }),
