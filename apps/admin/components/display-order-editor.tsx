@@ -2,6 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { updateItemDisplayOrder } from "@/lib/actions/placeholders";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type Item = {
   id: string;
@@ -41,31 +50,33 @@ function ItemRow({ topicId, item }: { topicId: string; item: Item }) {
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-md border border-neutral-200 bg-white px-4 py-2.5">
-      <span className="flex-1 text-sm text-neutral-900">{item.label}</span>
-      <input
-        type="number"
-        value={order}
-        onChange={(e) => {
-          setOrder(e.target.value);
-          setStatus("idle");
-        }}
-        onBlur={handleSave}
-        placeholder="—"
-        className="w-16 rounded border border-neutral-200 px-2 py-1 text-center text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-      />
-      {status === "saving" || isPending ? (
-        <span className="text-xs text-neutral-400 w-12">Saving…</span>
-      ) : status === "saved" ? (
-        <span className="text-xs text-green-600 w-12">Saved</span>
-      ) : status === "error" ? (
-        <span className="text-xs text-red-600 w-24 truncate" title={errorMsg}>
-          {errorMsg}
-        </span>
-      ) : (
-        <span className="w-12" />
-      )}
-    </div>
+    <TableRow>
+      <TableCell className="text-foreground">{item.label}</TableCell>
+      <TableCell className="w-24">
+        <Input
+          type="number"
+          value={order}
+          onChange={(e) => {
+            setOrder(e.target.value);
+            setStatus("idle");
+          }}
+          onBlur={handleSave}
+          placeholder="—"
+          className="w-16 text-center"
+        />
+      </TableCell>
+      <TableCell className="w-28 text-xs">
+        {status === "saving" || isPending ? (
+          <span className="text-muted-foreground">Saving…</span>
+        ) : status === "saved" ? (
+          <span className="text-success">Saved</span>
+        ) : status === "error" ? (
+          <span className="truncate text-destructive" title={errorMsg}>
+            {errorMsg}
+          </span>
+        ) : null}
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -78,7 +89,7 @@ export function DisplayOrderEditor({
 }) {
   if (items.length === 0) {
     return (
-      <p className="text-sm text-neutral-500">No canonical items found.</p>
+      <p className="text-sm text-muted-foreground">No canonical items found.</p>
     );
   }
 
@@ -93,14 +104,23 @@ export function DisplayOrderEditor({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-xs font-medium text-neutral-500 uppercase tracking-wide px-4 py-1">
-        <span>Item</span>
-        <span>Order</span>
+      <div className="rounded-lg border border-border">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Item</TableHead>
+              <TableHead>Order</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sorted.map((item) => (
+              <ItemRow key={item.id} topicId={topicId} item={item} />
+            ))}
+          </TableBody>
+        </Table>
       </div>
-      {sorted.map((item) => (
-        <ItemRow key={item.id} topicId={topicId} item={item} />
-      ))}
-      <p className="mt-1 text-xs text-neutral-400">
+      <p className="mt-1 text-xs text-muted-foreground">
         Leave blank to sort alphabetically. Lower numbers appear first. Changes
         save on blur.
       </p>

@@ -32,7 +32,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
     <div className="flex gap-8 min-h-0">
       {/* Sidebar */}
       <aside className="w-56 shrink-0">
-        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-widest mb-3">
+        <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">
           Topics
         </h2>
         <div className="flex flex-col gap-0.5">
@@ -46,7 +46,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
                 className={`flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
                   isActive
                     ? "bg-secondary text-secondary-foreground font-medium"
-                    : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                 }`}
               >
                 <span className="truncate">{t.title}</span>
@@ -56,7 +56,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
                     className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none ${
                       t.is_finite
                         ? "bg-secondary text-secondary-foreground"
-                        : "bg-neutral-100 text-neutral-500"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {t.is_finite ? "F" : "I"}
@@ -76,7 +76,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
               topic.is_finite
                 ? "bg-secondary text-secondary-foreground"
-                : "bg-neutral-100 text-neutral-600"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             {topic.is_finite ? "Finite" : "Infinite"}
@@ -85,7 +85,7 @@ export default async function TopicPlaceholdersPage({ params }: Props) {
 
         {topic.is_finite && (
           <div className="mb-8">
-            <h2 className="mb-4 text-sm font-medium text-neutral-700">
+            <h2 className="mb-4 text-sm font-medium text-foreground">
               Display order
             </h2>
             <DisplayOrderEditor topicId={topic.id} items={topicItems ?? []} />
