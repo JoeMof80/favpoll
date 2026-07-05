@@ -146,6 +146,7 @@ function renderContent(
       isOrganiser={false}
       entitled={opts.entitled ?? false}
       wallEntries={[]}
+      rankHistory={null}
     />
   )
 }

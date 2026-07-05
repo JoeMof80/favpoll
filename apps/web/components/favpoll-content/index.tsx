@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import { BumpChart } from "@/components/bump-chart"
+import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
@@ -34,6 +36,7 @@ type Props = {
   isOrganiser: boolean
   entitled: boolean
   wallEntries: GuestWallEntry[]
+  rankHistory: RankHistory | null
 }
 
 export function FavpollContent({
@@ -47,6 +50,7 @@ export function FavpollContent({
   isOrganiser,
   entitled,
   wallEntries,
+  rankHistory,
 }: Props) {
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
@@ -147,6 +151,12 @@ export function FavpollContent({
         <p className="mt-4 text-sm text-muted-foreground">
           No poll has been set up for this favpoll yet.
         </p>
+      )}
+
+      {rankHistory && (
+        <div className="mt-8 rounded-lg border border-border bg-card px-5 py-5">
+          <BumpChart history={rankHistory} />
+        </div>
       )}
     </>
   )

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { deriveRankHistory } from "@/lib/rank-history"
 import { FavpollContent } from "@/components/favpoll-content"
 import { FavpollSubheader } from "@/components/favpoll-subheader"
 import type {
@@ -228,6 +229,39 @@ export default async function FavpollPage({ params }: Props) {
     created_at: r.created_at,
   }))
 
+  // Bump chart ("the story of the poll"): rank-over-time, closed
+  // favpolls only (open polls gate standings behind the reveal lock; a
+  // live chart would leak them). Ordinal only — no amounts. Its own
+  // unbounded, chronological query (the wall query is capped at 24 and
+  // reverse-ordered). Gated on a minimum pledge count so sparse polls
+  // don't show sparse charts.
+  const RANK_HISTORY_MIN_PLEDGES = 8
+  let rankHistory: ReturnType<typeof deriveRankHistory> | null = null
+  if (isClosed && pollWithItems) {
+    const { data: historyRows } = await supabase
+      .from("pledges")
+      .select(
+        `created_at,
+         pledge_allocations ( amount, favourite_id, favourites ( label ) )`
+      )
+      .eq("favpoll_poll_id", pollWithItems.id)
+      .is("withdrawn_at", null)
+      .order("created_at", { ascending: true })
+
+    if ((historyRows?.length ?? 0) >= RANK_HISTORY_MIN_PLEDGES) {
+      const labels: Record<string, string> = {}
+      const events = (historyRows ?? []).map((r) => ({
+        createdAt: r.created_at,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        allocations: ((r.pledge_allocations ?? []) as any[]).map((a) => {
+          labels[a.favourite_id] = a.favourites?.label ?? a.favourite_id
+          return { favouriteId: a.favourite_id, amount: a.amount ?? 0 }
+        }),
+      }))
+      rankHistory = deriveRankHistory(events, labels)
+    }
+  }
+
   // Hide poll with unvetted custom topic from non-organisers
   const visiblePoll =
     isOrganiser || pollWithItems?.topics.is_active !== false
@@ -249,6 +283,7 @@ export default async function FavpollPage({ params }: Props) {
         totalRaised={totalRaised}
         isClosed={isClosed}
         wallEntries={wallEntries}
+        rankHistory={rankHistory}
         clerkUserId={userId}
         isOrganiser={isOrganiser}
         entitled={entitled}
