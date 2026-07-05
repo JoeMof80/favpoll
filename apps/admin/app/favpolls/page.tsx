@@ -1,21 +1,25 @@
-import { getClosedFavpolls } from "@/lib/actions/exemplars";
-import { ExemplarTable } from "@/components/exemplar-table";
+import { getAllFavpolls } from "@/lib/actions/favpolls";
+import { FavpollsTable } from "@/components/favpolls-table";
 
 export default async function FavpollsPage() {
-  const { data: favpolls, error } = await getClosedFavpolls();
+  const { data: favpolls, error } = await getAllFavpolls();
+  const webBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? null;
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-2">Favpolls</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Mark closed favpolls as exemplars to surface them in the inspiration
-        door on the New Favpoll form.
-      </p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Favpolls</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Every favpoll on the platform. Close early, list/unlist, and mark
+          closed favpolls as exemplars for the inspiration door on the New
+          Favpoll form.
+        </p>
+      </div>
 
       {error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : (
-        <ExemplarTable favpolls={favpolls ?? []} />
+        <FavpollsTable favpolls={favpolls ?? []} webBaseUrl={webBaseUrl} />
       )}
     </div>
   );
