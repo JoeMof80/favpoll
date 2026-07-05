@@ -2,7 +2,7 @@
 
 import type { BreakdownLine } from "@/components/pledge-card/pledge-breakdown"
 import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
-import { GBP } from "@/components/pledge-card/utils"
+import { GBP, formatTipLabel } from "@/components/pledge-card/utils"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -10,15 +10,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 type FavouriteBreakdownLine = { label: string; amount: number }
 
 const PRESETS = [5, 10, 20, 50]
-
-// Optional contribution to favpoll — flat amounts, never percentages
-// (pledges are small; percentage prompts read absurd at £5).
-const TIP_OPTIONS = [
-  { value: 0, label: "None" },
-  { value: 0.5, label: "50p" },
-  { value: 1, label: "£1" },
-  { value: 2, label: "£2" },
-]
 
 type HeaderProps = {
   pledgeAmount: string
@@ -120,6 +111,8 @@ type Props = {
   toggleFund: () => void
   tipAmount: number
   setTipAmount: (v: number) => void
+  /** Chip values for the current pledge tier (see tipOptionsFor) */
+  tipOptions: number[]
   /** false hides the contribution row (hero demo) */
   showTip?: boolean
   isListed?: boolean
@@ -136,6 +129,7 @@ export function StepAmount({
   toggleFund,
   tipAmount,
   setTipAmount,
+  tipOptions,
   showTip = true,
   isListed,
 }: Props) {
@@ -219,7 +213,7 @@ export function StepAmount({
                         role="radiogroup"
                         aria-label="Optional contribution to favpoll"
                       >
-                        {TIP_OPTIONS.map(({ value, label }) => (
+                        {tipOptions.map((value) => (
                           <Button
                             key={value}
                             type="button"
@@ -232,7 +226,7 @@ export function StepAmount({
                             className="px-2 font-normal aria-checked:font-medium"
                             onClick={() => setTipAmount(value)}
                           >
-                            {label}
+                            {formatTipLabel(value)}
                           </Button>
                         ))}
                       </div>

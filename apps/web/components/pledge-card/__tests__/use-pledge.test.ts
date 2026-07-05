@@ -88,7 +88,7 @@ const baseOptions = {
   pollSelections: {} as Record<string, string[]>,
   onPledgeAmountChange: vi.fn(),
   onPledgeSuccess: vi.fn(),
-  defaultTip: 0,
+  suggestTip: false,
 }
 
 beforeEach(() => {
@@ -249,47 +249,76 @@ describe("usePledge — pledge amount validation", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledge — optional contribution (tip)", () => {
-  it("defaults tipAmount to 1 when defaultTip is not passed", () => {
-    const { defaultTip: _omit, ...rest } = baseOptions
+  it("suggests the tier default when suggestTip is on (the default)", () => {
+    const { suggestTip: _omit, ...rest } = baseOptions
     const { result } = renderHook(() => usePledge(rest))
-    expect(result.current.tipAmount).toBe(1)
-  })
-
-  it("respects defaultTip 0 (memorial register)", () => {
-    const { result } = renderHook(() => usePledge(baseOptions))
-    expect(result.current.tipAmount).toBe(0)
-  })
-
-  it("adds the tip to ownCharge once a pledge is entered", () => {
-    const { result } = renderHook(() =>
-      usePledge({ ...baseOptions, defaultTip: 1 })
-    )
     act(() => {
       result.current.updatePledgeAmount("10")
     })
+    expect(result.current.tipAmount).toBe(1) // <£15 tier → £1
     expect(result.current.ownCharge).toBe(11)
-    // the tip is a UI-controlled row, not a breakdown line — no duplicate
-    const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
-    expect(labels).not.toContain("For favpoll")
-    expect(result.current.ownBreakdown!.total.amount).toBe(11)
   })
 
-  it("setTipAmount(0) removes the tip from the charge", () => {
+  it("defaults to None when suggestTip is false (memorial register)", () => {
+    const { result } = renderHook(() => usePledge(baseOptions))
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
+    expect(result.current.tipAmount).toBe(0)
+    expect(result.current.ownCharge).toBe(10)
+  })
+
+  it("scales chip options and the suggestion with the pledge", () => {
     const { result } = renderHook(() =>
-      usePledge({ ...baseOptions, defaultTip: 1 })
+      usePledge({ ...baseOptions, suggestTip: true })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("50")
+    })
+    expect(result.current.tipOptions).toEqual([0, 2, 5, 10])
+    expect(result.current.tipAmount).toBe(5) // ~10% suggestion
+    expect(result.current.ownCharge).toBe(55)
+
+    act(() => {
+      result.current.updatePledgeAmount("20")
+    })
+    expect(result.current.tipOptions).toEqual([0, 1, 2, 3])
+    expect(result.current.tipAmount).toBe(2)
+  })
+
+  it("never overrides a touched tip when the pledge tier changes", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, suggestTip: true })
     )
     act(() => {
       result.current.updatePledgeAmount("10")
       result.current.setTipAmount(0)
     })
-    expect(result.current.ownCharge).toBe(10)
+    expect(result.current.tipAmount).toBe(0)
+    act(() => {
+      result.current.updatePledgeAmount("50") // tier jump
+    })
+    expect(result.current.tipAmount).toBe(0) // explicit None sticks
+    expect(result.current.ownCharge).toBe(50)
+  })
+
+  it("the breakdown carries no duplicate tip line — total includes it", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, suggestTip: true })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
+    const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
+    expect(labels).not.toContain("For favpoll")
+    expect(result.current.ownBreakdown!.total.amount).toBe(11)
   })
 
   it("never touches the charity amount — total_amount stays the pledge", async () => {
     const { result } = renderHook(() =>
       usePledge({
         ...baseOptions,
-        defaultTip: 2,
+        suggestTip: true,
         pollSelections: { "poll-1": ["red"] },
       })
     )
@@ -300,7 +329,7 @@ describe("usePledge — optional contribution (tip)", () => {
       await result.current.handlePledgePaymentSuccess()
     })
     expect(mockActions.createPledge).toHaveBeenCalledWith(
-      expect.objectContaining({ totalAmount: 10, tipAmount: 2 })
+      expect.objectContaining({ totalAmount: 10, tipAmount: 1 })
     )
   })
 })

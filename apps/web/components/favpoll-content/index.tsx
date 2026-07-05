@@ -99,7 +99,7 @@ export function FavpollContent({
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}
         onAddItem={addItemHandler(pollWithItems)}
-        defaultTip={favpoll.category === "memorial" ? 0 : 1}
+        suggestTip={favpoll.category !== "memorial"}
         isListed={isListed}
         open={pledgeDialogOpen}
         onOpenChange={setPledgeDialogOpen}

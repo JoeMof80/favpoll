@@ -192,6 +192,7 @@ export function DemoCard({
       toggleFund={() => {}}
       tipAmount={0}
       setTipAmount={() => {}}
+      tipOptions={[0]}
       showTip={false}
       isListed={false}
     />

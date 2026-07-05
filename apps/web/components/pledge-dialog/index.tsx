@@ -23,8 +23,8 @@ type Props = {
   userPotAllocation: PotAllocation | null
   onPledgeSuccess?: (guestToken?: string) => void
   onAddItem?: (label: string) => Promise<void>
-  /** Preselected optional contribution (pounds); 0 for memorials */
-  defaultTip?: number
+  /** false defaults the contribution to None (memorials) */
+  suggestTip?: boolean
   isListed?: boolean
   /** Controlled mode — if provided, the internal trigger button is suppressed */
   open?: boolean
@@ -40,7 +40,7 @@ export function PledgeDialog({
   userPotAllocation,
   onPledgeSuccess,
   onAddItem,
-  defaultTip,
+  suggestTip,
   isListed,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
@@ -79,7 +79,7 @@ export function PledgeDialog({
       setOpen(false)
     },
     onAddItem,
-    defaultTip,
+    suggestTip,
   })
 
   // Reset Stripe state whenever we leave step 3 (back or re-entry)
@@ -259,6 +259,7 @@ export function PledgeDialog({
             toggleFund={dialog.toggleFund}
             tipAmount={dialog.tipAmount}
             setTipAmount={dialog.setTipAmount}
+            tipOptions={dialog.tipOptions}
             isListed={isListed}
           />
         )}
