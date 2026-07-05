@@ -1,8 +1,15 @@
 import { Resend } from "resend"
+import { renderEmail, escapeHtml } from "./email-template"
+import { formatFavpollDate } from "./display"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "noreply@favpoll.com"
+
+const GBP = new Intl.NumberFormat("en-GB", {
+  style: "currency",
+  currency: "GBP",
+})
 
 type PledgeConfirmationParams = {
   to: string
@@ -11,30 +18,46 @@ type PledgeConfirmationParams = {
   amount: number
   closesAt: string
   guestToken: string
-}
-
-type ExtensionRequestParams = {
-  organizerEmail: string
-  organizerName: string | null
   favpollId: string
-  message: string
 }
 
-export async function sendExtensionRequest(params: ExtensionRequestParams) {
-  const { organizerEmail, organizerName, favpollId, message } = params
-  const supportEmail = process.env.SUPPORT_EMAIL ?? FROM_EMAIL
+export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
+  const {
+    to,
+    protagonistName,
+    charityNames,
+    amount,
+    closesAt,
+    guestToken,
+    favpollId,
+  } = params
+  const withdrawUrl = `${BASE_URL}/pledges/withdraw?token=${guestToken}`
   const favpollUrl = `${BASE_URL}/favpolls/${favpollId}`
+  const closesDate = closesAt ? formatFavpollDate(closesAt.slice(0, 10)) : null
+  const name = escapeHtml(protagonistName)
+  const charityLabel = escapeHtml(
+    charityNames.length === 0
+      ? "charity"
+      : charityNames.length === 1
+        ? charityNames[0]
+        : charityNames.slice(0, -1).join(", ") + " & " + charityNames.at(-1)!
+  )
 
   await resend.emails.send({
     from: FROM_EMAIL,
-    to: supportEmail,
-    subject: `Extension request — favpoll ${favpollId}`,
-    html: `
-      <p><strong>Organiser:</strong> ${organizerName ?? "Unknown"} (${organizerEmail})</p>
-      <p><strong>Favpoll:</strong> <a href="${favpollUrl}">${favpollUrl}</a></p>
-      <p><strong>Message:</strong></p>
-      <p>${message.replace(/\n/g, "<br>")}</p>
-    `,
+    to,
+    subject: `Your pledge for ${protagonistName}`,
+    html: renderEmail({
+      preheader: `${GBP.format(amount)} to ${charityNames.join(" & ") || "charity"}, in honour of ${protagonistName}.`,
+      heading: "Thank you.",
+      bodyHtml: `<p style="margin:0 0 12px;">You pledged <strong>${GBP.format(amount)}</strong> to ${charityLabel}, in honour of ${name}. favpoll takes no fee — 100% of your pledge goes to charity.</p>${
+        closesDate
+          ? `<p style="margin:0;">The poll closes on ${escapeHtml(closesDate)}. Until then, your favourite stands in the running.</p>`
+          : ""
+      }`,
+      cta: { label: `Return to ${protagonistName}'s favpoll`, url: favpollUrl },
+      footnoteHtml: `You can <a href="${withdrawUrl}" style="color:#534AB7;">withdraw your pledge</a> any time before the poll closes. If you did not make this pledge, you can safely ignore this email.`,
+    }),
   })
 }
 
@@ -47,21 +70,19 @@ type FavpollClosedParams = {
 
 export async function sendFavpollClosed(params: FavpollClosedParams) {
   const { to, protagonistName, totalRaised, favpollId } = params
-  const GBP = new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-  })
   const resultsUrl = `${BASE_URL}/favpolls/${favpollId}`
+  const name = escapeHtml(protagonistName)
 
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
     subject: `Your favpoll for ${protagonistName} has closed`,
-    html: `
-      <p>Your favpoll for <strong>${protagonistName}</strong> has now closed.</p>
-      <p>Total raised: <strong>${GBP.format(totalRaised)}</strong></p>
-      <p><a href="${resultsUrl}">View the results</a></p>
-    `,
+    html: renderEmail({
+      preheader: `${GBP.format(totalRaised)} raised in ${protagonistName}'s name.`,
+      heading: "The poll has closed.",
+      bodyHtml: `<p style="margin:0 0 12px;">Your favpoll for <strong>${name}</strong> raised <strong>${GBP.format(totalRaised)}</strong> for charity.</p><p style="margin:0;">Every guest's favourite now stands in the final rankings — a small, lasting record from a day that mattered.</p>`,
+      cta: { label: "See the final rankings", url: resultsUrl },
+    }),
   })
 }
 
@@ -83,42 +104,34 @@ export async function sendGuestItemAdded(params: GuestItemAddedParams) {
     from: FROM_EMAIL,
     to,
     subject: `New item added to your ${topicTitle} poll`,
-    html: `
-      <p>A guest added "<strong>${itemLabel}</strong>" to your ${topicTitle} poll on your ${openingLine} for ${protagonistName}.</p>
-      <p><a href="${favpollUrl}">View your favpoll</a></p>
-    `,
+    html: renderEmail({
+      preheader: `A guest added “${itemLabel}”.`,
+      heading: "A guest added a favourite.",
+      bodyHtml: `<p style="margin:0;">Someone added <strong>“${escapeHtml(itemLabel)}”</strong> to the ${escapeHtml(topicTitle)} poll on your ${escapeHtml(openingLine)} for ${escapeHtml(protagonistName)}.</p>`,
+      cta: { label: "View your favpoll", url: favpollUrl },
+    }),
   })
 }
 
-export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
-  const { to, protagonistName, charityNames, amount, closesAt, guestToken } =
-    params
-  const GBP = new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-  })
-  const withdrawUrl = `${BASE_URL}/pledges/withdraw?token=${guestToken}`
-  const closesDate = new Date(closesAt).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
-  const charityLabel =
-    charityNames.length === 0
-      ? "charity"
-      : charityNames.length === 1
-        ? charityNames[0]
-        : charityNames.slice(0, -1).join(", ") + " & " + charityNames.at(-1)!
+type ExtensionRequestParams = {
+  organizerEmail: string
+  organizerName: string | null
+  favpollId: string
+  message: string
+}
+
+export async function sendExtensionRequest(params: ExtensionRequestParams) {
+  const { organizerEmail, organizerName, favpollId, message } = params
+  const supportEmail = process.env.SUPPORT_EMAIL ?? FROM_EMAIL
+  const favpollUrl = `${BASE_URL}/favpolls/${favpollId}`
 
   await resend.emails.send({
     from: FROM_EMAIL,
-    to,
-    subject: `Your pledge for ${protagonistName}`,
-    html: `
-      <p>Thank you for pledging ${GBP.format(amount)} to ${charityLabel} in honour of ${protagonistName}.</p>
-      <p>You can withdraw your pledge any time before ${closesDate} using the link below:</p>
-      <p><a href="${withdrawUrl}">Withdraw my pledge</a></p>
-      <p>If you did not make this pledge, you can safely ignore this email.</p>
-    `,
+    to: supportEmail,
+    subject: `Extension request — favpoll ${favpollId}`,
+    html: renderEmail({
+      heading: "Extension request",
+      bodyHtml: `<p style="margin:0 0 12px;"><strong>Organiser:</strong> ${escapeHtml(organizerName ?? "Unknown")} (${escapeHtml(organizerEmail)})</p><p style="margin:0 0 12px;"><strong>Favpoll:</strong> <a href="${favpollUrl}" style="color:#534AB7;">${favpollUrl}</a></p><p style="margin:0;">${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+    }),
   })
 }
