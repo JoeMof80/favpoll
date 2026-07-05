@@ -38,6 +38,7 @@ export function CharityBanner({
             key={charity.id}
             charity={charity}
             amountRaised={perCharity}
+            linkToCharity
           />
         ))}
       </div>
