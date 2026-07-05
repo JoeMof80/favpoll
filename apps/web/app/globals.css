@@ -1,4 +1,9 @@
 @import "tailwindcss";
+
+/* Workspace packages are symlinked through node_modules, which Tailwind's
+   auto-detection skips — without this, shared components (e.g. the theme
+   toggle) only get utilities the app happens to use elsewhere. */
+@source "../../../packages/ui/src";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@clerk/ui/themes/shadcn.css";
