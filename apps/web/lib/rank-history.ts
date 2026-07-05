@@ -118,3 +118,45 @@ export function deriveRankHistory(
 
   return { series, steps: ordered.length, leadChanges }
 }
+
+// ─── Weekly bucketing (topic/record all-time charts) ────────────────────────
+// The favpoll chart uses one step per pledge (a single 30-90 day poll). An
+// all-time topic chart spans months, so we bucket events into weeks and label
+// the axis with real dates — "Purple took the lead in March", not "step 47".
+
+/** Monday 00:00 UTC of the week containing `iso`, as an ISO date string. */
+function weekStart(iso: string): string {
+  const d = new Date(iso)
+  const day = (d.getUTCDay() + 6) % 7 // 0 = Monday
+  d.setUTCDate(d.getUTCDate() - day)
+  d.setUTCHours(0, 0, 0, 0)
+  return d.toISOString()
+}
+
+export type BucketedEvents = {
+  /** One merged event per week that had activity, chronological */
+  buckets: PledgeEvent[]
+  /** weekStart ISO for each bucket — parallel to `buckets` and to the
+   *  RankHistory steps derived from them (used as x-axis labels) */
+  bucketDates: string[]
+}
+
+/**
+ * Merge pledge events into weekly buckets. Each bucket's allocations are the
+ * concatenation of that week's events; feeding these to deriveRankHistory
+ * yields one cumulative-through-that-week ranking per step.
+ */
+export function bucketEventsByWeek(events: PledgeEvent[]): BucketedEvents {
+  const byWeek = new Map<string, PledgeEvent["allocations"]>()
+  for (const e of events) {
+    const key = weekStart(e.createdAt)
+    const arr = byWeek.get(key) ?? []
+    arr.push(...e.allocations)
+    byWeek.set(key, arr)
+  }
+  const weeks = [...byWeek.keys()].sort()
+  return {
+    buckets: weeks.map((w) => ({ createdAt: w, allocations: byWeek.get(w)! })),
+    bucketDates: weeks,
+  }
+}

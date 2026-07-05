@@ -52,6 +52,17 @@ export const PurpleClimbs: Story = {
   args: { history: deriveRankHistory(climbEvents(), labels) },
 }
 
+export const TopicOverTime: Story = {
+  name: "Topic (weekly, dated axis)",
+  args: {
+    history: deriveRankHistory(climbEvents(), labels),
+    title: "Colour over time",
+    caption:
+      "Positions only — how each favourite has ranked across every favpoll.",
+    axisLabels: climbEvents().map((e) => e.createdAt),
+  },
+}
+
 export const TooFewSteps: Story = {
   name: "Below minimum (renders nothing)",
   args: {

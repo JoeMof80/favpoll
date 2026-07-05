@@ -90,3 +90,40 @@ describe("deriveRankHistory", () => {
     expect(h.series.map((s) => s.favouriteId)).toEqual(["a"])
   })
 })
+
+import { bucketEventsByWeek } from "../rank-history"
+
+describe("bucketEventsByWeek", () => {
+  it("merges events in the same ISO week into one bucket", () => {
+    // 2026-05-04 is a Monday; 05-06 (Wed) and 05-10 (Sun) share its week.
+    const { buckets, bucketDates } = bucketEventsByWeek([
+      ev("2026-05-06T10:00:00Z", [["a", 10]]),
+      ev("2026-05-10T10:00:00Z", [["b", 5]]),
+      ev("2026-05-13T10:00:00Z", [["a", 3]]), // next week (Wed)
+    ])
+    expect(buckets).toHaveLength(2)
+    expect(buckets[0].allocations).toHaveLength(2) // two events merged
+    expect(bucketDates[0]).toContain("2026-05-04") // Monday of week 1
+    expect(bucketDates[1]).toContain("2026-05-11")
+  })
+
+  it("returns chronological buckets regardless of input order", () => {
+    const { bucketDates } = bucketEventsByWeek([
+      ev("2026-06-01T10:00:00Z", [["a", 1]]),
+      ev("2026-05-01T10:00:00Z", [["b", 1]]),
+    ])
+    expect(new Date(bucketDates[0]).getTime()).toBeLessThan(
+      new Date(bucketDates[1]).getTime()
+    )
+  })
+
+  it("feeds deriveRankHistory to give a weekly rank timeline", () => {
+    const { buckets } = bucketEventsByWeek([
+      ev("2026-05-04T10:00:00Z", [["a", 20]]), // week 1: Blue leads
+      ev("2026-05-11T10:00:00Z", [["b", 30]]), // week 2: Purple overtakes
+    ])
+    const h = deriveRankHistory(buckets, labels)
+    expect(h.steps).toBe(2)
+    expect(h.series[0].favouriteId).toBe("b") // Purple ends on top
+  })
+})
