@@ -58,6 +58,11 @@ export function usePledge({
   const hasFund = pot !== null && available > 0 && !!clerkUserId
 
   const [pledgeAmount, setPledgeAmount] = useState("")
+  // Guest-wall identity: guests may type a name (blank = "Someone");
+  // isAnonymous hides the name from the wall only — organisers always
+  // see names, which the UI discloses at the point of choice.
+  const [displayName, setDisplayName] = useState("")
+  const [isAnonymous, setIsAnonymous] = useState(false)
   // null = untouched: the suggestion tracks the pledge tier. Once the
   // guest taps a chip their choice is never overridden by tier changes.
   const [touchedTip, setTouchedTip] = useState<number | null>(null)
@@ -155,6 +160,7 @@ export function usePledge({
         potAllocationId: userPotAllocation?.id ?? null,
         totalAmount: numericPledge,
         tipAmount: ownTip,
+        isAnonymous,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -169,6 +175,8 @@ export function usePledge({
         guestEmail: email,
         totalAmount: numericPledge,
         tipAmount: ownTip,
+        displayName: displayName || null,
+        isAnonymous,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -212,6 +220,7 @@ export function usePledge({
         potId: pot.id,
         potCurrentAllocated: pot.total_allocated,
         totalAmount: numericPledge,
+        isAnonymous,
         allocations: computePledgeAllocations(
           pollSelections[pollWithItems.id] ?? [],
           pollWithItems.topics.favourites,
@@ -257,6 +266,10 @@ export function usePledge({
     tipAmount,
     setTipAmount: setTouchedTip,
     tipOptions,
+    displayName,
+    setDisplayName,
+    isAnonymous,
+    setIsAnonymous,
     setGuestEmail,
     toggleFund,
     setPledgeClientSecret,

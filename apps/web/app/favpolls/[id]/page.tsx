@@ -155,6 +155,37 @@ export default async function FavpollPage({ params }: Props) {
     0
   )
 
+  // Guest wall: names resolve server-side (guest display_name, or
+  // users.display_name for signed-in pledgers); anonymous → null →
+  // rendered as "Someone". Amounts never appear on the wall.
+  const { data: wallRows } = await supabase
+    .from("pledges")
+    .select(
+      `id, display_name, is_anonymous, clerk_user_id, created_at,
+       pledge_allocations ( favourites ( label ) )`
+    )
+    .eq("favpoll_poll_id", pollWithItems?.id ?? "")
+    .is("withdrawn_at", null)
+    .order("created_at", { ascending: false })
+    .limit(24)
+
+  const wallClerkIds = [
+    ...new Set(
+      (wallRows ?? [])
+        .map((r) => r.clerk_user_id)
+        .filter((v): v is string => !!v)
+    ),
+  ]
+  const { data: wallUsers } = wallClerkIds.length
+    ? await supabase
+        .from("users")
+        .select("id, display_name")
+        .in("id", wallClerkIds)
+    : { data: [] }
+  const wallUserNames = Object.fromEntries(
+    (wallUsers ?? []).map((u) => [u.id, u.display_name])
+  )
+
   const typedFavpoll = favpoll as FavpollWithDetails
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
@@ -178,6 +209,25 @@ export default async function FavpollPage({ params }: Props) {
     }
   }
 
+  // Wall entries: anonymous pledges show no name; un-entitled viewers
+  // of open polls must not see which favourites were backed (the same
+  // standings gate applied to per-favourite amounts above).
+  const wallEntries = (wallRows ?? []).map((r) => ({
+    id: r.id,
+    name: r.is_anonymous
+      ? null
+      : r.clerk_user_id
+        ? (wallUserNames[r.clerk_user_id] ?? null)
+        : (r.display_name ?? null),
+    labels: entitled
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (r.pledge_allocations ?? [])
+          .map((a: any) => a.favourites?.label)
+          .filter((l: unknown): l is string => typeof l === "string")
+      : [],
+    created_at: r.created_at,
+  }))
+
   // Hide poll with unvetted custom topic from non-organisers
   const visiblePoll =
     isOrganiser || pollWithItems?.topics.is_active !== false
@@ -198,6 +248,7 @@ export default async function FavpollPage({ params }: Props) {
         userPotAllocation={userPotAllocation}
         totalRaised={totalRaised}
         isClosed={isClosed}
+        wallEntries={wallEntries}
         clerkUserId={userId}
         isOrganiser={isOrganiser}
         entitled={entitled}

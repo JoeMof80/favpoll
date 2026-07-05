@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
@@ -32,6 +33,7 @@ type Props = {
   clerkUserId: string | null
   isOrganiser: boolean
   entitled: boolean
+  wallEntries: GuestWallEntry[]
 }
 
 export function FavpollContent({
@@ -44,6 +46,7 @@ export function FavpollContent({
   clerkUserId,
   isOrganiser,
   entitled,
+  wallEntries,
 }: Props) {
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
@@ -174,6 +177,8 @@ export function FavpollContent({
         totalRaised={totalRaised}
         goalAmount={favpoll.goal_amount ?? null}
       />
+
+      <GuestWall entries={wallEntries} />
 
       {/* Guest shared fund contribution card — always shown on open favpolls */}
       {!isClosed && pot && (

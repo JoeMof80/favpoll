@@ -15,6 +15,8 @@ type CreatePledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
+  /** Hide the name from the public guest wall (organiser still sees it) */
+  isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
 }
 
@@ -33,6 +35,7 @@ export async function createPledge(input: CreatePledgeInput) {
       total_amount: input.totalAmount,
       fee: 0,
       tip_amount: input.tipAmount ?? 0,
+      is_anonymous: input.isAnonymous ?? false,
     })
     .select("id")
     .single()
@@ -59,6 +62,10 @@ type CreateGuestPledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
+  /** Name shown on the guest wall; blank = appears as "Someone" */
+  displayName?: string | null
+  /** Hide the name from the public guest wall (organiser still sees it) */
+  isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
 }
 
@@ -95,6 +102,8 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       total_amount: input.totalAmount,
       fee: 0,
       tip_amount: input.tipAmount ?? 0,
+      display_name: input.displayName?.trim() || null,
+      is_anonymous: input.isAnonymous ?? false,
     })
     .select("id")
     .single()
@@ -337,6 +346,7 @@ export async function pledgeFromFund(input: {
   potId: string
   potCurrentAllocated: number
   totalAmount: number
+  isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
 }) {
   const { userId } = await auth()
@@ -358,6 +368,7 @@ export async function pledgeFromFund(input: {
       pot_allocation_id: input.potId,
       total_amount: input.totalAmount,
       fee: 0,
+      is_anonymous: input.isAnonymous ?? false,
     })
     .select("id")
     .single()

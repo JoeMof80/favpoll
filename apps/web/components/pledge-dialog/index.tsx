@@ -274,6 +274,11 @@ export function PledgeDialog({
             onSubmittingChange={setStripeSubmitting}
             onStripeReadyChange={setStripeReady}
             showEmailCapture={!clerkUserId}
+            isGuest={!clerkUserId}
+            displayName={dialog.displayName}
+            onDisplayNameChange={dialog.setDisplayName}
+            isAnonymous={dialog.isAnonymous}
+            onIsAnonymousChange={dialog.setIsAnonymous}
           />
         )}
       </ResponsiveOverlay>
