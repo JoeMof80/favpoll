@@ -31,7 +31,7 @@ export default async function CharityPage({ params }: Props) {
   const { data: charity } = await supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, registered_number, verification_status, is_active"
+      "id, name, description, impact_statement, logo_url, registered_number, verification_status, is_active"
     )
     .eq("id", id)
     .single()
@@ -130,6 +130,12 @@ export default async function CharityPage({ params }: Props) {
       {charity.description && (
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
           {charity.description}
+        </p>
+      )}
+
+      {charity.impact_statement && (
+        <p className="mt-4 inline-block rounded-md bg-secondary/40 px-4 py-2 text-sm font-medium text-secondary-foreground">
+          {charity.impact_statement}
         </p>
       )}
 
