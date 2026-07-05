@@ -260,7 +260,7 @@ describe("usePledge — optional contribution (tip)", () => {
     expect(result.current.tipAmount).toBe(0)
   })
 
-  it("adds the tip to ownCharge and the breakdown once a pledge is entered", () => {
+  it("adds the tip to ownCharge once a pledge is entered", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, defaultTip: 1 })
     )
@@ -268,13 +268,13 @@ describe("usePledge — optional contribution (tip)", () => {
       result.current.updatePledgeAmount("10")
     })
     expect(result.current.ownCharge).toBe(11)
-    const tipLine = result.current.ownBreakdown!.lines.find(
-      (l) => l.label === "For favpoll"
-    )
-    expect(tipLine).toMatchObject({ amount: 1, hidden: false })
+    // the tip is a UI-controlled row, not a breakdown line — no duplicate
+    const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
+    expect(labels).not.toContain("For favpoll")
+    expect(result.current.ownBreakdown!.total.amount).toBe(11)
   })
 
-  it("setTipAmount(0) removes the tip from charge and hides the line", () => {
+  it("setTipAmount(0) removes the tip from the charge", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, defaultTip: 1 })
     )
@@ -283,10 +283,6 @@ describe("usePledge — optional contribution (tip)", () => {
       result.current.setTipAmount(0)
     })
     expect(result.current.ownCharge).toBe(10)
-    const tipLine = result.current.ownBreakdown!.lines.find(
-      (l) => l.label === "For favpoll"
-    )
-    expect(tipLine).toMatchObject({ hidden: true })
   })
 
   it("never touches the charity amount — total_amount stays the pledge", async () => {

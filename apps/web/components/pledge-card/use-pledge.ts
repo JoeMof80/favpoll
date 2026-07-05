@@ -119,11 +119,6 @@ export function usePledge({
               amount: numericTopUp,
               hidden: !isTopUpValid,
             },
-            {
-              label: "For favpoll",
-              amount: ownTip,
-              hidden: ownTip <= 0,
-            },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }
