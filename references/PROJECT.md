@@ -992,7 +992,6 @@ CHARITY_COMMISSION_API_KEY        -- Register of Charities API (api-portal.chari
 - **Clerk production keys** — using `pk_test_` on Vercel until `favpoll.com` points at the app. Swap to `pk_live_` when domain is switched.
 - **Stripe Connect** — disbursement not wired. Cron has placeholder. Connect application pending approval.
 - **All-time rankings** — `/rankings` exists but needs data threshold logic.
-- **Favpoll oversight admin page** — `/favpolls` in admin app is a shell only.
 - **Email templates** — currently plain text via Resend.
 - **Rate limiting** on API routes.
 - **Transactions ledger, then shared-fund tips** — pot top-ups are counter increments on `favpoll_pots` (no per-transaction rows), so the SeedFundModal can't record a contribution yet. When disbursement accounting forces a proper transactions/contributions ledger (Stripe Connect or PPGF), add the optional contribution to the fund dialog using the same inline-breakdown grammar as the pledge step — the organiser seeding the fund is the most willing payer in the system.
