@@ -6,6 +6,7 @@ import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Card, CardContent } from "@/components/ui/card"
+import { meetsCrossTopicThreshold } from "@/lib/record"
 import { LandingHero } from "@/components/landing/hero"
 import { RevealMechanicDemo } from "@/components/landing/reveal-mechanic-demo"
 import { InTheRoom } from "@/components/landing/in-the-room"
@@ -13,8 +14,6 @@ import { RailNav } from "@/components/landing/rail-nav"
 import { RecordHolders } from "@/components/landing/record-holders"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
-
-const RECORD_THRESHOLD_GBP = 500
 
 const NAV = [
   ["#reveal", "The reveal"],
@@ -142,12 +141,7 @@ export default async function HomePage() {
     topics: { title: string } | null
   }
   const recordItems = (topFavourites ?? []) as unknown as TopFavourite[]
-  const recordTotal = recordItems.reduce(
-    (sum, f) => sum + f.all_time_pledged,
-    0
-  )
-  const showRecord =
-    recordTotal >= RECORD_THRESHOLD_GBP && recordItems.length >= 3
+  const showRecord = meetsCrossTopicThreshold(recordItems)
   const recordMax = recordItems[0]?.all_time_pledged ?? 1
 
   const totalLive = normalised.reduce((sum, f) => sum + f.total_raised, 0)
