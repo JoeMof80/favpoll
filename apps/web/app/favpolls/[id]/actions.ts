@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
+import { isRateLimited } from "@/lib/rate-limit"
 
 type PledgeAllocationInput = {
   favouriteId: string
@@ -166,6 +167,16 @@ export async function addGuestItem(
 ) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  // Guest item creation is a spam surface; 20/hour per user is far above
+  // any real guest's use of it.
+  if (
+    await isRateLimited("guest-item", userId, [
+      { name: "1h", max: 20, windowSeconds: 3600 },
+    ])
+  ) {
+    throw new Error("Too many additions — please try again later.")
+  }
 
   const supabase = createAdminClient()
   const trimmed = label.trim()

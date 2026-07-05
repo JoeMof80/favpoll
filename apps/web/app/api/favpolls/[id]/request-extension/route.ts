@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendExtensionRequest } from "@/lib/email"
+import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit"
 
 export async function POST(
   request: Request,
@@ -10,6 +11,15 @@ export async function POST(
   const { userId } = await auth()
   if (!userId)
     return Response.json({ error: "Not authenticated" }, { status: 401 })
+
+  // Sends support email — cap so a compromised session can't flood it.
+  if (
+    await isRateLimited("extension-request", userId, [
+      { name: "1h", max: 10, windowSeconds: 3600 },
+    ])
+  ) {
+    return Response.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 })
+  }
 
   const supabase = createAdminClient()
 
