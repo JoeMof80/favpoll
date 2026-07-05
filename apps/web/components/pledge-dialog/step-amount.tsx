@@ -120,6 +120,8 @@ type Props = {
   toggleFund: () => void
   tipAmount: number
   setTipAmount: (v: number) => void
+  /** false hides the contribution row (hero demo) */
+  showTip?: boolean
   isListed?: boolean
 }
 
@@ -134,6 +136,7 @@ export function StepAmount({
   toggleFund,
   tipAmount,
   setTipAmount,
+  showTip = true,
   isListed,
 }: Props) {
   return (
@@ -203,40 +206,46 @@ export function StepAmount({
             </div>
           )}
 
-          {!useSharedFund && (
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                For favpoll
-              </p>
-              <div
-                className="flex gap-2"
-                role="radiogroup"
-                aria-label="Optional contribution to favpoll"
-              >
-                {TIP_OPTIONS.map(({ value, label }) => (
-                  <Button
-                    key={value}
-                    type="button"
-                    size="sm"
-                    role="radio"
-                    aria-checked={tipAmount === value}
-                    variant={tipAmount === value ? "secondary" : "ghost"}
-                    className="flex-1"
-                    onClick={() => setTipAmount(value)}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Optional — nothing is taken from your pledge. Contributions are
-                what keep favpoll running.
-              </p>
-            </div>
-          )}
-
           {(ownBreakdown ?? fundBreakdown) && (
-            <PledgeBreakdown {...(ownBreakdown ?? fundBreakdown)!} />
+            <div className="space-y-1.5">
+              <PledgeBreakdown
+                {...(ownBreakdown ?? fundBreakdown)!}
+                extraRow={
+                  showTip && !useSharedFund ? (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-muted-foreground">For favpoll</span>
+                      <div
+                        className="flex gap-1"
+                        role="radiogroup"
+                        aria-label="Optional contribution to favpoll"
+                      >
+                        {TIP_OPTIONS.map(({ value, label }) => (
+                          <Button
+                            key={value}
+                            type="button"
+                            size="xs"
+                            role="radio"
+                            aria-checked={tipAmount === value}
+                            variant={
+                              tipAmount === value ? "secondary" : "ghost"
+                            }
+                            className="px-2 font-normal aria-checked:font-medium"
+                            onClick={() => setTipAmount(value)}
+                          >
+                            {label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null
+                }
+              />
+              {showTip && !useSharedFund && (
+                <p className="text-[11px] text-muted-foreground">
+                  Optional — never taken from your pledge.
+                </p>
+              )}
+            </div>
           )}
         </div>
       </div>

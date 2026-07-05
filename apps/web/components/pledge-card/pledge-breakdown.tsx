@@ -7,9 +7,12 @@ export type BreakdownLine = { label: string; amount: number; hidden?: boolean }
 export function PledgeBreakdown({
   lines,
   total,
+  extraRow,
 }: {
   lines: BreakdownLine[]
   total: { label: string; amount: number }
+  /** Optional custom row (e.g. the inline tip control) before the total */
+  extraRow?: React.ReactNode
 }) {
   return (
     <div className="space-y-1.5 border-t border-border pt-3 text-xs">
@@ -23,6 +26,7 @@ export function PledgeBreakdown({
             </span>
           </div>
         ))}
+      {extraRow}
       <div className="flex justify-between border-t border-border pt-1.5 text-sm">
         <span className="font-medium">{total.label}</span>
         <span className="font-semibold tabular-nums">
