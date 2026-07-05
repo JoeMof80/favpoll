@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
@@ -38,7 +39,12 @@ export function CharityRow({ charity, amountRaised, size = "lg" }: Props) {
       )}
       <div className="min-w-0 flex-1">
         <p className={`truncate ${nameClass} font-medium text-foreground`}>
-          {charity.name}
+          <Link
+            href={`/charities/${charity.id}`}
+            className="hover:text-primary hover:underline"
+          >
+            {charity.name}
+          </Link>
         </p>
         {charity.registered_number && size === "lg" && (
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
