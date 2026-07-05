@@ -177,3 +177,12 @@
     font-size: max(16px, 1em);
   }
 }
+
+/* Keepsake and any print view: drop the site chrome. */
+@media print {
+  header,
+  footer,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+}

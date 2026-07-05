@@ -23,7 +23,7 @@ import type {
 import { useFavpollContent } from "./use-favpoll-content"
 import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
 import { PageLayout } from "../page-layout"
-import { Gift } from "lucide-react"
+import { Gift, FileText } from "lucide-react"
 
 type Props = {
   favpoll: FavpollWithDetails
@@ -175,6 +175,17 @@ export function FavpollContent({
             {GBP.format(favpoll.total_raised ?? totalRaised)}
           </p>
           <p className="text-xs text-muted-foreground">raised in total</p>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="mt-3 flex w-full"
+          >
+            <a href={`/favpolls/${favpoll.id}/keepsake`}>
+              <FileText data-icon="inline-start" aria-hidden="true" />
+              Keepsake
+            </a>
+          </Button>
         </div>
       ) : (
         <div className="rounded-lg border border-border bg-card px-5 py-4">
