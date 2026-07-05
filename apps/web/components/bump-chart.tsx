@@ -23,6 +23,9 @@ type Props = {
   caption?: string
   /** ISO date per step; when present, renders a few dated x-axis ticks */
   axisLabels?: string[]
+  /** Preview mode: lines only (no labels/axis/title/caption), fits any
+   *  width. Used as the clickable teaser in the topic right column. */
+  compact?: boolean
   className?: string
 }
 
@@ -38,6 +41,7 @@ export function BumpChart({
   title = "The story of the poll",
   caption = "Positions only — how each favourite ranked as pledges came in.",
   axisLabels,
+  compact = false,
   className,
 }: Props) {
   const { series, steps } = history
@@ -46,9 +50,10 @@ export function BumpChart({
   const maxRank = Math.max(
     ...series.flatMap((s) => s.points.map((p) => p.rank))
   )
+  const padR = compact ? PAD_L : PAD_R
   const width = 640
-  const plotW = width - PAD_L - PAD_R
-  const hasAxis = !!axisLabels && axisLabels.length === steps
+  const plotW = width - PAD_L - padR
+  const hasAxis = !compact && !!axisLabels && axisLabels.length === steps
   const height = PAD_Y * 2 + maxRank * ROW_H + (hasAxis ? AXIS_H : 0)
 
   const x = (step: number) =>
@@ -69,11 +74,44 @@ export function BumpChart({
       )
     : []
 
+  if (compact) {
+    return (
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        role="img"
+        aria-label="Rank over time for each favourite"
+        className={`text-primary ${className ?? ""}`}
+      >
+        {series.map((s) => {
+          const isLeader = s.finalRank === 1
+          const path = s.points
+            .map((p, j) => `${j === 0 ? "M" : "L"} ${x(p.step)} ${y(p.rank)}`)
+            .join(" ")
+          return (
+            <path
+              key={s.favouriteId}
+              d={path}
+              fill="none"
+              stroke={isLeader ? "currentColor" : "var(--chart-3)"}
+              strokeWidth={isLeader ? 2.5 : 1.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity={isLeader ? 1 : 0.5}
+            />
+          )
+        })}
+      </svg>
+    )
+  }
+
   return (
     <div className={className}>
-      <SectionEyebrow variant="muted" className="mb-3 font-semibold">
-        {title}
-      </SectionEyebrow>
+      {title && (
+        <SectionEyebrow variant="muted" className="mb-3 font-semibold">
+          {title}
+        </SectionEyebrow>
+      )}
       <div className="overflow-x-auto">
         <svg
           viewBox={`0 0 ${width} ${height}`}

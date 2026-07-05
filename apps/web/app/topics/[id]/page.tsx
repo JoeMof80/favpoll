@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import type { Topic, Favourite } from "@favpoll/types"
 import { TopicRankings } from "./topic-rankings"
 import { PageLayout } from "@/components/page-layout"
-import { BumpChart } from "@/components/bump-chart"
+import { TopicChartCard } from "@/components/topic-chart-card"
 import {
   deriveRankHistory,
   bucketEventsByWeek,
@@ -94,25 +94,13 @@ export default async function TopicPage({ params }: Props) {
   const topItem = items[0]
 
   const left = (
-    <>
-      {topicHistory && (
-        <div className="mb-8 rounded-lg border border-border bg-card px-5 py-5">
-          <BumpChart
-            history={topicHistory}
-            title={`${typedTopic.title} over time`}
-            caption="Positions only — how each favourite has ranked across every favpoll."
-            axisLabels={bucketDates}
-          />
-        </div>
-      )}
-      <Suspense fallback={null}>
-        <TopicRankings
-          items={items}
-          topicTitle={typedTopic.title}
-          hasColourSwatch={typedTopic.title.toLowerCase().includes("colour")}
-        />
-      </Suspense>
-    </>
+    <Suspense fallback={null}>
+      <TopicRankings
+        items={items}
+        topicTitle={typedTopic.title}
+        hasColourSwatch={typedTopic.title.toLowerCase().includes("colour")}
+      />
+    </Suspense>
   )
 
   const right = (
@@ -156,6 +144,14 @@ export default async function TopicPage({ params }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {topicHistory && (
+        <TopicChartCard
+          history={topicHistory}
+          bucketDates={bucketDates}
+          topicTitle={typedTopic.title}
+        />
       )}
 
       <div className="rounded-lg border border-border bg-card px-5 py-5">
