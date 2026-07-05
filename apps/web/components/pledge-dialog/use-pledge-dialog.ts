@@ -21,8 +21,8 @@ export type UsePledgeDialogOptions = {
   userPotAllocation: PotAllocation | null
   onPledgeSuccess?: (guestToken?: string) => void
   onAddItem?: (label: string) => Promise<void>
-  /** Preselected optional contribution (pounds); 0 for memorials */
-  defaultTip?: number
+  /** false defaults the contribution to None (memorials) */
+  suggestTip?: boolean
 }
 
 export function usePledgeDialog({
@@ -34,7 +34,7 @@ export function usePledgeDialog({
   userPotAllocation,
   onPledgeSuccess,
   onAddItem,
-  defaultTip,
+  suggestTip,
 }: UsePledgeDialogOptions) {
   // --- step 1: picker draft state ---
   const [step, setStep] = useState<PledgeDialogStep>(1)
@@ -91,7 +91,7 @@ export function usePledgeDialog({
     pollSelections: { [pollWithItems.id]: selectedIds },
     onPledgeAmountChange: () => {},
     onPledgeSuccess,
-    defaultTip,
+    suggestTip,
   })
 
   // Auto-advance to step 3 when PI is created

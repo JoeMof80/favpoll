@@ -18,6 +18,8 @@ import {
   FUND_AMBER,
   FUND_RED,
   formatCharityLabel,
+  tipOptionsFor,
+  defaultTipFor,
 } from "./utils"
 import type { BreakdownLine } from "./pledge-breakdown"
 
@@ -31,10 +33,10 @@ export type UsePledgeOptions = {
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
   onPledgeSuccess?: (guestToken?: string) => void
-  /** Preselected optional contribution to favpoll (pounds); 0 = none.
-   *  Memorial favpolls pass 0 — the quietest ask for the most
-   *  sensitive register. */
-  defaultTip?: number
+  /** false = default the contribution to None (memorial favpolls —
+   *  the quietest ask for the most sensitive register). When true the
+   *  suggestion scales with the pledge (see tipOptionsFor). */
+  suggestTip?: boolean
 }
 
 export function usePledge({
@@ -47,7 +49,7 @@ export function usePledge({
   pollSelections,
   onPledgeAmountChange,
   onPledgeSuccess,
-  defaultTip = 1,
+  suggestTip = true,
 }: UsePledgeOptions) {
   const router = useRouter()
 
@@ -56,7 +58,9 @@ export function usePledge({
   const hasFund = pot !== null && available > 0 && !!clerkUserId
 
   const [pledgeAmount, setPledgeAmount] = useState("")
-  const [tipAmount, setTipAmount] = useState(defaultTip)
+  // null = untouched: the suggestion tracks the pledge tier. Once the
+  // guest taps a chip their choice is never overridden by tier changes.
+  const [touchedTip, setTouchedTip] = useState<number | null>(null)
   const [topUpAmount, setTopUpAmount] = useState("")
   const [guestEmail, setGuestEmail] = useState("")
   const [useSharedFund, setUseSharedFund] = useState(false)
@@ -88,6 +92,9 @@ export function usePledge({
   // No platform fee — 100% of the pledge goes to charity (decided 2026-07).
   // The optional contribution rides the same charge but is favpoll's, not
   // the charity's: it lives in tip_amount, never total_amount.
+  const tipOptions = tipOptionsFor(ownBase)
+  const tipAmount =
+    touchedTip !== null ? touchedTip : suggestTip ? defaultTipFor(ownBase) : 0
   const ownTip = ownBase > 0 ? tipAmount : 0
   const ownCharge = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
 
@@ -248,7 +255,8 @@ export function usePledge({
     updatePledgeAmount,
     setTopUpAmount,
     tipAmount,
-    setTipAmount,
+    setTipAmount: setTouchedTip,
+    tipOptions,
     setGuestEmail,
     toggleFund,
     setPledgeClientSecret,
