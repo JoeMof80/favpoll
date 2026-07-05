@@ -7,6 +7,13 @@ type Props = {
   charity: Charity
   amountRaised: number
   size?: FavpollCardSize
+  /**
+   * Link the name to the charity page. Off by default: CharityRow often
+   * renders inside a card that is itself a link (FavpollSummaryCard /
+   * FavpollListCard), and a nested <a> is invalid HTML that breaks
+   * hydration. Only enable where the row is not inside another anchor.
+   */
+  linkToCharity?: boolean
 }
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -15,7 +22,12 @@ const GBP = new Intl.NumberFormat("en-GB", {
   minimumFractionDigits: 0,
 })
 
-export function CharityRow({ charity, amountRaised, size = "lg" }: Props) {
+export function CharityRow({
+  charity,
+  amountRaised,
+  size = "lg",
+  linkToCharity = false,
+}: Props) {
   const logoClass = size === "lg" ? "h-8 w-8" : "h-6 w-6"
   const nameClass = size === "lg" ? "text-sm" : "text-sm"
   const amountClass = size === "lg" ? "text-sm" : "text-sm"
@@ -39,12 +51,16 @@ export function CharityRow({ charity, amountRaised, size = "lg" }: Props) {
       )}
       <div className="min-w-0 flex-1">
         <p className={`truncate ${nameClass} font-medium text-foreground`}>
-          <Link
-            href={`/charities/${charity.id}`}
-            className="hover:text-primary hover:underline"
-          >
-            {charity.name}
-          </Link>
+          {linkToCharity ? (
+            <Link
+              href={`/charities/${charity.id}`}
+              className="hover:text-primary hover:underline"
+            >
+              {charity.name}
+            </Link>
+          ) : (
+            charity.name
+          )}
         </p>
         {charity.registered_number && size === "lg" && (
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
