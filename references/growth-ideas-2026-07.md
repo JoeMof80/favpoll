@@ -25,7 +25,12 @@ where marked **Decided** (currently §4, the no-caps record principle).
 funeral flowers. Families genuinely want this. Honour-boosting rather than
 wallet-boosting.
 
-### 2. Anonymity — proposed model
+### 2. Anonymity — DECIDED (founder, 2026-07-05)
+
+Signed off as proposed, with the disclosure fix: the "hide my name"
+control must state at the point of choice that the organiser can always
+see names. Blank guest name = "Someone" (no anonymity shaming). Shipped
+with the guest wall the same day.
 
 Borrowing what works from JustGiving, tuned to favpoll's registers:
 
@@ -210,8 +215,8 @@ the gift framing).
 | Medium build, highest brand value | Guest wall + the anonymity model above · rank-over-time bump chart (build with the keepsake; zero cost to defer — history already captured) |
 | Strategic investigations (long lead — start early) | Gift Aid · open charity register via PayPal Giving Fund / Stripe Connect · B2B partner tier |
 
-**Decisions proposed here, pending founder sign-off:** the anonymity model
-(§2), no pledger rewards (§5).
+**Decisions proposed here, pending founder sign-off:** no pledger
+rewards (§5). The anonymity model (§2) was signed off 2026-07-05.
 
 **Decided (founder, 2026-07-04):** §4 — no record caps or damping ever;
 breadth visibility (distinct-pledger counts) + methodology transparency
