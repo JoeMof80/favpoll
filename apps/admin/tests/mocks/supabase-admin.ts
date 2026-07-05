@@ -98,9 +98,15 @@ export function makeSupabaseMock() {
     .fn()
     .mockImplementation((table: string) => makeBuilder(table));
 
+  const rpc = vi.fn().mockImplementation((fn: string, args?: unknown) => {
+    calls.push({ table: `rpc:${fn}`, method: "rpc", args: [args] });
+    return Promise.resolve(responses.shift() ?? { data: null, error: null });
+  });
+
   return {
-    supabase: { from },
+    supabase: { from, rpc },
     from,
+    rpc,
     queue: (data: any, error: any = null) => {
       responses.push({ data, error });
     },
