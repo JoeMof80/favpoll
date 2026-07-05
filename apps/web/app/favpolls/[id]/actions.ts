@@ -127,7 +127,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   const { data: pollData } = await supabase
     .from("favpoll_polls")
     .select(
-      "favpoll_id, favpolls(closes_at, protagonists(name), favpoll_charities(charities(name)))"
+      "favpoll_id, favpolls(closes_at, cause_label, protagonists(name), favpoll_charities(charities(name)))"
     )
     .eq("id", input.favpollPollId)
     .single()
@@ -135,7 +135,9 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   try {
     const favpollData = pollData?.favpolls as any
     const protagonistName: string =
-      favpollData?.protagonists?.name ?? "this favpoll"
+      favpollData?.protagonists?.name ??
+      favpollData?.cause_label ??
+      "this favpoll"
     const closesAt: string = favpollData?.closes_at ?? ""
     const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
       (ec: any) => ec.charities.name
@@ -148,6 +150,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       amount: input.totalAmount,
       closesAt,
       guestToken: guest_token,
+      favpollId: pollData?.favpoll_id ?? "",
     })
   } catch (emailErr) {
     console.error("Failed to send pledge confirmation email:", emailErr)
