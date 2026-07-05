@@ -6,6 +6,13 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import type { Topic, Favourite } from "@favpoll/types"
 import { TopicRankings } from "./topic-rankings"
 import { PageLayout } from "@/components/page-layout"
+import { BumpChart } from "@/components/bump-chart"
+import {
+  deriveRankHistory,
+  bucketEventsByWeek,
+  type PledgeEvent,
+} from "@/lib/rank-history"
+import { isEstablishedRecord } from "@/lib/record"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -46,18 +53,66 @@ export default async function TopicPage({ params }: Props) {
 
   const typedTopic = topic as Topic
   const hasActivity = items.some((i) => i.all_time_pledged > 0)
+
+  // All-time bump chart: how this topic's favourites moved across every
+  // favpoll, bucketed by week. Established topics only (same threshold as
+  // /rankings) so a sparse topic doesn't show a sparse chart. Ordinal —
+  // amounts never enter the chart.
+  let topicHistory: ReturnType<typeof deriveRankHistory> | null = null
+  let bucketDates: string[] = []
+  if (isEstablishedRecord(items)) {
+    const { data: allocRows } = await supabase
+      .from("pledge_allocations")
+      .select(
+        `amount, favourite_id,
+         favourites!inner ( label, topic_id ),
+         pledges!inner ( created_at, withdrawn_at )`
+      )
+      .eq("favourites.topic_id", id)
+      .is("pledges.withdrawn_at", null)
+
+    const labels: Record<string, string> = {}
+    const events: PledgeEvent[] = (allocRows ?? []).map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = r as any
+      labels[row.favourite_id] = row.favourites?.label ?? row.favourite_id
+      return {
+        createdAt: row.pledges.created_at,
+        allocations: [
+          { favouriteId: row.favourite_id, amount: row.amount ?? 0 },
+        ],
+      }
+    })
+    const bucketed = bucketEventsByWeek(events)
+    if (bucketed.buckets.length >= 2) {
+      topicHistory = deriveRankHistory(bucketed.buckets, labels)
+      bucketDates = bucketed.bucketDates
+    }
+  }
   const totalPledged = items.reduce((s, i) => s + i.all_time_pledged, 0)
   const totalVotes = items.reduce((s, i) => s + i.all_time_count, 0)
   const topItem = items[0]
 
   const left = (
-    <Suspense fallback={null}>
-      <TopicRankings
-        items={items}
-        topicTitle={typedTopic.title}
-        hasColourSwatch={typedTopic.title.toLowerCase().includes("colour")}
-      />
-    </Suspense>
+    <>
+      {topicHistory && (
+        <div className="mb-8 rounded-lg border border-border bg-card px-5 py-5">
+          <BumpChart
+            history={topicHistory}
+            title={`${typedTopic.title} over time`}
+            caption="Positions only — how each favourite has ranked across every favpoll."
+            axisLabels={bucketDates}
+          />
+        </div>
+      )}
+      <Suspense fallback={null}>
+        <TopicRankings
+          items={items}
+          topicTitle={typedTopic.title}
+          hasColourSwatch={typedTopic.title.toLowerCase().includes("colour")}
+        />
+      </Suspense>
+    </>
   )
 
   const right = (
