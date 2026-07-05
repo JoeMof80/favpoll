@@ -7,6 +7,7 @@ import Link from "next/link"
 const EXPLORE = [
   ["/favpolls", "Live favpolls"],
   ["/rankings", "The record"],
+  ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],
   ["/about", "About favpoll"],
 ] as const
