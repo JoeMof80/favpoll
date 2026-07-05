@@ -97,9 +97,15 @@ export function usePledge({
   // No platform fee — 100% of the pledge goes to charity (decided 2026-07).
   // The optional contribution rides the same charge but is favpoll's, not
   // the charity's: it lives in tip_amount, never total_amount.
-  const tipOptions = tipOptionsFor(ownBase)
   const tipAmount =
     touchedTip !== null ? touchedTip : suggestTip ? defaultTipFor(ownBase) : 0
+  // If a touched tip isn't one of the current tier's chips (e.g. £3 chosen
+  // at £20, then the pledge bumped to £50 whose tier is None/£2/£5/£10),
+  // surface it as an extra chip so the charged amount is never invisible.
+  const baseTipOptions = tipOptionsFor(ownBase)
+  const tipOptions = baseTipOptions.includes(tipAmount)
+    ? baseTipOptions
+    : [...baseTipOptions, tipAmount].sort((a, b) => a - b)
   const ownTip = ownBase > 0 ? tipAmount : 0
   const ownCharge = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
 

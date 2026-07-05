@@ -302,6 +302,24 @@ describe("usePledge — optional contribution (tip)", () => {
     expect(result.current.ownCharge).toBe(50)
   })
 
+  it("surfaces a preserved tip that isn't in the new tier as an extra chip", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, suggestTip: true })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("20") // tier None/£1/£2/£3
+      result.current.setTipAmount(3)
+    })
+    expect(result.current.tipOptions).toEqual([0, 1, 2, 3])
+    act(() => {
+      result.current.updatePledgeAmount("50") // tier None/£2/£5/£10 — no £3
+    })
+    // £3 preserved AND visible: injected into the chip set, still selected
+    expect(result.current.tipAmount).toBe(3)
+    expect(result.current.tipOptions).toEqual([0, 2, 3, 5, 10])
+    expect(result.current.ownCharge).toBe(53)
+  })
+
   it("the breakdown carries no duplicate tip line — total includes it", () => {
     const { result } = renderHook(() =>
       usePledge({ ...baseOptions, suggestTip: true })
