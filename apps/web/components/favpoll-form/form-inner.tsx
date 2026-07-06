@@ -282,8 +282,10 @@ export function FormInner({
               />
             </div>
 
-            {/* Right — sticky meta */}
-            <div className="sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16">
+            {/* Right — meta. Flows below the poll on mobile; a sticky
+                sidebar from lg. Kept reachable on mobile so goal +
+                closing-date editing aren't desktop-only. */}
+            <div className="space-y-4 self-start bg-background lg:sticky lg:top-14 lg:z-10 lg:pt-16">
               <EditableCountdown
                 closesAt={closesAt}
                 onClosesAtChange={onClosesAtChange}
