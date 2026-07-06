@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendFavpollClosed } from "@/lib/email"
+import { disbursementProvider, splitEqually } from "@/lib/disbursement"
 
 // Vercel cron (see vercel.json) — cron invocations are GET requests, so this
 // must be a GET handler or the schedule silently never fires.
@@ -45,6 +46,27 @@ export async function GET(request: Request) {
       (raisedByFavpoll[favpollId] ?? 0) + (row.total_amount ?? 0)
   }
 
+  // Charities per favpoll — proceeds are split equally across them on close.
+  const { data: charityRows } = await supabase
+    .from("favpoll_charities")
+    .select("favpoll_id, charities(id, registered_number)")
+    .in("favpoll_id", favpollIds)
+
+  const charitiesByFavpoll: Record<
+    string,
+    { id: string; registered_number: string | null }[]
+  > = {}
+  for (const row of charityRows ?? []) {
+    const favpollId = (row as unknown as { favpoll_id: string }).favpoll_id
+    const charity = (
+      row as unknown as {
+        charities: { id: string; registered_number: string | null } | null
+      }
+    ).charities
+    if (!charity) continue
+    ;(charitiesByFavpoll[favpollId] ??= []).push(charity)
+  }
+
   // Get organiser emails
   const userIds = [...new Set(favpolls.map((e) => e.created_by))]
   const { data: users } = await supabase
@@ -71,6 +93,54 @@ export async function GET(request: Request) {
     if (updateErr) {
       errors.push(`${favpoll.id}: ${updateErr.message}`)
       continue
+    }
+
+    // Disburse the raised total to the favpoll's charities (equal split),
+    // recording each attempt in the disbursements ledger. Idempotent: a
+    // favpoll is only selected while closed_at was null, so it can't be
+    // disbursed twice. The active provider is a no-op until a real rail is
+    // onboarded, so these land as 'pending' — no money has actually moved yet.
+    const charities = charitiesByFavpoll[favpoll.id] ?? []
+    if (totalRaised > 0 && charities.length > 0) {
+      const registeredById = Object.fromEntries(
+        charities.map((c) => [c.id, c.registered_number])
+      )
+      const ledgerRows = []
+      for (const split of splitEqually(
+        totalRaised,
+        charities.map((c) => c.id)
+      )) {
+        const reference = `${favpoll.id}:${split.charityId}`
+        const result = await disbursementProvider.disburse({
+          favpollId: favpoll.id,
+          charityId: split.charityId,
+          registeredNumber: registeredById[split.charityId] ?? null,
+          amount: split.amount,
+          reference,
+        })
+        ledgerRows.push({
+          favpoll_id: favpoll.id,
+          charity_id: split.charityId,
+          amount: split.amount,
+          provider: disbursementProvider.name,
+          provider_ref: result.providerRef,
+          status: result.status,
+          reason: result.reason ?? null,
+        })
+      }
+
+      const { error: disburseErr } = await supabase
+        .from("disbursements")
+        .insert(ledgerRows)
+
+      if (disburseErr) {
+        // A ledger write failure shouldn't undo the close; surface it instead.
+        console.error(
+          `[close-favpolls] disbursement ledger failed for ${favpoll.id}:`,
+          disburseErr.message
+        )
+        errors.push(`${favpoll.id} disbursement: ${disburseErr.message}`)
+      }
     }
 
     const organiser = userMap[favpoll.created_by]
