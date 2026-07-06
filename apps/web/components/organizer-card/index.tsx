@@ -2,7 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Clock, Monitor, Copy, Check, ExternalLink } from "lucide-react"
+import {
+  Clock,
+  Monitor,
+  Copy,
+  Check,
+  ExternalLink,
+  Printer,
+} from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
@@ -233,6 +240,13 @@ export function OrganizerCard({ favpoll }: Props) {
               )}
             </Button>
           </div>
+          {/* Print pack — poster + table cards for the venue */}
+          <Button asChild variant="outline" size="sm" className="mt-1 w-full">
+            <a href={`/favpolls/${favpoll.id}/pack`}>
+              <Printer data-icon="inline-start" aria-hidden="true" />
+              Print pack
+            </a>
+          </Button>
         </div>
       </div>
 

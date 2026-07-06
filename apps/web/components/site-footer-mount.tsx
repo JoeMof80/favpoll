@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/landing/site-footer"
 const EXCLUDED = [
   /^\/favpolls\/[^/]+\/live$/, // projector live display
   /^\/favpolls\/[^/]+\/keepsake$/, // print keepsake
+  /^\/favpolls\/[^/]+\/pack$/, // print pack
 ]
 
 // App-wide footer, mounted in the root layout. A client pathname check is
