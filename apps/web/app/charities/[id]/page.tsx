@@ -88,6 +88,10 @@ export default async function CharityPage({ params }: Props) {
   })
 
   const isVerified = charity.verification_status === "verified"
+  const contactEmail =
+    process.env.PARTNERSHIPS_EMAIL ??
+    process.env.SUPPORT_EMAIL ??
+    "hello@favpoll.com"
 
   return (
     <main className="mx-auto max-w-330 px-6 py-12">
@@ -192,6 +196,25 @@ export default async function CharityPage({ params }: Props) {
           <Link href="/favpolls/new">Create a favpoll</Link>
         </Button>
       </div>
+
+      {/* Charity claim — a manual first step before a self-service portal:
+          gathers demand and starts the relationship without a verification
+          system. The subject carries the charity name + id so replies are
+          identifiable. */}
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        Is this your charity?{" "}
+        <a
+          href={`mailto:${contactEmail}?subject=${encodeURIComponent(
+            `Charity page — ${charity.name}`
+          )}&body=${encodeURIComponent(
+            `We'd like to help keep ${charity.name}'s favpoll page up to date (logo, description, impact statement).\n\nCharity: ${charity.name}\nReference: ${charity.id}`
+          )}`}
+          className="font-medium text-primary hover:underline"
+        >
+          Get in touch
+        </a>{" "}
+        to help keep this page up to date.
+      </p>
     </main>
   )
 }
