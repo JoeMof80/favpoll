@@ -294,6 +294,7 @@ generated_drafts (
 20260705160000_rate_limits.sql                            -- rate_limits table + check_rate_limit() RPC (fixed-window; service-role only)
 20260705180000_charity_stats.sql                          -- charity_stats(charity_id) RPC: per-charity total raised (equal-split across each favpoll's charities) + favpoll/live counts; service-role only
 20260706000000_all_charity_stats.sql                      -- all_charity_stats() RPC: batch per-charity {total_raised, live_count} keyed by id (charities index; avoids N+1)
+20260706020000_charity_impact_statement.sql               -- ADD COLUMN impact_statement text on charities (admin-curated pledge-time line)
 ```
 
 ---

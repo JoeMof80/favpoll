@@ -18,6 +18,7 @@ type Props = {
   favpollId: string
   clerkUserId: string | null
   charityNames: string[]
+  impactStatements?: string[]
   pollWithItems: FavpollPollWithItems
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
@@ -35,6 +36,7 @@ export function PledgeDialog({
   favpollId,
   clerkUserId,
   charityNames,
+  impactStatements,
   pollWithItems,
   pot,
   userPotAllocation,
@@ -257,6 +259,7 @@ export function PledgeDialog({
             fundBreakdown={dialog.fundBreakdown}
             favouriteBreakdown={dialog.favouriteBreakdown}
             toggleFund={dialog.toggleFund}
+            impactStatements={impactStatements}
             tipAmount={dialog.tipAmount}
             setTipAmount={dialog.setTipAmount}
             tipOptions={dialog.tipOptions}

@@ -13,6 +13,8 @@ export type Charity = {
   description: string | null;
   logo_url: string | null;
   registered_number: string | null;
+  /** Admin-curated impact line shown at pledge time; null = none */
+  impact_statement?: string | null;
   /** Charity Commission check, written by the admin app; null = never checked */
   verification_status?:
     | "verified"

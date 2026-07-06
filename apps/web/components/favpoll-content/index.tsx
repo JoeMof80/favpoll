@@ -94,6 +94,9 @@ export function FavpollContent({
       : 0
 
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
+  const impactStatements = favpoll.favpoll_charities
+    .map((ec) => ec.charities.impact_statement)
+    .filter((s): s is string => !!s && s.trim().length > 0)
 
   const pledgeDialog =
     !isClosed && pollWithItems ? (
@@ -101,6 +104,7 @@ export function FavpollContent({
         favpollId={favpoll.id}
         clerkUserId={clerkUserId}
         charityNames={charityNames}
+        impactStatements={impactStatements}
         pollWithItems={pollWithItems}
         pot={pot}
         userPotAllocation={userPotAllocation}

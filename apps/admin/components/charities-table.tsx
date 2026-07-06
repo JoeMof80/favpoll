@@ -110,6 +110,7 @@ function MarketSelect({
 type CharityFormValues = {
   name: string;
   description: string;
+  impact_statement: string;
   registered_number: string;
   logo_url: string;
   market: string;
@@ -240,6 +241,16 @@ function CharityFields({
             className="resize-none"
           />
         </Field>
+        <Field
+          label="Impact statement (shown at pledge time)"
+          className="sm:col-span-2"
+        >
+          <Input
+            value={form.impact_statement}
+            onChange={(e) => set("impact_statement", e.target.value)}
+            placeholder="£20 funds an hour of nursing care"
+          />
+        </Field>
         <Field label="Logo URL">
           <Input
             value={form.logo_url}
@@ -263,6 +274,7 @@ function CharityFields({
 const EMPTY_FORM: CharityFormValues = {
   name: "",
   description: "",
+  impact_statement: "",
   registered_number: "",
   logo_url: "",
   market: "en-GB",
@@ -473,6 +485,7 @@ function CharityRow({
   const [form, setForm] = useState<CharityFormValues>({
     name: charity.name,
     description: charity.description ?? "",
+    impact_statement: charity.impact_statement ?? "",
     registered_number: charity.registered_number ?? "",
     logo_url: charity.logo_url ?? "",
     market: charity.market,

@@ -23,6 +23,7 @@ export type Charity = {
   name: string;
   description: string | null;
   logo_url: string | null;
+  impact_statement: string | null;
   registered_number: string | null;
   verification_status: VerificationStatus | null;
   verified_name: string | null;
@@ -64,7 +65,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, registered_number, verification_status, verified_name, verified_at, is_active, market, created_at",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, is_active, market, created_at",
     )
     .order("name", { ascending: true });
 
@@ -81,6 +82,7 @@ export async function getCharities(
 export async function createCharity(input: {
   name: string;
   description?: string;
+  impact_statement?: string;
   registered_number?: string;
   logo_url?: string;
   market: string;
@@ -100,6 +102,7 @@ export async function createCharity(input: {
   const { error } = await supabase.from("charities").insert({
     name,
     description: input.description?.trim() || null,
+    impact_statement: input.impact_statement?.trim() || null,
     registered_number: registeredNumber,
     logo_url: input.logo_url?.trim() || null,
     market: input.market,
@@ -118,6 +121,7 @@ export async function updateCharity(
   data: {
     name?: string;
     description?: string;
+    impact_statement?: string;
     registered_number?: string;
     logo_url?: string;
     market?: string;
@@ -131,6 +135,8 @@ export async function updateCharity(
   if (data.name !== undefined) updates.name = data.name.trim();
   if (data.description !== undefined)
     updates.description = data.description.trim() || null;
+  if (data.impact_statement !== undefined)
+    updates.impact_statement = data.impact_statement.trim() || null;
   if (data.registered_number !== undefined)
     updates.registered_number = data.registered_number.trim() || null;
   if (data.logo_url !== undefined)

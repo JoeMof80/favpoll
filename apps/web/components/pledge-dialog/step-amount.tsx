@@ -6,6 +6,7 @@ import { GBP, formatTipLabel } from "@/components/pledge-card/utils"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Sparkles } from "lucide-react"
 
 type FavouriteBreakdownLine = { label: string; amount: number }
 
@@ -109,6 +110,8 @@ type Props = {
   } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
   toggleFund: () => void
+  /** Admin-curated impact lines per charity ("£20 funds an hour…") */
+  impactStatements?: string[]
   tipAmount: number
   setTipAmount: (v: number) => void
   /** Chip values for the current pledge tier (see tipOptionsFor) */
@@ -127,6 +130,7 @@ export function StepAmount({
   fundBreakdown,
   favouriteBreakdown,
   toggleFund,
+  impactStatements,
   tipAmount,
   setTipAmount,
   tipOptions,
@@ -153,6 +157,22 @@ export function StepAmount({
               </Button>
             ))}
           </div>
+          {impactStatements && impactStatements.length > 0 && (
+            <div className="space-y-1.5 rounded-md bg-secondary/40 px-3 py-2.5">
+              {impactStatements.map((statement, i) => (
+                <p
+                  key={i}
+                  className="flex items-start gap-1.5 text-xs text-secondary-foreground"
+                >
+                  <Sparkles
+                    className="mt-0.5 size-3 shrink-0"
+                    aria-hidden="true"
+                  />
+                  {statement}
+                </p>
+              ))}
+            </div>
+          )}
           {isListed && (
             <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
               This is a public favpoll. Your pledge amount and identity are
