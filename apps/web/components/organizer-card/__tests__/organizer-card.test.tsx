@@ -7,8 +7,8 @@ vi.mock("@/app/favpolls/[id]/actions", () => ({
   setFavpollListed: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock("qrcode.react", () => ({
-  QRCodeSVG: ({
+vi.mock("@/components/branded-qr", () => ({
+  BrandedQR: ({
     value,
     "aria-label": label,
   }: {

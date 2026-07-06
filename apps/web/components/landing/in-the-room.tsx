@@ -2,7 +2,7 @@
 
 // The two modes of a favpoll: complete on its own, or paired with the day
 // itself — where the live display and a QR code put it in the room.
-import { QRCodeSVG } from "qrcode.react"
+import { BrandedQR } from "@/components/branded-qr"
 import { Link2, MonitorPlay } from "lucide-react"
 import { RankingBar } from "@/components/ui/ranking-bar"
 
@@ -69,7 +69,7 @@ export function InTheRoom() {
             ))}
           </div>
           <div className="shrink-0 rounded-md border border-border bg-background p-2">
-            <QRCodeSVG value="https://favpoll.com" size={72} />
+            <BrandedQR value="https://favpoll.com" size={72} />
             <p className="mt-1 text-center text-xs text-muted-foreground">
               scan to pledge
             </p>
