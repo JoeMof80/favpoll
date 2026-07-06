@@ -129,13 +129,15 @@ describe("GET /api/cron/close-favpolls — closes favpolls", () => {
         total_amount: totalRaised,
       },
     ])
-    // 3. users select
+    // 3. favpoll_charities select — none by default, so no disbursement occurs
+    mock.queue([])
+    // 4. users select
     mock.queue(
       organiserEmail
         ? [{ id: userId, email: organiserEmail, display_name: "Organiser" }]
         : [{ id: userId, email: null, display_name: null }]
     )
-    // 4. favpolls update (per favpoll in loop)
+    // 5. favpolls update (per favpoll in loop)
     mock.queue(null, updateError)
   }
 
@@ -210,6 +212,7 @@ describe("GET /api/cron/close-favpolls — closes favpolls", () => {
       { id: favpollId2, created_by: userId, protagonists: { name: "B" } },
     ])
     mock.queue([]) // no pledges
+    mock.queue([]) // no charities → no disbursement
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
     // First favpoll update → error
     mock.queue(null, { message: "update failed" })
@@ -238,6 +241,7 @@ describe("GET /api/cron/close-favpolls — closes favpolls", () => {
       { favpoll_polls: { favpoll_id: favpollId }, total_amount: 30 },
       { favpoll_polls: { favpoll_id: favpollId }, total_amount: 20 },
     ])
+    mock.queue([]) // no charities
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
     mock.queue(null) // update
 
@@ -247,5 +251,85 @@ describe("GET /api/cron/close-favpolls — closes favpolls", () => {
       .callsFor("favpolls")
       .find((c) => c.method === "update")!
     expect(favpollsUpdate.args[0].total_raised).toBe(100)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Disbursement — ledger written on close
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("GET /api/cron/close-favpolls — disbursement", () => {
+  it("records an equal-split disbursement per charity in the ledger", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
+    ])
+    mock.queue([{ favpoll_polls: { favpoll_id: favpollId }, total_amount: 90 }])
+    // Three charities
+    mock.queue([
+      {
+        favpoll_id: favpollId,
+        charities: { id: "ch-1", registered_number: "111" },
+      },
+      {
+        favpoll_id: favpollId,
+        charities: { id: "ch-2", registered_number: "222" },
+      },
+      {
+        favpoll_id: favpollId,
+        charities: { id: "ch-3", registered_number: null },
+      },
+    ])
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null) // favpolls update
+    mock.queue(null) // disbursements insert
+
+    await GET(makeRequest("Bearer test-secret"))
+
+    const insert = mock
+      .callsFor("disbursements")
+      .find((c) => c.method === "insert")!
+    const rows = insert.args[0]
+    expect(rows).toHaveLength(3)
+    expect(rows.map((r: { amount: number }) => r.amount)).toEqual([30, 30, 30])
+    expect(rows.every((r: { status: string }) => r.status === "pending")).toBe(
+      true
+    )
+    expect(rows.every((r: { provider: string }) => r.provider === "noop")).toBe(
+      true
+    )
+    expect(rows[0]).toMatchObject({
+      favpoll_id: favpollId,
+      charity_id: "ch-1",
+      provider_ref: `noop:${favpollId}:ch-1`,
+    })
+  })
+
+  it("does not disburse when the favpoll raised nothing", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
+    ])
+    mock.queue([]) // no pledges → totalRaised 0
+    mock.queue([
+      {
+        favpoll_id: favpollId,
+        charities: { id: "ch-1", registered_number: "111" },
+      },
+    ])
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null) // favpolls update
+
+    const res = await GET(makeRequest("Bearer test-secret"))
+    const body = await res.json()
+
+    expect(body.closed).toBe(1)
+    expect(
+      mock.callsFor("disbursements").filter((c) => c.method === "insert")
+    ).toHaveLength(0)
   })
 })
