@@ -76,7 +76,7 @@ import { SCENES } from "../scenes"
 
 // Page-copy verbatim — matches revealLockLabel(firstName) for SCENES[0]
 // (the normalised reveal-lock pill; see components/reveal-lock.tsx).
-const LOCK_CARD_COPY = "Pledge to see Belinda's reveal"
+const LOCK_CARD_COPY = "Pledge to reveal Belinda's favourite"
 
 const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
@@ -441,7 +441,9 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
 
   it("cause uses the person-free reveal lock label", () => {
     renderScene(causeScene, "arriving")
-    expect(screen.getByText("Pledge to see the reveal")).toBeInTheDocument()
+    expect(
+      screen.getByText("Pledge to reveal the favourite")
+    ).toBeInTheDocument()
   })
 
   it("shows the cause reveal text when unlocked", () => {
@@ -455,7 +457,7 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
     expect(screen.getByTestId("protagonist-avatar")).toBeInTheDocument()
     const firstName = fundraiserScene.protagonist!.name.split(/[\s&]+/)[0]
     expect(
-      screen.getByText(`Pledge to see ${firstName}'s reveal`)
+      screen.getByText(`Pledge to reveal ${firstName}'s favourite`)
     ).toBeInTheDocument()
   })
 })
