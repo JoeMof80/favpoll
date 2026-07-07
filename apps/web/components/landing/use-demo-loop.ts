@@ -92,6 +92,24 @@ export function useDemoLoop() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneIndex])
 
+  // Jump the loop to a chosen scene (the register tap-to-jump), disrupting the
+  // auto-cycle. For motion, setting sceneIndex re-runs the effect and restarts
+  // that scene's animation, then cycling continues from there. For reduced
+  // motion the effect no-ops, so resolve the target scene's payoff directly.
+  const goToScene = (i: number) => {
+    if (i === sceneIndex) return
+    clearAll()
+    setFading(false)
+    if (prefersReducedMotion) {
+      setPhase("reveal")
+      setBarWidths(SCENES[i].results.map((r) => r.widthPercent))
+    } else {
+      setPhase("arriving")
+      setBarWidths(decoyFor(SCENES[i]))
+    }
+    setSceneIndex(i)
+  }
+
   return {
     scene: SCENES[sceneIndex],
     sceneIndex,
@@ -99,6 +117,7 @@ export function useDemoLoop() {
     barWidths,
     fading,
     prefersReducedMotion,
+    goToScene,
   }
 }
 

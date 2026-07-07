@@ -8,8 +8,12 @@
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import { SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
+import {
+  SCENE_EYEBROWS,
+  REGISTER_TABS,
+} from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
 import { useDemoLoop, beatForPhase } from "./use-demo-loop"
 import { CountUp } from "./count-up"
@@ -23,8 +27,15 @@ type Props = {
 }
 
 export function LandingHero({ liveCount, totalLive }: Props) {
-  const { scene, sceneIndex, phase, barWidths, fading, prefersReducedMotion } =
-    useDemoLoop()
+  const {
+    scene,
+    sceneIndex,
+    phase,
+    barWidths,
+    fading,
+    prefersReducedMotion,
+    goToScene,
+  } = useDemoLoop()
   const beat = beatForPhase(phase)
 
   return (
@@ -111,9 +122,38 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             ~360px-wide screen. Stacks below the pitch on mobile. */}
         <div className="mx-auto md:mx-0">
           <span className="sr-only">
-            Animated demonstration of how favpoll works. The demonstration
-            cycles through different occasions automatically.
+            Animated demonstration of how favpoll works. It cycles through the
+            different kinds of favpoll automatically; use the buttons below to
+            jump to one.
           </span>
+          {/* Register nav — jump the demo to a kind of favpoll, disrupting the
+              auto-cycle so a visitor doesn't wait for their kind to come round. */}
+          <div
+            className="mb-4 flex flex-wrap justify-center gap-2"
+            role="group"
+            aria-label="Preview a kind of favpoll"
+          >
+            {REGISTER_TABS.map((tab) => {
+              const active = tab.registers.includes(scene.register)
+              return (
+                <Button
+                  key={tab.label}
+                  type="button"
+                  size="sm"
+                  variant={active ? "secondary" : "ghost"}
+                  aria-pressed={active}
+                  onClick={() => goToScene(tab.sceneIndex)}
+                  className={cn(
+                    "rounded-full",
+                    !active &&
+                      "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  )}
+                >
+                  {tab.label}
+                </Button>
+              )
+            })}
+          </div>
           <div
             className="transition-opacity duration-400"
             style={{ opacity: fading ? 0 : 1 }}
