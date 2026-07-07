@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils"
 
 export function revealLockLabel(firstName: string | null): string {
   return firstName
-    ? `Pledge to see ${firstName}'s reveal`
-    : "Pledge to see the reveal"
+    ? `Pledge to reveal ${firstName}'s favourite`
+    : "Pledge to reveal the favourite"
 }
 
 type PillProps = {
