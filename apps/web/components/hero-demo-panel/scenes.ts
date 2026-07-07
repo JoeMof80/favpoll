@@ -600,3 +600,32 @@ export const SCENE_EYEBROWS = [
   "For a cause worth backing",
   "Just for the love of it",
 ]
+
+export type RegisterTab = {
+  label: string
+  /** Register(s) this tab represents — "A celebration" maps two. */
+  registers: Register[]
+  /** Scene index the tab jumps to (first scene of its register). */
+  sceneIndex: number
+}
+
+// Softened, visitor-facing labels (distinct from the organiser create-flow
+// chips) for the demo's tap-to-jump nav — so a visitor can see their kind of
+// favpoll without waiting for the auto-cycle to reach it.
+const REGISTER_TAB_DEFS: { label: string; registers: Register[] }[] = [
+  { label: "In memory", registers: ["remembering"] },
+  {
+    label: "A celebration",
+    registers: ["celebrating_one", "celebrating_many"],
+  },
+  { label: "For a cause", registers: ["cause"] },
+  { label: "Just because", registers: ["neutral"] },
+]
+
+export const REGISTER_TABS: RegisterTab[] = REGISTER_TAB_DEFS.map((tab) => ({
+  ...tab,
+  sceneIndex: Math.max(
+    0,
+    SCENES.findIndex((s) => tab.registers.includes(s.register))
+  ),
+}))

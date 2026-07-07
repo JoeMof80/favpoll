@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import type { Phase } from "../scenes"
 
 // ── Framer-motion stub ────────────────────────────────────────────────────────
@@ -399,6 +399,22 @@ describe("LandingHero — reduced motion", () => {
     const reveals = screen.getAllByTestId("poll-reveal")
     expect(reveals.length).toBeGreaterThanOrEqual(1)
     expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
+  })
+
+  it("jumps the demo to the cause scene when the 'For a cause' chip is clicked", () => {
+    render(<LandingHero liveCount={6} totalLive={0} />)
+    // Starts on the first scene (Belinda / remembering), not the cause scene.
+    expect(screen.queryByText("For young minds")).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "For a cause" }))
+    expect(screen.getByText("For young minds")).toBeInTheDocument()
+  })
+
+  it("jumps the demo to the standalone scene when 'Just because' is clicked", () => {
+    render(<LandingHero liveCount={6} totalLive={0} />)
+    fireEvent.click(screen.getByRole("button", { name: "Just because" }))
+    expect(
+      screen.getByText("The greatest song ever written")
+    ).toBeInTheDocument()
   })
 })
 
