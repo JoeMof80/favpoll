@@ -1,5 +1,4 @@
 import type { PollResultItem } from "@/components/favpoll-card/types"
-import type { Register } from "@/lib/registers"
 
 export type Phase =
   | "arriving" // trigger button shown
@@ -35,9 +34,15 @@ export type Phase =
  * Demo-only fields (selectedIndex, pledgeAmount, results, total) carry
  * animation or display data that has no DB equivalent.
  */
+// Visitor-facing kinds for the demo nav. These match the wizard's mental model
+// (its three Types + the faceless cause Who), NOT the internal register — which
+// collapses both "a person's fundraiser" and "a faceless cause" into `cause`.
+// "fundraiser" keeps a protagonist (a runner); "cause" is faceless (none).
+export type SceneKind = "memorial" | "celebration" | "fundraiser" | "cause"
+
 export type HeroScene = {
-  /** Which register this scene demonstrates (drives breadth incl. cause + standalone) */
-  register: Register
+  /** Visitor-facing kind — drives the tap-to-jump nav. */
+  kind: SceneKind
   // ── Supabase-aligned ──────────────────────────────────────────────────────
   /** Drives the headline prefix via getFavpollHeadline (e.g. "Memorial") */
   occasion_type: string
@@ -87,7 +92,7 @@ export type HeroScene = {
 
 export const SCENES: HeroScene[] = [
   {
-    register: "remembering",
+    kind: "memorial",
     occasion_type: "Memorial",
     opening_line: null,
     protagonist: {
@@ -141,7 +146,7 @@ export const SCENES: HeroScene[] = [
     total: "£1,005",
   },
   {
-    register: "celebrating_one",
+    kind: "celebration",
     occasion_type: "Birthday",
     opening_line: null,
     protagonist: {
@@ -214,7 +219,7 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
-    register: "celebrating_one",
+    kind: "celebration",
     occasion_type: "Retirement",
     opening_line: null,
     protagonist: {
@@ -257,7 +262,7 @@ export const SCENES: HeroScene[] = [
     total: "£700",
   },
   {
-    register: "celebrating_many",
+    kind: "celebration",
     occasion_type: "Engagement",
     opening_line: null,
     protagonist: {
@@ -333,7 +338,7 @@ export const SCENES: HeroScene[] = [
     total: "£950",
   },
   {
-    register: "celebrating_one",
+    kind: "celebration",
     occasion_type: "Leaving do",
     opening_line: null,
     protagonist: {
@@ -406,7 +411,7 @@ export const SCENES: HeroScene[] = [
     total: "£585",
   },
   {
-    register: "celebrating_one",
+    kind: "celebration",
     occasion_type: "Graduation",
     opening_line: null,
     protagonist: {
@@ -486,7 +491,7 @@ export const SCENES: HeroScene[] = [
   {
     // ── Cause: no person honoured; the money still goes to a registered
     //    charity (mirrors the live subject="cause" shape). ──
-    register: "cause",
+    kind: "cause",
     occasion_type: "Cause",
     opening_line: null,
     protagonist: null,
@@ -535,56 +540,60 @@ export const SCENES: HeroScene[] = [
     total: "£740",
   },
   {
-    // ── Standalone: no person, no occasion, no cause — the purest favpoll.
-    //    Question-as-title; the money still goes to a registered charity. ──
-    register: "neutral",
-    occasion_type: "Open",
+    // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —
+    //    so it keeps a protagonist (the runner). Register-wise it derives to
+    //    `cause`, but it is nothing like a faceless appeal. ──
+    kind: "fundraiser",
+    occasion_type: "Sponsored event",
     opening_line: null,
-    protagonist: null,
-    heading: "The greatest song ever written",
-    eyebrow: "Just because",
-    blurb:
-      "No occasion, no catch — pledge your favourite, and every penny goes to Shelter.",
+    protagonist: {
+      name: "Marcus Bell",
+      context: "London Marathon · 26.2 miles",
+      about:
+        "Running his first marathon for the British Heart Foundation, in memory of his dad. There's one dance he's promised to bust out at the finish line.",
+      photo_url: null,
+    },
     poll: {
-      id: "demo-poll-open",
+      id: "demo-poll-fundraiser",
       personal_reveal:
-        "No secret to keep — just your favourite, and a warm bed for someone who needs one.",
+        "Northern Soul. Marcus has been spinning at all-nighters since he was nineteen.",
       topic: {
-        title: "Song",
+        title: "Dance",
         favourites: [
-          { id: "sg-bohemian", label: "Bohemian Rhapsody" },
-          { id: "sg-dancing", label: "Dancing on My Own" },
-          { id: "sg-hallelujah", label: "Hallelujah" },
-          { id: "sg-heroes", label: "Heroes" },
-          { id: "sg-imagine", label: "Imagine" },
-          { id: "sg-respect", label: "Respect" },
-          { id: "sg-superstition", label: "Superstition" },
-          { id: "sg-teenspirit", label: "Smells Like Teen Spirit" },
-          { id: "sg-waterloo", label: "Waterloo Sunset" },
-          { id: "sg-wonderful", label: "What a Wonderful World" },
-          { id: "sg-yesterday", label: "Yesterday" },
+          { id: "d-ballet", label: "Ballet" },
+          { id: "d-ballroom", label: "Ballroom" },
+          { id: "d-breakdancing", label: "Breakdancing" },
+          { id: "d-charleston", label: "Charleston" },
+          { id: "d-disco", label: "Disco" },
+          { id: "d-flamenco", label: "Flamenco" },
+          { id: "d-jive", label: "Jive" },
+          { id: "d-linedancing", label: "Line dancing" },
+          { id: "d-northernsoul", label: "Northern Soul" },
+          { id: "d-salsa", label: "Salsa" },
+          { id: "d-tango", label: "Tango" },
+          { id: "d-waltz", label: "Waltz" },
         ],
       },
     },
     charities: [
       {
-        id: "ch-shelter",
-        name: "Shelter",
+        id: "ch-bhf",
+        name: "British Heart Foundation",
         logo_url: null,
-        registered_number: "263710",
+        registered_number: "225971",
       },
     ],
-    selectedIndex: 8,
-    pledgeAmount: "£10",
+    selectedIndex: 9,
+    pledgeAmount: "£20",
     results: [
-      { label: "Bohemian Rhapsody", amount: "£260", widthPercent: 78 },
-      { label: "Imagine", amount: "£210", widthPercent: 63 },
-      { label: "Waterloo Sunset", amount: "£150", widthPercent: 45 },
-      { label: "Hallelujah", amount: "£110", widthPercent: 33 },
-      { label: "Heroes", amount: "£80", widthPercent: 24 },
-      { label: "Yesterday", amount: "£50", widthPercent: 15 },
+      { label: "Salsa", amount: "£240", widthPercent: 80 },
+      { label: "Ballroom", amount: "£190", widthPercent: 63 },
+      { label: "Northern Soul", amount: "£150", widthPercent: 50 },
+      { label: "Tango", amount: "£110", widthPercent: 37 },
+      { label: "Jive", amount: "£75", widthPercent: 25 },
+      { label: "Disco", amount: "£45", widthPercent: 15 },
     ],
-    total: "£860",
+    total: "£810",
   },
 ]
 
@@ -598,34 +607,32 @@ export const SCENE_EYEBROWS = [
   "For the one who's moving on",
   "As they take their next step",
   "For a cause worth backing",
-  "Just for the love of it",
+  "For the challenge, and the cause",
 ]
 
-export type RegisterTab = {
+export type NavTab = {
   label: string
-  /** Register(s) this tab represents — "A celebration" maps two. */
-  registers: Register[]
-  /** Scene index the tab jumps to (first scene of its register). */
+  kind: SceneKind
+  /** Scene index the tab jumps to (first scene of its kind). */
   sceneIndex: number
 }
 
 // Softened, visitor-facing labels (distinct from the organiser create-flow
 // chips) for the demo's tap-to-jump nav — so a visitor can see their kind of
-// favpoll without waiting for the auto-cycle to reach it.
-const REGISTER_TAB_DEFS: { label: string; registers: Register[] }[] = [
-  { label: "In memory", registers: ["remembering"] },
-  {
-    label: "A celebration",
-    registers: ["celebrating_one", "celebrating_many"],
-  },
-  { label: "For a cause", registers: ["cause"] },
-  { label: "Just because", registers: ["neutral"] },
+// favpoll without waiting for the auto-cycle to reach it. Cut by visitor kind,
+// so "A fundraiser" (a person's challenge) and "For a cause" (a faceless
+// appeal) read as the different things they are.
+const NAV_TAB_DEFS: { label: string; kind: SceneKind }[] = [
+  { label: "In memory", kind: "memorial" },
+  { label: "A celebration", kind: "celebration" },
+  { label: "A fundraiser", kind: "fundraiser" },
+  { label: "For a cause", kind: "cause" },
 ]
 
-export const REGISTER_TABS: RegisterTab[] = REGISTER_TAB_DEFS.map((tab) => ({
+export const NAV_TABS: NavTab[] = NAV_TAB_DEFS.map((tab) => ({
   ...tab,
   sceneIndex: Math.max(
     0,
-    SCENES.findIndex((s) => tab.registers.includes(s.register))
+    SCENES.findIndex((s) => s.kind === tab.kind)
   ),
 }))

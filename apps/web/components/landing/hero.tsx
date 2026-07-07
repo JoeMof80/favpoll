@@ -1,17 +1,14 @@
 "use client"
 
-// Landing hero: purple band with monogram shimmer texture, cycling occasion
-// eyebrow + per-occasion headline (synced to the demo scene), and the live
-// animated demo card in a browser-style frame (traffic lights signal that
-// it's a demo). The card renders at full logical size and is optically
-// scaled to 80%.
+// Landing hero: purple band with monogram shimmer texture, one fixed universal
+// headline, a cycling eyebrow that carries the occasion, a kind nav to jump the
+// demo, and the live animated demo card in a browser-style frame (traffic
+// lights signal that it's a demo). The card renders at full logical size and is
+// optically scaled to 80%.
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import {
-  SCENE_EYEBROWS,
-  REGISTER_TABS,
-} from "@/components/hero-demo-panel/scenes"
+import { SCENE_EYEBROWS, NAV_TABS } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
@@ -59,7 +56,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             </AnimatePresence>
           </div>
           {/* Single, register-agnostic headline — no longer cycles with the
-              scene; the eyebrow carries the register, the subheader the soul. */}
+              scene; the eyebrow carries the occasion, the subheader the soul. */}
           <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
             {t("landing.headline")}
           </h1>
@@ -126,15 +123,15 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             different kinds of favpoll automatically; use the buttons below to
             jump to one.
           </span>
-          {/* Register nav — jump the demo to a kind of favpoll, disrupting the
+          {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
           <div
             className="mb-4 flex flex-wrap justify-center gap-2"
             role="group"
             aria-label="Preview a kind of favpoll"
           >
-            {REGISTER_TABS.map((tab) => {
-              const active = tab.registers.includes(scene.register)
+            {NAV_TABS.map((tab) => {
+              const active = tab.kind === scene.kind
               return (
                 <Button
                   key={tab.label}

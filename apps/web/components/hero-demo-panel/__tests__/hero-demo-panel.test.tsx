@@ -409,20 +409,18 @@ describe("LandingHero — reduced motion", () => {
     expect(screen.getByText("For young minds")).toBeInTheDocument()
   })
 
-  it("jumps the demo to the standalone scene when 'Just because' is clicked", () => {
+  it("jumps the demo to the fundraiser scene when 'A fundraiser' is clicked", () => {
     render(<LandingHero liveCount={6} totalLive={0} />)
-    fireEvent.click(screen.getByRole("button", { name: "Just because" }))
-    expect(
-      screen.getByText("The greatest song ever written")
-    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "A fundraiser" }))
+    expect(screen.getByText("Marcus Bell")).toBeInTheDocument()
   })
 })
 
-// ── No-protagonist scenes (cause + standalone) ────────────────────────────────
+// ── Cause (faceless, no protagonist) vs fundraiser (a person's challenge) ──────
 
-describe("DemoCard — cause + standalone (no protagonist)", () => {
-  const causeScene = SCENES.find((s) => s.register === "cause")!
-  const standaloneScene = SCENES.find((s) => s.register === "neutral")!
+describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
+  const causeScene = SCENES.find((s) => s.kind === "cause")!
+  const fundraiserScene = SCENES.find((s) => s.kind === "fundraiser")!
 
   function renderScene(s: (typeof SCENES)[number], phase: Phase) {
     return render(
@@ -435,33 +433,29 @@ describe("DemoCard — cause + standalone (no protagonist)", () => {
     )
   }
 
-  it.each([
-    ["cause", () => causeScene],
-    ["standalone", () => standaloneScene],
-  ] as const)(
-    "renders the %s heading and no protagonist avatar",
-    (_label, get) => {
-      const s = get()
-      renderScene(s, "arriving")
-      expect(screen.getByText(s.heading!)).toBeInTheDocument()
-      expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
-    }
-  )
+  it("cause is faceless — renders its heading and no protagonist avatar", () => {
+    renderScene(causeScene, "arriving")
+    expect(screen.getByText(causeScene.heading!)).toBeInTheDocument()
+    expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
+  })
 
-  it.each([
-    ["cause", () => causeScene],
-    ["standalone", () => standaloneScene],
-  ] as const)(
-    "uses the person-free reveal lock label for the %s scene",
-    (_label, get) => {
-      renderScene(get(), "arriving")
-      expect(screen.getByText("Pledge to see the reveal")).toBeInTheDocument()
-    }
-  )
+  it("cause uses the person-free reveal lock label", () => {
+    renderScene(causeScene, "arriving")
+    expect(screen.getByText("Pledge to see the reveal")).toBeInTheDocument()
+  })
 
   it("shows the cause reveal text when unlocked", () => {
     renderScene(causeScene, "reveal")
     const reveals = screen.getAllByTestId("poll-reveal")
     expect(reveals[0]).toHaveTextContent(causeScene.poll.personal_reveal)
+  })
+
+  it("fundraiser keeps its protagonist — avatar shown, named reveal lock", () => {
+    renderScene(fundraiserScene, "arriving")
+    expect(screen.getByTestId("protagonist-avatar")).toBeInTheDocument()
+    const firstName = fundraiserScene.protagonist!.name.split(/[\s&]+/)[0]
+    expect(
+      screen.getByText(`Pledge to see ${firstName}'s reveal`)
+    ).toBeInTheDocument()
   })
 })
