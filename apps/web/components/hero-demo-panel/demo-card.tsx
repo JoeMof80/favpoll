@@ -112,18 +112,30 @@ export function DemoCard({
   const raisedNum = Number(scene.total.replace(/[^0-9.]/g, "")) || 0
   const amountNum = Number(scene.pledgeAmount.replace(/[^0-9.]/g, "")) || 0
   const amountStr = String(amountNum)
-  const firstName = scene.protagonist.name.split(" ")[0]
   const revealText = scene.poll.personal_reveal
-  const aboutText = scene.protagonist.about ?? ""
   const results = scene.results.slice(0, RESULTS_SHOWN)
 
-  const headline = getFavpollHeadline({
-    occasionType: scene.occasion_type,
-    name: scene.protagonist.name,
-    dateLabel: scene.protagonist.context,
-    openingLine: scene.opening_line,
-    subject: "someone",
-  })
+  // A scene may honour a person (remembering / celebrating) or no one at all
+  // (cause / standalone). With no protagonist, the h1 comes from the scene's
+  // own heading, the eyebrow is the register label, and the avatar + the
+  // person-named reveal lock fall away.
+  const protagonist = scene.protagonist
+  const firstName = protagonist ? protagonist.name.split(/[\s&]+/)[0] : null
+  const aboutText = protagonist?.about ?? scene.blurb ?? ""
+
+  const headline = protagonist
+    ? getFavpollHeadline({
+        occasionType: scene.occasion_type,
+        name: protagonist.name,
+        dateLabel: protagonist.context,
+        openingLine: scene.opening_line,
+        subject: "someone",
+      })
+    : null
+
+  const title = protagonist ? protagonist.name : (scene.heading ?? "")
+  const cardPrefix = protagonist ? headline!.prefix : (scene.eyebrow ?? "")
+  const cardSuffix = protagonist ? headline!.suffix : null
 
   // ── Phase flags ───────────────────────────────────────────────────────────
   const triggerHover = phase === "trigger-hover"
@@ -310,19 +322,19 @@ export function DemoCard({
       <div className="flex-1 space-y-4 overflow-hidden">
         {/* Hero */}
         <div className="relative">
-          <div className="pr-24">
+          <div className={protagonist ? "pr-24" : ""}>
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
             >
-              {headline.prefix}
+              {cardPrefix}
             </SectionEyebrow>
             <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground">
-              {scene.protagonist.name}
+              {title}
             </h1>
-            {headline.suffix && (
+            {cardSuffix && (
               <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary">
-                {headline.suffix}
+                {cardSuffix}
               </p>
             )}
           </div>
@@ -340,12 +352,14 @@ export function DemoCard({
               </p>
             </div>
           )}
-          <div className="absolute top-0 right-0 origin-top-right scale-[0.8]">
-            <ProtagonistAvatar
-              name={scene.protagonist.name}
-              photoUrl={scene.protagonist.photo_url}
-            />
-          </div>
+          {protagonist && (
+            <div className="absolute top-0 right-0 origin-top-right scale-[0.8]">
+              <ProtagonistAvatar
+                name={protagonist.name}
+                photoUrl={protagonist.photo_url}
+              />
+            </div>
+          )}
         </div>
 
         {/* "FAVOURITE {topic}" pill — merged header + pledge trigger. */}
@@ -373,7 +387,7 @@ export function DemoCard({
             <div className="blur-xs" aria-hidden="true">
               <PollReveal
                 personalReveal={revealText}
-                protagonistFirstName={firstName}
+                protagonistFirstName={firstName ?? undefined}
               />
             </div>
           ) : (
@@ -382,7 +396,7 @@ export function DemoCard({
               <div className="invisible" aria-hidden="true">
                 <PollReveal
                   personalReveal={revealText}
-                  protagonistFirstName={firstName}
+                  protagonistFirstName={firstName ?? undefined}
                 />
               </div>
               <div
@@ -392,7 +406,7 @@ export function DemoCard({
               >
                 <PollReveal
                   personalReveal={revealShown || "\u00A0"}
-                  protagonistFirstName={firstName}
+                  protagonistFirstName={firstName ?? undefined}
                 />
               </div>
             </div>
@@ -410,11 +424,7 @@ export function DemoCard({
                 className="absolute inset-0 z-[1] flex items-center justify-center"
                 aria-hidden="true"
               >
-                <RevealLockPill
-                  label={revealLockLabel(
-                    scene.protagonist.name.split(/[\s&]+/)[0]
-                  )}
-                />
+                <RevealLockPill label={revealLockLabel(firstName)} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,4 +1,5 @@
 import type { PollResultItem } from "@/components/favpoll-card/types"
+import type { Register } from "@/lib/registers"
 
 export type Phase =
   | "arriving" // trigger button shown
@@ -35,18 +36,27 @@ export type Phase =
  * animation or display data that has no DB equivalent.
  */
 export type HeroScene = {
+  /** Which register this scene demonstrates (drives breadth incl. cause + standalone) */
+  register: Register
   // ── Supabase-aligned ──────────────────────────────────────────────────────
   /** Drives the headline prefix via getFavpollHeadline (e.g. "Memorial") */
   occasion_type: string
   /** Custom opening line override; null = derive prefix from occasion_type */
   opening_line: string | null
+  /** null for cause + standalone favpolls — no person is honoured */
   protagonist: {
     name: string
     context: string | null
     /** Withholding intro — introduces the person, never names the favourite */
     about: string
     photo_url: string | null
-  }
+  } | null
+  /** h1 for no-protagonist scenes: the cause label, or the question-as-title */
+  heading?: string
+  /** small eyebrow prefix inside the card for no-protagonist scenes */
+  eyebrow?: string
+  /** typed "about"-equivalent line for no-protagonist scenes */
+  blurb?: string
   poll: {
     id: string
     personal_reveal: string
@@ -77,6 +87,7 @@ export type HeroScene = {
 
 export const SCENES: HeroScene[] = [
   {
+    register: "remembering",
     occasion_type: "Memorial",
     opening_line: null,
     protagonist: {
@@ -130,6 +141,7 @@ export const SCENES: HeroScene[] = [
     total: "£1,005",
   },
   {
+    register: "celebrating_one",
     occasion_type: "Birthday",
     opening_line: null,
     protagonist: {
@@ -202,6 +214,7 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
+    register: "celebrating_one",
     occasion_type: "Retirement",
     opening_line: null,
     protagonist: {
@@ -244,6 +257,7 @@ export const SCENES: HeroScene[] = [
     total: "£700",
   },
   {
+    register: "celebrating_many",
     occasion_type: "Engagement",
     opening_line: null,
     protagonist: {
@@ -319,6 +333,7 @@ export const SCENES: HeroScene[] = [
     total: "£950",
   },
   {
+    register: "celebrating_one",
     occasion_type: "Leaving do",
     opening_line: null,
     protagonist: {
@@ -391,6 +406,7 @@ export const SCENES: HeroScene[] = [
     total: "£585",
   },
   {
+    register: "celebrating_one",
     occasion_type: "Graduation",
     opening_line: null,
     protagonist: {
@@ -467,6 +483,109 @@ export const SCENES: HeroScene[] = [
     ],
     total: "£1,030",
   },
+  {
+    // ── Cause: no person honoured; the money still goes to a registered
+    //    charity (mirrors the live subject="cause" shape). ──
+    register: "cause",
+    occasion_type: "Cause",
+    opening_line: null,
+    protagonist: null,
+    heading: "For young minds",
+    eyebrow: "A cause",
+    blurb:
+      "A team fundraiser for children's mental health — pledge your favourite, and it all goes to YoungMinds.",
+    poll: {
+      id: "demo-poll-cause",
+      personal_reveal:
+        "Every pledge helps YoungMinds reach a young person before they reach crisis.",
+      topic: {
+        title: "Hot drink",
+        favourites: [
+          { id: "hd-chai", label: "Chai" },
+          { id: "hd-coffee", label: "Coffee" },
+          { id: "hd-espresso", label: "Espresso" },
+          { id: "hd-flatwhite", label: "Flat white" },
+          { id: "hd-greentea", label: "Green tea" },
+          { id: "hd-hotchoc", label: "Hot chocolate" },
+          { id: "hd-latte", label: "Latte" },
+          { id: "hd-mocha", label: "Mocha" },
+          { id: "hd-peppermint", label: "Peppermint tea" },
+          { id: "hd-tea", label: "Tea" },
+        ],
+      },
+    },
+    charities: [
+      {
+        id: "ch-ym",
+        name: "YoungMinds",
+        logo_url: null,
+        registered_number: "1016968",
+      },
+    ],
+    selectedIndex: 1,
+    pledgeAmount: "£10",
+    results: [
+      { label: "Tea", amount: "£240", widthPercent: 80 },
+      { label: "Coffee", amount: "£205", widthPercent: 68 },
+      { label: "Hot chocolate", amount: "£120", widthPercent: 40 },
+      { label: "Latte", amount: "£85", widthPercent: 28 },
+      { label: "Chai", amount: "£55", widthPercent: 18 },
+      { label: "Flat white", amount: "£35", widthPercent: 12 },
+    ],
+    total: "£740",
+  },
+  {
+    // ── Standalone: no person, no occasion, no cause — the purest favpoll.
+    //    Question-as-title; the money still goes to a registered charity. ──
+    register: "neutral",
+    occasion_type: "Open",
+    opening_line: null,
+    protagonist: null,
+    heading: "The greatest song ever written",
+    eyebrow: "Just because",
+    blurb:
+      "No occasion, no catch — pledge your favourite, and every penny goes to Shelter.",
+    poll: {
+      id: "demo-poll-open",
+      personal_reveal:
+        "No secret to keep — just your favourite, and a warm bed for someone who needs one.",
+      topic: {
+        title: "Song",
+        favourites: [
+          { id: "sg-bohemian", label: "Bohemian Rhapsody" },
+          { id: "sg-dancing", label: "Dancing on My Own" },
+          { id: "sg-hallelujah", label: "Hallelujah" },
+          { id: "sg-heroes", label: "Heroes" },
+          { id: "sg-imagine", label: "Imagine" },
+          { id: "sg-respect", label: "Respect" },
+          { id: "sg-superstition", label: "Superstition" },
+          { id: "sg-teenspirit", label: "Smells Like Teen Spirit" },
+          { id: "sg-waterloo", label: "Waterloo Sunset" },
+          { id: "sg-wonderful", label: "What a Wonderful World" },
+          { id: "sg-yesterday", label: "Yesterday" },
+        ],
+      },
+    },
+    charities: [
+      {
+        id: "ch-shelter",
+        name: "Shelter",
+        logo_url: null,
+        registered_number: "263710",
+      },
+    ],
+    selectedIndex: 8,
+    pledgeAmount: "£10",
+    results: [
+      { label: "Bohemian Rhapsody", amount: "£260", widthPercent: 78 },
+      { label: "Imagine", amount: "£210", widthPercent: 63 },
+      { label: "Waterloo Sunset", amount: "£150", widthPercent: 45 },
+      { label: "Hallelujah", amount: "£110", widthPercent: 33 },
+      { label: "Heroes", amount: "£80", widthPercent: 24 },
+      { label: "Yesterday", amount: "£50", widthPercent: 15 },
+    ],
+    total: "£860",
+  },
 ]
 
 export const PLEDGE_AMOUNTS = ["£5", "£10", "£20", "£50"]
@@ -478,4 +597,6 @@ export const SCENE_EYEBROWS = [
   "For the yes that changes everything",
   "For the one who's moving on",
   "As they take their next step",
+  "For a cause worth backing",
+  "Just for the love of it",
 ]

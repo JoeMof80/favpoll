@@ -12,7 +12,7 @@ import { SCENES } from "@/components/hero-demo-panel/scenes"
 
 const scene = SCENES[1] // Poppy Chen — Sweet Sixteen, Ice cream
 const REVEAL = scene.poll.personal_reveal
-const FIRST_NAME = scene.protagonist.name.split(" ")[0]
+const FIRST_NAME = scene.protagonist!.name.split(" ")[0]
 
 export function RevealMechanicDemo() {
   const [pledged, setPledged] = useState(false)
@@ -52,7 +52,7 @@ export function RevealMechanicDemo() {
         Favourite {scene.poll.topic.title.toLowerCase()}
       </p>
       <p className="mb-4 text-sm text-muted-foreground">
-        {FIRST_NAME}, {scene.protagonist.context?.toLowerCase()} — her guests
+        {FIRST_NAME}, {scene.protagonist!.context?.toLowerCase()} — her guests
         saw this locked card first.
       </p>
 

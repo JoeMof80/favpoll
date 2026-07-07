@@ -136,7 +136,7 @@ describe("DemoCard — locked phases", () => {
     renderCard("arriving")
     // The reserve <p> always carries the full About text (the typed copy starts
     // as NBSP). getByText traverses textContent regardless of aria-hidden.
-    const aboutEls = screen.getAllByText(scene.protagonist.about, {
+    const aboutEls = screen.getAllByText(scene.protagonist!.about, {
       exact: false,
     })
     expect(aboutEls.length).toBeGreaterThanOrEqual(1)
@@ -399,5 +399,53 @@ describe("LandingHero — reduced motion", () => {
     const reveals = screen.getAllByTestId("poll-reveal")
     expect(reveals.length).toBeGreaterThanOrEqual(1)
     expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
+  })
+})
+
+// ── No-protagonist scenes (cause + standalone) ────────────────────────────────
+
+describe("DemoCard — cause + standalone (no protagonist)", () => {
+  const causeScene = SCENES.find((s) => s.register === "cause")!
+  const standaloneScene = SCENES.find((s) => s.register === "neutral")!
+
+  function renderScene(s: (typeof SCENES)[number], phase: Phase) {
+    return render(
+      <DemoCard
+        scene={s}
+        phase={phase}
+        barWidths={DECOY_WIDTHS}
+        prefersReducedMotion={false}
+      />
+    )
+  }
+
+  it.each([
+    ["cause", () => causeScene],
+    ["standalone", () => standaloneScene],
+  ] as const)(
+    "renders the %s heading and no protagonist avatar",
+    (_label, get) => {
+      const s = get()
+      renderScene(s, "arriving")
+      expect(screen.getByText(s.heading!)).toBeInTheDocument()
+      expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
+    }
+  )
+
+  it.each([
+    ["cause", () => causeScene],
+    ["standalone", () => standaloneScene],
+  ] as const)(
+    "uses the person-free reveal lock label for the %s scene",
+    (_label, get) => {
+      renderScene(get(), "arriving")
+      expect(screen.getByText("Pledge to see the reveal")).toBeInTheDocument()
+    }
+  )
+
+  it("shows the cause reveal text when unlocked", () => {
+    renderScene(causeScene, "reveal")
+    const reveals = screen.getAllByTestId("poll-reveal")
+    expect(reveals[0]).toHaveTextContent(causeScene.poll.personal_reveal)
   })
 })
