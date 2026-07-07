@@ -83,28 +83,33 @@ favpoll charges no platform fee. 100% of every pledge reaches the charity; Strip
 
 ## Landing page — headline and eyebrow copy
 
-### Headline — one per occasion, cycling with the hero demo scene
+### Headline — one fixed, universal line
 
-As of 2026-07-03 (landing redesign) the headline cycles with the occasion,
-in step with the eyebrow and the demo scene. All six share one rhythm — the
-verb carries the register. The memorial line is the canonical original and
-must never change:
+As of 2026-07-07 the headline is a single, register-agnostic line. It does the
+job the brand statement can't — the hook + the mechanic — while the **eyebrow**
+carries the register/occasion and the **brand statement** carries the soul
+(see the concept model, `references/favpoll-concept-model-2026-07.md`):
 
 ```
-Memorial:    Honour them through what they loved — for the causes they cared about.
-Birthday:    Celebrate them through what they love — for the causes they care about.
-Retirement:  Thank them through what they love — for the causes they care about.
-Engagement:  Toast them through what they love — for the causes they care about.
-Leaving do:  Send them off with what they love — for the causes they care about.
-Graduation:  Cheer them on through what they love — for the causes they care about.
+Turn what you love into what you give.
 ```
 
-Canonical strings live in `messages/en-GB.json` under `landing.headline.*` —
-edit there, never inline. Only the memorial line uses past tense. Any new
-occasion headline must keep the "<verb> them … what they love — for the
-causes they care about." rhythm. (History: a single fixed headline was the
-rule from 2026-06-24 to 2026-07-03; before that, "Introducing a new way to
-honour them.")
+It does **not** cycle. The register signal (remembering, celebrating, cause,
+standalone) lives entirely in the eyebrow + the hero demo scene, so the headline
+stays true for every register — including cause and standalone favpolls, which
+the old per-occasion headlines silently excluded. The reveal spark is carried by
+the eyebrow and the first "Locked until you've given" section, not the headline.
+
+Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
+there, never inline. (This structure change — from `landing.headline.*` to a
+single `landing.headline` — lands with the 2026-07-07 hero rebuild.)
+
+History: 2026-07-03 → 2026-07-07, six honour-locked headlines cycled per occasion
+(all sharing "<verb> them … what they love — for the causes they care about.",
+canonical memorial line "Honour them through what they loved — for the causes
+they cared about."). A single fixed headline was the rule 2026-06-24 → 2026-07-03;
+before that, "Introducing a new way to honour them." Retired because they defined
+favpoll by honouring a person, downgrading cause and standalone favpolls.
 
 ### Brand subheader — fixed
 
@@ -112,7 +117,21 @@ honour them.")
 Expressions of joy, for charitable causes, in the name of those we love.
 ```
 
-### Eyebrows — update with active occasion in hero demo
+### Eyebrows — carry the register, cycle with the hero demo scene
+
+The eyebrow is now the line that carries the register/occasion (the headline is
+fixed). As of the 2026-07-07 hero rebuild the demo cycles by **register**, and
+must include **cause** and **standalone** — which the old occasion-only set
+omitted, silently downgrading honourless favpolls.
+
+Softened, visitor-facing tap-to-jump labels for the demo:
+
+```
+In memory  ·  A celebration  ·  For a cause  ·  Just because
+```
+
+Poetic eyebrow copy per occasion (used within the remembering / celebrating
+registers):
 
 ```
 Memorial:   In memory of someone special
@@ -123,8 +142,9 @@ Engagement: The yes that changes everything
 Graduation: As they take their next step
 ```
 
-Never show the headline without an eyebrow. Headline and eyebrow must always
-agree on the occasion — they change together, in sync with the demo scene.
+Cause + standalone eyebrow copy is finalised with the hero rebuild. Never show
+the headline without an eyebrow; the eyebrow changes in sync with the demo scene
+while the headline stays fixed.
 
 ### Supporting line — fixed
 
@@ -309,6 +329,13 @@ Never describe favpoll as:
 - A prediction market
 - A polling tool (too generic)
 - A memorial app (too narrow)
+- **A crowdfunding platform** — the recipient is **always a registered
+  charity**. favpoll never raises money for a project ("a village hall roof"),
+  a personal/DIY fund, or the organiser themselves (no self-beneficiary). A
+  "cause" favpoll means a charitable cause with a registered-charity recipient,
+  never a project fund. Crowdfunding is deliberately deferred — it would break
+  the charity pillar, sit outside the disbursement rail (Goodstack Impact
+  Foundation → registered charities), and forfeit Gift Aid.
 
 ---
 

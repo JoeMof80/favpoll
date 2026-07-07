@@ -17,18 +17,6 @@ import { HeroTexture } from "./hero-texture"
 
 const BEATS = ["Choose", "Pledge", "Reveal"] as const
 
-// One headline per scene (Memorial, Birthday, Retirement, Engagement,
-// Leaving do, Graduation) — same rhythm, the verb carries the register.
-// The memorial line is the canonical brand headline.
-const SCENE_HEADLINE_KEYS = [
-  "landing.headline.memorial",
-  "landing.headline.birthday",
-  "landing.headline.retirement",
-  "landing.headline.engagement",
-  "landing.headline.leaving_do",
-  "landing.headline.graduation",
-] as const
-
 type Props = {
   liveCount: number
   totalLive: number
@@ -59,19 +47,10 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               </motion.p>
             </AnimatePresence>
           </div>
-          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:min-h-[10.5rem] md:text-5xl">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={`headline-${sceneIndex}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="block"
-              >
-                {t(SCENE_HEADLINE_KEYS[sceneIndex])}
-              </motion.span>
-            </AnimatePresence>
+          {/* Single, register-agnostic headline — no longer cycles with the
+              scene; the eyebrow carries the register, the subheader the soul. */}
+          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
+            {t("landing.headline")}
           </h1>
           <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
             {t("landing.subheader")}
