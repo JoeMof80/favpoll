@@ -42,19 +42,35 @@ it as the copy spine is what stops honourless favpolls being downgraded.
 The schema already models these (`remembering`, `celebrating_one`,
 `celebrating_many`, `cause`, `neutral`). None is a sub-case of another.
 
-- **Remembering** — memorials, tributes. _The emotional flagship, and the
-  origin._
-- **Celebrating** — a person, a couple, a group. Birthdays, retirements,
-  weddings, teams.
-- **A cause** — no person honoured; the favpoll rallies around a charitable
-  cause. The cause is the _subject_; the **recipient is still a registered
-  charity** that serves it (e.g. in support of the local hospice, for mental
-  health via Mind, for the air ambulance). _Not_ a project fund.
-- **Open / standalone** — just a favpoll. No person, no event, no occasion. The
-  purest expression of what favpoll is.
+The create wizard actually models this as **two axes**, which matters:
 
-Cause and standalone are **not afterthoughts**. The copy and the demo must give
-them real presence.
+- **Who** — He / She / They (a person) · A couple · A group · **A cause**. Only
+  "A cause" has no protagonist.
+- **Type** — Celebration · Memorial · **Fundraiser**.
+
+They combine freely — so **"Fundraiser" is a _Type_, not a Who.** A marathon
+runner is _a person + Fundraiser_ and **keeps their protagonist** (name, photo,
+bio). Only _A cause_ is faceless. (Internally `deriveRegister` collapses both a
+person's fundraiser and a faceless cause into the `cause` register — so
+"register" alone can't tell you if there's a person; the `event_subject` field
+does.)
+
+The visitor-facing **kinds** (used by the demo nav and copy) are therefore:
+
+- **Remembering / In memory** — memorials, tributes. _The emotional flagship,
+  and the origin._ Has a protagonist.
+- **Celebrating** — a person, a couple, a group. Birthdays, retirements,
+  weddings, teams. Has a protagonist.
+- **A fundraiser** — a person's charitable challenge (a marathon runner).
+  **Has a protagonist.** The vivid "favpoll beyond a life event" case.
+- **For a cause** — faceless; no person. The cause is the _subject_; the
+  **recipient is still a registered charity** (e.g. the local hospice, mental
+  health via Mind). _Not_ a project fund. No protagonist.
+
+None of these is an afterthought — the copy and demo give each real presence.
+(The `neutral` "Open / other" register stays a valid organiser fallback but is
+**not a featured demo scene** — it's abstract, and the fundraiser now carries
+the "no life event needed" point far more concretely.)
 
 ## Boundary — what favpoll is NOT (yet)
 
@@ -148,9 +164,17 @@ them, not instead of them.
      let the eyebrow + first "Locked until you've given" section carry the
      reveal instead of forcing it into the headline.
    - _Changing the headline means updating the favpoll-brand skill once locked._
-2. **Standalone/open register — gets its own demo scene** (at least to evaluate;
-   "even if we don't keep it"). Demo cycles four register scenes: remembering ·
-   celebrating · cause · standalone.
-3. **Register labels — softened for visitors** (demo tap-to-jump, distinct from
-   the organiser create-flow chips): **"In memory" · "A celebration" · "For a
-   cause" · "Just because."** _To confirm._
+2. **Demo scenes — cut by visitor _kind_, not raw register.** Because
+   `deriveRegister` collapses a person's fundraiser and a faceless cause into
+   `cause`, the demo tags scenes by a visitor-facing `kind`
+   (memorial · celebration · fundraiser · cause) so the two read as the
+   different things they are. Four scenes:
+   - **In memory** (protagonist), **A celebration** (protagonist),
+     **A fundraiser** (protagonist — a marathon runner), **For a cause**
+     (faceless, no protagonist).
+   - **Standalone/"Just because" (neutral) was DROPPED** as a featured scene —
+     weak and abstract; the fundraiser carries the "beyond a life event" point
+     concretely. Neutral stays a valid organiser fallback, just not a demo.
+3. **Nav labels — softened for visitors** (demo tap-to-jump, distinct from the
+   organiser create-flow chips): **"In memory" · "A celebration" · "A
+   fundraiser" · "For a cause."** (Implemented, PRs #200–#203.)

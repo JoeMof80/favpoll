@@ -124,11 +124,18 @@ fixed). As of the 2026-07-07 hero rebuild the demo cycles by **register**, and
 must include **cause** and **standalone** — which the old occasion-only set
 omitted, silently downgrading honourless favpolls.
 
-Softened, visitor-facing tap-to-jump labels for the demo:
+Softened, visitor-facing tap-to-jump labels for the demo — cut by visitor
+**kind**, matching the wizard's three Types + the faceless cause Who (NOT the
+internal register, which collapses fundraiser and cause together):
 
 ```
-In memory  ·  A celebration  ·  For a cause  ·  Just because
+In memory  ·  A celebration  ·  A fundraiser  ·  For a cause
 ```
+
+Note: **"Fundraiser" is a _Type_, not a Who** — a marathon runner is a person +
+Fundraiser and **keeps their protagonist**. Only "A cause" is faceless. The
+`neutral` "Open / other" register is a valid organiser fallback but is **not** a
+featured demo scene.
 
 Poetic eyebrow copy per occasion (used within the remembering / celebrating
 registers):
