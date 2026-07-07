@@ -86,7 +86,7 @@ const meta = {
     isClosed: false,
     hasPledged: false,
     pledgeJustConfirmed: false,
-    protagonistName: SCENES[0].protagonist.name,
+    protagonistName: SCENES[0].protagonist!.name,
     isCause: false,
     poll: MEMORIAL_POLL,
     isOrganiser: false,
@@ -106,7 +106,7 @@ export const PledgeView: Story = {
   name: "Pledge view — Colour (Memorial)",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonist.name,
+    protagonistName: SCENES[0].protagonist!.name,
     hasPledged: false,
   },
 }
@@ -115,7 +115,7 @@ export const PledgeViewBirthday: Story = {
   name: "Pledge view — Ice cream (Birthday)",
   args: {
     poll: BIRTHDAY_POLL,
-    protagonistName: SCENES[1].protagonist.name,
+    protagonistName: SCENES[1].protagonist!.name,
     hasPledged: false,
   },
 }
@@ -126,7 +126,7 @@ export const ResultsWithReveal: Story = {
   name: "Results view — reveal shown (Memorial)",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonist.name,
+    protagonistName: SCENES[0].protagonist!.name,
     hasPledged: true,
     entitled: true,
     personalReveal: MEMORIAL_POLL.personal_reveal,
@@ -138,7 +138,7 @@ export const ResultsWithRevealRetirement: Story = {
   name: "Results view — reveal shown (Retirement)",
   args: {
     poll: RETIREMENT_POLL,
-    protagonistName: SCENES[2].protagonist.name,
+    protagonistName: SCENES[2].protagonist!.name,
     hasPledged: true,
     entitled: true,
     personalReveal: RETIREMENT_POLL.personal_reveal,
@@ -152,7 +152,7 @@ export const Closed: Story = {
   name: "Closed poll",
   args: {
     poll: MEMORIAL_POLL,
-    protagonistName: SCENES[0].protagonist.name,
+    protagonistName: SCENES[0].protagonist!.name,
     isClosed: true,
     hasPledged: false,
     entitled: true,

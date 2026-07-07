@@ -72,7 +72,7 @@ type Story = StoryObj<typeof meta>
 export const Memorial: Story = {
   args: {
     favpollId: "demo-memorial",
-    protagonistName: SCENES[0].protagonist.name,
+    protagonistName: SCENES[0].protagonist!.name,
     dateLabel: "1943–2024",
     openingLine: "In memory of",
     description:
@@ -97,7 +97,7 @@ export const WithGoal: Story = {
 export const Birthday: Story = {
   args: {
     favpollId: "demo-birthday",
-    protagonistName: SCENES[1].protagonist.name,
+    protagonistName: SCENES[1].protagonist!.name,
     dateLabel: "30th May 2026",
     openingLine: "Birthday",
     description: null,
@@ -113,7 +113,7 @@ export const Birthday: Story = {
 export const Retirement: Story = {
   args: {
     favpollId: "demo-retirement",
-    protagonistName: SCENES[2].protagonist.name,
+    protagonistName: SCENES[2].protagonist!.name,
     dateLabel: null,
     openingLine: "After a lifetime of good work",
     description:
@@ -130,7 +130,7 @@ export const Retirement: Story = {
 export const Graduation: Story = {
   args: {
     favpollId: "demo-graduation",
-    protagonistName: SCENES[5].protagonist.name,
+    protagonistName: SCENES[5].protagonist!.name,
     dateLabel: "13th June 2026",
     openingLine: "Congratulations",
     description:
