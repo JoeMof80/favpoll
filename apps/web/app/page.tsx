@@ -8,7 +8,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { meetsCrossTopicThreshold } from "@/lib/record"
 import { LandingHero } from "@/components/landing/hero"
 import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
-import { InTheRoom } from "@/components/landing/in-the-room"
+import { WatchItHappen } from "@/components/landing/watch-it-happen"
 import { RecordHolders } from "@/components/landing/record-holders"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
@@ -159,15 +159,15 @@ export default async function HomePage() {
             </FadeIn>
           </section>
 
-          <section id="room" className="scroll-mt-20">
+          <section id="watch" className="scroll-mt-20">
             <FadeIn>
-              <SectionEyebrow className="mb-2">In the room</SectionEyebrow>
+              <SectionEyebrow className="mb-2">Live</SectionEyebrow>
               <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-                Runs on a link. Comes alive in the room.
+                Watch it happen.
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <InTheRoom />
+              <WatchItHappen />
             </FadeIn>
           </section>
 
