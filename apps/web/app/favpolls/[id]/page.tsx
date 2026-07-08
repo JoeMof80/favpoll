@@ -194,6 +194,10 @@ export default async function FavpollPage({ params }: Props) {
   // Entitlement: viewer may see real reveal + real per-favourite amounts
   const entitled = !!hasPledged || isClosed || isOrganiser
 
+  // Safe to send even when un-entitled: whether a reveal exists, without its
+  // content — the lock pill must not promise a reveal on favpolls without one.
+  const hasReveal = !!pollWithItems?.personal_reveal
+
   // Gate sensitive data server-side for un-entitled viewers of open polls
   if (!entitled && pollWithItems) {
     pollWithItems = {
@@ -287,6 +291,7 @@ export default async function FavpollPage({ params }: Props) {
         clerkUserId={userId}
         isOrganiser={isOrganiser}
         entitled={entitled}
+        hasReveal={hasReveal}
       />
     </>
   )
