@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { meetsCrossTopicThreshold } from "@/lib/record"
 import { LandingHero } from "@/components/landing/hero"
 import { RevealMechanicDemo } from "@/components/landing/reveal-mechanic-demo"
+import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
 import { InTheRoom } from "@/components/landing/in-the-room"
 import { RailNav } from "@/components/landing/rail-nav"
 import { RecordHolders } from "@/components/landing/record-holders"
@@ -17,6 +18,7 @@ import { t } from "@/lib/i18n"
 
 const NAV = [
   ["#reveal", "The reveal"],
+  ["#anyone", "Anyone can answer"],
   ["#room", "In the room"],
   ["#live", "Live right now"],
   ["#record", "The record"],
@@ -180,13 +182,30 @@ export default async function HomePage() {
                   Locked until you've given.
                 </h2>
                 <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Every favpoll holds one answer back — what the person it
-                  honours actually loved. Guests pledge first. Then the reveal
-                  is theirs.
+                  Every favpoll can hold one answer back — the favourite at its
+                  heart. Guests pledge first. Then the reveal is theirs.
                 </p>
               </FadeIn>
               <FadeIn delay={0.1}>
                 <RevealMechanicDemo />
+              </FadeIn>
+            </section>
+
+            <section id="anyone" className="scroll-mt-20">
+              <FadeIn>
+                <SectionEyebrow className="mb-2">
+                  Anyone can answer
+                </SectionEyebrow>
+                <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
+                  Every guest has an answer.
+                </h2>
+                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+                  The best favpolls ask for a favourite everyone has — a colour,
+                  a season, a biscuit.
+                </p>
+              </FadeIn>
+              <FadeIn delay={0.1}>
+                <AnyoneCanAnswer />
               </FadeIn>
             </section>
 
