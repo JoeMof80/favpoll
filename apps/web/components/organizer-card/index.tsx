@@ -48,9 +48,10 @@ export function OrganizerCard({ favpoll }: Props) {
   const guestUrl = baseUrl
     ? `${baseUrl}/favpolls/${favpoll.id}`
     : `/favpolls/${favpoll.id}`
+  // Capability URL — the unguessable slug is what authorises the display
   const displayUrl = baseUrl
-    ? `${baseUrl}/favpolls/${favpoll.id}/live`
-    : `/favpolls/${favpoll.id}/live`
+    ? `${baseUrl}/live/${favpoll.live_slug}`
+    : `/live/${favpoll.live_slug}`
 
   const topicTitle = favpoll.poll?.topic?.title
   const protagonistName =

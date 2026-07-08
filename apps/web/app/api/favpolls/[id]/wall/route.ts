@@ -7,10 +7,10 @@ import { createAdminClient } from "@/lib/supabase/admin"
 //
 // Label gating mirrors the favpoll page's standings gate: backed-favourite
 // labels are included only for entitled viewers (organiser, a pledger, or
-// anyone once closed) — EXCEPT on the live display (?display=1), which is a
-// deliberately public surface that already renders full standings and the
-// reveal to the room (see /favpolls/[id]/live). Anonymity is absolute either
-// way: anonymous pledges never expose a name on any surface.
+// anyone once closed) — or for the live display, which authenticates with
+// the favpoll's unguessable live_slug (?display_key=…, the same capability
+// that opens /live/[slug]). Anonymity is absolute either way: anonymous
+// pledges never expose a name on any surface.
 
 export async function GET(
   request: Request,
@@ -18,14 +18,14 @@ export async function GET(
 ) {
   const { id } = await params
   const url = new URL(request.url)
-  const isDisplay = url.searchParams.get("display") === "1"
+  const displayKey = url.searchParams.get("display_key")
   const guestToken = url.searchParams.get("guest_token")
 
   const supabase = createAdminClient()
 
   const { data: favpoll } = await supabase
     .from("favpolls")
-    .select("id, created_by, closed_at, closes_at")
+    .select("id, created_by, closed_at, closes_at, live_slug")
     .eq("id", id)
     .single()
 
@@ -47,7 +47,7 @@ export async function GET(
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
   // Entitlement for backed-labels (never affects names/anonymity)
-  let entitled = isDisplay || isClosed
+  let entitled = (!!displayKey && displayKey === favpoll.live_slug) || isClosed
   if (!entitled) {
     const { userId } = await auth()
     if (userId) {

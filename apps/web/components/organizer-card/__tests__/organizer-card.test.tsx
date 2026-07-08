@@ -36,6 +36,7 @@ function makeFavpoll(
   const farFuture = new Date(Date.now() + 30 * 86400000).toISOString()
   return {
     id: "fp-1",
+    live_slug: "slug-fp-1",
     opening_line: "In memory of",
     closes_at: farFuture,
     closed_at: null,
@@ -217,7 +218,7 @@ describe("OrganizerCard", () => {
       render(<OrganizerCard favpoll={makeFavpoll()} />)
       fireEvent.click(screen.getByTestId("copy-display-button"))
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining("/favpolls/fp-1/live")
+        expect.stringContaining("/live/slug-fp-1")
       )
     })
   })

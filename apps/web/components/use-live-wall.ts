@@ -11,11 +11,11 @@ import type { GuestWallEntry } from "@/components/guest-wall"
 export function useLiveWall(
   favpollId: string,
   initialEntries: GuestWallEntry[],
-  options: { display?: boolean } = {}
+  options: { displayKey?: string } = {}
 ): GuestWallEntry[] {
   const [entries, setEntries] = useState(initialEntries)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const { display = false } = options
+  const { displayKey } = options
 
   // Server refresh (router.refresh) may stream fresher entries — adopt them.
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useLiveWall(
         try {
           const res = await fetch(
             `/api/favpolls/${encodeURIComponent(favpollId)}/wall${
-              display ? "?display=1" : ""
+              displayKey ? `?display_key=${encodeURIComponent(displayKey)}` : ""
             }`
           )
           if (!res.ok) return
@@ -56,7 +56,7 @@ export function useLiveWall(
       if (timer.current) clearTimeout(timer.current)
       supabase.removeChannel(channel)
     }
-  }, [favpollId, display])
+  }, [favpollId, displayKey])
 
   return entries
 }

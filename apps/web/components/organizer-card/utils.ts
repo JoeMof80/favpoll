@@ -1,5 +1,7 @@
 export type OrganizerCardFavpoll = {
   id: string
+  /** Unguessable capability for the live display URL (/live/[slug]) */
+  live_slug: string
   opening_line: string
   closes_at: string
   closed_at: string | null

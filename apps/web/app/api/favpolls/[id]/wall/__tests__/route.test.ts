@@ -23,6 +23,7 @@ const OPEN_FAVPOLL = {
   created_by: "user-org",
   closed_at: null,
   closes_at: FUTURE,
+  live_slug: "slug-secret",
 }
 
 const WALL_ROW = {
@@ -74,13 +75,22 @@ describe("GET /api/favpolls/[id]/wall", () => {
     expect(body.entries[0]).toMatchObject({ name: "Claire", labels: [] })
   })
 
-  it("includes labels on the display surface (?display=1)", async () => {
+  it("includes labels on the display surface with the correct live_slug", async () => {
     mock.queue(OPEN_FAVPOLL)
     mock.queue({ id: "poll-1" })
     mock.queue([WALL_ROW])
-    const res = await GET(req("?display=1"), params)
+    const res = await GET(req("?display_key=slug-secret"), params)
     const body = await res.json()
     expect(body.entries[0].labels).toEqual(["Purple"])
+  })
+
+  it("strips labels for a wrong display_key", async () => {
+    mock.queue(OPEN_FAVPOLL)
+    mock.queue({ id: "poll-1" })
+    mock.queue([WALL_ROW])
+    const res = await GET(req("?display_key=guessed-wrong"), params)
+    const body = await res.json()
+    expect(body.entries[0].labels).toEqual([])
   })
 
   it("includes labels once the favpoll is closed", async () => {
@@ -116,7 +126,7 @@ describe("GET /api/favpolls/[id]/wall", () => {
     mock.queue(OPEN_FAVPOLL)
     mock.queue({ id: "poll-1" })
     mock.queue([ANON_ROW])
-    const res = await GET(req("?display=1"), params)
+    const res = await GET(req("?display_key=slug-secret"), params)
     const body = await res.json()
     expect(body.entries[0].name).toBeNull()
     expect(JSON.stringify(body)).not.toContain("Secret Name")
