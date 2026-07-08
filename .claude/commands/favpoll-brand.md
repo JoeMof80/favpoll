@@ -100,7 +100,10 @@ It does **not** cycle. The register signal (remembering, celebrating, cause,
 standalone) lives entirely in the eyebrow + the hero demo scene, so the headline
 stays true for every register — including cause and standalone favpolls, which
 the old per-occasion headlines silently excluded. The reveal spark is carried by
-the eyebrow and the first "Locked until you've given" section, not the headline.
+the eyebrow and the hero demo itself (which plays the blur → lock → reveal arc
+in every scene), not the headline. (The standalone reveal section + interactive
+demo were cut 2026-07-08's artifact-first pass, as duplication of the hero
+demo.)
 
 Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
 there, never inline. (This structure change — from `landing.headline.*` to a

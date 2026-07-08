@@ -184,8 +184,9 @@ them, not instead of them.
      (Reveal spark carried by the eyebrow + first section, not the headline.)
    - **Brand statement** (sub-line) → the soul. Unchanged/sacred.
    - Tension to hold: a universal headline risks losing the **reveal** spark —
-     let the eyebrow + first "Locked until you've given" section carry the
-     reveal instead of forcing it into the headline.
+     carried by the eyebrow + the hero demo itself (blur → lock → reveal in
+     every scene). _(Updated 8 Jul: the standalone reveal section + interactive
+     demo were cut in the artifact-first pass as duplication of the hero demo.)_
    - _Changing the headline means updating the favpoll-brand skill once locked._
 2. **Demo scenes — cut by visitor _kind_, not raw register.** Because
    `deriveRegister` collapses a person's fundraiser and a faceless cause into

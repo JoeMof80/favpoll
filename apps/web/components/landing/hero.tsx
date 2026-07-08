@@ -67,13 +67,6 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             <Button asChild size="lg" variant="secondary">
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
-            <Button
-              asChild
-              variant="ghost"
-              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <Link href="/favpolls">See live favpolls →</Link>
-            </Button>
           </div>
           <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8">
             <div>
