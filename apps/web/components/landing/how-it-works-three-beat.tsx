@@ -1,20 +1,23 @@
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
+// The ORGANISER's three steps — the landing speaks to the prospective
+// organiser (three-surface model); the guest's pick → pledge → reveal arc is
+// already shown by the hero demo, so it is not re-told here.
 const STEPS = [
   {
     n: 1,
-    heading: "Introduce them.",
-    body: "Write about the person being honoured — their story, their occasion — without giving away their answer. The withholding is the point.",
+    heading: "Create.",
+    body: "Choose who or what it's for — a person, a couple, a group, a cause. Pick the question, name up to three charities, and it's ready in minutes.",
   },
   {
     n: 2,
-    heading: "Guests pledge.",
-    body: "Each guest shares their own favourite and gives to charity in your person's name. The answer is still unread.",
+    heading: "Share.",
+    body: "Send one link, or print the pack — a poster and table cards, each carrying a QR code that opens the favpoll.",
   },
   {
     n: 3,
-    heading: "The reveal.",
-    body: "Only now do guests learn what your person loved, and why. Their own voice, their own words — disclosed after the giving.",
+    heading: "It runs itself.",
+    body: "Rankings climb as guests pledge, the reveal waits for each of them, and when the poll closes, 100% of every pledge goes to the charities you chose.",
   },
 ]
 
