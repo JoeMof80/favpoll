@@ -295,6 +295,8 @@ generated_drafts (
 20260705180000_charity_stats.sql                          -- charity_stats(charity_id) RPC: per-charity total raised (equal-split across each favpoll's charities) + favpoll/live counts; service-role only
 20260706000000_all_charity_stats.sql                      -- all_charity_stats() RPC: batch per-charity {total_raised, live_count} keyed by id (charities index; avoids N+1)
 20260706020000_charity_impact_statement.sql               -- ADD COLUMN impact_statement text on charities (admin-curated pledge-time line)
+20260706120000_disbursements.sql                          -- disbursements ledger: one row per (favpoll, charity) payout attempt on close; unique(favpoll_id,charity_id); service-role only. NoopProvider until Goodstack onboards.
+20260708150000_live_slug.sql                              -- ADD COLUMN live_slug uuid unique default gen_random_uuid() on favpolls: capability slug for /live/[slug]
 ```
 
 ---
@@ -404,7 +406,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
 /favpolls/[id]                 -- Favpoll page — guest pledge view + edit mode toggle
 /favpolls/[id]/edit            -- Edit favpoll (FavpollForm)
-/favpolls/[id]/live            -- Live display for projector screen (renamed from /display 2026-07-04 to match the glossary's live_display; /favpolls/[id]/display permanentRedirects here). Cause-aware (cause_label shown when subject='cause' — protagonists.name crashed cause favpolls before). Rankings and total are both realtime: DisplayPollSection uses the same useRankingItems Supabase channel as RankingList (animated row reordering); DisplayScreen subscribes to pledges for the running total.
+/live/[slug]                   -- Live display for projector screen, behind an UNGUESSABLE capability slug (favpolls.live_slug, 2026-07-08) — the page shows full standings + the reveal, so possession of the link is the authorisation. Old /favpolls/[id]/live and /favpolls/[id]/display permanentRedirect to the PUBLIC guest page (deliberately NOT resolving id→slug, which would defeat the slug). Cause-aware (cause_label shown when subject='cause'). Rankings, total AND guest wall are realtime: DisplayPollSection uses the same useRankingItems channel as RankingList; DisplayScreen subscribes to pledges for the total and useLiveWall refetches GET /api/favpolls/[id]/wall (?display_key=live_slug authorises backed-labels; anonymity absolute). Organiser copies the /live/{slug} URL from OrganizerCard.
 /my-favpolls                     -- Organiser's favpoll management surface (auth required). OrganizerPageClient handles filter (All/Active/Closed) and sort (Closing soonest / Recently created / Highest raised) client-side. Each OrganizerCard shows: identity row + status badge (amber warning ≤7 days), total raised, poll topic row, shared fund row, Listed/Unlisted toggle, QR + share link block, charity footer + Live display button. Manage page (/favpolls/[id]/manage) was retired — this card is the single management surface. WARNING_THRESHOLD_DAYS = 7.
 /rankings                      -- Global all-time rankings
 /topics/[id]                   -- Individual topic rankings
