@@ -12,6 +12,13 @@ const MOCK_BARS = [
   ["Red", "£165", 38],
 ] as const
 
+// Mirrors the real guest wall's row format (name · backed X · time)
+const MOCK_WALL = [
+  ["Claire", "backed Purple", "just now"],
+  ["Someone", "backed Blue", "5m ago"],
+  ["Raj", "backed Purple", "1h ago"],
+] as const
+
 export function InTheRoom() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -23,11 +30,35 @@ export function InTheRoom() {
             On its own
           </h3>
         </div>
-        <p className="text-base leading-relaxed text-muted-foreground">
+        <p className="mb-5 text-base leading-relaxed text-muted-foreground">
           Create it and share the link. Guests pledge from wherever they are,
           the reveal waits for each of them, and the poll closes on the date you
           choose. Nothing else to organise.
         </p>
+
+        {/* Mini guest-wall mock — remote guests arriving via the link */}
+        <div
+          className="mt-auto space-y-2 rounded-lg border border-border bg-muted/40 p-4"
+          aria-hidden="true"
+        >
+          <p className="text-xs font-medium tracking-widest text-primary uppercase">
+            Guest wall
+          </p>
+          {MOCK_WALL.map(([name, backed, time]) => (
+            <p
+              key={`${name}-${time}`}
+              className="flex items-baseline justify-between gap-2 text-sm"
+            >
+              <span className="min-w-0 truncate">
+                <span className="font-medium text-foreground">{name}</span>{" "}
+                <span className="text-muted-foreground">{backed}</span>
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {time}
+              </span>
+            </p>
+          ))}
+        </div>
       </div>
 
       {/* At the event */}
@@ -39,10 +70,10 @@ export function InTheRoom() {
           </h3>
         </div>
         <p className="mb-5 text-base leading-relaxed text-muted-foreground">
-          Pair it with the day itself. The live display goes on a screen, the QR
-          code goes on the tables, and guests pledge from their phones. The
-          rankings update in real time as pledges come in — purple climbs
-          because Belinda loved purple.
+          Pair it with the day itself. The live display goes on a screen, the
+          printable pack — a poster and table cards — puts the QR code on every
+          table, and guests pledge from their phones. The rankings update in
+          real time: purple climbs because Belinda loved purple.
         </p>
 
         {/* Mini live-display mock */}
