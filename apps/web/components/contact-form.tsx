@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,9 +15,13 @@ const ROLES = [
   "something else",
 ]
 
-// Matches ui/Input's resting style (native <select> has no shadcn component).
+// A comfortable, roomier field than the app's dense h-8 default — this is a
+// public form on a marketing page, not a packed dialog.
+const FIELD = "h-11 text-base"
+// Native <select> (no shadcn Select component) styled to match, with room for
+// the chevron overlay.
 const SELECT_CLASSES =
-  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
+  "h-11 w-full min-w-0 appearance-none rounded-lg border border-input bg-transparent px-3 pr-10 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
 
 type Status = "idle" | "sending" | "sent" | "error"
 
@@ -62,12 +67,12 @@ export function ContactForm() {
     return (
       <div
         role="status"
-        className="rounded-lg border border-border bg-secondary/40 px-5 py-6"
+        className="rounded-xl border border-border bg-card p-8 text-center"
       >
-        <p className="text-base font-medium text-foreground">
+        <p className="text-lg font-medium text-foreground">
           Thank you — your message is on its way.
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-sm text-muted-foreground">
           We&apos;ll be in touch by email.
         </p>
       </div>
@@ -75,68 +80,87 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="contact-name">Name</Label>
-        <Input
-          id="contact-name"
-          name="name"
-          required
-          autoComplete="name"
-          maxLength={200}
-        />
+    <form
+      onSubmit={onSubmit}
+      className="rounded-xl border border-border bg-card p-6 shadow-sm md:p-8"
+    >
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="contact-name">Name</Label>
+          <Input
+            id="contact-name"
+            name="name"
+            required
+            autoComplete="name"
+            maxLength={200}
+            className={FIELD}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="contact-email">Email</Label>
+          <Input
+            id="contact-email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            maxLength={200}
+            className={FIELD}
+          />
+        </div>
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <Label htmlFor="contact-role">I&apos;m getting in touch as…</Label>
+          <div className="relative">
+            <select
+              id="contact-role"
+              name="role"
+              defaultValue=""
+              className={SELECT_CLASSES}
+            >
+              <option value="" disabled>
+                Choose one…
+              </option>
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <Label htmlFor="contact-message">Message</Label>
+          <Textarea
+            id="contact-message"
+            name="message"
+            required
+            rows={5}
+            maxLength={5000}
+            className="min-h-32 text-base"
+          />
+        </div>
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="contact-email">Email</Label>
-        <Input
-          id="contact-email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          maxLength={200}
-        />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="contact-role">I&apos;m getting in touch as…</Label>
-        <select
-          id="contact-role"
-          name="role"
-          defaultValue=""
-          className={SELECT_CLASSES}
-        >
-          <option value="" disabled>
-            Choose one…
-          </option>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="contact-message">Message</Label>
-        <Textarea
-          id="contact-message"
-          name="message"
-          required
-          rows={5}
-          maxLength={5000}
-        />
-      </div>
+
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="mt-4 text-sm text-destructive">
           {error}
         </p>
       )}
-      <Button
-        type="submit"
-        disabled={status === "sending"}
-        className="self-start"
-      >
-        {status === "sending" ? "Sending…" : "Send message"}
-      </Button>
+
+      <div className="mt-6">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={status === "sending"}
+          className="w-full sm:w-auto"
+        >
+          {status === "sending" ? "Sending…" : "Send message"}
+        </Button>
+      </div>
     </form>
   )
 }
