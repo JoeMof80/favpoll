@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import { useLiveWall } from "@/components/use-live-wall"
 import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
@@ -75,6 +76,10 @@ export function FavpollContent({
     clerkUserId,
     entitled,
   })
+
+  // Wall updates live as pledges land (labels stay gated by the endpoint —
+  // un-entitled viewers keep seeing plain "pledged" rows, just fresher).
+  const liveWallEntries = useLiveWall(favpoll.id, wallEntries)
 
   const isCause = favpoll.subject === "cause"
   const isListed = favpoll.is_listed ?? true
@@ -213,7 +218,11 @@ export function FavpollContent({
         goalAmount={favpoll.goal_amount ?? null}
       />
 
-      <GuestWall entries={wallEntries} teaseBacked={!localEntitled} />
+      <GuestWall
+        entries={liveWallEntries}
+        teaseBacked={!localEntitled}
+        animate
+      />
 
       {/* Guest shared fund contribution card — always shown on open favpolls.
           Carries both jobs explicitly: how to USE the fund (pledge step) and

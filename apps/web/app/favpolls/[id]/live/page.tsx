@@ -53,6 +53,55 @@ export default async function LiveDisplayPage({ params }: Props) {
     (favpoll.favpoll_charities as { charities: { name: string } }[])?.[0]
       ?.charities?.name ?? null
 
+  // Initial guest wall (kept live client-side via the wall endpoint). The
+  // display is a public, organiser-sanctioned surface: backed-labels are
+  // shown; anonymity still holds (anonymous → "Someone").
+  const { data: wallRows } = pollId
+    ? await supabase
+        .from("pledges")
+        .select(
+          `id, display_name, is_anonymous, clerk_user_id, created_at,
+           pledge_allocations ( favourites ( label ) )`
+        )
+        .eq("favpoll_poll_id", pollId)
+        .is("withdrawn_at", null)
+        .order("created_at", { ascending: false })
+        .limit(24)
+    : { data: [] }
+
+  const wallClerkIds = [
+    ...new Set(
+      (wallRows ?? [])
+        .map((r) => r.clerk_user_id)
+        .filter((v): v is string => !!v)
+    ),
+  ]
+  const { data: wallUsers } = wallClerkIds.length
+    ? await supabase
+        .from("users")
+        .select("id, display_name")
+        .in("id", wallClerkIds)
+    : { data: [] }
+  const wallUserNames = Object.fromEntries(
+    (wallUsers ?? []).map((u) => [u.id, u.display_name])
+  )
+  const initialWallEntries = (wallRows ?? []).map((r) => ({
+    id: r.id,
+    name: r.is_anonymous
+      ? null
+      : r.clerk_user_id
+        ? (wallUserNames[r.clerk_user_id] ?? null)
+        : (r.display_name ?? null),
+    labels: (
+      (r.pledge_allocations ?? []) as unknown as {
+        favourites: { label: string } | null
+      }[]
+    )
+      .map((a) => a.favourites?.label)
+      .filter((l): l is string => typeof l === "string"),
+    created_at: r.created_at,
+  }))
+
   const displayPoll = rawPoll
     ? {
         id: rawPoll.id,
@@ -95,6 +144,7 @@ export default async function LiveDisplayPage({ params }: Props) {
       initialTotalRaised={initialTotalRaised}
       pollId={pollId}
       favpollUrl={`${baseUrl}/favpolls/${id}`}
+      initialWallEntries={initialWallEntries}
     />
   )
 }
