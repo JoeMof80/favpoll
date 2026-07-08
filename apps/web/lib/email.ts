@@ -135,3 +135,34 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
     }),
   })
 }
+
+type ContactMessageParams = {
+  name: string
+  email: string
+  /** Optional self-description, e.g. "a charity"; empty string when unset. */
+  role: string
+  message: string
+}
+
+// Routes a public contact-form submission to the team inbox. All fields are
+// user-supplied, so every value is escaped; replyTo lets you answer directly.
+export async function sendContactMessage(params: ContactMessageParams) {
+  const { name, email, role, message } = params
+  const to =
+    process.env.CONTACT_EMAIL ?? process.env.SUPPORT_EMAIL ?? FROM_EMAIL
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    replyTo: email,
+    subject: `Contact form — ${name}`,
+    html: renderEmail({
+      heading: "New message via the contact form",
+      bodyHtml: `<p style="margin:0 0 12px;"><strong>From:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>${
+        role
+          ? `<p style="margin:0 0 12px;"><strong>Getting in touch as:</strong> ${escapeHtml(role)}</p>`
+          : ""
+      }<p style="margin:0;">${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+    }),
+  })
+}
