@@ -52,7 +52,9 @@ favpoll speaks with warmth and quiet dignity. It is never corporate, never sales
 ## Core product facts — always accurate
 
 **What favpoll is:**
-A charitable polling platform for life events. Guests pledge real money against their favourite things. Rankings update live. Proceeds go to charity. Every pledge contributes to a permanent record of human favourites.
+A way of giving that gives something back. Guests pledge real money to charity, cast a favourite of their own, and — once they've given — the favpoll shares back the favourite it was holding. Rankings update live. It works whether it honours someone, backs a cause, or cheers on a fundraiser, and needs no life event (though it pairs beautifully with one). Every pledge also adds to a permanent record of human favourites — a principle, not a headline (see the concept model, `references/favpoll-concept-model-2026-07.md`).
+
+_Never describe favpoll as "a charitable polling platform" or define it by life events — see "What favpoll is not" and the concept model. The demo shows what favpoll is better than any definition; copy should point rather than over-explain._
 
 **The reveal mechanic:**
 The reveal field on each favpoll poll is shown to guests only after they have pledged. The framing question withholds the protagonist's favourite; the reveal discloses it after payment. The pledge becomes a two-way act: the guest shares something of themselves, the person being honoured shares something back.
@@ -312,7 +314,7 @@ Memorial and funeral copy: measured, no exclamation marks, no upbeat language, d
 
 Birthday, retirement, graduation copy: warmer, lighter, can be slightly playful but never flippant.
 
-When writing for the platform generally: acknowledge the full range without leading with death. "Life's most significant moments" is a good frame.
+When writing for the platform generally: acknowledge the full range without leading with death, and without defining favpoll _by_ life events — it stands alone (a fundraiser, a cause) and pairs with them. Lead with the act (give · pick · reveal) and the breadth, not "life's most significant moments."
 
 ---
 
