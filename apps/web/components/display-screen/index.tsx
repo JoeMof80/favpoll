@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { BrandedQR } from "@/components/branded-qr"
 import { createClient } from "@/lib/supabase/client"
 import { getFavpollHeadline } from "@/lib/display"
+import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 
@@ -20,6 +22,8 @@ type Props = {
   initialTotalRaised: number
   pollId: string | null
   favpollUrl: string
+  /** Server-rendered wall entries; kept live via the wall endpoint */
+  initialWallEntries?: GuestWallEntry[]
 }
 
 export function DisplayScreen({
@@ -35,8 +39,14 @@ export function DisplayScreen({
   initialTotalRaised,
   pollId,
   favpollUrl,
+  initialWallEntries = [],
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
+  // The room's wall: names appear as pledges land (display=1 — this surface
+  // already shows full standings publicly, and anonymity still holds).
+  const wallEntries = useLiveWall(favpollId, initialWallEntries, {
+    display: true,
+  })
   const supabase = createClient()
 
   useEffect(() => {
@@ -142,6 +152,13 @@ export function DisplayScreen({
                 </p>
               </div>
             ) : null}
+          </div>
+        )}
+
+        {/* Guest wall — pledges landing in the room, live */}
+        {wallEntries.length > 0 && (
+          <div className="mx-auto mt-8 max-w-md">
+            <GuestWall entries={wallEntries} animate maxEntries={6} />
           </div>
         )}
 

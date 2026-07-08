@@ -1,3 +1,6 @@
+"use client"
+
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 // The guest wall: presence, not size. Names (or "Someone") and what they
@@ -37,6 +40,8 @@ function backedLine(labels: string[]): string {
 export function GuestWall({
   entries,
   teaseBacked = false,
+  animate = false,
+  maxEntries,
 }: {
   entries: GuestWallEntry[]
   /**
@@ -44,37 +49,51 @@ export function GuestWall({
    * favourites stripped — adds a line telling them pledging shows more.
    */
   teaseBacked?: boolean
+  /** Animate new rows in as they arrive (live wall surfaces). */
+  animate?: boolean
+  /** Cap the rows shown (e.g. the live display). */
+  maxEntries?: number
 }) {
+  const reduced = useReducedMotion()
+  const shown = maxEntries ? entries.slice(0, maxEntries) : entries
+  const animated = animate && !reduced
+
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <SectionEyebrow variant="muted" className="font-semibold">
         Guest wall
       </SectionEyebrow>
-      {entries.length === 0 ? (
+      {shown.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">
           Guests appear here as they pledge.
         </p>
       ) : (
         <>
           <ul className="mt-2 space-y-1.5" aria-label="Recent pledges">
-            {entries.map((entry) => (
-              <li
-                key={entry.id}
-                className="flex items-baseline justify-between gap-2 text-sm"
-              >
-                <span className="min-w-0 truncate">
-                  <span className="font-medium text-foreground">
-                    {entry.name ?? "Someone"}
-                  </span>{" "}
-                  <span className="text-muted-foreground">
-                    {backedLine(entry.labels)}
+            <AnimatePresence initial={false}>
+              {shown.map((entry) => (
+                <motion.li
+                  key={entry.id}
+                  layout={animated}
+                  initial={animated ? { opacity: 0, y: -8 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="flex items-baseline justify-between gap-2 text-sm"
+                >
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium text-foreground">
+                      {entry.name ?? "Someone"}
+                    </span>{" "}
+                    <span className="text-muted-foreground">
+                      {backedLine(entry.labels)}
+                    </span>
                   </span>
-                </span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {relativeTime(entry.created_at)}
-                </span>
-              </li>
-            ))}
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {relativeTime(entry.created_at)}
+                  </span>
+                </motion.li>
+              ))}
+            </AnimatePresence>
           </ul>
           {teaseBacked && (
             <p className="mt-2.5 text-xs text-muted-foreground">
