@@ -141,9 +141,10 @@ export default async function HomePage() {
       {/* ── Purple hero band with the live demo ── */}
       <LandingHero liveCount={normalised.length} totalLive={totalLive} />
 
-      {/* ── Product surfaces — a single centred column; the hero demo does
-          the showing, the sections below each add one thing. ── */}
-      <div className="mx-auto w-full max-w-4xl px-6 py-16">
+      {/* ── Product surfaces — a single centred column matching the hero
+          band's width; the hero demo does the showing, the sections below
+          each add one thing. ── */}
+      <div className="mx-auto w-full max-w-330 px-6 py-16">
         <div className="flex flex-col gap-20">
           <section id="anyone" className="scroll-mt-20">
             <FadeIn>
