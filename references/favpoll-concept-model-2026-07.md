@@ -123,6 +123,29 @@ product's public face.** Therefore:
   the data can't cash. (The landing already hides the record section below a data
   threshold — the fix is mostly tone + the about page.)
 
+## The three surfaces — one audience each (decided 8 July 2026)
+
+The guest never chooses favpoll — they're handed it (QR on a table card, a
+link in a group chat). So **the guest needs no marketing page at all**, and
+each surface serves exactly one audience:
+
+| Surface          | Audience                                | Job                                              |
+| ---------------- | --------------------------------------- | ------------------------------------------------ |
+| **Favpoll page** | Guest                                   | Self-evident participation, **zero context**     |
+| **Landing**      | Prospective organiser                   | Show the guest experience → "Create a favpoll"   |
+| **About**        | Charities, press, partners, will-writers | Trust + contact                                  |
+
+Consequences:
+
+- The **hero demo shows the guest experience, but its job is to sell the
+  organiser** on what their guests will feel. Show-don't-tell serves the
+  organiser's decision, not guest instruction.
+- **Never add guest instruction to the landing** ("how to pledge" etc.) —
+  guests won't be there. The guest's entire onboarding is the favpoll page
+  itself, which must work for a cold visitor with no context.
+- The favpoll page's self-evidence is a **testable claim** — audit it as a
+  zero-context visitor, don't assume it.
+
 ## Emphasis hierarchy — what the pages should do
 
 - **Lead:** the act + the spine (pick → pledge → reveal), stated with confidence,
