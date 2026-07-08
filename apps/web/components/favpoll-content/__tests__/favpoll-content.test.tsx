@@ -145,6 +145,7 @@ function renderContent(
       clerkUserId={null}
       isOrganiser={false}
       entitled={opts.entitled ?? false}
+      hasReveal={true}
       wallEntries={[]}
       rankHistory={null}
     />

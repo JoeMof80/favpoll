@@ -164,13 +164,24 @@ Expressions of joy, for charitable causes, in the name of those we love.
 This is the brand statement used as the supporting line. Static. No animation.
 Do not update per occasion. Do not personalise with protagonist names.
 
-## The framing / reveal pattern
+## The withhold / reveal pattern
 
 This is the most important copy pattern in favpoll. Get it right every time.
 
-**The framing question withholds. The reveal discloses.**
+**The page withholds. The reveal discloses.**
 
-The framing is shown upfront, before pledging. It invites the guest to share their own preference without revealing the protagonist's:
+> **Product reality (July 2026):** there is no standalone framing-question
+> field — `personal_framing` is a dead column, deliberately absorbed into the
+> **About** text. The withholding job is done by About ("tease the topic and
+> the cause, but don't give too much away") + the topic pill + the reveal
+> lock; the guest *feels* the mechanic through the blurred decoy and the
+> "Pledge to reveal X's favourite" pill rather than reading a question. The
+> reveal (`personal_reveal`) is the only stored copy field. The framing-style
+> examples below survive as the **register for About text and wizard
+> placeholders** — copy that withholds while inviting — not as a field's
+> content.
+
+Framing-style copy invites the guest to share their own preference without revealing the protagonist's:
 
 ✓ "Belinda had a colour she returned to all her life — what's yours?"
 ✓ "There was a season Margaret always loved most — which is yours?"

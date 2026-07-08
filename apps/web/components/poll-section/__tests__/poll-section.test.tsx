@@ -321,3 +321,82 @@ describe("PollSection — gating: real reveal absent when not entitled", () => {
     expect(screen.queryByText(REVEAL_TEXT)).toBeNull()
   })
 })
+
+// ─── No-reveal favpolls + trust line ─────────────────────────────────────────
+
+describe("PollSection — favpolls without a reveal", () => {
+  it("offers the results, not a reveal, when hasReveal is false", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        hasReveal={false}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByRole("button", { name: "Pledge to see the results" })
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/Pledge to reveal/i)).toBeNull()
+  })
+
+  it("renders no decoy reveal quote when hasReveal is false", () => {
+    const { container } = render(
+      <PollSection
+        {...BASE_PROPS}
+        hasReveal={false}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(container.querySelector("blockquote")).toBeNull()
+  })
+
+  it("uses the verb-form decoy placeholder when a reveal exists", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        hasReveal={true}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getAllByText(/Pledge to reveal their favourite\./).length
+    ).toBeGreaterThanOrEqual(1)
+  })
+})
+
+describe("PollSection — pre-pledge trust line", () => {
+  it("states where pledges go and the no-fee fact when charityLine is set", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        charityLine="Marie Curie & WWF"
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText(
+        "Every pledge goes to Marie Curie & WWF — favpoll takes no fee."
+      )
+    ).toBeInTheDocument()
+  })
+
+  it("renders no trust line without charityLine", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Yusuf"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(screen.queryByText(/favpoll takes no fee/)).toBeNull()
+  })
+})

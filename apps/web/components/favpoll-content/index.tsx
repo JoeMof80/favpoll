@@ -20,6 +20,7 @@ import type {
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
+import { charityNames as joinCharityNames } from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
 import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
 import { PageLayout } from "../page-layout"
@@ -35,6 +36,8 @@ type Props = {
   clerkUserId: string | null
   isOrganiser: boolean
   entitled: boolean
+  /** Whether a personal reveal exists (content withheld until entitled) */
+  hasReveal: boolean
   wallEntries: GuestWallEntry[]
   rankHistory: RankHistory | null
 }
@@ -49,6 +52,7 @@ export function FavpollContent({
   clerkUserId,
   isOrganiser,
   entitled,
+  hasReveal,
   wallEntries,
   rankHistory,
 }: Props) {
@@ -94,6 +98,10 @@ export function FavpollContent({
       : 0
 
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
+  // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
+  const charityLine = joinCharityNames(
+    favpoll.favpoll_charities.map((ec) => ({ charity: ec.charities }))
+  )
   const impactStatements = favpoll.favpoll_charities
     .map((ec) => ec.charities.impact_statement)
     .filter((s): s is string => !!s && s.trim().length > 0)
@@ -144,6 +152,8 @@ export function FavpollContent({
             onViewChange={handleViewChange}
             entitled={localEntitled}
             personalReveal={effectiveReveal}
+            hasReveal={hasReveal}
+            charityLine={charityLine || null}
             initialItems={effectiveItems}
             onOpenPledgeDialog={
               !isClosed ? () => setPledgeDialogOpen(true) : undefined
@@ -203,14 +213,21 @@ export function FavpollContent({
         goalAmount={favpoll.goal_amount ?? null}
       />
 
-      <GuestWall entries={wallEntries} />
+      <GuestWall entries={wallEntries} teaseBacked={!localEntitled} />
 
-      {/* Guest shared fund contribution card — always shown on open favpolls */}
+      {/* Guest shared fund contribution card — always shown on open favpolls.
+          Carries both jobs explicitly: how to USE the fund (pledge step) and
+          how to GIVE to it (the button). */}
       {!isClosed && pot && (
         <div className="rounded-lg border border-border bg-background px-5 py-4">
           <p className="mt-1 text-sm text-muted-foreground">
-            <b>{GBP.format(fundAvailable)}</b> available for guests who need
-            help to pledge.
+            <b>{GBP.format(fundAvailable)}</b> in the shared fund, for any guest
+            who needs help to pledge.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {fundAvailable > 0
+              ? "To use it, choose “Use shared fund” when you pledge — or top it up for others."
+              : "Top it up so every guest can take part."}
           </p>
           <Button
             type="button"

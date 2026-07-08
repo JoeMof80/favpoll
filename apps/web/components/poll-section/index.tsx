@@ -32,6 +32,14 @@ type Props = {
   entitled: boolean
   /** Real personal_reveal — null until entitled */
   personalReveal: string | null
+  /**
+   * Whether a reveal exists at all (safe to know pre-pledge). Drives the lock
+   * copy: a favpoll without a reveal must offer the results, not promise a
+   * disclosure that never comes. Defaults true for existing callers/stories.
+   */
+  hasReveal?: boolean
+  /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
+  charityLine?: string | null
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -51,6 +59,8 @@ export function PollSection({
   onViewChange,
   entitled,
   personalReveal,
+  hasReveal = true,
+  charityLine = null,
   initialItems,
   onOpenPledgeDialog,
 }: Props) {
@@ -68,9 +78,11 @@ export function PollSection({
   const displayFirstName = isCause ? null : personFirstName
   const hasItems = poll.topics.favourites.length > 0
 
-  const unlockAriaLabel = displayFirstName
-    ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
-    : "Pledge to see the reveal and results"
+  const unlockAriaLabel = !hasReveal
+    ? "Pledge to see the results"
+    : displayFirstName
+      ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
+      : "Pledge to see the reveal and results"
 
   return (
     <section
@@ -132,7 +144,11 @@ export function PollSection({
             className="pointer-events-none space-y-4 blur-xs select-none"
             aria-hidden="true"
           >
-            <PollReveal personalReveal="Pledge to see their reveal. Pledge to see their reveal. Pledge to see their reveal." />
+            {/* Decoy quote only when a reveal actually exists — a favpoll
+                without one shows no quote post-pledge, so fake none here. */}
+            {hasReveal && (
+              <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
+            )}
 
             {hasItems && (
               <>
@@ -179,7 +195,20 @@ export function PollSection({
             >
               {/* pt-4 sits the pill over the centre of the decoy reveal
                   quote — the lock guards the reveal, not the results */}
-              <RevealLockPill label={revealLockLabel(displayFirstName)} />
+              <RevealLockPill
+                label={
+                  hasReveal
+                    ? revealLockLabel(displayFirstName)
+                    : "Pledge to see the results"
+                }
+              />
+              {/* Trust line — the cold guest's "where does the money go?"
+                  answered before they commit, not inside the dialog. */}
+              {charityLine && (
+                <span className="mt-3 max-w-full rounded-full bg-background/85 px-3 py-1 text-xs font-normal whitespace-normal text-muted-foreground">
+                  Every pledge goes to {charityLine} — favpoll takes no fee.
+                </span>
+              )}
             </Button>
           )}
         </div>

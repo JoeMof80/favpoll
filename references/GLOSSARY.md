@@ -111,15 +111,20 @@ sum of allocations equals the pledge total amount.
 
 ---
 
-### Personal framing
-**What it is:** The organiser-written question shown above the poll
-favourites, before the guest pledges. Withholds the protagonist's favourite to
-set up the reveal. E.g. "Belinda had a colour she returned to all her life —
-what's yours?"
+### Personal framing — RETIRED (absorbed into About)
+**What it was:** A planned organiser-written question shown above the poll
+favourites, withholding the protagonist's favourite to set up the reveal.
+E.g. "Belinda had a colour she returned to all her life — what's yours?"
 
-**Code:** `favpoll_polls.personal_framing`
-**UI:** shown as body text above the item list. Label in edit mode: "Question"
-**Not:** description, subtitle, prompt, question text
+**Status (July 2026):** never built as a field. Its job — the withholding
+introduction — is carried by the protagonist **About** text ("tease the topic
+and the cause, but don't give too much away") plus the topic pill and the
+reveal lock. The framing-style copy patterns now inform the About and reveal
+*placeholders* in the wizard, not a standalone field.
+
+**Code:** `favpoll_polls.personal_framing` column still exists but is dead —
+the app never reads or writes it (see PROJECT.md)
+**Not:** a live field, a question input, a poll subtitle
 
 ---
 
@@ -284,7 +289,7 @@ for brand or clarity reasons. Both usages are correct in their context.
 |---|---|---|
 | `favpolls` (table) | "favpoll" | Brand/product name is singular and lowercase in UI; the table is plural by SQL convention |
 | `protagonist` | shown by name only | Never labelled in UI |
-| `favpoll_polls.personal_framing` | "Question" (edit label) | Shorter and clearer in UI context |
+| `favpoll_polls.personal_framing` | — (retired; column dead, no UI) | Absorbed into the About text |
 | `favpoll_polls.personal_reveal` | "The reveal" (edit label) | More evocative than "reveal" alone |
 | `closes_at` | "favpoll closes" | Branded phrasing |
 | `favourites` (table) | options / pills | Never labelled "favourites" directly in the pledge UI — shown as interactive elements |
