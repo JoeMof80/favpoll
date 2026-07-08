@@ -7,17 +7,17 @@ const STEPS = [
   {
     n: 1,
     heading: "Create.",
-    body: "Choose who or what it's for — a person, a couple, a group, a cause. Pick the question, name up to three charities, and it's ready in minutes.",
+    body: "Who or what it's for, the question, up to three charities. Minutes.",
   },
   {
     n: 2,
     heading: "Share.",
-    body: "Send one link, or print the pack — a poster and table cards, each carrying a QR code that opens the favpoll.",
+    body: "One link — or the printable pack of QR posters and table cards.",
   },
   {
     n: 3,
     heading: "It runs itself.",
-    body: "Rankings climb as guests pledge, the reveal waits for each of them, and when the poll closes, 100% of every pledge goes to the charities you chose.",
+    body: "Live rankings, a reveal waiting for each guest, and 100% to your charities at close.",
   },
 ]
 

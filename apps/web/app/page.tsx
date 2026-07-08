@@ -5,25 +5,13 @@ import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-bea
 import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { Card, CardContent } from "@/components/ui/card"
 import { meetsCrossTopicThreshold } from "@/lib/record"
 import { LandingHero } from "@/components/landing/hero"
-import { RevealMechanicDemo } from "@/components/landing/reveal-mechanic-demo"
 import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
 import { InTheRoom } from "@/components/landing/in-the-room"
-import { RailNav } from "@/components/landing/rail-nav"
 import { RecordHolders } from "@/components/landing/record-holders"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
-
-const NAV = [
-  ["#reveal", "The reveal"],
-  ["#anyone", "Anyone can answer"],
-  ["#room", "In the room"],
-  ["#live", "Live right now"],
-  ["#record", "The record"],
-  ["#how", "How it works"],
-] as const
 
 export default async function HomePage() {
   const supabase = createAdminClient()
@@ -153,155 +141,112 @@ export default async function HomePage() {
       {/* ── Purple hero band with the live demo ── */}
       <LandingHero liveCount={normalised.length} totalLive={totalLive} />
 
-      {/* ── Sticky rail + product surfaces ── */}
-      <div className="mx-auto w-full max-w-330 px-6 py-16">
-        <div className="md:grid md:grid-cols-[260px_1fr] md:gap-14">
-          {/* Left rail */}
-          <aside className="hidden md:block">
-            <div className="sticky top-20 flex flex-col gap-8">
-              <RailNav items={NAV} />
-              <Card>
-                <CardContent className="flex flex-col gap-3 pt-2">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    Free to create. Guests pledge directly to charity.
-                  </p>
-                  <Button asChild>
-                    <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </aside>
-
-          {/* Right: stacked surfaces */}
-          <div className="flex flex-col gap-20">
-            <section id="reveal" className="scroll-mt-20">
-              <FadeIn>
-                <SectionEyebrow className="mb-2">The reveal</SectionEyebrow>
-                <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-                  Locked until you've given.
-                </h2>
-                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Every favpoll can hold one answer back — the favourite at its
-                  heart. Guests pledge first. Then the reveal is theirs.
-                </p>
-              </FadeIn>
-              <FadeIn delay={0.1}>
-                <RevealMechanicDemo />
-              </FadeIn>
-            </section>
-
-            <section id="anyone" className="scroll-mt-20">
-              <FadeIn>
-                <SectionEyebrow className="mb-2">
-                  Anyone can answer
-                </SectionEyebrow>
-                <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-                  Every guest has an answer.
-                </h2>
-                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  The best favpolls ask for a favourite everyone has — a colour,
-                  a season, a biscuit.
-                </p>
-              </FadeIn>
-              <FadeIn delay={0.1}>
-                <AnyoneCanAnswer />
-              </FadeIn>
-            </section>
-
-            <section id="room" className="scroll-mt-20">
-              <FadeIn>
-                <SectionEyebrow className="mb-2">In the room</SectionEyebrow>
-                <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-                  Runs on a link. Comes alive in the room.
-                </h2>
-                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Every favpoll is complete on its own — and made for the day
-                  itself when there is one.
-                </p>
-              </FadeIn>
-              <FadeIn delay={0.1}>
-                <InTheRoom />
-              </FadeIn>
-            </section>
-
-            {normalised.length > 0 && (
-              <section id="live" className="scroll-mt-20">
-                <FadeIn>
-                  <div className="mb-6 flex items-baseline justify-between">
-                    <SectionEyebrow>Live right now</SectionEyebrow>
-                    <Button variant="ghost" asChild>
-                      <Link href="/favpolls">See all →</Link>
-                    </Button>
-                  </div>
-                </FadeIn>
-                <ul className="grid gap-4 sm:grid-cols-2" role="list">
-                  {normalised.slice(0, 4).map((f, i) => (
-                    <li key={f.id} className="list-none">
-                      <FadeIn delay={i * 0.06} className="h-full">
-                        <FavpollSummaryCard
-                          favpoll={f}
-                          className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                        />
-                      </FadeIn>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {showRecord && (
-              <section id="record" className="scroll-mt-20">
-                <FadeIn>
-                  <SectionEyebrow className="mb-2">The record</SectionEyebrow>
-                  <h2 className="mb-3 max-w-lg text-3xl font-light tracking-tight text-foreground">
-                    The current record holders.
-                  </h2>
-                  <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                    Every pledge, on every favpoll, feeds one shared record —
-                    each question with its own standing champion.
-                  </p>
-                </FadeIn>
-                <RecordHolders
-                  items={recordItems}
-                  className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-                />
-                <p className="mt-6">
-                  <Button variant="ghost" asChild>
-                    <Link href="/rankings">See the full record →</Link>
-                  </Button>
-                </p>
-              </section>
-            )}
-
-            <section id="how" className="scroll-mt-20">
-              <FadeIn>
-                <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
-                <HowItWorksThreeBeat />
-              </FadeIn>
-            </section>
-
+      {/* ── Product surfaces — a single centred column; the hero demo does
+          the showing, the sections below each add one thing. ── */}
+      <div className="mx-auto w-full max-w-4xl px-6 py-16">
+        <div className="flex flex-col gap-20">
+          <section id="anyone" className="scroll-mt-20">
             <FadeIn>
-              <section className="flex items-center gap-8 border-t border-border pt-12">
-                <HonourCharityLoveVenn
-                  size={120}
-                  animate
-                  className="hidden shrink-0 opacity-90 sm:block"
-                />
-                <div>
-                  <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
-                    {t("landing.subheader")}
-                  </h2>
-                  <Button asChild size="lg">
-                    <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
-                  </Button>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {t("landing.cta.caption")}
-                  </p>
-                </div>
-              </section>
+              <SectionEyebrow className="mb-2">
+                Anyone can answer
+              </SectionEyebrow>
+              <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
+                Every guest has an answer.
+              </h2>
             </FadeIn>
-          </div>
+            <FadeIn delay={0.1}>
+              <AnyoneCanAnswer />
+            </FadeIn>
+          </section>
+
+          <section id="room" className="scroll-mt-20">
+            <FadeIn>
+              <SectionEyebrow className="mb-2">In the room</SectionEyebrow>
+              <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
+                Runs on a link. Comes alive in the room.
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <InTheRoom />
+            </FadeIn>
+          </section>
+
+          {normalised.length > 0 && (
+            <section id="live" className="scroll-mt-20">
+              <FadeIn>
+                <div className="mb-6 flex items-baseline justify-between">
+                  <SectionEyebrow>Live right now</SectionEyebrow>
+                  <Button variant="ghost" asChild>
+                    <Link href="/favpolls">See all →</Link>
+                  </Button>
+                </div>
+              </FadeIn>
+              <ul className="grid gap-4 sm:grid-cols-2" role="list">
+                {normalised.slice(0, 4).map((f, i) => (
+                  <li key={f.id} className="list-none">
+                    <FadeIn delay={i * 0.06} className="h-full">
+                      <FavpollSummaryCard
+                        favpoll={f}
+                        className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                      />
+                    </FadeIn>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {showRecord && (
+            <section id="record" className="scroll-mt-20">
+              <FadeIn>
+                <SectionEyebrow className="mb-2">The record</SectionEyebrow>
+                <h2 className="mb-3 max-w-lg text-3xl font-light tracking-tight text-foreground">
+                  The current record holders.
+                </h2>
+                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+                  Every pledge, on every favpoll, feeds one shared record — each
+                  question with its own standing champion.
+                </p>
+              </FadeIn>
+              <RecordHolders
+                items={recordItems}
+                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              />
+              <p className="mt-6">
+                <Button variant="ghost" asChild>
+                  <Link href="/rankings">See the full record →</Link>
+                </Button>
+              </p>
+            </section>
+          )}
+
+          <section id="how" className="scroll-mt-20">
+            <FadeIn>
+              <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
+              <HowItWorksThreeBeat />
+            </FadeIn>
+          </section>
+
+          <FadeIn>
+            <section className="flex items-center gap-8 border-t border-border pt-12">
+              <HonourCharityLoveVenn
+                size={120}
+                animate
+                className="hidden shrink-0 opacity-90 sm:block"
+              />
+              <div>
+                <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
+                  {t("landing.subheader")}
+                </h2>
+                <Button asChild size="lg">
+                  <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+                </Button>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {t("landing.cta.caption")}
+                </p>
+              </div>
+            </section>
+          </FadeIn>
         </div>
       </div>
     </main>
