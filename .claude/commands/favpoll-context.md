@@ -54,7 +54,7 @@ Full definitions in `references/GLOSSARY.md`.
 | Item in favpoll poll             | `favpoll_poll_favourite`              | not labelled          |
 | Financial commitment             | `pledge`                              | "pledge"              |
 | Pledge split                     | `pledge_allocation`                   | not shown             |
-| Organiser's question             | `personal_framing`                    | "Question"            |
+| Organiser's question (RETIRED)   | `personal_framing` (dead column)      | absorbed into About   |
 | Post-pledge secret               | `personal_reveal`                     | "The reveal"          |
 | Communal pot                     | `favpoll_pot`                         | "shared fund"         |
 | Fund draw                        | `pot_allocation`                      | not shown             |

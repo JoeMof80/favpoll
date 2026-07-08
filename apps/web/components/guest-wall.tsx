@@ -34,7 +34,17 @@ function backedLine(labels: string[]): string {
   return `backed ${labels[0]} and ${labels.length - 1} more`
 }
 
-export function GuestWall({ entries }: { entries: GuestWallEntry[] }) {
+export function GuestWall({
+  entries,
+  teaseBacked = false,
+}: {
+  entries: GuestWallEntry[]
+  /**
+   * True for un-entitled viewers, whose entries arrive with the backed
+   * favourites stripped — adds a line telling them pledging shows more.
+   */
+  teaseBacked?: boolean
+}) {
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <SectionEyebrow variant="muted" className="font-semibold">
@@ -45,26 +55,33 @@ export function GuestWall({ entries }: { entries: GuestWallEntry[] }) {
           Guests appear here as they pledge.
         </p>
       ) : (
-        <ul className="mt-2 space-y-1.5" aria-label="Recent pledges">
-          {entries.map((entry) => (
-            <li
-              key={entry.id}
-              className="flex items-baseline justify-between gap-2 text-sm"
-            >
-              <span className="min-w-0 truncate">
-                <span className="font-medium text-foreground">
-                  {entry.name ?? "Someone"}
-                </span>{" "}
-                <span className="text-muted-foreground">
-                  {backedLine(entry.labels)}
+        <>
+          <ul className="mt-2 space-y-1.5" aria-label="Recent pledges">
+            {entries.map((entry) => (
+              <li
+                key={entry.id}
+                className="flex items-baseline justify-between gap-2 text-sm"
+              >
+                <span className="min-w-0 truncate">
+                  <span className="font-medium text-foreground">
+                    {entry.name ?? "Someone"}
+                  </span>{" "}
+                  <span className="text-muted-foreground">
+                    {backedLine(entry.labels)}
+                  </span>
                 </span>
-              </span>
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {relativeTime(entry.created_at)}
-              </span>
-            </li>
-          ))}
-        </ul>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {relativeTime(entry.created_at)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {teaseBacked && (
+            <p className="mt-2.5 text-xs text-muted-foreground">
+              Pledge to see what each guest backed.
+            </p>
+          )}
+        </>
       )}
     </div>
   )
