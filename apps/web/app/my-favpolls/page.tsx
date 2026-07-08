@@ -20,6 +20,7 @@ export default async function MyFavpollsPage() {
     .select(
       `
       id,
+      live_slug,
       opening_line,
       closes_at,
       closed_at,
@@ -43,6 +44,7 @@ export default async function MyFavpollsPage() {
   type RawPot = { total_deposited: number; total_allocated: number }
   type RawFavpoll = {
     id: string
+    live_slug: string
     opening_line: string
     closes_at: string
     closed_at: string | null
@@ -73,6 +75,7 @@ export default async function MyFavpollsPage() {
     (rawFavpolls ?? []) as unknown as RawFavpoll[]
   ).map((ev) => ({
     id: ev.id,
+    live_slug: ev.live_slug,
     opening_line: ev.opening_line,
     closes_at: ev.closes_at,
     closed_at: ev.closed_at,

@@ -14,6 +14,7 @@ function makeFavpoll(
 ): OrganizerCardFavpoll {
   return {
     id: "fp-1",
+    live_slug: "slug-fp-1",
     opening_line: "In memory of",
     closes_at: new Date(NOW.getTime() + 14 * 86400000).toISOString(), // 14 days from now
     closed_at: null,

@@ -4,9 +4,11 @@ type Props = {
   params: Promise<{ id: string }>
 }
 
-// Legacy URL — the live display moved to /favpolls/[id]/live (2026-07-04)
-// to match the domain vocabulary (live_display / "Live display").
+// Legacy URL. The live display now lives at /live/[slug] behind an
+// unguessable slug (2026-07-08) — deliberately NOT resolved from the id
+// here, or the redirect would defeat the slug. Land on the public guest
+// page; organisers get the live link from their dashboard.
 export default async function LegacyDisplayRedirect({ params }: Props) {
   const { id } = await params
-  permanentRedirect(`/favpolls/${id}/live`)
+  permanentRedirect(`/favpolls/${id}`)
 }

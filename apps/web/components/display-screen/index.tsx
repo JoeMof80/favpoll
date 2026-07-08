@@ -24,6 +24,8 @@ type Props = {
   favpollUrl: string
   /** Server-rendered wall entries; kept live via the wall endpoint */
   initialWallEntries?: GuestWallEntry[]
+  /** The favpoll's live_slug — authorises the wall endpoint's display mode */
+  liveKey?: string
 }
 
 export function DisplayScreen({
@@ -40,12 +42,13 @@ export function DisplayScreen({
   pollId,
   favpollUrl,
   initialWallEntries = [],
+  liveKey,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
-  // The room's wall: names appear as pledges land (display=1 — this surface
-  // already shows full standings publicly, and anonymity still holds).
+  // The room's wall: names appear as pledges land. The live_slug capability
+  // authorises backed-labels; anonymity still holds ("Someone").
   const wallEntries = useLiveWall(favpollId, initialWallEntries, {
-    display: true,
+    displayKey: liveKey,
   })
   const supabase = createClient()
 

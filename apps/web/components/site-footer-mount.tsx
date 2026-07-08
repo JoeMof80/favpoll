@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/landing/site-footer"
 
 // Full-screen surfaces that must not carry the site footer.
 const EXCLUDED = [
-  /^\/favpolls\/[^/]+\/live$/, // projector live display
+  /^\/live\/[^/]+$/, // projector live display (capability slug)
   /^\/favpolls\/[^/]+\/keepsake$/, // print keepsake
   /^\/favpolls\/[^/]+\/pack$/, // print pack
 ]
