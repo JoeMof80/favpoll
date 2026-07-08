@@ -59,7 +59,7 @@ export default function AboutPage() {
                   Charity · Honour · Love
                 </SectionEyebrow>
                 <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-                  Three things that rarely appear together.
+                  What every favpoll holds.
                 </h2>
               </FadeIn>
               <div className="flex max-w-xl flex-col gap-5">
@@ -91,18 +91,18 @@ export default function AboutPage() {
 
         {/* ── Contact ── */}
         <section className="py-16">
-          <FadeIn>
-            <SectionEyebrow className="mb-2">Get in touch</SectionEyebrow>
-            <h2 className="mb-3 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              We&apos;d love to hear from you.
-            </h2>
-            <p className="mb-8 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Whether you&apos;re a charity wondering how favpoll works, a
-              partner with an idea, or a writer with a question — this reaches
-              us.
-            </p>
-          </FadeIn>
-          <div className="max-w-xl">
+          <div className="grid gap-10 md:grid-cols-2 md:items-start md:gap-16">
+            <FadeIn>
+              <SectionEyebrow className="mb-2">Get in touch</SectionEyebrow>
+              <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
+                We&apos;d love to hear from you.
+              </h2>
+              <p className="max-w-md text-base leading-relaxed text-muted-foreground">
+                Whether you&apos;re a charity wondering how favpoll works, a
+                partner with an idea, or a writer with a question — this reaches
+                us.
+              </p>
+            </FadeIn>
             <ContactForm />
           </div>
         </section>
