@@ -18,7 +18,7 @@ export default async function LiveDisplayPage({ params }: Props) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(name))"
+      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*))"
     )
     .eq("live_slug", slug)
     .single()
@@ -54,9 +54,12 @@ export default async function LiveDisplayPage({ params }: Props) {
     0
   )
 
-  const charityName =
-    (favpoll.favpoll_charities as { charities: { name: string } }[])?.[0]
-      ?.charities?.name ?? null
+  const charityRows = (
+    (favpoll.favpoll_charities ?? []) as {
+      charities: import("@favpoll/types").Charity
+    }[]
+  ).map((ec) => ec.charities)
+  const charityName = charityRows[0]?.name ?? null
 
   // Initial guest wall (kept live client-side via the wall endpoint). The
   // display is a public, organiser-sanctioned surface: backed-labels are
@@ -151,6 +154,16 @@ export default async function LiveDisplayPage({ params }: Props) {
       favpollUrl={`${baseUrl}/favpolls/${id}`}
       initialWallEntries={initialWallEntries}
       liveKey={slug}
+      charities={charityRows}
+      closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
+      avatar={
+        isCause
+          ? null
+          : {
+              name: displayName,
+              photoUrl: favpoll.protagonists?.photo_url ?? null,
+            }
+      }
     />
   )
 }
