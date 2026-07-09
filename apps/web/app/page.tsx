@@ -141,86 +141,95 @@ export default async function HomePage() {
       {/* ── Purple hero band with the live demo ── */}
       <LandingHero liveCount={normalised.length} totalLive={totalLive} />
 
-      {/* ── Product surfaces — a single centred column matching the hero
-          band's width; the hero demo does the showing, the sections below
+      {/* ── Product surfaces — full-bleed alternating bands (white ·
+          bg-primary/5) for section division; each band's inner column matches
+          the hero's width. The hero demo does the showing; the sections below
           each add one thing. ── */}
-      <div className="mx-auto w-full max-w-330 px-6 py-16">
-        <div className="flex flex-col gap-20">
-          <section id="anyone" className="scroll-mt-20">
-            <FadeIn>
-              <SectionEyebrow className="mb-2">
-                Anyone can answer
-              </SectionEyebrow>
-              <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-                Every guest has an answer.
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <AnyoneCanAnswer />
-            </FadeIn>
-          </section>
-
-          <section id="watch" className="scroll-mt-20">
-            <FadeIn>
-              <SectionEyebrow className="mb-2">Live</SectionEyebrow>
-              <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-                Watch it happen.
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <WatchItHappen />
-            </FadeIn>
-          </section>
-
-          {normalised.length > 0 && (
-            <section id="live" className="scroll-mt-20">
-              <FadeIn>
-                <div className="mb-6 flex items-baseline justify-between">
-                  <SectionEyebrow>Open right now</SectionEyebrow>
-                  <Button variant="ghost" asChild>
-                    <Link href="/favpolls">See all →</Link>
-                  </Button>
-                </div>
-              </FadeIn>
-              <FadeIn>
-                <LiveFavpollsCarousel favpolls={normalised} />
-              </FadeIn>
-            </section>
-          )}
-
-          {showRecord && (
-            <section id="record" className="scroll-mt-20">
-              <FadeIn>
-                <SectionEyebrow className="mb-2">The record</SectionEyebrow>
-                <h2 className="mb-3 max-w-lg text-3xl font-light tracking-tight text-foreground">
-                  The current record holders.
-                </h2>
-                <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Every pledge, on every favpoll, feeds one shared record — each
-                  question with its own standing champion.
-                </p>
-              </FadeIn>
-              <RecordHolders
-                items={recordItems}
-                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              />
-              <p className="mt-6">
-                <Button variant="ghost" asChild>
-                  <Link href="/rankings">See the full record →</Link>
-                </Button>
-              </p>
-            </section>
-          )}
-
-          <section id="how" className="scroll-mt-20">
-            <FadeIn>
-              <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
-              <HowItWorksThreeBeat />
-            </FadeIn>
-          </section>
-
+      <section id="anyone" className="w-full scroll-mt-20">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <section className="flex items-center gap-8 border-t border-border pt-12">
+            <SectionEyebrow className="mb-2">Anyone can answer</SectionEyebrow>
+            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
+              Every guest has an answer.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <AnyoneCanAnswer />
+          </FadeIn>
+        </div>
+      </section>
+
+      <section id="watch" className="w-full scroll-mt-20 bg-primary/5">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <SectionEyebrow className="mb-2">Live</SectionEyebrow>
+            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
+              Watch it happen.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <WatchItHappen />
+          </FadeIn>
+        </div>
+      </section>
+
+      {normalised.length > 0 && (
+        <section id="live" className="w-full scroll-mt-20">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <FadeIn>
+              <div className="mb-6 flex items-baseline justify-between">
+                <SectionEyebrow>Open right now</SectionEyebrow>
+                <Button variant="ghost" asChild>
+                  <Link href="/favpolls">See all →</Link>
+                </Button>
+              </div>
+            </FadeIn>
+            <FadeIn>
+              <LiveFavpollsCarousel favpolls={normalised} />
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
+      {showRecord && (
+        <section id="record" className="w-full scroll-mt-20">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <FadeIn>
+              <SectionEyebrow className="mb-2">The record</SectionEyebrow>
+              <h2 className="mb-3 max-w-lg text-3xl font-light tracking-tight text-foreground">
+                The current record holders.
+              </h2>
+              <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+                Every pledge, on every favpoll, feeds one shared record — each
+                question with its own standing champion.
+              </p>
+            </FadeIn>
+            <RecordHolders
+              items={recordItems}
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            />
+            <p className="mt-6">
+              <Button variant="ghost" asChild>
+                <Link href="/rankings">See the full record →</Link>
+              </Button>
+            </p>
+          </div>
+        </section>
+      )}
+
+      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
+            <HowItWorksThreeBeat />
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="w-full border-t border-border">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <div className="flex items-center gap-8">
               <HonourCharityLoveVenn
                 size={120}
                 animate
@@ -237,10 +246,10 @@ export default async function HomePage() {
                   {t("landing.cta.caption")}
                 </p>
               </div>
-            </section>
+            </div>
           </FadeIn>
         </div>
-      </div>
+      </section>
     </main>
   )
 }
