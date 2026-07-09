@@ -7,6 +7,7 @@
 // Reduced motion: the final frame, static.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
+import { BrandedQR } from "@/components/branded-qr"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { RankingBar } from "@/components/ui/ranking-bar"
 
@@ -67,12 +68,22 @@ export function WatchItHappen() {
   const bars = BARS[step]
 
   return (
-    <div className="grid items-center gap-6 md:grid-cols-[1fr_1.1fr_1.1fr]">
-      {/* Brief explanation — the artifacts to its right act it out */}
+    <div className="grid items-center gap-6 md:grid-cols-2 lg:grid-cols-[1fr_auto_1.1fr_1.1fr]">
+      {/* Brief explanation — the artifacts to its right act it out, in
+          process order: scan → pledge lands on the wall → rankings move */}
       <p className="max-w-md text-base leading-relaxed text-muted-foreground">
-        Put the live display on a screen at the event. Every pledge lands on the
-        guest wall and moves the rankings — the moment it&apos;s made.
+        Pair your favpoll with a real life occasion and watch it unfold live, on
+        a large display, as guests pledge.
       </p>
+
+      {/* The way in — guests scan from the poster or table cards */}
+      <div
+        className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border border-border bg-card px-5 py-4"
+        aria-hidden="true"
+      >
+        <BrandedQR value="https://favpoll.com" size={88} />
+        <p className="text-xs text-muted-foreground">scan to pledge</p>
+      </div>
 
       {/* The wall — pledges landing. [&>div]:h-full stretches the card to
           match the display card so the loop never shifts layout. */}

@@ -63,24 +63,36 @@ export function TopicItemsDialog({
       }}
       title={topicTitle}
       header={
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            autoFocus
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                if (showAddRow) handleAdd()
+        <div className="space-y-2">
+          {/* Visible title at block-start — the header slot makes the overlay
+              title sr-only, which left the dialog opening with no visible
+              question (the landing demo showed the intended shape). */}
+          <p className="text-lg font-medium tracking-tight text-foreground">
+            {topicTitle}
+          </p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  if (showAddRow) handleAdd()
+                }
+              }}
+              placeholder={
+                isNewTopic
+                  ? `Add ${topicTitle.toLowerCase()} options…`
+                  : `Search or add ${topicTitle.toLowerCase()} options…`
               }
-            }}
-            placeholder={`Search or add ${topicTitle.toLowerCase()} options…`}
-            className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
-          />
-          {showAddRow && (
-            <InputGroupButton onClick={handleAdd}>Add</InputGroupButton>
-          )}
+              className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+            />
+            {showAddRow && (
+              <InputGroupButton onClick={handleAdd}>Add</InputGroupButton>
+            )}
+          </div>
         </div>
       }
       hideCloseButton

@@ -148,9 +148,9 @@ export default async function HomePage() {
       <section id="anyone" className="w-full scroll-mt-20">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-2">Anyone can answer</SectionEyebrow>
+            <SectionEyebrow className="mb-2">Custom favpoll</SectionEyebrow>
             <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              Every guest has an answer.
+              Create or curate your favpoll
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -162,9 +162,9 @@ export default async function HomePage() {
       <section id="watch" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-2">Live</SectionEyebrow>
+            <SectionEyebrow className="mb-2">Live favpoll</SectionEyebrow>
             <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              Watch it happen.
+              Watch it happen
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
