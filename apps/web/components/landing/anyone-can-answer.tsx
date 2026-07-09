@@ -102,9 +102,8 @@ export function AnyoneCanAnswer() {
   return (
     <div className="grid items-center gap-6 sm:grid-cols-2">
       <p className="max-w-md text-base leading-relaxed text-muted-foreground">
-        Colour, season, biscuit — the built-in questions need no expertise, so
-        everyone takes part as equals. Or write your own question and answers,
-        for an office, a club, a family.
+        There are many favpoll topics to choose from and you are free to add
+        missing items. You are also welcome to create your own topics.
       </p>
 
       {/* The app's own add-options interaction, replayed */}
@@ -126,7 +125,7 @@ export function AnyoneCanAnswer() {
                 : "flex-1 text-base text-muted-foreground/50"
             }
           >
-            {inputText || "Search or add meeting room options…"}
+            {inputText || "Add meeting room options…"}
             {phase.kind === "typing" && <span className="opacity-40">|</span>}
           </span>
           {showAdd && (
