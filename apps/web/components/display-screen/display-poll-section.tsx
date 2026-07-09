@@ -3,7 +3,6 @@
 import { PollHeading } from "@/components/poll-heading"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { RankingList } from "@/components/ranking-list"
-import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
 import { TypedReveal } from "@/components/poll-section/typed-reveal"
 import type { Favourite } from "@favpoll/types"
 
@@ -49,33 +48,23 @@ export function DisplayPollSection({
     <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
       <PollHeading topicTitle={poll.topic.title} />
 
+      {/* While OPEN the poll column carries no reveal at all — the lock
+          hint lives in the banner beside the name (a blurred decoy on a
+          projector is just noise). The reveal appears here only as the
+          finale: typed out at the live close, static once closed. */}
       {hasReveal &&
-        (isClosed || justClosed ? (
-          justClosed ? (
-            // The finale: the room watches the reveal type out
-            <TypedReveal
-              text={revealText!}
-              active
-              protagonistFirstName={protagonistFirstName ?? "Their"}
-            />
-          ) : (
-            <PollReveal
-              personalReveal={revealText!}
-              protagonistFirstName={protagonistFirstName ?? undefined}
-            />
-          )
+        (isClosed || justClosed) &&
+        (justClosed ? (
+          <TypedReveal
+            text={revealText!}
+            active
+            protagonistFirstName={protagonistFirstName ?? "Their"}
+          />
         ) : (
-          <div className="relative">
-            <div className="blur-xs select-none" aria-hidden="true">
-              <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite." />
-            </div>
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              aria-hidden="true"
-            >
-              <RevealLockPill label={revealLockLabel(protagonistFirstName)} />
-            </div>
-          </div>
+          <PollReveal
+            personalReveal={revealText!}
+            protagonistFirstName={protagonistFirstName ?? undefined}
+          />
         ))}
 
       <RankingList
