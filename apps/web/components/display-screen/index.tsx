@@ -8,12 +8,10 @@ import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { BaseFavpollHero } from "@/components/heroes/base-favpoll-hero"
-import { CauseHero } from "@/components/cause-hero"
 import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
-import type { Charity, Favpoll, Protagonist } from "@favpoll/types"
+import type { Charity } from "@favpoll/types"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
@@ -47,10 +45,6 @@ type Props = {
   avatar?: { name: string; photoUrl: string | null } | null
   /** Closed favpolls disclose the reveal; open ones withhold it */
   isClosed?: boolean
-  /** Full rows — renders the event page's own hero (BaseFavpollHero /
-      CauseHero); the compact fallback below is for stories */
-  heroFavpoll?: Favpoll | null
-  heroProtagonist?: Protagonist | null
 }
 
 // Matches CharityBanner/CharityRow's whole-pound display
@@ -79,8 +73,6 @@ export function DisplayScreen({
   closesAt = null,
   avatar = null,
   isClosed = false,
-  heroFavpoll = null,
-  heroProtagonist = null,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   // The close, witnessed live: when closes_at passes while the room is
@@ -147,20 +139,11 @@ export function DisplayScreen({
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="mx-auto w-full max-w-6xl px-8">
-        {/* ── Hero — the event page's own, full width ── */}
-        {heroFavpoll ? (
-          <div className="mb-8">
-            {heroFavpoll.subject === "cause" || !heroProtagonist ? (
-              <CauseHero favpoll={heroFavpoll} />
-            ) : (
-              <BaseFavpollHero
-                favpoll={heroFavpoll}
-                protagonist={heroProtagonist}
-              />
-            )}
-          </div>
-        ) : (
-          <div className="mb-8 flex items-center gap-4">
+        {/* ── Telethon banner: identity · goal-or-countdown · QR ·
+            charities — the room's whole context in one glance ── */}
+        <div className="mb-8 flex flex-col gap-6 rounded-lg border border-border bg-card px-6 py-5 lg:flex-row lg:items-center">
+          {/* Who it's for — the opening line + name, in place of a hero */}
+          <div className="flex min-w-0 items-center gap-3 lg:max-w-xs">
             {avatar && (
               <div className="origin-left scale-75">
                 <ProtagonistAvatar
@@ -171,23 +154,21 @@ export function DisplayScreen({
             )}
             <div className="min-w-0">
               {headline.prefix && (
-                <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
                   {headline.prefix}
                 </p>
               )}
-              <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
+              <h1 className="truncate text-2xl font-medium tracking-tight text-foreground">
                 {protagonistName}
               </h1>
               {headline.suffix && (
-                <p className="text-sm text-primary">{headline.suffix}</p>
+                <p className="truncate text-sm text-primary">
+                  {headline.suffix}
+                </p>
               )}
             </div>
           </div>
-        )}
 
-        {/* ── Telethon banner: QR · goal-or-countdown · charities — the
-            room's whole "act now" band in one glance ── */}
-        <div className="mb-8 flex flex-col gap-6 rounded-lg border border-border bg-card px-6 py-5 md:flex-row md:items-center">
           {/* The way in */}
           <div className="flex shrink-0 flex-col items-center gap-1.5">
             <BrandedQR
@@ -274,7 +255,7 @@ export function DisplayScreen({
 
           {/* Charities — the event page's rows, with the live total */}
           {(charities.length > 0 || charityName) && (
-            <div className="w-full shrink-0 space-y-3 border-t border-border pt-4 md:w-72 md:border-t-0 md:border-l md:pt-0 md:pl-6">
+            <div className="w-full shrink-0 space-y-3 border-t border-border pt-4 lg:w-64 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
               {charities.length > 0 ? (
                 <>
                   {charities.slice(0, 3).map((charity) => (

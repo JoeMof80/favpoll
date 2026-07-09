@@ -165,8 +165,6 @@ export default async function LiveDisplayPage({ params }: Props) {
               photoUrl: favpoll.protagonists?.photo_url ?? null,
             }
       }
-      heroFavpoll={favpoll}
-      heroProtagonist={favpoll.protagonists ?? null}
     />
   )
 }
