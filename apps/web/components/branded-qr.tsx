@@ -8,12 +8,13 @@ import { useEffect, useRef, useState } from "react"
 // it reliably scannable, which matters most on small printed table cards.
 //
 // Client-only: qr-code-styling renders via the DOM, so it's dynamically
-// imported in an effect. The module colour is read from the --foreground
-// token at runtime, so it stays theme-appropriate and carries no hardcoded
-// hex (respecting the colour-token rule).
+// imported in an effect. Both colours are read from the theme at runtime —
+// modules from --foreground, the heart logo from --primary — so the whole
+// mark stays on-theme (no baked-in hex; the logo SVG is built per render
+// from the resolved token).
 
-const HEART_LOGO =
-  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyODIgMTIwIDEwOSI+PHBhdGggZD0iTTQxMS4zNDkgMzE4LjI0OEM0MTQuNjEgMzE4LjI0OCA0MTYuNzY5IDMxNS42MDYgNDE2Ljc2OSAzMTIuMzQ3QzQxMy45NTggMjk1LjYwMiAzOTkuMzgxIDI4Mi44NDMgMzgxLjgyOCAyODIuODQzQzM3Mi43NTUgMjgyLjg0MyAzNjQuNTcxIDI4Ni4xNjkgMzU4LjMwMyAyOTEuNzc1TDM1NS44NTkgMjg5Ljc2OUMzNDkuOTM1IDI4NS4zNzEgMzQyLjU0NSAyODIuODQzIDMzNC41OTQgMjgyLjg0M0MzMTUuMDI5IDI4Mi44NDMgMjk5LjE2OSAyOTguNjk0IDI5OS4xNjkgMzE4LjI0OEMyOTkuMTY5IDMyNy45NTQgMzAzLjA4IDMzNi43NDcgMzA5LjQwOSAzNDMuMTQyTDMyOC45ODcgMzYyLjcxNEMzMzEuMjkyIDM2NS4wMTkgMzM1LjAzMSAzNjUuMDE5IDMzNy4zMzcgMzYyLjcxNEMzMzkuNjQzIDM2MC40MSAzMzkuNjQzIDM1Ni42NzQgMzM3LjMzNyAzNTQuMzY5TDMxNy43NTggMzM0Ljc5OEMzMTMuNTUzIDMzMC41MjYgMzEwLjk3OCAzMjQuNjk5IDMxMC45NzggMzE4LjI0OEMzMTAuOTc4IDMwNS4yMTIgMzIxLjU1MSAyOTQuNjQ1IDMzNC41OTQgMjk0LjY0NUMzNDAuNzg2IDI5NC42NDUgMzQ2LjMzMyAyOTYuODg2IDM1MC40MjcgMzAwLjU1N0wzNTguMzAzIDMwNy42MjJMMzY2LjE3OSAzMDAuNTY5QzM3MC4zMzIgMjk2Ljg1NCAzNzUuNzI4IDI5NC42NDUgMzgxLjgyOCAyOTQuNjQ1QzM5Mi44MjcgMjk0LjY0NSA0MDIuMDkxIDMwMi4xNjggNDA0LjcwOSAzMTIuMzQ3QzQwNC43MDkgMzE1LjYwNiA0MDguMDg4IDMxOC4yNDggNDExLjM0OSAzMTguMjQ4WiIgZmlsbD0iIzUzNEFCNyIvPjxwYXRoIGQ9Ik0zNTIuNTY5IDMzNS45NDNDMzUyLjU2OSAzMzkuMDkxIDM1NS4yMDIgMzQxLjY0MyAzNTguNDQ5IDM0MS42NDNINDA1LjQ4OUM0MDguNzM3IDM0MS42NDMgNDExLjM2OSAzMzkuMDkxIDQxMS4zNjkgMzM1Ljk0M0M0MTEuMzY5IDMzMi43OTUgNDA4LjczNyAzMzAuMjQzIDQwNS40ODkgMzMwLjI0M0gzNTguNDQ5QzM1NS4yMDIgMzMwLjI0MyAzNTIuNTY5IDMzMi43OTUgMzUyLjU2OSAzMzUuOTQzWiIgZmlsbD0iIzUzNEFCNyIgZmlsbC1vcGFjaXR5PSIwLjYiLz48cGF0aCBkPSJNMzUyLjU2OSAzNTkuNjQzQzM1Mi41NjkgMzYyLjk1NiAzNTUuMjExIDM2NS42NDMgMzU4LjQ2OSAzNjUuNjQzSDM4Mi4wN0MzODUuMzI4IDM2NS42NDMgMzg3Ljk2OSAzNjIuOTU2IDM4Ny45NjkgMzU5LjY0M0MzODcuOTY5IDM1Ni4zMjkgMzg1LjMyOCAzNTMuNjQzIDM4Mi4wNyAzNTMuNjQzSDM1OC40NjlDMzU1LjIxMSAzNTMuNjQzIDM1Mi41NjkgMzU2LjMyOSAzNTIuNTY5IDM1OS42NDNaIiBmaWxsPSIjNTM0QUI3IiBmaWxsLW9wYWNpdHk9IjAuNiIvPjxwYXRoIGQ9Ik0zNjMuOTY5IDM4My4wNDNDMzYzLjk2OSAzODYuMzU3IDM2MS40MTggMzg5LjA0MyAzNTguMjY5IDM4OS4wNDNDMzU1LjEyMSAzODkuMDQzIDM1Mi41NjkgMzg2LjM1NyAzNTIuNTY5IDM4My4wNDNDMzUyLjU2OSAzNzkuNzI5IDM1NS4xMjEgMzc3LjA0MyAzNTguMjY5IDM3Ny4wNDNDMzYxLjQxOCAzNzcuMDQzIDM2My45NjkgMzc5LjcyOSAzNjMuOTY5IDM4My4wNDNaIiBmaWxsPSIjNTM0QUI3IiBmaWxsLW9wYWNpdHk9IjAuNiIvPjwvc3ZnPg=="
+const heartSvg = (colour: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="298 282 120 109"><path d="M411.349 318.248C414.61 318.248 416.769 315.606 416.769 312.347C413.958 295.602 399.381 282.843 381.828 282.843C372.755 282.843 364.571 286.169 358.303 291.775L355.859 289.769C349.935 285.371 342.545 282.843 334.594 282.843C315.029 282.843 299.169 298.694 299.169 318.248C299.169 327.954 303.08 336.747 309.409 343.142L328.987 362.714C331.292 365.019 335.031 365.019 337.337 362.714C339.643 360.41 339.643 356.674 337.337 354.369L317.758 334.798C313.553 330.526 310.978 324.699 310.978 318.248C310.978 305.212 321.551 294.645 334.594 294.645C340.786 294.645 346.333 296.886 350.427 300.557L358.303 307.622L366.179 300.569C370.332 296.854 375.728 294.645 381.828 294.645C392.827 294.645 402.091 302.168 404.709 312.347C404.709 315.606 408.088 318.248 411.349 318.248Z" fill="${colour}"/><path d="M352.569 335.943C352.569 339.091 355.202 341.643 358.449 341.643H405.489C408.737 341.643 411.369 339.091 411.369 335.943C411.369 332.795 408.737 330.243 405.489 330.243H358.449C355.202 330.243 352.569 332.795 352.569 335.943Z" fill="${colour}" fill-opacity="0.6"/><path d="M352.569 359.643C352.569 362.956 355.211 365.643 358.469 365.643H382.07C385.328 365.643 387.969 362.956 387.969 359.643C387.969 356.329 385.328 353.643 382.07 353.643H358.469C355.211 353.643 352.569 356.329 352.569 359.643Z" fill="${colour}" fill-opacity="0.6"/><path d="M363.969 383.043C363.969 386.357 361.418 389.043 358.269 389.043C355.121 389.043 352.569 386.357 352.569 383.043C352.569 379.729 355.121 377.043 358.269 377.043C361.418 377.043 363.969 379.729 363.969 383.043Z" fill="${colour}" fill-opacity="0.6"/></svg>`
 
 type Props = {
   value: string
@@ -33,18 +34,24 @@ export function BrandedQR({
   "aria-label": ariaLabel = "QR code",
 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [color, setColor] = useState("")
+  const [colors, setColors] = useState<{
+    foreground: string
+    primary: string
+  } | null>(null)
 
   useEffect(() => {
-    const resolved = getComputedStyle(document.documentElement)
-      .getPropertyValue("--foreground")
-      .trim()
-    setColor(resolved || "black")
+    const styles = getComputedStyle(document.documentElement)
+    const foreground = styles.getPropertyValue("--foreground").trim()
+    const primary = styles.getPropertyValue("--primary").trim()
+    setColors({
+      foreground: foreground || "black",
+      primary: primary || foreground || "black",
+    })
   }, [])
 
   useEffect(() => {
     const node = ref.current
-    if (!node || !color) return
+    if (!node || !colors) return
     let cancelled = false
 
     import("qr-code-styling").then(({ default: QRCodeStyling }) => {
@@ -57,12 +64,15 @@ export function BrandedQR({
         margin: 0,
         qrOptions: { errorCorrectionLevel: "H" },
         backgroundOptions: { color: "transparent" },
-        dotsOptions: { type: "rounded", color },
-        cornersSquareOptions: { type: "extra-rounded", color },
-        cornersDotOptions: { type: "dot", color },
+        dotsOptions: { type: "rounded", color: colors.foreground },
+        cornersSquareOptions: {
+          type: "extra-rounded",
+          color: colors.foreground,
+        },
+        cornersDotOptions: { type: "dot", color: colors.foreground },
         ...(logo
           ? {
-              image: HEART_LOGO,
+              image: `data:image/svg+xml,${encodeURIComponent(heartSvg(colors.primary))}`,
               imageOptions: {
                 imageSize: 0.22,
                 margin: 3,
@@ -78,7 +88,7 @@ export function BrandedQR({
     return () => {
       cancelled = true
     }
-  }, [value, size, color, logo])
+  }, [value, size, colors, logo])
 
   return (
     <div
