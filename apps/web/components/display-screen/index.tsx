@@ -9,6 +9,7 @@ import { Countdown } from "@/components/countdown"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
+import { DisplayChrome } from "./display-chrome"
 import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
@@ -142,7 +143,8 @@ export function DisplayScreen({
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
     // a wider canvas.
     <div className="min-h-screen overflow-x-clip bg-primary/5">
-      <div className="mx-auto min-h-[calc(100vh-3.5rem)] w-full max-w-6xl bg-background px-8 py-10 md:px-12 md:drop-shadow-lg">
+      <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 py-8 md:px-12 md:drop-shadow-lg">
+        <DisplayChrome />
         {/* ── Telethon banner, two rows: the identity line (a lower-third
             title), then the action row — QR · goal-or-countdown · charities
             — with room to breathe. ── */}
