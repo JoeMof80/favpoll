@@ -5,7 +5,7 @@
 import Link from "next/link"
 
 const EXPLORE = [
-  ["/favpolls", "Live favpolls"],
+  ["/favpolls", "Favpolls"],
   ["/rankings", "The record"],
   ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],

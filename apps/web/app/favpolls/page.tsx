@@ -171,7 +171,7 @@ export default async function FavpollsPage({
     fallbackExemplars ?? ((favpolls ?? []) as unknown as RawFavpoll[])
   const showingExemplars = !!fallbackExemplars
 
-  // For authenticated users, pre-fetch pledge results for live favpolls
+  // For authenticated users, pre-fetch pledge results for open favpolls
   const pledgedResultsByPollId = new Map<string, CardResultItem[]>()
 
   if (userId && !showClosed && !showingExemplars) {
@@ -306,7 +306,7 @@ export default async function FavpollsPage({
 
         {showingExemplars && (
           <SectionEyebrow variant="muted" className="mb-6">
-            No live favpolls yet for this occasion — here are some examples to
+            No open favpolls yet for this occasion — here are some examples to
             inspire you.
           </SectionEyebrow>
         )}

@@ -221,7 +221,7 @@ export function SeedFundModal({
             </p>
             <p className="text-xs text-muted-foreground">
               {listingState
-                ? "Appears on the live favpolls page."
+                ? "Appears on the public favpolls page."
                 : "Only reachable by people you give the link to."}
             </p>
           </div>
