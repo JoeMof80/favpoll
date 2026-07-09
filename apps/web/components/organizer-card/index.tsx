@@ -270,6 +270,31 @@ export function OrganizerCard({ favpoll }: Props) {
           </span>
         </div>
       )}
+
+      {/* 6. Pledge goal — understated progress, CharityBanner's pattern */}
+      {favpoll.goal_amount ? (
+        <div className="border-t border-border px-3 py-2.5">
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-label="Progress towards the pledge goal"
+            aria-valuemin={0}
+            aria-valuemax={favpoll.goal_amount}
+            aria-valuenow={Math.min(favpoll.total_raised, favpoll.goal_amount)}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+              style={{
+                width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+              }}
+            />
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {formatAmount(favpoll.total_raised)} raised of the{" "}
+            {formatAmount(favpoll.goal_amount)} goal
+          </p>
+        </div>
+      ) : null}
     </div>
   )
 }

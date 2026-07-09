@@ -37,6 +37,7 @@ function makeFavpoll(
   return {
     id: "fp-1",
     live_slug: "slug-fp-1",
+    goal_amount: null,
     opening_line: "In memory of",
     closes_at: farFuture,
     closed_at: null,
@@ -244,6 +245,27 @@ describe("OrganizerCard", () => {
       render(<OrganizerCard favpoll={makeFavpoll({ poll: null })} />)
       expect(screen.getByTestId("organizer-card")).toBeInTheDocument()
       expect(screen.queryByText("Colour")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("pledge goal", () => {
+    it("shows the goal progress when a goal is set", () => {
+      render(
+        <OrganizerCard
+          favpoll={makeFavpoll({ total_raised: 250, goal_amount: 1000 })}
+        />
+      )
+      expect(
+        screen.getByRole("progressbar", {
+          name: /Progress towards the pledge goal/i,
+        })
+      ).toBeInTheDocument()
+      expect(screen.getByText(/raised of the .*1,000 goal/)).toBeInTheDocument()
+    })
+
+    it("shows no goal row when goal_amount is null", () => {
+      render(<OrganizerCard favpoll={makeFavpoll({ goal_amount: null })} />)
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     })
   })
 })
