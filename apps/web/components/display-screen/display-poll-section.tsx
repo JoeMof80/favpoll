@@ -1,10 +1,10 @@
 "use client"
 
-import { useRankingItems } from "@/components/ranking-list/use-ranking-items"
-import { DisplayRankingRow } from "./display-ranking-row"
+import { PollHeading } from "@/components/poll-heading"
+import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { RankingList } from "@/components/ranking-list"
+import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
 import type { Favourite } from "@favpoll/types"
-
-const ROW_HEIGHT = 72
 
 export type DisplayPoll = {
   id: string
@@ -16,56 +16,61 @@ export type DisplayPoll = {
   items: Favourite[]
 }
 
-export function DisplayPollSection({ poll }: { poll: DisplayPoll }) {
-  const { items, announcement, maxValue } = useRankingItems(
-    poll.items,
-    poll.topic.id,
-    "amount"
-  )
-  const isColorTopic =
-    poll.topic.title.toLowerCase().includes("colour") ||
-    poll.topic.title.toLowerCase().includes("color")
+type Props = {
+  poll: DisplayPoll
+  /** Closed favpolls show the reveal; open ones withhold it (see below) */
+  isClosed?: boolean
+  /** Person favpolls: names the lock pill; null for causes */
+  protagonistFirstName?: string | null
+}
+
+// The display's poll block, in the event page's language: the same
+// PollHeading pill, the same RankingList bars (realtime via
+// useRankingItems), and the same withhold-then-disclose reveal treatment.
+//
+// While the poll is OPEN the reveal is withheld — showing it to the room
+// would spoil each guest's own post-pledge reveal moment and could bias
+// their pick. The blurred decoy + lock pill advertise the mechanic instead
+// (the QR beside it is the way in). When the poll closes, the display
+// discloses the reveal — the room's collective finale.
+export function DisplayPollSection({
+  poll,
+  isClosed = false,
+  protagonistFirstName = null,
+}: Props) {
+  const revealText = poll.personal_reveal
+  const hasReveal = !!revealText
 
   return (
-    <section className="mb-10" aria-labelledby={`poll-${poll.id}-heading`}>
-      <h2
-        id={`poll-${poll.id}-heading`}
-        className="mb-1 text-lg font-medium text-foreground"
-      >
-        {poll.topic.title}
-      </h2>
-      {poll.personal_reveal && (
-        <p className="mb-4 border-l-2 border-secondary pl-3 text-sm text-muted-foreground italic">
-          {poll.personal_reveal}
-        </p>
-      )}
-      <span
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {announcement}
-      </span>
-      <ol
-        aria-label={`${poll.topic.title} rankings`}
-        aria-live="polite"
-        className="relative"
-        style={{ height: items.length * ROW_HEIGHT }}
-      >
-        {items.map((item) => (
-          <DisplayRankingRow
-            key={item.id}
-            item={item}
-            isColorTopic={isColorTopic}
-            maxPledged={maxValue}
-            isFirst={item.rank === 1}
-            style={{
-              transform: `translateY(${(item.rank - 1) * ROW_HEIGHT}px)`,
-            }}
+    <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
+      <PollHeading topicTitle={poll.topic.title} />
+
+      {hasReveal &&
+        (isClosed ? (
+          <PollReveal
+            personalReveal={revealText!}
+            protagonistFirstName={protagonistFirstName ?? undefined}
           />
+        ) : (
+          <div className="relative">
+            <div className="blur-xs select-none" aria-hidden="true">
+              <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite." />
+            </div>
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <RevealLockPill label={revealLockLabel(protagonistFirstName)} />
+            </div>
+          </div>
         ))}
-      </ol>
+
+      <RankingList
+        initialItems={poll.items}
+        favpollPollId={poll.id}
+        topicId={poll.topic.id}
+        rankingView="amount"
+      />
     </section>
   )
 }

@@ -43,6 +43,8 @@ type Props = {
   closesAt?: string | null
   /** Person favpolls: the event page's avatar beside the hero */
   avatar?: { name: string; photoUrl: string | null } | null
+  /** Closed favpolls disclose the reveal; open ones withhold it */
+  isClosed?: boolean
 }
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -69,6 +71,7 @@ export function DisplayScreen({
   charities = [],
   closesAt = null,
   avatar = null,
+  isClosed = false,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   // The room's wall: names appear as pledges land. The live_slug capability
@@ -119,36 +122,41 @@ export function DisplayScreen({
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_22.5rem]">
           {/* ── Left: hero + rankings (what the room watches) ── */}
           <div>
-            <div className="relative mb-10">
-              <div className={avatar ? "pr-24" : ""}>
-                {headline.prefix && (
-                  <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
-                    {headline.prefix}
-                  </p>
-                )}
-                <h1 className="text-5xl font-medium tracking-tight text-foreground">
-                  {protagonistName}
-                </h1>
-                {headline.suffix && (
-                  <p className="mt-2 text-xl text-primary">{headline.suffix}</p>
-                )}
-                {description && (
-                  <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-                    {description}
-                  </p>
-                )}
-              </div>
+            {/* Compact hero — the room knows whose day it is; the poll is
+                the star. Name small, no biography. */}
+            <div className="mb-8 flex items-center gap-4">
               {avatar && (
-                <div className="absolute top-0 right-0">
+                <div className="origin-left scale-75">
                   <ProtagonistAvatar
                     name={avatar.name}
                     photoUrl={avatar.photoUrl}
                   />
                 </div>
               )}
+              <div className="min-w-0">
+                {headline.prefix && (
+                  <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                    {headline.prefix}
+                  </p>
+                )}
+                <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
+                  {protagonistName}
+                </h1>
+                {headline.suffix && (
+                  <p className="text-sm text-primary">{headline.suffix}</p>
+                )}
+              </div>
             </div>
 
-            {poll && <DisplayPollSection poll={poll} />}
+            {poll && (
+              <DisplayPollSection
+                poll={poll}
+                isClosed={isClosed}
+                protagonistFirstName={
+                  avatar ? protagonistName.split(/[\s&]+/)[0] : null
+                }
+              />
+            )}
           </div>
 
           {/* ── Right: the room's meta, event-page style ── */}
@@ -168,6 +176,38 @@ export function DisplayScreen({
               </p>
             </div>
 
+            {goalAmount ? (
+              <div className="rounded-lg border border-border bg-card px-5 py-4">
+                <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                  Pledge goal
+                </p>
+                <p
+                  className="mt-1 text-3xl font-medium text-foreground"
+                  aria-live="polite"
+                >
+                  {GBP.format(totalRaised)}
+                  <span className="ml-2 text-base font-normal text-muted-foreground">
+                    of {GBP.format(goalAmount)}
+                  </span>
+                </p>
+                <div
+                  className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Progress towards the pledge goal"
+                  aria-valuemin={0}
+                  aria-valuemax={goalAmount}
+                  aria-valuenow={Math.min(totalRaised, goalAmount)}
+                >
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
+
             {isOpen && (
               <div className="rounded-lg border border-border bg-card px-5 py-4">
                 <Countdown closesAt={closesAt!} />
@@ -178,7 +218,7 @@ export function DisplayScreen({
               <CharityBanner
                 charities={charities}
                 totalRaised={totalRaised}
-                goalAmount={goalAmount}
+                goalAmount={null}
               />
             ) : (
               charityName && (
