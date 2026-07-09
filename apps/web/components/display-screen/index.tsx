@@ -138,8 +138,11 @@ export function DisplayScreen({
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
   return (
-    <div className="min-h-screen bg-background py-10">
-      <div className="mx-auto w-full max-w-6xl px-8">
+    // The event page's frame (tinted surround, floating card) at broadcast
+    // width — max-w-6xl rather than the page's 5xl, since a projector earns
+    // a wider canvas.
+    <div className="min-h-screen overflow-x-clip bg-primary/5">
+      <div className="mx-auto min-h-[calc(100vh-3.5rem)] w-full max-w-6xl bg-background px-8 py-10 md:px-12 md:drop-shadow-lg">
         {/* ── Telethon banner, two rows: the identity line (a lower-third
             title), then the action row — QR · goal-or-countdown · charities
             — with room to breathe. ── */}
