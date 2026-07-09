@@ -8,10 +8,12 @@ import { CharityBanner } from "@/components/charity-banner"
 import { Countdown } from "@/components/countdown"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { BaseFavpollHero } from "@/components/heroes/base-favpoll-hero"
+import { CauseHero } from "@/components/cause-hero"
 import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
-import type { Charity } from "@favpoll/types"
+import type { Charity, Favpoll, Protagonist } from "@favpoll/types"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
@@ -45,6 +47,10 @@ type Props = {
   avatar?: { name: string; photoUrl: string | null } | null
   /** Closed favpolls disclose the reveal; open ones withhold it */
   isClosed?: boolean
+  /** Full rows — renders the event page's own hero (BaseFavpollHero /
+      CauseHero); the compact fallback below is for stories */
+  heroFavpoll?: Favpoll | null
+  heroProtagonist?: Protagonist | null
 }
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -72,8 +78,13 @@ export function DisplayScreen({
   closesAt = null,
   avatar = null,
   isClosed = false,
+  heroFavpoll = null,
+  heroProtagonist = null,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
+  // The close, witnessed live: when closes_at passes while the room is
+  // watching, the countdown gives way and the reveal types out — the finale.
+  const [localClosed, setLocalClosed] = useState(false)
   // The room's wall: names appear as pledges land. The live_slug capability
   // authorises backed-labels; anonymity still holds ("Someone").
   const wallEntries = useLiveWall(favpollId, initialWallEntries, {
@@ -107,6 +118,18 @@ export function DisplayScreen({
     }
   }, [favpollId, pollId, supabase])
 
+  useEffect(() => {
+    if (isClosed || !closesAt) return
+    const delta = new Date(closesAt).getTime() - Date.now()
+    if (delta <= 0) {
+      setLocalClosed(true)
+      return
+    }
+    if (delta > 2 ** 31 - 1) return // beyond setTimeout range; irrelevant live
+    const id = setTimeout(() => setLocalClosed(true), delta)
+    return () => clearTimeout(id)
+  }, [closesAt, isClosed])
+
   const headline = getFavpollHeadline({
     occasionType,
     openingLine,
@@ -114,44 +137,103 @@ export function DisplayScreen({
     dateLabel,
   })
 
-  const isOpen = closesAt ? new Date(closesAt) > new Date() : false
+  const effectiveClosed = isClosed || localClosed
+  const isOpen = !effectiveClosed && !!closesAt
+  const goalReached = !!goalAmount && totalRaised >= goalAmount
 
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="mx-auto w-full max-w-6xl px-8">
+        {/* Pledge goal — full-width, telethon-style, on the realtime total */}
+        {goalAmount ? (
+          <div className="mb-8 rounded-lg border border-border bg-card px-6 py-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                Pledge goal
+              </p>
+              {goalReached && (
+                <p className="text-sm font-medium text-success">
+                  Goal reached — every further pledge still counts
+                </p>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
+              <p
+                className="text-4xl font-medium text-foreground"
+                aria-live="polite"
+              >
+                {GBP.format(totalRaised)}
+              </p>
+              <p className="text-lg text-muted-foreground">
+                of {GBP.format(goalAmount)}
+              </p>
+            </div>
+            <div
+              className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-label="Progress towards the pledge goal"
+              aria-valuemin={0}
+              aria-valuemax={goalAmount}
+              aria-valuenow={Math.min(totalRaised, goalAmount)}
+            >
+              <div
+                className={`h-full rounded-full transition-[width] duration-700 ease-out ${
+                  goalReached ? "bg-success" : "bg-primary"
+                }`}
+                style={{
+                  width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_22.5rem]">
           {/* ── Left: hero + rankings (what the room watches) ── */}
           <div>
-            {/* Compact hero — the room knows whose day it is; the poll is
-                the star. Name small, no biography. */}
-            <div className="mb-8 flex items-center gap-4">
-              {avatar && (
-                <div className="origin-left scale-75">
-                  <ProtagonistAvatar
-                    name={avatar.name}
-                    photoUrl={avatar.photoUrl}
+            {heroFavpoll ? (
+              // The event page's own hero — identical styling by construction
+              <div className="mb-8">
+                {heroFavpoll.subject === "cause" || !heroProtagonist ? (
+                  <CauseHero favpoll={heroFavpoll} />
+                ) : (
+                  <BaseFavpollHero
+                    favpoll={heroFavpoll}
+                    protagonist={heroProtagonist}
                   />
-                </div>
-              )}
-              <div className="min-w-0">
-                {headline.prefix && (
-                  <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                    {headline.prefix}
-                  </p>
-                )}
-                <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
-                  {protagonistName}
-                </h1>
-                {headline.suffix && (
-                  <p className="text-sm text-primary">{headline.suffix}</p>
                 )}
               </div>
-            </div>
+            ) : (
+              <div className="mb-8 flex items-center gap-4">
+                {avatar && (
+                  <div className="origin-left scale-75">
+                    <ProtagonistAvatar
+                      name={avatar.name}
+                      photoUrl={avatar.photoUrl}
+                    />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  {headline.prefix && (
+                    <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                      {headline.prefix}
+                    </p>
+                  )}
+                  <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
+                    {protagonistName}
+                  </h1>
+                  {headline.suffix && (
+                    <p className="text-sm text-primary">{headline.suffix}</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {poll && (
               <DisplayPollSection
                 poll={poll}
-                isClosed={isClosed}
+                isClosed={effectiveClosed}
+                justClosed={localClosed && !isClosed}
                 protagonistFirstName={
                   avatar ? protagonistName.split(/[\s&]+/)[0] : null
                 }
@@ -176,43 +258,20 @@ export function DisplayScreen({
               </p>
             </div>
 
-            {goalAmount ? (
-              <div className="rounded-lg border border-border bg-card px-5 py-4">
-                <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                  Pledge goal
-                </p>
-                <p
-                  className="mt-1 text-3xl font-medium text-foreground"
-                  aria-live="polite"
-                >
-                  {GBP.format(totalRaised)}
-                  <span className="ml-2 text-base font-normal text-muted-foreground">
-                    of {GBP.format(goalAmount)}
-                  </span>
-                </p>
-                <div
-                  className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
-                  aria-label="Progress towards the pledge goal"
-                  aria-valuemin={0}
-                  aria-valuemax={goalAmount}
-                  aria-valuenow={Math.min(totalRaised, goalAmount)}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                    style={{
-                      width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {isOpen && (
+            {isOpen ? (
               <div className="rounded-lg border border-border bg-card px-5 py-4">
                 <Countdown closesAt={closesAt!} />
               </div>
-            )}
+            ) : localClosed ? (
+              <div className="rounded-lg border border-border bg-card px-5 py-4">
+                <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                  Poll closed
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Thank you — the final standings are in.
+                </p>
+              </div>
+            ) : null}
 
             {charities.length > 0 ? (
               <CharityBanner

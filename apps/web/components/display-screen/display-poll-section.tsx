@@ -4,6 +4,7 @@ import { PollHeading } from "@/components/poll-heading"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { RankingList } from "@/components/ranking-list"
 import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
+import { TypedReveal } from "@/components/poll-section/typed-reveal"
 import type { Favourite } from "@favpoll/types"
 
 export type DisplayPoll = {
@@ -20,6 +21,8 @@ type Props = {
   poll: DisplayPoll
   /** Closed favpolls show the reveal; open ones withhold it (see below) */
   isClosed?: boolean
+  /** The poll closed while the room watched — type the reveal out */
+  justClosed?: boolean
   /** Person favpolls: names the lock pill; null for causes */
   protagonistFirstName?: string | null
 }
@@ -36,6 +39,7 @@ type Props = {
 export function DisplayPollSection({
   poll,
   isClosed = false,
+  justClosed = false,
   protagonistFirstName = null,
 }: Props) {
   const revealText = poll.personal_reveal
@@ -46,11 +50,20 @@ export function DisplayPollSection({
       <PollHeading topicTitle={poll.topic.title} />
 
       {hasReveal &&
-        (isClosed ? (
-          <PollReveal
-            personalReveal={revealText!}
-            protagonistFirstName={protagonistFirstName ?? undefined}
-          />
+        (isClosed || justClosed ? (
+          justClosed ? (
+            // The finale: the room watches the reveal type out
+            <TypedReveal
+              text={revealText!}
+              active
+              protagonistFirstName={protagonistFirstName ?? "Their"}
+            />
+          ) : (
+            <PollReveal
+              personalReveal={revealText!}
+              protagonistFirstName={protagonistFirstName ?? undefined}
+            />
+          )
         ) : (
           <div className="relative">
             <div className="blur-xs select-none" aria-hidden="true">
