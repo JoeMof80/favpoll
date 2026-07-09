@@ -8,6 +8,7 @@ import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
 import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
@@ -143,31 +144,43 @@ export function DisplayScreen({
             title), then the action row — QR · goal-or-countdown · charities
             — with room to breathe. ── */}
         <div className="mb-8 rounded-lg border border-border bg-card px-6 py-5">
-          {/* Who it's for — the opening line + name, in place of a hero */}
-          <div className="flex min-w-0 items-center gap-3 border-b border-border pb-4">
-            {avatar && (
-              <div className="origin-left scale-75">
-                <ProtagonistAvatar
-                  name={avatar.name}
-                  photoUrl={avatar.photoUrl}
-                />
+          {/* Who it's for — the opening line + name, in place of a hero.
+              The reveal's lock hint sits beside the name while the poll is
+              open: intrigue without the blurred-decoy noise. */}
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+            <div className="flex min-w-0 items-center gap-3">
+              {avatar && (
+                <div className="origin-left scale-75">
+                  <ProtagonistAvatar
+                    name={avatar.name}
+                    photoUrl={avatar.photoUrl}
+                  />
+                </div>
+              )}
+              <div className="min-w-0">
+                {headline.prefix && (
+                  <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
+                    {headline.prefix}
+                  </p>
+                )}
+                <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
+                  {protagonistName}
+                </h1>
+                {headline.suffix && (
+                  <p className="truncate text-sm text-primary">
+                    {headline.suffix}
+                  </p>
+                )}
               </div>
-            )}
-            <div className="min-w-0">
-              {headline.prefix && (
-                <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
-                  {headline.prefix}
-                </p>
-              )}
-              <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
-                {protagonistName}
-              </h1>
-              {headline.suffix && (
-                <p className="truncate text-sm text-primary">
-                  {headline.suffix}
-                </p>
-              )}
             </div>
+            {!effectiveClosed && poll?.personal_reveal && (
+              <RevealLockPill
+                size="sm"
+                label={revealLockLabel(
+                  avatar ? protagonistName.split(/[\s&]+/)[0] : null
+                )}
+              />
+            )}
           </div>
 
           {/* Action row */}
