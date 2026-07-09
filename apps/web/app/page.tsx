@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { FavpollSummaryCard } from "@/components/favpoll-summary-card"
+import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn"
 import { Button } from "@/components/ui/button"
@@ -182,18 +182,9 @@ export default async function HomePage() {
                   </Button>
                 </div>
               </FadeIn>
-              <ul className="grid gap-4 sm:grid-cols-2" role="list">
-                {normalised.slice(0, 4).map((f, i) => (
-                  <li key={f.id} className="list-none">
-                    <FadeIn delay={i * 0.06} className="h-full">
-                      <FavpollSummaryCard
-                        favpoll={f}
-                        className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                      />
-                    </FadeIn>
-                  </li>
-                ))}
-              </ul>
+              <FadeIn>
+                <LiveFavpollsCarousel favpolls={normalised} />
+              </FadeIn>
             </section>
           )}
 
