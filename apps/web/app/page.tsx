@@ -176,7 +176,7 @@ export default async function HomePage() {
             <section id="live" className="scroll-mt-20">
               <FadeIn>
                 <div className="mb-6 flex items-baseline justify-between">
-                  <SectionEyebrow>Live right now</SectionEyebrow>
+                  <SectionEyebrow>Open right now</SectionEyebrow>
                   <Button variant="ghost" asChild>
                     <Link href="/favpolls">See all →</Link>
                   </Button>

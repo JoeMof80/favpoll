@@ -50,7 +50,7 @@ export function Header() {
               <Link href="/rankings">Rankings</Link>
             </Button>
             <Button asChild variant="ghost" className="text-muted-foreground">
-              <Link href="/favpolls">Live favpolls</Link>
+              <Link href="/favpolls">Favpolls</Link>
             </Button>
             <Show when="signed-in">
               <Button asChild variant="ghost" className="text-muted-foreground">
@@ -104,7 +104,7 @@ export function Header() {
               className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={close}
             >
-              Live favpolls
+              Favpolls
             </Link>
             <Show when="signed-in">
               <Link

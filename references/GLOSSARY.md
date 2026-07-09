@@ -168,13 +168,22 @@ shared fund.
 ---
 
 ### Live display
-**What it is:** A full-screen view of a favpoll's real-time rankings, designed
-to be shown on a projector or large screen at a physical gathering. No pledge
-panel — guests use their phones while watching the display.
+**What it is:** A full-screen view of a favpoll's real-time rankings + guest
+wall, designed to be shown on a projector or large screen at a physical
+gathering. No pledge panel — guests use their phones while watching the
+display.
 
-**Code:** `/favpolls/[id]/display` route — `apps/web/app/favpolls/[id]/display/page.tsx`
+**Code:** `/live/[slug]` route (capability slug `favpolls.live_slug`,
+2026-07-08) — `apps/web/app/live/[slug]/page.tsx`
 **UI:** "Live display" in the organiser's manage panel
 **Not:** projector view, screen mode, display mode, kiosk
+
+> **"Live" vs "open" (decided 2026-07-09):** in UI copy, **live** means
+> _updating in real time_ (the live display, live rankings, the wall) and
+> **open** means _currently accepting pledges_ (the opposite of closed —
+> "Open favpolls", "Open right now", "No open favpolls yet"). Never use
+> "live" for the open sense; the two previously collided on the landing
+> page. Code identifiers (e.g. `LiveFavpollsCarousel`) are exempt.
 
 ---
 

@@ -71,7 +71,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8">
             <div>
               <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Live favpolls
+                Open favpolls
               </dt>
               <dd className="mt-1 text-3xl font-light tabular-nums">
                 <CountUp
@@ -83,7 +83,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             {totalLive > 0 && (
               <div>
                 <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                  Raised by live favpolls
+                  Raised by open favpolls
                 </dt>
                 <dd className="mt-1 text-3xl font-light tabular-nums">
                   <CountUp

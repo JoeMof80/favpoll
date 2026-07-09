@@ -11,13 +11,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: "Live favpolls" },
+  args: { children: "Open favpolls" },
 }
 
 export const WithHeading = {
   render: () => (
     <div>
-      <SectionEyebrow className="mb-2">Live favpolls</SectionEyebrow>
+      <SectionEyebrow className="mb-2">Open favpolls</SectionEyebrow>
       <h2 className="text-[26px] font-medium tracking-tight text-foreground">
         Happening right now
       </h2>
@@ -34,7 +34,7 @@ export const BothVariants = {
     <div className="flex flex-col gap-6">
       <div>
         <p className="mb-2 text-xs text-muted-foreground">brand (default)</p>
-        <SectionEyebrow>Live favpolls</SectionEyebrow>
+        <SectionEyebrow>Open favpolls</SectionEyebrow>
       </div>
       <div>
         <p className="mb-2 text-xs text-muted-foreground">muted</p>

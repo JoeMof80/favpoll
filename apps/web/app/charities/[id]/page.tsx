@@ -47,7 +47,7 @@ export default async function CharityPage({ params }: Props) {
     live_count: 0,
   }
 
-  // Live favpolls supporting this charity — the "charities market favpoll
+  // Open favpolls supporting this charity — the "charities market favpoll
   // for you" surface. Listed, open, non-private only.
   const { data: rawLive } = await supabase
     .from("favpoll_charities")
@@ -163,14 +163,14 @@ export default async function CharityPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Live favpolls */}
+      {/* Open favpolls */}
       <section className="mt-12">
         <SectionEyebrow className="mb-4">
-          Live favpolls supporting {charity.name}
+          Open favpolls supporting {charity.name}
         </SectionEyebrow>
         {liveFavpolls.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No live favpolls right now — start one and every pledge reaches{" "}
+            No open favpolls right now — start one and every pledge reaches{" "}
             {charity.name} in full.
           </p>
         ) : (

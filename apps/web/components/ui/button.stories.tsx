@@ -32,7 +32,7 @@ export const Default: Story = {
 }
 
 export const Ghost: Story = {
-  args: { children: "See live favpolls →", variant: "ghost" },
+  args: { children: "See open favpolls →", variant: "ghost" },
 }
 
 export const Outline: Story = {
