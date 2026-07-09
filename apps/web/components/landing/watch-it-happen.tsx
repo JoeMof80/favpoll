@@ -67,15 +67,24 @@ export function WatchItHappen() {
   const bars = BARS[step]
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2" aria-hidden="true">
+    <div className="grid items-center gap-6 md:grid-cols-[1fr_1.1fr_1.1fr]">
+      {/* Brief explanation — the artifacts to its right act it out */}
+      <p className="max-w-md text-base leading-relaxed text-muted-foreground">
+        Put the live display on a screen at the event. Every pledge lands on the
+        guest wall and moves the rankings — the moment it&apos;s made.
+      </p>
+
       {/* The wall — pledges landing. [&>div]:h-full stretches the card to
           match the display card so the loop never shifts layout. */}
-      <div className="[&>div]:h-full">
+      <div className="[&>div]:h-full" aria-hidden="true">
         <GuestWall entries={wallEntries} animate maxEntries={4} />
       </div>
 
       {/* The display — bars moving in the same beat */}
-      <div className="space-y-2 rounded-lg border border-border bg-card px-5 py-4">
+      <div
+        className="h-full space-y-2 rounded-lg border border-border bg-card px-5 py-4"
+        aria-hidden="true"
+      >
         <p className="flex items-center gap-1.5 text-xs font-medium tracking-widest text-primary uppercase">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
