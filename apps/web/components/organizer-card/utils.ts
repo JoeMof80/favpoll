@@ -11,6 +11,7 @@ export type OrganizerCardFavpoll = {
   subject: string
   cause_label: string | null
   total_raised: number
+  goal_amount: number | null
   is_listed: boolean
   created_at: string
   protagonist: { name: string } | null

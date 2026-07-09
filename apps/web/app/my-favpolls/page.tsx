@@ -30,6 +30,7 @@ export default async function MyFavpollsPage() {
       subject,
       cause_label,
       total_raised,
+      goal_amount,
       is_listed,
       created_at,
       protagonists!favpolls_protagonist_id_fkey ( name ),
@@ -54,6 +55,7 @@ export default async function MyFavpollsPage() {
     subject: string
     cause_label: string | null
     total_raised: number
+    goal_amount: number | null
     is_listed: boolean
     created_at: string
     protagonists: { name: string } | null
@@ -85,6 +87,7 @@ export default async function MyFavpollsPage() {
     subject: ev.subject,
     cause_label: ev.cause_label,
     total_raised: ev.total_raised,
+    goal_amount: ev.goal_amount ?? null,
     is_listed: ev.is_listed ?? true,
     created_at: ev.created_at,
     protagonist: ev.protagonists ?? null,
