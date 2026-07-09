@@ -187,9 +187,9 @@ export function DisplayScreen({
           </div>
 
           {/* Action row */}
-          <div className="flex flex-col gap-6 pt-4 md:flex-row md:items-center">
+          <div className="flex flex-col gap-6 pt-4 md:flex-row md:items-stretch">
             {/* The way in */}
-            <div className="flex shrink-0 flex-col items-center gap-1.5">
+            <div className="flex shrink-0 flex-col items-center justify-center gap-1.5">
               <BrandedQR
                 value={favpollUrl}
                 size={132}
@@ -201,7 +201,7 @@ export function DisplayScreen({
             </div>
 
             {/* Centre: goal progress, or the countdown when no goal is set */}
-            <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 flex-col justify-center">
               {effectiveClosed ? (
                 <div>
                   <p className="text-xs font-medium tracking-widest text-primary uppercase">
@@ -274,7 +274,7 @@ export function DisplayScreen({
 
             {/* Charities — the event page's rows, with the live total */}
             {(charities.length > 0 || charityName) && (
-              <div className="w-full shrink-0 space-y-3 border-t border-border pt-4 md:w-72 md:border-t-0 md:border-l md:pt-0 md:pl-6">
+              <div className="flex w-full shrink-0 flex-col justify-center space-y-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
                 {charities.length > 0 ? (
                   <>
                     {charities.slice(0, 3).map((charity) => (
