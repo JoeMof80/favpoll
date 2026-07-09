@@ -139,11 +139,12 @@ export function DisplayScreen({
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="mx-auto w-full max-w-6xl px-8">
-        {/* ── Telethon banner: identity · goal-or-countdown · QR ·
-            charities — the room's whole context in one glance ── */}
-        <div className="mb-8 flex flex-col gap-6 rounded-lg border border-border bg-card px-6 py-5 lg:flex-row lg:items-center">
+        {/* ── Telethon banner, two rows: the identity line (a lower-third
+            title), then the action row — QR · goal-or-countdown · charities
+            — with room to breathe. ── */}
+        <div className="mb-8 rounded-lg border border-border bg-card px-6 py-5">
           {/* Who it's for — the opening line + name, in place of a hero */}
-          <div className="flex min-w-0 items-center gap-3 lg:max-w-xs">
+          <div className="flex min-w-0 items-center gap-3 border-b border-border pb-4">
             {avatar && (
               <div className="origin-left scale-75">
                 <ProtagonistAvatar
@@ -158,7 +159,7 @@ export function DisplayScreen({
                   {headline.prefix}
                 </p>
               )}
-              <h1 className="truncate text-2xl font-medium tracking-tight text-foreground">
+              <h1 className="truncate text-3xl font-medium tracking-tight text-foreground">
                 {protagonistName}
               </h1>
               {headline.suffix && (
@@ -169,124 +170,127 @@ export function DisplayScreen({
             </div>
           </div>
 
-          {/* The way in */}
-          <div className="flex shrink-0 flex-col items-center gap-1.5">
-            <BrandedQR
-              value={favpollUrl}
-              size={112}
-              aria-label="Scan to pledge on your phone"
-            />
-            <p className="text-sm font-medium text-foreground">
-              Scan to pledge
-            </p>
-          </div>
+          {/* Action row */}
+          <div className="flex flex-col gap-6 pt-4 md:flex-row md:items-center">
+            {/* The way in */}
+            <div className="flex shrink-0 flex-col items-center gap-1.5">
+              <BrandedQR
+                value={favpollUrl}
+                size={132}
+                aria-label="Scan to pledge on your phone"
+              />
+              <p className="text-sm font-medium text-foreground">
+                Scan to pledge
+              </p>
+            </div>
 
-          {/* Centre: goal progress, or the countdown when no goal is set */}
-          <div className="min-w-0 flex-1">
-            {effectiveClosed ? (
-              <div>
-                <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                  Poll closed
-                </p>
-                <p
-                  className="mt-1 text-4xl font-medium text-foreground"
-                  aria-live="polite"
-                >
-                  {GBP.format(totalRaised)}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Thank you — the final standings are in.
-                </p>
-              </div>
-            ) : goalAmount ? (
-              <div>
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
+            {/* Centre: goal progress, or the countdown when no goal is set */}
+            <div className="min-w-0 flex-1">
+              {effectiveClosed ? (
+                <div>
                   <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                    Pledge goal
+                    Poll closed
                   </p>
-                  {goalReached && (
-                    <p className="text-sm font-medium text-success">
-                      Goal reached — every further pledge still counts
-                    </p>
-                  )}
-                </div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
                   <p
-                    className="text-4xl font-medium text-foreground"
+                    className="mt-1 text-4xl font-medium text-foreground"
                     aria-live="polite"
                   >
                     {GBP.format(totalRaised)}
                   </p>
-                  <p className="text-lg text-muted-foreground">
-                    of {GBP.format(goalAmount)}
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Thank you — the final standings are in.
                   </p>
                 </div>
-                <div
-                  className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
-                  aria-label="Progress towards the pledge goal"
-                  aria-valuemin={0}
-                  aria-valuemax={goalAmount}
-                  aria-valuenow={Math.min(totalRaised, goalAmount)}
-                >
+              ) : goalAmount ? (
+                <div>
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                      Pledge goal
+                    </p>
+                    {goalReached && (
+                      <p className="text-sm font-medium text-success">
+                        Goal reached — every further pledge still counts
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                    <p
+                      className="text-4xl font-medium text-foreground"
+                      aria-live="polite"
+                    >
+                      {GBP.format(totalRaised)}
+                    </p>
+                    <p className="text-lg text-muted-foreground">
+                      of {GBP.format(goalAmount)}
+                    </p>
+                  </div>
                   <div
-                    className={`h-full rounded-full transition-[width] duration-700 ease-out ${
-                      goalReached ? "bg-success" : "bg-primary"
-                    }`}
-                    style={{
-                      width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
-                    }}
-                  />
+                    className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted"
+                    role="progressbar"
+                    aria-label="Progress towards the pledge goal"
+                    aria-valuemin={0}
+                    aria-valuemax={goalAmount}
+                    aria-valuenow={Math.min(totalRaised, goalAmount)}
+                  >
+                    <div
+                      className={`h-full rounded-full transition-[width] duration-700 ease-out ${
+                        goalReached ? "bg-success" : "bg-primary"
+                      }`}
+                      style={{
+                        width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  {isOpen && closesAt && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Poll closes{" "}
+                      {new Date(closesAt).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+                  )}
                 </div>
-                {isOpen && closesAt && (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Poll closes{" "}
-                    {new Date(closesAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "long",
-                    })}
+              ) : isOpen ? (
+                <Countdown closesAt={closesAt!} />
+              ) : null}
+            </div>
+
+            {/* Charities — the event page's rows, with the live total */}
+            {(charities.length > 0 || charityName) && (
+              <div className="w-full shrink-0 space-y-3 border-t border-border pt-4 md:w-72 md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                {charities.length > 0 ? (
+                  <>
+                    {charities.slice(0, 3).map((charity) => (
+                      <CharityRow
+                        key={charity.id}
+                        charity={charity}
+                        amountRaised={perCharity}
+                      />
+                    ))}
+                    {!goalAmount && (
+                      <p className="text-right text-xs text-muted-foreground">
+                        <span
+                          className="text-base font-medium text-primary"
+                          aria-live="polite"
+                        >
+                          {GBP.format(totalRaised)}
+                        </span>{" "}
+                        raised so far
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    raised for {charityName}:{" "}
+                    <span className="font-medium text-foreground">
+                      {GBP.format(totalRaised)}
+                    </span>
                   </p>
                 )}
               </div>
-            ) : isOpen ? (
-              <Countdown closesAt={closesAt!} />
-            ) : null}
+            )}
           </div>
-
-          {/* Charities — the event page's rows, with the live total */}
-          {(charities.length > 0 || charityName) && (
-            <div className="w-full shrink-0 space-y-3 border-t border-border pt-4 lg:w-64 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
-              {charities.length > 0 ? (
-                <>
-                  {charities.slice(0, 3).map((charity) => (
-                    <CharityRow
-                      key={charity.id}
-                      charity={charity}
-                      amountRaised={perCharity}
-                    />
-                  ))}
-                  {!goalAmount && (
-                    <p className="text-right text-xs text-muted-foreground">
-                      <span
-                        className="text-base font-medium text-primary"
-                        aria-live="polite"
-                      >
-                        {GBP.format(totalRaised)}
-                      </span>{" "}
-                      raised so far
-                    </p>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  raised for {charityName}:{" "}
-                  <span className="font-medium text-foreground">
-                    {GBP.format(totalRaised)}
-                  </span>
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {/* ── Left: rankings · Right: the guest wall ── */}
