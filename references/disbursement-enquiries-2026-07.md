@@ -40,13 +40,57 @@ technical build is genuinely gated on the demo. A demo gate is normal here —
 onboarding platforms is Goodstack's core commercial motion, so expect
 engagement (unlike PPGF's closed program).
 
-**Status: DEMO REQUESTED 6 July 2026.** Submitted via the "request a demo"
-form; got the redirect screen ("someone will be in touch") but **no
-confirmation email** — normal for demo-request flows, the redirect is the
-acknowledgement, so it almost certainly registered. **Awaiting contact.**
-If quiet by ~10 July: book directly (if a Calendly/booking link was offered)
-or send one short LinkedIn note to a Goodstack BD/sales contact linking
-favpoll.com. One nudge, not a barrage — don't re-submit repeatedly.
+**Status: DEMO REQUESTED 6 July 2026 — NO RESPONSE as of 10 July** (not
+even an acknowledgment; the form gave only a redirect, so there is no thread
+and no proof of receipt). Chase drafted 10 July (below) — escalate the
+channel (direct email leading with the Gift Aid question, or LinkedIn) rather
+than re-submitting the form. One nudge, not a barrage. If still silent by
+~17 July, treat the silence as signal and warm the CAF fallback.
+
+### Chase — drafted 10 July 2026
+
+**Email** — to `sales@goodstack.io` (verify the address on goodstack.io;
+`hello@` as fallback). Fresh email, since the form left no thread:
+
+> **Subject: Demo request (6 July) — UK giving platform, one Gift Aid question**
+>
+> Hi — I requested a demo through goodstack.io on 6 July but haven't heard
+> back, so I'm trying a more direct route.
+>
+> favpoll is a UK charitable-giving platform (a company, not a nonprofit —
+> trading name of Josmo Services Ltd), launching soon. Guests pledge money at
+> life events and choose the UK charities that receive it, so we need
+> infrastructure that validates and disburses to donor-chosen charities
+> without onboarding each one. Goodstack looks like the fit, and I've read up
+> on the Impact Foundation structure — it's exactly the shape we need.
+>
+> One question decides it for us: does the Goodstack Impact Foundation UK
+> (charity 1192508) claim Gift Aid on eligible UK donations and pass it to
+> the recipient charity, the way PayPal Giving Fund does?
+>
+> If someone can confirm that and set up a short call on onboarding for a
+> pre-launch platform, we're ready to move — our integration seam is already
+> built and waiting for a provider.
+>
+> Thanks,
+> Joseph Moffatt
+> favpoll.com
+
+**LinkedIn** — to a Goodstack BD/sales contact (CEO if no obvious SDR);
+connection note or short InMail:
+
+> Hi {name} — I requested a Goodstack demo via the website on 6 July but
+> haven't heard anything, so trying you directly. favpoll (favpoll.com) is a
+> UK charitable-giving platform launching soon: guests pledge at life events
+> and pick the UK charities that receive it, so we need donor-chosen-charity
+> validation and disbursement without per-charity onboarding — exactly what
+> the Impact Foundation structure looks built for. One question decides it:
+> does the Foundation claim Gift Aid and pass it through, PPGF-style? Happy
+> to take a short call whenever suits.
+
+Rationale: "one question decides it" signals a qualified, near-decision
+buyer (gets prioritised over generic demo requests); "already built and
+waiting" counters pre-launch smallness.
 
 ### Sent enquiry (fresh single first-contact — informed by the Foundation finding)
 
