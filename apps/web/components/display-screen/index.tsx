@@ -148,9 +148,10 @@ export function DisplayScreen({
       <DisplayChrome eventUrl={favpollUrl} />
       <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 py-8 md:px-12 md:drop-shadow-lg">
         {/* ── Telethon banner, two rows: the identity line (a lower-third
-            title), then the action row — QR · goal-or-countdown · charities
-            — with room to breathe. ── */}
-        <div className="mb-8 rounded-lg border border-border bg-card px-6 py-5">
+            title), then the action row — QR · goal-or-countdown · charities.
+            A section of the framed card (hairline-delimited, the event
+            page's convention) rather than a nested card. ── */}
+        <div className="mb-8 border-b border-border pb-6">
           {/* Who it's for — the opening line + name, in place of a hero.
               The reveal's lock hint sits beside the name while the poll is
               open: intrigue without the blurred-decoy noise. */}
