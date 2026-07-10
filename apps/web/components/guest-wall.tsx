@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -28,6 +29,26 @@ function relativeTime(iso: string): string {
     day: "numeric",
     month: "short",
   })
+}
+
+// relativeTime is clock-dependent, so server-rendered text can disagree with
+// the client at hydration — by hours on statically prerendered pages (the
+// landing demo bakes Date.now() into its HTML at build). Keep the server's
+// text through hydration, then re-render once mounted so the client's clock
+// takes over.
+function RelativeTime({ iso }: { iso: string }) {
+  const [, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  return (
+    <span
+      className="shrink-0 text-xs text-muted-foreground"
+      suppressHydrationWarning
+    >
+      {relativeTime(iso)}
+    </span>
+  )
 }
 
 function backedLine(labels: string[]): string {
@@ -88,9 +109,7 @@ export function GuestWall({
                       {backedLine(entry.labels)}
                     </span>
                   </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {relativeTime(entry.created_at)}
-                  </span>
+                  <RelativeTime iso={entry.created_at} />
                 </motion.li>
               ))}
             </AnimatePresence>
