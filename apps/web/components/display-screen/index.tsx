@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { createClient } from "@/lib/supabase/client"
 import { getFavpollHeadline } from "@/lib/display"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
@@ -17,9 +17,9 @@ import type { Charity } from "@favpoll/types"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
-// charities, live guest wall). Everything the room watches updates in
-// realtime: rankings (useRankingItems), the raised total (pledges channel),
-// and the wall (useLiveWall).
+// charities, live guest wall). Everything the room watches stays current via
+// an interval router.refresh() — see the note inside — with the realtime
+// channels (useRankingItems, useLiveWall) as future progressive enhancement.
 
 type Props = {
   favpollId: string
@@ -80,38 +80,33 @@ export function DisplayScreen({
   // The close, witnessed live: when closes_at passes while the room is
   // watching, the countdown gives way and the reveal types out — the finale.
   const [localClosed, setLocalClosed] = useState(false)
+  // Anchored at mount: the interval refresh below re-delivers isClosed from
+  // the server ~5s after the close, and "did the room witness it" must not
+  // flip mid-finale — the typed reveal would be cut off.
+  const [wasOpenAtMount] = useState(!isClosed)
   // The room's wall: names appear as pledges land. The live_slug capability
   // authorises backed-labels; anonymity still holds ("Someone").
   const wallEntries = useLiveWall(favpollId, initialWallEntries, {
     displayKey: liveKey,
   })
-  const supabase = createClient()
 
+  // Realtime postgres_changes never reach the browser here: pledges/
+  // favourites have RLS enabled with no anon policies, so events are
+  // silently filtered (and an anon refetch would read nothing). Instead the
+  // page re-pulls its own SERVER data — service role, fully gated — on a
+  // short interval: rankings re-rank via RankingList's initialItems effect,
+  // the wall adopts fresh entries, and the total syncs below.
+  const router = useRouter()
   useEffect(() => {
-    const channel = supabase
-      .channel(`display-pledges-${favpollId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "pledges" },
-        async () => {
-          if (!pollId) return
-          const { data } = await supabase
-            .from("pledges")
-            .select("total_amount")
-            .eq("favpoll_poll_id", pollId)
-            .is("withdrawn_at", null)
-          const total = (data ?? []).reduce(
-            (s: number, p: { total_amount: number }) => s + p.total_amount,
-            0
-          )
-          setTotalRaised(total)
-        }
-      )
-      .subscribe()
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [favpollId, pollId, supabase])
+    const id = setInterval(() => router.refresh(), 5000)
+    return () => clearInterval(id)
+  }, [router])
+
+  // Adopt the refreshed total (state, so a future push channel could also
+  // set it)
+  useEffect(() => {
+    setTotalRaised(initialTotalRaised)
+  }, [initialTotalRaised])
 
   useEffect(() => {
     if (isClosed || !closesAt) return
@@ -323,7 +318,7 @@ export function DisplayScreen({
               <DisplayPollSection
                 poll={poll}
                 isClosed={effectiveClosed}
-                justClosed={localClosed && !isClosed}
+                justClosed={localClosed && wasOpenAtMount}
                 protagonistFirstName={
                   avatar
                     ? protagonistName.split(/[\s&]+/)[0]
