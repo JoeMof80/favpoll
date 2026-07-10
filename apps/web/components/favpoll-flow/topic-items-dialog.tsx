@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { InputGroupButton } from "@/components/ui/input-group"
+import { hasFinePointer } from "@/lib/pointer"
 
 type Props = {
   open: boolean
@@ -73,7 +74,7 @@ export function TopicItemsDialog({
           <div className="flex items-center gap-2">
             <input
               type="text"
-              autoFocus
+              autoFocus={hasFinePointer()}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
