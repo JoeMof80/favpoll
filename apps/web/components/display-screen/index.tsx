@@ -192,18 +192,6 @@ export function DisplayScreen({
 
           {/* Action row */}
           <div className="flex flex-col gap-6 pt-4 md:flex-row md:items-stretch">
-            {/* The way in */}
-            <div className="flex shrink-0 flex-col items-center justify-center gap-1.5">
-              <BrandedQR
-                value={favpollUrl}
-                size={132}
-                aria-label="Scan to pledge on your phone"
-              />
-              <p className="text-sm font-medium text-foreground">
-                Scan to pledge
-              </p>
-            </div>
-
             {/* Centre: goal progress, or the countdown when no goal is set */}
             <div className="flex min-w-0 flex-1 flex-col justify-center">
               {effectiveClosed ? (
@@ -274,6 +262,18 @@ export function DisplayScreen({
               ) : isOpen ? (
                 <Countdown closesAt={closesAt!} />
               ) : null}
+            </div>
+
+            {/* The way in */}
+            <div className="flex shrink-0 flex-col items-center justify-center gap-1.5">
+              <BrandedQR
+                value={favpollUrl}
+                size={132}
+                aria-label="Scan to pledge on your phone"
+              />
+              <p className="text-sm font-medium text-foreground">
+                Scan to pledge
+              </p>
             </div>
 
             {/* Charities — the event page's rows, with the live total */}
