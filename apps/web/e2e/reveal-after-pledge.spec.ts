@@ -79,11 +79,14 @@ test.describe("reveal after pledge", () => {
     // Positive check: the reveal-lock overlay is visible pre-pledge.
     // Assert via the aria-label (stable, personalised) rather than the
     // visible pill label — fixture protagonist is "E2E Playwright Test".
+    // First positive assertion after navigation: generous timeout because a
+    // cold preview's first render of this route can exceed the 5s default
+    // (global-setup warms the route, but this is the belt to that braces).
     await expect(
       page.getByRole("button", {
         name: /Pledge to reveal E2E's favourite and see the results/i,
       })
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 30_000 })
 
     // ── 3. Open the pledge dialog ─────────────────────────────────────────────
     // PR #127 replaced the old "Pledge favourites" PledgeCard button with the

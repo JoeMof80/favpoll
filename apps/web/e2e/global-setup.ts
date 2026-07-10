@@ -85,6 +85,7 @@ export default async function globalSetup() {
     console.log(
       `[e2e/global-setup] ✓ Reusing existing test favpoll: ${existing.id} (closes_at extended)`
     )
+    await warmUpFavpollPage(existing.id)
     return
   }
 
@@ -222,6 +223,50 @@ export default async function globalSetup() {
     revealText: E2E_REVEAL_TEXT,
   })
   console.log(`[e2e/global-setup] ✓ Created test favpoll: ${favpoll.id}`)
+  await warmUpFavpollPage(favpoll.id)
+}
+
+/**
+ * Warm the favpoll public page before any test navigates to it.
+ *
+ * On a cold Vercel preview the first render of /favpolls/[id] (function cold
+ * start + Supabase fetch) can exceed Playwright's 5s default expect timeout,
+ * flaking the guest spec's first assertion. CI's readiness check only pings
+ * the deployment root, so this route stays cold without an explicit ping.
+ *
+ * Best-effort: only runs when PLAYWRIGHT_BASE_URL is set (preview/staging
+ * runs — a local dev server has no cold-start problem worth 30s here), and
+ * never fails setup.
+ */
+async function warmUpFavpollPage(favpollId: string) {
+  const baseUrl = process.env.PLAYWRIGHT_BASE_URL
+  if (!baseUrl) return
+
+  const url = `${baseUrl.replace(/\/$/, "")}/favpolls/${favpollId}`
+  const bypassSecret = process.env.E2E_VERCEL_BYPASS_SECRET
+  const headers: Record<string, string> = bypassSecret
+    ? { "x-vercel-protection-bypass": bypassSecret }
+    : {}
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const started = Date.now()
+      const res = await fetch(url, {
+        headers,
+        signal: AbortSignal.timeout(30_000),
+      })
+      // Drain the body so the server completes the full render.
+      await res.text()
+      console.log(
+        `[e2e/global-setup] ✓ Warmed ${url} (status ${res.status}, ${Date.now() - started}ms)`
+      )
+      return
+    } catch (err) {
+      console.warn(
+        `[e2e/global-setup] ⚠ Warm-up attempt ${attempt} for ${url} failed: ${err}`
+      )
+    }
+  }
 }
 
 type State = {
