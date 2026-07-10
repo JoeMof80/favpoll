@@ -57,12 +57,15 @@ export function DisplayChrome({ eventUrl }: Props) {
     }
   }
 
+  // Mirrors the app header's geometry (h-14 row, items-center, px-6,
+  // justify-between) so the mark and menu sit exactly where the header's
+  // would — pointer-events pass through the strip itself.
   return (
-    <>
-      <div className="fixed top-4 left-4 z-20">
+    <div className="pointer-events-none fixed top-0 right-0 left-0 z-20 flex h-14 items-center justify-between px-6">
+      <div className="pointer-events-auto">
         <FavpollLogo />
       </div>
-      <div className="fixed top-4 right-4 z-20">
+      <div className="pointer-events-auto">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -104,6 +107,6 @@ export function DisplayChrome({ eventUrl }: Props) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </>
+    </div>
   )
 }
