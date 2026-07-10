@@ -144,7 +144,7 @@ export function DisplayScreen({
     // a wider canvas.
     <div className="min-h-screen overflow-x-clip bg-primary/5">
       <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 py-8 md:px-12 md:drop-shadow-lg">
-        <DisplayChrome />
+        <DisplayChrome eventUrl={favpollUrl} />
         {/* ── Telethon banner, two rows: the identity line (a lower-third
             title), then the action row — QR · goal-or-countdown · charities
             — with room to breathe. ── */}
