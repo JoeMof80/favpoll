@@ -1,6 +1,14 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+# Single source of truth for React across the workspace. Both apps reference
+# these via "catalog:" — a version drift between apps splits .pnpm into
+# duplicate React instances (caused the next-themes dual-instance bug).
+catalog:
+  react: ^19.2.4
+  react-dom: ^19.2.4
+  '@types/react': ^19.2.14
+  '@types/react-dom': ^19.2.3
 allowBuilds:
   '@clerk/shared': true
   bufferutil: true
