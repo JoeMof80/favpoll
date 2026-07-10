@@ -74,8 +74,9 @@ export function PollSection({
   })
 
   const personFirstName = protagonistName.split(/[\s&]+/)[0]
-  // Null for cause favpolls — the first token of the cause label is not a person name
-  const displayFirstName = isCause ? null : personFirstName
+  // Causes use the FULL cause label ("The Sunshine Appeal's favourite") —
+  // splitting a first name only makes sense for people.
+  const displayFirstName = isCause ? protagonistName || null : personFirstName
   const hasItems = poll.topics.favourites.length > 0
 
   const unlockAriaLabel = !hasReveal

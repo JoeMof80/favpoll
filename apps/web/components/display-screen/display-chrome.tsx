@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
+import { useTheme } from "@favpoll/ui"
 import {
   EllipsisVertical,
   ExternalLink,

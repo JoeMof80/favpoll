@@ -185,7 +185,9 @@ export function DisplayScreen({
               <RevealLockPill
                 size="sm"
                 label={revealLockLabel(
-                  avatar ? protagonistName.split(/[\s&]+/)[0] : null
+                  avatar
+                    ? protagonistName.split(/[\s&]+/)[0]
+                    : protagonistName || null
                 )}
               />
             )}
@@ -323,7 +325,9 @@ export function DisplayScreen({
                 isClosed={effectiveClosed}
                 justClosed={localClosed && !isClosed}
                 protagonistFirstName={
-                  avatar ? protagonistName.split(/[\s&]+/)[0] : null
+                  avatar
+                    ? protagonistName.split(/[\s&]+/)[0]
+                    : protagonistName || null
                 }
               />
             )}
