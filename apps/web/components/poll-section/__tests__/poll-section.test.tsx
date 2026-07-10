@@ -101,7 +101,7 @@ describe("PollSection — unlock overlay copy", () => {
     ).toBeInTheDocument()
   })
 
-  it("shows the no-name fallback for a cause favpoll", () => {
+  it("names the full cause label for a cause favpoll", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -111,11 +111,26 @@ describe("PollSection — unlock overlay copy", () => {
       />
     )
 
-    // Accessible name is the generic fallback; cause label must not appear
+    // Causes use the FULL label — "The Sunshine Appeal's favourite" style
+    expect(
+      screen.getByRole("button", {
+        name: /Pledge to reveal Protecting our seas's favourite/i,
+      })
+    ).toBeInTheDocument()
+  })
+
+  it("falls back to the generic label when the cause label is empty", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName=""
+        isCause={true}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
     expect(
       screen.getByRole("button", { name: /Pledge to see the reveal/i })
     ).toBeInTheDocument()
-    expect(screen.queryByText(/Protecting/)).not.toBeInTheDocument()
   })
 
   it("does not render the overlay when no onOpenPledgeDialog is provided", () => {

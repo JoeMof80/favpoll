@@ -40,13 +40,24 @@ export function BrandedQR({
   } | null>(null)
 
   useEffect(() => {
-    const styles = getComputedStyle(document.documentElement)
-    const foreground = styles.getPropertyValue("--foreground").trim()
-    const primary = styles.getPropertyValue("--primary").trim()
-    setColors({
-      foreground: foreground || "black",
-      primary: primary || foreground || "black",
+    const resolve = () => {
+      const styles = getComputedStyle(document.documentElement)
+      const foreground = styles.getPropertyValue("--foreground").trim()
+      const primary = styles.getPropertyValue("--primary").trim()
+      setColors({
+        foreground: foreground || "black",
+        primary: primary || foreground || "black",
+      })
+    }
+    resolve()
+    // Re-resolve when the theme class flips (next-themes toggles a class on
+    // <html>) — otherwise a light-rendered QR turns invisible in dark mode.
+    const observer = new MutationObserver(resolve)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
     })
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
