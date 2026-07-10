@@ -19,14 +19,12 @@ type Props = {
 
 export function RankingList({
   initialItems,
-  topicId,
   rankingView = "amount",
   isOrganiser = false,
   size = "default",
 }: Props) {
   const { items, announcement, maxValue } = useRankingItems(
     initialItems,
-    topicId,
     rankingView
   )
 

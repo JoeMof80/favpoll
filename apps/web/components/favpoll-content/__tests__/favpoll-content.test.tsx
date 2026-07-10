@@ -48,12 +48,6 @@ vi.mock("@/app/favpolls/[id]/actions", () => ({
   addGuestItem: vi.fn(),
   addOrganizerItem: vi.fn(),
 }))
-// useLiveWall constructs a browser Supabase client + realtime channel (env
-// vars absent in CI) — pass the initial entries straight through in tests.
-vi.mock("@/components/use-live-wall", () => ({
-  useLiveWall: (_favpollId: string, initial: unknown) => initial,
-}))
-
 import { FavpollContent } from "@/components/favpoll-content"
 
 // ---------------------------------------------------------------------------

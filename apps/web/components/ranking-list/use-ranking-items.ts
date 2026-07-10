@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import type { Favourite } from "@favpoll/types"
 import { rankItems, type RankedItem } from "./utils"
 
+// No realtime subscription here: postgres_changes never reach the anon
+// browser (pledges/favourites have RLS enabled with no policies, so every
+// event is filtered before delivery). Live surfaces stream fresh
+// initialItems instead — the event page after the viewer's own pledge, the
+// live display via its interval router.refresh() — and this hook announces
+// any rank movements when they arrive.
 export function useRankingItems(
   initialItems: Favourite[],
-  topicId: string,
   rankingView: "amount" | "count"
 ) {
   const [items, setItems] = useState<RankedItem[]>(() =>
@@ -13,18 +17,34 @@ export function useRankingItems(
   )
   const [announcement, setAnnouncement] = useState("")
   const prevRanksRef = useRef<Map<string, number>>(new Map())
-  const supabase = createClient()
 
   // Seed initial prev ranks
   useEffect(() => {
     items.forEach((item) => prevRanksRef.current.set(item.id, item.rank))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-initialize when server streams fresh initialItems (e.g. after router.refresh() post-pledge)
+  // Re-initialize when the server streams fresh initialItems, announcing
+  // movements so aria-live keeps narrating the race
   useEffect(() => {
-    const ranked = rankItems(initialItems, rankingView)
-    setItems(ranked)
-    ranked.forEach((item) => prevRanksRef.current.set(item.id, item.rank))
+    const reranked = rankItems(initialItems, rankingView).map((item) => ({
+      ...item,
+      prevRank: prevRanksRef.current.get(item.id) ?? null,
+    }))
+    const movers = reranked.filter(
+      (item) => item.prevRank !== null && item.prevRank !== item.rank
+    )
+    if (movers.length > 0) {
+      setAnnouncement(
+        movers
+          .map((item) => {
+            const dir = item.rank < item.prevRank! ? "up" : "down"
+            return `${item.label} moved ${dir} to position ${item.rank}`
+          })
+          .join(". ")
+      )
+    }
+    reranked.forEach((item) => prevRanksRef.current.set(item.id, item.rank))
+    setItems(reranked)
   }, [initialItems]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Re-sort when rankingView changes
@@ -41,53 +61,6 @@ export function useRankingItems(
       `Sorted by ${rankingView === "amount" ? "amount pledged" : "number of pledges"}`
     )
   }, [rankingView])
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel(`favourites:${topicId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "favourites",
-          filter: `topic_id=eq.${topicId}`,
-        },
-        (payload) => {
-          setItems((prev) => {
-            const updated = prev.map((item) =>
-              item.id === payload.new.id
-                ? { ...item, ...(payload.new as Favourite) }
-                : item
-            )
-            const reranked = rankItems(updated, rankingView).map((item) => ({
-              ...item,
-              prevRank: prevRanksRef.current.get(item.id) ?? null,
-            }))
-            const movers = reranked.filter(
-              (item) => item.prevRank !== null && item.prevRank !== item.rank
-            )
-            if (movers.length > 0) {
-              const parts = movers.map((item) => {
-                const dir = item.rank < item.prevRank! ? "up" : "down"
-                return `${item.label} moved ${dir} to position ${item.rank}`
-              })
-              setAnnouncement(parts.join(". "))
-            }
-            reranked.forEach((item) =>
-              prevRanksRef.current.set(item.id, item.rank)
-            )
-            return reranked
-          })
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [supabase, topicId, rankingView])
 
   const maxValue = Math.max(
     ...items.map((i) =>

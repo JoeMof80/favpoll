@@ -10,7 +10,6 @@ import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
 import { DisplayChrome } from "./display-chrome"
-import { useLiveWall } from "@/components/use-live-wall"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 import type { Charity } from "@favpoll/types"
@@ -18,8 +17,7 @@ import type { Charity } from "@favpoll/types"
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
 // charities, live guest wall). Everything the room watches stays current via
-// an interval router.refresh() — see the note inside — with the realtime
-// channels (useRankingItems, useLiveWall) as future progressive enhancement.
+// an interval router.refresh() — see the note inside.
 
 type Props = {
   favpollId: string
@@ -35,10 +33,8 @@ type Props = {
   initialTotalRaised: number
   pollId: string | null
   favpollUrl: string
-  /** Server-rendered wall entries; kept live via the wall endpoint */
+  /** Server-rendered wall entries; refreshed by the interval refresh */
   initialWallEntries?: GuestWallEntry[]
-  /** The favpoll's live_slug — authorises the wall endpoint's display mode */
-  liveKey?: string
   /** Full charity rows — renders the event page's CharityBanner */
   charities?: Charity[]
   /** Open favpolls: renders the event page's countdown card */
@@ -70,7 +66,6 @@ export function DisplayScreen({
   pollId,
   favpollUrl,
   initialWallEntries = [],
-  liveKey,
   charities = [],
   closesAt = null,
   avatar = null,
@@ -84,12 +79,6 @@ export function DisplayScreen({
   // the server ~5s after the close, and "did the room witness it" must not
   // flip mid-finale — the typed reveal would be cut off.
   const [wasOpenAtMount] = useState(!isClosed)
-  // The room's wall: names appear as pledges land. The live_slug capability
-  // authorises backed-labels; anonymity still holds ("Someone").
-  const wallEntries = useLiveWall(favpollId, initialWallEntries, {
-    displayKey: liveKey,
-  })
-
   // Realtime postgres_changes never reach the browser here: pledges/
   // favourites have RLS enabled with no anon policies, so events are
   // silently filtered (and an anon refetch would read nothing). Instead the
@@ -328,7 +317,7 @@ export function DisplayScreen({
             )}
           </div>
 
-          <GuestWall entries={wallEntries} animate maxEntries={12} />
+          <GuestWall entries={initialWallEntries} animate maxEntries={12} />
         </div>
       </div>
     </div>

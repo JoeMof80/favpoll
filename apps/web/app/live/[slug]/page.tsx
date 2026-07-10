@@ -153,7 +153,6 @@ export default async function LiveDisplayPage({ params }: Props) {
       pollId={pollId}
       favpollUrl={`${baseUrl}/favpolls/${id}`}
       initialWallEntries={initialWallEntries}
-      liveKey={slug}
       charities={charityRows}
       closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
       isClosed={!!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()}
