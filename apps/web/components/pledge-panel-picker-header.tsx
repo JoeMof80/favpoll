@@ -3,6 +3,7 @@
 import { Chip } from "@/components/ui/chip"
 import { InputGroupButton } from "@/components/ui/input-group"
 import type { Favourite } from "@favpoll/types"
+import { hasFinePointer } from "@/lib/pointer"
 
 export type Allocation = {
   favouriteId: string
@@ -93,7 +94,7 @@ export function PledgePanelPickerHeader({
             onDeselect(selectedIds[selectedIds.length - 1])
           }
         }}
-        autoFocus
+        autoFocus={hasFinePointer()}
         placeholder={hasSelections ? "" : placeholder}
         className={
           hasSelections

@@ -70,6 +70,11 @@ export function ResponsiveOverlay({
           className="flex flex-col gap-0 p-0"
           style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
           showCloseButton={!hideCloseButton}
+          // Radix focuses the first focusable on open — on touch that's often
+          // a text input, which summons the iOS keyboard over the sheet.
+          // Writing-first overlays still opt in via their own autoFocus,
+          // which fires on mount regardless of this.
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetHeader className={`shrink-0 ${headerClassName ?? "px-4 py-4"}`}>
             {header ? (
