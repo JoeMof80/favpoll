@@ -72,6 +72,7 @@ export function DisplayPollSection({
         favpollPollId={poll.id}
         topicId={poll.topic.id}
         rankingView="amount"
+        size="display"
       />
     </section>
   )
