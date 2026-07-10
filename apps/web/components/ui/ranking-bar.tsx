@@ -8,6 +8,8 @@ type Props = {
   barStyle?: React.CSSProperties
   className?: string
   labelSuffix?: React.ReactNode
+  /** "display" = projector scale (the live page) — larger text, thicker bar */
+  size?: "default" | "display"
 }
 
 export function RankingBar({
@@ -18,10 +20,17 @@ export function RankingBar({
   barStyle,
   className,
   labelSuffix,
+  size = "default",
 }: Props) {
+  const isDisplay = size === "display"
   return (
     <div className={className}>
-      <div className="mb-1 flex justify-between text-sm">
+      <div
+        className={cn(
+          "flex justify-between",
+          isDisplay ? "mb-1.5 text-xl" : "mb-1 text-sm"
+        )}
+      >
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
           <span className="truncate text-foreground">{label}</span>
           {labelSuffix}
@@ -31,7 +40,10 @@ export function RankingBar({
         </span>
       </div>
       <div
-        className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+        className={cn(
+          "w-full overflow-hidden rounded-full bg-muted",
+          isDisplay ? "h-2.5" : "h-1.5"
+        )}
         role="presentation"
       >
         <div
