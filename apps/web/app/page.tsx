@@ -141,6 +141,15 @@ export default async function HomePage() {
       {/* ── Purple hero band with the live demo ── */}
       <LandingHero liveCount={normalised.length} totalLive={totalLive} />
 
+      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
+            <HowItWorksThreeBeat />
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ── Product surfaces — full-bleed alternating bands (white ·
           bg-primary/5) for section division; each band's inner column matches
           the hero's width. The hero demo does the showing; the sections below
@@ -216,15 +225,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
-            <HowItWorksThreeBeat />
-          </FadeIn>
-        </div>
-      </section>
 
       <section className="w-full border-t border-border">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
