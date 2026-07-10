@@ -143,8 +143,10 @@ export function DisplayScreen({
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
     // a wider canvas.
     <div className="min-h-screen overflow-x-clip bg-primary/5">
+      {/* Outside the card: its drop-shadow filter would otherwise become the
+          containing block for the chrome's fixed corner positioning */}
+      <DisplayChrome eventUrl={favpollUrl} />
       <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 py-8 md:px-12 md:drop-shadow-lg">
-        <DisplayChrome eventUrl={favpollUrl} />
         {/* ── Telethon banner, two rows: the identity line (a lower-third
             title), then the action row — QR · goal-or-countdown · charities
             — with room to breathe. ── */}

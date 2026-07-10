@@ -38,10 +38,14 @@ export function DisplayChrome({ eventUrl }: Props) {
     }
   }
 
+  // Pinned to the viewport's far corners, floating over the frame's tinted
+  // gutters — the live content pays no height for the chrome.
   return (
-    <div className="mb-6 flex items-center justify-between">
-      <FavpollLogo />
-      <div className="flex items-center gap-1.5">
+    <>
+      <div className="fixed top-4 left-4 z-20">
+        <FavpollLogo />
+      </div>
+      <div className="fixed top-4 right-4 z-20 flex items-center gap-1.5">
         <Button
           asChild
           variant="ghost"
@@ -69,6 +73,6 @@ export function DisplayChrome({ eventUrl }: Props) {
           )}
         </Button>
       </div>
-    </div>
+    </>
   )
 }
