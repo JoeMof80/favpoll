@@ -26,7 +26,7 @@ Every pledge also feeds a permanent all-time universal ranking of human favourit
 - **UI:** shadcn/ui with Base UI (preset b0), Tailwind 4, Lucide icons, Framer Motion, Embla Carousel
 - **Component catalogue:** Storybook (`@storybook/nextjs-vite`), co-located `.stories.tsx` files
 - **Auth:** Clerk (`@clerk/nextjs`) — login is optional for guests. Admin app requires `publicMetadata.role === 'admin'` on the Clerk user.
-- **Database:** Supabase (Postgres + Realtime). Production and staging are separate projects.
+- **Database:** Supabase (Postgres). Production and staging are separate projects. Realtime is NOT usable browser-side (RLS with no policies filters all postgres_changes — see Live mode); live surfaces poll server data instead.
 - **Payments:** Stripe (marketplace model — favpoll collects, disburses to charities via Stripe Connect Express). Connect application submitted, pending approval.
 - **Image cropping:** react-easy-crop (inline crop within photo dialog, rounded-rect 1:1, JPEG output)
 - **Email:** Resend
@@ -406,7 +406,7 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
 /favpolls/[id]                 -- Favpoll page — guest pledge view + edit mode toggle
 /favpolls/[id]/edit            -- Edit favpoll (FavpollForm)
-/live/[slug]                   -- Live display for projector screen, behind an UNGUESSABLE capability slug (favpolls.live_slug, 2026-07-08) — the page shows full standings + the reveal, so possession of the link is the authorisation. Old /favpolls/[id]/live and /favpolls/[id]/display permanentRedirect to the PUBLIC guest page (deliberately NOT resolving id→slug, which would defeat the slug). Cause-aware (cause_label shown when subject='cause'). Rankings, total AND guest wall are realtime: DisplayPollSection uses the same useRankingItems channel as RankingList; DisplayScreen subscribes to pledges for the total and useLiveWall refetches GET /api/favpolls/[id]/wall (?display_key=live_slug authorises backed-labels; anonymity absolute). Organiser copies the /live/{slug} URL from OrganizerCard.
+/live/[slug]                   -- Live display for projector screen, behind an UNGUESSABLE capability slug (favpolls.live_slug, 2026-07-08) — possession of the link is the authorisation (wall labels always shown; standings full). Old /favpolls/[id]/live and /favpolls/[id]/display permanentRedirect to the PUBLIC guest page (deliberately NOT resolving id→slug, which would defeat the slug). Cause-aware (cause_label shown when subject='cause'). Freshness via interval router.refresh() — NOT realtime (see Live mode chapter). Organiser copies the /live/{slug} URL from OrganizerCard.
 /my-favpolls                     -- Organiser's favpoll management surface (auth required). OrganizerPageClient handles filter (All/Active/Closed) and sort (Closing soonest / Recently created / Highest raised) client-side. Each OrganizerCard shows: identity row + status badge (amber warning ≤7 days), total raised, poll topic row, shared fund row, Listed/Unlisted toggle, QR + share link block, charity footer + Live display button. Manage page (/favpolls/[id]/manage) was retired — this card is the single management surface. WARNING_THRESHOLD_DAYS = 7.
 /rankings                      -- Global all-time rankings
 /topics/[id]                   -- Individual topic rankings
@@ -453,8 +453,9 @@ app/
 │   └── [id]/
 │       ├── page.tsx
 │       ├── actions.ts
-│       ├── display/page.tsx
+│       ├── display/page.tsx      -- permanentRedirect → guest page (legacy; live moved to /live/[slug])
 │       └── edit/page.tsx, actions.ts
+├── live/[slug]/page.tsx          -- live display: lookup by live_slug, renders DisplayScreen
 ├── my-favpolls/page.tsx
 ├── rankings/page.tsx
 ├── topics/[id]/page.tsx
@@ -524,14 +525,21 @@ components/
 │   ├── step-pay.tsx              -- Inline StripeCheckout (inline prop) for step 3.
 │   ├── pledge-dialog.stories.tsx -- Stories: SignedIn, WithSharedFund, TwoCharities, Guest, InfinitePoll.
 │   └── __tests__/use-pledge-dialog.test.ts  -- 17 tests: step nav, draft state, breakdowns, shared fund path, payment success.
+├── display-screen/               -- the live page (see Live mode chapter)
+│   ├── index.tsx                 -- DisplayScreen: framed card + telethon banner + columns; interval router.refresh() every 5s; localClosed timer; wasOpenAtMount anchors the finale
+│   ├── display-chrome.tsx        -- fixed corner strip mirroring header geometry (logo + presenter ⋮ dropdown: event page / theme / fullscreen); rendered OUTSIDE the card (drop-shadow filter would capture fixed positioning)
+│   └── display-poll-section.tsx  -- PollHeading + reveal only when closed (TypedReveal finale if witnessed) + RankingList size="display"
+├── guest-wall.tsx                -- names + "backed X" + RelativeTime (server text kept through hydration, corrected after mount — clock-dependent text mismatches statically prerendered HTML); animate/maxEntries/teaseBacked props
+├── branded-qr.tsx                -- styled QR (qr-code-styling): theme tokens resolved at render, MutationObserver re-resolves on theme flip; heart logo built from --primary (no hex anywhere)
+├── header-mount.tsx              -- suppresses the app Header on /live/[slug] (pathname regex)
 ├── ranking-list/
-│   ├── index.tsx, use-ranking-items.ts, utils.ts
+│   ├── index.tsx, use-ranking-items.ts, utils.ts  -- useRankingItems has NO subscription: re-ranks + announces movers when fresh initialItems stream in (router.refresh)
 ├── favpoll-card/
 │   ├── section-label.tsx             -- Generic small-caps brand-purple section label (`text-primary-muted uppercase tracking-[0.09em]`); used across cards, wizard steps, form preview, rankings
 │   ├── poll-reveal.tsx
 │   ├── poll-results.tsx
 ├── poll-section/
-│   ├── index.tsx             -- permanent blur/reveal layout: pre-pledge shows pixel-perfect blurred decoy (blur-xs, aria-hidden, not interactive) — real PollReveal placeholder + RankingBar rows with arbitrary DECOY_WIDTHS so blurred shape reveals nothing about true ranking — with absolute lock-card overlay button (Lock icon + fixed "Pledge to see the reveal — and how the pledges are landing." visible text; aria-label names protagonist first name or generic fallback for cause). Post-pledge renders TypedReveal (if personalReveal set) + Tabs + RankingList. RankingList NOT mounted pre-pledge (Realtime leak prevention). Props: entitled, personalReveal, initialItems, isCause, onOpenPledgeDialog, pledgeJustConfirmed.
+│   ├── index.tsx             -- permanent blur/reveal layout: pre-pledge shows pixel-perfect blurred decoy (blur-xs, aria-hidden, not interactive) — real PollReveal placeholder + RankingBar rows with arbitrary DECOY_WIDTHS so blurred shape reveals nothing about true ranking — with absolute lock-card overlay button (Lock icon + fixed "Pledge to see the reveal — and how the pledges are landing." visible text; aria-label names protagonist first name or generic fallback for cause). Post-pledge renders TypedReveal (if personalReveal set) + Tabs + RankingList. RankingList NOT mounted pre-pledge (standings stay hidden until entitled). Props: entitled, personalReveal, initialItems, isCause, onOpenPledgeDialog, pledgeJustConfirmed.
 │   ├── typed-reveal.tsx      -- thin client wrapper: when pledgeJustConfirmed=true types personal_reveal character-by-character (~1900ms total); when false delegates to PollReveal directly (SSR-safe). Animated path: aria-hidden typed blockquote + sr-only role="status" aria-live="polite" for AT. Respects prefers-reduced-motion. Interval deps [text, shouldType] — no re-type on RankingList realtime re-renders.
 │   ├── use-poll-section.ts   -- fires onViewChange on mount (initial view) and all view transitions
 │   ├── __tests__/poll-section.test.tsx  -- overlay copy (name in aria-label, cause fallback, no-handler), interaction (click, keyboard, entitled hides overlay), decoy aria-hidden; TypedReveal integration (pledgeJustConfirmed=true/false paths)
@@ -688,6 +696,72 @@ Ranking bars: pass `barClassName` to `RankingBar` (never `barStyle` background).
 - 1st extension: free; 2nd: inline warning; 3rd: blocked, request via form
 - Auto-close: Vercel cron (hourly)
 - Disbursement: Stripe Connect TODO — placeholder in cron
+
+---
+
+## Live mode (the projector surface)
+
+The favpoll's third surface (guest page = pledge, landing = prospect, live =
+the room). Built 2026-07-08/09 across PRs #219–#241; freshness model settled
+in #243/#244 (2026-07-10).
+
+**Access.** `/live/[slug]` where slug = `favpolls.live_slug` (uuid, unique,
+`gen_random_uuid()` default; migration `20260708150000`, applied staging +
+production). A capability URL: possession authorises the surface, so the wall
+shows backed-labels and standings are full. Legacy `/favpolls/[id]/live` and
+`/display` permanentRedirect to the PUBLIC guest page — deliberately never
+resolving id→slug, which would defeat the slug. The organiser gets the URL
+from OrganizerCard (copy button + printed pack QR points at the guest page,
+not this).
+
+**Anatomy** (`components/display-screen/`). Event-page frame at broadcast
+width: tinted `bg-primary/5` surround, floating `max-w-6xl bg-background`
+card with `md:drop-shadow-lg`. App Header suppressed (`header-mount.tsx`);
+`DisplayChrome` renders OUTSIDE the card (its drop-shadow filter would become
+the containing block for fixed positioning) as a corner strip mirroring
+header geometry — logo top-left, presenter ⋮ dropdown top-right (event page /
+light–dark via `useTheme` re-exported from `@favpoll/ui`, same-instance
+requirement / fullscreen toggle). Inside the card, the telethon banner
+(hairline-delimited section, not a nested card): identity row (avatar ·
+headline prefix · name · suffix, RevealLockPill right while open), then the
+action row — centre = goal progress or Countdown (closed = final total),
+`BrandedQR` 132px ("Scan to pledge"), charities column (`md:w-90`, full-height
+left border, CharityRow rows + running total). Below: rankings
+(`RankingList size="display"` — text-xl labels, h-2.5 bars) beside the
+`GuestWall` (animate, maxEntries 12).
+
+**Freshness — polling, not realtime.** Supabase `postgres_changes` never
+reach the anon browser: `pledges`/`favourites`/`pledge_allocations` have RLS
+enabled with ZERO policies, and realtime respects RLS, so every event is
+silently filtered (channels connect and hear nothing — this hid because
+server renders use the service role). Never "fix" this with anon SELECT
+policies: RLS is row-level, not column-level, and would expose guest
+emails/tokens via PostgREST. Instead `DisplayScreen` calls `router.refresh()`
+every 5s — the server re-fetches with full gating and streams fresh props:
+rankings re-rank via `useRankingItems`' initialItems effect (which also fires
+the aria-live mover announcements), the wall adopts fresh entries, the total
+syncs from its prop. All other realtime code was removed in #244 (the
+`useLiveWall` hook, the `/api/favpolls/[id]/wall` endpoint it consumed, the
+`useRankingItems` channel) — the EVENT page deliberately has no live updates
+(transactional surface: it refreshes after the viewer's own pledge;
+spectating is this page's job). If push is ever wanted, use a server-sent
+broadcast channel (bypasses table RLS), never postgres_changes.
+
+**Reveal rule.** While the poll is open the reveal is WITHHELD entirely — no
+blurred decoy on this surface; the RevealLockPill beside the name ("Pledge to
+reveal {name}'s favourite") carries the intrigue. At close the reveal is the
+finale: if the room witnessed the close (`localClosed` timer reaching
+`closes_at`, anchored by `wasOpenAtMount` so a refresh delivering
+`isClosed` can't cut it off), `TypedReveal` types it out; a page loaded after
+close shows it statically.
+
+**Goal = milestone, not stop sign.** Polls always end by date, never by
+reaching the goal. Goal reached → success-green bar + "Goal reached — every
+further pledge still counts". No goal → Countdown takes the centre slot.
+
+**Vocabulary.** "Live" = updating in real time (this surface); "open" =
+accepting pledges (vs closed). Never use "live" for open-ness in UI copy —
+see GLOSSARY.md.
 
 ---
 
