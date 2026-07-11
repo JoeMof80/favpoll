@@ -5,71 +5,51 @@ import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-bea
 import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { meetsCrossTopicThreshold } from "@/lib/record"
 import { LandingHero } from "@/components/landing/hero"
 import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
 import { WatchItHappen } from "@/components/landing/watch-it-happen"
-import { RecordHolders } from "@/components/landing/record-holders"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
 
 export default async function HomePage() {
   const supabase = createAdminClient()
 
-  const [{ data: favpolls }, { data: topFavourites }, { data: charities }] =
-    await Promise.all([
-      supabase
-        .from("favpolls")
-        .select(
-          `
-          id,
-          opening_line,
-          description,
-          closes_at,
-          occasion_type,
-          total_raised,
-          subject,
-          cause_label,
-          protagonist:protagonists ( name ),
-          charities:favpoll_charities (
-            charity:charities ( id, name, logo_url, registered_number )
-          ),
-          favpoll_polls (
-            id,
-            topic_id,
-            topics (
-              title,
-              is_finite,
-              favourites ( id, label )
-            ),
-            favpoll_poll_favourites (
-              favourites ( id, label )
-            )
-          )
-        `
+  const { data: favpolls } = await supabase
+    .from("favpolls")
+    .select(
+      `
+      id,
+      opening_line,
+      description,
+      closes_at,
+      occasion_type,
+      total_raised,
+      subject,
+      cause_label,
+      protagonist:protagonists ( name ),
+      charities:favpoll_charities (
+        charity:charities ( id, name, logo_url, registered_number )
+      ),
+      favpoll_polls (
+        id,
+        topic_id,
+        topics (
+          title,
+          is_finite,
+          favourites ( id, label )
+        ),
+        favpoll_poll_favourites (
+          favourites ( id, label )
         )
-        .eq("is_private", false)
-        .eq("is_listed", true)
-        .is("closed_at", null)
-        .gt("closes_at", new Date().toISOString())
-        .order("created_at", { ascending: false })
-        .limit(6),
-
-      // Top favourites for the record section
-      supabase
-        .from("favourites")
-        .select("id, label, all_time_pledged, all_time_count, topics(title)")
-        .gt("all_time_pledged", 0)
-        .order("all_time_pledged", { ascending: false })
-        .limit(6),
-
-      // A small set of active charities for Section 5
-      supabase
-        .from("charities")
-        .select("id, name")
-        .eq("is_active", true)
-        .limit(3),
-    ])
+      )
+    `
+    )
+    .eq("is_private", false)
+    .eq("is_listed", true)
+    .is("closed_at", null)
+    .gt("closes_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(6)
 
   type RawFavourite = { id: string; label: string }
   type RawEpf = { favourites: RawFavourite }
@@ -121,18 +101,6 @@ export default async function HomePage() {
     }
     return { ...ev, poll }
   })
-
-  // Record section: only shown when the total pledged meets the threshold
-  type TopFavourite = {
-    id: string
-    label: string
-    all_time_pledged: number
-    all_time_count: number
-    topics: { title: string } | null
-  }
-  const recordItems = (topFavourites ?? []) as unknown as TopFavourite[]
-  const showRecord = meetsCrossTopicThreshold(recordItems)
-  const recordMax = recordItems[0]?.all_time_pledged ?? 1
 
   const totalLive = normalised.reduce((sum, f) => sum + f.total_raised, 0)
 
@@ -200,31 +168,24 @@ export default async function HomePage() {
         </section>
       )}
 
-      {showRecord && (
-        <section id="record" className="w-full scroll-mt-20">
-          <div className="mx-auto w-full max-w-330 px-6 py-16">
-            <FadeIn>
-              <SectionEyebrow className="mb-2">The record</SectionEyebrow>
-              <h2 className="mb-3 max-w-lg text-3xl font-light tracking-tight text-foreground">
-                The current record holders.
-              </h2>
-              <p className="mb-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-                Every pledge, on every favpoll, feeds one shared record — each
-                question with its own standing champion.
-              </p>
-            </FadeIn>
-            <RecordHolders
-              items={recordItems}
-              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            />
-            <p className="mt-6">
-              <Button variant="ghost" asChild>
-                <Link href="/rankings">See the full record →</Link>
-              </Button>
+      {/* ── The record — a principle, not a destination (concept model,
+          2026-07). No headline, no tiles, no data claim: one quiet line,
+          true from pledge one, and a quiet link to its full home. ── */}
+      <section className="w-full">
+        <div className="mx-auto w-full max-w-330 px-6 py-10">
+          <FadeIn>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+              {t("landing.record.principle")}{" "}
+              <Link
+                href="/rankings"
+                className="whitespace-nowrap text-primary hover:underline"
+              >
+                {t("landing.record.link")} →
+              </Link>
             </p>
-          </div>
-        </section>
-      )}
+          </FadeIn>
+        </div>
+      </section>
 
       <section className="w-full border-t border-border">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
