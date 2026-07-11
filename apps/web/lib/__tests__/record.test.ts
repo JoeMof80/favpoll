@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest"
 import {
   isEstablishedRecord,
-  meetsCrossTopicThreshold,
   topicPledgedTotal,
   RECORD_MIN_PLEDGED_GBP,
   RECORD_MIN_ITEMS_WITH_ACTIVITY,
@@ -43,16 +42,5 @@ describe("isEstablishedRecord", () => {
 
   it("treats an empty topic as not established", () => {
     expect(isEstablishedRecord([])).toBe(false)
-  })
-})
-
-describe("meetsCrossTopicThreshold", () => {
-  it("counts shown items (not active items) for the landing tiles", () => {
-    // 3 items present, £500 total → qualifies even if one is zero
-    expect(meetsCrossTopicThreshold([item(500), item(0), item(0)])).toBe(true)
-  })
-
-  it("fails with too few items shown", () => {
-    expect(meetsCrossTopicThreshold([item(500), item(200)])).toBe(false)
   })
 })

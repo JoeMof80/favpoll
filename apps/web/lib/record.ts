@@ -34,16 +34,3 @@ export function isEstablishedRecord(
     itemsWithActivity(items) >= RECORD_MIN_ITEMS_WITH_ACTIVITY
   )
 }
-
-/**
- * Cross-topic record gate (landing hero tiles): a flat list of the top
- * favourites qualifies once the shown set clears the same bar.
- */
-export function meetsCrossTopicThreshold(
-  items: Pick<Favourite, "all_time_pledged">[]
-): boolean {
-  return (
-    topicPledgedTotal(items) >= RECORD_MIN_PLEDGED_GBP &&
-    items.length >= RECORD_MIN_ITEMS_WITH_ACTIVITY
-  )
-}
