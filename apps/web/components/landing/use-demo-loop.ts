@@ -1,7 +1,8 @@
 "use client"
 
 // The hero demo animation loop: a timeout state machine that walks DemoCard
-// through the 15-phase choose → pledge → reveal arc across the six scenes.
+// through the 15-phase pick → pledge → reveal arc across the scenes (one per
+// visitor-facing kind, cycling in nav-tab order).
 import { useEffect, useRef, useState } from "react"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
