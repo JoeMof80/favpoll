@@ -53,16 +53,51 @@ describe("HonourStep — who row", () => {
     )
   })
 
-  it("calls onChange with subject='cause' and pronoun=undefined when A cause is clicked", () => {
+  it("clicking A cause sets subject='cause' and auto-sets category='fundraiser'", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    expect(onChange).toHaveBeenCalledWith({
+      category: "fundraiser",
+      subject: "cause",
+      grouping: "individual",
+      pronoun: undefined,
+    })
+  })
+
+  it("leaving A cause for a person resets the auto-set category to null", () => {
+    const onChange = vi.fn()
+    render(
+      <HonourStep
+        value={{
+          ...DEFAULT_VALUE,
+          subject: "cause",
+          category: "fundraiser",
+        }}
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(screen.getByRole("radio", { name: "She" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "cause",
-        grouping: "individual",
-        pronoun: undefined,
+        subject: "someone",
+        pronoun: "she",
+        category: null,
       })
+    )
+  })
+
+  it("switching between person options keeps a chosen category", () => {
+    const onChange = vi.fn()
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, pronoun: "he", category: "memorial" }}
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(screen.getByRole("radio", { name: "A group" }))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ grouping: "group", category: "memorial" })
     )
   })
 
@@ -171,26 +206,45 @@ describe("HonourStep — category row", () => {
     const onChange = vi.fn()
     render(
       <HonourStep
-        value={{ ...DEFAULT_VALUE, subject: "cause" }}
+        value={{ ...DEFAULT_VALUE, pronoun: "they" }}
         onChange={onChange}
       />
     )
     fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ subject: "cause", category: "fundraiser" })
+      expect.objectContaining({ subject: "someone", category: "fundraiser" })
     )
   })
 
-  it("category row is always visible regardless of subject", () => {
+  it("category row is disabled and unselected for a cause — no layout shift, no visible fundraiser claim", () => {
     render(
       <HonourStep
-        value={{ ...DEFAULT_VALUE, subject: "cause" }}
+        value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
         onChange={() => {}}
       />
     )
+    // Row stays in the layout but every chip is disabled…
+    for (const name of ["Celebration", "Memorial", "Fundraiser"]) {
+      expect(screen.getByRole("radio", { name })).toBeDisabled()
+    }
+    // …and the internally-set fundraiser category is NOT shown as selected.
+    expect(screen.getByRole("radio", { name: "Fundraiser" })).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
     expect(
-      screen.getByRole("radio", { name: "Celebration" })
+      screen.getByText("What type of favpoll is this?")
     ).toBeInTheDocument()
+  })
+
+  it("category chips are enabled for a person", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, pronoun: "she" }}
+        onChange={() => {}}
+      />
+    )
+    expect(screen.getByRole("radio", { name: "Memorial" })).toBeEnabled()
   })
 
   it("selected category item has aria-checked=true", () => {

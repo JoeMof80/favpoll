@@ -190,21 +190,23 @@ describe("NewFavpollWizard — redirect", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GUARDRAIL — cause: category required, no causeLabel capture in wizard
+// GUARDRAIL — cause: category auto-set to fundraiser, no causeLabel capture
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — cause guardrail", () => {
-  it("Next is disabled on step 1 when only A cause is selected (no category)", () => {
+  it("Next is enabled as soon as A cause is selected — category auto-set to fundraiser", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("Next is enabled on step 1 when A cause and a category are selected", () => {
+  it("disables the type row for a cause without showing a selection", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
-    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
+    const fundraiser = screen.getByRole("radio", { name: "Fundraiser" })
+    expect(fundraiser).toBeDisabled()
+    // The internally-set category is plumbing, never a visible chip choice.
+    expect(fundraiser).toHaveAttribute("aria-checked", "false")
   })
 
   it("wizard does not show a cause label input on step 1", () => {
@@ -219,9 +221,8 @@ describe("NewFavpollWizard — cause guardrail", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
-    // Step 1: Honour — cause
+    // Step 1: Honour — cause (category auto-set to fundraiser)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
     // Step 2: Charity
@@ -237,6 +238,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
 
     const url: string = mockPush.mock.calls[0][0]
     expect(url).toContain("subject=cause")
+    expect(url).toContain("category=fundraiser")
     expect(url).not.toContain("pronoun=")
     expect(url).not.toContain("causeLabel")
   })
@@ -251,7 +253,6 @@ describe("NewFavpollWizard — Love step copy by subject", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     if (subject === "cause") {
       fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-      fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     } else {
       fireEvent.click(screen.getByRole("radio", { name: "He" }))
       fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
