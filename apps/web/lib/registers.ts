@@ -1,4 +1,8 @@
-import type { FavpollCategory, FavpollGrouping } from "@favpoll/types"
+import type {
+  FavpollCategory,
+  FavpollGrouping,
+  FavpollSubject,
+} from "@favpoll/types"
 
 export type Register =
   | "remembering"
@@ -119,12 +123,19 @@ export function registerForOccasionType(occasionType: string | null): Register {
 }
 
 /**
- * Derive the register from the new category + grouping model.
+ * Derive the register from the category + grouping model, subject-first.
+ *
+ * A faceless cause favpoll (subject='cause') is the cause register by
+ * identity — it carries category=null (a cause has no type; rows created
+ * before 2026-07-13 carry a legacy 'fundraiser' and derive the same way).
+ * Only person favpolls derive from category.
  */
 export function deriveRegister(
   category: FavpollCategory | null,
-  grouping: FavpollGrouping
+  grouping: FavpollGrouping,
+  subject?: FavpollSubject
 ): Register {
+  if (subject === "cause") return "cause"
   if (!category) return "neutral"
   if (category === "memorial") return "remembering"
   if (category === "fundraiser") return "cause"

@@ -86,7 +86,7 @@ export function useWizardState(data: WizardData) {
 
   const nextDisabled =
     step === "honour"
-      ? !category || !whoSelected
+      ? (subject !== "cause" && !category) || !whoSelected
       : step === "charity"
         ? charityIds.length === 0
         : topics.length === 0 ||
@@ -147,11 +147,14 @@ export function useWizardState(data: WizardData) {
   function handleFinish() {
     const topic = topics[0]
     const params = new URLSearchParams({
-      category: category ?? "",
       grouping,
       subject,
       charityIds: charityIds.join(","),
     })
+    // A cause carries no category — the param is simply absent.
+    if (category) {
+      params.set("category", category)
+    }
     if (pronoun) {
       params.set("pronoun", pronoun)
     }

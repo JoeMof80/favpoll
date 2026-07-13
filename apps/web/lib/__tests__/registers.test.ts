@@ -40,6 +40,22 @@ describe("deriveRegister", () => {
     expect(deriveRegister(null, "individual")).toBe("neutral")
   })
 
+  it("subject='cause' → cause register regardless of category", () => {
+    // The honest new-row shape: a cause has no type.
+    expect(deriveRegister(null, "individual", "cause")).toBe("cause")
+    // Legacy rows (pre-2026-07-13) carry 'fundraiser'; incoherent legacy
+    // pairings are overridden by subject too.
+    expect(deriveRegister("fundraiser", "individual", "cause")).toBe("cause")
+    expect(deriveRegister("memorial", "individual", "cause")).toBe("cause")
+  })
+
+  it("subject='someone' leaves category-based derivation unchanged", () => {
+    expect(deriveRegister("memorial", "individual", "someone")).toBe(
+      "remembering"
+    )
+    expect(deriveRegister(null, "individual", "someone")).toBe("neutral")
+  })
+
   it("memorial → remembering regardless of grouping", () => {
     expect(deriveRegister("memorial", "individual")).toBe("remembering")
     expect(deriveRegister("memorial", "couple")).toBe("remembering")

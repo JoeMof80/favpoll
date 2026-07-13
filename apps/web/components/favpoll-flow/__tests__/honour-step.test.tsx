@@ -53,27 +53,23 @@ describe("HonourStep — who row", () => {
     )
   })
 
-  it("clicking A cause sets subject='cause' and auto-sets category='fundraiser'", () => {
+  it("clicking A cause sets subject='cause' with category=null — a cause has no type", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     expect(onChange).toHaveBeenCalledWith({
-      category: "fundraiser",
+      category: null,
       subject: "cause",
       grouping: "individual",
       pronoun: undefined,
     })
   })
 
-  it("leaving A cause for a person resets the auto-set category to null", () => {
+  it("leaving A cause for a person starts the person path with no type chosen", () => {
     const onChange = vi.fn()
     render(
       <HonourStep
-        value={{
-          ...DEFAULT_VALUE,
-          subject: "cause",
-          category: "fundraiser",
-        }}
+        value={{ ...DEFAULT_VALUE, subject: "cause", category: null }}
         onChange={onChange}
       />
     )
@@ -216,10 +212,10 @@ describe("HonourStep — category row", () => {
     )
   })
 
-  it("category row stays live and unselected for a cause — no visible fundraiser claim", () => {
+  it("category row stays live and unselected for a cause", () => {
     render(
       <HonourStep
-        value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
+        value={{ ...DEFAULT_VALUE, subject: "cause", category: null }}
         onChange={() => {}}
       />
     )
@@ -227,7 +223,7 @@ describe("HonourStep — category row", () => {
     for (const name of ["Celebration", "Memorial", "Fundraiser"]) {
       expect(screen.getByRole("radio", { name })).toBeEnabled()
     }
-    // …and the internally-set fundraiser category is NOT shown as selected.
+    // …and nothing shows selected — a cause carries category=null.
     expect(screen.getByRole("radio", { name: "Fundraiser" })).toHaveAttribute(
       "aria-checked",
       "false"
@@ -238,7 +234,7 @@ describe("HonourStep — category row", () => {
     const onChange = vi.fn()
     render(
       <HonourStep
-        value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
+        value={{ ...DEFAULT_VALUE, subject: "cause", category: null }}
         onChange={onChange}
       />
     )
