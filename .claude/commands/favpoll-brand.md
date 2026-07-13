@@ -33,9 +33,23 @@ This is favpoll's foundational brand statement. It appears in the founding story
 
 favpoll sits at the intersection of three things that rarely appear together:
 
-- **Charity** — every pledge goes to a cause chosen in someone's name
-- **Honour** — every favpoll is an act of remembrance or celebration
-- **Love** — every answer is a small piece of what someone genuinely cares about
+- **Charity** — every pledge goes to a registered charity, in full. The
+  floor: universal by hard rule.
+- **Honour** — a favpoll can remember a life, mark a milestone, or carry
+  someone to a finish line. The summit: present when there is someone to
+  carry it — and it often arrives uninvited (a marathon run in memory of a
+  dad is a cause-register poll with honour at its heart).
+- **Love** — every answer is a small piece of what someone genuinely cares
+  about. The medium: universal by mechanics.
+
+**The triad describes the space favpoll occupies, not a test each favpoll
+must pass** (decided 2026-07-13; the earlier "every favpoll is an act of
+remembrance or celebration" overclaimed — false for cause and standalone
+favpolls). Every favpoll lives somewhere in the Venn; only some sit in the
+centre. The centre — all three at once — is favpoll at its fullest, and the
+intersection nobody else occupies. One family on a gradient, never two
+tiers: charity and love always; honour when there's someone to carry it.
+Never write copy that quantifies honour over *every* favpoll.
 
 Use this as an internal design principle when evaluating copy or features: does this serve charity, honour, or love? If it serves none of them, it probably doesn't belong.
 
