@@ -92,9 +92,10 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(charitySearch).toBeVisible()
     await charitySearch.fill("Marie Curie")
 
-    const marieCurieOption = charityDialog.getByRole("radio", {
-      name: /marie curie/i,
-    })
+    // Charity options render as buttons (not ToggleGroup radios).
+    const marieCurieOption = charityDialog
+      .getByRole("button", { name: /marie curie/i })
+      .first()
     await expect(marieCurieOption).toBeVisible({ timeout: 5_000 })
     await marieCurieOption.click()
 
@@ -115,7 +116,11 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(topicSearch).toBeVisible()
     await topicSearch.fill("Colour")
 
-    const colourOption = topicDialog.getByRole("radio", { name: /^colour$/i })
+    // Topic chips render as buttons; "Colour" can appear twice when it is
+    // also in the "Suggested for {charity}" section — take the first.
+    const colourOption = topicDialog
+      .getByRole("button", { name: /^colour$/i })
+      .first()
     await expect(colourOption).toBeVisible({ timeout: 5_000 })
     await colourOption.click()
 
