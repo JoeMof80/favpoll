@@ -5,7 +5,7 @@ import {
   UsersRound,
   Balloon,
   Flower2,
-  Flag,
+  Medal,
   HeartHandshake,
   Mars,
   Venus,
@@ -46,7 +46,7 @@ const PERSON_OPTIONS = [
 const CATEGORY_OPTIONS = [
   { value: "celebration", label: "Celebration", icon: Balloon },
   { value: "memorial", label: "Memorial", icon: Flower2 },
-  { value: "fundraiser", label: "Fundraiser", icon: Flag },
+  { value: "fundraiser", label: "Fundraiser", icon: Medal },
 ] as const
 
 const WHO_ITEM_CLASS =
@@ -118,6 +118,19 @@ export function HonourStep({ value, onChange }: Props) {
 
   function handleCategoryChange(v: string) {
     if (!v) return
+    // Touch either side of the OR and you're on that side: picking a type
+    // while "A cause" is selected hops back to the person path (cause
+    // deselects, who empties, Next re-gates until a who is chosen). The
+    // step's questions stay answerable in any order — no dead controls.
+    if (value.subject === "cause") {
+      onChange({
+        category: v as FavpollCategory,
+        subject: "someone",
+        grouping: "individual",
+        pronoun: undefined,
+      })
+      return
+    }
     onChange({ ...value, category: v as FavpollCategory })
   }
 
@@ -140,14 +153,11 @@ export function HonourStep({ value, onChange }: Props) {
         ))}
       </ToggleGroup>
 
-      {/* …and how you're honouring them. Dimmed (never hidden — no layout
-          shift) when the cause path is taken, and it must show NO selection
-          then: the plumbing category is not a chip choice. */}
-      <div
-        className={`flex flex-col gap-3 transition-opacity ${
-          isCause ? "opacity-40" : ""
-        }`}
-      >
+      {/* …and how you're honouring them. Always live (any-order answering is
+          the step's grammar); when the cause path is taken it shows NO
+          selection — the plumbing category is not a chip choice — and
+          clicking a chip hops back to the person path. */}
+      <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
           What type of favpoll is this?
         </p>
@@ -158,12 +168,7 @@ export function HonourStep({ value, onChange }: Props) {
           className="flex flex-wrap gap-2"
         >
           {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-            <ToggleGroupItem
-              key={v}
-              value={v}
-              disabled={isCause}
-              className={CATEGORY_ITEM_CLASS}
-            >
+            <ToggleGroupItem key={v} value={v} className={CATEGORY_ITEM_CLASS}>
               <Icon className="h-6 w-6" />
               {label}
             </ToggleGroupItem>
