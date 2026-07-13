@@ -140,7 +140,13 @@ test.describe("wizard → publish flow (cause)", () => {
     await page.waitForURL(/\/favpolls\/new\/details/, { timeout: 10_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    const causeLabelField = page.getByText("What are you raising for?")
+    // Exact button match: the same phrase also opens the About placeholder
+    // ("What are you raising for? Tease the topic…") and echoes in Next's
+    // route announcer.
+    const causeLabelField = page.getByRole("button", {
+      name: "What are you raising for?",
+      exact: true,
+    })
     await expect(causeLabelField).toBeVisible({ timeout: 10_000 })
 
     // Fill the cause label (the cause path's equivalent of the name field).

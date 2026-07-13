@@ -154,28 +154,20 @@ test.describe("wizard → publish flow", () => {
     await page.waitForURL(/\/favpolls\/new\/details/, { timeout: 10_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    // Fill protagonist name — the form preview shows an editable name field.
-    // The name input is in the EditableHero section.
-    // Click the name edit area to open the name overlay.
-    const nameEditArea = page
-      .getByRole("button", { name: /edit name/i })
-      .or(page.locator('[aria-label*="name"]').first())
-    if (await nameEditArea.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await nameEditArea.click()
-      // Name overlay input
-      const nameInput = page.getByRole("textbox", { name: /name/i }).last()
-      await nameInput.fill(TEST_PROTAGONIST_NAME)
-      // Save the overlay
-      await page.getByRole("button", { name: /save/i }).click()
-    } else {
-      // Alternative: name may be directly editable in the preview
-      const directNameInput = page.getByRole("textbox", { name: /name/i })
-      if (
-        await directNameInput.isVisible({ timeout: 3_000 }).catch(() => false)
-      ) {
-        await directNameInput.fill(TEST_PROTAGONIST_NAME)
-      }
-    }
+    // Fill the protagonist name. The empty h1 renders as an EditableField
+    // button "Enter Name" (exact — the phrase also echoes in Next's route
+    // announcer); clicking it opens the name overlay.
+    const nameField = page.getByRole("button", {
+      name: "Enter Name",
+      exact: true,
+    })
+    await expect(nameField).toBeVisible({ timeout: 10_000 })
+    await nameField.click()
+    const nameInput = page.getByPlaceholder("Name or nickname")
+    await expect(nameInput).toBeVisible({ timeout: 5_000 })
+    await nameInput.fill(TEST_PROTAGONIST_NAME)
+    await page.getByRole("button", { name: /^save$/i }).click()
+    await expect(page.getByText(TEST_PROTAGONIST_NAME)).toBeVisible()
 
     // ── 6. Publish ────────────────────────────────────────────────────────────
     // CommandPanel "Publish" button opens CloseDateOverlay.
