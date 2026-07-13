@@ -25,6 +25,7 @@
  *   Colour topic and Marie Curie charity exist.
  */
 
+import { clerkSetup } from "@clerk/testing/playwright"
 import { createClient } from "@supabase/supabase-js"
 import { mkdirSync, writeFileSync } from "fs"
 import { resolve } from "path"
@@ -38,6 +39,28 @@ export const E2E_REVEAL_TEXT =
   "Cornflower blue. She kept a pot of cornflowers on the windowsill every summer."
 
 export default async function globalSetup() {
+  // ── Clerk testing token ─────────────────────────────────────────────────────
+  // Clerk's bot detection blocks headless sign-in on per-branch preview
+  // domains, so auth.setup.ts used to time out and every organiser (wizard)
+  // spec silently skipped in CI — discovered 2026-07-13. clerkSetup() mints a
+  // Testing Token via the Clerk Backend API and exports CLERK_TESTING_TOKEN;
+  // auth.setup.ts then attaches it to Clerk's frontend-API requests, which
+  // bypasses bot detection on any domain. Needs CLERK_SECRET_KEY (+ the
+  // publishable key) — skip gracefully without it, preserving old behaviour.
+  if (
+    process.env.CLERK_SECRET_KEY &&
+    (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+      process.env.CLERK_PUBLISHABLE_KEY)
+  ) {
+    await clerkSetup()
+    console.log("[e2e/global-setup] ✓ Clerk testing token minted")
+  } else if (process.env.E2E_TEST_EMAIL) {
+    console.warn(
+      "[e2e/global-setup] ⚠ CLERK_SECRET_KEY not set — no Clerk testing token; " +
+        "sign-in may fail on preview domains (bot detection) and wizard specs will skip."
+    )
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 

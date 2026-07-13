@@ -882,6 +882,8 @@ Never hardcode a test email — it will fail on every CI run after the first.
 
 The organiser project's `testMatch` is `**/wizard-publish*.spec.ts` — new organiser wizard specs named `wizard-publish-*.spec.ts` are picked up automatically.
 
+**Clerk testing tokens (2026-07-13):** Clerk's bot detection blocks headless sign-in on per-branch preview domains, so `auth.setup.ts` saved empty state and **every organiser spec silently skipped on every CI run** while the advisory job stayed green (found by reading the job logs, not the check). Fix: `global-setup.ts` calls `clerkSetup()` (`@clerk/testing`) when `CLERK_SECRET_KEY` is set, and `auth.setup.ts` applies `setupClerkTestingToken({ page })` — requires the `CLERK_SECRET_KEY` secret in the "Preview – favpoll-web" GitHub environment (same Clerk instance as the publishable key). Without the secret everything degrades to the old skip-gracefully behaviour, now with an explicit warning.
+
 **TODO (follow-up):** Shared fund paths (Part 4 from the brief):
 
 - Path B (guest contribute to fund via SeedFundModal guest variant)

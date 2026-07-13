@@ -18,6 +18,7 @@
  */
 
 import { test as setup, expect } from "@playwright/test"
+import { setupClerkTestingToken } from "@clerk/testing/playwright"
 import { mkdirSync } from "fs"
 import { resolve } from "path"
 
@@ -36,6 +37,14 @@ setup("authenticate as test organiser", async ({ page }) => {
     // Save minimal state so dependent projects don't crash on missing file
     await page.context().storageState({ path: AUTH_STATE_PATH })
     return
+  }
+
+  // Attach the Clerk testing token (minted in global-setup when
+  // CLERK_SECRET_KEY is available) to frontend-API requests — bypasses bot
+  // detection, which otherwise stops the sign-in form hydrating on preview
+  // domains. No-token runs proceed exactly as before.
+  if (process.env.CLERK_TESTING_TOKEN) {
+    await setupClerkTestingToken({ page })
   }
 
   await page.goto("/sign-in")

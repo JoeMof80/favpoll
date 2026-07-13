@@ -276,11 +276,12 @@ test.describe("reveal after pledge", () => {
     await expect(revealBlock).toBeVisible({ timeout: 10_000 })
     await expect(revealBlock).not.toBeEmpty()
 
-    // Verify the specific reveal content (fixed test-fixture text)
-    await expect(
-      page.getByText("Cornflower blue", { exact: false })
-    ).toBeVisible()
-    await expect(page.getByText(revealText, { exact: false })).toBeVisible()
+    // Verify the specific reveal content (fixed test-fixture text). Scoped to
+    // the blockquote: a bare getByText is a strict-mode violation now that the
+    // sr-only aria-live announcement carries the same text, and toContainText
+    // retries while the typewriter animation finishes.
+    await expect(revealBlock).toContainText("Cornflower blue")
+    await expect(revealBlock).toContainText(revealText, { timeout: 10_000 })
 
     // ── 9. Confirm results ranking is visible ─────────────────────────────────
     // After pledging, the poll switches to results view and renders a RankingList
