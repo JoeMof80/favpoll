@@ -13,11 +13,16 @@ export const metadata: Metadata = {
     "Expressions of joy, for charitable causes, in the name of those we love.",
 }
 
-// The Charity · Honour · Love triad — favpoll's identity. "Honour" is broadened
-// beyond remembrance/celebration so it doesn't fence out fundraisers and causes.
+// The Charity · Honour · Love triad — favpoll's identity. The triad describes
+// the space favpoll occupies, not a test each favpoll must pass (2026-07-13):
+// charity and love are universal; honour is the summit, so its line says "can",
+// never "every" — a cause favpoll without a protagonist must not be overclaimed.
 const TRIAD = [
-  ["Charity", "Every pledge goes to a cause chosen in someone's name."],
-  ["Honour", "Every favpoll marks a moment that matters."],
+  ["Charity", "Every pledge goes to a registered charity."],
+  [
+    "Honour",
+    "A favpoll can remember a life, mark a milestone, or carry someone to a finish line.",
+  ],
   [
     "Love",
     "Every answer is a small piece of what someone genuinely cares about.",
@@ -59,7 +64,7 @@ export default function AboutPage() {
                   Charity · Honour · Love
                 </SectionEyebrow>
                 <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-                  What every favpoll holds.
+                  Where every favpoll lives.
                 </h2>
               </FadeIn>
               <div className="flex max-w-xl flex-col gap-5">
