@@ -236,6 +236,7 @@ export function FormInner({
   }
 
   const category = useWatch({ control: form.control, name: "category" })
+  const subjectWatch = useWatch({ control: form.control, name: "subject" })
   const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
   const charityIds =
     useWatch({ control: form.control, name: "charities" }) ?? []
@@ -245,7 +246,11 @@ export function FormInner({
     ? !!selectedTopics[0]?.title
     : !!selectedTopics[0]?.topicId
 
-  if (!category) return null
+  // No category and no cause subject means we didn't arrive through the
+  // wizard — nothing to render. A cause favpoll legitimately has no
+  // category (null since the 2026-07-13 remodel), so it must not be
+  // caught by this guard.
+  if (!category && subjectWatch !== "cause") return null
 
   const selectedCharities = charities.filter((c) => charityIds.includes(c.id))
   const displayCharities =

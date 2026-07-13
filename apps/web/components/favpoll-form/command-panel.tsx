@@ -51,7 +51,8 @@ export function CommandPanel({
   // Edit mode: all fields must be filled before saving
   const missing: string[] = []
   if (mode === "edit") {
-    if (!category) missing.push("occasion")
+    // A cause favpoll has no category (null since the 2026-07-13 remodel).
+    if (!category && subjectValue !== "cause") missing.push("occasion")
     if (!charitiesValue?.length) missing.push("charity")
     if (!topicsValue?.[0]?.topicId && !topicsValue?.[0]?.isCustom)
       missing.push("favpoll topic")
