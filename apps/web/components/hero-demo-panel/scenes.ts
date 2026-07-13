@@ -230,7 +230,7 @@ export const SCENES: HeroScene[] = [
       context: "London Marathon · 26.2 miles",
       about:
         "Running his first marathon for the British Heart Foundation, in memory of his dad. There's one dance he's promised to bust out at the finish line.",
-      photo_url: null,
+      photo_url: "/demo/marcus.jpg",
     },
     poll: {
       id: "demo-poll-fundraiser",
