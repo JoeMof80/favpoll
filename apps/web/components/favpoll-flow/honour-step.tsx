@@ -77,21 +77,19 @@ export function HonourStep({ value, onChange }: Props) {
   function handleWhoChange(v: string) {
     if (!v) return
     if (v === "cause") {
-      // A faceless cause is a fundraiser by definition — the only category
-      // that derives the cause register. Set it here so the type question
-      // needn't be asked (deriveRegister maps memorial→remembering and
-      // celebration→celebrating_*, both of which presume a protagonist).
+      // A cause has no type: category is honestly null (deriveRegister is
+      // subject-first, so the cause register needs no category plumbing).
       onChange({
-        category: "fundraiser",
+        category: null,
         subject: "cause",
         grouping: "individual",
         pronoun: undefined,
       })
       return
     }
-    // Leaving "A cause" discards its auto-set category — the organiser
-    // should choose a type for a person explicitly, not inherit one.
-    const category = value.subject === "cause" ? null : value.category
+    // A cause carries category=null, so leaving it naturally starts the
+    // person path with no type chosen — Next gates until one is picked.
+    const category = value.category
     if (v === "couple") {
       onChange({
         category,
@@ -154,16 +152,15 @@ export function HonourStep({ value, onChange }: Props) {
       </ToggleGroup>
 
       {/* …and how you're honouring them. Always live (any-order answering is
-          the step's grammar); when the cause path is taken it shows NO
-          selection — the plumbing category is not a chip choice — and
-          clicking a chip hops back to the person path. */}
+          the step's grammar); a cause carries category=null so nothing shows
+          selected, and clicking a chip hops back to the person path. */}
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
           What type of favpoll is this?
         </p>
         <ToggleGroup
           type="single"
-          value={isCause ? "" : (value.category ?? "")}
+          value={value.category ?? ""}
           onValueChange={handleCategoryChange}
           className="flex flex-wrap gap-2"
         >

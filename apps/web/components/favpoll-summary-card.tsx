@@ -60,10 +60,15 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         <FavpollHeader
           protagonist={{ name: displayName }}
           eyebrow={
-            favpoll.category
-              ? favpoll.category.charAt(0).toUpperCase() +
-                favpoll.category.slice(1)
-              : (favpoll.opening_line ?? "")
+            // Subject first: a cause favpoll has no type (new rows carry
+            // category=null; pre-2026-07-13 rows carry a legacy 'fundraiser'
+            // that must not surface as a badge).
+            favpoll.subject === "cause"
+              ? "For a cause"
+              : favpoll.category
+                ? favpoll.category.charAt(0).toUpperCase() +
+                  favpoll.category.slice(1)
+                : (favpoll.opening_line ?? "")
           }
           size="md"
         />

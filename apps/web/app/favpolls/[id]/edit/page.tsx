@@ -93,7 +93,11 @@ export default async function EditFavpollPage({ params }: Props) {
   const defaultValues: Partial<FavpollFormValues> = {
     category: category ?? undefined,
     grouping,
-    register: deriveRegister(category, grouping),
+    register: deriveRegister(
+      category,
+      grouping,
+      (favpoll.subject ?? "someone") as FavpollSubject
+    ),
     subject: (favpoll.subject ?? "someone") as FavpollSubject,
     name: isCause ? "" : (favpoll.protagonists?.name ?? ""),
     context: isCause ? "" : (favpoll.protagonists?.context ?? ""),

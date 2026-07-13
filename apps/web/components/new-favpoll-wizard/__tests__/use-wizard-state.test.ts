@@ -106,18 +106,9 @@ describe("useWizardState — honour step nextDisabled gate", () => {
     expect(result.current.nextDisabled).toBe(false)
   })
 
-  it("nextDisabled true for cause subject without category", () => {
+  it("nextDisabled false for cause subject without category — a cause has no type", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setSubject("cause"))
-    expect(result.current.nextDisabled).toBe(true)
-  })
-
-  it("nextDisabled false for cause subject with category", () => {
-    const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("fundraiser")
-      result.current.setSubject("cause")
-    })
     expect(result.current.nextDisabled).toBe(false)
   })
 })
@@ -304,12 +295,9 @@ describe("useWizardState — handleFinish", () => {
     expect(url).not.toContain("causeLabel")
   })
 
-  it("does not include pronoun in URL for cause favpoll", () => {
+  it("cause URL carries no pronoun and no category — a cause has no type", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("fundraiser")
-      result.current.setSubject("cause")
-    })
+    act(() => result.current.setSubject("cause"))
     act(() => result.current.handleNext())
     act(() => result.current.setCharityIds(["c1"]))
     act(() => result.current.handleNext())
@@ -328,6 +316,7 @@ describe("useWizardState — handleFinish", () => {
     const url = mockPush.mock.calls[0][0] as string
     expect(url).toContain("subject=cause")
     expect(url).not.toContain("pronoun=")
+    expect(url).not.toContain("category=")
     expect(url).not.toContain("causeLabel")
   })
 

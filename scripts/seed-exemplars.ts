@@ -210,8 +210,10 @@ function registerToOccasionModel(register: string): {
         is_listed: true,
       };
     case "cause":
+      // A cause has no type — category is null (2026-07-13 remodel);
+      // deriveRegister is subject-first so the cause register still derives.
       return {
-        category: "fundraiser",
+        category: null,
         grouping: "individual",
         subject: "cause",
         is_listed: true,

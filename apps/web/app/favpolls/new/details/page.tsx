@@ -88,11 +88,16 @@ export default async function NewFavpollDetailsPage({ searchParams }: Props) {
     }
   }
 
-  const register = deriveRegister(category || null, grouping)
+  const register = deriveRegister(category || null, grouping, subject)
 
-  const defaultValues: Partial<FavpollFormValues> = category
+  // A cause favpoll arrives with no category param — the wizard handoff is
+  // valid whenever either a type was chosen (person path) or the subject is
+  // a cause (which has no type).
+  const fromWizard = Boolean(category) || subject === "cause"
+
+  const defaultValues: Partial<FavpollFormValues> = fromWizard
     ? {
-        category: category as FavpollCategory,
+        ...(category ? { category: category as FavpollCategory } : {}),
         grouping,
         subject,
         ...(pronoun ? { pronoun } : {}),
