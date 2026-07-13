@@ -874,10 +874,13 @@ Never hardcode a test email — it will fail on every CI run after the first.
 
 ### Covered flows (as of PR #123)
 
-| Test                                                 | File                          | Auth            |
-| ---------------------------------------------------- | ----------------------------- | --------------- |
-| Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts` | None (guest)    |
-| Wizard → publish → verify public page                | `wizard-publish.spec.ts`      | Clerk organiser |
+| Test                                                 | File                                | Auth            |
+| ---------------------------------------------------- | ----------------------------------- | --------------- |
+| Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts`       | None (guest)    |
+| Wizard → publish → verify public page                | `wizard-publish.spec.ts`            | Clerk organiser |
+| Cause wizard → publish → verify (no category; the faceless path — added after the 2026-07-13 blank-details regression shipped past unit tests; asserts is_listed=true, the inverse of the memorial spec) | `wizard-publish-cause.spec.ts` | Clerk organiser |
+
+The organiser project's `testMatch` is `**/wizard-publish*.spec.ts` — new organiser wizard specs named `wizard-publish-*.spec.ts` are picked up automatically.
 
 **TODO (follow-up):** Shared fund paths (Part 4 from the brief):
 
