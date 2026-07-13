@@ -6,7 +6,11 @@
  * e2e/.auth/user.json, which wizard-publish.spec.ts loads as storageState.
  *
  * Requirements (set in .env.local locally, GitHub secrets in CI):
- *   E2E_TEST_EMAIL     — email address of the test Clerk account
+ *   E2E_TEST_EMAIL     — email address of the test Clerk account. Use a
+ *                        +clerk_test address (e.g. organiser+clerk_test@x.com):
+ *                        dev instances send no real email and accept the fixed
+ *                        verification code 424242, which automates Clerk's
+ *                        new-device verification on CI runners.
  *   E2E_TEST_PASSWORD  — password of the test Clerk account
  *
  * IMPORTANT: the test account MUST have 2FA / MFA disabled.
@@ -112,23 +116,40 @@ setup("authenticate as test organiser", async ({ page }) => {
   // header's "Sign in" nav button, which is also visible at this step.
   await page.locator('[data-localization-key="formButtonPrimary"]').click()
 
-  // ── Check for MFA (factor-two) ───────────────────────────────────────────────
-  // If the account has 2FA enabled, Clerk redirects to /sign-in/factor-two.
-  // We cannot automate TOTP without the secret key — skip with a clear message.
+  // ── Check for a second step (factor-two) ────────────────────────────────────
+  // Clerk lands here in two cases:
+  //   1. Device verification ("You're signing in from a new device") — every
+  //      CI runner is a new device. With a +clerk_test email (dev instances)
+  //      no real email is sent and the fixed code 424242 always verifies.
+  //   2. Real 2FA (TOTP/SMS) — cannot be automated; skip with a clear message.
   await page.waitForURL(/.+/, { timeout: 5_000 }).catch(() => {})
   if (page.url().includes("/sign-in/factor-two")) {
-    console.error(
-      "\n[auth.setup] ✗ The test account has 2FA enabled.\n" +
-        "  Clerk is asking for a second factor (TOTP/SMS) which cannot be\n" +
-        "  automated without the TOTP secret.\n\n" +
-        "  Fix: create a dedicated Clerk e2e account at /sign-up with ONLY\n" +
-        "  email + password auth (no 2FA), then update E2E_TEST_EMAIL and\n" +
-        "  E2E_TEST_PASSWORD in the GitHub environment secrets.\n"
-    )
-    // Save empty state so dependent wizard-publish test skips rather than errors.
-    mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
-    await page.context().storageState({ path: AUTH_STATE_PATH })
-    return
+    const codeInput = page.getByRole("textbox", {
+      name: /verification code/i,
+    })
+    const codeReady = await codeInput
+      .waitFor({ timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false)
+    if (codeReady && email.includes("+clerk_test")) {
+      await codeInput.fill("424242")
+      await page.getByRole("button", { name: /^continue$/i }).click()
+    } else {
+      console.error(
+        "\n[auth.setup] ✗ Clerk is asking for a second factor that cannot be automated.\n" +
+          (codeReady
+            ? "  An email verification code is required but the account is not a\n" +
+              "    +clerk_test address, so the fixed code 424242 does not apply.\n" +
+              "    Fix: use a test email like organiser+clerk_test@example.com\n" +
+              "    (dev instances: no email sent, code is always 424242).\n"
+            : "  TOTP/SMS 2FA appears to be enabled on the account — use a\n" +
+              "    dedicated e2e account with only email + password.\n")
+      )
+      // Save empty state so dependent wizard-publish tests skip rather than error.
+      mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
+      await page.context().storageState({ path: AUTH_STATE_PATH })
+      return
+    }
   }
 
   // ── Verify auth succeeded ───────────────────────────────────────────────────
