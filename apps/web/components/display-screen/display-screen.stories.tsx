@@ -46,18 +46,11 @@ const BIRTHDAY_POLL = {
   items: makeItems(SCENES[1], "topic-ice-cream"),
 }
 
-const RETIREMENT_POLL = {
-  id: "poll-retirement",
+const FUNDRAISER_POLL = {
+  id: "poll-fundraiser",
   personal_reveal: SCENES[2].poll.personal_reveal,
-  topic: { id: "topic-season", title: SCENES[2].poll.topic.title },
-  items: makeItems(SCENES[2], "topic-season"),
-}
-
-const GRADUATION_POLL = {
-  id: "poll-graduation",
-  personal_reveal: SCENES[5].poll.personal_reveal,
-  topic: { id: "topic-film", title: SCENES[5].poll.topic.title },
-  items: makeItems(SCENES[5], "topic-film"),
+  topic: { id: "topic-dance", title: SCENES[2].poll.topic.title },
+  items: makeItems(SCENES[2], "topic-dance"),
 }
 
 const meta = {
@@ -110,36 +103,19 @@ export const Birthday: Story = {
   },
 }
 
-export const Retirement: Story = {
+export const Fundraiser: Story = {
   args: {
-    favpollId: "demo-retirement",
+    favpollId: "demo-fundraiser",
     protagonistName: SCENES[2].protagonist!.name,
-    dateLabel: null,
-    openingLine: "After a lifetime of good work",
+    dateLabel: "London Marathon · 26.2 miles",
+    openingLine: "Sponsored event",
     description:
-      "Ros spent thirty-one years teaching secondary science. She never once took a sick day.",
-    occasionType: "Retirement",
+      "Running his first marathon for the British Heart Foundation, in memory of his dad.",
+    occasionType: "Sponsored event",
     charityName: SCENES[2].charities[0].name,
-    poll: RETIREMENT_POLL,
-    initialTotalRaised: 700,
-    pollId: "poll-retirement",
-    favpollUrl: "https://favpoll.com/favpolls/demo-retirement",
-  },
-}
-
-export const Graduation: Story = {
-  args: {
-    favpollId: "demo-graduation",
-    protagonistName: SCENES[5].protagonist!.name,
-    dateLabel: "13th June 2026",
-    openingLine: "Congratulations",
-    description:
-      "James graduated last week with a first in mechanical engineering. He's already accepted a job offer.",
-    occasionType: "Graduation",
-    charityName: "The Prince's Trust",
-    poll: GRADUATION_POLL,
-    initialTotalRaised: 1730,
-    pollId: "poll-graduation",
-    favpollUrl: "https://favpoll.com/favpolls/demo-graduation",
+    poll: FUNDRAISER_POLL,
+    initialTotalRaised: 810,
+    pollId: "poll-fundraiser",
+    favpollUrl: "https://favpoll.com/favpolls/demo-fundraiser",
   },
 }

@@ -1,14 +1,15 @@
 "use client"
 
-// Landing hero: purple band with monogram shimmer texture, one fixed universal
-// headline, a cycling eyebrow that carries the occasion, a kind nav to jump the
-// demo, and the live animated demo card in a browser-style frame (traffic
-// lights signal that it's a demo). The card renders at full logical size and is
-// optically scaled to 80%.
+// Landing hero: purple band with monogram shimmer texture, a static eyebrow
+// carrying the breadth (any occasion, or none), one fixed universal headline
+// naming the mechanic the demo enacts, a kind nav to jump the demo, and the
+// live animated demo card in a browser-style frame (traffic lights signal that
+// it's a demo). The card renders at full logical size and is optically scaled
+// to 80%. Register/occasion signals live in the kind nav + the demo content —
+// nothing in the pitch column cycles.
 import Link from "next/link"
-import { AnimatePresence, motion } from "framer-motion"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import { SCENE_EYEBROWS, NAV_TABS } from "@/components/hero-demo-panel/scenes"
+import { NAV_TABS } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
@@ -16,7 +17,7 @@ import { useDemoLoop, beatForPhase } from "./use-demo-loop"
 import { CountUp } from "./count-up"
 import { HeroTexture } from "./hero-texture"
 
-const BEATS = ["Choose", "Pledge", "Reveal"] as const
+const BEATS = ["Pick", "Pledge", "Reveal"] as const
 
 type Props = {
   liveCount: number
@@ -24,15 +25,8 @@ type Props = {
 }
 
 export function LandingHero({ liveCount, totalLive }: Props) {
-  const {
-    scene,
-    sceneIndex,
-    phase,
-    barWidths,
-    fading,
-    prefersReducedMotion,
-    goToScene,
-  } = useDemoLoop()
+  const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
+    useDemoLoop()
   const beat = beatForPhase(phase)
 
   return (
@@ -41,22 +35,11 @@ export function LandingHero({ liveCount, totalLive }: Props) {
       <div className="relative mx-auto grid max-w-330 items-center gap-12 px-6 py-16 md:grid-cols-[1fr_25rem] md:py-20">
         {/* Left — pitch */}
         <div>
-          <div className="mb-4 h-4">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={`eyebrow-${sceneIndex}`}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -3 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="text-xs font-medium tracking-widest uppercase opacity-80"
-              >
-                {SCENE_EYEBROWS[sceneIndex]}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-          {/* Single, register-agnostic headline — no longer cycles with the
-              scene; the eyebrow carries the occasion, the subheader the soul. */}
+          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
+            {t("landing.eyebrow")}
+          </p>
+          {/* Single, register-agnostic headline — names the three-beat
+              mechanic the demo plays out; the subheader carries the soul. */}
           <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
             {t("landing.headline")}
           </h1>

@@ -66,7 +66,7 @@ function makePoll(sceneIndex: number): FavpollPollWithItems {
 
 const MEMORIAL_POLL = makePoll(0) // Belinda · Colour
 const BIRTHDAY_POLL = makePoll(1) // Poppy · Ice cream
-const RETIREMENT_POLL = makePoll(2) // Ros · Season
+const FUNDRAISER_POLL = makePoll(2) // Marcus · Dance
 
 // ─── Meta ────────────────────────────────────────────────────────────────────
 
@@ -134,15 +134,15 @@ export const ResultsWithReveal: Story = {
   },
 }
 
-export const ResultsWithRevealRetirement: Story = {
-  name: "Results view — reveal shown (Retirement)",
+export const ResultsWithRevealFundraiser: Story = {
+  name: "Results view — reveal shown (Fundraiser)",
   args: {
-    poll: RETIREMENT_POLL,
+    poll: FUNDRAISER_POLL,
     protagonistName: SCENES[2].protagonist!.name,
     hasPledged: true,
     entitled: true,
-    personalReveal: RETIREMENT_POLL.personal_reveal,
-    initialItems: RETIREMENT_POLL.topics.favourites,
+    personalReveal: FUNDRAISER_POLL.personal_reveal,
+    initialItems: FUNDRAISER_POLL.topics.favourites,
   },
 }
 

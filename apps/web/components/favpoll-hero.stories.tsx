@@ -1,10 +1,30 @@
 import React from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { FavpollHero } from "./favpoll-hero"
-import { SCENES, SCENE_EYEBROWS } from "@/components/hero-demo-panel/scenes"
 import type { Favpoll, Protagonist, Register } from "@favpoll/types"
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
+// Self-contained — the landing demo scenes used to supply names/eyebrows, but
+// the demo was cut to one scene per kind (2026-07-11) and no longer carries
+// this six-occasion spread.
+
+const NAMES: string[] = [
+  "Belinda Hartley",
+  "Poppy Chen",
+  "Ros Turner",
+  "Alex & Jordan",
+  "Dave Kowalski",
+  "James Okafor",
+]
+
+const OPENING_LINES: string[] = [
+  "In memory of someone special",
+  "On the birthday they'll always remember",
+  "After a lifetime of good work",
+  "For the yes that changes everything",
+  "For the one who's moving on",
+  "As they take their next step",
+]
 
 const REGISTERS: Register[] = [
   "remembering",
@@ -46,11 +66,9 @@ function makeViewProps(sceneIndex: number): {
   favpoll: Favpoll
   protagonist: Protagonist
 } {
-  const scene = SCENES[sceneIndex]
-
   const protagonist: Protagonist = {
     id: `p-${sceneIndex}`,
-    name: scene.protagonist!.name,
+    name: NAMES[sceneIndex],
     context: DATE_LABELS[sceneIndex],
     about: BIOS[sceneIndex],
     photo_url: null,
@@ -65,7 +83,7 @@ function makeViewProps(sceneIndex: number): {
     subject: "someone",
     cause_label: null,
     occasion_type: OCCASION_TYPES[sceneIndex],
-    opening_line: SCENE_EYEBROWS[sceneIndex],
+    opening_line: OPENING_LINES[sceneIndex],
     market: "en-GB",
     created_by: "user-1",
     closes_at: "2026-12-31T00:00:00Z",

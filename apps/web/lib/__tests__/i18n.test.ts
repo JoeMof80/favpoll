@@ -45,7 +45,11 @@ describe("MARKET_DEFAULTS", () => {
 
 describe("t", () => {
   it("returns the universal, register-agnostic landing headline", () => {
-    expect(t("landing.headline")).toBe("Turn what you love into what you give.")
+    expect(t("landing.headline")).toBe("Pick, pledge, reveal.")
+  })
+
+  it("returns the static landing eyebrow", () => {
+    expect(t("landing.eyebrow")).toBe("For any occasion — or none at all")
   })
 
   it("returns the brand subheader", () => {

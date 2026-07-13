@@ -87,34 +87,35 @@ favpoll charges no platform fee. 100% of every pledge reaches the charity; Strip
 
 ### Headline — one fixed, universal line
 
-As of 2026-07-07 the headline is a single, register-agnostic line. It does the
-job the brand statement can't — the hook + the mechanic — while the **eyebrow**
-carries the register/occasion and the **brand statement** carries the soul
-(see the concept model, `references/favpoll-concept-model-2026-07.md`):
+As of 2026-07-11 the headline is the mechanic itself, named in three beats:
 
 ```
-Turn what you love into what you give.
+Pick, pledge, reveal.
 ```
 
-It does **not** cycle. The register signal (remembering, celebrating, cause,
-standalone) lives entirely in the eyebrow + the hero demo scene, so the headline
-stays true for every register — including cause and standalone favpolls, which
-the old per-occasion headlines silently excluded. The reveal spark is carried by
-the eyebrow and the hero demo itself (which plays the blur → lock → reveal arc
-in every scene), not the headline. (The standalone reveal section + interactive
-demo were cut 2026-07-08's artifact-first pass, as duplication of the hero
-demo.)
+It does **not** cycle, and it deliberately carries no register, no protagonist,
+and no promise about the personal reveal. The division of labour: the **eyebrow**
+carries the breadth, the **headline** names the arc the hero demo then enacts
+(the beat chips under the demo — Pick · Pledge · Reveal — track it live), and
+the **brand statement** carries the soul. "Reveal" is honest for every favpoll
+because poll results are always shown after pledging; the personal reveal — a
+gift, not a gate — stays a *discovered* moment (the demo's blur → lock → reveal
+arc, the reveal pill on real polls), never a headline promise. Do not re-promote
+the personal reveal into hero copy: it is optional per-poll and protagonist-
+shaped, so any one-clause version over-promises, reads gated, or goes vague.
 
 Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
-there, never inline. (This structure change — from `landing.headline.*` to a
-single `landing.headline` — lands with the 2026-07-07 hero rebuild.)
+there, never inline.
 
-History: 2026-07-03 → 2026-07-07, six honour-locked headlines cycled per occasion
-(all sharing "<verb> them … what they love — for the causes they care about.",
-canonical memorial line "Honour them through what they loved — for the causes
-they cared about."). A single fixed headline was the rule 2026-06-24 → 2026-07-03;
-before that, "Introducing a new way to honour them." Retired because they defined
-favpoll by honouring a person, downgrading cause and standalone favpolls.
+History: "Turn what you love into what you give." (2026-07-07 → 2026-07-11,
+retired for the "love" repetition against the brand-statement subheader).
+Before that: 2026-07-03 → 2026-07-07, six honour-locked headlines cycled per
+occasion (all sharing "<verb> them … what they love — for the causes they care
+about.", canonical memorial line "Honour them through what they loved — for the
+causes they cared about."). A single fixed headline was the rule 2026-06-24 →
+2026-07-03; before that, "Introducing a new way to honour them." The cycling
+sets were retired because they defined favpoll by honouring a person,
+downgrading cause and standalone favpolls.
 
 ### Brand subheader — fixed
 
@@ -122,12 +123,24 @@ favpoll by honouring a person, downgrading cause and standalone favpolls.
 Expressions of joy, for charitable causes, in the name of those we love.
 ```
 
-### Eyebrows — carry the register, cycle with the hero demo scene
+### Eyebrow — one static line carrying the breadth
 
-The eyebrow is now the line that carries the register/occasion (the headline is
-fixed). As of the 2026-07-07 hero rebuild the demo cycles by **register**, and
-must include **cause** and **standalone** — which the old occasion-only set
-omitted, silently downgrading honourless favpolls.
+As of 2026-07-11 the eyebrow no longer cycles. One fixed line
+(`landing.eyebrow` in `messages/en-GB.json`):
+
+```
+For any occasion — or none at all
+```
+
+"Or none at all" is doing real work — it is the hero copy that explicitly
+includes standalone and cause favpolls, the registers the old per-occasion
+copy silently excluded. Never show the headline without the eyebrow.
+
+The register/occasion signal now lives entirely in the demo's tap-to-jump kind
+nav + the demo scene content (one scene per kind as of 2026-07-11, cycling in
+nav order). The per-scene poetic eyebrows (2026-07-07 → 2026-07-11: "In memory
+of someone special", "On the birthday they'll always remember", …) were retired
+as redundant once the kind nav labelled the register explicitly.
 
 Softened, visitor-facing tap-to-jump labels for the demo — cut by visitor
 **kind**, matching the wizard's three Types + the faceless cause Who (NOT the
@@ -141,22 +154,6 @@ Note: **"Fundraiser" is a _Type_, not a Who** — a marathon runner is a person 
 Fundraiser and **keeps their protagonist**. Only "A cause" is faceless. The
 `neutral` "Open / other" register is a valid organiser fallback but is **not** a
 featured demo scene.
-
-Poetic eyebrow copy per occasion (used within the remembering / celebrating
-registers):
-
-```
-Memorial:   In memory of someone special
-Birthday:   On the birthday they'll always remember
-Retirement: After a lifetime of good work
-Wedding:    On the day they say 'I do'
-Engagement: The yes that changes everything
-Graduation: As they take their next step
-```
-
-Cause + standalone eyebrow copy is finalised with the hero rebuild. Never show
-the headline without an eyebrow; the eyebrow changes in sync with the demo scene
-while the headline stays fixed.
 
 ### Supporting line — fixed
 
