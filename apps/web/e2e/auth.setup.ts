@@ -116,40 +116,42 @@ setup("authenticate as test organiser", async ({ page }) => {
   // header's "Sign in" nav button, which is also visible at this step.
   await page.locator('[data-localization-key="formButtonPrimary"]').click()
 
-  // ── Check for a second step (factor-two) ────────────────────────────────────
-  // Clerk lands here in two cases:
-  //   1. Device verification ("You're signing in from a new device") — every
-  //      CI runner is a new device. With a +clerk_test email (dev instances)
-  //      no real email is sent and the fixed code 424242 always verifies.
-  //   2. Real 2FA (TOTP/SMS) — cannot be automated; skip with a clear message.
-  await page.waitForURL(/.+/, { timeout: 5_000 }).catch(() => {})
-  if (page.url().includes("/sign-in/factor-two")) {
-    const codeInput = page.getByRole("textbox", {
-      name: /verification code/i,
-    })
-    const codeReady = await codeInput
-      .waitFor({ timeout: 5_000 })
-      .then(() => true)
-      .catch(() => false)
-    if (codeReady && email.includes("+clerk_test")) {
-      await codeInput.fill("424242")
-      await page.getByRole("button", { name: /^continue$/i }).click()
-    } else {
+  // ── Second step (device verification / 2FA) ────────────────────────────────
+  // After the password submit Clerk either completes the session or redirects
+  // through /sign-in/factor-one → /factor-two (~2s). Sampling page.url() once
+  // races that redirect (run 4 failed exactly there), so instead race two
+  // outcomes: we left /sign-in, or a verification-code input appeared.
+  //   • Device verification ("new device") — every CI runner is new. With a
+  //     +clerk_test email (dev instances) no email is sent and the fixed code
+  //     424242 always verifies.
+  //   • Real TOTP/SMS 2FA — cannot be automated; skip with a clear message.
+  const codeInput = page.getByRole("textbox", { name: /verification code/i })
+  const secondStep = await Promise.race([
+    page
+      .waitForURL((u) => !u.pathname.startsWith("/sign-in"), {
+        timeout: 15_000,
+      })
+      .then(() => "signed-in" as const),
+    codeInput.waitFor({ timeout: 15_000 }).then(() => "code" as const),
+  ]).catch(() => "timeout" as const)
+
+  if (secondStep === "code") {
+    if (!email.includes("+clerk_test")) {
       console.error(
-        "\n[auth.setup] ✗ Clerk is asking for a second factor that cannot be automated.\n" +
-          (codeReady
-            ? "  An email verification code is required but the account is not a\n" +
-              "    +clerk_test address, so the fixed code 424242 does not apply.\n" +
-              "    Fix: use a test email like organiser+clerk_test@example.com\n" +
-              "    (dev instances: no email sent, code is always 424242).\n"
-            : "  TOTP/SMS 2FA appears to be enabled on the account — use a\n" +
-              "    dedicated e2e account with only email + password.\n")
+        "\n[auth.setup] ✗ Clerk is asking for a verification code that cannot be automated.\n" +
+          "  Use a +clerk_test address (e.g. organiser+clerk_test@example.com):\n" +
+          "  dev instances send no email and accept the fixed code 424242.\n"
       )
-      // Save empty state so dependent wizard-publish tests skip rather than error.
       mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
       await page.context().storageState({ path: AUTH_STATE_PATH })
       return
     }
+    await codeInput.fill("424242")
+    // Clerk may auto-submit a complete code — the button can already be gone.
+    await page
+      .getByRole("button", { name: /^continue$/i })
+      .click({ timeout: 3_000 })
+      .catch(() => {})
   }
 
   // ── Verify auth succeeded ───────────────────────────────────────────────────
