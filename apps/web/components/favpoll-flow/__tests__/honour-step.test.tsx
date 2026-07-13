@@ -216,20 +216,35 @@ describe("HonourStep — category row", () => {
     )
   })
 
-  it("category row is hidden for a cause — its type is determined", () => {
+  it("category row is disabled and unselected for a cause — no layout shift, no visible fundraiser claim", () => {
     render(
       <HonourStep
         value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
         onChange={() => {}}
       />
     )
+    // Row stays in the layout but every chip is disabled…
+    for (const name of ["Celebration", "Memorial", "Fundraiser"]) {
+      expect(screen.getByRole("radio", { name })).toBeDisabled()
+    }
+    // …and the internally-set fundraiser category is NOT shown as selected.
+    expect(screen.getByRole("radio", { name: "Fundraiser" })).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
     expect(
-      screen.queryByRole("radio", { name: "Celebration" })
-    ).not.toBeInTheDocument()
-    expect(screen.queryByText("What type of favpoll is this?")).toBeNull()
-    expect(
-      screen.getByText("A favpoll for a cause is a fundraiser.")
+      screen.getByText("What type of favpoll is this?")
     ).toBeInTheDocument()
+  })
+
+  it("category chips are enabled for a person", () => {
+    render(
+      <HonourStep
+        value={{ ...DEFAULT_VALUE, pronoun: "she" }}
+        onChange={() => {}}
+      />
+    )
+    expect(screen.getByRole("radio", { name: "Memorial" })).toBeEnabled()
   })
 
   it("selected category item has aria-checked=true", () => {

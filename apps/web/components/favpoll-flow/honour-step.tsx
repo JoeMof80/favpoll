@@ -121,69 +121,77 @@ export function HonourStep({ value, onChange }: Props) {
     onChange({ ...value, category: v as FavpollCategory })
   }
 
+  const isCause = value.subject === "cause"
+
   return (
     <div className="flex flex-col gap-8">
-      {/* Who fork: someone… */}
+      {/* Person path: who… */}
       <ToggleGroup
         type="single"
-        value={whoToggleValue}
+        value={isCause ? "" : whoToggleValue}
         onValueChange={handleWhoChange}
-        className="flex w-full flex-col items-stretch gap-5"
+        className="grid w-full grid-cols-4 gap-2 sm:grid-cols-5"
       >
-        <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
-          {PERSON_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-            <ToggleGroupItem key={v} value={v} className={WHO_ITEM_CLASS}>
+        {PERSON_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+          <ToggleGroupItem key={v} value={v} className={WHO_ITEM_CLASS}>
+            <Icon className="h-6 w-6" />
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+
+      {/* …and how you're honouring them. Dimmed (never hidden — no layout
+          shift) when the cause path is taken, and it must show NO selection
+          then: the plumbing category is not a chip choice. */}
+      <div
+        className={`flex flex-col gap-3 transition-opacity ${
+          isCause ? "opacity-40" : ""
+        }`}
+      >
+        <p className="text-sm text-muted-foreground">
+          What type of favpoll is this?
+        </p>
+        <ToggleGroup
+          type="single"
+          value={isCause ? "" : (value.category ?? "")}
+          onValueChange={handleCategoryChange}
+          className="flex flex-wrap gap-2"
+        >
+          {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+            <ToggleGroupItem
+              key={v}
+              value={v}
+              disabled={isCause}
+              className={CATEGORY_ITEM_CLASS}
+            >
               <Icon className="h-6 w-6" />
               {label}
             </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
+      </div>
 
-        {/* …or a cause (faceless — flips subject, no protagonist) */}
-        <div className="flex items-center gap-3" aria-hidden="true">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            or
-          </span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
+      {/* OR — the fork between two complete answers: honouring someone
+          (who + type, above) or backing a cause (below, no type needed). */}
+      <div className="flex items-center gap-3" aria-hidden="true">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          or
+        </span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
 
-        <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
-          <ToggleGroupItem value="cause" className={WHO_ITEM_CLASS}>
-            <HeartHandshake className="h-6 w-6" />A cause
-          </ToggleGroupItem>
-        </div>
+      {/* Cause path: faceless — flips subject; category is set internally */}
+      <ToggleGroup
+        type="single"
+        value={isCause ? "cause" : ""}
+        onValueChange={handleWhoChange}
+        className="grid w-full grid-cols-4 gap-2 sm:grid-cols-5"
+      >
+        <ToggleGroupItem value="cause" className={WHO_ITEM_CLASS}>
+          <HeartHandshake className="h-6 w-6" />A cause
+        </ToggleGroupItem>
       </ToggleGroup>
-
-      {/* Category row — hidden for a cause: its type is determined */}
-      {value.subject === "cause" ? (
-        <p className="text-sm text-muted-foreground">
-          A favpoll for a cause is a fundraiser.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">
-            What type of favpoll is this?
-          </p>
-          <ToggleGroup
-            type="single"
-            value={value.category ?? ""}
-            onValueChange={handleCategoryChange}
-            className="flex flex-wrap gap-2"
-          >
-            {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-              <ToggleGroupItem
-                key={v}
-                value={v}
-                className={CATEGORY_ITEM_CLASS}
-              >
-                <Icon className="h-6 w-6" />
-                {label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-      )}
     </div>
   )
 }

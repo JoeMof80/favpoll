@@ -200,15 +200,13 @@ describe("NewFavpollWizard — cause guardrail", () => {
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("hides the type question for a cause and states its type instead", () => {
+  it("disables the type row for a cause without showing a selection", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
-    expect(
-      screen.queryByRole("radio", { name: "Fundraiser" })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.getByText("A favpoll for a cause is a fundraiser.")
-    ).toBeInTheDocument()
+    const fundraiser = screen.getByRole("radio", { name: "Fundraiser" })
+    expect(fundraiser).toBeDisabled()
+    // The internally-set category is plumbing, never a visible chip choice.
+    expect(fundraiser).toHaveAttribute("aria-checked", "false")
   })
 
   it("wizard does not show a cause label input on step 1", () => {
