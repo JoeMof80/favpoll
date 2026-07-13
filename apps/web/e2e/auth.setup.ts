@@ -47,6 +47,14 @@ setup("authenticate as test organiser", async ({ page }) => {
     await setupClerkTestingToken({ page })
   }
 
+  // Capture page-side failures so a hydration failure is diagnosable from CI
+  // logs instead of a silent skip (the 2026-07-13 lesson).
+  const pageErrors: string[] = []
+  page.on("console", (m) => {
+    if (m.type() === "error") pageErrors.push(m.text())
+  })
+  page.on("pageerror", (e) => pageErrors.push(String(e)))
+
   await page.goto("/sign-in")
 
   // ── Clerk sign-in: email step ───────────────────────────────────────────────
@@ -59,13 +67,29 @@ setup("authenticate as test organiser", async ({ page }) => {
 
   const emailReady = await emailInput
     .waitFor({ timeout: 15_000 })
-    .catch(() => null)
+    .then(() => true)
+    .catch((err: Error) => {
+      console.warn(
+        `[auth.setup] waitFor(email input) rejected: ${String(err?.message ?? err).slice(0, 400)}`
+      )
+      return false
+    })
   if (!emailReady) {
+    const clerkPresent = await page
+      .evaluate(() => typeof (window as { Clerk?: unknown }).Clerk)
+      .catch(
+        (e: Error) => `eval failed: ${String(e?.message ?? e).slice(0, 120)}`
+      )
+    const bodySnippet = await page
+      .content()
+      .then((h) => h.replace(/\s+/g, " ").slice(0, 500))
+      .catch(() => "(content unavailable)")
     console.warn(
       "\n[auth.setup] ⚠  Sign-in page did not render the Clerk email input after 15s.\n" +
-        "  Possible causes:\n" +
-        "  • The preview deployment domain is not in Clerk's allowed domains list\n" +
-        "  • NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is wrong/missing in the Vercel Preview env\n" +
+        `  url:             ${page.url()}\n` +
+        `  window.Clerk:    ${clerkPresent}\n` +
+        `  console errors:  ${pageErrors.slice(0, 5).join(" | ").slice(0, 800) || "none"}\n` +
+        `  html snippet:    ${bodySnippet}\n` +
         "  Saving empty auth state — wizard-publish tests will be skipped.\n"
     )
     mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
