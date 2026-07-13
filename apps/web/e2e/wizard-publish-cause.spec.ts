@@ -99,6 +99,10 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(marieCurieOption).toBeVisible({ timeout: 5_000 })
     await marieCurieOption.click()
 
+    // The charity overlay is multi-select (up to 3 charities) — it stays
+    // open after a pick; confirm with Done. (The topic overlay, single
+    // select, closes itself.)
+    await charityDialog.getByRole("button", { name: /^done$/i }).click()
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
     await expect(page.getByText("Marie Curie")).toBeVisible()
 
