@@ -200,13 +200,29 @@ describe("NewFavpollWizard — cause guardrail", () => {
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("disables the type row for a cause without showing a selection", () => {
+  it("shows no type selection for a cause — the plumbing category is not a chip choice", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     const fundraiser = screen.getByRole("radio", { name: "Fundraiser" })
-    expect(fundraiser).toBeDisabled()
-    // The internally-set category is plumbing, never a visible chip choice.
+    expect(fundraiser).toBeEnabled()
     expect(fundraiser).toHaveAttribute("aria-checked", "false")
+  })
+
+  it("clicking a type chip while A cause is selected hops paths and re-gates Next", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
+    fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
+    // Cause deselects, the type is kept, and Next gates until a who is chosen.
+    expect(screen.getByRole("radio", { name: "A cause" })).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
+    expect(screen.getByRole("radio", { name: "Memorial" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
   })
 
   it("wizard does not show a cause label input on step 1", () => {

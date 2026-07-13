@@ -216,35 +216,39 @@ describe("HonourStep — category row", () => {
     )
   })
 
-  it("category row is disabled and unselected for a cause — no layout shift, no visible fundraiser claim", () => {
+  it("category row stays live and unselected for a cause — no visible fundraiser claim", () => {
     render(
       <HonourStep
         value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
         onChange={() => {}}
       />
     )
-    // Row stays in the layout but every chip is disabled…
+    // Every chip stays enabled (any-order answering is the step's grammar)…
     for (const name of ["Celebration", "Memorial", "Fundraiser"]) {
-      expect(screen.getByRole("radio", { name })).toBeDisabled()
+      expect(screen.getByRole("radio", { name })).toBeEnabled()
     }
     // …and the internally-set fundraiser category is NOT shown as selected.
     expect(screen.getByRole("radio", { name: "Fundraiser" })).toHaveAttribute(
       "aria-checked",
       "false"
     )
-    expect(
-      screen.getByText("What type of favpoll is this?")
-    ).toBeInTheDocument()
   })
 
-  it("category chips are enabled for a person", () => {
+  it("clicking a type chip while A cause is selected hops back to the person path", () => {
+    const onChange = vi.fn()
     render(
       <HonourStep
-        value={{ ...DEFAULT_VALUE, pronoun: "she" }}
-        onChange={() => {}}
+        value={{ ...DEFAULT_VALUE, subject: "cause", category: "fundraiser" }}
+        onChange={onChange}
       />
     )
-    expect(screen.getByRole("radio", { name: "Memorial" })).toBeEnabled()
+    fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
+    expect(onChange).toHaveBeenCalledWith({
+      category: "memorial",
+      subject: "someone",
+      grouping: "individual",
+      pronoun: undefined,
+    })
   })
 
   it("selected category item has aria-checked=true", () => {
