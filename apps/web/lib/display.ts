@@ -111,8 +111,15 @@ export function getFavpollHeadline(params: {
   subject?: "someone" | "cause"
 }): { prefix: string; name: string; suffix: string } {
   const { occasionType, name: personName, dateLabel, openingLine } = params
-  const register = params.register ?? registerForOccasionType(occasionType)
   const subject = params.subject ?? "someone"
+  // Subject-first, like deriveRegister (2026-07-13 remodel): a faceless cause
+  // is the cause register regardless of occasion_type — otherwise a cause
+  // favpoll with no opening line fell back to the "Honouring" prefix, the
+  // exact honour-overclaim the triad decision forbids (caught by the cause
+  // e2e's first live run).
+  const register =
+    params.register ??
+    (subject === "cause" ? "cause" : registerForOccasionType(occasionType))
 
   const registerPrefix =
     subject === "cause" && register === "cause"

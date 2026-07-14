@@ -208,13 +208,16 @@ test.describe("wizard → publish flow", () => {
     await page.waitForURL(/\/favpolls\/[0-9a-f-]{36}$/, { timeout: 15_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    // Memorial + individual → headline prefix should be "In memory of"
-    // (per getFavpollHeadline: remembering → "In memory of")
-    // The opening_line from OPENING_LINE_PREFIXES["Memorial"] = "In memory of"
-    // is rendered in FavpollHero.
-    await expect(page.getByText(/in memory of/i)).toBeVisible({
+    // This wizard path sets no occasion_type and no opening line, so the
+    // headline prefix derives to "Honouring" (learned from the first live
+    // run, 2026-07-13 — the old "In memory of" expectation assumed an
+    // occasion flow that doesn't happen here). The protagonist name is the h1.
+    await expect(page.getByText(/honouring/i).first()).toBeVisible({
       timeout: 10_000,
     })
+    await expect(
+      page.getByRole("heading", { level: 1, name: TEST_PROTAGONIST_NAME })
+    ).toBeVisible()
 
     // Colour poll section should be visible
     const pollSection = page.getByRole("region", {
