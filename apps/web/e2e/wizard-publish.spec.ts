@@ -104,13 +104,17 @@ test.describe("wizard → publish flow", () => {
     await expect(charitySearch).toBeVisible()
     await charitySearch.fill("Marie Curie")
 
-    const marieCurieOption = charityDialog.getByRole("radio", {
-      name: /marie curie/i,
-    })
+    // Charity options render as buttons (not ToggleGroup radios).
+    const marieCurieOption = charityDialog
+      .getByRole("button", { name: /marie curie/i })
+      .first()
     await expect(marieCurieOption).toBeVisible({ timeout: 5_000 })
     await marieCurieOption.click()
 
-    // Overlay closes after selection; WizardCharityCard appears
+    // The charity overlay is multi-select (up to 3 charities) — it stays
+    // open after a pick; confirm with Done. (The topic overlay, single
+    // select, closes itself.)
+    await charityDialog.getByRole("button", { name: /^done$/i }).click()
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
     await expect(page.getByText("Marie Curie")).toBeVisible()
 
@@ -132,7 +136,11 @@ test.describe("wizard → publish flow", () => {
     await topicSearch.fill("Colour")
 
     // Select the Colour topic chip
-    const colourOption = topicDialog.getByRole("radio", { name: /^colour$/i })
+    // Topic chips render as buttons; "Colour" can appear twice when it is
+    // also in the "Suggested for {charity}" section — take the first.
+    const colourOption = topicDialog
+      .getByRole("button", { name: /^colour$/i })
+      .first()
     await expect(colourOption).toBeVisible({ timeout: 5_000 })
     await colourOption.click()
 
@@ -146,28 +154,20 @@ test.describe("wizard → publish flow", () => {
     await page.waitForURL(/\/favpolls\/new\/details/, { timeout: 10_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    // Fill protagonist name — the form preview shows an editable name field.
-    // The name input is in the EditableHero section.
-    // Click the name edit area to open the name overlay.
-    const nameEditArea = page
-      .getByRole("button", { name: /edit name/i })
-      .or(page.locator('[aria-label*="name"]').first())
-    if (await nameEditArea.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await nameEditArea.click()
-      // Name overlay input
-      const nameInput = page.getByRole("textbox", { name: /name/i }).last()
-      await nameInput.fill(TEST_PROTAGONIST_NAME)
-      // Save the overlay
-      await page.getByRole("button", { name: /save/i }).click()
-    } else {
-      // Alternative: name may be directly editable in the preview
-      const directNameInput = page.getByRole("textbox", { name: /name/i })
-      if (
-        await directNameInput.isVisible({ timeout: 3_000 }).catch(() => false)
-      ) {
-        await directNameInput.fill(TEST_PROTAGONIST_NAME)
-      }
-    }
+    // Fill the protagonist name. The empty h1 renders as an EditableField
+    // button "Enter Name" (exact — the phrase also echoes in Next's route
+    // announcer); clicking it opens the name overlay.
+    const nameField = page.getByRole("button", {
+      name: "Enter Name",
+      exact: true,
+    })
+    await expect(nameField).toBeVisible({ timeout: 10_000 })
+    await nameField.click()
+    const nameInput = page.getByPlaceholder("Name or nickname")
+    await expect(nameInput).toBeVisible({ timeout: 5_000 })
+    await nameInput.fill(TEST_PROTAGONIST_NAME)
+    await page.getByRole("button", { name: /^save$/i }).click()
+    await expect(page.getByText(TEST_PROTAGONIST_NAME)).toBeVisible()
 
     // ── 6. Publish ────────────────────────────────────────────────────────────
     // CommandPanel "Publish" button opens CloseDateOverlay.
@@ -175,25 +175,18 @@ test.describe("wizard → publish flow", () => {
     await expect(publishButton).toBeVisible({ timeout: 10_000 })
     await publishButton.click()
 
-    // CloseDateOverlay opens — preset "2 weeks" or "1 month" is sufficient
+    // CloseDateOverlay opens
     const closeDateDialog = page
       .getByRole("dialog")
       .or(page.locator("[data-radix-dialog-content]"))
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
-    // Pick "1 month" preset (ensures date is set)
-    const oneMonthBtn = page
-      .getByRole("button", { name: /1 month/i })
-      .or(page.getByRole("button", { name: /1m/i }))
-    if (await oneMonthBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await oneMonthBtn.click()
-    } else {
-      // Fallback: pick the first preset button in the overlay
-      const presets = closeDateDialog.getByRole("button").filter({
-        hasNotText: /back|cancel|publish|save/i,
-      })
-      await presets.first().click()
-    }
+    // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
+    // exact "In a month" chip — a broad fallback can match calendar internals
+    // and hang on an invisible button.
+    await closeDateDialog
+      .getByRole("button", { name: "In a month", exact: true })
+      .click()
 
     // Click the "Publish" submit button in the overlay footer
     const publishConfirm = closeDateDialog
@@ -215,13 +208,16 @@ test.describe("wizard → publish flow", () => {
     await page.waitForURL(/\/favpolls\/[0-9a-f-]{36}$/, { timeout: 15_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    // Memorial + individual → headline prefix should be "In memory of"
-    // (per getFavpollHeadline: remembering → "In memory of")
-    // The opening_line from OPENING_LINE_PREFIXES["Memorial"] = "In memory of"
-    // is rendered in FavpollHero.
-    await expect(page.getByText(/in memory of/i)).toBeVisible({
+    // This wizard path sets no occasion_type and no opening line, so the
+    // headline prefix derives to "Honouring" (learned from the first live
+    // run, 2026-07-13 — the old "In memory of" expectation assumed an
+    // occasion flow that doesn't happen here). The protagonist name is the h1.
+    await expect(page.getByText(/honouring/i).first()).toBeVisible({
       timeout: 10_000,
     })
+    await expect(
+      page.getByRole("heading", { level: 1, name: TEST_PROTAGONIST_NAME })
+    ).toBeVisible()
 
     // Colour poll section should be visible
     const pollSection = page.getByRole("region", {

@@ -6,7 +6,11 @@
  * e2e/.auth/user.json, which wizard-publish.spec.ts loads as storageState.
  *
  * Requirements (set in .env.local locally, GitHub secrets in CI):
- *   E2E_TEST_EMAIL     — email address of the test Clerk account
+ *   E2E_TEST_EMAIL     — email address of the test Clerk account. Use a
+ *                        +clerk_test address (e.g. organiser+clerk_test@x.com):
+ *                        dev instances send no real email and accept the fixed
+ *                        verification code 424242, which automates Clerk's
+ *                        new-device verification on CI runners.
  *   E2E_TEST_PASSWORD  — password of the test Clerk account
  *
  * IMPORTANT: the test account MUST have 2FA / MFA disabled.
@@ -18,6 +22,7 @@
  */
 
 import { test as setup, expect } from "@playwright/test"
+import { setupClerkTestingToken } from "@clerk/testing/playwright"
 import { mkdirSync } from "fs"
 import { resolve } from "path"
 
@@ -38,6 +43,22 @@ setup("authenticate as test organiser", async ({ page }) => {
     return
   }
 
+  // Attach the Clerk testing token (minted in global-setup when
+  // CLERK_SECRET_KEY is available) to frontend-API requests — bypasses bot
+  // detection, which otherwise stops the sign-in form hydrating on preview
+  // domains. No-token runs proceed exactly as before.
+  if (process.env.CLERK_TESTING_TOKEN) {
+    await setupClerkTestingToken({ page })
+  }
+
+  // Capture page-side failures so a hydration failure is diagnosable from CI
+  // logs instead of a silent skip (the 2026-07-13 lesson).
+  const pageErrors: string[] = []
+  page.on("console", (m) => {
+    if (m.type() === "error") pageErrors.push(m.text())
+  })
+  page.on("pageerror", (e) => pageErrors.push(String(e)))
+
   await page.goto("/sign-in")
 
   // ── Clerk sign-in: email step ───────────────────────────────────────────────
@@ -50,13 +71,29 @@ setup("authenticate as test organiser", async ({ page }) => {
 
   const emailReady = await emailInput
     .waitFor({ timeout: 15_000 })
-    .catch(() => null)
+    .then(() => true)
+    .catch((err: Error) => {
+      console.warn(
+        `[auth.setup] waitFor(email input) rejected: ${String(err?.message ?? err).slice(0, 400)}`
+      )
+      return false
+    })
   if (!emailReady) {
+    const clerkPresent = await page
+      .evaluate(() => typeof (window as { Clerk?: unknown }).Clerk)
+      .catch(
+        (e: Error) => `eval failed: ${String(e?.message ?? e).slice(0, 120)}`
+      )
+    const bodySnippet = await page
+      .content()
+      .then((h) => h.replace(/\s+/g, " ").slice(0, 500))
+      .catch(() => "(content unavailable)")
     console.warn(
       "\n[auth.setup] ⚠  Sign-in page did not render the Clerk email input after 15s.\n" +
-        "  Possible causes:\n" +
-        "  • The preview deployment domain is not in Clerk's allowed domains list\n" +
-        "  • NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is wrong/missing in the Vercel Preview env\n" +
+        `  url:             ${page.url()}\n` +
+        `  window.Clerk:    ${clerkPresent}\n` +
+        `  console errors:  ${pageErrors.slice(0, 5).join(" | ").slice(0, 800) || "none"}\n` +
+        `  html snippet:    ${bodySnippet}\n` +
         "  Saving empty auth state — wizard-publish tests will be skipped.\n"
     )
     mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
@@ -79,23 +116,42 @@ setup("authenticate as test organiser", async ({ page }) => {
   // header's "Sign in" nav button, which is also visible at this step.
   await page.locator('[data-localization-key="formButtonPrimary"]').click()
 
-  // ── Check for MFA (factor-two) ───────────────────────────────────────────────
-  // If the account has 2FA enabled, Clerk redirects to /sign-in/factor-two.
-  // We cannot automate TOTP without the secret key — skip with a clear message.
-  await page.waitForURL(/.+/, { timeout: 5_000 }).catch(() => {})
-  if (page.url().includes("/sign-in/factor-two")) {
-    console.error(
-      "\n[auth.setup] ✗ The test account has 2FA enabled.\n" +
-        "  Clerk is asking for a second factor (TOTP/SMS) which cannot be\n" +
-        "  automated without the TOTP secret.\n\n" +
-        "  Fix: create a dedicated Clerk e2e account at /sign-up with ONLY\n" +
-        "  email + password auth (no 2FA), then update E2E_TEST_EMAIL and\n" +
-        "  E2E_TEST_PASSWORD in the GitHub environment secrets.\n"
-    )
-    // Save empty state so dependent wizard-publish test skips rather than errors.
-    mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
-    await page.context().storageState({ path: AUTH_STATE_PATH })
-    return
+  // ── Second step (device verification / 2FA) ────────────────────────────────
+  // After the password submit Clerk either completes the session or redirects
+  // through /sign-in/factor-one → /factor-two (~2s). Sampling page.url() once
+  // races that redirect (run 4 failed exactly there), so instead race two
+  // outcomes: we left /sign-in, or a verification-code input appeared.
+  //   • Device verification ("new device") — every CI runner is new. With a
+  //     +clerk_test email (dev instances) no email is sent and the fixed code
+  //     424242 always verifies.
+  //   • Real TOTP/SMS 2FA — cannot be automated; skip with a clear message.
+  const codeInput = page.getByRole("textbox", { name: /verification code/i })
+  const secondStep = await Promise.race([
+    page
+      .waitForURL((u) => !u.pathname.startsWith("/sign-in"), {
+        timeout: 15_000,
+      })
+      .then(() => "signed-in" as const),
+    codeInput.waitFor({ timeout: 15_000 }).then(() => "code" as const),
+  ]).catch(() => "timeout" as const)
+
+  if (secondStep === "code") {
+    if (!email.includes("+clerk_test")) {
+      console.error(
+        "\n[auth.setup] ✗ Clerk is asking for a verification code that cannot be automated.\n" +
+          "  Use a +clerk_test address (e.g. organiser+clerk_test@example.com):\n" +
+          "  dev instances send no email and accept the fixed code 424242.\n"
+      )
+      mkdirSync(resolve(process.cwd(), "e2e/.auth"), { recursive: true })
+      await page.context().storageState({ path: AUTH_STATE_PATH })
+      return
+    }
+    await codeInput.fill("424242")
+    // Clerk may auto-submit a complete code — the button can already be gone.
+    await page
+      .getByRole("button", { name: /^continue$/i })
+      .click({ timeout: 3_000 })
+      .catch(() => {})
   }
 
   // ── Verify auth succeeded ───────────────────────────────────────────────────

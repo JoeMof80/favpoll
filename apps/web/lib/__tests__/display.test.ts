@@ -67,6 +67,18 @@ describe("formatFavpollDate", () => {
 })
 
 describe("getFavpollHeadline", () => {
+  it("subject='cause' derives the In support of prefix with no occasion_type or opening line", () => {
+    // Subject-first register derivation (2026-07-13): without it a faceless
+    // cause with an empty opening line fell back to "Honouring".
+    const result = getFavpollHeadline({
+      occasionType: null,
+      openingLine: "",
+      name: "Help the Homeless",
+      subject: "cause",
+    })
+    expect(result.prefix).toBe("In support of")
+  })
+
   it("returns the correct prefix for Birthday occasion_type", () => {
     const result = getFavpollHeadline({
       register: "celebrating_one",

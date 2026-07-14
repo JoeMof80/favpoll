@@ -62,7 +62,7 @@ export default defineConfig({
         storageState: "e2e/.auth/user.json",
       },
       dependencies: ["setup:auth"],
-      testMatch: "**/wizard-publish.spec.ts",
+      testMatch: "**/wizard-publish*.spec.ts",
     },
   ],
 
