@@ -149,7 +149,7 @@ export function NewFavpollWizard({ data }: Props) {
           w.setLoveOpen(o)
           if (!o) setLoveSearch("")
         }}
-        title="Choose a topic"
+        title="Pick a topic"
         hideCloseButton
         header={
           <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export function NewFavpollWizard({ data }: Props) {
           w.setCharityOpen(o)
           if (!o) setCharitySearch("")
         }}
-        title="Choose a charity"
+        title="Pick a charity"
         hideCloseButton
         header={
           <input
