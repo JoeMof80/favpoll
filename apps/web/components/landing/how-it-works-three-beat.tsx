@@ -128,7 +128,7 @@ export function HowItWorksThreeBeat() {
 
             {/* About — last written, front of the deck */}
             <div
-              className={`${DIALOG} top-[13rem] left-14 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
+              className={`${DIALOG} top-[12.25rem] left-14 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
             >
               <p className="mb-1.5 text-sm font-medium text-foreground">
                 About
@@ -261,7 +261,7 @@ export function HowItWorksThreeBeat() {
             {/* Charity + pledge goal — in front, bottom, overlapping the
                 rankings so the goal-reached hover moment stays visible */}
             <div
-              className={`${DIALOG} top-[15.5rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-3`}
+              className={`${DIALOG} top-[14.75rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-3`}
             >
               <div className="flex items-baseline justify-between">
                 <p className="text-sm font-medium text-foreground">
