@@ -61,11 +61,16 @@ export function WatchItHappen() {
 
   return (
     <div className="grid items-center gap-8 lg:grid-cols-3">
-      {/* Brief explanation — the room to its right acts it out */}
-      <p className="max-w-md text-base leading-relaxed text-muted-foreground">
-        Pair your favpoll with a real life occasion and watch it unfold live, on
-        a large display, as guests pledge.
-      </p>
+      {/* Heading + brief explanation — the room to its right acts it out */}
+      <div className="max-w-md">
+        <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
+          Watch it happen
+        </h2>
+        <p className="text-base leading-relaxed text-muted-foreground">
+          Pair your favpoll with a real life occasion and watch it unfold live,
+          on a large display, as guests pledge.
+        </p>
+      </div>
 
       {/* The room: display on the far wall, a guest's phone in the near
           foreground. Depth = scale + perspective + shadow softness. */}

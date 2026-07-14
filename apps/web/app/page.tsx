@@ -136,10 +136,7 @@ export default async function HomePage() {
       <section id="watch" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-2">Live favpoll</SectionEyebrow>
-            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              Watch it happen
-            </h2>
+            <SectionEyebrow className="mb-6">Live favpoll</SectionEyebrow>
           </FadeIn>
           <FadeIn delay={0.1}>
             <WatchItHappen />
