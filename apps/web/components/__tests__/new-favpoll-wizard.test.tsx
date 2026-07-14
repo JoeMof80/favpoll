@@ -101,7 +101,7 @@ describe("NewFavpollWizard — structure", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — step order is Honour → Charity → Love", () => {
-  it("step 2 is Charity (shows 'Choose a charity')", () => {
+  it("step 2 is Charity (shows 'Pick a charity')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
@@ -115,7 +115,7 @@ describe("NewFavpollWizard — step order is Honour → Charity → Love", () =>
     )
   })
 
-  it("step 3 is Love (shows 'Choose a topic')", () => {
+  it("step 3 is Love (shows 'Pick a topic')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     // Honour
     fireEvent.click(screen.getByRole("radio", { name: "He" }))
