@@ -79,7 +79,7 @@ export function HowItWorksThreeBeat() {
               className={`${DIALOG} top-4 left-2 w-60 -rotate-2 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-4`}
             >
               <p className="mb-1.5 text-sm font-medium text-foreground">
-                Choose a charity
+                Pick a charity
               </p>
               <div className="flex items-center gap-2.5">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-sm text-secondary-foreground">
@@ -101,7 +101,7 @@ export function HowItWorksThreeBeat() {
               className={`${DIALOG} top-20 left-10 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
             >
               <p className="mb-1.5 text-sm font-medium text-foreground">
-                Choose a topic
+                Pick a topic
               </p>
               <div className="flex flex-wrap gap-1.5">
                 <Chip readOnly selected size="sm">
@@ -118,7 +118,7 @@ export function HowItWorksThreeBeat() {
 
             {/* Name */}
             <div
-              className={`${DIALOG} top-36 left-4 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
+              className={`${DIALOG} top-[8.25rem] left-4 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
             >
               <p className="mb-1.5 text-sm font-medium text-foreground">Name</p>
               <p className="rounded-lg border border-border px-3 py-2 text-base text-foreground">
