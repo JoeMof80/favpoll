@@ -125,10 +125,7 @@ export default async function HomePage() {
       <section id="anyone" className="w-full scroll-mt-20">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-2">Custom favpoll</SectionEyebrow>
-            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              Create or curate your favpoll
-            </h2>
+            <SectionEyebrow className="mb-6">Custom favpoll</SectionEyebrow>
           </FadeIn>
           <FadeIn delay={0.1}>
             <AnyoneCanAnswer />
