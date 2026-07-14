@@ -182,43 +182,100 @@ export function HowItWorksThreeBeat() {
         </div>
       </Step>
 
-      {/* ── Watch — the poll answering its question, live ── */}
+      {/* ── Watch — the live surfaces, rankings in front ── */}
       <Step step={STEPS[2]}>
         <div
           aria-hidden="true"
-          className={`${VIGNETTE_CARD} h-80 space-y-5 p-5`}
+          className={`${VIGNETTE_CARD} group relative h-80 bg-primary/5`}
           onMouseEnter={() => setWatching(true)}
           onMouseLeave={() => setWatching(false)}
         >
-          <div inert className="space-y-5">
-            <PollHeading topicTitle="Colour" size="md" />
-            <div className="space-y-3">
-              {BARS.map((bar) => {
-                const [pct, amount] = watching ? bar.live : bar.rest
-                return (
-                  <RankingBar
-                    key={bar.label}
-                    label={bar.label}
-                    amount={amount}
-                    widthPercent={pct}
-                    barClassName="transition-all duration-700 ease-out"
-                  />
-                )
-              })}
+          {/* Same deck language as Create: the rankings are the hero card;
+              the favpoll page's sidebar cards peek beneath — everything an
+              organiser gets to watch. */}
+          <div inert className="relative mx-auto h-full w-[22rem]">
+            {/* Rankings — the main card */}
+            <div className={`${DIALOG} top-4 left-2 w-72 -rotate-1`}>
+              <div className="mb-2">
+                <PollHeading topicTitle="Colour" size="sm" />
+              </div>
+              <div className="space-y-2.5">
+                {BARS.map((bar) => {
+                  const [pct, amount] = watching ? bar.live : bar.rest
+                  return (
+                    <RankingBar
+                      key={bar.label}
+                      label={bar.label}
+                      amount={amount}
+                      widthPercent={pct}
+                      barClassName="transition-all duration-700 ease-out"
+                    />
+                  )
+                })}
+              </div>
             </div>
 
-            {/* The pledge goal — the live display's goal-as-milestone moment:
-                on hover the surge tips it over and the bar turns success. */}
-            <div className="border-t border-border pt-3 text-right">
-              <p className="text-lg font-medium text-primary">
-                £{watching ? GOAL.live : GOAL.rest}
+            {/* Countdown peek */}
+            <div
+              className={`${DIALOG} top-[11.75rem] left-0 w-56 rotate-1 motion-safe:group-hover:-translate-x-1 motion-safe:group-hover:rotate-2`}
+            >
+              <p className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+                Poll closes in
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-foreground">
+                {[
+                  ["18", "days"],
+                  ["04", "hr"],
+                  ["36", "min"],
+                ].map(([n, unit]) => (
+                  <span key={unit} className="mr-2.5">
+                    <span className="text-lg font-medium tabular-nums">
+                      {n}
+                    </span>{" "}
+                    <span className="text-[10px] text-muted-foreground">
+                      {unit}
+                    </span>
+                  </span>
+                ))}
+              </p>
+            </div>
+
+            {/* Guest wall peek */}
+            <div
+              className={`${DIALOG} top-[13.75rem] left-8 w-60 -rotate-1 motion-safe:group-hover:translate-y-0.5 motion-safe:group-hover:-rotate-2`}
+            >
+              <p className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+                Guest wall
+              </p>
+              <p className="text-xs text-foreground">
+                Claire <span className="text-muted-foreground">pledged</span>{" "}
+                Purple
+              </p>
+              <p className="text-xs text-foreground">
+                Someone <span className="text-muted-foreground">pledged</span>{" "}
+                Red
+              </p>
+            </div>
+
+            {/* Charity + pledge goal peek — front, so the goal-reached
+                hover moment stays visible */}
+            <div
+              className={`${DIALOG} top-[15.25rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-x-1 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-3`}
+            >
+              <div className="flex items-baseline justify-between">
+                <p className="text-sm font-medium text-foreground">
+                  Marie Curie
+                </p>
+                <p className="text-sm font-medium text-primary">
+                  £{watching ? GOAL.live : GOAL.rest}
+                </p>
+              </div>
+              <p className="text-right text-[10px] text-muted-foreground">
                 {watching
                   ? "raised — goal reached"
                   : `raised of the £${GOAL.amount} goal`}
               </p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ease-out ${
                     watching ? "bg-success" : "bg-primary"
