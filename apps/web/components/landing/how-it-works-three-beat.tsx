@@ -5,24 +5,27 @@
 // already shown by the hero demo, so it is not re-told here.
 //
 // Styled in the wizard triad rail's grammar (icon + tracked uppercase label +
-// muted description) so the landing previews the product: the first screen an
-// organiser meets after "Create a favpoll" is the wizard, whose rail looks
-// exactly like this. Icons are deliberately NOT the rail's Award/Gift/Heart —
-// those are triad-bound (Honour/Charity/Love); these steps get their own.
+// muted description) and stacked VERTICALLY like the rail itself, so the
+// landing previews the product: the first screen an organiser meets after
+// "Create a favpoll" is the wizard, whose rail looks exactly like this.
+// Icons are deliberately NOT the rail's Award/Gift/Heart — those are
+// triad-bound (Honour/Charity/Love); these steps get their own.
 //
-// Each step demonstrates itself with a REAL component in miniature (the hero
+// Each step demonstrates itself with REAL components in miniature (the hero
 // demo's idiom — never screenshots: they rot silently and don't theme):
-//   Create        → the wizard in miniature: triad rail mid-journey + the
-//                    charity card just picked
-//   Share         → a printed table card from the pack (BrandedQR)
-//   It runs itself → the real PollHeading + RankingList over demo data
+//   Create → Belinda's favpoll being assembled: her hero (name, dates,
+//            photo, About — the hero's primitives, statically composed)
+//            beside the charity and topic cards from the wizard
+//   Share  → a printed table card from the pack (BrandedQR)
+//   Watch  → the real PollHeading + RankingList over the same demo data
 import { Activity, PencilLine, QrCode } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { PollHeading } from "@/components/poll-heading"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { RankingList } from "@/components/ranking-list"
 import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
-import { WizardTriadRail } from "@/components/new-favpoll-wizard/wizard-triad-rail"
-import { getWizardCopy } from "@/lib/wizard-copy"
+import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
 import type { Charity, Favourite } from "@favpoll/types"
 
 const STEPS = [
@@ -38,13 +41,14 @@ const STEPS = [
   },
   {
     icon: Activity,
-    label: "It runs itself",
+    label: "Watch",
     body: "Live rankings, a reveal waiting for each guest, and 100% to your charities at close.",
   },
 ]
 
-// Mock rankings for the "It runs itself" vignette — mirrors the hero demo's
-// Belinda · Colour scene so the landing tells one story.
+// ── Demo data — mirrors the hero demo's Belinda · Colour · Marie Curie scene
+// so the landing tells one story throughout. ──────────────────────────────────
+
 const DEMO_ITEMS: Favourite[] = [
   ["Purple", 350, 18],
   ["Blue", 220, 12],
@@ -64,7 +68,6 @@ const DEMO_ITEMS: Favourite[] = [
   created_at: "2026-01-01T00:00:00Z",
 }))
 
-// Marie Curie mirrors the hero demo's Belinda scene — one story throughout.
 const DEMO_CHARITY: Charity = {
   id: "how-demo-charity",
   name: "Marie Curie",
@@ -74,47 +77,85 @@ const DEMO_CHARITY: Charity = {
   created_at: "2026-01-01T00:00:00Z",
 }
 
-const WIZARD_COPY = getWizardCopy("someone")
+const DEMO_ABOUT =
+  "A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved."
+
+const DEMO_TOPIC = {
+  topicId: "how-demo-topic",
+  title: "Colour",
+  isCustom: false,
+  items: [],
+  customLabels: [],
+}
 
 const VIGNETTE_CARD =
   "pointer-events-none select-none overflow-hidden rounded-xl border border-border bg-background"
 
+const noop = () => {}
+
 export function HowItWorksThreeBeat() {
   return (
-    <div className="grid gap-10 md:grid-cols-3 md:gap-8">
-      {/* ── Create ── */}
-      <div className="flex flex-col gap-5">
-        <StepHeader step={STEPS[0]} />
-        {/* The wizard in miniature — the real triad rail mid-journey (Honour
-            done, Charity active) beside the real charity card just picked.
-            The rail hides itself below md (its own responsive rule), leaving
-            the charity card as the mobile vignette. */}
-        <div aria-hidden="true" className={`${VIGNETTE_CARD} relative h-56`}>
-          <div className="flex h-[400px] w-[640px] origin-top-left scale-[0.56]">
-            <div className="w-56 shrink-0">
-              <WizardTriadRail currentStep="charity" copy={WIZARD_COPY} />
+    <div className="flex flex-col gap-14">
+      {/* ── Create — Belinda's favpoll being assembled ── */}
+      <Step step={STEPS[0]}>
+        <div aria-hidden="true" className={`${VIGNETTE_CARD} relative h-64`}>
+          {/* One scaled canvas: her page taking shape on the left, the
+              wizard's charity + topic cards on the right. On mobile the
+              overflow crop leaves the hero as the vignette. */}
+          <div className="grid h-[440px] w-[1240px] origin-top-left scale-[0.62] grid-cols-[1fr_400px] gap-12 px-8">
+            {/* Belinda's hero, static — the real FavpollHero is a live
+                scroll organism (HeroLayout fades the dates and slides the
+                About under its sticky header once the page has scrolled),
+                so the vignette recomposes the same primitives without the
+                choreography: real eyebrow, real avatar, the hero's own type
+                classes. */}
+            <div className="flex items-start gap-6 pt-8">
+              <div className="min-w-0 flex-1">
+                <SectionEyebrow
+                  variant="muted"
+                  className="flex h-8 items-center"
+                >
+                  In memory of
+                </SectionEyebrow>
+                <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-foreground sm:text-5xl">
+                  Belinda Hartley
+                </h1>
+                <p className="mt-2 text-xl font-normal text-primary md:text-2xl">
+                  1945 – 2024
+                </p>
+                <p className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground">
+                  {DEMO_ABOUT}
+                </p>
+              </div>
+              <ProtagonistAvatar
+                name="Belinda Hartley"
+                photoUrl="/demo/belinda.jpg"
+              />
             </div>
-            <div className="flex-1 space-y-3 p-6">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {WIZARD_COPY.charityGuidance}
-              </p>
+            <div className="space-y-4 pt-8">
               <WizardCharityCard
                 charities={[DEMO_CHARITY]}
-                onEdit={() => {}}
-                onRemove={() => {}}
-                onPickAnother={() => {}}
+                onEdit={noop}
+                onRemove={noop}
+                onPickAnother={noop}
+              />
+              <WizardTopicCard
+                topic={DEMO_TOPIC}
+                sortedExistingItems={DEMO_ITEMS}
+                customLabels={[]}
+                showItemsSection
+                onEdit={noop}
+                onRemove={noop}
+                onOpenItemsDialog={noop}
               />
             </div>
           </div>
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
         </div>
-      </div>
+      </Step>
 
-      {/* ── Share ── */}
-      <div className="flex flex-col gap-5">
-        <StepHeader step={STEPS[1]} />
-        {/* A table card from the printable pack (WatchItHappen already shows
-            the bare scan-to-pledge tile — this one reads as print). */}
+      {/* ── Share — a table card from the printable pack ── */}
+      <Step step={STEPS[1]}>
         <div
           aria-hidden="true"
           className={`${VIGNETTE_CARD} flex h-56 items-center justify-center bg-primary/5`}
@@ -130,40 +171,47 @@ export function HowItWorksThreeBeat() {
             <p className="text-[10px] text-muted-foreground">favpoll.com</p>
           </div>
         </div>
-      </div>
+      </Step>
 
-      {/* ── It runs itself ── */}
-      <div className="flex flex-col gap-5">
-        <StepHeader step={STEPS[2]} />
-        <div
-          aria-hidden="true"
-          className={`${VIGNETTE_CARD} h-56 space-y-4 p-5`}
-        >
-          <PollHeading topicTitle="Colour" size="md" />
-          <RankingList
-            initialItems={DEMO_ITEMS}
-            favpollPollId="how-demo"
-            topicId="how-demo-topic"
-          />
+      {/* ── Watch — the poll answering its question, live ── */}
+      <Step step={STEPS[2]}>
+        <div aria-hidden="true" className={`${VIGNETTE_CARD} h-60 p-6`}>
+          <div className="max-w-xl space-y-4">
+            <PollHeading topicTitle="Colour" size="md" />
+            <RankingList
+              initialItems={DEMO_ITEMS}
+              favpollPollId="how-demo"
+              topicId="how-demo-topic"
+            />
+          </div>
         </div>
-      </div>
+      </Step>
     </div>
   )
 }
 
-function StepHeader({ step }: { step: (typeof STEPS)[number] }) {
+function Step({
+  step,
+  children,
+}: {
+  step: (typeof STEPS)[number]
+  children: React.ReactNode
+}) {
   const Icon = step.icon
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-2.5">
-        <Icon className="h-6 w-6 shrink-0 text-primary" />
-        <h3 className="text-lg font-medium tracking-widest text-primary uppercase">
-          {step.label}
-        </h3>
+    <div className="grid items-start gap-5 md:grid-cols-[280px_1fr] md:gap-12">
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2.5">
+          <Icon className="h-6 w-6 shrink-0 text-primary" />
+          <h3 className="text-lg font-medium tracking-widest text-primary uppercase">
+            {step.label}
+          </h3>
+        </div>
+        <p className="pl-8.5 text-sm leading-relaxed text-muted-foreground">
+          {step.body}
+        </p>
       </div>
-      <p className="pl-8.5 text-sm leading-relaxed text-muted-foreground">
-        {step.body}
-      </p>
+      {children}
     </div>
   )
 }
