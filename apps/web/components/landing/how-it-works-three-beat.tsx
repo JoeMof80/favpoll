@@ -19,11 +19,13 @@
 //            iPhone-camera-style detection frame + link pill appear
 //   Watch  → PollHeading + real RankingBars; hover nudges the live standings
 import { useState } from "react"
+import { useReducedMotion } from "framer-motion"
 import { Eye, PencilLine, QrCode } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { Chip } from "@/components/ui/chip"
 import { PollHeading } from "@/components/poll-heading"
 import { RankingBar } from "@/components/ui/ranking-bar"
+import { useTyped } from "@/components/hero-demo-panel/demo-card"
 
 const STEPS = [
   { icon: PencilLine, label: "Create" },
@@ -32,9 +34,9 @@ const STEPS = [
 ]
 
 // Belinda · Colour · Marie Curie — mirrors the hero demo scene so the landing
-// tells one story throughout.
-const DEMO_ABOUT =
-  "A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved."
+// tells one story throughout. The About card carries the signature sentence —
+// the one that sets up the demo's reveal — typed out on hover.
+const ABOUT_SIGNATURE = "She had a signature colour that she loved."
 
 // Watch vignette bars: rest state and the hover nudge (Blue closing in) —
 // widths animate via the bar fill's transition; amounts tick alongside.
@@ -44,6 +46,11 @@ const BARS = [
   { label: "Red", rest: [38, "£165"], live: [40, "£170"] },
   { label: "Green", rest: [28, "£120"], live: [28, "£120"] },
 ] as const
+
+// Rest: £855 of the £900 goal. The hover surge (bars above) sums to £925 —
+// the goal is reached and the bar turns success-green, the live display's
+// goal-as-milestone moment in miniature.
+const GOAL = { amount: 900, rest: 855, live: 925 }
 
 // The card itself keeps pointer events (the hover moments depend on them);
 // its content is wrapped `inert` — unfocusable and untouchable.
@@ -56,6 +63,9 @@ const DIALOG =
 
 export function HowItWorksThreeBeat() {
   const [watching, setWatching] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const reduced = useReducedMotion() ?? false
+  const typedAbout = useTyped(ABOUT_SIGNATURE, creating, reduced, 1600)
 
   return (
     <div className="grid gap-10 md:grid-cols-3 md:gap-8">
@@ -63,12 +73,14 @@ export function HowItWorksThreeBeat() {
       <Step step={STEPS[0]}>
         <div
           aria-hidden="true"
-          className={`${VIGNETTE_CARD} group relative h-72 bg-primary/5`}
+          className={`${VIGNETTE_CARD} group relative h-80 bg-primary/5`}
+          onMouseEnter={() => setCreating(true)}
+          onMouseLeave={() => setCreating(false)}
         >
           <div inert className="absolute inset-0">
             {/* Charity — first pick, back of the deck */}
             <div
-              className={`${DIALOG} top-5 left-5 w-60 -rotate-2 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-4`}
+              className={`${DIALOG} top-3 left-8 w-60 -rotate-2 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-4`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">
                 Choose a charity
@@ -90,7 +102,7 @@ export function HowItWorksThreeBeat() {
 
             {/* Topic */}
             <div
-              className={`${DIALOG} top-16 left-12 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
+              className={`${DIALOG} top-[4.75rem] left-16 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">
                 Choose a topic
@@ -110,7 +122,7 @@ export function HowItWorksThreeBeat() {
 
             {/* Name */}
             <div
-              className={`${DIALOG} top-28 left-7 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
+              className={`${DIALOG} top-[9.5rem] left-10 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">Name</p>
               <p className="rounded-lg border border-border px-3 py-2 text-base text-foreground">
@@ -120,14 +132,21 @@ export function HowItWorksThreeBeat() {
 
             {/* About — last written, front of the deck */}
             <div
-              className={`${DIALOG} top-44 left-14 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
+              className={`${DIALOG} top-[14rem] left-20 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">
                 About
               </p>
-              <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                {DEMO_ABOUT}
-              </p>
+              {/* Typewriter on hover — invisible reserve keeps the height
+                  stable while the visible copy types (the demo's pattern). */}
+              <div className="relative">
+                <p className="invisible text-sm leading-relaxed">
+                  {ABOUT_SIGNATURE}
+                </p>
+                <p className="absolute inset-0 text-sm leading-relaxed text-muted-foreground">
+                  {creating ? typedAbout : ABOUT_SIGNATURE}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -137,11 +156,11 @@ export function HowItWorksThreeBeat() {
       <Step step={STEPS[1]}>
         <div
           aria-hidden="true"
-          className={`${VIGNETTE_CARD} group flex h-72 items-center justify-center bg-primary/5`}
+          className={`${VIGNETTE_CARD} group flex h-80 items-center justify-center bg-primary/5`}
         >
           <div
             inert
-            className="flex -rotate-2 flex-col items-center gap-2.5 rounded-lg border border-border bg-background px-8 py-5 shadow-md transition-transform duration-300 motion-safe:group-hover:rotate-0"
+            className="flex -rotate-2 flex-col items-center gap-3 rounded-lg border border-border bg-background px-9 py-7 shadow-md transition-transform duration-300 motion-safe:group-hover:rotate-0"
           >
             <p className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
               In memory of
@@ -175,13 +194,13 @@ export function HowItWorksThreeBeat() {
       <Step step={STEPS[2]}>
         <div
           aria-hidden="true"
-          className={`${VIGNETTE_CARD} h-72 space-y-5 p-5`}
+          className={`${VIGNETTE_CARD} h-80 space-y-5 p-5`}
           onMouseEnter={() => setWatching(true)}
           onMouseLeave={() => setWatching(false)}
         >
           <div inert className="space-y-5">
             <PollHeading topicTitle="Colour" size="md" />
-            <div className="space-y-4">
+            <div className="space-y-3">
               {BARS.map((bar) => {
                 const [pct, amount] = watching ? bar.live : bar.rest
                 return (
@@ -194,6 +213,29 @@ export function HowItWorksThreeBeat() {
                   />
                 )
               })}
+            </div>
+
+            {/* The pledge goal — the live display's goal-as-milestone moment:
+                on hover the surge tips it over and the bar turns success. */}
+            <div className="border-t border-border pt-3 text-right">
+              <p className="text-lg font-medium text-primary">
+                £{watching ? GOAL.live : GOAL.rest}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {watching
+                  ? "raised — goal reached"
+                  : `raised of the £${GOAL.amount} goal`}
+              </p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${
+                    watching ? "bg-success" : "bg-primary"
+                  }`}
+                  style={{
+                    width: `${Math.min(100, ((watching ? GOAL.live : GOAL.rest) / GOAL.amount) * 100)}%`,
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
