@@ -12,14 +12,18 @@
 //
 // Each step demonstrates itself with a REAL component in miniature (the hero
 // demo's idiom — never screenshots: they rot silently and don't theme):
-//   Create        → the wizard honour step, frozen mid-choice
+//   Create        → the wizard in miniature: triad rail mid-journey + the
+//                    charity card just picked
 //   Share         → a printed table card from the pack (BrandedQR)
-//   It runs itself → the real RankingList over demo data
+//   It runs itself → the real PollHeading + RankingList over demo data
 import { Activity, PencilLine, QrCode } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
-import { HonourStep } from "@/components/favpoll-flow/honour-step"
+import { PollHeading } from "@/components/poll-heading"
 import { RankingList } from "@/components/ranking-list"
-import type { Favourite } from "@favpoll/types"
+import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
+import { WizardTriadRail } from "@/components/new-favpoll-wizard/wizard-triad-rail"
+import { getWizardCopy } from "@/lib/wizard-copy"
+import type { Charity, Favourite } from "@favpoll/types"
 
 const STEPS = [
   {
@@ -60,6 +64,18 @@ const DEMO_ITEMS: Favourite[] = [
   created_at: "2026-01-01T00:00:00Z",
 }))
 
+// Marie Curie mirrors the hero demo's Belinda scene — one story throughout.
+const DEMO_CHARITY: Charity = {
+  id: "how-demo-charity",
+  name: "Marie Curie",
+  description: null,
+  logo_url: null,
+  registered_number: "207994",
+  created_at: "2026-01-01T00:00:00Z",
+}
+
+const WIZARD_COPY = getWizardCopy("someone")
+
 const VIGNETTE_CARD =
   "pointer-events-none select-none overflow-hidden rounded-xl border border-border bg-background"
 
@@ -69,20 +85,26 @@ export function HowItWorksThreeBeat() {
       {/* ── Create ── */}
       <div className="flex flex-col gap-5">
         <StepHeader step={STEPS[0]} />
-        {/* The real wizard step, frozen mid-choice and optically scaled; the
-            crop at the card edge is deliberate — there's more below — and a
-            fade softens the cut. */}
+        {/* The wizard in miniature — the real triad rail mid-journey (Honour
+            done, Charity active) beside the real charity card just picked.
+            The rail hides itself below md (its own responsive rule), leaving
+            the charity card as the mobile vignette. */}
         <div aria-hidden="true" className={`${VIGNETTE_CARD} relative h-56`}>
-          <div className="h-[420px] w-[560px] origin-top-left scale-[0.58] p-6">
-            <HonourStep
-              value={{
-                category: "celebration",
-                grouping: "individual",
-                subject: "someone",
-                pronoun: "she",
-              }}
-              onChange={() => {}}
-            />
+          <div className="flex h-[400px] w-[640px] origin-top-left scale-[0.56]">
+            <div className="w-56 shrink-0">
+              <WizardTriadRail currentStep="charity" copy={WIZARD_COPY} />
+            </div>
+            <div className="flex-1 space-y-3 p-6">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {WIZARD_COPY.charityGuidance}
+              </p>
+              <WizardCharityCard
+                charities={[DEMO_CHARITY]}
+                onEdit={() => {}}
+                onRemove={() => {}}
+                onPickAnother={() => {}}
+              />
+            </div>
           </div>
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
         </div>
@@ -113,7 +135,11 @@ export function HowItWorksThreeBeat() {
       {/* ── It runs itself ── */}
       <div className="flex flex-col gap-5">
         <StepHeader step={STEPS[2]} />
-        <div aria-hidden="true" className={`${VIGNETTE_CARD} h-56 p-5`}>
+        <div
+          aria-hidden="true"
+          className={`${VIGNETTE_CARD} h-56 space-y-4 p-5`}
+        >
+          <PollHeading topicTitle="Colour" size="md" />
           <RankingList
             initialItems={DEMO_ITEMS}
             favpollPollId="how-demo"
