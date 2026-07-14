@@ -60,7 +60,7 @@ export function WatchItHappen() {
   const confirmed = step >= 3
 
   return (
-    <div className="grid items-center gap-8 lg:grid-cols-3">
+    <div className="grid items-center gap-8 lg:grid-cols-2">
       {/* Heading + brief explanation — the room to its right acts it out */}
       <div className="max-w-md">
         <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
@@ -72,15 +72,10 @@ export function WatchItHappen() {
         </p>
       </div>
 
-      {/* The room: display on the far wall, a guest's phone in the near
-          foreground. Depth = scale + perspective + shadow softness. */}
-      <div
-        className="relative h-[22rem] overflow-hidden rounded-xl bg-primary/5 lg:col-span-2"
-        aria-hidden="true"
-      >
-        {/* Floor — grounds the scene */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-primary/10 to-transparent" />
-
+      {/* The stage: display on the far wall, a guest's phone in the near
+          foreground. The section itself is the room (tint + floor gradient
+          + crop edge live on the #watch section wrapper). */}
+      <div className="relative h-[22rem]" aria-hidden="true">
         {/* ── The display, in the distance ── */}
         <div
           className="absolute top-10 right-10 w-[44%] min-w-60 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
@@ -133,7 +128,7 @@ export function WatchItHappen() {
 
         {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-        <div className="absolute -bottom-52 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
+        <div className="absolute -bottom-56 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
           {/* Side buttons */}
           <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
           <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
