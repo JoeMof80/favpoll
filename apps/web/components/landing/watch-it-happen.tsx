@@ -13,7 +13,6 @@
 // Reduced motion: the final frame (goal reached), static.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
-import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
 import { RankingBar } from "@/components/ui/ranking-bar"
 
 const GBP = (n: number) => `£${n}`
@@ -26,25 +25,17 @@ const GOAL = 900
 const STEP_MS = [1600, 1000, 350, 2600, 4600]
 const LAST = STEP_MS.length - 1
 
-const WALL_BASE: GuestWallEntry[] = [
-  {
-    id: "w-claire",
-    name: "Claire",
-    labels: ["Purple"],
-    created_at: new Date(Date.now() - 5 * 60000).toISOString(),
-  },
-]
-
-// Display state per step: [Purple, Blue, Red] bars + running total.
-const BARS: [number, number, number][] = [
-  [350, 220, 165],
-  [350, 220, 165],
-  [350, 220, 165],
-  [350, 270, 165], // Raj's £50 on Blue → £905, goal crossed
-  [370, 270, 165], // Amara's £20 on Purple → £925
+// Display state per step: [Purple, Blue, Red, Green] bars + running total —
+// the bars sum exactly to the total at every step.
+const BARS: [number, number, number, number][] = [
+  [350, 220, 165, 120],
+  [350, 220, 165, 120],
+  [350, 220, 165, 120],
+  [350, 270, 165, 120], // Raj's £50 on Blue → £905, goal crossed
+  [370, 270, 165, 120], // Amara's £20 on Purple → £925
 ]
 const TOTALS = [855, 855, 855, 905, 925]
-const LABELS = ["Purple", "Blue", "Red"] as const
+const LABELS = ["Purple", "Blue", "Red", "Green"] as const
 const PRESETS = ["£5", "£10", "£20", "£50"] as const
 
 export function WatchItHappen() {
@@ -64,36 +55,12 @@ export function WatchItHappen() {
   const total = TOTALS[step]
   const goalReached = total >= GOAL
 
-  const wallEntries: GuestWallEntry[] = [
-    ...(step >= 4
-      ? [
-          {
-            id: "w-amara",
-            name: "Amara",
-            labels: ["Purple"],
-            created_at: new Date().toISOString(),
-          },
-        ]
-      : []),
-    ...(step >= 3
-      ? [
-          {
-            id: "w-raj",
-            name: "Raj",
-            labels: ["Blue"],
-            created_at: new Date().toISOString(),
-          },
-        ]
-      : []),
-    ...WALL_BASE,
-  ]
-
   const amountPicked = step >= 1
   const pledgePressed = step === 2
   const confirmed = step >= 3
 
   return (
-    <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,20rem)_1fr]">
+    <div className="grid items-center gap-8 lg:grid-cols-3">
       {/* Brief explanation — the room to its right acts it out */}
       <p className="max-w-md text-base leading-relaxed text-muted-foreground">
         Pair your favpoll with a real life occasion and watch it unfold live, on
@@ -103,7 +70,7 @@ export function WatchItHappen() {
       {/* The room: display on the far wall, a guest's phone in the near
           foreground. Depth = scale + perspective + shadow softness. */}
       <div
-        className="relative h-96 overflow-hidden rounded-xl bg-primary/5"
+        className="relative h-[27rem] overflow-hidden rounded-xl bg-primary/5 lg:col-span-2"
         aria-hidden="true"
       >
         {/* Floor — grounds the scene */}
@@ -111,21 +78,21 @@ export function WatchItHappen() {
 
         {/* ── The display, in the distance ── */}
         <div
-          className="absolute top-8 left-6 w-[58%] min-w-64 [transform:perspective(1200px)_rotateY(7deg)] rounded-lg border-[6px] border-foreground/75 bg-background p-4 shadow-md"
+          className="absolute top-8 left-8 w-[60%] min-w-64 [transform:perspective(1100px)_rotateY(16deg)_rotateX(1deg)] rounded-lg border-8 border-foreground/80 bg-background p-5 shadow-md"
           style={{ transformOrigin: "left center" }}
         >
-          <p className="truncate text-[9px] font-medium tracking-widest text-primary uppercase">
+          <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
             In memory of Belinda Hartley
           </p>
 
           {/* Telethon strip: total vs goal (fixed-height line — no shift) */}
-          <p className="mt-1 text-lg font-medium text-foreground">
+          <p className="mt-1.5 text-2xl font-medium text-foreground">
             {GBP(total)}{" "}
             <span
               className={
                 goalReached
-                  ? "text-[10px] font-medium text-success"
-                  : "text-[10px] font-normal text-muted-foreground"
+                  ? "text-xs font-medium text-success"
+                  : "text-xs font-normal text-muted-foreground"
               }
             >
               {goalReached
@@ -133,7 +100,7 @@ export function WatchItHappen() {
                 : `of the ${GBP(GOAL)} goal`}
             </span>
           </p>
-          <div className="mt-1 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="mt-1.5 mb-4 h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
               style={{
@@ -143,7 +110,7 @@ export function WatchItHappen() {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             {LABELS.map((label, i) => (
               <RankingBar
                 key={label}
@@ -154,23 +121,22 @@ export function WatchItHappen() {
                 barStyle={{
                   transition: reduced ? "none" : "width 700ms ease-out",
                 }}
-                className="[&_span]:text-xs"
               />
             ))}
           </div>
         </div>
 
-        {/* ── The guest wall, mid-distance beside the screen ── */}
-        <div className="absolute top-10 right-3 hidden w-56 [transform:perspective(1200px)_rotateY(-6deg)_scale(0.92)] opacity-90 md:block lg:right-6">
-          <GuestWall entries={wallEntries} animate maxEntries={3} />
-        </div>
-
-        {/* ── The phone, near — making the pledge ── */}
-        <div className="absolute bottom-[-1.25rem] left-[54%] w-44 -translate-x-1/2 rounded-[2rem] border-[5px] border-foreground/80 bg-background shadow-2xl sm:left-[58%]">
+        {/* ── The phone, near — making the pledge. Cropped at the scene
+            edge (only the top matters); side buttons + island for realism. */}
+        <div className="absolute right-[8%] -bottom-16 h-[26rem] w-52 [transform:perspective(1100px)_rotateY(-14deg)_rotate(3deg)] rounded-[2.75rem] border-[6px] border-foreground/80 bg-background shadow-2xl">
+          {/* Side buttons */}
+          <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
+          <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
+          <div className="absolute top-28 -right-[9px] h-12 w-[3px] rounded-full bg-foreground/80" />
           {/* Island */}
-          <div className="absolute top-2 left-1/2 h-3.5 w-16 -translate-x-1/2 rounded-full bg-foreground/80" />
-          <div className="px-3.5 pt-8 pb-6">
-            <p className="text-center text-[9px] font-medium tracking-widest text-primary uppercase">
+          <div className="absolute top-3 left-1/2 h-[18px] w-20 -translate-x-1/2 rounded-full bg-foreground/80" />
+          <div className="px-4 pt-10 pb-6">
+            <p className="text-center text-[10px] font-medium tracking-widest text-primary uppercase">
               Favourite colour
             </p>
 
