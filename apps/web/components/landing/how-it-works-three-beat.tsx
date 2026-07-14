@@ -58,7 +58,7 @@ const VIGNETTE_CARD =
 
 // Mini overlay-dialog chrome — the wizard's field overlays in miniature.
 const DIALOG =
-  "absolute rounded-xl border border-border bg-background p-4 shadow-lg transition-transform duration-300"
+  "absolute rounded-xl border border-border bg-background p-3 shadow-lg transition-transform duration-300"
 
 export function HowItWorksThreeBeat() {
   const [watching, setWatching] = useState(false)
@@ -71,12 +71,14 @@ export function HowItWorksThreeBeat() {
           aria-hidden="true"
           className={`${VIGNETTE_CARD} group relative h-80 bg-primary/5`}
         >
-          <div inert className="absolute inset-0">
+          {/* Fixed-width canvas, centred — the deck holds its shape at any
+              card width (single-column mobile included). */}
+          <div inert className="relative mx-auto h-full w-[22rem]">
             {/* Charity — first pick, back of the deck */}
             <div
-              className={`${DIALOG} top-3 left-8 w-60 -rotate-2 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-4`}
+              className={`${DIALOG} top-4 left-2 w-60 -rotate-2 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-4`}
             >
-              <p className="mb-2.5 text-sm font-medium text-foreground">
+              <p className="mb-1.5 text-sm font-medium text-foreground">
                 Choose a charity
               </p>
               <div className="flex items-center gap-2.5">
@@ -96,9 +98,9 @@ export function HowItWorksThreeBeat() {
 
             {/* Topic */}
             <div
-              className={`${DIALOG} top-16 left-16 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
+              className={`${DIALOG} top-20 left-10 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
             >
-              <p className="mb-2.5 text-sm font-medium text-foreground">
+              <p className="mb-1.5 text-sm font-medium text-foreground">
                 Choose a topic
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -116,9 +118,9 @@ export function HowItWorksThreeBeat() {
 
             {/* Name */}
             <div
-              className={`${DIALOG} top-[7.75rem] left-10 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
+              className={`${DIALOG} top-36 left-4 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
             >
-              <p className="mb-2.5 text-sm font-medium text-foreground">Name</p>
+              <p className="mb-1.5 text-sm font-medium text-foreground">Name</p>
               <p className="rounded-lg border border-border px-3 py-2 text-base text-foreground">
                 Belinda Hartley
               </p>
@@ -126,9 +128,9 @@ export function HowItWorksThreeBeat() {
 
             {/* About — last written, front of the deck */}
             <div
-              className={`${DIALOG} top-[11.5rem] left-20 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
+              className={`${DIALOG} top-[13rem] left-14 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
             >
-              <p className="mb-2.5 text-sm font-medium text-foreground">
+              <p className="mb-1.5 text-sm font-medium text-foreground">
                 About
               </p>
               {/* Freshly typed: same text-box treatment as the Name card,
