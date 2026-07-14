@@ -40,7 +40,7 @@ type Props = {
 // Types `text` out character by character while `active`; shows full text
 // otherwise. `targetMs` is the rough total duration, so short and long strings
 // both finish in a similar, controlled window.
-export function useTyped(
+function useTyped(
   text: string,
   active: boolean,
   reduced: boolean,

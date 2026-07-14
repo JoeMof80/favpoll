@@ -19,13 +19,11 @@
 //            iPhone-camera-style detection frame + link pill appear
 //   Watch  → PollHeading + real RankingBars; hover nudges the live standings
 import { useState } from "react"
-import { useReducedMotion } from "framer-motion"
 import { Eye, PencilLine, QrCode } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { Chip } from "@/components/ui/chip"
 import { PollHeading } from "@/components/poll-heading"
 import { RankingBar } from "@/components/ui/ranking-bar"
-import { useTyped } from "@/components/hero-demo-panel/demo-card"
 
 const STEPS = [
   { icon: PencilLine, label: "Create" },
@@ -35,7 +33,8 @@ const STEPS = [
 
 // Belinda · Colour · Marie Curie — mirrors the hero demo scene so the landing
 // tells one story throughout. The About card carries the signature sentence —
-// the one that sets up the demo's reveal — typed out on hover.
+// the one that sets up the demo's reveal — shown freshly typed, caret still
+// blinking.
 const ABOUT_SIGNATURE = "She had a signature colour that she loved."
 
 // Watch vignette bars: rest state and the hover nudge (Blue closing in) —
@@ -63,9 +62,6 @@ const DIALOG =
 
 export function HowItWorksThreeBeat() {
   const [watching, setWatching] = useState(false)
-  const [creating, setCreating] = useState(false)
-  const reduced = useReducedMotion() ?? false
-  const typedAbout = useTyped(ABOUT_SIGNATURE, creating, reduced, 1600)
 
   return (
     <div className="grid gap-10 md:grid-cols-3 md:gap-8">
@@ -74,8 +70,6 @@ export function HowItWorksThreeBeat() {
         <div
           aria-hidden="true"
           className={`${VIGNETTE_CARD} group relative h-80 bg-primary/5`}
-          onMouseEnter={() => setCreating(true)}
-          onMouseLeave={() => setCreating(false)}
         >
           <div inert className="absolute inset-0">
             {/* Charity — first pick, back of the deck */}
@@ -102,7 +96,7 @@ export function HowItWorksThreeBeat() {
 
             {/* Topic */}
             <div
-              className={`${DIALOG} top-[4.75rem] left-16 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
+              className={`${DIALOG} top-16 left-16 w-60 rotate-1 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-3`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">
                 Choose a topic
@@ -122,7 +116,7 @@ export function HowItWorksThreeBeat() {
 
             {/* Name */}
             <div
-              className={`${DIALOG} top-[9.5rem] left-10 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
+              className={`${DIALOG} top-[7.75rem] left-10 w-64 -rotate-1 motion-safe:group-hover:-translate-x-3 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:-rotate-3`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">Name</p>
               <p className="rounded-lg border border-border px-3 py-2 text-base text-foreground">
@@ -132,21 +126,17 @@ export function HowItWorksThreeBeat() {
 
             {/* About — last written, front of the deck */}
             <div
-              className={`${DIALOG} top-[14rem] left-20 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
+              className={`${DIALOG} top-[11.5rem] left-20 w-64 rotate-2 motion-safe:group-hover:translate-x-3 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
             >
               <p className="mb-2.5 text-sm font-medium text-foreground">
                 About
               </p>
-              {/* Typewriter on hover — invisible reserve keeps the height
-                  stable while the visible copy types (the demo's pattern). */}
-              <div className="relative">
-                <p className="invisible text-sm leading-relaxed">
-                  {ABOUT_SIGNATURE}
-                </p>
-                <p className="absolute inset-0 text-sm leading-relaxed text-muted-foreground">
-                  {creating ? typedAbout : ABOUT_SIGNATURE}
-                </p>
-              </div>
+              {/* Freshly typed: same text-box treatment as the Name card,
+                  with a blinking caret at the end of the sentence. */}
+              <p className="rounded-lg border border-border px-3 py-2 text-sm leading-relaxed text-foreground">
+                {ABOUT_SIGNATURE}
+                <span className="ml-0.5 inline-block h-[1em] w-0.5 translate-y-[2px] animate-caret-blink bg-foreground" />
+              </p>
             </div>
           </div>
         </div>
