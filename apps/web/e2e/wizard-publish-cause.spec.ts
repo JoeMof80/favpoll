@@ -167,17 +167,12 @@ test.describe("wizard → publish flow (cause)", () => {
       .or(page.locator("[data-radix-dialog-content]"))
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
-    const oneMonthBtn = page
-      .getByRole("button", { name: /1 month/i })
-      .or(page.getByRole("button", { name: /1m/i }))
-    if (await oneMonthBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await oneMonthBtn.click()
-    } else {
-      const presets = closeDateDialog.getByRole("button").filter({
-        hasNotText: /back|cancel|publish|save/i,
-      })
-      await presets.first().click()
-    }
+    // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
+    // exact "In a month" chip — a broad fallback can match calendar internals
+    // and hang on an invisible button.
+    await closeDateDialog
+      .getByRole("button", { name: "In a month", exact: true })
+      .click()
 
     const publishConfirm = closeDateDialog
       .getByRole("button", { name: /^publish$/i })
