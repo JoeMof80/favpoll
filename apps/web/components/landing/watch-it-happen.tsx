@@ -1,19 +1,17 @@
 "use client"
 
-// The live section's artifact: the REAL live display page in miniature — the
-// telethon banner (identity lower-third, the big total against the pledge
-// goal, the QR as the room's call to action) with the rankings and guest wall
-// beneath, inside the browser-style demo frame. A scripted loop lands each
-// pledge on the wall, grows its bar, and ticks the total up the goal bar —
-// the final arrival crosses the goal, the display's goal-as-milestone moment
-// (the poll never stops at goal; the room just celebrates).
+// The live section's artifact: the guest wall and the ranking bars moving
+// TOGETHER, on a scripted loop — a pledge lands on the wall, its bar grows,
+// and the running total climbs the pledge goal in the same beat. The final
+// arrival crosses the goal — the live display's goal-as-milestone moment
+// (the poll never stops at goal; the room just celebrates). Uses the real
+// GuestWall component (the same one the live display and favpoll page
+// render), so the landing demos actual behaviour.
 // Figures match the How It Works Watch card: £855 → £925 over a £900 goal.
 // Reduced motion: the final frame (goal reached), static.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
-import { BrandedQR } from "@/components/branded-qr"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { RankingBar } from "@/components/ui/ranking-bar"
 
 const GBP = (n: number) => `£${n}`
@@ -78,103 +76,74 @@ export function WatchItHappen() {
   const goalReached = total >= GOAL
 
   return (
-    <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,20rem)_1fr]">
-      {/* Brief explanation — the display to its right acts it out */}
+    <div className="grid items-center gap-6 md:grid-cols-3 lg:grid-cols-[1fr_1.1fr_1.1fr]">
+      {/* Brief explanation — the artifacts to its right act it out:
+          a pledge lands on the wall → the rankings and goal move */}
       <p className="max-w-md text-base leading-relaxed text-muted-foreground">
         Pair your favpoll with a real life occasion and watch it unfold live, on
         a large display, as guests pledge.
       </p>
 
-      {/* The live display page in miniature, in the demo browser frame */}
-      <div aria-hidden="true">
-        <div className="flex h-9 shrink-0 items-center gap-1.5 rounded-t-xl border border-b-0 border-border bg-muted px-3.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-          <span className="flex-1 text-center text-xs text-muted-foreground">
-            favpoll.com/live · demo
+      {/* The wall — pledges landing. [&>div]:h-full stretches the card to
+          match the display card so the loop never shifts layout. */}
+      <div className="[&>div]:h-full" aria-hidden="true">
+        <GuestWall entries={wallEntries} animate maxEntries={4} />
+      </div>
+
+      {/* The display — the pledge goal and the bars moving in the same beat */}
+      <div
+        className="h-full space-y-2 rounded-lg border border-border bg-card px-5 py-4"
+        aria-hidden="true"
+      >
+        <p className="flex items-center gap-1.5 text-xs font-medium tracking-widest text-primary uppercase">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
           </span>
-          <span className="w-9" />
-        </div>
-        <div className="rounded-b-xl border border-border bg-background p-5 shadow-lg">
-          {/* ── Telethon banner: identity line, then the action row ── */}
-          <div className="border-b border-border pb-4">
-            <div className="flex min-w-0 items-center gap-3 border-b border-border pb-3">
-              <div className="origin-left scale-[0.6]">
-                <ProtagonistAvatar
-                  name="Belinda Hartley"
-                  photoUrl="/demo/belinda.jpg"
-                />
-              </div>
-              <div className="-ml-4 min-w-0">
-                <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
-                  In memory of
-                </p>
-                <p className="truncate text-xl font-medium tracking-tight text-foreground">
-                  Belinda Hartley
-                </p>
-              </div>
-            </div>
+          Live display
+        </p>
 
-            {/* Action row: goal progress + the room's QR */}
-            <div className="flex items-stretch gap-5 pt-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-[10px] font-medium tracking-widest text-primary uppercase">
-                    Pledge goal
-                  </p>
-                  {goalReached && (
-                    <p className="text-xs font-medium text-success">
-                      Goal reached — every further pledge still counts
-                    </p>
-                  )}
-                </div>
-                <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
-                  <p className="text-2xl font-medium text-foreground">
-                    {GBP(total)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    of {GBP(GOAL)}
-                  </p>
-                </div>
-                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={`h-full rounded-full transition-[width] duration-700 ease-out ${
-                      goalReached ? "bg-success" : "bg-primary"
-                    }`}
-                    style={{
-                      width: `${Math.min(100, (total / GOAL) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="flex shrink-0 flex-col items-center justify-center gap-1">
-                <BrandedQR value="https://favpoll.com" size={64} />
-                <p className="text-[10px] text-muted-foreground">
-                  scan to pledge
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Below the banner: rankings + the wall, moving in one beat ── */}
-          <div className="grid gap-5 pt-4 sm:grid-cols-[1.2fr_1fr]">
-            <div className="space-y-2.5">
-              {LABELS.map((label, i) => (
-                <RankingBar
-                  key={label}
-                  label={label}
-                  amount={GBP(bars[i])}
-                  widthPercent={(bars[i] / MAX) * 100}
-                  barClassName="transition-all duration-700 ease-out"
-                />
-              ))}
-            </div>
-            <div className="[&>div]:h-full">
-              <GuestWall entries={wallEntries} animate maxEntries={3} />
-            </div>
+        {/* The telethon strip: running total against the goal; the last
+            arrival crosses it and the display celebrates (fixed-height
+            line so the loop never shifts layout). */}
+        <div className="border-b border-border pb-2.5">
+          <p className="text-lg font-medium text-foreground">
+            {GBP(total)}{" "}
+            <span
+              className={
+                goalReached
+                  ? "text-xs font-medium text-success"
+                  : "text-xs font-normal text-muted-foreground"
+              }
+            >
+              {goalReached
+                ? "goal reached — every pledge still counts"
+                : `of the ${GBP(GOAL)} goal`}
+            </span>
+          </p>
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
+              style={{
+                width: `${Math.min(100, (total / GOAL) * 100)}%`,
+                transition: reduced ? "none" : "width 700ms ease-out",
+              }}
+            />
           </div>
         </div>
+
+        {LABELS.map((label, i) => (
+          <RankingBar
+            key={label}
+            label={label}
+            amount={GBP(bars[i])}
+            widthPercent={Math.round((bars[i] / MAX) * 100)}
+            barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
+            barStyle={{
+              transition: reduced ? "none" : "width 700ms ease-out",
+            }}
+          />
+        ))}
       </div>
     </div>
   )
