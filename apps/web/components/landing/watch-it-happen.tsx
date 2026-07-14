@@ -133,7 +133,7 @@ export function WatchItHappen() {
 
         {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-        <div className="absolute -bottom-24 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
+        <div className="absolute -bottom-52 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
           {/* Side buttons */}
           <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
           <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
