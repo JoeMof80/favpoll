@@ -5,9 +5,9 @@
 // already shown by the hero demo, so it is not re-told here.
 //
 // Styled in the wizard triad rail's grammar (icon + tracked uppercase label +
-// muted description) and stacked VERTICALLY like the rail itself, so the
-// landing previews the product: the first screen an organiser meets after
-// "Create a favpoll" is the wizard, whose rail looks exactly like this.
+// muted description), three columns, so the landing previews the product: the
+// first screen an organiser meets after "Create a favpoll" is the wizard,
+// whose rail looks exactly like this.
 // Icons are deliberately NOT the rail's Award/Gift/Heart — those are
 // triad-bound (Honour/Charity/Love); these steps get their own.
 //
@@ -95,21 +95,20 @@ const noop = () => {}
 
 export function HowItWorksThreeBeat() {
   return (
-    <div className="flex flex-col gap-14">
+    <div className="grid gap-10 md:grid-cols-3 md:gap-8">
       {/* ── Create — Belinda's favpoll being assembled ── */}
       <Step step={STEPS[0]}>
-        <div aria-hidden="true" className={`${VIGNETTE_CARD} relative h-64`}>
-          {/* One scaled canvas: her page taking shape on the left, the
-              wizard's charity + topic cards on the right. On mobile the
-              overflow crop leaves the hero as the vignette. */}
-          <div className="grid h-[440px] w-[1240px] origin-top-left scale-[0.62] grid-cols-[1fr_400px] gap-12 px-8">
+        <div aria-hidden="true" className={`${VIGNETTE_CARD} relative h-72`}>
+          {/* One scaled canvas: her page taking shape, then the wizard's
+              charity + topic cards, cropped with a fade — there's more. */}
+          <div className="w-[560px] origin-top-left scale-[0.62] space-y-6 p-6">
             {/* Belinda's hero, static — the real FavpollHero is a live
                 scroll organism (HeroLayout fades the dates and slides the
                 About under its sticky header once the page has scrolled),
                 so the vignette recomposes the same primitives without the
                 choreography: real eyebrow, real avatar, the hero's own type
                 classes. */}
-            <div className="flex items-start gap-6 pt-8">
+            <div className="flex items-start gap-6">
               <div className="min-w-0 flex-1">
                 <SectionEyebrow
                   variant="muted"
@@ -117,13 +116,13 @@ export function HowItWorksThreeBeat() {
                 >
                   In memory of
                 </SectionEyebrow>
-                <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-foreground sm:text-5xl">
+                <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight text-foreground">
                   Belinda Hartley
                 </h1>
-                <p className="mt-2 text-xl font-normal text-primary md:text-2xl">
+                <p className="mt-2 text-xl font-normal text-primary">
                   1945 – 2024
                 </p>
-                <p className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground">
+                <p className="mt-4 line-clamp-2 text-base leading-relaxed text-muted-foreground">
                   {DEMO_ABOUT}
                 </p>
               </div>
@@ -132,23 +131,21 @@ export function HowItWorksThreeBeat() {
                 photoUrl="/demo/belinda.jpg"
               />
             </div>
-            <div className="space-y-4 pt-8">
-              <WizardCharityCard
-                charities={[DEMO_CHARITY]}
-                onEdit={noop}
-                onRemove={noop}
-                onPickAnother={noop}
-              />
-              <WizardTopicCard
-                topic={DEMO_TOPIC}
-                sortedExistingItems={DEMO_ITEMS}
-                customLabels={[]}
-                showItemsSection
-                onEdit={noop}
-                onRemove={noop}
-                onOpenItemsDialog={noop}
-              />
-            </div>
+            <WizardCharityCard
+              charities={[DEMO_CHARITY]}
+              onEdit={noop}
+              onRemove={noop}
+              onPickAnother={noop}
+            />
+            <WizardTopicCard
+              topic={DEMO_TOPIC}
+              sortedExistingItems={DEMO_ITEMS}
+              customLabels={[]}
+              showItemsSection
+              onEdit={noop}
+              onRemove={noop}
+              onOpenItemsDialog={noop}
+            />
           </div>
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
         </div>
@@ -158,7 +155,7 @@ export function HowItWorksThreeBeat() {
       <Step step={STEPS[1]}>
         <div
           aria-hidden="true"
-          className={`${VIGNETTE_CARD} flex h-56 items-center justify-center bg-primary/5`}
+          className={`${VIGNETTE_CARD} flex h-72 items-center justify-center bg-primary/5`}
         >
           <div className="flex -rotate-2 flex-col items-center gap-2.5 rounded-lg border border-border bg-background px-8 py-5 shadow-md">
             <p className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -175,15 +172,16 @@ export function HowItWorksThreeBeat() {
 
       {/* ── Watch — the poll answering its question, live ── */}
       <Step step={STEPS[2]}>
-        <div aria-hidden="true" className={`${VIGNETTE_CARD} h-60 p-6`}>
-          <div className="max-w-xl space-y-4">
-            <PollHeading topicTitle="Colour" size="md" />
-            <RankingList
-              initialItems={DEMO_ITEMS}
-              favpollPollId="how-demo"
-              topicId="how-demo-topic"
-            />
-          </div>
+        <div
+          aria-hidden="true"
+          className={`${VIGNETTE_CARD} h-72 space-y-4 p-5`}
+        >
+          <PollHeading topicTitle="Colour" size="md" />
+          <RankingList
+            initialItems={DEMO_ITEMS}
+            favpollPollId="how-demo"
+            topicId="how-demo-topic"
+          />
         </div>
       </Step>
     </div>
@@ -199,7 +197,7 @@ function Step({
 }) {
   const Icon = step.icon
   return (
-    <div className="grid items-start gap-5 md:grid-cols-[280px_1fr] md:gap-12">
+    <div className="flex flex-col gap-5">
       <div className="space-y-1.5">
         <div className="flex items-center gap-2.5">
           <Icon className="h-6 w-6 shrink-0 text-primary" />
