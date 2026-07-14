@@ -78,8 +78,8 @@ export function WatchItHappen() {
 
         {/* ── The display, in the distance ── */}
         <div
-          className="absolute top-8 left-8 w-[60%] min-w-64 [transform:perspective(1100px)_rotateY(16deg)_rotateX(1deg)] rounded-lg border-8 border-foreground/80 bg-background p-5 shadow-md"
-          style={{ transformOrigin: "left center" }}
+          className="absolute top-8 right-8 w-[60%] min-w-64 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-8 border-foreground/80 bg-background p-5 shadow-md"
+          style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
             In memory of Belinda Hartley
@@ -128,15 +128,18 @@ export function WatchItHappen() {
 
         {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-        <div className="absolute right-[8%] -bottom-16 h-[26rem] w-52 [transform:perspective(1100px)_rotateY(-14deg)_rotate(3deg)] rounded-[2.75rem] border-[6px] border-foreground/80 bg-background shadow-2xl">
+        <div
+          className="absolute -bottom-24 left-[5%] h-[28rem] w-64 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl"
+          style={{ transformOrigin: "left bottom" }}
+        >
           {/* Side buttons */}
           <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
           <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
           <div className="absolute top-28 -right-[9px] h-12 w-[3px] rounded-full bg-foreground/80" />
           {/* Island */}
           <div className="absolute top-3 left-1/2 h-[18px] w-20 -translate-x-1/2 rounded-full bg-foreground/80" />
-          <div className="px-4 pt-10 pb-6">
-            <p className="text-center text-[10px] font-medium tracking-widest text-primary uppercase">
+          <div className="px-5 pt-12 pb-6">
+            <p className="text-center text-[11px] font-medium tracking-widest text-primary uppercase">
               Favourite colour
             </p>
 
