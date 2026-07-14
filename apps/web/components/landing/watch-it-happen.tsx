@@ -70,7 +70,7 @@ export function WatchItHappen() {
       {/* The room: display on the far wall, a guest's phone in the near
           foreground. Depth = scale + perspective + shadow softness. */}
       <div
-        className="relative h-[27rem] overflow-hidden rounded-xl bg-primary/5 lg:col-span-2"
+        className="relative h-[22rem] overflow-hidden rounded-xl bg-primary/5 lg:col-span-2"
         aria-hidden="true"
       >
         {/* Floor — grounds the scene */}
@@ -78,7 +78,7 @@ export function WatchItHappen() {
 
         {/* ── The display, in the distance ── */}
         <div
-          className="absolute top-8 right-8 w-[60%] min-w-64 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-8 border-foreground/80 bg-background p-5 shadow-md"
+          className="absolute top-10 right-10 w-[44%] min-w-60 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
           style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
@@ -86,7 +86,7 @@ export function WatchItHappen() {
           </p>
 
           {/* Telethon strip: total vs goal (fixed-height line — no shift) */}
-          <p className="mt-1.5 text-2xl font-medium text-foreground">
+          <p className="mt-1 text-xl font-medium text-foreground">
             {GBP(total)}{" "}
             <span
               className={
@@ -100,7 +100,7 @@ export function WatchItHappen() {
                 : `of the ${GBP(GOAL)} goal`}
             </span>
           </p>
-          <div className="mt-1.5 mb-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
               style={{
@@ -110,7 +110,7 @@ export function WatchItHappen() {
             />
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-1.5 [&_span]:text-xs">
             {LABELS.map((label, i) => (
               <RankingBar
                 key={label}
@@ -128,10 +128,7 @@ export function WatchItHappen() {
 
         {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-        <div
-          className="absolute -bottom-24 left-[5%] h-[28rem] w-64 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl"
-          style={{ transformOrigin: "left bottom" }}
-        >
+        <div className="absolute -bottom-24 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
           {/* Side buttons */}
           <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
           <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
