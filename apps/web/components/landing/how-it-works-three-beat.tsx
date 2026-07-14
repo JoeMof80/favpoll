@@ -238,7 +238,7 @@ export function HowItWorksThreeBeat() {
             </div>
 
             {/* Rankings — the main card, centred */}
-            <div className={`${DIALOG} top-14 left-8 w-72`}>
+            <div className={`${DIALOG} top-14 left-8 w-72 -rotate-1`}>
               <div className="mb-2">
                 <PollHeading topicTitle="Colour" size="sm" />
               </div>
@@ -261,7 +261,7 @@ export function HowItWorksThreeBeat() {
             {/* Charity + pledge goal — in front, bottom, overlapping the
                 rankings so the goal-reached hover moment stays visible */}
             <div
-              className={`${DIALOG} top-[15.5rem] left-16 w-64 rotate-1 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-2`}
+              className={`${DIALOG} top-[15.5rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-3`}
             >
               <div className="flex items-baseline justify-between">
                 <p className="text-sm font-medium text-foreground">
