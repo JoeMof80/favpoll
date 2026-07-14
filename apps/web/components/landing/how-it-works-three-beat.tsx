@@ -190,34 +190,14 @@ export function HowItWorksThreeBeat() {
           onMouseEnter={() => setWatching(true)}
           onMouseLeave={() => setWatching(false)}
         >
-          {/* Same deck language as Create: the rankings are the hero card;
-              the favpoll page's sidebar cards peek beneath — everything an
-              organiser gets to watch. */}
+          {/* Same deck language as Create: the rankings hold the centre;
+              the countdown and guest wall peek from behind at the top
+              corners, and the charity + pledge-goal card sits in front at
+              the bottom — everything an organiser gets to watch. */}
           <div inert className="relative mx-auto h-full w-[22rem]">
-            {/* Rankings — the main card */}
-            <div className={`${DIALOG} top-4 left-2 w-72 -rotate-1`}>
-              <div className="mb-2">
-                <PollHeading topicTitle="Colour" size="sm" />
-              </div>
-              <div className="space-y-2.5">
-                {BARS.map((bar) => {
-                  const [pct, amount] = watching ? bar.live : bar.rest
-                  return (
-                    <RankingBar
-                      key={bar.label}
-                      label={bar.label}
-                      amount={amount}
-                      widthPercent={pct}
-                      barClassName="transition-all duration-700 ease-out"
-                    />
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Countdown peek */}
+            {/* Countdown — peeking from behind, top left */}
             <div
-              className={`${DIALOG} top-[11.75rem] left-0 w-56 rotate-1 motion-safe:group-hover:-translate-x-1 motion-safe:group-hover:rotate-2`}
+              className={`${DIALOG} top-4 left-0 w-56 -rotate-2 motion-safe:group-hover:-translate-x-1 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:-rotate-3`}
             >
               <p className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
                 Poll closes in
@@ -240,9 +220,9 @@ export function HowItWorksThreeBeat() {
               </p>
             </div>
 
-            {/* Guest wall peek */}
+            {/* Guest wall — peeking from behind, top right */}
             <div
-              className={`${DIALOG} top-[13.75rem] left-8 w-60 -rotate-1 motion-safe:group-hover:translate-y-0.5 motion-safe:group-hover:-rotate-2`}
+              className={`${DIALOG} top-3 left-28 w-60 rotate-1 motion-safe:group-hover:translate-x-1 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-2`}
             >
               <p className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
                 Guest wall
@@ -257,10 +237,31 @@ export function HowItWorksThreeBeat() {
               </p>
             </div>
 
-            {/* Charity + pledge goal peek — front, so the goal-reached
-                hover moment stays visible */}
+            {/* Rankings — the main card, centred */}
+            <div className={`${DIALOG} top-14 left-8 w-72`}>
+              <div className="mb-2">
+                <PollHeading topicTitle="Colour" size="sm" />
+              </div>
+              <div className="space-y-2.5">
+                {BARS.map((bar) => {
+                  const [pct, amount] = watching ? bar.live : bar.rest
+                  return (
+                    <RankingBar
+                      key={bar.label}
+                      label={bar.label}
+                      amount={amount}
+                      widthPercent={pct}
+                      barClassName="transition-all duration-700 ease-out"
+                    />
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Charity + pledge goal — in front, bottom, overlapping the
+                rankings so the goal-reached hover moment stays visible */}
             <div
-              className={`${DIALOG} top-[15.25rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-x-1 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-3`}
+              className={`${DIALOG} top-[15.5rem] left-16 w-64 rotate-1 motion-safe:group-hover:translate-y-1 motion-safe:group-hover:rotate-2`}
             >
               <div className="flex items-baseline justify-between">
                 <p className="text-sm font-medium text-foreground">
