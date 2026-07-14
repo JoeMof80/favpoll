@@ -175,25 +175,18 @@ test.describe("wizard → publish flow", () => {
     await expect(publishButton).toBeVisible({ timeout: 10_000 })
     await publishButton.click()
 
-    // CloseDateOverlay opens — preset "2 weeks" or "1 month" is sufficient
+    // CloseDateOverlay opens
     const closeDateDialog = page
       .getByRole("dialog")
       .or(page.locator("[data-radix-dialog-content]"))
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
-    // Pick "1 month" preset (ensures date is set)
-    const oneMonthBtn = page
-      .getByRole("button", { name: /1 month/i })
-      .or(page.getByRole("button", { name: /1m/i }))
-    if (await oneMonthBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await oneMonthBtn.click()
-    } else {
-      // Fallback: pick the first preset button in the overlay
-      const presets = closeDateDialog.getByRole("button").filter({
-        hasNotText: /back|cancel|publish|save/i,
-      })
-      await presets.first().click()
-    }
+    // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
+    // exact "In a month" chip — a broad fallback can match calendar internals
+    // and hang on an invisible button.
+    await closeDateDialog
+      .getByRole("button", { name: "In a month", exact: true })
+      .click()
 
     // Click the "Publish" submit button in the overlay footer
     const publishConfirm = closeDateDialog
