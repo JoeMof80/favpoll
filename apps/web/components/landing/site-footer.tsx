@@ -3,6 +3,7 @@
 // mounting app-wide via the root layout is a follow-up (projector/display
 // routes must opt out).
 import Link from "next/link"
+import { FavpollLogo } from "@/components/favpoll-logo"
 
 const EXPLORE = [
   ["/favpolls", "Favpolls"],
@@ -50,9 +51,9 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.6fr]">
           {/* Brand */}
           <div>
-            <p className="mb-3 text-xl font-medium text-primary">
-              fav<span className="font-normal opacity-70">poll</span>
-            </p>
+            <div className="mb-3">
+              <FavpollLogo />
+            </div>
             <ul
               className="flex items-center gap-4"
               aria-label="favpoll on social media"
