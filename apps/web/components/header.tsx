@@ -46,7 +46,7 @@ export function Header() {
           {/* Desktop nav — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
             <Button asChild variant="ghost" className="text-muted-foreground">
-              <Link href="/rankings">Rankings</Link>
+              <Link href="/rankings">The record</Link>
             </Button>
             <Button asChild variant="ghost" className="text-muted-foreground">
               <Link href="/favpolls">Favpolls</Link>
@@ -95,7 +95,7 @@ export function Header() {
               className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={close}
             >
-              Rankings
+              The record
             </Link>
             <Link
               href="/favpolls"
@@ -113,6 +113,22 @@ export function Header() {
                 Your favpolls
               </Link>
             </Show>
+            {/* The drawer is a mini-sitemap — the rare destinations live
+                here (and in the footer), keeping the desktop header lean. */}
+            <Link
+              href="/charities"
+              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={close}
+            >
+              Charities
+            </Link>
+            <Link
+              href="/about"
+              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={close}
+            >
+              About favpoll
+            </Link>
             <Show when="signed-out">
               <div className="space-y-2 pt-3">
                 <SignInButton>
