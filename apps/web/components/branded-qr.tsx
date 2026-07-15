@@ -8,13 +8,16 @@ import { useEffect, useRef, useState } from "react"
 // it reliably scannable, which matters most on small printed table cards.
 //
 // Client-only: qr-code-styling renders via the DOM, so it's dynamically
-// imported in an effect. Both colours are read from the theme at runtime —
-// modules from --foreground, the heart logo from --primary — so the whole
-// mark stays on-theme (no baked-in hex; the logo SVG is built per render
-// from the resolved token).
+// imported in an effect. Colours are read from the theme at runtime — the
+// modules and the centre logo both take --foreground, so the QR reads as
+// one object and dark mode inverts for free. The logo is the canonical
+// favpoll mark (paths from favpoll-logo.tsx, but solid — the wordmark's
+// 60%-opacity accents wash out at QR sizes), bare on the cleared hole and
+// as large as convention allows — every step of the size ladder up to
+// 0.4 machine-decodes under error-correction level H. No baked-in hex.
 
-const heartSvg = (colour: string) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="298 282 120 109"><path d="M411.349 318.248C414.61 318.248 416.769 315.606 416.769 312.347C413.958 295.602 399.381 282.843 381.828 282.843C372.755 282.843 364.571 286.169 358.303 291.775L355.859 289.769C349.935 285.371 342.545 282.843 334.594 282.843C315.029 282.843 299.169 298.694 299.169 318.248C299.169 327.954 303.08 336.747 309.409 343.142L328.987 362.714C331.292 365.019 335.031 365.019 337.337 362.714C339.643 360.41 339.643 356.674 337.337 354.369L317.758 334.798C313.553 330.526 310.978 324.699 310.978 318.248C310.978 305.212 321.551 294.645 334.594 294.645C340.786 294.645 346.333 296.886 350.427 300.557L358.303 307.622L366.179 300.569C370.332 296.854 375.728 294.645 381.828 294.645C392.827 294.645 402.091 302.168 404.709 312.347C404.709 315.606 408.088 318.248 411.349 318.248Z" fill="${colour}"/><path d="M352.569 335.943C352.569 339.091 355.202 341.643 358.449 341.643H405.489C408.737 341.643 411.369 339.091 411.369 335.943C411.369 332.795 408.737 330.243 405.489 330.243H358.449C355.202 330.243 352.569 332.795 352.569 335.943Z" fill="${colour}" fill-opacity="0.6"/><path d="M352.569 359.643C352.569 362.956 355.211 365.643 358.469 365.643H382.07C385.328 365.643 387.969 362.956 387.969 359.643C387.969 356.329 385.328 353.643 382.07 353.643H358.469C355.211 353.643 352.569 356.329 352.569 359.643Z" fill="${colour}" fill-opacity="0.6"/><path d="M363.969 383.043C363.969 386.357 361.418 389.043 358.269 389.043C355.121 389.043 352.569 386.357 352.569 383.043C352.569 379.729 355.121 377.043 358.269 377.043C361.418 377.043 363.969 379.729 363.969 383.043Z" fill="${colour}" fill-opacity="0.6"/></svg>`
+const logoSvg = (fg: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 22" fill="none"><path d="M13 21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21C11 20.4477 11.4477 20 12 20C12.5523 20 13 20.4477 13 21Z" fill="${fg}"/><path d="M22.8939 7.37611C23.5594 7.37611 24 6.82571 24 6.14676C23.4264 2.65821 20.4515 0 16.8692 0C15.0175 0 13.3473 0.692853 12.0682 1.86083L11.5693 1.44305C10.3604 0.526775 8.85215 0 7.22965 0C3.23683 0 0 3.3024 0 7.37611C0 9.39831 0.798074 11.23 2.08982 12.5624L6.08526 16.6399C6.55582 17.12 7.31874 17.12 7.7893 16.6399C8.25986 16.1598 8.25986 15.3815 7.7893 14.9014L3.79368 10.8241C2.9355 9.93401 2.40988 8.72017 2.40988 7.37611C2.40988 4.6603 4.56777 2.4587 7.22965 2.4587C8.4932 2.4587 9.62539 2.92576 10.4609 3.69046L12.0682 5.16232L13.6756 3.69286C14.5231 2.91899 15.6243 2.4587 16.8692 2.4587C19.1138 2.4587 21.0045 4.0261 21.5387 6.14676C21.5387 6.82571 22.2284 7.37611 22.8939 7.37611Z" fill="${fg}"/><path d="M11 11C11 11.5523 11.5373 12 12.2 12H21.8C22.4627 12 23 11.5523 23 11C23 10.4477 22.4627 10 21.8 10H12.2C11.5373 10 11 10.4477 11 11Z" fill="${fg}"/><path d="M11 16C11 16.5523 11.5223 17 12.1667 17H16.8333C17.4777 17 18 16.5523 18 16C18 15.4477 17.4777 15 16.8333 15H12.1667C11.5223 15 11 15.4477 11 16Z" fill="${fg}"/></svg>`
 
 type Props = {
   value: string
@@ -34,20 +37,13 @@ export function BrandedQR({
   "aria-label": ariaLabel = "QR code",
 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [colors, setColors] = useState<{
-    foreground: string
-    primary: string
-  } | null>(null)
+  const [colors, setColors] = useState<{ foreground: string } | null>(null)
 
   useEffect(() => {
     const resolve = () => {
       const styles = getComputedStyle(document.documentElement)
       const foreground = styles.getPropertyValue("--foreground").trim()
-      const primary = styles.getPropertyValue("--primary").trim()
-      setColors({
-        foreground: foreground || "black",
-        primary: primary || foreground || "black",
-      })
+      setColors({ foreground: foreground || "black" })
     }
     resolve()
     // Re-resolve when the theme class flips (next-themes toggles a class on
@@ -83,10 +79,10 @@ export function BrandedQR({
         cornersDotOptions: { type: "dot", color: colors.foreground },
         ...(logo
           ? {
-              image: `data:image/svg+xml,${encodeURIComponent(heartSvg(colors.primary))}`,
+              image: `data:image/svg+xml,${encodeURIComponent(logoSvg(colors.foreground))}`,
               imageOptions: {
-                imageSize: 0.22,
-                margin: 3,
+                imageSize: 0.4,
+                margin: 2,
                 hideBackgroundDots: true,
               },
             }
