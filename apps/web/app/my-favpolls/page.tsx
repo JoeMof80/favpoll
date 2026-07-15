@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { NewFavpollButton } from "@/components/new-favpoll-button"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OrganizerPageClient } from "./organizer-page-client"
-import type { OrganizerCardFavpoll } from "@/components/organizer-card/utils"
+import type { OrganizerFavpoll } from "@/components/organizer-row/utils"
 
 export const metadata = {
   title: "Your favpolls — favpoll",
@@ -73,7 +73,7 @@ export default async function MyFavpollsPage() {
     favpoll_pots: RawPot | null
   }
 
-  const favpolls: OrganizerCardFavpoll[] = (
+  const favpolls: OrganizerFavpoll[] = (
     (rawFavpolls ?? []) as unknown as RawFavpoll[]
   ).map((ev) => ({
     id: ev.id,
