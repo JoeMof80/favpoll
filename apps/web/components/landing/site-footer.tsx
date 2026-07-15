@@ -3,6 +3,7 @@
 // mounting app-wide via the root layout is a follow-up (projector/display
 // routes must opt out).
 import Link from "next/link"
+import { Show } from "@clerk/nextjs"
 import { FavpollLogo } from "@/components/favpoll-logo"
 
 const EXPLORE = [
@@ -11,12 +12,6 @@ const EXPLORE = [
   ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],
   ["/about", "About favpoll"],
-] as const
-
-const ACCOUNT = [
-  ["/my-favpolls", "My favpolls"],
-  ["/sign-in", "Sign in"],
-  ["/sign-up", "Sign up"],
 ] as const
 
 // Brand glyphs inline (lucide removed brand icons); paths from simple-icons,
@@ -106,16 +101,35 @@ export function SiteFooter() {
               Your account
             </p>
             <ul className="flex flex-col gap-2">
-              {ACCOUNT.map(([href, label]) => (
-                <li key={href}>
+              {/* Auth-aware: sign-in/up are dead links for signed-in users */}
+              <Show when="signed-in">
+                <li>
                   <Link
-                    href={href}
+                    href="/my-favpolls"
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {label}
+                    My favpolls
                   </Link>
                 </li>
-              ))}
+              </Show>
+              <Show when="signed-out">
+                <li>
+                  <Link
+                    href="/sign-in"
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/sign-up"
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Sign up
+                  </Link>
+                </li>
+              </Show>
             </ul>
           </nav>
 
