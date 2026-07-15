@@ -47,6 +47,39 @@ channel (direct email leading with the Gift Aid question, or LinkedIn) rather
 than re-submitting the form. One nudge, not a barrage. If still silent by
 ~17 July, treat the silence as signal and warm the CAF fallback.
 
+### Contact log — trustee route (revised strategy, 11–15 July 2026)
+
+Rather than a cold `sales@` email, the revised plan works the people around
+the Impact Foundation first, keeping the company-side email in reserve:
+
+- **Leo Chandler** — trustee, Goodstack Impact Foundation UK (verified on the
+  Charity Commission register, appointed Nov 2020); early-stage investor.
+  **LinkedIn connection note SENT 11 July 2026** (no reply as of 15 July):
+  > Hi Leo, I'm building favpoll, a UK giving platform, considering Goodstack
+  > and the Impact Foundation as our disbursement rail. I was hoping for your
+  > insight as to whether we're a good fit. Thanks, Joe
+- **Elani Buchan** — trustee since Nov 2023 (verified on the register); ops
+  specialist (fractional COO/Head of Ops at Bondaval; ex-COO Concured;
+  startup + charity crossover background). **LinkedIn connection note SENT
+  15 July 2026**, angled to her operational lens:
+  > Hi Elani, I'm building favpoll, a UK giving platform, hoping to use
+  > Goodstack and the Impact Foundation as our disbursement rail. I'd value
+  > your operational take on whether we're a fit. Thanks, Joe
+- **Josh Radford** — VP of GTM at Goodstack (the "J.R." on the site; email
+  format `{first}@goodstack.io`). Direct email drafted — **ON HOLD** on the
+  founder's word while the trustee notes are in flight. This is the
+  highest-value card: answering exactly this enquiry is his job. Play it at
+  the ~17 July trigger if the trustees stay silent.
+- **Henry Ludlam** — Goodstack team; wave two if all the above are quiet.
+- Remaining trustees (Christina Hallett — chair, Henry Barclay): reserve;
+  don't blanket the board.
+
+Connection notes are private to each recipient, but the board is four people
+— if both trustees reply, say plainly that a couple of trustees were
+approached out of care to get the fit right. The ~17 July trigger now fires
+the **Josh Radford email** first; CAF warming becomes the step after that,
+not the immediate next move.
+
 ### Chase — drafted 10 July 2026
 
 **Email** — to `sales@goodstack.io` (verify the address on goodstack.io;
