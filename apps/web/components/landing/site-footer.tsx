@@ -51,7 +51,9 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.6fr]">
           {/* Brand */}
           <div>
-            <div className="mb-3">
+            {/* Slightly under header scale — the footer wordmark was text-xl
+                to the logo's text-2xl (20/24 ≈ 0.85) */}
+            <div className="mb-3 origin-left scale-[0.85]">
               <FavpollLogo />
             </div>
             <ul
