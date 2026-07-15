@@ -129,13 +129,6 @@ export function Header() {
                 </SignUpButton>
               </div>
             </Show>
-            <Show when="signed-in">
-              <div className="pt-3">
-                <NewFavpollButton className="w-full" onBeforeOpen={close}>
-                  New favpoll
-                </NewFavpollButton>
-              </div>
-            </Show>
           </nav>
         </div>
       )}

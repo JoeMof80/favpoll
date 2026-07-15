@@ -112,7 +112,6 @@ export default async function HomePage() {
       <section id="how" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
             <HowItWorksThreeBeat />
           </FadeIn>
         </div>
@@ -125,9 +124,6 @@ export default async function HomePage() {
       <section id="anyone" className="w-full scroll-mt-20">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-6">Custom favpoll</SectionEyebrow>
-          </FadeIn>
-          <FadeIn delay={0.1}>
             <AnyoneCanAnswer />
           </FadeIn>
         </div>
@@ -145,9 +141,6 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-6">Live favpoll</SectionEyebrow>
-          </FadeIn>
-          <FadeIn delay={0.1}>
             <WatchItHappen />
           </FadeIn>
         </div>
