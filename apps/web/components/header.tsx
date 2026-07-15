@@ -8,7 +8,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
-import { NewFavpollButton } from "@/components/new-favpoll-button"
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -56,7 +55,6 @@ export function Header() {
               <Button asChild variant="ghost" className="text-muted-foreground">
                 <Link href="/my-favpolls">Your favpolls</Link>
               </Button>
-              <NewFavpollButton>New favpoll</NewFavpollButton>
             </Show>
             <Show when="signed-out">
               <SignInButton>
@@ -127,13 +125,6 @@ export function Header() {
                     Sign up
                   </Button>
                 </SignUpButton>
-              </div>
-            </Show>
-            <Show when="signed-in">
-              <div className="pt-3">
-                <NewFavpollButton className="w-full" onBeforeOpen={close}>
-                  New favpoll
-                </NewFavpollButton>
               </div>
             </Show>
           </nav>

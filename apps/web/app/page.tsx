@@ -2,10 +2,10 @@ import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
-import HonourCharityLoveVenn from "@/components/landing/honour-charity-love-venn"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { LandingHero } from "@/components/landing/hero"
+import { HeroTexture } from "@/components/landing/hero-texture"
 import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
 import { WatchItHappen } from "@/components/landing/watch-it-happen"
 import { FadeIn } from "@/components/landing/fade-in"
@@ -112,7 +112,6 @@ export default async function HomePage() {
       <section id="how" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-6">How it works</SectionEyebrow>
             <HowItWorksThreeBeat />
           </FadeIn>
         </div>
@@ -125,23 +124,23 @@ export default async function HomePage() {
       <section id="anyone" className="w-full scroll-mt-20">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-6">Custom favpoll</SectionEyebrow>
-          </FadeIn>
-          <FadeIn delay={0.1}>
             <AnyoneCanAnswer />
           </FadeIn>
         </div>
       </section>
 
-      <section id="watch" className="w-full scroll-mt-20 bg-primary/5">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
+      {/* The section IS the room: full-bleed tint, a floor gradient, and
+          overflow-hidden so the foreground phone crops at the section edge */}
+      <section
+        id="watch"
+        className="relative w-full scroll-mt-20 overflow-hidden bg-primary/5"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
+        />
+        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <SectionEyebrow className="mb-2">Live favpoll</SectionEyebrow>
-            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              Watch it happen
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.1}>
             <WatchItHappen />
           </FadeIn>
         </div>
@@ -168,7 +167,7 @@ export default async function HomePage() {
       {/* ── The record — a principle, not a destination (concept model,
           2026-07). No headline, no tiles, no data claim: one quiet line,
           true from pledge one, and a quiet link to its full home. ── */}
-      <section className="w-full">
+      {/* <section className="w-full">
         <div className="mx-auto w-full max-w-330 px-6 py-10">
           <FadeIn>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
@@ -182,29 +181,23 @@ export default async function HomePage() {
             </p>
           </FadeIn>
         </div>
-      </section>
+      </section> */}
 
-      <section className="w-full border-t border-border">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
+      {/* ── Final CTA: the brand statement on the monogram band, closing
+          the page the way the hero opened it ── */}
+      <section className="relative w-full bg-primary text-primary-foreground">
+        <HeroTexture />
+        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <div className="flex items-center gap-8">
-              <HonourCharityLoveVenn
-                size={120}
-                animate
-                className="hidden shrink-0 opacity-90 sm:block"
-              />
-              <div>
-                <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
-                  {t("landing.subheader")}
-                </h2>
-                <Button asChild size="lg">
-                  <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
-                </Button>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {t("landing.cta.caption")}
-                </p>
-              </div>
-            </div>
+            <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
+              {t("landing.subheader")}
+            </h2>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+            </Button>
+            <p className="mt-3 text-xs opacity-80">
+              {t("landing.cta.caption")}
+            </p>
           </FadeIn>
         </div>
       </section>
