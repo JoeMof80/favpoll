@@ -5,7 +5,6 @@ import Link from "next/link"
 import {
   ChevronDown,
   Clock,
-  Monitor,
   Copy,
   Check,
   ExternalLink,
@@ -30,9 +29,9 @@ type Props = {
 }
 
 // One favpoll as an expandable list row — built for organisers who hold many.
-// Collapsed: identity, countdown, raised, quick guest-link copy. Expanded:
-// the full management surface the old organiser card carried (QR, guest +
-// display links, print pack, listed switch, charity, goal, shared fund).
+// Collapsed: identity, charity, countdown, raised, quick guest-link copy.
+// Expanded: a Share zone (QR + labelled guest/display links + print pack)
+// and a Manage zone (listed switch, goal, shared fund, edit/view).
 export function OrganizerRow({ favpoll }: Props) {
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -126,6 +125,30 @@ export function OrganizerRow({ favpoll }: Props) {
               )}
             </span>
           </span>
+          {charity && (
+            <span className="hidden shrink-0 items-center gap-1.5 md:flex">
+              {charity.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={charity.logo_url}
+                  alt=""
+                  className="h-5 w-5 rounded object-contain"
+                />
+              ) : (
+                <span
+                  className="flex h-5 w-5 items-center justify-center rounded bg-secondary text-[10px] font-medium text-secondary-foreground"
+                  aria-hidden="true"
+                >
+                  {charity.name.charAt(0)}
+                </span>
+              )}
+              <span className="max-w-36 truncate text-xs text-muted-foreground">
+                {charity.name}
+                {favpoll.charities.length > 1 &&
+                  ` +${favpoll.charities.length - 1}`}
+              </span>
+            </span>
+          )}
           <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
             <Clock
               size={12}
@@ -178,94 +201,109 @@ export function OrganizerRow({ favpoll }: Props) {
         </Button>
       </div>
 
-      {/* ── Expanded management panel ── */}
+      {/* ── Expanded management panel: Share zone | Manage zone ── */}
       {expanded && (
-        <div className="grid gap-6 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2 sm:px-6">
-          {/* Share block */}
-          <div className="flex gap-3">
-            <div
-              data-testid="qr-code"
-              className="shrink-0"
-              suppressHydrationWarning
-            >
-              <BrandedQR
-                value={guestUrl}
-                size={96}
-                aria-label="QR code for the guest-facing favpoll page"
-              />
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5">
-              {/* Guest URL (copy lives on the collapsed row) */}
-              <div className="flex items-center gap-1.5">
-                <ExternalLink
-                  size={12}
-                  className="shrink-0 text-muted-foreground"
-                  aria-hidden="true"
+        <div className="grid gap-x-8 gap-y-5 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2 sm:px-6 sm:py-5">
+          {/* Share zone — QR fills the block; labelled link rows beside it */}
+          <div>
+            <p className="mb-3 text-[11px] font-medium tracking-widest text-primary uppercase">
+              Share
+            </p>
+            <div className="flex flex-col gap-4 min-[480px]:flex-row">
+              <div
+                data-testid="qr-code"
+                className="shrink-0"
+                suppressHydrationWarning
+              >
+                <BrandedQR
+                  value={guestUrl}
+                  size={148}
+                  aria-label="QR code for the guest-facing favpoll page"
                 />
-                <span
-                  className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
-                  title={guestUrl}
-                  suppressHydrationWarning
-                >
-                  {guestUrl}
-                </span>
               </div>
-              {/* Display URL */}
-              <div className="flex items-center gap-1.5">
-                <Monitor
-                  size={12}
-                  className="shrink-0 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <span
-                  className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
-                  title={displayUrl}
-                  suppressHydrationWarning
-                >
-                  {displayUrl}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5 shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={handleCopyDisplay}
-                  aria-label="Copy display link"
-                  data-testid="copy-display-button"
-                >
-                  {copiedDisplay ? (
-                    <Check size={12} aria-hidden="true" />
-                  ) : (
-                    <Copy size={12} aria-hidden="true" />
-                  )}
-                </Button>
-              </div>
-              <div className="mt-1 flex gap-2">
-                <Button asChild variant="outline" size="sm" className="flex-1">
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                {/* Guest link */}
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-foreground">
+                    Guest link
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+                      title={guestUrl}
+                      suppressHydrationWarning
+                    >
+                      {guestUrl}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+                      onClick={handleCopyGuest}
+                      aria-label="Copy guest link"
+                      data-testid="copy-guest-url-button"
+                    >
+                      {copiedGuest ? (
+                        <Check size={12} aria-hidden="true" />
+                      ) : (
+                        <Copy size={12} aria-hidden="true" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Guests scan or follow this to pledge.
+                  </p>
+                </div>
+                {/* Display link */}
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-foreground">
+                    Display link
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+                      title={displayUrl}
+                      suppressHydrationWarning
+                    >
+                      {displayUrl}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+                      onClick={handleCopyDisplay}
+                      aria-label="Copy display link"
+                      data-testid="copy-display-button"
+                    >
+                      {copiedDisplay ? (
+                        <Check size={12} aria-hidden="true" />
+                      ) : (
+                        <Copy size={12} aria-hidden="true" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Open on a big screen at the venue.
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm">
                   <a href={`/favpolls/${favpoll.id}/pack`}>
                     <Printer data-icon="inline-start" aria-hidden="true" />
                     Print pack
                   </a>
                 </Button>
-                <Button asChild variant="outline" size="sm" className="flex-1">
-                  <Link href={`/favpolls/${favpoll.id}/edit`}>
-                    <Pencil data-icon="inline-start" aria-hidden="true" />
-                    Edit
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="flex-1">
-                  <Link href={`/favpolls/${favpoll.id}`}>
-                    <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                    View
-                  </Link>
-                </Button>
               </div>
             </div>
           </div>
 
-          {/* Status column: listed switch, charity, goal, shared fund */}
-          <div className="flex flex-col justify-center gap-3">
-            <div className="flex items-center justify-between">
+          {/* Manage zone — visibility, goal, shared fund, page actions */}
+          <div className="flex flex-col gap-4">
+            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
+              Manage
+            </p>
+            <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium">
                   {listed ? "Listed" : "Unlisted"}
@@ -287,32 +325,6 @@ export function OrganizerRow({ favpoll }: Props) {
                 }
               />
             </div>
-
-            {charity && (
-              <div className="flex items-center gap-3">
-                {charity.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={charity.logo_url}
-                    alt={charity.name}
-                    className="h-9 w-9 shrink-0 rounded object-contain"
-                  />
-                ) : (
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary text-sm font-medium text-secondary-foreground"
-                    aria-hidden="true"
-                  >
-                    {charity.name.charAt(0)}
-                  </div>
-                )}
-                <span className="min-w-0 flex-1 truncate text-sm text-foreground">
-                  {charity.name}
-                </span>
-                <span className="shrink-0 text-sm font-medium text-primary">
-                  {formatAmount(favpoll.total_raised)}
-                </span>
-              </div>
-            )}
 
             {favpoll.goal_amount ? (
               <div>
@@ -347,6 +359,21 @@ export function OrganizerRow({ favpoll }: Props) {
                 deposited · {formatAmount(favpoll.pot.total_allocated)} used
               </p>
             )}
+
+            <div className="mt-auto flex gap-2 pt-1">
+              <Button asChild variant="outline" size="sm" className="flex-1">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="flex-1">
+                <Link href={`/favpolls/${favpoll.id}`}>
+                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
+                  View favpoll
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       )}

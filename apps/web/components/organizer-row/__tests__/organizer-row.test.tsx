@@ -111,6 +111,24 @@ describe("OrganizerRow", () => {
       expect(screen.queryByText("Unlisted")).not.toBeInTheDocument()
     })
 
+    it("shows the charity in the collapsed header", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expect(screen.getByText("Age UK")).toBeInTheDocument()
+    })
+
+    it("appends a +n suffix when there are multiple charities", () => {
+      const fp = makeFavpoll()
+      const second = {
+        charity: { ...fp.charities[0].charity, id: "c2", name: "Mind" },
+      }
+      render(
+        <OrganizerRow
+          favpoll={makeFavpoll({ charities: [...fp.charities, second] })}
+        />
+      )
+      expect(screen.getByText(/Age UK \+1/)).toBeInTheDocument()
+    })
+
     it("copies the guest URL from the collapsed row", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       fireEvent.click(screen.getByTestId("copy-guest-button"))
@@ -126,7 +144,7 @@ describe("OrganizerRow", () => {
   })
 
   describe("expansion", () => {
-    it("expands on toggle: QR, listed switch, charity appear", () => {
+    it("expands on toggle: QR and listed switch appear", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
       expect(screen.getByTestId("row-toggle")).toHaveAttribute(
@@ -135,7 +153,15 @@ describe("OrganizerRow", () => {
       )
       expect(screen.getByTestId("qr-svg")).toBeInTheDocument()
       expect(screen.getByRole("switch")).toBeInTheDocument()
-      expect(screen.getByText("Age UK")).toBeInTheDocument()
+    })
+
+    it("offers a second guest-link copy inside the share zone", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expand()
+      fireEvent.click(screen.getByTestId("copy-guest-url-button"))
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining("/favpolls/fp-1")
+      )
     })
 
     it("collapses again on a second toggle", () => {
@@ -271,7 +297,7 @@ describe("OrganizerRow", () => {
   })
 
   describe("edge cases", () => {
-    it("renders without charity block when charities is empty", () => {
+    it("renders without a charity anywhere when charities is empty", () => {
       render(<OrganizerRow favpoll={makeFavpoll({ charities: [] })} />)
       expand()
       expect(screen.getByTestId("organizer-row")).toBeInTheDocument()
