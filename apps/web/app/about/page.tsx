@@ -86,7 +86,7 @@ export default function AboutPage() {
                   <p className="text-base leading-relaxed text-muted-foreground">
                     Every pledge also feeds{" "}
                     <Link
-                      href="/rankings"
+                      href="/record"
                       className="text-primary hover:underline"
                     >
                       the record

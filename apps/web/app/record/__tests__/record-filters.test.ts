@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { filterTopics, sortTopics } from "../rankings-client"
+import { filterTopics, sortTopics } from "../record-client"
 import type { Category, Topic, Favourite } from "@favpoll/types"
 
 type TopicWithItems = Topic & {

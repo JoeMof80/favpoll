@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { RankingsClient } from "./rankings-client"
+import { RankingsClient } from "./record-client"
 import type { Category, Topic, Favourite } from "@favpoll/types"
 
 type TopicWithItems = Topic & {

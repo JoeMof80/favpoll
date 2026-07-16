@@ -8,7 +8,7 @@ import { FavpollLogo } from "@/components/favpoll-logo"
 
 const EXPLORE = [
   ["/favpolls", "Favpolls"],
-  ["/rankings", "The record"],
+  ["/record", "The record"],
   ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],
   ["/about", "About favpoll"],
