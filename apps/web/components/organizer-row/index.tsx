@@ -16,7 +16,6 @@ import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { setFavpollListed } from "@/app/favpolls/[id]/actions"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -39,9 +38,9 @@ const formatPanelDate = (iso: string) =>
 
 // One favpoll as an expandable list row — built for organisers who hold many.
 // Collapsed: identity, charity, countdown, raised, quick guest-link copy.
-// Expanded: a share column (clickable guest/display/edit link rows + QR)
-// and a manage column (listed switch, closing date, pledge count, reveal
-// status, goal, shared fund, print pack).
+// Expanded: a share column (clickable favpoll/edit/live link rows + QR
+// with its print-pack button) and a manage column of uniform
+// label-over-value facts — controls sit under labels at fact weight.
 export function OrganizerRow({ favpoll }: Props) {
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -136,28 +135,22 @@ export function OrganizerRow({ favpoll }: Props) {
             <span className="block truncate text-xs text-muted-foreground">
               {favpoll.opening_line}
             </span>
-            <span className="flex items-center gap-2">
-              <span className="truncate text-sm font-medium text-foreground">
-                {protagonistName}
-              </span>
+            <span className="block truncate text-sm font-medium text-foreground">
+              {protagonistName}
               {/* The triad at a glance: protagonist · topic · charity */}
               {topicTitle && (
-                <Badge
-                  variant="outline"
-                  className="hidden font-normal text-muted-foreground sm:inline-flex"
-                >
-                  {topicTitle}
-                </Badge>
+                <span className="font-normal text-muted-foreground">
+                  {" "}
+                  · {topicTitle}
+                </span>
               )}
               {charity && (
-                <Badge
-                  variant="outline"
-                  className="hidden font-normal text-muted-foreground sm:inline-flex"
-                >
-                  {charity.name}
+                <span className="font-normal text-muted-foreground">
+                  {" "}
+                  · {charity.name}
                   {favpoll.charities.length > 1 &&
                     ` +${favpoll.charities.length - 1}`}
-                </Badge>
+                </span>
               )}
             </span>
           </span>
@@ -336,59 +329,78 @@ export function OrganizerRow({ favpoll }: Props) {
                   </div>
                 </div>
               </div>
-              <div
-                data-testid="qr-code"
-                className="shrink-0"
-                suppressHydrationWarning
-              >
-                <BrandedQR
-                  value={guestUrl}
-                  size={148}
-                  aria-label="QR code for the guest-facing favpoll page"
-                />
+              <div className="flex shrink-0 flex-col gap-2">
+                <div data-testid="qr-code" suppressHydrationWarning>
+                  <BrandedQR
+                    value={guestUrl}
+                    size={148}
+                    aria-label="QR code for the guest-facing favpoll page"
+                  />
+                </div>
+                <Button asChild variant="outline" size="sm" className="w-37">
+                  <a href={`/favpolls/${favpoll.id}/pack`}>
+                    <Printer data-icon="inline-start" aria-hidden="true" />
+                    Print pack
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
 
-          {/* Manage — visibility, at-a-glance details, goal, shared fund,
-              print pack */}
-          <div className="flex flex-col gap-3 sm:order-1">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm font-medium">
-                {listed ? "Listed" : "Unlisted"}
-              </p>
-              <Switch
-                checked={listed}
-                onCheckedChange={handleToggleListed}
-                disabled={listingPending}
-                aria-label={
-                  listed
-                    ? "Listed — click to unlist"
-                    : "Unlisted — click to list"
-                }
-              />
+          {/* Manage — uniform label-over-value facts; the visibility switch
+              sits under its label at the same weight as everything else */}
+          <div className="grid grid-cols-2 content-start gap-x-6 gap-y-4 sm:order-1">
+            <div>
+              <p className="text-xs text-muted-foreground">Visibility</p>
+              <div className="mt-1 flex items-center gap-2">
+                <Switch
+                  checked={listed}
+                  onCheckedChange={handleToggleListed}
+                  disabled={listingPending}
+                  aria-label={
+                    listed
+                      ? "Listed — click to unlist"
+                      : "Unlisted — click to list"
+                  }
+                />
+                <span className="text-sm text-foreground">
+                  {listed ? "Listed" : "Unlisted"}
+                </span>
+              </div>
             </div>
 
-            <div className="text-xs text-muted-foreground">
-              <p>
-                {isClosed ? "Closed" : "Closes"}{" "}
+            <div>
+              <p className="text-xs text-muted-foreground">
+                {isClosed ? "Closed" : "Closes"}
+              </p>
+              <p className="mt-1 text-sm text-foreground">
                 {formatPanelDate(
                   isClosed
                     ? (favpoll.closed_at ?? favpoll.closes_at)
                     : favpoll.closes_at
                 )}
               </p>
-              <p>
-                {favpoll.pledge_count}{" "}
-                {favpoll.pledge_count === 1 ? "pledge" : "pledges"} ·{" "}
-                {favpoll.has_reveal ? "Reveal written" : "No reveal"}
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground">Pledges</p>
+              <p className="mt-1 text-sm text-foreground tabular-nums">
+                {favpoll.pledge_count}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground">Reveal</p>
+              <p className="mt-1 text-sm text-foreground">
+                {favpoll.has_reveal ? "Written" : "None"}
               </p>
             </div>
 
             {favpoll.goal_amount ? (
-              <div>
+              <div className="col-span-2">
+                <p className="text-xs text-muted-foreground">Goal</p>
                 <div
-                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted"
                   role="progressbar"
                   aria-label="Progress towards the pledge goal"
                   aria-valuemin={0}
@@ -405,7 +417,7 @@ export function OrganizerRow({ favpoll }: Props) {
                     }}
                   />
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-sm text-foreground">
                   {formatAmount(favpoll.total_raised)} raised of the{" "}
                   {formatAmount(favpoll.goal_amount)} goal
                 </p>
@@ -413,18 +425,14 @@ export function OrganizerRow({ favpoll }: Props) {
             ) : null}
 
             {favpoll.pot && favpoll.pot.total_deposited > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Shared fund: {formatAmount(favpoll.pot.total_deposited)}{" "}
-                deposited · {formatAmount(favpoll.pot.total_allocated)} used
-              </p>
+              <div className="col-span-2">
+                <p className="text-xs text-muted-foreground">Shared fund</p>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatAmount(favpoll.pot.total_deposited)} deposited ·{" "}
+                  {formatAmount(favpoll.pot.total_allocated)} used
+                </p>
+              </div>
             )}
-
-            <Button asChild variant="outline" size="sm" className="mt-auto">
-              <a href={`/favpolls/${favpoll.id}/pack`}>
-                <Printer data-icon="inline-start" aria-hidden="true" />
-                Print pack
-              </a>
-            </Button>
           </div>
         </div>
       )}

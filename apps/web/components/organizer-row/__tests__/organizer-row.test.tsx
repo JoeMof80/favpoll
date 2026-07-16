@@ -235,28 +235,24 @@ describe("OrganizerRow", () => {
       })
       render(<OrganizerRow favpoll={fp} />)
       expand()
-      expect(screen.getByText(/Closes 12 August 2026/)).toBeInTheDocument()
-      expect(
-        screen.getByText(/12 pledges · Reveal written/)
-      ).toBeInTheDocument()
+      expect(screen.getByText("Closes")).toBeInTheDocument()
+      expect(screen.getByText("12 August 2026")).toBeInTheDocument()
+      expect(screen.getByText("Pledges")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(screen.getByText("Written")).toBeInTheDocument()
     })
 
     it("reports a missing reveal", () => {
       render(<OrganizerRow favpoll={makeFavpoll({ has_reveal: false })} />)
       expand()
-      expect(screen.getByText(/No reveal/)).toBeInTheDocument()
-    })
-
-    it("singularises a single pledge", () => {
-      render(<OrganizerRow favpoll={makeFavpoll({ pledge_count: 1 })} />)
-      expand()
-      expect(screen.getByText(/1 pledge ·/)).toBeInTheDocument()
+      expect(screen.getByText("None")).toBeInTheDocument()
     })
 
     it("shows the shared fund line when the pot has deposits", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
-      expect(screen.getByText(/Shared fund:/)).toBeInTheDocument()
+      expect(screen.getByText("Shared fund")).toBeInTheDocument()
+      expect(screen.getByText(/deposited/)).toBeInTheDocument()
     })
 
     it("hides the shared fund line when the pot is empty", () => {
@@ -268,7 +264,7 @@ describe("OrganizerRow", () => {
         />
       )
       expand()
-      expect(screen.queryByText(/Shared fund:/)).not.toBeInTheDocument()
+      expect(screen.queryByText("Shared fund")).not.toBeInTheDocument()
     })
   })
 
