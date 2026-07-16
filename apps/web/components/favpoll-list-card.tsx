@@ -163,10 +163,7 @@ export function FavpollListCard({
                   className="absolute inset-0 flex items-center justify-center"
                   aria-hidden="true"
                 >
-                  <RevealLockPill
-                    size="sm"
-                    label="Pledge to see how the pledges are landing."
-                  />
+                  <RevealLockPill size="sm" label="Pledge to see the results" />
                 </div>
               </div>
             )}

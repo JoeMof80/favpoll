@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { RankingsClient } from "./rankings-client"
+import { RankingsClient } from "./record-client"
 import type { Category, Topic, Favourite } from "@favpoll/types"
 
 type TopicWithItems = Topic & {
@@ -28,15 +28,10 @@ export default async function RankingsPage() {
     ),
   }))
 
-  const totalPledged = rankedTopics
-    .flatMap((t) => t.favourites)
-    .reduce((sum, i) => sum + i.all_time_pledged, 0)
-
   return (
     <RankingsClient
       categories={(categories ?? []) as Category[]}
       topics={rankedTopics}
-      totalPledged={totalPledged}
     />
   )
 }

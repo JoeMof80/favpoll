@@ -56,7 +56,7 @@ export default async function TopicPage({ params }: Props) {
 
   // All-time bump chart: how this topic's favourites moved across every
   // favpoll, bucketed by week. Established topics only (same threshold as
-  // /rankings) so a sparse topic doesn't show a sparse chart. Ordinal —
+  // /record) so a sparse topic doesn't show a sparse chart. Ordinal —
   // amounts never enter the chart.
   let topicHistory: ReturnType<typeof deriveRankHistory> | null = null
   let bucketDates: string[] = []

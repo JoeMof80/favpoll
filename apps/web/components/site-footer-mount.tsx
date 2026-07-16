@@ -13,7 +13,7 @@ const INCLUDED = [
   /^\/$/, // landing
   /^\/about$/,
   /^\/charities(\/[^/]+)?$/,
-  /^\/rankings$/,
+  /^\/record$/,
   /^\/favpolls$/, // the listing only — not favpolls/[id] or the wizard
 ]
 
