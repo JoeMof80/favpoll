@@ -331,8 +331,8 @@ export default async function FavpollsPage({
                 aria-current={selected ? "page" : undefined}
                 className={
                   selected
-                    ? "inline-flex h-7 shrink-0 items-center rounded-full border border-primary bg-primary px-4 text-sm font-medium text-white"
-                    : "inline-flex h-7 shrink-0 items-center rounded-full border border-border bg-muted px-4 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
+                    ? "inline-flex h-6 shrink-0 items-center rounded-full border border-primary bg-primary px-3 py-1 text-sm font-medium text-white"
+                    : "inline-flex h-6 shrink-0 items-center rounded-full border border-border bg-muted px-3 py-1 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
                 }
               >
                 {label}
