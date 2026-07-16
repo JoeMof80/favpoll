@@ -51,6 +51,7 @@ export function OrganizerRow({ favpoll }: Props) {
   const [listingPending, setListingPending] = useState(false)
   const [copiedGuest, setCopiedGuest] = useState(false)
   const [copiedDisplay, setCopiedDisplay] = useState(false)
+  const [copiedEdit, setCopiedEdit] = useState(false)
 
   // Computed once per render; `typeof window` guard handles SSR pass.
   // URL spans carry suppressHydrationWarning to silence the server/client diff.
@@ -99,6 +100,13 @@ export function OrganizerRow({ favpoll }: Props) {
     navigator.clipboard.writeText(displayUrl).then(() => {
       setCopiedDisplay(true)
       setTimeout(() => setCopiedDisplay(false), 2000)
+    })
+  }
+
+  function handleCopyEdit() {
+    navigator.clipboard.writeText(editUrl).then(() => {
+      setCopiedEdit(true)
+      setTimeout(() => setCopiedEdit(false), 2000)
     })
   }
 
@@ -209,22 +217,22 @@ export function OrganizerRow({ favpoll }: Props) {
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                 {/* favpoll link */}
                 <div className="min-w-0">
-                  <a
-                    href={guestUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    <ExternalLink size={11} aria-hidden="true" />
+                  <p className="text-xs font-medium text-foreground">
                     favpoll link
-                  </a>
+                  </p>
                   <div className="flex items-center gap-1.5">
+                    <ExternalLink
+                      size={11}
+                      className="shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
                     <a
                       href={guestUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
                       title={guestUrl}
+                      data-testid="favpoll-link"
                       suppressHydrationWarning
                     >
                       {guestUrl}
@@ -248,40 +256,59 @@ export function OrganizerRow({ favpoll }: Props) {
                 </div>
                 {/* Edit favpoll link */}
                 <div className="min-w-0">
-                  <Link
-                    href={`/favpolls/${favpoll.id}/edit`}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    <Pencil size={11} aria-hidden="true" />
+                  <p className="text-xs font-medium text-foreground">
                     Edit favpoll link
-                  </Link>
-                  <Link
-                    href={`/favpolls/${favpoll.id}/edit`}
-                    className="block truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-                    title={editUrl}
-                    suppressHydrationWarning
-                  >
-                    {editUrl}
-                  </Link>
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Pencil
+                      size={11}
+                      className="shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <Link
+                      href={`/favpolls/${favpoll.id}/edit`}
+                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+                      title={editUrl}
+                      data-testid="edit-favpoll-link"
+                      suppressHydrationWarning
+                    >
+                      {editUrl}
+                    </Link>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+                      onClick={handleCopyEdit}
+                      aria-label="Copy edit link"
+                      data-testid="copy-edit-button"
+                    >
+                      {copiedEdit ? (
+                        <Check size={12} aria-hidden="true" />
+                      ) : (
+                        <Copy size={12} aria-hidden="true" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 {/* live favpoll link */}
                 <div className="min-w-0">
-                  <a
-                    href={displayUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    <Monitor size={11} aria-hidden="true" />
+                  <p className="text-xs font-medium text-foreground">
                     live favpoll link
-                  </a>
+                  </p>
                   <div className="flex items-center gap-1.5">
+                    <Monitor
+                      size={11}
+                      className="shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
                     <a
                       href={displayUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
                       title={displayUrl}
+                      data-testid="live-favpoll-link"
                       suppressHydrationWarning
                     >
                       {displayUrl}

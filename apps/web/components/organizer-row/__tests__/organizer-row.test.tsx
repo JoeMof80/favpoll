@@ -189,21 +189,45 @@ describe("OrganizerRow", () => {
       )
     })
 
-    it("renders clickable favpoll, edit and live link rows + print pack", () => {
+    it("renders clickable favpoll, edit and live link paths + print pack", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
-      expect(
-        screen.getByRole("link", { name: "favpoll link" })
-      ).toHaveAttribute("href", expect.stringContaining("/favpolls/fp-1"))
-      expect(
-        screen.getByRole("link", { name: "live favpoll link" })
-      ).toHaveAttribute("href", expect.stringContaining("/live/slug-fp-1"))
-      expect(
-        screen.getByRole("link", { name: "Edit favpoll link" })
-      ).toHaveAttribute("href", "/favpolls/fp-1/edit")
+      expect(screen.getByTestId("favpoll-link")).toHaveAttribute(
+        "href",
+        expect.stringContaining("/favpolls/fp-1")
+      )
+      expect(screen.getByTestId("live-favpoll-link")).toHaveAttribute(
+        "href",
+        expect.stringContaining("/live/slug-fp-1")
+      )
+      expect(screen.getByTestId("edit-favpoll-link")).toHaveAttribute(
+        "href",
+        "/favpolls/fp-1/edit"
+      )
       expect(screen.getByRole("link", { name: /Print pack/i })).toHaveAttribute(
         "href",
         "/favpolls/fp-1/pack"
+      )
+    })
+
+    it("row headers are plain text, not links", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expand()
+      for (const header of [
+        "favpoll link",
+        "Edit favpoll link",
+        "live favpoll link",
+      ]) {
+        expect(screen.getByText(header).closest("a")).toBeNull()
+      }
+    })
+
+    it("copies the edit URL", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expand()
+      fireEvent.click(screen.getByTestId("copy-edit-button"))
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining("/favpolls/fp-1/edit")
       )
     })
 
