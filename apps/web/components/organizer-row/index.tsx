@@ -136,22 +136,28 @@ export function OrganizerRow({ favpoll }: Props) {
             <span className="block truncate text-xs text-muted-foreground">
               {favpoll.opening_line}
             </span>
-            <span className="block truncate text-sm font-medium text-foreground">
-              {protagonistName}
-              {topicTitle && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  · {topicTitle}
-                </span>
-              )}
+            <span className="flex items-center gap-2">
+              <span className="truncate text-sm font-medium text-foreground">
+                {protagonistName}
+              </span>
               {/* The triad at a glance: protagonist · topic · charity */}
+              {topicTitle && (
+                <Badge
+                  variant="outline"
+                  className="hidden font-normal text-muted-foreground sm:inline-flex"
+                >
+                  {topicTitle}
+                </Badge>
+              )}
               {charity && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  · {charity.name}
+                <Badge
+                  variant="outline"
+                  className="hidden font-normal text-muted-foreground sm:inline-flex"
+                >
+                  {charity.name}
                   {favpoll.charities.length > 1 &&
                     ` +${favpoll.charities.length - 1}`}
-                </span>
+                </Badge>
               )}
             </span>
           </span>
@@ -216,11 +222,9 @@ export function OrganizerRow({ favpoll }: Props) {
           <div className="sm:order-2">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                {/* favpoll link */}
+                {/* favpoll */}
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground">
-                    favpoll link
-                  </p>
+                  <p className="text-xs font-medium text-foreground">favpoll</p>
                   <div className="flex items-center gap-1.5">
                     <ExternalLink
                       size={11}
@@ -255,10 +259,10 @@ export function OrganizerRow({ favpoll }: Props) {
                     </Button>
                   </div>
                 </div>
-                {/* Edit favpoll link */}
+                {/* Edit favpoll */}
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-foreground">
-                    Edit favpoll link
+                    Edit favpoll
                   </p>
                   <div className="flex items-center gap-1.5">
                     <Pencil
@@ -292,10 +296,10 @@ export function OrganizerRow({ favpoll }: Props) {
                     </Button>
                   </div>
                 </div>
-                {/* live favpoll link */}
+                {/* Live favpoll */}
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-foreground">
-                    live favpoll link
+                    Live favpoll
                   </p>
                   <div className="flex items-center gap-1.5">
                     <Monitor
@@ -365,33 +369,20 @@ export function OrganizerRow({ favpoll }: Props) {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Badge variant="outline">
-                <Clock aria-hidden="true" />
+            <div className="text-xs text-muted-foreground">
+              <p>
                 {isClosed ? "Closed" : "Closes"}{" "}
                 {formatPanelDate(
                   isClosed
                     ? (favpoll.closed_at ?? favpoll.closes_at)
                     : favpoll.closes_at
                 )}
-              </Badge>
-              <Badge variant="outline">
+              </p>
+              <p>
                 {favpoll.pledge_count}{" "}
-                {favpoll.pledge_count === 1 ? "pledge" : "pledges"}
-              </Badge>
-              {favpoll.has_reveal ? (
-                <Badge variant="secondary">
-                  <Check aria-hidden="true" />
-                  Reveal written
-                </Badge>
-              ) : (
-                <Badge
-                  variant="outline"
-                  className="border-dashed text-muted-foreground"
-                >
-                  No reveal
-                </Badge>
-              )}
+                {favpoll.pledge_count === 1 ? "pledge" : "pledges"} ·{" "}
+                {favpoll.has_reveal ? "Reveal written" : "No reveal"}
+              </p>
             </div>
 
             {favpoll.goal_amount ? (
