@@ -42,6 +42,8 @@ function makeFavpoll(
     ],
     poll: { id: "p1", topic: { title: "Colour" } },
     pot: { total_deposited: 50, total_allocated: 10 },
+    pledge_count: 3,
+    has_reveal: true,
     ...overrides,
   }
 }

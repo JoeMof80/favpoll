@@ -2,15 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import {
-  ChevronDown,
-  Clock,
-  Copy,
-  Check,
-  ExternalLink,
-  Printer,
-  Pencil,
-} from "lucide-react"
+import { ChevronDown, Clock, Copy, Check, Printer, Pencil } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
@@ -28,10 +20,18 @@ type Props = {
   favpoll: OrganizerFavpoll
 }
 
+const formatPanelDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+
 // One favpoll as an expandable list row — built for organisers who hold many.
 // Collapsed: identity, charity, countdown, raised, quick guest-link copy.
-// Expanded: a Share zone (QR + labelled guest/display links + print pack)
-// and a Manage zone (listed switch, goal, shared fund, edit/view).
+// Expanded: a share column (clickable guest/display/edit link rows + QR)
+// and a manage column (listed switch, closing date, pledge count, reveal
+// status, goal, shared fund, print pack).
 export function OrganizerRow({ favpoll }: Props) {
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -191,23 +191,31 @@ export function OrganizerRow({ favpoll }: Props) {
           get the links on top; sm:order swaps the columns on desktop. ── */}
       {expanded && (
         <div className="grid gap-x-8 gap-y-5 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2 sm:px-6 sm:py-5">
-          {/* Share — labelled link rows, QR on the outer edge */}
+          {/* Share — clickable link rows, QR on the outer edge */}
           <div className="sm:order-2">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                 {/* Guest link */}
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground">
+                  <a
+                    href={guestUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-medium text-foreground hover:text-primary hover:underline"
+                  >
                     Guest link
-                  </p>
+                  </a>
                   <div className="flex items-center gap-1.5">
-                    <span
-                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+                    <a
+                      href={guestUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
                       title={guestUrl}
                       suppressHydrationWarning
                     >
                       {guestUrl}
-                    </span>
+                    </a>
                     <Button
                       type="button"
                       variant="ghost"
@@ -230,17 +238,25 @@ export function OrganizerRow({ favpoll }: Props) {
                 </div>
                 {/* Display link */}
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground">
+                  <a
+                    href={displayUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-medium text-foreground hover:text-primary hover:underline"
+                  >
                     Display link
-                  </p>
+                  </a>
                   <div className="flex items-center gap-1.5">
-                    <span
-                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+                    <a
+                      href={displayUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
                       title={displayUrl}
                       suppressHydrationWarning
                     >
                       {displayUrl}
-                    </span>
+                    </a>
                     <Button
                       type="button"
                       variant="ghost"
@@ -261,12 +277,19 @@ export function OrganizerRow({ favpoll }: Props) {
                     Open on a big screen at the venue.
                   </p>
                 </div>
-                <Button asChild variant="outline" size="sm">
-                  <a href={`/favpolls/${favpoll.id}/pack`}>
-                    <Printer data-icon="inline-start" aria-hidden="true" />
-                    Print pack
-                  </a>
-                </Button>
+                {/* Edit link */}
+                <div className="min-w-0">
+                  <Link
+                    href={`/favpolls/${favpoll.id}/edit`}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
+                  >
+                    <Pencil size={11} aria-hidden="true" />
+                    Edit favpoll
+                  </Link>
+                  <p className="text-[11px] text-muted-foreground">
+                    Change details, charities or the closing date.
+                  </p>
+                </div>
               </div>
               <div
                 data-testid="qr-code"
@@ -282,7 +305,8 @@ export function OrganizerRow({ favpoll }: Props) {
             </div>
           </div>
 
-          {/* Manage — visibility, stacked page actions, goal, shared fund */}
+          {/* Manage — visibility, at-a-glance details, goal, shared fund,
+              print pack */}
           <div className="flex flex-col gap-3 sm:order-1">
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
@@ -307,19 +331,27 @@ export function OrganizerRow({ favpoll }: Props) {
               />
             </div>
 
-            <div className="flex flex-col gap-2 pt-1">
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/favpolls/${favpoll.id}`}>
-                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                  View favpoll
-                </Link>
-              </Button>
+            <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+              <p>
+                <span className="font-medium text-foreground">
+                  {isClosed ? "Closed" : "Closes"}
+                </span>{" "}
+                {formatPanelDate(
+                  isClosed
+                    ? (favpoll.closed_at ?? favpoll.closes_at)
+                    : favpoll.closes_at
+                )}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Pledges</span>{" "}
+                {favpoll.pledge_count}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Reveal</span>{" "}
+                {favpoll.has_reveal
+                  ? "written — shared after each pledge"
+                  : "none yet"}
+              </p>
             </div>
 
             {favpoll.goal_amount ? (
@@ -355,6 +387,13 @@ export function OrganizerRow({ favpoll }: Props) {
                 deposited · {formatAmount(favpoll.pot.total_allocated)} used
               </p>
             )}
+
+            <Button asChild variant="outline" size="sm" className="mt-auto">
+              <a href={`/favpolls/${favpoll.id}/pack`}>
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                Print pack
+              </a>
+            </Button>
           </div>
         </div>
       )}

@@ -64,6 +64,8 @@ function makeFavpoll(
     ],
     poll: { id: "p1", topic: { title: "Colour" } },
     pot: { total_deposited: 50, total_allocated: 10 },
+    pledge_count: 3,
+    has_reveal: true,
     ...overrides,
   }
 }
@@ -187,21 +189,44 @@ describe("OrganizerRow", () => {
       )
     })
 
-    it("links to print pack, edit and view", () => {
+    it("renders clickable guest, display and edit link rows + print pack", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
+      expect(screen.getByRole("link", { name: "Guest link" })).toHaveAttribute(
+        "href",
+        expect.stringContaining("/favpolls/fp-1")
+      )
+      expect(
+        screen.getByRole("link", { name: "Display link" })
+      ).toHaveAttribute("href", expect.stringContaining("/live/slug-fp-1"))
+      expect(
+        screen.getByRole("link", { name: /Edit favpoll/i })
+      ).toHaveAttribute("href", "/favpolls/fp-1/edit")
       expect(screen.getByRole("link", { name: /Print pack/i })).toHaveAttribute(
         "href",
         "/favpolls/fp-1/pack"
       )
-      expect(screen.getByRole("link", { name: /Edit/i })).toHaveAttribute(
-        "href",
-        "/favpolls/fp-1/edit"
-      )
-      expect(screen.getByRole("link", { name: /View/i })).toHaveAttribute(
-        "href",
-        "/favpolls/fp-1"
-      )
+    })
+
+    it("shows closing date, pledge count and reveal status", () => {
+      const fp = makeFavpoll({
+        closes_at: "2026-08-12T17:00:00Z",
+        pledge_count: 12,
+        has_reveal: true,
+      })
+      render(<OrganizerRow favpoll={fp} />)
+      expand()
+      expect(screen.getByText("12 August 2026")).toBeInTheDocument()
+      expect(screen.getByText("12")).toBeInTheDocument()
+      expect(
+        screen.getByText(/written — shared after each pledge/)
+      ).toBeInTheDocument()
+    })
+
+    it("reports a missing reveal", () => {
+      render(<OrganizerRow favpoll={makeFavpoll({ has_reveal: false })} />)
+      expand()
+      expect(screen.getByText(/none yet/)).toBeInTheDocument()
     })
 
     it("shows the shared fund line when the pot has deposits", () => {

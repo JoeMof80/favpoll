@@ -27,6 +27,8 @@ export type OrganizerFavpoll = {
   }[]
   poll: { id: string; topic: { title: string } | null } | null
   pot: { total_deposited: number; total_allocated: number } | null
+  pledge_count: number
+  has_reveal: boolean
 }
 
 export type StatusFilter = "all" | "active" | "closed"
