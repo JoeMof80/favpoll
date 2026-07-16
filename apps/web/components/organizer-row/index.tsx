@@ -16,6 +16,7 @@ import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { setFavpollListed } from "@/app/favpolls/[id]/actions"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -349,16 +350,9 @@ export function OrganizerRow({ favpoll }: Props) {
               print pack */}
           <div className="flex flex-col gap-3 sm:order-1">
             <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-medium">
-                  {listed ? "Listed" : "Unlisted"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {listed
-                    ? "Appears on the public favpolls page."
-                    : "Only reachable by people you give the link to."}
-                </p>
-              </div>
+              <p className="text-sm font-medium">
+                {listed ? "Listed" : "Unlisted"}
+              </p>
               <Switch
                 checked={listed}
                 onCheckedChange={handleToggleListed}
@@ -371,27 +365,33 @@ export function OrganizerRow({ favpoll }: Props) {
               />
             </div>
 
-            <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-              <p>
-                <span className="font-medium text-foreground">
-                  {isClosed ? "Closed" : "Closes"}
-                </span>{" "}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline">
+                <Clock aria-hidden="true" />
+                {isClosed ? "Closed" : "Closes"}{" "}
                 {formatPanelDate(
                   isClosed
                     ? (favpoll.closed_at ?? favpoll.closes_at)
                     : favpoll.closes_at
                 )}
-              </p>
-              <p>
-                <span className="font-medium text-foreground">Pledges</span>{" "}
-                {favpoll.pledge_count}
-              </p>
-              <p>
-                <span className="font-medium text-foreground">Reveal</span>{" "}
-                {favpoll.has_reveal
-                  ? "written — shared after each pledge"
-                  : "none yet"}
-              </p>
+              </Badge>
+              <Badge variant="outline">
+                {favpoll.pledge_count}{" "}
+                {favpoll.pledge_count === 1 ? "pledge" : "pledges"}
+              </Badge>
+              {favpoll.has_reveal ? (
+                <Badge variant="secondary">
+                  <Check aria-hidden="true" />
+                  Reveal written
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="border-dashed text-muted-foreground"
+                >
+                  No reveal
+                </Badge>
+              )}
             </div>
 
             {favpoll.goal_amount ? (
