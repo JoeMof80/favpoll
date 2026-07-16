@@ -5,6 +5,7 @@ import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
+import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
 import type { PublicStatusFilter } from "./list-utils"
 
@@ -385,6 +386,7 @@ export default async function FavpollsPage({
           />
         )}
       </div>
+      <NewFavpollFab />
     </main>
   )
 }

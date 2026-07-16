@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import Link from "next/link"
 import { Chip } from "@/components/ui/chip"
 import { ListControls } from "@/components/list-controls"
+import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import type { Category, Topic, Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollResults } from "@/components/favpoll-card/poll-results"
@@ -17,7 +18,6 @@ type TopicWithItems = Topic & {
 type Props = {
   categories: Category[]
   topics: TopicWithItems[]
-  totalPledged: number
 }
 
 function formatAmount(amount: number): string {
@@ -144,7 +144,7 @@ export function sortTopics(
   return sorted
 }
 
-export function RankingsClient({ categories, topics, totalPledged }: Props) {
+export function RankingsClient({ categories, topics }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<RecordSortKey>("az")
@@ -199,20 +199,6 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
       </div>
 
       <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
-        <div className="mb-8">
-          <h1 className="text-2xl font-medium text-foreground">The record</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Every pledge ever made, across every favpoll.
-            {totalPledged > 0 && (
-              <> {formatAmount(totalPledged)} raised in total.</>
-            )}
-          </p>
-          <p className="mt-2 max-w-2xl text-xs text-muted-foreground">
-            Amounts are amounts — every pledge counts in full. We always show
-            how many pledges stand behind a total, so the record stays honest.
-          </p>
-        </div>
-
         <ListControls
           className="mb-8"
           search={search}
@@ -264,6 +250,7 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
             )}
           </div>
         )}
+        <NewFavpollFab />
       </main>
     </>
   )

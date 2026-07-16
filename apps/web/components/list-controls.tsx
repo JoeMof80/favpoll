@@ -1,6 +1,5 @@
 "use client"
 
-import { ArrowUpDown, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 
@@ -51,13 +50,13 @@ export function ListControls({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder={searchPlaceholder}
-        className="max-w-xs rounded-full"
+        className="max-w-xs"
         aria-label={searchLabel}
       />
 
       {segments && segments.length > 0 && (
         <div
-          className="flex items-center rounded-full border border-border bg-background p-0.5"
+          className="flex items-center rounded-lg border border-border bg-background p-0.5"
           role="group"
           aria-label={segmentsLabel}
         >
@@ -67,7 +66,7 @@ export function ListControls({
               type="button"
               onClick={() => onSegmentChange?.(opt.value)}
               className={cn(
-                "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+                "rounded-md px-3 py-1 text-sm font-medium transition-colors",
                 segmentValue === opt.value
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:text-foreground"
@@ -81,30 +80,18 @@ export function ListControls({
       )}
 
       {sortOptions && sortOptions.length > 0 && (
-        <span className="relative inline-flex items-center">
-          <ArrowUpDown
-            size={13}
-            className="pointer-events-none absolute left-3 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <select
-            value={sortValue}
-            onChange={(e) => onSortChange?.(e.target.value)}
-            className="appearance-none rounded-full border border-border bg-background py-1.5 pr-8 pl-8 text-sm font-medium text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-            aria-label="Sort by"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={14}
-            className="pointer-events-none absolute right-3 text-muted-foreground"
-            aria-hidden="true"
-          />
-        </span>
+        <select
+          value={sortValue}
+          onChange={(e) => onSortChange?.(e.target.value)}
+          className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+          aria-label="Sort by"
+        >
+          {sortOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       )}
 
       <p className="ml-auto text-xs text-muted-foreground">
