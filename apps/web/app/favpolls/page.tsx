@@ -312,37 +312,46 @@ export default async function FavpollsPage({
     return { ...fp, poll }
   })
 
-  return (
-    <main className="bg-muted">
-      {/* Register rail — the record's category rail, for occasions. Sticky
-          beneath the header (h-14); link-driven so the server keeps doing
-          the filtering and the exemplar fallback. */}
-      <div className="sticky top-14 z-30 border-b border-border bg-background">
-        <div
-          className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 py-2"
-          aria-label="Filter by occasion"
-        >
-          {REGISTER_RAIL.map(({ value, label }) => {
-            const selected = activeRegister === value
-            return (
-              <Link
-                key={label}
-                href={value ? `/favpolls?register=${value}` : "/favpolls"}
-                aria-current={selected ? "page" : undefined}
-                className={
-                  selected
-                    ? "inline-flex h-6 shrink-0 items-center rounded-full border border-primary bg-primary px-3 py-1 text-sm font-medium text-white"
-                    : "inline-flex h-6 shrink-0 items-center rounded-full border border-border bg-muted px-3 py-1 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
-                }
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </div>
-      </div>
+  // Register rail — the record's category rail, for occasions. Link-driven
+  // so the server keeps doing the filtering and the exemplar fallback.
+  const rail = (
+    <div
+      className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 py-2"
+      aria-label="Filter by occasion"
+    >
+      {REGISTER_RAIL.map(({ value, label }) => {
+        const selected = activeRegister === value
+        return (
+          <Link
+            key={label}
+            href={value ? `/favpolls?register=${value}` : "/favpolls"}
+            aria-current={selected ? "page" : undefined}
+            className={
+              selected
+                ? "inline-flex h-6 shrink-0 items-center rounded-full border border-primary bg-primary px-3 py-1 text-sm font-medium text-white"
+                : "inline-flex h-6 shrink-0 items-center rounded-full border border-border bg-muted px-3 py-1 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
+            }
+          >
+            {label}
+          </Link>
+        )
+      })}
+    </div>
+  )
 
-      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
+  return (
+    <main className="min-h-screen bg-muted">
+      {showingExemplars && (
+        <div className="sticky top-14 z-30 border-b border-border bg-background">
+          {rail}
+        </div>
+      )}
+
+      <div
+        className={
+          showingExemplars ? "mx-auto max-w-330 px-4 pt-8 pb-16" : undefined
+        }
+      >
         {activeOccasionType && (
           <div className="mb-6 flex items-center gap-1.5">
             <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
@@ -379,6 +388,7 @@ export default async function FavpollsPage({
           </>
         ) : (
           <FavpollsListClient
+            rail={rail}
             favpolls={cardFavpolls}
             clerkUserId={userId}
             initialResultsByPollId={Object.fromEntries(pledgedResultsByPollId)}

@@ -50,7 +50,7 @@ export function ListControls({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder={searchPlaceholder}
-        className="max-w-xs"
+        className="max-w-xs bg-muted"
         aria-label={searchLabel}
       />
 

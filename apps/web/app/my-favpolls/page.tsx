@@ -107,11 +107,11 @@ export default async function MyFavpollsPage() {
   }))
 
   return (
-    <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
+    <main className="min-h-screen bg-muted">
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (
-        <div className="mt-16 text-center">
+        <div className="mx-auto max-w-330 px-4 pt-24 pb-16 text-center">
           <p className="text-sm text-muted-foreground">
             You haven&apos;t created any favpolls yet.
           </p>

@@ -163,8 +163,9 @@ export function RankingsClient({ categories, topics }: Props) {
   )
 
   return (
-    <>
-      {/* Category filter bar — sticky beneath the header (header is h-14 = 3.5rem) */}
+    <main className="min-h-screen bg-muted">
+      {/* One sticky band: category rail + the list controls — everything
+          that narrows the list lives together (header is h-14 = 3.5rem) */}
       <div className="sticky top-14 z-30 border-b border-border bg-background">
         <div
           ref={tabsRef}
@@ -196,22 +197,22 @@ export function RankingsClient({ categories, topics }: Props) {
             </Chip>
           ))}
         </div>
+        <div className="mx-auto max-w-330 px-4 pb-2">
+          <ListControls
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Search topics or favourites…"
+            searchLabel="Search the record"
+            sortOptions={SORT_OPTIONS}
+            sortValue={sort}
+            onSortChange={(v) => setSort(v as RecordSortKey)}
+            shown={visibleTopics.length}
+            total={topics.length}
+          />
+        </div>
       </div>
 
-      <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
-        <ListControls
-          className="mb-8"
-          search={search}
-          onSearchChange={setSearch}
-          searchPlaceholder="Search topics or favourites…"
-          searchLabel="Search the record"
-          sortOptions={SORT_OPTIONS}
-          sortValue={sort}
-          onSortChange={(v) => setSort(v as RecordSortKey)}
-          shown={visibleTopics.length}
-          total={topics.length}
-        />
-
+      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
         {visibleTopics.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No topics match here yet.
@@ -250,8 +251,8 @@ export function RankingsClient({ categories, topics }: Props) {
             )}
           </div>
         )}
-        <NewFavpollFab />
-      </main>
-    </>
+      </div>
+      <NewFavpollFab />
+    </main>
   )
 }

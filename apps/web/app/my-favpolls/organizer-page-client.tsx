@@ -35,37 +35,43 @@ export function OrganizerPageClient({ favpolls }: Props) {
 
   return (
     <>
-      <ListControls
-        className="mb-6"
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search by name or topic…"
-        searchLabel="Search your favpolls"
-        segments={STATUS_OPTIONS}
-        segmentValue={status}
-        onSegmentChange={(v) => setStatus(v as StatusFilter)}
-        sortOptions={SORT_OPTIONS}
-        sortValue={sort}
-        onSortChange={(v) => setSort(v as SortKey)}
-        shown={displayed.length}
-        total={favpolls.length}
-      />
+      {/* The list-page sticky band — controls only; no rail here */}
+      <div className="sticky top-14 z-30 border-b border-border bg-background">
+        <div className="mx-auto max-w-330 px-4 py-2">
+          <ListControls
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Search by name or topic…"
+            searchLabel="Search your favpolls"
+            segments={STATUS_OPTIONS}
+            segmentValue={status}
+            onSegmentChange={(v) => setStatus(v as StatusFilter)}
+            sortOptions={SORT_OPTIONS}
+            sortValue={sort}
+            onSortChange={(v) => setSort(v as SortKey)}
+            shown={displayed.length}
+            total={favpolls.length}
+          />
+        </div>
+      </div>
 
-      {/* Row list */}
-      {displayed.length > 0 ? (
-        <ul
-          className="divide-y divide-border rounded-xl border border-border bg-background"
-          role="list"
-        >
-          {displayed.map((fp) => (
-            <OrganizerRow key={fp.id} favpoll={fp} />
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-16 text-center text-sm text-muted-foreground">
-          No favpolls match this filter.
-        </p>
-      )}
+      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
+        {/* Row list */}
+        {displayed.length > 0 ? (
+          <ul
+            className="divide-y divide-border rounded-xl border border-border bg-background"
+            role="list"
+          >
+            {displayed.map((fp) => (
+              <OrganizerRow key={fp.id} favpoll={fp} />
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-16 text-center text-sm text-muted-foreground">
+            No favpolls match this filter.
+          </p>
+        )}
+      </div>
     </>
   )
 }
