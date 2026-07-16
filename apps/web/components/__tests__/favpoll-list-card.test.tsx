@@ -75,7 +75,7 @@ describe("FavpollListCard — un-pledged live card", () => {
   it("shows lock hint copy", () => {
     render(<FavpollListCard favpoll={BASE} />)
     expect(
-      screen.getByText("Pledge to see how the pledges are landing.")
+      screen.getByText("Pledge to see the results")
     ).toBeInTheDocument()
   })
 
@@ -116,7 +116,7 @@ describe("FavpollListCard — pledged card", () => {
     render(<FavpollListCard favpoll={BASE} initialResults={REAL_RESULTS} />)
     expect(screen.queryByTestId("list-card-decoy")).toBeNull()
     expect(
-      screen.queryByText("Pledge to see how the pledges are landing.")
+      screen.queryByText("Pledge to see the results")
     ).toBeNull()
     // formatCurrency(1000) → £10
     expect(screen.getByText("£10")).toBeInTheDocument()
@@ -131,7 +131,7 @@ describe("FavpollListCard — closed card", () => {
     render(<FavpollListCard favpoll={closed} />)
     expect(screen.queryByTestId("list-card-decoy")).toBeNull()
     expect(
-      screen.queryByText("Pledge to see how the pledges are landing.")
+      screen.queryByText("Pledge to see the results")
     ).toBeNull()
   })
 })

@@ -165,7 +165,7 @@ export function FavpollListCard({
                 >
                   <RevealLockPill
                     size="sm"
-                    label="Pledge to see how the pledges are landing."
+                    label="Pledge to see the results"
                   />
                 </div>
               </div>
