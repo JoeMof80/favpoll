@@ -65,7 +65,7 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Button asChild variant="ghost" size="icon-sm">
-              <Link href="/rankings" className="hover:text-foreground">
+              <Link href="/record" className="hover:text-foreground">
                 <ArrowLeft size={4} />
               </Link>
             </Button>

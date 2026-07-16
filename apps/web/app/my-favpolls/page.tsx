@@ -1,9 +1,10 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { NewFavpollButton } from "@/components/new-favpoll-button"
+import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OrganizerPageClient } from "./organizer-page-client"
-import type { OrganizerCardFavpoll } from "@/components/organizer-card/utils"
+import type { OrganizerFavpoll } from "@/components/organizer-row/utils"
 
 export const metadata = {
   title: "Your favpolls — favpoll",
@@ -35,7 +36,7 @@ export default async function MyFavpollsPage() {
       created_at,
       protagonists!favpolls_protagonist_id_fkey ( name ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description ) ),
-      favpoll_polls ( id, topics ( title ) ),
+      favpoll_polls ( id, personal_reveal, topics ( title ), pledges ( count ) ),
       favpoll_pots ( total_deposited, total_allocated )
     `
     )
@@ -69,11 +70,16 @@ export default async function MyFavpollsPage() {
         created_at: string
       }
     }[]
-    favpoll_polls: { id: string; topics: { title: string } | null } | null
+    favpoll_polls: {
+      id: string
+      personal_reveal: string | null
+      topics: { title: string } | null
+      pledges: { count: number }[]
+    } | null
     favpoll_pots: RawPot | null
   }
 
-  const favpolls: OrganizerCardFavpoll[] = (
+  const favpolls: OrganizerFavpoll[] = (
     (rawFavpolls ?? []) as unknown as RawFavpoll[]
   ).map((ev) => ({
     id: ev.id,
@@ -96,19 +102,16 @@ export default async function MyFavpollsPage() {
       ? { id: ev.favpoll_polls.id, topic: ev.favpoll_polls.topics ?? null }
       : null,
     pot: ev.favpoll_pots ?? null,
+    pledge_count: ev.favpoll_polls?.pledges?.[0]?.count ?? 0,
+    has_reveal: !!ev.favpoll_polls?.personal_reveal,
   }))
 
   return (
-    <main className="mx-auto max-w-330 px-6 py-10">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-medium text-foreground">Your favpolls</h1>
-        <NewFavpollButton size="lg">New favpoll</NewFavpollButton>
-      </div>
-
+    <main className="min-h-screen bg-muted">
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (
-        <div className="mt-16 text-center">
+        <div className="mx-auto max-w-330 px-4 pt-24 pb-16 text-center">
           <p className="text-sm text-muted-foreground">
             You haven&apos;t created any favpolls yet.
           </p>
@@ -117,6 +120,7 @@ export default async function MyFavpollsPage() {
           </NewFavpollButton>
         </div>
       )}
+      <NewFavpollFab />
     </main>
   )
 }

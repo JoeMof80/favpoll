@@ -46,7 +46,7 @@ export function Header() {
           {/* Desktop nav — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
             <Button asChild variant="ghost" className="text-muted-foreground">
-              <Link href="/rankings">The record</Link>
+              <Link href="/record">The record</Link>
             </Button>
             <Button asChild variant="ghost" className="text-muted-foreground">
               <Link href="/favpolls">Favpolls</Link>
@@ -91,7 +91,7 @@ export function Header() {
         <div className="absolute top-full right-0 left-0 z-50 border-b border-border bg-background px-4 pt-2 pb-4 shadow-sm md:hidden">
           <nav className="space-y-0.5">
             <Link
-              href="/rankings"
+              href="/record"
               className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={close}
             >

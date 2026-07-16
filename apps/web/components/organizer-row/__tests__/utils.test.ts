@@ -4,14 +4,14 @@ import {
   daysRemaining,
   filterAndSort,
   WARNING_THRESHOLD_DAYS,
-  type OrganizerCardFavpoll,
+  type OrganizerFavpoll,
 } from "../utils"
 
 const NOW = new Date("2026-06-21T12:00:00Z")
 
 function makeFavpoll(
-  overrides: Partial<OrganizerCardFavpoll> = {}
-): OrganizerCardFavpoll {
+  overrides: Partial<OrganizerFavpoll> = {}
+): OrganizerFavpoll {
   return {
     id: "fp-1",
     live_slug: "slug-fp-1",
@@ -42,6 +42,8 @@ function makeFavpoll(
     ],
     poll: { id: "p1", topic: { title: "Colour" } },
     pot: { total_deposited: 50, total_allocated: 10 },
+    pledge_count: 3,
+    has_reveal: true,
     ...overrides,
   }
 }
@@ -121,6 +123,7 @@ describe("filterAndSort", () => {
       [active, closing, closed],
       "all",
       "recently_created",
+      "",
       NOW
     )
     expect(result).toHaveLength(3)
@@ -131,6 +134,7 @@ describe("filterAndSort", () => {
       [active, closing, closed],
       "active",
       "recently_created",
+      "",
       NOW
     )
     expect(result.map((f) => f.id)).toEqual(expect.arrayContaining(["a", "b"]))
@@ -142,6 +146,7 @@ describe("filterAndSort", () => {
       [active, closing, closed],
       "closed",
       "recently_created",
+      "",
       NOW
     )
     expect(result.map((f) => f.id)).toEqual(["c"])
@@ -152,6 +157,7 @@ describe("filterAndSort", () => {
       [active, closing],
       "active",
       "closing_soonest",
+      "",
       NOW
     )
     expect(result[0].id).toBe("b")
@@ -163,6 +169,7 @@ describe("filterAndSort", () => {
       [active, closing, closed],
       "all",
       "highest_raised",
+      "",
       NOW
     )
     expect(result[0].id).toBe("c")
@@ -175,6 +182,7 @@ describe("filterAndSort", () => {
       [active, closing, closed],
       "all",
       "recently_created",
+      "",
       NOW
     )
     expect(result.map((f) => f.id)).toEqual(["a", "b", "c"])
@@ -185,8 +193,59 @@ describe("filterAndSort", () => {
       [active, closing],
       "closed",
       "recently_created",
+      "",
       NOW
     )
     expect(result).toHaveLength(0)
+  })
+  it("query matches protagonist name case-insensitively", () => {
+    const result = filterAndSort(
+      [active, closing, closed],
+      "all",
+      "recently_created",
+      "belinda",
+      NOW
+    )
+    expect(result.map((f) => f.id)).toEqual(["a", "b", "c"])
+  })
+
+  it("query matches the topic title", () => {
+    const noTopic = makeFavpoll({ id: "d", poll: null })
+    const result = filterAndSort(
+      [active, noTopic],
+      "all",
+      "recently_created",
+      "colour",
+      NOW
+    )
+    expect(result.map((f) => f.id)).toEqual(["a"])
+  })
+
+  it("query matches cause_label for cause favpolls", () => {
+    const cause = makeFavpoll({
+      id: "e",
+      subject: "cause",
+      protagonist: null,
+      cause_label: "The Village Green",
+    })
+    const result = filterAndSort(
+      [active, cause],
+      "all",
+      "recently_created",
+      "village",
+      NOW
+    )
+    expect(result.map((f) => f.id)).toEqual(["e"])
+  })
+
+  it("query combines with the status filter", () => {
+    const result = filterAndSort(
+      [active, closing, closed],
+      "closed",
+      "recently_created",
+      "johnson",
+      NOW
+    )
+    expect(result.map((f) => f.id)).toEqual(["c"])
   })
 })

@@ -173,7 +173,7 @@ export default async function HomePage() {
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
               {t("landing.record.principle")}{" "}
               <Link
-                href="/rankings"
+                href="/record"
                 className="whitespace-nowrap text-primary hover:underline"
               >
                 {t("landing.record.link")} →
