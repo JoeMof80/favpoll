@@ -2,7 +2,16 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ChevronDown, Clock, Copy, Check, Printer, Pencil } from "lucide-react"
+import {
+  ChevronDown,
+  Clock,
+  Copy,
+  Check,
+  ExternalLink,
+  Monitor,
+  Printer,
+  Pencil,
+} from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
@@ -56,6 +65,9 @@ export function OrganizerRow({ favpoll }: Props) {
   const displayUrl = baseUrl
     ? `${baseUrl}/live/${favpoll.live_slug}`
     : `/live/${favpoll.live_slug}`
+  const editUrl = baseUrl
+    ? `${baseUrl}/favpolls/${favpoll.id}/edit`
+    : `/favpolls/${favpoll.id}/edit`
 
   const topicTitle = favpoll.poll?.topic?.title
   const protagonistName =
@@ -195,15 +207,16 @@ export function OrganizerRow({ favpoll }: Props) {
           <div className="sm:order-2">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                {/* Guest link */}
+                {/* favpoll link */}
                 <div className="min-w-0">
                   <a
                     href={guestUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs font-medium text-foreground hover:text-primary hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
                   >
-                    Guest link
+                    <ExternalLink size={11} aria-hidden="true" />
+                    favpoll link
                   </a>
                   <div className="flex items-center gap-1.5">
                     <a
@@ -232,19 +245,35 @@ export function OrganizerRow({ favpoll }: Props) {
                       )}
                     </Button>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Guests scan or follow this to pledge.
-                  </p>
                 </div>
-                {/* Display link */}
+                {/* Edit favpoll link */}
+                <div className="min-w-0">
+                  <Link
+                    href={`/favpolls/${favpoll.id}/edit`}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
+                  >
+                    <Pencil size={11} aria-hidden="true" />
+                    Edit favpoll link
+                  </Link>
+                  <Link
+                    href={`/favpolls/${favpoll.id}/edit`}
+                    className="block truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+                    title={editUrl}
+                    suppressHydrationWarning
+                  >
+                    {editUrl}
+                  </Link>
+                </div>
+                {/* live favpoll link */}
                 <div className="min-w-0">
                   <a
                     href={displayUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs font-medium text-foreground hover:text-primary hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
                   >
-                    Display link
+                    <Monitor size={11} aria-hidden="true" />
+                    live favpoll link
                   </a>
                   <div className="flex items-center gap-1.5">
                     <a
@@ -273,22 +302,6 @@ export function OrganizerRow({ favpoll }: Props) {
                       )}
                     </Button>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Open on a big screen at the venue.
-                  </p>
-                </div>
-                {/* Edit link */}
-                <div className="min-w-0">
-                  <Link
-                    href={`/favpolls/${favpoll.id}/edit`}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    <Pencil size={11} aria-hidden="true" />
-                    Edit favpoll
-                  </Link>
-                  <p className="text-[11px] text-muted-foreground">
-                    Change details, charities or the closing date.
-                  </p>
                 </div>
               </div>
               <div

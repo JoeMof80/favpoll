@@ -189,18 +189,17 @@ describe("OrganizerRow", () => {
       )
     })
 
-    it("renders clickable guest, display and edit link rows + print pack", () => {
+    it("renders clickable favpoll, edit and live link rows + print pack", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
-      expect(screen.getByRole("link", { name: "Guest link" })).toHaveAttribute(
-        "href",
-        expect.stringContaining("/favpolls/fp-1")
-      )
       expect(
-        screen.getByRole("link", { name: "Display link" })
+        screen.getByRole("link", { name: "favpoll link" })
+      ).toHaveAttribute("href", expect.stringContaining("/favpolls/fp-1"))
+      expect(
+        screen.getByRole("link", { name: "live favpoll link" })
       ).toHaveAttribute("href", expect.stringContaining("/live/slug-fp-1"))
       expect(
-        screen.getByRole("link", { name: /Edit favpoll/i })
+        screen.getByRole("link", { name: "Edit favpoll link" })
       ).toHaveAttribute("href", "/favpolls/fp-1/edit")
       expect(screen.getByRole("link", { name: /Print pack/i })).toHaveAttribute(
         "href",
