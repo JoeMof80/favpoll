@@ -107,7 +107,7 @@ export default async function MyFavpollsPage() {
   }))
 
   return (
-    <main className="mx-auto max-w-330 px-6 py-10">
+    <main className="mx-auto max-w-330 px-4 pt-8 pb-16">
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (

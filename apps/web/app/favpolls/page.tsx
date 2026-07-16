@@ -342,7 +342,7 @@ export default async function FavpollsPage({
         </div>
       </div>
 
-      <div className="mx-auto max-w-330 px-6 py-12">
+      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
         {activeOccasionType && (
           <div className="mb-6 flex items-center gap-1.5">
             <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
