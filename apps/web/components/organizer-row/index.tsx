@@ -123,30 +123,20 @@ export function OrganizerRow({ favpoll }: Props) {
                   · {topicTitle}
                 </span>
               )}
-            </span>
-          </span>
-          {charity && (
-            <span className="hidden shrink-0 items-center gap-1.5 md:flex">
-              {charity.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={charity.logo_url}
-                  alt=""
-                  className="h-5 w-5 rounded object-contain"
-                />
-              ) : (
-                <span
-                  className="flex h-5 w-5 items-center justify-center rounded bg-secondary text-[10px] font-medium text-secondary-foreground"
-                  aria-hidden="true"
-                >
-                  {charity.name.charAt(0)}
+              {/* The triad at a glance: protagonist · topic · charity */}
+              {charity && (
+                <span className="font-normal text-muted-foreground">
+                  {" "}
+                  · {charity.name}
+                  {favpoll.charities.length > 1 &&
+                    ` +${favpoll.charities.length - 1}`}
                 </span>
               )}
-              <span className="max-w-36 truncate text-xs text-muted-foreground">
-                {charity.name}
-                {favpoll.charities.length > 1 &&
-                  ` +${favpoll.charities.length - 1}`}
-              </span>
+            </span>
+          </span>
+          {!listed && (
+            <span className="hidden shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline">
+              Unlisted
             </span>
           )}
           <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
@@ -173,11 +163,6 @@ export function OrganizerRow({ favpoll }: Props) {
           </span>
         </button>
 
-        {!listed && (
-          <span className="hidden shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline">
-            Unlisted
-          </span>
-        )}
         <span
           className="shrink-0 text-sm font-medium text-primary tabular-nums"
           aria-live="polite"
@@ -201,26 +186,14 @@ export function OrganizerRow({ favpoll }: Props) {
         </Button>
       </div>
 
-      {/* ── Expanded management panel: Share zone | Manage zone ── */}
+      {/* ── Expanded panel: manage column | share column (QR far right).
+          Share renders first in the DOM so phones — the at-the-venue case —
+          get the links on top; sm:order swaps the columns on desktop. ── */}
       {expanded && (
         <div className="grid gap-x-8 gap-y-5 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2 sm:px-6 sm:py-5">
-          {/* Share zone — QR fills the block; labelled link rows beside it */}
-          <div>
-            <p className="mb-3 text-[11px] font-medium tracking-widest text-primary uppercase">
-              Share
-            </p>
+          {/* Share — labelled link rows, QR on the outer edge */}
+          <div className="sm:order-2">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
-              <div
-                data-testid="qr-code"
-                className="shrink-0"
-                suppressHydrationWarning
-              >
-                <BrandedQR
-                  value={guestUrl}
-                  size={148}
-                  aria-label="QR code for the guest-facing favpoll page"
-                />
-              </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                 {/* Guest link */}
                 <div className="min-w-0">
@@ -295,14 +268,22 @@ export function OrganizerRow({ favpoll }: Props) {
                   </a>
                 </Button>
               </div>
+              <div
+                data-testid="qr-code"
+                className="shrink-0"
+                suppressHydrationWarning
+              >
+                <BrandedQR
+                  value={guestUrl}
+                  size={148}
+                  aria-label="QR code for the guest-facing favpoll page"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Manage zone — visibility, goal, shared fund, page actions */}
-          <div className="flex flex-col gap-4">
-            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
-              Manage
-            </p>
+          {/* Manage — visibility, stacked page actions, goal, shared fund */}
+          <div className="flex flex-col gap-3 sm:order-1">
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium">
@@ -324,6 +305,21 @@ export function OrganizerRow({ favpoll }: Props) {
                     : "Unlisted — click to list"
                 }
               />
+            </div>
+
+            <div className="flex flex-col gap-2 pt-1">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/favpolls/${favpoll.id}`}>
+                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
+                  View favpoll
+                </Link>
+              </Button>
             </div>
 
             {favpoll.goal_amount ? (
@@ -359,21 +355,6 @@ export function OrganizerRow({ favpoll }: Props) {
                 deposited · {formatAmount(favpoll.pot.total_allocated)} used
               </p>
             )}
-
-            <div className="mt-auto flex gap-2 pt-1">
-              <Button asChild variant="outline" size="sm" className="flex-1">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="sm" className="flex-1">
-                <Link href={`/favpolls/${favpoll.id}`}>
-                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                  View favpoll
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       )}

@@ -111,9 +111,9 @@ describe("OrganizerRow", () => {
       expect(screen.queryByText("Unlisted")).not.toBeInTheDocument()
     })
 
-    it("shows the charity in the collapsed header", () => {
+    it("shows the charity in the triad line", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
-      expect(screen.getByText("Age UK")).toBeInTheDocument()
+      expect(screen.getByText(/Age UK/)).toBeInTheDocument()
     })
 
     it("appends a +n suffix when there are multiple charities", () => {
