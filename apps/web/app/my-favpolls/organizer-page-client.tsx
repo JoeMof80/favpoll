@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { OrganizerCard } from "@/components/organizer-card"
+import { Input } from "@/components/ui/input"
+import { OrganizerRow } from "@/components/organizer-row"
 import {
-  type OrganizerCardFavpoll,
+  type OrganizerFavpoll,
   type StatusFilter,
   type SortKey,
   filterAndSort,
-} from "@/components/organizer-card/utils"
+} from "@/components/organizer-row/utils"
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
@@ -23,19 +24,27 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 ]
 
 type Props = {
-  favpolls: OrganizerCardFavpoll[]
+  favpolls: OrganizerFavpoll[]
 }
 
 export function OrganizerPageClient({ favpolls }: Props) {
   const [status, setStatus] = useState<StatusFilter>("all")
   const [sort, setSort] = useState<SortKey>("closing_soonest")
+  const [search, setSearch] = useState("")
 
-  const displayed = filterAndSort(favpolls, status, sort)
+  const displayed = filterAndSort(favpolls, status, sort, search)
 
   return (
     <>
-      {/* Filter + sort bar */}
-      <div className="mb-8 flex flex-wrap items-center gap-3">
+      {/* Search + filter + sort bar */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name or topic…"
+          className="max-w-xs"
+          aria-label="Search your favpolls"
+        />
         <div
           className="flex items-center rounded-lg border border-border bg-background p-0.5"
           role="group"
@@ -71,18 +80,20 @@ export function OrganizerPageClient({ favpolls }: Props) {
             </option>
           ))}
         </select>
+
+        <p className="ml-auto text-xs text-muted-foreground">
+          {displayed.length} of {favpolls.length}
+        </p>
       </div>
 
-      {/* Grid */}
+      {/* Row list */}
       {displayed.length > 0 ? (
         <ul
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="divide-y divide-border rounded-xl border border-border bg-background"
           role="list"
         >
           {displayed.map((fp) => (
-            <li key={fp.id} className="list-none">
-              <OrganizerCard favpoll={fp} />
-            </li>
+            <OrganizerRow key={fp.id} favpoll={fp} />
           ))}
         </ul>
       ) : (

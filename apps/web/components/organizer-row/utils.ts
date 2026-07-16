@@ -1,4 +1,4 @@
-export type OrganizerCardFavpoll = {
+export type OrganizerFavpoll = {
   id: string
   /** Unguessable capability for the live display URL (/live/[slug]) */
   live_slug: string
@@ -27,6 +27,8 @@ export type OrganizerCardFavpoll = {
   }[]
   poll: { id: string; topic: { title: string } | null } | null
   pot: { total_deposited: number; total_allocated: number } | null
+  pledge_count: number
+  has_reveal: boolean
 }
 
 export type StatusFilter = "all" | "active" | "closed"
@@ -35,7 +37,7 @@ export type SortKey = "closing_soonest" | "recently_created" | "highest_raised"
 export const WARNING_THRESHOLD_DAYS = 7
 
 export function isFavpollClosed(
-  fp: OrganizerCardFavpoll,
+  fp: OrganizerFavpoll,
   now: Date = new Date()
 ): boolean {
   return !!fp.closed_at || new Date(fp.closes_at) < now
@@ -51,15 +53,26 @@ export function daysRemaining(
 }
 
 export function filterAndSort(
-  favpolls: OrganizerCardFavpoll[],
+  favpolls: OrganizerFavpoll[],
   status: StatusFilter,
   sort: SortKey,
+  query = "",
   now: Date = new Date()
-): OrganizerCardFavpoll[] {
+): OrganizerFavpoll[] {
+  const q = query.trim().toLowerCase()
   const filtered = favpolls.filter((fp) => {
     const closed = isFavpollClosed(fp, now)
-    if (status === "active") return !closed
-    if (status === "closed") return closed
+    if (status === "active" && closed) return false
+    if (status === "closed" && !closed) return false
+    if (q) {
+      const haystack = [
+        fp.protagonist?.name,
+        fp.cause_label,
+        fp.opening_line,
+        fp.poll?.topic?.title,
+      ]
+      return haystack.some((s) => s?.toLowerCase().includes(q))
+    }
     return true
   })
 
