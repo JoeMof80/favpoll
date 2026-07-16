@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import Link from "next/link"
 import { Chip } from "@/components/ui/chip"
+import { ListControls } from "@/components/list-controls"
 import type { Category, Topic, Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollResults } from "@/components/favpoll-card/poll-results"
@@ -22,12 +23,13 @@ type Props = {
 function formatAmount(amount: number): string {
   if (amount === 0) return "—"
   if (amount >= 1000) {
-    return new Intl.NumberFormat("en-GB", {
-      style: "currency",
-      currency: "GBP",
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(amount)
+    // Hand-rolled compact form: Intl's `notation: "compact"` differs
+    // between Node's ICU and the browser's ("K" vs "k", "£3.0k" vs
+    // "£3k"), which caused hydration text mismatches on this page.
+    const [value, suffix] =
+      amount >= 1_000_000 ? [amount / 1_000_000, "m"] : [amount / 1000, "k"]
+    const digits = value >= 100 ? 0 : 1
+    return `£${value.toFixed(digits).replace(/\.0$/, "")}${suffix}`
   }
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -95,14 +97,63 @@ function TopicCard({ topic }: { topic: TopicWithItems }) {
   )
 }
 
+type RecordSortKey = "az" | "most_raised" | "most_pledges"
+
+const SORT_OPTIONS: { value: RecordSortKey; label: string }[] = [
+  { value: "az", label: "A to Z" },
+  { value: "most_raised", label: "Most raised" },
+  { value: "most_pledges", label: "Most pledges" },
+]
+
+// Search matches the topic itself or any favourite within it — searching
+// "purple" finds Colour.
+export function filterTopics(
+  topics: TopicWithItems[],
+  category: string | null,
+  query: string
+): TopicWithItems[] {
+  const q = query.trim().toLowerCase()
+  return topics.filter((t) => {
+    if (category !== null && !t.category_ids.includes(category)) return false
+    if (q) {
+      return (
+        t.title.toLowerCase().includes(q) ||
+        t.favourites.some((f) => f.label.toLowerCase().includes(q))
+      )
+    }
+    return true
+  })
+}
+
+export function sortTopics(
+  topics: TopicWithItems[],
+  sort: RecordSortKey
+): TopicWithItems[] {
+  const sorted = [...topics]
+  if (sort === "most_raised") {
+    sorted.sort(
+      (a, b) =>
+        topicPledgedTotal(b.favourites) - topicPledgedTotal(a.favourites)
+    )
+  } else if (sort === "most_pledges") {
+    const count = (t: TopicWithItems) =>
+      t.favourites.reduce((sum, i) => sum + i.all_time_count, 0)
+    sorted.sort((a, b) => count(b) - count(a))
+  }
+  // az: preserve server order (topics arrive title-sorted)
+  return sorted
+}
+
 export function RankingsClient({ categories, topics, totalPledged }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [search, setSearch] = useState("")
+  const [sort, setSort] = useState<RecordSortKey>("az")
   const tabsRef = useRef<HTMLDivElement>(null)
 
-  const visibleTopics =
-    activeCategory === null
-      ? topics
-      : topics.filter((t) => t.category_ids.includes(activeCategory))
+  const visibleTopics = sortTopics(
+    filterTopics(topics, activeCategory, search),
+    sort
+  )
 
   const established = visibleTopics.filter((t) =>
     isEstablishedRecord(t.favourites)
@@ -162,9 +213,22 @@ export function RankingsClient({ categories, topics, totalPledged }: Props) {
           </p>
         </div>
 
+        <ListControls
+          className="mb-8"
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search topics or favourites…"
+          searchLabel="Search the record"
+          sortOptions={SORT_OPTIONS}
+          sortValue={sort}
+          onSortChange={(v) => setSort(v as RecordSortKey)}
+          shown={visibleTopics.length}
+          total={topics.length}
+        />
+
         {visibleTopics.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No topics in this category yet.
+            No topics match here yet.
           </p>
         ) : (
           <div className="space-y-12">

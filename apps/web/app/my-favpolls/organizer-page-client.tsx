@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
+import { ListControls } from "@/components/list-controls"
 import { OrganizerRow } from "@/components/organizer-row"
 import {
   type OrganizerFavpoll,
@@ -13,7 +12,7 @@ import {
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "active", label: "Active" },
+  { value: "active", label: "Live" },
   { value: "closed", label: "Closed" },
 ]
 
@@ -36,55 +35,21 @@ export function OrganizerPageClient({ favpolls }: Props) {
 
   return (
     <>
-      {/* Search + filter + sort bar */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or topic…"
-          className="max-w-xs"
-          aria-label="Search your favpolls"
-        />
-        <div
-          className="flex items-center rounded-lg border border-border bg-background p-0.5"
-          role="group"
-          aria-label="Filter by status"
-        >
-          {STATUS_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setStatus(opt.value)}
-              className={cn(
-                "rounded-md px-3 py-1 text-sm font-medium transition-colors",
-                status === opt.value
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              aria-pressed={status === opt.value}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-          aria-label="Sort by"
-        >
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-
-        <p className="ml-auto text-xs text-muted-foreground">
-          {displayed.length} of {favpolls.length}
-        </p>
-      </div>
+      <ListControls
+        className="mb-6"
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name or topic…"
+        searchLabel="Search your favpolls"
+        segments={STATUS_OPTIONS}
+        segmentValue={status}
+        onSegmentChange={(v) => setStatus(v as StatusFilter)}
+        sortOptions={SORT_OPTIONS}
+        sortValue={sort}
+        onSortChange={(v) => setSort(v as SortKey)}
+        shown={displayed.length}
+        total={favpolls.length}
+      />
 
       {/* Row list */}
       {displayed.length > 0 ? (

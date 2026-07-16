@@ -2,11 +2,11 @@ import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { FavpollListCard } from "@/components/favpoll-list-card"
-import { FavpollListCardEmpty } from "@/components/favpoll-list-card-empty"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
-import { cn } from "@/lib/utils"
 import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
+import { FavpollsListClient } from "./favpolls-list-client"
+import type { PublicStatusFilter } from "./list-utils"
 
 export const metadata = {
   title: "Favpolls — favpoll",
@@ -83,23 +83,22 @@ export default async function FavpollsPage({
   const params = await searchParams
   const activeRegister = params.register ?? null
   const activeOccasionType = params.occasion_type ?? null
-  const showClosed = params.state === "closed"
+  // Status filtering is client-side now (the segmented control); the URL
+  // param only seeds the initial segment so old ?state=closed links keep
+  // working.
+  const initialStatus: PublicStatusFilter =
+    params.state === "closed" ? "closed" : "live"
 
   const supabase = createAdminClient()
   const { userId } = await auth()
 
-  // Build favpoll query
+  // Build favpoll query — live and closed together; the client filters
   let favpollsQuery = supabase
     .from("favpolls")
     .select(FAVPOLL_SELECT)
     .eq("is_private", false)
     .eq("is_listed", true)
 
-  if (showClosed) {
-    favpollsQuery = favpollsQuery.not("closed_at", "is", null)
-  } else {
-    favpollsQuery = favpollsQuery.is("closed_at", null)
-  }
   if (activeRegister) {
     const reg = activeRegister as Register
     const types = OCCASION_TYPES_BY_REGISTER[reg] ?? []
@@ -122,7 +121,7 @@ export default async function FavpollsPage({
 
   favpollsQuery = favpollsQuery
     .order("created_at", { ascending: false })
-    .limit(24)
+    .limit(60)
 
   const { data: favpolls } = await favpollsQuery
 
@@ -174,7 +173,7 @@ export default async function FavpollsPage({
   // For authenticated users, pre-fetch pledge results for open favpolls
   const pledgedResultsByPollId = new Map<string, CardResultItem[]>()
 
-  if (userId && !showClosed && !showingExemplars) {
+  if (userId && !showingExemplars) {
     const pollIds = displayFavpolls
       .map((fp) => (fp.favpoll_polls as RawPoll | null)?.id)
       .filter((id): id is string => Boolean(id))
@@ -257,110 +256,84 @@ export default async function FavpollsPage({
 
   const filterLabel = activeOccasionType ?? activeRegister ?? null
 
+  // Normalise once for the client list (and the exemplar shelf)
+  const cardFavpolls = displayFavpolls.map((fp) => {
+    const rawPoll = fp.favpoll_polls ?? null
+    let poll: {
+      id: string
+      topic_id: string | null
+      topic: {
+        title: string
+        is_finite: boolean
+        favourites: RawFavourite[]
+      } | null
+    } | null = null
+    if (rawPoll) {
+      const isFinite = rawPoll.topics?.is_finite ?? false
+      const favourites = isFinite
+        ? (rawPoll.topics?.favourites ?? [])
+        : (rawPoll.favpoll_poll_favourites ?? [])
+            .map((epf) => epf.favourites)
+            .filter(Boolean)
+      poll = {
+        id: rawPoll.id,
+        topic_id: rawPoll.topic_id,
+        topic: rawPoll.topics
+          ? {
+              title: rawPoll.topics.title,
+              is_finite: isFinite,
+              favourites,
+            }
+          : null,
+      }
+    }
+    return { ...fp, poll }
+  })
+
   return (
     <main className="bg-muted">
       <div className="mx-auto max-w-330 px-6 py-12">
-        {/* State filter tabs */}
-        <div className="mb-8 flex items-center gap-3">
-          <Link
-            href={
-              activeRegister
-                ? `/favpolls?register=${activeRegister}${activeOccasionType ? `&occasion_type=${encodeURIComponent(activeOccasionType)}` : ""}`
-                : "/favpolls"
-            }
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-              !showClosed
-                ? "bg-foreground text-background"
-                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/15"
-            )}
-          >
-            Live
-          </Link>
-          <Link
-            href={`/favpolls?state=closed${activeRegister ? `&register=${activeRegister}` : ""}${activeOccasionType ? `&occasion_type=${encodeURIComponent(activeOccasionType)}` : ""}`}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-              showClosed
-                ? "bg-foreground text-background"
-                : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/15"
-            )}
-          >
-            Closed
-          </Link>
-          {filterLabel && (
-            <div className="flex items-center gap-1.5">
-              <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
-                {filterLabel}
-              </span>
-              <Link
-                href={`/favpolls${showClosed ? "?state=closed" : ""}`}
-                className="text-sm text-muted-foreground hover:text-foreground"
-                aria-label="Clear filter"
-              >
-                ×
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {showingExemplars && (
-          <SectionEyebrow variant="muted" className="mb-6">
-            No open favpolls yet for this occasion — here are some examples to
-            inspire you.
-          </SectionEyebrow>
+        {filterLabel && (
+          <div className="mb-6 flex items-center gap-1.5">
+            <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
+              {filterLabel}
+            </span>
+            <Link
+              href="/favpolls"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              aria-label="Clear filter"
+            >
+              ×
+            </Link>
+          </div>
         )}
 
-        {displayFavpolls.length === 0 ? (
-          <FavpollListCardEmpty />
-        ) : (
-          <ul
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            role="list"
-          >
-            {displayFavpolls.map((fp) => {
-              const rawPoll = fp.favpoll_polls ?? null
-              let poll: {
-                id: string
-                topic_id: string | null
-                topic: {
-                  title: string
-                  is_finite: boolean
-                  favourites: RawFavourite[]
-                } | null
-              } | null = null
-              if (rawPoll) {
-                const isFinite = rawPoll.topics?.is_finite ?? false
-                const favourites = isFinite
-                  ? (rawPoll.topics?.favourites ?? [])
-                  : (rawPoll.favpoll_poll_favourites ?? [])
-                      .map((epf) => epf.favourites)
-                      .filter(Boolean)
-                poll = {
-                  id: rawPoll.id,
-                  topic_id: rawPoll.topic_id,
-                  topic: rawPoll.topics
-                    ? {
-                        title: rawPoll.topics.title,
-                        is_finite: isFinite,
-                        favourites,
-                      }
-                    : null,
-                }
-              }
-              const initialResults = poll
-                ? pledgedResultsByPollId.get(poll.id)
-                : undefined
-              return (
+        {showingExemplars ? (
+          <>
+            <SectionEyebrow variant="muted" className="mb-6">
+              No open favpolls yet for this occasion — here are some examples to
+              inspire you.
+            </SectionEyebrow>
+            <ul
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              role="list"
+            >
+              {cardFavpolls.map((fp) => (
                 <FavpollListCard
                   key={fp.id}
-                  favpoll={{ ...fp, poll }}
+                  favpoll={fp}
                   clerkUserId={userId}
-                  initialResults={initialResults}
                 />
-              )
-            })}
-          </ul>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <FavpollsListClient
+            favpolls={cardFavpolls}
+            clerkUserId={userId}
+            initialResultsByPollId={Object.fromEntries(pledgedResultsByPollId)}
+            initialStatus={initialStatus}
+          />
         )}
       </div>
     </main>
