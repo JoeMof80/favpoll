@@ -10,8 +10,7 @@ const EXPLORE = [
   ["/favpolls", "Favpolls"],
   ["/record", "The record"],
   ["/charities", "Charities"],
-  ["/favpolls/new", "Create a favpoll"],
-  ["/about", "About favpoll"],
+  ["/about", "About"],
   ["/about#contact", "Contact"],
 ] as const
 
@@ -109,7 +108,7 @@ export function SiteFooter() {
                     href="/my-favpolls"
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    My favpolls
+                    Your favpolls
                   </Link>
                 </li>
               </Show>
