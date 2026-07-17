@@ -132,7 +132,7 @@ export function AnyoneCanAnswer() {
       <div className="relative min-h-72" aria-hidden="true">
         {/* Dialog 1 — the wizard's "Pick a topic" overlay */}
         <div className="absolute top-0 left-0 w-[88%] -rotate-1 rounded-xl border border-border bg-background p-5 shadow-lg">
-          <div className="flex h-9 items-center gap-2 border-b border-border pb-2">
+          <div className="flex h-9 items-center gap-2">
             <span
               className={
                 searchText
@@ -197,7 +197,7 @@ export function AnyoneCanAnswer() {
               </p>
 
               {/* "Add … options" field + Add button (as in the dialog) */}
-              <div className="mt-3 flex h-9 items-center gap-2 border-b border-border pb-2">
+              <div className="mt-3 flex h-9 items-center gap-2">
                 <span
                   className={
                     inputText
