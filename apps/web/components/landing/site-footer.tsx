@@ -138,7 +138,7 @@ export function SiteFooter() {
           <div className="flex flex-col gap-6">
             <div>
               <Link
-                href="/about"
+                href="/about#money"
                 className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
               >
                 Where the money goes
@@ -150,7 +150,7 @@ export function SiteFooter() {
             </div>
             <div>
               <Link
-                href="/about"
+                href="/about#wills"
                 className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
               >
                 Written in advance
