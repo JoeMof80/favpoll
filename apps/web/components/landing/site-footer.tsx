@@ -148,18 +148,6 @@ export function SiteFooter() {
                 reaches your chosen charity in full.
               </p>
             </div>
-            <div>
-              <Link
-                href="/about#wills"
-                className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
-              >
-                Written in advance
-              </Link>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                A favpoll can be kept in a will or letter of wishes — the
-                questions and reveals written in advance, in your own words.
-              </p>
-            </div>
           </div>
         </div>
 
