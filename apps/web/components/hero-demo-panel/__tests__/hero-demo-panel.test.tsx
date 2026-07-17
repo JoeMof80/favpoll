@@ -401,17 +401,17 @@ describe("LandingHero — reduced motion", () => {
     expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
   })
 
-  it("jumps the demo to the cause scene when the 'For a cause' chip is clicked", () => {
+  it("jumps the demo to the cause scene when the 'Cause' chip is clicked", () => {
     render(<LandingHero liveCount={6} totalLive={0} />)
     // Starts on the first scene (Belinda / remembering), not the cause scene.
     expect(screen.queryByText("For young minds")).toBeNull()
-    fireEvent.click(screen.getByRole("button", { name: "For a cause" }))
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
     expect(screen.getByText("For young minds")).toBeInTheDocument()
   })
 
-  it("jumps the demo to the fundraiser scene when 'A fundraiser' is clicked", () => {
+  it("jumps the demo to the fundraiser scene when 'Fundraiser' is clicked", () => {
     render(<LandingHero liveCount={6} totalLive={0} />)
-    fireEvent.click(screen.getByRole("button", { name: "A fundraiser" }))
+    fireEvent.click(screen.getByRole("button", { name: "Fundraiser" }))
     expect(screen.getByText("Marcus Bell")).toBeInTheDocument()
   })
 })

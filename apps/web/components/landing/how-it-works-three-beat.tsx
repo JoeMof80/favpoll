@@ -265,10 +265,18 @@ export function HowItWorksThreeBeat() {
             <div
               className={`${DIALOG} top-[14.75rem] left-16 w-64 rotate-2 motion-safe:group-hover:translate-x-2 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-4`}
             >
-              <div className="flex items-baseline justify-between">
-                <p className="text-sm font-medium text-foreground">
-                  Marie Curie
-                </p>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded bg-secondary text-xs font-medium text-secondary-foreground"
+                    aria-hidden="true"
+                  >
+                    M
+                  </span>
+                  <p className="text-sm font-medium text-foreground">
+                    Marie Curie
+                  </p>
+                </span>
                 <p className="text-sm font-medium text-primary">
                   £{watching ? GOAL.live : GOAL.rest}
                 </p>
