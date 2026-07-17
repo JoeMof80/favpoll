@@ -279,7 +279,7 @@ export function LoveStep({
           </div>
         ) : (
           <p className="py-3 text-center text-sm text-muted-foreground">
-            No topics found.
+            No matching topics — add your own.
           </p>
         )}
       </div>

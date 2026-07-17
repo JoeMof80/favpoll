@@ -275,7 +275,7 @@ export function NewFavpollWizard({ data }: Props) {
         <TopicItemsDialog
           open={w.itemsDialogOpen}
           onOpenChange={w.setItemsDialogOpen}
-          topicTitle="Select Items"
+          topicTitle={w.topics[0].title}
           existingItems={w.dialogExistingItems}
           addedItems={w.customLabels}
           onAdd={w.handleAddItem}
