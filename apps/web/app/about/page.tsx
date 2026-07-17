@@ -136,7 +136,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── Contact ── */}
-        <section className="py-16">
+        <section id="contact" className="scroll-mt-20 py-16">
           <div className="grid gap-10 md:grid-cols-2 md:items-start md:gap-16">
             <FadeIn>
               <SectionEyebrow className="mb-2">Get in touch</SectionEyebrow>

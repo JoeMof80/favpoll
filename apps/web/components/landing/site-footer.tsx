@@ -12,6 +12,7 @@ const EXPLORE = [
   ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],
   ["/about", "About favpoll"],
+  ["/about#contact", "Contact"],
 ] as const
 
 // Brand glyphs inline (lucide removed brand icons); paths from simple-icons,
