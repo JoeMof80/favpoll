@@ -32,6 +32,10 @@ export function TopicItemsDialog({
   const trimmed = search.trim()
   const lower = trimmed.toLowerCase()
 
+  // The topic-as-question, matching the guest display (PollHeading) and the
+  // landing demo — never the raw prop, which was showing "Select Items".
+  const heading = `Favourite ${topicTitle}`
+
   const filteredExisting = trimmed
     ? existingItems.filter((i) => i.label.toLowerCase().includes(lower))
     : existingItems
@@ -62,14 +66,14 @@ export function TopicItemsDialog({
         if (!v) setSearch("")
         onOpenChange(v)
       }}
-      title={topicTitle}
+      title={heading}
       header={
         <div className="space-y-2">
           {/* Visible title at block-start — the header slot makes the overlay
               title sr-only, which left the dialog opening with no visible
               question (the landing demo showed the intended shape). */}
           <p className="text-lg font-medium tracking-tight text-foreground">
-            {topicTitle}
+            {heading}
           </p>
           <div className="flex items-center gap-2">
             <input
