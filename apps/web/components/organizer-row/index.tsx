@@ -45,6 +45,8 @@ export function OrganizerRow({ favpoll }: Props) {
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
+  const goalReached =
+    !!favpoll.goal_amount && favpoll.total_raised >= favpoll.goal_amount
 
   const [expanded, setExpanded] = useState(false)
   const [listed, setListed] = useState(favpoll.is_listed)
@@ -182,11 +184,22 @@ export function OrganizerRow({ favpoll }: Props) {
           </span>
         </button>
 
+        {/* Raised, with the goal for at-a-glance progress; green once met */}
         <span
-          className="shrink-0 text-sm font-medium text-primary tabular-nums"
+          className={cn(
+            "shrink-0 text-sm font-medium tabular-nums",
+            goalReached ? "text-success" : "text-primary"
+          )}
           aria-live="polite"
+          data-testid="row-raised"
         >
           {formatAmount(favpoll.total_raised)}
+          {favpoll.goal_amount ? (
+            <span className="font-normal text-muted-foreground">
+              {" / "}
+              {formatAmount(favpoll.goal_amount)}
+            </span>
+          ) : null}
         </span>
         <Button
           type="button"

@@ -143,6 +143,39 @@ describe("OrganizerRow", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expect(screen.getByTestId("organizer-row")).not.toHaveClass("opacity-70")
     })
+
+    it("shows raised alone when no goal is set", () => {
+      render(
+        <OrganizerRow
+          favpoll={makeFavpoll({ total_raised: 250, goal_amount: null })}
+        />
+      )
+      const raised = screen.getByTestId("row-raised")
+      expect(raised.textContent).toBe("£250")
+      expect(raised).toHaveClass("text-primary")
+    })
+
+    it("shows raised / goal when a goal is set", () => {
+      render(
+        <OrganizerRow
+          favpoll={makeFavpoll({ total_raised: 250, goal_amount: 1000 })}
+        />
+      )
+      const raised = screen.getByTestId("row-raised")
+      expect(raised.textContent).toBe("£250 / £1,000")
+      expect(raised).toHaveClass("text-primary")
+    })
+
+    it("turns green once the goal is reached", () => {
+      render(
+        <OrganizerRow
+          favpoll={makeFavpoll({ total_raised: 1000, goal_amount: 1000 })}
+        />
+      )
+      const raised = screen.getByTestId("row-raised")
+      expect(raised).toHaveClass("text-success")
+      expect(raised).not.toHaveClass("text-primary")
+    })
   })
 
   describe("expansion", () => {
