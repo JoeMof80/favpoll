@@ -98,7 +98,8 @@ export default function AboutPage() {
               <p className="text-base leading-relaxed text-muted-foreground">
                 favpoll takes no fee from donations. 100% of every pledge
                 reaches your chosen charity in full. Payments are processed by
-                Stripe.
+                Stripe, and favpoll is supported by optional contributions —
+                never by your pledge.
               </p>
             </FadeIn>
             <FadeIn delay={0.16}>
