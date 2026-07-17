@@ -123,8 +123,9 @@ export function AnyoneCanAnswer() {
           Create or curate your favpoll
         </h2>
         <p className="text-base leading-relaxed text-muted-foreground">
-          There are many favpoll topics to choose from and you are free to add
-          missing items. You are also welcome to create your own topics.
+          Pick from the many favpoll topics, or create your own. Feel free to
+          add any missing favourites — guests can too, and you keep the final
+          say.
         </p>
       </div>
 
