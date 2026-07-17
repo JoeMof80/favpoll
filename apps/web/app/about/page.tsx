@@ -29,9 +29,10 @@ const TRIAD = [
   ],
 ] as const
 
-// A lean, show-don't-tell about page: the landing shows what favpoll is, so this
-// states the soul (the brand statement), the principles, and offers a way to
-// reach us — no definition, no origin story (that's press/investor material).
+// A lean about page: the soul (the brand statement), the founder's plain
+// two-paragraph definition (added 2026-07-17 for the trust audiences — a
+// charity partner wants the mechanics stated, not demoed), the principles,
+// and a way to reach us. Still no origin story (press/investor material).
 export default function AboutPage() {
   return (
     <main className="flex flex-col">
@@ -55,6 +56,33 @@ export default function AboutPage() {
       </section>
 
       <div className="mx-auto w-full max-w-330 px-6">
+        {/* ── The definition — the mechanics, stated plainly ── */}
+        <section className="border-b border-border py-16">
+          <FadeIn>
+            <SectionEyebrow className="mb-2">What a favpoll is</SectionEyebrow>
+            <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
+              Three parts, one act of giving.
+            </h2>
+          </FadeIn>
+          <div className="flex max-w-2xl flex-col gap-5">
+            <FadeIn delay={0.08}>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                A favpoll can stand alone or accompany a life event. It has
+                three parts: a topic (Dog breed), one to three charities (Dogs
+                Trust), and a subject — somebody to honour, or a cause to
+                support.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.16}>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                Guests pick their favourite (Golden Retriever) and pledge money
+                towards it; 100% goes to the charity. Pledging reveals the
+                rankings and — optionally — the subject&apos;s favourite.
+              </p>
+            </FadeIn>
+          </div>
+        </section>
+
         {/* ── Principles ── */}
         <section className="border-b border-border py-16">
           <div className="grid items-center gap-12 md:grid-cols-[1fr_auto]">
