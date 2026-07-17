@@ -110,6 +110,11 @@ export function WatchItHappen() {
             />
           </div>
 
+          {/* Topic heading — labels the bars, as the guest/live page does */}
+          <p className="mb-1.5 text-[10px] font-medium tracking-widest text-primary uppercase">
+            Favourite Colour
+          </p>
+
           <div className="space-y-1.5 [&_span]:text-xs">
             {LABELS.map((label, i) => (
               <RankingBar
