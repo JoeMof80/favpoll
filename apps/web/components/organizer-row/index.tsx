@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ChevronDown,
@@ -89,26 +89,25 @@ export function OrganizerRow({ favpoll }: Props) {
     }
   }
 
-  function handleCopyGuest() {
-    navigator.clipboard.writeText(guestUrl).then(() => {
-      setCopiedGuest(true)
-      setTimeout(() => setCopiedGuest(false), 2000)
+  // Copied-feedback timers are cleared on unmount — a timer firing after
+  // teardown calls setState on a dead tree (and crashed the test suite
+  // with "window is not defined" when it outlived the jsdom environment).
+  const copyTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  useEffect(() => {
+    const timers = copyTimersRef.current
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  function flashCopied(setCopied: (v: boolean) => void, url: string) {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      copyTimersRef.current.push(setTimeout(() => setCopied(false), 2000))
     })
   }
 
-  function handleCopyDisplay() {
-    navigator.clipboard.writeText(displayUrl).then(() => {
-      setCopiedDisplay(true)
-      setTimeout(() => setCopiedDisplay(false), 2000)
-    })
-  }
-
-  function handleCopyEdit() {
-    navigator.clipboard.writeText(editUrl).then(() => {
-      setCopiedEdit(true)
-      setTimeout(() => setCopiedEdit(false), 2000)
-    })
-  }
+  const handleCopyGuest = () => flashCopied(setCopiedGuest, guestUrl)
+  const handleCopyDisplay = () => flashCopied(setCopiedDisplay, displayUrl)
+  const handleCopyEdit = () => flashCopied(setCopiedEdit, editUrl)
 
   return (
     <li
