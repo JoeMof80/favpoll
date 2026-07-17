@@ -53,7 +53,13 @@ Never write copy that quantifies honour over *every* favpoll.
 
 Use this as an internal design principle when evaluating copy or features: does this serve charity, honour, or love? If it serves none of them, it probably doesn't belong.
 
-This framing appears explicitly on the about page. It does not need to appear on every page — it is a truth that underpins everything rather than a message to repeat.
+**The triad is internal mythology, not reader copy (founder decision,
+2026-07-17).** It appears on no user-facing page — it was retired from the
+about page the day the plain two-paragraph definition landed there, as
+"useful mythology for us to draw on" but "weird and indulgent to include".
+Draw on it when writing and judging; never publish it as a branded triplet.
+The one survivor in public copy is the spirit of the Honour line ("can",
+never "every" — a cause favpoll must not be overclaimed).
 
 ---
 

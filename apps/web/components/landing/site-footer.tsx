@@ -12,6 +12,7 @@ const EXPLORE = [
   ["/charities", "Charities"],
   ["/favpolls/new", "Create a favpoll"],
   ["/about", "About favpoll"],
+  ["/about#contact", "Contact"],
 ] as const
 
 // Brand glyphs inline (lucide removed brand icons); paths from simple-icons,
@@ -137,7 +138,7 @@ export function SiteFooter() {
           <div className="flex flex-col gap-6">
             <div>
               <Link
-                href="/about"
+                href="/about#money"
                 className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
               >
                 Where the money goes
@@ -145,18 +146,6 @@ export function SiteFooter() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 favpoll takes no fee from donations. 100% of every pledge
                 reaches your chosen charity in full.
-              </p>
-            </div>
-            <div>
-              <Link
-                href="/about"
-                className="mb-2 block text-xs font-medium tracking-widest text-primary uppercase hover:underline"
-              >
-                Written in advance
-              </Link>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                A favpoll can be kept in a will or letter of wishes — the
-                questions and reveals written in advance, in your own words.
               </p>
             </div>
           </div>
