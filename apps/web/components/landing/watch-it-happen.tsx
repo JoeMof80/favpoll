@@ -64,7 +64,7 @@ export function WatchItHappen() {
       {/* Heading + brief explanation — the room to its right acts it out */}
       <div className="max-w-md">
         <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
-          Watch it happen
+          Watch it live
         </h2>
         <p className="text-base leading-relaxed text-muted-foreground">
           Pair your favpoll with a real life occasion and watch it unfold live,
