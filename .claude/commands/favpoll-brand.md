@@ -120,10 +120,11 @@ guest picks *their* favourite, the amount is framed as *what that favourite is
 worth to them* (the Love pillar as a pledge-value anchor), and what's revealed
 is the favourite's **standing** — the poll result, which every favpoll shows
 after pledging ("standing(s)" is deliberately the record's vocabulary). The
-division of labour is unchanged: the **eyebrow** carries the breadth, the
-**headline** names the arc the hero demo then enacts (the beat chips under the
-demo — Pick · Pledge · Reveal — track it live), and the **brand statement**
-carries the soul. The personal reveal — a gift, not a gate — stays a
+division of labour (revised 2026-07-17): the hero **eyebrow is retired** —
+the kind chips beside the demo (Memorial · Celebration · Fundraiser · Cause)
+carry the breadth visually; the **headline** names the arc the hero demo then
+enacts (the beat chips under the demo — Pick · Pledge · Reveal — track it
+live), and the **brand statement** carries the soul. The personal reveal — a gift, not a gate — stays a
 *discovered* moment (the demo's blur → lock → reveal arc, the reveal pill on
 real polls), never a headline promise. Do not re-promote the personal reveal
 into hero copy: it is optional per-poll and protagonist-shaped, so any
@@ -152,20 +153,16 @@ downgrading cause and standalone favpolls.
 Expressions of joy, for charitable causes, in the name of those we love.
 ```
 
-### Eyebrow — one static line carrying the breadth
+### Eyebrow — RETIRED from the hero (2026-07-17)
 
-As of 2026-07-11 the eyebrow no longer cycles. One fixed line
-(`landing.eyebrow` in `messages/en-GB.json`):
+The hero shows no eyebrow. The static "For any occasion — or none at all"
+line (2026-07-11 → 2026-07-17) was removed as redundant against the demo's
+kind chips, which were relabelled to single nouns the same day:
+**Memorial · Celebration · Fundraiser · Cause**. The breadth signal — that a
+favpoll needs no life event — lives in the chips + demo scenes, and in the
+About definition ("A favpoll can stand alone or accompany a life event").
 
-```
-For any occasion — or none at all
-```
-
-"Or none at all" is doing real work — it is the hero copy that explicitly
-includes standalone and cause favpolls, the registers the old per-occasion
-copy silently excluded. Never show the headline without the eyebrow.
-
-The register/occasion signal now lives entirely in the demo's tap-to-jump kind
+The register/occasion signal lives entirely in the demo's tap-to-jump kind
 nav + the demo scene content (one scene per kind as of 2026-07-11, cycling in
 nav order). The per-scene poetic eyebrows (2026-07-07 → 2026-07-11: "In memory
 of someone special", "On the birthday they'll always remember", …) were retired

@@ -50,8 +50,10 @@ describe("t", () => {
     )
   })
 
-  it("returns the static landing eyebrow", () => {
-    expect(t("landing.eyebrow")).toBe("For any occasion — or none at all")
+  it("returns the CTA caption", () => {
+    expect(t("landing.cta.caption")).toBe(
+      "Free to create · 100% goes to charity"
+    )
   })
 
   it("returns the brand subheader", () => {
