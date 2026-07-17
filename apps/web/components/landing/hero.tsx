@@ -39,9 +39,18 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             {t("landing.eyebrow")}
           </p>
           {/* Single, register-agnostic headline — names the three-beat
-              mechanic the demo plays out; the subheader carries the soul. */}
+              mechanic the demo plays out; the subheader carries the soul.
+              Each sentence takes its own line so the triad never wraps
+              mid-beat. */}
           <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            {t("landing.headline")}
+            {t("landing.headline")
+              .split(". ")
+              .map((sentence, i, all) => (
+                <span key={sentence} className="block">
+                  {sentence}
+                  {i < all.length - 1 ? "." : ""}
+                </span>
+              ))}
           </h1>
           <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
             {t("landing.subheader")}

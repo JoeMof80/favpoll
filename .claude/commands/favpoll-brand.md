@@ -101,28 +101,37 @@ favpoll charges no platform fee. 100% of every pledge reaches the charity; Strip
 
 ### Headline — one fixed, universal line
 
-As of 2026-07-11 the headline is the mechanic itself, named in three beats:
+As of 2026-07-17 the headline centres the guest's favourite in the mechanic's
+three beats:
 
 ```
-Pick, pledge, reveal.
+Pick your favourite. Pledge its worth. Reveal its standing.
 ```
 
 It does **not** cycle, and it deliberately carries no register, no protagonist,
-and no promise about the personal reveal. The division of labour: the **eyebrow**
-carries the breadth, the **headline** names the arc the hero demo then enacts
-(the beat chips under the demo — Pick · Pledge · Reveal — track it live), and
-the **brand statement** carries the soul. "Reveal" is honest for every favpoll
-because poll results are always shown after pledging; the personal reveal — a
-gift, not a gate — stays a *discovered* moment (the demo's blur → lock → reveal
-arc, the reveal pill on real polls), never a headline promise. Do not re-promote
-the personal reveal into hero copy: it is optional per-poll and protagonist-
-shaped, so any one-clause version over-promises, reads gated, or goes vague.
+and no promise about the personal reveal. The favourite is the subject: the
+guest picks *their* favourite, the amount is framed as *what that favourite is
+worth to them* (the Love pillar as a pledge-value anchor), and what's revealed
+is the favourite's **standing** — the poll result, which every favpoll shows
+after pledging ("standing(s)" is deliberately the record's vocabulary). The
+division of labour is unchanged: the **eyebrow** carries the breadth, the
+**headline** names the arc the hero demo then enacts (the beat chips under the
+demo — Pick · Pledge · Reveal — track it live), and the **brand statement**
+carries the soul. The personal reveal — a gift, not a gate — stays a
+*discovered* moment (the demo's blur → lock → reveal arc, the reveal pill on
+real polls), never a headline promise. Do not re-promote the personal reveal
+into hero copy: it is optional per-poll and protagonist-shaped, so any
+one-clause version over-promises, reads gated, or goes vague. Grammar guard:
+it is "pledge **its** worth" (possessive) — never "it's".
 
 Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
 there, never inline.
 
-History: "Turn what you love into what you give." (2026-07-07 → 2026-07-11,
-retired for the "love" repetition against the brand-statement subheader).
+History: "Pick, pledge, reveal." (2026-07-11 → 2026-07-17, retired as
+semantically hollow — punchy but the verbs carried no subject; the worth
+framing was the upgrade). Before that "Turn what you love into what you give."
+(2026-07-07 → 2026-07-11, retired for the "love" repetition against the
+brand-statement subheader).
 Before that: 2026-07-03 → 2026-07-07, six honour-locked headlines cycled per
 occasion (all sharing "<verb> them … what they love — for the causes they care
 about.", canonical memorial line "Honour them through what they loved — for the
