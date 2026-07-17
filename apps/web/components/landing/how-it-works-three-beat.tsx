@@ -35,7 +35,6 @@ const STEPS = [
 // tells one story throughout. The About card carries the signature sentence —
 // the one that sets up the demo's reveal — shown freshly typed, caret still
 // blinking.
-const ABOUT_LEADIN = "\u2026pupil\u2019s name. "
 const ABOUT_SIGNATURE = "She had a signature colour that she loved."
 
 // Watch vignette bars: rest state and the hover nudge (Blue closing in) —
@@ -137,7 +136,6 @@ export function HowItWorksThreeBeat() {
               {/* Freshly typed: same text-box treatment as the Name card,
                   with a blinking caret at the end of the sentence. */}
               <p className="rounded-lg border border-border px-3 py-2 text-sm leading-relaxed text-foreground">
-                <span className="text-muted-foreground">{ABOUT_LEADIN}</span>
                 {ABOUT_SIGNATURE}
                 <span className="ml-0.5 inline-block h-[1em] w-0.5 translate-y-[2px] animate-caret-blink bg-foreground" />
               </p>
