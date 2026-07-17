@@ -1,6 +1,6 @@
 "use client"
 
-// Landing hero: purple band with monogram shimmer texture, a static eyebrow
+// Landing hero: purple band with monogram shimmer texture (eyebrow retired
 // carrying the breadth (any occasion, or none), one fixed universal headline
 // naming the mechanic the demo enacts, a kind nav to jump the demo, and the
 // live animated demo card in a browser-style frame (traffic lights signal that
@@ -35,9 +35,6 @@ export function LandingHero({ liveCount, totalLive }: Props) {
       <div className="relative mx-auto grid max-w-330 items-center gap-12 px-6 py-16 md:grid-cols-[1fr_25rem] md:py-20">
         {/* Left — pitch */}
         <div>
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
-            {t("landing.eyebrow")}
-          </p>
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps

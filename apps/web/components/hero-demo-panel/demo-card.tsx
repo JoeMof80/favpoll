@@ -484,8 +484,8 @@ export function DemoCard({
             transition={
               prefersReducedMotion ? FAST : { duration: 0.2, ease: "easeOut" }
             }
-            style={{ height: dialogH }}
-            className="absolute inset-x-4 bottom-4 z-20 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-xl"
+            style={{ height: dialogH, y: "-50%" }}
+            className="absolute inset-x-4 top-1/2 z-20 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-xl"
             aria-hidden="true"
           >
             <div inert className="flex min-h-0 flex-1 flex-col">

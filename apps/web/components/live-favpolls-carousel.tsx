@@ -40,11 +40,14 @@ export function LiveFavpollsCarousel({ favpolls }: Props) {
 
   return (
     <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="-m-4 overflow-hidden p-4" ref={emblaRef}>
         <ul className="flex gap-4" role="list">
           {favpolls.map((favpoll) => (
             <li key={favpoll.id} className="w-[306px] shrink-0 list-none">
-              <FavpollSummaryCard favpoll={favpoll} className="h-full" />
+              <FavpollSummaryCard
+                favpoll={favpoll}
+                className="h-full shadow-sm transition-all duration-300 hover:shadow-lg motion-safe:hover:-translate-y-1"
+              />
             </li>
           ))}
         </ul>
