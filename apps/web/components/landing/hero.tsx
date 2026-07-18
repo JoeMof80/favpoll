@@ -40,7 +40,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
               mid-beat. */}
-          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
+          <h1 className="mb-6 w-[19.4rem] text-4xl leading-[1.12] font-light tracking-tight sm:w-100 md:w-auto md:max-w-xl md:text-5xl">
             {t("landing.headline")
               .split(". ")
               .map((sentence, i, all) => (
