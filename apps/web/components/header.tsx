@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { Show, SignInButton, SignUpButton } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
@@ -8,35 +8,23 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+
+const MOBILE_LINK =
+  "block rounded-md px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const headerRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function handleOutside(e: MouseEvent | TouchEvent) {
-      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener("mousedown", handleOutside)
-    document.addEventListener("touchstart", handleOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleOutside)
-      document.removeEventListener("touchstart", handleOutside)
-    }
-  }, [menuOpen])
-
-  function close() {
-    setMenuOpen(false)
-  }
+  const close = () => setMenuOpen(false)
 
   return (
-    <header
-      ref={headerRef}
-      className="sticky top-0 z-40 border-b border-border bg-background"
-    >
+    <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="mx-auto flex h-14 items-center justify-between px-6">
         <Link href="/" aria-label="favpoll home">
           <FavpollLogo />
@@ -72,80 +60,84 @@ export function Header() {
             <UserButtonClient />
           </Show>
 
-          {/* Hamburger — mobile only */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 md:hidden"
-            aria-label="Open navigation menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+          {/* Mobile menu — a top sheet that blurs the page behind it */}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 md:hidden"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="top"
+              overlayClassName="bg-background/50 backdrop-blur-md"
+              className="gap-0 px-4 pt-4 pb-6"
+            >
+              <SheetHeader className="p-0 pb-2">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+
+              <nav className="space-y-0.5">
+                <Link href="/record" className={MOBILE_LINK} onClick={close}>
+                  The record
+                </Link>
+                <Link href="/favpolls" className={MOBILE_LINK} onClick={close}>
+                  Favpolls
+                </Link>
+                <Show when="signed-in">
+                  <Link
+                    href="/my-favpolls"
+                    className={MOBILE_LINK}
+                    onClick={close}
+                  >
+                    Your favpolls
+                  </Link>
+                </Show>
+                {/* Mini-sitemap: the rarer destinations live here (and in the
+                    footer), keeping the desktop header lean. */}
+                <Link href="/charities" className={MOBILE_LINK} onClick={close}>
+                  Charities
+                </Link>
+                <Link href="/about" className={MOBILE_LINK} onClick={close}>
+                  About
+                </Link>
+              </nav>
+
+              {/* Appearance — the theme switch */}
+              <div className="mt-2 flex items-center justify-between border-t border-border px-3 pt-3">
+                <span className="text-sm text-muted-foreground">
+                  Appearance
+                </span>
+                <MenuButton />
+              </div>
+
+              {/* Login UI — signed-out only (signed-in users use the avatar) */}
+              <Show when="signed-out">
+                <div className="mt-3 space-y-2 border-t border-border pt-3">
+                  <SignInButton>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={close}
+                    >
+                      Sign in
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton>
+                    <Button className="w-full" onClick={close}>
+                      Sign up
+                    </Button>
+                  </SignUpButton>
+                </div>
+              </Show>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {/* Mobile dropdown */}
-      {menuOpen && (
-        <div className="absolute top-full right-0 left-0 z-50 border-b border-border bg-background px-4 pt-2 pb-4 shadow-sm md:hidden">
-          <nav className="space-y-0.5">
-            <Link
-              href="/record"
-              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={close}
-            >
-              The record
-            </Link>
-            <Link
-              href="/favpolls"
-              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={close}
-            >
-              Favpolls
-            </Link>
-            <Show when="signed-in">
-              <Link
-                href="/my-favpolls"
-                className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-                onClick={close}
-              >
-                Your favpolls
-              </Link>
-            </Show>
-            {/* The drawer is a mini-sitemap — the rare destinations live
-                here (and in the footer), keeping the desktop header lean. */}
-            <Link
-              href="/charities"
-              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={close}
-            >
-              Charities
-            </Link>
-            <Link
-              href="/about"
-              className="block rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={close}
-            >
-              About favpoll
-            </Link>
-            <Show when="signed-out">
-              <div className="space-y-2 pt-3">
-                <SignInButton>
-                  <Button variant="outline" className="w-full" onClick={close}>
-                    Sign in
-                  </Button>
-                </SignInButton>
-                <SignUpButton>
-                  <Button className="w-full" onClick={close}>
-                    Sign up
-                  </Button>
-                </SignUpButton>
-              </div>
-            </Show>
-          </nav>
-        </div>
-      )}
     </header>
   )
 }
