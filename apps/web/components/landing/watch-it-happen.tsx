@@ -78,7 +78,7 @@ export function WatchItHappen() {
       <div className="relative h-[22rem]" aria-hidden="true">
         {/* ── The display, in the distance ── */}
         <div
-          className="absolute top-10 right-6 w-[54%] min-w-72 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
+          className="absolute top-10 right-6 w-80 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
           style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
