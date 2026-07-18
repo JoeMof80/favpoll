@@ -1,10 +1,47 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { FadeIn } from "@/components/landing/fade-in"
 import { ContactForm } from "@/components/contact-form"
+
+// Operational questions the marketing doesn't answer — the anxieties that
+// make an organiser hesitate before creating. Kept product-true (see the
+// brand skill): 90-day cap, editable before close, account-free pledging,
+// goal-as-milestone, unlisted privacy, shared fund. The fee question lives
+// in the "Where the money goes" section, not here.
+const FAQ_ITEMS: { q: string; a: string }[] = [
+  {
+    q: "How long does a favpoll run?",
+    a: "You choose the closing date, up to 90 days from when you create it. When that date arrives, the favpoll closes on its own.",
+  },
+  {
+    q: "Can I change a favpoll after publishing it?",
+    a: "Yes. You can edit the details, the charities and the closing date any time before it closes.",
+  },
+  {
+    q: "Do guests need an account to pledge?",
+    a: "No. A guest pledges with just an email address — there's nothing to sign up for.",
+  },
+  {
+    q: "If I set a goal, does pledging stop once it's reached?",
+    a: "No. A goal is a milestone, not a finish line. The favpoll stays open until its closing date, and every pledge after the goal still counts.",
+  },
+  {
+    q: "Can I keep a favpoll private?",
+    a: "Yes. An unlisted favpoll is reachable only by the people you share the link with, and never appears on the public favpolls page.",
+  },
+  {
+    q: "Can someone pledge for a guest who can't pay?",
+    a: "Yes. Anyone can top up a shared fund, so a child or a guest without means can still take part — and nobody sees who used it.",
+  },
+  {
+    q: "What happens when a favpoll closes?",
+    a: "Pledging ends and the standings are final. The proceeds go to the charities you chose, and any reveal is shared with the guests who pledged.",
+  },
+]
 
 export const metadata: Metadata = {
   title: "About — favpoll",
@@ -146,6 +183,38 @@ export default function AboutPage() {
               </p>
             </FadeIn>
           </div>
+        </section>
+
+        {/* ── FAQ — the operational questions the marketing doesn't answer.
+            Native <details> so it needs no client JS in this server page. ── */}
+        <section id="faq" className="scroll-mt-20 border-b border-border py-16">
+          <FadeIn>
+            <SectionEyebrow className="mb-2">Good to know</SectionEyebrow>
+            <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
+              The questions that come up.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <div className="max-w-2xl">
+              {FAQ_ITEMS.map(({ q, a }) => (
+                <details
+                  key={q}
+                  className="group border-b border-border py-4 first:border-t"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-foreground [&::-webkit-details-marker]:hidden">
+                    <span>{q}</span>
+                    <ChevronDown
+                      className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </summary>
+                  <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
+                    {a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </FadeIn>
         </section>
 
         {/* ── Contact ── */}

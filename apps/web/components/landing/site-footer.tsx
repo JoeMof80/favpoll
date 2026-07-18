@@ -11,6 +11,7 @@ const EXPLORE = [
   ["/record", "The record"],
   ["/charities", "Charities"],
   ["/about", "About"],
+  ["/about#faq", "FAQ"],
   ["/about#contact", "Contact"],
 ] as const
 
