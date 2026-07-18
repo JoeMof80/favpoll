@@ -50,7 +50,10 @@ export function LandingHero({ liveCount, totalLive }: Props) {
                 </span>
               ))}
           </h1>
-          <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
+          {/* On mobile the pitch stacks above the demo, so the brand line
+              is capped to the demo's width to share its edges; on desktop
+              it's its own column and keeps the roomier max-w-md. */}
+          <p className="mb-8 w-[19.4rem] text-lg leading-relaxed opacity-80 sm:w-100 md:w-auto md:max-w-md">
             {t("landing.subheader")}
           </p>
           <div className="flex flex-wrap items-center gap-3.5">
