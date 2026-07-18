@@ -194,7 +194,7 @@ export default function AboutPage() {
             <FadeIn>
               <SectionEyebrow className="mb-2">Good to know</SectionEyebrow>
               <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-                The questions that come up.
+                FAQ
               </h2>
               <p className="max-w-md text-base leading-relaxed text-muted-foreground">
                 A few practical things worth knowing before you create a
