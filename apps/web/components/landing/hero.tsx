@@ -32,9 +32,10 @@ export function LandingHero({ liveCount, totalLive }: Props) {
   return (
     <section className="relative bg-primary text-primary-foreground">
       <HeroTexture />
-      <div className="relative mx-auto grid max-w-330 items-center gap-12 px-6 py-16 md:grid-cols-[1fr_25rem] md:py-20">
-        {/* Left — pitch */}
-        <div>
+      <div className="relative mx-auto grid max-w-330 gap-8 px-6 py-10 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-20">
+        {/* Left — pitch (headline + CTA). Stats are a separate cell below,
+            so on mobile the demo comes right after the pitch. */}
+        <div className="md:col-start-1 md:row-start-1">
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
@@ -52,54 +53,20 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
             {t("landing.subheader")}
           </p>
-          <div className="mb-12 flex flex-wrap items-center gap-3.5">
+          <div className="flex flex-wrap items-center gap-3.5">
             <Button asChild size="lg" variant="secondary">
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
           </div>
-          <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8">
-            <div>
-              <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Open favpolls
-              </dt>
-              <dd className="mt-1 text-3xl font-light tabular-nums">
-                <CountUp
-                  value={liveCount}
-                  format={(n) => String(Math.round(n))}
-                />
-              </dd>
-            </div>
-            {totalLive > 0 && (
-              <div>
-                <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                  Raised by open favpolls
-                </dt>
-                <dd className="mt-1 text-3xl font-light tabular-nums">
-                  <CountUp
-                    value={totalLive}
-                    format={(n) =>
-                      formatCurrency(Math.round(n), MARKET_DEFAULTS["en-GB"])
-                    }
-                  />
-                </dd>
-              </div>
-            )}
-            <div>
-              <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Reaches charity
-              </dt>
-              <dd className="mt-1 text-3xl font-light tabular-nums">
-                <CountUp value={100} format={(n) => `${Math.round(n)}%`} />
-              </dd>
-            </div>
-          </dl>
         </div>
 
         {/* Right — live demo in a browser-style frame. Rendered at full
             logical size (nothing cropped — the real experience) and optically
             scaled: 80% on md+, 68% on phones so the same card fits a
-            ~360px-wide screen. Stacks below the pitch on mobile. */}
-        <div className="mx-auto md:mx-0">
+            ~360px-wide screen. On mobile it stacks directly under the pitch,
+            before the stats, so the demo is the first thing a visitor scrolls
+            to. */}
+        <div className="md:col-start-2 md:row-span-2 md:row-start-1">
           <span className="sr-only">
             Animated demonstration of how favpoll works. It cycles through the
             different kinds of favpoll automatically; use the buttons below to
@@ -108,7 +75,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
           <div
-            className="mb-4 flex flex-wrap justify-center gap-2"
+            className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
             role="group"
             aria-label="Preview a kind of favpoll"
           >
@@ -167,7 +134,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             </div>
             {/* Beat indicator: which of the three beats the loop is in */}
             <div
-              className="mt-3 flex w-[19.4rem] items-center justify-center gap-4 sm:w-100"
+              className="mt-3 flex w-[19.4rem] items-center justify-start gap-4 sm:w-100 md:justify-center"
               aria-hidden="true"
             >
               {BEATS.map((label, i) => (
@@ -190,6 +157,43 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             </div>
           </div>
         </div>
+
+        <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8 md:col-start-1 md:row-start-2">
+          <div>
+            <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
+              Open favpolls
+            </dt>
+            <dd className="mt-1 text-3xl font-light tabular-nums">
+              <CountUp
+                value={liveCount}
+                format={(n) => String(Math.round(n))}
+              />
+            </dd>
+          </div>
+          {totalLive > 0 && (
+            <div>
+              <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
+                Raised by open favpolls
+              </dt>
+              <dd className="mt-1 text-3xl font-light tabular-nums">
+                <CountUp
+                  value={totalLive}
+                  format={(n) =>
+                    formatCurrency(Math.round(n), MARKET_DEFAULTS["en-GB"])
+                  }
+                />
+              </dd>
+            </div>
+          )}
+          <div>
+            <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
+              Reaches charity
+            </dt>
+            <dd className="mt-1 text-3xl font-light tabular-nums">
+              <CountUp value={100} format={(n) => `${Math.round(n)}%`} />
+            </dd>
+          </div>
+        </dl>
       </div>
     </section>
   )
