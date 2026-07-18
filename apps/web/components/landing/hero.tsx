@@ -32,7 +32,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
   return (
     <section className="relative bg-primary text-primary-foreground">
       <HeroTexture />
-      <div className="relative mx-auto grid max-w-xl gap-8 px-6 py-10 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-20">
+      <div className="relative mx-auto grid max-w-[19.4rem] gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
         {/* Left — pitch (headline + CTA). Stats are a separate cell below,
             so on mobile the demo comes right after the pitch. */}
         <div className="md:col-start-1 md:row-start-1">
@@ -40,7 +40,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
               mid-beat. */}
-          <h1 className="mb-6 w-[19.4rem] text-4xl leading-[1.12] font-light tracking-tight sm:w-100 md:w-auto md:max-w-xl md:text-5xl">
+          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
             {t("landing.headline")
               .split(". ")
               .map((sentence, i, all) => (
@@ -50,10 +50,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
                 </span>
               ))}
           </h1>
-          {/* On mobile the pitch stacks above the demo, so the brand line
-              is capped to the demo's width to share its edges; on desktop
-              it's its own column and keeps the roomier max-w-md. */}
-          <p className="mb-8 w-[19.4rem] text-lg leading-relaxed opacity-80 sm:w-100 md:w-auto md:max-w-md">
+          <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
             {t("landing.subheader")}
           </p>
           <div className="flex flex-wrap items-center gap-3.5">
@@ -78,7 +75,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
           <div
-            className="mb-4 flex w-[19.4rem] flex-wrap justify-start gap-2 sm:w-100 md:justify-center"
+            className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
             role="group"
             aria-label="Preview a kind of favpoll"
           >
