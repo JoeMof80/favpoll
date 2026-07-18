@@ -61,7 +61,6 @@ const meta = {
   parameters: { layout: "padded" },
   args: {
     onEdit: () => {},
-    onRemove: () => {},
     onOpenItemsDialog: () => {},
   },
 } satisfies Meta<typeof WizardTopicCard>

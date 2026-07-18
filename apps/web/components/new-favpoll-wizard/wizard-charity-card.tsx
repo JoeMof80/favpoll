@@ -52,14 +52,16 @@ export function WizardCharityCard({
               >
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="ghost"
-                onClick={() => onRemove(c.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {charities.length > 1 && (
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={() => onRemove(c.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
