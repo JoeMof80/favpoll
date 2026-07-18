@@ -90,23 +90,24 @@ export function CommandPanel({
       >
         <Button
           type="button"
-          size="lg"
           disabled={submitting}
           onClick={handleClick}
-          className="h-12 rounded-full px-6 text-base shadow-lg"
+          aria-label={
+            submitting
+              ? mode === "create"
+                ? "Publishing…"
+                : "Saving…"
+              : mode === "create"
+                ? "Publish"
+                : "Save"
+          }
+          className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
           {mode === "create" ? (
-            <Send data-icon="inline-start" aria-hidden="true" />
+            <Send aria-hidden="true" />
           ) : (
-            <Check data-icon="inline-start" aria-hidden="true" />
+            <Check aria-hidden="true" />
           )}
-          {submitting
-            ? mode === "create"
-              ? "Publishing…"
-              : "Saving…"
-            : mode === "create"
-              ? "Publish"
-              : "Save"}
         </Button>
       </div>
 
