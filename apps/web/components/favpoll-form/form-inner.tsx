@@ -267,10 +267,9 @@ export function FormInner({
                 <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
                   <Button
                     type="button"
-                    variant="ghost"
                     disabled={isGenerating}
                     onClick={handleRegenerate}
-                    className="gap-2 rounded-full bg-background px-4 shadow-md"
+                    className="gap-2 rounded-full px-4 shadow-md"
                   >
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                     {isGenerating ? "Generating…" : "Generate a suggestion"}
