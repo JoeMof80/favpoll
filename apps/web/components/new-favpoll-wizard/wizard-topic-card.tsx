@@ -53,7 +53,7 @@ export function WizardTopicCard({
                 key={label}
                 size="lg"
                 readOnly
-                className="border-primary bg-primary text-white"
+                className="border-primary bg-primary text-primary-foreground"
               >
                 {label}
               </Chip>

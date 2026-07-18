@@ -35,7 +35,7 @@ function Chip({
         className={cn(
           "inline-flex min-w-0 shrink items-center gap-1 rounded-full border font-medium whitespace-normal",
           chipSizeClasses[size],
-          "border-primary bg-primary text-white",
+          "border-primary bg-primary text-primary-foreground",
           className
         )}
       >
@@ -62,7 +62,7 @@ function Chip({
         readOnly
           ? "pointer-events-none border-border bg-background font-normal text-muted-foreground/60 shadow-none"
           : selected
-            ? "border-primary bg-primary font-medium text-white hover:bg-primary/90"
+            ? "border-primary bg-primary font-medium text-primary-foreground hover:bg-primary/90"
             : "border-border bg-muted font-normal text-muted-foreground shadow-none hover:border-border-strong hover:text-primary",
         className
       )}
