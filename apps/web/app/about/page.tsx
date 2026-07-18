@@ -186,35 +186,43 @@ export default function AboutPage() {
         </section>
 
         {/* ── FAQ — the operational questions the marketing doesn't answer.
-            Native <details> so it needs no client JS in this server page. ── */}
+            Two-column (heading left, accordion right) to match the Contact
+            section below and fill the width. Native <details> — no client
+            JS in this server page. ── */}
         <section id="faq" className="scroll-mt-20 border-b border-border py-16">
-          <FadeIn>
-            <SectionEyebrow className="mb-2">Good to know</SectionEyebrow>
-            <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              The questions that come up.
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.08}>
-            <div className="max-w-2xl">
-              {FAQ_ITEMS.map(({ q, a }) => (
-                <details
-                  key={q}
-                  className="group border-b border-border py-4 first:border-t"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-foreground [&::-webkit-details-marker]:hidden">
-                    <span>{q}</span>
-                    <ChevronDown
-                      className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-                    {a}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </FadeIn>
+          <div className="grid gap-10 md:grid-cols-2 md:items-start md:gap-16">
+            <FadeIn>
+              <SectionEyebrow className="mb-2">Good to know</SectionEyebrow>
+              <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
+                The questions that come up.
+              </h2>
+              <p className="max-w-md text-base leading-relaxed text-muted-foreground">
+                A few practical things worth knowing before you create a
+                favpoll.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.08}>
+              <div>
+                {FAQ_ITEMS.map(({ q, a }) => (
+                  <details
+                    key={q}
+                    className="group border-b border-border py-4 first:border-t"
+                  >
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-foreground [&::-webkit-details-marker]:hidden">
+                      <span>{q}</span>
+                      <ChevronDown
+                        className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+                        aria-hidden="true"
+                      />
+                    </summary>
+                    <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                      {a}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
         </section>
 
         {/* ── Contact ── */}
