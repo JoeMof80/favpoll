@@ -78,28 +78,32 @@ export function WatchItHappen() {
       <div className="relative h-[22rem]" aria-hidden="true">
         {/* ── The display, in the distance ── */}
         <div
-          className="absolute top-10 right-6 w-80 [transform:perspective(1100px)_rotateY(-16deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
+          className="absolute top-10 right-6 w-80 [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
           style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
             In memory of Belinda Hartley
           </p>
 
-          {/* Telethon strip: total vs goal (fixed-height line — no shift) */}
-          <p className="mt-1 text-xl font-medium text-foreground">
-            {GBP(total)}{" "}
-            <span
-              className={
+          {/* Telethon strip — value and status on their own fixed-height
+              lines so the frame never resizes as the message changes (a real
+              display doesn't grow). */}
+          <div className="mt-1">
+            <p className="text-xl leading-tight font-medium text-foreground tabular-nums">
+              {GBP(total)}
+            </p>
+            <p
+              className={`truncate text-xs leading-tight ${
                 goalReached
-                  ? "text-xs font-medium text-success"
-                  : "text-xs font-normal text-muted-foreground"
-              }
+                  ? "font-medium text-success"
+                  : "font-normal text-muted-foreground"
+              }`}
             >
               {goalReached
                 ? "goal reached — every pledge still counts"
                 : `of the ${GBP(GOAL)} goal`}
-            </span>
-          </p>
+            </p>
+          </div>
           <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
