@@ -9,7 +9,7 @@
 // goal-as-milestone moment — the poll never stops at goal; the room just
 // celebrates). A second guest's pledge then lands on its own, so the room
 // reads as live rather than waiting for you.
-// The exemplar is a CELEBRATION — Arthur's 70th, a dog-mad birthday — so the
+// The exemplar is a CELEBRATION — Jess's 30th, a dog-mad birthday — so the
 // landing shows its range: the hero demo's featured scene is Belinda's
 // memorial; the room is a party. Topic · charity · subject cohere the
 // platonic way (dog lover → Favourite dog breed → Dogs Trust), the same
@@ -93,7 +93,7 @@ export function WatchItHappen() {
           style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
-            Arthur&apos;s 70th birthday
+            Jess&apos;s 30th birthday
           </p>
 
           {/* Telethon strip — value and status on their own fixed-height
@@ -204,7 +204,7 @@ export function WatchItHappen() {
                   £50 to Dogs Trust
                 </p>
                 <p className="text-center text-[10px] leading-relaxed text-muted-foreground">
-                  Arthur&apos;s favourite is waiting for you
+                  Jess&apos;s favourite is waiting for you
                 </p>
               </div>
             )}
