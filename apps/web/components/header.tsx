@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Show, SignInButton, SignUpButton } from "@clerk/nextjs"
+import { Show, SignInButton, SignUpButton, useClerk } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
 import Link from "next/link"
@@ -10,20 +10,27 @@ import { MenuButton } from "@favpoll/ui"
 import { FavpollLogo } from "@/components/favpoll-logo"
 
 const MOBILE_LINK =
-  "block rounded-md px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+  "block w-full rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
+  const clerk = useClerk()
 
-  // Close on Escape (the scrim handles click-away; links close on tap).
+  // While the menu is open: lock the page scroll and close on Escape.
+  // Click-away is handled by the scrim below.
   useEffect(() => {
     if (!menuOpen) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setMenuOpen(false)
     }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.removeEventListener("keydown", onKey)
+    }
   }, [menuOpen])
 
   return (
@@ -58,9 +65,12 @@ export function Header() {
             <MenuButton />
           </div>
 
-          {/* Avatar — always visible when signed in */}
+          {/* Avatar — desktop only; on mobile the header stays logo + hamburger
+              and the account actions live in the menu. */}
           <Show when="signed-in">
-            <UserButtonClient />
+            <div className="hidden md:block">
+              <UserButtonClient />
+            </div>
           </Show>
 
           {/* Hamburger — mobile only */}
@@ -80,8 +90,9 @@ export function Header() {
       </div>
 
       {/* Mobile menu — a dropdown below the header (logo + hamburger stay in
-          view). A scrim blurs the page behind it; the header itself stays
-          sharp because the scrim starts at its bottom edge (top-14). */}
+          view). A scrim blurs and freezes the page behind it; the header stays
+          sharp because the scrim starts at its bottom edge (top-14). Tapping
+          the scrim dismisses the menu. */}
       {menuOpen && (
         <>
           <div
@@ -122,7 +133,7 @@ export function Header() {
               <MenuButton />
             </div>
 
-            {/* Login UI — signed-out only (signed-in users use the avatar) */}
+            {/* Account — sign in/up when signed out, manage/sign out when in */}
             <Show when="signed-out">
               <div className="mt-3 space-y-2 border-t border-border pt-3">
                 <SignInButton>
@@ -135,6 +146,30 @@ export function Header() {
                     Sign up
                   </Button>
                 </SignUpButton>
+              </div>
+            </Show>
+            <Show when="signed-in">
+              <div className="mt-2 space-y-0.5 border-t border-border pt-2">
+                <button
+                  type="button"
+                  className={MOBILE_LINK}
+                  onClick={() => {
+                    close()
+                    clerk.openUserProfile()
+                  }}
+                >
+                  Manage account
+                </button>
+                <button
+                  type="button"
+                  className={MOBILE_LINK}
+                  onClick={() => {
+                    close()
+                    clerk.signOut()
+                  }}
+                >
+                  Sign out
+                </button>
               </div>
             </Show>
           </div>
