@@ -85,21 +85,25 @@ export function WatchItHappen() {
             In memory of Belinda Hartley
           </p>
 
-          {/* Telethon strip: total vs goal (fixed-height line — no shift) */}
-          <p className="mt-1 text-xl font-medium text-foreground">
-            {GBP(total)}{" "}
-            <span
-              className={
+          {/* Telethon strip — value and status on their own fixed-height
+              lines so the frame never resizes as the message changes (a real
+              display doesn't grow). */}
+          <div className="mt-1">
+            <p className="text-xl leading-tight font-medium text-foreground tabular-nums">
+              {GBP(total)}
+            </p>
+            <p
+              className={`truncate text-xs leading-tight ${
                 goalReached
-                  ? "text-xs font-medium text-success"
-                  : "text-xs font-normal text-muted-foreground"
-              }
+                  ? "font-medium text-success"
+                  : "font-normal text-muted-foreground"
+              }`}
             >
               {goalReached
                 ? "goal reached — every pledge still counts"
                 : `of the ${GBP(GOAL)} goal`}
-            </span>
-          </p>
+            </p>
+          </div>
           <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}

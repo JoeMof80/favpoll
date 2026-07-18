@@ -32,7 +32,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
   return (
     <section className="relative bg-primary text-primary-foreground">
       <HeroTexture />
-      <div className="relative mx-auto grid max-w-330 gap-8 px-6 py-10 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-20">
+      <div className="relative mx-auto grid max-w-xl gap-8 px-6 py-10 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-20">
         {/* Left — pitch (headline + CTA). Stats are a separate cell below,
             so on mobile the demo comes right after the pitch. */}
         <div className="md:col-start-1 md:row-start-1">
