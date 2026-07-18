@@ -75,7 +75,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
           <div
-            className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
+            className="mb-4 flex w-[19.4rem] flex-wrap justify-start gap-2 sm:w-100 md:justify-center"
             role="group"
             aria-label="Preview a kind of favpoll"
           >
