@@ -15,8 +15,15 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Chip } from "@/components/ui/chip"
 import { InputGroupButton } from "@/components/ui/input-group"
 
-const QUESTION = "Favourite meeting room"
-const ITEMS = ["The fishbowl", "Third-floor corner", "The one with the sofa"]
+// The custom-topic exemplar: a family in-joke no canon could ever hold —
+// the purest case for the create path. Items are meaningless to strangers
+// and everything to the guest list (an 80th, or a memorial — both work).
+const QUESTION = "Favourite Grandad story"
+const ITEMS = [
+  "The wheelbarrow incident",
+  "The time he met Elvis",
+  "The allotment feud",
+]
 // Real canonical topics shown in the picker before the search filters them out.
 const SUGGESTED_TOPICS = ["Colour", "Season", "Song", "Film", "Biscuit"]
 
@@ -205,7 +212,7 @@ export function AnyoneCanAnswer() {
                       : "flex-1 text-base text-muted-foreground/50"
                   }
                 >
-                  {inputText || "Add meeting room options…"}
+                  {inputText || "Add grandad story options…"}
                   {phase.kind === "typing" && (
                     <span className="opacity-40">|</span>
                   )}
