@@ -116,7 +116,6 @@ export function NewFavpollWizard({ data }: Props) {
                     customLabels={w.customLabels}
                     showItemsSection={w.showItemsSection}
                     onEdit={() => w.setLoveOpen(true)}
-                    onRemove={() => w.setTopics([])}
                     onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
                   />
                 ) : (

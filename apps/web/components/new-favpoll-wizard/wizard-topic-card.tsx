@@ -1,6 +1,6 @@
 "use client"
 
-import { Edit, Trash2 } from "lucide-react"
+import { Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
@@ -14,7 +14,6 @@ type Props = {
   customLabels: string[]
   showItemsSection: boolean
   onEdit: () => void
-  onRemove: () => void
   onOpenItemsDialog: () => void
 }
 
@@ -24,26 +23,15 @@ export function WizardTopicCard({
   customLabels,
   showItemsSection,
   onEdit,
-  onRemove,
   onOpenItemsDialog,
 }: Props) {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <div className="flex items-start justify-between gap-2">
         <SectionLabel title={shortTopicLabel(topic.title)} size="lg" />
-        <div>
-          <Button type="button" size="icon-sm" variant="ghost" onClick={onEdit}>
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            onClick={onRemove}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button type="button" size="icon-sm" variant="ghost" onClick={onEdit}>
+          <Edit className="h-4 w-4" />
+        </Button>
       </div>
 
       {showItemsSection && (
