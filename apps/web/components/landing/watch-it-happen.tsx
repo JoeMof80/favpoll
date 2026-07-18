@@ -9,6 +9,11 @@
 // goal-as-milestone moment — the poll never stops at goal; the room just
 // celebrates). A second guest's pledge then lands on its own, so the room
 // reads as live rather than waiting for you.
+// The exemplar is a CELEBRATION — Jess's 30th, a dog-mad birthday — so the
+// landing shows its range: the hero demo's featured scene is Belinda's
+// memorial; the room is a party. Topic · charity · subject cohere the
+// platonic way (dog lover → Favourite dog breed → Dogs Trust), the same
+// teaching example as the About page's definition.
 // Figures end on the landing's agreed numbers: £855 → £925 over £900.
 // Reduced motion: the final frame (goal reached), static.
 import { useEffect, useState } from "react"
@@ -25,17 +30,23 @@ const GOAL = 900
 const STEP_MS = [1600, 1000, 350, 2600, 4600]
 const LAST = STEP_MS.length - 1
 
-// Display state per step: [Purple, Blue, Red, Green] bars + running total —
-// the bars sum exactly to the total at every step.
+// Display state per step: [Labrador, Cocker Spaniel, Border Terrier,
+// Greyhound] bars + running total — the bars sum exactly to the total at
+// every step.
 const BARS: [number, number, number, number][] = [
   [350, 220, 165, 120],
   [350, 220, 165, 120],
   [350, 220, 165, 120],
-  [350, 270, 165, 120], // Raj's £50 on Blue → £905, goal crossed
-  [370, 270, 165, 120], // Amara's £20 on Purple → £925
+  [350, 270, 165, 120], // Raj's £50 on Cocker Spaniel → £905, goal crossed
+  [370, 270, 165, 120], // Amara's £20 on Labrador → £925
 ]
 const TOTALS = [855, 855, 855, 905, 925]
-const LABELS = ["Purple", "Blue", "Red", "Green"] as const
+const LABELS = [
+  "Labrador",
+  "Cocker Spaniel",
+  "Border Terrier",
+  "Greyhound",
+] as const
 const PRESETS = ["£5", "£10", "£20", "£50"] as const
 
 export function WatchItHappen() {
@@ -82,7 +93,7 @@ export function WatchItHappen() {
           style={{ transformOrigin: "right center" }}
         >
           <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
-            In memory of Belinda Hartley
+            Jess&apos;s 30th birthday
           </p>
 
           {/* Telethon strip — value and status on their own fixed-height
@@ -116,7 +127,7 @@ export function WatchItHappen() {
 
           {/* Topic heading — labels the bars, as the guest/live page does */}
           <p className="mb-1.5 text-[10px] font-medium tracking-widest text-primary uppercase">
-            Favourite Colour
+            Favourite Dog Breed
           </p>
 
           <div className="space-y-1.5 [&_span]:text-xs">
@@ -146,7 +157,7 @@ export function WatchItHappen() {
           <div className="absolute top-3 left-1/2 h-[18px] w-20 -translate-x-1/2 rounded-full bg-foreground/80" />
           <div className="px-5 pt-12 pb-6">
             <p className="text-center text-[11px] font-medium tracking-widest text-primary uppercase">
-              Favourite colour
+              Favourite dog breed
             </p>
 
             {!confirmed ? (
@@ -155,7 +166,7 @@ export function WatchItHappen() {
                   Your favourite
                 </p>
                 <p className="mt-1 w-fit rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                  Blue
+                  Cocker Spaniel
                 </p>
                 <p className="mt-3 text-[11px] text-muted-foreground">
                   Your pledge
@@ -190,10 +201,10 @@ export function WatchItHappen() {
                   ✓
                 </span>
                 <p className="text-xs font-medium text-foreground">
-                  £50 to Marie Curie
+                  £50 to Dogs Trust
                 </p>
                 <p className="text-center text-[10px] leading-relaxed text-muted-foreground">
-                  Belinda&apos;s favourite is waiting for you
+                  Jess&apos;s favourite is waiting for you
                 </p>
               </div>
             )}
