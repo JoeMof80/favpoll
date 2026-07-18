@@ -66,7 +66,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             ~360px-wide screen. On mobile it stacks directly under the pitch,
             before the stats, so the demo is the first thing a visitor scrolls
             to. */}
-        <div className="mx-auto md:col-start-2 md:row-span-2 md:row-start-1 md:mx-0">
+        <div className="md:col-start-2 md:row-span-2 md:row-start-1">
           <span className="sr-only">
             Animated demonstration of how favpoll works. It cycles through the
             different kinds of favpoll automatically; use the buttons below to
@@ -75,7 +75,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
           <div
-            className="mb-4 flex flex-wrap justify-center gap-2"
+            className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
             role="group"
             aria-label="Preview a kind of favpoll"
           >
@@ -134,7 +134,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             </div>
             {/* Beat indicator: which of the three beats the loop is in */}
             <div
-              className="mt-3 flex w-[19.4rem] items-center justify-center gap-4 sm:w-100"
+              className="mt-3 flex w-[19.4rem] items-center justify-start gap-4 sm:w-100 md:justify-center"
               aria-hidden="true"
             >
               {BEATS.map((label, i) => (
