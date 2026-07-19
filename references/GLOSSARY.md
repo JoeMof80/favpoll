@@ -19,6 +19,7 @@ documented explicitly below.
 ## Terms
 
 ### Protagonist
+
 **What it is:** The individual, couple, or group being honoured in a favpoll.
 May be a single person (memorial, birthday), a couple (wedding, anniversary),
 a group (sports achievement, work milestone), or a baby (christening). Has a
@@ -31,6 +32,7 @@ name (free text — can be "Sarah & Tom" or "The 2024 Sales Team").
 ---
 
 ### Favpoll
+
 **What it is:** The top-level entity in favpoll — both the brand name and the
 entity name. An occasion created by an organiser to honour a protagonist — a
 memorial, birthday, retirement, wedding, etc. Contains polls, charities, and a
@@ -43,6 +45,7 @@ shared fund. Has a closing date and a hard close date.
 ---
 
 ### Topic
+
 **What it is:** A canonical question category — "Colour", "Season",
 "Comfort food", etc. Exists independently of any favpoll. Has a title (no
 "Favourite" prefix), a list of favourites, and a finite/infinite flag. Topics
@@ -56,6 +59,7 @@ shown directly: "Favourite colour".
 ---
 
 ### Favpoll poll
+
 **What it is:** A topic activated within a specific favpoll. Carries a personal
 framing, a reveal, and a curated list of favourites. The join between a
 favpoll and a topic.
@@ -67,6 +71,7 @@ favpoll and a topic.
 ---
 
 ### Favourite
+
 **What it is:** A single answer option within a topic — "Purple", "Autumn",
 "Beans on toast". Favourites belong to a topic, not to a favpoll. A favpoll
 poll references favourites via `favpoll_poll_favourites`. Favourites carry
@@ -79,6 +84,7 @@ data that contributes to the record.
 ---
 
 ### Favpoll poll favourite
+
 **What it is:** The association between a favpoll poll and a favourite.
 Records whether the favourite was guest-added and who added it. Used to
 curate which favourites appear in a given favpoll poll.
@@ -90,6 +96,7 @@ curate which favourites appear in a given favpoll poll.
 ---
 
 ### Pledge
+
 **What it is:** A guest's financial commitment against one or more favourites
 in a favpoll poll. Has a total amount, a fee, and one or more pledge
 allocations. May be made by a signed-in user or a guest (email only).
@@ -101,6 +108,7 @@ allocations. May be made by a signed-in user or a guest (email only).
 ---
 
 ### Pledge allocation
+
 **What it is:** How a pledge is split across favourites. A pledge of £10 split
 60/40 across two favourites creates two pledge allocations of £6 and £4. The
 sum of allocations equals the pledge total amount.
@@ -112,6 +120,7 @@ sum of allocations equals the pledge total amount.
 ---
 
 ### Personal framing — RETIRED (absorbed into About)
+
 **What it was:** A planned organiser-written question shown above the poll
 favourites, withholding the protagonist's favourite to set up the reveal.
 E.g. "Belinda had a colour she returned to all her life — what's yours?"
@@ -120,7 +129,7 @@ E.g. "Belinda had a colour she returned to all her life — what's yours?"
 introduction — is carried by the protagonist **About** text ("tease the topic
 and the cause, but don't give too much away") plus the topic pill and the
 reveal lock. The framing-style copy patterns now inform the About and reveal
-*placeholders* in the wizard, not a standalone field.
+_placeholders_ in the wizard, not a standalone field.
 
 **Code:** `favpoll_polls.personal_framing` column still exists but is dead —
 the app never reads or writes it (see PROJECT.md)
@@ -129,6 +138,7 @@ the app never reads or writes it (see PROJECT.md)
 ---
 
 ### Reveal
+
 **What it is:** The organiser-written disclosure shown to each guest after they
 pledge. Contains the protagonist's answer. May be first person (will-directed
 favpolls) or third person (organiser-written). E.g. "Mine was purple. I wore
@@ -146,6 +156,7 @@ Any references to `personal_quote` in code are outdated and must be updated.
 ---
 
 ### Shared fund
+
 **What it is:** A communal pot of money deposited by the favpoll organiser (or
 generous guests) so that others — children, guests without means — can
 participate without paying from their own pocket. Separate from direct pledges.
@@ -157,6 +168,7 @@ participate without paying from their own pocket. Separate from direct pledges.
 ---
 
 ### Pot allocation
+
 **What it is:** An allocation of shared fund money to a specific guest, enabling
 them to pledge using that allocation. Created when a guest chooses to use the
 shared fund.
@@ -168,6 +180,7 @@ shared fund.
 ---
 
 ### Live display
+
 **What it is:** A full-screen view of a favpoll's real-time rankings + guest
 wall, designed to be shown on a projector or large screen at a physical
 gathering. No pledge panel — guests use their phones while watching the
@@ -188,6 +201,7 @@ display.
 ---
 
 ### Finite topic
+
 **What it is:** A topic with a fixed, canonical list of items that cannot be
 added to by organisers or guests. Examples: Colour, Season, Day of the week.
 Preserves the integrity of the record.
@@ -199,6 +213,7 @@ Preserves the integrity of the record.
 ---
 
 ### Infinite topic
+
 **What it is:** A topic with an open list of items. Organisers can pin and
 reorder items; guests can suggest new items. Examples: Film, Song, Comfort food.
 
@@ -209,6 +224,7 @@ reorder items; guests can suggest new items. Examples: Film, Song, Comfort food.
 ---
 
 ### Inclusion
+
 **What it is:** The process by which a non-canonical favourite is included in
 the master list after appearing in a sufficient number of independent
 favpolls (current threshold: 3). Inclusion means the favourite permanently
@@ -228,6 +244,7 @@ and the column `is_master`. Both have been renamed to match ubiquitous language.
 ---
 
 ### Hard close
+
 **What it is:** The immutable maximum closing date for a favpoll — set to 90
 days after creation and never changeable. When this date is reached the
 favpoll closes automatically regardless of the organiser's chosen closing date.
@@ -239,6 +256,7 @@ favpoll closes automatically regardless of the organiser's chosen closing date.
 ---
 
 ### Auto-close
+
 **What it is:** The automatic closure of a favpoll when `closes_at` or
 `hard_close_at` is reached, triggered by the hourly Vercel cron job. On
 auto-close, `closed_at` is set, `total_raised` is recorded, and the charity
@@ -251,6 +269,7 @@ disbursement is triggered.
 ---
 
 ### The record
+
 **What it is:** The aggregate of all pledged amounts and pledge counts across
 all favpolls for every favourite — favpoll's permanent, financially-weighted
 measure of what people love. Updated in real time via Postgres trigger on
@@ -268,7 +287,58 @@ all-time scores
 
 ---
 
+### Poll standings
+
+**What it is:** THIS poll's pledge sums and counts per favourite — what every
+poll surface shows on its bars (poll page, live display, list-card unlocked
+results, results API). The rule (settled 2026-07-19, PRs #292–#295): bars on
+a poll surface must sum to the favpoll's raised figure, exactly as the hero
+demo card and the Watch-it-live room depict. The record's all-time numbers
+appear ONLY on /record and topic pages — never on a poll's own bars.
+
+**Code:** `lib/poll-standings.ts` — `pollStandings` / `pollSetStandings`
+compute from non-withdrawn `pledges` → `pledge_allocations`;
+`overlayStandings` swaps the values into items' `all_time_*` fields (reused
+field names so `RankingList` and the sort comparators need no fork).
+**Not:** the record, all-time totals, `favourites.all_time_pledged` on a
+poll surface
+
+---
+
+### Settlement total and live totals
+
+**What it is:** `favpolls.total_raised` is a **settlement figure** — written
+once, at close, by the close-favpolls cron. It reads £0 for a favpoll's
+entire live life. Any surface showing money for an open favpoll must compute
+the live sum of non-withdrawn pledges instead.
+
+**Code:** RPC `favpoll_live_totals(uuid[])` (migration `20260719120000`,
+service-role only, `charity_stats` idiom) via `lib/live-totals.ts` —
+overlays live sums onto `total_raised` for open favpolls; closed favpolls
+keep the stored figure. Used by /favpolls, the landing carousel, and the
+hero's open-favpolls stat. The poll page computes its own per-poll sum.
+**Not:** a live counter (do not read `total_raised` for open polls)
+
+---
+
+### E2E favpolls
+
+**What it is:** Favpolls created by Playwright runs — cause labels or
+protagonist names beginning "E2E". The wizard specs assert listing behaviour
+mid-run (cause → listed, memorial → not), so rows stay intact during a run;
+`e2e/global-teardown.ts` unlists them all afterwards so test débris never
+surfaces on /favpolls or the landing. The global-setup fixture ("E2E
+Playwright Test") is created unlisted. Some seed pledges sit under the
+founder's dev Clerk user, which unlocks those cards for them in dev.
+
+**Code:** `apps/web/e2e/global-teardown.ts` (wired in `playwright.config.ts`)
+**Not:** deleted after runs (unlist only — evidence trail + mid-run
+assertions)
+
+---
+
 ### Organiser
+
 **What it is:** The person who creates and manages a favpoll. May be a family
 member, friend, colleague, or executor acting on will instructions. Has full
 edit access to their favpolls.
@@ -280,6 +350,7 @@ edit access to their favpolls.
 ---
 
 ### Guest
+
 **What it is:** Anyone who views and pledges in a favpoll. May be signed in
 (Clerk account) or anonymous (email only). The term covers both.
 
@@ -294,15 +365,15 @@ edit access to their favpolls.
 These are cases where the UI deliberately uses a different term from the code
 for brand or clarity reasons. Both usages are correct in their context.
 
-| Code term | UI term | Reason |
-|---|---|---|
-| `favpolls` (table) | "favpoll" | Brand/product name is singular and lowercase in UI; the table is plural by SQL convention |
-| `protagonist` | shown by name only | Never labelled in UI |
-| `favpoll_polls.personal_framing` | — (retired; column dead, no UI) | Absorbed into the About text |
-| `favpoll_polls.personal_reveal` | "The reveal" (edit label) | More evocative than "reveal" alone |
-| `closes_at` | "favpoll closes" | Branded phrasing |
-| `favourites` (table) | options / pills | Never labelled "favourites" directly in the pledge UI — shown as interactive elements |
-| `all_time_pledged` / `all_time_count` | "the record" | Removes competitive framing |
+| Code term                             | UI term                         | Reason                                                                                    |
+| ------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `favpolls` (table)                    | "favpoll"                       | Brand/product name is singular and lowercase in UI; the table is plural by SQL convention |
+| `protagonist`                         | shown by name only              | Never labelled in UI                                                                      |
+| `favpoll_polls.personal_framing`      | — (retired; column dead, no UI) | Absorbed into the About text                                                              |
+| `favpoll_polls.personal_reveal`       | "The reveal" (edit label)       | More evocative than "reveal" alone                                                        |
+| `closes_at`                           | "favpoll closes"                | Branded phrasing                                                                          |
+| `favourites` (table)                  | options / pills                 | Never labelled "favourites" directly in the pledge UI — shown as interactive elements     |
+| `all_time_pledged` / `all_time_count` | "the record"                    | Removes competitive framing                                                               |
 
 ---
 
