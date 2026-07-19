@@ -44,7 +44,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 20 },
       { label: "Digestive", value: 15 },
     ],
-    pos: "top-0 left-[12%] -rotate-2",
+    pos: "top-0 left-[18%] -rotate-2",
   },
   {
     eyebrow: "Fundraiser",
@@ -54,7 +54,7 @@ const MINIS: Mini[] = [
       { label: "Hobnob", value: 25 },
       { label: "Bourbon", value: 20 },
     ],
-    pos: "top-[36%] left-[8%] rotate-1",
+    pos: "top-[35%] left-[14%] rotate-1",
   },
   {
     eyebrow: "Birthday",
@@ -64,7 +64,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: "bottom-0 left-[14%] rotate-2",
+    pos: "bottom-0 left-[20%] rotate-2",
   },
   {
     eyebrow: "Wedding",
@@ -74,7 +74,7 @@ const MINIS: Mini[] = [
       { label: "Bourbon", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: "top-[2%] right-[6%] rotate-3",
+    pos: "top-[1%] right-[12%] rotate-3",
   },
   {
     eyebrow: "Retirement",
@@ -84,7 +84,7 @@ const MINIS: Mini[] = [
       { label: "Custard Cream", value: 25 },
       { label: "Hobnob", value: 20 },
     ],
-    pos: "top-[38%] right-[4%] -rotate-2",
+    pos: "top-[37%] right-[9%] -rotate-2",
   },
   {
     eyebrow: "For a cause",
@@ -94,7 +94,7 @@ const MINIS: Mini[] = [
       { label: "Digestive", value: 20 },
       { label: "Bourbon", value: 5 },
     ],
-    pos: "bottom-[2%] right-[8%] rotate-2",
+    pos: "bottom-[1%] right-[14%] rotate-2",
   },
 ]
 
@@ -177,7 +177,7 @@ export function RecordFlow() {
   const recordMax = recordValues[ranking[0]]
 
   return (
-    <div className="relative h-[25rem]" aria-hidden="true">
+    <div className="relative h-[22rem]" aria-hidden="true">
       {/* ── The favpolls — clustered tight, tucked under the record; the
           active one comes forward to deliver its pledge ── */}
       {MINIS.map((mini, i) => {
