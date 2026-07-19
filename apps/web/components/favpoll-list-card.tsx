@@ -30,7 +30,7 @@ type FavpollListCardFavpoll = {
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
-  protagonist: { name: string } | null
+  protagonist: { name: string; photo_url?: string | null } | null
   charities: { charity: Charity }[]
   poll: {
     id: string
@@ -122,29 +122,48 @@ export function FavpollListCard({
         } as unknown as FavpollPollWithItems)
       : null
 
+  const displayName =
+    favpoll.subject === "cause"
+      ? (favpoll.cause_label ?? "")
+      : (favpoll.protagonist?.name ?? "")
+
   return (
     <li className={cn("list-none", className)}>
-      <div className="group flex h-full flex-col rounded-xl border border-border bg-background transition-colors duration-200 hover:border-border-strong">
-        <Link href={`/favpolls/${favpoll.id}`} className="relative block p-3">
+      {/* Interaction matches FavpollSummaryCard: the whole card navigates
+          (stretched link below), with the same hover lift + shadow. The
+          poll body sits above the link (relative) so pledging still works. */}
+      <div className="group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1">
+        {/* Stretched link — covers the card; positioned siblings (the poll
+            body) paint and hit-test above it. */}
+        <Link
+          href={`/favpolls/${favpoll.id}`}
+          aria-label={`View favpoll: ${displayName}`}
+          className="absolute inset-0 rounded-xl"
+        />
+        <div className="p-3">
           {favpoll.is_exemplar && (
-            <Badge variant="secondary" className="absolute top-3 right-3">
+            <Badge
+              variant="secondary"
+              className="pointer-events-none absolute top-3 right-3"
+            >
               Example
             </Badge>
           )}
           <FavpollHeader
             protagonist={{
-              name:
+              name: displayName,
+              photo_url:
                 favpoll.subject === "cause"
-                  ? (favpoll.cause_label ?? "")
-                  : (favpoll.protagonist?.name ?? ""),
+                  ? null
+                  : (favpoll.protagonist?.photo_url ?? null),
             }}
             eyebrow={favpollEyebrow(favpoll)}
             size={size}
           />
-        </Link>
+        </div>
 
         {pollWithItems && topicItems.length > 0 && (
-          <div className="border-t border-border px-3 py-2">
+          <div className="relative border-t border-border bg-background px-3 py-2">
             <PollHeading
               topicTitle={pollWithItems.topics.title}
               size="md"

@@ -21,7 +21,7 @@ export type FavpollSummaryCardFavpoll = {
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
-  protagonist: { name: string } | null // null for cause favpolls
+  protagonist: { name: string; photo_url?: string | null } | null // null for cause favpolls
   charities: { charity: Charity }[]
   poll: { topic: { title: string } | null } | null
 }
@@ -47,7 +47,9 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
     <Link
       href={`/favpolls/${favpoll.id}`}
       className={cn(
-        "block rounded-xl border border-border bg-background transition-colors duration-200 hover:border-border-strong",
+        // Hover matches FavpollListCard: border + shadow + lift — the card
+        // shells share one interaction language wherever favpolls appear.
+        "block rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
         className
       )}
     >
@@ -59,7 +61,13 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
           </Badge>
         )}
         <FavpollHeader
-          protagonist={{ name: displayName }}
+          protagonist={{
+            name: displayName,
+            photo_url:
+              favpoll.subject === "cause"
+                ? null
+                : (favpoll.protagonist?.photo_url ?? null),
+          }}
           eyebrow={favpollEyebrow(favpoll)}
           size="md"
         />
