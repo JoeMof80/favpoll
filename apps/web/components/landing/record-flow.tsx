@@ -1,18 +1,20 @@
 "use client"
 
 // The record vignette — the landing's fourth scripted illustration (with the
-// hero demo, the Grandad dialogs and the watch room): a constellation of
-// favpolls scattered around one record card, all asking the same topic. The
-// scripted loop walks the constellation: a pledge lands on a mini favpoll
-// (+£ pill, bar growth) and BOTH cards glow in sync — the favpoll
-// energising the record — as the same amount moves the record's standing.
-// Midway, a pledge tips Jaffa Cake past Custard Cream and the record
-// re-ranks live (the bump moment, the record's whole drama).
+// hero demo, the Grandad dialogs and the watch room): a tight cluster of
+// favpolls around one record card, all asking the same topic. Three featured
+// favpolls (fully visible, left) take the pledges; three more tuck behind
+// the record's edges as texture — the "many more" the baseline implies.
+//
+// The scripted loop tells one causal story per beat, twice over: a +£ pill
+// appears on the favpoll's item AND on the record's same item, while both
+// bar fills flip to primary and pulse in sync — the favpoll's bar visibly
+// energising the record bar it aggregates into. Pledge four tips Jaffa
+// Cake past Custard Cream and the record re-ranks live (the bump moment).
 //
 // Arithmetic discipline (the watch room's rule): every record movement
-// equals a visible pledge on a mini card. The record's baseline stands for
-// the many favpolls that fed it before this scene — nothing moves unpaid.
-// Reduced motion: the final frame (post-overtake), static, no glow.
+// equals a visible pledge on a featured card. Reduced motion: the final
+// frame (post-overtake), static, no glow.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 
@@ -25,47 +27,55 @@ type Mini = {
   eyebrow: string
   title: string
   base: Record<Item, number>
-  /** Scatter position + tilt on the constellation canvas */
+  /** Cluster position + tilt; background cards tuck behind the record */
   pos: string
+  featured: boolean
 }
 
-// Six occasions across the registers, scattered around the record.
 const MINIS: Mini[] = [
+  // ── Featured: fully visible on the left, these take the pledges ──
   {
     eyebrow: "In memory of",
     title: "June Bailey",
     base: { "Jaffa Cake": 30, "Custard Cream": 45, Bourbon: 15 },
-    pos: "top-0 left-[2%] -rotate-3",
-  },
-  {
-    eyebrow: "Wedding",
-    title: "Amy & Tom",
-    base: { "Jaffa Cake": 15, "Custard Cream": 25, Bourbon: 20 },
-    pos: "top-[3%] right-[3%] rotate-2",
-  },
-  {
-    eyebrow: "Retirement",
-    title: "Pat Nowak",
-    base: { "Jaffa Cake": 25, "Custard Cream": 20, Bourbon: 30 },
-    pos: "top-[36%] left-0 rotate-1",
+    pos: "top-0 left-[6%] -rotate-2",
+    featured: true,
   },
   {
     eyebrow: "Fundraiser",
     title: "Ben's Big Run",
     base: { "Jaffa Cake": 40, "Custard Cream": 15, Bourbon: 25 },
-    pos: "top-[38%] right-0 -rotate-2",
+    pos: "top-[34%] left-0 rotate-1",
+    featured: true,
   },
   {
     eyebrow: "Birthday",
     title: "Rosa's 50th",
     base: { "Jaffa Cake": 20, "Custard Cream": 30, Bourbon: 10 },
-    pos: "bottom-0 left-[6%] rotate-2",
+    pos: "bottom-0 left-[8%] rotate-2",
+    featured: true,
+  },
+  // ── Background: tucked behind the record's edges, static texture ──
+  {
+    eyebrow: "Wedding",
+    title: "Amy & Tom",
+    base: { "Jaffa Cake": 15, "Custard Cream": 25, Bourbon: 20 },
+    pos: "top-[2%] right-[4%] rotate-3",
+    featured: false,
+  },
+  {
+    eyebrow: "Retirement",
+    title: "Pat Nowak",
+    base: { "Jaffa Cake": 25, "Custard Cream": 20, Bourbon: 30 },
+    pos: "top-[38%] right-0 -rotate-2",
+    featured: false,
   },
   {
     eyebrow: "For a cause",
     title: "Bake Sale for Shelter",
     base: { "Jaffa Cake": 20, "Custard Cream": 10, Bourbon: 10 },
-    pos: "bottom-[2%] right-[5%] -rotate-1",
+    pos: "bottom-[2%] right-[6%] rotate-2",
+    featured: false,
   },
 ]
 
@@ -78,23 +88,34 @@ const RECORD_BASE: Record<Item, number> = {
 
 const PLEDGES: { card: number; item: Item; amount: number }[] = [
   { card: 0, item: "Jaffa Cake", amount: 20 },
-  { card: 2, item: "Bourbon", amount: 15 },
-  { card: 1, item: "Custard Cream", amount: 10 }, // CC extends its lead…
-  { card: 3, item: "Jaffa Cake", amount: 30 }, // …then 2,155 > 2,150 — overtake
-  { card: 4, item: "Bourbon", amount: 10 },
-  { card: 5, item: "Jaffa Cake", amount: 20 },
+  { card: 1, item: "Bourbon", amount: 15 },
+  { card: 2, item: "Custard Cream", amount: 10 }, // CC extends its lead…
+  { card: 1, item: "Jaffa Cake", amount: 30 }, // …then 2,155 > 2,150 — overtake
+  { card: 2, item: "Bourbon", amount: 10 },
+  { card: 0, item: "Jaffa Cake", amount: 20 },
 ]
 
 // step 0: idle · 1–6: pledges land · 7: hold → reset
-const STEP_MS = [1600, 2400, 2400, 2400, 3200, 2400, 2400, 4600]
+const STEP_MS = [1600, 2600, 2600, 2600, 3400, 2600, 2600, 4600]
 const LAST = STEP_MS.length - 1
 
 const GBP = (n: number) => `£${n.toLocaleString("en-GB")}`
 const RECORD_ROW_H = 42
 
-// The synced glow: the active favpoll and the record share this while a
-// pledge lands — the favpoll energising the record.
+// Card-level glow while a pledge lands — shared by the active favpoll and
+// the record, in sync: the favpoll energising the record.
 const GLOW = "border-primary ring-4 ring-primary/15 shadow-lg shadow-primary/25"
+// Bar-level sync: the favpoll's item fill and the record's same item fill
+// flip to primary and pulse together while the pledge lands.
+const ACTIVE_FILL = "bg-primary motion-safe:animate-pulse"
+
+function PlusPill({ amount }: { amount: number }) {
+  return (
+    <span className="ml-1.5 rounded-full bg-primary px-1.5 py-px text-[9px] font-medium text-primary-foreground">
+      +{GBP(amount)}
+    </span>
+  )
+}
 
 export function RecordFlow() {
   const reduced = useReducedMotion()
@@ -133,8 +154,8 @@ export function RecordFlow() {
   const recordMax = recordValues[ranking[0]]
 
   return (
-    <div className="relative h-[30rem]" aria-hidden="true">
-      {/* ── The favpolls — scattered around the record ── */}
+    <div className="relative h-[27rem]" aria-hidden="true">
+      {/* ── The favpolls — featured left, the rest tucked behind ── */}
       {MINIS.map((mini, i) => {
         const values = miniValues[i]
         const miniMax = Math.max(...ITEMS.map((item) => values[item]))
@@ -143,7 +164,9 @@ export function RecordFlow() {
           <div
             key={mini.title}
             className={`absolute w-40 rounded-lg border bg-background p-2.5 transition-all duration-300 ${mini.pos} ${
-              isActive ? `z-20 ${GLOW}` : "z-0 border-border shadow-sm"
+              isActive
+                ? `z-[5] ${GLOW}`
+                : `border-border ${mini.featured ? "z-[5] shadow-sm" : "z-0 shadow-sm"}`
             }`}
           >
             <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -156,40 +179,48 @@ export function RecordFlow() {
               {TOPIC}
             </p>
             <div className="space-y-[3px]">
-              {ITEMS.map((item) => (
-                <div key={item}>
-                  <div className="flex items-baseline justify-between text-[9px] leading-tight">
-                    <span className="text-foreground">
-                      {item}
-                      {isActive && active?.item === item && (
-                        <span className="ml-1 rounded-full bg-secondary px-1 py-px text-[8px] font-medium text-secondary-foreground">
-                          +{GBP(active.amount)}
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-muted-foreground tabular-nums">
-                      {GBP(values[item])}
-                    </span>
+              {ITEMS.map((item) => {
+                const isActiveBar = isActive && active?.item === item
+                return (
+                  <div key={item}>
+                    <div className="flex items-baseline justify-between text-[9px] leading-tight">
+                      <span
+                        className={
+                          isActiveBar
+                            ? "font-medium text-primary"
+                            : "text-foreground"
+                        }
+                      >
+                        {item}
+                        {isActiveBar && <PlusPill amount={active.amount} />}
+                      </span>
+                      <span className="text-muted-foreground tabular-nums">
+                        {GBP(values[item])}
+                      </span>
+                    </div>
+                    <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className={`h-full rounded-full ${
+                          isActiveBar ? ACTIVE_FILL : "bg-chart-3"
+                        }`}
+                        style={{
+                          width: `${Math.round((values[item] / miniMax) * 100)}%`,
+                          transition: reduced ? "none" : "width 700ms ease-out",
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-chart-3"
-                      style={{
-                        width: `${Math.round((values[item] / miniMax) * 100)}%`,
-                        transition: reduced ? "none" : "width 700ms ease-out",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )
       })}
 
-      {/* ── The record — centred; glows in sync with the active favpoll ── */}
+      {/* ── The record — centred; card and bar glow in sync with the
+          active favpoll ── */}
       <div
-        className={`absolute top-1/2 left-1/2 z-10 w-64 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
+        className={`absolute top-1/2 left-[54%] z-10 w-64 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
           active ? GLOW : "border-border shadow-md"
         }`}
       >
@@ -203,7 +234,7 @@ export function RecordFlow() {
         >
           {ITEMS.map((item) => {
             const rank = ranking.indexOf(item)
-            const isActive = active?.item === item
+            const isActiveBar = active?.item === item
             return (
               <div
                 key={item}
@@ -216,10 +247,13 @@ export function RecordFlow() {
                 <div className="flex items-baseline justify-between text-xs">
                   <span
                     className={`font-medium transition-colors duration-300 ${
-                      isActive ? "text-primary" : "text-foreground"
+                      isActiveBar ? "text-primary" : "text-foreground"
                     }`}
                   >
                     {item}
+                    {isActiveBar && active && (
+                      <PlusPill amount={active.amount} />
+                    )}
                   </span>
                   <span className="text-muted-foreground tabular-nums">
                     {GBP(recordValues[item])}
@@ -227,7 +261,13 @@ export function RecordFlow() {
                 </div>
                 <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full rounded-full ${rank === 0 ? "bg-primary" : "bg-chart-3"}`}
+                    className={`h-full rounded-full ${
+                      isActiveBar
+                        ? ACTIVE_FILL
+                        : rank === 0
+                          ? "bg-primary"
+                          : "bg-chart-3"
+                    }`}
                     style={{
                       width: `${Math.round((recordValues[item] / recordMax) * 100)}%`,
                       transition: reduced
