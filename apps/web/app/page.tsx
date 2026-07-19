@@ -163,8 +163,8 @@ export default async function HomePage() {
           record; a pledge on any of them moves its standing — nothing moves
           unpaid). White band: also the breath between the watch room and
           the shelf, so the room's floor gradient has a light section to
-          land on. Illustration, not the record itself — the real one is a
-          click away. ── */}
+          land on. Quiet "coming soon" until the record earns its public
+          stage — the vignette is illustration, not the record itself. ── */}
       <section className="w-full">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
@@ -174,13 +174,10 @@ export default async function HomePage() {
                   The record
                 </h2>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  {t("landing.record.principle")}{" "}
-                  <Link
-                    href="/record"
-                    className="whitespace-nowrap text-primary hover:underline"
-                  >
-                    {t("landing.record.link")} →
-                  </Link>
+                  {t("landing.record.principle")}
+                </p>
+                <p className="mt-3 text-sm font-medium tracking-widest text-primary-muted uppercase">
+                  {t("landing.record.status")}
                 </p>
               </div>
               <RecordFlow />
