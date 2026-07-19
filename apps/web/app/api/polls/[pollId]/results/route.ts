@@ -7,6 +7,8 @@ export type PollResultItem = {
   widthPercent: number
 }
 
+type ItemRow = { id: string; label: string; all_time_pledged: number | null }
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ pollId: string }> }
@@ -14,72 +16,65 @@ export async function GET(
   const { pollId } = await params
   const supabase = createAdminClient()
 
-  // pledge_allocations has no favpoll_poll_id — must join through pledges
-  // Fetch all visible items in the poll
-  const { data: pollItems, error: pollItemsErr } = await supabase
-    .from("favpoll_poll_favourites")
-    .select("favourite_id, favourites ( label )")
-    .eq("favpoll_poll_id", pollId)
-    .eq("is_hidden", false)
+  // The standings a pledge reveals are each item's all_time_pledged — the
+  // record's number, the same source the poll page's RankingList displays
+  // ("reveal its standing") — NOT a per-poll pledge aggregation.
+  //
+  // Item source mirrors every card surface: a finite topic's items are the
+  // topic's closed set (such polls carry no favpoll_poll_favourites rows);
+  // an infinite topic's items are its curated epf rows.
+  const { data: poll, error: pollErr } = await supabase
+    .from("favpoll_polls")
+    .select("id, topic_id, topics ( is_finite )")
+    .eq("id", pollId)
+    .single()
 
-  if (pollItemsErr) {
-    return NextResponse.json({ error: pollItemsErr.message }, { status: 500 })
+  if (pollErr) {
+    return NextResponse.json({ error: pollErr.message }, { status: 500 })
   }
 
-  if (!pollItems || pollItems.length === 0) {
-    return NextResponse.json({ results: [] })
-  }
+  const isFinite =
+    (poll?.topics as unknown as { is_finite: boolean } | null)?.is_finite ??
+    false
 
-  // Build a label map for all poll items
-  const labelMap = new Map<string, string>()
-  for (const row of pollItems) {
-    const label = (row.favourites as unknown as { label: string } | null)?.label
-    if (label) labelMap.set(row.favourite_id, label)
-  }
+  let items: ItemRow[] = []
+  if (isFinite) {
+    const { data, error } = await supabase
+      .from("favourites")
+      .select("id, label, all_time_pledged")
+      .eq("topic_id", poll.topic_id)
 
-  // Aggregate pledged amounts
-  const { data: pledges } = await supabase
-    .from("pledges")
-    .select("id")
-    .eq("favpoll_poll_id", pollId)
-    .is("withdrawn_at", null)
-
-  const pledgeIds = (pledges ?? []).map((p) => p.id)
-  const totals = new Map<string, number>()
-
-  if (pledgeIds.length > 0) {
-    const { data: allocations, error: allocErr } = await supabase
-      .from("pledge_allocations")
-      .select("favourite_id, amount")
-      .in("pledge_id", pledgeIds)
-
-    if (allocErr) {
-      return NextResponse.json({ error: allocErr.message }, { status: 500 })
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
+    items = (data ?? []) as ItemRow[]
+  } else {
+    const { data, error } = await supabase
+      .from("favpoll_poll_favourites")
+      .select("favourites ( id, label, all_time_pledged )")
+      .eq("favpoll_poll_id", pollId)
+      .eq("is_hidden", false)
 
-    for (const row of allocations ?? []) {
-      totals.set(
-        row.favourite_id,
-        (totals.get(row.favourite_id) ?? 0) + (row.amount ?? 0)
-      )
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
+    items = (data ?? [])
+      .map((row) => row.favourites as unknown as ItemRow | null)
+      .filter((f): f is ItemRow => Boolean(f))
   }
 
-  // Merge: all poll items, using pledge totals where available
-  const merged = [...labelMap.entries()].map(([id, label]) => ({
-    label,
-    total: totals.get(id) ?? 0,
-  }))
-
-  const sorted = merged.sort(
-    (a, b) => b.total - a.total || a.label.localeCompare(b.label)
+  const sorted = items.sort(
+    (a, b) =>
+      (b.all_time_pledged ?? 0) - (a.all_time_pledged ?? 0) ||
+      a.label.localeCompare(b.label)
   )
-  const max = sorted[0]?.total ?? 0
+  const max = sorted[0]?.all_time_pledged ?? 0
 
   const results: PollResultItem[] = sorted.map((item) => ({
     label: item.label,
-    amountPence: Math.round(item.total * 100),
-    widthPercent: max > 0 ? Math.round((item.total / max) * 100) : 0,
+    amountPence: Math.round((item.all_time_pledged ?? 0) * 100),
+    widthPercent:
+      max > 0 ? Math.round(((item.all_time_pledged ?? 0) / max) * 100) : 0,
   }))
 
   return NextResponse.json({ results })

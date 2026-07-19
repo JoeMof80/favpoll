@@ -26,6 +26,7 @@ export default async function HomePage() {
       total_raised,
       subject,
       cause_label,
+      category,
       protagonist:protagonists ( name ),
       charities:favpoll_charities (
         charity:charities ( id, name, logo_url, registered_number )
@@ -72,6 +73,7 @@ export default async function HomePage() {
     total_raised: number
     subject: string | null
     cause_label: string | null
+    category: string | null
     protagonist: { name: string } | null // null for cause favpolls
     charities: { charity: import("@favpoll/types").Charity }[]
     favpoll_polls: RawPoll | null

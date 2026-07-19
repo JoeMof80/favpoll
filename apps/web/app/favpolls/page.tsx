@@ -29,6 +29,7 @@ const FAVPOLL_SELECT = `
   id,
   subject,
   cause_label,
+  category,
   opening_line,
   description,
   closes_at,
@@ -46,15 +47,15 @@ const FAVPOLL_SELECT = `
     topics (
       title,
       is_finite,
-      favourites ( id, label )
+      favourites ( id, label, all_time_pledged )
     ),
     favpoll_poll_favourites (
-      favourites ( id, label )
+      favourites ( id, label, all_time_pledged )
     )
   )
 `
 
-type RawFavourite = { id: string; label: string }
+type RawFavourite = { id: string; label: string; all_time_pledged?: number }
 type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
@@ -70,6 +71,7 @@ type RawFavpoll = {
   id: string
   subject: string
   cause_label: string | null
+  category: string | null
   opening_line: string
   description: string | null
   closes_at: string
@@ -194,7 +196,11 @@ export default async function FavpollsPage({
     fallbackExemplars ?? ((favpolls ?? []) as unknown as RawFavpoll[])
   const showingExemplars = !!fallbackExemplars
 
-  // For authenticated users, pre-fetch pledge results for open favpolls
+  // For authenticated users, pre-fetch unlocked results for polls they've
+  // pledged on. The user's pledges decide entitlement only; the standings
+  // themselves are each item's all_time_pledged — the record's number, the
+  // same source the poll page's RankingList displays ("reveal its
+  // standing"), NOT a per-poll pledge aggregation.
   const pledgedResultsByPollId = new Map<string, CardResultItem[]>()
 
   if (userId && !showingExemplars) {
@@ -213,67 +219,32 @@ export default async function FavpollsPage({
         (p) => p.favpoll_poll_id as string
       )
 
-      if (pledgedPollIds.length > 0) {
-        const pledgeIds = (pledges ?? []).map((p) => p.id)
-        const { data: allocations } = await supabase
-          .from("pledge_allocations")
-          .select("pledge_id, favourite_id, amount")
-          .in("pledge_id", pledgeIds)
-
-        const pledgeToPoll = new Map(
-          (pledges ?? []).map((p) => [p.id, p.favpoll_poll_id as string])
+      for (const fp of displayFavpolls) {
+        const rawPoll = fp.favpoll_polls
+        if (!rawPoll || !pledgedPollIds.includes(rawPoll.id)) continue
+        const isFinite = rawPoll.topics?.is_finite ?? false
+        const items = isFinite
+          ? (rawPoll.topics?.favourites ?? [])
+          : (rawPoll.favpoll_poll_favourites ?? [])
+              .map((epf) => epf.favourites)
+              .filter(Boolean)
+        const sorted = [...items].sort(
+          (a, b) =>
+            (b.all_time_pledged ?? 0) - (a.all_time_pledged ?? 0) ||
+            a.label.localeCompare(b.label)
         )
-
-        const byPoll = new Map<string, Map<string, number>>()
-        for (const row of allocations ?? []) {
-          const pollId = pledgeToPoll.get(row.pledge_id)
-          if (!pollId) continue
-          if (!byPoll.has(pollId)) byPoll.set(pollId, new Map())
-          const totals = byPoll.get(pollId)!
-          totals.set(
-            row.favourite_id,
-            (totals.get(row.favourite_id) ?? 0) + (row.amount ?? 0)
-          )
-        }
-
-        const pollItemLabels = new Map<string, Map<string, string>>()
-        for (const fp of displayFavpolls) {
-          const rawPoll = fp.favpoll_polls
-          if (!rawPoll) continue
-          const labelMap = new Map<string, string>()
-          const isFinite = rawPoll.topics?.is_finite ?? false
-          const items = isFinite
-            ? (rawPoll.topics?.favourites ?? [])
-            : (rawPoll.favpoll_poll_favourites ?? [])
-                .map((epf) => epf.favourites)
-                .filter(Boolean)
-          for (const item of items) {
-            labelMap.set(item.id, item.label)
-          }
-          pollItemLabels.set(rawPoll.id, labelMap)
-        }
-
-        for (const pollId of pledgedPollIds) {
-          const totals = byPoll.get(pollId) ?? new Map<string, number>()
-          const labelMap =
-            pollItemLabels.get(pollId) ?? new Map<string, string>()
-          const merged = [...labelMap.entries()].map(([id, label]) => ({
-            label,
-            total: totals.get(id) ?? 0,
+        const max = sorted[0]?.all_time_pledged ?? 0
+        pledgedResultsByPollId.set(
+          rawPoll.id,
+          sorted.map((item) => ({
+            label: item.label,
+            amountPence: Math.round((item.all_time_pledged ?? 0) * 100),
+            widthPercent:
+              max > 0
+                ? Math.round(((item.all_time_pledged ?? 0) / max) * 100)
+                : 0,
           }))
-          const sorted = merged.sort(
-            (a, b) => b.total - a.total || a.label.localeCompare(b.label)
-          )
-          const max = sorted[0]?.total ?? 0
-          pledgedResultsByPollId.set(
-            pollId,
-            sorted.map((item) => ({
-              label: item.label,
-              amountPence: Math.round(item.total * 100),
-              widthPercent: max > 0 ? Math.round((item.total / max) * 100) : 0,
-            }))
-          )
-        }
+        )
       }
     }
   }
