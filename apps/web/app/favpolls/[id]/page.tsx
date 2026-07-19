@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { deriveRankHistory } from "@/lib/rank-history"
+import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { FavpollContent } from "@/components/favpoll-content"
 import { FavpollSubheader } from "@/components/favpoll-subheader"
 import type {
@@ -57,6 +58,12 @@ export default async function FavpollPage({ params }: Props) {
 
     const topic = topicData as Topic | null
 
+    // The bars on a poll page show THIS poll's pledges (they must sum to
+    // the favpoll's raised figure) — not the favourites table's all-time
+    // record, which lives on /record. overlayStandings swaps each item's
+    // all_time_* fields for the poll's own sums/counts before sorting.
+    const standings = await pollStandings(supabase, rawPoll.id as string)
+
     let items: Favourite[] = []
 
     if (topic?.is_finite) {
@@ -64,7 +71,10 @@ export default async function FavpollPage({ params }: Props) {
         .from("favourites")
         .select("*")
         .eq("topic_id", topicId)
-      items = ((finiteItemsData ?? []) as Favourite[]).sort((a, b) => {
+      items = overlayStandings(
+        (finiteItemsData ?? []) as Favourite[],
+        standings
+      ).sort((a, b) => {
         const diff = b.all_time_pledged - a.all_time_pledged
         if (diff !== 0) return diff
         const da = a.display_order ?? null
@@ -91,18 +101,19 @@ export default async function FavpollPage({ params }: Props) {
         .eq("favpoll_poll_id", rawPoll.id)
         .order("label", { referencedTable: "favourites", ascending: true })
 
-      const allItems = ((epiData ?? []) as unknown as EpiRow[])
-        .map((epi) => ({
+      const allItems = overlayStandings(
+        ((epiData ?? []) as unknown as EpiRow[]).map((epi) => ({
           ...epi.favourites,
           favpoll_poll_item_id: epi.id,
           is_hidden: epi.is_hidden,
           is_guest_added: epi.is_guest_added,
-        }))
-        .sort((a, b) => {
-          if (b.all_time_pledged !== a.all_time_pledged)
-            return b.all_time_pledged - a.all_time_pledged
-          return a.label.localeCompare(b.label)
-        })
+        })),
+        standings
+      ).sort((a, b) => {
+        if (b.all_time_pledged !== a.all_time_pledged)
+          return b.all_time_pledged - a.all_time_pledged
+        return a.label.localeCompare(b.label)
+      })
 
       // Organiser sees all items (including hidden); guests see only visible ones
       items = isOrganiser

@@ -5,6 +5,8 @@ import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
+import { withLiveTotals } from "@/lib/live-totals"
+import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
 import type { PublicStatusFilter } from "./list-utils"
@@ -47,15 +49,15 @@ const FAVPOLL_SELECT = `
     topics (
       title,
       is_finite,
-      favourites ( id, label, all_time_pledged )
+      favourites ( id, label )
     ),
     favpoll_poll_favourites (
-      favourites ( id, label, all_time_pledged )
+      favourites ( id, label )
     )
   )
 `
 
-type RawFavourite = { id: string; label: string; all_time_pledged?: number }
+type RawFavourite = { id: string; label: string }
 type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
@@ -192,15 +194,18 @@ export default async function FavpollsPage({
     }
   }
 
-  const displayFavpolls =
+  // Live favpolls carry a settlement total_raised of 0 until close — overlay
+  // the real sums (see lib/live-totals) so the cards' raised figures are live.
+  const displayFavpolls = await withLiveTotals(
+    supabase,
     fallbackExemplars ?? ((favpolls ?? []) as unknown as RawFavpoll[])
+  )
   const showingExemplars = !!fallbackExemplars
 
   // For authenticated users, pre-fetch unlocked results for polls they've
-  // pledged on. The user's pledges decide entitlement only; the standings
-  // themselves are each item's all_time_pledged — the record's number, the
-  // same source the poll page's RankingList displays ("reveal its
-  // standing"), NOT a per-poll pledge aggregation.
+  // pledged on. The user's pledges decide entitlement; the standings are
+  // THIS poll's pledge sums (lib/poll-standings) — the bars must agree
+  // with the card's raised figure. The all-time record lives on /record.
   const pledgedResultsByPollId = new Map<string, CardResultItem[]>()
 
   if (userId && !showingExemplars) {
@@ -215,36 +220,41 @@ export default async function FavpollsPage({
         .eq("clerk_user_id", userId)
         .in("favpoll_poll_id", pollIds)
 
-      const pledgedPollIds = (pledges ?? []).map(
-        (p) => p.favpoll_poll_id as string
-      )
+      const pledgedPollIds = [
+        ...new Set((pledges ?? []).map((p) => p.favpoll_poll_id as string)),
+      ]
 
-      for (const fp of displayFavpolls) {
-        const rawPoll = fp.favpoll_polls
-        if (!rawPoll || !pledgedPollIds.includes(rawPoll.id)) continue
-        const isFinite = rawPoll.topics?.is_finite ?? false
-        const items = isFinite
-          ? (rawPoll.topics?.favourites ?? [])
-          : (rawPoll.favpoll_poll_favourites ?? [])
-              .map((epf) => epf.favourites)
-              .filter(Boolean)
-        const sorted = [...items].sort(
-          (a, b) =>
-            (b.all_time_pledged ?? 0) - (a.all_time_pledged ?? 0) ||
-            a.label.localeCompare(b.label)
-        )
-        const max = sorted[0]?.all_time_pledged ?? 0
-        pledgedResultsByPollId.set(
-          rawPoll.id,
-          sorted.map((item) => ({
+      if (pledgedPollIds.length > 0) {
+        const standingsByPoll = await pollSetStandings(supabase, pledgedPollIds)
+
+        for (const fp of displayFavpolls) {
+          const rawPoll = fp.favpoll_polls
+          if (!rawPoll || !pledgedPollIds.includes(rawPoll.id)) continue
+          const isFinite = rawPoll.topics?.is_finite ?? false
+          const items = isFinite
+            ? (rawPoll.topics?.favourites ?? [])
+            : (rawPoll.favpoll_poll_favourites ?? [])
+                .map((epf) => epf.favourites)
+                .filter(Boolean)
+          const totals =
+            standingsByPoll.get(rawPoll.id)?.totals ?? new Map<string, number>()
+          const merged = items.map((item) => ({
             label: item.label,
-            amountPence: Math.round((item.all_time_pledged ?? 0) * 100),
-            widthPercent:
-              max > 0
-                ? Math.round(((item.all_time_pledged ?? 0) / max) * 100)
-                : 0,
+            total: totals.get(item.id) ?? 0,
           }))
-        )
+          const sorted = merged.sort(
+            (a, b) => b.total - a.total || a.label.localeCompare(b.label)
+          )
+          const max = sorted[0]?.total ?? 0
+          pledgedResultsByPollId.set(
+            rawPoll.id,
+            sorted.map((item) => ({
+              label: item.label,
+              amountPence: Math.round(item.total * 100),
+              widthPercent: max > 0 ? Math.round((item.total / max) * 100) : 0,
+            }))
+          )
+        }
       }
     }
   }
