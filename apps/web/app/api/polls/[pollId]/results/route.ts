@@ -14,27 +14,51 @@ export async function GET(
   const { pollId } = await params
   const supabase = createAdminClient()
 
-  // pledge_allocations has no favpoll_poll_id — must join through pledges
-  // Fetch all visible items in the poll
-  const { data: pollItems, error: pollItemsErr } = await supabase
-    .from("favpoll_poll_favourites")
-    .select("favourite_id, favourites ( label )")
-    .eq("favpoll_poll_id", pollId)
-    .eq("is_hidden", false)
+  // Item source mirrors every card surface: a finite topic's items are the
+  // topic's closed set (such polls carry no favpoll_poll_favourites rows);
+  // an infinite topic's items are its curated epf rows. Reading epf alone
+  // returned [] for finite polls — an empty card right after pledging.
+  const { data: poll, error: pollErr } = await supabase
+    .from("favpoll_polls")
+    .select("id, topics ( is_finite, favourites ( id, label ) )")
+    .eq("id", pollId)
+    .single()
 
-  if (pollItemsErr) {
-    return NextResponse.json({ error: pollItemsErr.message }, { status: 500 })
+  if (pollErr) {
+    return NextResponse.json({ error: pollErr.message }, { status: 500 })
   }
 
-  if (!pollItems || pollItems.length === 0) {
-    return NextResponse.json({ results: [] })
-  }
+  const topic = poll?.topics as unknown as {
+    is_finite: boolean
+    favourites: { id: string; label: string }[]
+  } | null
 
-  // Build a label map for all poll items
   const labelMap = new Map<string, string>()
-  for (const row of pollItems) {
-    const label = (row.favourites as unknown as { label: string } | null)?.label
-    if (label) labelMap.set(row.favourite_id, label)
+  if (topic?.is_finite) {
+    for (const item of topic.favourites ?? []) {
+      labelMap.set(item.id, item.label)
+    }
+  } else {
+    // pledge_allocations has no favpoll_poll_id — must join through pledges
+    const { data: pollItems, error: pollItemsErr } = await supabase
+      .from("favpoll_poll_favourites")
+      .select("favourite_id, favourites ( label )")
+      .eq("favpoll_poll_id", pollId)
+      .eq("is_hidden", false)
+
+    if (pollItemsErr) {
+      return NextResponse.json({ error: pollItemsErr.message }, { status: 500 })
+    }
+
+    for (const row of pollItems ?? []) {
+      const label = (row.favourites as unknown as { label: string } | null)
+        ?.label
+      if (label) labelMap.set(row.favourite_id, label)
+    }
+  }
+
+  if (labelMap.size === 0) {
+    return NextResponse.json({ results: [] })
   }
 
   // Aggregate pledged amounts
