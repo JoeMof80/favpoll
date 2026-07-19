@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { ClosingLabel } from "@/components/closing-label"
 import { RevealLockPill } from "@/components/reveal-lock"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
+import { formatCurrency } from "@/lib/i18n"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
@@ -160,6 +162,19 @@ export function FavpollListCard({
             eyebrow={favpollEyebrow(favpoll)}
             size={size}
           />
+          {/* Value + urgency — what a market's volume row is to Polymarket:
+              total raised (quiet) and the closing countdown. Mirrors the
+              summary card's topic/countdown row position. */}
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {favpoll.total_raised > 0
+                ? `${formatCurrency(Math.round(favpoll.total_raised * 100))} raised`
+                : isClosed
+                  ? ""
+                  : "Be the first to pledge"}
+            </span>
+            <ClosingLabel closesAt={favpoll.closed_at ?? favpoll.closes_at} />
+          </div>
         </div>
 
         {pollWithItems && topicItems.length > 0 && (
