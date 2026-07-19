@@ -5,6 +5,7 @@ import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
+import { withLiveTotals } from "@/lib/live-totals"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
 import type { PublicStatusFilter } from "./list-utils"
@@ -192,8 +193,12 @@ export default async function FavpollsPage({
     }
   }
 
-  const displayFavpolls =
+  // Live favpolls carry a settlement total_raised of 0 until close — overlay
+  // the real sums (see lib/live-totals) so the cards' raised figures are live.
+  const displayFavpolls = await withLiveTotals(
+    supabase,
     fallbackExemplars ?? ((favpolls ?? []) as unknown as RawFavpoll[])
+  )
   const showingExemplars = !!fallbackExemplars
 
   // For authenticated users, pre-fetch unlocked results for polls they've

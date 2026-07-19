@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { withLiveTotals } from "@/lib/live-totals"
 import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { Button } from "@/components/ui/button"
@@ -79,7 +80,15 @@ export default async function HomePage() {
     favpoll_polls: RawPoll | null
   }
 
-  const normalised = ((favpolls ?? []) as unknown as RawFavpoll[]).map((ev) => {
+  // Live favpolls carry a settlement total_raised of 0 until close — overlay
+  // the real sums so the carousel cards and the hero's "raised by open
+  // favpolls" stat are live (see lib/live-totals).
+  const withTotals = await withLiveTotals(
+    supabase,
+    (favpolls ?? []) as unknown as RawFavpoll[]
+  )
+
+  const normalised = withTotals.map((ev) => {
     const rawPoll = ev.favpoll_polls ?? null
     let poll: {
       id: string
