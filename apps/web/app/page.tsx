@@ -146,8 +146,13 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── The shelf: real favpoll cards always sit on the brand pastel
+          (bg-muted), matching /favpolls — white cards on light purple is the
+          convention wherever the actual product appears; the illustration
+          vignettes above keep the fainter bg-primary/5. In dark mode both
+          resolve to cards lifted off the purple page. ── */}
       {normalised.length > 0 && (
-        <section id="live" className="w-full scroll-mt-20">
+        <section id="live" className="w-full scroll-mt-20 bg-muted">
           <div className="mx-auto w-full max-w-330 px-6 py-16">
             <FadeIn>
               <div className="mb-6 flex items-baseline justify-between">
