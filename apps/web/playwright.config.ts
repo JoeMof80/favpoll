@@ -67,6 +67,8 @@ export default defineConfig({
   ],
 
   globalSetup: "./e2e/global-setup.ts",
+  // Unlists the run's E2E favpolls so test débris never surfaces publicly
+  globalTeardown: "./e2e/global-teardown.ts",
 
   // Start a local dev server only when no explicit base URL is given.
   // In CI, PLAYWRIGHT_BASE_URL points at staging.
