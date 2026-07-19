@@ -216,14 +216,23 @@ export default async function FavpollsPage({
       )
 
       if (pledgedPollIds.length > 0) {
-        const pledgeIds = (pledges ?? []).map((p) => p.id)
+        // Entitlement is personal (the user's pledge unlocks the poll) but
+        // the results are communal — totals come from EVERY guest's pledge
+        // on the entitled polls, as /api/polls/[id]/results aggregates.
+        const { data: allPledges } = await supabase
+          .from("pledges")
+          .select("id, favpoll_poll_id")
+          .in("favpoll_poll_id", pledgedPollIds)
+          .is("withdrawn_at", null)
+
+        const pledgeIds = (allPledges ?? []).map((p) => p.id)
         const { data: allocations } = await supabase
           .from("pledge_allocations")
           .select("pledge_id, favourite_id, amount")
           .in("pledge_id", pledgeIds)
 
         const pledgeToPoll = new Map(
-          (pledges ?? []).map((p) => [p.id, p.favpoll_poll_id as string])
+          (allPledges ?? []).map((p) => [p.id, p.favpoll_poll_id as string])
         )
 
         const byPoll = new Map<string, Map<string, number>>()
