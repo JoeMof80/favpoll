@@ -157,6 +157,28 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── The record — a principle, not a destination (concept model,
+          2026-07): one quiet line, true from pledge one, and a link to its
+          full home. Doubles as the white breath between the watch room and
+          the shelf — the room's floor gradient needs a light section to
+          land on (a dissolve left the phone stranded), and this slot is
+          seeded for the record's future landing presence. ── */}
+      <section className="w-full">
+        <div className="mx-auto w-full max-w-330 px-6 py-10">
+          <FadeIn>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+              {t("landing.record.principle")}{" "}
+              <Link
+                href="/record"
+                className="whitespace-nowrap text-primary hover:underline"
+              >
+                {t("landing.record.link")} →
+              </Link>
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ── The shelf: real favpoll cards always sit on the brand pastel
           (bg-muted), matching /favpolls — white cards on light purple is the
           convention wherever the actual product appears; the illustration
@@ -179,25 +201,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* ── The record — a principle, not a destination (concept model,
-          2026-07). No headline, no tiles, no data claim: one quiet line,
-          true from pledge one, and a quiet link to its full home. ── */}
-      {/* <section className="w-full">
-        <div className="mx-auto w-full max-w-330 px-6 py-10">
-          <FadeIn>
-            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-              {t("landing.record.principle")}{" "}
-              <Link
-                href="/record"
-                className="whitespace-nowrap text-primary hover:underline"
-              >
-                {t("landing.record.link")} →
-              </Link>
-            </p>
-          </FadeIn>
-        </div>
-      </section> */}
 
       {/* ── Final CTA: the brand statement on the monogram band, closing
           the page the way the hero opened it ── */}
