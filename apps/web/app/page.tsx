@@ -9,6 +9,7 @@ import { LandingHero } from "@/components/landing/hero"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
 import { WatchItHappen } from "@/components/landing/watch-it-happen"
+import { RecordFlow } from "@/components/landing/record-flow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
 
@@ -157,24 +158,30 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── The record — a principle, not a destination (concept model,
-          2026-07): one quiet line, true from pledge one, and a link to its
-          full home. Doubles as the white breath between the watch room and
-          the shelf — the room's floor gradient needs a light section to
-          land on (a dissolve left the phone stranded), and this slot is
-          seeded for the record's future landing presence. ── */}
+      {/* ── The record — three favpolls, one topic, one permanent ranking.
+          The vignette acts out the principle line (many polls feed the
+          record; a pledge on any of them moves its standing — nothing moves
+          unpaid). White band: also the breath between the watch room and
+          the shelf, so the room's floor gradient has a light section to
+          land on. Quiet "coming soon" until the record earns its public
+          stage — the vignette is illustration, not the record itself. ── */}
       <section className="w-full">
-        <div className="mx-auto w-full max-w-330 px-6 py-10">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
-            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-              {t("landing.record.principle")}{" "}
-              <Link
-                href="/record"
-                className="whitespace-nowrap text-primary hover:underline"
-              >
-                {t("landing.record.link")} →
-              </Link>
-            </p>
+            <div className="grid items-center gap-8 lg:grid-cols-2">
+              <div className="max-w-md">
+                <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
+                  The record
+                </h2>
+                <p className="text-base leading-relaxed text-muted-foreground">
+                  {t("landing.record.principle")}
+                </p>
+                <p className="mt-3 text-sm font-medium tracking-widest text-primary-muted uppercase">
+                  {t("landing.record.status")}
+                </p>
+              </div>
+              <RecordFlow />
+            </div>
           </FadeIn>
         </div>
       </section>
