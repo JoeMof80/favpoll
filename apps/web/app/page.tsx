@@ -141,14 +141,16 @@ export default async function HomePage() {
       </section>
 
       {/* The section IS the room: full-bleed tint, a floor gradient, and
-          overflow-hidden so the foreground phone crops at the section edge */}
+          overflow-hidden so the foreground phone crops at the section edge.
+          The floor dissolves into the shelf below (from-muted) — the room
+          sinks into the live-favpolls band with no seam. */}
       <section
         id="watch"
         className="relative w-full scroll-mt-20 overflow-hidden bg-primary/5"
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-muted to-transparent"
         />
         <div className="relative mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
