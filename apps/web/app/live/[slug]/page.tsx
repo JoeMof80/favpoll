@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { DisplayScreen } from "@/components/display-screen"
 import type { Favourite } from "@favpoll/types"
 
@@ -110,6 +111,16 @@ export default async function LiveDisplayPage({ params }: Props) {
     created_at: r.created_at,
   }))
 
+  // The display's bars show THIS poll's pledges — they must sum to the
+  // telethon total above them (see lib/poll-standings). The interval
+  // router.refresh() re-runs this overlay, keeping the room live.
+  const items = pollId
+    ? overlayStandings(
+        (allItems ?? []) as Favourite[],
+        await pollStandings(supabase, pollId)
+      )
+    : ((allItems ?? []) as Favourite[])
+
   const displayPoll = rawPoll
     ? {
         id: rawPoll.id,
@@ -122,7 +133,7 @@ export default async function LiveDisplayPage({ params }: Props) {
             (rawPoll.topics as { id: string; title: string } | null)?.title ??
             "",
         },
-        items: (allItems ?? []) as Favourite[],
+        items,
       }
     : null
 

@@ -16,6 +16,8 @@ as $$
   from favpoll_polls fp
   join pledges pl on pl.favpoll_poll_id = fp.id and pl.withdrawn_at is null
   where fp.favpoll_id = any(p_favpoll_ids)
+
+  
   group by fp.favpoll_id;
 $$;
 

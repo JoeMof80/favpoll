@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { pollStandings } from "@/lib/poll-standings"
 
 export type PollResultItem = {
   label: string
@@ -7,7 +8,7 @@ export type PollResultItem = {
   widthPercent: number
 }
 
-type ItemRow = { id: string; label: string; all_time_pledged: number | null }
+type ItemRow = { id: string; label: string }
 
 export async function GET(
   _req: Request,
@@ -16,9 +17,9 @@ export async function GET(
   const { pollId } = await params
   const supabase = createAdminClient()
 
-  // The standings a pledge reveals are each item's all_time_pledged — the
-  // record's number, the same source the poll page's RankingList displays
-  // ("reveal its standing") — NOT a per-poll pledge aggregation.
+  // The standings a pledge reveals are THIS poll's pledge sums — the bars
+  // must agree with the favpoll's raised figure (lib/poll-standings). The
+  // all-time record lives on /record.
   //
   // Item source mirrors every card surface: a finite topic's items are the
   // topic's closed set (such polls carry no favpoll_poll_favourites rows);
@@ -41,7 +42,7 @@ export async function GET(
   if (isFinite) {
     const { data, error } = await supabase
       .from("favourites")
-      .select("id, label, all_time_pledged")
+      .select("id, label")
       .eq("topic_id", poll.topic_id)
 
     if (error) {
@@ -51,7 +52,7 @@ export async function GET(
   } else {
     const { data, error } = await supabase
       .from("favpoll_poll_favourites")
-      .select("favourites ( id, label, all_time_pledged )")
+      .select("favourites ( id, label )")
       .eq("favpoll_poll_id", pollId)
       .eq("is_hidden", false)
 
@@ -63,18 +64,22 @@ export async function GET(
       .filter((f): f is ItemRow => Boolean(f))
   }
 
-  const sorted = items.sort(
-    (a, b) =>
-      (b.all_time_pledged ?? 0) - (a.all_time_pledged ?? 0) ||
-      a.label.localeCompare(b.label)
+  const { totals } = await pollStandings(supabase, pollId)
+
+  const merged = items.map((item) => ({
+    label: item.label,
+    total: totals.get(item.id) ?? 0,
+  }))
+
+  const sorted = merged.sort(
+    (a, b) => b.total - a.total || a.label.localeCompare(b.label)
   )
-  const max = sorted[0]?.all_time_pledged ?? 0
+  const max = sorted[0]?.total ?? 0
 
   const results: PollResultItem[] = sorted.map((item) => ({
     label: item.label,
-    amountPence: Math.round((item.all_time_pledged ?? 0) * 100),
-    widthPercent:
-      max > 0 ? Math.round(((item.all_time_pledged ?? 0) / max) * 100) : 0,
+    amountPence: Math.round(item.total * 100),
+    widthPercent: max > 0 ? Math.round((item.total / max) * 100) : 0,
   }))
 
   return NextResponse.json({ results })
