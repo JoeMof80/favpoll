@@ -123,17 +123,29 @@ product's public face.** Therefore:
   the data can't cash. (The landing already hides the record section below a data
   threshold — the fix is mostly tone + the about page.)
 
+**Addendum (2026-07-20, PRs #297–#298):** the landing's record section grew
+from the principle line into a scripted **vignette** — six favpoll cards
+piled around one record card, all asking Favourite Biscuit; pledges land one
+per card with a synced glow and the same +£ pill on both surfaces; pledge
+four re-ranks the record live. This stays within the doctrine because it is
+**illustration, not the record's data** (the landing's established vignette
+language — Belinda, Jess, Grandad), and the section deliberately links
+nowhere: a quiet "Coming soon" replaced the "See the record" link until the
+record earns its public stage. Copy: "Every pledge makes an eternal mark by
+feeding the record — all-time rankings for favpoll topics." Open decision:
+header/footer still link `/record`.
+
 ## The three surfaces — one audience each (decided 8 July 2026)
 
 The guest never chooses favpoll — they're handed it (QR on a table card, a
 link in a group chat). So **the guest needs no marketing page at all**, and
 each surface serves exactly one audience:
 
-| Surface          | Audience                                | Job                                              |
-| ---------------- | --------------------------------------- | ------------------------------------------------ |
-| **Favpoll page** | Guest                                   | Self-evident participation, **zero context**     |
-| **Landing**      | Prospective organiser                   | Show the guest experience → "Create a favpoll"   |
-| **About**        | Charities, press, partners, will-writers | Trust + contact                                  |
+| Surface          | Audience                                 | Job                                            |
+| ---------------- | ---------------------------------------- | ---------------------------------------------- |
+| **Favpoll page** | Guest                                    | Self-evident participation, **zero context**   |
+| **Landing**      | Prospective organiser                    | Show the guest experience → "Create a favpoll" |
+| **About**        | Charities, press, partners, will-writers | Trust + contact                                |
 
 Consequences:
 
