@@ -2,97 +2,117 @@
 
 // The record vignette — the landing's fourth scripted illustration (with the
 // hero demo, the Grandad dialogs and the watch room): a tight cluster of
-// favpolls around one record card, all asking the same topic. Three featured
-// favpolls (fully visible, left) take the pledges; three more tuck behind
-// the record's edges as texture — the "many more" the baseline implies.
+// favpolls overlapping one record card, all asking the same topic. Every
+// favpoll takes a pledge in turn — tucked cards come forward (z above the
+// record) to deliver theirs, then recede. Each favpoll has its own local
+// ranking, with biscuits beyond the record's top three (Digestive, Hobnob,
+// Party Ring, Shortbread) for realism.
 //
-// The scripted loop tells one causal story per beat, twice over: a +£ pill
-// appears on the favpoll's item AND on the record's same item, while both
-// bar fills flip to primary and pulse in sync — the favpoll's bar visibly
-// energising the record bar it aggregates into. Pledge four tips Jaffa
-// Cake past Custard Cream and the record re-ranks live (the bump moment).
+// The causal story plays at bar level, twice over: a +£ pill appears on the
+// favpoll's item AND on the record's same item, while both bar fills flip
+// to primary and pulse in sync — the favpoll's bar visibly energising the
+// record bar it aggregates into. Pledge four tips Jaffa Cake past Custard
+// Cream and the record re-ranks live (the bump moment).
 //
 // Arithmetic discipline (the watch room's rule): every record movement
-// equals a visible pledge on a featured card. Reduced motion: the final
-// frame (post-overtake), static, no glow.
+// equals a visible pledge on a card; numbers are chosen so no favpoll's
+// own ranking reorders mid-loop (only the record re-ranks). Reduced
+// motion: the final frame (post-overtake), static, no glow.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 
-const ITEMS = ["Jaffa Cake", "Custard Cream", "Bourbon"] as const
-type Item = (typeof ITEMS)[number]
+const RECORD_ITEMS = ["Jaffa Cake", "Custard Cream", "Bourbon"] as const
+type RecordItem = (typeof RECORD_ITEMS)[number]
 
 const TOPIC = "Favourite Biscuit"
 
 type Mini = {
   eyebrow: string
   title: string
-  base: Record<Item, number>
-  /** Cluster position + tilt; background cards tuck behind the record */
+  /** The favpoll's own top three, sorted by base value (its local ranking) */
+  items: { label: string; value: number }[]
+  /** Cluster position + tilt; the record overlaps every card's inner edge */
   pos: string
-  featured: boolean
 }
 
 const MINIS: Mini[] = [
-  // ── Featured: fully visible on the left, these take the pledges ──
   {
     eyebrow: "In memory of",
     title: "June Bailey",
-    base: { "Jaffa Cake": 30, "Custard Cream": 45, Bourbon: 15 },
-    pos: "top-0 left-[6%] -rotate-2",
-    featured: true,
+    items: [
+      { label: "Custard Cream", value: 45 },
+      { label: "Jaffa Cake", value: 20 },
+      { label: "Digestive", value: 15 },
+    ],
+    pos: "top-0 left-[12%] -rotate-2",
   },
   {
     eyebrow: "Fundraiser",
     title: "Ben's Big Run",
-    base: { "Jaffa Cake": 40, "Custard Cream": 15, Bourbon: 25 },
-    pos: "top-[34%] left-0 rotate-1",
-    featured: true,
+    items: [
+      { label: "Jaffa Cake", value: 40 },
+      { label: "Hobnob", value: 25 },
+      { label: "Bourbon", value: 20 },
+    ],
+    pos: "top-[36%] left-[8%] rotate-1",
   },
   {
     eyebrow: "Birthday",
     title: "Rosa's 50th",
-    base: { "Jaffa Cake": 20, "Custard Cream": 30, Bourbon: 10 },
-    pos: "bottom-0 left-[8%] rotate-2",
-    featured: true,
+    items: [
+      { label: "Party Ring", value: 60 },
+      { label: "Jaffa Cake", value: 25 },
+      { label: "Custard Cream", value: 20 },
+    ],
+    pos: "bottom-0 left-[14%] rotate-2",
   },
-  // ── Background: tucked behind the record's edges, static texture ──
   {
     eyebrow: "Wedding",
     title: "Amy & Tom",
-    base: { "Jaffa Cake": 15, "Custard Cream": 25, Bourbon: 20 },
-    pos: "top-[2%] right-[4%] rotate-3",
-    featured: false,
+    items: [
+      { label: "Shortbread", value: 45 },
+      { label: "Bourbon", value: 25 },
+      { label: "Custard Cream", value: 20 },
+    ],
+    pos: "top-[2%] right-[6%] rotate-3",
   },
   {
     eyebrow: "Retirement",
     title: "Pat Nowak",
-    base: { "Jaffa Cake": 25, "Custard Cream": 20, Bourbon: 30 },
-    pos: "top-[38%] right-0 -rotate-2",
-    featured: false,
+    items: [
+      { label: "Bourbon", value: 40 },
+      { label: "Custard Cream", value: 25 },
+      { label: "Hobnob", value: 20 },
+    ],
+    pos: "top-[38%] right-[4%] -rotate-2",
   },
   {
     eyebrow: "For a cause",
     title: "Bake Sale for Shelter",
-    base: { "Jaffa Cake": 20, "Custard Cream": 10, Bourbon: 10 },
-    pos: "bottom-[2%] right-[6%] rotate-2",
-    featured: false,
+    items: [
+      { label: "Jaffa Cake", value: 30 },
+      { label: "Digestive", value: 20 },
+      { label: "Bourbon", value: 5 },
+    ],
+    pos: "bottom-[2%] right-[8%] rotate-2",
   },
 ]
 
 // Custard Cream leads the record until pledge four tips Jaffa Cake past.
-const RECORD_BASE: Record<Item, number> = {
+const RECORD_BASE: Record<RecordItem, number> = {
   "Jaffa Cake": 2105,
   "Custard Cream": 2140,
   Bourbon: 1480,
 }
 
-const PLEDGES: { card: number; item: Item; amount: number }[] = [
+// One pledge per favpoll — every card animates in turn.
+const PLEDGES: { card: number; item: RecordItem; amount: number }[] = [
   { card: 0, item: "Jaffa Cake", amount: 20 },
-  { card: 1, item: "Bourbon", amount: 15 },
-  { card: 2, item: "Custard Cream", amount: 10 }, // CC extends its lead…
+  { card: 3, item: "Bourbon", amount: 15 },
+  { card: 4, item: "Custard Cream", amount: 10 }, // CC extends its lead…
   { card: 1, item: "Jaffa Cake", amount: 30 }, // …then 2,155 > 2,150 — overtake
-  { card: 2, item: "Bourbon", amount: 10 },
-  { card: 0, item: "Jaffa Cake", amount: 20 },
+  { card: 5, item: "Bourbon", amount: 10 },
+  { card: 2, item: "Jaffa Cake", amount: 20 },
 ]
 
 // step 0: idle · 1–6: pledges land · 7: hold → reset
@@ -100,7 +120,7 @@ const STEP_MS = [1600, 2600, 2600, 2600, 3400, 2600, 2600, 4600]
 const LAST = STEP_MS.length - 1
 
 const GBP = (n: number) => `£${n.toLocaleString("en-GB")}`
-const RECORD_ROW_H = 42
+const RECORD_ROW_H = 36
 
 // Card-level glow while a pledge lands — shared by the active favpoll and
 // the record, in sync: the favpoll energising the record.
@@ -134,13 +154,16 @@ export function RecordFlow() {
   const active =
     !reduced && step >= 1 && step <= PLEDGES.length ? PLEDGES[step - 1] : null
 
-  // Mini card values after the applied pledges
-  const miniValues: Record<Item, number>[] = MINIS.map((mini, i) => {
-    const values = { ...mini.base }
-    for (const p of PLEDGES.slice(0, appliedCount)) {
-      if (p.card === i) values[p.item] += p.amount
-    }
-    return values
+  // Mini card values after the applied pledges (order stays the card's own
+  // base ranking — numbers are chosen so no card reorders internally)
+  const miniValues = MINIS.map((mini, i) => {
+    return mini.items.map(({ label, value }) => {
+      let v = value
+      for (const p of PLEDGES.slice(0, appliedCount)) {
+        if (p.card === i && p.item === label) v += p.amount
+      }
+      return { label, value: v }
+    })
   })
 
   // Record values + live ranking
@@ -148,25 +171,24 @@ export function RecordFlow() {
   for (const p of PLEDGES.slice(0, appliedCount)) {
     recordValues[p.item] += p.amount
   }
-  const ranking = [...ITEMS].sort(
+  const ranking = [...RECORD_ITEMS].sort(
     (a, b) => recordValues[b] - recordValues[a] || a.localeCompare(b)
   )
   const recordMax = recordValues[ranking[0]]
 
   return (
-    <div className="relative h-[27rem]" aria-hidden="true">
-      {/* ── The favpolls — featured left, the rest tucked behind ── */}
+    <div className="relative h-[25rem]" aria-hidden="true">
+      {/* ── The favpolls — clustered tight, tucked under the record; the
+          active one comes forward to deliver its pledge ── */}
       {MINIS.map((mini, i) => {
         const values = miniValues[i]
-        const miniMax = Math.max(...ITEMS.map((item) => values[item]))
+        const miniMax = Math.max(...values.map((v) => v.value))
         const isActive = active?.card === i
         return (
           <div
             key={mini.title}
             className={`absolute w-40 rounded-lg border bg-background p-2.5 transition-all duration-300 ${mini.pos} ${
-              isActive
-                ? `z-[5] ${GLOW}`
-                : `border-border ${mini.featured ? "z-[5] shadow-sm" : "z-0 shadow-sm"}`
+              isActive ? `z-20 ${GLOW}` : "z-0 border-border shadow-sm"
             }`}
           >
             <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -179,10 +201,10 @@ export function RecordFlow() {
               {TOPIC}
             </p>
             <div className="space-y-[3px]">
-              {ITEMS.map((item) => {
-                const isActiveBar = isActive && active?.item === item
+              {values.map(({ label, value }) => {
+                const isActiveBar = isActive && active?.item === label
                 return (
-                  <div key={item}>
+                  <div key={label}>
                     <div className="flex items-baseline justify-between text-[9px] leading-tight">
                       <span
                         className={
@@ -191,11 +213,11 @@ export function RecordFlow() {
                             : "text-foreground"
                         }
                       >
-                        {item}
+                        {label}
                         {isActiveBar && <PlusPill amount={active.amount} />}
                       </span>
                       <span className="text-muted-foreground tabular-nums">
-                        {GBP(values[item])}
+                        {GBP(value)}
                       </span>
                     </div>
                     <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
@@ -204,7 +226,7 @@ export function RecordFlow() {
                           isActiveBar ? ACTIVE_FILL : "bg-chart-3"
                         }`}
                         style={{
-                          width: `${Math.round((values[item] / miniMax) * 100)}%`,
+                          width: `${Math.round((value / miniMax) * 100)}%`,
                           transition: reduced ? "none" : "width 700ms ease-out",
                         }}
                       />
@@ -220,19 +242,19 @@ export function RecordFlow() {
       {/* ── The record — centred; card and bar glow in sync with the
           active favpoll ── */}
       <div
-        className={`absolute top-1/2 left-[54%] z-10 w-64 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
+        className={`absolute top-1/2 left-1/2 z-10 w-64 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
           active ? GLOW : "border-border shadow-md"
         }`}
       >
         <p className="text-[10px] font-medium tracking-widest text-primary uppercase">
           The record
         </p>
-        <p className="mb-3 text-sm font-medium text-foreground">{TOPIC}</p>
+        <p className="mb-2 text-sm font-medium text-foreground">{TOPIC}</p>
         <div
           className="relative"
-          style={{ height: ITEMS.length * RECORD_ROW_H }}
+          style={{ height: RECORD_ITEMS.length * RECORD_ROW_H }}
         >
-          {ITEMS.map((item) => {
+          {RECORD_ITEMS.map((item) => {
             const rank = ranking.indexOf(item)
             const isActiveBar = active?.item === item
             return (
@@ -259,7 +281,7 @@ export function RecordFlow() {
                     {GBP(recordValues[item])}
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full ${
                       isActiveBar
