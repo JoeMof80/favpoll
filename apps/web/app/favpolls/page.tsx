@@ -29,6 +29,7 @@ const FAVPOLL_SELECT = `
   id,
   subject,
   cause_label,
+  category,
   opening_line,
   description,
   closes_at,
@@ -70,6 +71,7 @@ type RawFavpoll = {
   id: string
   subject: string
   cause_label: string | null
+  category: string | null
   opening_line: string
   description: string | null
   closes_at: string

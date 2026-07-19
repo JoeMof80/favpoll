@@ -4,8 +4,11 @@ import { useState } from "react"
 import Link from "next/link"
 import { RevealLockPill } from "@/components/reveal-lock"
 import { cn } from "@/lib/utils"
+import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
+import { PollHeading } from "@/components/poll-heading"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
 import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-results"
@@ -19,6 +22,7 @@ type FavpollListCardFavpoll = {
   id: string
   subject?: string
   cause_label?: string | null
+  category?: string | null
   occasion_type: string | null
   opening_line: string
   description: string | null
@@ -65,6 +69,9 @@ export function FavpollListCard({
   const [results, setResults] = useState<CardResultItem[] | null>(
     initialResults ?? null
   )
+  // The dialog is controlled so both the topic banner and the lock overlay
+  // can open it (uncontrolled mode ties opening to the banner alone).
+  const [pledgeOpen, setPledgeOpen] = useState(false)
 
   const isClosed = !!favpoll.closed_at
   const entitled = hasPledged || isClosed
@@ -131,13 +138,18 @@ export function FavpollListCard({
                   ? (favpoll.cause_label ?? "")
                   : (favpoll.protagonist?.name ?? ""),
             }}
-            eyebrow={favpoll.opening_line ?? ""}
+            eyebrow={favpollEyebrow(favpoll)}
             size={size}
           />
         </Link>
 
         {pollWithItems && topicItems.length > 0 && (
           <div className="border-t border-border px-3 py-2">
+            <PollHeading
+              topicTitle={pollWithItems.topics.title}
+              size="md"
+              onPledge={() => setPledgeOpen(true)}
+            />
             <PledgeDialog
               favpollId={favpoll.id}
               clerkUserId={clerkUserId}
@@ -147,6 +159,8 @@ export function FavpollListCard({
               userPotAllocation={null}
               onPledgeSuccess={handlePledgeSuccess}
               isListed
+              open={pledgeOpen}
+              onOpenChange={setPledgeOpen}
             />
             {entitled ? (
               <FavpollListCardResults results={results ?? []} />
@@ -159,12 +173,17 @@ export function FavpollListCard({
                 >
                   <FavpollListCardResults results={decoyResults} />
                 </div>
-                <div
-                  className="absolute inset-0 flex items-center justify-center"
-                  aria-hidden="true"
+                {/* Full-area unlock — the poll section's idiom: a ghost
+                    button over the decoy, the pointer-events-none pill
+                    riding inside it. */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setPledgeOpen(true)}
+                  className="absolute inset-0 z-10 h-auto w-full rounded-none hover:bg-transparent"
                 >
                   <RevealLockPill size="sm" label="Pledge to see the results" />
-                </div>
+                </Button>
               </div>
             )}
           </div>

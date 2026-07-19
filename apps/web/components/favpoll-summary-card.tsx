@@ -3,6 +3,7 @@
 import { ClosingLabel } from "@/components/closing-label"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import type { Charity } from "@favpoll/types"
 import Link from "next/link"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
@@ -59,17 +60,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         )}
         <FavpollHeader
           protagonist={{ name: displayName }}
-          eyebrow={
-            // Subject first: a cause favpoll has no type (new rows carry
-            // category=null; pre-2026-07-13 rows carry a legacy 'fundraiser'
-            // that must not surface as a badge).
-            favpoll.subject === "cause"
-              ? "For a cause"
-              : favpoll.category
-                ? favpoll.category.charAt(0).toUpperCase() +
-                  favpoll.category.slice(1)
-                : (favpoll.opening_line ?? "")
-          }
+          eyebrow={favpollEyebrow(favpoll)}
           size="md"
         />
       </div>
