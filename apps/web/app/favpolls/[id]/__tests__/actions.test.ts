@@ -11,11 +11,13 @@ const mockEmail = vi.hoisted(() => ({
 // Payment verification (lib/stripe-verify) — resolved by default so existing
 // happy paths pass; individual tests reject it to prove nothing is recorded.
 const mockVerify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
+const mockVerifyTopUp = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 
 vi.mock("@clerk/nextjs/server", () => ({ auth: mockAuth }))
 vi.mock("@/lib/email", () => mockEmail)
 vi.mock("@/lib/stripe-verify", () => ({
   verifyPledgePayment: mockVerify,
+  verifyTopUpPayment: mockVerifyTopUp,
 }))
 
 let mock = makeSupabaseMock()
@@ -36,6 +38,8 @@ beforeEach(() => {
   mockEmail.sendPledgeConfirmation.mockResolvedValue(undefined)
   mockVerify.mockReset()
   mockVerify.mockResolvedValue(undefined)
+  mockVerifyTopUp.mockReset()
+  mockVerifyTopUp.mockResolvedValue(undefined)
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -480,32 +484,52 @@ describe("addOrganizerItem", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("topUpFundAsGuest", () => {
-  it("throws when no pot exists for the favpoll", async () => {
-    mock.queue(null) // no pot returned (maybeSingle → null via single)
+  it("verifies the top-up payment before crediting the fund", async () => {
+    mock.queue("pot-1") // pot_top_up rpc
 
-    await expect(topUpFundAsGuest("favpoll-1", 10)).rejects.toThrow(
-      "No shared fund found for this favpoll"
-    )
+    await topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+
+    expect(mockVerifyTopUp).toHaveBeenCalledWith({
+      paymentIntentId: "pi_topup_1",
+      favpollId: "favpoll-1",
+      topUpAmount: 10,
+    })
+    const rpcCall = mock.callsFor("rpc:pot_top_up")[0]!
+    expect(rpcCall.args[0]).toEqual({
+      p_favpoll_id: "favpoll-1",
+      p_amount: 10,
+      p_payment_intent_id: "pi_topup_1",
+      p_clerk_user_id: null,
+    })
   })
 
-  it("updates total_deposited by adding the amount to the existing balance", async () => {
-    mock.queue({ id: "pot-1", total_deposited: 50 }) // pot select
-    mock.queue(null) // pot update
+  it("credits nothing when payment verification fails", async () => {
+    mockVerifyTopUp.mockRejectedValueOnce(
+      new Error("Top-up amount does not match the payment")
+    )
 
-    await topUpFundAsGuest("favpoll-1", 10)
-
-    const potUpdate = mock
-      .callsFor("favpoll_pots")
-      .find((c) => c.method === "update")!
-    expect(potUpdate.args[0]).toEqual({ total_deposited: 60 })
+    await expect(
+      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+    ).rejects.toThrow("does not match the payment")
+    expect(mock.callsFor("rpc:pot_top_up")).toHaveLength(0)
   })
 
-  it("throws when the update fails", async () => {
-    mock.queue({ id: "pot-1", total_deposited: 50 })
-    mock.queue(null, { message: "update failed" })
+  it("rejects a top-up payment that was already recorded", async () => {
+    mock.queue(null, {
+      message:
+        'duplicate key value violates unique constraint "pot_topups_payment_intent_id_key"',
+    })
 
-    await expect(topUpFundAsGuest("favpoll-1", 10)).rejects.toThrow(
-      "update failed"
-    )
+    await expect(
+      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+    ).rejects.toThrow("This payment has already been recorded.")
+  })
+
+  it("throws when the rpc fails", async () => {
+    mock.queue(null, { message: "Favpoll not found" })
+
+    await expect(
+      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+    ).rejects.toThrow("Favpoll not found")
   })
 })

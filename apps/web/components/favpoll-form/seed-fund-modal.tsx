@@ -33,6 +33,9 @@ export function SeedFundModal({
 }: Props) {
   const [amount, setAmount] = useState("")
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  // The PaymentIntent behind clientSecret — the top-up actions verify it
+  // against Stripe before crediting the fund.
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [listingState, setListingState] = useState(isListed ?? true)
@@ -68,10 +71,12 @@ export function SeedFundModal({
       })
       const data = (await res.json()) as {
         clientSecret?: string
+        paymentIntentId?: string
         error?: string
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to create payment")
       setClientSecret(data.clientSecret ?? null)
+      setPaymentIntentId(data.paymentIntentId ?? null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
@@ -82,13 +87,14 @@ export function SeedFundModal({
   async function handlePaymentSuccess() {
     try {
       if (isGuest) {
-        await topUpFundAsGuest(favpollId, numeric)
+        await topUpFundAsGuest(favpollId, numeric, paymentIntentId ?? "")
       } else {
-        await topUpFund(favpollId, numeric)
+        await topUpFund(favpollId, numeric, paymentIntentId ?? "")
       }
     } catch {
       // Fund recording failed — continue regardless
     }
+    setPaymentIntentId(null)
     onComplete()
   }
 

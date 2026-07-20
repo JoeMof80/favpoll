@@ -86,3 +86,52 @@ export async function verifyPledgePayment({
     )
   }
 }
+
+type VerifyTopUpInput = {
+  paymentIntentId: string
+  /** The favpoll whose shared fund is being credited */
+  favpollId: string
+  /** Pounds — the amount being credited to the fund */
+  topUpAmount: number
+}
+
+/**
+ * Throws PaymentVerificationError unless the PaymentIntent proves the
+ * top-up being credited was genuinely charged for this favpoll's fund.
+ * For guest top-ups the verified payment IS the authorisation. Both flows
+ * carry the metadata: the standalone fund modal charges only a top-up;
+ * the pledge flow's top-up rides the pledge PaymentIntent.
+ */
+export async function verifyTopUpPayment({
+  paymentIntentId,
+  favpollId,
+  topUpAmount,
+}: VerifyTopUpInput): Promise<void> {
+  if (!paymentIntentId) {
+    throw new PaymentVerificationError("Missing payment reference")
+  }
+
+  let intent: Stripe.PaymentIntent
+  try {
+    intent = await stripe().paymentIntents.retrieve(paymentIntentId)
+  } catch {
+    throw new PaymentVerificationError("Payment not found")
+  }
+
+  if (intent.status !== "succeeded") {
+    throw new PaymentVerificationError("Payment has not completed")
+  }
+  if (intent.currency !== "gbp") {
+    throw new PaymentVerificationError("Unexpected payment currency")
+  }
+  if (intent.metadata.favpoll_id !== favpollId) {
+    throw new PaymentVerificationError("Payment is for a different favpoll")
+  }
+
+  const paidTopUp = Number(intent.metadata.topup_amount)
+  if (!Number.isFinite(paidTopUp) || paidTopUp !== topUpAmount) {
+    throw new PaymentVerificationError(
+      "Top-up amount does not match the payment"
+    )
+  }
+}

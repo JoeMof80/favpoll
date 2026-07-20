@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { isRateLimited } from "@/lib/rate-limit"
-import { verifyPledgePayment } from "@/lib/stripe-verify"
+import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
 
 type PledgeAllocationInput = {
   favouriteId: string
@@ -399,7 +399,6 @@ export async function removeFavpollPollFavourite(id: string) {
 export async function pledgeFromFund(input: {
   favpollPollId: string
   potId: string
-  potCurrentAllocated: number
   totalAmount: number
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
@@ -409,11 +408,17 @@ export async function pledgeFromFund(input: {
 
   const supabase = createAdminClient()
 
-  const { error: potErr } = await supabase
-    .from("favpoll_pots")
-    .update({ total_allocated: input.potCurrentAllocated + input.totalAmount })
-    .eq("id", input.potId)
+  // Atomic guarded reservation (pot_allocate refuses to allocate more than
+  // the fund holds) — the server no longer trusts a client-supplied
+  // current-allocated figure, and concurrent allocations cannot oversell.
+  const { data: allocated, error: potErr } = await supabase.rpc(
+    "pot_allocate",
+    { p_pot_id: input.potId, p_amount: input.totalAmount }
+  )
   if (potErr) throw new Error(potErr.message)
+  if (!allocated) {
+    throw new Error("There isn't enough left in the shared fund for that.")
+  }
 
   const { data: pledge, error: pledgeErr } = await supabase
     .from("pledges")
@@ -427,8 +432,15 @@ export async function pledgeFromFund(input: {
     })
     .select("id")
     .single()
-  if (pledgeErr || !pledge)
+  if (pledgeErr || !pledge) {
+    // Best-effort release of the reservation so the fund isn't drained by
+    // a failed pledge
+    await supabase.rpc("pot_deallocate", {
+      p_pot_id: input.potId,
+      p_amount: input.totalAmount,
+    })
     throw new Error(pledgeErr?.message ?? "Failed to create pledge")
+  }
 
   const { error: allocErr } = await supabase.from("pledge_allocations").insert(
     input.allocations
@@ -442,58 +454,49 @@ export async function pledgeFromFund(input: {
   if (allocErr) throw new Error(allocErr.message)
 }
 
-export async function topUpFundAsGuest(favpollId: string, amount: number) {
+// Shared-fund credits: verified against Stripe (the payment IS the
+// authorisation — a guest needs no account to give to the fund) and applied
+// via the atomic pot_top_up RPC, whose ledger (pot_topups, unique
+// payment_intent_id) makes each payment creditable exactly once.
+async function creditFund(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string,
+  clerkUserId: string | null
+) {
+  await verifyTopUpPayment({ paymentIntentId, favpollId, topUpAmount: amount })
+
   const supabase = createAdminClient()
-
-  const { data: pot } = await supabase
-    .from("favpoll_pots")
-    .select("id, total_deposited")
-    .eq("favpoll_id", favpollId)
-    .single()
-
-  if (!pot) throw new Error("No shared fund found for this favpoll")
-
-  const { error } = await supabase
-    .from("favpoll_pots")
-    .update({ total_deposited: pot.total_deposited + amount })
-    .eq("id", pot.id)
-
-  if (error) throw new Error(error.message)
+  const { error } = await supabase.rpc("pot_top_up", {
+    p_favpoll_id: favpollId,
+    p_amount: amount,
+    p_payment_intent_id: paymentIntentId,
+    p_clerk_user_id: clerkUserId,
+  })
+  if (error) {
+    if (error.message.includes("pot_topups_payment_intent_id_key")) {
+      throw new Error("This payment has already been recorded.")
+    }
+    throw new Error(error.message)
+  }
 }
 
-export async function topUpFund(favpollId: string, amount: number) {
+export async function topUpFundAsGuest(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
+  await creditFund(favpollId, amount, paymentIntentId, null)
+}
+
+export async function topUpFund(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
-
-  const supabase = createAdminClient()
-
-  const { data: pot } = await supabase
-    .from("favpoll_pots")
-    .select("id, total_deposited")
-    .eq("favpoll_id", favpollId)
-    .single()
-
-  if (!pot) {
-    const { data: organiserData } = await supabase
-      .from("favpolls")
-      .select("created_by")
-      .eq("id", favpollId)
-      .single()
-    const { error: createErr } = await supabase.from("favpoll_pots").insert({
-      favpoll_id: favpollId,
-      created_by: organiserData?.created_by ?? userId,
-      total_deposited: amount,
-    })
-    if (createErr) throw new Error(createErr.message)
-    return
-  }
-
-  const { error } = await supabase
-    .from("favpoll_pots")
-    .update({ total_deposited: pot.total_deposited + amount })
-    .eq("id", pot.id)
-
-  if (error) throw new Error(error.message)
+  await creditFund(favpollId, amount, paymentIntentId, userId)
 }
 
 export async function setFavpollListed(favpollId: string, isListed: boolean) {
