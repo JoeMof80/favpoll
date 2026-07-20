@@ -130,8 +130,8 @@ describe("SeedFundModal — payment intent flow", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
-          amount: 50,
-          metadata: { type: "pot_top_up", favpoll_id: FAVPOLL_ID },
+          favpollId: FAVPOLL_ID,
+          topUpAmount: 50,
         }),
       })
     )

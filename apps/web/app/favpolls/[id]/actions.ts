@@ -4,10 +4,29 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { isRateLimited } from "@/lib/rate-limit"
+import { verifyPledgePayment } from "@/lib/stripe-verify"
 
 type PledgeAllocationInput = {
   favouriteId: string
   amount: number
+}
+
+// A card pledge is recorded only after its PaymentIntent is verified against
+// Stripe (status succeeded, bound to this poll, amounts matching what was
+// actually charged — lib/stripe-verify). The PI id is stored so each payment
+// can be recorded exactly once (partial unique index is the backstop).
+async function assertUnusedPaymentIntent(
+  supabase: ReturnType<typeof createAdminClient>,
+  paymentIntentId: string
+) {
+  const { data: existing } = await supabase
+    .from("pledges")
+    .select("id")
+    .eq("payment_intent_id", paymentIntentId)
+    .maybeSingle()
+  if (existing) {
+    throw new Error("This payment has already been recorded.")
+  }
 }
 
 type CreatePledgeInput = {
@@ -19,13 +38,23 @@ type CreatePledgeInput = {
   /** Hide the name from the public guest wall (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
+  /** The Stripe PaymentIntent that charged this pledge */
+  paymentIntentId: string
 }
 
 export async function createPledge(input: CreatePledgeInput) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
+  await verifyPledgePayment({
+    paymentIntentId: input.paymentIntentId,
+    favpollPollId: input.favpollPollId,
+    totalAmount: input.totalAmount,
+    tipAmount: input.tipAmount ?? 0,
+  })
+
   const supabase = createAdminClient()
+  await assertUnusedPaymentIntent(supabase, input.paymentIntentId)
 
   const { data: pledge, error: pledgeErr } = await supabase
     .from("pledges")
@@ -37,6 +66,7 @@ export async function createPledge(input: CreatePledgeInput) {
       fee: 0,
       tip_amount: input.tipAmount ?? 0,
       is_anonymous: input.isAnonymous ?? false,
+      payment_intent_id: input.paymentIntentId,
     })
     .select("id")
     .single()
@@ -68,12 +98,22 @@ type CreateGuestPledgeInput = {
   /** Hide the name from the public guest wall (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
+  /** The Stripe PaymentIntent that charged this pledge */
+  paymentIntentId: string
 }
 
 export async function createGuestPledge(input: CreateGuestPledgeInput) {
   if (!input.guestEmail) throw new Error("Email is required")
 
+  await verifyPledgePayment({
+    paymentIntentId: input.paymentIntentId,
+    favpollPollId: input.favpollPollId,
+    totalAmount: input.totalAmount,
+    tipAmount: input.tipAmount ?? 0,
+  })
+
   const supabase = createAdminClient()
+  await assertUnusedPaymentIntent(supabase, input.paymentIntentId)
 
   // Check for existing active pledge from same email on same poll
   const { data: existing } = await supabase
@@ -105,6 +145,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       tip_amount: input.tipAmount ?? 0,
       display_name: input.displayName?.trim() || null,
       is_anonymous: input.isAnonymous ?? false,
+      payment_intent_id: input.paymentIntentId,
     })
     .select("id")
     .single()

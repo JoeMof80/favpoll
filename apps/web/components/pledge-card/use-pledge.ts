@@ -72,6 +72,11 @@ export function usePledge({
   const [pledgeClientSecret, setPledgeClientSecret] = useState<string | null>(
     null
   )
+  // The PaymentIntent behind pledgeClientSecret — passed to the pledge
+  // actions, which verify it against Stripe before recording anything.
+  const [pledgePaymentIntentId, setPledgePaymentIntentId] = useState<
+    string | null
+  >(null)
   const [pendingTopUp, setPendingTopUp] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -160,6 +165,9 @@ export function usePledge({
     guestEmailParam?: string
   ): Promise<string | undefined> {
     const selections = pollSelections[pollWithItems.id] ?? []
+    // The actions verify this PaymentIntent against Stripe before recording;
+    // an empty id is rejected server-side.
+    const paymentIntentId = pledgePaymentIntentId ?? ""
     if (clerkUserId) {
       await createPledge({
         favpollPollId: pollWithItems.id,
@@ -172,6 +180,7 @@ export function usePledge({
           pollWithItems.topics.favourites,
           numericPledge
         ),
+        paymentIntentId,
       })
       return undefined
     } else {
@@ -188,6 +197,7 @@ export function usePledge({
           pollWithItems.topics.favourites,
           numericPledge
         ),
+        paymentIntentId,
       })
       return token
     }
@@ -201,14 +211,22 @@ export function usePledge({
     setError(null)
     setSubmitting(true)
     try {
+      // The route computes the charge server-side from these parts and
+      // stamps them into PI metadata — savePledge is verified against them.
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: ownCharge }),
+        body: JSON.stringify({
+          favpollPollId: pollWithItems.id,
+          pledgeAmount: ownBase,
+          tipAmount: ownTip,
+          topUpAmount: ownTopUp,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Failed to create payment")
       setPendingTopUp(isTopUpValid)
+      setPledgePaymentIntentId(data.paymentIntentId ?? null)
       setPledgeClientSecret(data.clientSecret)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -246,6 +264,7 @@ export function usePledge({
     setPledgeClientSecret(null)
     try {
       const guestToken = await savePledge(email ?? guestEmail)
+      setPledgePaymentIntentId(null)
       if (pendingTopUp) await topUpFund(favpollId, numericTopUp)
       setPendingTopUp(false)
       onPledgeSuccess?.(guestToken)

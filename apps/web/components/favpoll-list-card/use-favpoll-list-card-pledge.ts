@@ -23,6 +23,9 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
     initialResults ? "pledged" : "idle"
   )
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  // The PaymentIntent behind clientSecret — the pledge action verifies it
+  // against Stripe before recording anything.
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
   const [results, setResults] = useState<CardResultItem[] | null>(
     initialResults ?? null
   )
@@ -43,10 +46,17 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
     if (selectedIds.length === 0 || amount === null) return
     setError(null)
     try {
+      // The route computes the charge server-side and stamps the parts into
+      // PI metadata — createPledge is verified against them.
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }), // pounds
+        body: JSON.stringify({
+          favpollPollId: pollId,
+          pledgeAmount: amount, // pounds
+          tipAmount: 0,
+          topUpAmount: 0,
+        }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
@@ -54,10 +64,12 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
           (body as { error?: string }).error ?? "Failed to initialise payment"
         )
       }
-      const { clientSecret: secret } = (await res.json()) as {
+      const data = (await res.json()) as {
         clientSecret: string
+        paymentIntentId?: string
       }
-      setClientSecret(secret)
+      setClientSecret(data.clientSecret)
+      setPaymentIntentId(data.paymentIntentId ?? null)
       setStep("paying")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment setup failed")
@@ -83,6 +95,7 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
         potAllocationId: null,
         totalAmount: amount,
         allocations,
+        paymentIntentId: paymentIntentId ?? "",
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")
@@ -105,6 +118,7 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
     }
 
     setClientSecret(null)
+    setPaymentIntentId(null)
     setStep("pledged")
   }
 
