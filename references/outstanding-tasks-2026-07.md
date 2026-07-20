@@ -18,11 +18,11 @@ the growth doc, and recent sessions. For everything shipped 10–20 July, see
 
 ## 2. Business / waiting
 
-| Task                                   | Detail                                                                                                                                                                                                                          |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Goodstack (lead disbursement rail)** | Leo Chandler + Elani Buchan messaged on LinkedIn — no reply as of 19 July. Josh Radford email drafted in `references/disbursement-enquiries-2026-07.md` (plan: schedule-send Monday morning). Chase trigger ~24 July if silent. |
-| **PPGF**                               | Demoted to Gift-Aid-only interest; Goodstack is the lead rail. CAF/Swiftaid remain the Gift Aid fallback.                                                                                                                       |
-| **Stripe Connect**                     | Application pending approval; disbursement not wired (cron has a placeholder).                                                                                                                                                  |
+| Task                                   | Detail                                                                                                                                                                                                                                                                             |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Goodstack (lead disbursement rail)** | Leo Chandler + Elani Buchan messaged on LinkedIn — no reply. **Josh Radford emailed 20 July** (sent copy in `references/disbursement-enquiries-2026-07.md`); chase trigger ~27 July if silent, then Henry Ludlam, then CAF warming. Gift Aid question reserved for the reply/call. |
+| **PPGF**                               | Demoted to Gift-Aid-only interest; Goodstack is the lead rail. CAF/Swiftaid remain the Gift Aid fallback.                                                                                                                                                                          |
+| **Stripe Connect**                     | Application pending approval; disbursement not wired (cron has a placeholder).                                                                                                                                                                                                     |
 
 ## 3. Buildable code features (still open)
 

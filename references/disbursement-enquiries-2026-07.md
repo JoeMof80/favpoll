@@ -15,7 +15,7 @@ keeps discretion), which is exactly what keeps Gift Aid valid.
 
 This largely closes the **fund-flow** question (favpoll never holds the money;
 the gift goes to a charity) and **removes PPGF's last structural advantage** —
-Goodstack replicates PPGF's charitable-intermediary model *with* an API and
+Goodstack replicates PPGF's charitable-intermediary model _with_ an API and
 self-serve onboarding. It also means **Swiftaid may be unnecessary**: if the
 Foundation claims Gift Aid itself, no separate agent is needed.
 
@@ -34,7 +34,7 @@ the **call agenda / reply-thread checklist**, not the first touch.
 
 **Route (confirmed 6 July 2026):** Goodstack's **business** path is
 **sales-led — "Request a demo"**, no self-serve signup and **no sandbox/API
-keys until after the call**. (The self-serve "Sign up" is the *nonprofit*
+keys until after the call**. (The self-serve "Sign up" is the _nonprofit_
 route — not us; favpoll is "A corporation".) So the Goodstack-specific
 technical build is genuinely gated on the demo. A demo gate is normal here —
 onboarding platforms is Goodstack's core commercial motion, so expect
@@ -66,19 +66,40 @@ the Impact Foundation first, keeping the company-side email in reserve:
   > Goodstack and the Impact Foundation as our disbursement rail. I'd value
   > your operational take on whether we're a fit. Thanks, Joe
 - **Josh Radford** — VP of GTM at Goodstack (the "J.R." on the site; email
-  format `{first}@goodstack.io`). Direct email drafted — **ON HOLD** on the
-  founder's word while the trustee notes are in flight. This is the
-  highest-value card: answering exactly this enquiry is his job. Play it at
-  the ~17 July trigger if the trustees stay silent.
+  format `{first}@goodstack.io`). **EMAIL SENT 20 July 2026** (trustees
+  stayed silent past the ~17 July trigger). Founder chose the short, soft
+  form — no Gift Aid question in the opener; that lands on the call/reply
+  instead (it stays top of the questions list below). Sent verbatim:
+
+  > Hi Josh,
+  >
+  > I hope you don't mind the direct approach. I requested a demo via
+  > goodstack.io two weeks ago but haven't heard back yet.
+  >
+  > We're currently building favpoll, a UK charitable-giving platform.
+  > Guests pledge money at life events and choose the UK charities that
+  > receive it.
+  >
+  > We need infrastructure that validates and disburses to donor-chosen
+  > charities, so Goodstack looks like a good fit. It would be great to
+  > find out more.
+  >
+  > Thanks,
+  > Joe Moffatt
+  > favpoll.com
+
+  Chase trigger: **~27 July** if silent; next card after that is Henry
+  Ludlam, then CAF warming.
+
 - **Henry Ludlam** — Goodstack team; wave two if all the above are quiet.
 - Remaining trustees (Christina Hallett — chair, Henry Barclay): reserve;
   don't blanket the board.
 
 Connection notes are private to each recipient, but the board is four people
 — if both trustees reply, say plainly that a couple of trustees were
-approached out of care to get the fit right. The ~17 July trigger now fires
-the **Josh Radford email** first; CAF warming becomes the step after that,
-not the immediate next move.
+approached out of care to get the fit right. The ~17 July trigger fired on
+20 July: the **Josh Radford email is SENT** (above). CAF warming is the
+step after Henry Ludlam, not the immediate next move.
 
 ### Chase — drafted 10 July 2026
 
@@ -165,10 +186,11 @@ waiting" counters pre-launch smallness.
 
 **Your goal for the call:** confirm the one open question (Gift Aid), learn the
 fund-ingestion model (does it replace favpoll's Stripe flow or sit after it),
-and get onboarding + sandbox access moving. You are qualifying *them* as much
+and get onboarding + sandbox access moving. You are qualifying _them_ as much
 as the reverse — you've already chosen them as the lead; this de-risks it.
 
 **30-second pitch (say this early to frame it right):**
+
 > favpoll is a UK charitable-giving platform — a company, not a nonprofit.
 > Guests pledge money at life events, choose up to three UK charities, and the
 > proceeds are split between them. We charge no platform fee; donors optionally
@@ -178,12 +200,14 @@ as the reverse — you've already chosen them as the lead; this de-risks it.
 > right.
 
 **The one that decides it — ask first:**
+
 - Does the **Goodstack Impact Foundation UK (1192508)** claim **Gift Aid** on
   eligible UK donations and pass it to the recipient charity, PPGF-style? For
   **any** donor-chosen registered UK charity, or only enrolled ones?
 
 **Architecture (determines how much of favpoll changes):**
-- **Fund ingestion:** do donors pay the Foundation via *your hosted flow*
+
+- **Fund ingestion:** do donors pay the Foundation via _your hosted flow_
   (i.e. you largely **replace Stripe**), or does favpoll collect payment
   (Stripe) and **remit onward** to the Foundation? This is the big one for our
   build.
@@ -191,6 +215,7 @@ as the reverse — you've already chosen them as the lead; this de-risks it.
 - Is it API + hosted components, or embed-only? (We're Next.js / Supabase.)
 
 **Commercial / onboarding:**
+
 - Can a **pre-launch** UK company (Josmo Services Ltd) onboard now? KYC,
   contract, any **minimum volume** or revenue-share, exclusivity, data terms?
 - Confirm pricing: **2.9% + 20p** UK cards, **no platform/monthly fee**.
@@ -198,10 +223,12 @@ as the reverse — you've already chosen them as the lead; this de-risks it.
 - **Sandbox access** — can we get keys to start building now?
 
 **Disbursement edge cases:**
+
 - Frequency/mechanics of payout to charities. What happens if a donor-chosen
   charity **isn't payable** (no verified bank details, dormant)? Fallback?
 
 **Later / multi-market (mention, don't dwell):**
+
 - Compliant donor **tax receipts** for US / EU / AU when we expand.
 
 **Things to volunteer that make onboarding smoother:** UK Ltd company with
@@ -220,7 +247,7 @@ exclusivity or data-ownership terms.
 
 **Do not send yet.** The Goodstack Impact Foundation finding means Goodstack
 may claim Gift Aid itself, making a separate agent unnecessary. Send this
-**only if** Goodstack's reply confirms the Foundation does *not* claim Gift Aid
+**only if** Goodstack's reply confirms the Foundation does _not_ claim Gift Aid
 on donor-chosen-charity donations.
 
 **Where to send (when/if needed):** `swiftaid.co.uk` (HMRC-registered Gift Aid
