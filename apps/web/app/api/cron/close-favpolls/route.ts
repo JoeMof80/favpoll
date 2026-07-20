@@ -85,21 +85,17 @@ export async function GET(request: Request) {
       (favpoll.protagonists as unknown as { name: string } | null)?.name ??
       "someone special"
 
-    const { error: updateErr } = await supabase
-      .from("favpolls")
-      .update({ closed_at: now, total_raised: totalRaised })
-      .eq("id", favpoll.id)
-
-    if (updateErr) {
-      errors.push(`${favpoll.id}: ${updateErr.message}`)
-      continue
-    }
-
-    // Disburse the raised total to the favpoll's charities (equal split),
-    // recording each attempt in the disbursements ledger. Idempotent: a
-    // favpoll is only selected while closed_at was null, so it can't be
-    // disbursed twice. The active provider is a no-op until a real rail is
-    // onboarded, so these land as 'pending' — no money has actually moved yet.
+    // ORDER MATTERS (2026-07-21): disbursements are written FIRST and the
+    // close marker LAST, with every step idempotent — so any failure leaves
+    // closed_at null, the favpoll is re-selected next run, and the re-run is
+    // duplicate-safe. Previously the close was written first: a ledger
+    // failure left the favpoll closed and never re-selected — the payout
+    // silently dropped.
+    //
+    // Idempotency: the ledger upsert ignores duplicates on
+    // (favpoll_id, charity_id); the provider is keyed by a deterministic
+    // reference (a real provider must treat it as an idempotency key — the
+    // no-op provider trivially does).
     const charities = charitiesByFavpoll[favpoll.id] ?? []
     if (totalRaised > 0 && charities.length > 0) {
       const registeredById = Object.fromEntries(
@@ -131,16 +127,33 @@ export async function GET(request: Request) {
 
       const { error: disburseErr } = await supabase
         .from("disbursements")
-        .insert(ledgerRows)
+        .upsert(ledgerRows, {
+          onConflict: "favpoll_id,charity_id",
+          ignoreDuplicates: true,
+        })
 
       if (disburseErr) {
-        // A ledger write failure shouldn't undo the close; surface it instead.
+        // Leave the favpoll OPEN so the next run retries the whole flow.
         console.error(
           `[close-favpolls] disbursement ledger failed for ${favpoll.id}:`,
           disburseErr.message
         )
         errors.push(`${favpoll.id} disbursement: ${disburseErr.message}`)
+        continue
       }
+    }
+
+    const { error: updateErr } = await supabase
+      .from("favpolls")
+      .update({ closed_at: now, total_raised: totalRaised })
+      .eq("id", favpoll.id)
+
+    if (updateErr) {
+      // Disbursements exist but the favpoll stays open — next run re-splits
+      // identically, the upsert ignores the duplicates, and the close is
+      // retried.
+      errors.push(`${favpoll.id}: ${updateErr.message}`)
+      continue
     }
 
     const organiser = userMap[favpoll.created_by]

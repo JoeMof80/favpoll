@@ -283,15 +283,15 @@ describe("GET /api/cron/close-favpolls — disbursement", () => {
       },
     ])
     mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null) // disbursements upsert (written BEFORE the close)
     mock.queue(null) // favpolls update
-    mock.queue(null) // disbursements insert
 
     await GET(makeRequest("Bearer test-secret"))
 
-    const insert = mock
+    const upsert = mock
       .callsFor("disbursements")
-      .find((c) => c.method === "insert")!
-    const rows = insert.args[0]
+      .find((c) => c.method === "upsert")!
+    const rows = upsert.args[0]
     expect(rows).toHaveLength(3)
     expect(rows.map((r: { amount: number }) => r.amount)).toEqual([30, 30, 30])
     expect(rows.every((r: { status: string }) => r.status === "pending")).toBe(
@@ -305,6 +305,34 @@ describe("GET /api/cron/close-favpolls — disbursement", () => {
       charity_id: "ch-1",
       provider_ref: `noop:${favpollId}:ch-1`,
     })
+  })
+
+  it("leaves the favpoll open when the ledger write fails (retried next run)", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
+    ])
+    mock.queue([{ favpoll_polls: { favpoll_id: favpollId }, total_amount: 90 }])
+    mock.queue([
+      {
+        favpoll_id: favpollId,
+        charities: { id: "ch-1", registered_number: "111" },
+      },
+    ])
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null, { message: "ledger down" }) // disbursements upsert fails
+
+    const res = await GET(makeRequest("Bearer test-secret"))
+    const body = await res.json()
+
+    // The close was NOT written — the favpoll stays open for the next run
+    expect(
+      mock.callsFor("favpolls").filter((c) => c.method === "update")
+    ).toHaveLength(0)
+    expect(body.closed).toBe(0)
+    expect(body.errors?.[0]).toContain("ledger down")
   })
 
   it("does not disburse when the favpoll raised nothing", async () => {
