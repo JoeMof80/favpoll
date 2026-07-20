@@ -8,9 +8,15 @@ const mockAuth = vi.hoisted(() =>
 const mockEmail = vi.hoisted(() => ({
   sendPledgeConfirmation: vi.fn().mockResolvedValue(undefined),
 }))
+// Payment verification (lib/stripe-verify) — resolved by default so existing
+// happy paths pass; individual tests reject it to prove nothing is recorded.
+const mockVerify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 
 vi.mock("@clerk/nextjs/server", () => ({ auth: mockAuth }))
 vi.mock("@/lib/email", () => mockEmail)
+vi.mock("@/lib/stripe-verify", () => ({
+  verifyPledgePayment: mockVerify,
+}))
 
 let mock = makeSupabaseMock()
 vi.mock("@/lib/supabase/admin", () => ({
@@ -28,6 +34,8 @@ beforeEach(() => {
   mock = makeSupabaseMock()
   mockAuth.mockResolvedValue({ userId: "user-1" })
   mockEmail.sendPledgeConfirmation.mockResolvedValue(undefined)
+  mockVerify.mockReset()
+  mockVerify.mockResolvedValue(undefined)
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -43,6 +51,7 @@ describe("createPledge", () => {
       { favouriteId: "item-a", amount: 6 },
       { favouriteId: "item-b", amount: 4 },
     ],
+    paymentIntentId: "pi_test_123",
   }
 
   it("throws 'Not authenticated' when userId is null", async () => {
@@ -50,7 +59,44 @@ describe("createPledge", () => {
     await expect(createPledge(input)).rejects.toThrow("Not authenticated")
   })
 
-  it("inserts pledge row with zero fee and the tip recorded separately", async () => {
+  it("verifies the PaymentIntent against the recorded amounts", async () => {
+    mock.queue(null) // PI-unused check → maybeSingle
+    mock.queue({ id: "pledge-1" })
+    mock.queue(null)
+
+    await createPledge({ ...input, tipAmount: 1 })
+
+    expect(mockVerify).toHaveBeenCalledWith({
+      paymentIntentId: "pi_test_123",
+      favpollPollId: "poll-1",
+      totalAmount: 10,
+      tipAmount: 1,
+    })
+  })
+
+  it("records nothing when payment verification fails", async () => {
+    mockVerify.mockRejectedValueOnce(new Error("Payment has not completed"))
+
+    await expect(createPledge(input)).rejects.toThrow(
+      "Payment has not completed"
+    )
+    expect(mock.callsFor("pledges")).toHaveLength(0)
+    expect(mock.callsFor("pledge_allocations")).toHaveLength(0)
+  })
+
+  it("rejects a PaymentIntent that was already recorded", async () => {
+    mock.queue({ id: "pledge-existing" }) // PI-unused check finds a pledge
+
+    await expect(createPledge(input)).rejects.toThrow(
+      "This payment has already been recorded."
+    )
+    expect(
+      mock.callsFor("pledges").filter((c) => c.method === "insert")
+    ).toHaveLength(0)
+  })
+
+  it("inserts pledge row with zero fee, the tip recorded separately, and the PI id", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" }) // pledge insert → single()
     mock.queue(null) // allocations insert → await
 
@@ -65,10 +111,12 @@ describe("createPledge", () => {
       total_amount: 10, // charity money only — tip never inflates it
       fee: 0,
       tip_amount: 1,
+      payment_intent_id: "pi_test_123",
     })
   })
 
   it("inserts pledge row with pot_allocation_id when provided", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
@@ -81,6 +129,7 @@ describe("createPledge", () => {
   })
 
   it("inserts allocations with pledge_id from the pledge row", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-99" })
     mock.queue(null)
 
@@ -106,6 +155,7 @@ describe("createPledge", () => {
   })
 
   it("filters out zero-amount allocations before inserting", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
@@ -125,12 +175,14 @@ describe("createPledge", () => {
   })
 
   it("throws when pledge insert returns an error", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue(null, { message: "duplicate key" })
 
     await expect(createPledge(input)).rejects.toThrow("duplicate key")
   })
 
   it("throws when allocation insert returns an error", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" }) // pledge insert ok
     mock.queue(null, { message: "FK violation" }) // alloc insert fails
 
@@ -138,6 +190,7 @@ describe("createPledge", () => {
   })
 
   it("defaults tip_amount to 0 when no tip is passed", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
@@ -161,6 +214,7 @@ describe("createGuestPledge", () => {
     guestEmail: "guest@example.com",
     totalAmount: 10,
     allocations: [{ favouriteId: "item-a", amount: 10 }],
+    paymentIntentId: "pi_test_456",
   }
 
   it("throws 'Email is required' when guestEmail is empty", async () => {
@@ -169,7 +223,19 @@ describe("createGuestPledge", () => {
     ).rejects.toThrow("Email is required")
   })
 
+  it("records nothing when payment verification fails", async () => {
+    mockVerify.mockRejectedValueOnce(
+      new Error("Pledge amount does not match the payment")
+    )
+
+    await expect(createGuestPledge(input)).rejects.toThrow(
+      "does not match the payment"
+    )
+    expect(mock.callsFor("pledges")).toHaveLength(0)
+  })
+
   it("throws when a duplicate active pledge exists for the same email + poll", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue({ id: "existing-pledge" }) // maybeSingle finds existing
 
     await expect(createGuestPledge(input)).rejects.toThrow(
@@ -178,6 +244,7 @@ describe("createGuestPledge", () => {
   })
 
   it("inserts pledge with clerk_user_id: null, a UUID guest_token, zero fee", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge (maybeSingle)
     mock.queue({ id: "pledge-1" }) // pledge insert (single)
     mock.queue(null) // allocations insert (await)
@@ -206,7 +273,8 @@ describe("createGuestPledge", () => {
   })
 
   it("returns the guest_token on success", async () => {
-    mock.queue(null)
+    mock.queue(null) // PI-unused check
+    mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
     mock.queue({
@@ -224,7 +292,8 @@ describe("createGuestPledge", () => {
   })
 
   it("calls sendPledgeConfirmation with the correct arguments", async () => {
-    mock.queue(null)
+    mock.queue(null) // PI-unused check
+    mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
     mock.queue({
@@ -250,7 +319,8 @@ describe("createGuestPledge", () => {
   })
 
   it("still returns guest_token even when sendPledgeConfirmation throws", async () => {
-    mock.queue(null)
+    mock.queue(null) // PI-unused check
+    mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
     mock.queue({
@@ -270,6 +340,7 @@ describe("createGuestPledge", () => {
   })
 
   it("throws when pledge insert fails", async () => {
+    mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge
     mock.queue(null, { message: "insert fail" }) // pledge insert error
 

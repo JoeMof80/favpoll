@@ -56,12 +56,14 @@ export function SeedFundModal({
     setError(null)
     setSubmitting(true)
     try {
+      // Fund-only top-up: the route computes the charge from topUpAmount
+      // and binds the PI to the favpoll (no poll, no pledge part).
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: numeric,
-          metadata: { type: "pot_top_up", favpoll_id: favpollId },
+          favpollId,
+          topUpAmount: numeric,
         }),
       })
       const data = (await res.json()) as {

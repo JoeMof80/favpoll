@@ -9,10 +9,24 @@ import {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+// Sanity ceiling per charge part (pounds) — hostile-input guard, not a
+// product limit.
+const MAX_PART = 10_000
+
+function part(value: unknown): number | null {
+  if (value === undefined || value === null) return 0
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < 0 || n > MAX_PART) return null
+  // Money arrives in pounds; forbid sub-penny fractions
+  if (Math.round(n * 100) !== n * 100) return null
+  return n
+}
+
 export async function POST(req: Request) {
   // Guests (userId === null) are allowed — the whole pledge-dialog flow supports
   // unauthenticated pledging. Email is captured at checkout and passed to the
-  // webhook-driven savePledge call.
+  // savePledge call, which verifies this PaymentIntent server-side before
+  // recording (lib/stripe-verify).
   const { userId } = await auth()
 
   // Payment-intent creation is the card-testing surface. Generous per-IP
@@ -27,25 +41,61 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 })
   }
 
-  const { amount, metadata } = (await req.json()) as {
-    amount: number
-    metadata?: Record<string, string>
+  // The charge is computed SERVER-side from its parts, and the parts are
+  // stamped into the PaymentIntent metadata — savePledge later verifies the
+  // recorded pledge/tip against them (lib/stripe-verify), so a client can
+  // never record amounts it didn't pay.
+  const body = (await req.json()) as {
+    pledgeAmount?: unknown
+    tipAmount?: unknown
+    topUpAmount?: unknown
+    favpollPollId?: unknown
+    favpollId?: unknown
   }
 
-  if (!amount || amount <= 0) {
+  const pledgeAmount = part(body.pledgeAmount)
+  const tipAmount = part(body.tipAmount)
+  const topUpAmount = part(body.topUpAmount)
+
+  if (pledgeAmount === null || tipAmount === null || topUpAmount === null) {
     return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
   }
 
+  const totalPence = Math.round((pledgeAmount + tipAmount + topUpAmount) * 100)
+  if (totalPence <= 0) {
+    return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
+  }
+
+  const favpollPollId =
+    typeof body.favpollPollId === "string" ? body.favpollPollId : null
+  const favpollId = typeof body.favpollId === "string" ? body.favpollId : null
+
+  // A pledge charge must be bound to its poll so the PaymentIntent can only
+  // ever record a pledge there. Fund-only top-ups carry a favpoll instead.
+  if (pledgeAmount > 0 && !favpollPollId) {
+    return NextResponse.json({ error: "Missing poll" }, { status: 400 })
+  }
+
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Math.round(amount * 100), // pence
+    amount: totalPence,
     currency: "gbp",
     // Restrict to card only so the PaymentElement renders the card form
     // directly, bypassing Stripe's adaptive payment-method selector.
     // Apple Pay / Google Pay require additional domain verification and
     // are not supported in E2E or headless environments.
     payment_method_types: ["card"],
-    metadata: { ...(userId ? { clerk_user_id: userId } : {}), ...metadata },
+    metadata: {
+      ...(userId ? { clerk_user_id: userId } : {}),
+      ...(favpollPollId ? { favpoll_poll_id: favpollPollId } : {}),
+      ...(favpollId ? { favpoll_id: favpollId } : {}),
+      pledge_amount: String(pledgeAmount),
+      tip_amount: String(tipAmount),
+      topup_amount: String(topUpAmount),
+    },
   })
 
-  return NextResponse.json({ clientSecret: paymentIntent.client_secret })
+  return NextResponse.json({
+    clientSecret: paymentIntent.client_secret,
+    paymentIntentId: paymentIntent.id,
+  })
 }

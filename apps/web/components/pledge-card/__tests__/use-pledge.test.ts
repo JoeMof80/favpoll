@@ -714,7 +714,7 @@ describe("usePledge — handleOwnConfirm", () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
-  it("calls /api/stripe/payment-intent with the correct charge amount", async () => {
+  it("calls /api/stripe/payment-intent with the charge parts", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ clientSecret: "pi_secret_test" }), {
         status: 200,
@@ -732,12 +732,47 @@ describe("usePledge — handleOwnConfirm", () => {
       await result.current.handleOwnConfirm()
     })
 
+    // The route computes the charge server-side from these parts
     expect(fetchSpy).toHaveBeenCalledWith(
       "/api/stripe/payment-intent",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ amount: 10 }),
+        body: JSON.stringify({
+          favpollPollId: "poll-1",
+          pledgeAmount: 10,
+          tipAmount: 0,
+          topUpAmount: 0,
+        }),
       })
+    )
+  })
+
+  it("threads the PaymentIntent id from creation into savePledge", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          clientSecret: "pi_secret_test",
+          paymentIntentId: "pi_threaded_1",
+        }),
+        { status: 200 }
+      )
+    )
+
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, pollSelections: { "poll-1": ["red"] } })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+    })
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
+
+    expect(mockActions.createPledge).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentIntentId: "pi_threaded_1" })
     )
   })
 
