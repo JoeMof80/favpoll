@@ -1,13 +1,10 @@
 # Session handoff — 2026-07-20
 
-For the next Fable session. State at close: **clean** — `main` at `1f92ae0`
-(#298), all tests green (1063 web), no open PRs. One deliberate loose end in
-the working tree: the founder's uncommitted `h-174` tweak on
-`apps/web/components/landing/hero.tsx` (equivalent to `h-[43.5rem]`, canonical
-spacing form) — commit it with the next hero change.
+For the next Fable session. State at close: **clean** — `main` at `ec3c40f`
+(#303), all tests green (1086 web), no open PRs, nothing uncommitted.
 
-Covers PRs **#248–#298** (50 merges since the 2026-07-10 handoff). Grouped by
-theme, not chronology.
+Covers PRs **#248–#303** (55 merges since the 2026-07-10 handoff). Grouped by
+theme, not chronology. §6 (the security arc) was the closing day's work.
 
 ---
 
@@ -133,3 +130,42 @@ theme-toggle hydration fix (#251).
   card in view will show it; drop footer amount if it grates.
 - Pledge-step "worth" framing; close-favpoll from edit; tip collection
   post-ledger; /favpolls pagination past 60.
+
+## 6. The security arc (2026-07-20, PRs #300–#303)
+
+Three parallel architecture surveys (condensed in
+`references/audits/architecture-survey-2026-07-20.md`) found the Tier-1
+money/trust holes; all three were fixed the same day:
+
+- **#301 — payment verification.** There was NO Stripe webhook and payment
+  truth was client-side: the pledge actions recorded whatever the client
+  claimed. Now /api/stripe/payment-intent computes the charge server-side
+  from parts (pledge + tip + top-up) and stamps them into PI metadata;
+  `lib/stripe-verify` retrieves the PI at save time (succeeded, GBP,
+  poll-bound, amounts equal); `pledges.payment_intent_id` + partial unique
+  index make each payment recordable exactly once (migration
+  `20260720120000`). All three client flows thread the PI id. Proven with a
+  real Stripe test payment (reveal-after-pledge E2E) and the recorded
+  pledge's `pi_…` id in the DB.
+- **#302 — results API gate.** /api/polls/[id]/results now enforces the
+  reveal route's exact entitlement (closed public; open requires a
+  non-withdrawn pledge via cookie auth or guest token — the card threads
+  the token). Anonymous curl of an open poll → 403, live-verified.
+- **#303 — atomic, verified fund money.** `pot_topups` mini-ledger (unique
+  payment_intent_id; seed of the eventual transactions ledger) +
+  `pot_top_up`/`pot_allocate`/`pot_deallocate` RPCs (migration
+  `20260720140000`); `verifyTopUpPayment` gates both top-up flows (for
+  guests the verified payment IS the authorisation); `pledgeFromFund` no
+  longer trusts a client-supplied allocated figure and cannot oversell the
+  fund. `rpc()` support added to the shared supabase test mock.
+- **#300** — the founder's `h-174` hero tweak, committed at last.
+
+**Deliberate follow-ups (not yet built):** webhook reconciliation for the
+charged-but-unrecorded window; the close-cron's non-atomic close→disburse;
+the survey's Tier-2 bugs (live display's infinite-topic item source,
+poll-standings 1,000-row truncation risk, sequential poll-page queries) and
+the Tier-3 hygiene sweeps. All catalogued in the audit doc.
+
+Also fixed this day (not favpoll code): the founder's recurring macOS
+keychain prompt — Xcode's system gitconfig forced the osxkeychain helper;
+now reset in ~/.gitconfig with `gh auth setup-git` serving credentials.
