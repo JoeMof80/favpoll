@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { overlayStandings, pollStandings } from "@/lib/poll-standings"
+import { fetchPollItems } from "@/lib/poll-items"
 import { DisplayScreen } from "@/components/display-screen"
 import type { Favourite } from "@favpoll/types"
 
@@ -30,18 +31,26 @@ export default async function LiveDisplayPage({ params }: Props) {
 
   const { data: rawPoll } = await supabase
     .from("favpoll_polls")
-    .select("*, topics(id, title)")
+    .select("*, topics(id, title, is_finite)")
     .eq("favpoll_id", id)
     .maybeSingle()
 
   const pollId = rawPoll?.id ?? null
 
-  const { data: allItems } = rawPoll?.topic_id
-    ? await supabase
-        .from("favourites")
-        .select("*")
-        .eq("topic_id", rawPoll.topic_id)
-    : { data: null }
+  // The display's list is THIS poll's items (lib/poll-items): the topic's
+  // closed set for finite topics, the curated visible epf rows for infinite
+  // ones. Previously this read the whole topic canon — an infinite-topic
+  // display showed every canonical item instead of the poll's list.
+  const allItems: Favourite[] =
+    rawPoll?.topic_id && pollId
+      ? await fetchPollItems(supabase, {
+          pollId,
+          topicId: rawPoll.topic_id,
+          isFinite:
+            (rawPoll.topics as { is_finite?: boolean } | null)?.is_finite ??
+            false,
+        })
+      : []
 
   // Total raised
   const { data: pledges } = await supabase
@@ -115,11 +124,8 @@ export default async function LiveDisplayPage({ params }: Props) {
   // telethon total above them (see lib/poll-standings). The interval
   // router.refresh() re-runs this overlay, keeping the room live.
   const items = pollId
-    ? overlayStandings(
-        (allItems ?? []) as Favourite[],
-        await pollStandings(supabase, pollId)
-      )
-    : ((allItems ?? []) as Favourite[])
+    ? overlayStandings(allItems, await pollStandings(supabase, pollId))
+    : allItems
 
   const displayPoll = rawPoll
     ? {
