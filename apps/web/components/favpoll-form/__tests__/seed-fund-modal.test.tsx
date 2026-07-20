@@ -178,7 +178,7 @@ describe("SeedFundModal — post-payment", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pay" }))
 
     await waitFor(() => {
-      expect(mockTopUpFund).toHaveBeenCalledWith(FAVPOLL_ID, 10)
+      expect(mockTopUpFund).toHaveBeenCalledWith(FAVPOLL_ID, 10, "")
     })
     expect(onComplete).toHaveBeenCalledTimes(1)
   })

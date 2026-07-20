@@ -739,6 +739,7 @@ describe("usePledge — handleOwnConfirm", () => {
         method: "POST",
         body: JSON.stringify({
           favpollPollId: "poll-1",
+          favpollId: "favpoll-1",
           pledgeAmount: 10,
           tipAmount: 0,
           topUpAmount: 0,
@@ -994,7 +995,7 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
       await result.current.handlePledgePaymentSuccess()
     })
 
-    expect(mockActions.topUpFund).toHaveBeenCalledWith("favpoll-1", 5)
+    expect(mockActions.topUpFund).toHaveBeenCalledWith("favpoll-1", 5, "")
   })
 
   it("clears pledgeClientSecret on success", async () => {

@@ -218,6 +218,7 @@ export function usePledge({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           favpollPollId: pollWithItems.id,
+          favpollId,
           pledgeAmount: ownBase,
           tipAmount: ownTip,
           topUpAmount: ownTopUp,
@@ -242,7 +243,6 @@ export function usePledge({
       await pledgeFromFund({
         favpollPollId: pollWithItems.id,
         potId: pot.id,
-        potCurrentAllocated: pot.total_allocated,
         totalAmount: numericPledge,
         isAnonymous,
         allocations: computePledgeAllocations(
@@ -264,8 +264,11 @@ export function usePledge({
     setPledgeClientSecret(null)
     try {
       const guestToken = await savePledge(email ?? guestEmail)
+      // The top-up rode the same PaymentIntent as the pledge — the action
+      // verifies its topup_amount metadata before crediting the fund.
+      if (pendingTopUp)
+        await topUpFund(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
       setPledgePaymentIntentId(null)
-      if (pendingTopUp) await topUpFund(favpollId, numericTopUp)
       setPendingTopUp(false)
       onPledgeSuccess?.(guestToken)
       router.refresh()

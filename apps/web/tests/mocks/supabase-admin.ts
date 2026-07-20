@@ -95,9 +95,17 @@ export function makeSupabaseMock() {
 
   const from = vi.fn().mockImplementation((table: string) => makeBuilder(table))
 
+  // RPCs consume the same response queue; recorded under `rpc:<name>` so
+  // callsFor("rpc:pot_top_up") filters like a table.
+  const rpc = vi.fn().mockImplementation((fn: string, args?: any) => {
+    calls.push({ table: `rpc:${fn}`, method: "rpc", args: [args] })
+    return Promise.resolve(responses.shift() ?? { data: null, error: null })
+  })
+
   return {
-    supabase: { from },
+    supabase: { from, rpc },
     from,
+    rpc,
     /** Queue the next response consumed by single(), maybeSingle(), or direct await */
     queue: (data: any, error: any = null) => {
       responses.push({ data, error })
