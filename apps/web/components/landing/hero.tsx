@@ -106,7 +106,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             aria-live="polite"
           >
             <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
-              <div className="h-[43.5rem] w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
+              <div className="h-174 w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
                 <div className="flex h-full flex-col rounded-xl shadow-2xl">
                   {/* Traffic-light window bar — signals this is a demo */}
                   <div
