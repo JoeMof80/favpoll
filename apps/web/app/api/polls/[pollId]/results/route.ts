@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { pollStandings } from "@/lib/poll-standings"
 
@@ -11,10 +12,14 @@ export type PollResultItem = {
 type ItemRow = { id: string; label: string }
 
 export async function GET(
-  _req: Request,
+  request: Request,
   { params }: { params: Promise<{ pollId: string }> }
 ) {
   const { pollId } = await params
+  const { userId } = await auth()
+  const url = new URL(request.url)
+  const guestToken = url.searchParams.get("guest_token")
+
   const supabase = createAdminClient()
 
   // The standings a pledge reveals are THIS poll's pledge sums — the bars
@@ -26,12 +31,54 @@ export async function GET(
   // an infinite topic's items are its curated epf rows.
   const { data: poll, error: pollErr } = await supabase
     .from("favpoll_polls")
-    .select("id, topic_id, topics ( is_finite )")
+    .select("id, topic_id, favpoll_id, topics ( is_finite )")
     .eq("id", pollId)
     .single()
 
   if (pollErr) {
     return NextResponse.json({ error: pollErr.message }, { status: 500 })
+  }
+
+  // Entitlement — the same gate as the reveal route: an open poll's
+  // standings sit behind the pledge lock, so only a viewer who pledged
+  // (signed-in or via guest token) may read them; closed polls are public.
+  // Without this, anyone could curl the standings and bypass the lock.
+  const { data: favpollRow } = await supabase
+    .from("favpolls")
+    .select("closed_at, closes_at")
+    .eq("id", poll.favpoll_id)
+    .single()
+
+  const isClosed =
+    !!favpollRow?.closed_at ||
+    (favpollRow ? new Date(favpollRow.closes_at) < new Date() : false)
+
+  let entitled = isClosed
+
+  if (!entitled && userId) {
+    const { data } = await supabase
+      .from("pledges")
+      .select("id")
+      .eq("favpoll_poll_id", pollId)
+      .eq("clerk_user_id", userId)
+      .is("withdrawn_at", null)
+      .limit(1)
+    entitled = (data?.length ?? 0) > 0
+  }
+
+  if (!entitled && guestToken) {
+    const { data } = await supabase
+      .from("pledges")
+      .select("id")
+      .eq("favpoll_poll_id", pollId)
+      .eq("guest_token", guestToken)
+      .is("withdrawn_at", null)
+      .limit(1)
+    entitled = (data?.length ?? 0) > 0
+  }
+
+  if (!entitled) {
+    return NextResponse.json({ error: "Not entitled" }, { status: 403 })
   }
 
   const isFinite =

@@ -87,11 +87,17 @@ export function FavpollListCard({
       widthPercent: DECOY_WIDTHS[i % DECOY_WIDTHS.length],
     }))
 
-  async function handlePledgeSuccess() {
+  async function handlePledgeSuccess(guestToken?: string) {
     setHasPledged(true)
     if (!poll) return
     try {
-      const res = await fetch(`/api/polls/${poll.id}/results`)
+      // The results API is entitlement-gated (same gate as the reveal):
+      // signed-in pledgers pass via cookie auth; guests pass the token
+      // their pledge just minted.
+      const query = guestToken
+        ? `?guest_token=${encodeURIComponent(guestToken)}`
+        : ""
+      const res = await fetch(`/api/polls/${poll.id}/results${query}`)
       if (res.ok) {
         const { results: fetched } = (await res.json()) as {
           results: CardResultItem[]
