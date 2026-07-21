@@ -3,7 +3,11 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
-import { overlayStandings, pollStandings } from "@/lib/poll-standings"
+import {
+  overlayStandings,
+  pollStandings,
+  type PollStandings,
+} from "@/lib/poll-standings"
 import { FavpollContent } from "@/components/favpoll-content"
 import { FavpollSubheader } from "@/components/favpoll-subheader"
 import type {
@@ -39,53 +43,156 @@ export default async function FavpollPage({ params }: Props) {
   }
 
   const isOrganiser = userId === favpoll.created_by
+  const isClosed =
+    !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
-  const { data: rawPoll } = await supabase
-    .from("favpoll_polls")
-    .select("*")
-    .eq("favpoll_id", id)
-    .maybeSingle()
-
-  let pollWithItems: FavpollPollWithItems | null = null
-
-  if (rawPoll) {
-    const topicId = rawPoll.topic_id as string
-
-    const { data: topicData } = await supabase
-      .from("topics")
+  // Round trip 2 — both keyed on the favpoll id alone
+  const [{ data: rawPoll }, { data: pot }] = await Promise.all([
+    supabase
+      .from("favpoll_polls")
       .select("*")
-      .eq("id", topicId)
-      .single()
+      .eq("favpoll_id", id)
+      .maybeSingle(),
+    supabase
+      .from("favpoll_pots")
+      .select("*")
+      .eq("favpoll_id", id)
+      .maybeSingle(),
+  ])
 
-    const topic = topicData as Topic | null
+  const pollId: string | null = rawPoll?.id ?? null
 
-    // The bars on a poll page show THIS poll's pledges (they must sum to
-    // the favpoll's raised figure) — not the favourites table's all-time
-    // record, which lives on /record. overlayStandings swaps each item's
-    // all_time_* fields for the poll's own sums/counts before sorting.
-    const standings = await pollStandings(supabase, rawPoll.id as string)
+  const RANK_HISTORY_MIN_PLEDGES = 8
 
-    let items: Favourite[] = []
+  // Round trip 3 — everything keyed on the poll/pot ids runs together.
+  // Each branch gates on its id existing: no poll → no query (the old
+  // sequential code queried with eq("") — an invalid uuid PostgREST
+  // rejects, which fetchAllRows now turns into a crash).
+  const [
+    { data: topicData },
+    standings,
+    { data: potAllocData },
+    hasPledged,
+    totalData,
+    { data: wallRows },
+    historyRows,
+  ] = await Promise.all([
+    rawPoll
+      ? supabase.from("topics").select("*").eq("id", rawPoll.topic_id).single()
+      : Promise.resolve({ data: null }),
+    pollId
+      ? pollStandings(supabase, pollId)
+      : Promise.resolve<PollStandings>({
+          totals: new Map(),
+          counts: new Map(),
+        }),
+    pot && userId
+      ? supabase
+          .from("pot_allocations")
+          .select("*")
+          .eq("pot_id", pot.id)
+          .eq("allocated_to", userId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    userId && pollId
+      ? supabase
+          .from("pledges")
+          .select("id")
+          .eq("favpoll_poll_id", pollId)
+          .eq("clerk_user_id", userId)
+          .is("withdrawn_at", null)
+          .limit(1)
+          .then(({ data }) => (data?.length ?? 0) > 0)
+      : Promise.resolve(false),
+    // Paginated — the sidebar total is money; PostgREST's silent 1,000-row
+    // cap would under-report a popular poll (lib/supabase/paginate).
+    pollId
+      ? fetchAllRows<{ total_amount: number | null }>((from, to) =>
+          supabase
+            .from("pledges")
+            .select("total_amount")
+            .eq("favpoll_poll_id", pollId)
+            .is("withdrawn_at", null)
+            .range(from, to)
+        )
+      : Promise.resolve([]),
+    // Guest wall: names resolve server-side (guest display_name, or
+    // users.display_name for signed-in pledgers); anonymous → null →
+    // rendered as "Someone". Amounts never appear on the wall.
+    pollId
+      ? supabase
+          .from("pledges")
+          .select(
+            `id, display_name, is_anonymous, clerk_user_id, created_at,
+             pledge_allocations ( favourites ( label ) )`
+          )
+          .eq("favpoll_poll_id", pollId)
+          .is("withdrawn_at", null)
+          .order("created_at", { ascending: false })
+          .limit(24)
+      : Promise.resolve({ data: [] }),
+    // Bump chart ("the story of the poll"): rank-over-time, closed
+    // favpolls only (open polls gate standings behind the reveal lock; a
+    // live chart would leak them). Ordinal only — no amounts. Its own
+    // unbounded, chronological query (the wall query is capped at 24 and
+    // reverse-ordered). Paginated — a closed poll's full pledge history.
+    isClosed && pollId
+      ? fetchAllRows<{ created_at: string; pledge_allocations: unknown }>(
+          (from, to) =>
+            supabase
+              .from("pledges")
+              .select(
+                `created_at,
+                 pledge_allocations ( amount, favourite_id, favourites ( label ) )`
+              )
+              .eq("favpoll_poll_id", pollId)
+              .is("withdrawn_at", null)
+              .order("created_at", { ascending: true })
+              .range(from, to)
+        )
+      : Promise.resolve([]),
+  ])
 
-    if (topic?.is_finite) {
-      const { data: finiteItemsData } = await supabase
-        .from("favourites")
-        .select("*")
-        .eq("topic_id", topicId)
-      items = overlayStandings(
-        (finiteItemsData ?? []) as Favourite[],
-        standings
-      ).sort((a, b) => {
-        const diff = b.all_time_pledged - a.all_time_pledged
-        if (diff !== 0) return diff
-        const da = a.display_order ?? null
-        const db = b.display_order ?? null
-        if (da !== null && db !== null) return da - db
-        if (da !== null) return -1
-        if (db !== null) return 1
-        return a.label.localeCompare(b.label)
-      })
-    } else {
+  const topic = topicData as Topic | null
+  const userPotAllocation: PotAllocation | null = potAllocData ?? null
+
+  const wallClerkIds = [
+    ...new Set(
+      (wallRows ?? [])
+        .map((r) => r.clerk_user_id)
+        .filter((v): v is string => !!v)
+    ),
+  ]
+
+  // Round trip 4 — the poll's items (branch decided by the topic row) and
+  // the wall pledgers' account names, independently.
+  //
+  // The bars on a poll page show THIS poll's pledges (they must sum to
+  // the favpoll's raised figure) — not the favourites table's all-time
+  // record, which lives on /record. overlayStandings swaps each item's
+  // all_time_* fields for the poll's own sums/counts before sorting.
+  const [items, { data: wallUsers }] = await Promise.all([
+    (async (): Promise<Favourite[]> => {
+      if (!rawPoll) return []
+      if (topic?.is_finite) {
+        const { data: finiteItemsData } = await supabase
+          .from("favourites")
+          .select("*")
+          .eq("topic_id", rawPoll.topic_id)
+        return overlayStandings(
+          (finiteItemsData ?? []) as Favourite[],
+          standings
+        ).sort((a, b) => {
+          const diff = b.all_time_pledged - a.all_time_pledged
+          if (diff !== 0) return diff
+          const da = a.display_order ?? null
+          const db = b.display_order ?? null
+          if (da !== null && db !== null) return da - db
+          if (da !== null) return -1
+          if (db !== null) return 1
+          return a.label.localeCompare(b.label)
+        })
+      }
       type EpiRow = {
         id: string
         favpoll_poll_id: string
@@ -117,97 +224,30 @@ export default async function FavpollPage({ params }: Props) {
       })
 
       // Organiser sees all items (including hidden); guests see only visible ones
-      items = isOrganiser
-        ? allItems
-        : allItems.filter((item) => !item.is_hidden)
-    }
+      return isOrganiser ? allItems : allItems.filter((item) => !item.is_hidden)
+    })(),
+    wallClerkIds.length
+      ? supabase.from("users").select("id, display_name").in("id", wallClerkIds)
+      : Promise.resolve({ data: [] }),
+  ])
 
-    pollWithItems = {
-      ...rawPoll,
-      topics: { ...(topic as Topic), favourites: items },
-    } as FavpollPollWithItems
-  }
-
-  const { data: pot } = await supabase
-    .from("favpoll_pots")
-    .select("*")
-    .eq("favpoll_id", id)
-    .maybeSingle()
-
-  let userPotAllocation: PotAllocation | null = null
-  if (pot && userId) {
-    const { data } = await supabase
-      .from("pot_allocations")
-      .select("*")
-      .eq("pot_id", pot.id)
-      .eq("allocated_to", userId)
-      .maybeSingle()
-    userPotAllocation = data
-  }
-
-  const hasPledged =
-    userId && pollWithItems
-      ? await supabase
-          .from("pledges")
-          .select("id")
-          .eq("favpoll_poll_id", pollWithItems.id)
-          .eq("clerk_user_id", userId)
-          .is("withdrawn_at", null)
-          .limit(1)
-          .then(({ data }) => (data?.length ?? 0) > 0)
-      : false
-
-  // Paginated — the sidebar total is money; PostgREST's silent 1,000-row
-  // cap would under-report a popular poll (lib/supabase/paginate).
-  const totalData = await fetchAllRows<{ total_amount: number | null }>(
-    (from, to) =>
-      supabase
-        .from("pledges")
-        .select("total_amount")
-        .eq("favpoll_poll_id", pollWithItems?.id ?? "")
-        .is("withdrawn_at", null)
-        .range(from, to)
-  )
+  let pollWithItems: FavpollPollWithItems | null = rawPoll
+    ? ({
+        ...rawPoll,
+        topics: { ...(topic as Topic), favourites: items },
+      } as FavpollPollWithItems)
+    : null
 
   const totalRaised = totalData.reduce(
     (sum, p) => sum + (p.total_amount ?? 0),
     0
   )
 
-  // Guest wall: names resolve server-side (guest display_name, or
-  // users.display_name for signed-in pledgers); anonymous → null →
-  // rendered as "Someone". Amounts never appear on the wall.
-  const { data: wallRows } = await supabase
-    .from("pledges")
-    .select(
-      `id, display_name, is_anonymous, clerk_user_id, created_at,
-       pledge_allocations ( favourites ( label ) )`
-    )
-    .eq("favpoll_poll_id", pollWithItems?.id ?? "")
-    .is("withdrawn_at", null)
-    .order("created_at", { ascending: false })
-    .limit(24)
-
-  const wallClerkIds = [
-    ...new Set(
-      (wallRows ?? [])
-        .map((r) => r.clerk_user_id)
-        .filter((v): v is string => !!v)
-    ),
-  ]
-  const { data: wallUsers } = wallClerkIds.length
-    ? await supabase
-        .from("users")
-        .select("id, display_name")
-        .in("id", wallClerkIds)
-    : { data: [] }
   const wallUserNames = Object.fromEntries(
     (wallUsers ?? []).map((u) => [u.id, u.display_name])
   )
 
   const typedFavpoll = favpoll as FavpollWithDetails
-  const isClosed =
-    !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
   // Entitlement: viewer may see real reveal + real per-favourite amounts
   const entitled = !!hasPledged || isClosed || isOrganiser
@@ -251,44 +291,19 @@ export default async function FavpollPage({ params }: Props) {
     created_at: r.created_at,
   }))
 
-  // Bump chart ("the story of the poll"): rank-over-time, closed
-  // favpolls only (open polls gate standings behind the reveal lock; a
-  // live chart would leak them). Ordinal only — no amounts. Its own
-  // unbounded, chronological query (the wall query is capped at 24 and
-  // reverse-ordered). Gated on a minimum pledge count so sparse polls
-  // don't show sparse charts.
-  const RANK_HISTORY_MIN_PLEDGES = 8
+  // Gated on a minimum pledge count so sparse polls don't show sparse charts.
   let rankHistory: ReturnType<typeof deriveRankHistory> | null = null
-  if (isClosed && pollWithItems) {
-    // Paginated — a closed poll's full pledge history feeds the chart
-    const historyRows = await fetchAllRows<{
-      created_at: string
-      pledge_allocations: unknown
-    }>((from, to) =>
-      supabase
-        .from("pledges")
-        .select(
-          `created_at,
-           pledge_allocations ( amount, favourite_id, favourites ( label ) )`
-        )
-        .eq("favpoll_poll_id", pollWithItems.id)
-        .is("withdrawn_at", null)
-        .order("created_at", { ascending: true })
-        .range(from, to)
-    )
-
-    if (historyRows.length >= RANK_HISTORY_MIN_PLEDGES) {
-      const labels: Record<string, string> = {}
-      const events = historyRows.map((r) => ({
-        createdAt: r.created_at,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        allocations: ((r.pledge_allocations ?? []) as any[]).map((a) => {
-          labels[a.favourite_id] = a.favourites?.label ?? a.favourite_id
-          return { favouriteId: a.favourite_id, amount: a.amount ?? 0 }
-        }),
-      }))
-      rankHistory = deriveRankHistory(events, labels)
-    }
+  if (historyRows.length >= RANK_HISTORY_MIN_PLEDGES) {
+    const labels: Record<string, string> = {}
+    const events = historyRows.map((r) => ({
+      createdAt: r.created_at,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      allocations: ((r.pledge_allocations ?? []) as any[]).map((a) => {
+        labels[a.favourite_id] = a.favourites?.label ?? a.favourite_id
+        return { favouriteId: a.favourite_id, amount: a.amount ?? 0 }
+      }),
+    }))
+    rankHistory = deriveRankHistory(events, labels)
   }
 
   // Hide poll with unvetted custom topic from non-organisers
