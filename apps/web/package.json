@@ -11,6 +11,7 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "seed": "tsx --env-file=.env.local ../../scripts/seed.ts",
+    "seed:scale": "tsx --env-file=.env.local ../../scripts/seed-scale.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",

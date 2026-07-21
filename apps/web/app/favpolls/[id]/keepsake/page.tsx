@@ -107,12 +107,17 @@ export default async function KeepsakePage({ params }: Props) {
       nameRows.map((r) => r.clerk_user_id).filter((v): v is string => !!v)
     ),
   ]
-  const { data: users } = clerkIds.length
-    ? await supabase.from("users").select("id, display_name").in("id", clerkIds)
-    : { data: [] }
-  const userNames = Object.fromEntries(
-    (users ?? []).map((u) => [u.id, u.display_name])
-  )
+  // Chunked .in(): a big poll's named-guest list is unbounded, and id
+  // filters travel in the URL (see lib/poll-standings IN_CHUNK).
+  const users: { id: string; display_name: string | null }[] = []
+  for (let i = 0; i < clerkIds.length; i += 100) {
+    const { data } = await supabase
+      .from("users")
+      .select("id, display_name")
+      .in("id", clerkIds.slice(i, i + 100))
+    users.push(...(data ?? []))
+  }
+  const userNames = Object.fromEntries(users.map((u) => [u.id, u.display_name]))
   const guestNames = [
     ...new Set(
       nameRows
