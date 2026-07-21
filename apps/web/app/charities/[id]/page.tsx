@@ -8,7 +8,7 @@ import {
   FavpollSummaryCard,
   type FavpollSummaryCardFavpoll,
 } from "@/components/favpoll-summary-card"
-import type { Charity } from "@favpoll/types"
+import type {} from "@favpoll/types"
 import { formatPounds } from "@/lib/i18n"
 
 type Props = { params: Promise<{ id: string }> }

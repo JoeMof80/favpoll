@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { usePledge } from "@/components/pledge-card/use-pledge"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type {

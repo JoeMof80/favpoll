@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import {} from "react"
 import Link from "next/link"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,6 @@ import { AmountPresets } from "./amount-presets"
 import { PledgeBreakdown } from "./pledge-breakdown"
 import { PledgeCardWrapper } from "./pledge-card-wrapper"
 import { usePledge } from "./use-pledge"
-import { formatCharityLabel } from "./utils"
 import { formatPoundsExact } from "@/lib/i18n"
 
 export type LivePledgeCardProps = {

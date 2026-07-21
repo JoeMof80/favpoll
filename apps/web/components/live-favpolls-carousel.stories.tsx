@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { LiveFavpollsCarousel } from "./live-favpolls-carousel"
 import type { FavpollSummaryCardFavpoll } from "./favpoll-summary-card"
 import type { Charity } from "@favpoll/types"

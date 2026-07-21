@@ -57,6 +57,7 @@ export async function updatePlaceholder(
 
   if (fetchError) return { error: fetchError.message };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const current: PlaceholdersMap = (topic as any)?.placeholders ?? {};
   const merged: PlaceholdersMap = { ...current, [register]: { about, reveal } };
 

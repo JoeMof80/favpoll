@@ -283,8 +283,8 @@ export default async function FavpollPage({ params }: Props) {
         ? (wallUserNames[r.clerk_user_id] ?? null)
         : (r.display_name ?? null),
     labels: entitled
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (r.pledge_allocations ?? [])
+      ? (r.pledge_allocations ?? [])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
           .map((a: any) => a.favourites?.label)
           .filter((l: unknown): l is string => typeof l === "string")
       : [],

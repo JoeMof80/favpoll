@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { DisplayScreen } from "./index"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import type { Favourite } from "@favpoll/types"
@@ -64,17 +64,13 @@ type Story = StoryObj<typeof meta>
 
 export const Memorial: Story = {
   args: {
-    favpollId: "demo-memorial",
     protagonistName: SCENES[0].protagonist!.name,
     dateLabel: "1943–2024",
     openingLine: "In memory of",
-    description:
-      "Belinda was a school librarian for forty years at St Catherine's. She is remembered for her warmth, her impossible memory for every pupil's name, and her lifelong love of purple.",
     occasionType: "Memorial",
     charityName: SCENES[0].charities[0].name,
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
-    pollId: "poll-memorial",
     favpollUrl: "https://favpoll.com/favpolls/demo-memorial",
   },
 }
@@ -82,40 +78,32 @@ export const Memorial: Story = {
 export const WithGoal: Story = {
   args: {
     ...Memorial.args,
-    favpollId: "demo-goal",
     goalAmount: 1500,
   },
 }
 
 export const Birthday: Story = {
   args: {
-    favpollId: "demo-birthday",
     protagonistName: SCENES[1].protagonist!.name,
     dateLabel: "30th May 2026",
     openingLine: "Birthday",
-    description: null,
     occasionType: "Birthday",
     charityName: SCENES[1].charities[0].name,
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
-    pollId: "poll-birthday",
     favpollUrl: "https://favpoll.com/favpolls/demo-birthday",
   },
 }
 
 export const Fundraiser: Story = {
   args: {
-    favpollId: "demo-fundraiser",
     protagonistName: SCENES[2].protagonist!.name,
     dateLabel: "London Marathon · 26.2 miles",
     openingLine: "Sponsored event",
-    description:
-      "Running his first marathon for the British Heart Foundation, in memory of his dad.",
     occasionType: "Sponsored event",
     charityName: SCENES[2].charities[0].name,
     poll: FUNDRAISER_POLL,
     initialTotalRaised: 810,
-    pollId: "poll-fundraiser",
     favpollUrl: "https://favpoll.com/favpolls/demo-fundraiser",
   },
 }

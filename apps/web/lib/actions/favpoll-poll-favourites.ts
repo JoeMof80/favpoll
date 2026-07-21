@@ -20,6 +20,7 @@ async function verifyOrganiser(
 
   if (error || !data) throw new Error("Favpoll poll favourite not found")
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const favpollData = (data as any).favpoll_polls?.favpolls
   if (favpollData?.created_by !== userId) {
     throw new Error(

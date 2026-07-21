@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { DemoCard } from "./demo-card"
 import { SCENES } from "./scenes"
 import { DECOY_WIDTHS } from "@/lib/decoys"

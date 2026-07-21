@@ -5,7 +5,6 @@ import {
   registerForOccasionType,
   deriveRegister,
   getExampleName,
-  type Register,
 } from "@/lib/registers"
 
 describe("shortTopicLabel", () => {

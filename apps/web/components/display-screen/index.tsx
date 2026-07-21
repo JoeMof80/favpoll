@@ -21,18 +21,15 @@ import { formatPounds } from "@/lib/i18n"
 // an interval router.refresh() — see the note inside.
 
 type Props = {
-  favpollId: string
   protagonistName: string
   dateLabel: string | null
   openingLine: string | null
-  description: string | null
   occasionType: string | null
   /** Fallback label when full charity rows aren't provided (stories) */
   charityName: string | null
   goalAmount?: number | null
   poll: DisplayPoll | null
   initialTotalRaised: number
-  pollId: string | null
   favpollUrl: string
   /** Server-rendered wall entries; refreshed by the interval refresh */
   initialWallEntries?: GuestWallEntry[]
@@ -47,17 +44,14 @@ type Props = {
 }
 
 export function DisplayScreen({
-  favpollId,
   protagonistName,
   dateLabel,
   openingLine,
-  description,
   occasionType,
   charityName,
   goalAmount = null,
   poll,
   initialTotalRaised,
-  pollId,
   favpollUrl,
   initialWallEntries = [],
   charities = [],

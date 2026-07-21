@@ -175,6 +175,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
     .single()
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     const favpollData = pollData?.favpolls as any
     const protagonistName: string =
       favpollData?.protagonists?.name ??
@@ -182,6 +183,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       "this favpoll"
     const closesAt: string = favpollData?.closes_at ?? ""
     const charityNames: string[] = (favpollData?.favpoll_charities ?? []).map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
       (ec: any) => ec.charities.name
     )
 
@@ -272,7 +274,9 @@ export async function addGuestItem(
       .eq("id", favpollPollId)
       .single()
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     const favpollData = pollData?.favpolls as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     const topicData = pollData?.topics as any
     const organizerUserId: string | null = favpollData?.created_by ?? null
 

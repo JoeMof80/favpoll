@@ -162,17 +162,14 @@ export default async function LiveDisplayPage({ params }: Props) {
 
   return (
     <DisplayScreen
-      favpollId={id}
       protagonistName={displayName}
       dateLabel={isCause ? null : (favpoll.protagonists?.context ?? null)}
       openingLine={favpoll.opening_line ?? null}
-      description={favpoll.description ?? null}
       occasionType={favpoll.occasion_type ?? null}
       charityName={charityName}
       goalAmount={favpoll.goal_amount ?? null}
       poll={displayPoll}
       initialTotalRaised={initialTotalRaised}
-      pollId={pollId}
       favpollUrl={`${baseUrl}/favpolls/${id}`}
       initialWallEntries={initialWallEntries}
       charities={charityRows}

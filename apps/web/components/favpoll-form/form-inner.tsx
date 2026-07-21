@@ -19,7 +19,6 @@ import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import type {
   Charity,
   TopicWithMeta,
-  Category,
   Register,
   FavpollGrouping,
 } from "@favpoll/types"
@@ -43,7 +42,6 @@ export type FormInnerProps = {
   >
   charities: Charity[]
   topics: TopicWithMeta[]
-  categories: Category[]
   mode: "create" | "edit"
   submitting: boolean
   error: string | null
@@ -58,7 +56,6 @@ export function FormInner({
   form,
   charities,
   topics,
-  categories,
   mode,
   submitting,
   error,

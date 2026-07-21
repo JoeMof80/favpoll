@@ -17,17 +17,11 @@ import {
 import { SeedFundModal } from "./seed-fund-modal"
 import { toast } from "sonner"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
-import type {
-  Category,
-  Charity,
-  CanvasPollInput,
-  TopicWithMeta,
-} from "@favpoll/types"
+import type { Charity, CanvasPollInput, TopicWithMeta } from "@favpoll/types"
 
 type Props = {
   charities: Charity[]
   topics: TopicWithMeta[]
-  categories: Category[]
   mode: "create" | "edit"
   favpollId?: string
   protagonistId?: string
@@ -40,7 +34,6 @@ type Props = {
 export function FavpollForm({
   charities,
   topics,
-  categories,
   mode,
   favpollId,
   protagonistId,
@@ -241,7 +234,6 @@ export function FavpollForm({
         form={form}
         charities={charities}
         topics={topics}
-        categories={categories}
         mode={mode}
         submitting={submitting}
         error={error}

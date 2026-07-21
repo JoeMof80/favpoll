@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { DateTimePicker } from "./date-time-picker"
 
 const meta = {

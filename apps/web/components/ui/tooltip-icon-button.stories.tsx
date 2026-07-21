@@ -1,5 +1,4 @@
-import React from "react"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { RotateCcw, Eye, Share2 } from "lucide-react"
 import { TooltipIconButton } from "./tooltip-icon-button"
 

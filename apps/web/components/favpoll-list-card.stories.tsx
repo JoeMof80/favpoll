@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { FavpollListCard } from "./favpoll-list-card"
 
 const COLOUR_ITEMS = [

@@ -36,6 +36,7 @@ export async function getPendingContributions(): Promise<{
 
   if (error) return { data: null, error: error.message };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const rows = (data ?? []).map((item: any) => ({
     id: item.id,
     label: item.label,
@@ -74,6 +75,7 @@ export async function getReviewedContributions(): Promise<{
 
   if (error) return { data: null, error: error.message };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const rows = (data ?? []).map((item: any) => ({
     id: item.id,
     label: item.label,

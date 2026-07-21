@@ -1,5 +1,4 @@
-import React from "react"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { EmptyPollAlert } from "./empty-poll-alert"
 
 const meta = {
