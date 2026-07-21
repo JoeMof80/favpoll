@@ -23,58 +23,61 @@ const EMPTY: PollStandings = { totals: new Map(), counts: new Map() }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Client = SupabaseClient<any, any, any>
 
-/** Standings for a set of polls in two queries, keyed by poll id. */
+// ids-per-request ceiling for .in() filters: PostgREST filters travel in
+// the query string, so an unbounded id list explodes the URL (a
+// 1,500-pledge poll produced a ~55KB URL → request rejected → 500; found
+// by the 2026-07-21 scale seed).
+const IN_CHUNK = 100
+
+/** Standings for a set of polls, keyed by poll id. */
 export async function pollSetStandings(
   supabase: Client,
   pollIds: string[]
 ): Promise<Map<string, PollStandings>> {
   const byPoll = new Map<string, PollStandings>()
-  if (pollIds.length === 0) return byPoll
 
-  // Paginated (fetchAllRows): a popular poll's pledges/allocations exceed
+  // One query per chunk via the embedded-join filter — never by pledge id
+  // (a poll's pledge count is unbounded; the poll id list is page-sized).
+  // Paginated (fetchAllRows): a popular poll's allocations exceed
   // PostgREST's 1,000-row default cap, which truncates SILENTLY — bars
   // would under-report.
-  const pledges = await fetchAllRows<{ id: string; favpoll_poll_id: string }>(
-    (from, to) =>
+  for (let i = 0; i < pollIds.length; i += IN_CHUNK) {
+    const chunk = pollIds.slice(i, i + IN_CHUNK)
+    const allocations = await fetchAllRows<{
+      favourite_id: string
+      amount: number | null
+      pledges: unknown
+    }>((from, to) =>
       supabase
-        .from("pledges")
-        .select("id, favpoll_poll_id")
-        .in("favpoll_poll_id", pollIds)
-        .is("withdrawn_at", null)
+        .from("pledge_allocations")
+        .select(
+          "favourite_id, amount, pledges!inner(favpoll_poll_id, withdrawn_at)"
+        )
+        .in("pledges.favpoll_poll_id", chunk)
+        .is("pledges.withdrawn_at", null)
         .range(from, to)
-  )
+    )
 
-  const pledgeToPoll = new Map(pledges.map((p) => [p.id, p.favpoll_poll_id]))
-  if (pledgeToPoll.size === 0) return byPoll
-
-  const allocations = await fetchAllRows<{
-    pledge_id: string
-    favourite_id: string
-    amount: number | null
-  }>((from, to) =>
-    supabase
-      .from("pledge_allocations")
-      .select("pledge_id, favourite_id, amount")
-      .in("pledge_id", [...pledgeToPoll.keys()])
-      .range(from, to)
-  )
-
-  for (const row of allocations) {
-    const pollId = pledgeToPoll.get(row.pledge_id)
-    if (!pollId) continue
-    let standings = byPoll.get(pollId)
-    if (!standings) {
-      standings = { totals: new Map(), counts: new Map() }
-      byPoll.set(pollId, standings)
+    for (const row of allocations) {
+      // !inner to-one embed: object at runtime (the client's fallback
+      // types say array, hence the cast)
+      const pollId = (row.pledges as { favpoll_poll_id: string } | null)
+        ?.favpoll_poll_id
+      if (!pollId) continue
+      let standings = byPoll.get(pollId)
+      if (!standings) {
+        standings = { totals: new Map(), counts: new Map() }
+        byPoll.set(pollId, standings)
+      }
+      standings.totals.set(
+        row.favourite_id,
+        (standings.totals.get(row.favourite_id) ?? 0) + (row.amount ?? 0)
+      )
+      standings.counts.set(
+        row.favourite_id,
+        (standings.counts.get(row.favourite_id) ?? 0) + 1
+      )
     }
-    standings.totals.set(
-      row.favourite_id,
-      (standings.totals.get(row.favourite_id) ?? 0) + (row.amount ?? 0)
-    )
-    standings.counts.set(
-      row.favourite_id,
-      (standings.counts.get(row.favourite_id) ?? 0) + 1
-    )
   }
   return byPoll
 }

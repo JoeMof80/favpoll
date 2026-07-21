@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "seed": "pnpm --filter @favpoll/web seed",
+    "seed:scale": "pnpm --filter @favpoll/web seed:scale",
     "test": "pnpm --filter @favpoll/web test:run",
     "lint:colors": "node scripts/check-hex-colors.mjs"
   },
