@@ -13,7 +13,6 @@ import type {
   PotAllocation,
 } from "@favpoll/types"
 import {
-  GBP,
   FUND_GREEN,
   FUND_AMBER,
   FUND_RED,

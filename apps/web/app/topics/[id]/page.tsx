@@ -14,26 +14,10 @@ import {
   type PledgeEvent,
 } from "@/lib/rank-history"
 import { isEstablishedRecord } from "@/lib/record"
+import { formatCount, formatPoundsCompact } from "@/lib/i18n"
 
 type Props = {
   params: Promise<{ id: string }>
-}
-
-function formatAmount(amount: number): string {
-  if (amount === 0) return "—"
-  if (amount >= 1000) {
-    return new Intl.NumberFormat("en-GB", {
-      style: "currency",
-      currency: "GBP",
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(amount)
-  }
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 0,
-  }).format(amount)
 }
 
 export default async function TopicPage({ params }: Props) {
@@ -139,13 +123,13 @@ export default async function TopicPage({ params }: Props) {
             <div>
               <p className="text-xs text-muted-foreground">Total raised</p>
               <p className="mt-0.5 text-sm font-medium text-primary">
-                {formatAmount(totalPledged)}
+                {formatPoundsCompact(totalPledged)}
               </p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total pledges</p>
               <p className="mt-0.5 text-sm font-medium text-foreground">
-                {totalVotes.toLocaleString("en-GB")}
+                {formatCount(totalVotes)}
               </p>
             </div>
           </div>

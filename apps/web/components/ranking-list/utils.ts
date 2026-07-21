@@ -1,4 +1,5 @@
 import type { Favourite } from "@favpoll/types"
+import { formatPounds } from "@/lib/i18n"
 
 export type RankedItem = Favourite & { rank: number; prevRank: number | null }
 
@@ -27,9 +28,5 @@ export function formatAmount(amount: number): string {
   if (amount === 0) return "£0"
   if (amount >= 1_000_000) return `£${(amount / 1_000_000).toFixed(1)}M`
   if (amount >= 1_000) return `£${(amount / 1_000).toFixed(1)}K`
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 0,
-  }).format(amount)
+  return formatPounds(amount)
 }

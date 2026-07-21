@@ -1,18 +1,13 @@
 import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { formatPounds } from "@/lib/i18n"
 
 export const metadata = {
   title: "Charities — favpoll",
   description:
     "The charities favpoll supports. Every pledge reaches them in full — favpoll takes no fee.",
 }
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 type Stat = { total_raised: number; live_count: number }
 
@@ -91,7 +86,7 @@ export default async function CharitiesIndexPage() {
                 </p>
                 <p className="mt-0.5 text-sm text-muted-foreground">
                   {c.total_raised > 0
-                    ? `${GBP.format(c.total_raised)} raised`
+                    ? `${formatPounds(c.total_raised)} raised`
                     : "No pledges yet"}
                   {c.live_count > 0 && <> · {c.live_count} live</>}
                 </p>

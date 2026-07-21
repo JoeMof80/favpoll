@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Button } from "@/components/ui/button"
 import { withdrawPledge } from "./actions"
+import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
   searchParams: Promise<{ token?: string }>
@@ -15,11 +16,6 @@ type FavpollPollRow = {
     favpoll_charities: { charities: { name: string } }[]
   } | null
 } | null
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-})
 
 export default async function WithdrawPage({ searchParams }: Props) {
   const { token } = await searchParams
@@ -103,7 +99,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
       <p className="mt-3 text-sm text-muted-foreground">
         You pledged{" "}
         <span className="font-medium text-foreground">
-          {GBP.format(pledge.total_amount)}
+          {formatPoundsExact(pledge.total_amount)}
         </span>{" "}
         to <span className="font-medium text-foreground">{charityLabel}</span>{" "}
         in honour of{" "}

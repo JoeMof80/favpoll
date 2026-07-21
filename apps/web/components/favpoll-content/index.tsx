@@ -25,6 +25,7 @@ import { useFavpollContent } from "./use-favpoll-content"
 import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
 import { PageLayout } from "../page-layout"
 import { Gift, FileText } from "lucide-react"
+import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
   favpoll: FavpollWithDetails
@@ -80,10 +81,6 @@ export function FavpollContent({
   const isListed = favpoll.is_listed ?? true
   const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
-  const GBP = new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-  })
   const closedAt = favpoll.closed_at
     ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
         day: "numeric",
@@ -186,7 +183,7 @@ export function FavpollContent({
             <p className="text-sm text-muted-foreground">{closedAt}</p>
           )}
           <p className="text-xl font-medium text-primary">
-            {GBP.format(favpoll.total_raised ?? totalRaised)}
+            {formatPoundsExact(favpoll.total_raised ?? totalRaised)}
           </p>
           <p className="text-xs text-muted-foreground">raised in total</p>
           <Button
@@ -221,8 +218,8 @@ export function FavpollContent({
       {!isClosed && pot && (
         <div className="rounded-lg border border-border bg-background px-5 py-4">
           <p className="mt-1 text-sm text-muted-foreground">
-            <b>{GBP.format(fundAvailable)}</b> in the shared fund, for any guest
-            who needs help to pledge.
+            <b>{formatPoundsExact(fundAvailable)}</b> in the shared fund, for
+            any guest who needs help to pledge.
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {fundAvailable > 0

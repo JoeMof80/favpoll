@@ -20,7 +20,8 @@ import { AmountPresets } from "./amount-presets"
 import { PledgeBreakdown } from "./pledge-breakdown"
 import { PledgeCardWrapper } from "./pledge-card-wrapper"
 import { usePledge } from "./use-pledge"
-import { GBP, formatCharityLabel } from "./utils"
+import { formatCharityLabel } from "./utils"
+import { formatPoundsExact } from "@/lib/i18n"
 
 export type LivePledgeCardProps = {
   prePublish?: false | undefined
@@ -163,14 +164,14 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
                 {isPledgeValid
-                  ? `Using ${GBP.format(numericPledge)} of ${GBP.format(available)} available`
-                  : `${GBP.format(available)} available in the shared fund`}
+                  ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
+                  : `${formatPoundsExact(available)} available in the shared fund`}
               </p>
             </div>
             {fundOverAvailable && (
               <p className="text-[11px] text-destructive">
-                Shared fund has {GBP.format(available)} available — reduce your
-                pledge to use it
+                Shared fund has {formatPoundsExact(available)} available —
+                reduce your pledge to use it
               </p>
             )}
           </div>

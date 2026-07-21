@@ -13,6 +13,7 @@ import { DisplayChrome } from "./display-chrome"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 import type { Charity } from "@favpoll/types"
+import { formatPounds } from "@/lib/i18n"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
@@ -44,13 +45,6 @@ type Props = {
   /** Closed favpolls disclose the reveal; open ones withhold it */
   isClosed?: boolean
 }
-
-// Matches CharityBanner/CharityRow's whole-pound display
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 export function DisplayScreen({
   favpollId,
@@ -190,7 +184,7 @@ export function DisplayScreen({
                     className="mt-1 text-4xl font-medium text-foreground"
                     aria-live="polite"
                   >
-                    {GBP.format(totalRaised)}
+                    {formatPounds(totalRaised)}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Thank you — the final standings are in.
@@ -213,10 +207,10 @@ export function DisplayScreen({
                       className="text-4xl font-medium text-foreground"
                       aria-live="polite"
                     >
-                      {GBP.format(totalRaised)}
+                      {formatPounds(totalRaised)}
                     </p>
                     <p className="text-lg text-muted-foreground">
-                      of {GBP.format(goalAmount)}
+                      of {formatPounds(goalAmount)}
                     </p>
                   </div>
                   <div
@@ -281,7 +275,7 @@ export function DisplayScreen({
                           className="text-base font-medium text-primary"
                           aria-live="polite"
                         >
-                          {GBP.format(totalRaised)}
+                          {formatPounds(totalRaised)}
                         </span>{" "}
                         raised so far
                       </p>
@@ -291,7 +285,7 @@ export function DisplayScreen({
                   <p className="text-sm text-muted-foreground">
                     raised for {charityName}:{" "}
                     <span className="font-medium text-foreground">
-                      {GBP.format(totalRaised)}
+                      {formatPounds(totalRaised)}
                     </span>
                   </p>
                 )}

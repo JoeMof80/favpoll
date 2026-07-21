@@ -1,16 +1,12 @@
 import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
 import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
+import { formatPoundsExact } from "@/lib/i18n"
 
 // The keepsake: "the story of the day" as a single A4 sheet. Ordinal
 // standings, the reveal, the total, and the guests who took part — no
 // per-guest amounts (the amounts-private default holds here too). Styled
 // to look right on screen and to print cleanly (see print CSS in globals).
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-})
 
 export type KeepsakeStanding = {
   favouriteId: string
@@ -94,7 +90,7 @@ export function KeepsakeDocument({ data }: { data: KeepsakeData }) {
                     {s.label}
                   </span>
                   <span className="text-sm text-muted-foreground tabular-nums">
-                    {GBP.format(s.amount)}
+                    {formatPoundsExact(s.amount)}
                   </span>
                 </span>
                 <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-muted">
@@ -126,7 +122,7 @@ export function KeepsakeDocument({ data }: { data: KeepsakeData }) {
       <section className="mt-8 break-inside-avoid border-t border-border pt-6 text-center">
         <p className="text-sm text-muted-foreground">Together, guests raised</p>
         <p className="mt-1 text-3xl font-medium text-primary">
-          {GBP.format(data.totalRaised)}
+          {formatPoundsExact(data.totalRaised)}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           for {charityLabel(data.charityNames)}

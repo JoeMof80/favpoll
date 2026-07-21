@@ -9,6 +9,7 @@ import { Chip } from "@/components/ui/chip"
 import { PledgePanelPickerHeader } from "./pledge-panel-picker-header"
 import type { Allocation } from "./pledge-panel-picker-header"
 import { PledgePanelPickerItems } from "./pledge-panel-picker-items"
+import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
   items: Favourite[]
@@ -153,10 +154,9 @@ export function PledgePanel({
           const pct = alloc?.percentage ?? 0
           const itemAmount =
             isAmountValid && pct > 0
-              ? new Intl.NumberFormat("en-GB", {
-                  style: "currency",
-                  currency: "GBP",
-                }).format(Math.round(((amount * pct) / 100) * 100) / 100)
+              ? formatPoundsExact(
+                  Math.round(((amount * pct) / 100) * 100) / 100
+                )
               : null
           return (
             <Chip key={id} size="lg" selected className="max-w-full">

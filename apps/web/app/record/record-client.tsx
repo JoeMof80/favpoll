@@ -9,6 +9,7 @@ import type { Category, Topic, Favourite } from "@favpoll/types"
 import { SectionLabel } from "@/components/favpoll-card/section-label"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import { isEstablishedRecord, topicPledgedTotal } from "@/lib/record"
+import { formatCount, formatPounds } from "@/lib/i18n"
 
 type TopicWithItems = Topic & {
   favourites: Favourite[]
@@ -31,11 +32,7 @@ function formatAmount(amount: number): string {
     const digits = value >= 100 ? 0 : 1
     return `£${value.toFixed(digits).replace(/\.0$/, "")}${suffix}`
   }
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 0,
-  }).format(amount)
+  return formatPounds(amount)
 }
 
 function TopicCard({ topic }: { topic: TopicWithItems }) {
@@ -88,7 +85,7 @@ function TopicCard({ topic }: { topic: TopicWithItems }) {
         pledgeCount > 0 && (
           <p className="mt-3 text-xs text-muted-foreground">
             {formatAmount(topicPledgedTotal(topic.favourites))} across{" "}
-            {pledgeCount.toLocaleString("en-GB")}{" "}
+            {formatCount(pledgeCount)}{" "}
             {pledgeCount === 1 ? "pledge" : "pledges"}
           </p>
         )

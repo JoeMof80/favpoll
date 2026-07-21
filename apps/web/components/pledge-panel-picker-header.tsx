@@ -4,6 +4,7 @@ import { Chip } from "@/components/ui/chip"
 import { InputGroupButton } from "@/components/ui/input-group"
 import type { Favourite } from "@favpoll/types"
 import { hasFinePointer } from "@/lib/pointer"
+import { formatPoundsExact } from "@/lib/i18n"
 
 export type Allocation = {
   favouriteId: string
@@ -52,10 +53,7 @@ export function PledgePanelPickerHeader({
         const pct = alloc?.percentage ?? 0
         const itemAmount =
           isAmountValid && pct > 0
-            ? new Intl.NumberFormat("en-GB", {
-                style: "currency",
-                currency: "GBP",
-              }).format(Math.round(((amount * pct) / 100) * 100) / 100)
+            ? formatPoundsExact(Math.round(((amount * pct) / 100) * 100) / 100)
             : null
         return (
           <Chip

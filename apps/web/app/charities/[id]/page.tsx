@@ -9,14 +9,9 @@ import {
   type FavpollSummaryCardFavpoll,
 } from "@/components/favpoll-summary-card"
 import type { Charity } from "@favpoll/types"
+import { formatPounds } from "@/lib/i18n"
 
 type Props = { params: Promise<{ id: string }> }
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 type CharityStats = {
   total_raised: number
@@ -147,7 +142,7 @@ export default async function CharityPage({ params }: Props) {
       <div className="mt-8 grid grid-cols-2 gap-4 sm:max-w-md">
         <div className="rounded-lg border border-border bg-card px-5 py-4">
           <p className="text-2xl font-medium text-primary tabular-nums">
-            {GBP.format(stats.total_raised)}
+            {formatPounds(stats.total_raised)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             raised through favpoll
