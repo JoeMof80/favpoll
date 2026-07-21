@@ -1,11 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import {
   Field,
   FieldLabel,
   FieldDescription,
   FieldError,
   FieldGroup,
-  FieldSet,
   FieldTitle,
 } from "./field"
 import { Input } from "./input"
@@ -40,7 +39,7 @@ export const WithDescription: Story = {
     <Field>
       <FieldTitle>Email address</FieldTitle>
       <FieldDescription>
-        We'll send your pledge confirmation here.
+        We&apos;ll send your pledge confirmation here.
       </FieldDescription>
       <Input id="email" type="email" placeholder="you@example.com" />
     </Field>
@@ -76,7 +75,7 @@ export const FieldGroupExample: Story = {
       <Field>
         <FieldTitle>Email address</FieldTitle>
         <FieldDescription>
-          We'll send your pledge confirmation here.
+          We&apos;ll send your pledge confirmation here.
         </FieldDescription>
         <Input id="email" type="email" placeholder="you@example.com" />
       </Field>

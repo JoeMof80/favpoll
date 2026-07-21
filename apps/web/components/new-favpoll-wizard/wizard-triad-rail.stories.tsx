@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { WizardTriadRail } from "./wizard-triad-rail"
 import { getWizardCopy } from "@/lib/wizard-copy"
 

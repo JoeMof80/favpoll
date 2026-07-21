@@ -43,7 +43,6 @@ function Wrapper({
       form={form}
       charities={[]}
       topics={[]}
-      categories={[]}
       mode="create"
       submitting={false}
       error={null}

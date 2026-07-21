@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { Countdown } from "./countdown"
 
 const future = (ms: number) => new Date(Date.now() + ms).toISOString()

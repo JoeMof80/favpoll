@@ -1,5 +1,5 @@
 import React from "react"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { FavpollHero } from "./favpoll-hero"
 import type { Favpoll, Protagonist, Register } from "@favpoll/types"
 
@@ -24,15 +24,6 @@ const OPENING_LINES: string[] = [
   "For the yes that changes everything",
   "For the one who's moving on",
   "As they take their next step",
-]
-
-const REGISTERS: Register[] = [
-  "remembering",
-  "celebrating_one",
-  "celebrating_one",
-  "celebrating_many",
-  "celebrating_one",
-  "celebrating_one",
 ]
 
 const OCCASION_TYPES: (string | null)[] = [

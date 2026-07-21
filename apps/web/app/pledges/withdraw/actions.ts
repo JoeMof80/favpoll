@@ -19,6 +19,7 @@ export async function withdrawPledge(formData: FormData) {
 
   if (!pledge) redirect("/pledges/withdraw/invalid")
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const favpollData = (pledge.favpoll_polls as any)?.favpolls
   const closesAt = favpollData?.closes_at
   const favpollId = favpollData?.id

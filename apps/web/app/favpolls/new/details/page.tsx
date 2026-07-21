@@ -4,7 +4,6 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { FavpollForm } from "@/components/favpoll-form"
 import { deriveRegister } from "@/lib/registers"
 import type {
-  Category,
   Charity,
   Favourite,
   FavpollCategory,
@@ -37,20 +36,14 @@ export default async function NewFavpollDetailsPage({ searchParams }: Props) {
     : []
 
   const supabase = createAdminClient()
-  const [{ data: charities }, { data: topicsAll }, { data: categories }] =
-    await Promise.all([
-      supabase
-        .from("charities")
-        .select("*")
-        .eq("is_active", true)
-        .order("name"),
-      supabase
-        .from("topics")
-        .select("*, favourites(*), topic_categories(category_id)")
-        .eq("is_active", true)
-        .order("title"),
-      supabase.from("categories").select("*").order("label"),
-    ])
+  const [{ data: charities }, { data: topicsAll }] = await Promise.all([
+    supabase.from("charities").select("*").eq("is_active", true).order("name"),
+    supabase
+      .from("topics")
+      .select("*, favourites(*), topic_categories(category_id)")
+      .eq("is_active", true)
+      .order("title"),
+  ])
 
   const enrichedTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
@@ -113,7 +106,6 @@ export default async function NewFavpollDetailsPage({ searchParams }: Props) {
       mode="create"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
-      categories={(categories ?? []) as Category[]}
       defaultValues={defaultValues}
       hasNewTopicDraft={hasDraftAdditions || newTopic}
     />

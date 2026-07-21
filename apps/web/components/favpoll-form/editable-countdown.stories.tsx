@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { EditableCountdown } from "./editable-countdown"
 
 const meta: Meta<typeof EditableCountdown> = {

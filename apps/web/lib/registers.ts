@@ -142,12 +142,6 @@ export function deriveRegister(
   return grouping === "individual" ? "celebrating_one" : "celebrating_many"
 }
 
-const OCCASION_TYPE_CLOSING_OVERRIDES: Record<string, number> = {
-  Tribute: 21,
-  Retirement: 21,
-  Anniversary: 21,
-}
-
 export const DATE_LABEL_PLACEHOLDERS: Record<string, string> = {
   Memorial: "1940 – 2024",
   Tribute: "Born 1962",

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { BumpChart } from "./bump-chart"
 import { deriveRankHistory, type PledgeEvent } from "@/lib/rank-history"
 

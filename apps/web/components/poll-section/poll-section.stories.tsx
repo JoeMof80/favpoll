@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { PollSection } from "./index"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import type { FavpollPollWithItems } from "@favpoll/types"

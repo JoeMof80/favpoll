@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { FavpollForm } from "@/components/favpoll-form"
 import type {
-  Category,
   Charity,
   FavpollCategory,
   FavpollGrouping,
@@ -36,30 +35,23 @@ export default async function EditFavpollPage({ params }: Props) {
   if (!favpoll) notFound()
   if (favpoll.created_by !== userId) redirect(`/favpolls/${id}`)
 
-  const [
-    { data: rawPoll },
-    { data: charities },
-    { data: topicsAll },
-    { data: categories },
-    { data: pot },
-  ] = await Promise.all([
-    supabase
-      .from("favpoll_polls")
-      .select("*")
-      .eq("favpoll_id", id)
-      .maybeSingle(),
-    supabase.from("charities").select("*").eq("is_active", true).order("name"),
-    supabase
-      .from("topics")
-      .select("*, favourites(*), topic_categories(category_id)")
-      .order("title"),
-    supabase.from("categories").select("*").order("label"),
-    supabase
-      .from("favpoll_pots")
-      .select("*")
-      .eq("favpoll_id", id)
-      .maybeSingle(),
-  ])
+  const [{ data: rawPoll }, { data: charities }, { data: topicsAll }] =
+    await Promise.all([
+      supabase
+        .from("favpoll_polls")
+        .select("*")
+        .eq("favpoll_id", id)
+        .maybeSingle(),
+      supabase
+        .from("charities")
+        .select("*")
+        .eq("is_active", true)
+        .order("name"),
+      supabase
+        .from("topics")
+        .select("*, favourites(*), topic_categories(category_id)")
+        .order("title"),
+    ])
 
   const enrichedTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
@@ -126,7 +118,6 @@ export default async function EditFavpollPage({ params }: Props) {
       mode="edit"
       charities={(charities ?? []) as Charity[]}
       topics={enrichedTopics}
-      categories={(categories ?? []) as Category[]}
       favpollId={id}
       protagonistId={favpoll.protagonist_id ?? undefined}
       existingPollId={rawPoll?.id}

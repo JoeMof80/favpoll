@@ -33,6 +33,7 @@ export async function getGeneratedDrafts(
 
   if (error) return { data: null, error: error.message };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const rows = (data ?? []).map((row: any) => ({
     id: row.id,
     cache_key: row.cache_key,
