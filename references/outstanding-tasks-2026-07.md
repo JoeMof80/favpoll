@@ -70,9 +70,11 @@ with `vercel env pull`.
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~Close-cron atomicity~~     | FIXED 2026-07-21: disbursements upsert first (duplicate-safe on favpoll_id+charity_id), close marker last — any failure leaves the favpoll open for retry. |
 | ~~Live display item source~~ | FIXED 2026-07-21 (#306): `lib/poll-items.fetchPollItems` — the shared rule the other item-sourcing forks migrate to.                                       |
-| **poll-standings row cap**   | Unbounded `.in()` queries silently truncate at PostgREST's 1,000-row default on popular polls.                                                             |
-| **Hygiene sweeps**           | One money formatter (10+ forks), one `sourceItems` helper (5 forks), dead `PledgePanel` trio, CI: add ESLint job + admin Prettier.                         |
+| ~~poll-standings row cap~~   | FIXED 2026-07-21 (#311 pagination + #317 join/chunk rewrite): every money read pages via `fetchAllRows`; id-list filters chunked at 100. |
+| ~~Hygiene sweeps~~           | DONE 2026-07-21 (#313 formatters, #314 dead code, #315 ESLint gate). Item-source forks on the two list pages migrate as touched (`lib/poll-items` note). |
 | **RLS posture**              | No policies anywhere by design (service-role only); document, and never add anon-key queries without revisiting.                                           |
+| **Shelf 60-cap (parked)**    | /favpolls shows the newest 60 (`page.tsx .limit(60)`) — deliberate, and load-bearing (standings aggregate per card). Decided 2026-07-21: keep for launch. Eventual answer is "Load more" (cursor on created_at, 60/page) — but decide first whether the shelf is a shop window (recent-60 is right) or a finder (then it needs search, not depth). |
+| **Scale-seed cohort live**   | 1,503 seeded favpolls + 56k pledges in the shared staging DB (2026-07-21, #317) for scale testing. Tear down with `pnpm seed:scale -- --wipe` when done. |
 
 ## 4. Doc hygiene (minor)
 
