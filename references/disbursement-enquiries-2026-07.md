@@ -56,10 +56,37 @@ the Impact Foundation first, keeping the company-side email in reserve:
   Charity Commission register, appointed Nov 2020); early-stage investor.
   **LinkedIn connection note SENT 11 July 2026**; **CONNECTION ACCEPTED
   21 July 2026** — the first response signal from anyone at Goodstack on any
-  channel. The DM channel is now open: a short, soft follow-up message to
-  Leo referencing the original note is the live next move (it front-runs the
-  ~27 July Josh chase; if Leo engages, the Josh thread becomes the backup
-  rather than the spearhead). Original note:
+  channel. **Follow-up DM SENT 21 July 2026**, same day. The Gift Aid
+  question was deliberately deployed here — Leo is a trustee of the
+  Foundation itself, so it's a governance question in his lap, not deal
+  detail (it stays out of sales-side threads; on a call it remains top of
+  the questions list). His answer settles whether Swiftaid stays benched.
+  Sent verbatim:
+
+  > Hi Leo,
+  >
+  > Thanks a lot for connecting - I really appreciate it.
+  >
+  > As I mentioned, favpoll is preparing for launch. It's a platform for
+  > use at life events where guests pledge money to UK charities selected
+  > by the event organiser. There is no fee so we need infrastructure that
+  > validates and disburses to recipient charities. Goodstack and the
+  > Impact Foundation seem like a good fit for this use case.
+  >
+  > I requested a demo through goodstack.io but haven't heard back yet.
+  > One question I had was if the Impact Foundation claims Gift Aid on
+  > eligible donations and passes the uplift on to the recipient
+  > charities?
+  >
+  > If there is somebody better placed for this query, I'd be grateful
+  > for a pointer.
+  >
+  > Thanks again,
+  > Joe
+
+  Chase state after this send: Leo's DM is the live thread. The ~27 July
+  Josh chase stands only if Leo is silent by then; if Leo engages, Josh
+  becomes backup. Original 11 July note:
   > Hi Leo, I'm building favpoll, a UK giving platform, considering Goodstack
   > and the Impact Foundation as our disbursement rail. I was hoping for your
   > insight as to whether we're a good fit. Thanks, Joe
