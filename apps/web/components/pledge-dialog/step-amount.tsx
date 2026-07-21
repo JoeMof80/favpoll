@@ -2,7 +2,8 @@
 
 import type { BreakdownLine } from "@/components/pledge-card/pledge-breakdown"
 import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
-import { GBP, formatTipLabel } from "@/components/pledge-card/utils"
+import { formatTipLabel } from "@/components/pledge-card/utils"
+import { formatPoundsExact } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -78,14 +79,14 @@ export function StepAmountHeader({
           {useSharedFund && !fundOverAvailable && (
             <p className="text-[11px] text-muted-foreground">
               {isPledgeValid && available > 0
-                ? `Using ${GBP.format(numericPledge)} of ${GBP.format(available)} available`
-                : `${GBP.format(available)} available in the shared fund`}
+                ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
+                : `${formatPoundsExact(available)} available in the shared fund`}
             </p>
           )}
           {useSharedFund && fundOverAvailable && (
             <p className="text-[11px] text-destructive">
-              Shared fund has {GBP.format(available)} available — reduce your
-              pledge to use it
+              Shared fund has {formatPoundsExact(available)} available — reduce
+              your pledge to use it
             </p>
           )}
           {error && <p className="text-sm text-destructive">{error}</p>}
@@ -212,7 +213,7 @@ export function StepAmount({
                   <div key={i} className="flex justify-between">
                     <span className="text-sm">{line.label}</span>
                     <span className="text-sm font-semibold tabular-nums">
-                      {GBP.format(line.amount)}
+                      {formatPoundsExact(line.amount)}
                     </span>
                   </div>
                 ))}

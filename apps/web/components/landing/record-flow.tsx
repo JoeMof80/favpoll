@@ -20,6 +20,7 @@
 // motion: the final frame (post-overtake), static, no glow.
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
+import { formatPounds } from "@/lib/i18n"
 
 const RECORD_ITEMS = ["Jaffa Cake", "Custard Cream", "Bourbon"] as const
 type RecordItem = (typeof RECORD_ITEMS)[number]
@@ -119,7 +120,6 @@ const PLEDGES: { card: number; item: RecordItem; amount: number }[] = [
 const STEP_MS = [1600, 2600, 2600, 2600, 3400, 2600, 2600, 4600]
 const LAST = STEP_MS.length - 1
 
-const GBP = (n: number) => `£${n.toLocaleString("en-GB")}`
 const RECORD_ROW_H = 36
 
 // Card-level glow while a pledge lands — shared by the active favpoll and
@@ -132,7 +132,7 @@ const ACTIVE_FILL = "bg-primary motion-safe:animate-pulse"
 function PlusPill({ amount }: { amount: number }) {
   return (
     <span className="ml-1.5 rounded-full bg-primary px-1.5 py-px text-[9px] font-medium text-primary-foreground">
-      +{GBP(amount)}
+      +{formatPounds(amount)}
     </span>
   )
 }
@@ -217,7 +217,7 @@ export function RecordFlow() {
                         {isActiveBar && <PlusPill amount={active.amount} />}
                       </span>
                       <span className="text-muted-foreground tabular-nums">
-                        {GBP(value)}
+                        {formatPounds(value)}
                       </span>
                     </div>
                     <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
@@ -278,7 +278,7 @@ export function RecordFlow() {
                     )}
                   </span>
                   <span className="text-muted-foreground tabular-nums">
-                    {GBP(recordValues[item])}
+                    {formatPounds(recordValues[item])}
                   </span>
                 </div>
                 <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">

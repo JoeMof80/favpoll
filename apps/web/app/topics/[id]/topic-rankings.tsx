@@ -8,25 +8,9 @@ import { SectionLabel } from "@/components/favpoll-card/section-label"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { formatPoundsCompact } from "@/lib/i18n"
 
 type RankingView = "amount" | "count"
-
-function formatAmount(amount: number): string {
-  if (amount === 0) return "—"
-  if (amount >= 1000) {
-    return new Intl.NumberFormat("en-GB", {
-      style: "currency",
-      currency: "GBP",
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(amount)
-  }
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 0,
-  }).format(amount)
-}
 
 type Props = {
   items: Favourite[]
@@ -96,7 +80,7 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
           const barWidth = hasActivity ? (value / maxValue) * 100 : 0
           const valueLabel =
             view === "amount"
-              ? formatAmount(item.all_time_pledged)
+              ? formatPoundsCompact(item.all_time_pledged)
               : item.all_time_count > 0
                 ? `${item.all_time_count} pledge${item.all_time_count !== 1 ? "s" : ""}`
                 : "—"

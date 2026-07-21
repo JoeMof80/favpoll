@@ -2,6 +2,7 @@ import { Pencil, Target } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import { Button } from "@/components/ui/button"
 import { CharityRow } from "./charity-row"
+import { formatPounds } from "@/lib/i18n"
 
 type Props = {
   charities: Charity[]
@@ -15,12 +16,6 @@ type Props = {
    */
   onEditGoal?: () => void
 }
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 export function CharityBanner({
   charities,
@@ -44,11 +39,11 @@ export function CharityBanner({
       </div>
       <div className="mt-3 border-t border-border pt-3 text-right">
         <p className="text-lg font-medium text-primary">
-          {GBP.format(totalRaised)}
+          {formatPounds(totalRaised)}
         </p>
         <p className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
           {goalAmount
-            ? `raised of the ${GBP.format(goalAmount)} goal`
+            ? `raised of the ${formatPounds(goalAmount)} goal`
             : "raised so far"}
           {goalAmount && onEditGoal ? (
             <Button

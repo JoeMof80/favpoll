@@ -1,6 +1,6 @@
 "use client"
 
-import { GBP } from "./utils"
+import { formatPoundsExact } from "@/lib/i18n"
 
 export type BreakdownLine = { label: string; amount: number; hidden?: boolean }
 
@@ -22,7 +22,7 @@ export function PledgeBreakdown({
           <div key={i} className="flex justify-between">
             <span className="text-muted-foreground">{line.label}</span>
             <span className="font-medium tabular-nums">
-              {GBP.format(line.amount)}
+              {formatPoundsExact(line.amount)}
             </span>
           </div>
         ))}
@@ -30,7 +30,7 @@ export function PledgeBreakdown({
       <div className="flex justify-between border-t border-border pt-1.5 text-sm">
         <span className="font-medium">{total.label}</span>
         <span className="font-semibold tabular-nums">
-          {GBP.format(total.amount)}
+          {formatPoundsExact(total.amount)}
         </span>
       </div>
     </div>

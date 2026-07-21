@@ -19,8 +19,8 @@
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 import { RankingBar } from "@/components/ui/ranking-bar"
+import { formatPounds } from "@/lib/i18n"
 
-const GBP = (n: number) => `£${n}`
 const MAX = 450
 const GOAL = 900
 
@@ -101,7 +101,7 @@ export function WatchItHappen() {
               display doesn't grow). */}
           <div className="mt-1">
             <p className="text-xl leading-tight font-medium text-foreground tabular-nums">
-              {GBP(total)}
+              {formatPounds(total)}
             </p>
             <p
               className={`truncate text-xs leading-tight ${
@@ -112,7 +112,7 @@ export function WatchItHappen() {
             >
               {goalReached
                 ? "goal reached — every pledge still counts"
-                : `of the ${GBP(GOAL)} goal`}
+                : `of the ${formatPounds(GOAL)} goal`}
             </p>
           </div>
           <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -135,7 +135,7 @@ export function WatchItHappen() {
               <RankingBar
                 key={label}
                 label={label}
-                amount={GBP(bars[i])}
+                amount={formatPounds(bars[i])}
                 widthPercent={Math.round((bars[i] / MAX) * 100)}
                 barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
                 barStyle={{

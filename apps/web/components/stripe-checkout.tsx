@@ -4,15 +4,11 @@ import { useState } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
 import { CheckoutForm } from "./checkout-form"
+import { formatPoundsExact } from "@/lib/i18n"
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
-
-const gbp = (n: number) =>
-  new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-    n
-  )
 
 type Props = {
   clientSecret: string
@@ -56,11 +52,13 @@ export function StripeCheckout({
     <>
       <p className="mb-1 text-sm text-muted-foreground">
         You will be charged{" "}
-        <span className="font-medium text-foreground">{gbp(chargeAmount)}</span>
+        <span className="font-medium text-foreground">
+          {formatPoundsExact(chargeAmount)}
+        </span>
       </p>
       {charityAmount !== undefined && (
         <p className="mb-5 text-xs text-muted-foreground">
-          {gbp(charityAmount)} to charity — favpoll takes no fee
+          {formatPoundsExact(charityAmount)} to charity — favpoll takes no fee
         </p>
       )}
       {charityAmount === undefined && <div className="mb-5" />}

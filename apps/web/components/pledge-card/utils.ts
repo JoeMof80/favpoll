@@ -1,8 +1,3 @@
-export const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-})
-
 // Fund-bar colours read design tokens so they follow theme changes; CSS
 // custom properties resolve inside the inline `style` props these feed.
 export const FUND_GREEN = "var(--success)"

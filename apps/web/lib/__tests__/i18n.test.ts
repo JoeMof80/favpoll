@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest"
-import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
+import {
+  formatCount,
+  formatCurrency,
+  formatPounds,
+  formatPoundsCompact,
+  formatPoundsExact,
+  MARKET_DEFAULTS,
+  t,
+} from "@/lib/i18n"
 
 describe("formatCurrency", () => {
   it("formats whole pounds with no decimal places", () => {
@@ -24,6 +32,50 @@ describe("formatCurrency", () => {
 
   it("uses en-GB / GBP by default", () => {
     expect(formatCurrency(1000)).toBe("£10")
+  })
+})
+
+describe("formatPounds", () => {
+  it("drops decimals on whole amounts", () => {
+    expect(formatPounds(1300)).toBe("£1,300")
+  })
+
+  it("keeps pence when present (no trailing-zero padding)", () => {
+    expect(formatPounds(12.5)).toBe("£12.5")
+    expect(formatPounds(12.55)).toBe("£12.55")
+  })
+
+  it("formats zero", () => {
+    expect(formatPounds(0)).toBe("£0")
+  })
+})
+
+describe("formatPoundsExact", () => {
+  it("always shows two decimals", () => {
+    expect(formatPoundsExact(12)).toBe("£12.00")
+    expect(formatPoundsExact(12.5)).toBe("£12.50")
+  })
+})
+
+describe("formatPoundsCompact", () => {
+  it("shows a dash for zero", () => {
+    expect(formatPoundsCompact(0)).toBe("—")
+  })
+
+  it("compacts from a thousand", () => {
+    // ICU versions disagree on the suffix case ("£1.3K" locally, "£1.3k"
+    // on CI's Node) — assert the shape, not the case
+    expect(formatPoundsCompact(1250)).toMatch(/^£1\.3[kK]$/)
+  })
+
+  it("shows whole pounds below a thousand", () => {
+    expect(formatPoundsCompact(999)).toBe("£999")
+  })
+})
+
+describe("formatCount", () => {
+  it("groups thousands", () => {
+    expect(formatCount(1234)).toBe("1,234")
   })
 })
 

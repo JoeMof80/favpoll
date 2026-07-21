@@ -14,13 +14,8 @@ import { AmountInput } from "./amount-input"
 import { AmountPresets } from "./amount-presets"
 import { PledgeBreakdown } from "./pledge-breakdown"
 import { PledgeCardWrapper } from "./pledge-card-wrapper"
-import {
-  GBP,
-  FUND_GREEN,
-  FUND_AMBER,
-  FUND_RED,
-  formatCharityLabel,
-} from "./utils"
+import { FUND_GREEN, FUND_AMBER, FUND_RED, formatCharityLabel } from "./utils"
+import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
   pledgeAmount?: string
@@ -162,16 +157,16 @@ export function PreviewPledgeCard({
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
                 {isPledgeValid && available > 0
-                  ? `Using ${GBP.format(numericPledge)} of ${GBP.format(available)} available`
+                  ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
                   : available > 0
-                    ? `${GBP.format(available)} available in the shared fund`
+                    ? `${formatPoundsExact(available)} available in the shared fund`
                     : "No funds in the shared fund yet"}
               </p>
             </div>
             {fundOverAvailable && (
               <p className="text-[11px] text-destructive">
-                Shared fund has {GBP.format(available)} available — reduce your
-                pledge to use it
+                Shared fund has {formatPoundsExact(available)} available —
+                reduce your pledge to use it
               </p>
             )}
           </div>

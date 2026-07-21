@@ -1,15 +1,11 @@
 import { Resend } from "resend"
 import { renderEmail, escapeHtml } from "./email-template"
 import { formatFavpollDate } from "./display"
+import { formatPoundsExact } from "./i18n"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "noreply@favpoll.com"
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-})
 
 type PledgeConfirmationParams = {
   to: string
@@ -48,9 +44,9 @@ export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
     to,
     subject: `Your pledge for ${protagonistName}`,
     html: renderEmail({
-      preheader: `${GBP.format(amount)} to ${charityNames.join(" & ") || "charity"}, in honour of ${protagonistName}.`,
+      preheader: `${formatPoundsExact(amount)} to ${charityNames.join(" & ") || "charity"}, in honour of ${protagonistName}.`,
       heading: "Thank you.",
-      bodyHtml: `<p style="margin:0 0 12px;">You pledged <strong>${GBP.format(amount)}</strong> to ${charityLabel}, in honour of ${name}. favpoll takes no fee — 100% of your pledge goes to charity.</p>${
+      bodyHtml: `<p style="margin:0 0 12px;">You pledged <strong>${formatPoundsExact(amount)}</strong> to ${charityLabel}, in honour of ${name}. favpoll takes no fee — 100% of your pledge goes to charity.</p>${
         closesDate
           ? `<p style="margin:0;">The poll closes on ${escapeHtml(closesDate)}. Until then, your favourite stands in the running.</p>`
           : ""
@@ -78,9 +74,9 @@ export async function sendFavpollClosed(params: FavpollClosedParams) {
     to,
     subject: `Your favpoll for ${protagonistName} has closed`,
     html: renderEmail({
-      preheader: `${GBP.format(totalRaised)} raised in ${protagonistName}'s name.`,
+      preheader: `${formatPoundsExact(totalRaised)} raised in ${protagonistName}'s name.`,
       heading: "The poll has closed.",
-      bodyHtml: `<p style="margin:0 0 12px;">Your favpoll for <strong>${name}</strong> raised <strong>${GBP.format(totalRaised)}</strong> for charity.</p><p style="margin:0;">Every guest's favourite now stands in the final rankings — a small, lasting record from a day that mattered.</p>`,
+      bodyHtml: `<p style="margin:0 0 12px;">Your favpoll for <strong>${name}</strong> raised <strong>${formatPoundsExact(totalRaised)}</strong> for charity.</p><p style="margin:0;">Every guest's favourite now stands in the final rankings — a small, lasting record from a day that mattered.</p>`,
       cta: { label: "See the final rankings", url: resultsUrl },
     }),
   })

@@ -19,15 +19,9 @@ import { StepAmount } from "@/components/pledge-dialog/step-amount"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
 import { FAST } from "./variants"
+import { formatPounds } from "@/lib/i18n"
 
 const RESULTS_SHOWN = 5
-
-// Mirrors CharityRow's GBP formatting (favpoll-card/charity-row.tsx).
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 type Props = {
   scene: HeroScene
@@ -285,7 +279,7 @@ export function DemoCard({
       </div>
       {raisedNum > 0 && (
         <p className="shrink-0 text-sm font-medium text-primary">
-          {GBP.format(raisedNum)}
+          {formatPounds(raisedNum)}
         </p>
       )}
     </div>

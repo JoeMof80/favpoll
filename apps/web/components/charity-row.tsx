@@ -2,6 +2,7 @@ import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
+import { formatPounds } from "@/lib/i18n"
 
 type Props = {
   charity: Charity
@@ -15,12 +16,6 @@ type Props = {
    */
   linkToCharity?: boolean
 }
-
-const GBP = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  minimumFractionDigits: 0,
-})
 
 export function CharityRow({
   charity,
@@ -77,7 +72,7 @@ export function CharityRow({
       </div>
       {amountRaised > 0 && (
         <p className={`shrink-0 ${amountClass} font-medium text-primary`}>
-          {GBP.format(amountRaised)}
+          {formatPounds(amountRaised)}
         </p>
       )}
     </div>
