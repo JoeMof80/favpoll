@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 import { getFavpollHeadline } from "@/lib/display"
 import { deriveRankHistory, type PledgeEvent } from "@/lib/rank-history"
 import {
@@ -44,17 +45,21 @@ export default async function KeepsakePage({ params }: Props) {
 
   // Final standings + rank history for this favpoll's poll, from its
   // pledge allocations (non-withdrawn). Same source as the bump chart.
-  const { data: allocRows } = await supabase
-    .from("pledge_allocations")
-    .select(
-      "amount, favourite_id, favourites(label), pledges!inner(created_at, favpoll_poll_id, withdrawn_at)"
-    )
-    .eq("pledges.favpoll_poll_id", poll.id)
-    .is("pledges.withdrawn_at", null)
+  // Paginated (lib/supabase/paginate) — a keepsake reads the WHOLE poll
+  const allocRows = await fetchAllRows<Record<string, unknown>>((from, to) =>
+    supabase
+      .from("pledge_allocations")
+      .select(
+        "amount, favourite_id, favourites(label), pledges!inner(created_at, favpoll_poll_id, withdrawn_at)"
+      )
+      .eq("pledges.favpoll_poll_id", poll.id)
+      .is("pledges.withdrawn_at", null)
+      .range(from, to)
+  )
 
   const totals = new Map<string, { label: string; amount: number }>()
   const labels: Record<string, string> = {}
-  for (const r of allocRows ?? []) {
+  for (const r of allocRows) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const row = r as any
     const label = row.favourites?.label ?? row.favourite_id
@@ -70,14 +75,20 @@ export default async function KeepsakePage({ params }: Props) {
 
   // Rank history: one event per pledge (group allocations by pledge).
   // The select above is per-allocation, so re-query grouped by pledge.
-  const { data: pledgeRows } = await supabase
-    .from("pledges")
-    .select("created_at, pledge_allocations(amount, favourite_id)")
-    .eq("favpoll_poll_id", poll.id)
-    .is("withdrawn_at", null)
-    .order("created_at", { ascending: true })
+  const pledgeRows = await fetchAllRows<{
+    created_at: string
+    pledge_allocations: unknown
+  }>((from, to) =>
+    supabase
+      .from("pledges")
+      .select("created_at, pledge_allocations(amount, favourite_id)")
+      .eq("favpoll_poll_id", poll.id)
+      .is("withdrawn_at", null)
+      .order("created_at", { ascending: true })
+      .range(from, to)
+  )
 
-  const events: PledgeEvent[] = (pledgeRows ?? []).map((p) => ({
+  const events: PledgeEvent[] = pledgeRows.map((p) => ({
     createdAt: p.created_at,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     allocations: ((p.pledge_allocations ?? []) as any[]).map((a) => ({
@@ -90,18 +101,23 @@ export default async function KeepsakePage({ params }: Props) {
 
   // Guests who chose to be named (anonymity model): guest display_name or
   // the account name for signed-in pledgers. Never derived from emails.
-  const { data: nameRows } = await supabase
-    .from("pledges")
-    .select("display_name, is_anonymous, clerk_user_id")
-    .eq("favpoll_poll_id", poll.id)
-    .is("withdrawn_at", null)
-    .eq("is_anonymous", false)
+  const nameRows = await fetchAllRows<{
+    display_name: string | null
+    is_anonymous: boolean
+    clerk_user_id: string | null
+  }>((from, to) =>
+    supabase
+      .from("pledges")
+      .select("display_name, is_anonymous, clerk_user_id")
+      .eq("favpoll_poll_id", poll.id)
+      .is("withdrawn_at", null)
+      .eq("is_anonymous", false)
+      .range(from, to)
+  )
 
   const clerkIds = [
     ...new Set(
-      (nameRows ?? [])
-        .map((r) => r.clerk_user_id)
-        .filter((v): v is string => !!v)
+      nameRows.map((r) => r.clerk_user_id).filter((v): v is string => !!v)
     ),
   ]
   const { data: users } = clerkIds.length
@@ -112,7 +128,7 @@ export default async function KeepsakePage({ params }: Props) {
   )
   const guestNames = [
     ...new Set(
-      (nameRows ?? [])
+      nameRows
         .map((r) =>
           r.clerk_user_id
             ? (userNames[r.clerk_user_id] ?? null)

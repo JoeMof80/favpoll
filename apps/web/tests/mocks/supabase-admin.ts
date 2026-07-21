@@ -70,6 +70,10 @@ export function makeSupabaseMock() {
         rec("limit", a)
         return b
       },
+      range: (...a: any[]) => {
+        rec("range", a)
+        return b
+      },
       order: (...a: any[]) => {
         rec("order", a)
         return b

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { fetchPollItems } from "@/lib/poll-items"
 import { DisplayScreen } from "@/components/display-screen"
@@ -52,17 +53,18 @@ export default async function LiveDisplayPage({ params }: Props) {
         })
       : []
 
-  // Total raised
-  const { data: pledges } = await supabase
-    .from("pledges")
-    .select("total_amount")
-    .eq("favpoll_poll_id", pollId ?? "")
-    .is("withdrawn_at", null)
-
-  const initialTotalRaised = (pledges ?? []).reduce(
-    (s, p) => s + p.total_amount,
-    0
+  // Total raised — paginated (the telethon figure is money; the silent
+  // 1,000-row cap would under-report a big room)
+  const pledges = await fetchAllRows<{ total_amount: number }>((from, to) =>
+    supabase
+      .from("pledges")
+      .select("total_amount")
+      .eq("favpoll_poll_id", pollId ?? "")
+      .is("withdrawn_at", null)
+      .range(from, to)
   )
+
+  const initialTotalRaised = pledges.reduce((s, p) => s + p.total_amount, 0)
 
   const charityRows = (
     (favpoll.favpoll_charities ?? []) as {

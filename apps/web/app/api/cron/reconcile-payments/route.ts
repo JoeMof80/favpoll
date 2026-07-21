@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 
 // Hourly reconciliation (see vercel.json) — marks each webhook-recorded
 // succeeded PaymentIntent (stripe_payment_events) off against the row that
@@ -20,17 +21,27 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient()
 
-  const { data: events, error } = await supabase
-    .from("stripe_payment_events")
-    .select("payment_intent_id, amount_pence, received_at")
-    .is("reconciled_at", null)
-
-  if (error) {
-    console.error("[reconcile-payments] fetch error:", error.message)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  // Paginated — the unreconciled backlog must never silently truncate
+  let events: {
+    payment_intent_id: string
+    amount_pence: number
+    received_at: string
+  }[]
+  try {
+    events = await fetchAllRows((from, to) =>
+      supabase
+        .from("stripe_payment_events")
+        .select("payment_intent_id, amount_pence, received_at")
+        .is("reconciled_at", null)
+        .range(from, to)
+    )
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "fetch failed"
+    console.error("[reconcile-payments] fetch error:", message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 
-  if (!events || events.length === 0) {
+  if (events.length === 0) {
     return NextResponse.json({ reconciled: 0, unmatched: 0 })
   }
 

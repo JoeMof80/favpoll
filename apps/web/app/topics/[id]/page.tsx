@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 import type { Topic, Favourite } from "@favpoll/types"
 import { TopicRankings } from "./topic-rankings"
 import { PageLayout } from "@/components/page-layout"
@@ -61,18 +62,23 @@ export default async function TopicPage({ params }: Props) {
   let topicHistory: ReturnType<typeof deriveRankHistory> | null = null
   let bucketDates: string[] = []
   if (isEstablishedRecord(items)) {
-    const { data: allocRows } = await supabase
-      .from("pledge_allocations")
-      .select(
-        `amount, favourite_id,
-         favourites!inner ( label, topic_id ),
-         pledges!inner ( created_at, withdrawn_at )`
-      )
-      .eq("favourites.topic_id", id)
-      .is("pledges.withdrawn_at", null)
+    // Paginated — an established topic's allocations exceed the silent
+    // 1,000-row cap (lib/supabase/paginate)
+    const allocRows = await fetchAllRows<Record<string, unknown>>((from, to) =>
+      supabase
+        .from("pledge_allocations")
+        .select(
+          `amount, favourite_id,
+             favourites!inner ( label, topic_id ),
+             pledges!inner ( created_at, withdrawn_at )`
+        )
+        .eq("favourites.topic_id", id)
+        .is("pledges.withdrawn_at", null)
+        .range(from, to)
+    )
 
     const labels: Record<string, string> = {}
-    const events: PledgeEvent[] = (allocRows ?? []).map((r) => {
+    const events: PledgeEvent[] = (allocRows as never[]).map((r) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const row = r as any
       labels[row.favourite_id] = row.favourites?.label ?? row.favourite_id
