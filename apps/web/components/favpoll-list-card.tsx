@@ -17,8 +17,7 @@ import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-re
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import type { CardResultItem } from "./favpoll-list-card/use-favpoll-list-card-pledge"
 import type { Charity, FavpollPollWithItems } from "@favpoll/types"
-
-const DECOY_WIDTHS = [85, 62, 48, 33, 19]
+import { DECOY_WIDTHS } from "@/lib/decoys"
 
 type FavpollListCardFavpoll = {
   id: string

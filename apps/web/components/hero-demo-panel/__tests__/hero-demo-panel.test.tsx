@@ -71,14 +71,13 @@ vi.mock("@/components/pledge-dialog/step-amount", () => ({
 import { DemoCard } from "../demo-card"
 import { LandingHero } from "@/components/landing/hero"
 import { SCENES } from "../scenes"
+import { DECOY_WIDTHS } from "@/lib/decoys"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 // Page-copy verbatim — matches revealLockLabel(firstName) for SCENES[0]
 // (the normalised reveal-lock pill; see components/reveal-lock.tsx).
 const LOCK_CARD_COPY = "Pledge to reveal Belinda's favourite"
-
-const DECOY_WIDTHS = [85, 62, 48, 33, 19]
 
 const scene = SCENES[0] // Belinda · Colour · Marie Curie
 const charity = scene.charities[0]

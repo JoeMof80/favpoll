@@ -6,7 +6,7 @@ import {
   topUpFund,
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
-import { computePledgeAllocations } from "@/components/pledge-panel"
+import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type {
   FavpollPollWithItems,
   FavpollPot,
