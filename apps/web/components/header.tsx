@@ -43,9 +43,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           {/* Desktop nav — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
-            <Button asChild variant="ghost" className="text-muted-foreground">
-              <Link href="/record">The record</Link>
-            </Button>
+            {/* "The record" nav link hidden until the record launches
+                (landing says Coming soon — 2026-07-21); /record stays
+                reachable by URL. Restore here + mobile menu + footer +
+                about. */}
             <Button asChild variant="ghost" className="text-muted-foreground">
               <Link href="/favpolls">Favpolls</Link>
             </Button>
@@ -102,9 +103,6 @@ export function Header() {
           />
           <div className="absolute inset-x-0 top-full z-40 border-b border-border bg-background px-4 pt-2 pb-4 shadow-lg md:hidden">
             <nav className="space-y-0.5">
-              <Link href="/record" className={MOBILE_LINK} onClick={close}>
-                The record
-              </Link>
               <Link href="/favpolls" className={MOBILE_LINK} onClick={close}>
                 Favpolls
               </Link>

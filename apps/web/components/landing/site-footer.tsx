@@ -6,9 +6,9 @@ import Link from "next/link"
 import { Show } from "@clerk/nextjs"
 import { FavpollLogo } from "@/components/favpoll-logo"
 
+// "The record" entry hidden until the record launches (2026-07-21)
 const EXPLORE = [
   ["/favpolls", "Favpolls"],
-  ["/record", "The record"],
   ["/charities", "Charities"],
   ["/about", "About"],
   ["/about#faq", "FAQ"],
