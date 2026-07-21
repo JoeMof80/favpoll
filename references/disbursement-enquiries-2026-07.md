@@ -54,7 +54,12 @@ the Impact Foundation first, keeping the company-side email in reserve:
 
 - **Leo Chandler** — trustee, Goodstack Impact Foundation UK (verified on the
   Charity Commission register, appointed Nov 2020); early-stage investor.
-  **LinkedIn connection note SENT 11 July 2026** (no reply as of 15 July):
+  **LinkedIn connection note SENT 11 July 2026**; **CONNECTION ACCEPTED
+  21 July 2026** — the first response signal from anyone at Goodstack on any
+  channel. The DM channel is now open: a short, soft follow-up message to
+  Leo referencing the original note is the live next move (it front-runs the
+  ~27 July Josh chase; if Leo engages, the Josh thread becomes the backup
+  rather than the spearhead). Original note:
   > Hi Leo, I'm building favpoll, a UK giving platform, considering Goodstack
   > and the Impact Foundation as our disbursement rail. I was hoping for your
   > insight as to whether we're a good fit. Thanks, Joe
@@ -287,6 +292,32 @@ agent).
    record-keeping / audit trail?
 
 ---
+
+## Pledge (pledge.to) — evaluated 2026-07-21, NOT suitable as rail
+
+Pledgeling: US donation-infrastructure company (fundraiser pages, donation
+forms, text-to-donate/QR, Zoom/livestream, embedded giving APIs). Surfaced
+by the founder as a possible competitor/partner; evaluated same day.
+
+- **Not a competitor in substance** — generic donation plumbing, no
+  favourite/withhold-reveal mechanic, no occasion register, no record.
+- **Not suitable as our disbursement rail**: payments to non-US charities
+  go through international regranting partners charging **5% of the
+  donation** — breaks the 0%/100% promise outright — plus a $5/month
+  disbursement fee, a US DAF-style regrant model, and **no Gift Aid**.
+  Strictly worse than Goodstack (lead) and CAF (fallback) for a UK-first
+  product. Back pocket only if the whole Goodstack → Ludlam → CAF chain
+  fails.
+- **Validates the funding model**: Pledge is free and funded by optional
+  tips (5% technology fee only when no tip is given) — our
+  optional-contribution model, proven at scale.
+- **Feature borrowed**: wallet payments (their 12+ methods vs our
+  card-only) — scoped in `references/wallet-payments-scope-2026-07.md`.
+  Text-to-donate judged redundant against the live display's QR;
+  livestream/remote-guest room noted as post-launch idea.
+
+Sources: pledge.to/pricing, help.pledgeling.com fee articles,
+developer.pledge.to (2026-07-21).
 
 ## Not tax/legal advice
 
