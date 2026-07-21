@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { usePledge } from "@/components/pledge-card/use-pledge"
-import { computePledgeAllocations } from "@/components/pledge-panel"
+import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type {
   FavpollPollWithItems,
   FavpollPot,

@@ -1,5 +1,4 @@
 export type FavpollCardSize = "lg" | "md" | "sm"
-export type PollStep = "choose" | "pledge" | "pledged"
 
 export type PollResultItem = {
   label: string
@@ -16,53 +15,4 @@ export type CardProtagonist = {
   photo_url?: string | null
   context?: string | null
   initials?: string
-}
-
-/**
- * Poll data aligned to the Supabase shape:
- *   favpoll_polls.id, favpoll_polls.personal_reveal
- *   → topics.title
- *   → favourites.id + favourites.label
- *
- * UI-only state fields (selectedItemId, results) are appended here
- * because FavpollCard is a display-only component that receives fully
- * resolved data from its parent.
- */
-export type PollData = {
-  id: string
-  personal_reveal: string | null
-  topic: {
-    title: string
-    favourites: { id: string; label: string }[]
-  } | null
-  /** Selected item ID during choose / pledge steps */
-  selectedItemId?: string | null
-  /** Results shown in the pledged step */
-  results?: PollResultItem[]
-}
-
-/**
- * Charity as passed to the card — mirrors the Supabase `charities` row
- * (only the fields the card needs).
- */
-export type CardCharity = {
-  id: string
-  name: string
-  logo_url?: string | null
-  registered_number?: string | null
-}
-
-export type FavpollCardProps = {
-  size?: FavpollCardSize
-  protagonist: CardProtagonist
-  /** Maps to favpoll.opening_line */
-  eyebrow?: string
-  charities: CardCharity[]
-  /** charity id → formatted amount string shown next to each charity row */
-  charityAmounts?: Record<string, string>
-  poll: PollData
-  step?: PollStep
-  showSteps?: boolean
-  onStepChange?: (step: PollStep) => void
-  showSharedFund?: boolean
 }

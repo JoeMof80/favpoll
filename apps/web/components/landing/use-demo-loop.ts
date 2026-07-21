@@ -6,8 +6,7 @@
 import { useEffect, useRef, useState } from "react"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
-
-const DECOY_WIDTHS = [85, 62, 48, 33, 19]
+import { DECOY_WIDTHS } from "@/lib/decoys"
 
 export function useDemoLoop() {
   const prefersReducedMotion =

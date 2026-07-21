@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { computePledgeAllocations } from "@/components/pledge-panel"
+import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type { Favourite } from "@favpoll/types"
 
 function makeItem(id: string): Favourite {

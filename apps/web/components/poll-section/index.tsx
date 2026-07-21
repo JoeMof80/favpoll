@@ -11,8 +11,7 @@ import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
 import { RevealLockPill, revealLockLabel } from "../reveal-lock"
-
-const DECOY_WIDTHS = [85, 62, 48, 33, 19]
+import { DECOY_WIDTHS } from "@/lib/decoys"
 
 type RankingView = "amount" | "count"
 
