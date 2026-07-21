@@ -81,8 +81,13 @@ export async function POST(req: Request) {
     currency: "gbp",
     // Restrict to card only so the PaymentElement renders the card form
     // directly, bypassing Stripe's adaptive payment-method selector.
-    // Apple Pay / Google Pay require additional domain verification and
-    // are not supported in E2E or headless environments.
+    // "card" deliberately includes Apple Pay / Google Pay — they are
+    // wallets riding on the card type, shown by PaymentElement once the
+    // domain is registered with Stripe (public/.well-known/, see
+    // references/wallet-payments-scope-2026-07.md). Keeping the explicit
+    // pin excludes Link/Klarna-style redirect methods (no return_url
+    // handling in the dialog flow). Headless/E2E still get the plain
+    // card form.
     payment_method_types: ["card"],
     metadata: {
       ...(userId ? { clerk_user_id: userId } : {}),
