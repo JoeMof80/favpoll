@@ -105,12 +105,9 @@ export default function AboutPage() {
             </FadeIn>
             <FadeIn delay={0.24}>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Every pledge also feeds{" "}
-                <Link href="/record" className="text-primary hover:underline">
-                  the record
-                </Link>{" "}
-                — favpoll&apos;s permanent ranking of favourites. Nothing on it
-                is gamed or free; every standing was paid for.
+                Every pledge also feeds the record — favpoll&apos;s permanent
+                ranking of favourites. Nothing on it is gamed or free; every
+                standing was paid for.
               </p>
             </FadeIn>
           </div>
