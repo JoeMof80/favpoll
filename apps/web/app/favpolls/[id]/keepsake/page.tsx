@@ -43,77 +43,64 @@ export default async function KeepsakePage({ params }: Props) {
 
   if (!poll) notFound()
 
-  // Final standings + rank history for this favpoll's poll, from its
-  // pledge allocations (non-withdrawn). Same source as the bump chart.
-  // Paginated (lib/supabase/paginate) — a keepsake reads the WHOLE poll
-  const allocRows = await fetchAllRows<Record<string, unknown>>((from, to) =>
-    supabase
-      .from("pledge_allocations")
-      .select(
-        "amount, favourite_id, favourites(label), pledges!inner(created_at, favpoll_poll_id, withdrawn_at)"
-      )
-      .eq("pledges.favpoll_poll_id", poll.id)
-      .is("pledges.withdrawn_at", null)
-      .range(from, to)
-  )
+  // One round trip for both full-poll reads. The pledge timeline (with
+  // labels joined onto each allocation) is the single source for BOTH the
+  // final standings and the rank history — previously the same allocation
+  // rows were read twice, once per-allocation and once per-pledge.
+  // Paginated (lib/supabase/paginate) — a keepsake reads the WHOLE poll.
+  const [pledgeRows, nameRows] = await Promise.all([
+    fetchAllRows<{
+      created_at: string
+      pledge_allocations: unknown
+    }>((from, to) =>
+      supabase
+        .from("pledges")
+        .select(
+          "created_at, pledge_allocations(amount, favourite_id, favourites(label))"
+        )
+        .eq("favpoll_poll_id", poll.id)
+        .is("withdrawn_at", null)
+        .order("created_at", { ascending: true })
+        .range(from, to)
+    ),
+    // Guests who chose to be named (anonymity model): guest display_name or
+    // the account name for signed-in pledgers. Never derived from emails.
+    fetchAllRows<{
+      display_name: string | null
+      is_anonymous: boolean
+      clerk_user_id: string | null
+    }>((from, to) =>
+      supabase
+        .from("pledges")
+        .select("display_name, is_anonymous, clerk_user_id")
+        .eq("favpoll_poll_id", poll.id)
+        .is("withdrawn_at", null)
+        .eq("is_anonymous", false)
+        .range(from, to)
+    ),
+  ])
 
   const totals = new Map<string, { label: string; amount: number }>()
   const labels: Record<string, string> = {}
-  for (const r of allocRows) {
+  const events: PledgeEvent[] = pledgeRows.map((p) => ({
+    createdAt: p.created_at,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const row = r as any
-    const label = row.favourites?.label ?? row.favourite_id
-    labels[row.favourite_id] = label
-    const cur = totals.get(row.favourite_id) ?? { label, amount: 0 }
-    cur.amount += row.amount ?? 0
-    totals.set(row.favourite_id, cur)
-  }
+    allocations: ((p.pledge_allocations ?? []) as any[]).map((a) => {
+      const label = a.favourites?.label ?? a.favourite_id
+      labels[a.favourite_id] = label
+      const cur = totals.get(a.favourite_id) ?? { label, amount: 0 }
+      cur.amount += a.amount ?? 0
+      totals.set(a.favourite_id, cur)
+      return { favouriteId: a.favourite_id, amount: a.amount ?? 0 }
+    }),
+  }))
 
   const standings: KeepsakeStanding[] = [...totals.entries()]
     .map(([favouriteId, v]) => ({ favouriteId, ...v }))
     .sort((a, b) => b.amount - a.amount)
 
-  // Rank history: one event per pledge (group allocations by pledge).
-  // The select above is per-allocation, so re-query grouped by pledge.
-  const pledgeRows = await fetchAllRows<{
-    created_at: string
-    pledge_allocations: unknown
-  }>((from, to) =>
-    supabase
-      .from("pledges")
-      .select("created_at, pledge_allocations(amount, favourite_id)")
-      .eq("favpoll_poll_id", poll.id)
-      .is("withdrawn_at", null)
-      .order("created_at", { ascending: true })
-      .range(from, to)
-  )
-
-  const events: PledgeEvent[] = pledgeRows.map((p) => ({
-    createdAt: p.created_at,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    allocations: ((p.pledge_allocations ?? []) as any[]).map((a) => ({
-      favouriteId: a.favourite_id,
-      amount: a.amount ?? 0,
-    })),
-  }))
   const rankHistory =
     events.length >= 8 ? deriveRankHistory(events, labels) : null
-
-  // Guests who chose to be named (anonymity model): guest display_name or
-  // the account name for signed-in pledgers. Never derived from emails.
-  const nameRows = await fetchAllRows<{
-    display_name: string | null
-    is_anonymous: boolean
-    clerk_user_id: string | null
-  }>((from, to) =>
-    supabase
-      .from("pledges")
-      .select("display_name, is_anonymous, clerk_user_id")
-      .eq("favpoll_poll_id", poll.id)
-      .is("withdrawn_at", null)
-      .eq("is_anonymous", false)
-      .range(from, to)
-  )
 
   const clerkIds = [
     ...new Set(

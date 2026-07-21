@@ -38,31 +38,52 @@ export default async function LiveDisplayPage({ params }: Props) {
 
   const pollId = rawPoll?.id ?? null
 
-  // The display's list is THIS poll's items (lib/poll-items): the topic's
-  // closed set for finite topics, the curated visible epf rows for infinite
-  // ones. Previously this read the whole topic canon — an infinite-topic
-  // display showed every canonical item instead of the poll's list.
-  const allItems: Favourite[] =
+  // One round trip for everything keyed on the poll id. Each branch gates
+  // on pollId — no poll, no query (eq("") is an invalid uuid PostgREST
+  // rejects, which fetchAllRows turns into a crash).
+  const [allItems, pledges, { data: wallRows }, standings] = await Promise.all([
+    // The display's list is THIS poll's items (lib/poll-items): the topic's
+    // closed set for finite topics, the curated visible epf rows for infinite
+    // ones. Previously this read the whole topic canon — an infinite-topic
+    // display showed every canonical item instead of the poll's list.
     rawPoll?.topic_id && pollId
-      ? await fetchPollItems(supabase, {
+      ? fetchPollItems(supabase, {
           pollId,
           topicId: rawPoll.topic_id,
           isFinite:
             (rawPoll.topics as { is_finite?: boolean } | null)?.is_finite ??
             false,
         })
-      : []
-
-  // Total raised — paginated (the telethon figure is money; the silent
-  // 1,000-row cap would under-report a big room)
-  const pledges = await fetchAllRows<{ total_amount: number }>((from, to) =>
-    supabase
-      .from("pledges")
-      .select("total_amount")
-      .eq("favpoll_poll_id", pollId ?? "")
-      .is("withdrawn_at", null)
-      .range(from, to)
-  )
+      : Promise.resolve([] as Favourite[]),
+    // Total raised — paginated (the telethon figure is money; the silent
+    // 1,000-row cap would under-report a big room)
+    pollId
+      ? fetchAllRows<{ total_amount: number }>((from, to) =>
+          supabase
+            .from("pledges")
+            .select("total_amount")
+            .eq("favpoll_poll_id", pollId)
+            .is("withdrawn_at", null)
+            .range(from, to)
+        )
+      : Promise.resolve([]),
+    // Initial guest wall (kept live client-side via the wall endpoint). The
+    // display is a public, organiser-sanctioned surface: backed-labels are
+    // shown; anonymity still holds (anonymous → "Someone").
+    pollId
+      ? supabase
+          .from("pledges")
+          .select(
+            `id, display_name, is_anonymous, clerk_user_id, created_at,
+             pledge_allocations ( favourites ( label ) )`
+          )
+          .eq("favpoll_poll_id", pollId)
+          .is("withdrawn_at", null)
+          .order("created_at", { ascending: false })
+          .limit(24)
+      : Promise.resolve({ data: [] }),
+    pollId ? pollStandings(supabase, pollId) : Promise.resolve(null),
+  ])
 
   const initialTotalRaised = pledges.reduce((s, p) => s + p.total_amount, 0)
 
@@ -72,22 +93,6 @@ export default async function LiveDisplayPage({ params }: Props) {
     }[]
   ).map((ec) => ec.charities)
   const charityName = charityRows[0]?.name ?? null
-
-  // Initial guest wall (kept live client-side via the wall endpoint). The
-  // display is a public, organiser-sanctioned surface: backed-labels are
-  // shown; anonymity still holds (anonymous → "Someone").
-  const { data: wallRows } = pollId
-    ? await supabase
-        .from("pledges")
-        .select(
-          `id, display_name, is_anonymous, clerk_user_id, created_at,
-           pledge_allocations ( favourites ( label ) )`
-        )
-        .eq("favpoll_poll_id", pollId)
-        .is("withdrawn_at", null)
-        .order("created_at", { ascending: false })
-        .limit(24)
-    : { data: [] }
 
   const wallClerkIds = [
     ...new Set(
@@ -125,9 +130,7 @@ export default async function LiveDisplayPage({ params }: Props) {
   // The display's bars show THIS poll's pledges — they must sum to the
   // telethon total above them (see lib/poll-standings). The interval
   // router.refresh() re-runs this overlay, keeping the room live.
-  const items = pollId
-    ? overlayStandings(allItems, await pollStandings(supabase, pollId))
-    : allItems
+  const items = standings ? overlayStandings(allItems, standings) : allItems
 
   const displayPoll = rawPoll
     ? {
