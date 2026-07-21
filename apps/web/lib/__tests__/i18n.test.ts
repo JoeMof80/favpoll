@@ -63,7 +63,9 @@ describe("formatPoundsCompact", () => {
   })
 
   it("compacts from a thousand", () => {
-    expect(formatPoundsCompact(1250)).toBe("£1.3K")
+    // ICU versions disagree on the suffix case ("£1.3K" locally, "£1.3k"
+    // on CI's Node) — assert the shape, not the case
+    expect(formatPoundsCompact(1250)).toMatch(/^£1\.3[kK]$/)
   })
 
   it("shows whole pounds below a thousand", () => {
