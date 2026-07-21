@@ -218,7 +218,7 @@ export function RankingsClient({ categories, topics }: Props) {
           <div className="space-y-12">
             {established.length > 0 && (
               <section>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {established.map((topic) => (
                     <TopicCard key={topic.id} topic={topic} />
                   ))}
@@ -237,7 +237,7 @@ export function RankingsClient({ categories, topics }: Props) {
                     people pledge.
                   </p>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {gathering.map((topic) => (
                     <div key={topic.id} className="opacity-60">
                       <TopicCard topic={topic} />
