@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
 import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { FavpollContent } from "@/components/favpoll-content"
@@ -156,13 +157,19 @@ export default async function FavpollPage({ params }: Props) {
           .then(({ data }) => (data?.length ?? 0) > 0)
       : false
 
-  const { data: totalData } = await supabase
-    .from("pledges")
-    .select("total_amount")
-    .eq("favpoll_poll_id", pollWithItems?.id ?? "")
-    .is("withdrawn_at", null)
+  // Paginated — the sidebar total is money; PostgREST's silent 1,000-row
+  // cap would under-report a popular poll (lib/supabase/paginate).
+  const totalData = await fetchAllRows<{ total_amount: number | null }>(
+    (from, to) =>
+      supabase
+        .from("pledges")
+        .select("total_amount")
+        .eq("favpoll_poll_id", pollWithItems?.id ?? "")
+        .is("withdrawn_at", null)
+        .range(from, to)
+  )
 
-  const totalRaised = (totalData ?? []).reduce(
+  const totalRaised = totalData.reduce(
     (sum, p) => sum + (p.total_amount ?? 0),
     0
   )
@@ -253,19 +260,26 @@ export default async function FavpollPage({ params }: Props) {
   const RANK_HISTORY_MIN_PLEDGES = 8
   let rankHistory: ReturnType<typeof deriveRankHistory> | null = null
   if (isClosed && pollWithItems) {
-    const { data: historyRows } = await supabase
-      .from("pledges")
-      .select(
-        `created_at,
-         pledge_allocations ( amount, favourite_id, favourites ( label ) )`
-      )
-      .eq("favpoll_poll_id", pollWithItems.id)
-      .is("withdrawn_at", null)
-      .order("created_at", { ascending: true })
+    // Paginated — a closed poll's full pledge history feeds the chart
+    const historyRows = await fetchAllRows<{
+      created_at: string
+      pledge_allocations: unknown
+    }>((from, to) =>
+      supabase
+        .from("pledges")
+        .select(
+          `created_at,
+           pledge_allocations ( amount, favourite_id, favourites ( label ) )`
+        )
+        .eq("favpoll_poll_id", pollWithItems.id)
+        .is("withdrawn_at", null)
+        .order("created_at", { ascending: true })
+        .range(from, to)
+    )
 
-    if ((historyRows?.length ?? 0) >= RANK_HISTORY_MIN_PLEDGES) {
+    if (historyRows.length >= RANK_HISTORY_MIN_PLEDGES) {
       const labels: Record<string, string> = {}
-      const events = (historyRows ?? []).map((r) => ({
+      const events = historyRows.map((r) => ({
         createdAt: r.created_at,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         allocations: ((r.pledge_allocations ?? []) as any[]).map((a) => {

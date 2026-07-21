@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 import { sendFavpollClosed } from "@/lib/email"
 import { disbursementProvider, splitEqually } from "@/lib/disbursement"
 
@@ -31,15 +32,23 @@ export async function GET(request: Request) {
 
   const favpollIds = favpolls.map((e) => e.id)
 
-  // Sum non-withdrawn pledges per favpoll
-  const { data: pledgeTotals } = await supabase
-    .from("pledges")
-    .select("favpoll_polls!inner(favpoll_id), total_amount")
-    .in("favpoll_polls.favpoll_id", favpollIds)
-    .is("withdrawn_at", null)
+  // Sum non-withdrawn pledges per favpoll — PAGINATED: this is the
+  // settlement figure (total_raised); PostgREST's silent 1,000-row cap
+  // would under-count a popular favpoll's close.
+  const pledgeTotals = await fetchAllRows<{
+    favpoll_polls: unknown
+    total_amount: number | null
+  }>((from, to) =>
+    supabase
+      .from("pledges")
+      .select("favpoll_polls!inner(favpoll_id), total_amount")
+      .in("favpoll_polls.favpoll_id", favpollIds)
+      .is("withdrawn_at", null)
+      .range(from, to)
+  )
 
   const raisedByFavpoll: Record<string, number> = {}
-  for (const row of pledgeTotals ?? []) {
+  for (const row of pledgeTotals) {
     const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string })
       .favpoll_id
     raisedByFavpoll[favpollId] =

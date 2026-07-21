@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { fetchAllRows } from "@/lib/supabase/paginate"
 
 // Per-poll standings: the sum and count of non-withdrawn pledge allocations
 // per favourite, for one poll. POLL SURFACES SHOW THIS POLL'S NUMBERS — the
@@ -30,23 +31,35 @@ export async function pollSetStandings(
   const byPoll = new Map<string, PollStandings>()
   if (pollIds.length === 0) return byPoll
 
-  const { data: pledges } = await supabase
-    .from("pledges")
-    .select("id, favpoll_poll_id")
-    .in("favpoll_poll_id", pollIds)
-    .is("withdrawn_at", null)
-
-  const pledgeToPoll = new Map(
-    (pledges ?? []).map((p) => [p.id as string, p.favpoll_poll_id as string])
+  // Paginated (fetchAllRows): a popular poll's pledges/allocations exceed
+  // PostgREST's 1,000-row default cap, which truncates SILENTLY — bars
+  // would under-report.
+  const pledges = await fetchAllRows<{ id: string; favpoll_poll_id: string }>(
+    (from, to) =>
+      supabase
+        .from("pledges")
+        .select("id, favpoll_poll_id")
+        .in("favpoll_poll_id", pollIds)
+        .is("withdrawn_at", null)
+        .range(from, to)
   )
+
+  const pledgeToPoll = new Map(pledges.map((p) => [p.id, p.favpoll_poll_id]))
   if (pledgeToPoll.size === 0) return byPoll
 
-  const { data: allocations } = await supabase
-    .from("pledge_allocations")
-    .select("pledge_id, favourite_id, amount")
-    .in("pledge_id", [...pledgeToPoll.keys()])
+  const allocations = await fetchAllRows<{
+    pledge_id: string
+    favourite_id: string
+    amount: number | null
+  }>((from, to) =>
+    supabase
+      .from("pledge_allocations")
+      .select("pledge_id, favourite_id, amount")
+      .in("pledge_id", [...pledgeToPoll.keys()])
+      .range(from, to)
+  )
 
-  for (const row of allocations ?? []) {
+  for (const row of allocations) {
     const pollId = pledgeToPoll.get(row.pledge_id)
     if (!pollId) continue
     let standings = byPoll.get(pollId)
