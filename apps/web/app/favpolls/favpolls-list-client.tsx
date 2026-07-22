@@ -52,9 +52,8 @@ export function FavpollsListClient({
   return (
     <>
       {/* One sticky band: occasion rail + list controls */}
-      <div className="sticky top-14 z-30 border-b border-border bg-background">
-        {rail}
-        <div className="mx-auto max-w-330 px-4 pb-2">
+      <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
+        <div className="mx-auto max-w-330 px-4 pt-2">
           <ListControls
             search={search}
             onSearchChange={setSearch}
@@ -70,6 +69,7 @@ export function FavpollsListClient({
             total={favpolls.length}
           />
         </div>
+        {rail}
       </div>
 
       <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
