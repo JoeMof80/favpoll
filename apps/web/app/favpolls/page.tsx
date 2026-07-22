@@ -17,14 +17,16 @@ export const metadata = {
     "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
 
-// The visitor-facing occasion rail: fundraisers live under "cause" in the
-// register model; "celebrating" spans both celebrating registers.
+// The visitor-facing occasion rail, phrased to match the hero demo's kind
+// nav. Fundraisers live under "cause" in the register model; "celebrating"
+// spans both celebrating registers. No pill for the neutral register — it's
+// an organiser fallback, and "Open" read as poll-status next to the
+// All/Live/Closed switch (neutral favpolls remain under All).
 const REGISTER_RAIL: { value: string | null; label: string }[] = [
   { value: null, label: "All" },
   { value: "remembering", label: "In memory" },
-  { value: "celebrating", label: "Celebrating" },
+  { value: "celebrating", label: "A celebration" },
   { value: "cause", label: "For a cause" },
-  { value: "neutral", label: "Open" },
 ]
 
 const FAVPOLL_SELECT = `

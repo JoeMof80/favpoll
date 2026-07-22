@@ -134,26 +134,13 @@ describe("FavpollListCard — closed card", () => {
 // ─── Value + urgency row ──────────────────────────────────────────────────────
 
 describe("FavpollListCard — value row", () => {
-  it("shows the total raised when there is one", () => {
+  // The value/urgency row was removed 2026-07-22 (founder call): the raised
+  // figure duplicated the charity footer on single-charity cards, and the
+  // shelf's date-group headers carry urgency. Pin its absence.
+  it("does not render a raised/countdown row", () => {
     render(<FavpollListCard favpoll={{ ...BASE, total_raised: 90 }} />)
-    expect(screen.getByText("£90 raised")).toBeInTheDocument()
-  })
-
-  it("invites the first pledge on an open card with nothing raised", () => {
-    render(<FavpollListCard favpoll={BASE} />)
-    expect(screen.getByText("Be the first to pledge")).toBeInTheDocument()
-  })
-
-  it("no first-pledge invitation on a closed card", () => {
-    const closed = { ...BASE, closed_at: "2024-01-01T00:00:00Z" }
-    render(<FavpollListCard favpoll={closed} />)
-    expect(screen.queryByText("Be the first to pledge")).toBeNull()
-  })
-
-  it("shows the closing countdown", () => {
-    render(<FavpollListCard favpoll={BASE} />)
-    // closes_at 2099 → "N days"
-    expect(screen.getByText(/\d+ days/)).toBeInTheDocument()
+    expect(screen.queryByText("£90 raised")).not.toBeInTheDocument()
+    expect(screen.queryByText(/\d+ days/)).not.toBeInTheDocument()
   })
 })
 
