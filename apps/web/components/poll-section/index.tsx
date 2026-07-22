@@ -90,7 +90,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-40 z-20 md:top-55">
+      <div className="sticky top-[var(--hero-stuck-bottom,10rem)] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
         {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
             so the slit between them, the ribbon's rounded corners, and the
             decoy's blur bleed (filters paint past their box) all showed
@@ -118,7 +118,7 @@ export function PollSection({
 
           {hasItems && (
             <>
-              <div className="sticky top-40 z-20 flex items-center justify-end md:top-67">
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
                 <Tabs
                   value={rankingView}
                   onValueChange={(v: string) =>
@@ -212,7 +212,7 @@ export function PollSection({
                   over the decoy reveal quote, then travels with the scroll —
                   never over the hero above (found on-device: the absolute
                   pill rode over the name at small scroll offsets). */}
-              <span className="sticky top-52 flex w-full flex-col items-center md:top-67">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
                 <RevealLockPill
                   label={
                     hasReveal
