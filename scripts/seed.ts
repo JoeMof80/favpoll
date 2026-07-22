@@ -184,7 +184,14 @@ const categories = [
     label: "Sport",
     description: "Games, teams, and the thrill of competition",
   },
-  { label: "Literature", description: "Books and the worlds they opened" },
+  {
+    label: "Books & Arts",
+    description: "Books, art, and the worlds they opened",
+  },
+  {
+    label: "Animals",
+    description: "The creatures we loved, wild and at home",
+  },
   { label: "Everyday life", description: "Small things that make up a life" },
   { label: "Childhood", description: "What we remember from growing up" },
   { label: "Time", description: "Seasons, moments, and the rhythm of days" },
@@ -586,7 +593,7 @@ const topics: TopicSeed[] = [
     title: "Animal",
     description: "Creature they felt closest to",
     is_finite: false,
-    categories: ["Nature", "Childhood"],
+    categories: ["Animals", "Childhood"],
     placeholders: {
       remembering: {
         about:
@@ -624,7 +631,7 @@ const topics: TopicSeed[] = [
     title: "Bird",
     description: "Bird that always caught their eye",
     is_finite: false,
-    categories: ["Nature"],
+    categories: ["Animals"],
     placeholders: {
       remembering: {
         about:
@@ -1538,7 +1545,7 @@ const topics: TopicSeed[] = [
     title: "Type of book",
     description: "What they loved to read",
     is_finite: false,
-    categories: ["Literature", "Everyday life"],
+    categories: ["Books & Arts", "Everyday life"],
     placeholders: {
       remembering: {
         about:
@@ -1576,7 +1583,7 @@ const topics: TopicSeed[] = [
     title: "Poet",
     description: "Voice that said what they felt",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       remembering: {
         about:
@@ -1612,7 +1619,7 @@ const topics: TopicSeed[] = [
     title: "Author",
     description: "Writer whose books they'd press into anyone's hands",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       celebration: {
         about:
@@ -1783,7 +1790,7 @@ const topics: TopicSeed[] = [
     title: "Insect",
     description: "The small creature that makes them stop and look",
     is_finite: false,
-    categories: ["Nature", "Childhood"],
+    categories: ["Animals", "Childhood"],
     placeholders: {
       memorial: {
         about:
@@ -1824,7 +1831,7 @@ const topics: TopicSeed[] = [
     title: "Sea creature",
     description: "The one from below the surface they could watch for hours",
     is_finite: false,
-    categories: ["Nature"],
+    categories: ["Animals"],
     placeholders: {
       memorial: {
         about:
@@ -2938,7 +2945,7 @@ const topics: TopicSeed[] = [
     title: "Landmark or building",
     description: "The one that stopped them in their tracks",
     is_finite: false,
-    categories: ["Places", "Literature"],
+    categories: ["Places", "Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -3272,7 +3279,7 @@ const topics: TopicSeed[] = [
     title: "Book",
     description: "The one they'd press into anyone's hands",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -3313,7 +3320,7 @@ const topics: TopicSeed[] = [
     title: "Children's book",
     description: "The one they'd read aloud from memory",
     is_finite: false,
-    categories: ["Literature", "Childhood"],
+    categories: ["Books & Arts", "Childhood"],
     placeholders: {
       memorial: {
         about:
@@ -3354,7 +3361,7 @@ const topics: TopicSeed[] = [
     title: "Play",
     description: "The one they'd see in any venue",
     is_finite: false,
-    categories: ["Literature", "Film & TV"],
+    categories: ["Books & Arts", "Film & TV"],
     placeholders: {
       memorial: {
         about:
@@ -3602,7 +3609,7 @@ const topics: TopicSeed[] = [
     title: "Word",
     description: "The one they'd keep if they could only keep one",
     is_finite: false,
-    categories: ["Everyday life", "Literature"],
+    categories: ["Everyday life", "Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -4056,7 +4063,7 @@ const topics: TopicSeed[] = [
     title: "Dog breed",
     description: "The one they'd always have at their feet",
     is_finite: false,
-    categories: ["Nature", "Everyday life"],
+    categories: ["Animals", "Everyday life"],
     placeholders: {
       memorial: {
         about:
@@ -4097,7 +4104,7 @@ const topics: TopicSeed[] = [
     title: "Cat breed",
     description: "The one they'd let rule the house",
     is_finite: false,
-    categories: ["Nature", "Everyday life"],
+    categories: ["Animals", "Everyday life"],
     placeholders: {
       memorial: {
         about:
@@ -4138,7 +4145,7 @@ const topics: TopicSeed[] = [
     title: "Butterfly",
     description: "The one they'd stop the walk for",
     is_finite: false,
-    categories: ["Nature"],
+    categories: ["Animals"],
     placeholders: {
       memorial: {
         about:
@@ -4179,7 +4186,7 @@ const topics: TopicSeed[] = [
     title: "Dinosaur",
     description: "The one they knew everything about aged six",
     is_finite: false,
-    categories: ["Nature", "Childhood"],
+    categories: ["Animals", "Childhood"],
     placeholders: {
       birthday: {
         about:
@@ -4220,7 +4227,7 @@ const topics: TopicSeed[] = [
     title: "Mythical creature",
     description: "The one they'd most want to be real",
     is_finite: false,
-    categories: ["Childhood", "Literature"],
+    categories: ["Childhood", "Animals"],
     placeholders: {
       memorial: {
         about:
@@ -4675,7 +4682,7 @@ const topics: TopicSeed[] = [
     title: "Painter or artist",
     description: "The one whose work they'd cross a city to see",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -4716,7 +4723,7 @@ const topics: TopicSeed[] = [
     title: "Famous painting",
     description: "The one they'd hang above the fireplace",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -4759,7 +4766,7 @@ const topics: TopicSeed[] = [
     title: "Fairy tale",
     description: "The one they'd want read at bedtime",
     is_finite: false,
-    categories: ["Childhood", "Literature"],
+    categories: ["Childhood", "Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -4841,7 +4848,7 @@ const topics: TopicSeed[] = [
     title: "Regional or dialect word",
     description: "The one that gives away where they're from",
     is_finite: false,
-    categories: ["Everyday life", "Literature"],
+    categories: ["Everyday life", "Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -4968,7 +4975,7 @@ const topics: TopicSeed[] = [
     title: "Comic or annual",
     description: "The one they couldn't wait to get every week",
     is_finite: false,
-    categories: ["Childhood", "Literature"],
+    categories: ["Childhood", "Books & Arts"],
     placeholders: {
       memorial: {
         about:
@@ -5010,7 +5017,7 @@ const topics: TopicSeed[] = [
     title: "Poem",
     description: "The lines they carried with them",
     is_finite: false,
-    categories: ["Literature"],
+    categories: ["Books & Arts"],
     placeholders: {
       celebration: {
         about:
@@ -5056,7 +5063,7 @@ const topics: TopicSeed[] = [
     title: "Nursery rhyme",
     description: "The rhyme that always got a giggle",
     is_finite: false,
-    categories: ["Childhood", "Literature"],
+    categories: ["Childhood", "Books & Arts"],
     placeholders: {
       celebration: {
         about:
