@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 // The shared list-page control bar: search, an optional segmented state
@@ -57,7 +58,7 @@ export function ListControls({
       {segments && segments.length > 0 && (
         <>
           <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
-            Filters
+            Status
           </span>
           <div
             className="flex items-center rounded-lg border border-border bg-background p-0.5 shadow-xs"
@@ -89,18 +90,24 @@ export function ListControls({
           <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
             Sort
           </span>
-          <select
-            value={sortValue}
-            onChange={(e) => onSortChange?.(e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-            aria-label="Sort by"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <span className="relative">
+            <select
+              value={sortValue}
+              onChange={(e) => onSortChange?.(e.target.value)}
+              className="appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-3 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+              aria-label="Sort by"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+          </span>
         </>
       )}
 

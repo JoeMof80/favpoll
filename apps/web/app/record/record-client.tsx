@@ -165,7 +165,7 @@ export function RankingsClient({ categories, topics }: Props) {
       {/* One sticky band: category rail + the list controls — everything
           that narrows the list lives together (header is h-14 = 3.5rem) */}
       <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
-        <div className="mx-auto max-w-330 px-4 pt-2">
+        <div className="mx-auto max-w-330 px-4 pt-3 pb-1">
           <ListControls
             search={search}
             onSearchChange={setSearch}
@@ -180,7 +180,7 @@ export function RankingsClient({ categories, topics }: Props) {
         </div>
         <div
           ref={tabsRef}
-          className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-2"
+          className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-3"
           role="tablist"
           aria-label="Filter by category"
         >
