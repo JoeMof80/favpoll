@@ -12,7 +12,7 @@ import { FavpollsListClient } from "./favpolls-list-client"
 import type { PublicStatusFilter } from "./list-utils"
 
 export const metadata = {
-  title: "Favpolls — favpoll",
+  title: "favpolls — favpoll",
   description:
     "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
