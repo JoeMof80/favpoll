@@ -177,10 +177,10 @@ export function EditablePollArea({
             >
               <TabsList className="h-7">
                 <TabsTrigger value="amount" className="px-3 text-xs">
-                  By amount
+                  Amount
                 </TabsTrigger>
                 <TabsTrigger value="count" className="px-3 text-xs">
-                  By pledges
+                  Pledges
                 </TabsTrigger>
               </TabsList>
             </Tabs>
