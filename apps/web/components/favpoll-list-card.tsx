@@ -137,7 +137,14 @@ export function FavpollListCard({
       {/* Interaction matches FavpollSummaryCard: the whole card navigates
           (stretched link below), with the same hover lift + shadow. The
           poll body sits above the link (relative) so pledging still works. */}
-      <div className="group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1">
+      <div
+        className={cn(
+          "group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
+          // Your pledge, visible at a glance: soft purple border (the
+          // view-state colour) — the badge on the seam carries the words
+          hasPledged && "border-primary/40 hover:border-primary/60"
+        )}
+      >
         {/* Stretched link — covers the card; positioned siblings (the poll
             body) paint and hit-test above it. */}
         <Link
@@ -169,6 +176,14 @@ export function FavpollListCard({
 
         {pollWithItems && topicItems.length > 0 && (
           <div className="relative border-t border-border bg-background px-3 py-2">
+            {hasPledged && (
+              <Badge
+                variant="secondary"
+                className="absolute -top-2.5 right-3 z-10 border border-primary/30 text-primary"
+              >
+                Pledged
+              </Badge>
+            )}
             <PollHeading
               topicTitle={pollWithItems.topics.title}
               size="md"

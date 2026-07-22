@@ -134,6 +134,21 @@ describe("FavpollListCard — closed card", () => {
 // ─── Value + urgency row ──────────────────────────────────────────────────────
 
 describe("FavpollListCard — value row", () => {
+  it("marks a pledged card with the Pledged badge", () => {
+    render(
+      <FavpollListCard
+        favpoll={BASE}
+        initialResults={[{ label: "Blue", amountPence: 2000, widthPercent: 100 }]}
+      />
+    )
+    expect(screen.getByText("Pledged")).toBeInTheDocument()
+  })
+
+  it("no Pledged badge without a pledge", () => {
+    render(<FavpollListCard favpoll={BASE} />)
+    expect(screen.queryByText("Pledged")).not.toBeInTheDocument()
+  })
+
   // The value/urgency row was removed 2026-07-22 (founder call): the raised
   // figure duplicated the charity footer on single-charity cards, and the
   // shelf's date-group headers carry urgency. Pin its absence.
