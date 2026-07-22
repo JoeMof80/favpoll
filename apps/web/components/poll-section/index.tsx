@@ -193,22 +193,27 @@ export function PollSection({
               aria-label={unlockAriaLabel}
               className="absolute inset-0 z-10 h-auto w-full flex-col items-center justify-start rounded-none pt-4 hover:bg-transparent"
             >
-              {/* pt-4 sits the pill over the centre of the decoy reveal
-                  quote — the lock guards the reveal, not the results */}
-              <RevealLockPill
-                label={
-                  hasReveal
-                    ? revealLockLabel(displayFirstName)
-                    : "Pledge to see the results"
-                }
-              />
-              {/* Trust line — the cold guest's "where does the money go?"
-                  answered before they commit, not inside the dialog. */}
-              {charityLine && (
-                <span className="mt-3 max-w-full rounded-full bg-background/85 px-3 py-1 text-xs font-normal whitespace-normal text-muted-foreground">
-                  Every pledge goes to {charityLine} — favpoll takes no fee.
-                </span>
-              )}
+              {/* Sticky, offset to clear the stuck topic ribbon (top-40 +
+                  ribbon height mobile; md:top-55 + height): the pill starts
+                  over the decoy reveal quote, then travels with the scroll —
+                  never over the hero above (found on-device: the absolute
+                  pill rode over the name at small scroll offsets). */}
+              <span className="sticky top-52 flex w-full flex-col items-center md:top-67">
+                <RevealLockPill
+                  label={
+                    hasReveal
+                      ? revealLockLabel(displayFirstName)
+                      : "Pledge to see the results"
+                  }
+                />
+                {/* Trust line — the cold guest's "where does the money go?"
+                    answered before they commit, not inside the dialog. */}
+                {charityLine && (
+                  <span className="mt-3 max-w-full rounded-full bg-background/85 px-3 py-1 text-xs font-normal whitespace-normal text-muted-foreground">
+                    Every pledge goes to {charityLine} — favpoll takes no fee.
+                  </span>
+                )}
+              </span>
             </Button>
           )}
         </div>

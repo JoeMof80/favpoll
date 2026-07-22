@@ -181,6 +181,27 @@ const ABOUTS: Record<string, string[]> = {
   ],
 }
 
+// The PERSON hero renders protagonists.about ("Tell their story") — a
+// different field from favpolls.description (the cause hero's About).
+// Withholds the favourite, teases the person.
+const PERSON_ABOUTS: Record<string, string[]> = {
+  memorial: [
+    "There was one answer everyone knew was coming, and nobody ever tired of hearing it.",
+    "A quiet life, firmly held opinions, and one favourite that explained the rest.",
+    "Ask anyone who knew them — the stories all end up in the same place.",
+  ],
+  celebration: [
+    "Opinionated in the best way, and never more so than on today's question.",
+    "There are things everyone knows about them, and one thing worth pledging to find out.",
+    "The answer will surprise nobody who knows them — and delight everyone who doesn't.",
+  ],
+  fundraiser: [
+    "Training done, number pinned on, and one favourite carrying them through the miles.",
+    "They said they'd never do it. They're doing it. Back them and find out what keeps them going.",
+    "Every step for the cause — and one favourite that never leaves their head en route.",
+  ],
+}
+
 const OPENERS = [
   "A life full of small joys",
   "Everyone welcome, bring a story",
@@ -385,6 +406,9 @@ async function seed() {
       protagonists.push({
         id: protagonistId,
         name: grouping === "couple" ? `${pick(FIRST)} & ${name}` : name,
+        about: pick(
+          PERSON_ABOUTS[category ?? "celebration"] ?? PERSON_ABOUTS.celebration
+        ),
         context:
           category === "memorial"
             ? `${1930 + between(0, 60)} – ${2024 + between(0, 2)}`
