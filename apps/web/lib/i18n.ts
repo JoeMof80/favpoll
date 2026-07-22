@@ -14,7 +14,9 @@ export function formatCurrency(
   return new Intl.NumberFormat(options.locale, {
     style: "currency",
     currency: options.currency,
-    minimumFractionDigits: 0,
+    // Whole amounts drop the decimals ("£750"); anything fractional shows
+    // both ("£10.50", never "£10.5")
+    minimumFractionDigits: amountInPence % 100 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(amountInPence / 100)
 }
@@ -49,7 +51,10 @@ const GBP_COMPACT = new Intl.NumberFormat("en-GB", {
 
 /** "£1,300", or "£12.50" when there are pence — totals and summary surfaces. */
 export function formatPounds(pounds: number): string {
-  return GBP_WHOLE.format(pounds)
+  // Whole → "£1,300"; fractional → padded "£12.50", never "£12.5"
+  return Number.isInteger(pounds)
+    ? GBP_WHOLE.format(pounds)
+    : GBP_EXACT.format(pounds)
 }
 
 /** Always two decimals ("£12.00") — payment and breakdown surfaces where the exact charge matters. */
@@ -61,7 +66,7 @@ export function formatPoundsExact(pounds: number): string {
 export function formatPoundsCompact(pounds: number): string {
   if (pounds === 0) return "—"
   if (pounds >= 1000) return GBP_COMPACT.format(pounds)
-  return GBP_WHOLE.format(pounds)
+  return formatPounds(pounds)
 }
 
 /** Grouped tally ("1,234") for pledge and vote counts. */
