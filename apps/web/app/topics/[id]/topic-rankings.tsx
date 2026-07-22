@@ -45,16 +45,20 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
 
   return (
     <section className="space-y-4">
-      <div className="sticky top-14 z-20 bg-background pt-6 md:pt-16">
+      <div className="sticky top-14 z-20 bg-background pt-4 md:pt-10">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="mb-1 -ml-2 text-muted-foreground"
+        >
+          <Link href="/record">
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            Back to the record
+          </Link>
+        </Button>
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Button asChild variant="ghost" size="icon-sm">
-              <Link href="/record" className="hover:text-foreground">
-                <ArrowLeft size={4} />
-              </Link>
-            </Button>
-            <SectionLabel title={topicTitle} />
-          </div>
+          <SectionLabel title={topicTitle} />
           <Tabs value={view} onValueChange={(v) => setView(v as RankingView)}>
             <TabsList className="h-7">
               <TabsTrigger value="amount" className="px-3 text-xs">
