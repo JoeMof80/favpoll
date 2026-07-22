@@ -6,6 +6,7 @@ import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4";
 import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5";
 import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6";
 import { regeneratedPlaceholdersBatch7 } from "./placeholders-regenerated-7";
+import { regeneratedPlaceholdersBatch8 } from "./placeholders-regenerated-8";
 import { celebratingManySetOverrides } from "./celebrating-many-groups";
 
 const supabase = createClient(
@@ -313,6 +314,7 @@ const combinedPlaceholders = (() => {
     regeneratedPlaceholdersBatch5 as never,
     regeneratedPlaceholdersBatch6 as never,
     regeneratedPlaceholdersBatch7 as never,
+    regeneratedPlaceholdersBatch8 as never,
   ];
   const map: Record<
     string,
@@ -5220,6 +5222,168 @@ const topics: TopicSeed[] = [
       },
     },
   },
+  // ── Batch 8 — Tier-1 additions (2026-07-22) ────────────────────────────────
+  {
+    title: "Sound",
+    description: "The sound that meant home",
+    is_finite: false,
+    categories: ["Everyday life", "Nature"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the sound that means home to them.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite sound is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. A favourite sound says more than it should.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Name for a grandparent",
+    description: "What you called yours",
+    is_finite: false,
+    categories: ["Childhood", "Everyday life"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and what the grandchildren call them.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. What you called yours is a story in itself.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. A grandparent's name is a family fingerprint.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Beatle",
+    description: "The original four-way question",
+    is_finite: true,
+    categories: ["Music"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which of the four was theirs.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. Everyone has a Beatle. Worth recording.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. Which Beatle is a question with only right answers.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "James Bond",
+    description: "Everyone has their Bond",
+    is_finite: true,
+    categories: ["Film & TV"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and which Bond was theirs.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. Everyone gets their Bond young and keeps him.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. A favourite Bond is a generational marker.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Soap",
+    description: "The one they never missed",
+    is_finite: false,
+    categories: ["Film & TV", "Everyday life"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the one they never missed.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. The soap someone never missed says a lot.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. A favourite soap is a lifelong loyalty.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Fairground ride",
+    description: "The ride worth queueing for",
+    is_finite: false,
+    categories: ["Childhood"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the ride they always queued for.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite ride is a childhood in miniature.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. The ride worth queueing for is a position people defend.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Curry",
+    description: "The order they always came back to",
+    is_finite: false,
+    categories: ["Food & Drink"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the order they always came back to.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite curry is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. The Friday order is a position people defend.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
   {
     title: "Puzzle",
     description: "The puzzle they can't leave unfinished",
@@ -9525,6 +9689,135 @@ const topicItems: Record<string, string[]> = {
     "Wordwheel",
   ],
 
+  // Batch 8 — Tier-1 additions (2026-07-22)
+  Sound: [
+    "A brass band",
+    "A cat purring",
+    "A choir",
+    "A cork popping",
+    "A crackling fire",
+    "A cricket match on the radio",
+    "A crowd singing",
+    "A steam train",
+    "An ice cream van",
+    "Bacon sizzling",
+    "Bees in a garden",
+    "Birdsong at dawn",
+    "Church bells",
+    "Crunching snow",
+    "Distant thunder",
+    "Fireworks",
+    "Gulls by the sea",
+    "Kids playing outside",
+    "Leaves underfoot",
+    "Rain on a tent",
+    "Rain on the window",
+    "The kettle boiling",
+    "The sea",
+    "Vinyl crackle",
+    "Wind in the trees",
+    "Wood pigeons",
+  ],
+  "Name for a grandparent": [
+    "Bamps",
+    "Gaga",
+    "Gramps",
+    "Grampy",
+    "Gran",
+    "Granda",
+    "Grandad",
+    "Grandma",
+    "Grandpa",
+    "Granny",
+    "Nan",
+    "Nana",
+    "Nanna",
+    "Nanny",
+    "Nonna",
+    "Oma",
+    "Opa",
+    "Papa",
+    "Pop",
+    "Pops",
+  ],
+  Beatle: [
+    "George",
+    "John",
+    "Paul",
+    "Ringo",
+  ],
+  "James Bond": [
+    "Daniel Craig",
+    "George Lazenby",
+    "Pierce Brosnan",
+    "Roger Moore",
+    "Sean Connery",
+    "Timothy Dalton",
+  ],
+  Soap: [
+    "Brookside",
+    "Coronation Street",
+    "Crossroads",
+    "Dallas",
+    "Doctors",
+    "Dynasty",
+    "EastEnders",
+    "Eldorado",
+    "Emmerdale",
+    "Fair City",
+    "Hollyoaks",
+    "Home and Away",
+    "Neighbours",
+    "Pobol y Cwm",
+    "River City",
+    "Sunset Beach",
+    "Take the High Road",
+    "The Archers",
+  ],
+  "Fairground ride": [
+    "Big wheel",
+    "Cakewalk",
+    "Carousel",
+    "Chair-o-planes",
+    "Dodgems",
+    "Fun house",
+    "Gallopers",
+    "Ghost train",
+    "Hall of mirrors",
+    "Helter-skelter",
+    "Log flume",
+    "Pirate ship",
+    "Rollercoaster",
+    "Swing boats",
+    "Teacups",
+    "Waltzers",
+  ],
+  Curry: [
+    "Balti",
+    "Bhuna",
+    "Biryani",
+    "Butter chicken",
+    "Chana masala",
+    "Chicken tikka masala",
+    "Dal",
+    "Dhansak",
+    "Dopiaza",
+    "Jalfrezi",
+    "Karahi",
+    "Katsu curry",
+    "Keema",
+    "Korma",
+    "Madras",
+    "Massaman",
+    "Pasanda",
+    "Pathia",
+    "Phall",
+    "Rogan josh",
+    "Saag",
+    "Thai green curry",
+    "Thai red curry",
+    "Vindaloo",
+  ],
 };
 
 // ---------------------------------------------------------------------------
