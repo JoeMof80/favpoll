@@ -53,7 +53,7 @@ export function FavpollsListClient({
     <>
       {/* One sticky band: occasion rail + list controls */}
       <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
-        <div className="mx-auto max-w-330 px-4 pt-3 pb-1">
+        <div className="mx-auto max-w-330 px-4 pt-3 pb-2.5">
           <ListControls
             search={search}
             onSearchChange={setSearch}
