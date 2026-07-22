@@ -9,8 +9,9 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 // all-time record (weekly buckets, dated x-axis via `axisLabels`).
 
 const ROW_H = 26 // px per rank row
+const MAX_SERIES = 15 // lanes beyond this are spaghetti (found by the scale seed)
 const PAD_L = 12
-const PAD_R = 120 // room for right-edge labels
+const PAD_R = 150 // room for right-edge labels (longest: Denzel Washington)
 const PAD_Y = 16
 const DOT_R = 3
 const AXIS_H = 22 // extra bottom space when axisLabels are shown
@@ -44,11 +45,20 @@ export function BumpChart({
   compact = false,
   className,
 }: Props) {
-  const { series, steps } = history
-  if (series.length === 0 || steps < 2) return null
+  const { series: allSeries, steps } = history
+  if (allSeries.length === 0 || steps < 2) return null
+
+  // Top N by final standing; a kept line that once ranked lower than the
+  // cap is clamped to a floor row so it stays in frame ("fell out of view")
+  const series = [...allSeries]
+    .sort((a, b) => a.finalRank - b.finalRank)
+    .slice(0, MAX_SERIES)
+  const capped = allSeries.length > series.length
+  const rankFloor = MAX_SERIES + 1
+  const clamp = (rank: number) => Math.min(rank, rankFloor)
 
   const maxRank = Math.max(
-    ...series.flatMap((s) => s.points.map((p) => p.rank))
+    ...series.flatMap((s) => s.points.map((p) => clamp(p.rank)))
   )
   const padR = compact ? PAD_L : PAD_R
   const width = 640
@@ -86,7 +96,10 @@ export function BumpChart({
         {series.map((s) => {
           const isLeader = s.finalRank === 1
           const path = s.points
-            .map((p, j) => `${j === 0 ? "M" : "L"} ${x(p.step)} ${y(p.rank)}`)
+            .map(
+              (p, j) =>
+                `${j === 0 ? "M" : "L"} ${x(p.step)} ${y(clamp(p.rank))}`
+            )
             .join(" ")
           return (
             <path
@@ -123,7 +136,10 @@ export function BumpChart({
           {series.map((s) => {
             const isLeader = s.finalRank === 1
             const path = s.points
-              .map((p, j) => `${j === 0 ? "M" : "L"} ${x(p.step)} ${y(p.rank)}`)
+              .map(
+                (p, j) =>
+                  `${j === 0 ? "M" : "L"} ${x(p.step)} ${y(clamp(p.rank))}`
+              )
               .join(" ")
             const last = s.points[s.points.length - 1]
             return (
@@ -141,7 +157,7 @@ export function BumpChart({
                   <circle
                     key={p.step}
                     cx={x(p.step)}
-                    cy={y(p.rank)}
+                    cy={y(clamp(p.rank))}
                     r={DOT_R}
                     fill={isLeader ? "currentColor" : "var(--chart-3)"}
                     opacity={isLeader ? 1 : 0.55}
@@ -149,7 +165,7 @@ export function BumpChart({
                 ))}
                 <text
                   x={x(last.step) + 8}
-                  y={y(last.rank)}
+                  y={y(clamp(last.rank))}
                   dominantBaseline="middle"
                   className={
                     isLeader
@@ -178,7 +194,9 @@ export function BumpChart({
             ))}
         </svg>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">{caption}</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        {capped ? `${caption} Top ${MAX_SERIES} shown.` : caption}
+      </p>
     </div>
   )
 }
