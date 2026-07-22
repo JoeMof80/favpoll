@@ -95,10 +95,10 @@ export function PollSection({
             so the slit between them, the ribbon's rounded corners, and the
             decoy's blur bleed (filters paint past their box) all showed
             scrolling content. One panel behind the ribbon covers the lot. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background"
-        />
+        {/* Decorative, empty — deliberately NO aria-hidden: the reveal
+            tests (and AT heuristics) locate TypedReveal's hidden copy via
+            [aria-hidden], and an empty div announces nothing anyway. */}
+        <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
         <PollHeading
           topicTitle={poll.topics.title}
           onPledge={onOpenPledgeDialog}
@@ -150,8 +150,11 @@ export function PollSection({
         <div className="relative">
           {/* overflow-hidden on a WRAPPER clips the blur filter's painted
               bleed (filters draw past the element's box) */}
-          <div className="overflow-hidden" aria-hidden="true">
-            <div className="pointer-events-none space-y-4 blur-xs select-none">
+          <div
+            className="pointer-events-none overflow-hidden"
+            aria-hidden="true"
+          >
+            <div className="space-y-4 blur-xs select-none">
               {/* Decoy quote only when a reveal actually exists — a favpoll
                 without one shows no quote post-pledge, so fake none here. */}
               {hasReveal && (
