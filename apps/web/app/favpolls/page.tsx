@@ -36,6 +36,7 @@ const FAVPOLL_SELECT = `
   description,
   closes_at,
   closed_at,
+  created_at,
   occasion_type,
   total_raised,
   is_exemplar,
@@ -78,6 +79,7 @@ type RawFavpoll = {
   description: string | null
   closes_at: string
   closed_at: string | null
+  created_at: string
   occasion_type: string | null
   total_raised: number
   is_exemplar: boolean

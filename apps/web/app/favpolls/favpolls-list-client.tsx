@@ -10,6 +10,7 @@ import {
   type PublicStatusFilter,
   type PublicSortKey,
   filterAndSortPublic,
+  groupPublic,
 } from "./list-utils"
 
 type CardFavpoll = ComponentProps<typeof FavpollListCard>["favpoll"]
@@ -48,6 +49,7 @@ export function FavpollsListClient({
   const [search, setSearch] = useState("")
 
   const displayed = filterAndSortPublic(favpolls, status, sort, search)
+  const groups = groupPublic(displayed, sort)
 
   return (
     <>
@@ -80,21 +82,33 @@ export function FavpollsListClient({
             No favpolls match this filter.
           </p>
         ) : (
-          <ul
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            role="list"
-          >
-            {displayed.map((fp) => (
-              <FavpollListCard
-                key={fp.id}
-                favpoll={fp}
-                clerkUserId={clerkUserId}
-                initialResults={
-                  fp.poll ? initialResultsByPollId[fp.poll.id] : undefined
-                }
-              />
+          <div className="space-y-10">
+            {groups.map((group) => (
+              <section key={group.label ?? "all"}>
+                {group.label && (
+                  <h2 className="mb-3 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                    {group.label}
+                  </h2>
+                )}
+                <ul
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                  role="list"
+                  aria-label={group.label ?? undefined}
+                >
+                  {group.items.map((fp) => (
+                    <FavpollListCard
+                      key={fp.id}
+                      favpoll={fp}
+                      clerkUserId={clerkUserId}
+                      initialResults={
+                        fp.poll ? initialResultsByPollId[fp.poll.id] : undefined
+                      }
+                    />
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </>
