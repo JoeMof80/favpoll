@@ -90,7 +90,7 @@ export function ListControls({
           <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
             Sort
           </span>
-          <span className="relative">
+          <span className="relative inline-flex items-center">
             <select
               value={sortValue}
               onChange={(e) => onSortChange?.(e.target.value)}
