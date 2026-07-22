@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { filterAndSortPublic, isLiveFavpoll } from "../list-utils"
+import { filterAndSortPublic, groupPublic, isLiveFavpoll } from "../list-utils"
 
 const NOW = new Date("2026-07-16T12:00:00Z")
 
@@ -124,6 +124,78 @@ describe("filterAndSortPublic", () => {
       "soon",
       "closed",
       "expired",
+    ])
+  })
+})
+
+describe("groupPublic", () => {
+  const NOW = new Date("2026-07-22T12:00:00Z")
+  const fp = (over: Record<string, unknown>) => ({
+    closes_at: "2026-08-30T12:00:00Z",
+    closed_at: null,
+    created_at: "2026-07-01T12:00:00Z",
+    total_raised: 0,
+    opening_line: "",
+    protagonist: null,
+    charities: [],
+    poll: null,
+    ...over,
+  })
+
+  it("returns one unlabelled group for highest_raised", () => {
+    const groups = groupPublic([fp({}), fp({})], "highest_raised", NOW)
+    expect(groups).toHaveLength(1)
+    expect(groups[0].label).toBeNull()
+    expect(groups[0].items).toHaveLength(2)
+  })
+
+  it("buckets closing_soonest into today / this week / later, closed LAST", () => {
+    const today = fp({ closes_at: "2026-07-22T20:00:00Z" })
+    const week = fp({ closes_at: "2026-07-26T12:00:00Z" })
+    const later = fp({ closes_at: "2026-09-01T12:00:00Z" })
+    const closedOld = fp({
+      closes_at: "2026-07-01T12:00:00Z",
+      closed_at: "2026-07-01T12:00:00Z",
+    })
+    const closedNew = fp({
+      closes_at: "2026-07-20T12:00:00Z",
+      closed_at: "2026-07-20T12:00:00Z",
+    })
+    // ascending closes_at order, as filterAndSortPublic produces
+    const groups = groupPublic(
+      [closedOld, closedNew, today, week, later],
+      "closing_soonest",
+      NOW
+    )
+    expect(groups.map((g) => g.label)).toEqual([
+      "Closing today",
+      "Closing this week",
+      "Closing later",
+      "Closed",
+    ])
+    // most recently closed leads the archive
+    expect(groups[3].items[0]).toBe(closedNew)
+  })
+
+  it("buckets recently_created by age", () => {
+    const thisWeek = fp({ created_at: "2026-07-20T12:00:00Z" })
+    const thisMonth = fp({ created_at: "2026-07-01T12:00:00Z" })
+    const earlier = fp({ created_at: "2026-05-01T12:00:00Z" })
+    const groups = groupPublic(
+      [thisWeek, thisMonth, earlier],
+      "recently_created",
+      NOW
+    )
+    expect(groups.map((g) => g.label)).toEqual([
+      "New this week",
+      "This month",
+      "Earlier",
+    ])
+  })
+
+  it("returns a single unlabelled group when empty", () => {
+    expect(groupPublic([], "closing_soonest", NOW)).toEqual([
+      { label: null, items: [] },
     ])
   })
 })

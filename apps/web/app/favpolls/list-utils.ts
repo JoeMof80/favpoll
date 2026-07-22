@@ -7,6 +7,7 @@ export type PublicSortKey =
 type Filterable = {
   closes_at: string
   closed_at?: string | null
+  created_at?: string
   total_raised: number
   cause_label?: string | null
   opening_line: string
@@ -60,4 +61,58 @@ export function filterAndSortPublic<T extends Filterable>(
     sorted.sort((a, b) => b.total_raised - a.total_raised)
   }
   return sorted
+}
+
+export type FavpollGroup<T> = { label: string | null; items: T[] }
+
+const DAY = 86_400_000
+
+// Date-based sorts read better in sections; the ranked sort doesn't (its
+// order already says it — headers would add ink without information).
+// Under "Closing soonest", closed favpolls fall to their own group at the
+// END: ascending closes_at would otherwise lead the list with the past.
+export function groupPublic<T extends Filterable>(
+  sorted: T[],
+  sort: PublicSortKey,
+  now: Date = new Date()
+): FavpollGroup<T>[] {
+  if (sort === "highest_raised" || sorted.length === 0) {
+    return [{ label: null, items: sorted }]
+  }
+
+  const sequential = (items: T[], labelFor: (fp: T) => string) => {
+    const groups: FavpollGroup<T>[] = []
+    for (const fp of items) {
+      const label = labelFor(fp)
+      const last = groups[groups.length - 1]
+      if (last && last.label === label) last.items.push(fp)
+      else groups.push({ label, items: [fp] })
+    }
+    return groups
+  }
+
+  if (sort === "closing_soonest") {
+    const live = sorted.filter((fp) => isLiveFavpoll(fp, now))
+    const closed = sorted.filter((fp) => !isLiveFavpoll(fp, now))
+    const groups = sequential(live, (fp) => {
+      const ms = new Date(fp.closes_at).getTime() - now.getTime()
+      if (ms <= DAY) return "Closing today"
+      if (ms <= 7 * DAY) return "Closing this week"
+      return "Closing later"
+    })
+    if (closed.length > 0) {
+      // most recently closed first — the freshest results lead the archive
+      groups.push({ label: "Closed", items: [...closed].reverse() })
+    }
+    return groups
+  }
+
+  // recently_created (input order is created_at desc)
+  return sequential(sorted, (fp) => {
+    const created = fp.created_at ? new Date(fp.created_at).getTime() : 0
+    const age = now.getTime() - created
+    if (age <= 7 * DAY) return "New this week"
+    if (age <= 31 * DAY) return "This month"
+    return "Earlier"
+  })
 }
