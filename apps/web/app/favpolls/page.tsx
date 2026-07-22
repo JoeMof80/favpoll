@@ -297,9 +297,12 @@ export default async function FavpollsPage({
   // so the server keeps doing the filtering and the exemplar fallback.
   const rail = (
     <div
-      className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 py-2"
+      className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-2"
       aria-label="Filter by occasion"
     >
+      <span className="hidden shrink-0 self-center text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
+        Filters
+      </span>
       {REGISTER_RAIL.map(({ value, label }) => {
         const selected = activeRegister === value
         return (
@@ -309,8 +312,8 @@ export default async function FavpollsPage({
             aria-current={selected ? "page" : undefined}
             className={
               selected
-                ? "inline-flex h-6 shrink-0 items-center rounded-full border border-primary bg-primary px-3 py-1 text-sm font-medium text-primary-foreground"
-                : "inline-flex h-6 shrink-0 items-center rounded-full border border-border bg-muted px-3 py-1 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
+                ? "inline-flex h-6 shrink-0 items-center rounded-full border border-primary bg-primary/5 px-3 py-1 text-sm font-medium text-primary"
+                : "inline-flex h-6 shrink-0 items-center rounded-full border border-border bg-background px-3 py-1 text-sm font-normal text-muted-foreground transition-all hover:border-border-strong hover:text-primary"
             }
           >
             {label}
@@ -323,7 +326,7 @@ export default async function FavpollsPage({
   return (
     <main className="min-h-screen bg-muted">
       {showingExemplars && (
-        <div className="sticky top-14 z-30 border-b border-border bg-background">
+        <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
           {rail}
         </div>
       )}
