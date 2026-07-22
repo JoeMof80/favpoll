@@ -91,6 +91,14 @@ export function PollSection({
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
       <div className="sticky top-40 z-20 md:top-55">
+        {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
+            so the slit between them, the ribbon's rounded corners, and the
+            decoy's blur bleed (filters paint past their box) all showed
+            scrolling content. One panel behind the ribbon covers the lot. */}
+        {/* Decorative, empty — deliberately NO aria-hidden: the reveal
+            tests (and AT heuristics) locate TypedReveal's hidden copy via
+            [aria-hidden], and an empty div announces nothing anyway. */}
+        <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
         <PollHeading
           topicTitle={poll.topics.title}
           onPledge={onOpenPledgeDialog}
@@ -140,49 +148,55 @@ export function PollSection({
       ) : (
         /* Pre-pledge: blurred decoy with centered unlock overlay */
         <div className="relative">
+          {/* overflow-hidden on a WRAPPER clips the blur filter's painted
+              bleed (filters draw past the element's box) */}
           <div
-            className="pointer-events-none space-y-4 blur-xs select-none"
+            className="pointer-events-none overflow-hidden"
             aria-hidden="true"
           >
-            {/* Decoy quote only when a reveal actually exists — a favpoll
+            <div className="space-y-4 blur-xs select-none">
+              {/* Decoy quote only when a reveal actually exists — a favpoll
                 without one shows no quote post-pledge, so fake none here. */}
-            {hasReveal && (
-              <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
-            )}
+              {hasReveal && (
+                <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
+              )}
 
-            {hasItems && (
-              <>
-                <div className="flex items-center justify-end">
-                  <Tabs value="amount">
-                    <TabsList className="h-7">
-                      <TabsTrigger value="amount" className="px-3 text-xs">
-                        Amount
-                      </TabsTrigger>
-                      <TabsTrigger value="count" className="px-3 text-xs">
-                        Pledges
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
+              {hasItems && (
+                <>
+                  <div className="flex items-center justify-end">
+                    <Tabs value="amount">
+                      <TabsList className="h-7">
+                        <TabsTrigger value="amount" className="px-3 text-xs">
+                          Amount
+                        </TabsTrigger>
+                        <TabsTrigger value="count" className="px-3 text-xs">
+                          Pledges
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
 
-                <div>
-                  <ol aria-label="Rankings" className="space-y-3">
-                    {[...poll.topics.favourites]
-                      .sort((a, b) => a.label.localeCompare(b.label))
-                      .map((item, i) => (
-                        <li key={item.id}>
-                          <RankingBar
-                            label={item.label}
-                            amount="—"
-                            widthPercent={DECOY_WIDTHS[i % DECOY_WIDTHS.length]}
-                            barClassName="transition-all duration-700 ease-out"
-                          />
-                        </li>
-                      ))}
-                  </ol>
-                </div>
-              </>
-            )}
+                  <div>
+                    <ol aria-label="Rankings" className="space-y-3">
+                      {[...poll.topics.favourites]
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .map((item, i) => (
+                          <li key={item.id}>
+                            <RankingBar
+                              label={item.label}
+                              amount="—"
+                              widthPercent={
+                                DECOY_WIDTHS[i % DECOY_WIDTHS.length]
+                              }
+                              barClassName="transition-all duration-700 ease-out"
+                            />
+                          </li>
+                        ))}
+                    </ol>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {onOpenPledgeDialog && (
