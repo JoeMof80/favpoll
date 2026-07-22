@@ -165,7 +165,7 @@ export function RankingsClient({ categories, topics }: Props) {
     <main className="min-h-screen bg-muted">
       {/* One sticky band: category rail + the list controls — everything
           that narrows the list lives together (header is h-14 = 3.5rem) */}
-      <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
+      <div className="sticky top-14 z-30 border-b border-border bg-muted">
         <div className="mx-auto max-w-330 px-4 pt-3 pb-2.5">
           <ListControls
             search={search}

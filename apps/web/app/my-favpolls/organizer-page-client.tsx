@@ -36,7 +36,7 @@ export function OrganizerPageClient({ favpolls }: Props) {
   return (
     <>
       {/* The list-page sticky band — controls only; no rail here */}
-      <div className="sticky top-14 z-30 border-b border-border bg-muted/85 backdrop-blur">
+      <div className="sticky top-14 z-30 border-b border-border bg-muted">
         <div className="mx-auto max-w-330 px-4 py-3">
           <ListControls
             search={search}
