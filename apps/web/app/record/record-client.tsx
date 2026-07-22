@@ -181,7 +181,7 @@ export function RankingsClient({ categories, topics }: Props) {
         </div>
         <div
           ref={tabsRef}
-          className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-3"
+          className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pt-1.5 pb-3"
           role="tablist"
           aria-label="Filter by category"
         >
