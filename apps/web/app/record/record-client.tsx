@@ -50,7 +50,7 @@ function TopicCard({ topic }: { topic: TopicWithItems }) {
   return (
     <Link
       href={`/topics/${topic.id}`}
-      className="group block rounded-lg border border-border bg-card px-5 py-5 transition-colors hover:border-primary/30 hover:bg-secondary/20 focus:ring-2 focus:ring-ring focus:outline-none"
+      className="group block rounded-lg border border-border bg-card px-5 py-5 transition-all duration-300 hover:border-border-strong hover:shadow-lg focus:ring-2 focus:ring-ring focus:outline-none motion-safe:hover:-translate-y-1"
       aria-labelledby={`topic-${topic.id}`}
     >
       <div className="space-y-3">
@@ -68,6 +68,7 @@ function TopicCard({ topic }: { topic: TopicWithItems }) {
           return (
             <PollResults
               key={i}
+              emphasizeFirst={i === 0}
               results={[
                 {
                   label: item.label,
