@@ -9,6 +9,7 @@ import {
   KeepsakeDocument,
   type KeepsakeStanding,
 } from "@/components/keepsake/keepsake-document"
+import { ExportCsvButton } from "@/components/keepsake/export-csv-button"
 import { PrintButton } from "@/components/keepsake/print-button"
 import { Button } from "@/components/ui/button"
 
@@ -176,7 +177,10 @@ export default async function KeepsakePage({ params }: Props) {
               Back to favpoll
             </Link>
           </Button>
-          <PrintButton />
+          <div className="flex items-center gap-1">
+            <ExportCsvButton data={data} />
+            <PrintButton />
+          </div>
         </div>
         <div className="rounded-lg border border-border bg-background shadow-sm print:border-0 print:shadow-none">
           <KeepsakeDocument data={data} />
