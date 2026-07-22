@@ -50,6 +50,7 @@ export function TopicChartCard({
         onOpenChange={setOpen}
         title={`${topicTitle} over time`}
         dialogClassName="sm:max-w-2xl"
+        dialogContentClassName="max-h-[80vh] flex-1 overflow-y-auto"
       >
         <div className="px-5 pt-1 pb-4">
           <BumpChart
