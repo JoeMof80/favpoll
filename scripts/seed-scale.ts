@@ -155,6 +155,32 @@ const CAUSES = [
   "Air ambulance night flights",
   "Rewilding the river valley",
 ]
+// About text is MANDATORY in the product (the wizard requires it) — seeded
+// favpolls must carry one so surfaces can assume it. Withholds the answer,
+// teases the topic, per the About bar.
+const ABOUTS: Record<string, string[]> = {
+  memorial: [
+    "A life remembered in the small things — add your favourite and help the total grow in their name.",
+    "Friends and family, near and far: share a favourite, make a pledge, and keep a good name doing good.",
+    "In their memory, for causes they'd have backed without hesitation. Every pledge tells them we remember.",
+  ],
+  celebration: [
+    "A milestone worth marking properly — pick a favourite, pledge what it's worth, and sign the day.",
+    "Everyone's invited, nobody needs an account. Pledge, pick your favourite, and see where it stands.",
+    "One day, one poll, one total that says how loved they are. Join in before it closes.",
+  ],
+  fundraiser: [
+    "Every pledge pushes the total on — pick your favourite and back it with what it's worth to you.",
+    "A challenge, a total, and a poll to argue over. Pledge to take part and reveal the standings.",
+    "The miles are theirs; the total is ours. Add a favourite and a pledge before the finish line.",
+  ],
+  cause: [
+    "No occasion needed — just a cause worth backing and a question worth answering. Pledge to take part.",
+    "Pick the favourite you'd stand behind and pledge its worth. Every penny reaches the charity.",
+    "A standing question for a standing cause. Your favourite, your pledge, their gain.",
+  ],
+}
+
 const OPENERS = [
   "A life full of small joys",
   "Everyone welcome, bring a story",
@@ -394,7 +420,7 @@ async function seed() {
       closed_at: plan.open ? null : iso(closesAt),
       is_private: false,
       is_listed: true,
-      description: null,
+      description: pick(ABOUTS[category ?? "cause"] ?? ABOUTS.cause),
       goal_amount: chance(0.3) ? pick([100, 250, 500, 1000]) : null,
       total_raised: 0, // settlement figure — patched below for closed polls
     })
