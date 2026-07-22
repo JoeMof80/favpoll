@@ -15,7 +15,7 @@ describe("formatCurrency", () => {
   })
 
   it("formats pence amounts with up to 2 decimal places", () => {
-    expect(formatCurrency(1050)).toBe("£10.5")
+    expect(formatCurrency(1050)).toBe("£10.50")
   })
 
   it("formats zero", () => {
@@ -40,8 +40,8 @@ describe("formatPounds", () => {
     expect(formatPounds(1300)).toBe("£1,300")
   })
 
-  it("keeps pence when present (no trailing-zero padding)", () => {
-    expect(formatPounds(12.5)).toBe("£12.5")
+  it("pads pence to two decimals when present", () => {
+    expect(formatPounds(12.5)).toBe("£12.50")
     expect(formatPounds(12.55)).toBe("£12.55")
   })
 
