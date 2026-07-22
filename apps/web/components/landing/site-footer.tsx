@@ -8,7 +8,7 @@ import { FavpollLogo } from "@/components/favpoll-logo"
 
 // "The record" entry hidden until the record launches (2026-07-21)
 const EXPLORE = [
-  ["/favpolls", "favpolls"],
+  ["/favpolls", "All favpolls"],
   ["/charities", "Charities"],
   ["/about", "About"],
   ["/about#faq", "FAQ"],

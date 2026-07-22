@@ -48,7 +48,7 @@ export function Header() {
                 reachable by URL. Restore here + mobile menu + footer +
                 about. */}
             <Button asChild variant="ghost" className="text-muted-foreground">
-              <Link href="/favpolls">favpolls</Link>
+              <Link href="/favpolls">All favpolls</Link>
             </Button>
             <Show when="signed-in">
               <Button asChild variant="ghost" className="text-muted-foreground">
@@ -104,7 +104,7 @@ export function Header() {
           <div className="absolute inset-x-0 top-full z-40 border-b border-border bg-background px-4 pt-2 pb-4 shadow-lg md:hidden">
             <nav className="space-y-0.5">
               <Link href="/favpolls" className={MOBILE_LINK} onClick={close}>
-                favpolls
+                All favpolls
               </Link>
               <Show when="signed-in">
                 <Link
