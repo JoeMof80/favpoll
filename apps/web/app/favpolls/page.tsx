@@ -297,7 +297,7 @@ export default async function FavpollsPage({
   // so the server keeps doing the filtering and the exemplar fallback.
   const rail = (
     <div
-      className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-2"
+      className="mx-auto flex max-w-330 scrollbar-none gap-1 overflow-x-auto px-4 pb-3"
       aria-label="Filter by occasion"
     >
       <span className="hidden shrink-0 self-center text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">

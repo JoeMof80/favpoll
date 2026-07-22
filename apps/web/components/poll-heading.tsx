@@ -21,10 +21,10 @@ export function PollHeading({ topicTitle, size = "lg", onPledge }: Props) {
     return (
       <Button
         type="button"
-        className={`${textClass} w-full font-medium tracking-[0.09em] uppercase`}
+        className={`${textClass} w-full min-w-0 font-medium tracking-[0.09em] uppercase`}
         onClick={onPledge}
       >
-        {label}
+        <span className="truncate">{label}</span>
       </Button>
     )
   }
