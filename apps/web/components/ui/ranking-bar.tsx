@@ -10,6 +10,8 @@ type Props = {
   labelSuffix?: React.ReactNode
   /** "display" = projector scale (the live page) — larger text, thicker bar */
   size?: "default" | "display"
+  /** Leader emphasis: medium label, full-ink amount (the record's top row) */
+  emphasis?: boolean
 }
 
 export function RankingBar({
@@ -21,6 +23,7 @@ export function RankingBar({
   className,
   labelSuffix,
   size = "default",
+  emphasis = false,
 }: Props) {
   const isDisplay = size === "display"
   return (
@@ -32,10 +35,22 @@ export function RankingBar({
         )}
       >
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
-          <span className="truncate text-foreground">{label}</span>
+          <span
+            className={cn(
+              "truncate text-foreground",
+              emphasis && "font-medium"
+            )}
+          >
+            {label}
+          </span>
           {labelSuffix}
         </span>
-        <span className="shrink-0 text-muted-foreground tabular-nums">
+        <span
+          className={cn(
+            "shrink-0 tabular-nums",
+            emphasis ? "font-medium text-foreground" : "text-muted-foreground"
+          )}
+        >
           {amount}
         </span>
       </div>
