@@ -4,7 +4,6 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
-import { OCCASION_TYPES_BY_REGISTER, type Register } from "@/lib/registers"
 import { withLiveTotals } from "@/lib/live-totals"
 import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
@@ -17,17 +16,29 @@ export const metadata = {
     "Real charitable polls happening right now. Pledge your favourites and honour the people behind them.",
 }
 
-// The visitor-facing occasion rail, phrased to match the hero demo's kind
-// nav. Fundraisers live under "cause" in the register model; "celebrating"
-// spans both celebrating registers. No pill for the neutral register — it's
-// an organiser fallback, and "Open" read as poll-status next to the
-// All/Live/Closed switch (neutral favpolls remain under All).
-const REGISTER_RAIL: { value: string | null; label: string }[] = [
+// The kind rail — the hero demo's four kinds, filtered at CATEGORY level
+// (founder call 2026-07-22). Doctrine: "Fundraiser is a Type, not a Who" —
+// a marathon runner keeps their protagonist; only Cause is faceless. No
+// pill for the neutral register (organiser fallback; lives under All).
+type Kind = "memorial" | "celebration" | "fundraiser" | "cause"
+const KIND_RAIL: { value: Kind | null; label: string }[] = [
   { value: null, label: "All" },
-  { value: "remembering", label: "In memory" },
-  { value: "celebrating", label: "A celebration" },
-  { value: "cause", label: "For a cause" },
+  { value: "memorial", label: "Memorial" },
+  { value: "celebration", label: "Celebration" },
+  { value: "fundraiser", label: "Fundraiser" },
+  { value: "cause", label: "Cause" },
 ]
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- builder pass-through
+function applyKindFilter<Q extends { eq: any; neq: any }>(
+  query: Q,
+  kind: Kind
+): Q {
+  if (kind === "cause") return query.eq("subject", "cause")
+  if (kind === "fundraiser")
+    return query.eq("category", "fundraiser").neq("subject", "cause")
+  return query.eq("category", kind)
+}
 
 const FAVPOLL_SELECT = `
   id,
@@ -94,13 +105,21 @@ export default async function FavpollsPage({
   searchParams,
 }: {
   searchParams: Promise<{
+    kind?: string
     register?: string
     occasion_type?: string
     state?: string
   }>
 }) {
   const params = await searchParams
-  const activeRegister = params.register ?? null
+  const REGISTER_TO_KIND: Record<string, Kind> = {
+    remembering: "memorial",
+    celebrating: "celebration",
+    cause: "cause",
+  }
+  const activeKind: Kind | null =
+    (params.kind as Kind | undefined) ??
+    (params.register ? (REGISTER_TO_KIND[params.register] ?? null) : null)
   const activeOccasionType = params.occasion_type ?? null
   // Status filtering is client-side now (the segmented control); the URL
   // param only seeds the initial segment so old ?state=closed links keep
@@ -118,28 +137,8 @@ export default async function FavpollsPage({
     .eq("is_private", false)
     .eq("is_listed", true)
 
-  if (activeRegister) {
-    const reg = activeRegister as Register | "celebrating"
-    // The rail's "Celebrating" chip spans both celebrating registers
-    const types =
-      reg === "celebrating"
-        ? [
-            ...OCCASION_TYPES_BY_REGISTER.celebrating_one,
-            ...OCCASION_TYPES_BY_REGISTER.celebrating_many,
-          ]
-        : (OCCASION_TYPES_BY_REGISTER[reg] ?? [])
-    if (reg === "neutral") {
-      const allNonNeutral = (
-        Object.entries(OCCASION_TYPES_BY_REGISTER) as [Register, string[]][]
-      )
-        .filter(([r]) => r !== "neutral")
-        .flatMap(([, t]) => t)
-      favpollsQuery = favpollsQuery.or(
-        `occasion_type.is.null,occasion_type.not.in.(${allNonNeutral.join(",")})`
-      )
-    } else if (types.length > 0) {
-      favpollsQuery = favpollsQuery.in("occasion_type", types)
-    }
+  if (activeKind) {
+    favpollsQuery = applyKindFilter(favpollsQuery, activeKind)
   }
   if (activeOccasionType) {
     favpollsQuery = favpollsQuery.eq("occasion_type", activeOccasionType)
@@ -153,7 +152,7 @@ export default async function FavpollsPage({
 
   // Exemplar fallback: if a register/occasion_type filter returns no results,
   // show exemplar favpolls for that filter so the shelf is never empty.
-  const hasFilter = !!(activeRegister || activeOccasionType)
+  const hasFilter = !!(activeKind || activeOccasionType)
   let fallbackExemplars: RawFavpoll[] | null = null
 
   if (hasFilter && (favpolls?.length ?? 0) === 0) {
@@ -165,27 +164,8 @@ export default async function FavpollsPage({
       .eq("is_exemplar", true)
       .not("closed_at", "is", null)
 
-    if (activeRegister) {
-      const reg = activeRegister as Register | "celebrating"
-      const types =
-        reg === "celebrating"
-          ? [
-              ...OCCASION_TYPES_BY_REGISTER.celebrating_one,
-              ...OCCASION_TYPES_BY_REGISTER.celebrating_many,
-            ]
-          : (OCCASION_TYPES_BY_REGISTER[reg] ?? [])
-      if (reg === "neutral") {
-        const allNonNeutral = (
-          Object.entries(OCCASION_TYPES_BY_REGISTER) as [Register, string[]][]
-        )
-          .filter(([r]) => r !== "neutral")
-          .flatMap(([, t]) => t)
-        exemplarQuery = exemplarQuery.or(
-          `occasion_type.is.null,occasion_type.not.in.(${allNonNeutral.join(",")})`
-        )
-      } else if (types.length > 0) {
-        exemplarQuery = exemplarQuery.in("occasion_type", types)
-      }
+    if (activeKind) {
+      exemplarQuery = applyKindFilter(exemplarQuery, activeKind)
     }
 
     exemplarQuery = exemplarQuery
@@ -307,12 +287,12 @@ export default async function FavpollsPage({
       <span className="hidden shrink-0 self-center text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
         Filters
       </span>
-      {REGISTER_RAIL.map(({ value, label }) => {
-        const selected = activeRegister === value
+      {KIND_RAIL.map(({ value, label }) => {
+        const selected = activeKind === value
         return (
           <Link
             key={label}
-            href={value ? `/favpolls?register=${value}` : "/favpolls"}
+            href={value ? `/favpolls?kind=${value}` : "/favpolls"}
             aria-current={selected ? "page" : undefined}
             className={
               selected
