@@ -142,9 +142,16 @@ export function FavpollListCard({
           "group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
           // Your pledge, visible at a glance: soft purple border (the
           // view-state colour) — the badge on the seam carries the words
-          hasPledged && "border-primary/40 hover:border-primary/60"
+          hasPledged && "border-primary/60 hover:border-primary/80"
         )}
       >
+        {/* Pre-attentive marker: a solid strip at a fixed position is what
+            scanning eyes catch; the border and badge alone needed reading.
+            No aria-hidden — empty divs are silent, and [aria-hidden] is
+            reserved surface here. */}
+        {hasPledged && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-xl bg-primary" />
+        )}
         {/* Stretched link — covers the card; positioned siblings (the poll
             body) paint and hit-test above it. */}
         <Link
