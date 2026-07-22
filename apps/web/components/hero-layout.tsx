@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
 type HeroLayoutProps = {
@@ -24,6 +25,29 @@ export function HeroLayout({
     scrollContainerRef ? { container: scrollContainerRef } : undefined
   )
 
+  // The poll section's sticky pieces (topic ribbon, lock pill, sort tabs)
+  // pin BELOW this hero. Their offsets can't be fixed numbers — a wrapping
+  // protagonist/cause name makes the hero taller and fixed offsets pin the
+  // ribbon through the name's second line (found on-device). Publish the
+  // hero's stuck bottom edge as a CSS var; consumers calc() from it.
+  const boxRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = boxRef.current
+    if (!el) return
+    const set = () =>
+      document.documentElement.style.setProperty(
+        "--hero-stuck-bottom",
+        `${56 + el.offsetHeight}px` // 56 = the h-14 site header above
+      )
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      document.documentElement.style.removeProperty("--hero-stuck-bottom")
+    }
+  }, [])
+
   const t = [0, 120]
   const nameScale = useTransform(scrollY, t, [1, 0.9])
   const avatarScale = useTransform(scrollY, t, [1, 0.635])
@@ -31,7 +55,10 @@ export function HeroLayout({
 
   return (
     <>
-      <div className="sticky top-14 z-10 bg-background pt-6 md:pt-16">
+      <div
+        ref={boxRef}
+        className="sticky top-14 z-10 bg-background pt-6 md:pt-16"
+      >
         <div className="flex items-start gap-4 md:gap-6">
           <div className="min-w-0 flex-1">
             {/* Eyebrow */}
