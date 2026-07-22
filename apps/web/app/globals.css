@@ -186,3 +186,13 @@
     display: none !important;
   }
 }
+
+/* Tailwind v4 removed v3's cursor:pointer on buttons (native-behaviour
+   purism). Our links show the pointer, so buttons without it read as
+   not-clickable — restore the affordance. Unlayered on purpose: wins over
+   every layer. Disabled stays default. */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+select:not(:disabled) {
+  cursor: pointer;
+}
