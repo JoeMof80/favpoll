@@ -33,7 +33,7 @@ until launch; this checklist is the flip:
 | 5   | **Clerk live keys**                  | `pk_test_` → `pk_live_` once `favpoll.com` points at the app (existing row above).                                                                                                                                                                 |
 | 6   | **Re-verify crons**                  | `CRON_SECRET` survives env edits, but confirm both cron jobs authenticate post-swap (close-favpolls :00, reconcile-payments :30).                                                                                                                  |
 | 7   | **Domain**                           | Point `favpoll.com` at the Vercel project; update the Stripe webhook URL (step 4) and any `NEXT_PUBLIC_BASE_URL`.                                                                                                                                  |
-| 8   | **Smoke test the money loop**        | One real small-value pledge end-to-end: verified record → webhook event → reconciled. The same three-step check used to verify staging on 2026-07-21.                                                                                              |
+| 8   | **Smoke test the money loop**        | One real small-value pledge end-to-end: verified record → webhook event → reconciled (the 2026-07-21 three-step check). Include one Apple Pay pledge and one Google Pay pledge (Google Pay has never been device-tested — sandbox verification was API-only).                                                                                              |
 
 Gotchas learned the hard way: JWT keys start `eyJ…` (a clipped paste stores
 an invalid key that fails SILENTLY into empty pages); `NEXT_PUBLIC_*` vars

@@ -53,6 +53,19 @@ them. No schema, no new flows.
     the 2026-07-21 production loop test.
   - Chrome (signed-in, saved card) → Google Pay button; same loop.
 
+## Outcome (built 2026-07-21/22, #321–#322)
+
+- Domain registered via the payment method domains API: **apple_pay
+  active, google_pay active** on favpoll-web-gamma.vercel.app.
+- **Apple Pay device-verified by the founder** (iPhone Safari, £2 pledge)
+  and money-loop-proven: verified `pi_`, webhook event, reconciled by the
+  scheduled 23:30 UTC cron run.
+- **Google Pay: API-active but NOT device-tested** (no Android device to
+  hand). Accepted risk — identical code path to Apple Pay (both are
+  wallets on the `card` type through the same PaymentElement). A Google
+  Pay pledge is folded into the §1b step-8 launch smoke test.
+- Launch flip: §1b step 4b re-registers the live domain.
+
 ## Estimate
 
 ~Half a day, most of it device QA. Code diff is one static file + one

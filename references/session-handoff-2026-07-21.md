@@ -122,3 +122,51 @@ Five PRs, in dependency order, each merged before the next began:
 - Launch flip checklist: `references/outstanding-tasks-2026-07.md` §1b.
 - Header/footer no longer link /record (#310) — the "known tension" from
   the last handoff is resolved until launch restores them.
+
+---
+
+## Addendum — the evening of 21 July (PRs #316–#323)
+
+Written at close, 2026-07-22 ~00:45 UTC. `main` at #323, suite 1,113
+green, no open PRs, nothing uncommitted.
+
+- **#317 — scale seed + the two launch-blockers it caught.**
+  `pnpm seed:scale` (deterministic cohort, `--wipe` teardown, whales at
+  1,500/2,600/5,200 pledges). Within minutes it exposed (1) the
+  `pollSetStandings` URL explosion — `.in()` over every pledge id →
+  ~55KB URL → 500; rewritten as an embedded-join query chunked at 100
+  poll ids (keepsake's guest-name `.in()` chunked too), and (2) **no FK
+  indexes on any money table** — migration `20260722100000_fk_indexes`
+  (applied to staging) took the 5,200-pledge poll page from statement
+  timeout to 1.7s. Whale totals penny-exact on every surface.
+  **The cohort is still live in the shared DB** (decision pending:
+  testbed vs wipe; open seeds start closing ~30 days out; the founder's
+  £2 test pledge rides on a seeded poll so wipe sweeps it).
+- **#318 — shelf 60-cap parked** (shop-window vs finder question first).
+- **#319/#320 — pledge.to evaluated; Leo Chandler thread opened.**
+  Pledge: not a rail (5% non-US, no Gift Aid), validates the tip model.
+  **Leo (Goodstack trustee) accepted the 11 July LinkedIn connection on
+  21 July — first Goodstack response signal on any channel**; follow-up
+  DM sent same day WITH the Gift Aid question (trustee = governance
+  question, not deal detail). Leo's DM is the live thread; the ~27 July
+  Josh chase fires only if he stays silent.
+- **#321/#322 — wallet payments live.** PaymentElement was already
+  wallet-ready; work = association file in `public/.well-known/` +
+  domain registration (apple_pay + google_pay ACTIVE). **Apple Pay
+  device-verified** by the founder and money-loop-proven (£2: verified
+  `pi_` → webhook → reconciled by the scheduled cron). Google Pay is
+  API-active but never device-tested (no Android) — folded into the
+  §1b step-8 launch smoke test. Step 4b = live-domain re-registration.
+- **#323 — iOS grid blowout.** /record clipped at the left edge on
+  a real iPhone: card grids declared columns only from `sm` up, so the
+  implicit mobile track honoured content min-content (a nowrap truncate
+  label = 456px card on a 393px viewport). `grid-cols-1` on all four
+  card grids (record ×2, charities ×2). Device-confirmed fixed.
+- **Operational notes:** the Vercel CLI token in
+  `~/Library/Application Support/com.vercel.cli/auth.json` has expired
+  (env-var API reads now 403 — re-auth with `vercel login` before the
+  launch flip). Vercel cron start jitter (~40s) means a grace-window
+  boundary can land either side of :30 — don't predict, watch.
+- **Still unverified from the week:** the first close-favpolls :00
+  sweep after CRON_SECRET was fixed (stale-backlog close + emails) and
+  the Clerk dashboard webhook endpoint URL check.
