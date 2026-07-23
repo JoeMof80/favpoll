@@ -30,10 +30,29 @@ const PLACEHOLDER_CHARITIES: Charity[] = [
   { id: "ch-1", name: "Chosen charity", is_active: true },
 ] as unknown as Charity[]
 
-const CONTEXT_SUGGESTIONS: Partial<Record<Register, string>> = {
-  remembering: "1940 – 2025",
-  celebrating_one: "turning 40",
-  celebrating_many: "class of 2025",
+// Context suggestions: pools, picked at random per generate click (like
+// the names). The fundraiser case is register "cause" WITH a protagonist —
+// it gets its own pool; faceless causes have no context line.
+const CONTEXT_POOLS: Partial<Record<Register, readonly string[]>> = {
+  remembering: ["1938 – 2024", "1942 – 2025", "1951 – 2026"],
+  celebrating_one: [
+    "turning 40",
+    "turning 60",
+    "retiring at last",
+    "30 years of service",
+  ],
+  celebrating_many: ["class of 2025", "20 years married", "50 golden years"],
+  cause: [
+    "taking on the marathon",
+    "100 miles in a month",
+    "a year of early starts",
+  ],
+}
+
+function pickContext(register: Register): string {
+  const pool = CONTEXT_POOLS[register]
+  if (!pool || pool.length === 0) return ""
+  return pool[Math.floor(Math.random() * pool.length)]
 }
 
 export type FormInnerProps = {
@@ -153,7 +172,7 @@ export function FormInner({
         ? pickExampleName(pronoun, grouping, reg as Register, sub)
         : null
     const suggestedContext =
-      sub !== "cause" ? (CONTEXT_SUGGESTIONS[reg as Register] ?? "") : null
+      sub !== "cause" ? pickContext(reg as Register) : null
 
     const manualFields: string[] = [
       values.openingLine &&
