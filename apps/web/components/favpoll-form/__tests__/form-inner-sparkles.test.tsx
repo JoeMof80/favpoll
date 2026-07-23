@@ -133,12 +133,14 @@ describe("FormInner — Sparkles button reachability", () => {
       screen.getByRole("button", { name: /generate a suggestion/i })
     )
     await waitFor(() =>
-      expect(mockSafeGenerateDraft).toHaveBeenCalledWith({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: "topic-1",
-        primaryCharityId: null,
-      })
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          register: "celebrating_one",
+          subject: "someone",
+          topicId: "topic-1",
+          primaryCharityId: null,
+        })
+      )
     )
   })
 
@@ -167,14 +169,16 @@ describe("FormInner — Sparkles button reachability", () => {
       screen.getByRole("button", { name: /generate a suggestion/i })
     )
     await waitFor(() =>
-      expect(mockSafeGenerateDraft).toHaveBeenCalledWith({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: "",
-        primaryCharityId: null,
-        topicTitle: "Thing",
-        itemLabels: ["Hat", "Scarf"],
-      })
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          register: "celebrating_one",
+          subject: "someone",
+          topicId: "",
+          primaryCharityId: null,
+          topicTitle: "Thing",
+          itemLabels: ["Hat", "Scarf"],
+        })
+      )
     )
   })
 

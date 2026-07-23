@@ -206,6 +206,12 @@ export function FormInner({
         topicId: topic.isCustom ? "" : topic.topicId,
         primaryCharityId,
         pronoun: sub === "someone" ? pronoun : undefined,
+        // The name lets the model catch "not actually a person" (appeals,
+        // funds) and fall back to protagonist-less grammar
+        displayName:
+          sub === "cause"
+            ? (values.causeLabel ?? null)
+            : (suggestedName ?? values.name ?? null),
         ...(topic.isCustom && {
           topicTitle: topic.title,
           itemLabels: topic.customLabels ?? [],
