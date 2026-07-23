@@ -162,7 +162,7 @@ export function EditablePollArea({
               ) : (
                 <p className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
                   Reveal their favourite here &mdash; guests see this only after
-                  they pledge. In their own words, if you can.
+                  they pledge. This could be a direct quote or a memory.
                 </p>
               )}
               <EditBadge />
