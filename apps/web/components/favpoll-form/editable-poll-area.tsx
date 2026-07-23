@@ -161,8 +161,8 @@ export function EditablePollArea({
                 </div>
               ) : (
                 <p className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground/40 italic">
-                  Name their favourite, then one true detail. &ldquo;Hers was
-                  the waltz &mdash; first on the floor at every wedding.&rdquo;
+                  Reveal their favourite here &mdash; guests see this only after
+                  they pledge. In their own words, if you can.
                 </p>
               )}
               <EditBadge />

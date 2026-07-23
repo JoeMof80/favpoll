@@ -37,17 +37,24 @@ function firstNames(displayName: string): string {
   return displayName.includes("&") ? words.slice(0, -1).join(" ") : words[0]
 }
 
+function possessive(name: string): string {
+  return name.endsWith("s") ? `${name}'` : `${name}'s`
+}
+
+/** "Sylvia's" from "Sylvia Cranfield", or null without a usable name. */
+function namePossessive(displayName?: string | null): string | null {
+  if (!displayName?.trim()) return null
+  return possessive(firstNames(displayName))
+}
+
 function revealOpener(
   register: Register,
   pronoun?: Pronoun,
   displayName?: string | null
 ): string {
   const tense = register === "remembering" ? "was" : "is"
-  if (displayName?.trim()) {
-    const name = firstNames(displayName)
-    const poss = name.endsWith("s") ? `${name}'` : `${name}'s`
-    return `${poss} ${tense}`
-  }
+  const named = namePossessive(displayName)
+  if (named) return `${named} ${tense}`
   const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
   return `${poss} ${tense}`
 }
@@ -94,8 +101,9 @@ ${charityLine}`
     const pronounHint = pronoun
       ? ` Use "${pronoun}" pronouns for the person.`
       : ""
-    const nameHint = displayName
-      ? `\nThe protagonist is called "${displayName}". The reveal opener below already contains the name — do not repeat it elsewhere; the about uses pronouns only (the page shows the name above it).`
+    const namePoss = namePossessive(displayName)
+    const nameHint = namePoss
+      ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with a clause like "and ${namePoss} will be revealed" or "and we'll reveal ${namePoss}". The reveal opener below already contains the name — never repeat it beyond these two places.`
       : ""
     const entityGuard = displayName
       ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
