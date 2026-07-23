@@ -41,6 +41,7 @@ function buildPrompt(opts: {
   charityName: string | null
   charityDescription: string | null
   pronoun?: Pronoun
+  displayName?: string | null
 }): string {
   const {
     register,
@@ -50,6 +51,7 @@ function buildPrompt(opts: {
     charityName,
     charityDescription,
     pronoun,
+    displayName,
   } = opts
 
   const charityLine = charityName
@@ -73,8 +75,11 @@ ${charityLine}`
     const pronounHint = pronoun
       ? ` Use "${pronoun}" pronouns for the person.`
       : ""
-    instructions = `- "about" (max 2 sentences): what this gathering is and that pledges go to ${charityName ?? "charity"}. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Guests pledge and pick their OWN favourite — never say they are guessing or voting on the protagonist's.${pronounHint} Do NOT name or hint at which option is the favourite — the reveal is the gift.
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}" then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete, believable detail. No preamble such as "We can't wait to reveal".`
+    const nameHint = displayName
+      ? `\nThe protagonist's name field reads "${displayName}". NEVER write this name into the copy — pronouns only. If it is clearly NOT an individual person (an appeal, fund, organisation, or event), there is no protagonist: write the about without personal pronouns and open the reveal with "Theirs is" instead of the opener below.`
+      : ""
+    instructions = `- "about" (max 2 sentences): what this gathering is and that pledges go to ${charityName ?? "charity"}. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Guests pledge and pick their OWN favourite — never say they are guessing or voting on the protagonist's.${pronounHint} Do NOT name or hint at which option is the favourite — the reveal is the gift.${nameHint}
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}" then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs. The options may be famous real people or works: NEVER state or invent a biographical fact about them; the detail belongs to the protagonist, not the favourite. No preamble such as "We can't wait to reveal".`
   }
 
   return `${voice}
@@ -99,11 +104,17 @@ async function callLLM(
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const message = await client.messages.create({
     model: modelId,
-    max_tokens: 256,
+    // headroom for models that emit a thinking block before the text
+    max_tokens: 512,
     messages: [{ role: "user", content: prompt }],
   })
-  const text =
-    message.content[0]?.type === "text" ? message.content[0].text.trim() : ""
+  // The text block is not always content[0] — newer models may lead with
+  // a thinking block, which used to fail this as "non-JSON"
+  const textBlock = message.content.find(
+    (c): c is Extract<(typeof message.content)[number], { type: "text" }> =>
+      c.type === "text"
+  )
+  const text = textBlock?.text.trim() ?? ""
   const raw = text.startsWith("{") ? text : (text.match(/\{[\s\S]*\}/) ?? [])[0]
   if (!raw) throw new Error("LLM returned non-JSON response")
   const parsed = JSON.parse(raw) as { about: string; reveal: string }
@@ -127,6 +138,8 @@ export type GenerateDraftInput = {
   /** Required when topicId is empty — the organiser's custom item labels. */
   itemLabels?: string[]
   pronoun?: Pronoun
+  /** Protagonist name or cause label — prompt context only, never cached into copy. */
+  displayName?: string | null
 }
 
 export type GeneratedDraftResult = {
@@ -173,6 +186,7 @@ export async function generateDraft(
       charityName,
       charityDescription,
       pronoun: input.subject === "someone" ? input.pronoun : undefined,
+      displayName: input.displayName ?? null,
     })
 
     let parsed = await callLLM(prompt, modelId)
@@ -202,7 +216,8 @@ export async function generateDraft(
     input.topicId,
     input.subject,
     input.primaryCharityId,
-    input.pronoun
+    input.pronoun,
+    input.displayName
   )
 
   const { data: cached } = await supabase
@@ -248,6 +263,7 @@ export async function generateDraft(
     charityName,
     charityDescription,
     pronoun: input.subject === "someone" ? input.pronoun : undefined,
+    displayName: input.displayName ?? null,
   })
 
   let parsed = await callLLM(prompt, modelId)
