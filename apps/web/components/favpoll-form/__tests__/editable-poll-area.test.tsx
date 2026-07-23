@@ -146,7 +146,7 @@ describe("EditablePollArea — reveal instructional placeholder", () => {
         <EditablePollArea />
       </Wrap>
     )
-    expect(screen.getByText(/What did they love\? Name it/)).toBeInTheDocument()
+    expect(screen.getByText(/Name their favourite, then one true detail/)).toBeInTheDocument()
   })
 
   it("shows the reveal text when reveal is non-empty", () => {
@@ -156,7 +156,7 @@ describe("EditablePollArea — reveal instructional placeholder", () => {
       </Wrap>
     )
     expect(screen.getByText("She always chose Blue.")).toBeInTheDocument()
-    expect(screen.queryByText(/What did they love/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Name their favourite/)).not.toBeInTheDocument()
   })
 })
 
@@ -187,7 +187,7 @@ describe("EditablePollArea — reveal overlay helper text", () => {
       "Share something they loved…"
     )
     expect(textarea.getAttribute("placeholder")).not.toMatch(
-      /What did they love/
+      /Name their favourite/
     )
   })
 
