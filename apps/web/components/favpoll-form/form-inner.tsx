@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useWatch, useForm } from "react-hook-form"
 import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
-import { getExampleName } from "@/lib/registers"
+import { pickExampleName } from "@/lib/registers"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
@@ -150,7 +150,7 @@ export function FormInner({
 
     const suggestedName =
       sub !== "cause"
-        ? getExampleName(topicTitle, pronoun, grouping, reg as Register)
+        ? pickExampleName(pronoun, grouping, reg as Register, sub)
         : null
     const suggestedContext =
       sub !== "cause" ? (CONTEXT_SUGGESTIONS[reg as Register] ?? "") : null

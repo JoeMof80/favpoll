@@ -211,30 +211,61 @@ function simpleHash(s: string): number {
  * Returns a stable greyed example name for the preview when the organiser
  * hasn't typed a real name yet. Selection is deterministic per topic title.
  */
+function examplePool(
+  pronouns: "she" | "he" | "they" | undefined,
+  grouping: FavpollGrouping,
+  register: Register,
+  subject: "someone" | "cause" = "someone",
+  fallbackHash = 0
+): readonly string[] {
+  // A fundraiser derives register "cause" but HAS a protagonist (subject
+  // "someone") — the runner needs a person's name, never an appeal's.
+  // Only faceless cause favpolls draw from the appeal pool.
+  if (register === "cause") {
+    if (subject === "cause") return exampleNames.cause
+    return pronouns === "he" ? exampleNames.he : exampleNames.she
+  }
+  if (register === "celebrating_many") {
+    return exampleNames[grouping === "group" ? "set" : "pair"]
+  }
+  if (register === "remembering" || register === "celebrating_one") {
+    return exampleNames[pronouns === "he" ? "he" : "she"]
+  }
+  // neutral — gender by hash parity
+  return fallbackHash % 2 === 0 ? exampleNames.she : exampleNames.he
+}
+
 export function getExampleName(
   topicTitle: string | null,
   pronouns: "she" | "he" | "they" | undefined,
   grouping: FavpollGrouping,
-  register: Register
+  register: Register,
+  subject: "someone" | "cause" = "someone"
 ): string {
   if (!topicTitle) return ""
   const h = simpleHash(topicTitle)
-  if (register === "cause") {
-    return exampleNames.cause[h % exampleNames.cause.length]
-  }
-  if (register === "celebrating_many") {
-    const key = grouping === "group" ? "set" : "pair"
-    const pool = exampleNames[key]
-    return pool[h % pool.length]
-  }
-  if (register === "remembering" || register === "celebrating_one") {
-    const genderKey = pronouns === "he" ? "he" : "she"
-    const pool = exampleNames[genderKey]
-    return pool[h % pool.length]
-  }
-  // neutral — gender by hash parity
-  const pool = h % 2 === 0 ? exampleNames.she : exampleNames.he
+  const pool = examplePool(pronouns, grouping, register, subject, h)
   return pool[h % pool.length]
+}
+
+/**
+ * Random variant for the generate button — each click should feel fresh
+ * (the deterministic getExampleName is for stable greyed previews).
+ */
+export function pickExampleName(
+  pronouns: "she" | "he" | "they" | undefined,
+  grouping: FavpollGrouping,
+  register: Register,
+  subject: "someone" | "cause" = "someone"
+): string {
+  const pool = examplePool(
+    pronouns,
+    grouping,
+    register,
+    subject,
+    Math.floor(Math.random() * 2)
+  )
+  return pool[Math.floor(Math.random() * pool.length)]
 }
 
 export function shortTopicLabel(title: string): string {

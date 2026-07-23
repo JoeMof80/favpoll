@@ -239,12 +239,30 @@ describe("getExampleName", () => {
     ]).toContain(name)
   })
 
-  it("returns a cause name for cause register", () => {
-    const name = getExampleName("Colour", undefined, "individual", "cause")
+  it("returns an appeal name only for FACELESS cause favpolls", () => {
+    const name = getExampleName(
+      "Colour",
+      undefined,
+      "individual",
+      "cause",
+      "cause"
+    )
     expect([
       "The Sunshine Appeal",
       "Helping Hands Fund",
       "The Riverside Appeal",
+    ]).toContain(name)
+  })
+
+  it("returns a PERSON name for a fundraiser (cause register, someone subject)", () => {
+    const name = getExampleName("Colour", "he", "individual", "cause")
+    expect([
+      "Arthur",
+      "George",
+      "Frank",
+      "Raymond",
+      "Donald",
+      "Stanley",
     ]).toContain(name)
   })
 
