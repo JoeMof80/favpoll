@@ -140,18 +140,11 @@ export function FavpollListCard({
       <div
         className={cn(
           "group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
-          // Your pledge, visible at a glance: soft purple border (the
-          // view-state colour) — the badge on the seam carries the words
-          hasPledged && "border-primary/60 hover:border-primary/80"
+          // Your pledge, visible at a glance: a thicker purple border
+          // (strip + badge tried and rejected — founder call 2026-07-23)
+          hasPledged && "border-2 border-primary/50 hover:border-primary/70"
         )}
       >
-        {/* Pre-attentive marker: a solid strip at a fixed position is what
-            scanning eyes catch; the border and badge alone needed reading.
-            No aria-hidden — empty divs are silent, and [aria-hidden] is
-            reserved surface here. */}
-        {hasPledged && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-xl bg-primary" />
-        )}
         {/* Stretched link — covers the card; positioned siblings (the poll
             body) paint and hit-test above it. */}
         <Link
@@ -183,14 +176,6 @@ export function FavpollListCard({
 
         {pollWithItems && topicItems.length > 0 && (
           <div className="relative border-t border-border bg-background px-3 py-2">
-            {hasPledged && (
-              <Badge
-                variant="secondary"
-                className="absolute -top-2.5 right-3 z-10 border border-primary/30 text-primary"
-              >
-                Pledged
-              </Badge>
-            )}
             <PollHeading
               topicTitle={pollWithItems.topics.title}
               size="md"

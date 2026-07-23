@@ -134,19 +134,21 @@ describe("FavpollListCard — closed card", () => {
 // ─── Value + urgency row ──────────────────────────────────────────────────────
 
 describe("FavpollListCard — value row", () => {
-  it("marks a pledged card with the Pledged badge", () => {
-    render(
+  it("marks a pledged card with the primary border", () => {
+    const { container } = render(
       <FavpollListCard
         favpoll={BASE}
-        initialResults={[{ label: "Blue", amountPence: 2000, widthPercent: 100 }]}
+        initialResults={[
+          { label: "Blue", amountPence: 2000, widthPercent: 100 },
+        ]}
       />
     )
-    expect(screen.getByText("Pledged")).toBeInTheDocument()
+    expect(container.querySelector('[class*="border-primary"]')).not.toBeNull()
   })
 
-  it("no Pledged badge without a pledge", () => {
-    render(<FavpollListCard favpoll={BASE} />)
-    expect(screen.queryByText("Pledged")).not.toBeInTheDocument()
+  it("plain border without a pledge", () => {
+    const { container } = render(<FavpollListCard favpoll={BASE} />)
+    expect(container.querySelector('[class*="border-primary"]')).toBeNull()
   })
 
   // The value/urgency row was removed 2026-07-22 (founder call): the raised
