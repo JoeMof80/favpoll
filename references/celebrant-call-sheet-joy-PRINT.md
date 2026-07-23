@@ -107,12 +107,18 @@ venue managers — names if offered)
 
 Notes: ______________________________________________________________
 
+**The demo ladder — one rung, matched to her warmth:**
+
+☐ **Baseline:** *"Could I text you a link to have a look at?"*
+   (the landing page demos the whole mechanic by itself)
+☐ **If engaged:** offer a 15-min video call to walk through a real one
+☐ **If genuinely warm:** *"I'd love to show you it properly — could I
+   buy you a coffee sometime?"*
+
 **If warm — the pilot ask:** *"Would you be open to showing it to a
 suitable family sometime — no obligation at all?"*
 
 ☐ Yes  ☐ Maybe  ☐ Not now
-
-**Offer the demo only now, if she's curious.**
 
 ---
 
