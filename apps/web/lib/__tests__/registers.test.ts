@@ -254,6 +254,11 @@ describe("getExampleName", () => {
     ]).toContain(name)
   })
 
+  it("returns a PAIR name for a couple memorial — grouping outranks register", () => {
+    const name = getExampleName("Cheese", "she", "couple", "remembering")
+    expect(name).toContain("&")
+  })
+
   it("returns a PERSON name for a fundraiser (cause register, someone subject)", () => {
     const name = getExampleName("Colour", "he", "individual", "cause")
     expect([

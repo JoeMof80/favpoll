@@ -221,16 +221,20 @@ function examplePool(
   // A fundraiser derives register "cause" but HAS a protagonist (subject
   // "someone") — the runner needs a person's name, never an appeal's.
   // Only faceless cause favpolls draw from the appeal pool.
-  if (register === "cause") {
-    if (subject === "cause") return exampleNames.cause
-    return pronouns === "he" ? exampleNames.he : exampleNames.she
-  }
-  if (register === "celebrating_many") {
-    return exampleNames[grouping === "group" ? "set" : "pair"]
-  }
-  if (register === "remembering" || register === "celebrating_one") {
+  if (register === "cause" && subject === "cause") return exampleNames.cause
+  // The grouping outranks the register: a couple memorial needs a pair
+  // name ("Joan & Arthur"), not a single (found on-device 2026-07-23).
+  if (grouping === "couple") return exampleNames.pair
+  if (grouping === "group") return exampleNames.set
+  if (
+    register === "remembering" ||
+    register === "celebrating_one" ||
+    register === "cause"
+  ) {
     return exampleNames[pronouns === "he" ? "he" : "she"]
   }
+  // celebrating_many is plural even if grouping says individual
+  if (register === "celebrating_many") return exampleNames.pair
   // neutral — gender by hash parity
   return fallbackHash % 2 === 0 ? exampleNames.she : exampleNames.he
 }
