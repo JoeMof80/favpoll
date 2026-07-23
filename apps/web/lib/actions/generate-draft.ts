@@ -76,10 +76,13 @@ ${charityLine}`
       ? ` Use "${pronoun}" pronouns for the person.`
       : ""
     const nameHint = displayName
-      ? `\nThe protagonist's name field reads "${displayName}". NEVER write this name into the copy — pronouns only. If it is clearly NOT an individual person (an appeal, fund, organisation, or event), there is no protagonist: write the about without personal pronouns and open the reveal with "Theirs is" instead of the opener below.`
+      ? `\nThe protagonist's name field reads "${displayName}". NEVER write this name into the copy — pronouns only.`
+      : ""
+    const entityGuard = displayName
+      ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
       : ""
     instructions = `- "about" (max 2 sentences): what this gathering is and that pledges go to ${charityName ?? "charity"}. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Guests pledge and pick their OWN favourite — never say they are guessing or voting on the protagonist's.${pronounHint} Do NOT name or hint at which option is the favourite — the reveal is the gift.${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}" then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs. The options may be famous real people or works: NEVER state or invent a biographical fact about them; the detail belongs to the protagonist, not the favourite. No preamble such as "We can't wait to reveal".`
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs. The options may be famous real people or works: NEVER state or invent a biographical fact about them; the detail belongs to the protagonist, not the favourite. No preamble such as "We can't wait to reveal".`
   }
 
   return `${voice}
