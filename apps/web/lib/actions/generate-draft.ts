@@ -33,8 +33,12 @@ const REGISTER_LABEL: Record<Register, string> = {
 function firstNames(displayName: string): string {
   const words = displayName.trim().split(/\s+/)
   if (words.length <= 1) return displayName.trim()
-  // "Derek & Emma Underhill" → "Derek & Emma"; "Roy Mansfield" → "Roy"
-  return displayName.includes("&") ? words.slice(0, -1).join(" ") : words[0]
+  // "Derek & Emma Underhill" → "Derek & Emma"; "Joan & Arthur" stays
+  // whole (no surname to drop); "Roy Mansfield" → "Roy"
+  if (displayName.includes("&")) {
+    return words.length >= 4 ? words.slice(0, -1).join(" ") : displayName.trim()
+  }
+  return words[0]
 }
 
 function possessive(name: string): string {

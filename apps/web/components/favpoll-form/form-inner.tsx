@@ -224,7 +224,12 @@ export function FormInner({
         subject: sub,
         topicId: topic.isCustom ? "" : topic.topicId,
         primaryCharityId,
-        pronoun: sub === "someone" ? pronoun : undefined,
+        pronoun:
+          sub === "someone"
+            ? grouping !== "individual"
+              ? "they"
+              : pronoun
+            : undefined,
         // The name lets the model catch "not actually a person" (appeals,
         // funds) and fall back to protagonist-less grammar
         displayName:
