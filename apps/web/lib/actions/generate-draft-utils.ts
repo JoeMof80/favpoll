@@ -78,8 +78,10 @@ export function buildCacheKey(
   primaryCharityId?: string | null,
   pronoun?: string | null
 ): string {
-  const charityPart =
-    subject === "cause" ? (primaryCharityId ?? "none") : "none"
+  // v2: the charity is ALWAYS part of the key — the generated About names
+  // the charity, so person drafts must never be shared across charities.
+  // The version prefix retires every v1 (pre-voice-rewrite) cached draft.
+  const charityPart = primaryCharityId ?? "none"
   const pronounPart = subject === "someone" ? (pronoun ?? "none") : "none"
-  return `${register}:${topicId}:${charityPart}:${subject}:${pronounPart}`
+  return `v2:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}`
 }

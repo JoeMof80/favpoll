@@ -17,11 +17,20 @@ import {
 // ---------------------------------------------------------------------------
 
 const REGISTER_LABEL: Record<Register, string> = {
-  remembering: "in memory of someone",
-  celebrating_one: "celebrating a person",
-  celebrating_many: "celebrating a group or couple",
-  cause: "supporting a cause",
+  remembering: "a memorial — someone being remembered",
+  celebrating_one: "a celebration of one person",
+  celebrating_many: "a celebration of a couple or group",
+  cause: "a charitable cause, no individual protagonist",
   neutral: "a general occasion",
+}
+
+// The reveal's opening words are computed HERE, not left to the model —
+// the grammar is a brand rule (see the favpoll-brand skill): possessive +
+// tense by register, then the favourite, then ONE concrete detail.
+function revealOpener(register: Register, pronoun?: Pronoun): string {
+  const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
+  const tense = register === "remembering" ? "was" : "is"
+  return `${poss} ${tense}`
 }
 
 function buildPrompt(opts: {
@@ -43,34 +52,36 @@ function buildPrompt(opts: {
     pronoun,
   } = opts
 
-  const topicContext = `Poll topic: "${topicTitle}". Options: ${itemLabels.slice(0, 12).join(", ")}.`
+  const charityLine = charityName
+    ? `Charity receiving the pledges: ${charityName}${charityDescription ? ` — ${charityDescription}` : ""}.`
+    : 'Charity: not yet chosen — say "charity" generically.'
+
+  const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
+Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
+Never use: "vote", "voting", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, or any fundraising cliché. The money word is "pledge".`
+
+  const context = `Occasion: ${REGISTER_LABEL[register]}.
+Poll topic: Favourite ${topicTitle}. Options include: ${itemLabels.slice(0, 12).join(", ")}.
+${charityLine}`
 
   let instructions: string
   if (subject === "cause") {
-    const charityCtx =
-      charityName && charityDescription
-        ? `\nCharity: ${charityName}. About them: ${charityDescription}`
-        : charityName
-          ? `\nCharity: ${charityName}.`
-          : ""
-    instructions = `Write for a charity fundraiser favpoll (${REGISTER_LABEL[register]}).
-- "about": 1–2 sentences about the spirit of gathering and giving; do NOT name any specific charity.
-- "reveal": 1 sentence that connects the charity's work to the poll topic. Ground it in the charity description${charityCtx ? " below" : ""}; do not invent statistics, specific numerical claims, or quotations.${charityCtx}`
+    instructions = `- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option.
+- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
-    const charityHint = charityName
-      ? `\nThis favpoll raises funds for charity (do not name the charity).`
-      : ""
+    const opener = revealOpener(register, pronoun)
     const pronounHint = pronoun
-      ? `\nUse "${pronoun}" pronouns when referring to the person being honoured.`
+      ? ` Use "${pronoun}" pronouns for the person.`
       : ""
-    instructions = `Write for a person-honoured favpoll (${REGISTER_LABEL[register]}).
-- "about": 1–2 sentences evoking the warmth of coming together and giving in someone's honour; do NOT name any specific charity.${charityHint}${pronounHint}
-- "reveal": 1 sentence that names the person's favourite from the poll options. You MUST use a real option from the list above — do not invent one.`
+    instructions = `- "about" (max 2 sentences): what this gathering is and that pledges go to ${charityName ?? "charity"}. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Guests pledge and pick their OWN favourite — never say they are guessing or voting on the protagonist's.${pronounHint} Do NOT name or hint at which option is the favourite — the reveal is the gift.
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}" then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete, believable detail. No preamble such as "We can't wait to reveal".`
   }
 
-  return `You are writing short copy for a charitable polling favpoll.
-${topicContext}
+  return `${voice}
 
+${context}
+
+Write:
 ${instructions}
 
 Respond with ONLY valid JSON, no markdown, no explanation:
@@ -153,7 +164,7 @@ export async function generateDraft(
       charityDescription = charity?.description ?? null
     }
 
-    const modelId = process.env.LLM_MODEL_ID ?? "claude-haiku-4-5-20251001"
+    const modelId = process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
     const prompt = buildPrompt({
       register: input.register,
       subject: input.subject,
@@ -228,7 +239,7 @@ export async function generateDraft(
     charityDescription = charity?.description ?? null
   }
 
-  const modelId = process.env.LLM_MODEL_ID ?? "claude-haiku-4-5-20251001"
+  const modelId = process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
   const prompt = buildPrompt({
     register: input.register,
     subject: input.subject,

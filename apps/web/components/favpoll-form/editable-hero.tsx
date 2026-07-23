@@ -143,8 +143,8 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
             ) : (
               <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/40">
                 {subject === "cause"
-                  ? "What are you raising for? Tease the topic and why it matters — but don't give it all away."
-                  : "Enter a short biography — tease the topic and the cause, but don't give too much away."}
+                  ? "Two or three sentences: what you're raising for and where pledges go. Don't name your pick — that's the reveal."
+                  : "Two or three sentences: who this is for, the occasion, and where pledges go. Don't name their favourite — that's the reveal."}
               </p>
             )}
           </EditableField>

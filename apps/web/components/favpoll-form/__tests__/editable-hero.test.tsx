@@ -57,13 +57,13 @@ function Wrap({
 describe("EditableHero — About instructional placeholder", () => {
   it("shows person instructional text when subject=someone and about is empty", () => {
     render(<Wrap defaultValues={{ subject: "someone", about: "" }} />)
-    expect(screen.getByText(/Enter a short biography/)).toBeInTheDocument()
+    expect(screen.getByText(/who this is for, the occasion/)).toBeInTheDocument()
   })
 
   it("shows cause instructional text when subject=cause and about is empty", () => {
     render(<Wrap defaultValues={{ subject: "cause", about: "" }} />)
     expect(
-      screen.getByText(/Tease the topic and why it matters/)
+      screen.getByText(/what you're raising for and where pledges go/)
     ).toBeInTheDocument()
   })
 
@@ -71,14 +71,14 @@ describe("EditableHero — About instructional placeholder", () => {
     render(<Wrap defaultValues={{ about: "A wonderful person." }} />)
     expect(screen.getByText("A wonderful person.")).toBeInTheDocument()
     expect(
-      screen.queryByText(/Enter a short biography/)
+      screen.queryByText(/who this is for, the occasion/)
     ).not.toBeInTheDocument()
   })
 
   it("does not show topic-specific placeholder prose for any subject", () => {
     render(<Wrap defaultValues={{ subject: "someone", about: "" }} />)
     // fixed instructional string is always present regardless of topic
-    expect(screen.getByText(/Enter a short biography/)).toBeInTheDocument()
+    expect(screen.getByText(/who this is for, the occasion/)).toBeInTheDocument()
     // no topic-specific gendered prose leaks through
     expect(screen.queryByText(/^She /)).not.toBeInTheDocument()
   })
