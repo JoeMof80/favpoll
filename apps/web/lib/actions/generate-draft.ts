@@ -27,9 +27,28 @@ const REGISTER_LABEL: Record<Register, string> = {
 // The reveal's opening words are computed HERE, not left to the model —
 // the grammar is a brand rule (see the favpoll-brand skill): possessive +
 // tense by register, then the favourite, then ONE concrete detail.
-function revealOpener(register: Register, pronoun?: Pronoun): string {
-  const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
+// When we have the protagonist's name the possessive IS the name
+// ("Donald's is …") — warmer than a pronoun, and safe because the cache
+// is keyed per-name (v3). Falls back to Hers/His/Theirs without one.
+function firstNames(displayName: string): string {
+  const words = displayName.trim().split(/\s+/)
+  if (words.length <= 1) return displayName.trim()
+  // "Derek & Emma Underhill" → "Derek & Emma"; "Roy Mansfield" → "Roy"
+  return displayName.includes("&") ? words.slice(0, -1).join(" ") : words[0]
+}
+
+function revealOpener(
+  register: Register,
+  pronoun?: Pronoun,
+  displayName?: string | null
+): string {
   const tense = register === "remembering" ? "was" : "is"
+  if (displayName?.trim()) {
+    const name = firstNames(displayName)
+    const poss = name.endsWith("s") ? `${name}'` : `${name}'s`
+    return `${poss} ${tense}`
+  }
+  const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
   return `${poss} ${tense}`
 }
 
@@ -71,12 +90,12 @@ ${charityLine}`
     instructions = `- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
-    const opener = revealOpener(register, pronoun)
+    const opener = revealOpener(register, pronoun, displayName)
     const pronounHint = pronoun
       ? ` Use "${pronoun}" pronouns for the person.`
       : ""
     const nameHint = displayName
-      ? `\nThe protagonist's name field reads "${displayName}". NEVER write this name into the copy — pronouns only.`
+      ? `\nThe protagonist is called "${displayName}". The reveal opener below already contains the name — do not repeat it elsewhere; the about uses pronouns only (the page shows the name above it).`
       : ""
     const entityGuard = displayName
       ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
