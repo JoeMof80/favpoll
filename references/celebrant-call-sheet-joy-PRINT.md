@@ -111,6 +111,8 @@ Notes: ______________________________________________________________
 
 ☐ **Baseline:** *"Could I text you a link to have a look at?"*
    (the landing page demos the whole mechanic by itself)
+   **⚠ Text the LANDING page URL only** — the favpolls shelf still
+   carries seeded test data (invented names) unless wiped first.
 ☐ **If engaged:** offer a 15-min video call to walk through a real one
 ☐ **If genuinely warm:** *"I'd love to show you it properly — could I
    buy you a coffee sometime?"*
