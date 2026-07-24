@@ -1,9 +1,9 @@
 export const CLOSE_DATE_PRESETS = [
-  { label: "Tomorrow", days: 1 },
+  { label: "1 day", days: 1 },
   { label: "3 days", days: 3 },
-  { label: "A week", days: 7 },
+  { label: "1 week", days: 7 },
   { label: "2 weeks", days: 14 },
-  { label: "A month", days: 30 },
+  { label: "1 month", days: 30 },
   { label: "6 weeks", days: 42 },
   { label: "3 months", days: 91 },
   { label: "6 months", days: 182 },
