@@ -1,3 +1,9 @@
+export const CLOSE_TIME_PRESETS = [
+  { label: "Midday", hours: 12, minutes: 0 },
+  { label: "Evening (6pm)", hours: 18, minutes: 0 },
+  { label: "End of day", hours: 23, minutes: 59 },
+]
+
 export const CLOSE_DATE_PRESETS = [
   { label: "Tomorrow", days: 1 },
   { label: "In 3 days", days: 3 },

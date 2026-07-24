@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
 import { INPUT_GROUP_CLS, FIELD_OVERLAY_PROPS } from "./edit-helpers"
-import { addDays, ordinalSuffix, CLOSE_DATE_PRESETS } from "./date-helpers"
+import {
+  addDays,
+  ordinalSuffix,
+  CLOSE_DATE_PRESETS,
+  CLOSE_TIME_PRESETS,
+} from "./date-helpers"
 
 type Props = {
   open: boolean
@@ -69,9 +74,17 @@ export function CloseDateOverlay({
 
   function handlePreset(days: number) {
     const d = addDays(new Date(), days)
-    d.setHours(23, 59, 0, 0)
+    // Keep whatever time the organiser has chosen — a date preset moves
+    // the day, it must not stomp a 2pm service back to end-of-day.
+    d.setHours(draft.getHours(), draft.getMinutes(), 0, 0)
     setDraft(d)
     setCalendarMonth(new Date(d.getFullYear(), d.getMonth(), 1))
+  }
+
+  function handleTimePreset(hours: number, minutes: number) {
+    const next = new Date(draft)
+    next.setHours(hours, minutes, 0, 0)
+    setDraft(next)
   }
 
   return (
@@ -103,7 +116,7 @@ export function CloseDateOverlay({
               step="60"
               value={timeStr}
               onChange={handleTimeChange}
-              className="appearance-none border-0 bg-transparent text-2xl text-muted-foreground tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              className="appearance-none border-b [border-bottom-style:dotted] border-primary/20 bg-transparent text-2xl text-muted-foreground tabular-nums outline-none hover:[border-bottom-style:solid] hover:border-primary/60 focus:[border-bottom-style:solid] focus:border-primary/60 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             />
           </div>
 
@@ -148,19 +161,45 @@ export function CloseDateOverlay({
           onSelect={handleDaySelect}
           className="w-full p-0"
         />
-        <div className="flex flex-wrap content-start gap-2">
-          {CLOSE_DATE_PRESETS.map((p) => (
-            <Button
-              key={p.label}
-              type="button"
-              variant="outline"
-              size="sm"
-              className="rounded-full"
-              onClick={() => handlePreset(p.days)}
-            >
-              {p.label}
-            </Button>
-          ))}
+        <div className="flex flex-col content-start gap-5">
+          <div>
+            <p className="mb-2 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+              Date
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CLOSE_DATE_PRESETS.map((p) => (
+                <Button
+                  key={p.label}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => handlePreset(p.days)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+              Time
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CLOSE_TIME_PRESETS.map((p) => (
+                <Button
+                  key={p.label}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => handleTimePreset(p.hours, p.minutes)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </ResponsiveOverlay>
