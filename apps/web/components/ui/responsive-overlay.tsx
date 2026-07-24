@@ -29,6 +29,8 @@ type Props = {
   dialogContentClassName?: string
   /** Override classes on the DialogContent root (e.g. to narrow the max-width). */
   dialogClassName?: string
+  /** Extra styles on the DialogContent root (e.g. to raise the max-height). Desktop only. */
+  dialogStyle?: React.CSSProperties
   /** Hides the × close button on both Sheet and Dialog. Use a skip/dismiss link in the footer instead. */
   hideCloseButton?: boolean
   /** Override classes on the header section (e.g. "p-0" when the header slot owns its own padding). */
@@ -57,6 +59,7 @@ export function ResponsiveOverlay({
   children,
   dialogContentClassName,
   dialogClassName,
+  dialogStyle,
   hideCloseButton = false,
   headerClassName,
 }: Props) {
@@ -114,7 +117,7 @@ export function ResponsiveOverlay({
           dialogClassName ??
           "flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
         }
-        style={{ maxHeight: "min(600px, 80vh)" }}
+        style={{ maxHeight: "min(600px, 80vh)", ...dialogStyle }}
         showCloseButton={!hideCloseButton}
       >
         <DialogHeader className={`shrink-0 ${headerClassName ?? "px-5 py-4"}`}>
