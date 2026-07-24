@@ -84,7 +84,7 @@ export function CloseDateOverlay({
         FIELD_OVERLAY_PROPS.dialogClassName,
         "bg-white dark:bg-card"
       )}
-      dialogContentClassName="px-5 py-4"
+      dialogContentClassName="flex-1 overflow-y-auto px-5 py-4"
       header={
         <InputGroup
           className={cn(INPUT_GROUP_CLS, "items-start")}
@@ -135,8 +135,20 @@ export function CloseDateOverlay({
         </div>
       }
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-2 gap-4">
+        <Calendar
+          mode="single"
+          captionLayout="dropdown"
+          selected={draft}
+          month={calendarMonth}
+          onMonthChange={setCalendarMonth}
+          startMonth={today}
+          endMonth={new Date(new Date().getFullYear() + 5, 11)}
+          disabled={{ before: today }}
+          onSelect={handleDaySelect}
+          className="w-full p-0"
+        />
+        <div className="flex flex-wrap content-start gap-2">
           {CLOSE_DATE_PRESETS.map((p) => (
             <Button
               key={p.label}
@@ -150,18 +162,6 @@ export function CloseDateOverlay({
             </Button>
           ))}
         </div>
-        <Calendar
-          mode="single"
-          captionLayout="dropdown"
-          selected={draft}
-          month={calendarMonth}
-          onMonthChange={setCalendarMonth}
-          startMonth={today}
-          endMonth={new Date(new Date().getFullYear() + 5, 11)}
-          disabled={{ before: today }}
-          onSelect={handleDaySelect}
-          className="w-full p-0"
-        />
       </div>
     </ResponsiveOverlay>
   )
