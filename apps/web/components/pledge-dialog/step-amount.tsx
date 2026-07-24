@@ -140,10 +140,12 @@ export function StepAmount({
 }: Props) {
   return (
     <div className="px-5 py-4">
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-5">
-        {/* ── Left column: presets + listed notice ── */}
-        <div className="flex flex-col gap-3 sm:col-span-2">
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-1">
+      <div className="flex flex-col gap-5">
+        {/* Presets quick-set the header amount — a horizontal row under
+            it at every width, matching the pledge card and hero demo (the
+            desktop two-column stack was the app's one layout island) */}
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {PRESETS.map((preset) => (
               <Button
                 key={preset}
@@ -182,8 +184,7 @@ export function StepAmount({
           )}
         </div>
 
-        {/* ── Right column: favourites → tabs → breakdown ── */}
-        <div className="flex flex-col gap-4 sm:col-span-3">
+        <div className="flex flex-col gap-4">
           {hasFund && (
             <Tabs
               value={useSharedFund ? "fund" : "card"}
@@ -228,7 +229,9 @@ export function StepAmount({
                 extraRow={
                   showTip && !useSharedFund ? (
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-muted-foreground">For favpoll</span>
+                      <span className="text-muted-foreground">
+                        Add a little for favpoll
+                      </span>
                       <div
                         className="flex gap-1"
                         role="radiogroup"
