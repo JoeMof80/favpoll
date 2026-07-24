@@ -1,12 +1,12 @@
 export const CLOSE_DATE_PRESETS = [
   { label: "Tomorrow", days: 1 },
-  { label: "In 3 days", days: 3 },
-  { label: "In a week", days: 7 },
-  { label: "In 2 weeks", days: 14 },
-  { label: "In a month", days: 30 },
-  { label: "In 6 weeks", days: 42 },
-  { label: "In 3 months", days: 91 },
-  { label: "In 6 months", days: 182 },
+  { label: "3 days", days: 3 },
+  { label: "A week", days: 7 },
+  { label: "2 weeks", days: 14 },
+  { label: "A month", days: 30 },
+  { label: "6 weeks", days: 42 },
+  { label: "3 months", days: 91 },
+  { label: "6 months", days: 182 },
 ]
 
 export function addDays(date: Date, days: number): Date {

@@ -133,7 +133,7 @@ export function CloseDateOverlay({
         FIELD_OVERLAY_PROPS.dialogClassName,
         "bg-white dark:bg-card"
       )}
-      dialogStyle={{ maxHeight: "min(740px, 88vh)" }}
+      dialogStyle={{ maxHeight: "min(640px, 85vh)" }}
       dialogContentClassName="flex-1 overflow-y-auto px-5 py-4"
       header={
         <InputGroup
@@ -144,8 +144,10 @@ export function CloseDateOverlay({
             <InputGroupText>Close date</InputGroupText>
           </InputGroupAddon>
 
-          <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-            <span className="text-2xl text-foreground">
+          {/* Two columns mirroring the body: date above the calendar,
+              time above the slot list. The values are the column labels. */}
+          <div className="grid grid-cols-2 items-baseline gap-4 px-5 pt-2 pb-3">
+            <span className="text-xl text-foreground">
               {`${ordinalSuffix(draft.getDate())} ${draft.toLocaleDateString("en-GB", { month: "long" })}, ${draft.getFullYear()}`}
             </span>
             <input
@@ -153,15 +155,9 @@ export function CloseDateOverlay({
               step="60"
               value={timeStr}
               onChange={handleTimeChange}
-              className="appearance-none border-b [border-bottom-style:dotted] border-primary/20 bg-transparent text-2xl text-muted-foreground tabular-nums outline-none hover:[border-bottom-style:solid] hover:border-primary/60 focus:[border-bottom-style:solid] focus:border-primary/60 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              className="appearance-none justify-self-start border-b [border-bottom-style:dotted] border-primary/20 bg-transparent text-xl text-foreground tabular-nums outline-none hover:[border-bottom-style:solid] hover:border-primary/60 focus:[border-bottom-style:solid] focus:border-primary/60 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             />
           </div>
-
-          <InputGroupAddon align="block-end" className="px-5 pb-3">
-            <InputGroupText>
-              Aim for at least a week — most pledges come in the final 48 hours.
-            </InputGroupText>
-          </InputGroupAddon>
         </InputGroup>
       }
       footer={
@@ -187,9 +183,6 @@ export function CloseDateOverlay({
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-3">
-          <p className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            Date
-          </p>
           <Calendar
             mode="single"
             captionLayout="dropdown"
@@ -218,9 +211,6 @@ export function CloseDateOverlay({
           </div>
         </div>
         <div className="flex min-h-0 flex-col gap-3">
-          <p className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            Time
-          </p>
           {/* On sm+ the wrapper stretches to the DATE column's height and the
               absolutely-filled list scrolls inside it (an in-flow list would
               set the grid row to its full content height). On mobile the
