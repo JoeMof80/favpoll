@@ -146,7 +146,10 @@ export function CloseDateOverlay({
 
           {/* Two columns mirroring the body: date above the calendar,
               time above the slot list. The values are the column labels. */}
-          <div className="grid grid-cols-2 items-baseline gap-4 px-5 pt-2 pb-3">
+          {/* w-full: the InputGroup shrink-wraps its children, and a
+              shrink-wrapped grid sizes its 1fr columns to content — the
+              time drifts off the body's column boundary on short dates. */}
+          <div className="grid w-full grid-cols-2 items-baseline gap-4 px-5 pt-2 pb-3">
             <span className="text-xl text-foreground">
               {`${ordinalSuffix(draft.getDate())} ${draft.toLocaleDateString("en-GB", { month: "long" })}, ${draft.getFullYear()}`}
             </span>
