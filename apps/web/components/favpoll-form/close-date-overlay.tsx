@@ -141,7 +141,7 @@ export function CloseDateOverlay({
           style={{ backgroundColor: "var(--card)" }}
         >
           <InputGroupAddon align="block-start" className="px-5 pt-4 pb-0">
-            <InputGroupText>Close date</InputGroupText>
+            <InputGroupText>Close date and time</InputGroupText>
           </InputGroupAddon>
 
           {/* Two columns mirroring the body: date above the calendar,
@@ -195,13 +195,13 @@ export function CloseDateOverlay({
             onSelect={handleDaySelect}
             className="w-full p-0"
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {CLOSE_DATE_PRESETS.map((p) => (
               <Button
                 key={p.label}
                 type="button"
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="rounded-full"
                 onClick={() => handlePreset(p.days)}
               >
