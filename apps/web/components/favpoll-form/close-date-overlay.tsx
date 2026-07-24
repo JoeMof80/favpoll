@@ -94,8 +94,8 @@ export function CloseDateOverlay({
             <InputGroupText>Close date</InputGroupText>
           </InputGroupAddon>
 
-          <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <span className="text-base">
+          <div className="flex items-baseline justify-between gap-4 px-5 py-3">
+            <span className="text-2xl text-foreground">
               {`${ordinalSuffix(draft.getDate())} ${draft.toLocaleDateString("en-GB", { month: "long" })}, ${draft.getFullYear()}`}
             </span>
             <input
@@ -103,7 +103,7 @@ export function CloseDateOverlay({
               step="60"
               value={timeStr}
               onChange={handleTimeChange}
-              className="appearance-none border-0 bg-transparent text-base tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              className="appearance-none border-0 bg-transparent text-2xl text-muted-foreground tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             />
           </div>
 
@@ -118,7 +118,7 @@ export function CloseDateOverlay({
         <div className="flex gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             className="flex-1"
             onClick={() => onOpenChange(false)}
           >
@@ -135,20 +135,8 @@ export function CloseDateOverlay({
         </div>
       }
     >
-      <div className="grid grid-cols-2 gap-4">
-        <Calendar
-          mode="single"
-          captionLayout="dropdown"
-          selected={draft}
-          month={calendarMonth}
-          onMonthChange={setCalendarMonth}
-          startMonth={today}
-          endMonth={new Date(new Date().getFullYear() + 5, 11)}
-          disabled={{ before: today }}
-          onSelect={handleDaySelect}
-          className="w-full p-0"
-        />
-        <div className="flex flex-wrap content-start gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2">
           {CLOSE_DATE_PRESETS.map((p) => (
             <Button
               key={p.label}
@@ -162,6 +150,18 @@ export function CloseDateOverlay({
             </Button>
           ))}
         </div>
+        <Calendar
+          mode="single"
+          captionLayout="dropdown"
+          selected={draft}
+          month={calendarMonth}
+          onMonthChange={setCalendarMonth}
+          startMonth={today}
+          endMonth={new Date(new Date().getFullYear() + 5, 11)}
+          disabled={{ before: today }}
+          onSelect={handleDaySelect}
+          className="w-full p-0"
+        />
       </div>
     </ResponsiveOverlay>
   )
