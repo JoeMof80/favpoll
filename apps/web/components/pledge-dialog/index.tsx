@@ -136,16 +136,27 @@ export function PledgeDialog({
     />
   )
 
-  // Step 1 footer
+  // Step 1 footer — Cancel gives the dialog a visible exit (the × is
+  // hidden and outside-click dismissal has no affordance)
   const step1Footer = (
-    <Button
-      type="button"
-      className="w-full text-base"
-      disabled={!dialog.canAdvanceStep1}
-      onClick={() => dialog.handleNext()}
-    >
-      Next →
-    </Button>
+    <div className="flex gap-3">
+      <Button
+        type="button"
+        variant="outline"
+        className="flex-1"
+        onClick={() => handleOpenChange(false)}
+      >
+        Cancel
+      </Button>
+      <Button
+        type="button"
+        className="flex-1 text-base"
+        disabled={!dialog.canAdvanceStep1}
+        onClick={() => dialog.handleNext()}
+      >
+        Next →
+      </Button>
+    </div>
   )
 
   const isNextDisabled = dialog.useSharedFund
