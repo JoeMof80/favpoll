@@ -226,11 +226,7 @@ export function PledgeDialog({
         }
         footer={currentFooter}
         headerClassName={
-          dialog.step === 1
-            ? "px-4 py-3"
-            : dialog.step === 2
-              ? "p-0"
-              : "px-5 py-4"
+          dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
         }
         dialogContentClassName="flex-1 overflow-y-auto"
       >
