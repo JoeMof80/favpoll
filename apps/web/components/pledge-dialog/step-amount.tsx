@@ -230,7 +230,7 @@ export function StepAmount({
                   showTip && !useSharedFund ? (
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-muted-foreground">
-                        Add a little for favpoll
+                        Tip for favpoll
                       </span>
                       <div
                         className="flex gap-1"
