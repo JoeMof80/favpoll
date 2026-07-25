@@ -34,8 +34,8 @@ type Mini = {
   title: string
   /** The favpoll's own top three, sorted by base value (its local ranking) */
   items: { label: string; value: number }[]
-  /** Hexagon vertex (% of the container); the card is centred on it */
-  pos: { x: number; y: number }
+  /** Regular-hexagon vertex (px offset from the container centre, R=180) */
+  pos: { dx: number; dy: number }
 }
 
 const MINIS: Mini[] = [
@@ -47,7 +47,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 20 },
       { label: "Digestive", value: 15 },
     ],
-    pos: { x: 30, y: 14 },
+    pos: { dx: -90, dy: -156 },
   },
   {
     eyebrow: "Fundraiser",
@@ -57,7 +57,7 @@ const MINIS: Mini[] = [
       { label: "Hobnob", value: 25 },
       { label: "Bourbon", value: 20 },
     ],
-    pos: { x: 14, y: 50 },
+    pos: { dx: -180, dy: 0 },
   },
   {
     eyebrow: "Birthday",
@@ -67,7 +67,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: { x: 30, y: 86 },
+    pos: { dx: -90, dy: 156 },
   },
   {
     eyebrow: "Wedding",
@@ -77,7 +77,7 @@ const MINIS: Mini[] = [
       { label: "Bourbon", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: { x: 70, y: 14 },
+    pos: { dx: 90, dy: -156 },
   },
   {
     eyebrow: "Retirement",
@@ -87,7 +87,7 @@ const MINIS: Mini[] = [
       { label: "Custard Cream", value: 25 },
       { label: "Hobnob", value: 20 },
     ],
-    pos: { x: 86, y: 50 },
+    pos: { dx: 180, dy: 0 },
   },
   {
     eyebrow: "For a cause",
@@ -97,7 +97,7 @@ const MINIS: Mini[] = [
       { label: "Digestive", value: 20 },
       { label: "Bourbon", value: 5 },
     ],
-    pos: { x: 70, y: 86 },
+    pos: { dx: 90, dy: 156 },
   },
 ]
 
@@ -179,22 +179,23 @@ export function RecordFlow() {
   const recordMax = recordValues[ranking[0]]
 
   return (
-    <div className="relative h-[22rem]" aria-hidden="true">
+    <div className="relative h-[26.5rem]" aria-hidden="true">
       {/* ── Spokes — each favpoll joined to the record it feeds; the active
-          card's spoke flips to primary while its pledge lands ── */}
+          card's spoke flips to primary while its pledge lands. Fixed-size
+          SVG centred on the container so it shares the cards' px geometry ── */}
       <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        width={360}
+        height={312}
+        viewBox="0 0 360 312"
       >
         {MINIS.map((mini, i) => (
           <line
             key={mini.title}
-            x1={mini.pos.x}
-            y1={mini.pos.y}
-            x2={50}
-            y2={50}
-            vectorEffect="non-scaling-stroke"
+            x1={180 + mini.pos.dx}
+            y1={156 + mini.pos.dy}
+            x2={180}
+            y2={156}
             stroke={
               active?.card === i ? "var(--primary)" : "var(--border-strong)"
             }
@@ -221,9 +222,9 @@ export function RecordFlow() {
             style={{
               // clamp: never centre a card closer than half its width
               // (w-40 → 5rem) to the container edge — the mid vertices sit
-              // at 14%/86%, which bleeds off-screen on phone widths
-              left: `clamp(5rem, ${mini.pos.x}%, calc(100% - 5rem))`,
-              top: `${mini.pos.y}%`,
+              // 180px out, which bleeds off-screen on phone widths
+              left: `clamp(5rem, calc(50% + ${mini.pos.dx}px), calc(100% - 5rem))`,
+              top: `calc(50% + ${mini.pos.dy}px)`,
             }}
           >
             <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -277,7 +278,7 @@ export function RecordFlow() {
       {/* ── The record — centred; card and bar glow in sync with the
           active favpoll ── */}
       <div
-        className={`absolute top-1/2 left-1/2 z-10 w-64 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
+        className={`absolute top-1/2 left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
           active ? GLOW : "border-border shadow-md"
         }`}
       >
