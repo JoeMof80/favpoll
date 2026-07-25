@@ -1,7 +1,11 @@
 "use client"
 
 import { Chip } from "@/components/ui/chip"
-import { InputGroupButton } from "@/components/ui/input-group"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
 import type { Favourite } from "@favpoll/types"
 import { hasFinePointer } from "@/lib/pointer"
 
@@ -34,63 +38,71 @@ export function PickerHeader({
   const hasSelections = draftIds.length > 0
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {draftIds.map((id) => {
-        const item = items.find((i) => i.id === id)
-        if (!item) return null
-        return (
-          <Chip
-            key={id}
-            size="lg"
-            selected
+    <InputGroup className="h-auto rounded-none border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+      <InputGroupAddon align="block-start" className="px-5 pt-4 pb-0">
+        <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          Your favourite
+        </span>
+      </InputGroupAddon>
+
+      <div className="flex w-full flex-wrap items-center gap-2 px-5 py-3">
+        {draftIds.map((id) => {
+          const item = items.find((i) => i.id === id)
+          if (!item) return null
+          return (
+            <Chip
+              key={id}
+              size="lg"
+              selected
+              onMouseDown={(e) => {
+                e.preventDefault()
+                onDeselect(id)
+              }}
+            >
+              {item.label}
+            </Chip>
+          )
+        })}
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              onAdd()
+            }
+            if (
+              (e.key === "Backspace" || e.key === "Delete") &&
+              search === "" &&
+              draftIds.length > 0
+            ) {
+              e.preventDefault()
+              onDeselect(draftIds[draftIds.length - 1])
+            }
+          }}
+          autoFocus={hasFinePointer()}
+          placeholder={hasSelections ? "" : placeholder}
+          className={
+            hasSelections
+              ? "w-0 overflow-hidden bg-transparent text-base outline-none"
+              : "min-w-30 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+          }
+        />
+        {showCreate && (
+          <InputGroupButton
             onMouseDown={(e) => {
               e.preventDefault()
-              onDeselect(id)
+              onAdd()
             }}
+            disabled={addingItem}
+            className="shrink-0"
           >
-            {item.label}
-          </Chip>
-        )
-      })}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            onAdd()
-          }
-          if (
-            (e.key === "Backspace" || e.key === "Delete") &&
-            search === "" &&
-            draftIds.length > 0
-          ) {
-            e.preventDefault()
-            onDeselect(draftIds[draftIds.length - 1])
-          }
-        }}
-        autoFocus={hasFinePointer()}
-        placeholder={hasSelections ? "" : placeholder}
-        className={
-          hasSelections
-            ? "w-0 overflow-hidden bg-transparent text-base outline-none"
-            : "min-w-30 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
-        }
-      />
-      {showCreate && (
-        <InputGroupButton
-          onMouseDown={(e) => {
-            e.preventDefault()
-            onAdd()
-          }}
-          disabled={addingItem}
-          className="shrink-0"
-        >
-          Add
-        </InputGroupButton>
-      )}
-    </div>
+            Add
+          </InputGroupButton>
+        )}
+      </div>
+    </InputGroup>
   )
 }
 
