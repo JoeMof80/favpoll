@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { CalendarDays, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -144,22 +145,32 @@ export function CloseDateOverlay({
             <InputGroupText>Close date and time</InputGroupText>
           </InputGroupAddon>
 
-          {/* Two columns mirroring the body: date above the calendar,
-              time above the slot list. The values are the column labels. */}
-          {/* w-full: the InputGroup shrink-wraps its children, and a
-              shrink-wrapped grid sizes its 1fr columns to content — the
+          {/* Columns mirror the body: date above the calendar + chip rail,
+              time above the slot list. The values are the column labels.
+              w-full: the InputGroup shrink-wraps its children, and a
+              shrink-wrapped grid sizes its fr columns to content — the
               time drifts off the body's column boundary on short dates. */}
-          <div className="grid w-full grid-cols-2 items-baseline gap-4 px-5 pt-2 pb-3">
-            <span className="text-xl text-foreground">
+          <div className="grid w-full grid-cols-2 items-center gap-3 px-5 pt-2 pb-3 sm:grid-cols-[minmax(0,1fr)_8.5rem]">
+            <span className="flex items-center gap-2 text-xl text-foreground">
+              <CalendarDays
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
               {`${ordinalSuffix(draft.getDate())} ${draft.toLocaleDateString("en-GB", { month: "long" })}, ${draft.getFullYear()}`}
             </span>
-            <input
-              type="time"
-              step="60"
-              value={timeStr}
-              onChange={handleTimeChange}
-              className="appearance-none justify-self-start border-b [border-bottom-style:dotted] border-primary/20 bg-transparent text-xl text-foreground tabular-nums outline-none hover:[border-bottom-style:solid] hover:border-primary/60 focus:[border-bottom-style:solid] focus:border-primary/60 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            />
+            <span className="flex items-center gap-2">
+              <Clock
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <input
+                type="time"
+                step="60"
+                value={timeStr}
+                onChange={handleTimeChange}
+                className="appearance-none border-b [border-bottom-style:dotted] border-primary/20 bg-transparent text-xl text-foreground tabular-nums outline-none hover:[border-bottom-style:solid] hover:border-primary/60 focus:[border-bottom-style:solid] focus:border-primary/60 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              />
+            </span>
           </div>
         </InputGroup>
       }
@@ -184,37 +195,38 @@ export function CloseDateOverlay({
         </div>
       }
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-3">
-          <Calendar
-            mode="single"
-            captionLayout="dropdown"
-            selected={draft}
-            month={calendarMonth}
-            onMonthChange={setCalendarMonth}
-            startMonth={today}
-            endMonth={new Date(new Date().getFullYear() + 5, 11)}
-            disabled={{ before: today }}
-            onSelect={handleDaySelect}
-            className="w-full p-0"
-          />
-          <div className="flex flex-wrap gap-1.5">
-            {CLOSE_DATE_PRESETS.map((p) => (
-              <Button
-                key={p.label}
-                type="button"
-                variant="outline"
-                size="xs"
-                className="rounded-full"
-                onClick={() => handlePreset(p.days)}
-              >
-                {p.label}
-              </Button>
-            ))}
-          </div>
+      {/* calendar | chip rail | slot list. The chip and list columns are
+          fixed widths so the header's time column can start on the same
+          boundary as the list. */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_5.25rem_8.5rem] sm:gap-3">
+        <Calendar
+          mode="single"
+          captionLayout="dropdown"
+          selected={draft}
+          month={calendarMonth}
+          onMonthChange={setCalendarMonth}
+          startMonth={today}
+          endMonth={new Date(new Date().getFullYear() + 5, 11)}
+          disabled={{ before: today }}
+          onSelect={handleDaySelect}
+          className="w-full p-0"
+        />
+        <div className="flex flex-wrap gap-1.5 sm:flex-col sm:flex-nowrap">
+          {CLOSE_DATE_PRESETS.map((p) => (
+            <Button
+              key={p.label}
+              type="button"
+              variant="outline"
+              size="xs"
+              className="rounded-full sm:w-full"
+              onClick={() => handlePreset(p.days)}
+            >
+              {p.label}
+            </Button>
+          ))}
         </div>
-        <div className="flex min-h-0 flex-col gap-3">
-          {/* On sm+ the wrapper stretches to the DATE column's height and the
+        <div className="flex min-h-0 flex-col">
+          {/* On sm+ the wrapper stretches to the calendar's height and the
               absolutely-filled list scrolls inside it (an in-flow list would
               set the grid row to its full content height). On mobile the
               columns stack, so the wrapper takes a fixed height instead. */}
