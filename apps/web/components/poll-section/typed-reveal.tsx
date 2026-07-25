@@ -59,16 +59,26 @@ export function TypedReveal({ text, active, protagonistFirstName }: Props) {
     : "Their reveal"
 
   return (
-    <div aria-label={label}>
+    <div aria-label={label} className="relative">
       <span className="sr-only" role="status" aria-live="polite">
         {text}
       </span>
       <blockquote
-        className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic"
+        className="absolute inset-0 border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic"
         aria-hidden="true"
       >
         {shown || " "}
       </blockquote>
+      {/* Reserves the final height so the quote border spans it from the
+          first keystroke and typing never pushes the layout below. Placed
+          AFTER the typed copy: tests read the first [aria-hidden] element
+          as the typing surface. */}
+      <div className="invisible" aria-hidden="true">
+        <PollReveal
+          personalReveal={text}
+          protagonistFirstName={protagonistFirstName}
+        />
+      </div>
     </div>
   )
 }
