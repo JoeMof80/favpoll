@@ -512,7 +512,9 @@ export function DemoCard({
                     transition={{ duration: 0.18 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
-                    <div className="shrink-0 px-4 py-3">
+                    {/* No wrapper padding — PickerHeader's InputGroup owns its
+                        own since the block-start eyebrow landed (#381) */}
+                    <div className="shrink-0">
                       {/* draftIds intentionally empty here so the selected chip
                           does NOT appear in the search bar; the grid below still
                           highlights the selection. */}
@@ -528,7 +530,7 @@ export function DemoCard({
                         addingItem={false}
                       />
                     </div>
-                    <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2">
+                    <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-2">
                       <PickerItems
                         filteredItems={items}
                         draftIds={draftIds}
@@ -540,7 +542,7 @@ export function DemoCard({
                         addError={null}
                       />
                     </div>
-                    <div className="shrink-0 px-4 py-3">
+                    <div className="shrink-0 px-5 py-3">
                       <Button
                         type="button"
                         tabIndex={-1}

@@ -16,11 +16,15 @@ export function PollReveal({
   if (!personalReveal) return null
 
   return (
+    // h-full is inert in normal auto-height flow; in reserved-height
+    // typewriter overlays it lets the quote border span the final height
+    // from the first keystroke instead of growing with the text.
     <div
+      className="h-full"
       aria-label={ariaLabel ?? `${protagonistFirstName ?? "Their"}'s reveal`}
     >
       <blockquote
-        className="border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic"
+        className="h-full border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic"
         role={role}
         aria-live={ariaLive}
       >
