@@ -1,10 +1,12 @@
 "use client"
 
 // The record vignette — the landing's fourth scripted illustration (with the
-// hero demo, the Grandad dialogs and the watch room): a tight cluster of
-// favpolls overlapping one record card, all asking the same topic. Every
-// favpoll takes a pledge in turn — tucked cards come forward (z above the
-// record) to deliver theirs, then recede. Each favpoll has its own local
+// hero demo, the Grandad dialogs and the watch room): six favpolls arranged
+// as a hexagon around one record card, all asking the same topic. The order
+// is deliberate — everywhere else on the page cards scatter and tilt, but
+// polls that share a topic ARE an orderly network, and the geometry says so.
+// Faint spokes join each favpoll to the record; the active card's spoke
+// flips to primary while its pledge lands. Each favpoll has its own local
 // ranking, with biscuits beyond the record's top three (Digestive, Hobnob,
 // Party Ring, Shortbread) for realism.
 //
@@ -32,8 +34,8 @@ type Mini = {
   title: string
   /** The favpoll's own top three, sorted by base value (its local ranking) */
   items: { label: string; value: number }[]
-  /** Cluster position + tilt; the record overlaps every card's inner edge */
-  pos: string
+  /** Hexagon vertex (% of the container); the card is centred on it */
+  pos: { x: number; y: number }
 }
 
 const MINIS: Mini[] = [
@@ -45,7 +47,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 20 },
       { label: "Digestive", value: 15 },
     ],
-    pos: "top-0 left-[18%] -rotate-2",
+    pos: { x: 30, y: 14 },
   },
   {
     eyebrow: "Fundraiser",
@@ -55,7 +57,7 @@ const MINIS: Mini[] = [
       { label: "Hobnob", value: 25 },
       { label: "Bourbon", value: 20 },
     ],
-    pos: "top-[35%] left-[14%] rotate-1",
+    pos: { x: 14, y: 50 },
   },
   {
     eyebrow: "Birthday",
@@ -65,7 +67,7 @@ const MINIS: Mini[] = [
       { label: "Jaffa Cake", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: "bottom-0 left-[20%] rotate-2",
+    pos: { x: 30, y: 86 },
   },
   {
     eyebrow: "Wedding",
@@ -75,7 +77,7 @@ const MINIS: Mini[] = [
       { label: "Bourbon", value: 25 },
       { label: "Custard Cream", value: 20 },
     ],
-    pos: "top-[1%] right-[12%] rotate-3",
+    pos: { x: 70, y: 14 },
   },
   {
     eyebrow: "Retirement",
@@ -85,7 +87,7 @@ const MINIS: Mini[] = [
       { label: "Custard Cream", value: 25 },
       { label: "Hobnob", value: 20 },
     ],
-    pos: "top-[37%] right-[9%] -rotate-2",
+    pos: { x: 86, y: 50 },
   },
   {
     eyebrow: "For a cause",
@@ -95,7 +97,7 @@ const MINIS: Mini[] = [
       { label: "Digestive", value: 20 },
       { label: "Bourbon", value: 5 },
     ],
-    pos: "bottom-[1%] right-[14%] rotate-2",
+    pos: { x: 70, y: 86 },
   },
 ]
 
@@ -178,8 +180,32 @@ export function RecordFlow() {
 
   return (
     <div className="relative h-[22rem]" aria-hidden="true">
-      {/* ── The favpolls — clustered tight, tucked under the record; the
-          active one comes forward to deliver its pledge ── */}
+      {/* ── Spokes — each favpoll joined to the record it feeds; the active
+          card's spoke flips to primary while its pledge lands ── */}
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        {MINIS.map((mini, i) => (
+          <line
+            key={mini.title}
+            x1={mini.pos.x}
+            y1={mini.pos.y}
+            x2={50}
+            y2={50}
+            vectorEffect="non-scaling-stroke"
+            stroke={
+              active?.card === i ? "var(--primary)" : "var(--border-strong)"
+            }
+            strokeWidth={active?.card === i ? 2 : 1}
+            style={{ transition: reduced ? "none" : "stroke 300ms" }}
+          />
+        ))}
+      </svg>
+
+      {/* ── The favpolls — one per hexagon vertex, tucked under the record;
+          the active one lifts to deliver its pledge ── */}
       {MINIS.map((mini, i) => {
         const values = miniValues[i]
         const miniMax = Math.max(...values.map((v) => v.value))
@@ -187,9 +213,18 @@ export function RecordFlow() {
         return (
           <div
             key={mini.title}
-            className={`absolute w-40 rounded-lg border bg-background p-2.5 transition-all duration-300 ${mini.pos} ${
-              isActive ? `z-20 ${GLOW}` : "z-0 border-border shadow-sm"
+            className={`absolute w-40 -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-2.5 transition-all duration-300 ${
+              isActive
+                ? `z-20 scale-105 ${GLOW}`
+                : "z-0 border-border shadow-sm"
             }`}
+            style={{
+              // clamp: never centre a card closer than half its width
+              // (w-40 → 5rem) to the container edge — the mid vertices sit
+              // at 14%/86%, which bleeds off-screen on phone widths
+              left: `clamp(5rem, ${mini.pos.x}%, calc(100% - 5rem))`,
+              top: `${mini.pos.y}%`,
+            }}
           >
             <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
               {mini.eyebrow}
