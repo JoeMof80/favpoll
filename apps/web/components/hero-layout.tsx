@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
 type HeroLayoutProps = {
@@ -48,9 +48,21 @@ export function HeroLayout({
     }
   }, [])
 
+  // The avatar starts at 80px on mobile (132px on md+), so the scroll
+  // shrink must not go as deep there — 0.635 of 80px is a 51px stamp
+  // (founder: "shrinks too small", on-device 2026-07-26).
+  const [avatarEnd, setAvatarEnd] = useState(0.635)
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)")
+    const set = () => setAvatarEnd(mq.matches ? 0.635 : 0.8)
+    set()
+    mq.addEventListener("change", set)
+    return () => mq.removeEventListener("change", set)
+  }, [])
+
   const t = [0, 120]
   const nameScale = useTransform(scrollY, t, [1, 0.9])
-  const avatarScale = useTransform(scrollY, t, [1, 0.635])
+  const avatarScale = useTransform(scrollY, t, [1, avatarEnd])
   const suffixOpacity = useTransform(scrollY, t, [1, 0])
 
   return (
