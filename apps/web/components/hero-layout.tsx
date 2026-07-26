@@ -54,7 +54,9 @@ export function HeroLayout({
   const [avatarEnd, setAvatarEnd] = useState(0.635)
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)")
-    const set = () => setAvatarEnd(mq.matches ? 0.635 : 0.8)
+    // Mobile: 0.9 of the 80px avatar = 72px, matching the stuck
+    // eyebrow + name block; 0.635 suits the 132px md+ avatar.
+    const set = () => setAvatarEnd(mq.matches ? 0.635 : 0.9)
     set()
     mq.addEventListener("change", set)
     return () => mq.removeEventListener("change", set)
@@ -64,6 +66,14 @@ export function HeroLayout({
   const nameScale = useTransform(scrollY, t, [1, 0.9])
   const avatarScale = useTransform(scrollY, t, [1, avatarEnd])
   const suffixOpacity = useTransform(scrollY, t, [1, 0])
+  // The faded subtitle must also give up its HEIGHT — opacity alone left
+  // ~36px of invisible dead space inside the stuck hero, pushing the
+  // ribbon (offset from the hero's measured box) too far down. As the
+  // height collapses, the hero's ResizeObserver republishes
+  // --hero-stuck-bottom and the ribbon rides up with it.
+  // Collapses to 12px, not 0 — a sliver of air keeps the stuck ribbon
+  // from crowding the name (founder-tuned).
+  const suffixMaxHeight = useTransform(scrollY, t, [48, 12])
 
   return (
     <>
@@ -85,7 +95,10 @@ export function HeroLayout({
 
             {/* Subtitle */}
             {subtitle && (
-              <motion.div style={{ opacity: suffixOpacity }}>
+              <motion.div
+                className="overflow-hidden"
+                style={{ opacity: suffixOpacity, maxHeight: suffixMaxHeight }}
+              >
                 {subtitle}
               </motion.div>
             )}
