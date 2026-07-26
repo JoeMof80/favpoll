@@ -282,6 +282,8 @@ export function PledgeDialog({
             clientSecret={dialog.pledgeClientSecret}
             chargeAmount={dialog.ownCharge}
             charityAmount={dialog.numericPledge}
+            guestEmail={dialog.guestEmail}
+            onGuestEmailChange={dialog.setGuestEmail}
             onSuccess={dialog.handlePledgePaymentSuccess}
             preflight={dialog.pledgePreflight}
             onBack={dialog.handleBack}

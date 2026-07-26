@@ -55,6 +55,8 @@ type Props = {
   onStripeReadyChange?: (ready: boolean) => void
   /** When true, renders an email input for guest pledge email capture. */
   showEmailCapture?: boolean
+  /** Guest email captured outside the form (see CheckoutForm.externalEmail) */
+  externalEmail?: string
 }
 
 export function StripeCheckout({
@@ -69,6 +71,7 @@ export function StripeCheckout({
   onSubmittingChange,
   onStripeReadyChange,
   showEmailCapture,
+  externalEmail,
 }: Props) {
   const [submitting, setSubmittingRaw] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -136,6 +139,7 @@ export function StripeCheckout({
           formId={formId}
           onStripeReadyChange={onStripeReadyChange}
           showEmailCapture={showEmailCapture}
+          externalEmail={externalEmail}
         />
       </Elements>
     </>
