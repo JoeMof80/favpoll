@@ -6,9 +6,12 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 
 export type CheckoutFormProps = {
   onSuccess: (email?: string) => void | Promise<void>
-  /** Ran after validation, BEFORE Stripe charges. Return an error message to
-   * abort the payment (e.g. the guest duplicate-pledge check). */
-  preflight?: (email?: string) => Promise<string | null>
+  /** Ran after validation, BEFORE Stripe charges. Return a veto to abort
+   * the payment (e.g. the guest duplicate-pledge check); signInEmail adds a
+   * prefilled create-account hand-off under the message. */
+  preflight?: (
+    email?: string
+  ) => Promise<{ message: string; signInEmail?: string } | null>
   onCancel: () => void
   submitting: boolean
   setSubmitting: (v: boolean) => void
@@ -49,6 +52,9 @@ export function CheckoutForm({
     onReadyRef.current?.(!!stripe && !!elements)
   }, [stripe, elements])
 
+  // Set alongside a preflight veto: renders the create-account hand-off
+  const [signUpEmail, setSignUpEmail] = useState<string | null>(null)
+
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!stripe || !elements) return
@@ -59,13 +65,13 @@ export function CheckoutForm({
 
     setSubmitting(true)
     setError(null)
+    setSignUpEmail(null)
 
     if (preflight) {
-      const preflightError = await preflight(
-        showEmailCapture ? email : undefined
-      )
-      if (preflightError) {
-        setError(preflightError)
+      const veto = await preflight(showEmailCapture ? email : undefined)
+      if (veto) {
+        setError(veto.message)
+        setSignUpEmail(veto.signInEmail ?? null)
         setSubmitting(false)
         return
       }
@@ -128,6 +134,17 @@ export function CheckoutForm({
       )}
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {signUpEmail && (
+        <Button asChild variant="outline" className="w-full">
+          <a
+            href={`/sign-up?email_address=${encodeURIComponent(signUpEmail)}&redirect_url=${encodeURIComponent(
+              typeof window !== "undefined" ? window.location.pathname : "/"
+            )}`}
+          >
+            Create an account with this email →
+          </a>
+        </Button>
+      )}
       {showButtons && (
         <div className="flex gap-3 pt-2">
           <Button

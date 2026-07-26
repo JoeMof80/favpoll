@@ -52,7 +52,7 @@ export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
           : ""
       }`,
       cta: { label: `Return to ${protagonistName}'s favpoll`, url: favpollUrl },
-      footnoteHtml: `You can <a href="${withdrawUrl}" style="color:#534AB7;">withdraw your pledge</a> any time before the poll closes. If you did not make this pledge, you can safely ignore this email.`,
+      footnoteHtml: `You can <a href="${withdrawUrl}" style="color:#534AB7;">withdraw your pledge</a> any time before the poll closes. <a href="${BASE_URL}/sign-up" style="color:#534AB7;">Create an account</a> with this address to keep your pledges together. If you did not make this pledge, you can safely ignore this email.`,
     }),
   })
 }
@@ -159,6 +159,32 @@ export async function sendContactMessage(params: ContactMessageParams) {
           ? `<p style="margin:0 0 12px;"><strong>Getting in touch as:</strong> ${escapeHtml(role)}</p>`
           : ""
       }<p style="margin:0;">${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+    }),
+  })
+}
+
+/**
+ * Sent when a new account's verified email matches existing guest pledges
+ * and they are linked to the account (Clerk webhook). The notification is
+ * the shared-inbox safeguard: a wrongful claim is at least visible to
+ * whoever holds the address.
+ */
+export async function sendPledgesClaimed(to: string, count: number) {
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: "Your pledges are now linked to your favpoll account",
+    html: renderEmail({
+      preheader:
+        "Guest pledges made with this address now live in your account.",
+      heading: "Your pledges, together.",
+      bodyHtml: `<p style="margin:0 0 12px;">${
+        count === 1
+          ? "A pledge you made as a guest with this email address"
+          : `${count} pledges you made as a guest with this email address`
+      } ${count === 1 ? "is" : "are"} now linked to your new favpoll account. Your withdrawal links still work, and nothing changes about where your pledges go.</p>`,
+      cta: { label: "See your pledges", url: `${BASE_URL}/my-favpolls` },
+      footnoteHtml: `If you did not create this account, contact us by replying to this email.`,
     }),
   })
 }

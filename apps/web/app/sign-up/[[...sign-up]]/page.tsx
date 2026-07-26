@@ -1,6 +1,14 @@
 import { SignUp } from "@clerk/nextjs"
 
-export default function SignUpPage() {
+// ?email_address= prefills the form — the repeat-guest-pledge invitation
+// hands the pledger here with the email their pledges live under, so the
+// signup webhook can claim them on exact verified match.
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ email_address?: string }>
+}) {
+  const { email_address } = await searchParams
   return (
     <div className="grid flex-1 lg:grid-cols-2">
       <div className="hidden flex-1 items-center justify-end p-10 lg:flex">
@@ -36,7 +44,11 @@ export default function SignUpPage() {
         </div>
       </div>
       <div className="flex flex-1 items-center justify-center p-6 md:p-10 lg:justify-start">
-        <SignUp />
+        <SignUp
+          initialValues={
+            email_address ? { emailAddress: email_address } : undefined
+          }
+        />
       </div>
     </div>
   )

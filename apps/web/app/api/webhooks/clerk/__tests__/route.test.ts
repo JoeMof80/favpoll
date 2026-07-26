@@ -8,6 +8,12 @@ const mockUpdate = vi.hoisted(() => vi.fn())
 const mockDelete = vi.hoisted(() => vi.fn())
 const mockEq = vi.hoisted(() => vi.fn())
 
+// The route imports lib/email (pledge claiming); the real module constructs
+// a Resend client at import time and throws without an API key on CI.
+vi.mock("@/lib/email", () => ({
+  sendPledgesClaimed: vi.fn(),
+}))
+
 vi.mock("@supabase/supabase-js", () => ({
   createClient: () => ({ from: mockFrom }),
 }))

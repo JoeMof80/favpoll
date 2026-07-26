@@ -264,13 +264,22 @@ export function usePledge({
   // must reject before money moves — createGuestPledge's own check fires
   // after the charge, which stranded a guest on a frozen "Processing…"
   // with their card already debited (found on-device, 2026-07-26).
-  async function pledgePreflight(email?: string): Promise<string | null> {
+  async function pledgePreflight(
+    email?: string
+  ): Promise<{ message: string; signInEmail?: string } | null> {
     if (clerkUserId) return null
     const addr = (email ?? guestEmail).trim()
     if (!addr) return null
     const exists = await guestPledgeExists(pollWithItems.id, addr)
     return exists
-      ? "You've already pledged on this poll. Check your email for a withdrawal link if you'd like to change it."
+      ? {
+          // The invitation, not a refusal: an account lets pledges stack
+          // (signed-in pledges have no per-poll limit) and signup claims
+          // the existing guest pledge by verified-email match.
+          message:
+            "You've already pledged on this poll as a guest. Create an account (or sign in) with this email to add another pledge — or use the withdrawal link in your email to change it.",
+          signInEmail: addr,
+        }
       : null
   }
 
