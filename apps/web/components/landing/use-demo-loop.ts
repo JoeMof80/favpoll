@@ -35,6 +35,21 @@ export function useDemoLoop() {
     scene.results.map((_, i) => DECOY_WIDTHS[i] ?? 12)
 
   useEffect(() => {
+    // Vary the door: first impressions shouldn't always be the memorial
+    // scene (kind order puts it first). Picked here, post-hydration — a
+    // Math.random state initializer would mismatch the SSR HTML, which
+    // renders scene 0. Runs before the reduced-motion return so static
+    // visitors get a varied resolved payoff too. isFirstRun is NOT
+    // consumed on this pass, so the re-run keeps the first-paint hold.
+    if (isFirstRun.current && sceneIndex === 0) {
+      const idx = Math.floor(Math.random() * SCENES.length)
+      if (idx !== 0) {
+        setBarWidths(SCENES[idx].results.map((r) => r.widthPercent))
+        setSceneIndex(idx)
+        return
+      }
+    }
+
     if (prefersReducedMotion) return
     clearAll()
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import type { Phase } from "../scenes"
 
@@ -369,6 +369,9 @@ describe("DemoCard — footer", () => {
 
 describe("LandingHero — reduced motion", () => {
   beforeEach(() => {
+    // Pin the demo's random opening scene to scene 0 (Belinda) — these
+    // tests assert start-scene content before jumping.
+    vi.spyOn(Math, "random").mockReturnValue(0)
     Object.defineProperty(window, "matchMedia", {
       writable: true,
       value: vi.fn().mockImplementation((query: string) => ({
@@ -382,6 +385,10 @@ describe("LandingHero — reduced motion", () => {
         dispatchEvent: vi.fn(),
       })),
     })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it("renders the resolved reveal state — no lock card, no blur", () => {
