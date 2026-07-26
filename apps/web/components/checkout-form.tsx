@@ -102,10 +102,13 @@ export function CheckoutForm({
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       {showEmailCapture && (
-        <div className="space-y-1">
+        /* Same bordered-unit grammar as the guest-wall block above — a bare
+           underline between two bordered cards read as an afterthought, and
+           this is the field the receipt and withdrawal link depend on. */
+        <div className="rounded-lg border border-border bg-card">
           <label
             htmlFor="checkout-email"
-            className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            className="block px-4 pt-3 text-xs font-medium tracking-widest text-muted-foreground uppercase"
           >
             Your email
           </label>
@@ -114,12 +117,12 @@ export function CheckoutForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="for your receipt and withdrawal link"
-            className="w-full border-b border-border bg-transparent py-1 text-base outline-none focus:border-primary"
+            placeholder="you@example.com"
+            className="w-full bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-muted-foreground/50"
             aria-label="Email address for receipt and withdrawal link"
           />
-          <p className="text-[11px] text-muted-foreground">
-            No account needed.
+          <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
+            For your receipt and withdrawal link — no account needed.
           </p>
         </div>
       )}
