@@ -1,10 +1,15 @@
 import { createClient } from "@supabase/supabase-js"
 import { headers } from "next/headers"
 import { Webhook } from "svix"
+import { sendPledgesClaimed } from "@/lib/email"
 
 type ClerkUserEventData = {
   id: string
-  email_addresses: { email_address: string; id: string }[]
+  email_addresses: {
+    email_address: string
+    id: string
+    verification?: { status: string } | null
+  }[]
   primary_email_address_id: string | null
   first_name: string | null
   last_name: string | null
@@ -71,6 +76,33 @@ export async function POST(req: Request) {
       avatar_url: data.image_url,
     })
     if (error) return new Response("Failed to create user", { status: 500 })
+
+    // Claim guest pledges made with this address — EXACT match on the
+    // Clerk-VERIFIED primary email only. Inbox control already held the
+    // withdrawal links, so claiming grants nothing the inbox didn't;
+    // guest_email and guest_token stay on the rows so old links keep
+    // working, and refunds only ever return to the original card.
+    const primary = data.primary_email_address_id
+      ? data.email_addresses.find((e) => e.id === data.primary_email_address_id)
+      : null
+    if (primary?.email_address && primary.verification?.status === "verified") {
+      const { data: claimed } = await supabase
+        .from("pledges")
+        .update({ clerk_user_id: data.id })
+        .eq("guest_email", primary.email_address)
+        .is("clerk_user_id", null)
+        .is("withdrawn_at", null)
+        .select("id")
+      if (claimed && claimed.length > 0) {
+        // The shared-inbox safeguard: make the claim visible to whoever
+        // holds the address. Never fail the webhook over a courtesy email.
+        try {
+          await sendPledgesClaimed(primary.email_address, claimed.length)
+        } catch {
+          // best effort
+        }
+      }
+    }
   }
 
   if (type === "user.updated") {

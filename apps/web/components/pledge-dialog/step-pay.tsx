@@ -10,7 +10,9 @@ type Props = {
   charityAmount: number
   onSuccess: (email?: string) => void | Promise<void>
   onBack: () => void
-  preflight?: (email?: string) => Promise<string | null>
+  preflight?: (
+    email?: string
+  ) => Promise<{ message: string; signInEmail?: string } | null>
   onSubmittingChange?: (v: boolean) => void
   onStripeReadyChange?: (ready: boolean) => void
   showEmailCapture?: boolean
