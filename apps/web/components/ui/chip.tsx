@@ -13,10 +13,14 @@ type ChipProps = React.ComponentProps<"button"> & {
   removeLabel?: string
 }
 
+// min-h, not h: labels wrap on narrow screens (whitespace-normal) and a
+// fixed height left the text spilling outside the pill (found on iOS with
+// "Always Look on the Bright Side of Life — Monty Python"). Single-line
+// chips render identically; wrapped ones grow, py keeps the border clear.
 const chipSizeClasses: Record<NonNullable<ChipProps["size"]>, string> = {
-  sm: "h-5 px-2.5 text-[11px]",
-  md: "h-6 px-3 text-xs",
-  lg: "h-7 px-4 text-sm",
+  sm: "min-h-5 px-2.5 py-0.5 text-[11px]",
+  md: "min-h-6 px-3 py-0.5 text-xs",
+  lg: "min-h-7 px-4 py-1 text-sm",
 }
 
 function Chip({

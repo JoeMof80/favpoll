@@ -242,7 +242,10 @@ export function PledgeDialog({
         dialogContentClassName="flex-1 overflow-y-auto"
       >
         {dialog.step === 1 && (
-          <div className="flex flex-col gap-2 px-5 py-4">
+          // min-h: searching filters the chips down and the bottom sheet
+          // would shrink with them — on iOS the whole sheet then sinks
+          // behind the keyboard. A stable floor keeps the input in view.
+          <div className="flex min-h-80 flex-col gap-2 px-5 py-4">
             <PickerItems
               filteredItems={dialog.filteredItems}
               draftIds={dialog.draftIds}
