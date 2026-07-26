@@ -21,6 +21,7 @@ const POLL_ROW = {
   personal_reveal: "Belinda's was purple.",
   topic_id: "topic-1",
   favpoll_id: "favpoll-1",
+  topics: { is_finite: true },
 }
 
 const OPEN_FAVPOLL = { closed_at: null, closes_at: FUTURE_DATE }
@@ -70,7 +71,8 @@ describe("GET /api/polls/[pollId]/reveal — closed poll", () => {
   it("returns 200 for any unauthenticated viewer when poll is closed", async () => {
     mock.queue(POLL_ROW) // favpoll_polls
     mock.queue(CLOSED_FAVPOLL) // favpolls
-    mock.queue(ITEMS) // favourites
+    mock.queue(ITEMS) // favourites (fetchPollItems, finite branch)
+    mock.queue([]) // pledge_allocations page (pollStandings)
 
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
@@ -124,13 +126,20 @@ describe("GET /api/polls/[pollId]/reveal — signed-in with pledge", () => {
     mock.queue(POLL_ROW) // favpoll_polls
     mock.queue(OPEN_FAVPOLL) // favpolls
     mock.queue([{ id: "pledge-1" }]) // pledges by clerk_user_id → found
-    mock.queue(ITEMS) // favourites
+    mock.queue(ITEMS) // favourites (fetchPollItems, finite branch)
+    mock.queue([]) // pledge_allocations page (pollStandings)
 
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.personal_reveal).toBe("Belinda's was purple.")
     expect(body.items).toHaveLength(2)
+    // The overlay must replace the all-time record with THIS poll's sums —
+    // with no pledge allocations, every bar is zero (the raw favourites
+    // select used to leak £1.2K record values onto a fresh poll's bars)
+    expect(
+      body.items.map((i: { all_time_pledged: number }) => i.all_time_pledged)
+    ).toEqual([0, 0])
   })
 })
 
@@ -143,7 +152,8 @@ describe("GET /api/polls/[pollId]/reveal — guest with valid token", () => {
     mock.queue(POLL_ROW) // favpoll_polls
     mock.queue(OPEN_FAVPOLL) // favpolls
     mock.queue([{ id: "pledge-2" }]) // pledges by guest_token → found
-    mock.queue(ITEMS) // favourites
+    mock.queue(ITEMS) // favourites (fetchPollItems, finite branch)
+    mock.queue([]) // pledge_allocations page (pollStandings)
 
     const res = await GET(makeRequest("valid-guest-token"), makeParams())
     expect(res.status).toBe(200)
@@ -157,6 +167,7 @@ describe("GET /api/polls/[pollId]/reveal — guest with valid token", () => {
     mock.queue(OPEN_FAVPOLL)
     mock.queue([{ id: "pledge-2" }])
     mock.queue(ITEMS)
+    mock.queue([]) // pledge_allocations page (pollStandings)
 
     const res = await GET(makeRequest("valid-guest-token"), makeParams())
     expect(res.status).toBe(200)
