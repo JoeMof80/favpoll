@@ -4,6 +4,9 @@ export async function createPledge(): Promise<void> {}
 export async function createGuestPledge(): Promise<string> {
   return ""
 }
+export async function guestPledgeExists(): Promise<boolean> {
+  return false
+}
 export async function addGuestItem(): Promise<void> {}
 export async function addOrganizerItem(): Promise<void> {}
 export async function removeFavpollPollFavourite(): Promise<void> {}

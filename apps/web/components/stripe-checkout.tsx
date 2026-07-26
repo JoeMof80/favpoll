@@ -39,8 +39,10 @@ type Props = {
   clientSecret: string
   chargeAmount: number
   charityAmount?: number
-  onSuccess: (email?: string) => void
+  onSuccess: (email?: string) => void | Promise<void>
   onClose: () => void
+  /** Forwarded to CheckoutForm: pre-charge veto (e.g. duplicate-pledge check) */
+  preflight?: (email?: string) => Promise<string | null>
   /** Render inline (no fixed overlay). Use inside a dialog's step 3. */
   inline?: boolean
   /** Sets the form's id so an external footer button can submit it via form="<id>". */
@@ -59,6 +61,7 @@ export function StripeCheckout({
   charityAmount,
   onSuccess,
   onClose,
+  preflight,
   inline = false,
   formId,
   onSubmittingChange,
@@ -121,6 +124,7 @@ export function StripeCheckout({
       >
         <CheckoutForm
           onSuccess={onSuccess}
+          preflight={preflight}
           onCancel={onClose}
           submitting={submitting}
           setSubmitting={setSubmitting}

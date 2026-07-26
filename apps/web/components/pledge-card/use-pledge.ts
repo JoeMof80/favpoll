@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation"
 import {
   createPledge,
   createGuestPledge,
+  guestPledgeExists,
   topUpFund,
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
@@ -259,20 +260,41 @@ export function usePledge({
     }
   }
 
+  // Ran by CheckoutForm BEFORE Stripe charges: the duplicate-email check
+  // must reject before money moves — createGuestPledge's own check fires
+  // after the charge, which stranded a guest on a frozen "Processing…"
+  // with their card already debited (found on-device, 2026-07-26).
+  async function pledgePreflight(email?: string): Promise<string | null> {
+    if (clerkUserId) return null
+    const addr = (email ?? guestEmail).trim()
+    if (!addr) return null
+    const exists = await guestPledgeExists(pollWithItems.id, addr)
+    return exists
+      ? "You've already pledged on this poll. Check your email for a withdrawal link if you'd like to change it."
+      : null
+  }
+
   async function handlePledgePaymentSuccess(email?: string) {
-    setPledgeClientSecret(null)
     try {
       const guestToken = await savePledge(email ?? guestEmail)
       // The top-up rode the same PaymentIntent as the pledge — the action
       // verifies its topup_amount metadata before crediting the fund.
       if (pendingTopUp)
         await topUpFund(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+      // Only now unmount the checkout — nulling the secret before saving
+      // emptied the dialog and orphaned its submitting flag when the save
+      // failed (the iOS freeze).
+      setPledgeClientSecret(null)
       setPledgePaymentIntentId(null)
       setPendingTopUp(false)
       onPledgeSuccess?.(guestToken)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")
+      // Re-throw so CheckoutForm (still mounted) shows the message inline
+      // and re-enables its buttons. Retrying cannot double-charge: the
+      // PaymentIntent has already succeeded and Stripe rejects a re-confirm.
+      throw err
     } finally {
       setSubmitting(false)
     }
@@ -321,5 +343,6 @@ export function usePledge({
     handleOwnConfirm,
     handleFundConfirm,
     handlePledgePaymentSuccess,
+    pledgePreflight,
   }
 }

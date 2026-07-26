@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button"
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 
 export type CheckoutFormProps = {
-  onSuccess: (email?: string) => void
+  onSuccess: (email?: string) => void | Promise<void>
+  /** Ran after validation, BEFORE Stripe charges. Return an error message to
+   * abort the payment (e.g. the guest duplicate-pledge check). */
+  preflight?: (email?: string) => Promise<string | null>
   onCancel: () => void
   submitting: boolean
   setSubmitting: (v: boolean) => void
@@ -23,6 +26,7 @@ export type CheckoutFormProps = {
 
 export function CheckoutForm({
   onSuccess,
+  preflight,
   onCancel,
   submitting,
   setSubmitting,
@@ -56,6 +60,17 @@ export function CheckoutForm({
     setSubmitting(true)
     setError(null)
 
+    if (preflight) {
+      const preflightError = await preflight(
+        showEmailCapture ? email : undefined
+      )
+      if (preflightError) {
+        setError(preflightError)
+        setSubmitting(false)
+        return
+      }
+    }
+
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -71,7 +86,17 @@ export function CheckoutForm({
       return
     }
 
-    onSuccess(showEmailCapture ? email : undefined)
+    try {
+      await onSuccess(showEmailCapture ? email : undefined)
+    } catch (err) {
+      // The charge succeeded but recording failed — show why and re-enable.
+      // A retry cannot double-charge: Stripe rejects re-confirming a
+      // succeeded PaymentIntent.
+      setError(
+        err instanceof Error ? err.message : "Something went wrong — try again"
+      )
+      setSubmitting(false)
+    }
   }
 
   return (

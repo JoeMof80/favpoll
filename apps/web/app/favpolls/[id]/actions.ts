@@ -102,6 +102,28 @@ type CreateGuestPledgeInput = {
   paymentIntentId: string
 }
 
+/**
+ * Pre-payment probe: does an active guest pledge already exist for this
+ * email on this poll? Checked BEFORE Stripe charges — createGuestPledge
+ * re-checks afterwards, but by then the money has moved and the guest saw
+ * a frozen "Processing…" instead of the message (found on-device,
+ * 2026-07-26).
+ */
+export async function guestPledgeExists(
+  favpollPollId: string,
+  guestEmail: string
+): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from("pledges")
+    .select("id")
+    .eq("favpoll_poll_id", favpollPollId)
+    .eq("guest_email", guestEmail)
+    .is("withdrawn_at", null)
+    .maybeSingle()
+  return !!data
+}
+
 export async function createGuestPledge(input: CreateGuestPledgeInput) {
   if (!input.guestEmail) throw new Error("Email is required")
 

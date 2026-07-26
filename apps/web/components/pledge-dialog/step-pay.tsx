@@ -8,8 +8,9 @@ type Props = {
   clientSecret: string
   chargeAmount: number
   charityAmount: number
-  onSuccess: (email?: string) => void
+  onSuccess: (email?: string) => void | Promise<void>
   onBack: () => void
+  preflight?: (email?: string) => Promise<string | null>
   onSubmittingChange?: (v: boolean) => void
   onStripeReadyChange?: (ready: boolean) => void
   showEmailCapture?: boolean
@@ -27,6 +28,7 @@ export function StepPay({
   charityAmount,
   onSuccess,
   onBack,
+  preflight,
   onSubmittingChange,
   onStripeReadyChange,
   showEmailCapture,
@@ -78,6 +80,7 @@ export function StepPay({
         chargeAmount={chargeAmount}
         charityAmount={charityAmount}
         onSuccess={onSuccess}
+        preflight={preflight}
         onClose={onBack}
         onSubmittingChange={onSubmittingChange}
         onStripeReadyChange={onStripeReadyChange}
