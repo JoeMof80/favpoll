@@ -124,6 +124,39 @@ export async function guestPledgeExists(
   return !!data
 }
 
+/**
+ * Pre-payment probe for the guest flow: whether this email belongs to a
+ * registered account (sign-in invitation — pledging as a guest with an
+ * account email would orphan the pledge from their history), and whether
+ * it already holds an active guest pledge on this poll (sign-up
+ * invitation). Both checked BEFORE Stripe charges.
+ */
+export async function guestPreflightState(
+  favpollPollId: string,
+  guestEmail: string
+): Promise<{ hasAccount: boolean; hasActivePledge: boolean }> {
+  const supabase = createAdminClient()
+  // ilike with escaped wildcards: case-insensitive exact match
+  const emailPattern = guestEmail.replace(/[\\%_]/g, (m) => "\\" + m)
+  const [{ data: account }, { data: pledge }] = await Promise.all([
+    supabase
+      .from("users")
+      .select("id")
+      .ilike("email", emailPattern)
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("pledges")
+      .select("id")
+      .eq("favpoll_poll_id", favpollPollId)
+      .eq("guest_email", guestEmail)
+      .is("withdrawn_at", null)
+      .limit(1)
+      .maybeSingle(),
+  ])
+  return { hasAccount: !!account, hasActivePledge: !!pledge }
+}
+
 export async function createGuestPledge(input: CreateGuestPledgeInput) {
   if (!input.guestEmail) throw new Error("Email is required")
 

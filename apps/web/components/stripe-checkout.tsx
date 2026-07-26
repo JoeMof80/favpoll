@@ -42,9 +42,11 @@ type Props = {
   onSuccess: (email?: string) => void | Promise<void>
   onClose: () => void
   /** Forwarded to CheckoutForm: pre-charge veto (e.g. duplicate-pledge check) */
-  preflight?: (
-    email?: string
-  ) => Promise<{ message: string; signInEmail?: string } | null>
+  preflight?: (email?: string) => Promise<{
+    message: string
+    signInEmail?: string
+    authMode?: "sign-in" | "sign-up"
+  } | null>
   /** Render inline (no fixed overlay). Use inside a dialog's step 3. */
   inline?: boolean
   /** Sets the form's id so an external footer button can submit it via form="<id>". */
