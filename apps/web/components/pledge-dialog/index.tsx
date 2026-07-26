@@ -283,6 +283,7 @@ export function PledgeDialog({
             chargeAmount={dialog.ownCharge}
             charityAmount={dialog.numericPledge}
             onSuccess={dialog.handlePledgePaymentSuccess}
+            preflight={dialog.pledgePreflight}
             onBack={dialog.handleBack}
             onSubmittingChange={setStripeSubmitting}
             onStripeReadyChange={setStripeReady}

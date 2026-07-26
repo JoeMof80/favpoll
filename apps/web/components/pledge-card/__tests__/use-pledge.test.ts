@@ -1017,7 +1017,7 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     expect(result.current.pledgeClientSecret).toBeNull()
   })
 
-  it("sets error on failure without crashing", async () => {
+  it("sets error on failure and re-throws for CheckoutForm to display", async () => {
     mockActions.createPledge.mockRejectedValueOnce(new Error("DB error"))
 
     const { result } = renderHook(() =>
@@ -1030,8 +1030,12 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
       result.current.updatePledgeAmount("10")
     })
 
+    // Re-throws so the still-mounted CheckoutForm can show the message and
+    // re-enable its buttons (the save-failure freeze, 2026-07-26)
     await act(async () => {
-      await result.current.handlePledgePaymentSuccess()
+      await expect(result.current.handlePledgePaymentSuccess()).rejects.toThrow(
+        "DB error"
+      )
     })
 
     expect(result.current.error).toBe("DB error")

@@ -65,6 +65,7 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
     handleOwnConfirm,
     handleFundConfirm,
     handlePledgePaymentSuccess,
+    pledgePreflight,
   } = usePledge(props)
 
   return (
@@ -76,6 +77,7 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
             charityAmount={numericPledge}
             chargeAmount={ownCharge}
             onSuccess={handlePledgePaymentSuccess}
+            preflight={pledgePreflight}
             onClose={() => {
               setPledgeClientSecret(null)
               setSubmitting(false)
