@@ -9,9 +9,11 @@ export type CheckoutFormProps = {
   /** Ran after validation, BEFORE Stripe charges. Return a veto to abort
    * the payment (e.g. the guest duplicate-pledge check); signInEmail adds a
    * prefilled create-account hand-off under the message. */
-  preflight?: (
-    email?: string
-  ) => Promise<{ message: string; signInEmail?: string } | null>
+  preflight?: (email?: string) => Promise<{
+    message: string
+    signInEmail?: string
+    authMode?: "sign-in" | "sign-up"
+  } | null>
   onCancel: () => void
   submitting: boolean
   setSubmitting: (v: boolean) => void
@@ -57,8 +59,11 @@ export function CheckoutForm({
     onReadyRef.current?.(!!stripe && !!elements)
   }, [stripe, elements])
 
-  // Set alongside a preflight veto: renders the create-account hand-off
-  const [signUpEmail, setSignUpEmail] = useState<string | null>(null)
+  // Set alongside a preflight veto: renders the auth hand-off
+  const [authHandOff, setAuthHandOff] = useState<{
+    email: string
+    mode: "sign-in" | "sign-up"
+  } | null>(null)
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -72,13 +77,17 @@ export function CheckoutForm({
 
     setSubmitting(true)
     setError(null)
-    setSignUpEmail(null)
+    setAuthHandOff(null)
 
     if (preflight) {
       const veto = await preflight(effectiveEmail)
       if (veto) {
         setError(veto.message)
-        setSignUpEmail(veto.signInEmail ?? null)
+        setAuthHandOff(
+          veto.signInEmail
+            ? { email: veto.signInEmail, mode: veto.authMode ?? "sign-up" }
+            : null
+        )
         setSubmitting(false)
         return
       }
@@ -141,14 +150,16 @@ export function CheckoutForm({
       )}
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {signUpEmail && (
+      {authHandOff && (
         <Button asChild variant="outline" className="w-full">
           <a
-            href={`/sign-up?email_address=${encodeURIComponent(signUpEmail)}&redirect_url=${encodeURIComponent(
+            href={`/${authHandOff.mode}?email_address=${encodeURIComponent(authHandOff.email)}&redirect_url=${encodeURIComponent(
               typeof window !== "undefined" ? window.location.pathname : "/"
             )}`}
           >
-            Create an account with this email →
+            {authHandOff.mode === "sign-in"
+              ? "Sign in with this email →"
+              : "Create an account with this email →"}
           </a>
         </Button>
       )}

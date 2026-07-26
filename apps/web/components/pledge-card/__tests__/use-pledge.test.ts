@@ -18,6 +18,9 @@ const mockRouter = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }))
 const mockActions = vi.hoisted(() => ({
   createPledge: vi.fn().mockResolvedValue(undefined),
   createGuestPledge: vi.fn().mockResolvedValue(undefined),
+  guestPreflightState: vi
+    .fn()
+    .mockResolvedValue({ hasAccount: false, hasActivePledge: false }),
   topUpFund: vi.fn().mockResolvedValue(undefined),
   pledgeFromFund: vi.fn().mockResolvedValue(undefined),
 }))
@@ -1039,5 +1042,51 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     })
 
     expect(result.current.error).toBe("DB error")
+  })
+})
+
+describe("usePledge — pledgePreflight (guest, pre-charge)", () => {
+  it("returns a sign-in veto when the email belongs to an account", async () => {
+    mockActions.guestPreflightState.mockResolvedValueOnce({
+      hasAccount: true,
+      hasActivePledge: false,
+    })
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, clerkUserId: null })
+    )
+    const veto = await result.current.pledgePreflight("joe@example.com")
+    expect(veto?.authMode).toBe("sign-in")
+    expect(veto?.signInEmail).toBe("joe@example.com")
+  })
+
+  it("returns a sign-up veto for a repeat guest pledge", async () => {
+    mockActions.guestPreflightState.mockResolvedValueOnce({
+      hasAccount: false,
+      hasActivePledge: true,
+    })
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, clerkUserId: null })
+    )
+    const veto = await result.current.pledgePreflight("joe@example.com")
+    expect(veto?.authMode).toBe("sign-up")
+  })
+
+  it("passes a fresh guest email through with no veto", async () => {
+    mockActions.guestPreflightState.mockResolvedValueOnce({
+      hasAccount: false,
+      hasActivePledge: false,
+    })
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, clerkUserId: null })
+    )
+    expect(await result.current.pledgePreflight("joe@example.com")).toBeNull()
+  })
+
+  it("is a no-op for signed-in users", async () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, clerkUserId: "user-1" })
+    )
+    expect(await result.current.pledgePreflight("joe@example.com")).toBeNull()
+    expect(mockActions.guestPreflightState).not.toHaveBeenCalled()
   })
 })

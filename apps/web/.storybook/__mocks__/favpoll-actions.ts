@@ -7,6 +7,12 @@ export async function createGuestPledge(): Promise<string> {
 export async function guestPledgeExists(): Promise<boolean> {
   return false
 }
+export async function guestPreflightState(): Promise<{
+  hasAccount: boolean
+  hasActivePledge: boolean
+}> {
+  return { hasAccount: false, hasActivePledge: false }
+}
 export async function addGuestItem(): Promise<void> {}
 export async function addOrganizerItem(): Promise<void> {}
 export async function removeFavpollPollFavourite(): Promise<void> {}

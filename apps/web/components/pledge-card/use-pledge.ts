@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 import {
   createPledge,
   createGuestPledge,
-  guestPledgeExists,
+  guestPreflightState,
   topUpFund,
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
@@ -264,23 +264,40 @@ export function usePledge({
   // must reject before money moves — createGuestPledge's own check fires
   // after the charge, which stranded a guest on a frozen "Processing…"
   // with their card already debited (found on-device, 2026-07-26).
-  async function pledgePreflight(
-    email?: string
-  ): Promise<{ message: string; signInEmail?: string } | null> {
+  async function pledgePreflight(email?: string): Promise<{
+    message: string
+    signInEmail?: string
+    authMode?: "sign-in" | "sign-up"
+  } | null> {
     if (clerkUserId) return null
     const addr = (email ?? guestEmail).trim()
     if (!addr) return null
-    const exists = await guestPledgeExists(pollWithItems.id, addr)
-    return exists
-      ? {
-          // The invitation, not a refusal: an account lets pledges stack
-          // (signed-in pledges have no per-poll limit) and signup claims
-          // the existing guest pledge by verified-email match.
-          message:
-            "You've already pledged on this poll as a guest. Create an account (or sign in) with this email to add another pledge — or use the withdrawal link in your email to change it.",
-          signInEmail: addr,
-        }
-      : null
+    const { hasAccount, hasActivePledge } = await guestPreflightState(
+      pollWithItems.id,
+      addr
+    )
+    // Account first: it answers both cases, and a guest pledge under an
+    // account email would orphan the pledge from their history.
+    if (hasAccount) {
+      return {
+        message:
+          "This email has a favpoll account. Sign in to pledge — it keeps your pledges together in your account.",
+        signInEmail: addr,
+        authMode: "sign-in",
+      }
+    }
+    if (hasActivePledge) {
+      // The invitation, not a refusal: an account lets pledges stack
+      // (signed-in pledges have no per-poll limit) and signup claims
+      // the existing guest pledge by verified-email match.
+      return {
+        message:
+          "You've already pledged on this poll as a guest. Create an account (or sign in) with this email to add another pledge — or use the withdrawal link in your email to change it.",
+        signInEmail: addr,
+        authMode: "sign-up",
+      }
+    }
+    return null
   }
 
   async function handlePledgePaymentSuccess(email?: string) {
