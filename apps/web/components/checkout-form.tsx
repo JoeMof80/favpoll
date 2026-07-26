@@ -25,6 +25,10 @@ export type CheckoutFormProps = {
   onStripeReadyChange?: (ready: boolean) => void
   /** When true, renders an email input above PaymentElement for guest pledge email capture. */
   showEmailCapture?: boolean
+  /** Guest email captured OUTSIDE this form (the dialog's identity block).
+   * When set, it is validated and used for preflight/receipt/onSuccess
+   * exactly as the built-in field would be. */
+  externalEmail?: string
 }
 
 export function CheckoutForm({
@@ -39,6 +43,7 @@ export function CheckoutForm({
   formId,
   onStripeReadyChange,
   showEmailCapture,
+  externalEmail,
 }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
@@ -58,7 +63,9 @@ export function CheckoutForm({
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!stripe || !elements) return
-    if (showEmailCapture && !email.trim()) {
+    const effectiveEmail = showEmailCapture ? email : externalEmail
+    const emailRequired = showEmailCapture || externalEmail !== undefined
+    if (emailRequired && !effectiveEmail?.trim()) {
       setError("Please enter your email address")
       return
     }
@@ -68,7 +75,7 @@ export function CheckoutForm({
     setSignUpEmail(null)
 
     if (preflight) {
-      const veto = await preflight(showEmailCapture ? email : undefined)
+      const veto = await preflight(effectiveEmail)
       if (veto) {
         setError(veto.message)
         setSignUpEmail(veto.signInEmail ?? null)
@@ -81,7 +88,7 @@ export function CheckoutForm({
       elements,
       confirmParams: {
         return_url: window.location.href,
-        ...(showEmailCapture && email ? { receipt_email: email } : {}),
+        ...(effectiveEmail ? { receipt_email: effectiveEmail } : {}),
       },
       redirect: "if_required",
     })
@@ -93,7 +100,7 @@ export function CheckoutForm({
     }
 
     try {
-      await onSuccess(showEmailCapture ? email : undefined)
+      await onSuccess(effectiveEmail)
     } catch (err) {
       // The charge succeeded but recording failed — show why and re-enable.
       // A retry cannot double-charge: Stripe rejects re-confirming a
