@@ -128,3 +128,26 @@ Founder's notes from the conversation, verbatim substance:
   conversation.
 - Funeral-director card: mock one up off the existing pack styling when
   the /memorials page exists to point at.
+
+### Addendum (same day) — the tip answer + the review-link promise
+
+- **Question 3 WAS answered, decisively.** Asked whether the default tip
+  should be 0% at memorials, Joy: **"Well if you do that, it will
+  probably stay at 0%."** No ethical concern whatsoever. A celebrant, in
+  the memorial register, arguing AGAINST the zero default on behavioural
+  grounds — the strongest possible ratification of the current
+  pre-selected middle tip. No product change; quote her in future
+  partner conversations.
+- **Funeral-director caveat (founder's instinct):** an FD might view
+  tip optics differently — their brochure pack, their reputation. Pitch
+  answer, not product answer: lead FD conversations with
+  100%-to-charity / tip optional and guest-side. A per-favpoll
+  "tips off" switch is the reserve concession if a partner ever demands
+  it — do not build pre-emptively.
+- **Not all questions were asked** (conversation flow); instead **Joe
+  agreed to send Joy a link to the app for review** — which forces the
+  seeded-cohort decision (the standing caveat was landing-URL-only
+  while the testbed is live). Recommended path: wipe the scale seed
+  (its job is done), curate a small set of exemplar favpolls in the
+  founder's voice, send the honest app. That state is also what
+  Ethan/Goodstack should meet.
