@@ -179,6 +179,48 @@ question in charity-facing phrasing:
 Await the human follow-up; its answer either retires the Gift Aid question
 or reshapes the rail comparison. Log it here when it lands.
 
+### 27 July 2026 (later) — help-centre/docs sweep: GIFT AID EFFECTIVELY ANSWERED
+
+Founder's hunch (help.goodstack.org) → forensic sweep of the help centre,
+legal terms, delivery policy, Charity Commission filing, and the public API
+docs. The chat-era "mildly negative" read above is REVERSED:
+
+- **Charity Commission register (1192508): the Foundation is officially
+  "Recognised by HMRC for gift aid"** and "operates as a Payroll Giving
+  Agent." (Also: FY2024 income £518,785 / grants to institutions £485,850
+  — modest scale; the four trustees confirmed as Hallett/Buchan/Barclay/
+  Chandler, none remunerated.)
+- **The API collects Gift Aid declarations**: Percent's API reference has a
+  Gift Aid section (create a GiftAid Declaration; retrieve a user's GiftAid
+  ID) and donation events carry a `giftAidId` field. Declaration-collection
+  machinery only exists so the donee Foundation can claim — the rail is
+  built for claim-and-pass-on.
+- **Verdict: yes-shaped.** Remaining human confirmation (call/support
+  ticket): that the claimed uplift is passed to the recipient charity, not
+  retained. **Swiftaid stays benched, now with confidence.**
+- The earlier bot-chat negative read was an artefact of the CAUSES-side
+  help centre not covering donor tax — the partner-API side documents it.
+
+**The demo gate is partly illusory (corrects the 6 July finding):**
+public API docs at `docs.goodstack.io` and a public sandbox dashboard at
+`sandbox.poweredbypercent.com` — the technical evaluation can start now,
+without sales.
+
+**New channels found:**
+- `engineering-support@goodstack.io` — developer support (from the docs).
+  The RIGHT inbox for the two remaining questions; dev-support inboxes
+  answer. Ask: (1) is the Gift Aid uplift passed to the recipient charity;
+  (2) fee structure for API-partner donations.
+- `governance@intelligentfoundation.org` — the Foundation's own governance
+  address (where the Leo question actually lives; reserve).
+
+**NEW TOP COMMERCIAL QUESTION — fees:** the Donation Delivery Policy says
+grants are disbursed "**net any applicable fees**" (unquantified; monthly,
+above a minimum disbursement amount; forced disbursement after 12 months).
+favpoll promises 100%-to-charity, so the fee structure (ideally
+platform-pays, never deducted from the gift) now ranks ABOVE Gift Aid on
+the call agenda.
+
 ### Chase — drafted 10 July 2026
 
 **Email** — to `sales@goodstack.io` (verify the address on goodstack.io;
