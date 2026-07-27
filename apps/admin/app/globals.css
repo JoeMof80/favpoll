@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-/* Workspace packages are symlinked through node_modules, which Tailwind's
-   auto-detection skips — without this, shared components (e.g. the theme
-   toggle) only get utilities the app happens to use elsewhere. */
-@source "../../../packages/ui/src";
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -18,19 +13,11 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
-  --color-destructive-muted: var(--destructive-muted);
-  --color-destructive-strong: var(--destructive-strong);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-muted: var(--warning-muted);
 }
 
 :root {
@@ -40,20 +27,11 @@
   --card-foreground: oklch(0.2 0.02 280);
   --primary: oklch(0.44 0.18 278);
   --primary-foreground: oklch(0.99 0 0);
-  /* Secondary: #EEEDFE */
-  --secondary: oklch(0.96 0.03 278);
-  --secondary-foreground: oklch(0.44 0.18 278);
   --muted: oklch(0.96 0.03 278);
   --muted-foreground: oklch(0.52 0.06 278);
   --accent: oklch(0.92 0.05 278);
   --accent-foreground: oklch(0.44 0.18 278);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-muted: oklch(0.97 0.01 17);
-  --destructive-strong: oklch(0.44 0.16 27);
-  --success: oklch(0.62 0.12 165);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.76 0.15 71);
-  --warning-muted: oklch(0.99 0.02 95);
   --border: oklch(0.91 0.02 278);
   --input: oklch(0.91 0.02 278);
   --ring: oklch(0.62 0.14 278);
@@ -67,19 +45,11 @@
   --card-foreground: oklch(0.97 0.01 278);
   --primary: oklch(0.75 0.1 278);
   --primary-foreground: oklch(0.15 0.02 278);
-  --secondary: oklch(0.28 0.04 278);
-  --secondary-foreground: oklch(0.97 0.01 278);
   --muted: oklch(0.25 0.03 278);
   --muted-foreground: oklch(0.7 0.05 278);
   --accent: oklch(0.28 0.04 278);
   --accent-foreground: oklch(0.97 0.01 278);
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-muted: oklch(0.3 0.08 25);
-  --destructive-strong: oklch(0.85 0.1 25);
-  --success: oklch(0.72 0.13 165);
-  --success-foreground: oklch(0.25 0.05 165);
-  --warning: oklch(0.83 0.14 75);
-  --warning-muted: oklch(0.35 0.06 70);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.75 0.1 278);
@@ -91,5 +61,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  button,
+  [role="button"] {
+    cursor: pointer;
   }
 }
