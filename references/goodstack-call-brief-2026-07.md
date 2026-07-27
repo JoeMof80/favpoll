@@ -1,7 +1,13 @@
-# Goodstack demo — call brief + disbursement seam (readable)
+# Goodstack call — brief for the Ethan conversation + disbursement seam
 
 _Companion to `disbursement-enquiries-2026-07.md` (which holds the enquiry
 status + full question checklist). This is the readable narrative version._
+
+**UPDATED 27 July 2026 for the Ethan call** — Josh forwarded the 20 July
+email; **Ethan (Goodstack) replied 27 July offering 30 minutes**. Joe's
+reply proposes this week and asks for **sandbox access ahead of the call**
+(integration-ready posture). Question order reshuffled below: the 27 July
+docs sweep effectively answered Gift Aid, so **fees are now the decider**.
 
 ---
 
@@ -13,10 +19,17 @@ status + full question checklist). This is the readable narrative version._
   with an API and self-serve reach. That largely closes the fund-flow question
   (the gift goes to a charity; favpoll never holds the money) and removes
   PPGF's last advantage.
-- **The business route is sales-led — "request a demo".** No self-serve, no
-  sandbox keys until after the call. So the Goodstack-specific build is gated
-  on the demo. A demo gate is normal here — onboarding platforms is their core
-  business, so expect engagement.
+- **Gift Aid: effectively answered YES (27 July sweep).** The Charity
+  Commission register flags the Foundation "**Recognised by HMRC for gift
+  aid**", and the partner API has **Gift Aid Declaration endpoints**
+  (`giftAidId` on donation events). On the call this is a one-line
+  _confirmation_, not an open question — and citing their own register
+  entry + API docs signals homework done.
+- **Public docs exist** (`docs.goodstack.io`) and a **sandbox dashboard**
+  (`sandbox.poweredbypercent.com`) — but access is **provisioned, not
+  self-serve** (keys "are provided to you"; no signup page). Ask Ethan to
+  provision it; `engineering-support@goodstack.io` is the documented
+  fallback channel (email drafted, HELD while the Ethan thread is live).
 - **The `close-favpolls` cron currently never disburses** — it closes favpolls,
   sums totals, and emails the organiser. Money isn't leaving today. That's the
   gap the seam fills.
@@ -30,30 +43,42 @@ status + full question checklist). This is the readable narrative version._
 at life events, pick up to 3 UK charities, proceeds split. 0% platform fee,
 donors cover processing. You need validate-and-disburse to donor-chosen
 charities without onboarding each — which is why their Impact Foundation
-structure looks right.
+structure looks right. You've read their docs and your integration seam is
+built: you're here to de-risk and get keys, not to be pitched.
 
-**Ask these, in this order:**
+**Ask these, in this order (reordered 27 July):**
 
-1. **Gift Aid (the decider).** Does the Impact Foundation (1192508) claim Gift
-   Aid PPGF-style, for _any_ donor-chosen UK charity or only enrolled ones?
+1. **Fees (now the decider).** The Donation Delivery Policy says grants
+   disburse "**net any applicable fees**". What's the fee structure for
+   API-partner donations — and can fees be **billed to the platform** rather
+   than deducted from donations? favpoll's public promise is 100%-to-charity;
+   a deduction from the gift breaks it. (Tip the preferred answer.)
 2. **Fund ingestion (the architecture decider).** Do donors pay the Foundation
    via _your_ flow (you largely replace our Stripe), or do we collect via
-   Stripe and remit onward? Do you hold the payment step (PCI)?
-3. **Onboarding.** Can a pre-launch UK Ltd onboard now — KYC, contract, any
-   minimum volume / revenue-share / exclusivity? Confirm 2.9% + 20p, no
-   platform fee. Sandbox keys?
-4. **Edge case.** What if a chosen charity isn't payable (no verified bank
-   details)?
+   Stripe and remit onward? Do you hold the payment step (PCI)? (Also
+   determines whether our Apple/Google Pay work carries over.)
+3. **Gift Aid (confirm, don't ask open).** "I can see the Foundation is
+   HMRC-recognised for Gift Aid and the API has declaration endpoints — just
+   confirming the claimed uplift is passed to the recipient charity in the
+   onward grant, and that it works for _any_ donor-chosen UK charity, not
+   only enrolled ones."
+4. **Onboarding + keys.** Can a pre-launch UK Ltd onboard now — KYC,
+   contract, any minimum volume / revenue-share / exclusivity? **Sandbox
+   access provisioned when?** (If offered on the call, take it on the call.)
+5. **Edge case.** What if a chosen charity isn't payable (no verified bank
+   details)? (Their delivery policy: outreach ~30 days, forced disbursement
+   of held funds at 12 months — ask how that plays per-charity.)
 
-**Red flags to listen for:** Gift Aid only for _enrolled_ charities
-(reintroduces per-charity onboarding → Swiftaid fallback); a minimum-volume
-commitment; ingestion that forces a full Stripe rip-out pre-launch;
-exclusivity / data-ownership terms.
+**Red flags to listen for:** fees deducted from donations with no
+platform-billed option (breaks the 100% promise — the new #1 flag); Gift Aid
+only for _enrolled_ charities (reintroduces per-charity onboarding →
+Swiftaid fallback); a minimum-volume commitment; ingestion that forces a
+full Stripe rip-out pre-launch; exclusivity / data-ownership terms.
 
 **Your posture:** you've already picked them as the lead — you're de-risking,
 not pitching. Volunteer that you're architecture-ready (a provider seam waiting
-for their SDK) and that early volumes are modest, so "minimum volume" surfaces
-early.
+for their SDK, docs read, launch imminent) and that early volumes are modest,
+so "minimum volume" surfaces early.
 
 ---
 
