@@ -133,6 +133,52 @@ approached out of care to get the fit right. The ~17 July trigger fired on
 20 July: the **Josh Radford email is SENT** (above). CAF warming is the
 step after Henry Ludlam, not the immediate next move.
 
+### 27 July 2026 — support live chat: first responsive channel + Gift Aid signal
+
+State at 27 July: Josh silent 7 days (chase trigger day), Leo silent 6 days
+post-DM, Elani silent. Revised plan agreed: Josh reply-bump + recruiter
+warm-intro angle (a recruiter who emailed Joe has LinkedIn contacts at
+Goodstack — checking mutuals before spending the card) + SDR/lower-level
+route (Goodstack runs a London Fitzrovia SDR team, actively hiring; find a
+name via the company People tab) + **CAF warming pulled forward to run in
+parallel** (three silent weeks changed the sequencing calculus; don't
+single-thread the launch). Soft decision date: **~10 August** — note the
+pressure is lower than it feels: first real favpolls won't CLOSE for weeks
+after launch, so disbursement is not a day-one dependency and Goodstack can
+be revisited post-traction.
+
+**Rejected angle (do not do):** registering favpoll through the nonprofit
+self-serve (`causes.goodstack.io/add-organization`). favpoll is a company;
+it would fail Charity Commission verification and leave "tried to register
+as a charity" in the internal records of the partner being courted.
+
+**The honest variant WORKED — the causes-site AI live chat is the first
+Goodstack channel to respond on any timescale.** Asked the Gift Aid
+question in charity-facing phrasing:
+
+- Bot: no Gift Aid content in the knowledge base at all. Confirmed the
+  PPGF-shaped structure (Foundation is the donee: processes the donation,
+  issues the receipt, pays onward) — the architecture that makes Gift Aid
+  POSSIBLE.
+- Second answer framed receipts as "useful for tax deduction purposes …
+  depends on your country of residence … consult a tax advisor" — the
+  DONOR-side tax-receipt model, not the PPGF claim-and-pass-on model.
+- **Signal now mildly negative: base case is the Foundation does NOT claim
+  Gift Aid.** Structural implication if confirmed: Gift Aid is then
+  UNAVAILABLE on the Goodstack rail full stop — only the donee can claim,
+  favpoll never holds the gift, and Swiftaid cannot patch a donee that
+  doesn't claim. Doesn't kill Goodstack (0% + open onboarding still win)
+  but becomes a live comparison point vs PPGF (which does claim).
+- Escalation to a human was accepted BUT the chat auto-ended before the
+  context message — the ticket may lack email/favpoll context/sales-routing
+  ask. Follow-up message drafted (PPGF-comparison question + founder
+  context + joseph.moffatt@gmail.com + route-to-sales) to add to the thread
+  or a fresh chat.
+- **If sales silence continues, the support chat is the proven route in.**
+
+Await the human follow-up; its answer either retires the Gift Aid question
+or reshapes the rail comparison. Log it here when it lands.
+
 ### Chase — drafted 10 July 2026
 
 **Email** — to `sales@goodstack.io` (verify the address on goodstack.io;
