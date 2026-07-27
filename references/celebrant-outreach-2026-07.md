@@ -63,3 +63,68 @@ generalities ("of your last ten…").
 11. **If it goes well** — would she be open to showing it to a
     suitable family, no obligation? One warm pilot through a celebrant
     beats fifty cold sign-ups.
+
+---
+
+## THE CALL HAPPENED — outcomes (logged 27 July 2026)
+
+Founder's notes from the conversation, verbatim substance:
+
+- **No ethical concerns.** The question the whole outreach was built to
+  answer — is this appropriate in the memorial register, from a
+  professional who stands in that room weekly — cleared without her even
+  raising it. Her scrutiny went to **business viability** instead: the
+  inversion nobody predicted (we worried about taste; she worried about
+  whether it works as a business).
+- **"99 out of 100 memorials have charitable donations."** Near-universal
+  charitable component, from practice not research. The market thesis
+  confirmed at the source.
+- **Cash is dying at the donation box** — people don't carry it. The
+  physical collection mechanism is failing on its own.
+- **QR codes on the order of service for charity are already
+  increasingly common.** THE key operational finding: the exact
+  behaviour favpoll's printable pack depends on (scan a QR at a
+  memorial to give) is already normalising without us. favpoll rides an
+  existing curve, not a behaviour change.
+- **JustGiving et al. skew to younger memorials** — digital giving
+  adoption is generational; incumbents own the young end.
+- **Funeral-director channel idea (hers):** a business card in the
+  brochure pack funeral directors assemble, QR → the memorial-specific
+  landing page. Maps almost exactly onto the existing printable-pack
+  card (favpolls/[id]/pack) — the product piece mostly exists; the GTM
+  piece is the funeral-director relationship.
+- **Doubt on changing practices at the funeral itself; wakes are the
+  better use case.** The service is liturgically locked and solemn; the
+  wake is social, phones-out, and open to warmth — which is where a
+  favourite-poll naturally lives. Positioning note, not a build note:
+  "at the wake" framing for memorial-register copy and the celebrant/FD
+  pitch.
+- **"Very encouraging of any ways to add fun to the occasion."** From a
+  celebrant, in the memorial register — permission for the warmth the
+  product already carries.
+
+### What this changes
+
+1. **The /memorials audience door is UNPARKED** — it was explicitly
+   waiting on this conversation. Its shape sharpened: speak to wakes and
+   funeral directors, not the service; lead with the QR-on-order-of-
+   service behaviour that already exists.
+2. **Funeral directors enter the channel map** — Joy's own suggestion.
+   The brochure-pack card is a concrete, cheap first artefact.
+3. **Wake-first framing** for memorial-register copy when next touched
+   (no immediate build).
+4. **Viability questions are the celebrant channel's real objection** —
+   trust markers, who's behind it, fee clarity (question 9 was right;
+   her scrutiny confirms it). The 0%-fee story and the Josmo Services
+   legal footing need to be one link deep from any celebrant-facing
+   page.
+
+### Open follow-ups
+
+- Thank-you message to Joy (landing URL only while the seeded testbed
+  is live — the standing caveat).
+- The question-11 ask (a warm family pilot, no obligation) was not
+  logged as asked/answered — carry it into the thank-you or the next
+  conversation.
+- Funeral-director card: mock one up off the existing pack styling when
+  the /memorials page exists to point at.
