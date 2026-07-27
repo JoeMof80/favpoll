@@ -221,6 +221,36 @@ favpoll promises 100%-to-charity, so the fee structure (ideally
 platform-pays, never deducted from the gift) now ranks ABOVE Gift Aid on
 the call agenda.
 
+### 27 July 2026 (later still) — BREAKTHROUGH: Ethan replies, call offered
+
+**Josh's 20 July email worked** — he forwarded it internally and **Ethan
+(Goodstack) replied 27 July** apologising for the delay and offering a
+30-minute call: "I'd love to schedule some time to learn more about
+Favpoll, how Goodstack might help and where there is a fit."
+
+- Joe's reply (drafted 27 July): proposes this week, flexible; asks for
+  **sandbox access ahead of the call** — deliberate integration-ready
+  signal (docs read, seam built, launch imminent) so the 30 minutes are
+  specifics, not a cold pitch.
+- **Sandbox correction:** the sandbox dashboard exists but access is
+  **provisioned, not self-serve** — no signup page; docs say keys "are
+  provided to you" and route access requests to
+  `engineering-support@goodstack.io`. That email is DRAFTED but **HELD**
+  while the Ethan thread is live (no double-channel asks).
+- **Stand-downs:** recruiter warm-intro (send the reply for the
+  relationship, minus the Goodstack favour), SDR route, Henry Ludlam — all
+  paused; the door they targeted is open. Leo needs no nudge. CAF warming
+  paused pending the call (resume if the call goes badly or fees break the
+  100% promise).
+- **Call brief updated** (`goodstack-call-brief-2026-07.md`): fees now
+  question #1, fund-ingestion #2, Gift Aid demoted to a one-line
+  confirmation citing their own register entry + API endpoints.
+
+**The ledger of what finally worked, for future outreach calibration:**
+the soft short email to a VP (forwarded internally, 7-day lag) and the
+docs/registry sweep (answered the substantive question without them).
+Trustee LinkedIn DMs and the demo form produced nothing.
+
 ### Chase — drafted 10 July 2026
 
 **Email** — to `sales@goodstack.io` (verify the address on goodstack.io;
