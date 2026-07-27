@@ -84,7 +84,14 @@ export function ClosingLabel({ closesAt, className }: Props) {
       aria-live="off"
     >
       {!closed && <Clock size={10} aria-hidden="true" />}
+      {/* suppressHydrationWarning: the label is computed from Date.now(),
+          so the server's text can lawfully differ from the client's (a day
+          boundary crossed between render and hydration made "39 days" vs
+          "38 days" regenerate the whole tree — and the client re-render
+          then tripped React's script-tag warning inside next-themes). The
+          mount effect recomputes immediately, so the client value wins. */}
       <span
+        suppressHydrationWarning
         className={cn(
           "text-xs font-semibold tabular-nums",
           urgencyClass[timeLeft.urgency]
