@@ -228,10 +228,23 @@ the call agenda.
 30-minute call: "I'd love to schedule some time to learn more about
 Favpoll, how Goodstack might help and where there is a fit."
 
-- Joe's reply (drafted 27 July): proposes this week, flexible; asks for
-  **sandbox access ahead of the call** — deliberate integration-ready
-  signal (docs read, seam built, launch imminent) so the 30 minutes are
-  specifics, not a cold pitch.
+- **Joe's reply SENT 27 July** (founder's own wording — softer sandbox
+  ask than the draft; the integration-ready card held back for the call
+  itself). Sent verbatim:
+
+  > Hi Ethan,
+  >
+  > Thanks a lot for getting back to me.
+  >
+  > Any afternoon this week would work if that is any good for you.
+  >
+  > Would it be possible to arrange sandbox access ahead of the call?
+  > The more I know in advance, the better. But I understand if this is
+  > something you'd rather arrange afterwards.
+  >
+  > Looking forward to it,
+  >
+  > Joe
 - **Sandbox correction:** the sandbox dashboard exists but access is
   **provisioned, not self-serve** — no signup page; docs say keys "are
   provided to you" and route access requests to
