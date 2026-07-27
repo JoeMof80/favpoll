@@ -51,20 +51,34 @@ export function HeroLayout({
   // The avatar starts at 80px on mobile (132px on md+), so the scroll
   // shrink must not go as deep there — 0.635 of 80px is a 51px stamp
   // (founder: "shrinks too small", on-device 2026-07-26).
-  const [avatarEnd, setAvatarEnd] = useState(0.635)
+  const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)")
     // Mobile: 0.9 of the 80px avatar = 72px, matching the stuck
     // eyebrow + name block; 0.635 suits the 132px md+ avatar.
-    const set = () => setAvatarEnd(mq.matches ? 0.635 : 0.9)
+    const set = () =>
+      setAvatarCfg(
+        mq.matches ? { end: 0.635, size: 132 } : { end: 0.9, size: 80 }
+      )
     set()
     mq.addEventListener("change", set)
     return () => mq.removeEventListener("change", set)
   }, [])
+  const avatarEnd = avatarCfg.end
 
   const t = [0, 120]
   const nameScale = useTransform(scrollY, t, [1, 0.9])
   const avatarScale = useTransform(scrollY, t, [1, avatarEnd])
+  // scale is visual only — the avatar's LAYOUT box would keep its full
+  // height and hold the stuck hero open (48px of phantom space on md+,
+  // where the 132px avatar, not the text, drives the hero's height; the
+  // ribbon then stuck too low on desktop). A negative bottom margin
+  // shrinks the layout in step with the visual, and the ResizeObserver
+  // republishes --hero-stuck-bottom.
+  const avatarMarginBottom = useTransform(scrollY, t, [
+    0,
+    -avatarCfg.size * (1 - avatarEnd),
+  ])
   const suffixOpacity = useTransform(scrollY, t, [1, 0])
   // The faded subtitle must also give up its HEIGHT — opacity alone left
   // ~36px of invisible dead space inside the stuck hero, pushing the
@@ -107,7 +121,11 @@ export function HeroLayout({
           {/* Avatar */}
           {avatar && (
             <motion.div
-              style={{ scale: avatarScale, transformOrigin: "top right" }}
+              style={{
+                scale: avatarScale,
+                transformOrigin: "top right",
+                marginBottom: avatarMarginBottom,
+              }}
             >
               {avatar}
             </motion.div>
