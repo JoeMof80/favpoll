@@ -274,7 +274,7 @@ export const regeneratedPlaceholdersBatch7: Record<
     },
   },
 
-  "Roast dinner": {
+  "Part of a roast dinner": {
     remembering: {
       about:
         "Her Sunday table seated twelve at its quietest, and one item on it was non-negotiable, guarded, and always counted.",
