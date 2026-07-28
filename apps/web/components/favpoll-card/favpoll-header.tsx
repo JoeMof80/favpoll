@@ -1,9 +1,13 @@
+import { ChevronRight } from "lucide-react"
 import type { CardProtagonist, FavpollCardSize } from "./types"
 
 type FavpollHeaderProps = {
   protagonist: CardProtagonist
   eyebrow?: string
   size?: FavpollCardSize
+  /** List cards: the header is a link to the favpoll page — show the
+   * goes-somewhere chevron (works on touch, where hover cues don't). */
+  linkCue?: boolean
 }
 
 function getInitials(name: string, override?: string): string {
@@ -21,6 +25,7 @@ export function FavpollHeader({
   protagonist,
   eyebrow,
   size = "lg",
+  linkCue = false,
 }: FavpollHeaderProps) {
   const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
   const nameClass =
@@ -43,7 +48,21 @@ export function FavpollHeader({
               {eyebrow}
             </span>
           )}
-          <span className={nameClass}>{protagonist.name}</span>
+          <span
+            className={
+              linkCue
+                ? `${nameClass} flex items-center gap-0.5 transition-colors group-hover:text-primary`
+                : nameClass
+            }
+          >
+            {protagonist.name}
+            {linkCue && (
+              <ChevronRight
+                aria-hidden="true"
+                className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
+              />
+            )}
+          </span>
           {protagonist.context && (
             <span className="text-[12px] text-muted-foreground">
               {protagonist.context}
