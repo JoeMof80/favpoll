@@ -13,6 +13,13 @@ import { RecordFlow } from "@/components/landing/record-flow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
 
+// The landing renders live data (open-favpoll count, raised total, the
+// shelf) but has no request-dependent APIs, so Next cached its FIRST
+// render indefinitely — the page froze at whatever the DB held that
+// moment (found on prod: 3 of 4 favpolls). ISR at 60s keeps it static-
+// fast and at most a minute stale.
+export const revalidate = 60
+
 export default async function HomePage() {
   const supabase = createAdminClient()
 
