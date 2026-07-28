@@ -41,21 +41,32 @@ export function FavpollHeader({
 
   return (
     <div>
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col">
+      <div className="flex items-start justify-between gap-2">
+        {/* min-w-0: without it the column refuses to shrink and truncate
+            never engages — long names ran under the avatar */}
+        <div className="flex min-w-0 flex-1 flex-col">
           {eyebrow && (
             <span className="text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
               {eyebrow}
             </span>
           )}
+          {/* One line always — "Winter Appeal for the Trussell Trust"
+              wrapped and pushed sibling cards' rows out of alignment.
+              Names may truncate (unlike topic labels); the full name is
+              on the favpoll page one tap away. */}
           <span
+            title={protagonist.name}
             className={
               linkCue
-                ? `${nameClass} flex items-center gap-0.5 transition-colors group-hover:text-primary`
-                : nameClass
+                ? `${nameClass} flex min-w-0 items-center gap-0.5 transition-colors group-hover:text-primary`
+                : `${nameClass} block min-w-0 truncate`
             }
           >
-            {protagonist.name}
+            {linkCue ? (
+              <span className="min-w-0 truncate">{protagonist.name}</span>
+            ) : (
+              protagonist.name
+            )}
             {linkCue && (
               <ChevronRight
                 aria-hidden="true"
