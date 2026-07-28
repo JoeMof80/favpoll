@@ -54,7 +54,14 @@ export function LandingHero({ liveCount, totalLive }: Props) {
             {t("landing.subheader")}
           </p>
           <div className="flex flex-wrap items-center gap-3.5">
-            <Button asChild size="lg" variant="secondary">
+            {/* The hero's only conversion action under a display headline —
+                poster-scale, not form-scale (founder call, 2026-07-28) */}
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="h-11 px-6 text-base"
+            >
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
           </div>

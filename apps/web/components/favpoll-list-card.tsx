@@ -162,6 +162,7 @@ export function FavpollListCard({
             </Badge>
           )}
           <FavpollHeader
+            linkCue
             protagonist={{
               name: displayName,
               photo_url:
