@@ -93,13 +93,16 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                 onClick={() => setContextOpen(true)}
                 className="mt-2"
               >
+                {/* /40 camouflaged the empty state next to the big name —
+                    the founder couldn't find the field on the edit page.
+                    Match the name placeholder's /50 and keep it legible. */}
                 <p
                   className={cn(
                     "truncate text-xl font-normal whitespace-normal md:text-2xl",
-                    context ? "text-primary" : "text-muted-foreground/40"
+                    context ? "text-primary" : "text-muted-foreground/50"
                   )}
                 >
-                  {context || "Enter dates or other context"}
+                  {context || "Add dates or other context"}
                 </p>
               </EditableField>
             )}
