@@ -7,7 +7,14 @@ import { CheckoutForm } from "./checkout-form"
 import { formatPoundsExact } from "@/lib/i18n"
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+  {
+    // Stripe's test-mode "developer tools" assistant floats a persistent
+    // badge bottom-right on any page that loads Elements with a test key
+    // (it outlives the checkout and sat over the charity bar on phones).
+    // Test-mode only, but the sandbox IS the review environment — hide it.
+    developerTools: { assistant: { enabled: false } },
+  }
 )
 
 // Stripe's iframe can't read our CSS custom properties, so resolve the
