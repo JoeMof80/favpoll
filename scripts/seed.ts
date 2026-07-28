@@ -5200,7 +5200,7 @@ const topics: TopicSeed[] = [
     },
   },
   {
-    title: "Roast dinner",
+    title: "Part of a roast dinner",
     description: "The part of the roast worth fighting over",
     is_finite: false,
     categories: ["Food & Drink", "Everyday life"],
@@ -9638,7 +9638,7 @@ const topicItems: Record<string, string[]> = {
     "Wellington",
     "Wright Flyer",
   ],
-  "Roast dinner": [
+  "Part of a roast dinner": [
     "Apple sauce",
     "Beef",
     "Bread sauce",
