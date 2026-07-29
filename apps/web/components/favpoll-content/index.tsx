@@ -11,6 +11,7 @@ import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
+import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
@@ -172,6 +173,11 @@ export function FavpollContent({
     </>
   )
 
+  const displayTitle =
+    favpoll.subject === "cause"
+      ? (favpoll.cause_label ?? "favpoll")
+      : (favpoll.protagonists?.name ?? "favpoll")
+
   const right = (
     <>
       {isClosed ? (
@@ -208,6 +214,13 @@ export function FavpollContent({
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
         goalAmount={favpoll.goal_amount ?? null}
+      />
+
+      {/* Desktop share lives in the rail (the actions column); the FAB
+          remains the mobile surface */}
+      <ShareFavpollButton
+        shareTitle={`${displayTitle} — favpoll`}
+        className="w-full"
       />
 
       <GuestWall entries={wallEntries} teaseBacked={!localEntitled} animate />

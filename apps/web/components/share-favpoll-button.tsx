@@ -29,7 +29,13 @@ export function ShareFavpollButton({
 
   async function handleShare() {
     const shareUrl = url ?? window.location.href
-    if (navigator.share) {
+    // Native sheet only on touch devices — desktop share sheets are patchy
+    // and anaemic; the desktop convention is copy-link (founder call,
+    // 2026-07-29)
+    const coarse = window.matchMedia(
+      "(hover: none) and (pointer: coarse)"
+    ).matches
+    if (coarse && navigator.share) {
       try {
         await navigator.share({ title: shareTitle, url: shareUrl })
         return
