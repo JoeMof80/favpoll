@@ -28,6 +28,9 @@ export function FavpollHeader({
   linkCue = false,
 }: FavpollHeaderProps) {
   const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
+  // Rounded square, matching the favpoll page hero (rounded-xl) and the
+  // charity chips — radius scaled to the avatar size
+  const avatarRadius = size === "lg" ? "rounded-xl" : "rounded-lg"
   const nameClass =
     size === "lg"
       ? "text-[22px] font-medium text-foreground"
@@ -90,11 +93,11 @@ export function FavpollHeader({
             <img
               src={protagonist.photo_url}
               alt={protagonist.name}
-              className="h-full w-full rounded-full object-cover"
+              className={`h-full w-full ${avatarRadius} object-cover`}
             />
           ) : (
             <div
-              className="flex h-full w-full items-center justify-center rounded-full border border-border-strong bg-secondary"
+              className={`flex h-full w-full items-center justify-center ${avatarRadius} border border-border-strong bg-secondary`}
               aria-label={protagonist.name}
             >
               <span
