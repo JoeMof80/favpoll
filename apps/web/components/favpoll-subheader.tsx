@@ -30,10 +30,11 @@ export function FavpollSubheader({
         bottom: "max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem))",
       }}
     >
+      {/* Mobile only — desktop share lives in the right rail */}
       <ShareFavpollButton
         variant="fab"
         shareTitle={`${favpollName} — favpoll`}
-        url={undefined}
+        className="md:hidden"
       />
       {isOrganiser && !isClosed && (
         <Button
