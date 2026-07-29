@@ -1,52 +1,41 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Pencil, Share2, Check } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ShareFavpollButton } from "@/components/share-favpoll-button"
 
 type Props = {
   favpollId: string
+  /** For the native share sheet title */
+  favpollName: string
   isOrganiser: boolean
   isClosed?: boolean
 }
 
-export function FavpollSubheader({ favpollId, isOrganiser, isClosed }: Props) {
-  const [copied, setCopied] = useState(false)
-
-  if (!isOrganiser) return null
-
-  function handleShareResults() {
-    const url = `${window.location.origin}/favpolls/${favpollId}`
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
+// Floating action cluster, bottom right. Share is for EVERYONE — a guest
+// at a wake is the favpoll's best distribution channel (the JustGiving
+// borrow, 2026-07-29); organisers additionally get Edit while open.
+export function FavpollSubheader({
+  favpollId,
+  favpollName,
+  isOrganiser,
+  isClosed,
+}: Props) {
   return (
     <div
-      className="fixed z-30"
+      className="fixed z-30 flex flex-col items-end gap-2"
       style={{
         right: "1.25rem",
         bottom: "max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem))",
       }}
     >
-      {isClosed ? (
-        <Button
-          type="button"
-          size="icon"
-          onClick={handleShareResults}
-          aria-label={copied ? "Link copied" : "Share results"}
-          className="h-12 w-12 rounded-full shadow-lg"
-        >
-          {copied ? (
-            <Check className="h-5 w-5" />
-          ) : (
-            <Share2 className="h-5 w-5" />
-          )}
-        </Button>
-      ) : (
+      <ShareFavpollButton
+        variant="fab"
+        shareTitle={`${favpollName} — favpoll`}
+        url={undefined}
+      />
+      {isOrganiser && !isClosed && (
         <Button
           asChild
           size="icon"

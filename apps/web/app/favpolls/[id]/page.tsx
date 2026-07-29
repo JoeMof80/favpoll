@@ -316,6 +316,11 @@ export default async function FavpollPage({ params }: Props) {
     <>
       <FavpollSubheader
         favpollId={id}
+        favpollName={
+          typedFavpoll.subject === "cause"
+            ? (typedFavpoll.cause_label ?? "favpoll")
+            : (typedFavpoll.protagonists?.name ?? "favpoll")
+        }
         isOrganiser={isOrganiser}
         isClosed={isClosed}
       />

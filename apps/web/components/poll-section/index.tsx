@@ -11,6 +11,7 @@ import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
 import { RevealLockPill, revealLockLabel } from "../reveal-lock"
+import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
 type RankingView = "amount" | "count"
@@ -142,6 +143,16 @@ export function PollSection({
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
               />
+              {/* The JustGiving lesson at the right moment: the pledge just
+                  landed, the reveal played — this is the peak, and sharing
+                  is the 5x lever. Quiet, once, only on the confirmed visit. */}
+              {pledgeJustConfirmed && (
+                <div className="flex justify-center pt-2">
+                  <ShareFavpollButton
+                    shareTitle={`${protagonistName} — favpoll`}
+                  />
+                </div>
+              )}
             </>
           )}
         </>
