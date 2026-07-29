@@ -52,6 +52,9 @@ export function HeroLayout({
   // shrink must not go as deep there — 0.635 of 80px is a 51px stamp
   // (founder: "shrinks too small", on-device 2026-07-26).
   const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
+  // Style binding waits for mount: SSR + first client paint use the CSS
+  // size classes, so server and client markup can't disagree.
+  const [avatarMounted, setAvatarMounted] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)")
     // Mobile: 0.9 of the 80px avatar = 72px, matching the stuck
@@ -61,23 +64,22 @@ export function HeroLayout({
         mq.matches ? { end: 0.635, size: 132 } : { end: 0.9, size: 80 }
       )
     set()
+    setAvatarMounted(true)
     mq.addEventListener("change", set)
     return () => mq.removeEventListener("change", set)
   }, [])
-  const avatarEnd = avatarCfg.end
 
   const t = [0, 120]
   const nameScale = useTransform(scrollY, t, [1, 0.9])
-  const avatarScale = useTransform(scrollY, t, [1, avatarEnd])
-  // scale is visual only — the avatar's LAYOUT box would keep its full
-  // height and hold the stuck hero open (48px of phantom space on md+,
-  // where the 132px avatar, not the text, drives the hero's height; the
-  // ribbon then stuck too low on desktop). A negative bottom margin
-  // shrinks the layout in step with the visual, and the ResizeObserver
-  // republishes --hero-stuck-bottom.
-  const avatarMarginBottom = useTransform(scrollY, t, [
-    0,
-    -avatarCfg.size * (1 - avatarEnd),
+  // The avatar shrink is PURE LAYOUT — width/height animate directly and
+  // the inner avatar fills the wrapper. The previous scale-transform +
+  // compensating-margin pair could desync (transform not applied, margin
+  // applied → the ribbon pinned 48px into the photo; founder's desktop,
+  // 2026-07-29). One value, no transform, nothing to disagree — and the
+  // ResizeObserver republishes --hero-stuck-bottom as it animates.
+  const avatarSize = useTransform(scrollY, t, [
+    avatarCfg.size,
+    avatarCfg.size * avatarCfg.end,
   ])
   const suffixOpacity = useTransform(scrollY, t, [1, 0])
   // The faded subtitle must also give up its HEIGHT — opacity alone left
@@ -121,11 +123,12 @@ export function HeroLayout({
           {/* Avatar */}
           {avatar && (
             <motion.div
-              style={{
-                scale: avatarScale,
-                transformOrigin: "top right",
-                marginBottom: avatarMarginBottom,
-              }}
+              className="h-20 w-20 shrink-0 md:h-33 md:w-33"
+              style={
+                avatarMounted
+                  ? { width: avatarSize, height: avatarSize }
+                  : undefined
+              }
             >
               {avatar}
             </motion.div>
