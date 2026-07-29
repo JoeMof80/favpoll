@@ -210,8 +210,12 @@ export function OrganizerRow({ favpoll }: Props) {
           get the links on top; sm:order swaps the columns on desktop. ── */}
       {expanded && (
         <div className="grid gap-x-8 gap-y-5 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2 sm:px-6 sm:py-5">
-          {/* Share — clickable link rows, QR on the outer edge */}
-          <div className="sm:order-2">
+          {/* Share — clickable link rows, QR on the outer edge.
+              min-w-0 on BOTH grid children: grid min-width:auto let the
+              mono URLs force the panel past the viewport, defeating every
+              truncate inside (the 562px lesson again; found on-device
+              2026-07-29) */}
+          <div className="min-w-0 sm:order-2">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                 {/* favpoll */}
@@ -348,7 +352,7 @@ export function OrganizerRow({ favpoll }: Props) {
 
           {/* Manage — uniform label-over-value facts; the visibility switch
               sits under its label at the same weight as everything else */}
-          <div className="grid grid-cols-2 content-start gap-x-6 gap-y-4 sm:order-1">
+          <div className="grid min-w-0 grid-cols-2 content-start gap-x-6 gap-y-4 sm:order-1">
             <div>
               <p className="text-xs text-muted-foreground">Visibility</p>
               <div className="mt-1 flex items-center gap-2">
