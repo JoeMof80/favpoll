@@ -3,7 +3,7 @@
 import { HeroLayout } from "../hero-layout"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { getFavpollHeadline } from "@/lib/display"
+import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
 type BaseFavpollHeroProps = {
@@ -39,9 +39,13 @@ export function BaseFavpollHero({
     </SectionEyebrow>
   )
 
+  const titleText =
+    favpoll.subject === "cause" ? (favpoll.cause_label ?? "") : protagonist.name
   const title = (
-    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
-      {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
+    <h1
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(titleText)}`}
+    >
+      {titleText}
     </h1>
   )
 
