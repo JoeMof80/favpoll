@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EditableField } from "@/components/editable-field"
 import { cn } from "@/lib/utils"
-import { heroNameSizeClass } from "@/lib/display"
 import { HeroCauseLabelOverlay } from "./hero-cause-label-overlay"
 import { HeroNameOverlay } from "./hero-name-overlay"
 import { HeroContextOverlay } from "./hero-context-overlay"
@@ -73,11 +72,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                   : () => setNameOpen(true)
               }
             >
-              <h1
-                className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(
-                  subject === "cause" ? causeLabel : name
-                )}`}
-              >
+              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
                 {subject === "cause"
                   ? causeLabel || (
                       <span className="text-muted-foreground/50">
