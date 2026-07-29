@@ -144,7 +144,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                 <div className="h-4 w-4/5 rounded-full bg-muted/60" />
               </div>
             ) : (
-              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/40">
+              <p className="line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground/50">
                 {subject === "cause"
                   ? "Two or three sentences: what you're raising for and where pledges go. Don't name your pick — that's the reveal."
                   : "Two or three sentences: who this is for, the occasion, and where pledges go. Don't name their favourite — that's the reveal."}

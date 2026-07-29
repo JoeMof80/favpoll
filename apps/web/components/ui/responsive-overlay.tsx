@@ -37,6 +37,30 @@ type Props = {
   headerClassName?: string
 }
 
+// iOS pins fixed bottom sheets to the LAYOUT viewport, and the keyboard
+// simply covers them — a short sheet (About, Context, Name overlays)
+// disappears entirely behind it (found on-device, 2026-07-29; the pledge
+// picker's min-h floor was the special case of the same bug). Measure the
+// keyboard via visualViewport and lift the sheet above it — the general
+// fix, inherited by every dialog.
+function useKeyboardInset() {
+  const [inset, setInset] = useState(0)
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () =>
+      setInset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop))
+    update()
+    vv.addEventListener("resize", update)
+    vv.addEventListener("scroll", update)
+    return () => {
+      vv.removeEventListener("resize", update)
+      vv.removeEventListener("scroll", update)
+    }
+  }, [])
+  return inset
+}
+
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
@@ -64,6 +88,7 @@ export function ResponsiveOverlay({
   headerClassName,
 }: Props) {
   const isMobile = useIsMobile()
+  const keyboardInset = useKeyboardInset()
 
   if (isMobile) {
     return (
@@ -71,7 +96,10 @@ export function ResponsiveOverlay({
         <SheetContent
           side="bottom"
           className="flex flex-col gap-0 p-0"
-          style={{ maxHeight: "calc(100dvh - 3.5rem)" }}
+          style={{
+            maxHeight: `calc(100dvh - 3.5rem - ${keyboardInset}px)`,
+            bottom: keyboardInset,
+          }}
           showCloseButton={!hideCloseButton}
           // Radix focuses the first focusable on open — on touch that's often
           // a text input, which summons the iOS keyboard over the sheet.
