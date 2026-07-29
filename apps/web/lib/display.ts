@@ -135,16 +135,13 @@ export function getFavpollHeadline(params: {
 }
 
 /**
- * Hero name sizing — the step-down doctrine applied to the page title.
- * Long names render a size smaller BEFORE wrapping; wrapping stays the
- * final always-legal behaviour (never truncate the hero name — the hero
- * is the one canonical surface where the full name must appear). The
- * two-line clamp on the h1 remains the guard for absurd input.
- * Thresholds tuned to the poll page column: ~16 chars fit text-5xl,
- * ~26 fit text-4xl.
+ * Hero name size — ONE standard size for every name (founder call,
+ * 2026-07-29: the smaller size reads fine — better, even — in all cases,
+ * and a constant height is what makes the sticky hero simple). Kept as a
+ * function so the three heroes share a single source. Long names wrap
+ * (never truncate on the hero); the h1's two-line clamp guards absurd
+ * input.
  */
-export function heroNameSizeClass(name: string): string {
-  if (name.length > 26) return "text-2xl sm:text-3xl"
-  if (name.length > 16) return "text-3xl sm:text-4xl"
-  return "text-4xl sm:text-5xl"
+export function heroNameSizeClass(_name: string): string {
+  return "text-3xl sm:text-4xl"
 }
