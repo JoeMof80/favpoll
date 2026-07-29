@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { NewFavpollButton } from "@/components/new-favpoll-button"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { withLiveTotals } from "@/lib/live-totals"
 import { OrganizerPageClient } from "./organizer-page-client"
 import type { OrganizerFavpoll } from "@/components/organizer-row/utils"
 
@@ -79,9 +80,15 @@ export default async function MyFavpollsPage() {
     favpoll_pots: RawPot | null
   }
 
-  const favpolls: OrganizerFavpoll[] = (
+  // total_raised is settlement-only (0 until close) — overlay live sums,
+  // like every other money surface (the organiser row showed £0 against a
+  // pledged poll; founder catch 2026-07-29)
+  const withTotals = await withLiveTotals(
+    supabase,
     (rawFavpolls ?? []) as unknown as RawFavpoll[]
-  ).map((ev) => ({
+  )
+
+  const favpolls: OrganizerFavpoll[] = withTotals.map((ev) => ({
     id: ev.id,
     live_slug: ev.live_slug,
     opening_line: ev.opening_line,
