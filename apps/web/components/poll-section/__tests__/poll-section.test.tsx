@@ -101,25 +101,26 @@ describe("PollSection — unlock overlay copy", () => {
     ).toBeInTheDocument()
   })
 
-  it("names the full cause label for a cause favpoll", () => {
+  it("uses 'our pick' for a cause favpoll — never the possessive label", () => {
     render(
       <PollSection
         {...BASE_PROPS}
-        protagonistName="Protecting our seas"
+        protagonistName="Winter Appeal for the Trussell Trust"
         isCause={true}
         onOpenPledgeDialog={vi.fn()}
       />
     )
 
-    // Causes use the FULL label — "The Sunshine Appeal's favourite" style
+    // The full-label possessive ("…Trussell Trust's favourite") overflowed
+    // the pill and misread — a cause's reveal is "our pick" (2026-07-29)
     expect(
       screen.getByRole("button", {
-        name: /Pledge to reveal Protecting our seas's favourite/i,
+        name: /Pledge to reveal our pick and see the results/i,
       })
     ).toBeInTheDocument()
   })
 
-  it("falls back to the generic label when the cause label is empty", () => {
+  it("uses 'our pick' even when the cause label is empty", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -129,7 +130,7 @@ describe("PollSection — unlock overlay copy", () => {
       />
     )
     expect(
-      screen.getByRole("button", { name: /Pledge to see the reveal/i })
+      screen.getByRole("button", { name: /Pledge to reveal our pick/i })
     ).toBeInTheDocument()
   })
 

@@ -74,16 +74,20 @@ export function PollSection({
   })
 
   const personFirstName = protagonistName.split(/[\s&]+/)[0]
-  // Causes use the FULL cause label ("The Sunshine Appeal's favourite") —
-  // splitting a first name only makes sense for people.
-  const displayFirstName = isCause ? protagonistName || null : personFirstName
+  // Causes get no possessive at all: "Winter Appeal for the Trussell
+  // Trust's favourite" overflowed the pill AND reads wrong — a cause's
+  // reveal is "our pick", not a personal favourite (found on-device,
+  // 2026-07-29). displayFirstName stays person-only.
+  const displayFirstName = isCause ? null : personFirstName
   const hasItems = poll.topics.favourites.length > 0
 
   const unlockAriaLabel = !hasReveal
     ? "Pledge to see the results"
-    : displayFirstName
-      ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
-      : "Pledge to see the reveal and results"
+    : isCause
+      ? "Pledge to reveal our pick and see the results"
+      : displayFirstName
+        ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
+        : "Pledge to see the reveal and results"
 
   return (
     <section
@@ -227,7 +231,9 @@ export function PollSection({
                 <RevealLockPill
                   label={
                     hasReveal
-                      ? revealLockLabel(displayFirstName)
+                      ? isCause
+                        ? "Pledge to reveal our pick"
+                        : revealLockLabel(displayFirstName)
                       : "Pledge to see the results"
                   }
                 />
