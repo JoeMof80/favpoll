@@ -24,11 +24,10 @@ export function FavpollSubheader({
 }: Props) {
   return (
     <div
-      className="fixed z-30 flex flex-col items-end gap-2"
-      style={{
-        right: "1.25rem",
-        bottom: "max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem))",
-      }}
+      // Mobile: the fixed charity bar owns the bottom edge — clear it so
+      // the FABs never sit over its £ figure (founder catch, 2026-07-29).
+      // Desktop (md+) has no bar; hug the corner as before.
+      className="fixed right-5 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-30 flex flex-col items-end gap-2 md:bottom-5"
     >
       {/* Mobile only — desktop share lives in the right rail */}
       <ShareFavpollButton
