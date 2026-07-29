@@ -1,6 +1,7 @@
 "use client"
 
 import { HeroLayout } from "./hero-layout"
+import { heroNameSizeClass } from "@/lib/display"
 import { getFavpollHeadline } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { Favpoll } from "@favpoll/types"
@@ -32,7 +33,9 @@ export function CauseHero({ favpoll }: Props) {
   )
 
   const title = (
-    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
+    <h1
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(favpoll.cause_label ?? "")}`}
+    >
       {favpoll.cause_label}
     </h1>
   )
