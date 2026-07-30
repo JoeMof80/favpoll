@@ -66,7 +66,7 @@ export function HonourStep({ value, onChange }: Props) {
     // horizontal OR, cause below); sm+ reads left-to-right on one row
     // with a vertical OR (founder, 2026-07-30). The step-shell guidance
     // asks the question, so there is no heading here.
-    <div className="flex w-full flex-col gap-6 sm:max-w-135 sm:flex-row sm:items-stretch sm:gap-2">
+    <div className="flex w-full flex-col gap-6 sm:flex-row sm:items-stretch sm:gap-2">
       <ToggleGroup
         type="single"
         value={value.category ?? ""}
