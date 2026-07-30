@@ -2,16 +2,19 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useWatch, useForm } from "react-hook-form"
-import { Sparkles, Mars, Venus, NonBinary, CalendarHeart } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { pickExampleName } from "@/lib/registers"
 import { deriveRegister } from "@/lib/registers"
-import { occasionsForRegister, type OccasionSpec } from "@/lib/occasions"
-import { GroupIcon, PairIcon } from "@/components/icons/people"
+import { type OccasionSpec } from "@/lib/occasions"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
-import { OccasionPicker } from "./occasion-picker"
+import {
+  GenerateExampleDialog,
+  groupingForWho,
+  type WhoValue,
+} from "./generate-example-dialog"
 import { GoalOverlay } from "./goal-overlay"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
@@ -65,24 +68,6 @@ function pickVariant(pool: readonly string[]): string {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
-/** Maps the form's grouping onto the occasion catalogue's pair/group tags. */
-function groupingFilterFor(
-  grouping: FavpollGrouping
-): "pair" | "group" | undefined {
-  return grouping === "couple"
-    ? "pair"
-    : grouping === "group"
-      ? "group"
-      : undefined
-}
-
-// Who-icon chip styling, shared with the occasion chip so the pill's
-// selected/unselected language stays uniform.
-const PILL_CHIP_ON =
-  "size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground hover:text-primary sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-const PILL_CHIP_OFF =
-  "size-7 rounded-full p-0 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-
 export type FormInnerProps = {
   form: ReturnType<
     typeof useForm<FavpollFormValues, unknown, FavpollFormValues>
@@ -116,7 +101,7 @@ export function FormInner({
   // The occasion is ephemeral generation input — it targets the opening
   // line and context lookups but is never stored on the favpoll.
   const [occasion, setOccasion] = useState<OccasionSpec | null>(null)
-  const [occasionOpen, setOccasionOpen] = useState(false)
+  const [generateOpen, setGenerateOpen] = useState(false)
   const lastGeneratedOpeningLine = useRef<string | null>(null)
   const lastGeneratedName = useRef<string | null>(null)
   const lastGeneratedCauseLabel = useRef<string | null>(null)
@@ -338,56 +323,33 @@ export function FormInner({
         ? "group"
         : (pronounWatch ?? "")
 
-  // Tapping a who icon applies the refinement AND generates in one step
-  // (founder, 2026-07-30): setValue is synchronous, so handleRegenerate's
-  // form.getValues() sees the fresh who.
-  function handleWhoGenerate(v: string) {
-    const grouping: FavpollGrouping =
-      v === "couple" ? "couple" : v === "group" ? "group" : "individual"
-    const pronoun = v === "couple" || v === "group" ? undefined : (v as Pronoun)
-    form.setValue("grouping", grouping, { shouldDirty: true })
-    form.setValue("pronoun", pronoun, { shouldDirty: true })
-    // Register depends on grouping (celebrating one vs many) — re-derive
-    // so the generation uses the right grammar.
-    const newRegister = deriveRegister(
-      (form.getValues("category") as FavpollCategory | null) ?? null,
-      grouping,
-      form.getValues("subject") ?? "someone"
-    )
-    form.setValue("register", newRegister, { shouldDirty: true })
-    // A who change can invalidate the selected occasion (She with
-    // "Wedding" picked, Group with "Renewal of vows") — clear rather than
-    // generate mismatched copy.
-    let occ: OccasionSpec | null = occasion
-    if (
-      occ &&
-      !occasionsForRegister(newRegister, groupingFilterFor(grouping)).includes(
-        occ
+  // The dialog hands back both selections at once (founder, 2026-07-30:
+  // who then occasion, structurally ordered). setValue is synchronous, so
+  // handleRegenerate's form.getValues() sees the fresh who.
+  function handleDialogGenerate(
+    who: WhoValue | null,
+    occ: OccasionSpec | null
+  ) {
+    if (who) {
+      const grouping = groupingForWho(who)
+      const pronoun =
+        who === "couple" || who === "group" ? undefined : (who as Pronoun)
+      form.setValue("grouping", grouping, { shouldDirty: true })
+      form.setValue("pronoun", pronoun, { shouldDirty: true })
+      // Register depends on grouping (celebrating one vs many) — re-derive
+      // so the generation uses the right grammar.
+      form.setValue(
+        "register",
+        deriveRegister(
+          (form.getValues("category") as FavpollCategory | null) ?? null,
+          grouping,
+          form.getValues("subject") ?? "someone"
+        ),
+        { shouldDirty: true }
       )
-    ) {
-      occ = null
-      setOccasion(null)
     }
+    setOccasion(occ)
     void handleRegenerate(occ)
-  }
-  const registerWatch = useWatch({ control: form.control, name: "register" })
-
-  // The occasion list narrows with the who selection (founder,
-  // 2026-07-30): who → register → occasions, and Pair/Group narrow
-  // celebrating_many further. A celebration has no occasion list until a
-  // who is picked — the chip waits.
-  const occasionReady =
-    subjectWatch === "cause" || category !== "celebration" || whoValue !== ""
-  const availableOccasions = registerWatch
-    ? occasionsForRegister(
-        registerWatch as Register,
-        groupingFilterFor(groupingWatch)
-      )
-    : []
-
-  function handleOccasionSelect(o: OccasionSpec | null) {
-    setOccasion(o)
-    void handleRegenerate(o)
   }
 
   const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
@@ -418,103 +380,29 @@ export function FormInner({
             <div>
               {showSparkles && (
                 <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
-                  <div className="flex items-center gap-1 rounded-full bg-primary py-1 pr-1 pl-3 text-primary-foreground shadow-md">
-                    {/* "Generate an example" is the group's TITLE; the
-                        who icons are the triggers — one tap sets the
-                        refinement and generates (founder, 2026-07-30).
-                        Causes have no who: a single sparkle triggers.
-                        The occasion chip narrows the deterministic
-                        fields; its list depends on the who, so it waits
-                        for one on celebrations. */}
-                    <span className="flex items-center gap-1.5 pr-1 text-sm font-medium whitespace-nowrap">
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      {isGenerating ? (
-                        "Generating…"
-                      ) : (
-                        <>
-                          <span className="sm:hidden">Generate</span>
-                          <span className="hidden sm:inline">
-                            Generate an example
-                          </span>
-                        </>
-                      )}
-                    </span>
-                    <div className="h-5 w-px shrink-0 bg-primary-foreground/30" />
-                    {subjectWatch !== "cause" ? (
-                      <div
-                        role="group"
-                        aria-label="Generate an example for…"
-                        className="flex items-center gap-0.5"
-                      >
-                        {(
-                          [
-                            { value: "he", label: "He", icon: Mars },
-                            { value: "she", label: "She", icon: Venus },
-                            { value: "they", label: "They", icon: NonBinary },
-                            { value: "couple", label: "Pair", icon: PairIcon },
-                            { value: "group", label: "Group", icon: GroupIcon },
-                          ] as const
-                        ).map(({ value, label, icon: Icon }) => (
-                          <Button
-                            key={value}
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            disabled={isGenerating}
-                            aria-label={`Generate for ${label}`}
-                            aria-pressed={whoValue === value}
-                            title={label}
-                            onClick={() => handleWhoGenerate(value)}
-                            className={
-                              whoValue === value ? PILL_CHIP_ON : PILL_CHIP_OFF
-                            }
-                          >
-                            <Icon aria-hidden="true" />
-                          </Button>
-                        ))}
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        size="icon"
-                        disabled={isGenerating}
-                        aria-label="Generate an example"
-                        onClick={() => void handleRegenerate()}
-                        className="size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground/90 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4"
-                      >
-                        <Sparkles aria-hidden="true" />
-                      </Button>
-                    )}
-                    <div className="h-5 w-px shrink-0 bg-primary-foreground/30" />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      disabled={isGenerating || !occasionReady}
-                      aria-label={
-                        occasion
-                          ? `Occasion: ${occasion.label}`
-                          : "Pick an occasion"
-                      }
-                      aria-pressed={occasion !== null}
-                      title={occasion?.label ?? "Occasion"}
-                      onClick={() => setOccasionOpen(true)}
-                      className={
-                        (occasion ? PILL_CHIP_ON : PILL_CHIP_OFF) +
-                        " disabled:opacity-40"
-                      }
-                    >
-                      <CalendarHeart aria-hidden="true" />
-                    </Button>
-                  </div>
+                  {/* Opens the two-step dialog: who → occasion (founder,
+                      2026-07-30) — the ordering is structural because the
+                      who narrows the occasion list. Selections are
+                      remembered, so a re-roll is tap-tap. */}
+                  <Button
+                    type="button"
+                    disabled={isGenerating}
+                    onClick={() => setGenerateOpen(true)}
+                    className="rounded-full shadow-md"
+                  >
+                    <Sparkles aria-hidden="true" />
+                    {isGenerating ? "Generating…" : "Generate an example"}
+                  </Button>
                 </div>
               )}
-              <OccasionPicker
-                open={occasionOpen}
-                onOpenChange={setOccasionOpen}
-                occasions={availableOccasions}
-                selected={occasion}
-                onSelect={handleOccasionSelect}
+              <GenerateExampleDialog
+                open={generateOpen}
+                onOpenChange={setGenerateOpen}
+                category={category}
+                subject={subjectWatch === "cause" ? "cause" : "someone"}
+                who={whoValue as WhoValue | ""}
+                occasion={occasion}
+                onGenerate={handleDialogGenerate}
               />
               {/* Wrapped so a caller's click event can't land in the
                   occasionOverride parameter */}

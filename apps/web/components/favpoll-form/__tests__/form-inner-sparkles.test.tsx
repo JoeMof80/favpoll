@@ -20,6 +20,23 @@ vi.mock("sonner", () => ({ toast: { error: vi.fn() } }))
 vi.mock("@/lib/actions/generate-draft", () => ({
   safeGenerateDraft: mockSafeGenerateDraft,
 }))
+// Flatten the overlay so the dialog's steps render inline.
+vi.mock("@/components/ui/responsive-overlay", () => ({
+  ResponsiveOverlay: ({
+    open,
+    children,
+  }: {
+    open: boolean
+    children?: React.ReactNode
+  }) => (open ? <div data-testid="generate-dialog">{children}</div> : null),
+}))
+
+// Drives the two-step dialog: pill -> who -> No occasion.
+function generateVia(who: string) {
+  fireEvent.click(screen.getByRole("button", { name: "Generate an example" }))
+  fireEvent.click(screen.getByRole("button", { name: who }))
+  fireEvent.click(screen.getByRole("option", { name: "No occasion" }))
+}
 
 function Wrapper({
   defaultValues,
@@ -88,9 +105,6 @@ describe("FormInner — Sparkles button reachability", () => {
       />
     )
     expect(screen.getByText("Generate an example")).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: "Generate for They" })
-    ).toBeInTheDocument()
   })
 
   it("is absent when a custom topic has no title", () => {
@@ -115,9 +129,6 @@ describe("FormInner — Sparkles button reachability", () => {
   it("is present when a canonical topic is selected", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     expect(screen.getByText("Generate an example")).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: "Generate for They" })
-    ).toBeInTheDocument()
   })
 
   it("invokes safeGenerateDraft with topicId for canonical topic", async () => {
@@ -127,7 +138,7 @@ describe("FormInner — Sparkles button reachability", () => {
       fromCache: false,
     })
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(screen.getByRole("button", { name: "Generate for She" }))
+    generateVia("She")
     await waitFor(() =>
       expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -162,7 +173,7 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
-    fireEvent.click(screen.getByRole("button", { name: "Generate for They" }))
+    generateVia("They")
     await waitFor(() =>
       expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -186,7 +197,7 @@ describe("FormInner — Sparkles button reachability", () => {
         })
     )
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(screen.getByRole("button", { name: "Generate for They" }))
+    generateVia("They")
     await waitFor(() =>
       expect(screen.getByText("Generating…")).toBeInTheDocument()
     )

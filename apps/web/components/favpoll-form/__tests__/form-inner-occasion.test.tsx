@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { useForm } from "react-hook-form"
 import { FormInner } from "../form-inner"
 import { OCCASIONS } from "@/lib/occasions"
-import type { OccasionSpec } from "@/lib/occasions"
 import type { FavpollFormValues } from "../schema"
 
 const mockSafeGenerateDraft = vi.hoisted(() => vi.fn())
@@ -22,25 +21,26 @@ vi.mock("sonner", () => ({ toast: { error: vi.fn() } }))
 vi.mock("@/lib/actions/generate-draft", () => ({
   safeGenerateDraft: mockSafeGenerateDraft,
 }))
-// The picker's overlay behaviour is its own concern — here it is a flat
-// list so the tests drive form-inner's occasion logic directly.
-vi.mock("../occasion-picker", () => ({
-  OccasionPicker: ({
+// Flatten the overlay so the real GenerateExampleDialog's step logic is
+// exercised without Radix portals.
+vi.mock("@/components/ui/responsive-overlay", () => ({
+  ResponsiveOverlay: ({
     open,
-    occasions,
-    onSelect,
+    children,
+    mobileBack,
   }: {
     open: boolean
-    occasions: OccasionSpec[]
-    onSelect: (o: OccasionSpec | null) => void
+    children?: React.ReactNode
+    mobileBack?: { label?: string; onClick: () => void }
   }) =>
     open ? (
-      <div data-testid="occasion-picker">
-        {occasions.map((o) => (
-          <button key={o.label} onClick={() => onSelect(o)}>
-            {o.label}
+      <div data-testid="generate-dialog">
+        {mobileBack && (
+          <button onClick={mobileBack.onClick}>
+            {mobileBack.label ?? "Back"}
           </button>
-        ))}
+        )}
+        {children}
       </div>
     ) : null,
 }))
@@ -89,7 +89,8 @@ const CANONICAL_TOPIC: FavpollFormValues["topics"][0] = {
   customLabels: [],
 }
 
-const occasionChip = () => screen.getByRole("button", { name: /occasion/i })
+const openDialog = () =>
+  fireEvent.click(screen.getByRole("button", { name: "Generate an example" }))
 
 beforeEach(() => {
   mockSafeGenerateDraft.mockReset()
@@ -101,29 +102,15 @@ beforeEach(() => {
   vi.spyOn(window, "confirm").mockReturnValue(true)
 })
 
-describe("FormInner — occasion chip readiness", () => {
-  it("waits for a who on celebrations, then enables", async () => {
+describe("GenerateExampleDialog — steps", () => {
+  it("opens on the who step for a celebration", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    expect(occasionChip()).toBeDisabled()
-    fireEvent.click(screen.getByRole("button", { name: "Generate for She" }))
-    // The tap also generates; the chip unlocks once generation settles.
-    await waitFor(() => expect(occasionChip()).toBeEnabled())
+    openDialog()
+    expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
+    expect(screen.queryByText("What's the occasion?")).not.toBeInTheDocument()
   })
 
-  it("is live from the start on a memorial", () => {
-    render(
-      <Wrapper
-        defaultValues={{
-          category: "memorial",
-          register: "remembering",
-          topics: [CANONICAL_TOPIC],
-        }}
-      />
-    )
-    expect(occasionChip()).toBeEnabled()
-  })
-
-  it("is live from the start on a cause", () => {
+  it("opens straight onto occasions for a cause", () => {
     render(
       <Wrapper
         defaultValues={{
@@ -134,79 +121,118 @@ describe("FormInner — occasion chip readiness", () => {
         }}
       />
     )
-    expect(occasionChip()).toBeEnabled()
+    openDialog()
+    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
+    expect(
+      screen.getByRole("option", { name: "Coffee morning" })
+    ).toBeInTheDocument()
+  })
+
+  it("picking a who advances to its narrowed occasion list", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "She" }))
+    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
+    expect(
+      screen.getByRole("option", { name: "Retirement" })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole("option", { name: "Wedding" })
+    ).not.toBeInTheDocument()
+  })
+
+  it("Pair sees pair occasions, not group ones", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Pair" }))
+    expect(screen.getByRole("option", { name: "Wedding" })).toBeInTheDocument()
+    expect(
+      screen.queryByRole("option", { name: "Championship win" })
+    ).not.toBeInTheDocument()
+  })
+
+  it("Back returns to the who step", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Group" }))
+    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
+    fireEvent.click(screen.getAllByRole("button", { name: "Back" })[0])
+    expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
+  })
+
+  it("search filters the occasion list", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "She" }))
+    fireEvent.change(screen.getByPlaceholderText("Search occasions…"), {
+      target: { value: "retire" },
+    })
+    expect(
+      screen.getByRole("option", { name: "Retirement" })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole("option", { name: "Birthday" })
+    ).not.toBeInTheDocument()
   })
 })
 
-describe("FormInner — occasion-targeted generation", () => {
-  it("stamps an opening line and context from the picked occasion's variants", async () => {
-    render(
-      <Wrapper
-        defaultValues={{
-          category: "memorial",
-          register: "remembering",
-          topics: [CANONICAL_TOPIC],
-        }}
-      />
+describe("GenerateExampleDialog — generation", () => {
+  it("picking an occasion generates with its variants and closes", async () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "She" }))
+    fireEvent.click(screen.getByRole("option", { name: "Retirement" }))
+    expect(screen.queryByTestId("generate-dialog")).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          register: "celebrating_one",
+          pronoun: "she",
+          topicId: "topic-1",
+        })
+      )
     )
-    fireEvent.click(occasionChip())
-    fireEvent.click(screen.getByRole("button", { name: "Pet memorial" }))
-    const spec = OCCASIONS.find((o) => o.label === "Pet memorial")!
-    await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
+    const spec = OCCASIONS.find((o) => o.label === "Retirement")!
     expect(spec.openingLines).toContain(capturedForm.getValues("openingLine"))
     expect(spec.contexts).toContain(capturedForm.getValues("context"))
   })
 
-  it("filters the list by who — Pair sees Wedding, Group does not", async () => {
+  it("No occasion generates at register level", async () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(screen.getByRole("button", { name: "Generate for Pair" }))
-    await waitFor(() => expect(occasionChip()).toBeEnabled())
-    fireEvent.click(occasionChip())
-    expect(screen.getByRole("button", { name: "Wedding" })).toBeInTheDocument()
-    expect(
-      screen.queryByRole("button", { name: "Championship win" })
-    ).not.toBeInTheDocument()
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Pair" }))
+    fireEvent.click(screen.getByRole("option", { name: "No occasion" }))
+    await waitFor(() =>
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          register: "celebrating_many",
+          pronoun: "they",
+        })
+      )
+    )
+    // Register-level prefix, not any occasion's opening line
+    expect(capturedForm.getValues("openingLine")).toBe("Celebrating")
   })
 
-  it("clears an incompatible occasion when the who changes", async () => {
+  it("remembers who and occasion for the next open", async () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(screen.getByRole("button", { name: "Generate for Pair" }))
-    await waitFor(() => expect(occasionChip()).toBeEnabled())
-    fireEvent.click(occasionChip())
-    fireEvent.click(screen.getByRole("button", { name: "Wedding" }))
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Pair" }))
+    fireEvent.click(screen.getByRole("option", { name: "Wedding" }))
     await waitFor(() =>
       expect(
-        screen.getByRole("button", { name: "Occasion: Wedding" })
+        screen.getByRole("button", { name: "Generate an example" })
       ).toBeEnabled()
     )
-    fireEvent.click(screen.getByRole("button", { name: "Generate for Group" }))
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Pick an occasion" })
-      ).toBeInTheDocument()
+    openDialog()
+    expect(screen.getByRole("button", { name: "Pair" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
     )
-    // The regeneration after the incompatible who fell back to the
-    // register-level prefix, not Wedding's opening lines.
-    const wedding = OCCASIONS.find((o) => o.label === "Wedding")!
-    expect(wedding.openingLines).not.toContain(
-      capturedForm.getValues("openingLine")
+    fireEvent.click(screen.getByRole("button", { name: "Pair" }))
+    expect(screen.getByRole("option", { name: "Wedding" })).toHaveAttribute(
+      "aria-selected",
+      "true"
     )
-  })
-
-  it("keeps a compatible occasion across a who change", async () => {
-    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(screen.getByRole("button", { name: "Generate for Pair" }))
-    await waitFor(() => expect(occasionChip()).toBeEnabled())
-    fireEvent.click(occasionChip())
-    fireEvent.click(screen.getByRole("button", { name: "Joint celebration" }))
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Occasion: Joint celebration" })
-      ).toBeEnabled()
-    )
-    fireEvent.click(screen.getByRole("button", { name: "Generate for Group" }))
-    expect(
-      screen.getByRole("button", { name: "Occasion: Joint celebration" })
-    ).toBeInTheDocument()
   })
 })
