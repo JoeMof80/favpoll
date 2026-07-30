@@ -62,35 +62,34 @@ export function HonourStep({ value, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Person path: what type of favpoll this is */}
-      <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground">
-          What type of favpoll is this?
-        </p>
-        <ToggleGroup
-          type="single"
-          value={value.category ?? ""}
-          onValueChange={handleCategoryChange}
-          className="grid w-full max-w-100 grid-cols-3 gap-1.5 sm:gap-2"
-        >
-          {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
-            <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
-              <Icon className="h-6 w-6" />
-              {label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </div>
+    // One row: the type chips, a vertical OR, the cause chip — the fork
+    // between two complete answers reads left-to-right (founder,
+    // 2026-07-30; the step-shell guidance asks the question, so there is
+    // no heading here).
+    <div className="flex w-full max-w-135 items-stretch gap-1.5 sm:gap-2">
+      <ToggleGroup
+        type="single"
+        value={value.category ?? ""}
+        onValueChange={handleCategoryChange}
+        className="grid min-w-0 flex-[3] grid-cols-3 gap-1.5 sm:gap-2"
+      >
+        {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
+          <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
+            <Icon className="h-6 w-6" />
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
 
-      {/* OR — the fork between two complete answers: honouring someone
-          (a type, above) or backing a cause (below, no type needed). */}
-      <div className="flex items-center gap-3" aria-hidden="true">
-        <div className="h-px flex-1 bg-border" />
+      <div
+        className="flex shrink-0 flex-col items-center gap-1"
+        aria-hidden="true"
+      >
+        <div className="w-px flex-1 bg-border" />
         <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
           or
         </span>
-        <div className="h-px flex-1 bg-border" />
+        <div className="w-px flex-1 bg-border" />
       </div>
 
       {/* Cause path: faceless — flips subject; category is set internally */}
@@ -98,7 +97,7 @@ export function HonourStep({ value, onChange }: Props) {
         type="single"
         value={isCause ? "cause" : ""}
         onValueChange={handleCauseChange}
-        className="grid w-full max-w-100 grid-cols-3 gap-1.5 sm:gap-2"
+        className="grid min-w-0 flex-1 grid-cols-1"
       >
         <ToggleGroupItem value="cause" className={ITEM_CLASS}>
           <HeartHandshake className="h-6 w-6" />A cause
