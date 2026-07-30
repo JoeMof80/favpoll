@@ -40,10 +40,10 @@ export function FavpollSubheader({
           asChild
           size="icon"
           aria-label="Edit Favpoll"
-          className="h-12 w-12 rounded-full shadow-lg"
+          className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
           <Link href={`/favpolls/${favpollId}/edit`}>
-            <Pencil className="h-5 w-5" />
+            <Pencil aria-hidden="true" />
           </Link>
         </Button>
       )}

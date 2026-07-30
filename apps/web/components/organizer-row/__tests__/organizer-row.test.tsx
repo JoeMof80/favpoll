@@ -5,6 +5,12 @@ import type { OrganizerFavpoll } from "../utils"
 
 vi.mock("@/app/favpolls/[id]/actions", () => ({
   setFavpollListed: vi.fn().mockResolvedValue(undefined),
+  deleteFavpoll: vi.fn().mockResolvedValue(undefined),
+}))
+
+const mockRefresh = vi.hoisted(() => vi.fn())
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: mockRefresh }),
 }))
 
 vi.mock("@/components/branded-qr", () => ({
@@ -131,12 +137,23 @@ describe("OrganizerRow", () => {
       expect(screen.getByText(/Age UK \+1/)).toBeInTheDocument()
     })
 
-    it("copies the guest URL from the collapsed row", () => {
+    it("the name links to the favpoll page without toggling expansion", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
-      fireEvent.click(screen.getByTestId("copy-guest-button"))
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining("/favpolls/fp-1")
-      )
+      const link = screen.getByTestId("row-link")
+      expect(link).toHaveAttribute("href", "/favpolls/fp-1")
+      fireEvent.click(link)
+      expect(screen.queryByTestId("qr-code")).not.toBeInTheDocument()
+    })
+
+    it("clicking the header background expands the row", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      fireEvent.click(screen.getByTestId("row-header"))
+      expect(screen.getByTestId("qr-code")).toBeInTheDocument()
+    })
+
+    it("has no copy button in the collapsed header", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expect(screen.queryByTestId("copy-guest-button")).not.toBeInTheDocument()
     })
 
     it("is not dimmed when active", () => {
@@ -389,6 +406,56 @@ describe("OrganizerRow", () => {
       render(<OrganizerRow favpoll={makeFavpoll({ goal_amount: null })} />)
       expand()
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("delete", () => {
+    const deletable = () =>
+      makeFavpoll({
+        pledge_count: 0,
+        pot: { total_deposited: 0, total_allocated: 0 },
+      })
+
+    it("is disabled with an explanation when the favpoll has pledges", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />) // pledge_count: 3
+      expand()
+      expect(screen.getByTestId("delete-favpoll-button")).toBeDisabled()
+      expect(
+        screen.getByText(/Favpolls with pledges can't be deleted/)
+      ).toBeInTheDocument()
+    })
+
+    it("is disabled when the shared fund has deposits even with no pledges", () => {
+      render(
+        <OrganizerRow
+          favpoll={makeFavpoll({
+            pledge_count: 0,
+            pot: { total_deposited: 50, total_allocated: 0 },
+          })}
+        />
+      )
+      expand()
+      expect(screen.getByTestId("delete-favpoll-button")).toBeDisabled()
+    })
+
+    it("confirms, calls deleteFavpoll, and refreshes", async () => {
+      const { deleteFavpoll } = await import("@/app/favpolls/[id]/actions")
+      vi.spyOn(window, "confirm").mockReturnValue(true)
+      render(<OrganizerRow favpoll={deletable()} />)
+      expand()
+      fireEvent.click(screen.getByTestId("delete-favpoll-button"))
+      await waitFor(() => expect(deleteFavpoll).toHaveBeenCalledWith("fp-1"))
+      await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
+    })
+
+    it("does nothing when the confirm is declined", async () => {
+      const { deleteFavpoll } = await import("@/app/favpolls/[id]/actions")
+      vi.mocked(deleteFavpoll).mockClear()
+      vi.spyOn(window, "confirm").mockReturnValue(false)
+      render(<OrganizerRow favpoll={deletable()} />)
+      expand()
+      fireEvent.click(screen.getByTestId("delete-favpoll-button"))
+      expect(deleteFavpoll).not.toHaveBeenCalled()
     })
   })
 })

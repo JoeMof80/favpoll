@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
-import { Check, Send } from "lucide-react"
+import { Save, Send } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { TOAST_ERROR_STYLE, TOAST_WARNING_STYLE } from "@/lib/toast-styles"
@@ -103,10 +103,12 @@ export function CommandPanel({
           }
           className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
+          {/* Save, not Check — a bare tick on the edit page read as
+              "approve/complete", not "save" (founder, 2026-07-30) */}
           {mode === "create" ? (
             <Send aria-hidden="true" />
           ) : (
-            <Check aria-hidden="true" />
+            <Save aria-hidden="true" />
           )}
         </Button>
       </div>

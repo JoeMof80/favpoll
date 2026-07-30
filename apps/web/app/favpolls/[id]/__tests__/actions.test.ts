@@ -30,6 +30,7 @@ import {
   createGuestPledge,
   addOrganizerItem,
   topUpFundAsGuest,
+  deleteFavpoll,
 } from "@/app/favpolls/[id]/actions"
 
 beforeEach(() => {
@@ -531,5 +532,85 @@ describe("topUpFundAsGuest", () => {
     await expect(
       topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
     ).rejects.toThrow("Favpoll not found")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// deleteFavpoll
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("deleteFavpoll", () => {
+  const OWNED_EMPTY = {
+    created_by: "user-1",
+    protagonist_id: "prot-1",
+    favpoll_polls: [{ id: "poll-1", pledges: [{ count: 0 }] }],
+    favpoll_pots: [{ id: "pot-1", total_deposited: 0 }],
+  }
+
+  it("throws Unauthorized when the favpoll belongs to someone else", async () => {
+    mock.queue({ ...OWNED_EMPTY, created_by: "other-user" })
+    await expect(deleteFavpoll("favpoll-1")).rejects.toThrow("Unauthorized")
+  })
+
+  it("refuses when any pledge exists", async () => {
+    mock.queue({
+      ...OWNED_EMPTY,
+      favpoll_polls: [{ id: "poll-1", pledges: [{ count: 2 }] }],
+    })
+    await expect(deleteFavpoll("favpoll-1")).rejects.toThrow("can't be deleted")
+    expect(
+      mock.callsFor("favpolls").filter((c) => c.method === "delete")
+    ).toHaveLength(0)
+  })
+
+  it("refuses when the shared fund holds deposits", async () => {
+    mock.queue({
+      ...OWNED_EMPTY,
+      favpoll_pots: [{ id: "pot-1", total_deposited: 25 }],
+    })
+    await expect(deleteFavpoll("favpoll-1")).rejects.toThrow("can't be deleted")
+  })
+
+  it("deletes children, the favpoll, and the orphaned protagonist", async () => {
+    mock.queue(OWNED_EMPTY) // ownership + counts fetch
+    mock.queue(null) // favpoll_poll_favourites delete
+    mock.queue(null) // favpoll_polls delete
+    mock.queue(null) // favpoll_charities delete
+    mock.queue(null) // pot_allocations delete
+    mock.queue(null) // favpoll_pots delete
+    mock.queue(null) // favpolls delete
+    mock.queue(null) // protagonists delete
+
+    await deleteFavpoll("favpoll-1")
+
+    for (const table of [
+      "favpoll_poll_favourites",
+      "favpoll_polls",
+      "favpoll_charities",
+      "pot_allocations",
+      "favpoll_pots",
+      "favpolls",
+      "protagonists",
+    ]) {
+      expect(
+        mock.callsFor(table).filter((c) => c.method === "delete")
+      ).toHaveLength(1)
+    }
+  })
+
+  it("skips the protagonist delete for cause favpolls", async () => {
+    mock.queue({ ...OWNED_EMPTY, protagonist_id: null })
+    mock.queue(null) // favpoll_poll_favourites
+    mock.queue(null) // favpoll_polls
+    mock.queue(null) // favpoll_charities
+    mock.queue(null) // pot_allocations
+    mock.queue(null) // favpoll_pots
+    mock.queue(null) // favpolls
+
+    await deleteFavpoll("favpoll-1")
+
+    expect(
+      mock.callsFor("protagonists").filter((c) => c.method === "delete")
+    ).toHaveLength(0)
   })
 })
