@@ -82,7 +82,7 @@ export function HonourStep({ value, onChange }: Props) {
       </ToggleGroup>
 
       <div
-        className="flex items-center gap-3 sm:shrink-0 sm:flex-col sm:gap-1"
+        className="flex items-center gap-3 sm:shrink-0 sm:flex-col sm:gap-1 sm:px-4"
         aria-hidden="true"
       >
         <div className="h-px flex-1 bg-border sm:h-auto sm:w-px" />
