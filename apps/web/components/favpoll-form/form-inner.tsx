@@ -346,19 +346,16 @@ export function FormInner({
             <div>
               {showSparkles && (
                 <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
-                  <div className="flex items-center gap-1 rounded-full border border-border bg-background py-1 pr-1 pl-3 shadow-md">
+                  <div className="flex items-center gap-1 rounded-full bg-primary py-1 pr-1 pl-3 text-primary-foreground shadow-md">
                     {/* "Generate a suggestion" is the group's TITLE; the
                         who icons are the triggers — one tap sets the
                         refinement and generates (founder, 2026-07-30).
                         Causes have no who: a single sparkle triggers. */}
                     <span className="flex items-center gap-1.5 pr-1 text-sm font-medium whitespace-nowrap">
-                      <Sparkles
-                        className="h-3.5 w-3.5 text-primary"
-                        aria-hidden="true"
-                      />
+                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                       {isGenerating ? "Generating…" : "Generate a suggestion"}
                     </span>
-                    <div className="h-5 w-px shrink-0 bg-border" />
+                    <div className="h-5 w-px shrink-0 bg-primary-foreground/30" />
                     {subjectWatch !== "cause" ? (
                       <div
                         role="group"
@@ -386,8 +383,8 @@ export function FormInner({
                             onClick={() => handleWhoGenerate(value)}
                             className={
                               whoValue === value
-                                ? "size-7 rounded-full bg-secondary p-0 text-secondary-foreground hover:bg-secondary sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-                                : "size-7 rounded-full p-0 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
+                                ? "size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground hover:text-primary sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
+                                : "size-7 rounded-full p-0 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
                             }
                           >
                             <Icon aria-hidden="true" />
@@ -401,7 +398,7 @@ export function FormInner({
                         disabled={isGenerating}
                         aria-label="Generate a suggestion"
                         onClick={handleRegenerate}
-                        className="size-7 rounded-full p-0 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4"
+                        className="size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground/90 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4"
                       >
                         <Sparkles aria-hidden="true" />
                       </Button>
