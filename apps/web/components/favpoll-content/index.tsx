@@ -236,7 +236,7 @@ export function FavpollContent({
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {fundAvailable > 0
-              ? "To use it, choose “Use shared fund” when you pledge — or top it up for others."
+              ? "To use it, pick “Use shared fund” when you pledge — or top it up for others."
               : "Top it up so every guest can take part."}
           </p>
           <Button

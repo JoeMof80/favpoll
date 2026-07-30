@@ -169,7 +169,7 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
                 className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-sm"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <span className="shrink-0 text-foreground">Choose file</span>
+                <span className="shrink-0 text-foreground">Pick a photo</span>
                 <span className="truncate text-muted-foreground">
                   {originalFilename ||
                     (dialogPhotoUrl ? "Current photo" : "No file chosen")}

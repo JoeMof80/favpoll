@@ -24,7 +24,7 @@ export default async function SignUpPage({
               },
               {
                 heading: "Every pledge goes to charity",
-                body: "You choose the charity. Guests make pledges split across their answers. Nothing is kept.",
+                body: "You pick the charity. Guests make pledges split across their answers. Nothing is kept.",
               },
               {
                 heading: "A permanent record of favourites",

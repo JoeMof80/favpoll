@@ -208,7 +208,7 @@ export function PledgeDialog({
   )
 
   const titleByStep = {
-    1: `Choose your favourite ${topicTitle.toLowerCase()}`,
+    1: `Pick your favourite ${topicTitle.toLowerCase()}`,
     2: "Your pledge",
     3: "Complete payment",
   }
@@ -236,6 +236,35 @@ export function PledgeDialog({
               : undefined
         }
         footer={currentFooter}
+        fullscreenOnMobile
+        mobileBack={
+          dialog.step === 1
+            ? { label: "Cancel", onClick: () => handleOpenChange(false) }
+            : {
+                label: "Back",
+                onClick: dialog.handleBack,
+                disabled: dialog.step === 3 && stripeSubmitting,
+              }
+        }
+        mobileSave={
+          dialog.step === 1
+            ? {
+                label: "Next",
+                onClick: () => dialog.handleNext(),
+                disabled: !dialog.canAdvanceStep1,
+              }
+            : dialog.step === 2
+              ? {
+                  label: nextLabel,
+                  onClick: () => dialog.handleNext(),
+                  disabled: isNextDisabled,
+                }
+              : {
+                  label: stripeSubmitting ? "Processing…" : "Pay now",
+                  form: "pledge-checkout-form",
+                  disabled: stripeSubmitting || !stripeReady,
+                }
+        }
         headerClassName={
           dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
         }

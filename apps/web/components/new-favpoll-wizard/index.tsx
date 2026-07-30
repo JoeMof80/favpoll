@@ -150,6 +150,14 @@ export function NewFavpollWizard({ data }: Props) {
         }}
         title="Pick a topic"
         hideCloseButton
+        fullscreenOnMobile
+        mobileSave={{
+          label: "Done",
+          onClick: () => {
+            w.setLoveOpen(false)
+            setLoveSearch("")
+          },
+        }}
         header={
           <div className="flex items-center gap-2">
             <input
@@ -225,6 +233,14 @@ export function NewFavpollWizard({ data }: Props) {
         }}
         title="Pick a charity"
         hideCloseButton
+        fullscreenOnMobile
+        mobileSave={{
+          label: "Done",
+          onClick: () => {
+            w.setCharityOpen(false)
+            setCharitySearch("")
+          },
+        }}
         header={
           <input
             type="text"

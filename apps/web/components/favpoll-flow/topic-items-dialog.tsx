@@ -102,6 +102,8 @@ export function TopicItemsDialog({
       }
       hideCloseButton
       bodyClassName="p-0"
+      fullscreenOnMobile
+      mobileSave={{ label: "Done", onClick: handleClose }}
       footer={
         <div className="flex gap-2">
           <Button

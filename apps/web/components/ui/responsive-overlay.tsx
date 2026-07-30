@@ -47,13 +47,29 @@ type Props = {
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
-   * or the actions — no visualViewport lifting needed. The `footer` prop is
-   * not rendered in this mode (the bar carries the actions). Desktop is
-   * unaffected.
+   * or the actions — no visualViewport lifting needed. With `mobileSave`
+   * the bar carries the actions and `footer` is not rendered; without it
+   * the consumer's `footer` renders at the bottom of the panel (multi-step
+   * and search flows whose footers carry navigation). Desktop unaffected.
    */
   fullscreenOnMobile?: boolean
-  /** Primary action for the fullscreen top bar (mobile only). */
-  mobileSave?: { label?: string; onClick: () => void; disabled?: boolean }
+  /**
+   * Primary action for the fullscreen top bar (mobile only). `form` renders
+   * it as a submit button for that form id (e.g. the Stripe checkout form)
+   * instead of an onClick.
+   */
+  mobileSave?: {
+    label?: string
+    onClick?: () => void
+    disabled?: boolean
+    form?: string
+  }
+  /**
+   * Left slot of the fullscreen top bar (mobile only) — defaults to a
+   * Cancel that closes the overlay. Pass e.g. { label: "Back", onClick }
+   * for multi-step flows.
+   */
+  mobileBack?: { label?: string; onClick: () => void; disabled?: boolean }
 }
 
 // iOS pins fixed bottom sheets to the LAYOUT viewport, and the keyboard
@@ -108,6 +124,7 @@ export function ResponsiveOverlay({
   bodyClassName,
   fullscreenOnMobile = false,
   mobileSave,
+  mobileBack,
 }: Props) {
   const isMobile = useIsMobile()
   const keyboardInset = useKeyboardInset()
@@ -130,23 +147,40 @@ export function ResponsiveOverlay({
             paddingTop: "env(safe-area-inset-top)",
           }}
         >
-          {/* Top action bar — the platform pattern for full-screen editors
-              (Cancel · title · Save), kept clear of the keyboard by being
-              at the top. */}
+          {/* Top action bar. Two shapes: with mobileSave it's the
+              full-screen-editor pattern (Cancel · title · Save) and the
+              footer prop is dropped; without it the bar is a plain centred
+              title and the consumer's footer renders at the bottom — for
+              multi-step / search flows whose footers carry the navigation
+              (Cancel · Next, Back · Pledge). */}
           <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2 py-1.5">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <SheetTitle className="min-w-0 truncate text-base font-medium">
+            {mobileBack ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={mobileBack.onClick}
+                disabled={mobileBack.disabled}
+              >
+                {mobileBack.label ?? "Back"}
+              </Button>
+            ) : mobileSave ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+            ) : (
+              <span aria-hidden className="w-16" />
+            )}
+            <SheetTitle className="min-w-0 truncate py-1.5 text-base font-medium">
               {title}
             </SheetTitle>
             {mobileSave ? (
               <Button
-                type="button"
+                type={mobileSave.form ? "submit" : "button"}
+                form={mobileSave.form}
                 onClick={mobileSave.onClick}
                 disabled={mobileSave.disabled}
               >
@@ -172,6 +206,16 @@ export function ResponsiveOverlay({
               className={`flex-1 overflow-y-auto ${bodyClassName ?? "px-4 py-4"}`}
             >
               {children}
+            </div>
+          )}
+          {footer && !mobileSave && (
+            <div
+              className="shrink-0 border-t border-border px-4 py-3"
+              style={{
+                paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+              }}
+            >
+              {footer}
             </div>
           )}
         </SheetContent>

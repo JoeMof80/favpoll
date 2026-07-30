@@ -53,7 +53,7 @@ vi.mock("@/components/pledge-dialog/step-pick-favourites", () => ({
     draftIds: string[]
   }) => (
     <div data-testid="picker-header" data-draft-count={String(draftIds.length)}>
-      Choose your favourite {topicTitle}
+      Pick your favourite {topicTitle}
     </div>
   ),
   PickerItems: ({ draftIds }: { draftIds: string[] }) => (
