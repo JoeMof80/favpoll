@@ -17,8 +17,8 @@ describe("HonourStep — who row", () => {
     expect(screen.getByRole("radio", { name: "He" })).toBeInTheDocument()
     expect(screen.getByRole("radio", { name: "She" })).toBeInTheDocument()
     expect(screen.getByRole("radio", { name: "They" })).toBeInTheDocument()
-    expect(screen.getByRole("radio", { name: "A couple" })).toBeInTheDocument()
-    expect(screen.getByRole("radio", { name: "A group" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Pair" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Group" })).toBeInTheDocument()
     expect(screen.getByRole("radio", { name: "A cause" })).toBeInTheDocument()
   })
 
@@ -91,16 +91,16 @@ describe("HonourStep — who row", () => {
         onChange={onChange}
       />
     )
-    fireEvent.click(screen.getByRole("radio", { name: "A group" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Group" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ grouping: "group", category: "memorial" })
     )
   })
 
-  it("calls onChange with grouping='couple' and pronoun=undefined when A couple is clicked", () => {
+  it("calls onChange with grouping='couple' and pronoun=undefined when Pair is clicked", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("radio", { name: "A couple" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Pair" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: "someone",
@@ -110,10 +110,10 @@ describe("HonourStep — who row", () => {
     )
   })
 
-  it("calls onChange with grouping='group' when A group is clicked", () => {
+  it("calls onChange with grouping='group' when Group is clicked", () => {
     const onChange = vi.fn()
     render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
-    fireEvent.click(screen.getByRole("radio", { name: "A group" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Group" }))
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: "someone",
@@ -155,7 +155,7 @@ describe("HonourStep — who row", () => {
 
   it("no who option is checked when nothing is selected", () => {
     render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
-    const whoOptions = ["He", "She", "They", "A couple", "A group", "A cause"]
+    const whoOptions = ["He", "She", "They", "Pair", "Group", "A cause"]
     whoOptions.forEach((name) => {
       expect(screen.getByRole("radio", { name })).toHaveAttribute(
         "aria-checked",

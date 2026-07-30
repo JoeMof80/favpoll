@@ -9,7 +9,7 @@ import {
   Venus,
   NonBinary,
 } from "lucide-react"
-import { CoupleIcon, GroupIcon } from "@/components/icons/people"
+import { GroupIcon, PairIcon } from "@/components/icons/people"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type {
   FavpollCategory,
@@ -38,8 +38,8 @@ const PERSON_OPTIONS = [
   { value: "he", label: "He", icon: Mars },
   { value: "she", label: "She", icon: Venus },
   { value: "they", label: "They", icon: NonBinary },
-  { value: "couple", label: "A couple", icon: CoupleIcon },
-  { value: "group", label: "A group", icon: GroupIcon },
+  { value: "couple", label: "Pair", icon: PairIcon },
+  { value: "group", label: "Group", icon: GroupIcon },
 ] as const
 
 const CATEGORY_OPTIONS = [
