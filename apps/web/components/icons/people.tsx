@@ -2,9 +2,10 @@ import { useId } from "react"
 import type { SVGProps } from "react"
 
 // Custom people icons in lucide's user-round grammar (24-box, stroke 2,
-// round caps/joins). Back figures' strokes break around the front
-// figure via an SVG mask (occlusion per the founder's reference,
-// 2026-07-30) — lucide itself has no pair/trio compositions.
+// round caps/joins). Back figures share the front figure's semicircular
+// body shape; their strokes break around the front silhouette via an
+// SVG mask, and the shoulder arcs exit through the bottom corners so
+// nothing shows a cut cap (founder-referenced composition, 2026-07-30).
 
 function iconProps(props: SVGProps<SVGSVGElement>) {
   return {
@@ -44,7 +45,7 @@ export function PairIcon(props: SVGProps<SVGSVGElement>) {
       </mask>
       <g mask={`url(#${maskId})`}>
         <circle cx="6.8" cy="5.4" r="3.6" />
-        <path d="M2 21v-4a4.6 4.6 0 0 1 4.6-4.6h3.5" />
+        <path d="M0.7 24.6A11 11 0 0 1 13 12.6" />
       </g>
       <circle cx="13.5" cy="9.2" r="4" />
       <path d="M19.7 21.5a6.2 6.2 0 0 0-12.4 0" />
@@ -75,10 +76,10 @@ export function GroupIcon(props: SVGProps<SVGSVGElement>) {
         />
       </mask>
       <g mask={`url(#${maskId})`}>
-        <circle cx="5.6" cy="6.2" r="3.5" />
-        <path d="M1.6 21v-3.4a4.4 4.4 0 0 1 4.4-4.4h3.5" />
-        <circle cx="18.4" cy="6.2" r="3.5" />
-        <path d="M22.4 21v-3.4a4.4 4.4 0 0 0-4.4-4.4h-3.5" />
+        <circle cx="5.7" cy="7" r="3.2" />
+        <path d="M0.6 24.4A10.5 10.5 0 0 1 12 13.3" />
+        <circle cx="18.3" cy="7" r="3.2" />
+        <path d="M23.4 24.4A10.5 10.5 0 0 0 12 13.3" />
       </g>
       <circle cx="12" cy="10.2" r="3.7" />
       <path d="M17.7 21.5a5.7 5.7 0 0 0-11.4 0" />
