@@ -37,6 +37,13 @@ type Props = {
   /** Override classes on the header section (e.g. "p-0" when the header slot owns its own padding). */
   headerClassName?: string
   /**
+   * Override classes on the MOBILE body wrapper (sheet + fullscreen),
+   * default "px-4 py-4". Pass "p-0" when the children own their padding —
+   * otherwise mobile double-pads what desktop (dialogContentClassName)
+   * renders once (found on-device, 2026-07-30).
+   */
+  bodyClassName?: string
+  /**
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
@@ -98,6 +105,7 @@ export function ResponsiveOverlay({
   dialogStyle,
   hideCloseButton = false,
   headerClassName,
+  bodyClassName,
   fullscreenOnMobile = false,
   mobileSave,
 }: Props) {
@@ -160,7 +168,11 @@ export function ResponsiveOverlay({
             </div>
           )}
           {children != null && (
-            <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+            <div
+              className={`flex-1 overflow-y-auto ${bodyClassName ?? "px-4 py-4"}`}
+            >
+              {children}
+            </div>
           )}
         </SheetContent>
       </Sheet>
@@ -198,7 +210,11 @@ export function ResponsiveOverlay({
             )}
           </SheetHeader>
           {children != null && (
-            <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+            <div
+              className={`flex-1 overflow-y-auto ${bodyClassName ?? "px-4 py-4"}`}
+            >
+              {children}
+            </div>
           )}
           {footer && (
             <div

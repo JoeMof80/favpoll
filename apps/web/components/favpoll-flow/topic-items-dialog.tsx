@@ -101,6 +101,7 @@ export function TopicItemsDialog({
         </div>
       }
       hideCloseButton
+      bodyClassName="p-0"
       footer={
         <div className="flex gap-2">
           <Button
@@ -118,7 +119,7 @@ export function TopicItemsDialog({
       }
     >
       <div>
-        <div className="space-y-4 px-5 py-4">
+        <div className="space-y-4 px-5 pt-1 pb-4">
           {/* Added by you */}
           {(trimmed ? filteredAdded : addedItems).length > 0 && (
             <div>
