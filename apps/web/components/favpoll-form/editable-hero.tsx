@@ -8,6 +8,7 @@ import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { EditableField } from "@/components/editable-field"
+import { heroNameSizeClass } from "@/lib/display"
 import { cn } from "@/lib/utils"
 import { HeroCauseLabelOverlay } from "./hero-cause-label-overlay"
 import { HeroNameOverlay } from "./hero-name-overlay"
@@ -72,7 +73,9 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
                   : () => setNameOpen(true)
               }
             >
-              <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
+              <h1
+                className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+              >
                 {subject === "cause"
                   ? causeLabel || (
                       <span className="text-muted-foreground/50">
@@ -87,43 +90,41 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
               </h1>
             </EditableField>
 
-            {/* Context */}
-            {subject !== "cause" && (
-              <EditableField
-                onClick={() => setContextOpen(true)}
-                className="mt-2"
+            {/* Context — all subjects (normalised structure, 2026-07-30) */}
+            <EditableField
+              onClick={() => setContextOpen(true)}
+              className="mt-2"
+            >
+              {/* /40 camouflaged the empty state next to the big name —
+                  the founder couldn't find the field on the edit page.
+                  Match the name placeholder's /50 and keep it legible. */}
+              <p
+                className={cn(
+                  "truncate text-xl font-normal whitespace-normal md:text-2xl",
+                  context ? "text-primary" : "text-muted-foreground/50"
+                )}
               >
-                {/* /40 camouflaged the empty state next to the big name —
-                    the founder couldn't find the field on the edit page.
-                    Match the name placeholder's /50 and keep it legible. */}
-                <p
-                  className={cn(
-                    "truncate text-xl font-normal whitespace-normal md:text-2xl",
-                    context ? "text-primary" : "text-muted-foreground/50"
-                  )}
-                >
-                  {context || "Add dates or other context"}
-                </p>
-              </EditableField>
-            )}
+                {context || "Add dates or other context"}
+              </p>
+            </EditableField>
           </div>
 
-          {/* Avatar */}
-          {subject !== "cause" && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="group relative h-auto shrink-0 rounded-xl border-dotted border-primary/20 p-0 hover:border-solid hover:border-primary/60 hover:bg-transparent focus-visible:border-solid focus-visible:border-primary/60 focus-visible:bg-transparent"
-              onClick={() => setPhotoOpen(true)}
-            >
-              <ProtagonistAvatar
-                name={name || "Name"}
-                photoUrl={resolvedPhotoUrl}
-                className="border-0"
-              />
-              <EditBadge className="right-0 bottom-0" />
-            </Button>
-          )}
+          {/* Avatar — all subjects (normalised structure, 2026-07-30); the
+              public heroes hide it when no photo is set, but the form
+              always offers the upload slot */}
+          <Button
+            type="button"
+            variant="ghost"
+            className="group relative h-auto shrink-0 rounded-xl border-dotted border-primary/20 p-0 hover:border-solid hover:border-primary/60 hover:bg-transparent focus-visible:border-solid focus-visible:border-primary/60 focus-visible:bg-transparent"
+            onClick={() => setPhotoOpen(true)}
+          >
+            <ProtagonistAvatar
+              name={(subject === "cause" ? causeLabel : name) || "Name"}
+              photoUrl={resolvedPhotoUrl}
+              className="border-0"
+            />
+            <EditBadge className="right-0 bottom-0" />
+          </Button>
         </div>
       </div>
 

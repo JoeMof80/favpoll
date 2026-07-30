@@ -222,12 +222,13 @@ export function PollSection({
               aria-label={unlockAriaLabel}
               className="absolute inset-0 z-10 h-auto w-full flex-col items-center justify-start rounded-none pt-4 hover:bg-transparent"
             >
-              {/* Sticky, offset to clear the stuck topic ribbon (top-40 +
-                  ribbon height mobile; md:top-55 + height): the pill starts
-                  over the decoy reveal quote, then travels with the scroll —
-                  never over the hero above (found on-device: the absolute
-                  pill rode over the name at small scroll offsets). */}
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              {/* Sticky, offset to clear the stuck topic ribbon: the pill
+                  starts over the decoy reveal quote, then travels with the
+                  scroll — never over the hero above (found on-device: the
+                  absolute pill rode over the name at small scroll offsets).
+                  +2.5rem = the ribbon's 36px height + 4px air; going below
+                  +2.25rem slides the pill under the ribbon. */}
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
                 <RevealLockPill
                   label={
                     hasReveal

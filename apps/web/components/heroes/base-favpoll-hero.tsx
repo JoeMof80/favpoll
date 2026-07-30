@@ -3,7 +3,7 @@
 import { HeroLayout } from "../hero-layout"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { getFavpollHeadline } from "@/lib/display"
+import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 
 type BaseFavpollHeroProps = {
@@ -40,7 +40,9 @@ export function BaseFavpollHero({
   )
 
   const title = (
-    <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground sm:text-5xl">
+    <h1
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+    >
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
   )
@@ -51,11 +53,16 @@ export function BaseFavpollHero({
     </p>
   ) : undefined
 
+  // No photo → no avatar at all on the public page (the hatched initials
+  // placeholder lives only on the edit form's upload slot; normalised
+  // structure, 2026-07-30). HeroLayout's min-height keeps the stuck band
+  // at the same height either way.
   const avatar =
-    !hideAvatar && favpoll.subject !== "cause" ? (
+    !hideAvatar && favpoll.subject !== "cause" && protagonist.photo_url ? (
       <ProtagonistAvatar
         name={protagonist.name}
-        photoUrl={protagonist.photo_url ?? null}
+        photoUrl={protagonist.photo_url}
+        className="h-full w-full md:h-full md:w-full"
       />
     ) : undefined
 

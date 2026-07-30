@@ -398,6 +398,40 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
     })
   })
 
+  it("stores cause photo_url and context on the favpoll row", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    // No protagonists insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
+    mock.queue(null) // favpoll_charities insert
+    mock.queue({ id: "poll-1" }) // favpoll_polls insert
+    mock.queue(null) // favpoll_poll_favourites insert
+    mock.queue(null) // favpoll_pots insert
+
+    await createFavpoll({
+      ...BASE_INPUT,
+      protagonistName: "",
+      subject: "cause",
+      causeLabel: "Help the Homeless",
+      photoUrl: "https://example.com/cause.jpg",
+      dateLabel: "Winter 2026 appeal",
+      charityIds: ["charity-1"],
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        reveal: null,
+        infiniteItems: null,
+      },
+    })
+
+    const favpollInsert = mock
+      .callsFor("favpolls")
+      .find((c) => c.method === "insert")!
+    expect(favpollInsert.args[0]).toMatchObject({
+      photo_url: "https://example.com/cause.jpg",
+      context: "Winter 2026 appeal",
+    })
+  })
+
   it("persists cause reveal as personal_reveal on the favpoll poll", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "favpoll-1" }) // favpolls insert

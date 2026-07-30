@@ -133,3 +133,14 @@ export function getFavpollHeadline(params: {
 
   return { prefix, name: personName, suffix: dateLabel ?? "" }
 }
+
+/**
+ * Hero name size — ONE standard size for every name (founder call,
+ * 2026-07-29: the compact size reads fine — better, even — in all cases,
+ * and it rarely wraps, so the sticky hero's height stays predictable).
+ * Shared here so the three heroes (BaseFavpollHero, CauseHero,
+ * EditableHero) cannot drift apart. Long names still wrap rather than
+ * truncate — the hero is the one canonical surface where the full name
+ * must appear; the h1's two-line clamp guards absurd input.
+ */
+export const heroNameSizeClass = "text-3xl sm:text-4xl"

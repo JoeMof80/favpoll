@@ -9,27 +9,41 @@ type HeroLayoutProps = {
   subtitle?: React.ReactNode
   avatar?: React.ReactNode
   about?: React.ReactNode
-  scrollContainerRef?: React.RefObject<HTMLElement | null>
 }
 
+// Rebuilt after the #423 revert (founder direction, 2026-07-29). The name
+// does not animate at all. Two animations survive, each deliberately
+// single-channel so nothing can desync:
+//   - subtitle (context) fades via opacity AND collapses its height —
+//     the reserved space of an invisible line was still holding the
+//     stuck band ~30px open (founder screenshot #2, 2026-07-29). The
+//     max-height is real layout, measured below; if either channel
+//     fails the line merely stays visible or keeps its space and the
+//     ribbon pins lower — nothing can overlap
+//   - avatar shrinks via PURE LAYOUT (width/height, one animated value) —
+//     never the #395 transform + compensating-margin pair, where two
+//     channels had to agree and visibly didn't on the founder's devices.
+//     The ResizeObserver below measures the avatar's REAL box, so the
+//     pinned ribbon tracks truth: if the animation fails the band merely
+//     stays open (ribbon pins lower), it can never pin into the photo.
+// The avatar shrink is what lets the stuck ribbon rise level with the
+// right rail's charity card on md+ (founder screenshot, 2026-07-29): the
+// unshrunk 132px box was holding the band open with 48px of dead air.
+// The var settles within the first ~120px of scroll — before the ribbon
+// or pledge pill reach their pin positions — so pinned pieces still hold
+// one position in practice.
 export function HeroLayout({
   eyebrowText,
   title,
   subtitle,
   avatar,
   about,
-  scrollContainerRef,
 }: HeroLayoutProps) {
-  // Use provided scroll container (for preview panels) or default to window (for live views)
-  const { scrollY } = useScroll(
-    scrollContainerRef ? { container: scrollContainerRef } : undefined
-  )
+  const { scrollY } = useScroll()
 
-  // The poll section's sticky pieces (topic ribbon, lock pill, sort tabs)
-  // pin BELOW this hero. Their offsets can't be fixed numbers — a wrapping
-  // protagonist/cause name makes the hero taller and fixed offsets pin the
-  // ribbon through the name's second line (found on-device). Publish the
-  // hero's stuck bottom edge as a CSS var; consumers calc() from it.
+  // The hero's height still varies with CONTENT (wrapping name, subtitle
+  // presence), so the measured CSS var stays — set on layout changes only,
+  // never mutated during scroll.
   const boxRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = boxRef.current
@@ -52,80 +66,73 @@ export function HeroLayout({
   // shrink must not go as deep there — 0.635 of 80px is a 51px stamp
   // (founder: "shrinks too small", on-device 2026-07-26).
   const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
+  // Style binding waits for mount: SSR + first client paint use the CSS
+  // size classes, so server and client markup can't disagree.
+  const [avatarMounted, setAvatarMounted] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)")
-    // Mobile: 0.9 of the 80px avatar = 72px, matching the stuck
-    // eyebrow + name block; 0.635 suits the 132px md+ avatar.
     const set = () =>
       setAvatarCfg(
         mq.matches ? { end: 0.635, size: 132 } : { end: 0.9, size: 80 }
       )
     set()
+    setAvatarMounted(true)
     mq.addEventListener("change", set)
     return () => mq.removeEventListener("change", set)
   }, [])
-  const avatarEnd = avatarCfg.end
 
   const t = [0, 120]
-  const nameScale = useTransform(scrollY, t, [1, 0.9])
-  const avatarScale = useTransform(scrollY, t, [1, avatarEnd])
-  // scale is visual only — the avatar's LAYOUT box would keep its full
-  // height and hold the stuck hero open (48px of phantom space on md+,
-  // where the 132px avatar, not the text, drives the hero's height; the
-  // ribbon then stuck too low on desktop). A negative bottom margin
-  // shrinks the layout in step with the visual, and the ResizeObserver
-  // republishes --hero-stuck-bottom.
-  const avatarMarginBottom = useTransform(scrollY, t, [
-    0,
-    -avatarCfg.size * (1 - avatarEnd),
+  const subtitleOpacity = useTransform(scrollY, t, [1, 0])
+  // Collapses to 0 (the old design kept a 12px sliver of air; that job
+  // is now done by the band's static pb-3).
+  const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
+  const avatarSize = useTransform(scrollY, t, [
+    avatarCfg.size,
+    avatarCfg.size * avatarCfg.end,
   ])
-  const suffixOpacity = useTransform(scrollY, t, [1, 0])
-  // The faded subtitle must also give up its HEIGHT — opacity alone left
-  // ~36px of invisible dead space inside the stuck hero, pushing the
-  // ribbon (offset from the hero's measured box) too far down. As the
-  // height collapses, the hero's ResizeObserver republishes
-  // --hero-stuck-bottom and the ribbon rides up with it.
-  // Collapses to 12px, not 0 — a sliver of air keeps the stuck ribbon
-  // from crowding the name (founder-tuned).
-  const suffixMaxHeight = useTransform(scrollY, t, [48, 12])
 
   return (
     <>
+      {/* pb-4 is load-bearing twice over: the poll ribbon's opaque
+          backdrop reaches 12px above its own top (-top-3) to seal the
+          slit between the two sticky boxes — that overlap must land on
+          padding, or it paints over the subtitle's descenders. The other
+          4px is the founder-tuned air between the name and the stuck
+          ribbon (bisected on-device: pb-3 high, pb-6 low, pb-4.5 barely
+          low; 2026-07-29). */}
       <div
         ref={boxRef}
-        className="sticky top-14 z-10 bg-background pt-6 md:pt-16"
+        className="sticky top-14 z-10 bg-background pt-6 pb-4 md:pt-16"
       >
-        <div className="flex items-start gap-4 md:gap-6">
+        {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
+            WITHOUT an avatar (causes) otherwise settle a few px higher
+            than person heroes, whose shrunken avatar outgrows the
+            eyebrow+name block (founder: cause ribbon "too high" next to
+            a person page, on-device 2026-07-30). */}
+        <div className="flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
           <div className="min-w-0 flex-1">
-            {/* Eyebrow */}
             {eyebrowText}
-
-            {/* Title */}
-            <motion.div
-              style={{ scale: nameScale, transformOrigin: "top left" }}
-            >
-              {title}
-            </motion.div>
-
-            {/* Subtitle */}
+            {title}
             {subtitle && (
               <motion.div
                 className="overflow-hidden"
-                style={{ opacity: suffixOpacity, maxHeight: suffixMaxHeight }}
+                style={{
+                  opacity: subtitleOpacity,
+                  maxHeight: subtitleMaxHeight,
+                }}
               >
                 {subtitle}
               </motion.div>
             )}
           </div>
-
-          {/* Avatar */}
           {avatar && (
             <motion.div
-              style={{
-                scale: avatarScale,
-                transformOrigin: "top right",
-                marginBottom: avatarMarginBottom,
-              }}
+              className="h-20 w-20 shrink-0 md:h-33 md:w-33"
+              style={
+                avatarMounted
+                  ? { width: avatarSize, height: avatarSize }
+                  : undefined
+              }
             >
               {avatar}
             </motion.div>
@@ -133,7 +140,7 @@ export function HeroLayout({
         </div>
       </div>
 
-      {/* About Section */}
+      {/* About — scrolls away beneath the pinned hero */}
       <div className="relative z-0 mt-4 mb-5 md:mb-10">{about}</div>
     </>
   )

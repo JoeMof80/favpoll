@@ -350,6 +350,21 @@ Kept internally for the backfill and any legacy read paths. `occasion_type` colu
 A fundraiser can honour a person (`subject='someone'`) or a cause (`subject='cause'`).
 When `subject='cause'`: no protagonist row is created; `cause_label` is stored instead.
 
+**Normalised structure (2026-07-30,
+`20260730100000_favpoll_cause_photo_context.sql`, applied to staging AND
+prod):** every favpoll type has an optional image and context line. For
+causes these live on the favpoll row (`favpolls.photo_url`,
+`favpolls.context`); for persons they stay on the protagonist. The edit
+form offers the photo-upload slot and Context field for all subjects
+(`EditableHero` no longer gates them on subject); the create/edit actions
+route the values by subject. On PUBLIC heroes, no photo → no avatar at
+all (the hatched initials placeholder appears only on the form's upload
+slot); `HeroLayout`'s min-height (settled avatar size: 72px / md 84px)
+keeps the stuck band height identical with or without an avatar.
+`CauseHero` renders the context line as its subtitle via
+`getFavpollHeadline`'s `dateLabel` and the photo through the same avatar
+slot as person heroes.
+
 ### Display headline matrix (from `lib/display.ts` `getFavpollHeadline`)
 
 `getFavpollHeadline` accepts an optional `subject?: 'someone' | 'cause'` param (defaults `'someone'`).
