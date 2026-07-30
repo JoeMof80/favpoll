@@ -154,7 +154,7 @@ export function EditablePollArea({
               ) : isGenerating ? (
                 <div
                   className="animate-pulse space-y-1.5"
-                  aria-label="Generating suggestion…"
+                  aria-label="Generating example…"
                 >
                   <div className="h-4 rounded-full bg-muted/60" />
                   <div className="h-4 w-3/4 rounded-full bg-muted/60" />
@@ -207,7 +207,7 @@ export function EditablePollArea({
                 <InputGroupButton
                   size="icon-xs"
                   disabled={isGenerating}
-                  aria-label="Regenerate suggestion"
+                  aria-label="Regenerate example"
                   onClick={() => {
                     setRevealOpen(false)
                     onRegenerate()

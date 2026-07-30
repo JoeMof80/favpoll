@@ -64,7 +64,7 @@ export function HeroAboutOverlay({
               <InputGroupButton
                 size="icon-xs"
                 disabled={isGenerating}
-                aria-label="Regenerate suggestion"
+                aria-label="Regenerate example"
                 onClick={() => {
                   onOpenChange(false)
                   onRegenerate()

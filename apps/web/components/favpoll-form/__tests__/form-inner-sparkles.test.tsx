@@ -68,7 +68,7 @@ describe("FormInner — Sparkles button reachability", () => {
 
   it("is absent when no topic is selected", () => {
     render(<Wrapper defaultValues={{ topics: [] }} />)
-    expect(screen.queryByText("Generate a suggestion")).not.toBeInTheDocument()
+    expect(screen.queryByText("Generate an example")).not.toBeInTheDocument()
   })
 
   it("is present when a custom topic with a title is selected", () => {
@@ -87,7 +87,7 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
-    expect(screen.getByText("Generate a suggestion")).toBeInTheDocument()
+    expect(screen.getByText("Generate an example")).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: "Generate for They" })
     ).toBeInTheDocument()
@@ -109,12 +109,12 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
-    expect(screen.queryByText("Generate a suggestion")).not.toBeInTheDocument()
+    expect(screen.queryByText("Generate an example")).not.toBeInTheDocument()
   })
 
   it("is present when a canonical topic is selected", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    expect(screen.getByText("Generate a suggestion")).toBeInTheDocument()
+    expect(screen.getByText("Generate an example")).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: "Generate for They" })
     ).toBeInTheDocument()
