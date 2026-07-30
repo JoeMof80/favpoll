@@ -98,6 +98,8 @@ export function HeroAboutOverlay({
         </InputGroup>
       }
       footer={overlayFooter(save, () => onOpenChange(false))}
+      fullscreenOnMobile
+      mobileSave={{ onClick: save }}
     />
   )
 }

@@ -138,6 +138,14 @@ export function ItemAddField({
             Done
           </Button>
         }
+        fullscreenOnMobile
+        mobileSave={{
+          label: "Done",
+          onClick: () => {
+            setOpen(false)
+            setSearch("")
+          },
+        }}
       >
         <div className="space-y-3">
           {/* Search / add input — only shown for infinite topics */}

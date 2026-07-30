@@ -84,6 +84,12 @@ export function GoalOverlay({ open, onOpenChange }: Props) {
       dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       dialogContentClassName="flex-1 overflow-y-auto px-5 pt-0 pb-2"
       footer={footer}
+      fullscreenOnMobile
+      mobileSave={{
+        label: goalAmount ? "Save goal" : "Set goal",
+        onClick: save,
+        disabled: !isValid,
+      }}
     >
       {/* Amount field */}
       <div className="flex items-baseline gap-1.5 py-4">
@@ -124,6 +130,19 @@ export function GoalOverlay({ open, onOpenChange }: Props) {
       <p className="mt-4 text-sm text-muted-foreground">
         Optional — shown to guests as understated progress, never as pressure.
       </p>
+
+      {/* Fullscreen mode drops the footer (the top bar carries Save) — the
+          secondary action survives here, mobile only */}
+      {goalAmount ? (
+        <Button
+          type="button"
+          variant="ghost"
+          className="mt-4 w-full md:hidden"
+          onClick={remove}
+        >
+          Remove goal
+        </Button>
+      ) : null}
     </ResponsiveOverlay>
   )
 }

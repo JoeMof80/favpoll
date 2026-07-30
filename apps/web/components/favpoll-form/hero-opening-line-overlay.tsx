@@ -85,6 +85,8 @@ export function HeroOpeningLineOverlay({ open, onOpenChange }: Props) {
         </InputGroup>
       }
       footer={overlayFooter(save, () => onOpenChange(false))}
+      fullscreenOnMobile
+      mobileSave={{ onClick: save }}
     />
   )
 }
