@@ -24,6 +24,11 @@ export type OccasionSpec = {
   /** UI label in the occasion picker. */
   label: string
   register: Register
+  /**
+   * celebrating_many only — narrows the list by the selected who icon.
+   * "pair" shows for Pair, "group" for Group; untagged shows for both.
+   */
+  grouping?: "pair" | "group"
   openingLines: string[]
   contexts: string[]
 }
@@ -353,30 +358,35 @@ export const OCCASIONS: OccasionSpec[] = [
   {
     label: "Wedding",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Congratulations to", "Celebrating the wedding of"],
     contexts: ["Married 20th June 2026", "At long last"],
   },
   {
     label: "Engagement",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Congratulations to", "Celebrating the engagement of"],
     contexts: ["Engaged 14th February 2026", "Ring on, date pending"],
   },
   {
     label: "Civil partnership",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Congratulations to", "Celebrating"],
     contexts: ["Partners · 3rd May 2026"],
   },
   {
     label: "Anniversary",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Happy anniversary", "Celebrating"],
     contexts: ["Together since 2005 · 20 years", "Twenty years in"],
   },
   {
     label: "Milestone anniversary",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Happy anniversary", "Celebrating"],
     contexts: [
       "Silver · 25 years",
@@ -388,6 +398,7 @@ export const OCCASIONS: OccasionSpec[] = [
   {
     label: "Renewal of vows",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Congratulations to", "Celebrating"],
     contexts: ["Vows renewed · June 2026", "Still the ones"],
   },
@@ -400,90 +411,105 @@ export const OCCASIONS: OccasionSpec[] = [
   {
     label: "Twins' birthday",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Happy birthday", "Celebrating"],
     contexts: ["Two at once", "Born minutes apart"],
   },
   {
     label: "Joint retirement",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Celebrating the retirement of", "Happy retirement"],
     contexts: ["70 years of service between them"],
   },
   {
     label: "New home together",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Congratulations to", "A housewarming for"],
     contexts: ["Keys in hand", "First home together"],
   },
   {
     label: "Expecting",
     register: "celebrating_many",
+    grouping: "pair",
     openingLines: ["Celebrating", "Congratulations to"],
     contexts: ["Due December 2026", "And then there were three"],
   },
   {
     label: "Reunion",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Reuniting", "Celebrating"],
     contexts: ["All back in one room", "20 years since we last met"],
   },
   {
     label: "School reunion",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Reuniting", "Celebrating"],
     contexts: ["Class of 2006", "20 years on"],
   },
   {
     label: "Family gathering",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "Gathering"],
     contexts: ["Four generations, one table"],
   },
   {
     label: "Family send-off",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Farewell", "Bon voyage"],
     contexts: ["Off to New Zealand", "One last gathering before the off"],
   },
   {
     label: "Team celebration",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "Three cheers for"],
     contexts: ["Season 2025/26", "What a season"],
   },
   {
     label: "Championship win",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Champions:", "Celebrating", "Glory for"],
     contexts: ["Champions 2026", "Promoted at last"],
   },
   {
     label: "End of season",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "Three cheers for"],
     contexts: ["Season done · May 2026"],
   },
   {
     label: "Testimonial",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["A testimonial for", "Honouring"],
     contexts: ["15 years of service", "400 appearances"],
   },
   {
     label: "Club anniversary",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "100 years of"],
     contexts: ["Founded 1926", "A century strong"],
   },
   {
     label: "Business anniversary",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "25 years of"],
     contexts: ["Est. 2001", "Open since 2001"],
   },
   {
     label: "Street party",
     register: "celebrating_many",
+    grouping: "group",
     openingLines: ["Celebrating", "A street party for"],
     contexts: ["Bunting's up", "The whole street's out"],
   },
@@ -683,7 +709,18 @@ export const OCCASIONS: OccasionSpec[] = [
   },
 ]
 
-/** Occasions available for a given register, in catalogue order. */
-export function occasionsForRegister(register: Register): OccasionSpec[] {
-  return OCCASIONS.filter((o) => o.register === register)
+/**
+ * Occasions available for a register, in catalogue order. For
+ * celebrating_many, pass the selected grouping to narrow pair-only /
+ * group-only occasions; untagged occasions show for both.
+ */
+export function occasionsForRegister(
+  register: Register,
+  grouping?: "pair" | "group"
+): OccasionSpec[] {
+  return OCCASIONS.filter(
+    (o) =>
+      o.register === register &&
+      (!o.grouping || !grouping || o.grouping === grouping)
+  )
 }
