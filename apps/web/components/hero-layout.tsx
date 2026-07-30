@@ -62,9 +62,11 @@ export function HeroLayout({
     }
   }, [])
 
-  // The avatar starts at 80px on mobile (132px on md+), so the scroll
-  // shrink must not go as deep there — 0.635 of 80px is a 51px stamp
-  // (founder: "shrinks too small", on-device 2026-07-26).
+  // Mobile rest size 104px = the eyebrow + name + context stack beside it,
+  // so the photo's bottom sits level with the context line (founder,
+  // on-device 2026-07-30). The settled stamp stays at the founder-tuned
+  // 72px ("shrinks too small" below that, 2026-07-26) — which also keeps
+  // the settled band height, and every pinned offset, unchanged.
   const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
@@ -73,7 +75,7 @@ export function HeroLayout({
     const mq = window.matchMedia("(min-width: 768px)")
     const set = () =>
       setAvatarCfg(
-        mq.matches ? { end: 0.635, size: 132 } : { end: 0.9, size: 80 }
+        mq.matches ? { end: 0.635, size: 132 } : { end: 72 / 104, size: 104 }
       )
     set()
     setAvatarMounted(true)
@@ -127,7 +129,7 @@ export function HeroLayout({
           </div>
           {avatar && (
             <motion.div
-              className="h-20 w-20 shrink-0 md:h-33 md:w-33"
+              className="h-26 w-26 shrink-0 md:h-33 md:w-33"
               style={
                 avatarMounted
                   ? { width: avatarSize, height: avatarSize }
