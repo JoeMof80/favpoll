@@ -29,14 +29,16 @@ export function CoupleIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-/** lucide UsersRound with the side figure mirrored — three figures. */
+/** lucide Users with the side figure mirrored — three figures. */
 export function GroupIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...iconProps(props)}>
-      <circle cx="12" cy="8" r="4.5" />
-      <path d="M19 21a7 7 0 0 0-14 0" />
-      <path d="M22.5 20c0-3-1.8-5.8-3.6-7.1a4.5 4.5 0 0 0-.4-7.5" />
-      <path d="M1.5 20c0-3 1.8-5.8 3.6-7.1a4.5 4.5 0 0 1 .4-7.5" />
+      <circle cx="12" cy="7" r="4" />
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <path d="M17 3.4a3.8 3.8 0 0 1 0 7.4" />
+      <path d="M23 21v-1.8a4 4 0 0 0-3-3.87" />
+      <path d="M7 3.4a3.8 3.8 0 0 0 0 7.4" />
+      <path d="M1 21v-1.8a4 4 0 0 1 3-3.87" />
     </svg>
   )
 }
