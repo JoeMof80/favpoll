@@ -17,8 +17,11 @@ import type { Register } from "@/lib/registers"
  *
  * openingLines: hero headline prefixes — rendered as "PREFIX" above the
  * name, so each must read naturally with a name after it.
- * contexts: subline examples (max 40 chars, no full stop) — concrete,
- * editable starting points, not slogans.
+ * contexts: subline examples (max 40 chars, no full stop) — a date,
+ * fact, or event detail. Never a fee promise, an instruction to guests,
+ * or bare sentiment: those collide with the about (which owns the
+ * "reaches the charity in full" clause) or aren't context at all
+ * (founder, 2026-07-30: "Every pledge goes in full" is not context).
  */
 export type OccasionSpec = {
   /** UI label in the occasion picker. */
@@ -215,13 +218,13 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Award",
     register: "celebrating_one",
     openingLines: ["Congratulations to", "Take a bow", "Well done"],
-    contexts: ["Awarded January 2026", "Richly deserved"],
+    contexts: ["Awarded January 2026"],
   },
   {
     label: "Achievement",
     register: "celebrating_one",
     openingLines: ["Well done", "Take a bow", "Celebrating"],
-    contexts: ["2nd November 2025", "Quietly brilliant"],
+    contexts: ["2nd November 2025"],
   },
   {
     label: "Christening",
@@ -315,7 +318,7 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Divorce party",
     register: "celebrating_one",
     openingLines: ["Celebrating", "A fresh start for"],
-    contexts: ["Signed, sealed, single", "Onwards"],
+    contexts: ["Signed, sealed, single"],
   },
   {
     label: "Hen do",
@@ -537,7 +540,7 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Fundraiser",
     register: "cause",
     openingLines: ["In support of", "Fundraising for", "Raising for"],
-    contexts: ["2026 appeal", "Every pledge goes in full"],
+    contexts: ["2026 appeal", "For local families"],
   },
   {
     label: "Charity night",
@@ -561,13 +564,13 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Bake sale",
     register: "cause",
     openingLines: ["In support of", "Baking for"],
-    contexts: ["Everything home-made", "All proceeds pledged"],
+    contexts: ["Everything home-made", "Saturday · village hall"],
   },
   {
     label: "Auction",
     register: "cause",
     openingLines: ["In support of", "Under the hammer for"],
-    contexts: ["Lots close 8pm", "Bid generously"],
+    contexts: ["Lots close 8pm", "All lots donated"],
   },
   {
     label: "Gala or ball",
@@ -651,7 +654,7 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Dress-down day",
     register: "cause",
     openingLines: ["In support of", "Dressed down for"],
-    contexts: ["Jeans in, pledges in"],
+    contexts: ["Last Friday of the month"],
   },
   {
     label: "Emergency appeal",

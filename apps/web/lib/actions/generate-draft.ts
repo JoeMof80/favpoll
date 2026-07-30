@@ -102,14 +102,19 @@ ${charityLine}`
     // empty fields: a cause name (only when the organiser hasn't set one)
     // and a short context line (normalised structure, 2026-07-30).
     const hasLabel = Boolean(displayName?.trim())
+    // The cause name renders directly beneath a deterministic opening line
+    // ("In support of", "Raising for", …) the model never sees — so the
+    // name must read naturally after such words and must not echo them
+    // (founder-caught, 2026-07-30: "In support of / Support for Dogs in
+    // Need").
     const causeLabelInstruction = hasLabel
       ? ""
-      : `- "causeLabel": a short name for what is being raised for — 2 to 5 plain words, no charity name, no punctuation (like "Help the Homeless" or "Warm Plates This Winter").\n`
+      : `- "causeLabel": a short name for what is being raised for — 2 to 5 plain words, no charity name, no punctuation (like "Help the Homeless" or "Warm Plates This Winter"). It appears directly BELOW a heading such as "In support of" or "Raising for", so it must read naturally after those words and must NOT contain "support", "supporting", "raising", or "aid of".\n`
     const labelContext = hasLabel
       ? `The organiser calls this cause "${displayName!.trim()}" — write around that name; do not rename it.\n`
       : ""
-    instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it). No full stop.
-- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option.
+    instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
+- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Lead with the cause; the pledge clause comes after it, never first. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName)
