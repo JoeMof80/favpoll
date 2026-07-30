@@ -62,16 +62,16 @@ export function HonourStep({ value, onChange }: Props) {
   }
 
   return (
-    // One row: the type chips, a vertical OR, the cause chip — the fork
-    // between two complete answers reads left-to-right (founder,
-    // 2026-07-30; the step-shell guidance asks the question, so there is
-    // no heading here).
-    <div className="flex w-full max-w-135 items-stretch gap-1.5 sm:gap-2">
+    // The fork between two complete answers. Mobile stacks (type row,
+    // horizontal OR, cause below); sm+ reads left-to-right on one row
+    // with a vertical OR (founder, 2026-07-30). The step-shell guidance
+    // asks the question, so there is no heading here.
+    <div className="flex w-full flex-col gap-6 sm:max-w-135 sm:flex-row sm:items-stretch sm:gap-2">
       <ToggleGroup
         type="single"
         value={value.category ?? ""}
         onValueChange={handleCategoryChange}
-        className="grid min-w-0 flex-[3] grid-cols-3 gap-1.5 sm:gap-2"
+        className="grid w-full grid-cols-3 gap-1.5 sm:min-w-0 sm:flex-[3] sm:gap-2"
       >
         {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
           <ToggleGroupItem key={v} value={v} className={ITEM_CLASS}>
@@ -82,14 +82,14 @@ export function HonourStep({ value, onChange }: Props) {
       </ToggleGroup>
 
       <div
-        className="flex shrink-0 flex-col items-center gap-1"
+        className="flex items-center gap-3 sm:shrink-0 sm:flex-col sm:gap-1"
         aria-hidden="true"
       >
-        <div className="w-px flex-1 bg-border" />
+        <div className="h-px flex-1 bg-border sm:h-auto sm:w-px" />
         <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
           or
         </span>
-        <div className="w-px flex-1 bg-border" />
+        <div className="h-px flex-1 bg-border sm:h-auto sm:w-px" />
       </div>
 
       {/* Cause path: faceless — flips subject; category is set internally */}
@@ -97,10 +97,11 @@ export function HonourStep({ value, onChange }: Props) {
         type="single"
         value={isCause ? "cause" : ""}
         onValueChange={handleCauseChange}
-        className="grid min-w-0 flex-1 grid-cols-1"
+        className="grid w-full grid-cols-3 gap-1.5 sm:min-w-0 sm:flex-1 sm:grid-cols-1"
       >
         <ToggleGroupItem value="cause" className={ITEM_CLASS}>
-          <HeartHandshake className="h-6 w-6" />A cause
+          <HeartHandshake className="h-6 w-6" />
+          Cause
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

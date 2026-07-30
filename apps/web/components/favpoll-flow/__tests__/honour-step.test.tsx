@@ -23,7 +23,7 @@ describe("HonourStep — category row", () => {
     expect(
       screen.getByRole("radio", { name: "Fundraiser" })
     ).toBeInTheDocument()
-    expect(screen.getByRole("radio", { name: "A cause" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Cause" })).toBeInTheDocument()
   })
 
   it("does not render the who options (moved to the Generate control)", () => {
@@ -90,7 +90,7 @@ describe("HonourStep — cause fork", () => {
         onChange={onChange}
       />
     )
-    fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
+    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
     expect(onChange).toHaveBeenCalledWith({
       category: null,
       subject: "cause",
@@ -106,7 +106,7 @@ describe("HonourStep — cause fork", () => {
         onChange={() => {}}
       />
     )
-    expect(screen.getByRole("radio", { name: "A cause" })).toHaveAttribute(
+    expect(screen.getByRole("radio", { name: "Cause" })).toHaveAttribute(
       "aria-checked",
       "true"
     )
