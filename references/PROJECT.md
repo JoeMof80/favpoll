@@ -333,6 +333,20 @@ Pure function in `lib/registers.ts`:
 
 The Honour step (`favpoll-flow/honour-step.tsx`) renders a forked who group and a conditional category row (redesigned 2026-07-13; both Radix `ToggleGroup` `type="single"`). ToggleGroup items render with `role="radio"` and `aria-checked` (not `role="button"`/`aria-pressed`) — tests must query with `getByRole("radio", { name: "..." })`.
 
+**2026-07-30 revision — who moved to the Generate control.** The who
+refinements (He/She/They → pronoun; Pair/Group → grouping) only shape
+generated suggestions, so they moved out of the wizard into a segmented
+icon strip attached to the form's "Generate a suggestion" button
+(`form-inner.tsx`) — which also makes them editable after creation (the
+strip renders in create AND edit mode; hidden for causes). The wizard's
+honour step is now type-or-cause only: category chips + the OR fork +
+"A cause"; `nextDisabled` gates on `subject !== "cause" && !category`.
+The `pronoun` query param between wizard and details is no longer sent.
+Changing the who strip re-derives `register` via `deriveRegister` so the
+next generation uses the right grammar. The paragraphs below describe
+the pre-revision wizard; the fork/any-order-answering grammar still
+applies to what remains.
+
 1. **Two complete paths, forked by an "OR" divider** (layout revised same day to the founder's second mock — the divider separates *complete answers to the step*, not options within the who question). Above the divider, the person path: five who options — **He / She / They** (`Mars`/`Venus`/`NonBinary` icons) / **Pair** (custom `PairIcon`) / **Group** (custom `GroupIcon`) — in a `grid-cols-4 sm:grid-cols-5` grid, followed by the category row. Below the divider, the cause path: **A cause** (`HeartHandshake` icon) alone. Person options set `subject='someone'` + grouping/pronoun (He/She/They → `grouping='individual'` + pronoun; couple/group → grouping + `pronoun=undefined`); "A cause" flips `subject='cause'`, `grouping='individual'`, `pronoun=undefined` with **`category=null` — a cause has no type** (`deriveRegister` is subject-first since the 2026-07-13 remodel, so no plumbing category is needed; memorial/celebration + cause was previously an allowed-but-incoherent state). The two who ToggleGroups share one selection model (selecting in one clears the other). Switching from cause back to a person starts the person path with no type chosen (cause carries `category=null` already). **No default selection** — Next is gated until a who option is chosen (`whoSelected = grouping !== "individual" || subject === "cause" || pronoun !== undefined`; the category gate is waived for cause — `(subject !== 'cause' && !category) || !whoSelected`). The wizard→details handoff omits the `category` param for a cause, and the details page's from-wizard gate is `Boolean(category) || subject === "cause"`. The cause-label input has been **removed** from the wizard — organisers enter the label on the details form instead. `pronoun` rides the redirect as a `pronoun` query param (only present for `subject='someone'`) and hydrates into `defaultValues.pronoun` on the details page.
 2. **Category row** (Celebration `Balloon` / Memorial `Flower2` / Fundraiser `Medal`): **always live, never dimmed or disabled** (any-order answering is the step's grammar — founder overruled an earlier disable-on-cause design because a fresh page already lets you pick a type before a who). For a cause it shows **no selection** (`category=null` — the remodel landed 2026-07-13, superseding the interim invisible-plumbing `fundraiser`) — and **clicking a type chip hops back to the person path** (subject→'someone', cause deselects, the clicked type is kept, who empties so Next re-gates). Touch either side of the OR and you're on that side. Active ToggleGroupItem style: solid fill (`bg-primary text-primary-foreground`).
 

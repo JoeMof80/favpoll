@@ -76,23 +76,17 @@ describe("NewFavpollWizard — structure", () => {
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
   })
 
-  it("Next button is still disabled when only a category is selected (no who)", () => {
+  it("Next button is enabled once a category is selected — who moved to the Generate control", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
-    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
-  })
-
-  it("Next button is still disabled when only a who option is selected (no category)", () => {
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "He" }))
-    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
-  })
-
-  it("Next button is enabled when both category and who are selected", () => {
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
+  })
+
+  it("does not render who options on step 1 (moved to the Generate control)", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    for (const name of ["He", "She", "They", "Pair", "Group"]) {
+      expect(screen.queryByRole("radio", { name })).not.toBeInTheDocument()
+    }
   })
 })
 
@@ -103,7 +97,6 @@ describe("NewFavpollWizard — structure", () => {
 describe("NewFavpollWizard — step order is Honour → Charity → Love", () => {
   it("step 2 is Charity (shows 'Pick a charity')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
@@ -118,7 +111,6 @@ describe("NewFavpollWizard — step order is Honour → Charity → Love", () =>
   it("step 3 is Love (shows 'Pick a topic')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     // Honour
-    fireEvent.click(screen.getByRole("radio", { name: "He" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     // Charity: open sheet, pick, Done
@@ -145,7 +137,6 @@ describe("NewFavpollWizard — redirect", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
     // Step 1: Honour
-    fireEvent.click(screen.getByRole("radio", { name: "She" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
@@ -166,11 +157,10 @@ describe("NewFavpollWizard — redirect", () => {
     )
   })
 
-  it("redirect URL contains subject=someone and pronoun=she for a person favpoll", () => {
+  it("redirect URL contains subject=someone and no pronoun for a person favpoll", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
-    fireEvent.click(screen.getByRole("radio", { name: "She" }))
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
@@ -184,7 +174,7 @@ describe("NewFavpollWizard — redirect", () => {
     const url: string = mockPush.mock.calls[0][0]
     expect(url).toContain("subject=someone")
     expect(url).toContain("grouping=individual")
-    expect(url).toContain("pronoun=she")
+    expect(url).not.toContain("pronoun")
     expect(url).not.toContain("causeLabel")
   })
 })
@@ -213,7 +203,8 @@ describe("NewFavpollWizard — cause guardrail", () => {
     fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
     fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
-    // Cause deselects, the type is kept, and Next gates until a who is chosen.
+    // Cause deselects, the type is kept — and a type alone now satisfies
+    // the step (who moved to the Generate control).
     expect(screen.getByRole("radio", { name: "A cause" })).toHaveAttribute(
       "aria-checked",
       "false"
@@ -222,7 +213,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
       "aria-checked",
       "true"
     )
-    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
   it("wizard does not show a cause label input on step 1", () => {
@@ -270,7 +261,6 @@ describe("NewFavpollWizard — Love step copy by subject", () => {
     if (subject === "cause") {
       fireEvent.click(screen.getByRole("radio", { name: "A cause" }))
     } else {
-      fireEvent.click(screen.getByRole("radio", { name: "He" }))
       fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     }
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
