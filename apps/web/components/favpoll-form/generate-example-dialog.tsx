@@ -1,9 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { occasionsForRegister, type OccasionSpec } from "@/lib/occasions"
 import { deriveRegister } from "@/lib/registers"
@@ -34,8 +32,13 @@ const CHIP_OFF = "rounded-full"
  * The Generate control's two-step dialog (founder, 2026-07-30): step 1
  * picks the who (He/She/They/Pair/Group), step 2 the occasion — the who
  * narrows the occasion list, so the ordering is structural. Selecting an
- * occasion (or "No occasion") generates immediately; there is no confirm
- * step. Causes have no who and open straight onto occasions.
+ * occasion (or "No occasion") generates immediately; Done is the escape
+ * hatch that closes without generating, like the wizard pickers. Causes
+ * have no who and open straight onto occasions.
+ *
+ * Chrome follows the pledge-dialog grammar: per-step title carries the
+ * question, close button hidden, search as a transparent header input,
+ * footer/top-bar carry the navigation.
  *
  * Selections are remembered between opens (the parent owns them), so a
  * re-roll with the same settings is tap-tap.
@@ -106,57 +109,78 @@ export function GenerateExampleDialog({
     <ResponsiveOverlay
       open={open}
       onOpenChange={onOpenChange}
-      title="Generate an example"
-      dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
+      title={step === 1 ? "Who is this favpoll for?" : "Pick an occasion"}
+      hideCloseButton
+      headerClassName={step === 2 ? "px-5 pt-4 pb-2" : undefined}
+      bodyClassName="p-0"
+      dialogContentClassName="flex-1 overflow-y-auto"
       fullscreenOnMobile
       mobileBack={
         step === 2 && !isCause
           ? { label: "Back", onClick: () => setStep(1) }
-          : { label: "Cancel", onClick: close }
+          : undefined
+      }
+      mobileSave={{ label: "Done", onClick: close }}
+      header={
+        step === 2 ? (
+          <input
+            type="text"
+            autoFocus
+            placeholder="Search occasions…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+          />
+        ) : undefined
+      }
+      footer={
+        <div className="flex gap-2">
+          {step === 2 && !isCause ? (
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => setStep(1)}
+            >
+              ← Back
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={close}
+            >
+              Cancel
+            </Button>
+          )}
+          <Button type="button" className="flex-1" onClick={close}>
+            Done
+          </Button>
+        </div>
       }
     >
       {step === 1 ? (
-        <div className="space-y-4">
-          <p className="text-base font-medium">Who is this favpoll for?</p>
-          <div className="flex flex-wrap gap-1.5">
-            {WHO_OPTIONS.map(({ value, label }) => (
-              <Button
-                key={value}
-                type="button"
-                variant="outline"
-                size="sm"
-                aria-pressed={localWho === value}
-                onClick={() => handleWho(value)}
-                className={cn(localWho === value ? CHIP_ON : CHIP_OFF)}
-              >
-                {label}
-              </Button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-1.5 px-5 pt-1 pb-4">
+          {WHO_OPTIONS.map(({ value, label }) => (
+            <Button
+              key={value}
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-pressed={localWho === value}
+              onClick={() => handleWho(value)}
+              className={cn(localWho === value ? CHIP_ON : CHIP_OFF)}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            {!isCause && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Back"
-                onClick={() => setStep(1)}
-                className="hidden md:inline-flex"
-              >
-                <ArrowLeft />
-              </Button>
-            )}
-            <p className="text-base font-medium">What&apos;s the occasion?</p>
-          </div>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search occasions…"
-            className="md:text-base"
-          />
+        // min-h floor: searching filters the chips down and the sheet
+        // would otherwise sink behind the iOS keyboard (pledge picker
+        // precedent).
+        <div className="min-h-80 px-5 pt-1 pb-4">
           <div
             className="flex flex-wrap gap-1.5"
             role="listbox"

@@ -26,21 +26,30 @@ vi.mock("@/lib/actions/generate-draft", () => ({
 vi.mock("@/components/ui/responsive-overlay", () => ({
   ResponsiveOverlay: ({
     open,
+    title,
+    header,
+    footer,
     children,
     mobileBack,
   }: {
     open: boolean
+    title: string
+    header?: React.ReactNode
+    footer?: React.ReactNode
     children?: React.ReactNode
     mobileBack?: { label?: string; onClick: () => void }
   }) =>
     open ? (
       <div data-testid="generate-dialog">
+        <span>{title}</span>
         {mobileBack && (
           <button onClick={mobileBack.onClick}>
             {mobileBack.label ?? "Back"}
           </button>
         )}
+        {header}
         {children}
+        {footer}
       </div>
     ) : null,
 }))
@@ -107,7 +116,7 @@ describe("GenerateExampleDialog — steps", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     openDialog()
     expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
-    expect(screen.queryByText("What's the occasion?")).not.toBeInTheDocument()
+    expect(screen.queryByText("Pick an occasion")).not.toBeInTheDocument()
   })
 
   it("opens straight onto occasions for a cause", () => {
@@ -122,7 +131,7 @@ describe("GenerateExampleDialog — steps", () => {
       />
     )
     openDialog()
-    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
+    expect(screen.getByText("Pick an occasion")).toBeInTheDocument()
     expect(
       screen.getByRole("option", { name: "Coffee morning" })
     ).toBeInTheDocument()
@@ -132,7 +141,7 @@ describe("GenerateExampleDialog — steps", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     openDialog()
     fireEvent.click(screen.getByRole("button", { name: "She" }))
-    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
+    expect(screen.getByText("Pick an occasion")).toBeInTheDocument()
     expect(
       screen.getByRole("option", { name: "Retirement" })
     ).toBeInTheDocument()
@@ -155,8 +164,8 @@ describe("GenerateExampleDialog — steps", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     openDialog()
     fireEvent.click(screen.getByRole("button", { name: "Group" }))
-    expect(screen.getByText("What's the occasion?")).toBeInTheDocument()
-    fireEvent.click(screen.getAllByRole("button", { name: "Back" })[0])
+    expect(screen.getByText("Pick an occasion")).toBeInTheDocument()
+    fireEvent.click(screen.getAllByRole("button", { name: /Back/ })[0])
     expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
   })
 
