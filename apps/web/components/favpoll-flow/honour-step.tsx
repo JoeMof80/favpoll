@@ -1,8 +1,6 @@
 "use client"
 
 import {
-  Users,
-  UsersRound,
   Balloon,
   Flower2,
   Medal,
@@ -11,6 +9,7 @@ import {
   Venus,
   NonBinary,
 } from "lucide-react"
+import { CoupleIcon, GroupIcon } from "@/components/icons/people"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type {
   FavpollCategory,
@@ -39,8 +38,8 @@ const PERSON_OPTIONS = [
   { value: "he", label: "He", icon: Mars },
   { value: "she", label: "She", icon: Venus },
   { value: "they", label: "They", icon: NonBinary },
-  { value: "couple", label: "A couple", icon: Users },
-  { value: "group", label: "A group", icon: UsersRound },
+  { value: "couple", label: "A couple", icon: CoupleIcon },
+  { value: "group", label: "A group", icon: GroupIcon },
 ] as const
 
 const CATEGORY_OPTIONS = [
@@ -49,11 +48,13 @@ const CATEGORY_OPTIONS = [
   { value: "fundraiser", label: "Fundraiser", icon: Medal },
 ] as const
 
+// px-1/text-xs on phones so five chips share one row without wrapping
+// (founder screenshot, 2026-07-30); sm+ restores the roomier chip.
 const WHO_ITEM_CLASS =
-  "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
+  "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-1 py-4 text-xs font-normal sm:px-4 sm:py-5 sm:text-sm [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
 
 const CATEGORY_ITEM_CLASS =
-  "flex h-auto w-32 flex-col items-center gap-2 rounded-xl border border-border bg-background px-4 py-5 text-sm font-normal [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
+  "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-1 py-4 text-xs font-normal sm:px-4 sm:py-5 sm:text-sm [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
 
 function deriveToggleValue(
   subject: FavpollSubject,
@@ -141,7 +142,7 @@ export function HonourStep({ value, onChange }: Props) {
         type="single"
         value={isCause ? "" : whoToggleValue}
         onValueChange={handleWhoChange}
-        className="grid w-full grid-cols-4 gap-2 sm:grid-cols-5"
+        className="grid w-full grid-cols-5 gap-1.5 sm:gap-2"
       >
         {PERSON_OPTIONS.map(({ value: v, label, icon: Icon }) => (
           <ToggleGroupItem key={v} value={v} className={WHO_ITEM_CLASS}>
@@ -162,7 +163,7 @@ export function HonourStep({ value, onChange }: Props) {
           type="single"
           value={value.category ?? ""}
           onValueChange={handleCategoryChange}
-          className="flex flex-wrap gap-2"
+          className="grid w-full max-w-100 grid-cols-3 gap-1.5 sm:gap-2"
         >
           {CATEGORY_OPTIONS.map(({ value: v, label, icon: Icon }) => (
             <ToggleGroupItem key={v} value={v} className={CATEGORY_ITEM_CLASS}>
@@ -188,7 +189,7 @@ export function HonourStep({ value, onChange }: Props) {
         type="single"
         value={isCause ? "cause" : ""}
         onValueChange={handleWhoChange}
-        className="grid w-full grid-cols-4 gap-2 sm:grid-cols-5"
+        className="grid w-full grid-cols-5 gap-1.5 sm:gap-2"
       >
         <ToggleGroupItem value="cause" className={WHO_ITEM_CLASS}>
           <HeartHandshake className="h-6 w-6" />A cause
