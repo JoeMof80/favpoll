@@ -137,13 +137,18 @@ describe("OrganizerRow", () => {
       expect(screen.getByText(/Age UK \+1/)).toBeInTheDocument()
     })
 
-    it("header text links to the favpoll page (does not toggle expansion)", () => {
+    it("the name links to the favpoll page without toggling expansion", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
-      expect(screen.getByTestId("row-link")).toHaveAttribute(
-        "href",
-        "/favpolls/fp-1"
-      )
+      const link = screen.getByTestId("row-link")
+      expect(link).toHaveAttribute("href", "/favpolls/fp-1")
+      fireEvent.click(link)
       expect(screen.queryByTestId("qr-code")).not.toBeInTheDocument()
+    })
+
+    it("clicking the header background expands the row", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      fireEvent.click(screen.getByTestId("row-header"))
+      expect(screen.getByTestId("qr-code")).toBeInTheDocument()
     })
 
     it("has no copy button in the collapsed header", () => {

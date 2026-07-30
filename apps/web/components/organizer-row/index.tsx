@@ -140,13 +140,21 @@ export function OrganizerRow({ favpoll }: Props) {
       className={cn("list-none", isClosed && "opacity-70")}
       data-testid="organizer-row"
     >
-      {/* ── Collapsed header: chevron toggles the panel; the text is a
-          plain link to the favpoll page (clicking the name used to expand
-          the row — the founder expected navigation, 2026-07-30). ── */}
-      <div className="flex items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4">
+      {/* ── Collapsed header: the ROW expands (background hover); the NAME
+          alone links to the favpoll page (underline hover). The div's
+          onClick is a pointer convenience — the chevron button is the
+          focusable, aria-expanded toggle for keyboards and AT. ── */}
+      <div
+        onClick={() => setExpanded((v) => !v)}
+        data-testid="row-header"
+        className="flex cursor-pointer items-center gap-2 px-3 py-2.5 transition-colors hover:bg-muted/50 sm:gap-3 sm:px-4"
+      >
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setExpanded((v) => !v)
+          }}
           aria-expanded={expanded}
           aria-label={expanded ? "Hide details" : "Show details"}
           data-testid="row-toggle"
@@ -160,62 +168,63 @@ export function OrganizerRow({ favpoll }: Props) {
             aria-hidden="true"
           />
         </button>
-        <Link
-          href={`/favpolls/${favpoll.id}`}
-          data-testid="row-link"
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left"
-        >
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-xs text-muted-foreground">
-              {favpoll.opening_line}
-            </span>
-            <span className="block truncate text-sm font-medium text-foreground">
-              {protagonistName}
-              {/* The triad at a glance: protagonist · topic · charity */}
-              {topicTitle && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  · {topicTitle}
-                </span>
-              )}
-              {charity && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  · {charity.name}
-                  {favpoll.charities.length > 1 &&
-                    ` +${favpoll.charities.length - 1}`}
-                </span>
-              )}
-            </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-xs text-muted-foreground">
+            {favpoll.opening_line}
           </span>
-          {!listed && (
-            <span className="hidden shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline">
-              Unlisted
-            </span>
-          )}
-          <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
-            <Clock
-              size={12}
-              className="text-muted-foreground"
-              aria-hidden="true"
-            />
-            <span
-              className={cn(
-                "text-xs tabular-nums",
-                isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-muted-foreground"
-              )}
-              data-testid={isClosed ? "countdown-closed" : "countdown-active"}
+          <span className="block truncate text-sm font-medium text-foreground">
+            <Link
+              href={`/favpolls/${favpoll.id}`}
+              data-testid="row-link"
+              onClick={(e) => e.stopPropagation()}
+              className="hover:underline"
             >
-              {isClosed
-                ? "Closed"
-                : days <= 0
-                  ? "closing"
-                  : `${days} day${days === 1 ? "" : "s"}`}
-            </span>
+              {protagonistName}
+            </Link>
+            {/* The triad at a glance: protagonist · topic · charity */}
+            {topicTitle && (
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                · {topicTitle}
+              </span>
+            )}
+            {charity && (
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                · {charity.name}
+                {favpoll.charities.length > 1 &&
+                  ` +${favpoll.charities.length - 1}`}
+              </span>
+            )}
           </span>
-        </Link>
+        </span>
+        {!listed && (
+          <span className="hidden shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline">
+            Unlisted
+          </span>
+        )}
+        <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
+          <Clock
+            size={12}
+            className="text-muted-foreground"
+            aria-hidden="true"
+          />
+          <span
+            className={cn(
+              "text-xs tabular-nums",
+              isWarning
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-muted-foreground"
+            )}
+            data-testid={isClosed ? "countdown-closed" : "countdown-active"}
+          >
+            {isClosed
+              ? "Closed"
+              : days <= 0
+                ? "closing"
+                : `${days} day${days === 1 ? "" : "s"}`}
+          </span>
+        </span>
 
         <span
           className="shrink-0 text-sm font-medium text-primary tabular-nums"
