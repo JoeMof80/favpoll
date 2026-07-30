@@ -81,12 +81,11 @@ export function useWizardState(data: WizardData) {
   const showItemsSection =
     topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
-  const whoSelected =
-    grouping !== "individual" || subject === "cause" || pronoun !== undefined
-
+  // The who refinements (pronoun, pair/group) moved to the form's
+  // Generate control (2026-07-30): the step gates on type-or-cause only.
   const nextDisabled =
     step === "honour"
-      ? (subject !== "cause" && !category) || !whoSelected
+      ? subject !== "cause" && !category
       : step === "charity"
         ? charityIds.length === 0
         : topics.length === 0 ||

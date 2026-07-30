@@ -82,10 +82,10 @@ describe("useWizardState — initial state", () => {
 })
 
 describe("useWizardState — honour step nextDisabled gate", () => {
-  it("nextDisabled true with category but no who selection", () => {
+  it("nextDisabled false once a category is set — who moved to the Generate control", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
-    expect(result.current.nextDisabled).toBe(true)
+    expect(result.current.nextDisabled).toBe(false)
   })
 
   it("nextDisabled false once category and pronoun are set", () => {

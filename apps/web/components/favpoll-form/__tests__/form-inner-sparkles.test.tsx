@@ -68,9 +68,7 @@ describe("FormInner — Sparkles button reachability", () => {
 
   it("is absent when no topic is selected", () => {
     render(<Wrapper defaultValues={{ topics: [] }} />)
-    expect(
-      screen.queryByRole("button", { name: /generate a suggestion/i })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText("Generate a suggestion")).not.toBeInTheDocument()
   })
 
   it("is present when a custom topic with a title is selected", () => {
@@ -89,8 +87,9 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
+    expect(screen.getByText("Generate a suggestion")).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: /generate a suggestion/i })
+      screen.getByRole("button", { name: "Generate for They" })
     ).toBeInTheDocument()
   })
 
@@ -110,15 +109,14 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
-    expect(
-      screen.queryByRole("button", { name: /generate a suggestion/i })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText("Generate a suggestion")).not.toBeInTheDocument()
   })
 
   it("is present when a canonical topic is selected", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    expect(screen.getByText("Generate a suggestion")).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: /generate a suggestion/i })
+      screen.getByRole("button", { name: "Generate for They" })
     ).toBeInTheDocument()
   })
 
@@ -129,9 +127,7 @@ describe("FormInner — Sparkles button reachability", () => {
       fromCache: false,
     })
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(
-      screen.getByRole("button", { name: /generate a suggestion/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: "Generate for She" }))
     await waitFor(() =>
       expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -139,6 +135,7 @@ describe("FormInner — Sparkles button reachability", () => {
           subject: "someone",
           topicId: "topic-1",
           primaryCharityId: null,
+          pronoun: "she",
         })
       )
     )
@@ -165,9 +162,7 @@ describe("FormInner — Sparkles button reachability", () => {
         }}
       />
     )
-    fireEvent.click(
-      screen.getByRole("button", { name: /generate a suggestion/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: "Generate for They" }))
     await waitFor(() =>
       expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -191,9 +186,7 @@ describe("FormInner — Sparkles button reachability", () => {
         })
     )
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
-    fireEvent.click(
-      screen.getByRole("button", { name: /generate a suggestion/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: "Generate for They" }))
     await waitFor(() =>
       expect(screen.getByText("Generating…")).toBeInTheDocument()
     )

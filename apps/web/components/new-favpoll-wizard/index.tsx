@@ -61,7 +61,7 @@ export function NewFavpollWizard({ data }: Props) {
             {w.step === "honour" && (
               <WizardStepShell
                 title="Honour"
-                guidance="Who or what is this favpoll for?"
+                guidance="What kind of favpoll is this?"
               >
                 <HonourStep
                   value={{
