@@ -240,6 +240,8 @@ export function EditablePollArea({
           </InputGroup>
         }
         footer={overlayFooter(saveReveal, () => setRevealOpen(false))}
+        fullscreenOnMobile
+        mobileSave={{ onClick: saveReveal }}
       />
     </>
   )

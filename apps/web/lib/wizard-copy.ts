@@ -14,7 +14,7 @@ const SOMEONE: WizardCopy = {
     "Someone you love, a cause that matters, and the things they loved — that's a favpoll.",
   rail: {
     honour: "Who or what is this favpoll for?",
-    charity: "Every pledge goes to the charity you choose.",
+    charity: "Every pledge goes to the charity you pick.",
     love: "What did they love? Guests pledge on their favourites.",
   },
   charityGuidance:
@@ -28,7 +28,7 @@ const CAUSE: WizardCopy = {
     "A cause that matters, and a question people will love answering — that's a favpoll.",
   rail: {
     honour: "Who or what is this favpoll for?",
-    charity: "Every pledge goes to the charity you choose.",
+    charity: "Every pledge goes to the charity you pick.",
     love: "Pick a topic your supporters will love voting on.",
   },
   charityGuidance:

@@ -69,6 +69,8 @@ export function HeroContextOverlay({ open, onOpenChange }: Props) {
         </InputGroup>
       }
       footer={overlayFooter(save, () => onOpenChange(false))}
+      fullscreenOnMobile
+      mobileSave={{ onClick: save }}
     />
   )
 }

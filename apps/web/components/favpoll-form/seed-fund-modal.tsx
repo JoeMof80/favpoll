@@ -181,6 +181,7 @@ export function SeedFundModal({
       hideCloseButton={!isGuest}
       dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       dialogContentClassName="flex-1 overflow-y-auto px-5 pt-0 pb-2"
+      bodyClassName="px-5 pt-0 pb-2"
       footer={footer}
     >
       {/* Amount field */}

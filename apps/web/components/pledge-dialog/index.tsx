@@ -208,7 +208,7 @@ export function PledgeDialog({
   )
 
   const titleByStep = {
-    1: `Choose your favourite ${topicTitle.toLowerCase()}`,
+    1: `Pick your favourite ${topicTitle.toLowerCase()}`,
     2: "Your pledge",
     3: "Complete payment",
   }
@@ -236,16 +236,46 @@ export function PledgeDialog({
               : undefined
         }
         footer={currentFooter}
+        fullscreenOnMobile
+        mobileBack={
+          dialog.step === 1
+            ? { label: "Cancel", onClick: () => handleOpenChange(false) }
+            : {
+                label: "Back",
+                onClick: dialog.handleBack,
+                disabled: dialog.step === 3 && stripeSubmitting,
+              }
+        }
+        mobileSave={
+          dialog.step === 1
+            ? {
+                label: "Next",
+                onClick: () => dialog.handleNext(),
+                disabled: !dialog.canAdvanceStep1,
+              }
+            : dialog.step === 2
+              ? {
+                  label: nextLabel,
+                  onClick: () => dialog.handleNext(),
+                  disabled: isNextDisabled,
+                }
+              : {
+                  label: stripeSubmitting ? "Processing…" : "Pay now",
+                  form: "pledge-checkout-form",
+                  disabled: stripeSubmitting || !stripeReady,
+                }
+        }
         headerClassName={
           dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
         }
+        bodyClassName="p-0"
         dialogContentClassName="flex-1 overflow-y-auto"
       >
         {dialog.step === 1 && (
           // min-h: searching filters the chips down and the bottom sheet
           // would shrink with them — on iOS the whole sheet then sinks
           // behind the keyboard. A stable floor keeps the input in view.
-          <div className="flex min-h-80 flex-col gap-2 px-5 py-4">
+          <div className="flex min-h-80 flex-col gap-2 px-5 pt-1 pb-4">
             <PickerItems
               filteredItems={dialog.filteredItems}
               draftIds={dialog.draftIds}

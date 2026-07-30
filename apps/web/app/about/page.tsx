@@ -15,7 +15,7 @@ import { ContactForm } from "@/components/contact-form"
 const FAQ_ITEMS: { q: string; a: string }[] = [
   {
     q: "How long does a favpoll run?",
-    a: "You choose the closing date, up to 90 days from when you create it. When that date arrives, the favpoll closes on its own.",
+    a: "You pick the closing date, up to 90 days from when you create it. When that date arrives, the favpoll closes on its own.",
   },
   {
     q: "Can I change a favpoll after publishing it?",

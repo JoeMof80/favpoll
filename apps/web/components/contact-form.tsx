@@ -118,7 +118,7 @@ export function ContactForm() {
               className={SELECT_CLASSES}
             >
               <option value="" disabled>
-                Choose one…
+                Pick one…
               </option>
               {ROLES.map((r) => (
                 <option key={r} value={r}>
