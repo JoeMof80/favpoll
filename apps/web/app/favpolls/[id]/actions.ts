@@ -558,6 +558,74 @@ export async function topUpFund(
   await creditFund(favpollId, amount, paymentIntentId, userId)
 }
 
+// Deletion is for favpolls that never took money: any pledge or shared-fund
+// deposit is a financial record and permanently blocks deletion (re-checked
+// here — the client's counts are display state, not authority).
+export async function deleteFavpoll(favpollId: string) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: favpoll } = await supabase
+    .from("favpolls")
+    .select(
+      "created_by, protagonist_id, favpoll_polls ( id, pledges ( count ) ), favpoll_pots ( id, total_deposited )"
+    )
+    .eq("id", favpollId)
+    .single()
+
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  type PollRow = { id: string; pledges: { count: number }[] | null }
+  type PotRow = { id: string; total_deposited: number }
+  const polls: PollRow[] = Array.isArray(favpoll.favpoll_polls)
+    ? favpoll.favpoll_polls
+    : favpoll.favpoll_polls
+      ? [favpoll.favpoll_polls]
+      : []
+  const pots: PotRow[] = Array.isArray(favpoll.favpoll_pots)
+    ? favpoll.favpoll_pots
+    : favpoll.favpoll_pots
+      ? [favpoll.favpoll_pots]
+      : []
+
+  const pledgeCount = polls.reduce(
+    (n, p) => n + (p.pledges?.[0]?.count ?? 0),
+    0
+  )
+  const deposited = pots.reduce((n, p) => n + (p.total_deposited ?? 0), 0)
+  if (pledgeCount > 0 || deposited > 0)
+    throw new Error("This favpoll has pledges and can't be deleted.")
+
+  const pollIds = polls.map((p) => p.id)
+  if (pollIds.length > 0) {
+    await supabase
+      .from("favpoll_poll_favourites")
+      .delete()
+      .in("favpoll_poll_id", pollIds)
+    await supabase.from("favpoll_polls").delete().eq("favpoll_id", favpollId)
+  }
+  await supabase.from("favpoll_charities").delete().eq("favpoll_id", favpollId)
+  const potIds = pots.map((p) => p.id)
+  if (potIds.length > 0) {
+    await supabase.from("pot_allocations").delete().in("pot_id", potIds)
+    await supabase.from("favpoll_pots").delete().eq("favpoll_id", favpollId)
+  }
+
+  const { error } = await supabase.from("favpolls").delete().eq("id", favpollId)
+  if (error) throw new Error(error.message)
+
+  // The protagonist row is per-favpoll (created alongside it) — remove the
+  // orphan after the favpoll no longer references it.
+  if (favpoll.protagonist_id) {
+    await supabase
+      .from("protagonists")
+      .delete()
+      .eq("id", favpoll.protagonist_id)
+  }
+}
+
 export async function setFavpollListed(favpollId: string, isListed: boolean) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")

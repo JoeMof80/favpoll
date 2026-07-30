@@ -63,22 +63,30 @@ export function useDemoLoop() {
       setBarWidths(decoyFor(scene))
     }, HOLD)
 
-    addT(() => setPhase("trigger-hover"), HOLD + 2400)
-    addT(() => setPhase("triggering"), HOLD + 2700)
-    addT(() => setPhase("picking"), HOLD + 3050)
-    addT(() => setPhase("selected"), HOLD + 4250)
-    addT(() => setPhase("next-hover"), HOLD + 4950)
-    addT(() => setPhase("next-pressed"), HOLD + 5250)
-    addT(() => setPhase("pledge-panel"), HOLD + 5600)
-    addT(() => setPhase("amount-picked"), HOLD + 6600)
-    addT(() => setPhase("pledge-hover"), HOLD + 7500)
-    addT(() => setPhase("pledging"), HOLD + 7800)
-    addT(() => setPhase("confirmed"), HOLD + 8100)
+    // The About finishes typing ~2200ms into "arriving" (useTyped's
+    // targetMs) — hold a beat before the cursor moves on so it can be
+    // READ, not just watched (founder, 2026-07-30).
+    const READ = 1300
 
-    addT(() => {
-      setPhase("clearing")
-      setBarWidths(scene.results.map(() => 0))
-    }, HOLD + 9300)
+    addT(() => setPhase("trigger-hover"), HOLD + READ + 2400)
+    addT(() => setPhase("triggering"), HOLD + READ + 2700)
+    addT(() => setPhase("picking"), HOLD + READ + 3050)
+    addT(() => setPhase("selected"), HOLD + READ + 4250)
+    addT(() => setPhase("next-hover"), HOLD + READ + 4950)
+    addT(() => setPhase("next-pressed"), HOLD + READ + 5250)
+    addT(() => setPhase("pledge-panel"), HOLD + READ + 5600)
+    addT(() => setPhase("amount-picked"), HOLD + READ + 6600)
+    addT(() => setPhase("pledge-hover"), HOLD + READ + 7500)
+    addT(() => setPhase("pledging"), HOLD + READ + 7800)
+    addT(() => setPhase("confirmed"), HOLD + READ + 8100)
+
+    addT(
+      () => {
+        setPhase("clearing")
+        setBarWidths(scene.results.map(() => 0))
+      },
+      HOLD + READ + 9300
+    )
     scene.results.forEach((result, i) => {
       addT(
         () =>
@@ -87,21 +95,24 @@ export function useDemoLoop() {
             next[i] = result.widthPercent
             return next
           }),
-        HOLD + 9400 + i * 180
+        HOLD + READ + 9400 + i * 180
       )
     })
 
-    addT(() => setPhase("results"), HOLD + 9800)
-    addT(() => setPhase("reveal"), HOLD + 11200)
+    addT(() => setPhase("results"), HOLD + READ + 9800)
+    addT(() => setPhase("reveal"), HOLD + READ + 11200)
 
-    addT(() => setFading(true), HOLD + 13700)
-    addT(() => {
-      const nextIndex = (sceneIndex + 1) % SCENES.length
-      setPhase("arriving")
-      setBarWidths(decoyFor(SCENES[nextIndex]))
-      setFading(false)
-      setSceneIndex(nextIndex)
-    }, HOLD + 14200)
+    addT(() => setFading(true), HOLD + READ + 13700)
+    addT(
+      () => {
+        const nextIndex = (sceneIndex + 1) % SCENES.length
+        setPhase("arriving")
+        setBarWidths(decoyFor(SCENES[nextIndex]))
+        setFading(false)
+        setSceneIndex(nextIndex)
+      },
+      HOLD + READ + 14200
+    )
 
     return clearAll
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import {
   ChevronDown,
   Clock,
@@ -11,11 +13,13 @@ import {
   Monitor,
   Printer,
   Pencil,
+  Trash2,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
-import { setFavpollListed } from "@/app/favpolls/[id]/actions"
+import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
+import { deleteFavpoll, setFavpollListed } from "@/app/favpolls/[id]/actions"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -46,9 +50,11 @@ export function OrganizerRow({ favpoll }: Props) {
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
+  const router = useRouter()
   const [expanded, setExpanded] = useState(false)
   const [listed, setListed] = useState(favpoll.is_listed)
   const [listingPending, setListingPending] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [copiedGuest, setCopiedGuest] = useState(false)
   const [copiedDisplay, setCopiedDisplay] = useState(false)
   const [copiedEdit, setCopiedEdit] = useState(false)
@@ -109,19 +115,42 @@ export function OrganizerRow({ favpoll }: Props) {
   const handleCopyDisplay = () => flashCopied(setCopiedDisplay, displayUrl)
   const handleCopyEdit = () => flashCopied(setCopiedEdit, editUrl)
 
+  // Money records are permanent: any pledge or shared-fund deposit blocks
+  // deletion (the server re-checks — this only drives the disabled state).
+  const canDelete =
+    favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
+
+  async function handleDelete() {
+    const name = protagonistName || "this favpoll"
+    if (!window.confirm(`Delete ${name}? This can't be undone.`)) return
+    setDeleting(true)
+    try {
+      await deleteFavpoll(favpoll.id)
+      router.refresh()
+    } catch {
+      toast.error("Couldn't delete this favpoll — please try again.", {
+        style: TOAST_ERROR_STYLE,
+      })
+      setDeleting(false)
+    }
+  }
+
   return (
     <li
       className={cn("list-none", isClosed && "opacity-70")}
       data-testid="organizer-row"
     >
-      {/* ── Collapsed header ── */}
+      {/* ── Collapsed header: chevron toggles the panel; the text is a
+          plain link to the favpoll page (clicking the name used to expand
+          the row — the founder expected navigation, 2026-07-30). ── */}
       <div className="flex items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4">
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
+          aria-label={expanded ? "Hide details" : "Show details"}
           data-testid="row-toggle"
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left"
+          className="-m-1.5 shrink-0 rounded-md p-1.5"
         >
           <ChevronDown
             className={cn(
@@ -130,6 +159,12 @@ export function OrganizerRow({ favpoll }: Props) {
             )}
             aria-hidden="true"
           />
+        </button>
+        <Link
+          href={`/favpolls/${favpoll.id}`}
+          data-testid="row-link"
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left"
+        >
           <span className="min-w-0 flex-1">
             <span className="block truncate text-xs text-muted-foreground">
               {favpoll.opening_line}
@@ -180,7 +215,7 @@ export function OrganizerRow({ favpoll }: Props) {
                   : `${days} day${days === 1 ? "" : "s"}`}
             </span>
           </span>
-        </button>
+        </Link>
 
         <span
           className="shrink-0 text-sm font-medium text-primary tabular-nums"
@@ -188,21 +223,6 @@ export function OrganizerRow({ favpoll }: Props) {
         >
           {formatAmount(favpoll.total_raised)}
         </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
-          onClick={handleCopyGuest}
-          aria-label="Copy guest link"
-          data-testid="copy-guest-button"
-        >
-          {copiedGuest ? (
-            <Check size={14} aria-hidden="true" />
-          ) : (
-            <Copy size={14} aria-hidden="true" />
-          )}
-        </Button>
       </div>
 
       {/* ── Expanded panel: manage column | share column (QR far right).
@@ -436,6 +456,26 @@ export function OrganizerRow({ favpoll }: Props) {
                 </p>
               </div>
             )}
+
+            <div className="col-span-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!canDelete || deleting}
+                onClick={handleDelete}
+                data-testid="delete-favpoll-button"
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 data-icon="inline-start" aria-hidden="true" />
+                {deleting ? "Deleting…" : "Delete favpoll"}
+              </Button>
+              {!canDelete && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Favpolls with pledges can&apos;t be deleted.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       )}
