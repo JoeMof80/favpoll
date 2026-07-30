@@ -118,8 +118,8 @@ export function FavpollForm({
         const { favpollId: newId } = await createFavpoll({
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
-          photoUrl: isCause ? null : resolvedPhotoUrl,
-          dateLabel: isCause ? null : values.context || null,
+          photoUrl: resolvedPhotoUrl,
+          dateLabel: values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
           subject,
@@ -155,8 +155,8 @@ export function FavpollForm({
         await updateFavpoll(favpollId, protagonistId ?? "", {
           protagonistName: isCause ? "" : (values.name ?? ""),
           protagonistAbout: isCause ? null : values.about || null,
-          photoUrl: isCause ? null : resolvedPhotoUrl,
-          dateLabel: isCause ? null : values.context || null,
+          photoUrl: resolvedPhotoUrl,
+          dateLabel: values.context || null,
           category: values.category ?? null,
           grouping: values.grouping ?? "individual",
           subject,

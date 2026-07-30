@@ -173,6 +173,8 @@ describe("generateDraft — cache hit", () => {
     expect(result).toEqual({
       about: "Cached about.",
       reveal: "Cached reveal — Red.",
+      causeLabel: null,
+      context: null,
       fromCache: true,
     })
     expect(mockMessagesCreate).not.toHaveBeenCalled()
@@ -298,6 +300,100 @@ describe("generateDraft — cache miss, cause", () => {
       subject: "cause",
       cache_key: "v3:cause:topic-1:charity-1:cause:none:none",
     })
+  })
+
+  it("returns and stores a generated causeLabel + context when no name is set", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockMessagesCreate.mockResolvedValueOnce({
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            causeLabel: "Help Our Oceans",
+            context: "Summer 2026 appeal",
+            about: "Every pledge reaches Ocean Trust in full.",
+            reveal: "Our pick to start: Blue — for the sea itself.",
+          }),
+        },
+      ],
+    })
+    mock.queue(null) // insert
+
+    const result = await generateDraft({
+      register: "cause",
+      subject: "cause",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+
+    expect(result.causeLabel).toBe("Help Our Oceans")
+    expect(result.context).toBe("Summer 2026 appeal")
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0].content
+    expect(prompt).toContain('"causeLabel"')
+    expect(prompt).toContain('"context"')
+    const insertCall = mock
+      .callsFor("generated_drafts")
+      .find((c) => c.method === "insert")
+    expect(insertCall?.args[0]).toMatchObject({
+      cause_label: "Help Our Oceans",
+      context: "Summer 2026 appeal",
+    })
+  })
+
+  it("does not ask for a causeLabel when the organiser already named the cause", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockMessagesCreate.mockResolvedValueOnce({
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            context: "Winter 2026 appeal",
+            about: "Every pledge reaches Ocean Trust in full.",
+            reveal: "Our pick to start: Blue — for the sea itself.",
+          }),
+        },
+      ],
+    })
+    mock.queue(null) // insert
+
+    const result = await generateDraft({
+      register: "cause",
+      subject: "cause",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      displayName: "Help the Homeless",
+    })
+
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0].content
+    expect(prompt).not.toContain('"causeLabel"')
+    expect(prompt).toContain("Help the Homeless")
+    expect(result.causeLabel).toBeNull()
+    expect(result.context).toBe("Winter 2026 appeal")
+  })
+
+  it("returns cached cause fields on a cache hit", async () => {
+    mock.queue({
+      about: "Cached about.",
+      reveal: "Cached reveal.",
+      cause_label: "Cached Cause",
+      context: "Cached context",
+    })
+
+    const result = await generateDraft({
+      register: "cause",
+      subject: "cause",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+
+    expect(result.fromCache).toBe(true)
+    expect(result.causeLabel).toBe("Cached Cause")
+    expect(result.context).toBe("Cached context")
+    expect(mockMessagesCreate).not.toHaveBeenCalled()
   })
 
   it("retries when cause reveal contains fabricated statistics", async () => {

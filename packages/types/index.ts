@@ -109,6 +109,9 @@ export type Favpoll = {
   category?: FavpollCategory | null;
   grouping?: FavpollGrouping;
   description: string | null;
+  /** Cause favpolls only — person favpolls keep these on the protagonist. */
+  photo_url?: string | null;
+  context?: string | null;
   created_at: string;
 };
 

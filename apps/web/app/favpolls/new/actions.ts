@@ -283,6 +283,10 @@ export async function createFavpoll(
       is_listed: input.isListed,
       description: input.description,
       goal_amount: input.goalAmount ?? null,
+      // Cause favpolls keep photo/context on the favpoll row — person
+      // favpolls store them on the protagonist created above.
+      photo_url: input.subject === "cause" ? input.photoUrl || null : null,
+      context: input.subject === "cause" ? input.dateLabel || null : null,
     })
     .select("id")
     .single()

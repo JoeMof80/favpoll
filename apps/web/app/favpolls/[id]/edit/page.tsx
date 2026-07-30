@@ -92,13 +92,15 @@ export default async function EditFavpollPage({ params }: Props) {
     ),
     subject: (favpoll.subject ?? "someone") as FavpollSubject,
     name: isCause ? "" : (favpoll.protagonists?.name ?? ""),
-    context: isCause ? "" : (favpoll.protagonists?.context ?? ""),
+    context: isCause
+      ? (favpoll.context ?? "")
+      : (favpoll.protagonists?.context ?? ""),
     openingLine: favpoll.opening_line ?? "",
     about: isCause
       ? (favpoll.description ?? "")
       : (favpoll.protagonists?.about ?? ""),
     photoUrl: isCause
-      ? undefined
+      ? (favpoll.photo_url ?? undefined)
       : (favpoll.protagonists?.photo_url ?? undefined),
     causeLabel: isCause ? (favpoll.cause_label ?? "") : "",
     pronoun: isCause

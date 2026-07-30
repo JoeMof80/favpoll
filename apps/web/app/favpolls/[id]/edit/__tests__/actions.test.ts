@@ -227,6 +227,63 @@ describe("updateFavpoll — DB writes", () => {
     })
   })
 
+  it("stores cause photo_url and context on the favpoll row (subject='cause')", async () => {
+    queueHappyPath()
+
+    await updateFavpoll(
+      "favpoll-1",
+      "",
+      makeInput({
+        subject: "cause",
+        causeLabel: "Help the Homeless",
+        protagonistName: "",
+        photoUrl: "https://example.com/cause.jpg",
+        dateLabel: "Winter 2026 appeal",
+      })
+    )
+
+    expect(
+      mock.callsFor("protagonists").filter((c) => c.method === "update")
+    ).toHaveLength(0)
+
+    const favpollUpdate = mock
+      .callsFor("favpolls")
+      .find((c) => c.method === "update")!
+    expect(favpollUpdate.args[0]).toMatchObject({
+      cause_label: "Help the Homeless",
+      photo_url: "https://example.com/cause.jpg",
+      context: "Winter 2026 appeal",
+    })
+  })
+
+  it("keeps favpoll-level photo/context null for person favpolls (they live on the protagonist)", async () => {
+    queueHappyPath()
+
+    await updateFavpoll(
+      "favpoll-1",
+      "prot-1",
+      makeInput({
+        photoUrl: "https://example.com/me.jpg",
+        dateLabel: "1990–2025",
+      })
+    )
+
+    const favpollUpdate = mock
+      .callsFor("favpolls")
+      .find((c) => c.method === "update")!
+    expect(favpollUpdate.args[0]).toMatchObject({
+      photo_url: null,
+      context: null,
+    })
+    const protUpdate = mock
+      .callsFor("protagonists")
+      .find((c) => c.method === "update")!
+    expect(protUpdate.args[0]).toMatchObject({
+      photo_url: "https://example.com/me.jpg",
+      context: "1990–2025",
+    })
+  })
+
   it("replaces charities: deletes all then inserts new ones", async () => {
     queueHappyPath()
 

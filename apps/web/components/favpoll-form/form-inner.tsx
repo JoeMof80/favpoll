@@ -87,6 +87,7 @@ export function FormInner({
   const [goalOpen, setGoalOpen] = useState(false)
   const lastGeneratedOpeningLine = useRef<string | null>(null)
   const lastGeneratedName = useRef<string | null>(null)
+  const lastGeneratedCauseLabel = useRef<string | null>(null)
   const lastGeneratedContext = useRef<string | null>(null)
   const lastGeneratedAbout = useRef<string | null>(null)
   const lastGeneratedReveal = useRef<string | null>(null)
@@ -184,9 +185,9 @@ export function FormInner({
       values.name !== lastGeneratedName.current
         ? "name"
         : "",
-      sub !== "cause" &&
-      values.context &&
-      values.context !== lastGeneratedContext.current
+      // Context is generated for both subjects now (persons locally,
+      // causes by the model) — warn whenever a manual edit would go
+      values.context && values.context !== lastGeneratedContext.current
         ? "context"
         : "",
       values.about && values.about !== lastGeneratedAbout.current
@@ -251,6 +252,19 @@ export function FormInner({
         lastGeneratedAbout.current = result.about
         form.setValue("reveal", result.reveal)
         lastGeneratedReveal.current = result.reveal
+        // Cause hero fields (normalised structure, 2026-07-30): the model
+        // suggests a cause name only when none was set, and a context
+        // subline. Replacement of manual edits was already confirmed above.
+        if (sub === "cause") {
+          if (result.causeLabel && !values.causeLabel?.trim()) {
+            form.setValue("causeLabel", result.causeLabel)
+            lastGeneratedCauseLabel.current = result.causeLabel
+          }
+          if (result.context) {
+            form.setValue("context", result.context)
+            lastGeneratedContext.current = result.context
+          }
+        }
       }
     } catch {
       toast.error(

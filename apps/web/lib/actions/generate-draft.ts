@@ -98,7 +98,18 @@ ${charityLine}`
 
   let instructions: string
   if (subject === "cause") {
-    instructions = `- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option.
+    // Causes have no protagonist, so the generator also fills the hero's
+    // empty fields: a cause name (only when the organiser hasn't set one)
+    // and a short context line (normalised structure, 2026-07-30).
+    const hasLabel = Boolean(displayName?.trim())
+    const causeLabelInstruction = hasLabel
+      ? ""
+      : `- "causeLabel": a short name for what is being raised for — 2 to 5 plain words, no charity name, no punctuation (like "Help the Homeless" or "Warm Plates This Winter").\n`
+    const labelContext = hasLabel
+      ? `The organiser calls this cause "${displayName!.trim()}" — write around that name; do not rename it.\n`
+      : ""
+    instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it). No full stop.
+- "about" (max 2 sentences): what this favpoll is raising for and that every pledge reaches ${charityName ?? "the charity"} in full. Mention the topic ("favourite ${topicTitle.toLowerCase()}") naturally. Do NOT name or hint at any particular option.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName)
@@ -116,6 +127,13 @@ ${charityLine}`
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
   }
 
+  const responseShape =
+    subject === "cause"
+      ? displayName?.trim()
+        ? '{"context":"...","about":"...","reveal":"..."}'
+        : '{"causeLabel":"...","context":"...","about":"...","reveal":"..."}'
+      : '{"about":"...","reveal":"..."}'
+
   return `${voice}
 
 ${context}
@@ -124,17 +142,23 @@ Write:
 ${instructions}
 
 Respond with ONLY valid JSON, no markdown, no explanation:
-{"about":"...","reveal":"..."}`
+${responseShape}`
 }
 
 // ---------------------------------------------------------------------------
 // LLM call
 // ---------------------------------------------------------------------------
 
-async function callLLM(
-  prompt: string,
-  modelId: string
-): Promise<{ about: string; reveal: string }> {
+type DraftFields = {
+  about: string
+  reveal: string
+  /** Cause favpolls only — present when the organiser hasn't named the cause. */
+  causeLabel?: string
+  /** Cause favpolls only. */
+  context?: string
+}
+
+async function callLLM(prompt: string, modelId: string): Promise<DraftFields> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const message = await client.messages.create({
     model: modelId,
@@ -151,7 +175,7 @@ async function callLLM(
   const text = textBlock?.text.trim() ?? ""
   const raw = text.startsWith("{") ? text : (text.match(/\{[\s\S]*\}/) ?? [])[0]
   if (!raw) throw new Error("LLM returned non-JSON response")
-  const parsed = JSON.parse(raw) as { about: string; reveal: string }
+  const parsed = JSON.parse(raw) as DraftFields
   if (!parsed.about || !parsed.reveal)
     throw new Error("LLM response missing about or reveal")
   return parsed
@@ -179,6 +203,10 @@ export type GenerateDraftInput = {
 export type GeneratedDraftResult = {
   about: string
   reveal: string
+  /** Cause favpolls only — suggested cause name when none was set. */
+  causeLabel?: string | null
+  /** Cause favpolls only — suggested context subline. */
+  context?: string | null
   fromCache: boolean
 }
 
@@ -240,7 +268,14 @@ export async function generateDraft(
     }
 
     incrementRateLimitCount(userId)
-    return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
+    return {
+      about: parsed.about,
+      reveal: parsed.reveal,
+      // Defensive caps match the form schema (causeLabel 60, context 40)
+      causeLabel: parsed.causeLabel?.trim().slice(0, 60) || null,
+      context: parsed.context?.trim().slice(0, 40) || null,
+      fromCache: false,
+    }
   }
 
   // ── Canonical topic: cache lookup → DB fetch → generate → cache write ──────
@@ -256,13 +291,19 @@ export async function generateDraft(
 
   const { data: cached } = await supabase
     .from("generated_drafts")
-    .select("about, reveal")
+    .select("about, reveal, cause_label, context")
     .eq("cache_key", cacheKey)
     .neq("status", "rejected")
     .maybeSingle()
 
   if (cached?.about && cached?.reveal) {
-    return { about: cached.about, reveal: cached.reveal, fromCache: true }
+    return {
+      about: cached.about,
+      reveal: cached.reveal,
+      causeLabel: cached.cause_label ?? null,
+      context: cached.context ?? null,
+      fromCache: true,
+    }
   }
 
   const { data: topic, error: topicErr } = await supabase
@@ -314,6 +355,10 @@ export async function generateDraft(
     if (retry && !hasFabricatedStats(retry.reveal)) parsed = retry
   }
 
+  // Defensive caps match the form schema (causeLabel 60, context 40)
+  const causeLabel = parsed.causeLabel?.trim().slice(0, 60) || null
+  const context = parsed.context?.trim().slice(0, 40) || null
+
   await supabase.from("generated_drafts").insert({
     cache_key: cacheKey,
     register: input.register,
@@ -322,12 +367,20 @@ export async function generateDraft(
     subject: input.subject,
     about: parsed.about,
     reveal: parsed.reveal,
+    cause_label: causeLabel,
+    context,
     model: modelId,
     status: "generated",
   })
 
   incrementRateLimitCount(userId)
-  return { about: parsed.about, reveal: parsed.reveal, fromCache: false }
+  return {
+    about: parsed.about,
+    reveal: parsed.reveal,
+    causeLabel,
+    context,
+    fromCache: false,
+  }
 }
 
 // ---------------------------------------------------------------------------
