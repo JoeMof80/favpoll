@@ -59,7 +59,9 @@ export function OrganizerPageClient({ favpolls }: Props) {
         {/* Row list */}
         {displayed.length > 0 ? (
           <ul
-            className="divide-y divide-border rounded-xl border border-border bg-background"
+            // overflow-hidden: the row-header hover fill would otherwise poke
+            // square corners past the rounded frame on the first/last rows
+            className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background"
             role="list"
           >
             {displayed.map((fp) => (

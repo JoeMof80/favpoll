@@ -58,15 +58,13 @@ export function ShareFavpollButton({
         onClick={handleShare}
         aria-label={copied ? "Link copied" : `Share ${shareTitle}`}
         className={cn(
-          "h-12 w-12 rounded-full border border-border shadow-lg",
+          // size-14 + size-6 icon = the FAB standard (new-favpoll +
+          // publish/save FABs; unified 2026-07-30)
+          "size-14 rounded-full border border-border shadow-lg [&_svg]:size-6",
           className
         )}
       >
-        {copied ? (
-          <Check className="h-5 w-5" />
-        ) : (
-          <Share2 className="h-5 w-5" />
-        )}
+        {copied ? <Check aria-hidden="true" /> : <Share2 aria-hidden="true" />}
       </Button>
     )
   }
