@@ -7,7 +7,6 @@ import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { pickExampleName } from "@/lib/registers"
 import { deriveRegister } from "@/lib/registers"
 import { GroupIcon, PairIcon } from "@/components/icons/people"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
@@ -297,15 +296,17 @@ export function FormInner({
         ? "group"
         : (pronounWatch ?? "")
 
-  function handleWhoChange(v: string) {
-    if (!v) return
+  // Tapping a who icon applies the refinement AND generates in one step
+  // (founder, 2026-07-30): setValue is synchronous, so handleRegenerate's
+  // form.getValues() sees the fresh who.
+  function handleWhoGenerate(v: string) {
     const grouping: FavpollGrouping =
       v === "couple" ? "couple" : v === "group" ? "group" : "individual"
     const pronoun = v === "couple" || v === "group" ? undefined : (v as Pronoun)
     form.setValue("grouping", grouping, { shouldDirty: true })
     form.setValue("pronoun", pronoun, { shouldDirty: true })
     // Register depends on grouping (celebrating one vs many) — re-derive
-    // so the next Generate uses the right grammar.
+    // so the generation uses the right grammar.
     form.setValue(
       "register",
       deriveRegister(
@@ -315,6 +316,7 @@ export function FormInner({
       ),
       { shouldDirty: true }
     )
+    void handleRegenerate()
   }
   const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
   const charityIds =
@@ -344,68 +346,66 @@ export function FormInner({
             <div>
               {showSparkles && (
                 <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
-                  <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1 shadow-md">
-                    {/* Who refinement — shapes the suggestion only, so it
-                        lives with Generate (and stays editable in edit
-                        mode). Hidden for causes: no protagonist. */}
-                    {subjectWatch !== "cause" && (
-                      <>
-                        <ToggleGroup
-                          type="single"
-                          value={whoValue}
-                          onValueChange={handleWhoChange}
-                          aria-label="Who is this favpoll for?"
-                          className="gap-0.5"
-                        >
-                          {(
-                            [
-                              { value: "he", label: "He", icon: Mars },
-                              { value: "she", label: "She", icon: Venus },
-                              { value: "they", label: "They", icon: NonBinary },
-                              {
-                                value: "couple",
-                                label: "Pair",
-                                icon: PairIcon,
-                              },
-                              {
-                                value: "group",
-                                label: "Group",
-                                icon: GroupIcon,
-                              },
-                            ] as const
-                          ).map(({ value, label, icon: Icon }) => (
-                            <ToggleGroupItem
-                              key={value}
-                              value={value}
-                              aria-label={label}
-                              title={label}
-                              className="size-7 rounded-full p-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-                            >
-                              <Icon aria-hidden="true" />
-                            </ToggleGroupItem>
-                          ))}
-                        </ToggleGroup>
-                        <div className="h-5 w-px shrink-0 bg-border" />
-                      </>
+                  <div className="flex items-center gap-1 rounded-full border border-border bg-background py-1 pr-1 pl-3 shadow-md">
+                    {/* "Generate a suggestion" is the group's TITLE; the
+                        who icons are the triggers — one tap sets the
+                        refinement and generates (founder, 2026-07-30).
+                        Causes have no who: a single sparkle triggers. */}
+                    <span className="flex items-center gap-1.5 pr-1 text-sm font-medium whitespace-nowrap">
+                      <Sparkles
+                        className="h-3.5 w-3.5 text-primary"
+                        aria-hidden="true"
+                      />
+                      {isGenerating ? "Generating…" : "Generate a suggestion"}
+                    </span>
+                    <div className="h-5 w-px shrink-0 bg-border" />
+                    {subjectWatch !== "cause" ? (
+                      <div
+                        role="group"
+                        aria-label="Generate a suggestion for…"
+                        className="flex items-center gap-0.5"
+                      >
+                        {(
+                          [
+                            { value: "he", label: "He", icon: Mars },
+                            { value: "she", label: "She", icon: Venus },
+                            { value: "they", label: "They", icon: NonBinary },
+                            { value: "couple", label: "Pair", icon: PairIcon },
+                            { value: "group", label: "Group", icon: GroupIcon },
+                          ] as const
+                        ).map(({ value, label, icon: Icon }) => (
+                          <Button
+                            key={value}
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            disabled={isGenerating}
+                            aria-label={`Generate for ${label}`}
+                            aria-pressed={whoValue === value}
+                            title={label}
+                            onClick={() => handleWhoGenerate(value)}
+                            className={
+                              whoValue === value
+                                ? "size-7 rounded-full bg-secondary p-0 text-secondary-foreground hover:bg-secondary sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
+                                : "size-7 rounded-full p-0 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
+                            }
+                          >
+                            <Icon aria-hidden="true" />
+                          </Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        size="icon"
+                        disabled={isGenerating}
+                        aria-label="Generate a suggestion"
+                        onClick={handleRegenerate}
+                        className="size-7 rounded-full p-0 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4"
+                      >
+                        <Sparkles aria-hidden="true" />
+                      </Button>
                     )}
-                    <Button
-                      type="button"
-                      disabled={isGenerating}
-                      onClick={handleRegenerate}
-                      className="gap-2 rounded-full px-4"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      {isGenerating ? (
-                        "Generating…"
-                      ) : (
-                        <>
-                          <span className="sm:hidden">Generate</span>
-                          <span className="hidden sm:inline">
-                            Generate a suggestion
-                          </span>
-                        </>
-                      )}
-                    </Button>
                   </div>
                 </div>
               )}
