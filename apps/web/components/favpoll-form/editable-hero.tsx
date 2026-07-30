@@ -118,10 +118,12 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
             className="group relative h-auto shrink-0 rounded-xl border-dotted border-primary/20 p-0 hover:border-solid hover:border-primary/60 hover:bg-transparent focus-visible:border-solid focus-visible:border-primary/60 focus-visible:bg-transparent"
             onClick={() => setPhotoOpen(true)}
           >
+            {/* h-26: match the public hero's mobile rest size (104px —
+                level with the eyebrow+name+context stack) */}
             <ProtagonistAvatar
               name={(subject === "cause" ? causeLabel : name) || "Name"}
               photoUrl={resolvedPhotoUrl}
-              className="border-0"
+              className="h-26 w-26 border-0 md:h-33 md:w-33"
             />
             <EditBadge className="right-0 bottom-0" />
           </Button>
