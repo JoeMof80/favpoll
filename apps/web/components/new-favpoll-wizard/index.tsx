@@ -150,6 +150,8 @@ export function NewFavpollWizard({ data }: Props) {
         }}
         title="Pick a topic"
         hideCloseButton
+        headerClassName="px-5 pt-4 pb-2"
+        bodyClassName="p-0"
         fullscreenOnMobile
         mobileSave={{
           label: "Done",
@@ -233,6 +235,8 @@ export function NewFavpollWizard({ data }: Props) {
         }}
         title="Pick a charity"
         hideCloseButton
+        headerClassName="px-5 pt-4 pb-2"
+        bodyClassName="p-0"
         fullscreenOnMobile
         mobileSave={{
           label: "Done",
