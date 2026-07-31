@@ -193,12 +193,6 @@ export function StepAmount({
               ))}
             </div>
           )}
-          {isListed && (
-            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-              This is a public favpoll. Your pledge amount and identity are
-              always private.
-            </p>
-          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -346,6 +340,15 @@ export function StepAmount({
                 ) : null
               }
             />
+          )}
+
+          {/* Last thing read before Pledge (founder, 2026-07-31): the
+              privacy reassurance lands at the moment of commitment */}
+          {isListed && (
+            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
+              This is a public favpoll. Your pledge amount and identity are
+              always private.
+            </p>
           )}
         </div>
       </div>

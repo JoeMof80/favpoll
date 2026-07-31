@@ -51,14 +51,8 @@ export function PreviewPledgeCard({
   const ownBreakdown =
     !useSharedFund && isPledgeValid
       ? {
-          lines: [
-            { label: `To ${charityLabel}`, amount: numericPledge },
-            {
-              label: "Shared fund contribution",
-              amount: numericTopUp,
-              hidden: !isTopUpValid,
-            },
-          ],
+          // One charity line covering pledge + fund (matches use-pledge)
+          lines: [{ label: `To ${charityLabel}`, amount: ownCharge }],
           total: { label: "Total charged", amount: ownCharge },
         }
       : null

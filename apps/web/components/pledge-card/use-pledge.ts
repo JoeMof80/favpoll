@@ -136,12 +136,15 @@ export function usePledge({
   } | null =
     !useSharedFund && isPledgeValid
       ? {
+          // ONE charity line covering pledge + fund: shared-fund money
+          // reaches the charity too — drawn by guests it helps, and any
+          // residual goes to the charity at settlement (founder policy,
+          // 2026-07-31). A separate "contribution" line read as if the
+          // fund money went elsewhere.
           lines: [
-            { label: `To ${charityLabel}`, amount: numericPledge },
             {
-              label: "Shared fund contribution",
-              amount: numericTopUp,
-              hidden: !isTopUpValid,
+              label: `To ${charityLabel}`,
+              amount: Math.round((numericPledge + ownTopUp) * 100) / 100,
             },
           ],
           total: { label: "Total charged", amount: ownCharge },
