@@ -132,7 +132,9 @@ export function EditablePollArea({
     <>
       <div className="space-y-4">
         <div className="space-y-3 py-1">
-          <PollHeading topicTitle={topicTitle} />
+          {/* Mirrors the guest page, where this is the pledge button —
+              the preview keeps its size and prominence, minus the tap */}
+          <PollHeading topicTitle={topicTitle} inert />
         </div>
 
         <div className="space-y-4">
