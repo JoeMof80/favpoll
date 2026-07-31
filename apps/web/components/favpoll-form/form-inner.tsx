@@ -352,6 +352,40 @@ export function FormInner({
     void handleRegenerate(occ)
   }
 
+  // Example copy must not be published as-is (founder, 2026-07-31). For a
+  // PERSON favpoll the generated name is a fictional person, the context
+  // carries invented dates and the reveal invents a favourite plus a
+  // personal detail — each must be replaced before submit. Cause examples
+  // are exempt: their copy is truthful by construction ("Our pick to
+  // start:" is designed to publish). The about survives a real-name
+  // generation, so it isn't gated.
+  function handleGuardedSubmit(closesAt?: Date) {
+    const values = form.getValues()
+    if (values.subject !== "cause") {
+      const stale = [
+        values.name && values.name === lastGeneratedName.current ? "name" : "",
+        values.context && values.context === lastGeneratedContext.current
+          ? "context"
+          : "",
+        values.reveal && values.reveal === lastGeneratedReveal.current
+          ? "reveal"
+          : "",
+      ].filter(Boolean)
+      if (stale.length > 0) {
+        const list =
+          stale.length === 1
+            ? stale[0]
+            : stale.slice(0, -1).join(", ") + " and " + stale.at(-1)
+        toast.error(
+          `The ${list} ${stale.length === 1 ? "is" : "are"} still the generated example — make ${stale.length === 1 ? "it" : "them"} your own before publishing.`,
+          { style: TOAST_ERROR_STYLE }
+        )
+        return
+      }
+    }
+    onSubmit(closesAt)
+  }
+
   const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
   const charityIds =
     useWatch({ control: form.control, name: "charities" }) ?? []
@@ -455,7 +489,7 @@ export function FormInner({
         mode={mode}
         submitting={submitting}
         error={error}
-        onSubmit={onSubmit}
+        onSubmit={handleGuardedSubmit}
       />
     </>
   )
