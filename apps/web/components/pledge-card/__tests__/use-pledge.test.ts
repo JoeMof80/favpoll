@@ -22,6 +22,7 @@ const mockActions = vi.hoisted(() => ({
     .fn()
     .mockResolvedValue({ hasAccount: false, hasActivePledge: false }),
   topUpFund: vi.fn().mockResolvedValue(undefined),
+  topUpFundAsGuest: vi.fn().mockResolvedValue(undefined),
   pledgeFromFund: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -610,24 +611,15 @@ describe("usePledge — ownBreakdown", () => {
     expect(result.current.ownBreakdown!.total).toMatchObject({ amount: 10 })
   })
 
-  it("marks the top-up line as hidden when no topUp is entered", () => {
-    const { result } = renderHook(() => usePledge(baseOptions))
-    act(() => {
-      result.current.updatePledgeAmount("10")
-    })
-    const topUpLine = result.current.ownBreakdown!.lines[1]
-    expect(topUpLine.hidden).toBe(true)
-  })
-
-  it("shows the top-up line when a topUp amount is entered", () => {
+  it("folds a top-up into the single charity line — all of it reaches the charity", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
       result.current.setTopUpAmount("5")
     })
-    const topUpLine = result.current.ownBreakdown!.lines[1]
-    expect(topUpLine.hidden).toBe(false)
-    expect(topUpLine.amount).toBe(5)
+    const lines = result.current.ownBreakdown!.lines
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toMatchObject({ label: "To Oxfam", amount: 15 })
   })
 })
 
@@ -999,6 +991,39 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     })
 
     expect(mockActions.topUpFund).toHaveBeenCalledWith("favpoll-1", 5, "")
+  })
+
+  it("guest top-up credits via topUpFundAsGuest, never the authed action", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ clientSecret: "pi_test" }), { status: 200 })
+    )
+
+    const { result } = renderHook(() =>
+      usePledge({
+        ...baseOptions,
+        clerkUserId: null,
+        pollSelections: { "poll-1": ["red"] },
+      })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+      result.current.setTopUpAmount("5")
+      result.current.setGuestEmail("guest@example.com")
+    })
+
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
+
+    expect(mockActions.topUpFundAsGuest).toHaveBeenCalledWith(
+      "favpoll-1",
+      5,
+      ""
+    )
+    expect(mockActions.topUpFund).not.toHaveBeenCalled()
   })
 
   it("clears pledgeClientSecret on success", async () => {

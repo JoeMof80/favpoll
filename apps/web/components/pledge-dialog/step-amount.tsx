@@ -6,8 +6,13 @@ import { formatTipLabel } from "@/components/pledge-card/utils"
 import { formatPoundsExact } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles } from "lucide-react"
+import { Sparkles, Info, Minus, Plus } from "lucide-react"
 
 type FavouriteBreakdownLine = { label: string; amount: number }
 
@@ -72,8 +77,9 @@ export function StepAmountHeader({
         <div className="w-full space-y-1.5">
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
-              Processed securely by Stripe. favpoll takes no fee — 100% of your
-              pledge goes to charity.
+              Give what feels right — you can split it below between your
+              favourite and the shared fund. Processed securely by Stripe;
+              favpoll takes no fee.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (
@@ -120,6 +126,10 @@ type Props = {
   /** false hides the contribution row (hero demo) */
   showTip?: boolean
   isListed?: boolean
+  /** Pounds of the total moved to the shared fund (dialog split). */
+  fundPart?: number
+  /** Step the fund by ±£1 — omitted (hero demo) hides the split row. */
+  onFundStep?: (delta: number) => void
 }
 
 export function StepAmount({
@@ -137,7 +147,14 @@ export function StepAmount({
   tipOptions,
   showTip = true,
   isListed,
+  fundPart = 0,
+  onFundStep,
 }: Props) {
+  const numericTotal = parseFloat(pledgeAmount)
+  const totalValid = !isNaN(numericTotal) && numericTotal > 0
+  // The favourite keeps at least £1 of worth
+  const canStepUp = totalValid && fundPart + 1 <= Math.floor(numericTotal - 1)
+  const showSplit = !useSharedFund && !!onFundStep && totalValid
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
@@ -176,12 +193,6 @@ export function StepAmount({
               ))}
             </div>
           )}
-          {isListed && (
-            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-              This is a public favpoll. Your pledge amount and identity are
-              always private.
-            </p>
-          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -206,9 +217,34 @@ export function StepAmount({
 
           {favouriteBreakdown.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                Your favourites
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                  {favouriteBreakdown.length === 1
+                    ? "Your favourite · its worth"
+                    : "Your favourites · their worth"}
+                </p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      aria-label="About your favourite's worth"
+                      className="h-4 w-4 rounded-full"
+                    >
+                      <Info className="h-3 w-3" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="w-64 text-xs leading-relaxed"
+                  >
+                    This amount is what your favourite&apos;s worth — it&apos;s
+                    what counts in the standings. Anything you move to the
+                    shared fund helps guests who can&apos;t pledge take part.
+                  </PopoverContent>
+                </Popover>
+              </div>
               <div className="space-y-2">
                 {favouriteBreakdown.map((line, i) => (
                   <div key={i} className="flex justify-between">
@@ -219,51 +255,100 @@ export function StepAmount({
                   </div>
                 ))}
               </div>
+              {/* The split: whole pounds move from the favourite(s) to the
+                  shared fund — the favourite lines above tick down as this
+                  ticks up, total unchanged (founder redesign, 2026-07-31) */}
+              {showSplit && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Shared fund</span>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-xs"
+                      aria-label="Move £1 back to your favourite"
+                      disabled={fundPart <= 0}
+                      onClick={() => onFundStep!(-1)}
+                    >
+                      <Minus />
+                    </Button>
+                    <span className="w-14 text-center text-sm font-semibold tabular-nums">
+                      {formatPoundsExact(fundPart)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-xs"
+                      aria-label="Move £1 to the shared fund"
+                      disabled={!canStepUp}
+                      onClick={() => onFundStep!(1)}
+                    >
+                      <Plus />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {/* Tip control lives with the other decisions (founder,
+                  2026-07-31) — the receipt below shows it as a plain
+                  line, like everything else charged */}
+              {showTip && !useSharedFund && totalValid && (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm">Tip for favpoll</span>
+                    <div
+                      className="flex gap-1"
+                      role="radiogroup"
+                      aria-label="Optional contribution to favpoll"
+                    >
+                      {tipOptions.map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          size="xs"
+                          role="radio"
+                          aria-checked={tipAmount === value}
+                          variant={tipAmount === value ? "secondary" : "ghost"}
+                          className="px-2 font-normal aria-checked:font-medium"
+                          onClick={() => setTipAmount(value)}
+                        >
+                          {formatTipLabel(value)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Optional — never taken from your pledge.
+                  </p>
+                </>
+              )}
             </div>
           )}
 
           {(ownBreakdown ?? fundBreakdown) && (
-            <div className="space-y-1.5">
-              <PledgeBreakdown
-                {...(ownBreakdown ?? fundBreakdown)!}
-                extraRow={
-                  showTip && !useSharedFund ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-muted-foreground">
-                        Tip for favpoll
-                      </span>
-                      <div
-                        className="flex gap-1"
-                        role="radiogroup"
-                        aria-label="Optional contribution to favpoll"
-                      >
-                        {tipOptions.map((value) => (
-                          <Button
-                            key={value}
-                            type="button"
-                            size="xs"
-                            role="radio"
-                            aria-checked={tipAmount === value}
-                            variant={
-                              tipAmount === value ? "secondary" : "ghost"
-                            }
-                            className="px-2 font-normal aria-checked:font-medium"
-                            onClick={() => setTipAmount(value)}
-                          >
-                            {formatTipLabel(value)}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null
-                }
-              />
-              {showTip && !useSharedFund && (
-                <p className="text-[11px] text-muted-foreground">
-                  Optional — never taken from your pledge.
-                </p>
-              )}
-            </div>
+            <PledgeBreakdown
+              {...(ownBreakdown ?? fundBreakdown)!}
+              extraRow={
+                showTip && !useSharedFund && tipAmount > 0 ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-muted-foreground">
+                      Tip for favpoll
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {formatPoundsExact(tipAmount)}
+                    </span>
+                  </div>
+                ) : null
+              }
+            />
+          )}
+
+          {/* Last thing read before Pledge (founder, 2026-07-31): the
+              privacy reassurance lands at the moment of commitment */}
+          {isListed && (
+            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
+              This is a public favpoll. Your pledge amount and identity are
+              always private.
+            </p>
           )}
         </div>
       </div>

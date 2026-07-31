@@ -5,6 +5,7 @@ import {
   createGuestPledge,
   guestPreflightState,
   topUpFund,
+  topUpFundAsGuest,
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
@@ -135,12 +136,15 @@ export function usePledge({
   } | null =
     !useSharedFund && isPledgeValid
       ? {
+          // ONE charity line covering pledge + fund: shared-fund money
+          // reaches the charity too — drawn by guests it helps, and any
+          // residual goes to the charity at settlement (founder policy,
+          // 2026-07-31). A separate "contribution" line read as if the
+          // fund money went elsewhere.
           lines: [
-            { label: `To ${charityLabel}`, amount: numericPledge },
             {
-              label: "Shared fund contribution",
-              amount: numericTopUp,
-              hidden: !isTopUpValid,
+              label: `To ${charityLabel}`,
+              amount: Math.round((numericPledge + ownTopUp) * 100) / 100,
             },
           ],
           total: { label: "Total charged", amount: ownCharge },
@@ -305,8 +309,12 @@ export function usePledge({
       const guestToken = await savePledge(email ?? guestEmail)
       // The top-up rode the same PaymentIntent as the pledge — the action
       // verifies its topup_amount metadata before crediting the fund.
-      if (pendingTopUp)
-        await topUpFund(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+      // Guests credit anonymously: topUpFund requires auth and would
+      // throw AFTER their card was charged.
+      if (pendingTopUp) {
+        const topUp = clerkUserId ? topUpFund : topUpFundAsGuest
+        await topUp(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+      }
       // Only now unmount the checkout — nulling the secret before saving
       // emptied the dialog and orphaned its submitting flag when the save
       // failed (the iOS freeze).
