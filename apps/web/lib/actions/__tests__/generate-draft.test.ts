@@ -24,6 +24,7 @@ import {
   buildCacheKey,
   revealNamesRealItem,
   hasFabricatedStats,
+  violatesCopyRules,
   _rateLimitStore,
   RATE_LIMIT_MAX,
   RateLimitError,
@@ -87,6 +88,23 @@ describe("revealNamesRealItem", () => {
 
   it("is case-insensitive", () => {
     expect(revealNamesRealItem("Always blue, without fail.", items)).toBe(true)
+  })
+})
+
+describe("violatesCopyRules", () => {
+  it("flags choose/choosing/choice", () => {
+    expect(violatesCopyRules("Guests choose their own favourite.")).toBe(true)
+    expect(violatesCopyRules("Choosing is half the fun.")).toBe(true)
+    expect(violatesCopyRules("Your choice will be revealed.")).toBe(true)
+  })
+
+  it("flags vote/voting", () => {
+    expect(violatesCopyRules("Cast your vote for charity.")).toBe(true)
+  })
+
+  it("passes pick-based copy and non-word matches", () => {
+    expect(violatesCopyRules("Pick your own favourite and pledge.")).toBe(false)
+    expect(violatesCopyRules("A devoted reader of choicest prose.")).toBe(false)
   })
 })
 

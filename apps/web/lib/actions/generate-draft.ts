@@ -9,6 +9,7 @@ import {
   incrementRateLimitCount,
   revealNamesRealItem,
   hasFabricatedStats,
+  violatesCopyRules,
   buildCacheKey,
 } from "./generate-draft-utils"
 
@@ -90,7 +91,7 @@ function buildPrompt(opts: {
 
   const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
 Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
-Never use: "vote", "voting", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, or any fundraising cliché. The money word is "pledge".`
+Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, or any fundraising cliché. The money word is "pledge"; the selection word is "pick".`
 
   const context = `Occasion: ${REGISTER_LABEL[register]}.
 Poll topic: Favourite ${topicTitle}. Options include: ${itemLabels.slice(0, 12).join(", ")}.
@@ -128,8 +129,16 @@ ${charityLine}`
     const entityGuard = displayName
       ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
       : ""
-    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — they have a favourite ${topicTitle.toLowerCase()}, long held, part of who they are — teased WITHOUT naming or hinting at which option it is (the reveal is the gift). Then one short clause: guests pledge to ${charityName ?? "charity"} and pick their OWN favourite (never say they are guessing or voting on the protagonist's). Keep the charity to a mention, not a description — this is about the person.${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
+    // A memorial's tense is the whole register: the opener's "was" is
+    // computed above, but the model also wrote "has loved" and "still
+    // reaches for it" until told the rule applies to EVERY sentence
+    // (founder-caught, 2026-07-31).
+    const tenseRule =
+      register === "remembering"
+        ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
+        : ""
+    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicTitle.toLowerCase()}, long held, part of who they are — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention, not a description — this is about the person.${pronounHint}${nameHint}
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
   }
 
   const responseShape =
@@ -161,6 +170,19 @@ type DraftFields = {
   causeLabel?: string
   /** Cause favpolls only. */
   context?: string
+}
+
+/** One retry when the copy breaks a hard brand rule ("choose"/"vote"). */
+async function callLLMWithCopyCheck(
+  prompt: string,
+  modelId: string
+): Promise<DraftFields> {
+  const first = await callLLM(prompt, modelId)
+  if (!violatesCopyRules(`${first.about} ${first.reveal}`)) return first
+  const retry = await callLLM(prompt, modelId).catch(() => null)
+  return retry && !violatesCopyRules(`${retry.about} ${retry.reveal}`)
+    ? retry
+    : first
 }
 
 async function callLLM(prompt: string, modelId: string): Promise<DraftFields> {
@@ -256,7 +278,7 @@ export async function generateDraft(
       displayName: input.displayName ?? null,
     })
 
-    let parsed = await callLLM(prompt, modelId)
+    let parsed = await callLLMWithCopyCheck(prompt, modelId)
 
     // Only retry fabricated-stats check; skip item-name check when labels are
     // empty (no canonical list to validate against).
@@ -346,7 +368,7 @@ export async function generateDraft(
     displayName: input.displayName ?? null,
   })
 
-  let parsed = await callLLM(prompt, modelId)
+  let parsed = await callLLMWithCopyCheck(prompt, modelId)
 
   // Validate and retry once if needed
   if (

@@ -6,7 +6,7 @@ import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { pickExampleName } from "@/lib/registers"
 import { deriveRegister } from "@/lib/registers"
-import { type OccasionSpec } from "@/lib/occasions"
+import { resolveOccasionContext, type OccasionSpec } from "@/lib/occasions"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
@@ -64,7 +64,7 @@ function pickContext(register: Register): string {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
-function pickVariant(pool: readonly string[]): string {
+function pickVariant<T>(pool: readonly T[]): T {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
@@ -199,7 +199,7 @@ export function FormInner({
         ? pickExampleName(pronoun, grouping, reg as Register, sub)
         : null
     const suggestedContext = occ
-      ? pickVariant(occ.contexts)
+      ? resolveOccasionContext(pickVariant(occ.contexts), pronoun)
       : sub !== "cause"
         ? pickContext(reg as Register)
         : null

@@ -23,6 +23,13 @@ import type { Register } from "@/lib/registers"
  * "reaches the charity in full" clause) or aren't context at all
  * (founder, 2026-07-30: "Every pledge goes in full" is not context).
  */
+/**
+ * A context variant is either pronoun-neutral (a plain string) or a
+ * per-pronoun record — for lines whose words are gendered ("Husband,
+ * father, grandad"; founder-caught on a She memorial, 2026-07-31).
+ */
+export type OccasionContext = string | { he: string; she: string; they: string }
+
 export type OccasionSpec = {
   /** UI label in the occasion picker. */
   label: string
@@ -33,7 +40,7 @@ export type OccasionSpec = {
    */
   grouping?: "pair" | "group"
   openingLines: string[]
-  contexts: string[]
+  contexts: OccasionContext[]
 }
 
 export const OCCASIONS: OccasionSpec[] = [
@@ -52,7 +59,15 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Memorial",
     register: "remembering",
     openingLines: ["In memory of", "In loving memory of", "Remembering"],
-    contexts: ["1940 – 2024", "Husband, father, grandad", "Always with us"],
+    contexts: [
+      "1940 – 2024",
+      {
+        he: "Husband, father, grandad",
+        she: "Wife, mother, nan",
+        they: "Partner, parent, friend",
+      },
+      "Always with us",
+    ],
   },
   {
     label: "Wake",
@@ -711,6 +726,15 @@ export const OCCASIONS: OccasionSpec[] = [
     contexts: ["Food, shelter, second chances"],
   },
 ]
+
+/** Resolves a context variant for the selected pronoun (they = neutral). */
+export function resolveOccasionContext(
+  context: OccasionContext,
+  pronoun?: "he" | "she" | "they"
+): string {
+  if (typeof context === "string") return context
+  return context[pronoun ?? "they"]
+}
 
 /**
  * Occasions available for a register, in catalogue order. For

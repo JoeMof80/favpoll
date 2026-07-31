@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest"
-import { OCCASIONS, occasionsForRegister } from "../occasions"
+import {
+  OCCASIONS,
+  occasionsForRegister,
+  resolveOccasionContext,
+  type OccasionContext,
+} from "../occasions"
+
+const contextStrings = (contexts: OccasionContext[]): string[] =>
+  contexts.flatMap((c) => (typeof c === "string" ? [c] : Object.values(c)))
 
 describe("occasion catalogue integrity", () => {
   it("labels are unique", () => {
@@ -24,11 +32,24 @@ describe("occasion catalogue integrity", () => {
 
   it("contexts fit the form's 40-char cap and carry no full stop", () => {
     for (const o of OCCASIONS) {
-      for (const c of o.contexts) {
+      for (const c of contextStrings(o.contexts)) {
         expect(c.length, `${o.label}: "${c}"`).toBeLessThanOrEqual(40)
         expect(c.endsWith("."), `${o.label}: "${c}"`).toBe(false)
       }
     }
+  })
+
+  it("resolveOccasionContext picks the pronoun variant, neutral for they", () => {
+    const memorial = OCCASIONS.find((o) => o.label === "Memorial")!
+    const gendered = memorial.contexts.find((c) => typeof c !== "string")!
+    expect(resolveOccasionContext(gendered, "she")).toBe("Wife, mother, nan")
+    expect(resolveOccasionContext(gendered, "he")).toBe(
+      "Husband, father, grandad"
+    )
+    expect(resolveOccasionContext(gendered, undefined)).toBe(
+      "Partner, parent, friend"
+    )
+    expect(resolveOccasionContext("1940 – 2024", "she")).toBe("1940 – 2024")
   })
 
   it("pair/group tags appear only on celebrating_many", () => {
@@ -39,7 +60,11 @@ describe("occasion catalogue integrity", () => {
 
   it("copy never uses the word choose", () => {
     for (const o of OCCASIONS) {
-      for (const s of [o.label, ...o.openingLines, ...o.contexts]) {
+      for (const s of [
+        o.label,
+        ...o.openingLines,
+        ...contextStrings(o.contexts),
+      ]) {
         expect(/choose/i.test(s), s).toBe(false)
       }
     }

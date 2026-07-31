@@ -63,6 +63,16 @@ export function hasFabricatedStats(text: string): boolean {
   )
 }
 
+/**
+ * True when generated copy breaks a hard brand rule the prompt already
+ * bans — "choose" (the selection word is "pick", founder rule) or
+ * "vote". Cheap belt-and-braces: the prompt is instruction, this is
+ * enforcement (one retry).
+ */
+export function violatesCopyRules(text: string): boolean {
+  return /\bchoos(?:e|es|ing)\b|\bchoice\b|\bvot(?:e|es|ing)\b/i.test(text)
+}
+
 // ---------------------------------------------------------------------------
 // Cache key
 // ---------------------------------------------------------------------------
