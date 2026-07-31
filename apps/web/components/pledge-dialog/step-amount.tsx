@@ -6,6 +6,12 @@ import { formatTipLabel } from "@/components/pledge-card/utils"
 import { formatPoundsExact } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Info } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sparkles } from "lucide-react"
 
@@ -72,8 +78,9 @@ export function StepAmountHeader({
         <div className="w-full space-y-1.5">
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
-              Processed securely by Stripe. favpoll takes no fee — 100% of your
-              pledge goes to charity.
+              Pledge what your favourite&apos;s worth — anything extra can go to
+              the shared fund below. Processed securely by Stripe; favpoll takes
+              no fee.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (
@@ -120,6 +127,9 @@ type Props = {
   /** false hides the contribution row (hero demo) */
   showTip?: boolean
   isListed?: boolean
+  /** Omitted (hero demo) hides the shared-fund top-up box */
+  topUpAmount?: string
+  setTopUpAmount?: (v: string) => void
 }
 
 export function StepAmount({
@@ -137,6 +147,8 @@ export function StepAmount({
   tipOptions,
   showTip = true,
   isListed,
+  topUpAmount,
+  setTopUpAmount,
 }: Props) {
   return (
     <div className="px-5 py-4">
@@ -218,6 +230,62 @@ export function StepAmount({
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Split the payment: the pledge is the favourite's worth; any
+              extra generosity goes to the shared fund (founder principle,
+              2026-07-31). Rides the same charge — see topUpAmount in
+              use-pledge. Own-funds path only. */}
+          {!useSharedFund && setTopUpAmount && (
+            <div className="rounded bg-muted p-3">
+              <div className="flex items-center justify-between gap-1.5">
+                <label
+                  htmlFor="dialog-top-up-amount"
+                  className="text-xs text-muted-foreground"
+                >
+                  Add to the shared fund
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      aria-label="About the shared fund"
+                      className="h-4 w-4 rounded-full"
+                    >
+                      <Info className="h-3 w-3" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="end"
+                    className="w-56 text-xs leading-relaxed"
+                  >
+                    Your pledge is what your favourite&apos;s worth. Anything
+                    extra goes here — it helps guests who can&apos;t pledge
+                    themselves take part.
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="relative mt-2">
+                <span
+                  className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground"
+                  aria-hidden="true"
+                >
+                  £
+                </span>
+                <input
+                  id="dialog-top-up-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={topUpAmount ?? ""}
+                  onChange={(e) => setTopUpAmount(e.target.value)}
+                  className="w-full rounded-md border border-input bg-background py-2 pr-3 pl-7 text-base focus:ring-2 focus:ring-ring focus:outline-none"
+                  placeholder="0"
+                />
               </div>
             </div>
           )}

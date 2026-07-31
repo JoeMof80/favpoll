@@ -304,6 +304,8 @@ export function PledgeDialog({
             setTipAmount={dialog.setTipAmount}
             tipOptions={dialog.tipOptions}
             isListed={isListed}
+            topUpAmount={dialog.topUpAmount}
+            setTopUpAmount={dialog.setTopUpAmount}
           />
         )}
 

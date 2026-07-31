@@ -22,6 +22,7 @@ const mockActions = vi.hoisted(() => ({
     .fn()
     .mockResolvedValue({ hasAccount: false, hasActivePledge: false }),
   topUpFund: vi.fn().mockResolvedValue(undefined),
+  topUpFundAsGuest: vi.fn().mockResolvedValue(undefined),
   pledgeFromFund: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -999,6 +1000,39 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
     })
 
     expect(mockActions.topUpFund).toHaveBeenCalledWith("favpoll-1", 5, "")
+  })
+
+  it("guest top-up credits via topUpFundAsGuest, never the authed action", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ clientSecret: "pi_test" }), { status: 200 })
+    )
+
+    const { result } = renderHook(() =>
+      usePledge({
+        ...baseOptions,
+        clerkUserId: null,
+        pollSelections: { "poll-1": ["red"] },
+      })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+      result.current.setTopUpAmount("5")
+      result.current.setGuestEmail("guest@example.com")
+    })
+
+    await act(async () => {
+      await result.current.handleOwnConfirm()
+    })
+    await act(async () => {
+      await result.current.handlePledgePaymentSuccess()
+    })
+
+    expect(mockActions.topUpFundAsGuest).toHaveBeenCalledWith(
+      "favpoll-1",
+      5,
+      ""
+    )
+    expect(mockActions.topUpFund).not.toHaveBeenCalled()
   })
 
   it("clears pledgeClientSecret on success", async () => {

@@ -5,6 +5,7 @@ import {
   createGuestPledge,
   guestPreflightState,
   topUpFund,
+  topUpFundAsGuest,
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
@@ -305,8 +306,12 @@ export function usePledge({
       const guestToken = await savePledge(email ?? guestEmail)
       // The top-up rode the same PaymentIntent as the pledge — the action
       // verifies its topup_amount metadata before crediting the fund.
-      if (pendingTopUp)
-        await topUpFund(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+      // Guests credit anonymously: topUpFund requires auth and would
+      // throw AFTER their card was charged.
+      if (pendingTopUp) {
+        const topUp = clerkUserId ? topUpFund : topUpFundAsGuest
+        await topUp(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+      }
       // Only now unmount the checkout — nulling the secret before saving
       // emptied the dialog and orphaned its submitting flag when the save
       // failed (the iOS freeze).
