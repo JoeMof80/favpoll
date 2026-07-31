@@ -1,14 +1,26 @@
 import { SectionLabel } from "@/components/favpoll-card/section-label"
-import { Button } from "./ui/button"
+import { Button, buttonVariants } from "./ui/button"
+import { cn } from "@/lib/utils"
 import type { FavpollCardSize } from "./favpoll-card/types"
 
 type Props = {
   topicTitle: string
   size?: FavpollCardSize
   onPledge?: () => void
+  /**
+   * Renders the pledge-button CHROME without the button — for previews
+   * (the edit form) that must look like the guest page. A static div,
+   * not a disabled button: there is nothing to enable.
+   */
+  inert?: boolean
 }
 
-export function PollHeading({ topicTitle, size = "lg", onPledge }: Props) {
+export function PollHeading({
+  topicTitle,
+  size = "lg",
+  onPledge,
+  inert = false,
+}: Props) {
   const label = `Favourite ${topicTitle}`
   // Long titles step DOWN in size (and tighten tracking) before they ever
   // truncate — the ribbon is the card's question, and "CHRISTMAS TRADI…"
@@ -31,6 +43,21 @@ export function PollHeading({ topicTitle, size = "lg", onPledge }: Props) {
       >
         <span className="truncate">{label}</span>
       </Button>
+    )
+  }
+
+  if (inert) {
+    return (
+      <div
+        className={cn(
+          buttonVariants(),
+          textClass,
+          trackingClass,
+          "pointer-events-none w-full min-w-0 font-medium uppercase"
+        )}
+      >
+        <span className="truncate">{label}</span>
+      </div>
     )
   }
 

@@ -2,14 +2,19 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useWatch, useForm } from "react-hook-form"
-import { Sparkles, Mars, Venus, NonBinary } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import { pickExampleName } from "@/lib/registers"
 import { deriveRegister } from "@/lib/registers"
-import { GroupIcon, PairIcon } from "@/components/icons/people"
+import { resolveOccasionContext, type OccasionSpec } from "@/lib/occasions"
 import { getFavpollHeadline } from "@/lib/display"
 import type { FavpollFormValues } from "./schema"
 import { CommandPanel } from "./command-panel"
+import {
+  GenerateExampleDialog,
+  groupingForWho,
+  type WhoValue,
+} from "./generate-example-dialog"
 import { GoalOverlay } from "./goal-overlay"
 import { EditableHero } from "./editable-hero"
 import { EditablePollArea } from "./editable-poll-area"
@@ -59,6 +64,10 @@ function pickContext(register: Register): string {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
+function pickVariant<T>(pool: readonly T[]): T {
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
 export type FormInnerProps = {
   form: ReturnType<
     typeof useForm<FavpollFormValues, unknown, FavpollFormValues>
@@ -89,6 +98,10 @@ export function FormInner({
 }: FormInnerProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [goalOpen, setGoalOpen] = useState(false)
+  // The occasion is ephemeral generation input — it targets the opening
+  // line and context lookups but is never stored on the favpoll.
+  const [occasion, setOccasion] = useState<OccasionSpec | null>(null)
+  const [generateOpen, setGenerateOpen] = useState(false)
   const lastGeneratedOpeningLine = useRef<string | null>(null)
   const lastGeneratedName = useRef<string | null>(null)
   const lastGeneratedCauseLabel = useRef<string | null>(null)
@@ -148,7 +161,10 @@ export function FormInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function handleRegenerate() {
+  // occasionOverride: pass the occasion explicitly when the caller has
+  // just changed it (state updates land after this synchronous read);
+  // omit to use the currently selected occasion.
+  async function handleRegenerate(occasionOverride?: OccasionSpec | null) {
     const values = form.getValues()
     const topic = values.topics?.[0]
     if (!topic) return
@@ -157,6 +173,7 @@ export function FormInner({
     const reg = values.register
     if (!reg) return
 
+    const occ = occasionOverride === undefined ? occasion : occasionOverride
     const sub = (values.subject ?? "someone") as "someone" | "cause"
     const grouping = (values.grouping ?? "individual") as FavpollGrouping
     const pronoun = sub !== "cause" ? (values.pronoun ?? undefined) : undefined
@@ -165,19 +182,27 @@ export function FormInner({
     const topicMeta = topics.find((t) => t.id === topic.topicId)
     const topicTitle = topicMeta?.title ?? topic.title ?? null
 
-    const suggestedOpeningLine = getFavpollHeadline({
-      register: reg,
-      occasionType: null,
-      name: "",
-      subject: sub,
-    }).prefix
+    // The occasion targets the deterministic fields: opening line and
+    // context rotate through its variants; without one, fall back to the
+    // register-level prefix and pools.
+    const suggestedOpeningLine = occ
+      ? pickVariant(occ.openingLines)
+      : getFavpollHeadline({
+          register: reg,
+          occasionType: null,
+          name: "",
+          subject: sub,
+        }).prefix
 
     const suggestedName =
       sub !== "cause"
         ? pickExampleName(pronoun, grouping, reg as Register, sub)
         : null
-    const suggestedContext =
-      sub !== "cause" ? pickContext(reg as Register) : null
+    const suggestedContext = occ
+      ? resolveOccasionContext(pickVariant(occ.contexts), pronoun)
+      : sub !== "cause"
+        ? pickContext(reg as Register)
+        : null
 
     const manualFields: string[] = [
       values.openingLine &&
@@ -207,7 +232,7 @@ export function FormInner({
         manualFields.length === 1
           ? manualFields[0]
           : manualFields.slice(0, -1).join(", ") + " and " + manualFields.at(-1)
-      if (!window.confirm(`Replace your ${list} with a new suggestion?`)) return
+      if (!window.confirm(`Replace your ${list} with a new example?`)) return
     }
 
     form.setValue("openingLine", suggestedOpeningLine)
@@ -248,7 +273,7 @@ export function FormInner({
       })
       if (!result) {
         toast.error(
-          "Couldn't generate a suggestion — you can write your own instead.",
+          "Couldn't generate an example — you can write your own instead.",
           { style: TOAST_ERROR_STYLE }
         )
       } else {
@@ -264,7 +289,9 @@ export function FormInner({
             form.setValue("causeLabel", result.causeLabel)
             lastGeneratedCauseLabel.current = result.causeLabel
           }
-          if (result.context) {
+          // A selected occasion already stamped a deterministic context
+          // above — the model's register-level one must not overwrite it.
+          if (result.context && !occ) {
             form.setValue("context", result.context)
             lastGeneratedContext.current = result.context
           }
@@ -272,7 +299,7 @@ export function FormInner({
       }
     } catch {
       toast.error(
-        "Couldn't generate a suggestion — you can write your own instead.",
+        "Couldn't generate an example — you can write your own instead.",
         { style: TOAST_ERROR_STYLE }
       )
     } finally {
@@ -296,28 +323,69 @@ export function FormInner({
         ? "group"
         : (pronounWatch ?? "")
 
-  // Tapping a who icon applies the refinement AND generates in one step
-  // (founder, 2026-07-30): setValue is synchronous, so handleRegenerate's
-  // form.getValues() sees the fresh who.
-  function handleWhoGenerate(v: string) {
-    const grouping: FavpollGrouping =
-      v === "couple" ? "couple" : v === "group" ? "group" : "individual"
-    const pronoun = v === "couple" || v === "group" ? undefined : (v as Pronoun)
-    form.setValue("grouping", grouping, { shouldDirty: true })
-    form.setValue("pronoun", pronoun, { shouldDirty: true })
-    // Register depends on grouping (celebrating one vs many) — re-derive
-    // so the generation uses the right grammar.
-    form.setValue(
-      "register",
-      deriveRegister(
-        (form.getValues("category") as FavpollCategory | null) ?? null,
-        grouping,
-        form.getValues("subject") ?? "someone"
-      ),
-      { shouldDirty: true }
-    )
-    void handleRegenerate()
+  // The dialog hands back both selections at once (founder, 2026-07-30:
+  // who then occasion, structurally ordered). setValue is synchronous, so
+  // handleRegenerate's form.getValues() sees the fresh who.
+  function handleDialogGenerate(
+    who: WhoValue | null,
+    occ: OccasionSpec | null
+  ) {
+    if (who) {
+      const grouping = groupingForWho(who)
+      const pronoun =
+        who === "couple" || who === "group" ? undefined : (who as Pronoun)
+      form.setValue("grouping", grouping, { shouldDirty: true })
+      form.setValue("pronoun", pronoun, { shouldDirty: true })
+      // Register depends on grouping (celebrating one vs many) — re-derive
+      // so the generation uses the right grammar.
+      form.setValue(
+        "register",
+        deriveRegister(
+          (form.getValues("category") as FavpollCategory | null) ?? null,
+          grouping,
+          form.getValues("subject") ?? "someone"
+        ),
+        { shouldDirty: true }
+      )
+    }
+    setOccasion(occ)
+    void handleRegenerate(occ)
   }
+
+  // Example copy must not be published as-is (founder, 2026-07-31). For a
+  // PERSON favpoll the generated name is a fictional person, the context
+  // carries invented dates and the reveal invents a favourite plus a
+  // personal detail — each must be replaced before submit. Cause examples
+  // are exempt: their copy is truthful by construction ("Our pick to
+  // start:" is designed to publish). The about survives a real-name
+  // generation, so it isn't gated.
+  function handleGuardedSubmit(closesAt?: Date) {
+    const values = form.getValues()
+    if (values.subject !== "cause") {
+      const stale = [
+        values.name && values.name === lastGeneratedName.current ? "name" : "",
+        values.context && values.context === lastGeneratedContext.current
+          ? "context"
+          : "",
+        values.reveal && values.reveal === lastGeneratedReveal.current
+          ? "reveal"
+          : "",
+      ].filter(Boolean)
+      if (stale.length > 0) {
+        const list =
+          stale.length === 1
+            ? stale[0]
+            : stale.slice(0, -1).join(", ") + " and " + stale.at(-1)
+        toast.error(
+          `The ${list} ${stale.length === 1 ? "is" : "are"} still the generated example — make ${stale.length === 1 ? "it" : "them"} your own before publishing.`,
+          { style: TOAST_ERROR_STYLE }
+        )
+        return
+      }
+    }
+    onSubmit(closesAt)
+  }
+
   const goalAmount = useWatch({ control: form.control, name: "goalAmount" })
   const charityIds =
     useWatch({ control: form.control, name: "charities" }) ?? []
@@ -346,73 +414,39 @@ export function FormInner({
             <div>
               {showSparkles && (
                 <div className="sticky top-16 z-30 flex h-0 items-start justify-center overflow-visible">
-                  <div className="flex items-center gap-1 rounded-full bg-primary py-1 pr-1 pl-3 text-primary-foreground shadow-md">
-                    {/* "Generate a suggestion" is the group's TITLE; the
-                        who icons are the triggers — one tap sets the
-                        refinement and generates (founder, 2026-07-30).
-                        Causes have no who: a single sparkle triggers. */}
-                    <span className="flex items-center gap-1.5 pr-1 text-sm font-medium whitespace-nowrap">
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      {isGenerating ? "Generating…" : "Generate a suggestion"}
-                    </span>
-                    <div className="h-5 w-px shrink-0 bg-primary-foreground/30" />
-                    {subjectWatch !== "cause" ? (
-                      <div
-                        role="group"
-                        aria-label="Generate a suggestion for…"
-                        className="flex items-center gap-0.5"
-                      >
-                        {(
-                          [
-                            { value: "he", label: "He", icon: Mars },
-                            { value: "she", label: "She", icon: Venus },
-                            { value: "they", label: "They", icon: NonBinary },
-                            { value: "couple", label: "Pair", icon: PairIcon },
-                            { value: "group", label: "Group", icon: GroupIcon },
-                          ] as const
-                        ).map(({ value, label, icon: Icon }) => (
-                          <Button
-                            key={value}
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            disabled={isGenerating}
-                            aria-label={`Generate for ${label}`}
-                            aria-pressed={whoValue === value}
-                            title={label}
-                            onClick={() => handleWhoGenerate(value)}
-                            className={
-                              whoValue === value
-                                ? "size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground hover:text-primary sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-                                : "size-7 rounded-full p-0 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4 sm:[&_svg]:!h-4.5 sm:[&_svg]:!w-4.5"
-                            }
-                          >
-                            <Icon aria-hidden="true" />
-                          </Button>
-                        ))}
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        size="icon"
-                        disabled={isGenerating}
-                        aria-label="Generate a suggestion"
-                        onClick={handleRegenerate}
-                        className="size-7 rounded-full bg-primary-foreground p-0 text-primary hover:bg-primary-foreground/90 sm:size-8 [&_svg]:!h-4 [&_svg]:!w-4"
-                      >
-                        <Sparkles aria-hidden="true" />
-                      </Button>
-                    )}
-                  </div>
+                  {/* Opens the two-step dialog: who → occasion (founder,
+                      2026-07-30) — the ordering is structural because the
+                      who narrows the occasion list. Selections are
+                      remembered, so a re-roll is tap-tap. */}
+                  <Button
+                    type="button"
+                    disabled={isGenerating}
+                    onClick={() => setGenerateOpen(true)}
+                    className="rounded-full shadow-md"
+                  >
+                    <Sparkles aria-hidden="true" />
+                    {isGenerating ? "Generating…" : "Generate an example"}
+                  </Button>
                 </div>
               )}
+              <GenerateExampleDialog
+                open={generateOpen}
+                onOpenChange={setGenerateOpen}
+                category={category}
+                subject={subjectWatch === "cause" ? "cause" : "someone"}
+                who={whoValue as WhoValue | ""}
+                occasion={occasion}
+                onGenerate={handleDialogGenerate}
+              />
+              {/* Wrapped so a caller's click event can't land in the
+                  occasionOverride parameter */}
               <EditableHero
                 isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
+                onRegenerate={() => void handleRegenerate()}
               />
               <EditablePollArea
                 isGenerating={isGenerating}
-                onRegenerate={handleRegenerate}
+                onRegenerate={() => void handleRegenerate()}
               />
             </div>
 
@@ -455,7 +489,7 @@ export function FormInner({
         mode={mode}
         submitting={submitting}
         error={error}
-        onSubmit={onSubmit}
+        onSubmit={handleGuardedSubmit}
       />
     </>
   )
