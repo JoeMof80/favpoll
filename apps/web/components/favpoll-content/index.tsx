@@ -105,6 +105,9 @@ export function FavpollContent({
     .filter((s): s is string => !!s && s.trim().length > 0)
 
   const pledgeDialog =
+    // No suggestTip override: memorials once defaulted the tip to None
+    // (quietest ask) — dropped 2026-07-31 on celebrant feedback: a None
+    // default simply stays None; nobody read the ask as insensitive.
     !isClosed && pollWithItems ? (
       <PledgeDialog
         favpollId={favpoll.id}
@@ -116,7 +119,6 @@ export function FavpollContent({
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}
         onAddItem={addItemHandler(pollWithItems)}
-        suggestTip={favpoll.category !== "memorial"}
         isListed={isListed}
         open={pledgeDialogOpen}
         onOpenChange={setPledgeDialogOpen}

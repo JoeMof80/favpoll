@@ -294,51 +294,58 @@ export function StepAmount({
                   </div>
                 </div>
               )}
+              {/* Tip control lives with the other decisions (founder,
+                  2026-07-31) — the receipt below shows it as a plain
+                  line, like everything else charged */}
+              {showTip && !useSharedFund && totalValid && (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm">Tip for favpoll</span>
+                    <div
+                      className="flex gap-1"
+                      role="radiogroup"
+                      aria-label="Optional contribution to favpoll"
+                    >
+                      {tipOptions.map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          size="xs"
+                          role="radio"
+                          aria-checked={tipAmount === value}
+                          variant={tipAmount === value ? "secondary" : "ghost"}
+                          className="px-2 font-normal aria-checked:font-medium"
+                          onClick={() => setTipAmount(value)}
+                        >
+                          {formatTipLabel(value)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Optional — never taken from your pledge.
+                  </p>
+                </>
+              )}
             </div>
           )}
 
           {(ownBreakdown ?? fundBreakdown) && (
-            <div className="space-y-1.5">
-              <PledgeBreakdown
-                {...(ownBreakdown ?? fundBreakdown)!}
-                extraRow={
-                  showTip && !useSharedFund ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-muted-foreground">
-                        Tip for favpoll
-                      </span>
-                      <div
-                        className="flex gap-1"
-                        role="radiogroup"
-                        aria-label="Optional contribution to favpoll"
-                      >
-                        {tipOptions.map((value) => (
-                          <Button
-                            key={value}
-                            type="button"
-                            size="xs"
-                            role="radio"
-                            aria-checked={tipAmount === value}
-                            variant={
-                              tipAmount === value ? "secondary" : "ghost"
-                            }
-                            className="px-2 font-normal aria-checked:font-medium"
-                            onClick={() => setTipAmount(value)}
-                          >
-                            {formatTipLabel(value)}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null
-                }
-              />
-              {showTip && !useSharedFund && (
-                <p className="text-[11px] text-muted-foreground">
-                  Optional — never taken from your pledge.
-                </p>
-              )}
-            </div>
+            <PledgeBreakdown
+              {...(ownBreakdown ?? fundBreakdown)!}
+              extraRow={
+                showTip && !useSharedFund && tipAmount > 0 ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-muted-foreground">
+                      Tip for favpoll
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {formatPoundsExact(tipAmount)}
+                    </span>
+                  </div>
+                ) : null
+              }
+            />
           )}
         </div>
       </div>
