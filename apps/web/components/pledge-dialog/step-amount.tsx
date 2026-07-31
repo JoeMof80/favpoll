@@ -11,9 +11,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Info } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles } from "lucide-react"
+import { Sparkles, Info, Minus, Plus } from "lucide-react"
 
 type FavouriteBreakdownLine = { label: string; amount: number }
 
@@ -78,9 +77,9 @@ export function StepAmountHeader({
         <div className="w-full space-y-1.5">
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
-              Pledge what your favourite&apos;s worth — anything extra can go to
-              the shared fund below. Processed securely by Stripe; favpoll takes
-              no fee.
+              Give what feels right — you can split it below between your
+              favourite and the shared fund. Processed securely by Stripe;
+              favpoll takes no fee.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (
@@ -127,9 +126,10 @@ type Props = {
   /** false hides the contribution row (hero demo) */
   showTip?: boolean
   isListed?: boolean
-  /** Omitted (hero demo) hides the shared-fund top-up box */
-  topUpAmount?: string
-  setTopUpAmount?: (v: string) => void
+  /** Pounds of the total moved to the shared fund (dialog split). */
+  fundPart?: number
+  /** Step the fund by ±£1 — omitted (hero demo) hides the split row. */
+  onFundStep?: (delta: number) => void
 }
 
 export function StepAmount({
@@ -147,9 +147,14 @@ export function StepAmount({
   tipOptions,
   showTip = true,
   isListed,
-  topUpAmount,
-  setTopUpAmount,
+  fundPart = 0,
+  onFundStep,
 }: Props) {
+  const numericTotal = parseFloat(pledgeAmount)
+  const totalValid = !isNaN(numericTotal) && numericTotal > 0
+  // The favourite keeps at least £1 of worth
+  const canStepUp = totalValid && fundPart + 1 <= Math.floor(numericTotal - 1)
+  const showSplit = !useSharedFund && !!onFundStep && totalValid
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
@@ -218,9 +223,34 @@ export function StepAmount({
 
           {favouriteBreakdown.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                Your favourites
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                  {favouriteBreakdown.length === 1
+                    ? "Your favourite · its worth"
+                    : "Your favourites · their worth"}
+                </p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      aria-label="About your favourite's worth"
+                      className="h-4 w-4 rounded-full"
+                    >
+                      <Info className="h-3 w-3" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="w-64 text-xs leading-relaxed"
+                  >
+                    This amount is what your favourite&apos;s worth — it&apos;s
+                    what counts in the standings. Anything you move to the
+                    shared fund helps guests who can&apos;t pledge take part.
+                  </PopoverContent>
+                </Popover>
+              </div>
               <div className="space-y-2">
                 {favouriteBreakdown.map((line, i) => (
                   <div key={i} className="flex justify-between">
@@ -231,62 +261,39 @@ export function StepAmount({
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Split the payment: the pledge is the favourite's worth; any
-              extra generosity goes to the shared fund (founder principle,
-              2026-07-31). Rides the same charge — see topUpAmount in
-              use-pledge. Own-funds path only. */}
-          {!useSharedFund && setTopUpAmount && (
-            <div className="rounded bg-muted p-3">
-              <div className="flex items-center justify-between gap-1.5">
-                <label
-                  htmlFor="dialog-top-up-amount"
-                  className="text-xs text-muted-foreground"
-                >
-                  Add to the shared fund
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
+              {/* The split: whole pounds move from the favourite(s) to the
+                  shared fund — the favourite lines above tick down as this
+                  ticks up, total unchanged (founder redesign, 2026-07-31) */}
+              {showSplit && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Shared fund</span>
+                  <div className="flex items-center gap-1.5">
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
                       size="icon-xs"
-                      aria-label="About the shared fund"
-                      className="h-4 w-4 rounded-full"
+                      aria-label="Move £1 back to your favourite"
+                      disabled={fundPart <= 0}
+                      onClick={() => onFundStep!(-1)}
                     >
-                      <Info className="h-3 w-3" />
+                      <Minus />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="end"
-                    className="w-56 text-xs leading-relaxed"
-                  >
-                    Your pledge is what your favourite&apos;s worth. Anything
-                    extra goes here — it helps guests who can&apos;t pledge
-                    themselves take part.
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="relative mt-2">
-                <span
-                  className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground"
-                  aria-hidden="true"
-                >
-                  £
-                </span>
-                <input
-                  id="dialog-top-up-amount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={topUpAmount ?? ""}
-                  onChange={(e) => setTopUpAmount(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background py-2 pr-3 pl-7 text-base focus:ring-2 focus:ring-ring focus:outline-none"
-                  placeholder="0"
-                />
-              </div>
+                    <span className="w-14 text-center text-sm font-semibold tabular-nums">
+                      {formatPoundsExact(fundPart)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-xs"
+                      aria-label="Move £1 to the shared fund"
+                      disabled={!canStepUp}
+                      onClick={() => onFundStep!(1)}
+                    >
+                      <Plus />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

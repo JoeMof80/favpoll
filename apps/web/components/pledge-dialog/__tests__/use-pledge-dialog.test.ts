@@ -260,6 +260,54 @@ describe("usePledgeDialog — charityBreakdown", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Total-then-split mapping
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("usePledgeDialog — total-then-split", () => {
+  it("maps total and fund steps onto pledge/topUp parts", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleTotalChange("20"))
+    expect(result.current.pledgeAmount).toBe("20")
+    act(() => result.current.stepFund(1))
+    act(() => result.current.stepFund(1))
+    expect(result.current.fundPart).toBe(2)
+    expect(result.current.pledgeAmount).toBe("18")
+    expect(result.current.topUpAmount).toBe("2")
+    act(() => result.current.stepFund(-1))
+    expect(result.current.fundPart).toBe(1)
+    expect(result.current.pledgeAmount).toBe("19")
+  })
+
+  it("clamps the fund so the favourite keeps at least £1", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleTotalChange("5"))
+    for (let i = 0; i < 10; i++) act(() => result.current.stepFund(1))
+    expect(result.current.fundPart).toBe(4)
+    expect(result.current.pledgeAmount).toBe("1")
+  })
+
+  it("shrinking the total pulls the fund down with it", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleTotalChange("20"))
+    for (let i = 0; i < 5; i++) act(() => result.current.stepFund(1))
+    expect(result.current.fundPart).toBe(5)
+    act(() => result.current.handleTotalChange("3"))
+    expect(result.current.fundPart).toBe(2)
+    expect(result.current.pledgeAmount).toBe("1")
+  })
+
+  it("switching to the shared-fund tab zeroes the split", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleTotalChange("20"))
+    act(() => result.current.stepFund(1))
+    act(() => result.current.toggleFund())
+    expect(result.current.fundPart).toBe(0)
+    expect(result.current.pledgeAmount).toBe("20")
+    expect(result.current.topUpAmount).toBe("")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Shared fund path
 // ─────────────────────────────────────────────────────────────────────────────
 
