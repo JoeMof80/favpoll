@@ -85,67 +85,61 @@ export function PackDocument({ data }: { data: PackData }) {
         <p className="mt-1 text-xs text-muted-foreground">favpoll.com</p>
       </section>
 
-      {/* ── Table cards: cut along the lines. Each card is the guest
-          page's lock card in print — same header, same numbered steps —
-          so the QR opens a page the guest has already read. ── */}
+      {/* ── Wallet cards: credit-card size (85.6 × 54 mm), full white
+          for printer-friendliness, favpoll-card format — eyebrow + name
+          with the QR in the corner, topic as the section heading, then
+          the same numbered steps as the guest page's lock card. Cut
+          along the borders; they slip into a wallet (founder, 2026-08-02). ── */}
       <section className="px-6 py-8">
         <p className="mb-4 text-center text-xs text-muted-foreground print:hidden">
-          Table cards — print, cut along the lines, and place on tables.
+          Wallet cards — print, cut along the borders. Credit-card sized, so
+          they slip into a wallet or an order of service.
         </p>
-        <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col overflow-hidden rounded-xl border border-border [print-color-adjust:exact]"
+              className="flex h-[54mm] w-[85.6mm] flex-col overflow-hidden rounded-[3mm] border border-border bg-white [print-color-adjust:exact]"
             >
-              <p className="bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground">
-                {data.topicTitle
-                  ? `Favourite ${data.topicTitle.toLowerCase()}`
-                  : `${data.prefix} ${data.name}`}
-              </p>
-              {/* Steps left, QR right (founder layout, 2026-08-01) */}
-              <div className="flex flex-1 items-center gap-3 px-4 pt-3 pb-1">
-                {steps && (
-                  <div className="flex flex-1 flex-col gap-1.5 text-left text-[11px] leading-snug text-muted-foreground">
-                    {steps.map((step, j) => (
-                      <p key={j} className="flex gap-1.5">
-                        <span className="font-semibold text-primary">
-                          {j + 1}.
-                        </span>
-                        <span>{step}</span>
-                      </p>
-                    ))}
-                  </div>
-                )}
+              <div className="flex items-start justify-between gap-[3mm] px-[4mm] pt-[2.5mm] pb-[1.5mm]">
+                <div className="min-w-0">
+                  <p className="truncate text-[5.5pt] font-medium tracking-[0.14em] text-muted-foreground uppercase">
+                    {data.prefix}
+                  </p>
+                  <p className="truncate text-[10pt] leading-tight font-medium text-foreground">
+                    {data.name}
+                  </p>
+                </div>
                 <BrandedQR
                   value={data.guestUrl}
-                  size={120}
+                  size={56}
                   aria-label={`QR code to pledge for ${data.name}`}
                   className="shrink-0"
                 />
               </div>
+              <div className="border-t border-border" />
               {data.topicTitle && (
-                <p className="px-4 pt-1 text-[9px] text-muted-foreground/80">
+                <p className="px-[4mm] pt-[1.5mm] text-[8pt] font-semibold tracking-wide text-primary uppercase">
+                  Favourite {data.topicTitle.toLowerCase()}
+                </p>
+              )}
+              {steps && (
+                <div className="flex flex-col gap-[1mm] px-[4mm] pt-[1.5mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
+                  {steps.map((step, j) => (
+                    <p key={j} className="flex gap-[1.5mm]">
+                      <span className="font-semibold text-primary">
+                        {j + 1}.
+                      </span>
+                      <span>{step}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+              {data.topicTitle && (
+                <p className="mt-auto px-[4mm] pb-[2mm] text-center text-[5.5pt] text-muted-foreground/80">
                   {mechanicFooter(data.topicTitle)}
                 </p>
               )}
-              {/* Brand strip — the favpoll mark carries the card's origin */}
-              <div className="mt-1.5 flex items-center justify-between border-t border-border/60 px-4 py-1.5">
-                <span className="max-w-[60%] truncate text-[9px] tracking-wide text-muted-foreground uppercase">
-                  {data.prefix} {data.name}
-                </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary">
-                  <svg
-                    width="12"
-                    height="11"
-                    viewBox="0 0 10 9"
-                    aria-hidden="true"
-                  >
-                    <FavpollMarkGlyph />
-                  </svg>
-                  favpoll.com
-                </span>
-              </div>
             </div>
           ))}
         </div>
