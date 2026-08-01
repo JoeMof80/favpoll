@@ -10,7 +10,8 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
-import { RevealLockPill, revealLockLabel } from "../reveal-lock"
+import { revealLockLabel } from "../reveal-lock"
+import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
@@ -84,18 +85,21 @@ export function PollSection({
   // The lock overlay is often a cold guest's FIRST favpoll contact (QR on
   // a wake table) — it must teach the mechanic, not just gate the content
   // (founder, 2026-08-01): pick your OWN favourite, the pledge is the
-  // worth, the money's destination, and what opens afterwards.
-  const charityClause = charityLine
-    ? ` — every pledge goes to ${charityLine}, and favpoll takes no fee`
-    : " — every pledge goes to charity, and favpoll takes no fee"
-  const afterwards = !hasReveal
-    ? "Afterwards you'll see where every favourite stands."
+  // worth, the money's destination, and what opens afterwards. One card,
+  // CTA and steps together at equal prominence; numbered short lines,
+  // because the sequence IS the information (founder, 2026-08-01).
+  const revealStep = !hasReveal
+    ? "See where every favourite stands"
     : isCause
-      ? "Afterwards, our pick is revealed — and you'll see where every favourite stands."
+      ? "See our pick — and where every favourite stands"
       : displayFirstName
-        ? `Afterwards, ${displayFirstName}'s own favourite is revealed to you — and you'll see where every favourite stands.`
-        : "Afterwards, the favourite is revealed — and you'll see where every favourite stands."
-  const lockExplainer = `Pick your own favourite ${poll.topics.title.toLowerCase()} and pledge what it's worth${charityClause}. ${afterwards}`
+        ? `See ${displayFirstName}'s own favourite — and where every favourite stands`
+        : "See the reveal — and where every favourite stands"
+  const lockSteps = [
+    `Pick your own favourite ${poll.topics.title.toLowerCase()}`,
+    `Pledge what it's worth — it all goes to ${charityLine ?? "charity"}, favpoll takes no fee`,
+    revealStep,
+  ]
 
   const unlockAriaLabel = !hasReveal
     ? "Pledge to see the results"
@@ -245,19 +249,27 @@ export function PollSection({
                   +2.5rem = the ribbon's 36px height + 4px air; going below
                   +2.25rem slides the pill under the ribbon. */}
               <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
-                <RevealLockPill
-                  label={
-                    hasReveal
+                {/* CTA and mechanic as ONE card: solid primary header
+                    carries the lock, numbered steps beneath it. */}
+                <span className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl bg-background/95 shadow-lg ring-1 ring-border">
+                  <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground">
+                    <Lock className="h-4 w-4" aria-hidden="true" />
+                    {hasReveal
                       ? isCause
                         ? "Pledge to reveal our pick"
                         : revealLockLabel(displayFirstName)
-                      : "Pledge to see the results"
-                  }
-                />
-                {/* The mechanic, taught at the gate — where the money
-                    goes, what a pledge is, what opens after. */}
-                <span className="mt-3 max-w-sm rounded-xl bg-background/90 px-4 py-2.5 text-xs leading-relaxed font-normal whitespace-normal text-muted-foreground">
-                  {lockExplainer}
+                      : "Pledge to see the results"}
+                  </span>
+                  <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-xs leading-relaxed font-normal whitespace-normal text-muted-foreground">
+                    {lockSteps.map((step, i) => (
+                      <span key={i} className="flex gap-2">
+                        <span className="font-semibold text-primary">
+                          {i + 1}.
+                        </span>
+                        <span>{step}</span>
+                      </span>
+                    ))}
+                  </span>
                 </span>
               </span>
             </Button>

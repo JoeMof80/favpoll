@@ -398,8 +398,16 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
+      screen.getByText("Pick your own favourite colour")
+    ).toBeInTheDocument()
+    expect(
       screen.getByText(
-        "Pick your own favourite colour and pledge what it's worth — every pledge goes to Marie Curie & WWF, and favpoll takes no fee. Afterwards, Yusuf's own favourite is revealed to you — and you'll see where every favourite stands."
+        "Pledge what it's worth — it all goes to Marie Curie & WWF, favpoll takes no fee"
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "See Yusuf's own favourite — and where every favourite stands"
       )
     ).toBeInTheDocument()
   })
@@ -414,7 +422,7 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText(/every pledge goes to charity, and favpoll takes no fee/)
+      screen.getByText(/it all goes to charity, favpoll takes no fee/)
     ).toBeInTheDocument()
   })
 
@@ -429,9 +437,9 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText(/Afterwards you'll see where every favourite stands\./)
+      screen.getByText("See where every favourite stands")
     ).toBeInTheDocument()
-    expect(screen.queryByText(/own favourite is revealed/)).toBeNull()
+    expect(screen.queryByText(/own favourite — and/)).toBeNull()
   })
 
   it("speaks as 'our pick' for causes", () => {
@@ -444,7 +452,7 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText(/Afterwards, our pick is revealed/)
+      screen.getByText(/See our pick — and where every favourite stands/)
     ).toBeInTheDocument()
   })
 })

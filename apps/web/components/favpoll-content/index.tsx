@@ -135,9 +135,12 @@ export function FavpollContent({
 
       {/* The brand triplet as a quiet mechanic line — first-contact
           guests (QR scans) get the shape of the thing before the poll
-          asks anything of them. Gone once they've pledged. */}
+          asks anything of them. Gone once they've pledged. The mb
+          clears the poll ribbon's opaque backdrop (-top-3), which
+          otherwise swallows the strip's second line when it wraps at
+          phone widths. */}
       {pollWithItems && !isClosed && !localEntitled && (
-        <p className="mt-4 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+        <p className="mt-4 mb-4 text-[11px] leading-relaxed font-medium tracking-widest text-muted-foreground uppercase">
           Pick your favourite · Pledge its worth · Reveal its standing
         </p>
       )}
