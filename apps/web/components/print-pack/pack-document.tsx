@@ -119,7 +119,7 @@ export function PackDocument({ data }: { data: PackData }) {
                 )}
                 <BrandedQR
                   value={data.guestUrl}
-                  size={88}
+                  size={120}
                   aria-label={`QR code to pledge for ${data.name}`}
                   className="shrink-0"
                 />
