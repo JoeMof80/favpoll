@@ -103,9 +103,10 @@ export function PackDocument({ data }: { data: PackData }) {
                   ? `Favourite ${data.topicTitle.toLowerCase()}`
                   : `${data.prefix} ${data.name}`}
               </p>
-              <div className="flex flex-1 flex-col px-4 py-3">
+              {/* Steps left, QR right (founder layout, 2026-08-01) */}
+              <div className="flex flex-1 items-center gap-3 px-4 pt-3 pb-1">
                 {steps && (
-                  <div className="flex flex-col gap-1 text-left text-[11px] leading-snug text-muted-foreground">
+                  <div className="flex flex-1 flex-col gap-1.5 text-left text-[11px] leading-snug text-muted-foreground">
                     {steps.map((step, j) => (
                       <p key={j} className="flex gap-1.5">
                         <span className="font-semibold text-primary">
@@ -114,31 +115,36 @@ export function PackDocument({ data }: { data: PackData }) {
                         <span>{step}</span>
                       </p>
                     ))}
-                    {data.topicTitle && (
-                      <p className="pt-0.5 text-[9px] text-muted-foreground/80">
-                        {mechanicFooter(data.topicTitle)}
-                      </p>
-                    )}
                   </div>
                 )}
-                <div className="mt-3 flex items-center justify-center gap-3">
-                  <BrandedQR
-                    value={data.guestUrl}
-                    size={72}
-                    aria-label={`QR code to pledge for ${data.name}`}
-                  />
-                  <div className="text-left">
-                    <p className="text-[10px] font-medium tracking-widest text-primary uppercase">
-                      {data.prefix}
-                    </p>
-                    <p className="text-sm font-medium text-reveal-foreground">
-                      {data.name}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      Scan to pick yours · favpoll.com
-                    </p>
-                  </div>
-                </div>
+                <BrandedQR
+                  value={data.guestUrl}
+                  size={88}
+                  aria-label={`QR code to pledge for ${data.name}`}
+                  className="shrink-0"
+                />
+              </div>
+              {data.topicTitle && (
+                <p className="px-4 pt-1 text-[9px] text-muted-foreground/80">
+                  {mechanicFooter(data.topicTitle)}
+                </p>
+              )}
+              {/* Brand strip — the favpoll mark carries the card's origin */}
+              <div className="mt-1.5 flex items-center justify-between border-t border-border/60 px-4 py-1.5">
+                <span className="max-w-[60%] truncate text-[9px] tracking-wide text-muted-foreground uppercase">
+                  {data.prefix} {data.name}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary">
+                  <svg
+                    width="12"
+                    height="11"
+                    viewBox="0 0 10 9"
+                    aria-hidden="true"
+                  >
+                    <FavpollMarkGlyph />
+                  </svg>
+                  favpoll.com
+                </span>
               </div>
             </div>
           ))}
