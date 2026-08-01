@@ -1,15 +1,23 @@
 import { BrandedQR } from "@/components/branded-qr"
 import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
+import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
 
 // Pre-event promotional material for an organiser to print and place at
 // the venue: an A4 poster and a sheet of cut-out table cards, each with a
 // QR to the guest page. The counterpart to the post-close keepsake.
 // Register-aware framing (prefix), neutral action copy that works for a
-// funeral and a birthday alike.
+// funeral and a birthday alike. The table cards carry the SAME numbered
+// mechanic steps as the guest page's lock card (lib/mechanic-steps) —
+// the guest reads them on the table, then again on scan (founder,
+// 2026-08-01).
 
 export type PackData = {
   prefix: string
   name: string
+  isCause: boolean
+  /** First poll's topic title; null when no poll exists yet. */
+  topicTitle: string | null
+  hasReveal: boolean
   charityNames: string[]
   guestUrl: string
 }
@@ -22,6 +30,16 @@ function charityLabel(names: string[]): string {
 
 export function PackDocument({ data }: { data: PackData }) {
   const charities = charityLabel(data.charityNames)
+  const firstName = data.isCause ? null : data.name.split(/[\s&]+/)[0] || null
+  const steps = data.topicTitle
+    ? buildMechanicSteps({
+        topicTitle: data.topicTitle,
+        charityLine: charities === "charity" ? null : charities,
+        firstName,
+        isCause: data.isCause,
+        hasReveal: data.hasReveal,
+      })
+    : null
 
   return (
     <>
@@ -43,6 +61,17 @@ export function PackDocument({ data }: { data: PackData }) {
           supports {charities}.
         </p>
 
+        {steps && (
+          <div className="mt-8 flex max-w-md flex-col gap-2 text-left">
+            {steps.map((step, i) => (
+              <p key={i} className="flex gap-2.5 text-base text-foreground">
+                <span className="font-semibold text-primary">{i + 1}.</span>
+                <span>{step}</span>
+              </p>
+            ))}
+          </div>
+        )}
+
         <div className="mt-10 rounded-2xl border border-border p-4">
           <BrandedQR
             value={data.guestUrl}
@@ -56,31 +85,61 @@ export function PackDocument({ data }: { data: PackData }) {
         <p className="mt-1 text-xs text-muted-foreground">favpoll.com</p>
       </section>
 
-      {/* ── Table cards: cut along the lines ── */}
+      {/* ── Table cards: cut along the lines. Each card is the guest
+          page's lock card in print — same header, same numbered steps —
+          so the QR opens a page the guest has already read. ── */}
       <section className="px-6 py-8">
         <p className="mb-4 text-center text-xs text-muted-foreground print:hidden">
           Table cards — print, cut along the lines, and place on tables.
         </p>
-        <div className="grid grid-cols-2 gap-0">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col items-center border border-dashed border-border px-6 py-8 text-center"
+              className="flex flex-col overflow-hidden rounded-xl border border-border [print-color-adjust:exact]"
             >
-              <BrandedQR
-                value={data.guestUrl}
-                size={104}
-                aria-label={`QR code to pledge for ${data.name}`}
-              />
-              <p className="mt-3 text-xs font-medium tracking-widest text-primary uppercase">
-                {data.prefix}
+              <p className="bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground">
+                {data.topicTitle
+                  ? `Favourite ${data.topicTitle.toLowerCase()}`
+                  : `${data.prefix} ${data.name}`}
               </p>
-              <p className="text-base font-medium text-reveal-foreground">
-                {data.name}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Scan to add your favourite
-              </p>
+              <div className="flex flex-1 flex-col px-4 py-3">
+                {steps && (
+                  <div className="flex flex-col gap-1 text-left text-[11px] leading-snug text-muted-foreground">
+                    {steps.map((step, j) => (
+                      <p key={j} className="flex gap-1.5">
+                        <span className="font-semibold text-primary">
+                          {j + 1}.
+                        </span>
+                        <span>{step}</span>
+                      </p>
+                    ))}
+                    {data.topicTitle && (
+                      <p className="pt-0.5 text-[9px] text-muted-foreground/80">
+                        {mechanicFooter(data.topicTitle)}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <BrandedQR
+                    value={data.guestUrl}
+                    size={72}
+                    aria-label={`QR code to pledge for ${data.name}`}
+                  />
+                  <div className="text-left">
+                    <p className="text-[10px] font-medium tracking-widest text-primary uppercase">
+                      {data.prefix}
+                    </p>
+                    <p className="text-sm font-medium text-reveal-foreground">
+                      {data.name}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
+                      Scan to pick yours · favpoll.com
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

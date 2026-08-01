@@ -407,7 +407,12 @@ describe("PollSection — lock explainer", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "See Yusuf's own favourite — and where every favourite stands"
+        "Yusuf's favourite will be revealed, along with the standings"
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Don't have a favourite colour? That's okay — you can still give to the shared fund."
       )
     ).toBeInTheDocument()
   })
@@ -437,9 +442,9 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText("See where every favourite stands")
+      screen.getByText("The standings will be revealed")
     ).toBeInTheDocument()
-    expect(screen.queryByText(/own favourite — and/)).toBeNull()
+    expect(screen.queryByText(/favourite will be revealed/)).toBeNull()
   })
 
   it("speaks as 'our pick' for causes", () => {
@@ -452,7 +457,7 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText(/See our pick — and where every favourite stands/)
+      screen.getByText(/Our pick will be revealed, along with the standings/)
     ).toBeInTheDocument()
   })
 })

@@ -14,6 +14,7 @@ import { revealLockLabel } from "../reveal-lock"
 import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { DECOY_WIDTHS } from "@/lib/decoys"
+import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
 
 type RankingView = "amount" | "count"
 
@@ -84,22 +85,16 @@ export function PollSection({
 
   // The lock overlay is often a cold guest's FIRST favpoll contact (QR on
   // a wake table) — it must teach the mechanic, not just gate the content
-  // (founder, 2026-08-01): pick your OWN favourite, the pledge is the
-  // worth, the money's destination, and what opens afterwards. One card,
-  // CTA and steps together at equal prominence; numbered short lines,
-  // because the sequence IS the information (founder, 2026-08-01).
-  const revealStep = !hasReveal
-    ? "See where every favourite stands"
-    : isCause
-      ? "See our pick — and where every favourite stands"
-      : displayFirstName
-        ? `See ${displayFirstName}'s own favourite — and where every favourite stands`
-        : "See the reveal — and where every favourite stands"
-  const lockSteps = [
-    `Pick your own favourite ${poll.topics.title.toLowerCase()}`,
-    `Pledge what it's worth — it all goes to ${charityLine ?? "charity"}, favpoll takes no fee`,
-    revealStep,
-  ]
+  // (founder, 2026-08-01). One card, CTA and steps at equal prominence;
+  // the steps come from lib/mechanic-steps so the print pack's table
+  // cards carry IDENTICAL instructions.
+  const lockSteps = buildMechanicSteps({
+    topicTitle: poll.topics.title,
+    charityLine,
+    firstName: displayFirstName,
+    isCause,
+    hasReveal,
+  })
 
   const unlockAriaLabel = !hasReveal
     ? "Pledge to see the results"
@@ -269,6 +264,9 @@ export function PollSection({
                         <span>{step}</span>
                       </span>
                     ))}
+                    <span className="pt-1 text-[11px] text-muted-foreground/80">
+                      {mechanicFooter(poll.topics.title)}
+                    </span>
                   </span>
                 </span>
               </span>

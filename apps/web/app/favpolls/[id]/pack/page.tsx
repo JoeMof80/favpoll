@@ -18,6 +18,7 @@ export default async function PackPage({ params }: Props) {
     .select(
       `id, subject, cause_label, occasion_type, opening_line, is_private,
        protagonists!favpolls_protagonist_id_fkey ( name ),
+       favpoll_polls ( personal_reveal, topics ( title ) ),
        favpoll_charities ( charities ( name ) )`
     )
     .eq("id", id)
@@ -38,9 +39,16 @@ export default async function PackPage({ params }: Props) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://favpoll.com"
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const polls = (favpoll.favpoll_polls ?? []) as any[]
+  const firstPoll = Array.isArray(polls) ? polls[0] : polls
+
   const data = {
     prefix,
     name,
+    isCause,
+    topicTitle: firstPoll?.topics?.title ?? null,
+    hasReveal: Boolean(firstPoll?.personal_reveal),
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
