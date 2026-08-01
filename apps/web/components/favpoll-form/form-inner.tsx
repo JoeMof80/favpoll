@@ -383,6 +383,16 @@ export function FormInner({
         return
       }
     }
+    // A generated about promises "…will be revealed" — an organiser who
+    // then clears the reveal would publish a promise that never opens
+    // (founder-caught, 2026-08-01).
+    if (!values.reveal?.trim() && /\breveal/i.test(values.about ?? "")) {
+      toast.error(
+        "The about mentions a reveal, but the reveal is empty — add one or reword the about.",
+        { style: TOAST_ERROR_STYLE }
+      )
+      return
+    }
     onSubmit(closesAt)
   }
 

@@ -386,8 +386,8 @@ describe("PollSection — favpolls without a reveal", () => {
   })
 })
 
-describe("PollSection — pre-pledge trust line", () => {
-  it("states where pledges go and the no-fee fact when charityLine is set", () => {
+describe("PollSection — lock explainer", () => {
+  it("teaches the mechanic: own pick, worth, destination, what opens after", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -399,12 +399,12 @@ describe("PollSection — pre-pledge trust line", () => {
     )
     expect(
       screen.getByText(
-        "Every pledge goes to Marie Curie & WWF — favpoll takes no fee."
+        "Pick your own favourite colour and pledge what it's worth — every pledge goes to Marie Curie & WWF, and favpoll takes no fee. Afterwards, Yusuf's own favourite is revealed to you — and you'll see where every favourite stands."
       )
     ).toBeInTheDocument()
   })
 
-  it("renders no trust line without charityLine", () => {
+  it("falls back to generic charity wording without charityLine", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -413,6 +413,38 @@ describe("PollSection — pre-pledge trust line", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(screen.queryByText(/favpoll takes no fee/)).toBeNull()
+    expect(
+      screen.getByText(/every pledge goes to charity, and favpoll takes no fee/)
+    ).toBeInTheDocument()
+  })
+
+  it("promises no reveal when the favpoll has none", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Yusuf"
+        isCause={false}
+        hasReveal={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText(/Afterwards you'll see where every favourite stands\./)
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/own favourite is revealed/)).toBeNull()
+  })
+
+  it("speaks as 'our pick' for causes", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Winter Appeal"
+        isCause
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText(/Afterwards, our pick is revealed/)
+    ).toBeInTheDocument()
   })
 })

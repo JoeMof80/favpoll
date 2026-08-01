@@ -133,6 +133,15 @@ export function FavpollContent({
         <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
       )}
 
+      {/* The brand triplet as a quiet mechanic line — first-contact
+          guests (QR scans) get the shape of the thing before the poll
+          asks anything of them. Gone once they've pledged. */}
+      {pollWithItems && !isClosed && !localEntitled && (
+        <p className="mt-4 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+          Pick your favourite · Pledge its worth · Reveal its standing
+        </p>
+      )}
+
       {pollWithItems ? (
         <>
           <PollSection

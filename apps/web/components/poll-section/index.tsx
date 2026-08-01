@@ -81,6 +81,22 @@ export function PollSection({
   const displayFirstName = isCause ? null : personFirstName
   const hasItems = poll.topics.favourites.length > 0
 
+  // The lock overlay is often a cold guest's FIRST favpoll contact (QR on
+  // a wake table) — it must teach the mechanic, not just gate the content
+  // (founder, 2026-08-01): pick your OWN favourite, the pledge is the
+  // worth, the money's destination, and what opens afterwards.
+  const charityClause = charityLine
+    ? ` — every pledge goes to ${charityLine}, and favpoll takes no fee`
+    : " — every pledge goes to charity, and favpoll takes no fee"
+  const afterwards = !hasReveal
+    ? "Afterwards you'll see where every favourite stands."
+    : isCause
+      ? "Afterwards, our pick is revealed — and you'll see where every favourite stands."
+      : displayFirstName
+        ? `Afterwards, ${displayFirstName}'s own favourite is revealed to you — and you'll see where every favourite stands.`
+        : "Afterwards, the favourite is revealed — and you'll see where every favourite stands."
+  const lockExplainer = `Pick your own favourite ${poll.topics.title.toLowerCase()} and pledge what it's worth${charityClause}. ${afterwards}`
+
   const unlockAriaLabel = !hasReveal
     ? "Pledge to see the results"
     : isCause
@@ -238,13 +254,11 @@ export function PollSection({
                       : "Pledge to see the results"
                   }
                 />
-                {/* Trust line — the cold guest's "where does the money go?"
-                    answered before they commit, not inside the dialog. */}
-                {charityLine && (
-                  <span className="mt-3 max-w-full rounded-full bg-background/85 px-3 py-1 text-xs font-normal whitespace-normal text-muted-foreground">
-                    Every pledge goes to {charityLine} — favpoll takes no fee.
-                  </span>
-                )}
+                {/* The mechanic, taught at the gate — where the money
+                    goes, what a pledge is, what opens after. */}
+                <span className="mt-3 max-w-sm rounded-xl bg-background/90 px-4 py-2.5 text-xs leading-relaxed font-normal whitespace-normal text-muted-foreground">
+                  {lockExplainer}
+                </span>
               </span>
             </Button>
           )}
