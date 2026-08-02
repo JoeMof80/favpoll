@@ -16,6 +16,7 @@ import {
   PickerItems,
 } from "@/components/pledge-dialog/step-pick-favourites"
 import { StepAmount } from "@/components/pledge-dialog/step-amount"
+import { PollHeading } from "@/components/poll-heading"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
 import { FAST } from "./variants"
@@ -132,8 +133,6 @@ export function DemoCard({
   const cardSuffix = protagonist ? headline!.suffix : null
 
   // ── Phase flags ───────────────────────────────────────────────────────────
-  const triggerHover = phase === "trigger-hover"
-  const triggerPressed = phase === "triggering"
 
   const pickerOpen =
     phase === "picking" ||
@@ -356,22 +355,11 @@ export function DemoCard({
           )}
         </div>
 
-        {/* "FAVOURITE {topic}" pill — merged header + pledge trigger. */}
-        <div>
-          <Button
-            type="button"
-            tabIndex={-1}
-            className={cn(
-              "pointer-events-none w-full tracking-[0.09em] uppercase transition-all duration-150",
-              triggerHover && !triggerPressed
-                ? "ring-2 ring-primary/30 brightness-105"
-                : "",
-              triggerPressed ? "scale-[0.98] brightness-95" : ""
-            )}
-            aria-hidden="true"
-          >
-            Favourite {topicTitle}
-          </Button>
+        {/* "FAVOURITE {topic}" header — a ribbon, not a button, matching
+            the real page (the lock card is the pre-pledge CTA there;
+            founder, 2026-08-02). */}
+        <div aria-hidden="true">
+          <PollHeading topicTitle={topicTitle} size="md" inert />
         </div>
 
         {/* ── Reveal — lock card sits on top of it while locked; types out on

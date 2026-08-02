@@ -184,31 +184,13 @@ describe("DemoCard — topic pill", () => {
     }
   })
 
-  it("uses default variant (bg-primary) throughout — never secondary", () => {
+  it("renders the topic as a header ribbon, not a button (2026-08-02)", () => {
     for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
       const { unmount } = renderCard(phase)
-      const pill = screen
-        .getByText(`Favourite ${scene.poll.topic.title}`)
-        .closest("button")
-      expect(pill).toHaveAttribute("data-variant", "default")
+      const label = screen.getByText(`Favourite ${scene.poll.topic.title}`)
+      expect(label.closest("button")).toBeNull()
       unmount()
     }
-  })
-
-  it("shows hover ring on trigger-hover phase", () => {
-    renderCard("trigger-hover")
-    const pill = screen
-      .getByText(`Favourite ${scene.poll.topic.title}`)
-      .closest("button")
-    expect(pill?.className).toMatch(/ring-2/)
-  })
-
-  it("shows press scale on triggering phase", () => {
-    renderCard("triggering")
-    const pill = screen
-      .getByText(`Favourite ${scene.poll.topic.title}`)
-      .closest("button")
-    expect(pill?.className).toMatch(/scale-\[0\.98\]/)
   })
 })
 
