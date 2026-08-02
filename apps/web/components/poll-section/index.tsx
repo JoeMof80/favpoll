@@ -132,11 +132,10 @@ export function PollSection({
               <Tooltip content="Pledge again">
                 <Button
                   type="button"
-                  variant="ghost"
                   size="icon-sm"
                   aria-label="Pledge again"
                   onClick={onOpenPledgeDialog}
-                  className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full text-primary hover:bg-primary/10 hover:text-primary"
+                  className="absolute top-1/2 right-0 -translate-y-1/2"
                 >
                   <Gift aria-hidden="true" />
                 </Button>
