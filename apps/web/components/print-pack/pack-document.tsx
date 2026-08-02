@@ -278,10 +278,15 @@ export function PackDocument({ data }: { data: PackData }) {
       <div className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" />
         <section
-          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6`}
+          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6 print:min-h-0 print:p-2`}
         >
-          <div className="relative h-[255mm] w-[190mm] max-w-full">
-            <div className="absolute top-1/2 left-1/2 h-[190mm] w-[255mm] -translate-x-1/2 -translate-y-1/2 rotate-90">
+          {/* 180 × 250 mm pre-rotation box: fits inside the printable
+              area (default margins shrink A4 to ~184 × 271), where the
+              earlier 190 × 255 overflowed and split across two pages
+              (founder-caught in print preview, 2026-08-02). -rotate-90
+              so the poster reads with its left edge at the page top. */}
+          <div className="relative h-[250mm] w-[180mm] max-w-full">
+            <div className="absolute top-1/2 left-1/2 h-[180mm] w-[250mm] -translate-x-1/2 -translate-y-1/2 -rotate-90">
               <PackCard data={data} steps={steps} scale="a4" />
             </div>
           </div>
