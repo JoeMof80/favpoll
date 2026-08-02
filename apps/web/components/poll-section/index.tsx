@@ -247,23 +247,20 @@ export function PollSection({
           </div>
 
           {onOpenPledgeDialog && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onOpenPledgeDialog}
-              aria-label={unlockAriaLabel}
-              className="absolute inset-0 z-10 h-auto w-full flex-col items-center justify-start rounded-none pt-4 hover:bg-transparent"
-            >
-              {/* Sticky, offset to clear the stuck topic ribbon: the pill
-                  starts over the decoy reveal quote, then travels with the
-                  scroll — never over the hero above (found on-device: the
-                  absolute pill rode over the name at small scroll offsets).
-                  +2.5rem = the ribbon's 36px height + 4px air; going below
-                  +2.25rem slides the pill under the ribbon. */}
+            /* Only the CARD is clickable (founder, 2026-08-02) — the old
+               full-area ghost button caught scroll-arresting taps on
+               mobile and gave the whole blur a pointer cursor. The
+               wrapper passes events through; the card hovers with the
+               list cards' lift idiom. */
+            <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center pt-4">
               <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
-                {/* CTA and mechanic as ONE card: solid primary header
-                    carries the lock, numbered steps beneath it. */}
-                <span className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl bg-background/95 shadow-xl ring-1 ring-border">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onOpenPledgeDialog}
+                  aria-label={unlockAriaLabel}
+                  className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background/95 p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background/95 hover:shadow-2xl motion-safe:hover:-translate-y-0.5"
+                >
                   <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
                     <Lock className="h-4 w-4" aria-hidden="true" />
                     {/* One universal CTA (founder question, 2026-08-02):
@@ -286,9 +283,9 @@ export function PollSection({
                       {mechanicFooter(poll.topics.title)}
                     </span>
                   </span>
-                </span>
+                </Button>
               </span>
-            </Button>
+            </div>
           )}
         </div>
       )}
