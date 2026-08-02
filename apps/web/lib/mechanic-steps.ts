@@ -3,8 +3,8 @@
 // cards/poster, founder, 2026-08-01: guests should read the same
 // instructions on the table card as on the page the QR opens).
 //
-// Step 1 keeps "own" deliberately: it is the single word that dismantles
-// the guess-the-protagonist's-favourite misread (Joy, 2026-07-31).
+// Copy is the founder's card text (2026-08-02); the no-fee fact lives on
+// the poster and page microcopy rather than in step 2.
 
 export type MechanicStepsInput = {
   topicTitle: string
@@ -27,13 +27,13 @@ export function buildMechanicSteps({
   const revealStep = !hasReveal
     ? "The standings will be revealed"
     : isCause
-      ? "Our pick will be revealed, along with the standings"
+      ? "Our pick will be revealed along with the standings"
       : firstName
-        ? `${firstName}'s favourite will be revealed, along with the standings`
-        : "The favourite will be revealed, along with the standings"
+        ? `${firstName}'s favourite will be revealed along with the standings`
+        : "The favourite will be revealed along with the standings"
   return [
-    `Pick your own favourite ${topic}`,
-    `Pledge what it's worth — it all goes to ${charityLine ?? "charity"}, favpoll takes no fee`,
+    `Pick your favourite ${topic}`,
+    `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
     revealStep,
   ]
 }

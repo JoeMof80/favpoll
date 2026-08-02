@@ -73,8 +73,10 @@ export function PackDocument({ data }: { data: PackData }) {
           <div className="mt-8 flex max-w-md flex-col gap-2 text-left">
             {steps.map((step, i) => (
               <p key={i} className="flex gap-2.5 text-base text-foreground">
-                <span className="font-semibold text-primary">{i + 1}.</span>
-                <span>{step}</span>
+                <span className="w-5 shrink-0 text-right font-semibold text-primary">
+                  {i + 1}.
+                </span>
+                <span className="flex-1">{step}</span>
               </p>
             ))}
           </div>
@@ -111,25 +113,27 @@ export function PackDocument({ data }: { data: PackData }) {
             >
               {/* Header — the list card's FavpollHeader, compact, with
                   the favpoll brand top-right */}
-              <div className="flex items-start justify-between gap-2 px-[3mm] pt-[2mm] pb-[1.5mm]">
-                <div className="flex min-w-0 flex-1 flex-col">
+              <div className="flex flex-col px-[3mm] pt-[2.5mm] pb-[2mm]">
+                {/* Brand bottom-aligns with the opening line (founder,
+                    2026-08-02) — one items-end row shared by both */}
+                <div className="flex items-end justify-between gap-2">
                   <span className="text-[6pt] font-medium tracking-[0.08em] text-muted-foreground uppercase">
                     {data.prefix}
                   </span>
-                  <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
-                    {data.name}
+                  <span className="inline-flex shrink-0 items-center gap-1 text-[7pt] leading-none font-medium text-primary">
+                    <svg
+                      width="11"
+                      height="10"
+                      viewBox="0 0 10 9"
+                      aria-hidden="true"
+                    >
+                      <FavpollMarkGlyph />
+                    </svg>
+                    favpoll
                   </span>
                 </div>
-                <span className="inline-flex shrink-0 items-center gap-1 pt-[0.5mm] text-[7pt] font-medium text-primary">
-                  <svg
-                    width="11"
-                    height="10"
-                    viewBox="0 0 10 9"
-                    aria-hidden="true"
-                  >
-                    <FavpollMarkGlyph />
-                  </svg>
-                  favpoll
+                <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
+                  {data.name}
                 </span>
               </div>
               {/* Topic row — the list card's poll ribbon */}
@@ -142,16 +146,16 @@ export function PackDocument({ data }: { data: PackData }) {
               )}
               {/* Steps section — steps left, QR right (moved out of the
                   header, which sat too tall with it; founder 2026-08-02) */}
-              <div className="flex flex-1 flex-col border-t border-border px-[3mm] pt-[1.5mm] pb-[2mm]">
+              <div className="flex flex-1 flex-col border-t border-border px-[3mm] pt-[3mm] pb-[2mm]">
                 <div className="flex flex-1 items-start gap-[3mm]">
                   {steps && (
-                    <div className="flex flex-1 flex-col gap-[1mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
+                    <div className="flex flex-1 flex-col gap-[1.5mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
                       {steps.map((step, j) => (
                         <p key={j} className="flex gap-[1.5mm]">
-                          <span className="font-semibold text-primary">
+                          <span className="w-[3.5mm] shrink-0 text-right font-semibold text-primary">
                             {j + 1}.
                           </span>
-                          <span>{step}</span>
+                          <span className="flex-1">{step}</span>
                         </p>
                       ))}
                     </div>

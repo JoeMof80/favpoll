@@ -258,10 +258,10 @@ export function PollSection({
                   <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-xs leading-relaxed font-normal whitespace-normal text-muted-foreground">
                     {lockSteps.map((step, i) => (
                       <span key={i} className="flex gap-2">
-                        <span className="font-semibold text-primary">
+                        <span className="w-4 shrink-0 text-right font-semibold text-primary">
                           {i + 1}.
                         </span>
-                        <span>{step}</span>
+                        <span className="flex-1">{step}</span>
                       </span>
                     ))}
                     <span className="pt-1 text-[11px] text-muted-foreground/80">

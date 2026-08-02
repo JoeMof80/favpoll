@@ -397,17 +397,15 @@ describe("PollSection — lock explainer", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(
-      screen.getByText("Pick your own favourite colour")
-    ).toBeInTheDocument()
+    expect(screen.getByText("Pick your favourite colour")).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Pledge what it's worth — it all goes to Marie Curie & WWF, favpoll takes no fee"
+        "Pledge what it's worth — all money will go to Marie Curie & WWF"
       )
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Yusuf's favourite will be revealed, along with the standings"
+        "Yusuf's favourite will be revealed along with the standings"
       )
     ).toBeInTheDocument()
     expect(
@@ -426,9 +424,7 @@ describe("PollSection — lock explainer", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(
-      screen.getByText(/it all goes to charity, favpoll takes no fee/)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/all money will go to charity/)).toBeInTheDocument()
   })
 
   it("promises no reveal when the favpoll has none", () => {
@@ -457,7 +453,7 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(
-      screen.getByText(/Our pick will be revealed, along with the standings/)
+      screen.getByText(/Our pick will be revealed along with the standings/)
     ).toBeInTheDocument()
   })
 })

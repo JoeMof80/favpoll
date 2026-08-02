@@ -12,9 +12,9 @@ describe("buildMechanicSteps", () => {
         hasReveal: true,
       })
     ).toEqual([
-      "Pick your own favourite seaside town",
-      "Pledge what it's worth — it all goes to Samaritans, favpoll takes no fee",
-      "Clive's favourite will be revealed, along with the standings",
+      "Pick your favourite seaside town",
+      "Pledge what it's worth — all money will go to Samaritans",
+      "Clive's favourite will be revealed along with the standings",
     ])
   })
 
@@ -26,8 +26,8 @@ describe("buildMechanicSteps", () => {
       isCause: true,
       hasReveal: true,
     })
-    expect(steps[1]).toContain("it all goes to charity")
-    expect(steps[2]).toBe("Our pick will be revealed, along with the standings")
+    expect(steps[1]).toContain("all money will go to charity")
+    expect(steps[2]).toBe("Our pick will be revealed along with the standings")
   })
 
   it("promises only the standings when no reveal exists", () => {
