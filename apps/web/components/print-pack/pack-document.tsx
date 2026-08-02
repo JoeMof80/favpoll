@@ -28,8 +28,27 @@ function charityLabel(names: string[]): string {
   return names.slice(0, -1).join(", ") + " and " + names.at(-1)!
 }
 
-// One card, two scales — every value that differs lives here.
+// One card, three scales — every value that differs lives here.
 const SCALE = {
+  a4: {
+    card: "min-h-[255mm] w-full max-w-[190mm] rounded-3xl",
+    headerPad: "px-[12mm] pt-[10mm] pb-[6mm]",
+    eyebrow: "text-[13pt] tracking-[0.12em]",
+    name: "text-[32pt]",
+    brandSvg: { width: 30, height: 27 },
+    brandText: "text-[18pt]",
+    brandGap: "gap-[2mm]",
+    topicRow: "px-[12mm] py-[5mm]",
+    topic: "text-[20pt] tracking-[0.09em]",
+    bodyPad: "px-[12mm] pt-[10mm] pb-[8mm]",
+    bodyGap: "gap-[10mm]",
+    steps: "gap-[6mm] text-[15pt] leading-relaxed",
+    stepGap: "gap-[4mm]",
+    numWidth: "w-[10mm]",
+    qr: 300,
+    footer: "pb-[6mm] text-[12pt]",
+    footerPad: "px-[12mm]",
+  },
   a5: {
     card: "h-[125mm] w-full max-w-[190mm] rounded-2xl",
     headerPad: "px-[8mm] pt-[5mm] pb-[3.5mm]",
@@ -45,7 +64,7 @@ const SCALE = {
     steps: "gap-[3mm] text-[11.5pt] leading-relaxed",
     stepGap: "gap-[3mm]",
     numWidth: "w-[7mm]",
-    qr: 128,
+    qr: 170,
     footer: "pb-[4mm] text-[9pt]",
     footerPad: "px-[8mm]",
   },
@@ -209,14 +228,17 @@ export function PackDocument({ data }: { data: PackData }) {
 
   return (
     <div className="flex flex-col gap-8 print:block">
+      {/* ── A4 card: the poster-scale version of the same design ── */}
+      <section
+        className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center justify-center px-6 py-6`}
+      >
+        <PackCard data={data} steps={steps} scale="a4" />
+      </section>
+
       {/* ── A5 cards: two per sheet, for tables and easels ── */}
       <section
         className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
       >
-        <p className="mb-4 text-center text-xs text-muted-foreground print:hidden">
-          A5 cards — print and cut in half: one for the table or easel, one
-          spare.
-        </p>
         <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
           <PackCard data={data} steps={steps} scale="a5" />
           <PackCard data={data} steps={steps} scale="a5" />
@@ -225,10 +247,6 @@ export function PackDocument({ data }: { data: PackData }) {
 
       {/* ── Wallet cards: credit-card size (85.6 × 54 mm) ── */}
       <section className={`${sheet} min-h-[277mm] px-6 py-8 print:min-h-0`}>
-        <p className="mb-4 text-center text-xs text-muted-foreground print:hidden">
-          Wallet cards — print, cut along the borders. Credit-card sized, so
-          they slip into a wallet or an order of service.
-        </p>
         <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
           {Array.from({ length: 8 }).map((_, i) => (
             <PackCard key={i} data={data} steps={steps} scale="wallet" />
