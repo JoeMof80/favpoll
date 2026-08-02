@@ -1,3 +1,8 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { Printer } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { BrandedQR } from "@/components/branded-qr"
 import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
 
@@ -30,42 +35,44 @@ function charityLabel(names: string[]): string {
 
 // One card, three scales — every value that differs lives here.
 const SCALE = {
+  // Landscape (founder, 2026-08-02): prints via its own button with an
+  // @page landscape rule — mixed orientations can't share one print job.
   a4: {
-    card: "min-h-[255mm] w-full max-w-[190mm] rounded-3xl",
-    headerPad: "px-[12mm] pt-[10mm] pb-[6mm]",
+    card: "min-h-[170mm] w-full max-w-[255mm] rounded-3xl",
+    headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
     name: "text-[32pt]",
     brandSvg: { width: 30, height: 27 },
     brandText: "text-[18pt]",
     brandGap: "gap-[2mm]",
-    topicRow: "px-[12mm] py-[5mm]",
+    topicRow: "px-[12mm] py-[4mm]",
     topic: "text-[20pt] tracking-[0.09em]",
-    bodyPad: "px-[12mm] pt-[10mm] pb-[8mm]",
-    bodyGap: "gap-[10mm]",
-    steps: "gap-[6mm] text-[15pt] leading-relaxed",
+    bodyPad: "px-[12mm] pt-[8mm] pb-[6mm]",
+    bodyGap: "gap-[12mm]",
+    steps: "gap-[5mm] text-[15pt] leading-relaxed",
     stepGap: "gap-[4mm]",
     numWidth: "w-[10mm]",
-    qr: 300,
-    footer: "pb-[6mm] text-[12pt]",
+    qr: 280,
+    footer: "pb-[5mm] text-[12pt]",
     footerPad: "px-[12mm]",
   },
   a5: {
     card: "h-[125mm] w-full max-w-[190mm] rounded-2xl",
     headerPad: "px-[8mm] pt-[5mm] pb-[3.5mm]",
-    eyebrow: "text-[9pt] tracking-[0.12em]",
-    name: "text-[20pt]",
-    brandSvg: { width: 22, height: 20 },
-    brandText: "text-[13pt]",
+    eyebrow: "text-[10.5pt] tracking-[0.12em]",
+    name: "text-[24pt]",
+    brandSvg: { width: 24, height: 22 },
+    brandText: "text-[14pt]",
     brandGap: "gap-[1.5mm]",
     topicRow: "px-[8mm] py-[3mm]",
-    topic: "text-[14pt] tracking-[0.09em]",
+    topic: "text-[16pt] tracking-[0.09em]",
     bodyPad: "px-[8mm] pt-[5mm] pb-[4mm]",
     bodyGap: "gap-[6mm]",
-    steps: "gap-[3mm] text-[11.5pt] leading-relaxed",
+    steps: "gap-[3.5mm] text-[13pt] leading-relaxed",
     stepGap: "gap-[3mm]",
-    numWidth: "w-[7mm]",
+    numWidth: "w-[8mm]",
     qr: 170,
-    footer: "pb-[4mm] text-[9pt]",
+    footer: "pb-[4mm] text-[10.5pt]",
     footerPad: "px-[8mm]",
   },
   wallet: {
@@ -221,6 +228,43 @@ export function PackDocument({ data }: { data: PackData }) {
       })
     : null
 
+  // Per-page printing (founder, 2026-08-02): each sheet has its own
+  // button; while one prints, the others hide — which also lets the A4
+  // sheet declare @page landscape without dragging the portrait sheets
+  // sideways with it.
+  const [printTarget, setPrintTarget] = useState<keyof typeof SCALE | null>(
+    null
+  )
+  useEffect(() => {
+    if (!printTarget) return
+    const reset = () => setPrintTarget(null)
+    window.addEventListener("afterprint", reset)
+    const id = requestAnimationFrame(() => window.print())
+    return () => {
+      cancelAnimationFrame(id)
+      window.removeEventListener("afterprint", reset)
+    }
+  }, [printTarget])
+
+  const hideWhenOtherPrints = (key: keyof typeof SCALE) =>
+    printTarget && printTarget !== key ? "print:hidden" : ""
+
+  function SheetPrintButton({ target }: { target: keyof typeof SCALE }) {
+    return (
+      <div className="mb-3 flex w-full justify-end print:hidden">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setPrintTarget(target)}
+        >
+          <Printer data-icon="inline-start" aria-hidden="true" />
+          Print this page
+        </Button>
+      </div>
+    )
+  }
+
   // Each section is one A4 sheet: distinct pages on screen (border +
   // shadow + gap), seamless in print where break-after-page splits them.
   const sheet =
@@ -228,17 +272,23 @@ export function PackDocument({ data }: { data: PackData }) {
 
   return (
     <div className="flex flex-col gap-8 print:block">
-      {/* ── A4 card: the poster-scale version of the same design ── */}
+      {printTarget === "a4" && <style>{`@page { size: A4 landscape; }`}</style>}
+
+      {/* ── A4 landscape card ── */}
       <section
-        className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center justify-center px-6 py-6`}
+        className={`${sheet} ${hideWhenOtherPrints("a4")} flex min-h-[190mm] break-after-page flex-col items-center justify-center px-6 py-6`}
       >
-        <PackCard data={data} steps={steps} scale="a4" />
+        <SheetPrintButton target="a4" />
+        <div className="flex w-full flex-1 flex-col items-center justify-center">
+          <PackCard data={data} steps={steps} scale="a4" />
+        </div>
       </section>
 
       {/* ── A5 cards: two per sheet, for tables and easels ── */}
       <section
-        className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
+        className={`${sheet} ${hideWhenOtherPrints("a5")} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
       >
+        <SheetPrintButton target="a5" />
         <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
           <PackCard data={data} steps={steps} scale="a5" />
           <PackCard data={data} steps={steps} scale="a5" />
@@ -246,7 +296,10 @@ export function PackDocument({ data }: { data: PackData }) {
       </section>
 
       {/* ── Wallet cards: credit-card size (85.6 × 54 mm) ── */}
-      <section className={`${sheet} min-h-[277mm] px-6 py-8 print:min-h-0`}>
+      <section
+        className={`${sheet} ${hideWhenOtherPrints("wallet")} min-h-[277mm] px-6 py-8 print:min-h-0`}
+      >
+        <SheetPrintButton target="wallet" />
         <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
           {Array.from({ length: 8 }).map((_, i) => (
             <PackCard key={i} data={data} steps={steps} scale="wallet" />
