@@ -352,7 +352,9 @@ describe("PollSection — favpolls without a reveal", () => {
       />
     )
     expect(
-      screen.getByRole("button", { name: "Pledge to see the results" })
+      screen.getByRole("button", {
+        name: "Pledge your favourite to see the results",
+      })
     ).toBeInTheDocument()
     expect(screen.queryByText(/Pledge to reveal/i)).toBeNull()
   })

@@ -8,6 +8,9 @@ type FavpollHeaderProps = {
   /** List cards: the header is a link to the favpoll page — show the
    * goes-somewhere chevron (works on touch, where hover cues don't). */
   linkCue?: boolean
+  /** Public cards: no photo → no avatar at all (founder, 2026-08-02),
+   * matching the hero's no-empty-avatar rule. */
+  hideEmptyAvatar?: boolean
 }
 
 function getInitials(name: string, override?: string): string {
@@ -26,6 +29,7 @@ export function FavpollHeader({
   eyebrow,
   size = "lg",
   linkCue = false,
+  hideEmptyAvatar = false,
 }: FavpollHeaderProps) {
   const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
   // Rounded square, matching the favpoll page hero (rounded-xl) and the
@@ -84,31 +88,33 @@ export function FavpollHeader({
           )}
         </div>
 
-        <div
-          className="shrink-0"
-          style={{ width: avatarSize, height: avatarSize }}
-        >
-          {protagonist.photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={protagonist.photo_url}
-              alt={protagonist.name}
-              className={`h-full w-full ${avatarRadius} object-cover`}
-            />
-          ) : (
-            <div
-              className={`flex h-full w-full items-center justify-center ${avatarRadius} border border-border-strong bg-secondary`}
-              aria-label={protagonist.name}
-            >
-              <span
-                className={`font-medium text-primary ${initialsTextClass}`}
-                aria-hidden="true"
+        {(protagonist.photo_url || !hideEmptyAvatar) && (
+          <div
+            className="shrink-0"
+            style={{ width: avatarSize, height: avatarSize }}
+          >
+            {protagonist.photo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={protagonist.photo_url}
+                alt={protagonist.name}
+                className={`h-full w-full ${avatarRadius} object-cover`}
+              />
+            ) : (
+              <div
+                className={`flex h-full w-full items-center justify-center ${avatarRadius} border border-border-strong bg-secondary`}
+                aria-label={protagonist.name}
               >
-                {initials}
-              </span>
-            </div>
-          )}
-        </div>
+                <span
+                  className={`font-medium text-primary ${initialsTextClass}`}
+                  aria-hidden="true"
+                >
+                  {initials}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -61,6 +61,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
           </Badge>
         )}
         <FavpollHeader
+          hideEmptyAvatar
           protagonist={{
             name: displayName,
             photo_url:

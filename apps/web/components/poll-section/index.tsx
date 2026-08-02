@@ -98,7 +98,7 @@ export function PollSection({
   })
 
   const unlockAriaLabel = !hasReveal
-    ? "Pledge to see the results"
+    ? "Pledge your favourite to see the results"
     : isCause
       ? "Pledge to reveal our pick and see the results"
       : displayFirstName
@@ -128,7 +128,7 @@ export function PollSection({
           <PollHeading topicTitle={poll.topics.title} inert />
           {entitled && onOpenPledgeDialog && (
             <TooltipProvider>
-              <Tooltip content="Pledge again">
+              <Tooltip content="Pledge again" side="left">
                 <Button
                   type="button"
                   size="icon-sm"
