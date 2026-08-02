@@ -4,21 +4,26 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@favpoll/ui"
 import {
+  Check,
   EllipsisVertical,
   ExternalLink,
+  Flower2,
   Maximize,
   Minimize,
   Moon,
   Sun,
+  TrendingUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import type { DisplayVariant } from "./index"
 
 // The live display's own minimal chrome (the app header is suppressed on
 // this surface), pinned to the viewport's far corners over the frame's
@@ -32,9 +37,21 @@ import { FavpollLogo } from "@/components/favpoll-logo"
 type Props = {
   /** The guest-facing event page for this favpoll */
   eventUrl: string
+  /** Active display variant — omitted in contexts without the dial (stories) */
+  variant?: DisplayVariant
+  onVariantChange?: (variant: DisplayVariant) => void
 }
 
-export function DisplayChrome({ eventUrl }: Props) {
+const VARIANT_OPTIONS: {
+  value: DisplayVariant
+  label: string
+  Icon: typeof TrendingUp
+}[] = [
+  { value: "fundraiser", label: "Fundraiser view", Icon: TrendingUp },
+  { value: "tribute", label: "Tribute view", Icon: Flower2 },
+]
+
+export function DisplayChrome({ eventUrl, variant, onVariantChange }: Props) {
   const [fullscreen, setFullscreen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const router = useRouter()
@@ -79,6 +96,27 @@ export function DisplayChrome({ eventUrl }: Props) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {/* The presence dial (founder, 2026-08-02): the presenter picks
+                how loud the room's screen is — telethon goal theatre, or
+                the person as the heading with the money kept quiet. The
+                default is derived from the favpoll's register upstream. */}
+            {variant && onVariantChange && (
+              <>
+                {VARIANT_OPTIONS.map(({ value, label, Icon }) => (
+                  <DropdownMenuItem
+                    key={value}
+                    onSelect={() => onVariantChange(value)}
+                  >
+                    <Icon aria-hidden="true" />
+                    {label}
+                    {variant === value && (
+                      <Check className="ml-auto" aria-hidden="true" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem onSelect={() => router.push(eventUrl)}>
               <ExternalLink aria-hidden="true" />
               Event page

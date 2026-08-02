@@ -5,7 +5,12 @@ import { fetchAllRows } from "@/lib/supabase/paginate"
 import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { fetchPollItems } from "@/lib/poll-items"
 import { DisplayScreen } from "@/components/display-screen"
-import type { Favourite } from "@favpoll/types"
+import { deriveRegister } from "@/lib/registers"
+import type {
+  Favourite,
+  FavpollCategory,
+  FavpollGrouping,
+} from "@favpoll/types"
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -154,6 +159,16 @@ export default async function LiveDisplayPage({ params }: Props) {
   const proto = headersList.get("x-forwarded-proto") ?? "https"
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`
 
+  // The presence dial's starting position: memorials open in the quiet
+  // tribute variant, everything else in fundraiser. The presenter can
+  // override live from the display's menu.
+  const register = deriveRegister(
+    (favpoll.category ?? null) as FavpollCategory | null,
+    (favpoll.grouping ?? "individual") as FavpollGrouping,
+    favpoll.subject
+  )
+  const defaultVariant = register === "remembering" ? "tribute" : "fundraiser"
+
   // Cause favpolls have no protagonist row — the cause label is the name.
   const isCause = favpoll.subject === "cause"
   const displayName = isCause
@@ -175,6 +190,8 @@ export default async function LiveDisplayPage({ params }: Props) {
       charities={charityRows}
       closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
       isClosed={!!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()}
+      defaultVariant={defaultVariant}
+      favpollId={id}
       avatar={
         isCause
           ? null
