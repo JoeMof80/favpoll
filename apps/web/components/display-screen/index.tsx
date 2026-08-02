@@ -140,9 +140,10 @@ export function DisplayScreen({
 
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
-  // The room's way in — shared by both variants.
+  // The room's way in, in-banner form — hidden from 2xl, where the QR
+  // moves to the gutter (below).
   const scanToPledge = (
-    <div className="flex shrink-0 flex-col items-center gap-1.5">
+    <div className="flex shrink-0 flex-col items-center gap-1.5 2xl:hidden">
       <BrandedQR
         value={favpollUrl}
         size={132}
@@ -164,6 +165,22 @@ export function DisplayScreen({
         variant={variant}
         onVariantChange={handleVariantChange}
       />
+      {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
+          the room — the telethon corner phone number — pinned in the left
+          gutter so it survives scrolling, and larger than the banner ever
+          allowed (scans from across a room). Only from 2xl: the 6xl card
+          leaves a 192px gutter at 1536 (QR 160 + 16 centres exactly);
+          narrower viewports keep the in-banner QR. Fixed, so rendered
+          OUTSIDE the card — its drop-shadow filter would otherwise become
+          this box's containing block (DisplayChrome precedent). */}
+      <div className="pointer-events-none fixed bottom-14 left-4 z-20 hidden flex-col items-center gap-2 2xl:flex">
+        <BrandedQR
+          value={favpollUrl}
+          size={160}
+          aria-label="Scan to pledge on your phone"
+        />
+        <p className="text-sm font-medium text-foreground">Scan to pledge</p>
+      </div>
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
@@ -212,7 +229,9 @@ export function DisplayScreen({
                     </div>
                   )}
                 </div>
-                <div className="flex justify-center">{scanToPledge}</div>
+                <div className="flex justify-center 2xl:hidden">
+                  {scanToPledge}
+                </div>
               </div>
 
               {/* Col 2 — the charities; the row amounts are the only money
