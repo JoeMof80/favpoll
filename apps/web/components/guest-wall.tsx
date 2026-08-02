@@ -163,6 +163,7 @@ export function GuestWall({
           open={allOpen}
           onOpenChange={setAllOpen}
           title="Guest wall"
+          dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
           <ul className="space-y-2" aria-label="All pledges">
             {entries.map((entry) => (
