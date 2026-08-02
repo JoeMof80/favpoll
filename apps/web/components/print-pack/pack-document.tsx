@@ -35,10 +35,9 @@ function charityLabel(names: string[]): string {
 
 // One card, three scales — every value that differs lives here.
 const SCALE = {
-  // Landscape (founder, 2026-08-02): prints via its own button with an
-  // @page landscape rule — mixed orientations can't share one print job.
+  // Landscape design, rotated 90° onto a portrait sheet (2026-08-02).
   a4: {
-    card: "h-full w-full rounded-3xl print:min-h-[170mm]",
+    card: "h-full w-full rounded-3xl",
     headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
     name: "text-[32pt]",
@@ -229,9 +228,7 @@ export function PackDocument({ data }: { data: PackData }) {
     : null
 
   // Per-page printing (founder, 2026-08-02): each sheet has its own
-  // button; while one prints, the others hide — which also lets the A4
-  // sheet declare @page landscape without dragging the portrait sheets
-  // sideways with it.
+  // button; while one prints, the others hide.
   const [printTarget, setPrintTarget] = useState<keyof typeof SCALE | null>(
     null
   )
@@ -273,17 +270,21 @@ export function PackDocument({ data }: { data: PackData }) {
 
   return (
     <div className="flex flex-col gap-8 print:block">
-      {printTarget === "a4" && <style>{`@page { size: A4 landscape; }`}</style>}
-
-      {/* ── A4 landscape card: the on-screen sheet keeps true landscape
-          A4 proportions (297:210); print supplies real size via the
-          scoped @page rule ── */}
+      {/* ── A4 card: landscape design ROTATED 90° on a portrait sheet
+          (founder, 2026-08-02) — every sheet stays portrait, one print
+          job covers the pack, and the poster comes out landscape when
+          the paper is turned. The card keeps real mm dimensions in the
+          pre-rotation box. ── */}
       <div className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" />
         <section
-          className={`${sheet} flex aspect-[297/210] w-full break-after-page flex-col p-6 print:aspect-auto print:min-h-0`}
+          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6`}
         >
-          <PackCard data={data} steps={steps} scale="a4" />
+          <div className="relative h-[255mm] w-[190mm] max-w-full">
+            <div className="absolute top-1/2 left-1/2 h-[190mm] w-[255mm] -translate-x-1/2 -translate-y-1/2 rotate-90">
+              <PackCard data={data} steps={steps} scale="a4" />
+            </div>
+          </div>
         </section>
       </div>
 
