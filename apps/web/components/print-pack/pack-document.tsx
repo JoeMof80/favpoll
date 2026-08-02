@@ -109,22 +109,14 @@ export function PackDocument({ data }: { data: PackData }) {
               key={i}
               className="flex h-[54mm] w-[85.6mm] flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm [print-color-adjust:exact]"
             >
-              {/* Header — the list card's FavpollHeader, QR in the avatar slot */}
-              <div className="flex items-start justify-between gap-2 px-[3mm] pt-[2.5mm] pb-[2mm]">
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="text-[6pt] font-medium tracking-[0.08em] text-muted-foreground uppercase">
-                    {data.prefix}
-                  </span>
-                  <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
-                    {data.name}
-                  </span>
-                </div>
-                <BrandedQR
-                  value={data.guestUrl}
-                  size={58}
-                  aria-label={`QR code to pledge for ${data.name}`}
-                  className="shrink-0"
-                />
+              {/* Header — the list card's FavpollHeader, compact */}
+              <div className="flex min-w-0 flex-col px-[3mm] pt-[2mm] pb-[1.5mm]">
+                <span className="text-[6pt] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                  {data.prefix}
+                </span>
+                <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
+                  {data.name}
+                </span>
               </div>
               {/* Topic row — the list card's poll ribbon */}
               {data.topicTitle && (
@@ -134,20 +126,29 @@ export function PackDocument({ data }: { data: PackData }) {
                   </p>
                 </div>
               )}
-              {/* Steps section */}
+              {/* Steps section — steps left, QR right (moved out of the
+                  header, which sat too tall with it; founder 2026-08-02) */}
               <div className="flex flex-1 flex-col border-t border-border px-[3mm] pt-[1.5mm] pb-[2mm]">
-                {steps && (
-                  <div className="flex flex-col gap-[1mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
-                    {steps.map((step, j) => (
-                      <p key={j} className="flex gap-[1.5mm]">
-                        <span className="font-semibold text-primary">
-                          {j + 1}.
-                        </span>
-                        <span>{step}</span>
-                      </p>
-                    ))}
-                  </div>
-                )}
+                <div className="flex flex-1 items-center gap-[3mm]">
+                  {steps && (
+                    <div className="flex flex-1 flex-col gap-[1mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
+                      {steps.map((step, j) => (
+                        <p key={j} className="flex gap-[1.5mm]">
+                          <span className="font-semibold text-primary">
+                            {j + 1}.
+                          </span>
+                          <span>{step}</span>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <BrandedQR
+                    value={data.guestUrl}
+                    size={58}
+                    aria-label={`QR code to pledge for ${data.name}`}
+                    className="shrink-0"
+                  />
+                </div>
                 {data.topicTitle && (
                   <p className="mt-auto pt-[1mm] text-center text-[5.5pt] text-muted-foreground/80">
                     {mechanicFooter(data.topicTitle)}
