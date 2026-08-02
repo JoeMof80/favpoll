@@ -19,6 +19,14 @@ import { formatPounds } from "@/lib/i18n"
 // charities, live guest wall). Everything the room watches stays current via
 // an interval router.refresh() — see the note inside.
 
+// The presence dial (founder, 2026-08-02): how loud the room's screen is.
+// "fundraiser" is telethon theatre — the goal figure is the heading;
+// "tribute" turns the volume down — the person is the heading and the
+// money stays quiet. The default derives from the favpoll's register
+// (memorial → tribute), and the presenter can override it live from the
+// chrome menu; the override sticks per favpoll on this machine.
+export type DisplayVariant = "fundraiser" | "tribute"
+
 type Props = {
   protagonistName: string
   dateLabel: string | null
@@ -40,6 +48,10 @@ type Props = {
   avatar?: { name: string; photoUrl: string | null } | null
   /** Closed favpolls disclose the reveal; open ones withhold it */
   isClosed?: boolean
+  /** Register-derived starting variant; the presenter can override live */
+  defaultVariant?: DisplayVariant
+  /** Keys the presenter's variant override in localStorage */
+  favpollId?: string
 }
 
 export function DisplayScreen({
@@ -57,8 +69,26 @@ export function DisplayScreen({
   closesAt = null,
   avatar = null,
   isClosed = false,
+  defaultVariant = "fundraiser",
+  favpollId,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
+  const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
+  const variantKey = favpollId ? `favpoll:display-variant:${favpollId}` : null
+
+  // Adopt a previously chosen variant after mount (not in the initial
+  // state: the server render knows nothing of localStorage, and a
+  // mismatch would break hydration).
+  useEffect(() => {
+    if (!variantKey) return
+    const stored = window.localStorage.getItem(variantKey)
+    if (stored === "fundraiser" || stored === "tribute") setVariant(stored)
+  }, [variantKey])
+
+  function handleVariantChange(next: DisplayVariant) {
+    setVariant(next)
+    if (variantKey) window.localStorage.setItem(variantKey, next)
+  }
   // The close, witnessed live: when closes_at passes while the room is
   // watching, the countdown gives way and the reveal types out — the finale.
   const [localClosed, setLocalClosed] = useState(false)
@@ -109,6 +139,18 @@ export function DisplayScreen({
 
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
+  // The room's way in — shared by both variants.
+  const scanToPledge = (
+    <div className="flex shrink-0 flex-col items-center gap-1.5">
+      <BrandedQR
+        value={favpollUrl}
+        size={132}
+        aria-label="Scan to pledge on your phone"
+      />
+      <p className="text-sm font-medium text-foreground">Scan to pledge</p>
+    </div>
+  )
+
   return (
     // The event page's frame (tinted surround, floating card) at broadcast
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
@@ -116,166 +158,232 @@ export function DisplayScreen({
     <div className="min-h-screen overflow-x-clip bg-primary/5">
       {/* Outside the card: its drop-shadow filter would otherwise become the
           containing block for the chrome's fixed corner positioning */}
-      <DisplayChrome eventUrl={favpollUrl} />
+      <DisplayChrome
+        eventUrl={favpollUrl}
+        variant={variant}
+        onVariantChange={handleVariantChange}
+      />
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
       <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 pt-16 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg">
-        {/* ── Telethon banner: ONE row, two columns (founder, 2026-08-02)
-            — the pledge goal (with the QR way-in beside it) left; the
-            compact identity stacked above the charity rows right. The
-            reveal lock pill is gone: the goal is the display's
-            protagonist. ── */}
+        {/* ── Banner: ONE row, two columns (founder, 2026-08-02). The
+            variants swap which column is the heading — fundraiser leads
+            with the goal figure, tribute leads with the person and keeps
+            the money to the quiet charity rows. ── */}
         <div className="mb-8 border-b border-border pb-6">
-          <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
-            {/* Col 1 — goal progress (or closed total / countdown), QR beside */}
-            <div className="flex min-w-0 flex-1 items-center gap-8">
-              <div className="min-w-0 flex-1">
-                {effectiveClosed ? (
-                  <div>
-                    <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                      Poll closed
-                    </p>
-                    <p
-                      className="mt-1 text-4xl font-medium text-foreground"
-                      aria-live="polite"
-                    >
-                      {formatPounds(totalRaised)}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Thank you — the final standings are in.
-                    </p>
-                  </div>
-                ) : goalAmount ? (
-                  <div>
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                        Pledge goal
+          {variant === "tribute" ? (
+            <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
+              {/* Col 1 — the person IS the heading; QR beside */}
+              <div className="flex min-w-0 flex-1 items-center gap-8">
+                <div className="flex min-w-0 flex-1 items-center gap-5">
+                  {avatar && (
+                    <ProtagonistAvatar
+                      name={avatar.name}
+                      photoUrl={avatar.photoUrl}
+                    />
+                  )}
+                  <div className="min-w-0">
+                    {headline.prefix && (
+                      <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
+                        {headline.prefix}
                       </p>
-                      {goalReached && (
-                        <p className="text-sm font-medium text-success">
-                          Goal reached — every further pledge still counts
-                        </p>
-                      )}
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                    )}
+                    <h1 className="truncate text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+                      {protagonistName}
+                    </h1>
+                    {headline.suffix && (
+                      <p className="truncate text-sm text-primary">
+                        {headline.suffix}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {scanToPledge}
+              </div>
+
+              {/* Col 2 — the charities; the row amounts are the only money
+                  on the banner. No goal figure, no progress bar, no
+                  goal-reached shout: at a wake the number climbing is not
+                  the point. */}
+              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                {charities.length > 0 ? (
+                  <div className="space-y-3">
+                    {charities.slice(0, 3).map((charity) => (
+                      <CharityRow
+                        key={charity.id}
+                        charity={charity}
+                        amountRaised={perCharity}
+                      />
+                    ))}
+                  </div>
+                ) : charityName ? (
+                  <p className="text-sm text-muted-foreground">
+                    raised for {charityName}:{" "}
+                    <span className="font-medium text-foreground">
+                      {formatPounds(totalRaised)}
+                    </span>
+                  </p>
+                ) : null}
+                {effectiveClosed ? (
+                  <p className="text-xs text-muted-foreground">
+                    Poll closed — thank you.
+                  </p>
+                ) : (
+                  isOpen &&
+                  closesAt && (
+                    <p className="text-xs text-muted-foreground">
+                      Poll closes{" "}
+                      {new Date(closesAt).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+                  )
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
+              {/* Col 1 — goal progress (or closed total / countdown), QR beside */}
+              <div className="flex min-w-0 flex-1 items-center gap-8">
+                <div className="min-w-0 flex-1">
+                  {effectiveClosed ? (
+                    <div>
+                      <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                        Poll closed
+                      </p>
                       <p
-                        className="text-4xl font-medium text-foreground"
+                        className="mt-1 text-4xl font-medium text-foreground"
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}
                       </p>
-                      <p className="text-lg text-muted-foreground">
-                        of {formatPounds(goalAmount)}
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Thank you — the final standings are in.
                       </p>
                     </div>
-                    <div
-                      className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted"
-                      role="progressbar"
-                      aria-label="Progress towards the pledge goal"
-                      aria-valuemin={0}
-                      aria-valuemax={goalAmount}
-                      aria-valuenow={Math.min(totalRaised, goalAmount)}
-                    >
+                  ) : goalAmount ? (
+                    <div>
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                          Pledge goal
+                        </p>
+                        {goalReached && (
+                          <p className="text-sm font-medium text-success">
+                            Goal reached — every further pledge still counts
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                        <p
+                          className="text-4xl font-medium text-foreground"
+                          aria-live="polite"
+                        >
+                          {formatPounds(totalRaised)}
+                        </p>
+                        <p className="text-lg text-muted-foreground">
+                          of {formatPounds(goalAmount)}
+                        </p>
+                      </div>
                       <div
-                        className={`h-full rounded-full transition-[width] duration-700 ease-out ${
-                          goalReached ? "bg-success" : "bg-primary"
-                        }`}
-                        style={{
-                          width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
-                        }}
-                      />
+                        className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted"
+                        role="progressbar"
+                        aria-label="Progress towards the pledge goal"
+                        aria-valuemin={0}
+                        aria-valuemax={goalAmount}
+                        aria-valuenow={Math.min(totalRaised, goalAmount)}
+                      >
+                        <div
+                          className={`h-full rounded-full transition-[width] duration-700 ease-out ${
+                            goalReached ? "bg-success" : "bg-primary"
+                          }`}
+                          style={{
+                            width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                      {isOpen && closesAt && (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Poll closes{" "}
+                          {new Date(closesAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                          })}
+                        </p>
+                      )}
                     </div>
-                    {isOpen && closesAt && (
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        Poll closes{" "}
-                        {new Date(closesAt).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "long",
-                        })}
+                  ) : isOpen ? (
+                    <Countdown closesAt={closesAt!} />
+                  ) : null}
+                </div>
+
+                {scanToPledge}
+              </div>
+
+              {/* Col 2 — compact identity above the charity rows */}
+              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  {avatar && (
+                    <ProtagonistAvatar
+                      name={avatar.name}
+                      photoUrl={avatar.photoUrl}
+                      className="h-12 w-12 rounded-lg md:h-12 md:w-12"
+                    />
+                  )}
+                  <div className="min-w-0">
+                    {headline.prefix && (
+                      <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
+                        {headline.prefix}
+                      </p>
+                    )}
+                    <h1 className="truncate text-lg leading-tight font-medium text-foreground">
+                      {protagonistName}
+                    </h1>
+                    {headline.suffix && (
+                      <p className="truncate text-xs text-primary">
+                        {headline.suffix}
                       </p>
                     )}
                   </div>
-                ) : isOpen ? (
-                  <Countdown closesAt={closesAt!} />
-                ) : null}
-              </div>
+                </div>
 
-              {/* The way in */}
-              <div className="flex shrink-0 flex-col items-center gap-1.5">
-                <BrandedQR
-                  value={favpollUrl}
-                  size={132}
-                  aria-label="Scan to pledge on your phone"
-                />
-                <p className="text-sm font-medium text-foreground">
-                  Scan to pledge
-                </p>
-              </div>
-            </div>
-
-            {/* Col 2 — compact identity above the charity rows */}
-            <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
-              <div className="flex min-w-0 items-center gap-2.5">
-                {avatar && (
-                  <ProtagonistAvatar
-                    name={avatar.name}
-                    photoUrl={avatar.photoUrl}
-                    className="h-12 w-12 rounded-lg md:h-12 md:w-12"
-                  />
+                {(charities.length > 0 || charityName) && (
+                  <div className="space-y-3 border-t border-border pt-3">
+                    {charities.length > 0 ? (
+                      <>
+                        {charities.slice(0, 3).map((charity) => (
+                          <CharityRow
+                            key={charity.id}
+                            charity={charity}
+                            amountRaised={perCharity}
+                          />
+                        ))}
+                        {!goalAmount && (
+                          <p className="text-right text-xs text-muted-foreground">
+                            <span
+                              className="text-base font-medium text-primary"
+                              aria-live="polite"
+                            >
+                              {formatPounds(totalRaised)}
+                            </span>{" "}
+                            raised so far
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        raised for {charityName}:{" "}
+                        <span className="font-medium text-foreground">
+                          {formatPounds(totalRaised)}
+                        </span>
+                      </p>
+                    )}
+                  </div>
                 )}
-                <div className="min-w-0">
-                  {headline.prefix && (
-                    <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
-                      {headline.prefix}
-                    </p>
-                  )}
-                  <h1 className="truncate text-lg leading-tight font-medium text-foreground">
-                    {protagonistName}
-                  </h1>
-                  {headline.suffix && (
-                    <p className="truncate text-xs text-primary">
-                      {headline.suffix}
-                    </p>
-                  )}
-                </div>
               </div>
-
-              {(charities.length > 0 || charityName) && (
-                <div className="space-y-3 border-t border-border pt-3">
-                  {charities.length > 0 ? (
-                    <>
-                      {charities.slice(0, 3).map((charity) => (
-                        <CharityRow
-                          key={charity.id}
-                          charity={charity}
-                          amountRaised={perCharity}
-                        />
-                      ))}
-                      {!goalAmount && (
-                        <p className="text-right text-xs text-muted-foreground">
-                          <span
-                            className="text-base font-medium text-primary"
-                            aria-live="polite"
-                          >
-                            {formatPounds(totalRaised)}
-                          </span>{" "}
-                          raised so far
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      raised for {charityName}:{" "}
-                      <span className="font-medium text-foreground">
-                        {formatPounds(totalRaised)}
-                      </span>
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
 
         {/* ── Left: rankings · Right: the guest wall ── */}
@@ -284,7 +392,6 @@ export function DisplayScreen({
             {poll && (
               <DisplayPollSection
                 poll={poll}
-                isClosed={effectiveClosed}
                 justClosed={localClosed && wasOpenAtMount}
                 protagonistFirstName={
                   avatar

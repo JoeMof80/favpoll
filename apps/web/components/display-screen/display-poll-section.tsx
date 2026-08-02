@@ -1,7 +1,6 @@
 "use client"
 
 import { PollHeading } from "@/components/poll-heading"
-import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { RankingList } from "@/components/ranking-list"
 import { TypedReveal } from "@/components/poll-section/typed-reveal"
 import type { Favourite } from "@favpoll/types"
@@ -18,54 +17,39 @@ export type DisplayPoll = {
 
 type Props = {
   poll: DisplayPoll
-  /** Closed favpolls show the reveal; open ones withhold it (see below) */
-  isClosed?: boolean
   /** The poll closed while the room watched — type the reveal out */
   justClosed?: boolean
-  /** Person favpolls: names the lock pill; null for causes */
+  /** Person favpolls: names the typed finale; null for causes */
   protagonistFirstName?: string | null
 }
 
 // The display's poll block, in the event page's language: the same
-// PollHeading pill, the same RankingList bars (realtime via
-// useRankingItems), and the same withhold-then-disclose reveal treatment.
+// PollHeading pill and the same RankingList bars (realtime via
+// useRankingItems).
 //
-// While the poll is OPEN the reveal is withheld — showing it to the room
-// would spoil each guest's own post-pledge reveal moment and could bias
-// their pick. The blurred decoy + lock pill advertise the mechanic instead
-// (the QR beside it is the way in). When the poll closes, the display
-// discloses the reveal — the room's collective finale.
+// The reveal appears here ONLY as the witnessed finale — typed out at the
+// moment the poll closes while the room is watching. On a shared screen
+// the reveal is a keepsake, not signage (founder, 2026-08-02): while open
+// it would spoil each guest's own post-pledge moment, and once closed a
+// static quote is just noise above the standings.
 export function DisplayPollSection({
   poll,
-  isClosed = false,
   justClosed = false,
   protagonistFirstName = null,
 }: Props) {
   const revealText = poll.personal_reveal
-  const hasReveal = !!revealText
 
   return (
     <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
       <PollHeading topicTitle={poll.topic.title} />
 
-      {/* While OPEN the poll column carries no reveal at all — the lock
-          hint lives in the banner beside the name (a blurred decoy on a
-          projector is just noise). The reveal appears here only as the
-          finale: typed out at the live close, static once closed. */}
-      {hasReveal &&
-        (isClosed || justClosed) &&
-        (justClosed ? (
-          <TypedReveal
-            text={revealText!}
-            active
-            protagonistFirstName={protagonistFirstName ?? "Their"}
-          />
-        ) : (
-          <PollReveal
-            personalReveal={revealText!}
-            protagonistFirstName={protagonistFirstName ?? undefined}
-          />
-        ))}
+      {!!revealText && justClosed && (
+        <TypedReveal
+          text={revealText}
+          active
+          protagonistFirstName={protagonistFirstName ?? "Their"}
+        />
+      )}
 
       <RankingList
         initialItems={poll.items}
