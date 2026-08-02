@@ -11,10 +11,9 @@ import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
 import { Tooltip, TooltipProvider } from "../ui/tooltip"
-import { revealLockLabel } from "../reveal-lock"
 import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
-import { DECOY_WIDTHS } from "@/lib/decoys"
+import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
 import { Gift } from "lucide-react"
 
@@ -204,7 +203,7 @@ export function PollSection({
             className="pointer-events-none overflow-hidden"
             aria-hidden="true"
           >
-            <div className="space-y-4 blur-xs select-none">
+            <div className="space-y-4 opacity-60 blur-xs select-none">
               {/* Decoy quote only when a reveal actually exists — a favpoll
                 without one shows no quote post-pledge, so fake none here. */}
               {hasReveal && (
@@ -235,9 +234,7 @@ export function PollSection({
                             <RankingBar
                               label={item.label}
                               amount="—"
-                              widthPercent={
-                                DECOY_WIDTHS[i % DECOY_WIDTHS.length]
-                              }
+                              widthPercent={decoyWidth(i)}
                               barClassName="transition-all duration-700 ease-out"
                             />
                           </li>
@@ -266,16 +263,17 @@ export function PollSection({
               <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
                 {/* CTA and mechanic as ONE card: solid primary header
                     carries the lock, numbered steps beneath it. */}
-                <span className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl bg-background/95 shadow-lg ring-1 ring-border">
-                  <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground">
+                <span className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl bg-background/95 shadow-xl ring-1 ring-border">
+                  <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
                     <Lock className="h-4 w-4" aria-hidden="true" />
-                    {hasReveal
-                      ? isCause
-                        ? "Pledge to reveal our pick"
-                        : revealLockLabel(displayFirstName)
-                      : "Pledge to see the results"}
+                    {/* One universal CTA (founder question, 2026-08-02):
+                        "reveal X's favourite" as the header made the
+                        reveal transactional bait — the quiz-frame again.
+                        The action is pledging YOUR favourite; step 3
+                        presents the reveal as the gift. */}
+                    Pledge your favourite
                   </span>
-                  <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-[13px] leading-relaxed font-normal whitespace-normal text-muted-foreground">
+                  <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground">
                     {lockSteps.map((step, i) => (
                       <span key={i} className="flex gap-2">
                         <span className="w-4 shrink-0 text-right font-semibold text-primary">
@@ -284,7 +282,7 @@ export function PollSection({
                         <span className="flex-1">{step}</span>
                       </span>
                     ))}
-                    <span className="pt-1 text-xs text-muted-foreground/80">
+                    <span className="pt-1 text-[13px] text-muted-foreground/80">
                       {mechanicFooter(poll.topics.title)}
                     </span>
                   </span>
