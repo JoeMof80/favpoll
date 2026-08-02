@@ -1,6 +1,5 @@
 "use client"
 
-import { PollHeading } from "@/components/poll-heading"
 import { RankingList } from "@/components/ranking-list"
 import { TypedReveal } from "@/components/poll-section/typed-reveal"
 import type { Favourite } from "@favpoll/types"
@@ -41,7 +40,11 @@ export function DisplayPollSection({
 
   return (
     <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
-      <PollHeading topicTitle={poll.topic.title} />
+      {/* Projector-scale topic header (founder, 2026-08-02) — PollHeading's
+          card-sized ramp reads small across a room. */}
+      <h2 className="truncate text-xl font-medium tracking-[0.09em] text-primary uppercase md:text-2xl">
+        Favourite {poll.topic.title}
+      </h2>
 
       {!!revealText && justClosed && (
         <TypedReveal
