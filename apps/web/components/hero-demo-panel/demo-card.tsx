@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
-import { RevealLockPill, revealLockLabel } from "@/components/reveal-lock"
+import { RevealLockPill } from "@/components/reveal-lock"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -406,7 +406,7 @@ export function DemoCard({
                 className="absolute inset-0 z-[1] flex items-center justify-center"
                 aria-hidden="true"
               >
-                <RevealLockPill label={revealLockLabel(firstName)} />
+                <RevealLockPill label="Pledge your favourite" />
               </motion.div>
             )}
           </AnimatePresence>
