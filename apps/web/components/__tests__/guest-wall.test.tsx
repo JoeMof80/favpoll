@@ -54,17 +54,25 @@ describe("GuestWall — expandable collapse", () => {
     created_at: "2026-08-01T00:00:00Z",
   }))
 
-  it("collapses long walls and opens the full list from See all", () => {
+  it("shows all rows in a scrollable list with an expand control", () => {
     render(<GuestWall entries={MANY} expandable />)
-    expect(screen.getAllByText(/Guest \d+/).length).toBe(8)
+    expect(screen.getAllByText(/Guest \d+/).length).toBe(12)
+    expect(screen.getByRole("list", { name: "Recent pledges" })).toHaveClass(
+      "max-h-72",
+      "overflow-y-auto"
+    )
     expect(
-      screen.getByRole("button", { name: "See all 12 guests" })
+      screen.getByRole("button", { name: "Expand guest wall" })
     ).toBeInTheDocument()
   })
 
-  it("shows everything without the button when not expandable", () => {
+  it("no expand control or height cap when not expandable", () => {
     render(<GuestWall entries={MANY} />)
-    expect(screen.getAllByText(/Guest \d+/).length).toBe(12)
-    expect(screen.queryByRole("button", { name: /See all/ })).toBeNull()
+    expect(
+      screen.getByRole("list", { name: "Recent pledges" })
+    ).not.toHaveClass("max-h-72")
+    expect(
+      screen.queryByRole("button", { name: "Expand guest wall" })
+    ).toBeNull()
   })
 })

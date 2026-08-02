@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Button } from "@/components/ui/button"
+import { Maximize2 } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 
 // The guest wall: presence, not size. Names (or "Someone") and what they
@@ -76,10 +77,6 @@ function WallRow({ entry }: { entry: GuestWallEntry }) {
   )
 }
 
-// How many rows the card shows before collapsing behind "See all"
-// (founder, 2026-08-02: a 25-guest wall dwarfed the right column).
-const COLLAPSED_ROWS = 8
-
 export function GuestWall({
   entries,
   teaseBacked = false,
@@ -102,23 +99,43 @@ export function GuestWall({
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
-  const cap = maxEntries ?? (expandable ? COLLAPSED_ROWS : undefined)
-  const shown = cap ? entries.slice(0, cap) : entries
-  const overflow = expandable && entries.length > shown.length
+  const shown = maxEntries ? entries.slice(0, maxEntries) : entries
   const animated = animate && !reduced
 
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
-      <SectionEyebrow variant="muted" className="font-semibold">
-        Guest wall
-      </SectionEyebrow>
+      <div className="flex items-start justify-between gap-2">
+        <SectionEyebrow variant="muted" className="font-semibold">
+          Guest wall
+        </SectionEyebrow>
+        {/* Expand to a dialog (founder, 2026-08-02) — the card itself
+            scrolls within a max height below */}
+        {expandable && entries.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            aria-label="Expand guest wall"
+            onClick={() => setAllOpen(true)}
+          >
+            <Maximize2 aria-hidden="true" />
+          </Button>
+        )}
+      </div>
       {shown.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">
           Guests appear here as they pledge.
         </p>
       ) : (
         <>
-          <ul className="mt-2 space-y-1.5" aria-label="Recent pledges">
+          <ul
+            className={
+              expandable
+                ? "mt-2 max-h-72 space-y-1.5 overflow-y-auto pr-1"
+                : "mt-2 space-y-1.5"
+            }
+            aria-label="Recent pledges"
+          >
             <AnimatePresence initial={false}>
               {shown.map((entry) => (
                 <motion.li
@@ -134,17 +151,6 @@ export function GuestWall({
               ))}
             </AnimatePresence>
           </ul>
-          {overflow && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="mt-2 w-full"
-              onClick={() => setAllOpen(true)}
-            >
-              See all {entries.length} guests
-            </Button>
-          )}
           {teaseBacked && (
             <p className="mt-2.5 text-xs text-muted-foreground">
               Pledge to see what each guest backed.
