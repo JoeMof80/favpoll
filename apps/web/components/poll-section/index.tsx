@@ -15,6 +15,7 @@ import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
+import { Plus } from "lucide-react"
 
 type RankingView = "amount" | "count"
 
@@ -119,10 +120,25 @@ export function PollSection({
             tests (and AT heuristics) locate TypedReveal's hidden copy via
             [aria-hidden], and an empty div announces nothing anyway. */}
         <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
-        <PollHeading
-          topicTitle={poll.topics.title}
-          onPledge={onOpenPledgeDialog}
-        />
+        {/* The ribbon is a HEADER, not a button (founder, 2026-08-02) —
+            pre-pledge the lock card is the one CTA, so a second full-
+            width button was redundant. Once entitled, a quiet icon at
+            the ribbon's edge reopens the dialog to pledge again. */}
+        <div className="relative">
+          <PollHeading topicTitle={poll.topics.title} inert />
+          {entitled && onOpenPledgeDialog && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Pledge again"
+              onClick={onOpenPledgeDialog}
+              className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+            >
+              <Plus aria-hidden="true" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}

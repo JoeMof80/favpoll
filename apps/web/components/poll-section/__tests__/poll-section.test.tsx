@@ -253,7 +253,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       />
     )
     // Animated path: typing copy is aria-hidden
-    const typed = container.querySelector('[aria-hidden="true"]')
+    const typed = container.querySelector('[aria-hidden="true"]:not(svg)')
     expect(typed).not.toBeNull()
     // Has not yet typed the full text
     expect(typed?.textContent).not.toBe(REVEAL_TEXT)
@@ -290,7 +290,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       />
     )
     act(() => vi.runAllTimers())
-    const typed = container.querySelector('[aria-hidden="true"]')
+    const typed = container.querySelector('[aria-hidden="true"]:not(svg)')
     expect(typed).toHaveTextContent(REVEAL_TEXT)
   })
 })
@@ -316,7 +316,7 @@ describe("PollSection — reveal for returning pledger (pledgeJustConfirmed=fals
       />
     )
     // No animated path — PollReveal renders directly
-    expect(container.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect(container.querySelector('[aria-hidden="true"]:not(svg)')).toBeNull()
     // Full text is in the document
     expect(screen.getByText(REVEAL_TEXT)).toBeInTheDocument()
   })

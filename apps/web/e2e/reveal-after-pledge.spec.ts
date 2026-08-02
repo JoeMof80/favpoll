@@ -89,13 +89,10 @@ test.describe("reveal after pledge", () => {
     ).toBeVisible({ timeout: 30_000 })
 
     // ── 3. Open the pledge dialog ─────────────────────────────────────────────
-    // PR #127 replaced the old "Pledge favourites" PledgeCard button with the
-    // merged "FAVOURITE {topic}" pill (PollHeading rendered as a primary Button).
-    // PledgeDialog runs in controlled mode on the favpoll page — its own
-    // internal "Pledge favourites" trigger button is suppressed (isControlled=true).
-    // The fixture topic is Colour → accessible name "Favourite Colour".
+    // The topic ribbon became a plain header (2026-08-02) — the lock card
+    // over the decoy is now the single pre-pledge CTA.
     const pledgeButton = page.getByRole("button", {
-      name: /favourite colour/i,
+      name: /Pledge to reveal E2E's favourite and see the results/i,
     })
     await expect(pledgeButton).toBeVisible()
     await pledgeButton.click()
