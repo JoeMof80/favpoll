@@ -104,7 +104,10 @@ export function HeroLayout({
           low; 2026-07-29). */}
       <div
         ref={boxRef}
-        className="sticky top-14 z-10 bg-background pt-6 pb-4 md:pt-16"
+        // z-30: above the poll ribbon (z-20) and the lock card's sticky
+        // overlay (z-10), which otherwise painted over the hero name when
+        // scrolling (founder-caught, 2026-08-02)
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 md:pt-16"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher

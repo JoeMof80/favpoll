@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { Button } from "@/components/ui/button"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 
 // The guest wall: presence, not size. Names (or "Someone") and what they
 // backed — never amounts (anonymity model, decided 2026-07-05). Anonymous
@@ -58,11 +60,32 @@ function backedLine(labels: string[]): string {
   return `backed ${labels[0]} and ${labels.length - 1} more`
 }
 
+function WallRow({ entry }: { entry: GuestWallEntry }) {
+  return (
+    <>
+      <span className="min-w-0 truncate">
+        <span className="font-medium text-foreground">
+          {entry.name ?? "Someone"}
+        </span>{" "}
+        <span className="text-muted-foreground">
+          {backedLine(entry.labels)}
+        </span>
+      </span>
+      <RelativeTime iso={entry.created_at} />
+    </>
+  )
+}
+
+// How many rows the card shows before collapsing behind "See all"
+// (founder, 2026-08-02: a 25-guest wall dwarfed the right column).
+const COLLAPSED_ROWS = 8
+
 export function GuestWall({
   entries,
   teaseBacked = false,
   animate = false,
   maxEntries,
+  expandable = false,
 }: {
   entries: GuestWallEntry[]
   /**
@@ -74,9 +97,14 @@ export function GuestWall({
   animate?: boolean
   /** Cap the rows shown (e.g. the live display). */
   maxEntries?: number
+  /** Collapse long walls behind a "See all" dialog (guest page). */
+  expandable?: boolean
 }) {
   const reduced = useReducedMotion()
-  const shown = maxEntries ? entries.slice(0, maxEntries) : entries
+  const [allOpen, setAllOpen] = useState(false)
+  const cap = maxEntries ?? (expandable ? COLLAPSED_ROWS : undefined)
+  const shown = cap ? entries.slice(0, cap) : entries
+  const overflow = expandable && entries.length > shown.length
   const animated = animate && !reduced
 
   return (
@@ -101,25 +129,51 @@ export function GuestWall({
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   className="flex items-baseline justify-between gap-2 text-sm"
                 >
-                  <span className="min-w-0 truncate">
-                    <span className="font-medium text-foreground">
-                      {entry.name ?? "Someone"}
-                    </span>{" "}
-                    <span className="text-muted-foreground">
-                      {backedLine(entry.labels)}
-                    </span>
-                  </span>
-                  <RelativeTime iso={entry.created_at} />
+                  <WallRow entry={entry} />
                 </motion.li>
               ))}
             </AnimatePresence>
           </ul>
+          {overflow && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={() => setAllOpen(true)}
+            >
+              See all {entries.length} guests
+            </Button>
+          )}
           {teaseBacked && (
             <p className="mt-2.5 text-xs text-muted-foreground">
               Pledge to see what each guest backed.
             </p>
           )}
         </>
+      )}
+      {expandable && (
+        <ResponsiveOverlay
+          open={allOpen}
+          onOpenChange={setAllOpen}
+          title="Guest wall"
+        >
+          <ul className="space-y-2" aria-label="All pledges">
+            {entries.map((entry) => (
+              <li
+                key={entry.id}
+                className="flex items-baseline justify-between gap-2 text-sm"
+              >
+                <WallRow entry={entry} />
+              </li>
+            ))}
+          </ul>
+          {teaseBacked && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Pledge to see what each guest backed.
+            </p>
+          )}
+        </ResponsiveOverlay>
       )}
     </div>
   )

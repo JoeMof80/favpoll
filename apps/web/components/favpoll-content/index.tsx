@@ -225,7 +225,12 @@ export function FavpollContent({
         className="w-full"
       />
 
-      <GuestWall entries={wallEntries} teaseBacked={!localEntitled} animate />
+      <GuestWall
+        entries={wallEntries}
+        teaseBacked={!localEntitled}
+        animate
+        expandable
+      />
 
       {/* Guest shared fund contribution card — always shown on open favpolls.
           Carries both jobs explicitly: how to USE the fund (pledge step) and

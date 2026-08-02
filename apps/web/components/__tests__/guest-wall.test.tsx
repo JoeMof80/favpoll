@@ -45,3 +45,26 @@ describe("GuestWall — teaser for un-entitled viewers", () => {
     expect(screen.getAllByText("pledged")).toHaveLength(2)
   })
 })
+
+describe("GuestWall — expandable collapse", () => {
+  const MANY = Array.from({ length: 12 }, (_, i) => ({
+    id: `e${i}`,
+    name: `Guest ${i}`,
+    labels: [],
+    created_at: "2026-08-01T00:00:00Z",
+  }))
+
+  it("collapses long walls and opens the full list from See all", () => {
+    render(<GuestWall entries={MANY} expandable />)
+    expect(screen.getAllByText(/Guest \d+/).length).toBe(8)
+    expect(
+      screen.getByRole("button", { name: "See all 12 guests" })
+    ).toBeInTheDocument()
+  })
+
+  it("shows everything without the button when not expandable", () => {
+    render(<GuestWall entries={MANY} />)
+    expect(screen.getAllByText(/Guest \d+/).length).toBe(12)
+    expect(screen.queryByRole("button", { name: /See all/ })).toBeNull()
+  })
+})
