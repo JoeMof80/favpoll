@@ -109,13 +109,27 @@ export function PackDocument({ data }: { data: PackData }) {
               key={i}
               className="flex h-[54mm] w-[85.6mm] flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm [print-color-adjust:exact]"
             >
-              {/* Header — the list card's FavpollHeader, compact */}
-              <div className="flex min-w-0 flex-col px-[3mm] pt-[2mm] pb-[1.5mm]">
-                <span className="text-[6pt] font-medium tracking-[0.08em] text-muted-foreground uppercase">
-                  {data.prefix}
-                </span>
-                <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
-                  {data.name}
+              {/* Header — the list card's FavpollHeader, compact, with
+                  the favpoll brand top-right */}
+              <div className="flex items-start justify-between gap-2 px-[3mm] pt-[2mm] pb-[1.5mm]">
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-[6pt] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                    {data.prefix}
+                  </span>
+                  <span className="truncate text-[11pt] leading-snug font-medium text-foreground">
+                    {data.name}
+                  </span>
+                </div>
+                <span className="inline-flex shrink-0 items-center gap-1 pt-[0.5mm] text-[7pt] font-medium text-primary">
+                  <svg
+                    width="11"
+                    height="10"
+                    viewBox="0 0 10 9"
+                    aria-hidden="true"
+                  >
+                    <FavpollMarkGlyph />
+                  </svg>
+                  favpoll
                 </span>
               </div>
               {/* Topic row — the list card's poll ribbon */}
@@ -129,7 +143,7 @@ export function PackDocument({ data }: { data: PackData }) {
               {/* Steps section — steps left, QR right (moved out of the
                   header, which sat too tall with it; founder 2026-08-02) */}
               <div className="flex flex-1 flex-col border-t border-border px-[3mm] pt-[1.5mm] pb-[2mm]">
-                <div className="flex flex-1 items-center gap-[3mm]">
+                <div className="flex flex-1 items-start gap-[3mm]">
                   {steps && (
                     <div className="flex flex-1 flex-col gap-[1mm] text-left text-[6.5pt] leading-snug text-muted-foreground">
                       {steps.map((step, j) => (
