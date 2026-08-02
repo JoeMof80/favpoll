@@ -165,6 +165,7 @@ export function FavpollListCard({
           )}
           <FavpollHeader
             linkCue
+            hideEmptyAvatar
             protagonist={{
               name: displayName,
               photo_url:
@@ -190,7 +191,7 @@ export function FavpollListCard({
               />
               {hasPledged && !isClosed && (
                 <TooltipProvider>
-                  <Tooltip content="Pledge again">
+                  <Tooltip content="Pledge again" side="left">
                     <Button
                       type="button"
                       size="icon-sm"
@@ -236,7 +237,7 @@ export function FavpollListCard({
                   onClick={() => setPledgeOpen(true)}
                   className="absolute inset-0 z-10 h-auto w-full rounded-none hover:bg-transparent"
                 >
-                  <RevealLockPill size="sm" label="Pledge to see the results" />
+                  <RevealLockPill size="sm" label="Pledge your favourite" />
                 </Button>
               </div>
             )}
