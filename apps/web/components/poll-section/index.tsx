@@ -195,12 +195,17 @@ export function PollSection({
           )}
         </>
       ) : (
-        /* Pre-pledge: blurred decoy with centered unlock overlay */
-        <div className="relative">
+        /* Pre-pledge: blurred decoy with the lock-card overlay sharing
+           one grid cell — NOT an absolute overlay: WebKit ignores sticky
+           inside absolutely-positioned ancestors, so the card never
+           actually pinned on Safari (found 2026-08-02). The in-flow grid
+           item stretches to the decoy's height, giving the card's sticky
+           its travel in every engine. */
+        <div className="grid">
           {/* overflow-hidden on a WRAPPER clips the blur filter's painted
               bleed (filters draw past the element's box) */}
           <div
-            className="pointer-events-none overflow-hidden"
+            className="pointer-events-none overflow-hidden [grid-area:1/1]"
             aria-hidden="true"
           >
             <div className="space-y-4 opacity-60 blur-xs select-none">
@@ -252,7 +257,7 @@ export function PollSection({
                mobile and gave the whole blur a pointer cursor. The
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
-            <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center pt-4">
+            <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
               <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
                 <Button
                   type="button"
