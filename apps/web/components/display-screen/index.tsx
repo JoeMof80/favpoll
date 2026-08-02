@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { getFavpollHeadline } from "@/lib/display"
+import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
 import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
@@ -174,39 +175,44 @@ export function DisplayScreen({
         <div className="mb-8 border-b border-border pb-6">
           {variant === "tribute" ? (
             <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
-              {/* Col 1 — QR left, then the heading with the photo at its
-                  right, mirroring the favpoll page hero (founder,
-                  2026-08-02). Mobile stacks: the heading first, the QR
-                  centred beneath — three-up crushes the name at phone
-                  widths. */}
+              {/* Col 1 — the favpoll page hero's EXACT grammar (founder,
+                  2026-08-02): SectionEyebrow, heroNameSizeClass name,
+                  text-xl/2xl primary subtitle, 26/33 photo-gated avatar
+                  at the right. The QR sits at the column's right edge;
+                  mobile stacks it centred beneath the heading. */}
               <div className="flex min-w-0 flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8">
-                <div className="flex min-w-0 items-center gap-4 md:order-2 md:flex-1 md:gap-5">
+                <div className="flex min-w-0 flex-1 items-start gap-4 md:gap-6">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
-                      <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
+                      <SectionEyebrow
+                        variant="muted"
+                        className="flex h-8 items-center truncate wrap-break-word"
+                      >
                         {headline.prefix}
-                      </p>
+                      </SectionEyebrow>
                     )}
-                    <h1 className="truncate text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+                    <h1
+                      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+                    >
                       {protagonistName}
                     </h1>
                     {headline.suffix && (
-                      <p className="truncate text-sm text-primary">
+                      <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
                         {headline.suffix}
                       </p>
                     )}
                   </div>
-                  {avatar && (
-                    <ProtagonistAvatar
-                      name={avatar.name}
-                      photoUrl={avatar.photoUrl}
-                      className="shrink-0"
-                    />
+                  {avatar?.photoUrl && (
+                    <div className="h-26 w-26 shrink-0 md:h-33 md:w-33">
+                      <ProtagonistAvatar
+                        name={avatar.name}
+                        photoUrl={avatar.photoUrl}
+                        className="h-full w-full md:h-full md:w-full"
+                      />
+                    </div>
                   )}
                 </div>
-                <div className="flex justify-center md:order-1 md:block">
-                  {scanToPledge}
-                </div>
+                <div className="flex justify-center">{scanToPledge}</div>
               </div>
 
               {/* Col 2 — the charities; the row amounts are the only money
@@ -330,15 +336,11 @@ export function DisplayScreen({
 
               {/* Col 2 — compact identity above the charity rows */}
               <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                {/* Photo at the right, no context line (founder,
+                    2026-08-02) — the identity is a byline here, not the
+                    story. */}
                 <div className="flex min-w-0 items-center gap-2.5">
-                  {avatar && (
-                    <ProtagonistAvatar
-                      name={avatar.name}
-                      photoUrl={avatar.photoUrl}
-                      className="h-12 w-12 rounded-lg md:h-12 md:w-12"
-                    />
-                  )}
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     {headline.prefix && (
                       <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
                         {headline.prefix}
@@ -347,12 +349,14 @@ export function DisplayScreen({
                     <h1 className="truncate text-lg leading-tight font-medium text-foreground">
                       {protagonistName}
                     </h1>
-                    {headline.suffix && (
-                      <p className="truncate text-xs text-primary">
-                        {headline.suffix}
-                      </p>
-                    )}
                   </div>
+                  {avatar?.photoUrl && (
+                    <ProtagonistAvatar
+                      name={avatar.name}
+                      photoUrl={avatar.photoUrl}
+                      className="h-12 w-12 shrink-0 rounded-lg md:h-12 md:w-12"
+                    />
+                  )}
                 </div>
 
                 {(charities.length > 0 || charityName) && (
