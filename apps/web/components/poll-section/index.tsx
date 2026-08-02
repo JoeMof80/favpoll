@@ -105,6 +105,54 @@ export function PollSection({
         ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
         : "Pledge to see the reveal and results"
 
+  // Rendered twice pre-pledge: an invisible in-flow copy that keeps the
+  // page's natural scroll length (and so provides the sticky runway on
+  // EVERY screen, mobile included), and a visible viewport-capped copy
+  // that pins beneath the stuck ribbon (founder, 2026-08-02).
+  const decoyBody = (
+    <div className="space-y-4">
+      {/* Decoy quote only when a reveal actually exists — a favpoll
+          without one shows no quote post-pledge, so fake none here. */}
+      {hasReveal && (
+        <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
+      )}
+
+      {hasItems && (
+        <>
+          <div className="flex items-center justify-end">
+            <Tabs value="amount">
+              <TabsList className="h-7">
+                <TabsTrigger value="amount" className="px-3 text-xs">
+                  Amount
+                </TabsTrigger>
+                <TabsTrigger value="count" className="px-3 text-xs">
+                  Pledges
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div>
+            <ol aria-label="Rankings" className="space-y-3">
+              {[...poll.topics.favourites]
+                .sort((a, b) => a.label.localeCompare(b.label))
+                .map((item, i) => (
+                  <li key={item.id}>
+                    <RankingBar
+                      label={item.label}
+                      amount="—"
+                      widthPercent={decoyWidth(i)}
+                      barClassName="transition-all duration-700 ease-out"
+                    />
+                  </li>
+                ))}
+            </ol>
+          </div>
+        </>
+      )}
+    </div>
+  )
+
   return (
     <section
       aria-label={`Favourite ${poll.topics.title} poll`}
@@ -195,103 +243,69 @@ export function PollSection({
           )}
         </>
       ) : (
-        /* Pre-pledge: blurred decoy with centered unlock overlay. The
-           decoy is HEIGHT-CAPPED with a fade-out (founder goal,
-           2026-08-02: the locked block must keep formation with the
-           stuck header — sticky pinning needed scroll runway that
-           mobile lacks and desktop clipped, so the block is instead
-           made short enough that there is nothing to scroll apart). */
+        /* Pre-pledge: the locked block (decoy + card) PINS at a constant
+           distance beneath the stuck ribbon on every screen (founder,
+           2026-08-02). The invisible spacer copy keeps the page's real
+           scroll length and supplies the sticky runway; the visible copy
+           is capped to the viewport with a fade. Nothing paints outside
+           the parent, so PageLayout's overflow clip never bites. */
         <div className="relative">
-          {/* overflow-hidden on a WRAPPER clips the blur filter's painted
-              bleed (filters draw past the element's box) */}
-          <div
-            className="pointer-events-none overflow-hidden"
-            aria-hidden="true"
-          >
-            <div className="max-h-[26rem] space-y-4 [mask-image:linear-gradient(to_bottom,black_70%,transparent)] opacity-60 blur-xs select-none">
-              {/* Decoy quote only when a reveal actually exists — a favpoll
-                without one shows no quote post-pledge, so fake none here. */}
-              {hasReveal && (
-                <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
-              )}
+          {/* Spacer: full natural height, invisible */}
+          <div className="invisible" aria-hidden="true">
+            {decoyBody}
+          </div>
 
-              {hasItems && (
-                <>
-                  <div className="flex items-center justify-end">
-                    <Tabs value="amount">
-                      <TabsList className="h-7">
-                        <TabsTrigger value="amount" className="px-3 text-xs">
-                          Amount
-                        </TabsTrigger>
-                        <TabsTrigger value="count" className="px-3 text-xs">
-                          Pledges
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
+          <div className="absolute inset-0">
+            <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              {/* overflow-hidden on a WRAPPER clips the blur filter's
+                  painted bleed (filters draw past the element's box) */}
+              <div
+                className="pointer-events-none max-h-[calc(100dvh-var(--hero-stuck-bottom,10rem)-8rem)] overflow-hidden [mask-image:linear-gradient(to_bottom,black_72%,transparent)]"
+                aria-hidden="true"
+              >
+                <div className="opacity-60 blur-xs select-none">
+                  {decoyBody}
+                </div>
+              </div>
 
-                  <div>
-                    <ol aria-label="Rankings" className="space-y-3">
-                      {[...poll.topics.favourites]
-                        .sort((a, b) => a.label.localeCompare(b.label))
-                        .map((item, i) => (
-                          <li key={item.id}>
-                            <RankingBar
-                              label={item.label}
-                              amount="—"
-                              widthPercent={decoyWidth(i)}
-                              barClassName="transition-all duration-700 ease-out"
-                            />
-                          </li>
-                        ))}
-                    </ol>
-                  </div>
-                </>
+              {onOpenPledgeDialog && (
+                /* Only the CARD is clickable (founder, 2026-08-02) — the
+                   wrapper passes events through; the card hovers with the
+                   list cards' lift idiom. No inner sticky needed: the
+                   whole block pins. */
+                <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center pt-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={onOpenPledgeDialog}
+                    aria-label={unlockAriaLabel}
+                    className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background/95 p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background/95 hover:shadow-2xl motion-safe:hover:-translate-y-0.5"
+                  >
+                    <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
+                      <Lock className="h-4 w-4" aria-hidden="true" />
+                      {/* One universal CTA: the action is pledging YOUR
+                          favourite; step 3 presents the reveal as the
+                          gift. */}
+                      Pledge your favourite
+                    </span>
+                    <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground">
+                      {lockSteps.map((step, i) => (
+                        <span key={i} className="flex gap-2">
+                          <span className="w-4 shrink-0 text-right font-semibold text-primary">
+                            {i + 1}.
+                          </span>
+                          <span className="flex-1">{step}</span>
+                        </span>
+                      ))}
+                      <span className="pt-1 text-[13px] text-muted-foreground/80">
+                        {mechanicFooter(poll.topics.title)}
+                      </span>
+                    </span>
+                  </Button>
+                </div>
               )}
             </div>
           </div>
-
-          {onOpenPledgeDialog && (
-            /* Only the CARD is clickable (founder, 2026-08-02) — the old
-               full-area ghost button caught scroll-arresting taps on
-               mobile and gave the whole blur a pointer cursor. The
-               wrapper passes events through; the card hovers with the
-               list cards' lift idiom. */
-            <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center pt-4">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={onOpenPledgeDialog}
-                  aria-label={unlockAriaLabel}
-                  className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background/95 p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background/95 hover:shadow-2xl motion-safe:hover:-translate-y-0.5"
-                >
-                  <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
-                    <Lock className="h-4 w-4" aria-hidden="true" />
-                    {/* One universal CTA (founder question, 2026-08-02):
-                        "reveal X's favourite" as the header made the
-                        reveal transactional bait — the quiz-frame again.
-                        The action is pledging YOUR favourite; step 3
-                        presents the reveal as the gift. */}
-                    Pledge your favourite
-                  </span>
-                  <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground">
-                    {lockSteps.map((step, i) => (
-                      <span key={i} className="flex gap-2">
-                        <span className="w-4 shrink-0 text-right font-semibold text-primary">
-                          {i + 1}.
-                        </span>
-                        <span className="flex-1">{step}</span>
-                      </span>
-                    ))}
-                    <span className="pt-1 text-[13px] text-muted-foreground/80">
-                      {mechanicFooter(poll.topics.title)}
-                    </span>
-                  </span>
-                </Button>
-              </span>
-            </div>
-          )}
         </div>
       )}
 
