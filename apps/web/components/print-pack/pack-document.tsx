@@ -278,16 +278,20 @@ export function PackDocument({ data }: { data: PackData }) {
       <div className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" />
         <section
-          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6 print:min-h-0 print:p-2`}
+          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2`}
         >
-          {/* 180 × 250 mm pre-rotation box: fits inside the printable
-              area (default margins shrink A4 to ~184 × 271), where the
-              earlier 190 × 255 overflowed and split across two pages
-              (founder-caught in print preview, 2026-08-02). -rotate-90
-              so the poster reads with its left edge at the page top. */}
-          <div className="relative h-[250mm] w-[180mm] max-w-full">
-            <div className="absolute top-1/2 left-1/2 h-[180mm] w-[250mm] -translate-x-1/2 -translate-y-1/2 -rotate-90">
-              <PackCard data={data} steps={steps} scale="a4" />
+          {/* Print fragmentation uses PRE-transform boxes, so a rotated
+              250mm-wide element split across pages in the print dialog
+              (founder-caught twice, 2026-08-02; headless zero-margin
+              PDFs masked it). The half-size/scale(2) sandwich keeps the
+              layout box at 125 × 90 mm — far inside any printable area,
+              one fragment — while painting at the full 250 × 180.
+              -rotate-90: the poster reads by turning the page clockwise. */}
+          <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
+            <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
+              <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
+                <PackCard data={data} steps={steps} scale="a4" />
+              </div>
             </div>
           </div>
         </section>
@@ -297,7 +301,7 @@ export function PackDocument({ data }: { data: PackData }) {
       <div className={hideWhenOtherPrints("a5")}>
         <SheetPrintButton target="a5" />
         <section
-          className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
+          className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6 print:min-h-0`}
         >
           <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
             <PackCard data={data} steps={steps} scale="a5" />
