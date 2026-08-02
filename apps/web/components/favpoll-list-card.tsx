@@ -197,7 +197,7 @@ export function FavpollListCard({
                       size="icon-sm"
                       aria-label="Pledge again"
                       onClick={() => setPledgeOpen(true)}
-                      className="absolute top-1/2 right-0 z-10 -translate-y-1/2"
+                      className="absolute top-1/2 right-0 z-10 -translate-y-1/2 transition-none active:not-aria-[haspopup]:-translate-y-1/2"
                     >
                       <Gift aria-hidden="true" />
                     </Button>

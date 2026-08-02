@@ -134,7 +134,7 @@ export function PollSection({
                   size="icon-sm"
                   aria-label="Pledge again"
                   onClick={onOpenPledgeDialog}
-                  className="absolute top-1/2 right-0 -translate-y-1/2"
+                  className="absolute top-1/2 right-0 -translate-y-1/2 transition-none active:not-aria-[haspopup]:-translate-y-1/2"
                 >
                   <Gift aria-hidden="true" />
                 </Button>
