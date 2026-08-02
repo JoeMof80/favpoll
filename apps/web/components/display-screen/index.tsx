@@ -174,16 +174,14 @@ export function DisplayScreen({
         <div className="mb-8 border-b border-border pb-6">
           {variant === "tribute" ? (
             <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
-              {/* Col 1 — the person IS the heading; QR beside */}
-              <div className="flex min-w-0 flex-1 items-center gap-8">
-                <div className="flex min-w-0 flex-1 items-center gap-5">
-                  {avatar && (
-                    <ProtagonistAvatar
-                      name={avatar.name}
-                      photoUrl={avatar.photoUrl}
-                    />
-                  )}
-                  <div className="min-w-0">
+              {/* Col 1 — QR left, then the heading with the photo at its
+                  right, mirroring the favpoll page hero (founder,
+                  2026-08-02). Mobile stacks: the heading first, the QR
+                  centred beneath — three-up crushes the name at phone
+                  widths. */}
+              <div className="flex min-w-0 flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8">
+                <div className="flex min-w-0 items-center gap-4 md:order-2 md:flex-1 md:gap-5">
+                  <div className="min-w-0 flex-1">
                     {headline.prefix && (
                       <p className="truncate text-xs font-medium tracking-widest text-primary uppercase">
                         {headline.prefix}
@@ -198,8 +196,17 @@ export function DisplayScreen({
                       </p>
                     )}
                   </div>
+                  {avatar && (
+                    <ProtagonistAvatar
+                      name={avatar.name}
+                      photoUrl={avatar.photoUrl}
+                      className="shrink-0"
+                    />
+                  )}
                 </div>
-                {scanToPledge}
+                <div className="flex justify-center md:order-1 md:block">
+                  {scanToPledge}
+                </div>
               </div>
 
               {/* Col 2 — the charities; the row amounts are the only money
