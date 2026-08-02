@@ -258,7 +258,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+2.5rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+2.5rem)]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <Button
                   type="button"
                   variant="ghost"
