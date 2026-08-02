@@ -143,7 +143,7 @@ export function DisplayScreen({
   // The room's way in, in-banner form — hidden from 2xl, where the QR
   // moves to the gutter (below).
   const scanToPledge = (
-    <div className="flex shrink-0 flex-col items-center gap-1.5 2xl:hidden">
+    <div className="flex shrink-0 flex-col items-center gap-1.5 min-[1600px]:hidden">
       <BrandedQR
         value={favpollUrl}
         size={132}
@@ -168,15 +168,19 @@ export function DisplayScreen({
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
           the room — the telethon corner phone number — pinned in the left
           gutter so it survives scrolling, and larger than the banner ever
-          allowed (scans from across a room). Only from 2xl: the 6xl card
-          leaves a 192px gutter at 1536 (QR 160 + 16 centres exactly);
-          narrower viewports keep the in-banner QR. Fixed, so rendered
-          OUTSIDE the card — its drop-shadow filter would otherwise become
-          this box's containing block (DisplayChrome precedent). */}
-      <div className="pointer-events-none fixed bottom-14 left-4 z-20 hidden flex-col items-center gap-2 2xl:flex">
+          allowed (scans from across a room). CENTRE-left, not a corner
+          (founder, 2026-08-03): the bottom band of a projected image is
+          the part most often occluded in a room. left = half the gutter's
+          spare space, so the QR centres in the gutter at any width
+          (gutter = (100vw − 72rem)/2; spare = gutter − 200px). Only from
+          1600px, where the gutter (224px) fits the 200px QR; narrower
+          viewports keep the in-banner QR. Fixed, so rendered OUTSIDE the
+          card — its drop-shadow filter would otherwise become this box's
+          containing block (DisplayChrome precedent). */}
+      <div className="pointer-events-none fixed top-1/2 left-[calc((100vw-72rem)/4-100px)] z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex">
         <BrandedQR
           value={favpollUrl}
-          size={160}
+          size={200}
           aria-label="Scan to pledge on your phone"
         />
         <p className="text-sm font-medium text-foreground">Scan to pledge</p>
@@ -229,7 +233,7 @@ export function DisplayScreen({
                     </div>
                   )}
                 </div>
-                <div className="flex justify-center 2xl:hidden">
+                <div className="flex justify-center min-[1600px]:hidden">
                   {scanToPledge}
                 </div>
               </div>
