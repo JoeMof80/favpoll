@@ -107,7 +107,12 @@ export function HeroLayout({
         // z-30: above the poll ribbon (z-20) and the lock card's sticky
         // overlay (z-10), which otherwise painted over the hero name when
         // scrolling (founder-caught, 2026-08-02)
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 md:pt-16"
+        // The before-cover seals the 56px header zone above the band:
+        // iOS Safari intermittently drops the app header's sticky,
+        // letting the about scroll visibly over that gap (founder-caught
+        // on-device, 2026-08-02). Under a working header (z-40) the
+        // cover is invisible.
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
