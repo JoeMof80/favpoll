@@ -10,12 +10,13 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
+import { Tooltip, TooltipProvider } from "../ui/tooltip"
 import { revealLockLabel } from "../reveal-lock"
 import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
-import { Plus } from "lucide-react"
+import { Gift } from "lucide-react"
 
 type RankingView = "amount" | "count"
 
@@ -127,16 +128,20 @@ export function PollSection({
         <div className="relative">
           <PollHeading topicTitle={poll.topics.title} inert />
           {entitled && onOpenPledgeDialog && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Pledge again"
-              onClick={onOpenPledgeDialog}
-              className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full text-primary hover:bg-primary/10 hover:text-primary"
-            >
-              <Plus aria-hidden="true" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip content="Pledge again">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Pledge again"
+                  onClick={onOpenPledgeDialog}
+                  className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full text-primary hover:bg-primary/10 hover:text-primary"
+                >
+                  <Gift aria-hidden="true" />
+                </Button>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </div>
