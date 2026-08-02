@@ -169,6 +169,14 @@ describe("GenerateExampleDialog — steps", () => {
     expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
   })
 
+  it("carries the provenance line on both steps", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    expect(screen.getByText(/Examples are starting points/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "She" }))
+    expect(screen.getByText(/Examples are starting points/)).toBeInTheDocument()
+  })
+
   it("search filters the occasion list", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     openDialog()

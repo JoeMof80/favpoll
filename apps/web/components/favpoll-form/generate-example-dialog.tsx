@@ -161,20 +161,26 @@ export function GenerateExampleDialog({
       }
     >
       {step === 1 ? (
-        <div className="flex flex-wrap gap-1.5 px-5 pt-1 pb-4">
-          {WHO_OPTIONS.map(({ value, label }) => (
-            <Button
-              key={value}
-              type="button"
-              variant="outline"
-              size="sm"
-              aria-pressed={localWho === value}
-              onClick={() => handleWho(value)}
-              className={cn(localWho === value ? CHIP_ON : CHIP_OFF)}
-            >
-              {label}
-            </Button>
-          ))}
+        <div className="px-5 pt-1 pb-4">
+          <div className="flex flex-wrap gap-1.5">
+            {WHO_OPTIONS.map(({ value, label }) => (
+              <Button
+                key={value}
+                type="button"
+                variant="outline"
+                size="sm"
+                aria-pressed={localWho === value}
+                onClick={() => handleWho(value)}
+                className={cn(localWho === value ? CHIP_ON : CHIP_OFF)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+          <p className="pt-3 text-[11px] text-muted-foreground">
+            Examples are starting points — everything published is yours to
+            edit.
+          </p>
         </div>
       ) : (
         // min-h floor: searching filters the chips down and the sheet
@@ -221,6 +227,10 @@ export function GenerateExampleDialog({
               No occasions match.
             </p>
           )}
+          <p className="pt-3 text-[11px] text-muted-foreground">
+            Examples are starting points — everything published is yours to
+            edit.
+          </p>
         </div>
       )}
     </ResponsiveOverlay>

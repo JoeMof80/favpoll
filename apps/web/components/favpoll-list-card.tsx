@@ -8,6 +8,8 @@ import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
+import { Gift } from "lucide-react"
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { PollHeading } from "@/components/poll-heading"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
 import type { FavpollCardSize } from "./favpoll-card/types"
@@ -177,11 +179,31 @@ export function FavpollListCard({
 
         {pollWithItems && topicItems.length > 0 && (
           <div className="relative border-t border-border bg-background px-3 py-2">
-            <PollHeading
-              topicTitle={pollWithItems.topics.title}
-              size="md"
-              onPledge={() => setPledgeOpen(true)}
-            />
+            {/* Header, not a button (founder, 2026-08-02) — the unlock
+                overlay is the pre-pledge CTA; pledged cards get the
+                quiet gift icon to pledge again. */}
+            <div className="relative">
+              <PollHeading
+                topicTitle={pollWithItems.topics.title}
+                size="md"
+                inert
+              />
+              {hasPledged && !isClosed && (
+                <TooltipProvider>
+                  <Tooltip content="Pledge again">
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      aria-label="Pledge again"
+                      onClick={() => setPledgeOpen(true)}
+                      className="absolute top-1/2 right-0 z-10 -translate-y-1/2"
+                    >
+                      <Gift aria-hidden="true" />
+                    </Button>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
             <PledgeDialog
               favpollId={favpoll.id}
               clerkUserId={clerkUserId}

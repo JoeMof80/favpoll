@@ -135,6 +135,24 @@ describe("FormInner — generated-example submit guard", () => {
     )
   })
 
+  it("blocks when the about promises a reveal but the reveal is empty", async () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    await generate()
+    capturedForm.setValue("name", "Auntie Vi")
+    capturedForm.setValue("context", "1938 – 2026")
+    capturedForm.setValue(
+      "about",
+      "She has always loved colour — and hers will be revealed."
+    )
+    capturedForm.setValue("reveal", "")
+    fireEvent.click(screen.getByRole("button", { name: "Publish" }))
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(mockToastError).toHaveBeenCalledWith(
+      expect.stringContaining("mentions a reveal"),
+      expect.anything()
+    )
+  })
+
   it("does not gate a favpoll that never generated", () => {
     render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
     fireEvent.click(screen.getByRole("button", { name: "Publish" }))

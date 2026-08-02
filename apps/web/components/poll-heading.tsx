@@ -1,5 +1,5 @@
 import { SectionLabel } from "@/components/favpoll-card/section-label"
-import { Button, buttonVariants } from "./ui/button"
+import { Button } from "./ui/button"
 import { cn } from "@/lib/utils"
 import type { FavpollCardSize } from "./favpoll-card/types"
 
@@ -47,13 +47,15 @@ export function PollHeading({
   }
 
   if (inert) {
+    // A HEADER, not button chrome (founder, 2026-08-02) — primary
+    // uppercase type at the button's exact height so the sticky offsets
+    // above the poll keep holding.
     return (
       <div
         className={cn(
-          buttonVariants(),
           textClass,
           trackingClass,
-          "pointer-events-none w-full min-w-0 font-medium uppercase"
+          "flex h-9 w-full min-w-0 items-center font-medium text-primary uppercase"
         )}
       >
         <span className="truncate">{label}</span>

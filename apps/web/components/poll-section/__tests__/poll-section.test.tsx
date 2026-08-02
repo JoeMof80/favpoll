@@ -253,7 +253,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       />
     )
     // Animated path: typing copy is aria-hidden
-    const typed = container.querySelector('[aria-hidden="true"]')
+    const typed = container.querySelector('[aria-hidden="true"]:not(svg)')
     expect(typed).not.toBeNull()
     // Has not yet typed the full text
     expect(typed?.textContent).not.toBe(REVEAL_TEXT)
@@ -290,7 +290,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       />
     )
     act(() => vi.runAllTimers())
-    const typed = container.querySelector('[aria-hidden="true"]')
+    const typed = container.querySelector('[aria-hidden="true"]:not(svg)')
     expect(typed).toHaveTextContent(REVEAL_TEXT)
   })
 })
@@ -316,7 +316,7 @@ describe("PollSection — reveal for returning pledger (pledgeJustConfirmed=fals
       />
     )
     // No animated path — PollReveal renders directly
-    expect(container.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect(container.querySelector('[aria-hidden="true"]:not(svg)')).toBeNull()
     // Full text is in the document
     expect(screen.getByText(REVEAL_TEXT)).toBeInTheDocument()
   })
@@ -386,8 +386,8 @@ describe("PollSection — favpolls without a reveal", () => {
   })
 })
 
-describe("PollSection — pre-pledge trust line", () => {
-  it("states where pledges go and the no-fee fact when charityLine is set", () => {
+describe("PollSection — lock explainer", () => {
+  it("teaches the mechanic: own pick, worth, destination, what opens after", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -397,14 +397,25 @@ describe("PollSection — pre-pledge trust line", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
+    expect(screen.getByText("Pick your favourite colour")).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Every pledge goes to Marie Curie & WWF — favpoll takes no fee."
+        "Pledge what it's worth — all money will go to Marie Curie & WWF"
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Yusuf's favourite will be revealed along with the standings"
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Don't have a favourite colour? That's okay — you can still give to the shared fund."
       )
     ).toBeInTheDocument()
   })
 
-  it("renders no trust line without charityLine", () => {
+  it("falls back to generic charity wording without charityLine", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -413,6 +424,36 @@ describe("PollSection — pre-pledge trust line", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(screen.queryByText(/favpoll takes no fee/)).toBeNull()
+    expect(screen.getByText(/all money will go to charity/)).toBeInTheDocument()
+  })
+
+  it("promises no reveal when the favpoll has none", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Yusuf"
+        isCause={false}
+        hasReveal={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText("The standings will be revealed")
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/favourite will be revealed/)).toBeNull()
+  })
+
+  it("speaks as 'our pick' for causes", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Winter Appeal"
+        isCause
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByText(/Our pick will be revealed along with the standings/)
+    ).toBeInTheDocument()
   })
 })
