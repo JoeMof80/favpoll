@@ -249,13 +249,18 @@ export function PollSection({
            scroll length and supplies the sticky runway; the visible copy
            is capped to the viewport with a fade. Nothing paints outside
            the parent, so PageLayout's overflow clip never bites. */
-        <div className="relative">
+        /* Grid-stack, NOT absolute overlay: WebKit ignores sticky inside
+           absolutely-positioned ancestors (founder-caught on-device,
+           2026-08-02). Both copies share one grid cell; the row takes the
+           spacer's full height, and the sticky child pins inside its
+           stretched in-flow grid item. */
+        <div className="grid">
           {/* Spacer: full natural height, invisible */}
-          <div className="invisible" aria-hidden="true">
+          <div className="invisible [grid-area:1/1]" aria-hidden="true">
             {decoyBody}
           </div>
 
-          <div className="absolute inset-0">
+          <div className="[grid-area:1/1]">
             <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
               {/* overflow-hidden on a WRAPPER clips the blur filter's
                   painted bleed (filters draw past the element's box) */}
