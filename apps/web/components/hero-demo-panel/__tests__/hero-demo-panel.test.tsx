@@ -75,9 +75,9 @@ import { DECOY_WIDTHS } from "@/lib/decoys"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-// Page-copy verbatim — matches revealLockLabel(firstName) for SCENES[0]
+// Page-copy verbatim — the universal lock CTA (2026-08-02)
 // (the normalised reveal-lock pill; see components/reveal-lock.tsx).
-const LOCK_CARD_COPY = "Pledge to reveal Belinda's favourite"
+const LOCK_CARD_COPY = "Pledge your favourite"
 
 const scene = SCENES[0] // Belinda · Colour · Marie Curie
 const charity = scene.charities[0]
@@ -427,11 +427,9 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
     expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
   })
 
-  it("cause uses the person-free reveal lock label", () => {
+  it("cause shows the universal lock label", () => {
     renderScene(causeScene, "arriving")
-    expect(
-      screen.getByText("Pledge to reveal the favourite")
-    ).toBeInTheDocument()
+    expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
   })
 
   it("shows the cause reveal text when unlocked", () => {
@@ -440,12 +438,9 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
     expect(reveals[0]).toHaveTextContent(causeScene.poll.personal_reveal)
   })
 
-  it("fundraiser keeps its protagonist — avatar shown, named reveal lock", () => {
+  it("fundraiser keeps its protagonist — avatar shown, universal lock label", () => {
     renderScene(fundraiserScene, "arriving")
     expect(screen.getByTestId("protagonist-avatar")).toBeInTheDocument()
-    const firstName = fundraiserScene.protagonist!.name.split(/[\s&]+/)[0]
-    expect(
-      screen.getByText(`Pledge to reveal ${firstName}'s favourite`)
-    ).toBeInTheDocument()
+    expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
   })
 })
