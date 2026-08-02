@@ -68,9 +68,7 @@ export default async function PackPage({ params }: Props) {
           </Button>
           <PrintButton />
         </div>
-        <div className="rounded-lg border border-border bg-background shadow-sm print:border-0 print:shadow-none">
-          <PackDocument data={data} />
-        </div>
+        <PackDocument data={data} />
       </div>
     </div>
   )
