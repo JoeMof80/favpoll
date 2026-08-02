@@ -38,7 +38,7 @@ const SCALE = {
   // Landscape (founder, 2026-08-02): prints via its own button with an
   // @page landscape rule — mixed orientations can't share one print job.
   a4: {
-    card: "min-h-[170mm] w-full max-w-[255mm] rounded-3xl",
+    card: "h-full w-full rounded-3xl print:min-h-[170mm]",
     headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
     name: "text-[32pt]",
@@ -249,12 +249,13 @@ export function PackDocument({ data }: { data: PackData }) {
   const hideWhenOtherPrints = (key: keyof typeof SCALE) =>
     printTarget && printTarget !== key ? "print:hidden" : ""
 
+  // Sits OUTSIDE the sheet, like the top Save-as-PDF button
   function SheetPrintButton({ target }: { target: keyof typeof SCALE }) {
     return (
-      <div className="mb-3 flex w-full justify-end print:hidden">
+      <div className="mb-2 flex w-full justify-end print:hidden">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => setPrintTarget(target)}
         >
@@ -274,38 +275,42 @@ export function PackDocument({ data }: { data: PackData }) {
     <div className="flex flex-col gap-8 print:block">
       {printTarget === "a4" && <style>{`@page { size: A4 landscape; }`}</style>}
 
-      {/* ── A4 landscape card ── */}
-      <section
-        className={`${sheet} ${hideWhenOtherPrints("a4")} flex min-h-[190mm] break-after-page flex-col items-center justify-center px-6 py-6`}
-      >
+      {/* ── A4 landscape card: the on-screen sheet keeps true landscape
+          A4 proportions (297:210); print supplies real size via the
+          scoped @page rule ── */}
+      <div className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" />
-        <div className="flex w-full flex-1 flex-col items-center justify-center">
+        <section
+          className={`${sheet} flex aspect-[297/210] w-full break-after-page flex-col p-6 print:aspect-auto print:min-h-0`}
+        >
           <PackCard data={data} steps={steps} scale="a4" />
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* ── A5 cards: two per sheet, for tables and easels ── */}
-      <section
-        className={`${sheet} ${hideWhenOtherPrints("a5")} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
-      >
+      <div className={hideWhenOtherPrints("a5")}>
         <SheetPrintButton target="a5" />
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
-          <PackCard data={data} steps={steps} scale="a5" />
-          <PackCard data={data} steps={steps} scale="a5" />
-        </div>
-      </section>
+        <section
+          className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6`}
+        >
+          <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
+            <PackCard data={data} steps={steps} scale="a5" />
+            <PackCard data={data} steps={steps} scale="a5" />
+          </div>
+        </section>
+      </div>
 
       {/* ── Wallet cards: credit-card size (85.6 × 54 mm) ── */}
-      <section
-        className={`${sheet} ${hideWhenOtherPrints("wallet")} min-h-[277mm] px-6 py-8 print:min-h-0`}
-      >
+      <div className={hideWhenOtherPrints("wallet")}>
         <SheetPrintButton target="wallet" />
-        <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <PackCard key={i} data={data} steps={steps} scale="wallet" />
-          ))}
-        </div>
-      </section>
+        <section className={`${sheet} min-h-[277mm] px-6 py-8 print:min-h-0`}>
+          <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <PackCard key={i} data={data} steps={steps} scale="wallet" />
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
