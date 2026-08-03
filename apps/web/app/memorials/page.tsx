@@ -61,7 +61,7 @@ export default function MemorialsPage() {
   return (
     <main>
       {/* ── Hero — the landing's purple band, in the quiet register ── */}
-      <section className="bg-primary text-primary-foreground">
+      <section className="bg-memorial text-memorial-foreground">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
           <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
             {t("memorials.eyebrow")}
@@ -80,7 +80,7 @@ export default function MemorialsPage() {
               asChild
               size="lg"
               variant="ghost"
-              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              className="text-memorial-foreground hover:bg-memorial-foreground/10 hover:text-memorial-foreground"
             >
               <Link href="#how">{t("memorials.cta.secondary")}</Link>
             </Button>
@@ -110,7 +110,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── Placement: the wake, not the service ── */}
-      <section className="w-full bg-primary/5">
+      <section className="w-full bg-memorial-muted">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
             {t("memorials.wake.title")}
@@ -118,7 +118,7 @@ export default function MemorialsPage() {
           <p className="mb-6 leading-relaxed text-muted-foreground">
             {t("memorials.wake.body")}
           </p>
-          <p className="border-l-2 border-primary pl-4 text-lg text-reveal-foreground italic">
+          <p className="border-l-2 border-memorial pl-4 text-lg text-foreground italic">
             {t("memorials.wake.nocash")}
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function MemorialsPage() {
               <li key={line} className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial"
                 />
                 <p className="leading-relaxed text-muted-foreground">{line}</p>
               </li>
@@ -176,7 +176,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── Close — the landing's purple monogram close, one line ── */}
-      <section className="bg-primary text-primary-foreground">
+      <section className="bg-memorial text-memorial-foreground">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
           <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
             {t("memorials.close.headline")}
