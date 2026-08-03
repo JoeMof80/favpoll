@@ -302,11 +302,14 @@ export function DisplayScreen({
                 <div className="min-w-0 flex-1">
                   {effectiveClosed ? (
                     <div>
-                      <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                      <SectionEyebrow
+                        variant="muted"
+                        className="flex h-8 items-center"
+                      >
                         Poll closed
-                      </p>
+                      </SectionEyebrow>
                       <p
-                        className="mt-1 text-4xl font-medium text-foreground"
+                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}
@@ -317,19 +320,19 @@ export function DisplayScreen({
                     </div>
                   ) : goalAmount ? (
                     <div>
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                      <div className="flex h-8 flex-wrap items-center justify-between gap-2">
+                        <SectionEyebrow variant="muted">
                           Pledge goal
-                        </p>
+                        </SectionEyebrow>
                         {goalReached && (
                           <p className="text-sm font-medium text-success">
                             Goal reached — every further pledge still counts
                           </p>
                         )}
                       </div>
-                      <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                      <div className="flex flex-wrap items-baseline gap-x-3">
                         <p
-                          className="text-4xl font-medium text-foreground"
+                          className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
                           aria-live="polite"
                         >
                           {formatPounds(totalRaised)}
@@ -373,11 +376,14 @@ export function DisplayScreen({
                        stretched beneath. */
                     <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
                       <div>
-                        <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                        <SectionEyebrow
+                          variant="muted"
+                          className="flex h-8 items-center"
+                        >
                           Raised so far
-                        </p>
+                        </SectionEyebrow>
                         <p
-                          className="mt-1 text-4xl font-medium text-foreground"
+                          className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
                           aria-live="polite"
                         >
                           {formatPounds(totalRaised)}
