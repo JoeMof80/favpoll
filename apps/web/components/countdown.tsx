@@ -109,32 +109,43 @@ export function Countdown({
   const { days, hours, minutes, seconds } = timeLeft
 
   if (variant === "subtitle") {
+    const subtitleParts: [number, string][] =
+      days > 0
+        ? [
+            [days, days === 1 ? "day" : "days"],
+            [hours, hours === 1 ? "hr" : "hrs"],
+            [minutes, "min"],
+          ]
+        : hours > 0
+          ? [
+              [hours, hours === 1 ? "hr" : "hrs"],
+              [minutes, "min"],
+              [seconds, "sec"],
+            ]
+          : [
+              [minutes, "min"],
+              [seconds, "sec"],
+            ]
     return (
       <p
         aria-live="off"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
         className="truncate text-xl font-normal whitespace-normal text-primary tabular-nums md:text-2xl"
       >
-        Closes in{" "}
-        {(days > 0
-          ? [
-              [days, days === 1 ? "day" : "days"],
-              [hours, hours === 1 ? "hr" : "hrs"],
-              [minutes, "min"],
-            ]
-          : hours > 0
-            ? [
-                [hours, hours === 1 ? "hr" : "hrs"],
-                [minutes, "min"],
-                [seconds, "sec"],
-              ]
-            : [
-                [minutes, "min"],
-                [seconds, "sec"],
-              ]
-        )
-          .map(([value, label]) => `${value} ${label}`)
-          .join(" ")}
+        {/* Figures keep the subtitle size; the prefix and unit labels
+            step down (size + 70% ink) so the numbers carry the line —
+            the inline variant's value/label hierarchy, in this type. */}
+        <span className="text-sm text-primary/70 md:text-base">Closes in</span>
+        {subtitleParts.map(([value, label]) => (
+          <span key={label}>
+            {" "}
+            {value}
+            <span className="text-sm text-primary/70 md:text-base">
+              {" "}
+              {label}
+            </span>
+          </span>
+        ))}
       </p>
     )
   }
