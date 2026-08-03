@@ -264,6 +264,31 @@ the soft short email to a VP (forwarded internally, 7-day lag) and the
 docs/registry sweep (answered the substantive question without them).
 Trustee LinkedIn DMs and the demo form produced nothing.
 
+### 3 August 2026 — nudge sent, Friday call agreed in minutes
+
+The 27 July scheduling reply lapsed unanswered for a week ("any
+afternoon this week" expired with the week — open-ended asks stall).
+Monday nudge sent 15:17, short and same-thread, sandbox ask dropped
+(decoupled so the call isn't blocked on provisioning). **Ethan replied
+at 15:25** — eight minutes — offering Friday; Joe accepted "anytime
+Friday afternoon".
+
+- **Call expected Friday 7 August, afternoon** — awaiting Ethan to pin
+  a slot/invite. If no invite lands by Wednesday, a one-line "shall we
+  say 2pm?" pins it (name a time; don't reopen the window).
+- **Prep**: `goodstack-call-brief-2026-07.md` is print-ready — fees
+  first ("net any applicable fees" vs the 100% promise; push
+  platform-billed), fund-ingestion second, Gift Aid a one-line
+  confirmation. Review Thursday.
+- **Sandbox**: not raised again; ask ON the call ("what's the fastest
+  route to sandbox keys after today?"). The
+  `engineering-support@goodstack.io` draft stays HELD.
+- **LinkedIn**: considered for the nudge, rejected (double-channel; DMs
+  produced nothing here before). Post-call, a connect is natural.
+- **Ledger note**: second confirmation of the pattern — the short
+  same-thread email to the engaged person works; the lag was calendar
+  drift, not disinterest.
+
 ### Chase — drafted 10 July 2026
 
 **Email** — to `sales@goodstack.io` (verify the address on goodstack.io;

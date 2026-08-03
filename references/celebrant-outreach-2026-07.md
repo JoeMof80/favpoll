@@ -151,3 +151,34 @@ Founder's notes from the conversation, verbatim substance:
   (its job is done), curate a small set of exemplar favpolls in the
   founder's voice, send the honest app. That state is also what
   Ethan/Goodstack should meet.
+
+
+## Reply SENT (Saturday 2026-08-01) — the clarity message, founder's wording
+
+Sent in full (logged 2026-08-03). What it does, in order: ratifies the
+wake-first placement + order-of-service QR flyer idea (HER idea, handed
+back); answers the one-topic question plainly (ready-made or custom);
+corrects the quiz misread head-on ("not a quiz... they pledge money
+against their own favourite... in Grandad's honour") and owns the
+clarity burden ("my challenge is to make all this as obvious as
+possible"); reframes the reveal as keepsake ("one final word from him,
+meant as a gift"); presents the presence dial in plain words (table
+cards ↔ telethon screen — "as the family wants"); previews the
+four-register marketing split and the hospice channel (fundraising +
+memorials in one door, free-to-set-up as the opener); and converts her
+"I'll ask around" offer into a SPECIFIC, low-effort task: "people's
+first impressions, especially the wrong ones."
+
+Thread state after send:
+- **Warm-pilot ask (question 11): STILL HELD** — deliberately not in
+  this message; carry to the next exchange once her network feedback
+  lands.
+- **The first-impressions ask is the active hook** — her replies become
+  a wrong-impressions ledger; route fixes into the clarity backlog
+  (lock card, /memorials copy).
+- **Product now backs the words**: the presence-dial paragraph she read
+  is shipped (fundraiser/tribute display variants, 2026-08-02/03) — the
+  tribute view IS the "background feature" register; anything she
+  forwards can be seen live.
+- **Next artefact she needs**: /memorials page (the forwarding link for
+  her network) — build queued.
