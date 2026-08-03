@@ -1,3 +1,4 @@
+import { isQuoteReveal } from "@/lib/mechanic-steps"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -255,6 +256,9 @@ export default async function FavpollPage({ params }: Props) {
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.
   const hasReveal = !!pollWithItems?.personal_reveal
+  // Also content-free: quote-or-not, so step 3 can promise "their own
+  // words" without leaking the reveal (founder, 2026-08-03).
+  const revealIsQuote = isQuoteReveal(pollWithItems?.personal_reveal)
 
   // Gate sensitive data server-side for un-entitled viewers of open polls
   if (!entitled && pollWithItems) {
@@ -337,6 +341,7 @@ export default async function FavpollPage({ params }: Props) {
         isOrganiser={isOrganiser}
         entitled={entitled}
         hasReveal={hasReveal}
+        revealIsQuote={revealIsQuote}
       />
     </>
   )

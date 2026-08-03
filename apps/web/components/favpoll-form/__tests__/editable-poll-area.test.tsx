@@ -172,7 +172,9 @@ describe("EditablePollArea — reveal overlay helper text", () => {
       </Wrap>
     )
     openRevealOverlay()
-    expect(screen.getByText(/Name the thing they loved/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/A quote in their own words, a memory/)
+    ).toBeInTheDocument()
     expect(screen.getByText(/a detail only you/)).toBeInTheDocument()
   })
 

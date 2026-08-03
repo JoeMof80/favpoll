@@ -234,8 +234,8 @@ export function EditablePollArea({
               className="order-last flex w-full items-center justify-between px-5 py-1.5 text-xs text-muted-foreground"
             >
               <span id="reveal-helper">
-                Name the thing they loved — and a detail only you&apos;d know.
-                The personal touch is what makes it land.
+                A quote in their own words, a memory, or a message to guests —
+                one sentence, with a detail only you&apos;d know.
               </span>
               <CharCounter value={revealDraft} max={280} />
             </div>

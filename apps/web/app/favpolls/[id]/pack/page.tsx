@@ -1,3 +1,4 @@
+import { isQuoteReveal } from "@/lib/mechanic-steps"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -49,6 +50,7 @@ export default async function PackPage({ params }: Props) {
     isCause,
     topicTitle: firstPoll?.topics?.title ?? null,
     hasReveal: Boolean(firstPoll?.personal_reveal),
+    revealIsQuote: isQuoteReveal(firstPoll?.personal_reveal),
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name

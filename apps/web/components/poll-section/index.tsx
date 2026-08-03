@@ -41,6 +41,8 @@ type Props = {
    * disclosure that never comes. Defaults true for existing callers/stories.
    */
   hasReveal?: boolean
+  /** Content-free quote flag — step 3 promises "their own words". */
+  revealIsQuote?: boolean
   /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
   charityLine?: string | null
   /** Real item list — may be zeroed until entitled */
@@ -63,6 +65,7 @@ export function PollSection({
   entitled,
   personalReveal,
   hasReveal = true,
+  revealIsQuote = false,
   charityLine = null,
   initialItems,
   onOpenPledgeDialog,
@@ -95,6 +98,7 @@ export function PollSection({
     firstName: displayFirstName,
     isCause,
     hasReveal,
+    revealIsQuote,
   })
 
   const unlockAriaLabel = !hasReveal

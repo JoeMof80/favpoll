@@ -23,6 +23,7 @@ export type PackData = {
   /** First poll's topic title; null when no poll exists yet. */
   topicTitle: string | null
   hasReveal: boolean
+  revealIsQuote?: boolean
   charityNames: string[]
   guestUrl: string
 }
@@ -224,6 +225,7 @@ export function PackDocument({ data }: { data: PackData }) {
         firstName,
         isCause: data.isCause,
         hasReveal: data.hasReveal,
+        revealIsQuote: data.revealIsQuote,
       })
     : null
 
