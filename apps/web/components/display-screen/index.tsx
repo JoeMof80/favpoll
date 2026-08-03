@@ -166,25 +166,36 @@ export function DisplayScreen({
         onVariantChange={handleVariantChange}
       />
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
-          the room — the telethon corner phone number — pinned in the left
-          gutter so it survives scrolling, and larger than the banner ever
-          allowed (scans from across a room). CENTRE-left, not a corner
-          (founder, 2026-08-03): the bottom band of a projected image is
-          the part most often occluded in a room. left = half the gutter's
-          spare space, so the QR centres in the gutter at any width
-          (gutter = (100vw − 72rem)/2; spare = gutter − 200px). Only from
-          1600px, where the gutter (224px) fits the 200px QR; narrower
-          viewports keep the in-banner QR. Fixed, so rendered OUTSIDE the
-          card — its drop-shadow filter would otherwise become this box's
+          the room — the telethon corner phone number — pinned in BOTH
+          gutters so it survives scrolling and asymmetric occlusion (a
+          speaker, a pillar — one blocked sight line still leaves the
+          other; founder, 2026-08-03), and larger than the banner ever
+          allowed (scans from across a room). CENTRE height, not a
+          corner: the bottom band of a projected image is the part most
+          often occluded in a room. The inset = half the gutter's spare
+          space, so each QR centres in its gutter at any width (gutter =
+          (100vw − 72rem)/2; spare = gutter − 200px). Only from 1600px,
+          where the gutter (224px) fits the 200px QR; narrower viewports
+          keep the in-banner QR. Fixed, so rendered OUTSIDE the card —
+          its drop-shadow filter would otherwise become these boxes'
           containing block (DisplayChrome precedent). */}
-      <div className="pointer-events-none fixed top-1/2 left-[calc((100vw-72rem)/4-100px)] z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex">
-        <BrandedQR
-          value={favpollUrl}
-          size={200}
-          aria-label="Scan to pledge on your phone"
-        />
-        <p className="text-sm font-medium text-foreground">Scan to pledge</p>
-      </div>
+      {(["left", "right"] as const).map((side) => (
+        <div
+          key={side}
+          className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
+            side === "left"
+              ? "left-[calc((100vw-72rem)/4-100px)]"
+              : "right-[calc((100vw-72rem)/4-100px)]"
+          }`}
+        >
+          <BrandedQR
+            value={favpollUrl}
+            size={200}
+            aria-label="Scan to pledge on your phone"
+          />
+          <p className="text-sm font-medium text-foreground">Scan to pledge</p>
+        </div>
+      ))}
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
