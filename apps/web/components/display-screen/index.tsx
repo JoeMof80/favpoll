@@ -260,11 +260,9 @@ export function DisplayScreen({
                   the point. */}
               <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
                 {/* Countdown above the charities (founder, 2026-08-03) —
-                    the small inline ramp, not the subtitle: this column
-                    is the banner's quiet side. */}
-                {isOpen && closesAt && (
-                  <Countdown closesAt={closesAt} size="sm" />
-                )}
+                    the favpoll page's exact ramp (default md), not the
+                    subtitle: this column is the banner's quiet side. */}
+                {isOpen && closesAt && <Countdown closesAt={closesAt} />}
                 {charities.length > 0 ? (
                   /* Hairline between the countdown and the charities
                      (founder) — the fundraiser column's same idiom. */
