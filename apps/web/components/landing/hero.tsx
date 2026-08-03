@@ -22,8 +22,12 @@ import { HeroTexture } from "./hero-texture"
 const BEATS = ["Pick", "Pledge", "Reveal"] as const
 
 type Props = {
-  liveCount: number
-  totalLive: number
+  liveCount?: number
+  totalLive?: number
+  /** Register pages: the stats row is home-flavoured — hide it. */
+  hideStats?: boolean
+  /** Optional eyebrow above the headline (home has none). */
+  eyebrow?: string
   /** Register landing v2 (2026-08-03): play ONLY this kind's scenes on a
    *  loop and hide the kind nav — the page IS the kind. Home omits it. */
   sceneKind?: SceneKind
@@ -37,8 +41,10 @@ type Props = {
 }
 
 export function LandingHero({
-  liveCount,
-  totalLive,
+  liveCount = 0,
+  totalLive = 0,
+  hideStats = false,
+  eyebrow,
   sceneKind,
   headline,
   subheader,
@@ -69,6 +75,11 @@ export function LandingHero({
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
               mid-beat. */}
+          {eyebrow && (
+            <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
+              {eyebrow}
+            </p>
+          )}
           <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
             {(headline ?? t("landing.headline"))
               .split(". ")
@@ -198,42 +209,44 @@ export function LandingHero({
           </div>
         </div>
 
-        <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8 md:col-start-1 md:row-start-2">
-          <div>
-            <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-              Open favpolls
-            </dt>
-            <dd className="mt-1 text-3xl font-light tabular-nums">
-              <CountUp
-                value={liveCount}
-                format={(n) => String(Math.round(n))}
-              />
-            </dd>
-          </div>
-          {totalLive > 0 && (
+        {!hideStats && (
+          <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8 md:col-start-1 md:row-start-2">
             <div>
               <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Raised by open favpolls
+                Open favpolls
               </dt>
               <dd className="mt-1 text-3xl font-light tabular-nums">
                 <CountUp
-                  value={totalLive}
-                  format={(n) =>
-                    formatCurrency(Math.round(n), MARKET_DEFAULTS["en-GB"])
-                  }
+                  value={liveCount}
+                  format={(n) => String(Math.round(n))}
                 />
               </dd>
             </div>
-          )}
-          <div>
-            <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-              Reaches charity
-            </dt>
-            <dd className="mt-1 text-3xl font-light tabular-nums">
-              <CountUp value={100} format={(n) => `${Math.round(n)}%`} />
-            </dd>
-          </div>
-        </dl>
+            {totalLive > 0 && (
+              <div>
+                <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
+                  Raised by open favpolls
+                </dt>
+                <dd className="mt-1 text-3xl font-light tabular-nums">
+                  <CountUp
+                    value={totalLive}
+                    format={(n) =>
+                      formatCurrency(Math.round(n), MARKET_DEFAULTS["en-GB"])
+                    }
+                  />
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
+                Reaches charity
+              </dt>
+              <dd className="mt-1 text-3xl font-light tabular-nums">
+                <CountUp value={100} format={(n) => `${Math.round(n)}%`} />
+              </dd>
+            </div>
+          </dl>
+        )}
       </div>
     </section>
   )
