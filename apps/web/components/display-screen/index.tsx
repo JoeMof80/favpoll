@@ -150,7 +150,10 @@ export function DisplayScreen({
         colorVar="--qr"
         aria-label="Scan to pledge on your phone"
       />
-      <p className="text-sm font-medium text-foreground">Scan to pledge</p>
+      {/* text-qr does double duty: the label matches the code's ink, and
+          the generated utility is the CSS reference that stops the build
+          stripping the --qr token BrandedQR reads at runtime. */}
+      <p className="text-sm font-medium text-qr">Scan to pledge</p>
     </div>
   )
 
@@ -195,7 +198,7 @@ export function DisplayScreen({
             colorVar="--qr"
             aria-label="Scan to pledge on your phone"
           />
-          <p className="text-sm font-medium text-foreground">Scan to pledge</p>
+          <p className="text-sm font-medium text-qr">Scan to pledge</p>
         </div>
       ))}
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
