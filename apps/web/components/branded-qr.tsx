@@ -25,6 +25,12 @@ type Props = {
   size?: number
   /** Show the favpoll heart at the centre */
   logo?: boolean
+  /**
+   * CSS variable the module colour is read from. Defaults to --foreground
+   * (maximum contrast — organiser card, print pack). The display screen
+   * passes --qr for the softened brand-tinted ink.
+   */
+  colorVar?: string
   className?: string
   "aria-label"?: string
 }
@@ -33,6 +39,7 @@ export function BrandedQR({
   value,
   size = 160,
   logo = true,
+  colorVar = "--foreground",
   className,
   "aria-label": ariaLabel = "QR code",
 }: Props) {
@@ -42,7 +49,7 @@ export function BrandedQR({
   useEffect(() => {
     const resolve = () => {
       const styles = getComputedStyle(document.documentElement)
-      const foreground = styles.getPropertyValue("--foreground").trim()
+      const foreground = styles.getPropertyValue(colorVar).trim()
       setColors({ foreground: foreground || "black" })
     }
     resolve()
@@ -54,7 +61,7 @@ export function BrandedQR({
       attributeFilter: ["class"],
     })
     return () => observer.disconnect()
-  }, [])
+  }, [colorVar])
 
   useEffect(() => {
     const node = ref.current

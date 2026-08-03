@@ -147,6 +147,7 @@ export function DisplayScreen({
       <BrandedQR
         value={favpollUrl}
         size={132}
+        colorVar="--qr"
         aria-label="Scan to pledge on your phone"
       />
       <p className="text-sm font-medium text-foreground">Scan to pledge</p>
@@ -191,6 +192,7 @@ export function DisplayScreen({
           <BrandedQR
             value={favpollUrl}
             size={200}
+            colorVar="--qr"
             aria-label="Scan to pledge on your phone"
           />
           <p className="text-sm font-medium text-foreground">Scan to pledge</p>

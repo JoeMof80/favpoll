@@ -99,6 +99,12 @@
   --primary-muted: oklch(0.62 0.14 278);
   /* Reveal/quote ink: #26215C */
   --reveal-foreground: oklch(0.29 0.1 278);
+  /* Display-screen QR ink (founder, 2026-08-03): brand-tinted so the big
+     gutter codes stop shouting next to the rankings, bounded by scan
+     contrast — deep purple on light, soft lavender on dark (dark modules
+     on a dark field would be invisible to a camera, so dark mode tones
+     DOWN from white rather than mirroring the light theme). */
+  --qr: oklch(0.29 0.1 278);
   --ring: oklch(0.62 0.14 278);
   --chart-1: oklch(0.44 0.18 278);
   --chart-2: oklch(0.62 0.14 278);
@@ -145,6 +151,9 @@
   --input: oklch(1 0 0 / 15%);
   --primary-muted: oklch(0.82 0.08 278);
   --reveal-foreground: oklch(0.95 0.03 278);
+  /* 0.85 L failed a decoder test against the brand-purple field (0.44 L)
+     — 0.92 is the toned floor that still machine-reads. */
+  --qr: oklch(0.92 0.05 278);
   --ring: oklch(0.82 0.08 278);
   --chart-1: oklch(0.92 0.05 278);
   --chart-2: oklch(0.78 0.1 278);
