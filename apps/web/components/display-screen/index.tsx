@@ -269,7 +269,14 @@ export function DisplayScreen({
                 {/* Countdown above the charities (founder, 2026-08-03) —
                     the favpoll page's exact ramp (default md), not the
                     subtitle: this column is the banner's quiet side. */}
-                {isOpen && closesAt && <Countdown closesAt={closesAt} />}
+                {/* min-h-14 here and on the fundraiser identity: the two
+                    upper blocks pin to one height so the charity card
+                    below sits identically in both views. */}
+                {isOpen && closesAt && (
+                  <div className="md:min-h-14">
+                    <Countdown closesAt={closesAt} />
+                  </div>
+                )}
                 {charities.length > 0 ? (
                   /* Hairline between the countdown and the charities
                      (founder) — the fundraiser column's same idiom. */
@@ -409,7 +416,7 @@ export function DisplayScreen({
                 {/* Photo at the right, no context line (founder,
                     2026-08-02) — the identity is a byline here, not the
                     story. */}
-                <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex min-w-0 items-center gap-2.5 md:min-h-14">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
                       /* mb-2 = the countdown label's rhythm, so this block
