@@ -136,9 +136,10 @@ export function Countdown({
             step down (size + 70% ink) so the numbers carry the line —
             the inline variant's value/label hierarchy, in this type. */}
         <span className="text-sm text-primary/70 md:text-base">Closes in</span>
+        {/* ml-3 between components (wider than the intra-group space)
+            so each figure+unit reads as one unit of time */}
         {subtitleParts.map(([value, label]) => (
-          <span key={label}>
-            {" "}
+          <span key={label} className="ml-3">
             {value}
             <span className="text-sm text-primary/70 md:text-base">
               {" "}
