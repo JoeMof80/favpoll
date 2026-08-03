@@ -126,7 +126,7 @@ export default async function HomePage() {
   return (
     <main className="flex flex-col">
       {/* ── Purple hero band with the live demo ── */}
-      <LandingHero liveCount={normalised.length} totalLive={totalLive} />
+      <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
 
       <section id="how" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">

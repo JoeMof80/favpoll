@@ -38,7 +38,37 @@ type Props = {
   ctaLabel?: string
   /** Band override, e.g. "bg-memorial text-memorial-foreground". */
   bandClassName?: string
+  /**
+   * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
+   * router replaces the demo column — the demos now live on the register
+   * pages. Remove the prop on the home page to restore the demo hero.
+   */
+  router?: boolean
 }
+
+const ROUTER_CARDS = [
+  {
+    href: "/memorials",
+    accent: "border-t-memorial",
+    eyebrow: "text-memorial",
+    title: t("home.router.memorials.title"),
+    body: t("home.router.memorials.body"),
+  },
+  {
+    href: "/celebrations",
+    accent: "border-t-warning",
+    eyebrow: "text-warning",
+    title: t("home.router.celebrations.title"),
+    body: t("home.router.celebrations.body"),
+  },
+  {
+    href: "/fundraisers",
+    accent: "border-t-success",
+    eyebrow: "text-success",
+    title: t("home.router.fundraisers.title"),
+    body: t("home.router.fundraisers.body"),
+  },
+] as const
 
 export function LandingHero({
   liveCount = 0,
@@ -50,6 +80,7 @@ export function LandingHero({
   subheader,
   ctaLabel,
   bandClassName,
+  router = false,
 }: Props) {
   const scenes = useMemo(
     () => (sceneKind ? SCENES.filter((s) => s.kind === sceneKind) : SCENES),
@@ -116,97 +147,140 @@ export function LandingHero({
             before the stats, so the demo is the first thing a visitor scrolls
             to. */}
         <div className="md:col-start-2 md:row-span-2 md:row-start-1">
-          <span className="sr-only">
-            Animated demonstration of how favpoll works. It cycles through the
-            different kinds of favpoll automatically; use the buttons below to
-            jump to one.
-          </span>
-          {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
-              auto-cycle so a visitor doesn't wait for their kind to come round. */}
-          {!sceneKind && (
-            <div
-              className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
-              role="group"
-              aria-label="Preview a kind of favpoll"
+          {router ? (
+            /* Register router — one card per register, its accent as the
+               top rule; the demo lives on the page each card opens. */
+            <nav
+              aria-label="Explore favpoll by occasion"
+              className="grid gap-4"
             >
-              {NAV_TABS.map((tab) => {
-                const active = tab.kind === scene.kind
-                return (
-                  <Button
-                    key={tab.label}
-                    type="button"
-                    size="sm"
-                    variant={active ? "secondary" : "ghost"}
-                    aria-pressed={active}
-                    onClick={() => goToScene(tab.sceneIndex)}
+              {ROUTER_CARDS.map((card) => (
+                <Link
+                  key={card.href}
+                  href={card.href}
+                  className={cn(
+                    "group block rounded-xl border-t-4 bg-background p-5 text-foreground shadow-lg transition-all hover:shadow-xl motion-safe:hover:-translate-y-0.5",
+                    card.accent
+                  )}
+                >
+                  <p
                     className={cn(
-                      "rounded-full",
-                      !active &&
-                        "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                      "mb-1 text-xs font-medium tracking-widest uppercase",
+                      card.eyebrow
                     )}
                   >
-                    {tab.label}
-                  </Button>
-                )
-              })}
-            </div>
-          )}
-          <div
-            className="transition-opacity duration-400"
-            style={{ opacity: fading ? 0 : 1 }}
-            aria-live="polite"
-          >
-            <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
-              <div className="h-174 w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
-                <div className="flex h-full flex-col rounded-xl shadow-2xl">
-                  {/* Traffic-light window bar — signals this is a demo */}
-                  <div
-                    className="flex h-9 shrink-0 items-center gap-1.5 rounded-t-xl border border-b-0 border-border bg-muted px-3.5"
-                    aria-hidden="true"
-                  >
-                    <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                    <span className="flex-1 text-center text-xs text-muted-foreground">
-                      favpoll.com · demo
+                    {card.title}
+                  </p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {card.body}
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-primary">
+                    {t("home.router.explore")}{" "}
+                    <span
+                      aria-hidden="true"
+                      className="inline-block transition-transform group-hover:translate-x-0.5"
+                    >
+                      →
                     </span>
-                    {/* Balance the dots so the label centres optically */}
-                    <span className="w-9" />
+                  </p>
+                </Link>
+              ))}
+            </nav>
+          ) : (
+            <>
+              <span className="sr-only">
+                Animated demonstration of how favpoll works. It cycles through
+                the different kinds of favpoll automatically; use the buttons
+                below to jump to one.
+              </span>
+              {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
+              auto-cycle so a visitor doesn't wait for their kind to come round. */}
+              {!sceneKind && (
+                <div
+                  className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
+                  role="group"
+                  aria-label="Preview a kind of favpoll"
+                >
+                  {NAV_TABS.map((tab) => {
+                    const active = tab.kind === scene.kind
+                    return (
+                      <Button
+                        key={tab.label}
+                        type="button"
+                        size="sm"
+                        variant={active ? "secondary" : "ghost"}
+                        aria-pressed={active}
+                        onClick={() => goToScene(tab.sceneIndex)}
+                        className={cn(
+                          "rounded-full",
+                          !active &&
+                            "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                        )}
+                      >
+                        {tab.label}
+                      </Button>
+                    )
+                  })}
+                </div>
+              )}
+              <div
+                className="transition-opacity duration-400"
+                style={{ opacity: fading ? 0 : 1 }}
+                aria-live="polite"
+              >
+                <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
+                  <div className="h-174 w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
+                    <div className="flex h-full flex-col rounded-xl shadow-2xl">
+                      {/* Traffic-light window bar — signals this is a demo */}
+                      <div
+                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-t-xl border border-b-0 border-border bg-muted px-3.5"
+                        aria-hidden="true"
+                      >
+                        <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                        <span className="flex-1 text-center text-xs text-muted-foreground">
+                          favpoll.com · demo
+                        </span>
+                        {/* Balance the dots so the label centres optically */}
+                        <span className="w-9" />
+                      </div>
+                      <DemoCard
+                        scene={scene}
+                        phase={phase}
+                        barWidths={barWidths}
+                        prefersReducedMotion={prefersReducedMotion}
+                        className="rounded-t-none border-t-0"
+                      />
+                    </div>
                   </div>
-                  <DemoCard
-                    scene={scene}
-                    phase={phase}
-                    barWidths={barWidths}
-                    prefersReducedMotion={prefersReducedMotion}
-                    className="rounded-t-none border-t-0"
-                  />
+                </div>
+                {/* Beat indicator: which of the three beats the loop is in */}
+                <div
+                  className="mt-3 flex w-[19.4rem] items-center justify-start gap-4 sm:w-100 md:justify-center"
+                  aria-hidden="true"
+                >
+                  {BEATS.map((label, i) => (
+                    <span
+                      key={label}
+                      className={`flex items-center gap-1.5 text-xs font-medium tracking-[0.07em] uppercase transition-opacity duration-300 ${
+                        i === beat ? "opacity-90" : "opacity-40"
+                      }`}
+                    >
+                      <span
+                        className={`h-1 w-6 rounded-full transition-colors duration-300 ${
+                          i === beat
+                            ? "bg-primary-foreground"
+                            : "bg-primary-foreground/30"
+                        }`}
+                      />
+                      {label}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
-            {/* Beat indicator: which of the three beats the loop is in */}
-            <div
-              className="mt-3 flex w-[19.4rem] items-center justify-start gap-4 sm:w-100 md:justify-center"
-              aria-hidden="true"
-            >
-              {BEATS.map((label, i) => (
-                <span
-                  key={label}
-                  className={`flex items-center gap-1.5 text-xs font-medium tracking-[0.07em] uppercase transition-opacity duration-300 ${
-                    i === beat ? "opacity-90" : "opacity-40"
-                  }`}
-                >
-                  <span
-                    className={`h-1 w-6 rounded-full transition-colors duration-300 ${
-                      i === beat
-                        ? "bg-primary-foreground"
-                        : "bg-primary-foreground/30"
-                    }`}
-                  />
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {!hideStats && (

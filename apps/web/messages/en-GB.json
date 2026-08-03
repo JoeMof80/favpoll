@@ -84,5 +84,12 @@
   "fundraisers.presence.screen": "The live display at the quiz night — standings between rounds.",
   "fundraisers.presence.rally": "The full telethon — goal on screen, guest wall scrolling, total climbing.",
   "fundraisers.close.headline": "For your cause, by their favourites.",
-  "fundraisers.close.cta": "Create a fundraiser favpoll"
+  "fundraisers.close.cta": "Create a fundraiser favpoll",
+  "home.router.memorials.title": "Memorials",
+  "home.router.memorials.body": "Remember them by what they loved — giving in their name, made for the wake.",
+  "home.router.celebrations.title": "Celebrations",
+  "home.router.celebrations.body": "Birthdays, weddings, retirements — the guest of honour's favourites, the fun turned into giving.",
+  "home.router.fundraisers.title": "Fundraisers & causes",
+  "home.router.fundraisers.body": "Give supporters something to play for — everyone backs a favourite, the room chases the goal.",
+  "home.router.explore": "Explore"
 }
