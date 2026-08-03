@@ -8,7 +8,12 @@ const PLACEHOLDER_PARTS = ["days", "hrs", "min", "sec"] as const
 type Props = {
   closesAt?: string
   size?: FavpollCardSize
-  variant?: "stacked" | "inline"
+  /**
+   * "subtitle" renders one line in the hero subtitle's type (the
+   * "1942 – 2025" ramp) — the live display's money block uses it so the
+   * countdown sits where the hero's dates line sits.
+   */
+  variant?: "stacked" | "inline" | "subtitle"
 }
 
 function getTimeLeft(closesAt: string) {
@@ -102,6 +107,37 @@ export function Countdown({
   if (!timeLeft) return null
 
   const { days, hours, minutes, seconds } = timeLeft
+
+  if (variant === "subtitle") {
+    return (
+      <p
+        aria-live="off"
+        aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
+        className="truncate text-xl font-normal whitespace-normal text-primary tabular-nums md:text-2xl"
+      >
+        Closes in{" "}
+        {(days > 0
+          ? [
+              [days, days === 1 ? "day" : "days"],
+              [hours, hours === 1 ? "hr" : "hrs"],
+              [minutes, "min"],
+            ]
+          : hours > 0
+            ? [
+                [hours, hours === 1 ? "hr" : "hrs"],
+                [minutes, "min"],
+                [seconds, "sec"],
+              ]
+            : [
+                [minutes, "min"],
+                [seconds, "sec"],
+              ]
+        )
+          .map(([value, label]) => `${value} ${label}`)
+          .join(" ")}
+      </p>
+    )
+  }
 
   const parts =
     days > 0

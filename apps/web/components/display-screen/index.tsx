@@ -369,28 +369,25 @@ export function DisplayScreen({
                       )}
                     </div>
                   ) : isOpen ? (
-                    /* No goal: the total still leads the hero, mirroring
-                       the goal block's grammar (founder, 2026-08-03) —
-                       same eyebrow ramp, same text-4xl figure — with the
-                       countdown hugging the right of the same band, not
-                       stretched beneath. */
-                    <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
-                      <div>
-                        <SectionEyebrow
-                          variant="muted"
-                          className="flex h-8 items-center"
-                        >
-                          Raised so far
-                        </SectionEyebrow>
-                        <p
-                          className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
-                          aria-live="polite"
-                        >
-                          {formatPounds(totalRaised)}
-                        </p>
-                      </div>
-                      <div className="shrink-0">
-                        <Countdown closesAt={closesAt!} size="sm" />
+                    /* No goal: the hero's exact three-line silhouette
+                       (founder, 2026-08-03) — eyebrow, headline figure,
+                       and the countdown as the subtitle line, where the
+                       tribute hero carries its dates. */
+                    <div>
+                      <SectionEyebrow
+                        variant="muted"
+                        className="flex h-8 items-center"
+                      >
+                        Raised so far
+                      </SectionEyebrow>
+                      <p
+                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                        aria-live="polite"
+                      >
+                        {formatPounds(totalRaised)}
+                      </p>
+                      <div className="mt-2">
+                        <Countdown closesAt={closesAt!} variant="subtitle" />
                       </div>
                     </div>
                   ) : null}
