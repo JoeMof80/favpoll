@@ -220,7 +220,11 @@ export function DisplayScreen({
                   text-xl/2xl primary subtitle, 26/33 photo-gated avatar
                   at the right. The QR sits at the column's right edge;
                   mobile stacks it centred beneath the heading. */}
-              <div className="flex min-w-0 flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8">
+              {/* md:items-start (both variants' col 1): within the shared
+                  min-h envelope the columns top-align, so the eyebrow sits
+                  on the same line in every view — centring drifted by half
+                  the height slack (founder, 2026-08-03). */}
+              <div className="flex min-w-0 flex-1 flex-col gap-6 md:flex-row md:items-start md:gap-8">
                 <div className="flex min-w-0 flex-1 items-start gap-4 md:gap-6">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
@@ -302,7 +306,7 @@ export function DisplayScreen({
           ) : (
             <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
               {/* Col 1 — goal progress (or closed total / countdown), QR beside */}
-              <div className="flex min-w-0 flex-1 items-center gap-8">
+              <div className="flex min-w-0 flex-1 items-center gap-8 md:items-start">
                 <div className="min-w-0 flex-1">
                   {effectiveClosed ? (
                     <div>
