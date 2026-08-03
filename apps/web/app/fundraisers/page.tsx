@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -39,33 +40,17 @@ const PRESENCE = [
 export default function FundraisersPage() {
   return (
     <main>
-      {/* ── Hero — the register's success green ── */}
-      <section className="bg-success text-success-foreground">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
-            {t("fundraisers.eyebrow")}
-          </p>
-          <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            {t("fundraisers.headline")}
-          </h1>
-          <p className="mx-auto mb-8 max-w-xl text-lg opacity-90">
-            {t("fundraisers.subheader")}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("fundraisers.cta.primary")}</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="ghost"
-              className="text-success-foreground hover:bg-success-foreground/10 hover:text-success-foreground"
-            >
-              <Link href="#how">{t("fundraisers.cta.secondary")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* ── Hero — the REAL landing hero, register-configured (v2):
+          the demo loops the fundraiser story on the register's band. ── */}
+      <LandingHero
+        sceneKind="fundraiser"
+        eyebrow={t("fundraisers.eyebrow")}
+        headline={t("fundraisers.headline")}
+        subheader={t("fundraisers.subheader")}
+        ctaLabel={t("fundraisers.cta.primary")}
+        bandClassName="bg-success text-success-foreground"
+        hideStats
+      />
 
       {/* ── How it works, in the rally register ── */}
       <section id="how" className="w-full scroll-mt-20">
