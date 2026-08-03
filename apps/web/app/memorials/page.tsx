@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -60,33 +61,18 @@ const PRESENCE = [
 export default function MemorialsPage() {
   return (
     <main>
-      {/* ── Hero — the landing's purple band, in the quiet register ── */}
-      <section className="bg-memorial text-memorial-foreground">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
-            {t("memorials.eyebrow")}
-          </p>
-          <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            {t("memorials.headline")}
-          </h1>
-          <p className="mx-auto mb-8 max-w-xl text-lg opacity-90">
-            {t("memorials.subheader")}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("memorials.cta.primary")}</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="ghost"
-              className="text-memorial-foreground hover:bg-memorial-foreground/10 hover:text-memorial-foreground"
-            >
-              <Link href="#how">{t("memorials.cta.secondary")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* ── Hero — the REAL landing hero, register-configured (v2,
+          2026-08-03): the demo loops the memorial story alone, on the
+          register's band. Stats hidden (home-flavoured). ── */}
+      <LandingHero
+        sceneKind="memorial"
+        eyebrow={t("memorials.eyebrow")}
+        headline={t("memorials.headline")}
+        subheader={t("memorials.subheader")}
+        ctaLabel={t("memorials.cta.primary")}
+        bandClassName="bg-memorial text-memorial-foreground"
+        hideStats
+      />
 
       {/* ── How it works, in the memorial register ── */}
       <section id="how" className="w-full scroll-mt-20">
