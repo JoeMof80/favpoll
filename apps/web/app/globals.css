@@ -36,6 +36,13 @@
      token — unreferenced custom properties are stripped from the served
      CSS, and BrandedQR reads this one from JS at runtime. */
   --color-qr: var(--qr);
+  /* Register accents (founder, 2026-08-03): purple stays the brand AND
+     the neutral default; each register gets its own accent — memorial =
+     forget-me-not blue (below), celebration = warning gold, fundraiser =
+     success green. */
+  --color-memorial: var(--memorial);
+  --color-memorial-foreground: var(--memorial-foreground);
+  --color-memorial-muted: var(--memorial-muted);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -109,6 +116,12 @@
      on a dark field would be invisible to a camera, so dark mode tones
      DOWN from white rather than mirroring the light theme). */
   --qr: oklch(0.29 0.1 278);
+  /* Memorial register accent: forget-me-not blue — remembrance
+     symbolism, calm, and clear of purple (278), gold (71), green (165)
+     and the destructive reds. */
+  --memorial: oklch(0.5 0.1 250);
+  --memorial-foreground: oklch(0.99 0 0);
+  --memorial-muted: oklch(0.96 0.02 250);
   --ring: oklch(0.62 0.14 278);
   --chart-1: oklch(0.44 0.18 278);
   --chart-2: oklch(0.62 0.14 278);
@@ -158,6 +171,9 @@
   /* 0.85 L failed a decoder test against the brand-purple field (0.44 L)
      — 0.92 is the toned floor that still machine-reads. */
   --qr: oklch(0.92 0.05 278);
+  --memorial: oklch(0.58 0.09 250);
+  --memorial-foreground: oklch(0.99 0 0);
+  --memorial-muted: oklch(0.35 0.05 250);
   --ring: oklch(0.82 0.08 278);
   --chart-1: oklch(0.92 0.05 278);
   --chart-2: oklch(0.78 0.1 278);
