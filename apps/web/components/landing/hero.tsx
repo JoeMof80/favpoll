@@ -8,8 +8,10 @@
 // to 80%. Register/occasion signals live in the kind nav + the demo content —
 // nothing in the pitch column cycles.
 import Link from "next/link"
+import { useMemo } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import { NAV_TABS } from "@/components/hero-demo-panel/scenes"
+import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
+import type { SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
@@ -22,15 +24,42 @@ const BEATS = ["Pick", "Pledge", "Reveal"] as const
 type Props = {
   liveCount: number
   totalLive: number
+  /** Register landing v2 (2026-08-03): play ONLY this kind's scenes on a
+   *  loop and hide the kind nav — the page IS the kind. Home omits it. */
+  sceneKind?: SceneKind
+  /** Copy overrides — literal strings (t() stays statically typed at the
+   *  call site). Defaults = the home landing's keys. */
+  headline?: string
+  subheader?: string
+  ctaLabel?: string
+  /** Band override, e.g. "bg-memorial text-memorial-foreground". */
+  bandClassName?: string
 }
 
-export function LandingHero({ liveCount, totalLive }: Props) {
+export function LandingHero({
+  liveCount,
+  totalLive,
+  sceneKind,
+  headline,
+  subheader,
+  ctaLabel,
+  bandClassName,
+}: Props) {
+  const scenes = useMemo(
+    () => (sceneKind ? SCENES.filter((s) => s.kind === sceneKind) : SCENES),
+    [sceneKind]
+  )
   const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
-    useDemoLoop()
+    useDemoLoop(scenes)
   const beat = beatForPhase(phase)
 
   return (
-    <section className="relative bg-primary text-primary-foreground">
+    <section
+      className={cn(
+        "relative",
+        bandClassName ?? "bg-primary text-primary-foreground"
+      )}
+    >
       <HeroTexture />
       <div className="relative mx-auto grid max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
         {/* Left — pitch (headline + CTA). Stats are a separate cell below,
@@ -41,7 +70,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               Each sentence takes its own line so the triad never wraps
               mid-beat. */}
           <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            {t("landing.headline")
+            {(headline ?? t("landing.headline"))
               .split(". ")
               .map((sentence, i, all) => (
                 <span key={sentence} className="block">
@@ -51,7 +80,7 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               ))}
           </h1>
           <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
-            {t("landing.subheader")}
+            {subheader ?? t("landing.subheader")}
           </p>
           <div className="flex flex-wrap items-center gap-3.5">
             {/* The hero's only conversion action under a display headline —
@@ -62,7 +91,9 @@ export function LandingHero({ liveCount, totalLive }: Props) {
               variant="secondary"
               className="h-11 px-6 text-base"
             >
-              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+              <Link href="/favpolls/new">
+                {ctaLabel ?? t("landing.cta.primary")}
+              </Link>
             </Button>
           </div>
         </div>
@@ -81,32 +112,34 @@ export function LandingHero({ liveCount, totalLive }: Props) {
           </span>
           {/* Kind nav — jump the demo to a kind of favpoll, disrupting the
               auto-cycle so a visitor doesn't wait for their kind to come round. */}
-          <div
-            className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
-            role="group"
-            aria-label="Preview a kind of favpoll"
-          >
-            {NAV_TABS.map((tab) => {
-              const active = tab.kind === scene.kind
-              return (
-                <Button
-                  key={tab.label}
-                  type="button"
-                  size="sm"
-                  variant={active ? "secondary" : "ghost"}
-                  aria-pressed={active}
-                  onClick={() => goToScene(tab.sceneIndex)}
-                  className={cn(
-                    "rounded-full",
-                    !active &&
-                      "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                  )}
-                >
-                  {tab.label}
-                </Button>
-              )
-            })}
-          </div>
+          {!sceneKind && (
+            <div
+              className="mb-4 flex flex-wrap justify-start gap-2 md:justify-center"
+              role="group"
+              aria-label="Preview a kind of favpoll"
+            >
+              {NAV_TABS.map((tab) => {
+                const active = tab.kind === scene.kind
+                return (
+                  <Button
+                    key={tab.label}
+                    type="button"
+                    size="sm"
+                    variant={active ? "secondary" : "ghost"}
+                    aria-pressed={active}
+                    onClick={() => goToScene(tab.sceneIndex)}
+                    className={cn(
+                      "rounded-full",
+                      !active &&
+                        "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                    )}
+                  >
+                    {tab.label}
+                  </Button>
+                )
+              })}
+            </div>
+          )}
           <div
             className="transition-opacity duration-400"
             style={{ opacity: fading ? 0 : 1 }}

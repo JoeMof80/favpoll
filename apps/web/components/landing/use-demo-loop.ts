@@ -4,11 +4,16 @@
 // through the 15-phase pick → pledge → reveal arc across the scenes (one per
 // visitor-facing kind, cycling in nav-tab order).
 import { useEffect, useRef, useState } from "react"
-import type { Phase } from "@/components/hero-demo-panel/scenes"
+import type { HeroScene, Phase } from "@/components/hero-demo-panel/scenes"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
-export function useDemoLoop() {
+/**
+ * @param scenes — the scene set to cycle. Defaults to ALL kinds (the home
+ * landing); a register landing passes its own kind's scenes so the demo
+ * plays that register's story on a loop (register-landing v2, 2026-08-03).
+ */
+export function useDemoLoop(scenes: HeroScene[] = SCENES) {
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -17,7 +22,7 @@ export function useDemoLoop() {
   // Start resolved so the payoff is visible on first paint.
   const [phase, setPhase] = useState<Phase>("reveal")
   const [barWidths, setBarWidths] = useState<number[]>(
-    SCENES[0].results.map((r) => r.widthPercent)
+    scenes[0].results.map((r) => r.widthPercent)
   )
   const [fading, setFading] = useState(false)
 
@@ -31,7 +36,7 @@ export function useDemoLoop() {
 
   const isFirstRun = useRef(true)
 
-  const decoyFor = (scene: (typeof SCENES)[number]) =>
+  const decoyFor = (scene: HeroScene) =>
     scene.results.map((_, i) => DECOY_WIDTHS[i] ?? 12)
 
   useEffect(() => {
@@ -42,9 +47,9 @@ export function useDemoLoop() {
     // visitors get a varied resolved payoff too. isFirstRun is NOT
     // consumed on this pass, so the re-run keeps the first-paint hold.
     if (isFirstRun.current && sceneIndex === 0) {
-      const idx = Math.floor(Math.random() * SCENES.length)
+      const idx = Math.floor(Math.random() * scenes.length)
       if (idx !== 0) {
-        setBarWidths(SCENES[idx].results.map((r) => r.widthPercent))
+        setBarWidths(scenes[idx].results.map((r) => r.widthPercent))
         setSceneIndex(idx)
         return
       }
@@ -56,7 +61,7 @@ export function useDemoLoop() {
     const HOLD = isFirstRun.current ? 2500 : 0
     isFirstRun.current = false
 
-    const scene = SCENES[sceneIndex]
+    const scene = scenes[sceneIndex]
 
     addT(() => {
       setPhase("arriving")
@@ -105,9 +110,9 @@ export function useDemoLoop() {
     addT(() => setFading(true), HOLD + READ + 13700)
     addT(
       () => {
-        const nextIndex = (sceneIndex + 1) % SCENES.length
+        const nextIndex = (sceneIndex + 1) % scenes.length
         setPhase("arriving")
-        setBarWidths(decoyFor(SCENES[nextIndex]))
+        setBarWidths(decoyFor(scenes[nextIndex]))
         setFading(false)
         setSceneIndex(nextIndex)
       },
@@ -128,16 +133,16 @@ export function useDemoLoop() {
     setFading(false)
     if (prefersReducedMotion) {
       setPhase("reveal")
-      setBarWidths(SCENES[i].results.map((r) => r.widthPercent))
+      setBarWidths(scenes[i].results.map((r) => r.widthPercent))
     } else {
       setPhase("arriving")
-      setBarWidths(decoyFor(SCENES[i]))
+      setBarWidths(decoyFor(scenes[i]))
     }
     setSceneIndex(i)
   }
 
   return {
-    scene: SCENES[sceneIndex],
+    scene: scenes[sceneIndex],
     sceneIndex,
     phase,
     barWidths,
