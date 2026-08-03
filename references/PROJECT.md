@@ -559,7 +559,7 @@ components/
 │   ├── display-chrome.tsx        -- fixed corner strip mirroring header geometry (logo + presenter ⋮ dropdown: event page / theme / fullscreen); rendered OUTSIDE the card (drop-shadow filter would capture fixed positioning)
 │   └── display-poll-section.tsx  -- PollHeading + reveal only when closed (TypedReveal finale if witnessed) + RankingList size="display"
 ├── guest-wall.tsx                -- names + "backed X" + RelativeTime (server text kept through hydration, corrected after mount — clock-dependent text mismatches statically prerendered HTML); animate/maxEntries/teaseBacked props
-├── branded-qr.tsx                -- styled QR (qr-code-styling): theme tokens resolved at render, MutationObserver re-resolves on theme flip; heart logo built from --primary (no hex anywhere)
+├── branded-qr.tsx                -- styled QR (qr-code-styling): theme tokens resolved at render, MutationObserver re-resolves on theme flip; heart logo built from --primary (no hex anywhere). `colorVar` prop (default --foreground; display passes --qr). GOTCHA (2026-08-03): a token read ONLY from JS gets stripped from served CSS — --qr survives because it's registered in @theme (--color-qr) AND referenced by the scan labels' text-qr; dark values are decoder-bounded (0.85 L failed jsQR against the brand-purple field; 0.92 is the floor)
 ├── header-mount.tsx              -- suppresses the app Header on /live/[slug] (pathname regex)
 ├── ranking-list/
 │   ├── index.tsx, use-ranking-items.ts, utils.ts  -- useRankingItems has NO subscription: re-ranks + announces movers when fresh initialItems stream in (router.refresh)
@@ -749,13 +749,35 @@ card with `md:drop-shadow-lg`. App Header suppressed (`header-mount.tsx`);
 the containing block for fixed positioning) as a corner strip mirroring
 header geometry — logo top-left, presenter ⋮ dropdown top-right (event page /
 light–dark via `useTheme` re-exported from `@favpoll/ui`, same-instance
-requirement / fullscreen toggle). Inside the card, the telethon banner
-(hairline-delimited section, not a nested card): identity row (avatar ·
-headline prefix · name · suffix, RevealLockPill right while open), then the
-action row — centre = goal progress or Countdown (closed = final total),
-`BrandedQR` 132px ("Scan to pledge"), charities column (`md:w-90`, full-height
-left border, CharityRow rows + running total). Below: rankings
-(`RankingList size="display"` — text-xl labels, h-2.5 bars) beside the
+requirement / fullscreen toggle). Rebuilt 2026-08-02/03 (PRs #461–#481)
+around the **presence dial**: `DisplayVariant = "fundraiser" | "tribute"`,
+default derived from register in the route (`remembering` → tribute),
+presenter-switchable from the chrome ⋮ menu (check on active), persisted per
+favpoll in localStorage. ONE banner row (`mb-8 border-b pb-6`, shared
+`md:min-h-33` = avatar height so views swap with ZERO shift — banner box,
+eyebrow text, headline and charity card all measured pixel-identical across
+variants; both col 1s `md:items-start`, col 2 upper blocks pinned
+`md:min-h-14`): **fundraiser** = money block left in the HERO's exact type
+(SectionEyebrow muted in the h-8 band + `heroNameSizeClass` figure —
+"Pledge goal £X of £Y" + progressbar; no goal → "Raised so far £X" with the
+countdown as the hero-subtitle line via `Countdown variant="subtitle"`
+[figures full size, "Closes in"/units text-sm/base at 70% ink, ml-3 between
+components, seconds only inside the final day]; closed → "Poll closed £X"),
+col 2 = compact identity (photo-gated avatar RIGHT of the name, no context
+line, eyebrow mb-2) above CharityRow rows. **tribute** = the favpoll hero's
+exact grammar as col 1 (eyebrow / name / dates line, 26/33 photo-gated
+avatar right), col 2 = inline Countdown (default md — the favpoll page's
+ramp) above a hairline + CharityRow rows; no goal figure/bar/shout. QR is
+CHROME, not content: pinned fixed at the vertical centre of BOTH tinted
+gutters (occlusion redundancy) at 200px from `min-[1600px]`
+(`left/right-[calc((100vw-72rem)/4-100px)]` centres each in its gutter);
+below 1600px an in-banner 132px QR remains; mobile stacks it under the
+heading. Display QRs use brand-tinted ink via the `--qr` token
+(`colorVar="--qr"`); the reveal appears ONLY as the witnessed close finale
+(TypedReveal when the poll closes while the room watches — a statically
+closed display shows no reveal; keepsake, not signage). Topic header is
+projector-scale (`text-xl md:text-2xl`, mb-6). Below: rankings
+(`RankingList size="display"` — text-lg labels, h-2 bars) beside the
 `GuestWall` (animate, maxEntries 12).
 
 **Freshness — polling, not realtime.** Supabase `postgres_changes` never
@@ -1021,7 +1043,7 @@ CHARITY_COMMISSION_API_KEY        -- Register of Charities API (api-portal.chari
 - **Pledge goals (2026-07-04, growth-doc quick win).** Optional `favpolls.goal_amount` (pounds, CHECK > 0, null = no goal). Set from within `CharityBanner` in the form's right column: the banner takes an optional `onEditGoal` callback (form passes it, guest page doesn't) which renders a ghost "Set a goal" button when unset, or a pencil `icon-xs` beside the progress caption when set. It opens `GoalOverlay` (`favpoll-form/goal-overlay.tsx`, controlled `open`/`onOpenChange` from `FormInner`) — SeedFundModal-style layout: £ amount field first, presets £100/£250/£500 as outline buttons, stacked full-width footer (primary "Set/Save goal" over ghost "Remove goal"/"Not now"). A plain form field: staged in create mode and written by `createFavpoll` at publish; saved by the FAB via `updateFavpoll` in edit mode. There is deliberately no separate goal card (removed 2026-07-04 — it duplicated the banner's goal line) and no wizard step (goal is calibration, not identity — same reasoning that removed cause-label from the wizard). Displayed as **understated progress, never pressure**: `CharityBanner` gains an optional `goalAmount` prop (h-1.5 `bg-muted` track, `bg-primary` fill, caption "raised of the £500 goal", `role="progressbar"` with aria values) on the favpoll page; the live display shows the same quiet bar under the running total (`DisplayScreen.goalAmount`, optional). No goal → both surfaces unchanged. Sub-decision still flagged for review: preset values.
 
 - **Optional contribution / tip (2026-07-05, funds the 0% model).** `pledges.tip_amount` (pounds, DEFAULT 0) — favpoll's money, strictly separate from `total_amount` (charity money): totals, `total_raised` and the record are untouched by tips. UI: a quiet "For favpoll" chip row (None / 50p / £1 / £2 — flat amounts, never percentages) on the pledge dialog's amount step, own-funds mode only (never on shared-fund pledges), caption "Optional — nothing is taken from your pledge. Contributions are what keep favpoll running." **Default: £1 preselected for all categories** (memorial None-default dropped 2026-07-31 on celebrant feedback — a None default simply stays None, and the ask wasn't read as insensitive). Tip controls sit in the amount step's decisions zone (under the shared-fund split, 2026-07-31); the receipt shows the tip as a plain line.
-- **Guest-clarity pass (2026-08-02, PR #436, from the Joy misread analysis).** The pre-pledge lock overlay is ONE card: solid primary header carrying the lock CTA + three numbered mechanic steps (`lib/mechanic-steps.ts`, shared verbatim with the print pack) + the shared-fund escape hatch ("Don't have a favourite X? … you can still give to the shared fund" — honest because a pledge requires a pick; the fund accepts favourite-less givers). Topic ribbons on the favpoll page and list cards are HEADERS, not buttons — the lock card is the single pre-pledge CTA; entitled users get a standard shadcn gift icon button ("Pledge again" tooltip) at the ribbon's right edge (closed cards: none). Publish guards: person favpolls block submit while name/context/reveal still equal the generated example, and any about that mentions a reveal blocks while the reveal is empty. Generate dialog carries a provenance line ("Examples are starting points — everything published is yours to edit"). Step copy is the founder's card text: "Pick your favourite X" / "Pledge what it's worth — all money will go to {charity}" / "{First}'s favourite will be revealed along with the standings" (no-fee fact lives on poster/page microcopy). `usePledge` gains `defaultTip` (default 1); `favpoll-content` passes `favpoll.category === "memorial" ? 0 : 1`. The tip rides the same Stripe charge (`ownCharge = pledge + topUp + tip`) and appears as a "For favpoll" breakdown line only when > 0. Also killed here: the leftover `FEE_RATE = 0.03` in the pledge actions that was still writing 3% into `pledges.fee` after the 0% pass — `fee` is now always written 0 (column retained for history).
+- **Guest-clarity pass (2026-08-02, PR #436, from the Joy misread analysis).** The pre-pledge lock overlay is ONE card: solid primary header carrying the lock CTA + three numbered mechanic steps (`lib/mechanic-steps.ts`, shared verbatim with the print pack) + the shared-fund escape hatch ("Don't have a favourite X? … you can still give to the shared fund" — honest because a pledge requires a pick; the fund accepts favourite-less givers). Topic ribbons on the favpoll page and list cards are HEADERS, not buttons — the lock card is the single pre-pledge CTA; entitled users get a standard shadcn gift icon button ("Pledge again" tooltip) at the ribbon's right edge (closed cards: none). Publish guards: person favpolls block submit while name/context/reveal still equal the generated example, and any about that mentions a reveal blocks while the reveal is empty. Generate dialog carries a provenance line ("Examples are starting points — everything published is yours to edit"). Step copy is the founder's card text: "Pick your favourite X" / "Pledge what it's worth — all money will go to {charity}" / "{First}'s favourite will be revealed along with the standings" (no-fee fact lives on poster/page microcopy). **Reveal shapes (2026-08-03, PR #482)**: no kind-selector UI (rejected — organiser friction + copy-matrix across printed packs); the Reveal field's helper teaches the three shapes ("a quote in their own words, a memory, or a message to guests — one sentence"), and quotes are INFERRED — `isQuoteReveal` (opening quotation mark) flips step 3 to "revealed in their own words" on both mechanic surfaces, travelling as a content-free boolean (pre-pledge surfaces never receive reveal text). `usePledge` gains `defaultTip` (default 1); `favpoll-content` passes `favpoll.category === "memorial" ? 0 : 1`. The tip rides the same Stripe charge (`ownCharge = pledge + topUp + tip`) and appears as a "For favpoll" breakdown line only when > 0. Also killed here: the leftover `FEE_RATE = 0.03` in the pledge actions that was still writing 3% into `pledges.fee` after the 0% pass — `fee` is now always written 0 (column retained for history).
 
 - **Anonymity model + guest wall (2026-07-05, founder-signed).** Rules: names public by default with a hide control; amounts never on the wall; organiser always sees names (disclosed in the control's microcopy — "The organiser can always see your name for thank-yous"); anonymous pledges count fully in totals and the record. Schema: `pledges.display_name` (guest-typed; signed-in pledgers resolve via `users.display_name` instead) + `pledges.is_anonymous`. Capture UI: an "On the guest wall" block at the top of the pledge dialog's payment step — guests get an optional name Input (blank = "Someone"), everyone gets a hide Switch; fund pledges carry `is_anonymous` too. Display: `GuestWall` (`components/guest-wall.tsx`) in the favpoll page's right column under CharityBanner — name + "backed X" + relative time, max 24, SSR (refreshes via the existing `router.refresh()` after a pledge). **Standings gate**: un-entitled viewers of open polls get `labels: []` server-side (wall says "pledged", not "backed Purple") — same invariant as the per-favourite amount gating. Names never derived from emails.
 
