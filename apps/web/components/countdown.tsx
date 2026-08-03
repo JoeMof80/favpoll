@@ -54,7 +54,7 @@ export function Countdown({
           >
             Poll closes in
           </p>
-          <div className="flex flex-wrap items-baseline justify-between gap-y-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             {PLACEHOLDER_PARTS.map((label) => (
               <span key={label} className="tabular-nums">
                 <span
@@ -137,7 +137,7 @@ export function Countdown({
           Poll closes in
         </p>
         <div
-          className="flex flex-wrap items-baseline justify-between gap-y-1"
+          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"
           aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
         >
           {parts.map(({ value, label }) => (
