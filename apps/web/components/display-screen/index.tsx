@@ -259,8 +259,22 @@ export function DisplayScreen({
                   goal-reached shout: at a wake the number climbing is not
                   the point. */}
               <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+                {/* Countdown above the charities (founder, 2026-08-03) —
+                    the small inline ramp, not the subtitle: this column
+                    is the banner's quiet side. */}
+                {isOpen && closesAt && (
+                  <Countdown closesAt={closesAt} size="sm" />
+                )}
                 {charities.length > 0 ? (
-                  <div className="space-y-3">
+                  /* Hairline between the countdown and the charities
+                     (founder) — the fundraiser column's same idiom. */
+                  <div
+                    className={
+                      isOpen && closesAt
+                        ? "space-y-3 border-t border-border pt-3"
+                        : "space-y-3"
+                    }
+                  >
                     {charities.slice(0, 3).map((charity) => (
                       <CharityRow
                         key={charity.id}
@@ -277,21 +291,10 @@ export function DisplayScreen({
                     </span>
                   </p>
                 ) : null}
-                {effectiveClosed ? (
+                {effectiveClosed && (
                   <p className="text-xs text-muted-foreground">
                     Poll closed — thank you.
                   </p>
-                ) : (
-                  isOpen &&
-                  closesAt && (
-                    <p className="text-xs text-muted-foreground">
-                      Poll closes{" "}
-                      {new Date(closesAt).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                      })}
-                    </p>
-                  )
                 )}
               </div>
             </div>
@@ -404,7 +407,11 @@ export function DisplayScreen({
                 <div className="flex min-w-0 items-center gap-2.5">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
-                      <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
+                      /* mb-2 = the countdown label's rhythm, so this block
+                         and the tribute column's countdown match heights
+                         and the charity card below holds its position
+                         across variant switches (founder, 2026-08-03). */
+                      <p className="mb-2 truncate text-[10px] font-medium tracking-widest text-primary uppercase">
                         {headline.prefix}
                       </p>
                     )}
