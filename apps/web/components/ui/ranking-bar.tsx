@@ -31,7 +31,7 @@ export function RankingBar({
       <div
         className={cn(
           "flex justify-between",
-          isDisplay ? "mb-1.5 text-xl" : "mb-1 text-sm"
+          isDisplay ? "mb-1.5 text-lg" : "mb-1 text-sm"
         )}
       >
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
@@ -57,7 +57,7 @@ export function RankingBar({
       <div
         className={cn(
           "w-full overflow-hidden rounded-full bg-muted",
-          isDisplay ? "h-2.5" : "h-1.5"
+          isDisplay ? "h-2" : "h-1.5"
         )}
         role="presentation"
       >
