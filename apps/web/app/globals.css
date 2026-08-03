@@ -32,6 +32,10 @@
   --color-border-strong: var(--border-strong);
   --color-primary-muted: var(--primary-muted);
   --color-reveal-foreground: var(--reveal-foreground);
+  /* Registered as a colour (not just a raw var) so the build keeps the
+     token — unreferenced custom properties are stripped from the served
+     CSS, and BrandedQR reads this one from JS at runtime. */
+  --color-qr: var(--qr);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
