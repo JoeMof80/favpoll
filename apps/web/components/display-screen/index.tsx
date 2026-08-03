@@ -211,7 +211,10 @@ export function DisplayScreen({
             the money to the quiet charity rows. ── */}
         <div className="mb-8 border-b border-border pb-6">
           {variant === "tribute" ? (
-            <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
+            /* md:min-h-33 on BOTH variant rows = the avatar's height, the
+               banner's tallest natural content — so switching views (or a
+               missing photo) never shifts the rankings below. */
+            <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
               {/* Col 1 — the favpoll page hero's EXACT grammar (founder,
                   2026-08-02): SectionEyebrow, heroNameSizeClass name,
                   text-xl/2xl primary subtitle, 26/33 photo-gated avatar
@@ -297,7 +300,7 @@ export function DisplayScreen({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 md:flex-row md:items-stretch">
+            <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
               {/* Col 1 — goal progress (or closed total / countdown), QR beside */}
               <div className="flex min-w-0 flex-1 items-center gap-8">
                 <div className="min-w-0 flex-1">
