@@ -366,7 +366,24 @@ export function DisplayScreen({
                       )}
                     </div>
                   ) : isOpen ? (
-                    <Countdown closesAt={closesAt!} />
+                    /* No goal: the total still leads the hero, mirroring
+                       the goal block's grammar (founder, 2026-08-03) —
+                       same eyebrow ramp, same text-4xl figure — with the
+                       countdown in the progress bar's slot. */
+                    <div>
+                      <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                        Raised so far
+                      </p>
+                      <p
+                        className="mt-1 text-4xl font-medium text-foreground"
+                        aria-live="polite"
+                      >
+                        {formatPounds(totalRaised)}
+                      </p>
+                      <div className="mt-3">
+                        <Countdown closesAt={closesAt!} size="sm" />
+                      </div>
+                    </div>
                   ) : null}
                 </div>
 
@@ -400,27 +417,19 @@ export function DisplayScreen({
 
                 {(charities.length > 0 || charityName) && (
                   <div className="space-y-3 border-t border-border pt-3">
+                    {/* No raised-so-far footer here any more — with or
+                        without a goal, the hero column now carries the
+                        total. */}
                     {charities.length > 0 ? (
-                      <>
-                        {charities.slice(0, 3).map((charity) => (
+                      charities
+                        .slice(0, 3)
+                        .map((charity) => (
                           <CharityRow
                             key={charity.id}
                             charity={charity}
                             amountRaised={perCharity}
                           />
-                        ))}
-                        {!goalAmount && (
-                          <p className="text-right text-xs text-muted-foreground">
-                            <span
-                              className="text-base font-medium text-primary"
-                              aria-live="polite"
-                            >
-                              {formatPounds(totalRaised)}
-                            </span>{" "}
-                            raised so far
-                          </p>
-                        )}
-                      </>
+                        ))
                     ) : (
                       <p className="text-sm text-muted-foreground">
                         raised for {charityName}:{" "}
