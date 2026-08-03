@@ -369,18 +369,21 @@ export function DisplayScreen({
                     /* No goal: the total still leads the hero, mirroring
                        the goal block's grammar (founder, 2026-08-03) —
                        same eyebrow ramp, same text-4xl figure — with the
-                       countdown in the progress bar's slot. */
-                    <div>
-                      <p className="text-xs font-medium tracking-widest text-primary uppercase">
-                        Raised so far
-                      </p>
-                      <p
-                        className="mt-1 text-4xl font-medium text-foreground"
-                        aria-live="polite"
-                      >
-                        {formatPounds(totalRaised)}
-                      </p>
-                      <div className="mt-3">
+                       countdown hugging the right of the same band, not
+                       stretched beneath. */
+                    <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+                      <div>
+                        <p className="text-xs font-medium tracking-widest text-primary uppercase">
+                          Raised so far
+                        </p>
+                        <p
+                          className="mt-1 text-4xl font-medium text-foreground"
+                          aria-live="polite"
+                        >
+                          {formatPounds(totalRaised)}
+                        </p>
+                      </div>
+                      <div className="shrink-0">
                         <Countdown closesAt={closesAt!} size="sm" />
                       </div>
                     </div>
