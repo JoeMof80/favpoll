@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -42,33 +43,17 @@ const PRESENCE = [
 export default function CelebrationsPage() {
   return (
     <main>
-      {/* ── Hero — the register's gold, dark ink, brand-purple CTA ── */}
-      <section className="bg-warning text-foreground">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
-            {t("celebrations.eyebrow")}
-          </p>
-          <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            {t("celebrations.headline")}
-          </h1>
-          <p className="mx-auto mb-8 max-w-xl text-lg opacity-90">
-            {t("celebrations.subheader")}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/favpolls/new">{t("celebrations.cta.primary")}</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="ghost"
-              className="hover:bg-foreground/10"
-            >
-              <Link href="#how">{t("celebrations.cta.secondary")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* ── Hero — the REAL landing hero, register-configured (v2):
+          the demo loops the celebration story on the register's band. ── */}
+      <LandingHero
+        sceneKind="celebration"
+        eyebrow={t("celebrations.eyebrow")}
+        headline={t("celebrations.headline")}
+        subheader={t("celebrations.subheader")}
+        ctaLabel={t("celebrations.cta.primary")}
+        bandClassName="bg-warning text-foreground"
+        hideStats
+      />
 
       {/* ── How it works, in the celebration register ── */}
       <section id="how" className="w-full scroll-mt-20">
