@@ -5,7 +5,6 @@ import {
   Printer,
   Quote,
   Target,
-  TrendingUp,
   Tv,
   Users,
 } from "lucide-react"
@@ -24,8 +23,7 @@ type Shine = 0 | 1
 
 const FEATURES: { key: string; icon: typeof Tv; fit: [Shine, Shine, Shine] }[] =
   [
-    { key: "display-tribute", icon: Tv, fit: [1, 0, 0] },
-    { key: "display-fundraiser", icon: TrendingUp, fit: [0, 0, 1] },
+    { key: "display", icon: Tv, fit: [1, 0, 1] },
     { key: "reveal", icon: Quote, fit: [1, 1, 0] },
     { key: "goal", icon: Target, fit: [0, 0, 1] },
     { key: "cards", icon: Printer, fit: [1, 1, 0] },
@@ -69,7 +67,11 @@ export function RegisterMatrix() {
           <table className="w-full min-w-160 border-collapse text-left">
             <thead>
               <tr>
-                <th className="w-1/4 pb-4" />
+                <th className="w-1/4 pb-4 align-bottom">
+                  <span className="text-xs font-medium tracking-widest text-primary uppercase">
+                    {t("home.matrix.feature")}
+                  </span>
+                </th>
                 {REGISTERS.map((reg) => (
                   <th key={reg.key} className="w-1/4 pr-4 pb-4 align-bottom">
                     <Link
