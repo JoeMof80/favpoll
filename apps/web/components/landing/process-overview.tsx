@@ -41,19 +41,22 @@ export function ProcessOverview() {
 
   const [active, setActive] = useState(0)
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
+  // Plain scroll math, not IntersectionObserver — percentage rootMargins
+  // proved unreliable across browsers/zoom (founder's tab never advanced
+  // the frames). Active = the last step whose block top has crossed 45%
+  // of the viewport.
   useEffect(() => {
-    const observers = blockRefs.current.map((node, i) => {
-      if (!node) return null
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActive(i)
-        },
-        { rootMargin: "-45% 0px -45% 0px" }
-      )
-      obs.observe(node)
-      return obs
-    })
-    return () => observers.forEach((o) => o?.disconnect())
+    const onScroll = () => {
+      const line = window.innerHeight * 0.45
+      let idx = 0
+      blockRefs.current.forEach((node, i) => {
+        if (node && node.getBoundingClientRect().top <= line) idx = i
+      })
+      setActive(idx)
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   return (
@@ -64,7 +67,7 @@ export function ProcessOverview() {
           <div className="md:col-span-2">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            <div className="z-10 bg-background pb-6 md:sticky md:top-14 md:pt-2">
+            <div className="relative z-10 bg-background pb-6 after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-background after:to-transparent md:sticky md:top-36">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
@@ -96,7 +99,7 @@ export function ProcessOverview() {
 
           {/* Col 3 — the pinned image, larger and bare */}
           <div className="relative hidden md:block" aria-hidden="true">
-            <div className="sticky top-14 flex justify-center md:pt-2">
+            <div className="sticky top-36 flex justify-center">
               <div className="pointer-events-none relative h-[34.8rem] w-100 max-w-full select-none">
                 {mounted &&
                   STEPS.map((step, i) => (
