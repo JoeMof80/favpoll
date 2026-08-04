@@ -324,3 +324,45 @@ ask of her time.
   you" beats cold-contacting both at once.
 - Diligence: confirm St Luke's registered charity number (site footer) before
   adding them — the hero displays it.
+
+
+## Marketing-friend meeting (Thursday 2026-08-06) — celebration/fundraiser lens
+
+Friend in marketing at The British Hamper Company (luxury occasion
+hampers, Lincoln; consumer + corporate gifting divisions; occasions =
+birthdays/weddings/new baby/Christmas; corporate = employee gifts, work
+anniversaries, bespoke). Adjacent, not distant: occasion marketing IS
+her craft, and hampers are club-together gifts — favpoll's celebration
+line ("a present everyone clubs together for — except the present is a
+donation") sits one step away.
+
+### What to show
+- /celebrations and /fundraisers — FIRST FIELD TEST of the register
+  pages as artefacts. Same ask as Joy's network: first impressions,
+  especially the wrong ones.
+
+### Questions worth her time
+1. **Occasion discovery**: how do organisers of celebrations find
+   products? Search terms, seasonality, who plans how far ahead. (The
+   register pages are occasion-term landing pages — her SEO/channel
+   knowledge transfers directly.)
+2. **The corporate organiser**: who inside a company buys celebration
+   things (EAs, office managers, HR)? Retirements/leaving dos are in
+   our occasion catalogue — is workplace celebration a favpoll channel?
+   Corporate CSR days → fundraiser register?
+3. **Complement or compete**: does favpoll sit ALONGSIDE a physical
+   gift (collection + favpoll) or replace it ("in lieu of gifts"
+   birthdays — Facebook birthday fundraisers are the proven behaviour
+   here and the celebrations register's closest comp)?
+4. **Events she attends/organises**: would the live display fly at a
+   corporate do / quiz night / gala? Presence dial validation outside
+   the memorial register.
+5. **Marketing craft**: cheapest credible channels for occasion
+   products; what she'd do with zero budget.
+
+### Watch-fors
+- She may reflexively pitch partnership ideas (hamper + favpoll
+  bundles) — interesting but downstream; the gold is her ORGANISER and
+  CHANNEL knowledge.
+- Same discipline as Joy: menu, not pitch; wrong impressions are the
+  yield.
