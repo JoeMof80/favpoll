@@ -143,6 +143,24 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── The validator's checklist — universal trust facts (page
+          architecture model, 2026-08-04): register-neutral versions of
+          the reassurance grid the register pages carry. ── */}
+      <section className="w-full">
+        <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
+          {(["free", "charity", "nofave", "phone"] as const).map((key) => (
+            <div key={key}>
+              <p className="mb-1 font-medium text-foreground">
+                {t(`home.assure.${key}.label`)}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t(`home.assure.${key}.body`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── Product surfaces — full-bleed alternating bands (white ·
           bg-primary/5) for section division; each band's inner column matches
           the hero's width. The hero demo does the showing; the sections below
