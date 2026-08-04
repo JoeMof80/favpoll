@@ -3,7 +3,6 @@ import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
 import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
-import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { LandingHero } from "@/components/landing/hero"
@@ -130,32 +129,6 @@ export default async function HomePage() {
       <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
 
       <ProcessOverview />
-
-      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          {/* The headline, explained clause by clause — one sentence per
-              beat for the visitor who reads rather than watches the demo.
-              The organiser vignettes below keep telling Create/Share/Watch;
-              this strip is the GUEST arc in words. */}
-          <FadeIn>
-            <div className="mb-14 grid gap-8 md:grid-cols-3">
-              {(["pick", "pledge", "reveal"] as const).map((beat) => (
-                <div key={beat}>
-                  <h3 className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
-                    {t(`landing.how.${beat}.label`)}
-                  </h3>
-                  <p className="text-base leading-relaxed text-muted-foreground">
-                    {t(`landing.how.${beat}.body`)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-          <FadeIn>
-            <HowItWorksThreeBeat />
-          </FadeIn>
-        </div>
-      </section>
 
       {/* ── Product surfaces — full-bleed alternating bands (white ·
           bg-primary/5) for section division; each band's inner column matches
