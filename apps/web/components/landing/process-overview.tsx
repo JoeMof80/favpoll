@@ -62,12 +62,16 @@ export function ProcessOverview() {
         <div className="grid gap-6 md:grid-cols-3">
           {/* Cols 1–2 — pinned headline, then the SCROLLING step texts */}
           <div className="md:col-span-2">
-            <SectionEyebrow className="mb-2">
-              {t("home.overview.eyebrow")}
-            </SectionEyebrow>
-            <h2 className="max-w-md text-3xl font-light tracking-tight text-foreground md:text-4xl">
-              {t("home.overview.headline")}
-            </h2>
+            {/* Pinned header (the Goodstack stills): solid backdrop so the
+                scrolling step texts vanish beneath it, not through it. */}
+            <div className="z-10 bg-background pb-6 md:sticky md:top-14 md:pt-2">
+              <SectionEyebrow className="mb-2">
+                {t("home.overview.eyebrow")}
+              </SectionEyebrow>
+              <h2 className="max-w-md text-3xl font-light tracking-tight text-foreground md:text-4xl">
+                {t("home.overview.headline")}
+              </h2>
+            </div>
             {STEPS.map((step, i) => (
               <div
                 key={step.phase}
@@ -92,8 +96,8 @@ export function ProcessOverview() {
 
           {/* Col 3 — the pinned image, larger and bare */}
           <div className="relative hidden md:block" aria-hidden="true">
-            <div className="sticky top-[calc(50vh-15.5rem)] flex justify-center">
-              <div className="pointer-events-none relative h-[31rem] w-[21.9rem] select-none">
+            <div className="sticky top-14 flex justify-center md:pt-2">
+              <div className="pointer-events-none relative h-[34.8rem] w-100 max-w-full select-none">
                 {mounted &&
                   STEPS.map((step, i) => (
                     <div
@@ -103,7 +107,7 @@ export function ProcessOverview() {
                         i === active ? "opacity-100" : "opacity-0"
                       )}
                     >
-                      <div className="h-174 w-125 origin-top-left scale-[0.7] drop-shadow-xl">
+                      <div className="h-174 w-125 origin-top-left scale-[0.8] drop-shadow-xl">
                         <DemoCard
                           scene={SCENE}
                           phase={step.phase}
