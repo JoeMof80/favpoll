@@ -1,3 +1,4 @@
+import { RegisterMatrix } from "@/components/landing/register-matrix"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
@@ -186,6 +187,10 @@ export default function AboutPage() {
             Two-column (heading left, accordion right) to match the Contact
             section below and fill the width. Native <details> — no client
             JS in this server page. ── */}
+        {/* The full feature-by-register matrix — reference for the
+            deliberating organiser; home carries the shine-list version. */}
+        <RegisterMatrix />
+
         <section id="faq" className="scroll-mt-20 border-b border-border py-16">
           <div className="grid gap-10 md:grid-cols-2 md:items-start md:gap-16">
             <FadeIn>
