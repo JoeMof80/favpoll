@@ -77,7 +77,7 @@ export function ProcessOverview() {
                 ref={(node) => {
                   blockRefs.current[i] = node
                 }}
-                className="flex min-h-[55vh] max-w-md flex-col justify-center"
+                className="flex min-h-[45vh] max-w-md flex-col justify-center last:min-h-[30vh]"
               >
                 <p
                   className={cn(
@@ -101,7 +101,7 @@ export function ProcessOverview() {
 
           {/* Right — sticky frame, crossfading to the active step */}
           <div className="relative hidden sm:block" aria-hidden="true">
-            <div className="sticky top-24 flex justify-center py-8">
+            <div className="sticky top-[calc(50vh-12rem)] flex justify-center">
               <div className="pointer-events-none relative h-[24rem] w-[17.2rem] select-none">
                 {mounted &&
                   STEPS.map((step, i) => (
