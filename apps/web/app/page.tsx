@@ -1,4 +1,4 @@
-import { RegisterOverview } from "@/components/landing/register-overview"
+import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
@@ -129,7 +129,7 @@ export default async function HomePage() {
       {/* ── Purple hero band with the live demo ── */}
       <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
 
-      <RegisterOverview />
+      <ProcessOverview />
 
       <section id="how" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
