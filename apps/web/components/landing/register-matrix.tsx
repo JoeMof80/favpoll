@@ -1,0 +1,120 @@
+import Link from "next/link"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { t } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
+
+// Feature × register matrix (founder, 2026-08-05): PHRASES, not ticks —
+// every cell says how the feature lives in that register, nothing is
+// crossed out anywhere, and "shine" cells simply carry more weight (a
+// register-accent dot + foreground ink) than "works" cells (muted).
+// The no-rules line beneath is the section's actual message. Column
+// heads deep-link to the register pages in their accents.
+
+type Shine = 0 | 1
+
+const FEATURES: { key: string; fit: [Shine, Shine, Shine] }[] = [
+  { key: "display-tribute", fit: [1, 0, 0] },
+  { key: "display-fundraiser", fit: [0, 0, 1] },
+  { key: "reveal", fit: [1, 1, 0] },
+  { key: "goal", fit: [0, 0, 1] },
+  { key: "cards", fit: [1, 1, 0] },
+  { key: "topics", fit: [1, 1, 1] },
+  { key: "wall", fit: [1, 1, 1] },
+  { key: "fund", fit: [1, 0, 1] },
+]
+
+const REGISTERS = [
+  {
+    key: "memorial",
+    href: "/memorials",
+    label: "Memorials",
+    accent: "text-memorial",
+    dot: "bg-memorial",
+  },
+  {
+    key: "celebration",
+    href: "/celebrations",
+    label: "Celebrations",
+    accent: "text-warning",
+    dot: "bg-warning",
+  },
+  {
+    key: "fundraiser",
+    href: "/fundraisers",
+    label: "Fundraisers",
+    accent: "text-success",
+    dot: "bg-success",
+  },
+] as const
+
+export function RegisterMatrix() {
+  return (
+    <section className="w-full bg-primary/5">
+      <div className="mx-auto w-full max-w-330 px-6 py-16">
+        <SectionEyebrow className="mb-8">
+          {t("home.matrix.title" as never)}
+        </SectionEyebrow>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-160 border-collapse text-left">
+            <thead>
+              <tr>
+                <th className="w-1/4 pb-4" />
+                {REGISTERS.map((reg) => (
+                  <th key={reg.key} className="w-1/4 pr-4 pb-4 align-bottom">
+                    <Link
+                      href={reg.href}
+                      className={cn(
+                        "text-xs font-medium tracking-widest uppercase",
+                        reg.accent
+                      )}
+                    >
+                      {reg.label} →
+                    </Link>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {FEATURES.map((feature) => (
+                <tr key={feature.key} className="border-t border-border">
+                  <th className="py-3.5 pr-4 text-sm font-medium text-foreground">
+                    {t(`home.matrix.${feature.key}.label` as never)}
+                  </th>
+                  {REGISTERS.map((reg, i) => {
+                    const shine = feature.fit[i] === 1
+                    return (
+                      <td key={reg.key} className="py-3.5 pr-4 text-sm">
+                        <span
+                          className={cn(
+                            "inline-flex items-baseline gap-1.5",
+                            shine
+                              ? "font-medium text-foreground"
+                              : "text-muted-foreground"
+                          )}
+                        >
+                          {shine && (
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                "h-1.5 w-1.5 shrink-0 self-center rounded-full",
+                                reg.dot
+                              )}
+                            />
+                          )}
+                          {t(`home.matrix.${feature.key}.${reg.key}` as never)}
+                        </span>
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground italic">
+          {t("home.matrix.norules" as never)}
+        </p>
+      </div>
+    </section>
+  )
+}
