@@ -67,7 +67,7 @@ export function ProcessOverview() {
           <div className="md:col-span-2">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            <div className="relative z-10 bg-background pb-6 after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-background after:to-transparent md:sticky md:top-36">
+            <div className="relative z-10 bg-background pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-28 before:bg-background after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-background after:to-transparent md:sticky md:top-28">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
@@ -99,7 +99,7 @@ export function ProcessOverview() {
 
           {/* Col 3 — the pinned image, larger and bare */}
           <div className="relative hidden md:block" aria-hidden="true">
-            <div className="sticky top-36 flex justify-center">
+            <div className="sticky top-28 flex justify-center">
               <div className="pointer-events-none relative h-[34.8rem] w-100 max-w-full select-none">
                 {mounted &&
                   STEPS.map((step, i) => (
