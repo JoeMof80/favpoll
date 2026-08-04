@@ -1,4 +1,4 @@
-import { RegisterShines } from "@/components/landing/register-shines"
+import { RegisterMatrix } from "@/components/landing/register-matrix"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
@@ -144,7 +144,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <RegisterShines />
+      <RegisterMatrix />
 
       {/* ── The validator's checklist — universal trust facts (page
           architecture model, 2026-08-04): register-neutral versions of
