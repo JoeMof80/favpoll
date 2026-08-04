@@ -2,7 +2,7 @@ import Link from "next/link"
 import {
   HeartHandshake,
   ListChecks,
-  Printer,
+  QrCode,
   Quote,
   Target,
   Tv,
@@ -26,7 +26,7 @@ const FEATURES: { key: string; icon: typeof Tv; fit: [Shine, Shine, Shine] }[] =
     { key: "display", icon: Tv, fit: [1, 0, 1] },
     { key: "reveal", icon: Quote, fit: [1, 1, 0] },
     { key: "goal", icon: Target, fit: [0, 0, 1] },
-    { key: "cards", icon: Printer, fit: [1, 1, 0] },
+    { key: "cards", icon: QrCode, fit: [1, 1, 0] },
     { key: "topics", icon: ListChecks, fit: [1, 1, 1] },
     { key: "wall", icon: Users, fit: [1, 1, 1] },
     { key: "fund", icon: HeartHandshake, fit: [1, 0, 1] },
