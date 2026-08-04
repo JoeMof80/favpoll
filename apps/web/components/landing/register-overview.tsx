@@ -2,15 +2,20 @@
 
 // The Goodstack-style "Platform overview" body section (founder,
 // 2026-08-04): eyebrow + headline, then one row per register — text left
-// (title, one-liner, Explore →), and the register's REAL DemoCard frozen
-// at its resolved payoff as the LARGE visual right (never a screenshot;
-// the too-small hero-card vignettes moved here at readable scale). Each
-// visual sits on its register's muted band.
+// (title, one-liner, Explore →), and the register's REAL DemoCard as the
+// LARGE visual right (never a screenshot). LIVE, not frozen (founder,
+// same day, after Goodstack's animation): each card walks the full
+// pick → pledge → reveal arc via the single-scene demo loop — but only
+// while its row is in view (IntersectionObserver), so at most the rows
+// on screen animate and off-screen rows hold the resolved payoff.
+// Reduced motion stays static via the loop's own path.
 
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { useDemoLoop } from "@/components/landing/use-demo-loop"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -40,6 +45,18 @@ const ROWS = [
     body: t("home.router.fundraisers.body"),
   },
 ]
+
+function LiveDemo({ scene }: { scene: (typeof SCENES)[number] }) {
+  const { phase, barWidths, prefersReducedMotion } = useDemoLoop([scene])
+  return (
+    <DemoCard
+      scene={scene}
+      phase={phase}
+      barWidths={barWidths}
+      prefersReducedMotion={prefersReducedMotion}
+    />
+  )
+}
 
 export function RegisterOverview() {
   return (
@@ -84,30 +101,61 @@ export function RegisterOverview() {
                     </span>
                   </Link>
                 </div>
-                {/* The register's frozen story, at readable scale */}
-                <div
-                  aria-hidden="true"
-                  className={cn(
-                    "pointer-events-none overflow-hidden rounded-xl p-6 select-none",
-                    row.band
-                  )}
-                >
-                  <div className="h-80 overflow-hidden rounded-lg shadow-lg">
-                    <div className="h-174 w-125 origin-top-left scale-[0.7]">
-                      <DemoCard
-                        scene={scene}
-                        phase="reveal"
-                        barWidths={scene.results.map((r) => r.widthPercent)}
-                        prefersReducedMotion
-                      />
-                    </div>
-                  </div>
-                </div>
+                <OverviewVisual band={row.band} scene={scene} />
               </div>
             )
           })}
         </div>
       </div>
     </section>
+  )
+}
+
+/** The row's visual: live demo while in view, resolved payoff otherwise. */
+function OverviewVisual({
+  band,
+  scene,
+}: {
+  band: string
+  scene: (typeof SCENES)[number]
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    )
+    obs.observe(node)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none flex justify-center overflow-hidden rounded-xl p-6 select-none",
+        band
+      )}
+    >
+      {/* Full card, uncropped — the walkthrough's pledge steps happen
+          mid-card, so nothing can be cut off. 0.55 scale = 275×383. */}
+      <div className="h-[24rem] w-[17.2rem]">
+        <div className="h-174 w-125 origin-top-left scale-[0.55]">
+          {inView ? (
+            <LiveDemo scene={scene} />
+          ) : (
+            <DemoCard
+              scene={scene}
+              phase="reveal"
+              barWidths={scene.results.map((r) => r.widthPercent)}
+              prefersReducedMotion
+            />
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
