@@ -1,4 +1,14 @@
 import Link from "next/link"
+import {
+  HeartHandshake,
+  ListChecks,
+  Printer,
+  Quote,
+  Target,
+  TrendingUp,
+  Tv,
+  Users,
+} from "lucide-react"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -12,16 +22,17 @@ import { cn } from "@/lib/utils"
 
 type Shine = 0 | 1
 
-const FEATURES: { key: string; fit: [Shine, Shine, Shine] }[] = [
-  { key: "display-tribute", fit: [1, 0, 0] },
-  { key: "display-fundraiser", fit: [0, 0, 1] },
-  { key: "reveal", fit: [1, 1, 0] },
-  { key: "goal", fit: [0, 0, 1] },
-  { key: "cards", fit: [1, 1, 0] },
-  { key: "topics", fit: [1, 1, 1] },
-  { key: "wall", fit: [1, 1, 1] },
-  { key: "fund", fit: [1, 0, 1] },
-]
+const FEATURES: { key: string; icon: typeof Tv; fit: [Shine, Shine, Shine] }[] =
+  [
+    { key: "display-tribute", icon: Tv, fit: [1, 0, 0] },
+    { key: "display-fundraiser", icon: TrendingUp, fit: [0, 0, 1] },
+    { key: "reveal", icon: Quote, fit: [1, 1, 0] },
+    { key: "goal", icon: Target, fit: [0, 0, 1] },
+    { key: "cards", icon: Printer, fit: [1, 1, 0] },
+    { key: "topics", icon: ListChecks, fit: [1, 1, 1] },
+    { key: "wall", icon: Users, fit: [1, 1, 1] },
+    { key: "fund", icon: HeartHandshake, fit: [1, 0, 1] },
+  ]
 
 const REGISTERS = [
   {
@@ -76,9 +87,18 @@ export function RegisterMatrix() {
             </thead>
             <tbody>
               {FEATURES.map((feature) => (
-                <tr key={feature.key} className="border-t border-border">
+                <tr
+                  key={feature.key}
+                  className="border-t border-border transition-colors hover:bg-background/70"
+                >
                   <th className="py-3.5 pr-4 text-sm font-medium text-foreground">
-                    {t(`home.matrix.${feature.key}.label` as never)}
+                    <span className="flex items-center gap-2.5">
+                      <feature.icon
+                        aria-hidden="true"
+                        className="h-4 w-4 shrink-0 text-primary-muted"
+                      />
+                      {t(`home.matrix.${feature.key}.label` as never)}
+                    </span>
                   </th>
                   {REGISTERS.map((reg, i) => {
                     const shine = feature.fit[i] === 1
