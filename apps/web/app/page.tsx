@@ -1,3 +1,4 @@
+import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -129,6 +130,18 @@ export default async function HomePage() {
       <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
 
       <ProcessOverview />
+
+      {/* ── Create · Share · Watch — the ORGANISER arc in real-component
+          vignettes. (The guest arc lives in ProcessOverview above; this
+          section's old Pick/Pledge/Reveal text strip duplicated it and
+          was removed, founder call 2026-08-04.) ── */}
+      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <HowItWorksThreeBeat />
+          </FadeIn>
+        </div>
+      </section>
 
       {/* ── Product surfaces — full-bleed alternating bands (white ·
           bg-primary/5) for section division; each band's inner column matches
