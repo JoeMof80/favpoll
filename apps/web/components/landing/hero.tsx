@@ -166,53 +166,26 @@ export function LandingHero({
                     card.accent
                   )}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className={cn(
-                          "mb-1 text-xs font-medium tracking-widest uppercase",
-                          card.eyebrow
-                        )}
-                      >
-                        {card.title}
-                      </p>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {card.body}
-                      </p>
-                      <p className="mt-2 text-sm font-medium text-primary">
-                        {t("home.router.explore")}{" "}
-                        <span
-                          aria-hidden="true"
-                          className="inline-block transition-transform group-hover:translate-x-0.5"
-                        >
-                          →
-                        </span>
-                      </p>
-                    </div>
-                    {/* Frozen vignette — the register's REAL DemoCard at
-                        its resolved payoff (never a screenshot), top-
-                        cropped at miniature scale. */}
-                    {(() => {
-                      const scene = SCENES.find((sc) => sc.kind === card.kind)!
-                      return (
-                        <div
-                          aria-hidden="true"
-                          className="pointer-events-none h-36 w-32 shrink-0 overflow-hidden rounded-lg border border-border select-none"
-                        >
-                          <div className="h-174 w-125 origin-top-left scale-[0.26]">
-                            <DemoCard
-                              scene={scene}
-                              phase="reveal"
-                              barWidths={scene.results.map(
-                                (r) => r.widthPercent
-                              )}
-                              prefersReducedMotion
-                            />
-                          </div>
-                        </div>
-                      )
-                    })()}
-                  </div>
+                  <p
+                    className={cn(
+                      "mb-1 text-xs font-medium tracking-widest uppercase",
+                      card.eyebrow
+                    )}
+                  >
+                    {card.title}
+                  </p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {card.body}
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-primary">
+                    {t("home.router.explore")}{" "}
+                    <span
+                      aria-hidden="true"
+                      className="inline-block transition-transform group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </p>
                 </Link>
               ))}
             </nav>
