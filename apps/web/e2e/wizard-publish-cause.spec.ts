@@ -168,10 +168,10 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
     // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
-    // exact "In a month" chip — a broad fallback can match calendar internals
+    // exact "1 month" chip — a broad fallback can match calendar internals
     // and hang on an invisible button.
     await closeDateDialog
-      .getByRole("button", { name: "In a month", exact: true })
+      .getByRole("button", { name: "1 month", exact: true })
       .click()
 
     const publishConfirm = closeDateDialog
