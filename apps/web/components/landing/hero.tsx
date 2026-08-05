@@ -72,9 +72,9 @@ const ROUTER_CARDS = [
     charity: "Marie Curie",
     total: "£1,005",
     results: [
-      { label: "Sweet pea", amount: "£350", widthPercent: 78 },
-      { label: "Daffodil", amount: "£220", widthPercent: 51 },
-      { label: "Rose", amount: "£165", widthPercent: 38 },
+      { label: "Sweet pea", amount: "£350", widthPercent: 100 },
+      { label: "Daffodil", amount: "£220", widthPercent: 63 },
+      { label: "Rose", amount: "£165", widthPercent: 47 },
     ],
   },
   {
@@ -88,9 +88,9 @@ const ROUTER_CARDS = [
     charity: "Barnardo's",
     total: "£705",
     results: [
-      { label: "Victoria sponge", amount: "£210", widthPercent: 78 },
-      { label: "Lemon drizzle", amount: "£175", widthPercent: 65 },
-      { label: "Carrot cake", amount: "£130", widthPercent: 48 },
+      { label: "Victoria sponge", amount: "£210", widthPercent: 100 },
+      { label: "Lemon drizzle", amount: "£175", widthPercent: 83 },
+      { label: "Carrot cake", amount: "£130", widthPercent: 62 },
     ],
   },
   {
@@ -104,9 +104,9 @@ const ROUTER_CARDS = [
     charity: "Macmillan",
     total: "£810",
     results: [
-      { label: "Hobnob", amount: "£240", widthPercent: 78 },
-      { label: "Digestive", amount: "£190", widthPercent: 62 },
-      { label: "Custard cream", amount: "£150", widthPercent: 49 },
+      { label: "Hobnob", amount: "£240", widthPercent: 100 },
+      { label: "Digestive", amount: "£190", widthPercent: 79 },
+      { label: "Custard cream", amount: "£150", widthPercent: 63 },
     ],
   },
 ] as const

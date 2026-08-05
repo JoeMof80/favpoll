@@ -18,7 +18,7 @@ import { t } from "@/lib/i18n"
 export const metadata: Metadata = {
   title: "Memorials — favpoll",
   description:
-    "Remember them by what they loved. A favpoll gathers everyone around their favourite things and turns the answers into giving to charity, in their name.",
+    "Remember them by what they loved. Give in their name. A favpoll turns everyone's favourites into pledges to a charity the family names.",
 }
 
 const STEPS = [
