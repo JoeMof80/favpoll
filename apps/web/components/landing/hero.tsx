@@ -252,7 +252,7 @@ export function LandingHero({
                     // nothing fights the accent's border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the dot and the bars.
-                    "group @container block rounded-xl bg-primary-foreground/12 p-4 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
+                    "group @container block rounded-xl bg-primary-foreground/12 p-5 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
@@ -316,13 +316,13 @@ export function LandingHero({
                         own column and must stay top-aligned with the label. */}
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none mt-auto space-y-1 select-none @min-[21rem]:mt-0"
+                      className="pointer-events-none mt-auto space-y-1.5 select-none @min-[21rem]:mt-0"
                     >
                       {/* text-sm, a step above the register label (founder,
                           2026-08-05): the poll is the product's core, so its
                           question shouldn't be the smallest thing on the
                           card. */}
-                      <p className="pb-1 text-sm font-medium tracking-[0.09em] text-primary-foreground/70 uppercase">
+                      <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-primary-foreground/70 uppercase">
                         Favourite {card.topic}
                       </p>
                       {card.results.map((r) => (
