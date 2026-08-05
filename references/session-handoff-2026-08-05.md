@@ -1,7 +1,10 @@
-# Session handoff — 2026-08-05 (PRs #508–#522)
+# Session handoff — 2026-08-05 (PRs #508–#526)
 
-Continues session-handoff-2026-08-04.md. All merged; suite 1189 in 116
-files (unchanged — none of this session's work added tests, see §6).
+Two sessions in one day. Part one (#508–#522, §1–§8) is the matrix and the
+first hero-router passes. Part two (#523–#526, §9–§12) rebuilt the hero
+router and repaired CI. Continues session-handoff-2026-08-04.md. All
+merged; suite 1189 in 116 files throughout — NOTHING all day added a test
+(see §12).
 
 ## 1. The feature × register matrix (#512, #514–#517)
 
@@ -148,3 +151,170 @@ the table, not a later advisor cleanup.
   measured heights (1020 vs 844), and the previous one's crossfade by
   scroll math after IntersectionObserver silently failed in the
   founder's Chrome.
+
+---
+
+# Part two — the hero rebuild and CI repair (PRs #523–#526)
+
+## 9. Hero register router, rebuilt (#524)
+
+Brief: the cards are "too wide, or too white". Measured, they covered
+**35%** of the band at 1440 and **42%** at 1280 — the founder was seeing
+the mild version.
+
+**Width.** The cards are now exactly the LAST OF THREE COLUMNS. The row
+uses `grid-cols-3` on the three-beat's own 2rem gutter; the demo hero the
+register pages mount uses `calc((100%-4rem)/3)`. Both resolve to the same
+402.7px and right-align to the same container edge, asserted by comparing
+each card's left edge against each three-beat column's at every viewport.
+Narrowing cost nothing in height: the poll side governs the card, so the
+text just reflows beside it.
+
+**Colour.** The cards are a translucent wash of the band's OWN foreground,
+with band ink throughout. That is what survives the theme flip: the hero
+band inverts (deep purple + white ink in light; near-white + purple ink in
+dark) and a wash of its own ink inverts with it. No per-theme branching.
+
+**The accessibility bug this exposed.** The accent-coloured eyebrows were
+already failing contrast BEFORE any of this: gold **2.14:1** on the white
+card, blue **1.95:1** in dark. The cause is structural and will bite again
+anywhere accents meet the brand band — the band inverts between themes and
+the accent tokens do not, so memorial dies in light (1.04:1 on glass) and
+gold and green die in dark. Fixed at the cause:
+
+- NEW tokens `--memorial-on-band` / `--warning-on-band` / `--success-on-band`
+  (globals.css, both themes), light on the dark band and dark on the pale
+  one, keeping the gold > green > blue energy order in both directions;
+- the accent moved OFF the label text onto a DOT — the register matrix's
+  existing grammar (accent dot + full ink).
+
+Every accent mark now clears the 3:1 non-text floor in both themes
+(3.8–5.6 measured). Use the `*-on-band` variants for any accent mark on
+the brand band; the base tokens stay correct on page surfaces.
+
+**Layout: the cards became a row.** Statement on top, three doors beneath.
+Free at 1440 and up — the min-height governs, and the cards were already a
+third of the container, so they do not resize (403×204 in both layouts).
+The headline scales up to hold the width it inherits, gated at `2xl` because
+at 1280–1440 the extra 40px of line height is the difference between fitting
+a laptop and not.
+
+**The overflow bug (worth internalising).** The card interior burst its own
+bounds by up to **69px** between 768 and ~950px, with horizontal page scroll
+below 800: plain `1fr` tracks have `min-width:auto`, so the poll could not
+shrink below its 147px min-content. Fixed with a **container query**, not a
+breakpoint — the interior has to answer to the CARD's width, which varies
+with the layout AND with browser zoom, which is how the founder found it and
+what no fixed-viewport test would have caught. `minmax(0,…)` stops the burst
+outright. Swept 1804 → 390: no spill, no scrollX.
+
+**Content.** Register-synonymous topics with their OWN miniature polls
+(flower / cake / biscuit) rather than the register's demo scene — the scenes
+are authored stories whose topics serve their own reveal, and the memorial
+scene turns on Belinda's favourite COLOUR, named aloud in its reveal quote.
+Charities are short by design (Marie Curie / Barnardo's / Macmillan) and two
+pairings do extra work: Marie Curie's appeal IS the daffodil, and the biscuit
+poll lands on Macmillan of coffee-morning fame. The `+N more` lines exist
+because the visible figures fall ~27% short of the total and **that gap is
+correct** — more items sit below, and every favpoll's shared fund takes
+pledges attaching to no favourite. Making the numbers balance would have
+depicted a favpoll that cannot exist.
+
+## 10. A wrong claim, corrected — read this before trusting a "ceiling"
+
+Mid-session the assistant said the cards were "at their height ceiling".
+The founder challenged it and was right. In a ROW a card's height costs the
+hero **once**, not three times (`rowH == cardH`, measured 208 = 208). Real
+headroom before the hero exceeds one viewport:
+
+| viewport | interior | card | headroom |
+| --- | --- | --- | --- |
+| 1804×1002 | 2-col | 208 | +189px |
+| 1440×900 | 2-col | 208 | +128px |
+| 1280×800 | 2-col | 208 | +28px |
+| 1180×820 | stacked | 324 | −69px |
+| 1024×768 | stacked | 324 | −121px |
+
+The claim came from generalising the ONE tight case (1083×900, where the
+interior stacks so two gap bumps land in the same column and cost 8px, not
+4). The genuinely constrained band is the stacked-interior mid widths and
+short 768-tall viewports, and that is total hero content, not card height —
+a row is already the most compact arrangement there (324px against ~450 for
+three full-width stacked cards).
+
+Because the row created room, two earlier compromises were REVERSED: card
+padding 16 → 20px and poll rows 4 → 6px. Hero padding stays cut (`md:py-8`)
+and should stay cut: above 1280 the min-height governs and the content is
+centred, so that padding never renders — it is a floor for short viewports,
+not a look.
+
+## 11. CI repair — both signals were failing on EVERY PR (#525, #526)
+
+Found because a **docs-only PR failed Lint and E2E identically**. Two
+signals that fail unconditionally are worse than no signals: a real
+regression is indistinguishable from the noise.
+
+**Lint (#525): 5 errors → 0.** Fixed, not downgraded — `eslint.config.mjs`
+already carries the policy ("do NOT silence individual hits with disable
+comments; fix them or leave them counted"), and its warn-list is for rules
+needing per-component refactors. These didn't.
+
+- `pack-document.tsx` ×3: `SheetPrintButton` was declared INSIDE
+  `PackDocument`, so it was a new component type every render and React
+  unmounted/remounted the subtree instead of updating it. Hoisted to module
+  scope; the setter arrives as an `onPrint` prop.
+- the two `form-inner-*` test harnesses ×2: each assigned the form handle to
+  a module-scope variable during render. Moved into an effect — RTL flushes
+  effects inside `render()`, so the handle is ready before any test reads it.
+
+35 warnings remain: that is the tracked debt the config deliberately counts.
+
+**E2E (#526): 3 failures, all stale specs.** The specs had fallen behind
+three UI changes the unit tests all followed.
+
+- "choose your favourite" → the dialog says **"Pick your favourite {topic}"**
+  (the house Pick-never-Choose rule).
+- radio `"A cause"` → the label is **"Cause"**; `honour-step.test.tsx` had
+  been asserting the correct name all along.
+- a `"She"` pronoun radio in the honour step → **those controls left that
+  step on 2026-07-30** (they only shape generated suggestions, so they moved
+  to the form's Generate control). The gate is now
+  `subject !== "cause" && !category`, so a category alone enables Next. The
+  step was removed, not re-pointed.
+
+Not runnable locally (E2E needs Clerk credentials + staging, absent from
+`.env.local`), so CI was the first real execution — and passed 4/4.
+
+**The proof the two failures were independent and real:** #525 passed Lint
+and failed E2E; #526 passed E2E and failed Lint. Neither could be green
+alone, because each was missing the other's fix.
+
+## 12. Carried forward from part two
+
+- **Still no tests, all day.** The suite is 1189 exactly as it was at #507.
+  The matrix, the hero router, the glass treatment and the `*-on-band`
+  tokens are all untested. This is now a day-long gap, not a session one.
+- The flaky pledge-card test (§6) is STILL unbumped.
+- Mid widths 1024–1180 and short 768-tall viewports scroll the hero by
+  69–121px. Accepted, not fixed: it is total hero content, and a row is
+  already the most compact arrangement there.
+- `home.router.fundraisers.title` lost "& causes", so **the word "causes"
+  now appears nowhere on home** — consistent with the one-register decision,
+  but a faceless-cause organiser scanning the page has nothing that says
+  "this is for me". The natural home if you want it back is the card's body
+  copy, not the label.
+
+## 13. Method notes that earned their keep
+
+- **Simulate before committing.** The row layout was applied to the live DOM
+  and measured at four viewports before a line of it was written — that is
+  how "the cards don't resize" was known rather than hoped.
+- **Chrome returns `lab()`/`oklab()` from `getComputedStyle`.** Parsing the
+  numbers out of that string as RGB yields garbage (it produced a confident,
+  entirely wrong contrast table). Paint the colour to a 1×1 canvas and read
+  the pixel back to get real sRGB.
+- **Container queries where the parent's size is the variable.** Viewport
+  breakpoints cannot see zoom or a layout change; the card interior needed
+  the card's width.
+- **Assert alignment, don't eyeball it.** Comparing card left edges against
+  three-beat column left edges turned "looks aligned" into a boolean.
