@@ -89,7 +89,7 @@
   "home.router.memorials.body": "Remember them by what they loved — giving in their name, made for the wake.",
   "home.router.celebrations.title": "Celebrations",
   "home.router.celebrations.body": "Birthdays, weddings, retirements — the guest of honour's favourites, the fun turned into giving.",
-  "home.router.fundraisers.title": "Fundraisers",
+  "home.router.fundraisers.title": "Fundraisers & causes",
   "home.router.fundraisers.body": "Give supporters something to play for — everyone backs a favourite, the room chases the goal.",
   "home.router.explore": "Explore",
   "home.overview.eyebrow": "For every occasion",
@@ -133,7 +133,5 @@
   "home.matrix.display.label": "Live display",
   "home.matrix.display.memorial": "the quiet tribute screen at the wake",
   "home.matrix.display.celebration": "a total for the party to chase",
-  "home.matrix.display.fundraiser": "the telethon screen",
-  "home.router.causes.title": "Causes",
-  "home.router.causes.body": "No guest of honour needed — one question for your community, every pledge to the cause."
+  "home.matrix.display.fundraiser": "the telethon screen"
 }
