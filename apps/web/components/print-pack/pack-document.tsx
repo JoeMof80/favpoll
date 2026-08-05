@@ -215,6 +215,33 @@ function PackCard({
   )
 }
 
+// Sits OUTSIDE the sheet, like the top Save-as-PDF button. Module scope, not
+// nested in PackDocument: a component declared during render is a NEW type on
+// every render, so React unmounts and remounts the subtree each time instead
+// of updating it (react-hooks/static-components). The print target it sets
+// comes in as a prop rather than closing over the parent's setter.
+function SheetPrintButton({
+  target,
+  onPrint,
+}: {
+  target: keyof typeof SCALE
+  onPrint: (target: keyof typeof SCALE) => void
+}) {
+  return (
+    <div className="mb-2 flex w-full justify-end print:hidden">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => onPrint(target)}
+      >
+        <Printer data-icon="inline-start" aria-hidden="true" />
+        Print this page
+      </Button>
+    </div>
+  )
+}
+
 export function PackDocument({ data }: { data: PackData }) {
   const charities = charityLabel(data.charityNames)
   const firstName = data.isCause ? null : data.name.split(/[\s&]+/)[0] || null
@@ -248,23 +275,6 @@ export function PackDocument({ data }: { data: PackData }) {
   const hideWhenOtherPrints = (key: keyof typeof SCALE) =>
     printTarget && printTarget !== key ? "print:hidden" : ""
 
-  // Sits OUTSIDE the sheet, like the top Save-as-PDF button
-  function SheetPrintButton({ target }: { target: keyof typeof SCALE }) {
-    return (
-      <div className="mb-2 flex w-full justify-end print:hidden">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setPrintTarget(target)}
-        >
-          <Printer data-icon="inline-start" aria-hidden="true" />
-          Print this page
-        </Button>
-      </div>
-    )
-  }
-
   // Each section is one A4 sheet: distinct pages on screen (border +
   // shadow + gap), seamless in print where break-after-page splits them.
   const sheet =
@@ -278,7 +288,7 @@ export function PackDocument({ data }: { data: PackData }) {
           the paper is turned. The card keeps real mm dimensions in the
           pre-rotation box. ── */}
       <div className={hideWhenOtherPrints("a4")}>
-        <SheetPrintButton target="a4" />
+        <SheetPrintButton target="a4" onPrint={setPrintTarget} />
         <section
           className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2`}
         >
@@ -301,7 +311,7 @@ export function PackDocument({ data }: { data: PackData }) {
 
       {/* ── A5 cards: two per sheet, for tables and easels ── */}
       <div className={hideWhenOtherPrints("a5")}>
-        <SheetPrintButton target="a5" />
+        <SheetPrintButton target="a5" onPrint={setPrintTarget} />
         <section
           className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6 print:min-h-0`}
         >
@@ -314,7 +324,7 @@ export function PackDocument({ data }: { data: PackData }) {
 
       {/* ── Wallet cards: credit-card size (85.6 × 54 mm) ── */}
       <div className={hideWhenOtherPrints("wallet")}>
-        <SheetPrintButton target="wallet" />
+        <SheetPrintButton target="wallet" onPrint={setPrintTarget} />
         <section className={`${sheet} min-h-[277mm] px-6 py-8 print:min-h-0`}>
           <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
             {Array.from({ length: 8 }).map((_, i) => (

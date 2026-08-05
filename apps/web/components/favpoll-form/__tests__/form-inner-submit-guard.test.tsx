@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { FormInner } from "../form-inner"
 import type { FavpollFormValues } from "../schema"
@@ -57,7 +58,13 @@ function Wrapper({
       ...defaultValues,
     } as FavpollFormValues,
   })
-  capturedForm = form
+  // In an effect, not during render: assigning a module-scope variable
+  // while rendering is exactly what react-hooks/globals forbids, and
+  // React Testing Library flushes effects inside render(), so the
+  // handle is ready by the time any test reads it.
+  useEffect(() => {
+    capturedForm = form
+  })
   return (
     <FormInner
       form={form}
