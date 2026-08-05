@@ -10,6 +10,13 @@ type Props = {
   labelSuffix?: React.ReactNode
   /** "display" = projector scale (the live page) — larger text, thicker bar */
   size?: "default" | "display"
+  /**
+   * "band" = the bar sits on a coloured band (the landing hero's glass
+   * cards), so its ink and track come from the band's foreground rather
+   * than the page's. Without this the labels are page-ink on a dark
+   * surface and vanish.
+   */
+  tone?: "default" | "band"
   /** Leader emphasis: medium label, full-ink amount (the record's top row) */
   emphasis?: boolean
 }
@@ -23,9 +30,11 @@ export function RankingBar({
   className,
   labelSuffix,
   size = "default",
+  tone = "default",
   emphasis = false,
 }: Props) {
   const isDisplay = size === "display"
+  const onBand = tone === "band"
   return (
     <div className={className}>
       <div
@@ -37,7 +46,8 @@ export function RankingBar({
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
           <span
             className={cn(
-              "truncate text-foreground",
+              "truncate",
+              onBand ? "text-primary-foreground" : "text-foreground",
               emphasis && "font-medium"
             )}
           >
@@ -48,7 +58,14 @@ export function RankingBar({
         <span
           className={cn(
             "shrink-0 tabular-nums",
-            emphasis ? "font-medium text-foreground" : "text-muted-foreground"
+            emphasis && "font-medium",
+            onBand
+              ? emphasis
+                ? "text-primary-foreground"
+                : "text-primary-foreground/75"
+              : emphasis
+                ? "text-foreground"
+                : "text-muted-foreground"
           )}
         >
           {amount}
@@ -56,7 +73,8 @@ export function RankingBar({
       </div>
       <div
         className={cn(
-          "w-full overflow-hidden rounded-full bg-muted",
+          "w-full overflow-hidden rounded-full",
+          onBand ? "bg-primary-foreground/20" : "bg-muted",
           isDisplay ? "h-2" : "h-1.5"
         )}
         role="presentation"

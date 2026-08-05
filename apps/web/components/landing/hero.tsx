@@ -47,33 +47,65 @@ type Props = {
   router?: boolean
 }
 
+// The cards are glass on the brand band, so every accent mark uses the
+// *-on-band variant (see globals.css) — the base accents are tuned for page
+// surfaces and go invisible here in one theme or the other.
+//
+// Each card carries its OWN miniature poll rather than reading the register's
+// demo scene (founder, 2026-08-05): the topic has to be synonymous with the
+// register at a glance — flower/cake/biscuit — and the scenes are authored
+// stories whose topics serve their own reveal (the memorial scene turns on
+// Belinda's favourite COLOUR, which its reveal quote names). The card is a
+// signpost, not a rerun of the page's story. Charities are short by design:
+// the row sits beside the total at a third of the container's width.
 const ROUTER_CARDS = [
   {
     kind: "memorial" as const,
     href: "/memorials",
-    accent: "border-t-memorial",
-    eyebrow: "text-memorial",
-    bar: "bg-memorial",
+    bar: "bg-memorial-on-band",
     title: t("home.router.memorials.title"),
     body: t("home.router.memorials.body"),
+    topic: "flower",
+    more: "+9 more flowers",
+    charity: "Marie Curie",
+    total: "£1,005",
+    results: [
+      { label: "Sweet pea", amount: "£350", widthPercent: 78 },
+      { label: "Daffodil", amount: "£220", widthPercent: 51 },
+      { label: "Rose", amount: "£165", widthPercent: 38 },
+    ],
   },
   {
     kind: "celebration" as const,
     href: "/celebrations",
-    accent: "border-t-warning",
-    eyebrow: "text-warning",
-    bar: "bg-warning",
+    bar: "bg-warning-on-band",
     title: t("home.router.celebrations.title"),
     body: t("home.router.celebrations.body"),
+    topic: "cake",
+    more: "+6 more cakes",
+    charity: "Barnardo's",
+    total: "£705",
+    results: [
+      { label: "Victoria sponge", amount: "£210", widthPercent: 78 },
+      { label: "Lemon drizzle", amount: "£175", widthPercent: 65 },
+      { label: "Carrot cake", amount: "£130", widthPercent: 48 },
+    ],
   },
   {
     kind: "fundraiser" as const,
     href: "/fundraisers",
-    accent: "border-t-success",
-    eyebrow: "text-success",
-    bar: "bg-success",
+    bar: "bg-success-on-band",
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
+    topic: "biscuit",
+    more: "+8 more biscuits",
+    charity: "Macmillan",
+    total: "£810",
+    results: [
+      { label: "Hobnob", amount: "£240", widthPercent: 78 },
+      { label: "Digestive", amount: "£190", widthPercent: 62 },
+      { label: "Custard cream", amount: "£150", widthPercent: 49 },
+    ],
   },
 ] as const
 
@@ -108,10 +140,32 @@ export function LandingHero({
       )}
     >
       <HeroTexture />
-      <div className="relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_44rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
-        {/* Left — pitch (headline + CTA). Stats are a separate cell below,
-            so on mobile the demo comes right after the pitch. */}
-        <div className="md:col-start-1 md:row-start-1">
+      {/* Both layouts put the cards on the page's three-column rhythm: the
+          row uses grid-cols-3 with the same 2rem gutter as the three-beat
+          band below, and the demo column uses calc((100%-4rem)/3) — the same
+          402.7px, right-aligned to the container. At the original 44rem the
+          cards covered 35% of the band on a 1440 laptop and read as white
+          slabs; a third of the container is the fix. */}
+      <div
+        className={cn(
+          "relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:px-6",
+          router
+            ? // ROW (founder, 2026-08-05): statement on top, three doors
+              // across the bottom. The cards don't change size doing this —
+              // each was already a third of the container — so this is purely
+              // a restacking, and above md the band's min-height governs, so
+              // the hero height is identical at 1440 and up. py is a floor,
+              // not a look: the content is centred inside the min-height, so
+              // it only shows on a short viewport, where it buys the fit.
+              "md:grid-cols-1 md:gap-y-8 md:py-8"
+            : // COLUMN: the demo hero the register pages mount — the demo
+              // card is 400px, so the last-of-three column still holds it.
+              "md:grid-cols-[1fr_calc((100%-4rem)/3)] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
+        )}
+      >
+        {/* Pitch (headline + CTA). Stats are a separate cell below, so on
+            mobile the demo comes right after the pitch. */}
+        <div className={cn(!router && "md:col-start-1 md:row-start-1")}>
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
@@ -121,7 +175,17 @@ export function LandingHero({
               {eyebrow}
             </p>
           )}
-          <h1 className="mb-6 max-w-xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
+          {/* In row mode the headline has the whole band to itself, so it
+              scales up to hold that width — otherwise the pitch fills the
+              left 40% and leaves ~700px of empty purple beside it. The 6xl
+              step waits for 2xl: at 1280–1440 the extra 40px of line height
+              is the difference between the hero fitting a laptop and not. */}
+          <h1
+            className={cn(
+              "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              router ? "max-w-3xl 2xl:text-6xl" : "max-w-xl"
+            )}
+          >
             {(headline ?? t("landing.headline"))
               .split(". ")
               .map((sentence, i, all) => (
@@ -131,7 +195,12 @@ export function LandingHero({
                 </span>
               ))}
           </h1>
-          <p className="mb-8 max-w-md text-lg leading-relaxed opacity-80">
+          <p
+            className={cn(
+              "mb-8 text-lg leading-relaxed opacity-80",
+              router ? "max-w-2xl" : "max-w-md"
+            )}
+          >
             {subheader ?? t("landing.subheader")}
           </p>
           <div className="flex flex-wrap items-center gap-3.5">
@@ -156,72 +225,138 @@ export function LandingHero({
             ~360px-wide screen. On mobile it stacks directly under the pitch,
             before the stats, so the demo is the first thing a visitor scrolls
             to. */}
-        <div className="md:col-start-2 md:row-span-2 md:row-start-1">
+        <div
+          className={cn(
+            !router && "md:col-start-2 md:row-span-2 md:row-start-1"
+          )}
+        >
           {router ? (
             /* Register router — one card per register, its accent as the
                top rule; the demo lives on the page each card opens. */
             <nav
               aria-label="Explore favpoll by occasion"
-              className="grid gap-4"
+              className="grid gap-4 md:grid-cols-3 md:gap-8"
             >
               {ROUTER_CARDS.map((card) => (
                 <Link
                   key={card.kind}
                   href={card.href}
                   className={cn(
-                    "group block rounded-xl border-t-4 bg-background p-5 text-foreground shadow-lg transition-all hover:shadow-xl motion-safe:hover:-translate-y-0.5",
-                    card.accent
+                    // Glass, not white (founder, 2026-08-05): a translucent
+                    // wash of the band's OWN foreground, so the cards sit in
+                    // the hero rather than on it. Everything inside takes band
+                    // ink (text-primary-foreground), which is what makes this
+                    // survive the theme flip — the band inverts (purple with
+                    // white ink in light, pale with purple ink in dark), and a
+                    // wash of its own ink inverts with it. ring, not border, so
+                    // nothing fights the accent's border-t-4.
+                    // No accent top rule (founder, 2026-08-05) — the register
+                    // reads from the dot and the bars.
+                    "group @container block rounded-xl bg-primary-foreground/12 p-5 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
                       the register's text one side, its poll — the
                       product's core — the other. Scene-sourced, accent
                       bars, charity + total beneath. */}
-                  <div className="grid items-center gap-5 sm:grid-cols-[1fr_1.3fr]">
+                  {/* Top-aligned (founder, 2026-08-05): the register label and
+                      the topic header then share a top line across the two
+                      columns. Centred, the shorter text column floated below
+                      the topic header and nothing lined up.
+
+                      A CONTAINER query, not a viewport one: the interior has
+                      to answer to the CARD's width, which varies with the
+                      layout and with browser zoom. Keyed to the viewport it
+                      spilled — plain 1fr tracks have min-width:auto, so the
+                      poll could not shrink below its 147px min-content and
+                      burst the card by up to 69px between 768 and 950px (and
+                      at zoom, which is how this was found). minmax(0,…) stops
+                      the burst; the 21rem threshold stacks the interior
+                      before the columns get too mean to read. */}
+                  <div className="flex h-full flex-col gap-5 @min-[21rem]:grid @min-[21rem]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] @min-[21rem]:items-start">
                     <div>
-                      <p
-                        className={cn(
-                          "mb-1 text-xs font-medium tracking-widest uppercase",
-                          card.eyebrow
-                        )}
-                      >
+                      {/* The register accent is a DOT, not the ink (the
+                          matrix's grammar). Measured 2026-08-05: as text the
+                          accents fail on every surface we have — gold on the
+                          old white card was 2.14:1, and blue on the dark
+                          theme's purple card 1.95:1. As a dot beside full
+                          band ink the register still reads and the label is
+                          legible. */}
+                      {/* Inline, not a flex child: "Fundraisers & causes"
+                          wraps to two lines in this column, and a flex dot
+                          centres itself across both. Inline keeps it on the
+                          first line where it reads as a bullet. */}
+                      {/* leading-5 + mb-1.5 puts this column on the poll's
+                          rhythm (founder, 2026-08-05): the same 20px line box
+                          as the topic header, so the two headers share a
+                          baseline rather than just a top edge (12px/16px vs
+                          14px/20px left them ~3px out), and the same 8px gap
+                          the poll uses, so the body starts level with the
+                          first ranking row. */}
+                      <p className="mb-2 text-xs leading-5 font-medium tracking-widest uppercase">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle",
+                            card.bar
+                          )}
+                        />
                         {card.title}
                       </p>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
+                      <p className="text-sm leading-relaxed text-primary-foreground/75">
                         {card.body}
                       </p>
                     </div>
-                    {(() => {
-                      const scene = SCENES.find((sc) => sc.kind === card.kind)!
-                      return (
-                        <div
-                          aria-hidden="true"
-                          className="pointer-events-none space-y-1.5 select-none"
-                        >
-                          <p className="text-xs font-medium tracking-[0.09em] text-muted-foreground uppercase">
-                            Favourite {scene.poll.topic.title}
-                          </p>
-                          {scene.results.slice(0, 3).map((r) => (
-                            <RankingBar
-                              key={r.label}
-                              label={r.label}
-                              amount={r.amount}
-                              widthPercent={r.widthPercent}
-                              barClassName={card.bar}
-                            />
-                          ))}
-                          {/* Where it all goes — charity + running total */}
-                          <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
-                            <span className="text-muted-foreground">
-                              {scene.charities[0].name}
-                            </span>
-                            <span className="font-medium text-primary">
-                              {scene.total}
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    })()}
+                    {/* Stacked, the bodies run 3 or 4 lines depending on the
+                        register, which left each card's poll starting at a
+                        different height. mt-auto pins the poll to the foot of
+                        the card so the three polls line up across the row
+                        (the cards are equal height already — grid stretch).
+                        Cancelled in two-column mode, where the poll is its
+                        own column and must stay top-aligned with the label. */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none mt-auto space-y-1.5 select-none @min-[21rem]:mt-0"
+                    >
+                      {/* text-sm, a step above the register label (founder,
+                          2026-08-05): the poll is the product's core, so its
+                          question shouldn't be the smallest thing on the
+                          card. */}
+                      <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-primary-foreground/70 uppercase">
+                        Favourite {card.topic}
+                      </p>
+                      {card.results.map((r) => (
+                        <RankingBar
+                          key={r.label}
+                          label={r.label}
+                          amount={r.amount}
+                          widthPercent={r.widthPercent}
+                          barClassName={card.bar}
+                          tone="band"
+                        />
+                      ))}
+                      {/* The three bars are a TOP three, and the total is the
+                          whole favpoll's — without this line the figures read
+                          as a column that doesn't add up (£735 shown against
+                          £1,005). The gap is real and correct: more items sit
+                          below, and every favpoll's shared fund takes pledges
+                          that attach to no favourite, so a total can never be
+                          just the sum of its visible rows. */}
+                      <p className="text-xs text-primary-foreground/55">
+                        {card.more}
+                      </p>
+                      {/* Where it all goes — charity + running total. No rule
+                          above it (founder, 2026-08-05); the spacing carries
+                          the break. */}
+                      <div className="flex items-center justify-between gap-3 pt-1.5 text-sm">
+                        <span className="min-w-0 truncate text-primary-foreground/70">
+                          {card.charity}
+                        </span>
+                        <span className="shrink-0 font-medium text-primary-foreground">
+                          {card.total}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -323,8 +458,19 @@ export function LandingHero({
           )}
         </div>
 
+        {/* In row mode the stats take the cards' own three columns and gutter
+            (founder, 2026-08-05), so each figure sits under a card instead of
+            floating on its own spacing. The demo hero keeps the flex row —
+            there the stats live in the narrow pitch column. */}
         {!hideStats && (
-          <dl className="flex flex-wrap gap-x-14 gap-y-6 border-t border-primary-foreground/20 pt-8 md:col-start-1 md:row-start-2">
+          <dl
+            className={cn(
+              "gap-y-6 border-t border-primary-foreground/20 pt-8",
+              router
+                ? "grid grid-cols-2 gap-x-8 md:grid-cols-3"
+                : "flex flex-wrap gap-x-14"
+            )}
+          >
             <div>
               <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
                 Open favpolls
