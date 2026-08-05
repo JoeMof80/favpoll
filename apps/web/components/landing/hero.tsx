@@ -75,15 +75,6 @@ const ROUTER_CARDS = [
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
   },
-  {
-    kind: "cause" as const,
-    href: "/fundraisers",
-    accent: "border-t-success",
-    eyebrow: "text-success",
-    bar: "bg-success",
-    title: t("home.router.causes.title"),
-    body: t("home.router.causes.body"),
-  },
 ] as const
 
 export function LandingHero({
@@ -171,7 +162,7 @@ export function LandingHero({
                top rule; the demo lives on the page each card opens. */
             <nav
               aria-label="Explore favpoll by occasion"
-              className="grid gap-4 sm:grid-cols-2"
+              className="grid gap-4"
             >
               {ROUTER_CARDS.map((card) => (
                 <Link
@@ -182,52 +173,56 @@ export function LandingHero({
                     card.accent
                   )}
                 >
-                  <p
-                    className={cn(
-                      "mb-1 text-xs font-medium tracking-widest uppercase",
-                      card.eyebrow
-                    )}
-                  >
-                    {card.title}
-                  </p>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {card.body}
-                  </p>
-                  {/* The register's poll in miniature — pulled from its
-                      demo scene, so the card previews the exact story
-                      its page plays; bars wear the register accent.
-                      Polls are the product's core (founder, 2026-08-05). */}
-                  {(() => {
-                    const scene = SCENES.find((sc) => sc.kind === card.kind)!
-                    return (
-                      <div
-                        aria-hidden="true"
-                        className="pointer-events-none mt-3 space-y-1.5 select-none"
+                  {/* Two columns inside the card (founder, 2026-08-05):
+                      the register's text one side, its poll — the
+                      product's core — the other. Scene-sourced, accent
+                      bars, charity + total beneath. */}
+                  <div className="grid items-center gap-5 sm:grid-cols-[1fr_1.3fr]">
+                    <div>
+                      <p
+                        className={cn(
+                          "mb-1 text-xs font-medium tracking-widest uppercase",
+                          card.eyebrow
+                        )}
                       >
-                        <p className="text-xs font-medium tracking-[0.09em] text-muted-foreground uppercase">
-                          Favourite {scene.poll.topic.title}
-                        </p>
-                        {scene.results.slice(0, 3).map((r) => (
-                          <RankingBar
-                            key={r.label}
-                            label={r.label}
-                            amount={r.amount}
-                            widthPercent={r.widthPercent}
-                            barClassName={card.bar}
-                          />
-                        ))}
-                        {/* Where it all goes — charity + running total */}
-                        <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
-                          <span className="text-muted-foreground">
-                            {scene.charities[0].name}
-                          </span>
-                          <span className="font-medium text-primary">
-                            {scene.total}
-                          </span>
+                        {card.title}
+                      </p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {card.body}
+                      </p>
+                    </div>
+                    {(() => {
+                      const scene = SCENES.find((sc) => sc.kind === card.kind)!
+                      return (
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none space-y-1.5 select-none"
+                        >
+                          <p className="text-xs font-medium tracking-[0.09em] text-muted-foreground uppercase">
+                            Favourite {scene.poll.topic.title}
+                          </p>
+                          {scene.results.slice(0, 3).map((r) => (
+                            <RankingBar
+                              key={r.label}
+                              label={r.label}
+                              amount={r.amount}
+                              widthPercent={r.widthPercent}
+                              barClassName={card.bar}
+                            />
+                          ))}
+                          {/* Where it all goes — charity + running total */}
+                          <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
+                            <span className="text-muted-foreground">
+                              {scene.charities[0].name}
+                            </span>
+                            <span className="font-medium text-primary">
+                              {scene.total}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })()}
+                      )
+                    })()}
+                  </div>
                 </Link>
               ))}
             </nav>
