@@ -273,9 +273,9 @@ Monday nudge sent 15:17, short and same-thread, sandbox ask dropped
 at 15:25** — eight minutes — offering Friday; Joe accepted "anytime
 Friday afternoon".
 
-- **Call expected Friday 7 August, afternoon** — awaiting Ethan to pin
-  a slot/invite. If no invite lands by Wednesday, a one-line "shall we
-  say 2pm?" pins it (name a time; don't reopen the window).
+- **Call PINNED: Friday 7 August, 14:30** (confirmed 5 August). No
+  chase needed — the "name a time if no invite by Wednesday" fallback
+  is spent.
 - **Prep**: `goodstack-call-brief-2026-07.md` is print-ready — fees
   first ("net any applicable fees" vs the 100% promise; push
   platform-billed), fund-ingestion second, Gift Aid a one-line
