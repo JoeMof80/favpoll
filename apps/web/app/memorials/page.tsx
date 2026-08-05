@@ -70,7 +70,7 @@ export default function MemorialsPage() {
         headline={t("memorials.headline")}
         subheader={t("memorials.subheader")}
         ctaLabel={t("memorials.cta.primary")}
-        bandClassName="bg-memorial text-memorial-foreground"
+        accentBarClassName="bg-memorial"
         hideStats
       />
 
@@ -96,7 +96,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── Placement: the wake, not the service ── */}
-      <section className="w-full bg-memorial-muted">
+      <section className="w-full bg-primary/5">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
             {t("memorials.wake.title")}
@@ -162,7 +162,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── Close — the landing's purple monogram close, one line ── */}
-      <section className="bg-memorial text-memorial-foreground">
+      <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
           <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
             {t("memorials.close.headline")}

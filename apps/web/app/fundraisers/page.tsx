@@ -48,7 +48,7 @@ export default function FundraisersPage() {
         headline={t("fundraisers.headline")}
         subheader={t("fundraisers.subheader")}
         ctaLabel={t("fundraisers.cta.primary")}
-        bandClassName="bg-success text-success-foreground"
+        accentBarClassName="bg-success-strong"
         hideStats
       />
 
@@ -74,7 +74,7 @@ export default function FundraisersPage() {
       </section>
 
       {/* ── The room: goal + live display ── */}
-      <section className="w-full bg-success/5">
+      <section className="w-full bg-primary/5">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
             {t("fundraisers.rally.title")}
@@ -82,7 +82,7 @@ export default function FundraisersPage() {
           <p className="mb-6 leading-relaxed text-muted-foreground">
             {t("fundraisers.rally.body")}
           </p>
-          <p className="border-l-2 border-success pl-4 text-lg text-foreground italic">
+          <p className="border-l-2 border-success-strong pl-4 text-lg text-foreground italic">
             {t("fundraisers.rally.line")}
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function FundraisersPage() {
               <li key={line} className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success"
+                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success-strong"
                 />
                 <p className="leading-relaxed text-muted-foreground">{line}</p>
               </li>
@@ -109,7 +109,7 @@ export default function FundraisersPage() {
       </section>
 
       {/* ── Close ── */}
-      <section className="bg-success text-success-foreground">
+      <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
           <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
             {t("fundraisers.close.headline")}

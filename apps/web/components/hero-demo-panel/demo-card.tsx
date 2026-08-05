@@ -30,6 +30,13 @@ type Props = {
   barWidths: number[]
   prefersReducedMotion: boolean
   className?: string
+  /**
+   * Register accent for the LEADER bar only (founder, 2026-08-05): the
+   * register pages wear standard purple/white branding, and the accent
+   * survives as small marks — a bar, a rule, a dot — the way the home
+   * router cards do it. Omitted = brand purple.
+   */
+  accentBarClassName?: string
 }
 
 // Types `text` out character by character while `active`; shows full text
@@ -97,6 +104,7 @@ export function DemoCard({
   barWidths,
   prefersReducedMotion,
   className,
+  accentBarClassName,
 }: Props) {
   const favourites = scene.poll.topic.favourites
   const selected = favourites[scene.selectedIndex]
@@ -234,7 +242,9 @@ export function DemoCard({
             label={result.label}
             amount={result.amount}
             widthPercent={barWidths[i] ?? 0}
-            barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
+            barClassName={
+              i === 0 ? (accentBarClassName ?? "bg-primary") : "bg-chart-3"
+            }
             barStyle={{
               transition:
                 animate && !prefersReducedMotion

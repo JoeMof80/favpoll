@@ -51,7 +51,7 @@ export default function CelebrationsPage() {
         headline={t("celebrations.headline")}
         subheader={t("celebrations.subheader")}
         ctaLabel={t("celebrations.cta.primary")}
-        bandClassName="bg-warning text-foreground"
+        accentBarClassName="bg-warning-strong"
         hideStats
       />
 
@@ -77,7 +77,7 @@ export default function CelebrationsPage() {
       </section>
 
       {/* ── Placement: a beat in the speeches ── */}
-      <section className="w-full bg-warning-muted">
+      <section className="w-full bg-primary/5">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
             {t("celebrations.moment.title")}
@@ -85,7 +85,7 @@ export default function CelebrationsPage() {
           <p className="mb-6 leading-relaxed text-muted-foreground">
             {t("celebrations.moment.body")}
           </p>
-          <p className="border-l-2 border-warning pl-4 text-lg text-foreground italic">
+          <p className="border-l-2 border-warning-strong pl-4 text-lg text-foreground italic">
             {t("celebrations.moment.line")}
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function CelebrationsPage() {
               <li key={line} className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning"
+                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning-strong"
                 />
                 <p className="leading-relaxed text-muted-foreground">{line}</p>
               </li>
@@ -112,7 +112,7 @@ export default function CelebrationsPage() {
       </section>
 
       {/* ── Close — gold band, brand CTA ── */}
-      <section className="bg-warning text-foreground">
+      <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
           <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
             {t("celebrations.close.headline")}
