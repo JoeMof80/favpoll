@@ -39,6 +39,7 @@ const REGISTERS = [
     label: "Memorials",
     accent: "text-memorial",
     dot: "bg-memorial",
+    col: "bg-memorial-muted/50",
   },
   {
     key: "celebration",
@@ -46,6 +47,7 @@ const REGISTERS = [
     label: "Celebrations",
     accent: "text-warning",
     dot: "bg-warning",
+    col: "bg-warning-muted/60",
   },
   {
     key: "fundraiser",
@@ -53,6 +55,7 @@ const REGISTERS = [
     label: "Fundraisers",
     accent: "text-success",
     dot: "bg-success",
+    col: "bg-success/8",
   },
 ] as const
 
@@ -73,7 +76,10 @@ export function RegisterMatrix() {
                   </span>
                 </th>
                 {REGISTERS.map((reg) => (
-                  <th key={reg.key} className="w-1/4 pr-4 pb-4 align-bottom">
+                  <th
+                    key={reg.key}
+                    className={cn("w-1/4 px-4 pt-4 pb-4 align-bottom", reg.col)}
+                  >
                     <Link
                       href={reg.href}
                       className={cn(
@@ -105,7 +111,10 @@ export function RegisterMatrix() {
                   {REGISTERS.map((reg, i) => {
                     const shine = feature.fit[i] === 1
                     return (
-                      <td key={reg.key} className="py-3.5 pr-4 text-sm">
+                      <td
+                        key={reg.key}
+                        className={cn("px-4 py-3.5 text-sm", reg.col)}
+                      >
                         <span
                           className={cn(
                             "inline-flex items-baseline gap-1.5",

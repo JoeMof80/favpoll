@@ -96,12 +96,15 @@ export function LandingHero({
   return (
     <section
       className={cn(
-        "relative",
+        // Full-screen band (founder, 2026-08-05): the hero fills the
+        // viewport below the h-14 nav, content vertically centred —
+        // min-h, not h, so short phones never clip.
+        "relative flex min-h-[calc(100vh-3.5rem)] items-center",
         bandClassName ?? "bg-primary text-primary-foreground"
       )}
     >
       <HeroTexture />
-      <div className="relative mx-auto grid max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
+      <div className="relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
         {/* Left — pitch (headline + CTA). Stats are a separate cell below,
             so on mobile the demo comes right after the pitch. */}
         <div className="md:col-start-1 md:row-start-1">
