@@ -108,7 +108,7 @@ export function LandingHero({
       )}
     >
       <HeroTexture />
-      <div className="relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_25rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
+      <div className="relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:grid-cols-[1fr_44rem] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:px-6 md:py-20">
         {/* Left — pitch (headline + CTA). Stats are a separate cell below,
             so on mobile the demo comes right after the pitch. */}
         <div className="md:col-start-1 md:row-start-1">
@@ -162,15 +162,16 @@ export function LandingHero({
                top rule; the demo lives on the page each card opens. */
             <nav
               aria-label="Explore favpoll by occasion"
-              className="grid gap-4"
+              className="grid gap-4 sm:grid-cols-2"
             >
-              {ROUTER_CARDS.map((card) => (
+              {ROUTER_CARDS.map((card, i) => (
                 <Link
                   key={card.href}
                   href={card.href}
                   className={cn(
                     "group block rounded-xl border-t-4 bg-background p-5 text-foreground shadow-lg transition-all hover:shadow-xl motion-safe:hover:-translate-y-0.5",
-                    card.accent
+                    card.accent,
+                    i === 2 && "sm:col-span-2"
                   )}
                 >
                   <p
@@ -207,6 +208,15 @@ export function LandingHero({
                             barClassName={card.bar}
                           />
                         ))}
+                        {/* Where it all goes — charity + running total */}
+                        <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
+                          <span className="text-muted-foreground">
+                            {scene.charities[0].name}
+                          </span>
+                          <span className="font-medium text-primary">
+                            {scene.total}
+                          </span>
+                        </div>
                       </div>
                     )
                   })()}
