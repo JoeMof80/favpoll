@@ -13,6 +13,7 @@ import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
+import { RankingBar } from "@/components/ui/ranking-bar"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
 import { useDemoLoop, beatForPhase } from "./use-demo-loop"
@@ -52,6 +53,7 @@ const ROUTER_CARDS = [
     href: "/memorials",
     accent: "border-t-memorial",
     eyebrow: "text-memorial",
+    bar: "bg-memorial",
     title: t("home.router.memorials.title"),
     body: t("home.router.memorials.body"),
   },
@@ -60,6 +62,7 @@ const ROUTER_CARDS = [
     href: "/celebrations",
     accent: "border-t-warning",
     eyebrow: "text-warning",
+    bar: "bg-warning",
     title: t("home.router.celebrations.title"),
     body: t("home.router.celebrations.body"),
   },
@@ -68,6 +71,7 @@ const ROUTER_CARDS = [
     href: "/fundraisers",
     accent: "border-t-success",
     eyebrow: "text-success",
+    bar: "bg-success",
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
   },
@@ -180,7 +184,33 @@ export function LandingHero({
                   <p className="text-sm leading-relaxed text-muted-foreground">
                     {card.body}
                   </p>
-                  <p className="mt-2 text-sm font-medium text-primary">
+                  {/* The register's poll in miniature — pulled from its
+                      demo scene, so the card previews the exact story
+                      its page plays; bars wear the register accent.
+                      Polls are the product's core (founder, 2026-08-05). */}
+                  {(() => {
+                    const scene = SCENES.find((sc) => sc.kind === card.kind)!
+                    return (
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none mt-3 space-y-1.5 select-none"
+                      >
+                        <p className="text-[10px] font-medium tracking-[0.09em] text-muted-foreground uppercase">
+                          Favourite {scene.poll.topic.title}
+                        </p>
+                        {scene.results.slice(0, 3).map((r) => (
+                          <RankingBar
+                            key={r.label}
+                            label={r.label}
+                            amount={r.amount}
+                            widthPercent={r.widthPercent}
+                            barClassName={card.bar}
+                          />
+                        ))}
+                      </div>
+                    )
+                  })()}
+                  <p className="mt-3 text-sm font-medium text-primary">
                     {t("home.router.explore")}{" "}
                     <span
                       aria-hidden="true"
