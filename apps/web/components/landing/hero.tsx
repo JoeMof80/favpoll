@@ -75,6 +75,15 @@ const ROUTER_CARDS = [
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
   },
+  {
+    kind: "cause" as const,
+    href: "/fundraisers",
+    accent: "border-t-success",
+    eyebrow: "text-success",
+    bar: "bg-success",
+    title: t("home.router.causes.title"),
+    body: t("home.router.causes.body"),
+  },
 ] as const
 
 export function LandingHero({
@@ -164,14 +173,13 @@ export function LandingHero({
               aria-label="Explore favpoll by occasion"
               className="grid gap-4 sm:grid-cols-2"
             >
-              {ROUTER_CARDS.map((card, i) => (
+              {ROUTER_CARDS.map((card) => (
                 <Link
-                  key={card.href}
+                  key={card.kind}
                   href={card.href}
                   className={cn(
                     "group block rounded-xl border-t-4 bg-background p-5 text-foreground shadow-lg transition-all hover:shadow-xl motion-safe:hover:-translate-y-0.5",
-                    card.accent,
-                    i === 2 && "sm:col-span-2"
+                    card.accent
                   )}
                 >
                   <p
@@ -196,7 +204,7 @@ export function LandingHero({
                         aria-hidden="true"
                         className="pointer-events-none mt-3 space-y-1.5 select-none"
                       >
-                        <p className="text-[10px] font-medium tracking-[0.09em] text-muted-foreground uppercase">
+                        <p className="text-xs font-medium tracking-[0.09em] text-muted-foreground uppercase">
                           Favourite {scene.poll.topic.title}
                         </p>
                         {scene.results.slice(0, 3).map((r) => (
@@ -209,7 +217,7 @@ export function LandingHero({
                           />
                         ))}
                         {/* Where it all goes — charity + running total */}
-                        <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
+                        <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
                           <span className="text-muted-foreground">
                             {scene.charities[0].name}
                           </span>
@@ -220,15 +228,6 @@ export function LandingHero({
                       </div>
                     )
                   })()}
-                  <p className="mt-3 text-sm font-medium text-primary">
-                    {t("home.router.explore")}{" "}
-                    <span
-                      aria-hidden="true"
-                      className="inline-block transition-transform group-hover:translate-x-0.5"
-                    >
-                      →
-                    </span>
-                  </p>
                 </Link>
               ))}
             </nav>
