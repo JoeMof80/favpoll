@@ -100,7 +100,9 @@ test.describe("reveal after pledge", () => {
     // Dialog opens (ResponsiveOverlay renders as Dialog on desktop)
     const dialog = page.getByRole("dialog")
     await expect(dialog).toBeVisible()
-    await expect(dialog).toContainText(/choose your favourite/i)
+    // "Pick", never "Choose" — the house copy rule. The dialog's step-1 title
+    // is `Pick your favourite ${topic}` (pledge-dialog/index.tsx).
+    await expect(dialog).toContainText(/pick your favourite/i)
 
     // ── 4. Step 1: Pick a favourite ───────────────────────────────────────────
     // Colour is a finite topic. Chips render as <button aria-pressed="false|true">,

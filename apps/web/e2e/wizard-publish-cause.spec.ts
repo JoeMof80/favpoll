@@ -8,7 +8,7 @@
  * CauseHero, and the cause-label field instead of a protagonist name.
  *
  * Exists because none of those branches are exercised by
- * wizard-publish.spec.ts (She + Memorial), and the first remodel regression
+ * wizard-publish.spec.ts (Memorial), and the first remodel regression
  * — FormInner's `if (!category) return null` blank-paging the details page —
  * shipped through 1024 green unit tests and was only caught by a manual
  * founder run-through of exactly this flow.
@@ -16,7 +16,7 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Honour step: "A cause" alone — no type; Next must enable immediately
+ *   3. Honour step: "Cause" alone — no type; Next must enable immediately
  *   4. Charity step: Marie Curie
  *   5. Love step: Colour topic
  *   6. Details page: MUST render (the blank-page regression) → fill cause label
@@ -67,10 +67,10 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
     // ── 2. Honour step — the cause fork ───────────────────────────────────────
-    // "A cause" sits alone below the OR divider. Selecting it is the complete
+    // "Cause" sits alone below the OR divider. Selecting it is the complete
     // answer to step 1: no type question applies (category stays null), so
     // Next must enable from this single click.
-    const causeRadio = page.getByRole("radio", { name: "A cause" })
+    const causeRadio = page.getByRole("radio", { name: "Cause" })
     await expect(causeRadio).toBeVisible({ timeout: 10_000 })
     await causeRadio.click()
     await expect(causeRadio).toBeChecked()
@@ -168,10 +168,10 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
     // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
-    // exact "In a month" chip — a broad fallback can match calendar internals
+    // exact "1 month" chip — a broad fallback can match calendar internals
     // and hang on an invisible button.
     await closeDateDialog
-      .getByRole("button", { name: "In a month", exact: true })
+      .getByRole("button", { name: "1 month", exact: true })
       .click()
 
     const publishConfirm = closeDateDialog

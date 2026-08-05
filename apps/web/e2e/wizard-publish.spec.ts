@@ -11,7 +11,7 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Honour step: She + Memorial
+ *   3. Honour step: Memorial (the who refinements moved to Generate)
  *   4. Charity step: Marie Curie
  *   5. Love step: Colour topic
  *   6. Details page: fill protagonist name
@@ -73,15 +73,12 @@ test.describe("wizard → publish flow", () => {
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
     // ── 2. Honour step ────────────────────────────────────────────────────────
-    // Two ToggleGroup rows: who row (He/She/They/couple/group/cause) and
-    // category row (Celebration/Memorial/Fundraiser). Both must be selected
-    // before Next is enabled. Select "She" + "Memorial".
-    const sheRadio = page.getByRole("radio", { name: /^she$/i })
-    await expect(sheRadio).toBeVisible({ timeout: 10_000 })
-    await sheRadio.click()
-
+    // One category row (Celebration/Memorial/Fundraiser) plus the Cause fork.
+    // The who refinements (He/She/They/Pair/Group) left this step on
+    // 2026-07-30 — they only shape generated suggestions, so they now live on
+    // the form's Generate control. Picking a type is the whole answer here.
     const memorialRadio = page.getByRole("radio", { name: /memorial/i })
-    await expect(memorialRadio).toBeVisible()
+    await expect(memorialRadio).toBeVisible({ timeout: 10_000 })
     await memorialRadio.click()
     await expect(memorialRadio).toBeChecked()
 
@@ -182,10 +179,10 @@ test.describe("wizard → publish flow", () => {
     await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
 
     // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
-    // exact "In a month" chip — a broad fallback can match calendar internals
+    // exact "1 month" chip — a broad fallback can match calendar internals
     // and hang on an invisible button.
     await closeDateDialog
-      .getByRole("button", { name: "In a month", exact: true })
+      .getByRole("button", { name: "1 month", exact: true })
       .click()
 
     // Click the "Publish" submit button in the overlay footer
