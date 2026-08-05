@@ -318,3 +318,100 @@ alone, because each was missing the other's fix.
   the card's width.
 - **Assert alignment, don't eyeball it.** Comparing card left edges against
   three-beat column left edges turned "looks aligned" into a boolean.
+
+---
+
+# Part three — register branding settled (PRs #527–#529)
+
+## 14. Per-register THEMING: explored, rejected, nothing shipped
+
+A founder-led revisit of the 2026-08-03 "no per-register rebrand" call —
+**deliberate, stated as such, not drift.** Two shapes were built on
+/memorials and looked at:
+
+- **(a) indigo + ice blue** — purple's hue shifted 278 → 262, the light end
+  re-pitched to ~0.985 / hue 250;
+- **(b) the founder's framing: purple held EXACTLY**, only the white end
+  re-pitched — surfaces, borders, and the ink on purple, which also carries
+  the logo and the monogram texture since both draw with `currentColor`.
+
+Neither was rejected for breaking anything: both measured **7.0–7.6:1**
+headline-on-band. They were rejected for what they DO. With purple held,
+the register can only live in the LIGHT surfaces — clear on content bands,
+**nearly invisible above the fold** where the screen is mostly purple, since
+the only difference from home up there is ink at 0.955 vs 0.99 lightness.
+Registers became something you feel as you scroll rather than something the
+page announces.
+
+**Conclusion: subtle accents on the standard branding.** Working tree
+reverted; nothing shipped. Recorded in PROJECT.md via #528 so a third
+revisit starts from the finding rather than from scratch.
+
+**Trap for anyone who tries again:** a `.theme-*` class has no light-mode
+selector, so every token it sets leaks into dark unless the dark block
+restates ALL of them. The first attempt produced an ice page with ice ink —
+completely unreadable — from exactly this.
+
+## 15. Register pages back to standard branding (#529)
+
+The register pages had gone further than the accent system intended: a full
+accent BAND for the hero and the close, plus an accent-tinted section. They
+now wear standard purple/white exactly as home, and the register is carried
+the way the home router cards carry it — **small marks**.
+
+Each page drops its `bandClassName` (hero = brand purple, verified identical
+to home's computed colour), its tinted section becomes `bg-primary/5`, and
+its close becomes the purple monogram close. What stays accent: the
+pull-quote rule, the presence-list dots, and — new — the demo card's LEADER
+bar, via an optional `accentBarClassName` threaded `DemoCard ← LandingHero`.
+Runners-up stay `bg-chart-3`, so the accent marks the top answer only.
+
+**NEW TOKENS `--warning-strong` / `--success-strong`.** Gold and green are
+pitched light for surface use, so as marks on a pale track they measured
+**1.94:1** and **3.04:1** — gold below even the 3:1 non-text floor, i.e. a
+"subtle gold mark" was effectively invisible. The deep variants clear 4.5 and
+the three registers now read at matched weight:
+
+| register | bar vs track | rule vs page |
+| --- | --- | --- |
+| memorial | 5.28 | 6.00 |
+| celebration | 4.56 | 5.17 |
+| fundraiser | 4.49 | 5.09 |
+
+Memorial needs no variant — its base already sits at 0.5. Same job
+`--destructive-strong` already does for error text on a soft surface. In
+dark the variants go LIGHTER, since a mark on a dark surface reads by
+lightening, not deepening.
+
+## 16. State at session close
+
+**Merged today:** #523 (handoff pt1 + diary pins), #524 (hero rebuild),
+#525 (lint), #526 (E2E), #527 (handoff pt2). `main` is green on all five CI
+signals — Lint, Test, Typecheck, Format, E2E — for the first time in a
+while, since Lint and E2E had been failing on EVERY PR including docs-only
+ones.
+
+**Open, awaiting review:** #528 (theming decision record, docs only) and
+#529 (register pages → standard branding).
+
+**Still carried forward:** nothing all day added a test — the suite is 1189
+exactly as it was at #507, so the matrix, the hero router, the glass
+treatment, the `*-on-band` and `*-strong` tokens are all untested. The
+pledge-card flaky test is still unbumped.
+
+## 17. Ops — the Tailwind scan cache bit TWICE
+
+Both times on newly-named utilities (`bg-memorial-on-band`, then
+`bg-warning-strong`). Symptom: the class is present in the DOM but resolves
+to transparent, and the custom property is missing from computed style
+entirely — Tailwind v4 strips properties it believes unreferenced, and the
+stale scan cache is what makes it believe that.
+
+**The giveaway worth remembering:** a contrast probe returned an impossible
+**18.51:1 for two different colours**. Identical ratios for different inputs
+means both resolved to the same thing — transparent, painted as black.
+
+Fix, both times: stop the dev server, `rm -rf apps/web/.next`, restart with
+`NODE_OPTIONS=--max-old-space-size=8192`. Before touching a running dev
+server, prove it is local: a fresh `pnpm build` CONTAINED the tokens while
+the dev chunk did not, which established it was never a shipped regression.
