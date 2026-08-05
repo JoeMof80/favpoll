@@ -47,6 +47,16 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-muted: var(--warning-muted);
+  /* On-band register accents (2026-08-05). The brand band INVERTS between
+     themes (dark purple with white ink in light; near-white with purple ink
+     in dark) but the base accents do not, so each one dies in one theme:
+     measured on the hero's glass cards, memorial scored 1.04:1 in light and
+     gold 1.31:1 in dark. These variants flip WITH the band and clear the
+     3:1 non-text floor in both (3.8–5.6). Use them for any accent mark that
+     sits on the brand band; the base tokens stay correct on page surfaces. */
+  --color-memorial-on-band: var(--memorial-on-band);
+  --color-warning-on-band: var(--warning-on-band);
+  --color-success-on-band: var(--success-on-band);
   --color-destructive: var(--destructive);
   --color-destructive-muted: var(--destructive-muted);
   --color-destructive-strong: var(--destructive-strong);
@@ -122,6 +132,11 @@
   --memorial: oklch(0.5 0.1 250);
   --memorial-foreground: oklch(0.99 0 0);
   --memorial-muted: oklch(0.96 0.02 250);
+  /* Light theme: the band is deep purple, so on-band accents go light.
+     Lightness keeps the register-energy order (gold > green > blue). */
+  --memorial-on-band: oklch(0.84 0.08 250);
+  --warning-on-band: oklch(0.9 0.11 85);
+  --success-on-band: oklch(0.85 0.11 165);
   --ring: oklch(0.62 0.14 278);
   --chart-1: oklch(0.44 0.18 278);
   --chart-2: oklch(0.62 0.14 278);
@@ -174,6 +189,11 @@
   --memorial: oklch(0.58 0.09 250);
   --memorial-foreground: oklch(0.99 0 0);
   --memorial-muted: oklch(0.35 0.05 250);
+  /* Dark theme: the band is near-white, so on-band accents go dark —
+     same register-energy order, mirrored. */
+  --memorial-on-band: oklch(0.45 0.11 250);
+  --warning-on-band: oklch(0.55 0.13 71);
+  --success-on-band: oklch(0.5 0.12 165);
   --ring: oklch(0.82 0.08 278);
   --chart-1: oklch(0.92 0.05 278);
   --chart-2: oklch(0.78 0.1 278);
