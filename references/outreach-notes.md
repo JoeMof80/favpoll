@@ -326,9 +326,9 @@ ask of her time.
   adding them — the hero displays it.
 
 
-## Marketing-friend meeting (Thursday 2026-08-06) — celebration/fundraiser lens
+## Sarah — marketing friend (Thursday 2026-08-06) — celebration/fundraiser lens
 
-Friend in marketing at The British Hamper Company (luxury occasion
+Sarah, friend in marketing at The British Hamper Company (luxury occasion
 hampers, Lincoln; consumer + corporate gifting divisions; occasions =
 birthdays/weddings/new baby/Christmas; corporate = employee gifts, work
 anniversaries, bespoke). Adjacent, not distant: occasion marketing IS

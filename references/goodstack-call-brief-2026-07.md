@@ -3,6 +3,8 @@
 _Companion to `disbursement-enquiries-2026-07.md` (which holds the enquiry
 status + full question checklist). This is the readable narrative version._
 
+**CALL PINNED: Friday 7 August 2026, 14:30 with Ethan (Goodstack).**
+
 **UPDATED 27 July 2026 for the Ethan call** — Josh forwarded the 20 July
 email; **Ethan (Goodstack) replied 27 July offering 30 minutes**. Joe's
 reply proposes this week and asks for **sandbox access ahead of the call**
