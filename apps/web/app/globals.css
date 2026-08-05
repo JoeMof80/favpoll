@@ -54,6 +54,13 @@
      gold 1.31:1 in dark. These variants flip WITH the band and clear the
      3:1 non-text floor in both (3.8–5.6). Use them for any accent mark that
      sits on the brand band; the base tokens stay correct on page surfaces. */
+  /* Deep variants for accent MARKS on light surfaces (bars, rules, dots) —
+     the same job --destructive-strong already does for error text on a soft
+     surface. Gold and green are pitched light for band/surface use, so on a
+     pale track they measure 1.94:1 and 3.04:1; these clear 4.5. Memorial
+     needs none — its base sits at 0.5 and already measures 5.28. */
+  --color-warning-strong: var(--warning-strong);
+  --color-success-strong: var(--success-strong);
   --color-memorial-on-band: var(--memorial-on-band);
   --color-warning-on-band: var(--warning-on-band);
   --color-success-on-band: var(--success-on-band);
@@ -112,6 +119,9 @@
   --warning: oklch(0.76 0.15 71);
   /* Soft warning surface: #FFFBEB */
   --warning-muted: oklch(0.99 0.02 95);
+  /* Deep gold/green for marks on light surfaces — see @theme note. */
+  --warning-strong: oklch(0.54 0.14 71);
+  --success-strong: oklch(0.52 0.12 165);
   --border: oklch(0.91 0.02 278);
   /* Strong purple border: #AFA9EC */
   --border-strong: oklch(0.75 0.1 278);
@@ -178,6 +188,9 @@
   --success-foreground: oklch(0.25 0.05 165);
   --warning: oklch(0.83 0.14 75);
   --warning-muted: oklch(0.35 0.06 70);
+  /* Dark: surfaces are dark, so a mark reads by going LIGHTER, not deeper. */
+  --warning-strong: oklch(0.83 0.14 75);
+  --success-strong: oklch(0.72 0.13 165);
   --border: oklch(1 0 0 / 18%);
   --border-strong: oklch(1 0 0 / 32%);
   --input: oklch(1 0 0 / 15%);

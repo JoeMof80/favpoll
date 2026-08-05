@@ -39,6 +39,8 @@ type Props = {
   ctaLabel?: string
   /** Band override, e.g. "bg-memorial text-memorial-foreground". */
   bandClassName?: string
+  /** Register accent for the demo's leader bar — see DemoCard. */
+  accentBarClassName?: string
   /**
    * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
    * router replaces the demo column — the demos now live on the register
@@ -119,6 +121,7 @@ export function LandingHero({
   subheader,
   ctaLabel,
   bandClassName,
+  accentBarClassName,
   router = false,
 }: Props) {
   const scenes = useMemo(
@@ -425,6 +428,7 @@ export function LandingHero({
                         phase={phase}
                         barWidths={barWidths}
                         prefersReducedMotion={prefersReducedMotion}
+                        accentBarClassName={accentBarClassName}
                         className="rounded-t-none border-t-0"
                       />
                     </div>
