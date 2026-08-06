@@ -281,14 +281,28 @@ export const SCENES: HeroScene[] = [
     occasion_type: "Cause",
     opening_line: null,
     protagonist: null,
-    heading: "For young minds",
+    // Hospice, not YoungMinds (founder, 2026-08-06): hospices are the channel
+    // being approached next, and this scene now carries the whole guest arc in
+    // ProcessOverview, so it is the example most visitors will read.
+    //
+    // NAMED but not BRANDED, deliberately. St Luke's is a prospect, not a
+    // customer: naming them matches how the other scenes name Marie Curie,
+    // Macmillan and Barnardo's, but a logo on the homepage would read as
+    // endorsement before any conversation — and the mark is theirs to grant.
+    // The occasion is a generic team walk rather than one of their real named
+    // appeals, for the same reason. If they say yes, the logo is one field
+    // (logo_url) and the card already renders it.
+    heading: "Walking for St Luke's",
     eyebrow: "A cause",
     blurb:
-      "A team fundraiser for children's mental health — pledge your favourite, and it all goes to YoungMinds.",
+      "A team walk for our local hospice — pledge your favourite, and every penny goes to St Luke's.",
     poll: {
       id: "demo-poll-cause",
+      // "helps St Luke's care for people" garden-paths — "St Luke's care" reads
+      // as a noun before the verb arrives. Leading with the fact avoids that
+      // and teaches the thing most people do not know about hospices.
       personal_reveal:
-        "Every pledge helps YoungMinds reach a young person before they reach crisis.",
+        "Hospice care is free. Every pledge helps St Luke's keep it that way.",
       topic: {
         title: "Hot drink",
         favourites: [
@@ -307,10 +321,13 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        id: "ch-ym",
-        name: "YoungMinds",
+        // Registered name and number as published on slhospice.co.uk. The card
+        // prints the number, so it has to be right — getting a prospect's
+        // charity number wrong on your own homepage is not a good opening.
+        id: "ch-slh",
+        name: "St Luke's (Cheshire) Hospice",
         logo_url: null,
-        registered_number: "1016968",
+        registered_number: "515595",
       },
     ],
     selectedIndex: 1,

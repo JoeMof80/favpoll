@@ -389,12 +389,22 @@ describe("LandingHero — reduced motion", () => {
     expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
   })
 
+  // Derived from the scene, not a copy string: this test hardcoded "For young
+  // minds" and broke the moment the cause example changed charity (2026-08-06).
+  // What is worth asserting is the BEHAVIOUR — the chip jumps to the cause
+  // scene — not which words that scene happens to carry this month.
   it("jumps the demo to the cause scene when the 'Cause' chip is clicked", () => {
+    const cause = SCENES.find((s) => s.kind === "cause")
+    // heading is optional on the scene type, but a faceless cause has no
+    // protagonist to headline with — so if this is ever missing the scene is
+    // broken, and the test should say so rather than silently pass on undefined.
+    const heading = cause?.heading
+    expect(heading).toBeTruthy()
     render(<LandingHero liveCount={6} totalLive={0} />)
     // Starts on the first scene (Belinda / remembering), not the cause scene.
-    expect(screen.queryByText("For young minds")).toBeNull()
+    expect(screen.queryByText(heading!)).toBeNull()
     fireEvent.click(screen.getByRole("button", { name: "Cause" }))
-    expect(screen.getByText("For young minds")).toBeInTheDocument()
+    expect(screen.getByText(heading!)).toBeInTheDocument()
   })
 
   it("jumps the demo to the fundraiser scene when 'Fundraiser' is clicked", () => {
