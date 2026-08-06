@@ -20,9 +20,9 @@ vi.mock("@/components/hero-demo-panel/phone-frame", () => ({
   ),
 }))
 
-vi.mock("@/components/hero-demo-panel/demo-frame", () => ({
-  DemoFrame: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="demo-frame">{children}</div>
+vi.mock("@/components/hero-demo-panel/tv-frame", () => ({
+  TvFrame: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tv-frame">{children}</div>
   ),
 }))
 
@@ -82,10 +82,10 @@ describe("ProcessOverview", () => {
       column.getAllByTestId("demo-card").map((el) => el.dataset.phase)
     ).toEqual(["arriving", "selected", "amount-picked", "reveal"])
 
-    // The card is paper at wallet size, and the display keeps the browser
-    // chrome — it is a page an organiser casts, not a phone screen.
+    // The card is paper at wallet size; the display hangs in a TV, not a
+    // browser window and not a phone.
     expect(screen.getByTestId("pack-card").dataset.scale).toBe("wallet")
-    expect(screen.getByTestId("demo-frame")).toContainElement(
+    expect(screen.getByTestId("tv-frame")).toContainElement(
       screen.getByTestId("display-still")
     )
   })

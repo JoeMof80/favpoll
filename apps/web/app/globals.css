@@ -143,7 +143,26 @@
      on a dark field would be invisible to a camera, so dark mode tones
      DOWN from white rather than mirroring the light theme). */
   --qr: oklch(0.29 0.1 278);
-  --band-tint: color-mix(in oklab, var(--primary) 5%, var(--background));
+  /* The tinted band's colour as an OPAQUE value, for the sticky headers that
+     have to paint over it. MUST equal what `bg-primary/5` composites to over
+     --background; if either of those changes, re-measure.
+
+     Two bugs are buried here, both fixed 2026-08-06.
+     1. It was authored as color-mix(in oklab, var(--primary) 5%,
+        var(--background)) in #536, and the build dropped the declaration —
+        color-mix() with var() inside cannot be resolved statically, so
+        neither this property nor the bg-band-tint utility ever reached the
+        browser. Every neighbouring token survived; this one alone used
+        color-mix. The process overview's pinned header was transparent for
+        its whole life, with the step text scrolling straight through it.
+     2. An oklab mix is the wrong maths anyway: a /5 opacity composites in
+        sRGB, so the oklab value was 1-3 sRGB units off and read as a faint
+        rectangle over the band.
+
+     Kept in sRGB deliberately, against the oklch convention above: this is a
+     MEASURED composite (canvas, both themes), and converting it to oklch
+     reintroduces exactly the rounding error being fixed. */
+  --band-tint: rgb(245, 245, 251);
   /* Memorial register accent: forget-me-not blue — remembrance
      symbolism, calm, and clear of purple (278), gold (71), green (165)
      and the destructive reds. */
@@ -207,6 +226,10 @@
   /* 0.85 L failed a decoder test against the brand-purple field (0.44 L)
      — 0.92 is the toned floor that still machine-reads. */
   --qr: oklch(0.92 0.05 278);
+  /* 5% --primary (near-white) over --background (brand purple), measured.
+     There was no dark value at all before, so even once the token resolved
+     it would have painted the LIGHT tint over a purple band. */
+  --band-tint: rgb(74, 68, 181);
   --memorial: oklch(0.58 0.09 250);
   --memorial-foreground: oklch(0.99 0 0);
   --memorial-muted: oklch(0.35 0.05 250);

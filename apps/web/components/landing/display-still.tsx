@@ -35,6 +35,9 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 export const DISPLAY_STILL_WIDTH = 900
 
+/** Leaders shown on the still — matches the demo card's own RESULTS_SHOWN. */
+const RANKS_SHOWN = 5
+
 export function DisplayStill({
   scene,
   qrUrl,
@@ -44,6 +47,17 @@ export function DisplayStill({
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
+  // The TOTAL counts everything, the LIST shows the leaders — cropping the
+  // frame mid-bar read as a broken screenshot rather than a screen.
+  //
+  // SORT BEFORE SLICING. sceneFavourites returns the topic's favourites in
+  // their own order, which is alphabetical, so an unsorted slice took Chai
+  // through Green tea and dropped Tea — the £240 leader — leaving two £0 rows
+  // and handing the 100% bar to Coffee. RankingList ranks what it is given;
+  // it cannot recover an item that never arrived.
+  const shown = [...items]
+    .sort((a, b) => b.all_time_pledged - a.all_time_pledged)
+    .slice(0, RANKS_SHOWN)
   const total = items.reduce((sum, item) => sum + item.all_time_pledged, 0)
   const charityName = scene.charities[0]?.name ?? null
 
@@ -92,7 +106,7 @@ export function DisplayStill({
             // only types out at the close; a still is not that moment.
             personal_reveal: null,
             topic: { id: topicId, title: scene.poll.topic.title },
-            items,
+            items: shown,
           }}
         />
       </div>

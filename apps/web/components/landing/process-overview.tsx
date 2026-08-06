@@ -19,7 +19,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
+import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { PackCard, buildPackSteps } from "@/components/print-pack/pack-card"
@@ -128,16 +128,20 @@ const NUMBERS = BEATS.reduce<(number | null)[]>((acc, beat) => {
 // media column, because each is a different real object:
 //   phone   — 414 x 868, the iPhone chassis around a 390px guest viewport
 //   card    — 85.6 x 54 mm, the wallet card at its printed size
-//   display — 900 x 596, wide enough to keep the display's md: two-column
-//             banner (below it the layout collapses to its mobile form and
-//             stops reading as a screen in a room)
+//   display — 900 x 560 inside a TV bezel (920 x 580 overall), wide enough to
+//             keep the display's md: two-column banner — below it the layout
+//             collapses to its mobile form and stops reading as a screen in
+//             a room
 // Scales are per-breakpoint and fixed rather than computed: the column is
 // ~273 / ~376 / ~478 px at md / lg / xl, and the phone is the tallest, so it
 // sets the well height at each stop.
 const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
 const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
 const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
-const DISPLAY_SCALE = "scale-[0.30] lg:scale-[0.41] xl:scale-[0.53]"
+// Down from the browser-framed version: the TV bezel adds 20px each way
+// (940 overall), and at xl the old 0.53 already sat within a pixel of the
+// column's width.
+const DISPLAY_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.50]"
 
 function BeatMedium({ medium }: { medium: Medium }) {
   if (medium.kind === "card") {
@@ -156,15 +160,14 @@ function BeatMedium({ medium }: { medium: Medium }) {
   if (medium.kind === "display") {
     return (
       <div className={DISPLAY_SCALE}>
-        <div className="h-[596px] w-[900px]">
-          <DemoFrame>
-            {/* Cropped, not scrolled: a projected display shows its leaders
-                and never scrolls. */}
-            <div className="h-[560px] overflow-hidden">
-              <DisplayStill scene={SCENE} qrUrl={DEMO_QR_URL} />
-            </div>
-          </DemoFrame>
-        </div>
+        <TvFrame>
+          {/* No crop: the still shows its leaders and ends where they do — a
+              fixed height cut the last bar in half and read as a broken
+              screenshot rather than a screen. */}
+          <div className="w-[900px]">
+            <DisplayStill scene={SCENE} qrUrl={DEMO_QR_URL} />
+          </div>
+        </TvFrame>
       </div>
     )
   }
@@ -212,7 +215,14 @@ export function ProcessOverview() {
     // 2026-08-06). That section and RegisterMatrix were BOTH bg-primary/5, so
     // the page ran two tinted bands back to back; the swap restores the
     // alternation (purple · tint · white · tint · white).
-    <section className="w-full bg-primary/5">
+    // overflow-x-clip, not -hidden: the TV's vignette is authored oversized so
+    // it survives being scaled down, and in the right-hand column its spill
+    // ran 34px past the page edge and put the whole document into horizontal
+    // scroll. `clip` contains it WITHOUT creating a scroll container — which
+    // `hidden` would, re-anchoring the sticky column to this section and
+    // killing the pinned media (the display screen uses clip for the same
+    // reason).
+    <section className="w-full overflow-x-clip bg-primary/5">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         {/* 5 columns, not 3 (2026-08-06): the display still is a 900px-wide
             desktop layout, and the old third-column width put its ranking
@@ -223,7 +233,12 @@ export function ProcessOverview() {
           <div className="md:col-span-3">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            <div className="relative z-10 bg-band-tint pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-band-tint after:to-transparent md:sticky md:top-28">
+            {/* pb-8 and a 36-deep fade, up from pb-6/h-20: the headline runs
+                to two lines now, so beats reached the fade sooner and their
+                text was legible THROUGH it rather than dissolving under it.
+                The solid backdrop has to clear the header's own descenders
+                before the gradient starts doing the work. */}
+            <div className="relative z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-transparent md:sticky md:top-28">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
