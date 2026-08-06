@@ -5,7 +5,6 @@ import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
 import { HeaderBar } from "@/components/header-bar"
 import { CharityRow } from "@/components/charity-row"
-import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -34,6 +33,16 @@ type Props = {
   barWidths: number[]
   prefersReducedMotion: boolean
   className?: string
+  /**
+   * Blank device safe-area strip above the app header, in px.
+   *
+   * It lives HERE rather than in PhoneFrame for one reason: the real
+   * DialogOverlay is `fixed inset-0`, so opening the pledge dialog dims
+   * the whole viewport INCLUDING the area behind the status bar. This
+   * card's scrim is absolute within the card, so anything the frame drew
+   * outside it would have stayed stubbornly bright while the rest dimmed.
+   */
+  topInset?: number
   /**
    * Register accent for the LEADER bar only (founder, 2026-08-05): the
    * register pages wear standard purple/white branding, and the accent
@@ -109,6 +118,7 @@ export function DemoCard({
   prefersReducedMotion,
   className,
   accentBarClassName,
+  topInset = 0,
 }: Props) {
   const favourites = scene.poll.topic.favourites
   const selected = favourites[scene.selectedIndex]
@@ -304,11 +314,19 @@ export function DemoCard({
         className
       )}
     >
+      {topInset > 0 && (
+        <div
+          className="-mx-5 -mt-5 shrink-0"
+          style={{ height: topInset }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* The app header, as a guest actually meets the page: logo and menu
           above the hero, with the rule under it. Full-bleed past the card's
           p-5, and the real HeaderBar rather than a lookalike — the version
           Header itself renders, minus the Clerk-aware hamburger. */}
-      <div className="-mx-5 -mt-5 mb-4 shrink-0">
+      <div className={cn("-mx-5 mb-4 shrink-0", topInset > 0 ? "" : "-mt-5")}>
         <HeaderBar staticMenu />
       </div>
 
@@ -457,14 +475,6 @@ export function DemoCard({
             )}
           </AnimatePresence>
         </div>
-      </div>
-
-      {/* The share FAB, where favpoll-subheader puts it: bottom right, clear
-          of the charity bar. The real button — it is inert here because the
-          whole demo is pointer-events-none, and drawing a fake circle would
-          have been one more lookalike. */}
-      <div className="pointer-events-none absolute right-4 bottom-20 z-20">
-        <ShareFavpollButton variant="fab" shareTitle={`${title} — favpoll`} />
       </div>
 
       {/* Charity row — anchored to the card bottom so the expanding reveal +

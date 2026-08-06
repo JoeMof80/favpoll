@@ -14,11 +14,19 @@ vi.mock("@/components/hero-demo-panel/demo-card", () => ({
   ),
 }))
 
-vi.mock("@/components/hero-demo-panel/phone-frame", () => ({
-  PhoneFrame: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="phone-frame">{children}</div>
-  ),
-}))
+// Keep the real module: it also exports the safe-area constant the phone
+// beats pass to DemoCard, and a bare stub silently made that undefined.
+vi.mock("@/components/hero-demo-panel/phone-frame", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/components/hero-demo-panel/phone-frame")
+  >("@/components/hero-demo-panel/phone-frame")
+  return {
+    ...actual,
+    PhoneFrame: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="phone-frame">{children}</div>
+    ),
+  }
+})
 
 vi.mock("@/components/hero-demo-panel/tv-frame", () => ({
   TvFrame: ({ children }: { children: React.ReactNode }) => (

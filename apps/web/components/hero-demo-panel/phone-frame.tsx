@@ -21,6 +21,19 @@ export const PHONE_SCREEN_WIDTH = 390
 export const PHONE_SCREEN_HEIGHT = 844
 const BEZEL = 12
 
+/**
+ * The blank strip a page leaves for the status bar. Owned here because it is
+ * device knowledge, but RENDERED by DemoCard — the real DialogOverlay is
+ * `fixed inset-0`, so the pledge scrim dims the area behind the status bar
+ * too, and a strip drawn by this frame would sit outside the card's scrim and
+ * stay bright while everything around it dimmed.
+ *
+ * Blank rather than a drawn clock and battery: that is OS chrome, it
+ * restyles every year, and a stale one reads as an old screenshot. Same
+ * reason Safari's URL bar stays out.
+ */
+export const PHONE_SAFE_AREA_TOP = 48
+
 export const PHONE_CHASSIS_WIDTH = PHONE_SCREEN_WIDTH + BEZEL * 2
 export const PHONE_CHASSIS_HEIGHT = PHONE_SCREEN_HEIGHT + BEZEL * 2
 
@@ -52,12 +65,6 @@ export function PhoneFrame({
       {/* flex column, matching DemoFrame: the DemoCard inside is `flex-1`,
           so it fills the screen the same way in both frames. */}
       <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[2.5rem] bg-background">
-        {/* Safe area. A page starts BELOW the status bar, so without this the
-            island sat on top of the app header — which no phone ever shows.
-            Left blank rather than filled with a fake clock and battery: that
-            is OS chrome, it restyles every year, and a stale one reads as an
-            old screenshot. */}
-        <div className="h-12 shrink-0 bg-background" />
         {children}
         {/* Dynamic island, over the content — the card scrolls beneath it on
             a real phone too. */}
