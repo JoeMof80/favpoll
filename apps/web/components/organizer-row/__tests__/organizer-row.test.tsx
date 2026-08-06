@@ -43,6 +43,7 @@ function makeFavpoll(
   return {
     id: "fp-1",
     live_slug: "slug-fp-1",
+    short_code: "a1b2c3d4e5f6",
     goal_amount: null,
     opening_line: "In memory of",
     closes_at: farFuture,
@@ -190,11 +191,29 @@ describe("OrganizerRow", () => {
       expect(screen.queryByTestId("qr-svg")).not.toBeInTheDocument()
     })
 
-    it("QR encodes the guest-facing favpoll URL", () => {
+    // QR-ONLY short link (2026-08-06). The QR encodes /p/<code> because
+    // /favpolls/<uuid> is 65 chars — a 49x49 code whose modules fall under the
+    // printable floor at card size — while the link the organiser COPIES stays
+    // long, so a random code never becomes a favpoll's public face. Both halves
+    // are asserted here: the split is the point, and either half drifting
+    // silently would undo it.
+    it("QR encodes the SHORT link, not the guest URL", () => {
       render(<OrganizerRow favpoll={makeFavpoll()} />)
       expand()
-      const qr = screen.getByTestId("qr-svg")
-      expect(qr.getAttribute("data-qr-value")).toContain("/favpolls/fp-1")
+      const value = screen.getByTestId("qr-svg").getAttribute("data-qr-value")
+      expect(value).toContain("/p/a1b2c3d4e5f6")
+      expect(value).not.toContain("/favpolls/fp-1")
+    })
+
+    it("the copied guest link stays the long form", () => {
+      render(<OrganizerRow favpoll={makeFavpoll()} />)
+      expand()
+      fireEvent.click(screen.getByTestId("copy-guest-url-button"))
+      const copied = vi
+        .mocked(navigator.clipboard.writeText)
+        .mock.calls.at(-1)?.[0]
+      expect(copied).toContain("/favpolls/fp-1")
+      expect(copied).not.toContain("/p/a1b2c3d4e5f6")
     })
 
     it("copies the live display URL", () => {

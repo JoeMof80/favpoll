@@ -18,7 +18,7 @@ export default async function PackPage({ params }: Props) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      `id, subject, cause_label, occasion_type, opening_line, is_private,
+      `id, short_code, subject, cause_label, occasion_type, opening_line, is_private,
        protagonists!favpolls_protagonist_id_fkey ( name ),
        favpoll_polls ( personal_reveal, topics ( title ) ),
        favpoll_charities ( charities ( name ) )`
@@ -56,7 +56,10 @@ export default async function PackPage({ params }: Props) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
     ),
-    guestUrl: `${baseUrl}/favpolls/${id}`,
+    // Short form — this feeds the QR only. /favpolls/<uuid> is 65 chars and
+    // renders 49x49, which put each module under the printable floor on the
+    // wallet card; /p/<12> is 34 chars and 33x33. See app/p/[code]/page.tsx.
+    qrUrl: `${baseUrl}/p/${favpoll.short_code}`,
   }
 
   return (

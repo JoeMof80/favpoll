@@ -2,6 +2,12 @@ export type OrganizerFavpoll = {
   id: string
   /** Unguessable capability for the live display URL (/live/[slug]) */
   live_slug: string
+  /**
+   * 12-char code behind the short QR target (/p/[code]). QR-ONLY — the link
+   * an organiser copies stays /favpolls/<id>. See the migration
+   * 20260806100000_favpoll_short_code.sql.
+   */
+  short_code: string
   opening_line: string
   closes_at: string
   closed_at: string | null

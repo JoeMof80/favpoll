@@ -23,6 +23,7 @@ export default async function MyFavpollsPage() {
       `
       id,
       live_slug,
+      short_code,
       opening_line,
       closes_at,
       closed_at,
@@ -48,6 +49,7 @@ export default async function MyFavpollsPage() {
   type RawFavpoll = {
     id: string
     live_slug: string
+    short_code: string
     opening_line: string
     closes_at: string
     closed_at: string | null
@@ -91,6 +93,7 @@ export default async function MyFavpollsPage() {
   const favpolls: OrganizerFavpoll[] = withTotals.map((ev) => ({
     id: ev.id,
     live_slug: ev.live_slug,
+    short_code: ev.short_code,
     opening_line: ev.opening_line,
     closes_at: ev.closes_at,
     closed_at: ev.closed_at,

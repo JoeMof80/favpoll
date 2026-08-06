@@ -25,7 +25,12 @@ export type PackData = {
   hasReveal: boolean
   revealIsQuote?: boolean
   charityNames: string[]
-  guestUrl: string
+  /**
+   * What the QR encodes — the SHORT form (/p/<code>), not the shareable
+   * /favpolls/<uuid>. Named for its job so it is obvious this is machine-
+   * facing: see app/p/[code]/page.tsx for why the two differ.
+   */
+  qrUrl: string
 }
 
 function charityLabel(names: string[]): string {
@@ -210,7 +215,7 @@ function PackCard({
             </div>
           )}
           <BrandedQR
-            value={data.guestUrl}
+            value={data.qrUrl}
             size={s.qr}
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
