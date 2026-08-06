@@ -36,6 +36,13 @@
      token — unreferenced custom properties are stripped from the served
      CSS, and BrandedQR reads this one from JS at runtime. */
   --color-qr: var(--qr);
+  /* The tinted band as a SOLID colour. Sections use bg-primary/5, but any
+     element that must paint an OPAQUE backdrop over that band (the process
+     overview's sticky header, which the step text scrolls beneath) cannot use
+     the translucent tint — stacked over the section's own, it composites to
+     roughly double and shows a seam. color-mix keeps it exactly in step with
+     both --primary and --background, so it tracks the theme flip for free. */
+  --color-band-tint: var(--band-tint);
   /* Register accents (founder, 2026-08-03): purple stays the brand AND
      the neutral default; each register gets its own accent — memorial =
      forget-me-not blue (below), celebration = warning gold, fundraiser =
@@ -136,6 +143,7 @@
      on a dark field would be invisible to a camera, so dark mode tones
      DOWN from white rather than mirroring the light theme). */
   --qr: oklch(0.29 0.1 278);
+  --band-tint: color-mix(in oklab, var(--primary) 5%, var(--background));
   /* Memorial register accent: forget-me-not blue — remembrance
      symbolism, calm, and clear of purple (278), gold (71), green (165)
      and the destructive reds. */

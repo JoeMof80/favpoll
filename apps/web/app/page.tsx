@@ -136,7 +136,7 @@ export default async function HomePage() {
           vignettes. (The guest arc lives in ProcessOverview above; this
           section's old Pick/Pledge/Reveal text strip duplicated it and
           was removed, founder call 2026-08-04.) ── */}
-      <section id="how" className="w-full scroll-mt-20 bg-primary/5">
+      <section id="how" className="w-full scroll-mt-20">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
             <HowItWorksThreeBeat />

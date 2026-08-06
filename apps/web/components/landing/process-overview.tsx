@@ -75,14 +75,18 @@ export function ProcessOverview() {
   }, [])
 
   return (
-    <section className="w-full">
+    // Tinted band, swapped with the Create/Share/Watch section below (founder,
+    // 2026-08-06). That section and RegisterMatrix were BOTH bg-primary/5, so
+    // the page ran two tinted bands back to back; the swap restores the
+    // alternation (purple · tint · white · tint · white).
+    <section className="w-full bg-primary/5">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {/* Cols 1–2 — pinned headline, then the SCROLLING step texts */}
           <div className="md:col-span-2">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            <div className="relative z-10 bg-background pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-background after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-background after:to-transparent md:sticky md:top-28">
+            <div className="relative z-10 bg-band-tint pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-band-tint after:to-transparent md:sticky md:top-28">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
