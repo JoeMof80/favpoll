@@ -1,36 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { DisplayScreen } from "./index"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
-import type { Favourite } from "@favpoll/types"
-
-function parseGBP(s: string): number {
-  return parseInt(s.replace(/[^0-9]/g, ""), 10) || 0
-}
-
-function makeItems(scene: (typeof SCENES)[0], topicId: string): Favourite[] {
-  const pledgeByLabel = Object.fromEntries(
-    scene.results.map((r) => [
-      r.label,
-      {
-        all_time_pledged: parseGBP(r.amount),
-        all_time_count: Math.max(1, Math.round(parseGBP(r.amount) / 15)),
-      },
-    ])
-  )
-  return scene.poll.topic.favourites.map((item, i) => ({
-    id: `${topicId}-item-${i}`,
-    topic_id: topicId,
-    label: item.label,
-    all_time_pledged: pledgeByLabel[item.label]?.all_time_pledged ?? 0,
-    all_time_count: pledgeByLabel[item.label]?.all_time_count ?? 0,
-    is_canonical: true,
-    source: "seed" as const,
-    markets: ["en-GB"],
-    favpoll_count: 1,
-    total_pledge_count: pledgeByLabel[item.label]?.all_time_count ?? 0,
-    created_at: "2024-01-01T00:00:00Z",
-  }))
-}
+import { sceneFavourites as makeItems } from "@/components/hero-demo-panel/scene-favourites"
 
 const MEMORIAL_POLL = {
   id: "poll-memorial",
