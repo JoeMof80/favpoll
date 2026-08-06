@@ -10,6 +10,7 @@
 import Link from "next/link"
 import { useMemo } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
+import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
@@ -428,21 +429,7 @@ export function LandingHero({
               >
                 <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
                   <div className="h-174 w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
-                    <div className="flex h-full flex-col rounded-xl shadow-2xl">
-                      {/* Traffic-light window bar — signals this is a demo */}
-                      <div
-                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-t-xl border border-b-0 border-border bg-muted px-3.5"
-                        aria-hidden="true"
-                      >
-                        <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                        <span className="flex-1 text-center text-xs text-muted-foreground">
-                          favpoll.com · demo
-                        </span>
-                        {/* Balance the dots so the label centres optically */}
-                        <span className="w-9" />
-                      </div>
+                    <DemoFrame>
                       <DemoCard
                         scene={scene}
                         phase={phase}
@@ -451,7 +438,7 @@ export function LandingHero({
                         accentBarClassName={accentBarClassName}
                         className="rounded-t-none border-t-0"
                       />
-                    </div>
+                    </DemoFrame>
                   </div>
                 </div>
                 {/* Beat indicator: which of the three beats the loop is in */}

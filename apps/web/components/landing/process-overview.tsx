@@ -9,6 +9,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
+import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -129,13 +130,16 @@ export function ProcessOverview() {
                         i === active ? "opacity-100" : "opacity-0"
                       )}
                     >
-                      <div className="h-174 w-125 origin-top-left scale-[0.8] drop-shadow-xl">
-                        <DemoCard
-                          scene={SCENE}
-                          phase={step.phase}
-                          barWidths={SCENE.results.map((r) => r.widthPercent)}
-                          prefersReducedMotion
-                        />
+                      <div className="h-174 w-125 origin-top-left scale-[0.8]">
+                        <DemoFrame>
+                          <DemoCard
+                            scene={SCENE}
+                            phase={step.phase}
+                            barWidths={SCENE.results.map((r) => r.widthPercent)}
+                            prefersReducedMotion
+                            className="rounded-t-none border-t-0"
+                          />
+                        </DemoFrame>
                       </div>
                     </div>
                   ))}
@@ -150,13 +154,16 @@ export function ProcessOverview() {
           >
             {mounted && (
               <div className="h-[24rem] w-[17.2rem]">
-                <div className="h-174 w-125 origin-top-left scale-[0.55] drop-shadow-xl">
-                  <DemoCard
-                    scene={SCENE}
-                    phase="reveal"
-                    barWidths={SCENE.results.map((r) => r.widthPercent)}
-                    prefersReducedMotion
-                  />
+                <div className="h-174 w-125 origin-top-left scale-[0.55]">
+                  <DemoFrame>
+                    <DemoCard
+                      scene={SCENE}
+                      phase="reveal"
+                      barWidths={SCENE.results.map((r) => r.widthPercent)}
+                      prefersReducedMotion
+                      className="rounded-t-none border-t-0"
+                    />
+                  </DemoFrame>
                 </div>
               </div>
             )}

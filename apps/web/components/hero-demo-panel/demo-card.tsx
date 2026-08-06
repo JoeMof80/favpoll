@@ -389,39 +389,61 @@ export function DemoCard({
           <PollHeading topicTitle={topicTitle} size="lg" inert />
         </div>
 
-        {/* ── Reveal — lock card sits on top of it while locked; types out on
-            disclosure. ── */}
-        <div className="relative">
-          {locked ? (
-            <div className="blur-xs" aria-hidden="true">
-              <PollReveal
-                personalReveal={revealText}
-                protagonistFirstName={firstName ?? undefined}
-              />
-            </div>
-          ) : (
-            <div className="relative">
-              {/* Reserve final height so typing doesn't push results down */}
-              <div className="invisible" aria-hidden="true">
+        {/* Reveal + results share ONE grid cell with the lock card, exactly
+            as poll-section does it (2026-08-06). The lock used to be an
+            absolute overlay on the REVEAL alone and vertically centred, so it
+            floated up over the About text and the topic ribbon. On the real
+            page it is top-aligned (pt-4) over the whole blurred block, which
+            is what a guest actually sees. */}
+        <div className="grid">
+          <div className="space-y-4 [grid-area:1/1]">
+            {locked ? (
+              <div className="blur-xs" aria-hidden="true">
                 <PollReveal
                   personalReveal={revealText}
                   protagonistFirstName={firstName ?? undefined}
                 />
               </div>
-              <div
-                className="absolute inset-0"
-                role="status"
-                aria-live="polite"
-              >
-                <PollReveal
-                  personalReveal={revealShown || "\u00A0"}
-                  protagonistFirstName={firstName ?? undefined}
-                />
+            ) : (
+              <div className="relative">
+                {/* Reserve final height so typing doesn't push results down */}
+                <div className="invisible" aria-hidden="true">
+                  <PollReveal
+                    personalReveal={revealText}
+                    protagonistFirstName={firstName ?? undefined}
+                  />
+                </div>
+                <div
+                  className="absolute inset-0"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <PollReveal
+                    personalReveal={revealShown || "\u00A0"}
+                    protagonistFirstName={firstName ?? undefined}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Lock card — centered over the reveal; fades out as it types. */}
+            {/* ── Results — blurred decoy while locked; real bars climb from 0
+              on disclosure. (Charity row is pinned to the card bottom.) ── */}
+            {locked ? (
+              <div
+                key="decoy-results"
+                className="space-y-3 blur-xs"
+                aria-hidden="true"
+              >
+                {renderRankings(false)}
+              </div>
+            ) : (
+              <div key="real-results" className="space-y-3">
+                {renderRankings(true)}
+              </div>
+            )}
+          </div>
+
+          {/* Lock card — same cell as the blurred block, top-aligned. */}
           <AnimatePresence>
             {locked && (
               <motion.div
@@ -430,7 +452,7 @@ export function DemoCard({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={prefersReducedMotion ? FAST : { duration: 0.4 }}
-                className="absolute inset-0 z-[1] flex items-center justify-center"
+                className="z-[1] flex flex-col items-center pt-4 [grid-area:1/1]"
                 aria-hidden="true"
               >
                 {/* The SAME card the guest page shows (LockCardContent) —
@@ -445,22 +467,6 @@ export function DemoCard({
             )}
           </AnimatePresence>
         </div>
-
-        {/* ── Results — blurred decoy while locked; real bars climb from 0 on
-            disclosure. (Charity row is pinned to the card bottom, below.) ── */}
-        {locked ? (
-          <div
-            key="decoy-results"
-            className="space-y-3 blur-xs"
-            aria-hidden="true"
-          >
-            {renderRankings(false)}
-          </div>
-        ) : (
-          <div key="real-results" className="space-y-3">
-            {renderRankings(true)}
-          </div>
-        )}
       </div>
 
       {/* Charity row — anchored to the card bottom so the expanding reveal +
