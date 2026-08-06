@@ -434,11 +434,21 @@ export function DisplayScreen({
                         </p>
                       )}
                     </div>
-                  ) : isOpen ? (
+                  ) : (
                     /* No goal: the hero's exact three-line silhouette
                        (founder, 2026-08-03) — eyebrow, headline figure,
                        and the countdown as the subtitle line, where the
-                       tribute hero carries its dates. */
+                       tribute hero carries its dates.
+
+                       The countdown is the only optional part. This used to
+                       be `isOpen ? ... : null`, so a favpoll with NO goal and
+                       NO close date — both optional — projected an entirely
+                       empty column with the QR alone beside it, and the money
+                       survived only as a charity row. The fundraiser variant
+                       exists to make the total the heading; it should say so
+                       whether or not a clock is running. Found 2026-08-06 by
+                       rendering the real display on the landing page, where
+                       neither field is set. */
                     <div>
                       <SectionEyebrow
                         variant="muted"
@@ -452,11 +462,13 @@ export function DisplayScreen({
                       >
                         {formatPounds(totalRaised)}
                       </p>
-                      <div className="mt-2">
-                        <Countdown closesAt={closesAt!} variant="subtitle" />
-                      </div>
+                      {isOpen && closesAt && (
+                        <div className="mt-2">
+                          <Countdown closesAt={closesAt} variant="subtitle" />
+                        </div>
+                      )}
                     </div>
-                  ) : null}
+                  )}
                 </div>
 
                 {scanToPledge}

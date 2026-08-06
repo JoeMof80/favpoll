@@ -36,11 +36,13 @@ const RANKS_SHOWN = 6
 const WALL_NAMES = ["Priya", "Tom", null, "Aisha", "Dan"]
 
 /**
- * The scene needs a goal, and this is the real component telling us so: with
- * no goal AND no close date the fundraiser banner's first column renders
- * nothing at all, so the still lost its money headline entirely and the QR
- * sat alone against an empty half. A team walk with a target is also just
- * truer to the occasion than one without.
+ * A choice, not a workaround. Rendering this still with neither a goal nor a
+ * close date is what exposed the display's empty-banner bug — the fundraiser
+ * column used to render nothing at all in that case — and that is now fixed
+ * in DisplayScreen itself, so the still would read correctly without this.
+ * It keeps a goal because the progress bar is the fundraiser variant at full
+ * voice, and a team walk with a target is truer to the occasion than one
+ * without.
  */
 const DEMO_GOAL = 1000
 
