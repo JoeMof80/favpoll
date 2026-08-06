@@ -9,15 +9,31 @@
 
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
+import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
 
-const SCENE = SCENES[0] // Belinda — one coherent story across the steps
+// The CAUSE scene (founder, 2026-08-06), not the memorial one. This is the
+// most neutral of the four — no protagonist, so the guest arc reads as the
+// mechanic itself rather than as one register's story — and the register
+// cards in the hero above have already covered the protagonist-shaped types.
+// Its reveal is an impact line rather than someone's favourite, which is what
+// a cause favpoll actually shows.
+const SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
 
 const STEPS: { phase: Phase; label: string; body: string }[] = [
+  {
+    // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
+    // locked phase, so the card shows blurred decoy bars and the reveal lock —
+    // the withholding the rest of the arc then resolves. Without it the
+    // sequence opened mid-story, on a picker already in use.
+    phase: "arriving",
+    label: t("landing.how.arrive.label"),
+    body: t("landing.how.arrive.body"),
+  },
   {
     phase: "selected",
     label: t("landing.how.pick.label"),
@@ -60,14 +76,18 @@ export function ProcessOverview() {
   }, [])
 
   return (
-    <section className="w-full">
+    // Tinted band, swapped with the Create/Share/Watch section below (founder,
+    // 2026-08-06). That section and RegisterMatrix were BOTH bg-primary/5, so
+    // the page ran two tinted bands back to back; the swap restores the
+    // alternation (purple · tint · white · tint · white).
+    <section className="w-full bg-primary/5">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {/* Cols 1–2 — pinned headline, then the SCROLLING step texts */}
           <div className="md:col-span-2">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            <div className="relative z-10 bg-background pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-background after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-background after:to-transparent md:sticky md:top-28">
+            <div className="relative z-10 bg-band-tint pb-6 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-20 after:bg-gradient-to-b after:from-band-tint after:to-transparent md:sticky md:top-28">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
@@ -110,13 +130,16 @@ export function ProcessOverview() {
                         i === active ? "opacity-100" : "opacity-0"
                       )}
                     >
-                      <div className="h-174 w-125 origin-top-left scale-[0.8] drop-shadow-xl">
-                        <DemoCard
-                          scene={SCENE}
-                          phase={step.phase}
-                          barWidths={SCENE.results.map((r) => r.widthPercent)}
-                          prefersReducedMotion
-                        />
+                      <div className="h-174 w-125 origin-top-left scale-[0.8]">
+                        <DemoFrame>
+                          <DemoCard
+                            scene={SCENE}
+                            phase={step.phase}
+                            barWidths={SCENE.results.map((r) => r.widthPercent)}
+                            prefersReducedMotion
+                            className="rounded-t-none border-t-0"
+                          />
+                        </DemoFrame>
                       </div>
                     </div>
                   ))}
@@ -131,13 +154,16 @@ export function ProcessOverview() {
           >
             {mounted && (
               <div className="h-[24rem] w-[17.2rem]">
-                <div className="h-174 w-125 origin-top-left scale-[0.55] drop-shadow-xl">
-                  <DemoCard
-                    scene={SCENE}
-                    phase="reveal"
-                    barWidths={SCENE.results.map((r) => r.widthPercent)}
-                    prefersReducedMotion
-                  />
+                <div className="h-174 w-125 origin-top-left scale-[0.55]">
+                  <DemoFrame>
+                    <DemoCard
+                      scene={SCENE}
+                      phase="reveal"
+                      barWidths={SCENE.results.map((r) => r.widthPercent)}
+                      prefersReducedMotion
+                      className="rounded-t-none border-t-0"
+                    />
+                  </DemoFrame>
                 </div>
               </div>
             )}

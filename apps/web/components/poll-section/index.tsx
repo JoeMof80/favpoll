@@ -11,10 +11,10 @@ import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
 import { Tooltip, TooltipProvider } from "../ui/tooltip"
-import { Lock } from "lucide-react"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
-import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
+import { buildMechanicSteps } from "@/lib/mechanic-steps"
+import { LockCardContent } from "@/components/lock-card-content"
 import { Gift } from "lucide-react"
 
 type RankingView = "amount" | "count"
@@ -270,28 +270,12 @@ export function PollSection({
                   aria-label={unlockAriaLabel}
                   className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background/95 p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background/95 hover:shadow-2xl motion-safe:hover:-translate-y-0.5"
                 >
-                  <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
-                    <Lock className="h-4 w-4" aria-hidden="true" />
-                    {/* One universal CTA (founder question, 2026-08-02):
-                        "reveal X's favourite" as the header made the
-                        reveal transactional bait — the quiz-frame again.
-                        The action is pledging YOUR favourite; step 3
-                        presents the reveal as the gift. */}
-                    Pledge your favourite
-                  </span>
-                  <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground">
-                    {lockSteps.map((step, i) => (
-                      <span key={i} className="flex gap-2">
-                        <span className="w-4 shrink-0 text-right font-semibold text-primary">
-                          {i + 1}.
-                        </span>
-                        <span className="flex-1">{step}</span>
-                      </span>
-                    ))}
-                    <span className="pt-1 text-[13px] text-muted-foreground/80">
-                      {mechanicFooter(poll.topics.title)}
-                    </span>
-                  </span>
+                  {/* Shared with the landing demo so the two cannot drift —
+                      see components/lock-card-content.tsx. */}
+                  <LockCardContent
+                    steps={lockSteps}
+                    topicTitle={poll.topics.title}
+                  />
                 </Button>
               </span>
             </div>

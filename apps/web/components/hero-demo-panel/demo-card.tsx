@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
-import { RevealLockPill } from "@/components/reveal-lock"
+import { LockCardContent } from "@/components/lock-card-content"
+import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -126,6 +127,17 @@ export function DemoCard({
   const firstName = protagonist ? protagonist.name.split(/[\s&]+/)[0] : null
   const aboutText = protagonist?.about ?? scene.blurb ?? ""
 
+  // Instructions for the lock card, from the same builder the guest page and
+  // the print pack use — so all three teach the mechanic identically.
+  const lockSteps = buildMechanicSteps({
+    topicTitle,
+    charityLine: charityName,
+    firstName,
+    isCause: !protagonist,
+    hasReveal: Boolean(scene.poll.personal_reveal),
+    revealIsQuote: isQuoteReveal(scene.poll.personal_reveal),
+  })
+
   const headline = protagonist
     ? getFavpollHeadline({
         occasionType: scene.occasion_type,
@@ -138,7 +150,8 @@ export function DemoCard({
 
   const title = protagonist ? protagonist.name : (scene.heading ?? "")
   const cardPrefix = protagonist ? headline!.prefix : (scene.eyebrow ?? "")
-  const cardSuffix = protagonist ? headline!.suffix : null
+  // Causes get their context line in the same slot a protagonist's dates use.
+  const cardSuffix = protagonist ? headline!.suffix : (scene.context ?? null)
 
   // ── Phase flags ───────────────────────────────────────────────────────────
 
@@ -369,42 +382,68 @@ export function DemoCard({
             the real page (the lock card is the pre-pledge CTA there;
             founder, 2026-08-02). */}
         <div aria-hidden="true">
-          <PollHeading topicTitle={topicTitle} size="md" inert />
+          {/* size="lg" — the DEFAULT, which is what the real guest page uses
+              (poll-section renders <PollHeading inert /> with no size). The
+              demo had been a step down at "md" (15px against the real 17px),
+              so the card under-sold the question it is built around. */}
+          <PollHeading topicTitle={topicTitle} size="lg" inert />
         </div>
 
-        {/* ── Reveal — lock card sits on top of it while locked; types out on
-            disclosure. ── */}
-        <div className="relative">
-          {locked ? (
-            <div className="blur-xs" aria-hidden="true">
-              <PollReveal
-                personalReveal={revealText}
-                protagonistFirstName={firstName ?? undefined}
-              />
-            </div>
-          ) : (
-            <div className="relative">
-              {/* Reserve final height so typing doesn't push results down */}
-              <div className="invisible" aria-hidden="true">
+        {/* Reveal + results share ONE grid cell with the lock card, exactly
+            as poll-section does it (2026-08-06). The lock used to be an
+            absolute overlay on the REVEAL alone and vertically centred, so it
+            floated up over the About text and the topic ribbon. On the real
+            page it is top-aligned (pt-4) over the whole blurred block, which
+            is what a guest actually sees. */}
+        <div className="grid">
+          <div className="space-y-4 [grid-area:1/1]">
+            {locked ? (
+              <div className="blur-xs" aria-hidden="true">
                 <PollReveal
                   personalReveal={revealText}
                   protagonistFirstName={firstName ?? undefined}
                 />
               </div>
-              <div
-                className="absolute inset-0"
-                role="status"
-                aria-live="polite"
-              >
-                <PollReveal
-                  personalReveal={revealShown || "\u00A0"}
-                  protagonistFirstName={firstName ?? undefined}
-                />
+            ) : (
+              <div className="relative">
+                {/* Reserve final height so typing doesn't push results down */}
+                <div className="invisible" aria-hidden="true">
+                  <PollReveal
+                    personalReveal={revealText}
+                    protagonistFirstName={firstName ?? undefined}
+                  />
+                </div>
+                <div
+                  className="absolute inset-0"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <PollReveal
+                    personalReveal={revealShown || "\u00A0"}
+                    protagonistFirstName={firstName ?? undefined}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Lock card — centered over the reveal; fades out as it types. */}
+            {/* ── Results — blurred decoy while locked; real bars climb from 0
+              on disclosure. (Charity row is pinned to the card bottom.) ── */}
+            {locked ? (
+              <div
+                key="decoy-results"
+                className="space-y-3 blur-xs"
+                aria-hidden="true"
+              >
+                {renderRankings(false)}
+              </div>
+            ) : (
+              <div key="real-results" className="space-y-3">
+                {renderRankings(true)}
+              </div>
+            )}
+          </div>
+
+          {/* Lock card — same cell as the blurred block, top-aligned. */}
           <AnimatePresence>
             {locked && (
               <motion.div
@@ -413,30 +452,21 @@ export function DemoCard({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={prefersReducedMotion ? FAST : { duration: 0.4 }}
-                className="absolute inset-0 z-[1] flex items-center justify-center"
+                className="z-[1] flex flex-col items-center pt-4 [grid-area:1/1]"
                 aria-hidden="true"
               >
-                <RevealLockPill label="Pledge your favourite" />
+                {/* The SAME card the guest page shows (LockCardContent) —
+                    it had been a bare pill here, so the landing advertised a
+                    simpler product than the one it links to. The wrapper
+                    mirrors poll-section's Button chrome; the demo is inert, so
+                    it is a div rather than a button. */}
+                <div className="w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-xl ring-1 ring-border">
+                  <LockCardContent steps={lockSteps} topicTitle={topicTitle} />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        {/* ── Results — blurred decoy while locked; real bars climb from 0 on
-            disclosure. (Charity row is pinned to the card bottom, below.) ── */}
-        {locked ? (
-          <div
-            key="decoy-results"
-            className="space-y-3 blur-xs"
-            aria-hidden="true"
-          >
-            {renderRankings(false)}
-          </div>
-        ) : (
-          <div key="real-results" className="space-y-3">
-            {renderRankings(true)}
-          </div>
-        )}
       </div>
 
       {/* Charity row — anchored to the card bottom so the expanding reveal +

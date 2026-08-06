@@ -31,6 +31,14 @@ export default defineConfig({
     alias: sharedAliases,
   },
   test: {
+    // 5s (vitest's default) is too tight for a 117-file suite running in
+    // parallel. The test that kept flaking — pledge-card "renders the Pledge
+    // favourites button" — is entirely SYNCHRONOUS: render, query, assert,
+    // nothing awaited. So a timeout there never meant the component was
+    // waiting on something; it meant a jsdom render was starved of CPU while
+    // the other files ran. Raising the global ceiling fixes the whole class
+    // rather than the one test that happened to lose the race most often.
+    testTimeout: 15000,
     projects: [
       {
         extends: true,
