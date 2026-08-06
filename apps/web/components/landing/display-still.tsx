@@ -36,6 +36,15 @@ const RANKS_SHOWN = 6
 const WALL_NAMES = ["Priya", "Tom", null, "Aisha", "Dan"]
 
 /**
+ * The scene needs a goal, and this is the real component telling us so: with
+ * no goal AND no close date the fundraiser banner's first column renders
+ * nothing at all, so the still lost its money headline entirely and the QR
+ * sat alone against an empty half. A team walk with a target is also just
+ * truer to the occasion than one without.
+ */
+const DEMO_GOAL = 1000
+
+/**
  * Captured once at module load, not per render: the wall prints relative
  * times ("4m ago"), so the entries need a clock, and reading one during
  * render is an impure call the compiler rightly rejects. Module scope is
@@ -94,6 +103,7 @@ export function DisplayStill({
         }}
         initialWallEntries={wall}
         initialTotalRaised={total}
+        goalAmount={DEMO_GOAL}
         favpollUrl="https://favpoll.com"
         qrUrl={qrUrl}
       />

@@ -167,8 +167,17 @@ export function DisplayScreen({
 
   // The room's way in, in-banner form — hidden from 2xl, where the QR
   // moves to the gutter (below).
+  //
+  // Both halves of that swap are keyed to the VIEWPORT, which is right for a
+  // display filling a projector and wrong for a still rendered at a fixed
+  // width inside a frame. A still has no gutters to move into, so it keeps
+  // the in-banner code at every width.
   const scanToPledge = (
-    <div className="flex shrink-0 flex-col items-center gap-1.5 min-[1600px]:hidden">
+    <div
+      className={`flex shrink-0 flex-col items-center gap-1.5 ${
+        live ? "min-[1600px]:hidden" : ""
+      }`}
+    >
       <BrandedQR
         value={qrUrl}
         size={132}
@@ -214,25 +223,31 @@ export function DisplayScreen({
           where the gutter (224px) fits the 200px QR; narrower viewports
           keep the in-banner QR. Fixed, so rendered OUTSIDE the card —
           its drop-shadow filter would otherwise become these boxes'
-          containing block (DisplayChrome precedent). */}
-      {(["left", "right"] as const).map((side) => (
-        <div
-          key={side}
-          className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
-            side === "left"
-              ? "left-[calc((100vw-72rem)/4-100px)]"
-              : "right-[calc((100vw-72rem)/4-100px)]"
-          }`}
-        >
-          <BrandedQR
-            value={qrUrl}
-            size={200}
-            colorVar="--qr"
-            aria-label="Scan to pledge on your phone"
-          />
-          <p className="text-sm font-medium text-qr">Scan to pledge</p>
-        </div>
-      ))}
+          containing block (DisplayChrome precedent).
+
+          Live only. A still has no gutters to pin them in, and `fixed`
+          resolves against the nearest TRANSFORMED ancestor — so inside the
+          landing page's scaled frame these two 200px codes landed in the
+          middle of the rankings. Same trap as DisplayChrome above. */}
+      {live &&
+        (["left", "right"] as const).map((side) => (
+          <div
+            key={side}
+            className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
+              side === "left"
+                ? "left-[calc((100vw-72rem)/4-100px)]"
+                : "right-[calc((100vw-72rem)/4-100px)]"
+            }`}
+          >
+            <BrandedQR
+              value={qrUrl}
+              size={200}
+              colorVar="--qr"
+              aria-label="Scan to pledge on your phone"
+            />
+            <p className="text-sm font-medium text-qr">Scan to pledge</p>
+          </div>
+        ))}
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
