@@ -182,11 +182,23 @@ export function LandingHero({
               scales up to hold that width — otherwise the pitch fills the
               left 40% and leaves ~700px of empty purple beside it. The 6xl
               step waits for 2xl: at 1280–1440 the extra 40px of line height
-              is the difference between the hero fitting a laptop and not. */}
+              is the difference between the hero fitting a laptop and not.
+
+              max-w-3xl in BOTH modes (2026-08-06) — a partial win, recorded
+              honestly. It buys /fundraisers a line back (4 → 3) and costs
+              nothing anywhere, but it does NOT give the register pages home's
+              beats-never-wrap poster. Measured: the register first-beats need
+              784 / 773 / 788px at 48px type against a 768px cap, so they were
+              only just overshooting; but the binding constraint below 1280 is
+              the demo layout's pitch COLUMN, which is 795px at 1280 and 624px
+              at 1024. No cap fixes 624. Home's beats are 404–427px — half the
+              width — which is why the poster works there and not here. If the
+              register headlines should hold one line, that is a COPY change
+              (shorter first beats), not a layout one. */}
           <h1
             className={cn(
-              "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
-              router ? "max-w-3xl 2xl:text-6xl" : "max-w-xl"
+              "mb-6 max-w-3xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              router && "2xl:text-6xl"
             )}
           >
             {(headline ?? t("landing.headline"))
@@ -219,6 +231,14 @@ export function LandingHero({
                 {ctaLabel ?? t("landing.cta.primary")}
               </Link>
             </Button>
+            {/* BESIDE the button, not beneath it (measured 2026-08-06): below
+                it, the extra line costs 16px and tips 1280x800 — which #524
+                worked to make fit exactly — over the fold. Inside the row it
+                sits within the button's own 44px and costs nothing at any
+                viewport. "Free to create" only: the 100% is already the stat
+                tile 335px below in this same band, and the short form is also
+                the only one that doesn't wrap at 390. */}
+            <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
           </div>
         </div>
 

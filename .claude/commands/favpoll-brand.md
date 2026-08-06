@@ -107,34 +107,66 @@ favpoll charges no platform fee. 100% of every pledge reaches the charity; Strip
 
 ### Headline — one fixed, universal line
 
-As of 2026-07-17 the headline centres the guest's favourite in the mechanic's
-three beats:
+As of 2026-08-06 the headline states the mechanic in plain language:
 
 ```
-Pick your favourite. Pledge its worth. Reveal its standing.
+Pick your favourite. Give what it's worth. See where it stands.
 ```
 
 It does **not** cycle, and it deliberately carries no register, no protagonist,
 and no promise about the personal reveal. The favourite is the subject: the
 guest picks *their* favourite, the amount is framed as *what that favourite is
-worth to them* (the Love pillar as a pledge-value anchor), and what's revealed
-is the favourite's **standing** — the poll result, which every favpoll shows
-after pledging ("standing(s)" is deliberately the record's vocabulary). The
-division of labour (revised 2026-07-17): the hero **eyebrow is retired** —
-the kind chips beside the demo (Memorial · Celebration · Fundraiser · Cause)
-carry the breadth visually; the **headline** names the arc the hero demo then
-enacts (the beat chips under the demo — Pick · Pledge · Reveal — track it
-live), and the **brand statement** carries the soul. The personal reveal — a gift, not a gate — stays a
-*discovered* moment (the demo's blur → lock → reveal arc, the reveal pill on
-real polls), never a headline promise. Do not re-promote the personal reveal
-into hero copy: it is optional per-poll and protagonist-shaped, so any
-one-clause version over-promises, reads gated, or goes vague. Grammar guard:
-it is "pledge **its** worth" (possessive) — never "it's".
+worth to them* (the Love pillar as a pledge-value anchor), and what they see is
+the favourite's **standing** — the poll result, which every favpoll shows after
+pledging ("standing(s)" is deliberately the record's vocabulary).
+
+**Why it changed on 2026-08-06.** The hero demo moved to the register pages
+(#519–#522), and the previous line had been written to caption it. Two beats
+went stale with it: "Pledge its worth" is the formal product term where the
+hero wants an instruction, and **"Reveal its standing" was captioning a reveal
+animation that is no longer on the page** — with the demo gone it drifts toward
+the *personal* reveal, which hero copy must never promise. The plain verbs also
+match the register cards, which all now say give/giving/gift.
+
+The division of labour (revised 2026-08-06): the hero **eyebrow is retired**;
+the **register router cards** carry the breadth and the honour (each names its
+own occasion, and the poll beside it shows a real question — the referent the
+demo used to supply); the **headline** names the arc in plain language; and the
+**brand statement** carries the soul, as the subheader. Keep the statement
+there: at display size it breaks mid-clause ("for charitable / causes, in the
+name of those we / love.") and widows "love.", against its own never-break
+rule — measured 2026-08-06 when it was tried as the headline.
+
+**On home the beats must never wrap**: each sentence takes its own line (the
+hero splits on `". "`), and every beat is short enough to hold one line down to
+390px. That is the poster, and it is the constraint any replacement has to
+clear — several two-beat candidates read well on desktop and broke mid-beat on
+a phone. Note this is a HOME invariant, and layout cannot make it hero-wide
+(measured 2026-08-06). The h1 is `max-w-3xl` in both modes now, but the
+register pages' two-beat headlines still wrap: their first beats need
+784 / 773 / 788px at 48px type, and the demo layout's pitch column is 795px at
+1280 and only 624px at 1024. Home's beats are 404–427px — half the width — and
+that is the whole reason the poster holds there. **If the register headlines
+should hold one line each, shorten the first beats; no layout change will do
+it.**
+
+The personal reveal — a gift, not a gate — stays a *discovered* moment (the
+demo's blur → lock → reveal arc, the reveal pill on real polls), never a
+headline promise. Do not re-promote the personal reveal into hero copy: it is
+optional per-poll and protagonist-shaped, so any one-clause version
+over-promises, reads gated, or goes vague.
 
 Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
-there, never inline.
+there, never inline. The hero CTA carries `landing.cta.free` ("Free to create")
+**beside** the button; the closing CTA keeps the fuller
+`landing.cta.caption` ("Free to create · 100% goes to charity"), because in the
+hero the 100% is already the stat row in the same band.
 
-History: "Pick, pledge, reveal." (2026-07-11 → 2026-07-17, retired as
+History: "Pick your favourite. Pledge its worth. Reveal its standing."
+(2026-07-17 → 2026-08-06 — see above; the "worth" anchor survives it, the
+demo-captioning verbs did not). Grammar guard for that line, kept in case it is
+ever quoted: it was "pledge **its** worth" (possessive), never "it's".
+Before that "Pick, pledge, reveal." (2026-07-11 → 2026-07-17, retired as
 semantically hollow — punchy but the verbs carried no subject; the worth
 framing was the upgrade). Before that "Turn what you love into what you give."
 (2026-07-07 → 2026-07-11, retired for the "love" repetition against the
