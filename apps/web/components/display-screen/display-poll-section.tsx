@@ -42,7 +42,9 @@ export function DisplayPollSection({
     <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
       {/* Projector-scale topic header (founder, 2026-08-02) — PollHeading's
           card-sized ramp reads small across a room. */}
-      <h2 className="mb-6 truncate text-xl font-medium tracking-[0.09em] text-primary uppercase md:text-2xl">
+      {/* --display-topic is set by DisplayScreen on a live room surface;
+          the fallback is the md:text-2xl this has always been. */}
+      <h2 className="mb-6 truncate text-xl font-medium tracking-[0.09em] text-primary uppercase md:text-[length:var(--display-topic,1.5rem)]">
         Favourite {poll.topic.title}
       </h2>
 

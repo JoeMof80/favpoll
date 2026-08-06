@@ -86,4 +86,20 @@ describe("DisplayScreen — live={false}", () => {
     rerender(<DisplayScreen {...BASE} live />)
     expect(screen.getAllByTestId("branded-qr").length).toBeGreaterThan(1)
   })
+
+  // The projector type ramp is vw-relative, so it must not reach a still —
+  // that renders at a fixed 900px inside the visitor's viewport, where
+  // vw-scaled type would burst the layout. Shared components read these with
+  // today's sizes as the fallback, so absence means "unchanged".
+  it("applies the room type ramp only when live", () => {
+    const { container, rerender } = render(<DisplayScreen {...BASE} live />)
+    const liveRoot = container.firstElementChild as HTMLElement
+    expect(liveRoot.style.getPropertyValue("--display-rank")).toContain("vw")
+    expect(liveRoot.style.getPropertyValue("--display-figure")).toContain("vw")
+
+    rerender(<DisplayScreen {...BASE} live={false} />)
+    const stillRoot = container.firstElementChild as HTMLElement
+    expect(stillRoot.style.getPropertyValue("--display-rank")).toBe("")
+    expect(stillRoot.style.getPropertyValue("--display-figure")).toBe("")
+  })
 })

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
+import { getFavpollHeadline, roomTypeScale } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
@@ -76,6 +76,12 @@ type Props = {
    */
   live?: boolean
 }
+
+// The event heroes and the display agree on the figure size right up to
+// the point a projector is involved, so the display keeps the small-screen
+// half of the shared heroNameSizeClass and swaps only the upper step.
+const figureSizeClass =
+  "text-3xl sm:text-[length:var(--display-figure,2.25rem)]"
 
 export function DisplayScreen({
   protagonistName,
@@ -197,6 +203,10 @@ export function DisplayScreen({
     // a wider canvas.
     <div
       className={`overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+      // The ramp is opt-in and live-only: it is vw-relative, and the
+      // landing page renders a still at a fixed width inside the
+      // visitor's viewport, where vw-scaled type would burst the layout.
+      style={live ? (roomTypeScale as React.CSSProperties) : undefined}
     >
       {/* Outside the card: its drop-shadow filter would otherwise become the
           containing block for the chrome's fixed corner positioning */}
@@ -267,7 +277,7 @@ export function DisplayScreen({
                missing photo) never shifts the rankings below. */
             <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
               {/* Col 1 — the favpoll page hero's EXACT grammar (founder,
-                  2026-08-02): SectionEyebrow, heroNameSizeClass name,
+                  2026-08-02): SectionEyebrow, hero-sized name,
                   text-xl/2xl primary subtitle, 26/33 photo-gated avatar
                   at the right. The QR sits at the column's right edge;
                   mobile stacks it centred beneath the heading. */}
@@ -287,7 +297,7 @@ export function DisplayScreen({
                       </SectionEyebrow>
                     )}
                     <h1
-                      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+                      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${figureSizeClass}`}
                     >
                       {protagonistName}
                     </h1>
@@ -375,7 +385,7 @@ export function DisplayScreen({
                         Poll closed
                       </SectionEyebrow>
                       <p
-                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                        className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}
@@ -398,7 +408,7 @@ export function DisplayScreen({
                       </div>
                       <div className="flex flex-wrap items-baseline gap-x-3">
                         <p
-                          className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                          className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                           aria-live="polite"
                         >
                           {formatPounds(totalRaised)}
@@ -457,7 +467,7 @@ export function DisplayScreen({
                         Raised so far
                       </SectionEyebrow>
                       <p
-                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                        className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}

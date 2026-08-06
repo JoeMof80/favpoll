@@ -40,7 +40,12 @@ export function RankingBar({
       <div
         className={cn(
           "flex justify-between",
-          isDisplay ? "mb-1.5 text-lg" : "mb-1 text-sm"
+          // --display-rank is set by DisplayScreen when it is a LIVE room
+          // surface; the fallback is the size this has always been, so every
+          // other caller (and the landing page's framed still) is unaffected.
+          isDisplay
+            ? "mb-1.5 text-[length:var(--display-rank,1.125rem)]"
+            : "mb-1 text-sm"
         )}
       >
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
@@ -75,7 +80,7 @@ export function RankingBar({
         className={cn(
           "w-full overflow-hidden rounded-full",
           onBand ? "bg-primary-foreground/20" : "bg-muted",
-          isDisplay ? "h-2" : "h-1.5"
+          isDisplay ? "h-[var(--display-bar,0.5rem)]" : "h-1.5"
         )}
         role="presentation"
       >
