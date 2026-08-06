@@ -95,20 +95,22 @@ const SCALE = {
     steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
     stepGap: "gap-[1.5mm]",
     numWidth: "w-[3.5mm]",
-    // 58 → 84 (2026-08-06). The guest URL is https://favpoll.com/favpolls/<uuid>
+    // 58 → 92 (2026-08-06). The guest URL is https://favpoll.com/favpolls/<uuid>
     // = 65 chars, which at error-correction H is a 49x49 QR; at 58px (15.35mm)
     // that put each module at 0.313mm, under the ~0.4mm floor printed codes
     // need, so domestic printers' ink spread merged adjacent modules and the
-    // card scanned only reluctantly. 84px = 22.2mm = 0.454mm per module.
-    // Measured: the steps column does not reflow at this width (it holds
-    // 18.8mm tall down to a 51.9mm column) and nothing spills the fixed 54mm
-    // card. Do not exceed ~92px — past that the row starts to grow.
-    // The real fix is a shorter guest URL: 65 chars → ≤34 drops the code from
-    // 49x49 to 33x33, making every module 48% bigger at the same physical
-    // size. Measured boundaries: 26–34 chars = 33x33, 35–44 = 37x37. So a
-    // /p/<code> route can afford a 12-char code for free — 4 and 12 land on
-    // the same 33x33 — and should take it rather than use a guessable 6.
-    qr: 84,
+    // card scanned only reluctantly.
+    //
+    // 92px = 24.3mm, and the QR now encodes the SHORT /p/<code> URL (34
+    // chars = 33x33, not 65 chars = 49x49), so each module is 0.737mm —
+    // 2.35x the 0.313mm that failed. 92 is the CEILING: measured, the steps
+    // column does not reflow down to a 51.9mm track and nothing spills the
+    // fixed 54mm card, but past 92 the row itself starts to grow.
+    //
+    // The code grows LEFTWARD, since it is the last item in the flex row and
+    // its right edge is pinned by the card padding. That is why enlarging it
+    // reads as "moved towards the centre" rather than "got bigger".
+    qr: 92,
     footer: "pb-[2mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
   },
@@ -299,7 +301,10 @@ export function PackDocument({ data }: { data: PackData }) {
     "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
 
   return (
-    <div className="flex flex-col gap-8 print:block">
+    // .paper pins the light token values across the whole pack, so the cards
+    // print the same whatever theme the organiser is viewing in — see the
+    // block in globals.css for the measurements that forced it.
+    <div className="paper flex flex-col gap-8 print:block">
       {/* ── A4 card: landscape design ROTATED 90° on a portrait sheet
           (founder, 2026-08-02) — every sheet stays portrait, one print
           job covers the pack, and the poster comes out landscape when

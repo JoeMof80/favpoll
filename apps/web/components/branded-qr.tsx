@@ -48,7 +48,13 @@ export function BrandedQR({
 
   useEffect(() => {
     const resolve = () => {
-      const styles = getComputedStyle(document.documentElement)
+      // Resolve from THIS node, not documentElement (2026-08-06). Reading the
+      // root meant the QR could not see a local token scope — so the print
+      // pack's .paper had no effect on it and a dark-mode organiser printed a
+      // near-white code (measured rgb(243,245,252)) onto white card. Reading
+      // the element's own cascade lets any ancestor scope reach it, and is
+      // identical to the old behaviour wherever no scope intervenes.
+      const styles = getComputedStyle(ref.current ?? document.documentElement)
       const foreground = styles.getPropertyValue(colorVar).trim()
       setColors({ foreground: foreground || "black" })
     }
