@@ -15,9 +15,24 @@ import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
 
-const SCENE = SCENES[0] // Belinda — one coherent story across the steps
+// The CAUSE scene (founder, 2026-08-06), not the memorial one. This is the
+// most neutral of the four — no protagonist, so the guest arc reads as the
+// mechanic itself rather than as one register's story — and the register
+// cards in the hero above have already covered the protagonist-shaped types.
+// Its reveal is an impact line rather than someone's favourite, which is what
+// a cause favpoll actually shows.
+const SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
 
 const STEPS: { phase: Phase; label: string; body: string }[] = [
+  {
+    // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
+    // locked phase, so the card shows blurred decoy bars and the reveal lock —
+    // the withholding the rest of the arc then resolves. Without it the
+    // sequence opened mid-story, on a picker already in use.
+    phase: "arriving",
+    label: t("landing.how.arrive.label"),
+    body: t("landing.how.arrive.body"),
+  },
   {
     phase: "selected",
     label: t("landing.how.pick.label"),
