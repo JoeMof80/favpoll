@@ -60,6 +60,14 @@ export type HeroScene = {
   heading?: string
   /** small eyebrow prefix inside the card for no-protagonist scenes */
   eyebrow?: string
+  /**
+   * Sub-heading line for no-protagonist scenes — the cause's equivalent of a
+   * protagonist's `context` ("1945 - 2024", "London Marathon · 26.2 miles").
+   * The real product stores this on favpolls.context for cause favpolls (see
+   * the favpoll_cause_photo_context migration); the scene type had it only
+   * inside `protagonist`, so cause scenes could not show one at all.
+   */
+  context?: string
   /** typed "about"-equivalent line for no-protagonist scenes */
   blurb?: string
   poll: {
@@ -294,6 +302,7 @@ export const SCENES: HeroScene[] = [
     // (logo_url) and the card already renders it.
     heading: "Walking for St Luke's",
     eyebrow: "A cause",
+    context: "Our team of 12 · 11 miles",
     blurb:
       "A team walk for our local hospice — pledge your favourite, and every penny goes to St Luke's.",
     poll: {
