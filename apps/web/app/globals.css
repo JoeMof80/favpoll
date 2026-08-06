@@ -249,6 +249,40 @@
   }
 }
 
+/* ── Paper ──────────────────────────────────────────────────────────────
+   A printed card is an artefact, not a surface of the app: it is white
+   because it is paper, so it must NOT follow the viewer's theme.
+
+   Measured 2026-08-06, printing the pack from dark mode: the card forces
+   bg-white but everything ON it still took theme tokens, so the ink went
+   near-white on white paper — "Donald" at 1.09:1, the topic at 1.09:1, the
+   borders at 1.00:1 (i.e. gone), and the QR drawn in rgb(243,245,252). A
+   dark-mode organiser printed table cards and got blank card stock.
+
+   This class pins the LIGHT values regardless of the .dark ancestor. It
+   must restate every token the pack consumes: a class has no light-mode
+   selector of its own, so anything omitted here keeps leaking the dark
+   value (the same trap that produced an ice-on-ice page in the register
+   theming exploration, PROJECT.md §14). Adding a new token-driven class
+   inside the pack means adding its token here.
+
+   --border is DELIBERATELY darker than the app's (0.91 → 0.72): at the
+   app value a 1px rule measured 1.31:1 against paper and dithered to
+   nothing on a domestic printer. Darker ink rather than a thicker line —
+   the house rule keeps dividers thin, and a thick faint line still prints
+   muddy where a thin dark one prints crisp. */
+.paper {
+  --background: oklch(1 0 0);
+  /* Values mirror the :root light block exactly, so the pack looks identical
+     on screen in light mode; only --border deliberately differs. */
+  --foreground: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.52 0.06 278);
+  --primary: oklch(0.44 0.18 278);
+  --primary-foreground: oklch(0.99 0 0);
+  --border: oklch(0.66 0.02 278);
+  --border-strong: oklch(0.75 0.1 278);
+}
+
 /* Tailwind v4 removed v3's cursor:pointer on buttons (native-behaviour
    purism). Our links show the pointer, so buttons without it read as
    not-clickable — restore the affordance. Unlayered on purpose: wins over
