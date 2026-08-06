@@ -98,8 +98,11 @@ const SCALE = {
     // Measured: the steps column does not reflow at this width (it holds
     // 18.8mm tall down to a 51.9mm column) and nothing spills the fixed 54mm
     // card. Do not exceed ~92px — past that the row starts to grow.
-    // The real fix is a shorter guest URL: 65 chars → ~30 would drop the code
-    // to 29x29 and make every module 69% bigger at the same physical size.
+    // The real fix is a shorter guest URL: 65 chars → ≤34 drops the code from
+    // 49x49 to 33x33, making every module 48% bigger at the same physical
+    // size. Measured boundaries: 26–34 chars = 33x33, 35–44 = 37x37. So a
+    // /p/<code> route can afford a 12-char code for free — 4 and 12 land on
+    // the same 33x33 — and should take it rather than use a guessable 6.
     qr: 84,
     footer: "pb-[2mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
