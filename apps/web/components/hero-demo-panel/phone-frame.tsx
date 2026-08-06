@@ -52,6 +52,12 @@ export function PhoneFrame({
       {/* flex column, matching DemoFrame: the DemoCard inside is `flex-1`,
           so it fills the screen the same way in both frames. */}
       <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[2.5rem] bg-background">
+        {/* Safe area. A page starts BELOW the status bar, so without this the
+            island sat on top of the app header — which no phone ever shows.
+            Left blank rather than filled with a fake clock and battery: that
+            is OS chrome, it restyles every year, and a stale one reads as an
+            old screenshot. */}
+        <div className="h-12 shrink-0 bg-background" />
         {children}
         {/* Dynamic island, over the content — the card scrolls beneath it on
             a real phone too. */}

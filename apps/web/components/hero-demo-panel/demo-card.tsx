@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
+import { HeaderBar } from "@/components/header-bar"
+import { CharityRow } from "@/components/charity-row"
+import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -270,41 +273,20 @@ export function DemoCard({
     </ol>
   )
 
-  // Charity row mirrors CharityRow (favpoll-card/charity-row.tsx) — pinned to
-  // the card bottom and always visible (not part of the gated reveal/results).
+  // The REAL CharityRow (2026-08-07). This was a hand-copy whose own comment
+  // said it "mirrors CharityRow (favpoll-card/charity-row.tsx)" — a path that
+  // had since moved, which is the drift the copy invited. Scene charities
+  // carry what a demo needs; Charity also wants description and created_at,
+  // neither of which this row renders.
   const charityRow = (
-    <div className="flex items-center gap-3">
-      {charity.logo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={charity.logo_url}
-          alt={charity.name}
-          className="h-8 w-8 rounded object-contain"
-        />
-      ) : (
-        <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary"
-          aria-hidden="true"
-        >
-          {charity.name.charAt(0)}
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-foreground">
-          {charity.name}
-        </p>
-        {charity.registered_number && (
-          <p className="text-xs text-muted-foreground">
-            Charity no. {charity.registered_number}
-          </p>
-        )}
-      </div>
-      {raisedNum > 0 && (
-        <p className="shrink-0 text-sm font-medium text-primary">
-          {formatPounds(raisedNum)}
-        </p>
-      )}
-    </div>
+    <CharityRow
+      charity={{
+        ...charity,
+        description: null,
+        created_at: "2024-01-01T00:00:00Z",
+      }}
+      amountRaised={raisedNum}
+    />
   )
 
   // ── Measurer ──────────────────────────────────────────────────────────────
@@ -322,6 +304,14 @@ export function DemoCard({
         className
       )}
     >
+      {/* The app header, as a guest actually meets the page: logo and menu
+          above the hero, with the rule under it. Full-bleed past the card's
+          p-5, and the real HeaderBar rather than a lookalike — the version
+          Header itself renders, minus the Clerk-aware hamburger. */}
+      <div className="-mx-5 -mt-5 mb-4 shrink-0">
+        <HeaderBar staticMenu />
+      </div>
+
       {/* Hidden measurer — same width as where the dialog renders. */}
       <div
         ref={measureRef}
@@ -469,18 +459,23 @@ export function DemoCard({
         </div>
       </div>
 
-      {/* Charity row — anchored to the card bottom so the expanding reveal +
-          climbing bars can't push it out of view. Gated (blurred) while locked,
-          like the rest of the reveal/results. */}
-      <div
-        className={cn(
-          "shrink-0 border-t border-border pt-3 transition-[filter] duration-500",
-          locked ? "blur-xs" : ""
-        )}
-        aria-hidden={locked ? "true" : undefined}
-      >
-        {charityRow}
+      {/* The share FAB, where favpoll-subheader puts it: bottom right, clear
+          of the charity bar. The real button — it is inert here because the
+          whole demo is pointer-events-none, and drawing a fake circle would
+          have been one more lookalike. */}
+      <div className="pointer-events-none absolute right-4 bottom-20 z-20">
+        <ShareFavpollButton variant="fab" shareTitle={`${title} — favpoll`} />
       </div>
+
+      {/* Charity row — anchored to the card bottom so the expanding reveal +
+          climbing bars can't push it out of view.
+          NOT gated. It used to blur while locked, "like the rest of the
+          reveal/results", but the real guest page shows this bar crisp before
+          any pledge — charity, number and running total all legible, which is
+          the point of it. Corrected 2026-08-07 against a photograph of the
+          real thing; what the lock withholds is the standings, never who the
+          money goes to. */}
+      <div className="shrink-0 border-t border-border pt-3">{charityRow}</div>
 
       {/* ── Mimicked pledge dialog ──
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
