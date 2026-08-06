@@ -90,7 +90,17 @@ const SCALE = {
     steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
     stepGap: "gap-[1.5mm]",
     numWidth: "w-[3.5mm]",
-    qr: 58,
+    // 58 → 84 (2026-08-06). The guest URL is https://favpoll.com/favpolls/<uuid>
+    // = 65 chars, which at error-correction H is a 49x49 QR; at 58px (15.35mm)
+    // that put each module at 0.313mm, under the ~0.4mm floor printed codes
+    // need, so domestic printers' ink spread merged adjacent modules and the
+    // card scanned only reluctantly. 84px = 22.2mm = 0.454mm per module.
+    // Measured: the steps column does not reflow at this width (it holds
+    // 18.8mm tall down to a 51.9mm column) and nothing spills the fixed 54mm
+    // card. Do not exceed ~92px — past that the row starts to grow.
+    // The real fix is a shorter guest URL: 65 chars → ~30 would drop the code
+    // to 29x29 and make every module 69% bigger at the same physical size.
+    qr: 84,
     footer: "pb-[2mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
   },
