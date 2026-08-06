@@ -98,7 +98,7 @@ describe("MARKET_DEFAULTS", () => {
 describe("t", () => {
   it("returns the universal, register-agnostic landing headline", () => {
     expect(t("landing.headline")).toBe(
-      "Pick your favourite. Pledge its worth. Reveal its standing."
+      "Pick your favourite. Give what it's worth. See where it stands."
     )
   })
 
@@ -106,6 +106,12 @@ describe("t", () => {
     expect(t("landing.cta.caption")).toBe(
       "Free to create · 100% goes to charity"
     )
+  })
+
+  // The hero's short caption — the closing CTA keeps the full one, where the
+  // 100% is doing work the hero's stat row already does.
+  it("returns the hero's short CTA caption", () => {
+    expect(t("landing.cta.free")).toBe("Free to create")
   })
 
   it("returns the brand subheader", () => {
