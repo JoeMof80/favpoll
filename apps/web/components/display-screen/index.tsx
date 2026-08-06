@@ -60,6 +60,21 @@ type Props = {
   defaultVariant?: DisplayVariant
   /** Keys the presenter's variant override in localStorage */
   favpollId?: string
+  /**
+   * False renders the display as a STILL — same markup, none of the
+   * behaviour that only makes sense on a screen someone is presenting from:
+   * no interval refetch, no localStorage variant, no close countdown, no
+   * presenter chrome, and no min-h-screen (a still is as tall as its
+   * content).
+   *
+   * Added 2026-08-06 for the landing page's "In the room" beat, which had
+   * been a hand-built reduction of this component. A homepage that refreshed
+   * the route every five seconds would be a bug, but so is maintaining a
+   * second definition of a surface — the four defects of that day were all
+   * two things claiming to be the same and quietly differing. This way the
+   * marketing still IS the display.
+   */
+  live?: boolean
 }
 
 export function DisplayScreen({
@@ -80,6 +95,7 @@ export function DisplayScreen({
   isClosed = false,
   defaultVariant = "fundraiser",
   favpollId,
+  live = true,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
@@ -89,10 +105,10 @@ export function DisplayScreen({
   // state: the server render knows nothing of localStorage, and a
   // mismatch would break hydration).
   useEffect(() => {
-    if (!variantKey) return
+    if (!live || !variantKey) return
     const stored = window.localStorage.getItem(variantKey)
     if (stored === "fundraiser" || stored === "tribute") setVariant(stored)
-  }, [variantKey])
+  }, [live, variantKey])
 
   function handleVariantChange(next: DisplayVariant) {
     setVariant(next)
@@ -113,9 +129,10 @@ export function DisplayScreen({
   // the wall adopts fresh entries, and the total syncs below.
   const router = useRouter()
   useEffect(() => {
+    if (!live) return
     const id = setInterval(() => router.refresh(), 5000)
     return () => clearInterval(id)
-  }, [router])
+  }, [live, router])
 
   // Adopt the refreshed total (state, so a future push channel could also
   // set it)
@@ -124,7 +141,7 @@ export function DisplayScreen({
   }, [initialTotalRaised])
 
   useEffect(() => {
-    if (isClosed || !closesAt) return
+    if (!live || isClosed || !closesAt) return
     const delta = new Date(closesAt).getTime() - Date.now()
     if (delta <= 0) {
       setLocalClosed(true)
@@ -133,7 +150,7 @@ export function DisplayScreen({
     if (delta > 2 ** 31 - 1) return // beyond setTimeout range; irrelevant live
     const id = setTimeout(() => setLocalClosed(true), delta)
     return () => clearTimeout(id)
-  }, [closesAt, isClosed])
+  }, [live, closesAt, isClosed])
 
   const headline = getFavpollHeadline({
     occasionType,
@@ -169,14 +186,21 @@ export function DisplayScreen({
     // The event page's frame (tinted surround, floating card) at broadcast
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
     // a wider canvas.
-    <div className="min-h-screen overflow-x-clip bg-primary/5">
+    <div
+      className={`overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+    >
       {/* Outside the card: its drop-shadow filter would otherwise become the
           containing block for the chrome's fixed corner positioning */}
-      <DisplayChrome
-        eventUrl={favpollUrl}
-        variant={variant}
-        onVariantChange={handleVariantChange}
-      />
+      {/* Presenter controls only exist for a presenter — a still has nobody
+          to drive them, and the bar is `fixed`, which inside the landing
+          page's scaled frame would anchor to that frame rather than a room. */}
+      {live && (
+        <DisplayChrome
+          eventUrl={favpollUrl}
+          variant={variant}
+          onVariantChange={handleVariantChange}
+        />
+      )}
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
           the room — the telethon corner phone number — pinned in BOTH
           gutters so it survives scrolling and asymmetric occlusion (a
@@ -212,7 +236,11 @@ export function DisplayScreen({
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
-      <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 pt-16 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg">
+      <div
+        className={`mx-auto w-full max-w-6xl bg-background px-8 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg ${
+          live ? "min-h-screen pt-16" : "pt-8"
+        }`}
+      >
         {/* ── Banner: ONE row, two columns (founder, 2026-08-02). The
             variants swap which column is the heading — fundraiser leads
             with the goal figure, tribute leads with the person and keeps

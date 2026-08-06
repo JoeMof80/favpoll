@@ -229,8 +229,12 @@ export function ProcessOverview() {
             labels near 6px. Two of five gives the media ~478px at 1280 and
             costs the text nothing — it is max-w-md either way. */}
         <div className="grid gap-6 md:grid-cols-5">
-          {/* Text column — pinned headline, then the SCROLLING beat texts */}
-          <div className="md:col-span-3">
+          {/* Text column — pinned headline, then the SCROLLING beat texts.
+              The bottom padding is travel for the sticky media, not spacing:
+              without it the column ran out exactly as the LAST beat became
+              active, so the TV — the payoff of the whole arc — pinned for a
+              moment and then scrolled away under the nav. */}
+          <div className="md:col-span-3 md:pb-[30vh]">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
             {/* pb-8 and a 36-deep fade, up from pb-6/h-20: the headline runs
@@ -277,8 +281,14 @@ export function ProcessOverview() {
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
+          {/* z-20, above the pinned header's z-10 backdrop. The header has to
+              paint over the scrolling step TEXT, but it is opaque and spans
+              its own column, so it was also slicing the TV's vignette off in
+              a straight vertical line at the column boundary. The two never
+              overlap horizontally except for that soft bleed, which should
+              pass over the header, not under it. */}
           <div
-            className="relative hidden md:col-span-2 md:block"
+            className="relative z-20 hidden md:col-span-2 md:block"
             aria-hidden="true"
           >
             <div className="sticky top-28">

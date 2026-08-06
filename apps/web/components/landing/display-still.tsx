@@ -1,42 +1,49 @@
 "use client"
 
-import { BrandedQR } from "@/components/branded-qr"
-import { DisplayPollSection } from "@/components/display-screen/display-poll-section"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { DisplayScreen } from "@/components/display-screen"
 import { sceneFavourites } from "@/components/hero-demo-panel/scene-favourites"
-import { heroNameSizeClass } from "@/lib/display"
-import { formatPounds } from "@/lib/i18n"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
-// The live display, as the closing frame of the guest arc — a still, not the
-// real DisplayScreen.
+// The live display as the closing beat of the guest arc — the REAL component,
+// not a depiction of it.
 //
-// DisplayScreen is a LIVE surface: it refreshes its own server data every
-// five seconds (postgres_changes never reach the anon browser, so the page
-// re-pulls instead), adopts a stored variant from localStorage and arms a
-// close countdown. None of that belongs on the landing page, and a
-// homepage that refreshed the route every five seconds would be a bug.
+// This was a hand-built reduction until 2026-08-06: a simplified banner over
+// the shared ranking parts, on the reasoning that a visible reduction cannot
+// drift the way a copy does. True as far as it goes, but the founder asked
+// the better question — why not show the actual display? — and the answer
+// turned out to be cheap: DisplayScreen takes `live={false}` and drops the
+// three behaviours that only make sense on a screen someone is presenting
+// from. Nine required props, all of which a demo scene already carries.
 //
-// This is deliberately a REDUCTION, and the distinction matters: the four
-// defects named on 2026-08-06 were each two things claiming to be the same
-// and quietly differing. A still that obviously shows less cannot drift that
-// way. What it does NOT restate is the part that carries meaning — the topic
-// header and the ranking bars come through DisplayPollSection, the code
-// through BrandedQR — so the leader still normalises to 100% here because
-// the same components compute it, not because a number was copied across.
-//
-// Rendered at a fixed 900px and scaled by the caller: the display is a
-// desktop layout (max-w-6xl, md: two-column banner), so laying it out at
-// column width would collapse it into its mobile form and stop it reading as
-// a screen in a room. 900 keeps the md: banner and, at the ~0.44 fit-scale a
-// third of the page grid allows, puts the 18px bar labels at about 8px —
-// smaller than the phone steps before it, which is right for something being
-// read across a room rather than in the hand.
+// So there is now ONE definition of the display. Whatever changes there
+// changes here, including the parts a reduction would have quietly lost —
+// the goal-free "Raised so far" silhouette, the charity rows, the guest wall,
+// the two-column banner.
 
+/** Rendered at this width, then scaled by the caller — see the note there. */
 export const DISPLAY_STILL_WIDTH = 900
 
-/** Leaders shown on the still — matches the demo card's own RESULTS_SHOWN. */
-const RANKS_SHOWN = 5
+/**
+ * Leaders shown. The real display lists every favourite, including the ones
+ * on £0 — correct there, and four empty bars in a marketing still. Sorted
+ * before slicing: sceneFavourites returns the topic's own (alphabetical)
+ * order, so an unsorted slice once dropped the £240 leader entirely and
+ * handed the 100% bar to the runner-up.
+ */
+const RANKS_SHOWN = 6
+
+/** A display mid-event has pledges on its wall; an empty one reads as broken. */
+const WALL_NAMES = ["Priya", "Tom", null, "Aisha", "Dan"]
+
+/**
+ * Captured once at module load, not per render: the wall prints relative
+ * times ("4m ago"), so the entries need a clock, and reading one during
+ * render is an impure call the compiler rightly rejects. Module scope is
+ * evaluated on import, and this component only ever renders client-side —
+ * its caller gates the media behind `mounted` — so there is no server pass
+ * to disagree with.
+ */
+const WALL_BASE_TIME = Date.now()
 
 export function DisplayStill({
   scene,
@@ -47,69 +54,49 @@ export function DisplayStill({
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
-  // The TOTAL counts everything, the LIST shows the leaders — cropping the
-  // frame mid-bar read as a broken screenshot rather than a screen.
-  //
-  // SORT BEFORE SLICING. sceneFavourites returns the topic's favourites in
-  // their own order, which is alphabetical, so an unsorted slice took Chai
-  // through Green tea and dropped Tea — the £240 leader — leaving two £0 rows
-  // and handing the 100% bar to Coffee. RankingList ranks what it is given;
-  // it cannot recover an item that never arrived.
-  const shown = [...items]
-    .sort((a, b) => b.all_time_pledged - a.all_time_pledged)
-    .slice(0, RANKS_SHOWN)
+  // The TOTAL counts everything; the LIST shows the leaders.
+  const ranked = [...items].sort(
+    (a, b) => b.all_time_pledged - a.all_time_pledged
+  )
   const total = items.reduce((sum, item) => sum + item.all_time_pledged, 0)
-  const charityName = scene.charities[0]?.name ?? null
+
+  const wall = WALL_NAMES.map((name, i) => ({
+    id: `wall-${i}`,
+    name,
+    labels: [ranked[i % ranked.length].label],
+    created_at: new Date(WALL_BASE_TIME - (i + 1) * 4 * 60_000).toISOString(),
+  }))
 
   return (
-    // The event page's frame at broadcast width, as the real display wears
-    // it: tinted surround, floating card.
-    <div
-      className="flex flex-col bg-primary/5"
-      style={{ width: DISPLAY_STILL_WIDTH }}
-    >
-      <div className="mx-auto flex w-full flex-1 flex-col bg-background px-12 py-8 drop-shadow-lg">
-        {/* Banner — the fundraiser variant's silhouette, reduced: eyebrow,
-            the figure, the QR beside it, and the charity it is for. No goal
-            bar, no countdown, no per-charity rows. */}
-        <div className="mb-8 flex items-start gap-8 border-b border-border pb-6">
-          <div className="min-w-0 flex-1">
-            <SectionEyebrow variant="muted" className="flex h-8 items-center">
-              Raised so far
-            </SectionEyebrow>
-            <p
-              className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
-            >
-              {formatPounds(total)}
-            </p>
-            {charityName && (
-              <p className="mt-2 text-lg text-muted-foreground">
-                for {charityName}
-              </p>
-            )}
-          </div>
-          <div className="flex shrink-0 flex-col items-center gap-1.5">
-            <BrandedQR
-              value={qrUrl}
-              size={132}
-              colorVar="--qr"
-              aria-label="Scan to pledge on your phone"
-            />
-            <p className="text-sm font-medium text-qr">Scan to pledge</p>
-          </div>
-        </div>
-
-        <DisplayPollSection
-          poll={{
-            id: scene.poll.id,
-            // The reveal is the witnessed finale on the real display and
-            // only types out at the close; a still is not that moment.
-            personal_reveal: null,
-            topic: { id: topicId, title: scene.poll.topic.title },
-            items: shown,
-          }}
-        />
-      </div>
+    <div style={{ width: DISPLAY_STILL_WIDTH }}>
+      <DisplayScreen
+        live={false}
+        protagonistName={scene.heading ?? ""}
+        dateLabel={null}
+        openingLine={scene.opening_line}
+        occasionType={scene.occasion_type}
+        charityName={scene.charities[0]?.name ?? null}
+        // Scene charities carry the fields a demo needs; Charity also wants
+        // `description` and `created_at`, which no scene has and the display
+        // never shows.
+        charities={scene.charities.map((c) => ({
+          ...c,
+          description: null,
+          created_at: "2024-01-01T00:00:00Z",
+        }))}
+        poll={{
+          id: scene.poll.id,
+          // The reveal is the witnessed finale on the real display and types
+          // out only at the close; a still is not that moment.
+          personal_reveal: null,
+          topic: { id: topicId, title: scene.poll.topic.title },
+          items: ranked.slice(0, RANKS_SHOWN),
+        }}
+        initialWallEntries={wall}
+        initialTotalRaised={total}
+        favpollUrl="https://favpoll.com"
+        qrUrl={qrUrl}
+      />
     </div>
   )
 }
