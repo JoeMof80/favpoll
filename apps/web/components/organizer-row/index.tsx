@@ -68,6 +68,15 @@ export function OrganizerRow({ favpoll }: Props) {
   const guestUrl = baseUrl
     ? `${baseUrl}/favpolls/${favpoll.id}`
     : `/favpolls/${favpoll.id}`
+  // QR-ONLY short form. The QR encodes /p/<code> because /favpolls/<uuid> is
+  // 65 chars — a 49x49 code whose modules fall under the printable floor at
+  // card size — while /p/<12> is 34 chars and 33x33. The link ABOVE stays the
+  // long one: it is what the organiser copies and shares, and random hex is no
+  // more memorable than a uuid, so putting it on the public face would spend
+  // the favpoll's identity for nothing. See app/p/[code]/page.tsx.
+  const qrUrl = baseUrl
+    ? `${baseUrl}/p/${favpoll.short_code}`
+    : `/p/${favpoll.short_code}`
   // Capability URL — the unguessable slug is what authorises the display
   const displayUrl = baseUrl
     ? `${baseUrl}/live/${favpoll.live_slug}`
@@ -364,7 +373,7 @@ export function OrganizerRow({ favpoll }: Props) {
               <div className="flex shrink-0 flex-col gap-2">
                 <div data-testid="qr-code" suppressHydrationWarning>
                   <BrandedQR
-                    value={guestUrl}
+                    value={qrUrl}
                     size={148}
                     aria-label="QR code for the guest-facing favpoll page"
                   />

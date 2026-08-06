@@ -15,6 +15,7 @@ function makeFavpoll(
   return {
     id: "fp-1",
     live_slug: "slug-fp-1",
+    short_code: "a1b2c3d4e5f6",
     goal_amount: null,
     opening_line: "In memory of",
     closes_at: new Date(NOW.getTime() + 14 * 86400000).toISOString(), // 14 days from now

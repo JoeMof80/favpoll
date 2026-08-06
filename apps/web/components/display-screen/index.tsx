@@ -39,6 +39,13 @@ type Props = {
   poll: DisplayPoll | null
   initialTotalRaised: number
   favpollUrl: string
+  /**
+   * What the two QR codes encode — the SHORT form (/p/<code>). Separate from
+   * favpollUrl because that one is also a NAVIGATION target (DisplayChrome
+   * router.push), and pushing a redirecting route would bounce the projector
+   * through an extra hop. QR-only: see app/p/[code]/page.tsx.
+   */
+  qrUrl: string
   /** Server-rendered wall entries; refreshed by the interval refresh */
   initialWallEntries?: GuestWallEntry[]
   /** Full charity rows — renders the event page's CharityBanner */
@@ -65,6 +72,7 @@ export function DisplayScreen({
   poll,
   initialTotalRaised,
   favpollUrl,
+  qrUrl,
   initialWallEntries = [],
   charities = [],
   closesAt = null,
@@ -145,7 +153,7 @@ export function DisplayScreen({
   const scanToPledge = (
     <div className="flex shrink-0 flex-col items-center gap-1.5 min-[1600px]:hidden">
       <BrandedQR
-        value={favpollUrl}
+        value={qrUrl}
         size={132}
         colorVar="--qr"
         aria-label="Scan to pledge on your phone"
@@ -193,7 +201,7 @@ export function DisplayScreen({
           }`}
         >
           <BrandedQR
-            value={favpollUrl}
+            value={qrUrl}
             size={200}
             colorVar="--qr"
             aria-label="Scan to pledge on your phone"

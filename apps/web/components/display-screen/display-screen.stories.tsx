@@ -72,6 +72,7 @@ export const Memorial: Story = {
     poll: MEMORIAL_POLL,
     initialTotalRaised: 1005,
     favpollUrl: "https://favpoll.com/favpolls/demo-memorial",
+    qrUrl: "https://favpoll.com/p/a1b2c3d4e5f6",
   },
 }
 
@@ -92,6 +93,7 @@ export const Birthday: Story = {
     poll: BIRTHDAY_POLL,
     initialTotalRaised: 705,
     favpollUrl: "https://favpoll.com/favpolls/demo-birthday",
+    qrUrl: "https://favpoll.com/p/b2c3d4e5f6a1",
   },
 }
 
@@ -105,5 +107,6 @@ export const Fundraiser: Story = {
     poll: FUNDRAISER_POLL,
     initialTotalRaised: 810,
     favpollUrl: "https://favpoll.com/favpolls/demo-fundraiser",
+    qrUrl: "https://favpoll.com/p/c3d4e5f6a1b2",
   },
 }
