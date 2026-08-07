@@ -1,141 +1,149 @@
-# Goodstack call — brief for the Ethan conversation + disbursement seam
+# Goodstack call — Ethan, Friday 7 August 2026, 14:30
 
-_Companion to `disbursement-enquiries-2026-07.md` (which holds the enquiry
-status + full question checklist). This is the readable narrative version._
-
-**CALL PINNED: Friday 7 August 2026, 14:30 with Ethan (Goodstack).**
-
-**UPDATED 27 July 2026 for the Ethan call** — Josh forwarded the 20 July
-email; **Ethan (Goodstack) replied 27 July offering 30 minutes**. Joe's
-reply proposes this week and asks for **sandbox access ahead of the call**
-(integration-ready posture). Question order reshuffled below: the 27 July
-docs sweep effectively answered Gift Aid, so **fees are now the decider**.
+_Read this. The engineering design moved to `disbursement-provider-seam.md`;
+the enquiry log and full checklist live in `disbursement-enquiries-2026-07.md`._
 
 ---
 
-## Where things stand
+## Who you are talking to
 
-- **Goodstack is the lead disbursement rail.** It runs its own registered UK
-  charity — **Goodstack Impact Foundation UK** (charity **1192508**) — which
-  receives donations and grants them onward, the **same structure as PPGF** but
-  with an API and self-serve reach. That largely closes the fund-flow question
-  (the gift goes to a charity; favpoll never holds the money) and removes
-  PPGF's last advantage.
-- **Gift Aid: effectively answered YES (27 July sweep).** The Charity
-  Commission register flags the Foundation "**Recognised by HMRC for gift
-  aid**", and the partner API has **Gift Aid Declaration endpoints**
-  (`giftAidId` on donation events). On the call this is a one-line
-  _confirmation_, not an open question — and citing their own register
-  entry + API docs signals homework done.
-- **Public docs exist** (`docs.goodstack.io`) and a **sandbox dashboard**
-  (`sandbox.poweredbypercent.com`) — but access is **provisioned, not
-  self-serve** (keys "are provided to you"; no signup page). Ask Ethan to
-  provision it; `engineering-support@goodstack.io` is the documented
-  fallback channel (email drafted, HELD while the Ethan thread is live).
-- **The `close-favpolls` cron currently never disburses** — it closes favpolls,
-  sums totals, and emails the organiser. Money isn't leaving today. That's the
-  gap the seam fills.
+- **"Social Impact Partnerships Rep"** — first-line commercial. BD, **not**
+  solutions engineering, **not** deal desk.
+- His email is discovery: _"learn more about"_, _"where there is a fit"_.
+  **He is qualifying you.**
+- Josh forwarded the thread cold. Assume he knows nothing about favpoll.
+- **So: fees — the thing you most need — is the thing he can least likely
+  answer.** It is a deal-desk call, usually gated on volume, and verbal is not
+  binding.
+
+**The 30 minutes:** ~5 intros · **~12–15 him asking about you** · ~5–8 his
+overview · ~5 next steps. You get **about eight minutes**. Pick questions by
+_who can answer_, not by _what matters most_.
 
 ---
 
-## Call brief
+## What a good call looks like
 
-**Frame it in one breath, early:** favpoll is a UK charitable-giving _platform_
-— a company, not a nonprofit, not a corporate grants programme. Guests pledge
-at life events, pick up to 3 UK charities, proceeds split. 0% platform fee,
-donors cover processing. You need validate-and-disburse to donor-chosen
-charities without onboarding each — which is why their Impact Foundation
-structure looks right. You've read their docs and your integration seam is
-built: you're here to de-risk and get keys, not to be pitched.
+Not answers. **Three commitments a rep can actually deliver:**
 
-**Ask these, in this order (reordered 27 July):**
-
-1. **Fees (now the decider).** The Donation Delivery Policy says grants
-   disburse "**net any applicable fees**". What's the fee structure for
-   API-partner donations — and can fees be **billed to the platform** rather
-   than deducted from donations? favpoll's public promise is 100%-to-charity;
-   a deduction from the gift breaks it. (Tip the preferred answer.)
-2. **Fund ingestion (the architecture decider).** Do donors pay the Foundation
-   via _your_ flow (you largely replace our Stripe), or do we collect via
-   Stripe and remit onward? Do you hold the payment step (PCI)? (Also
-   determines whether our Apple/Google Pay work carries over.)
-3. **Gift Aid (confirm, don't ask open).** "I can see the Foundation is
-   HMRC-recognised for Gift Aid and the API has declaration endpoints — just
-   confirming the claimed uplift is passed to the recipient charity in the
-   onward grant, and that it works for _any_ donor-chosen UK charity, not
-   only enrolled ones."
-4. **Onboarding + keys.** Can a pre-launch UK Ltd onboard now — KYC,
-   contract, any minimum volume / revenue-share / exclusivity? **Sandbox
-   access provisioned when?** (If offered on the call, take it on the call.)
-5. **Edge case.** What if a chosen charity isn't payable (no verified bank
-   details)? (Their delivery policy: outreach ~30 days, forced disbursement
-   of held funds at 12 months — ask how that plays per-charity.)
-
-**Red flags to listen for:** fees deducted from donations with no
-platform-billed option (breaks the 100% promise — the new #1 flag); Gift Aid
-only for _enrolled_ charities (reintroduces per-charity onboarding →
-Swiftaid fallback); a minimum-volume commitment; ingestion that forces a
-full Stripe rip-out pre-launch; exclusivity / data-ownership terms.
-
-**Your posture:** you've already picked them as the lead — you're de-risking,
-not pitching. Volunteer that you're architecture-ready (a provider seam waiting
-for their SDK, docs read, launch imminent) and that early volumes are modest,
-so "minimum volume" surfaces early.
+1. **Sandbox keys** — if offered on the call, take it on the call.
+2. **Fee schedule in writing** — ask, then email the question straight after.
+3. **A named next call** with whoever can quote and whoever is technical,
+   **booked before you hang up.**
 
 ---
 
-## The disbursement-provider seam (what's being built now)
+## Say this early
 
-A thin, partner-agnostic boundary: favpoll's core computes _who gets how much_;
-a provider handles _resolve + move money_. Goodstack becomes the first real
-implementation; a no-op keeps the pipeline runnable until the demo unlocks
-their SDK.
+- favpoll is a **UK charitable-giving platform** — a company, not a nonprofit,
+  not a corporate grants programme.
+- Guests pledge at life events, pick up to **3 UK charities**, split equally.
+- **The crux:** _"favpoll takes 0% and promises 100% to the charity, so any fee
+  has to be billed to us and paid from optional guest contributions — never
+  netted from the gift."_
+- You need **validate-and-disburse to donor-chosen charities without onboarding
+  each** — why their Impact Foundation structure looks right.
+- **Pre-launch, modest volumes.** Say it plainly; minimums surface early.
 
-The interface (money in pounds, matching the rest of favpoll; pence only at a
-real provider's API boundary):
+**Posture:** _"You're the leading option, and fees are the deciding factor."_
+NOT "we've already picked you" — that hands a sales rep your only leverage.
 
-```ts
-export type DisbursementRequest = {
-  favpollId: string
-  charityId: string
-  registeredNumber: string | null // Charity Commission no.
-  amount: number // pounds
-  reference: string // idempotency key: `${favpollId}:${charityId}`
-}
+---
 
-export type DisbursementResult = {
-  status: "pending" | "sent" | "unpayable" | "failed"
-  providerRef: string | null
-  reason?: string
-}
+## Answers to what he'll ask
 
-export interface DisbursementProvider {
-  readonly name: string
-  disburse(req: DisbursementRequest): Promise<DisbursementResult>
-}
-```
+**"Tell me about favpoll."**
+> A UK giving platform for life events. Someone creates a favpoll — one
+> question, like favourite dog breed — in memory of a person or for a cause,
+> picks up to three UK charities, and guests pledge money to their own
+> favourite. 100% goes to the charity. We take nothing.
 
-**How it slots in:** in `close-favpolls`, after a favpoll is closed, load its
-charities, split `total_raised` equally (≤3 charities, equal split), call the
-provider per charity, and record every attempt in a new **`disbursements`
-ledger table**. The active provider is a **no-op** that marks everything
-`pending` — so the ledger is populated and it's unambiguous that no money has
-actually moved yet.
+**"What volume are you expecting?"** — you don't know, and that's fine. Don't
+invent a number. Give the shape, then flip it:
+> Pre-launch, so I'd be guessing. What I can tell you is the shape: guests
+> pledge individually, but money only leaves **once per charity when a favpoll
+> closes** — so one to three grants per favpoll, not one per pledge.
+>
+> **What I need from you is whether there's a floor** — a minimum volume or
+> minimum grant size below which this doesn't work.
 
-**Two deliberate choices:**
+That converts a question you can't answer into one that gets you information.
 
-- The interface is **neutral on _when_ money moves** — `disburse` works whether
-  Goodstack already holds the funds (hosted-payment model → really an
-  "allocate" instruction) or needs a remittance. This protects the design from
-  the fund-ingestion unknown until the demo answers it.
-- **Gift Aid is not on this interface.** Declaration capture is a pledge-time
-  concern, and _who claims_ depends on the demo. Keeping it off the seam avoids
-  baking in an assumption we can't yet confirm.
+**"When do you launch?"**
+> I'm not putting a date on it today. The product is built; the disbursement
+> path is the last piece, and it's waiting on this conversation.
 
-**Build now vs hold:** building the seam + no-op provider + `disbursements`
-ledger + cron wiring now is low-regret — it retires the do-nothing gap and
-gives a real ledger whatever the demo decides. The `GoodstackProvider` impl and
-the Gift-Aid claim path wait for the call.
+True — `close-favpolls` closes favpolls and emails organisers but moves no
+money — and it makes them the critical path.
 
-The ledger also feeds the future "transactions ledger → shared-fund tips" work,
-so it pays double.
+**"Which markets?"** UK only, en-GB. US is a deliberate later second market.
+
+**"What's the entity?"** Josmo Services Ltd, trading as favpoll. UK Ltd,
+pre-revenue.
+
+**"How would you integrate?"**
+> Next.js on Vercel, Supabase, Stripe today. A partner-agnostic disbursement
+> seam is already built — an interface taking favpoll, charity, registered
+> number and amount, returning a status and a provider reference, with a
+> ledger recording every attempt. It's a no-op right now. A Goodstack
+> implementation is small once we have keys.
+
+**"Who else are you looking at?"** Don't over-answer:
+> You're the leading option. PPGF has the same structure without the API.
+
+---
+
+## Ask live (he can answer these)
+
+1. **Fund ingestion — the architecture decider.** Do donors pay the Foundation
+   via _your_ flow (largely replacing our Stripe), or do we collect and remit
+   onward? Do you hold the payment step (PCI)?
+2. **Onboarding + keys.** Can a pre-launch UK Ltd onboard now — KYC, contract,
+   minimum volume, revenue share, exclusivity? **Sandbox provisioned when?**
+3. **Gift Aid — confirm, don't ask open.** _"I can see the Foundation is
+   HMRC-recognised and the API has declaration endpoints — just confirming the
+   uplift passes to the recipient charity in the onward grant, and works for
+   **any** donor-chosen UK charity, not only enrolled ones."_
+
+**Ingestion and fees are the same question.** If Goodstack ingests the
+donations, their fee base is every pledge. If we collect via Stripe and remit,
+their base is the aggregated grants — one to three per favpoll. Many small
+pledges into few grants is cheap per-grant and expensive per-donation, so his
+answer to #1 tells you what the fee answer will look like before you get it.
+
+## Get in writing (don't burn call time)
+
+4. **Fees.** Their Donation Delivery Policy says grants disburse "**net any
+   applicable fees**". What's the structure for API-partner donations, and can
+   fees be **billed to the platform**?
+5. **Unpayable charity.** What if a chosen charity has no verified bank
+   details? _(Their policy: outreach ~30 days, forced disbursement at 12
+   months — how does that play per-charity?)_
+
+---
+
+## Red flags
+
+- **Fees deducted from donations with no platform-billed option** — breaks the
+  100% promise. The #1 flag.
+- **Gift Aid only for _enrolled_ charities** — reintroduces per-charity
+  onboarding → Swiftaid fallback.
+- **A minimum-volume commitment.**
+- **Ingestion that forces a full Stripe rip-out pre-launch.**
+- **Exclusivity or data-ownership terms.**
+
+---
+
+## Background, if needed
+
+- **Goodstack is the lead rail.** It runs its own registered UK charity —
+  **Goodstack Impact Foundation UK**, charity **1192508** — which receives
+  donations and grants them onward. Same structure as PPGF, but with an API.
+  favpoll never holds the money.
+- **Gift Aid is effectively answered YES** (27 July sweep): the Charity
+  Commission register flags the Foundation "Recognised by HMRC for gift aid",
+  and the partner API has Gift Aid Declaration endpoints (`giftAidId` on
+  donation events). Hence confirm, don't ask.
+- **Sandbox is provisioned, not self-serve** (`sandbox.poweredbypercent.com`;
+  keys "are provided to you"). `engineering-support@goodstack.io` is the
+  documented fallback, email drafted and held while this thread is live.
