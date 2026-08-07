@@ -64,6 +64,15 @@ export default defineConfig({
       dependencies: ["setup:auth"],
       testMatch: "**/wizard-publish*.spec.ts",
     },
+
+    // ── Layout assertions (no auth, no data) ─────────────────────────────────
+    // Marketing-page geometry that jsdom cannot check, because it has no
+    // layout engine and every rect comes back zero.
+    {
+      name: "layout",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/features-artefacts.spec.ts",
+    },
   ],
 
   globalSetup: "./e2e/global-setup.ts",
