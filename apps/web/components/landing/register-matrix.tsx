@@ -12,6 +12,14 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
+// TWO VIEWS, ONE DATA SET (2026-08-08). From md up it is a table, which is
+// the right shape for comparing three registers across seven features. Below
+// md it was the WORST shape available: a 640px min-width table inside
+// overflow-x-auto, so a phone side-scrolled it — and the columns being
+// compared could never be on screen together, which is the entire point of a
+// matrix. It is now one card per register, stacked, each carrying all seven
+// phrases. FEATURES and REGISTERS drive both, so the views cannot drift.
+//
 // Feature × register matrix (founder, 2026-08-05): PHRASES, not ticks —
 // every cell says how the feature lives in that register, nothing is
 // crossed out anywhere, and "shine" cells simply carry more weight (a
@@ -66,7 +74,68 @@ export function RegisterMatrix() {
         <SectionEyebrow className="mb-8">
           {t("home.matrix.title" as never)}
         </SectionEyebrow>
-        <div className="overflow-x-auto">
+        {/* ── Below md: one card per register ── */}
+        <div className="flex flex-col gap-4 md:hidden">
+          {REGISTERS.map((reg, i) => (
+            <div
+              key={reg.key}
+              className={cn(
+                "overflow-hidden rounded-xl border border-border",
+                reg.col
+              )}
+            >
+              <Link
+                href={reg.href}
+                className={cn(
+                  "block px-4 py-3 text-xs font-medium tracking-widest uppercase",
+                  reg.accent
+                )}
+              >
+                {reg.label} →
+              </Link>
+              <dl className="divide-y divide-border border-t border-border">
+                {FEATURES.map((feature) => {
+                  const shine = feature.fit[i] === 1
+                  return (
+                    <div key={feature.key} className="flex gap-3 px-4 py-3">
+                      <feature.icon
+                        aria-hidden="true"
+                        className="mt-0.5 h-4 w-4 shrink-0 text-primary-muted"
+                      />
+                      <div className="min-w-0">
+                        <dt className="text-sm font-medium text-foreground">
+                          {t(`home.matrix.${feature.key}.label` as never)}
+                        </dt>
+                        <dd
+                          className={cn(
+                            "mt-0.5 flex items-baseline gap-1.5 text-sm",
+                            shine
+                              ? "font-medium text-foreground"
+                              : "text-muted-foreground"
+                          )}
+                        >
+                          {shine && (
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                "h-1.5 w-1.5 shrink-0 self-center rounded-full",
+                                reg.dot
+                              )}
+                            />
+                          )}
+                          {t(`home.matrix.${feature.key}.${reg.key}` as never)}
+                        </dd>
+                      </div>
+                    </div>
+                  )
+                })}
+              </dl>
+            </div>
+          ))}
+        </div>
+
+        {/* ── md and up: the comparison table ── */}
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-160 border-collapse text-left">
             <thead>
               <tr>
