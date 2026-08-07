@@ -1,7 +1,10 @@
 # Goodstack call — Ethan, Friday 7 August 2026, 14:30
 
-_Read this. The engineering design moved to `disbursement-provider-seam.md`;
-the enquiry log and full checklist live in `disbursement-enquiries-2026-07.md`._
+**THE CALL HAPPENED. See `goodstack-call-2026-08-07.md` for what came of
+it — this file is now the prep record.**
+
+_Engineering design lives in `disbursement-provider-seam.md`; the enquiry
+log and full checklist in `disbursement-enquiries-2026-07.md`._
 
 ---
 
