@@ -550,7 +550,11 @@ export function DemoCard({
                 the picker's Next and the amount step's Pledge move up here
                 rather than sitting at the bottom of the sheet. */}
             {isPhone && !confirmedInDialog && (
-              <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2 py-1.5">
+              // border-t as well as -b: the sheet's own top edge, which the
+              // photograph shows as a rule under the status bar. Without it
+              // the safe-area strip and the bar were one undivided white
+              // block and the sheet had no visible beginning.
+              <div className="flex shrink-0 items-center justify-between gap-2 border-y border-border px-2 py-1.5">
                 <Button
                   type="button"
                   tabIndex={-1}

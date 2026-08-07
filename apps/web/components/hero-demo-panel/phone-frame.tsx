@@ -66,9 +66,10 @@ export function PhoneFrame({
           so it fills the screen the same way in both frames. */}
       <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[2.5rem] bg-background">
         {children}
-        {/* Dynamic island, over the content — the card scrolls beneath it on
-            a real phone too. */}
-        <span className="absolute top-2.5 left-1/2 h-7 w-26 -translate-x-1/2 rounded-full bg-zinc-900" />
+        {/* Dynamic island. z-30 puts it above the pledge sheet (z-20): the
+            island is the DEVICE, so nothing the page opens can cover it —
+            the full-screen sheet was painting straight over it. */}
+        <span className="absolute top-2.5 left-1/2 z-30 h-7 w-26 -translate-x-1/2 rounded-full bg-zinc-900" />
       </div>
     </div>
   )

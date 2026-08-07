@@ -152,7 +152,16 @@ function BeatMedium({ medium }: { medium: Medium }) {
       // this still would otherwise reintroduce on the homepage.
       // Tilted a couple of degrees: an object resting on a table, not a
       // screenshot of one.
-      <div className={cn("paper drop-shadow-xl", CARD_SCALE, "-rotate-2")}>
+      // .paper-screen puts the border back to the app's: .paper darkens it
+      // for ink that survives a domestic printer, which on screen just draws
+      // a hard outline round every row of the card.
+      <div
+        className={cn(
+          "paper paper-screen drop-shadow-xl",
+          CARD_SCALE,
+          "-rotate-2"
+        )}
+      >
         <PackCard data={PACK_DATA} steps={PACK_STEPS} scale="wallet" />
       </div>
     )

@@ -314,6 +314,22 @@
   --border-strong: oklch(0.75 0.1 278);
 }
 
+/* A pack card shown ON SCREEN rather than printed. Used with .paper, and
+   overriding exactly one thing: the border goes back to the app's.
+
+   .paper darkens --border from 0.91 to 0.66 on purpose — a thin faint line
+   prints muddy, so the pack trades screen delicacy for ink that survives a
+   domestic printer (1.31:1 -> 3.13:1, measured for #535). On a screen that
+   trade buys nothing and costs a lot: at the landing page's card size the
+   print border reads as a hard outline drawn around every row.
+
+   Still needs .paper underneath it, for the reason that class exists: the
+   card forces bg-white, so without the light tokens pinned a dark-mode
+   visitor gets white ink on a white card. */
+.paper-screen {
+  --border: oklch(0.91 0.02 278);
+}
+
 /* Tailwind v4 removed v3's cursor:pointer on buttons (native-behaviour
    purism). Our links show the pointer, so buttons without it read as
    not-clickable — restore the affordance. Unlayered on purpose: wins over
