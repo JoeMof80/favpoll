@@ -262,12 +262,14 @@ export default async function HomePage() {
             <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
               {t("landing.subheader")}
             </h2>
+            {/* No caption under this button any more (2026-08-08). It read
+                "Free to create · 100% goes to charity", which the trust grid
+                now directly above says at more length — and the fee was
+                being stated three times on one page (hero button, that grid,
+                here). landing.cta.caption is retired with it. */}
             <Button asChild size="lg" variant="secondary">
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
-            <p className="mt-3 text-xs opacity-80">
-              {t("landing.cta.caption")}
-            </p>
           </FadeIn>
         </div>
       </section>
