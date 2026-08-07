@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
 import { HeaderBar } from "@/components/header-bar"
+import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
 import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
@@ -34,15 +35,18 @@ type Props = {
   prefersReducedMotion: boolean
   className?: string
   /**
-   * Blank device safe-area strip above the app header, in px.
+   * Which medium this card is being shown in.
    *
-   * It lives HERE rather than in PhoneFrame for one reason: the real
-   * DialogOverlay is `fixed inset-0`, so opening the pledge dialog dims
-   * the whole viewport INCLUDING the area behind the status bar. This
-   * card's scrim is absolute within the card, so anything the frame drew
-   * outside it would have stayed stubbornly bright while the rest dimmed.
+   * "phone" makes it behave the way the real app does on a handset: a blank
+   * safe-area strip above the header, and the pledge overlay as a FULL-SCREEN
+   * sheet with its navigation in a top bar, not a centred dialog.
+   *
+   * It has to be told, because it cannot ask. The real dialog switches on
+   * useIsMobile(), a VIEWPORT-keyed hook — inside a 390px phone drawn on a
+   * desktop page it would report "desktop" and render the wrong shape. Same
+   * trap as the display's gutter QRs and its type ramp.
    */
-  topInset?: number
+  device?: "browser" | "phone"
   /**
    * Register accent for the LEADER bar only (founder, 2026-08-05): the
    * register pages wear standard purple/white branding, and the accent
@@ -105,6 +109,14 @@ const sheetVariant = {
   exit: { opacity: 0, scale: 0.96 },
 }
 
+// A handset sheet rises from the bottom edge; the browser dialog fades in
+// at the centre. Kept apart so neither borrows the other's motion.
+const phoneSheetVariant = {
+  initial: { y: "100%" },
+  animate: { y: 0 },
+  exit: { y: "100%" },
+}
+
 const scrimVariant = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -118,7 +130,7 @@ export function DemoCard({
   prefersReducedMotion,
   className,
   accentBarClassName,
-  topInset = 0,
+  device = "browser",
 }: Props) {
   const favourites = scene.poll.topic.favourites
   const selected = favourites[scene.selectedIndex]
@@ -193,6 +205,7 @@ export function DemoCard({
   const pledgePressed = phase === "pledging"
 
   const confirmedInDialog = phase === "confirmed"
+  const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
   // Locked = pre-pledge (blurred reveal + lock card, blurred decoy bars).
@@ -314,10 +327,10 @@ export function DemoCard({
         className
       )}
     >
-      {topInset > 0 && (
+      {isPhone && (
         <div
           className="-mx-5 -mt-5 shrink-0"
-          style={{ height: topInset }}
+          style={{ height: PHONE_SAFE_AREA_TOP }}
           aria-hidden="true"
         />
       )}
@@ -326,7 +339,7 @@ export function DemoCard({
           above the hero, with the rule under it. Full-bleed past the card's
           p-5, and the real HeaderBar rather than a lookalike — the version
           Header itself renders, minus the Clerk-aware hamburger. */}
-      <div className={cn("-mx-5 mb-4 shrink-0", topInset > 0 ? "" : "-mt-5")}>
+      <div className={cn("-mx-5 mb-4 shrink-0", isPhone ? "" : "-mt-5")}>
         <HeaderBar staticMenu />
       </div>
 
@@ -492,7 +505,7 @@ export function DemoCard({
           radius of its own — the card's overflow-hidden clips it to the card
           shape (square top under the browser frame, rounded bottom). */}
       <AnimatePresence>
-        {sheetOpen && (
+        {sheetOpen && !isPhone && (
           <motion.div
             key="scrim"
             {...scrimVariant}
@@ -507,14 +520,77 @@ export function DemoCard({
         {sheetOpen && (
           <motion.div
             key="sheet"
-            {...sheetVariant}
+            {...(isPhone ? phoneSheetVariant : sheetVariant)}
             transition={
               prefersReducedMotion ? FAST : { duration: 0.2, ease: "easeOut" }
             }
-            style={{ height: dialogH, y: "-50%" }}
-            className="absolute inset-x-4 top-1/2 z-20 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-xl"
+            style={
+              isPhone
+                ? // The real SheetContent carries paddingTop:
+                  // env(safe-area-inset-top), so its action bar clears the
+                  // status bar. Without it the bar ran under the island.
+                  { paddingTop: PHONE_SAFE_AREA_TOP }
+                : { height: dialogH, y: "-50%" }
+            }
+            className={cn(
+              "absolute z-20 flex flex-col overflow-hidden bg-background",
+              isPhone
+                ? // The real thing on a handset: ResponsiveOverlay renders a
+                  // bottom Sheet at 100dvh, so it takes the whole screen with
+                  // no radius, no border and nothing showing behind it.
+                  "inset-0"
+                : "inset-x-4 top-1/2 rounded-2xl border border-border shadow-xl"
+            )}
             aria-hidden="true"
           >
+            {/* Top action bar — ResponsiveOverlay's fullscreen shape:
+                back/cancel, the step title, and the primary action. On a
+                handset the NAVIGATION LIVES HERE, and the consumer's footer
+                is dropped entirely (`footer && !mobileSave`), which is why
+                the picker's Next and the amount step's Pledge move up here
+                rather than sitting at the bottom of the sheet. */}
+            {isPhone && !confirmedInDialog && (
+              <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2 py-1.5">
+                <Button
+                  type="button"
+                  tabIndex={-1}
+                  variant="ghost"
+                  className="pointer-events-none"
+                >
+                  {pickerOpen ? "Cancel" : "Back"}
+                </Button>
+                <p className="min-w-0 truncate py-1.5 text-base font-medium">
+                  {pickerOpen
+                    ? `Pick your favourite ${topicTitle.toLowerCase()}`
+                    : "Your pledge"}
+                </p>
+                <Button
+                  type="button"
+                  tabIndex={-1}
+                  variant={
+                    (pickerOpen ? nextEnabled : amountActive)
+                      ? "default"
+                      : "secondary"
+                  }
+                  className={cn(
+                    "pointer-events-none transition-all duration-150",
+                    pickerOpen
+                      ? nextEnabled && nextHover && !nextPressed
+                        ? "ring-2 ring-primary/30 brightness-105"
+                        : nextPressed
+                          ? "scale-[0.98] brightness-95"
+                          : ""
+                      : amountActive && pledgeHover && !pledgePressed
+                        ? "ring-2 ring-primary/30 brightness-105"
+                        : pledgePressed
+                          ? "scale-[0.98] brightness-95"
+                          : ""
+                  )}
+                >
+                  {pickerOpen ? "Next" : "Pledge"}
+                </Button>
+              </div>
+            )}
             <div inert className="flex min-h-0 flex-1 flex-col">
               <AnimatePresence mode="wait">
                 {confirmedInDialog ? (
@@ -575,7 +651,11 @@ export function DemoCard({
                         addError={null}
                       />
                     </div>
-                    <div className="shrink-0 px-5 py-3">
+                    {/* Bottom Next only in the browser dialog — on a
+                        handset it lives in the top bar above. */}
+                    <div
+                      className={cn("shrink-0 px-5 py-3", isPhone && "hidden")}
+                    >
                       <Button
                         type="button"
                         tabIndex={-1}
@@ -604,11 +684,12 @@ export function DemoCard({
                     <div className="min-h-0 flex-1 overflow-y-auto">
                       {renderAmountStep(dispAmount, dispAmountStr)}
                     </div>
-                    {renderPledgeFooter(
-                      amountActive,
-                      pledgeHover,
-                      pledgePressed
-                    )}
+                    {!isPhone &&
+                      renderPledgeFooter(
+                        amountActive,
+                        pledgeHover,
+                        pledgePressed
+                      )}
                   </motion.div>
                 )}
               </AnimatePresence>

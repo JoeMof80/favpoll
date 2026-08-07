@@ -20,10 +20,7 @@
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
-import {
-  PhoneFrame,
-  PHONE_SAFE_AREA_TOP,
-} from "@/components/hero-demo-panel/phone-frame"
+import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { PackCard, buildPackSteps } from "@/components/print-pack/pack-card"
 import { DisplayStill } from "@/components/landing/display-still"
@@ -182,7 +179,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
           phase={medium.phase}
           barWidths={SCENE.results.map((r) => r.widthPercent)}
           prefersReducedMotion
-          topInset={PHONE_SAFE_AREA_TOP}
+          device="phone"
           className="rounded-none border-0"
         />
       </PhoneFrame>
