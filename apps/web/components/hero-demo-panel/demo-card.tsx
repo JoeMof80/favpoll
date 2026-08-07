@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
+import { HeaderBar } from "@/components/header-bar"
+import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
+import { CharityRow } from "@/components/charity-row"
 import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -31,6 +34,19 @@ type Props = {
   barWidths: number[]
   prefersReducedMotion: boolean
   className?: string
+  /**
+   * Which medium this card is being shown in.
+   *
+   * "phone" makes it behave the way the real app does on a handset: a blank
+   * safe-area strip above the header, and the pledge overlay as a FULL-SCREEN
+   * sheet with its navigation in a top bar, not a centred dialog.
+   *
+   * It has to be told, because it cannot ask. The real dialog switches on
+   * useIsMobile(), a VIEWPORT-keyed hook — inside a 390px phone drawn on a
+   * desktop page it would report "desktop" and render the wrong shape. Same
+   * trap as the display's gutter QRs and its type ramp.
+   */
+  device?: "browser" | "phone"
   /**
    * Register accent for the LEADER bar only (founder, 2026-08-05): the
    * register pages wear standard purple/white branding, and the accent
@@ -93,6 +109,14 @@ const sheetVariant = {
   exit: { opacity: 0, scale: 0.96 },
 }
 
+// A handset sheet rises from the bottom edge; the browser dialog fades in
+// at the centre. Kept apart so neither borrows the other's motion.
+const phoneSheetVariant = {
+  initial: { y: "100%" },
+  animate: { y: 0 },
+  exit: { y: "100%" },
+}
+
 const scrimVariant = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -106,6 +130,7 @@ export function DemoCard({
   prefersReducedMotion,
   className,
   accentBarClassName,
+  device = "browser",
 }: Props) {
   const favourites = scene.poll.topic.favourites
   const selected = favourites[scene.selectedIndex]
@@ -180,6 +205,7 @@ export function DemoCard({
   const pledgePressed = phase === "pledging"
 
   const confirmedInDialog = phase === "confirmed"
+  const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
   // Locked = pre-pledge (blurred reveal + lock card, blurred decoy bars).
@@ -270,41 +296,20 @@ export function DemoCard({
     </ol>
   )
 
-  // Charity row mirrors CharityRow (favpoll-card/charity-row.tsx) — pinned to
-  // the card bottom and always visible (not part of the gated reveal/results).
+  // The REAL CharityRow (2026-08-07). This was a hand-copy whose own comment
+  // said it "mirrors CharityRow (favpoll-card/charity-row.tsx)" — a path that
+  // had since moved, which is the drift the copy invited. Scene charities
+  // carry what a demo needs; Charity also wants description and created_at,
+  // neither of which this row renders.
   const charityRow = (
-    <div className="flex items-center gap-3">
-      {charity.logo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={charity.logo_url}
-          alt={charity.name}
-          className="h-8 w-8 rounded object-contain"
-        />
-      ) : (
-        <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary"
-          aria-hidden="true"
-        >
-          {charity.name.charAt(0)}
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-foreground">
-          {charity.name}
-        </p>
-        {charity.registered_number && (
-          <p className="text-xs text-muted-foreground">
-            Charity no. {charity.registered_number}
-          </p>
-        )}
-      </div>
-      {raisedNum > 0 && (
-        <p className="shrink-0 text-sm font-medium text-primary">
-          {formatPounds(raisedNum)}
-        </p>
-      )}
-    </div>
+    <CharityRow
+      charity={{
+        ...charity,
+        description: null,
+        created_at: "2024-01-01T00:00:00Z",
+      }}
+      amountRaised={raisedNum}
+    />
   )
 
   // ── Measurer ──────────────────────────────────────────────────────────────
@@ -322,6 +327,22 @@ export function DemoCard({
         className
       )}
     >
+      {isPhone && (
+        <div
+          className="-mx-5 -mt-5 shrink-0"
+          style={{ height: PHONE_SAFE_AREA_TOP }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* The app header, as a guest actually meets the page: logo and menu
+          above the hero, with the rule under it. Full-bleed past the card's
+          p-5, and the real HeaderBar rather than a lookalike — the version
+          Header itself renders, minus the Clerk-aware hamburger. */}
+      <div className={cn("-mx-5 mb-4 shrink-0", isPhone ? "" : "-mt-5")}>
+        <HeaderBar staticMenu />
+      </div>
+
       {/* Hidden measurer — same width as where the dialog renders. */}
       <div
         ref={measureRef}
@@ -470,24 +491,21 @@ export function DemoCard({
       </div>
 
       {/* Charity row — anchored to the card bottom so the expanding reveal +
-          climbing bars can't push it out of view. Gated (blurred) while locked,
-          like the rest of the reveal/results. */}
-      <div
-        className={cn(
-          "shrink-0 border-t border-border pt-3 transition-[filter] duration-500",
-          locked ? "blur-xs" : ""
-        )}
-        aria-hidden={locked ? "true" : undefined}
-      >
-        {charityRow}
-      </div>
+          climbing bars can't push it out of view.
+          NOT gated. It used to blur while locked, "like the rest of the
+          reveal/results", but the real guest page shows this bar crisp before
+          any pledge — charity, number and running total all legible, which is
+          the point of it. Corrected 2026-08-07 against a photograph of the
+          real thing; what the lock withholds is the standings, never who the
+          money goes to. */}
+      <div className="shrink-0 border-t border-border pt-3">{charityRow}</div>
 
       {/* ── Mimicked pledge dialog ──
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
           radius of its own — the card's overflow-hidden clips it to the card
           shape (square top under the browser frame, rounded bottom). */}
       <AnimatePresence>
-        {sheetOpen && (
+        {sheetOpen && !isPhone && (
           <motion.div
             key="scrim"
             {...scrimVariant}
@@ -502,14 +520,81 @@ export function DemoCard({
         {sheetOpen && (
           <motion.div
             key="sheet"
-            {...sheetVariant}
+            {...(isPhone ? phoneSheetVariant : sheetVariant)}
             transition={
               prefersReducedMotion ? FAST : { duration: 0.2, ease: "easeOut" }
             }
-            style={{ height: dialogH, y: "-50%" }}
-            className="absolute inset-x-4 top-1/2 z-20 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-xl"
+            style={
+              isPhone
+                ? // The real SheetContent carries paddingTop:
+                  // env(safe-area-inset-top), so its action bar clears the
+                  // status bar. Without it the bar ran under the island.
+                  { paddingTop: PHONE_SAFE_AREA_TOP }
+                : { height: dialogH, y: "-50%" }
+            }
+            className={cn(
+              "absolute z-20 flex flex-col overflow-hidden bg-background",
+              isPhone
+                ? // The real thing on a handset: ResponsiveOverlay renders a
+                  // bottom Sheet at 100dvh, so it takes the whole screen with
+                  // no radius, no border and nothing showing behind it.
+                  "inset-0"
+                : "inset-x-4 top-1/2 rounded-2xl border border-border shadow-xl"
+            )}
             aria-hidden="true"
           >
+            {/* Top action bar — ResponsiveOverlay's fullscreen shape:
+                back/cancel, the step title, and the primary action. On a
+                handset the NAVIGATION LIVES HERE, and the consumer's footer
+                is dropped entirely (`footer && !mobileSave`), which is why
+                the picker's Next and the amount step's Pledge move up here
+                rather than sitting at the bottom of the sheet. */}
+            {isPhone && !confirmedInDialog && (
+              // border-t as well as -b: the sheet's own top edge, which the
+              // photograph shows as a rule under the status bar. Without it
+              // the safe-area strip and the bar were one undivided white
+              // block and the sheet had no visible beginning.
+              <div className="flex shrink-0 items-center justify-between gap-2 border-y border-border px-2 py-1.5">
+                <Button
+                  type="button"
+                  tabIndex={-1}
+                  variant="ghost"
+                  className="pointer-events-none"
+                >
+                  {pickerOpen ? "Cancel" : "Back"}
+                </Button>
+                <p className="min-w-0 truncate py-1.5 text-base font-medium">
+                  {pickerOpen
+                    ? `Pick your favourite ${topicTitle.toLowerCase()}`
+                    : "Your pledge"}
+                </p>
+                <Button
+                  type="button"
+                  tabIndex={-1}
+                  variant={
+                    (pickerOpen ? nextEnabled : amountActive)
+                      ? "default"
+                      : "secondary"
+                  }
+                  className={cn(
+                    "pointer-events-none transition-all duration-150",
+                    pickerOpen
+                      ? nextEnabled && nextHover && !nextPressed
+                        ? "ring-2 ring-primary/30 brightness-105"
+                        : nextPressed
+                          ? "scale-[0.98] brightness-95"
+                          : ""
+                      : amountActive && pledgeHover && !pledgePressed
+                        ? "ring-2 ring-primary/30 brightness-105"
+                        : pledgePressed
+                          ? "scale-[0.98] brightness-95"
+                          : ""
+                  )}
+                >
+                  {pickerOpen ? "Next" : "Pledge"}
+                </Button>
+              </div>
+            )}
             <div inert className="flex min-h-0 flex-1 flex-col">
               <AnimatePresence mode="wait">
                 {confirmedInDialog ? (
@@ -570,7 +655,11 @@ export function DemoCard({
                         addError={null}
                       />
                     </div>
-                    <div className="shrink-0 px-5 py-3">
+                    {/* Bottom Next only in the browser dialog — on a
+                        handset it lives in the top bar above. */}
+                    <div
+                      className={cn("shrink-0 px-5 py-3", isPhone && "hidden")}
+                    >
                       <Button
                         type="button"
                         tabIndex={-1}
@@ -599,11 +688,12 @@ export function DemoCard({
                     <div className="min-h-0 flex-1 overflow-y-auto">
                       {renderAmountStep(dispAmount, dispAmountStr)}
                     </div>
-                    {renderPledgeFooter(
-                      amountActive,
-                      pledgeHover,
-                      pledgePressed
-                    )}
+                    {!isPhone &&
+                      renderPledgeFooter(
+                        amountActive,
+                        pledgeHover,
+                        pledgePressed
+                      )}
                   </motion.div>
                 )}
               </AnimatePresence>

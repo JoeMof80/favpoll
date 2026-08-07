@@ -144,3 +144,40 @@ export function getFavpollHeadline(params: {
  * must appear; the h1's two-line clamp guards absurd input.
  */
 export const heroNameSizeClass = "text-3xl sm:text-4xl"
+
+/**
+ * The projector type ramp (founder, 2026-08-06).
+ *
+ * The display is the one surface meant to be read from the far side of a
+ * room, and every size on it was fixed: an 18px ranking label on a 1920
+ * projector is roughly 13mm of text on a 65" screen, which from ten metres
+ * is around 4-5 arcminutes of visual angle where comfortable reading wants
+ * closer to 10. Widening the content column would not have moved that by a
+ * millimetre — it spreads the same small type further apart. SIZE is the
+ * lever, not width, which is why the gutters were left alone: from 1600px
+ * they are the QR rail, and that is real work.
+ *
+ * Delivered as custom properties rather than props because the ranking bars
+ * and the poll section are shared components — they read these with the
+ * CURRENT size as the fallback, so every other surface is untouched and no
+ * flag has to be threaded down.
+ *
+ * vw, not container units: a projector IS the viewport. That also means the
+ * landing page's framed still must NOT opt in — it renders at a fixed 900px
+ * inside whatever viewport the visitor has, so vw-scaled type would burst
+ * its layout on a large monitor. DisplayScreen applies these only when
+ * `live`.
+ *
+ * Each is clamp(today's size, vw-relative, ceiling): unchanged at 1440 and
+ * below, growing to the cap at about 2880.
+ */
+export const roomTypeScale = {
+  /** Money figure / protagonist name — today's sm:text-4xl at the floor. */
+  "--display-figure": "clamp(2.25rem, 2.6vw, 4.5rem)",
+  /** "FAVOURITE HOT DRINK" — today's md:text-2xl at the floor. */
+  "--display-topic": "clamp(1.5rem, 1.7vw, 3rem)",
+  /** Ranking labels and amounts — today's text-lg at the floor. */
+  "--display-rank": "clamp(1.125rem, 1.25vw, 2.25rem)",
+  /** Bar thickness, so the bars keep their weight against the labels. */
+  "--display-bar": "clamp(0.5rem, 0.55vw, 1rem)",
+} as const

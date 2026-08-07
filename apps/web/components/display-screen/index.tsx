@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
+import { getFavpollHeadline, roomTypeScale } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
@@ -60,7 +60,28 @@ type Props = {
   defaultVariant?: DisplayVariant
   /** Keys the presenter's variant override in localStorage */
   favpollId?: string
+  /**
+   * False renders the display as a STILL — same markup, none of the
+   * behaviour that only makes sense on a screen someone is presenting from:
+   * no interval refetch, no localStorage variant, no close countdown, no
+   * presenter chrome, and no min-h-screen (a still is as tall as its
+   * content).
+   *
+   * Added 2026-08-06 for the landing page's "In the room" beat, which had
+   * been a hand-built reduction of this component. A homepage that refreshed
+   * the route every five seconds would be a bug, but so is maintaining a
+   * second definition of a surface — the four defects of that day were all
+   * two things claiming to be the same and quietly differing. This way the
+   * marketing still IS the display.
+   */
+  live?: boolean
 }
+
+// The event heroes and the display agree on the figure size right up to
+// the point a projector is involved, so the display keeps the small-screen
+// half of the shared heroNameSizeClass and swaps only the upper step.
+const figureSizeClass =
+  "text-3xl sm:text-[length:var(--display-figure,2.25rem)]"
 
 export function DisplayScreen({
   protagonistName,
@@ -80,6 +101,7 @@ export function DisplayScreen({
   isClosed = false,
   defaultVariant = "fundraiser",
   favpollId,
+  live = true,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
@@ -89,10 +111,10 @@ export function DisplayScreen({
   // state: the server render knows nothing of localStorage, and a
   // mismatch would break hydration).
   useEffect(() => {
-    if (!variantKey) return
+    if (!live || !variantKey) return
     const stored = window.localStorage.getItem(variantKey)
     if (stored === "fundraiser" || stored === "tribute") setVariant(stored)
-  }, [variantKey])
+  }, [live, variantKey])
 
   function handleVariantChange(next: DisplayVariant) {
     setVariant(next)
@@ -113,9 +135,10 @@ export function DisplayScreen({
   // the wall adopts fresh entries, and the total syncs below.
   const router = useRouter()
   useEffect(() => {
+    if (!live) return
     const id = setInterval(() => router.refresh(), 5000)
     return () => clearInterval(id)
-  }, [router])
+  }, [live, router])
 
   // Adopt the refreshed total (state, so a future push channel could also
   // set it)
@@ -124,7 +147,7 @@ export function DisplayScreen({
   }, [initialTotalRaised])
 
   useEffect(() => {
-    if (isClosed || !closesAt) return
+    if (!live || isClosed || !closesAt) return
     const delta = new Date(closesAt).getTime() - Date.now()
     if (delta <= 0) {
       setLocalClosed(true)
@@ -133,7 +156,7 @@ export function DisplayScreen({
     if (delta > 2 ** 31 - 1) return // beyond setTimeout range; irrelevant live
     const id = setTimeout(() => setLocalClosed(true), delta)
     return () => clearTimeout(id)
-  }, [closesAt, isClosed])
+  }, [live, closesAt, isClosed])
 
   const headline = getFavpollHeadline({
     occasionType,
@@ -148,13 +171,22 @@ export function DisplayScreen({
 
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
-  // The room's way in, in-banner form — hidden from 2xl, where the QR
-  // moves to the gutter (below).
+  // The room's way in. It sits at the TOP OF THE RIGHT COLUMN, above the
+  // guest wall (founder, 2026-08-07).
+  //
+  // It used to live in the banner, which made a two-column design carry
+  // three things and left the goal figure crowded. The obvious alternative
+  // — under the guest wall, where there is space — is the one place it must
+  // not go: that wall grows to twelve entries, so the code would sit lowest
+  // exactly when the room is busiest and scanning matters most. Its height
+  // here does not depend on how many people have pledged.
+  //
+  // Still hidden from 1600px, where the gutter pair takes over.
   const scanToPledge = (
-    <div className="flex shrink-0 flex-col items-center gap-1.5 min-[1600px]:hidden">
+    <div className="flex flex-col items-center gap-1.5 min-[1600px]:hidden">
       <BrandedQR
         value={qrUrl}
-        size={132}
+        size={160}
         colorVar="--qr"
         aria-label="Scan to pledge on your phone"
       />
@@ -169,14 +201,25 @@ export function DisplayScreen({
     // The event page's frame (tinted surround, floating card) at broadcast
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
     // a wider canvas.
-    <div className="min-h-screen overflow-x-clip bg-primary/5">
+    <div
+      className={`overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+      // The ramp is opt-in and live-only: it is vw-relative, and the
+      // landing page renders a still at a fixed width inside the
+      // visitor's viewport, where vw-scaled type would burst the layout.
+      style={live ? (roomTypeScale as React.CSSProperties) : undefined}
+    >
       {/* Outside the card: its drop-shadow filter would otherwise become the
           containing block for the chrome's fixed corner positioning */}
-      <DisplayChrome
-        eventUrl={favpollUrl}
-        variant={variant}
-        onVariantChange={handleVariantChange}
-      />
+      {/* Presenter controls only exist for a presenter — a still has nobody
+          to drive them, and the bar is `fixed`, which inside the landing
+          page's scaled frame would anchor to that frame rather than a room. */}
+      {live && (
+        <DisplayChrome
+          eventUrl={favpollUrl}
+          variant={variant}
+          onVariantChange={handleVariantChange}
+        />
+      )}
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
           the room — the telethon corner phone number — pinned in BOTH
           gutters so it survives scrolling and asymmetric occlusion (a
@@ -190,29 +233,39 @@ export function DisplayScreen({
           where the gutter (224px) fits the 200px QR; narrower viewports
           keep the in-banner QR. Fixed, so rendered OUTSIDE the card —
           its drop-shadow filter would otherwise become these boxes'
-          containing block (DisplayChrome precedent). */}
-      {(["left", "right"] as const).map((side) => (
-        <div
-          key={side}
-          className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
-            side === "left"
-              ? "left-[calc((100vw-72rem)/4-100px)]"
-              : "right-[calc((100vw-72rem)/4-100px)]"
-          }`}
-        >
-          <BrandedQR
-            value={qrUrl}
-            size={200}
-            colorVar="--qr"
-            aria-label="Scan to pledge on your phone"
-          />
-          <p className="text-sm font-medium text-qr">Scan to pledge</p>
-        </div>
-      ))}
+          containing block (DisplayChrome precedent).
+
+          Live only. A still has no gutters to pin them in, and `fixed`
+          resolves against the nearest TRANSFORMED ancestor — so inside the
+          landing page's scaled frame these two 200px codes landed in the
+          middle of the rankings. Same trap as DisplayChrome above. */}
+      {live &&
+        (["left", "right"] as const).map((side) => (
+          <div
+            key={side}
+            className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
+              side === "left"
+                ? "left-[calc((100vw-72rem)/4-100px)]"
+                : "right-[calc((100vw-72rem)/4-100px)]"
+            }`}
+          >
+            <BrandedQR
+              value={qrUrl}
+              size={200}
+              colorVar="--qr"
+              aria-label="Scan to pledge on your phone"
+            />
+            <p className="text-sm font-medium text-qr">Scan to pledge</p>
+          </div>
+        ))}
       {/* pt-16 on mobile: the chrome's fixed h-14 brand bar sits over the
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
-      <div className="mx-auto min-h-screen w-full max-w-6xl bg-background px-8 pt-16 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg">
+      <div
+        className={`mx-auto w-full max-w-6xl bg-background px-8 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg ${
+          live ? "min-h-screen pt-16" : "pt-8"
+        }`}
+      >
         {/* ── Banner: ONE row, two columns (founder, 2026-08-02). The
             variants swap which column is the heading — fundraiser leads
             with the goal figure, tribute leads with the person and keeps
@@ -224,7 +277,7 @@ export function DisplayScreen({
                missing photo) never shifts the rankings below. */
             <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
               {/* Col 1 — the favpoll page hero's EXACT grammar (founder,
-                  2026-08-02): SectionEyebrow, heroNameSizeClass name,
+                  2026-08-02): SectionEyebrow, hero-sized name,
                   text-xl/2xl primary subtitle, 26/33 photo-gated avatar
                   at the right. The QR sits at the column's right edge;
                   mobile stacks it centred beneath the heading. */}
@@ -244,7 +297,7 @@ export function DisplayScreen({
                       </SectionEyebrow>
                     )}
                     <h1
-                      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+                      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${figureSizeClass}`}
                     >
                       {protagonistName}
                     </h1>
@@ -263,9 +316,6 @@ export function DisplayScreen({
                       />
                     </div>
                   )}
-                </div>
-                <div className="flex justify-center min-[1600px]:hidden">
-                  {scanToPledge}
                 </div>
               </div>
 
@@ -332,7 +382,7 @@ export function DisplayScreen({
                         Poll closed
                       </SectionEyebrow>
                       <p
-                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                        className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}
@@ -355,7 +405,7 @@ export function DisplayScreen({
                       </div>
                       <div className="flex flex-wrap items-baseline gap-x-3">
                         <p
-                          className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                          className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                           aria-live="polite"
                         >
                           {formatPounds(totalRaised)}
@@ -391,11 +441,21 @@ export function DisplayScreen({
                         </p>
                       )}
                     </div>
-                  ) : isOpen ? (
+                  ) : (
                     /* No goal: the hero's exact three-line silhouette
                        (founder, 2026-08-03) — eyebrow, headline figure,
                        and the countdown as the subtitle line, where the
-                       tribute hero carries its dates. */
+                       tribute hero carries its dates.
+
+                       The countdown is the only optional part. This used to
+                       be `isOpen ? ... : null`, so a favpoll with NO goal and
+                       NO close date — both optional — projected an entirely
+                       empty column with the QR alone beside it, and the money
+                       survived only as a charity row. The fundraiser variant
+                       exists to make the total the heading; it should say so
+                       whether or not a clock is running. Found 2026-08-06 by
+                       rendering the real display on the landing page, where
+                       neither field is set. */
                     <div>
                       <SectionEyebrow
                         variant="muted"
@@ -404,19 +464,19 @@ export function DisplayScreen({
                         Raised so far
                       </SectionEyebrow>
                       <p
-                        className={`leading-tight font-medium tracking-tight text-foreground ${heroNameSizeClass}`}
+                        className={`leading-tight font-medium tracking-tight text-foreground ${figureSizeClass}`}
                         aria-live="polite"
                       >
                         {formatPounds(totalRaised)}
                       </p>
-                      <div className="mt-2">
-                        <Countdown closesAt={closesAt!} variant="subtitle" />
-                      </div>
+                      {isOpen && closesAt && (
+                        <div className="mt-2">
+                          <Countdown closesAt={closesAt} variant="subtitle" />
+                        </div>
+                      )}
                     </div>
-                  ) : null}
+                  )}
                 </div>
-
-                {scanToPledge}
               </div>
 
               {/* Col 2 — compact identity above the charity rows */}
@@ -494,7 +554,10 @@ export function DisplayScreen({
             )}
           </div>
 
-          <GuestWall entries={initialWallEntries} animate maxEntries={12} />
+          <div className="flex flex-col gap-8">
+            {scanToPledge}
+            <GuestWall entries={initialWallEntries} animate maxEntries={12} />
+          </div>
         </div>
       </div>
     </div>
