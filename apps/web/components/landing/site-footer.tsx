@@ -12,6 +12,7 @@ const EXPLORE = [
   ["/memorials", "For memorials"],
   ["/celebrations", "For celebrations"],
   ["/fundraisers", "For fundraisers"],
+  ["/features", "Features"],
   ["/charities", "Charities"],
   ["/about", "About"],
   ["/about#faq", "FAQ"],

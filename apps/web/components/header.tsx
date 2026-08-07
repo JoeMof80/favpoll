@@ -64,6 +64,9 @@ export function Header() {
                 </Show>
                 {/* Mini-sitemap: the rarer destinations live here (and in the
                     footer), keeping the desktop header lean. */}
+                <Link href="/features" className={MOBILE_LINK} onClick={close}>
+                  Features
+                </Link>
                 <Link href="/charities" className={MOBILE_LINK} onClick={close}>
                   Charities
                 </Link>
