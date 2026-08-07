@@ -18,41 +18,22 @@
 // six 1–6 would have mixed the two actors in one list.
 
 import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
-import { SCENES } from "@/components/hero-demo-panel/scenes"
-import { PackCard, buildPackSteps } from "@/components/print-pack/pack-card"
+import { PackCard } from "@/components/print-pack/pack-card"
+import {
+  DEMO_SCENE as SCENE,
+  DEMO_QR_URL,
+  DEMO_PACK_DATA as PACK_DATA,
+  DEMO_PACK_STEPS as PACK_STEPS,
+} from "@/components/landing/demo-fixture"
 import { DisplayStill } from "@/components/landing/display-still"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
-import type { PackData } from "@/components/print-pack/pack-card"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
-
-// The CAUSE scene (founder, 2026-08-06), not the memorial one. This is the
-// most neutral of the four — no protagonist, so the guest arc reads as the
-// mechanic itself rather than as one register's story — and the register
-// cards in the hero above have already covered the protagonist-shaped types.
-// Its reveal is an impact line rather than someone's favourite, which is what
-// a cause favpoll actually shows.
-const SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
-
-// A demo short link, in the real /p/<code> form the pack's QR encodes — 12
-// hex characters, which is what keeps the printed code at 33x33 rather than
-// the 49x49 the old /favpolls/<uuid> URL forced.
-const DEMO_QR_URL = "https://favpoll.com/p/a1b2c3d4e5f6"
-
-const PACK_DATA: PackData = {
-  prefix: SCENE.eyebrow ?? "A cause",
-  name: SCENE.heading ?? "",
-  isCause: true,
-  topicTitle: SCENE.poll.topic.title,
-  hasReveal: !!SCENE.poll.personal_reveal,
-  charityNames: SCENE.charities.map((c) => c.name),
-  qrUrl: DEMO_QR_URL,
-}
-const PACK_STEPS = buildPackSteps(PACK_DATA)
 
 type Medium =
   | { kind: "card" }
@@ -288,6 +269,21 @@ export function ProcessOverview() {
                 </p>
               </div>
             ))}
+
+            {/* ONE link, at the end of the arc. The temptation was a link per
+                beat, pointing at a features section each — but this is a
+                narrative whose whole mechanic is continuous downward scroll,
+                and six exits mid-story turn it into a menu. Six anchors held
+                in step with another page's headings would also be one more
+                thing defined twice. */}
+            <div className="max-w-md pt-4 max-md:mt-10">
+              <Link
+                href="/features"
+                className="text-base font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {t("home.overview.more")}
+              </Link>
+            </div>
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
