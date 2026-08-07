@@ -502,6 +502,18 @@ by the founder as a possible competitor/partner; evaluated same day.
 Sources: pledge.to/pricing, help.pledgeling.com fee articles,
 developer.pledge.to (2026-07-21).
 
+## Goodstack call — 7 August 2026
+
+Held. **No keys, no fee schedule, no next call booked.** The rep had not
+heard of Goodstack Impact Foundation UK and said their relationships are
+mostly North American. Neither fact is decisive on its own — see
+`goodstack-call-2026-08-07.md` for the reading, the follow-up questions sent,
+and the two strategy questions it raised (US-first, and running our own
+foundation; both deferred).
+
+**Action: stop being single-threaded.** PayPal Giving Fund UK and CAF
+enquiries move from fallback to parallel.
+
 ## Not tax/legal advice
 
 Fund-flow-vs-Gift-Aid interaction is subtle (the gift must run donor →
