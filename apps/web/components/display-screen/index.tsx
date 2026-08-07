@@ -171,22 +171,22 @@ export function DisplayScreen({
 
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
-  // The room's way in, in-banner form — hidden from 2xl, where the QR
-  // moves to the gutter (below).
+  // The room's way in. It sits at the TOP OF THE RIGHT COLUMN, above the
+  // guest wall (founder, 2026-08-07).
   //
-  // Both halves of that swap are keyed to the VIEWPORT, which is right for a
-  // display filling a projector and wrong for a still rendered at a fixed
-  // width inside a frame. A still has no gutters to move into, so it keeps
-  // the in-banner code at every width.
+  // It used to live in the banner, which made a two-column design carry
+  // three things and left the goal figure crowded. The obvious alternative
+  // — under the guest wall, where there is space — is the one place it must
+  // not go: that wall grows to twelve entries, so the code would sit lowest
+  // exactly when the room is busiest and scanning matters most. Its height
+  // here does not depend on how many people have pledged.
+  //
+  // Still hidden from 1600px, where the gutter pair takes over.
   const scanToPledge = (
-    <div
-      className={`flex shrink-0 flex-col items-center gap-1.5 ${
-        live ? "min-[1600px]:hidden" : ""
-      }`}
-    >
+    <div className="flex flex-col items-center gap-1.5 min-[1600px]:hidden">
       <BrandedQR
         value={qrUrl}
-        size={132}
+        size={160}
         colorVar="--qr"
         aria-label="Scan to pledge on your phone"
       />
@@ -316,9 +316,6 @@ export function DisplayScreen({
                       />
                     </div>
                   )}
-                </div>
-                <div className="flex justify-center min-[1600px]:hidden">
-                  {scanToPledge}
                 </div>
               </div>
 
@@ -480,8 +477,6 @@ export function DisplayScreen({
                     </div>
                   )}
                 </div>
-
-                {scanToPledge}
               </div>
 
               {/* Col 2 — compact identity above the charity rows */}
@@ -559,7 +554,10 @@ export function DisplayScreen({
             )}
           </div>
 
-          <GuestWall entries={initialWallEntries} animate maxEntries={12} />
+          <div className="flex flex-col gap-8">
+            {scanToPledge}
+            <GuestWall entries={initialWallEntries} animate maxEntries={12} />
+          </div>
         </div>
       </div>
     </div>
