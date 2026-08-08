@@ -1,4 +1,4 @@
-import { RegisterMatrix } from "@/components/landing/register-matrix"
+import { CapabilityGrid } from "@/components/landing/capability-grid"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { LandingHero } from "@/components/landing/hero"
 import { HeroTexture } from "@/components/landing/hero-texture"
-import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
-import { WatchItHappen } from "@/components/landing/watch-it-happen"
 import { RecordFlow } from "@/components/landing/record-flow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
@@ -132,36 +130,15 @@ export default async function HomePage() {
 
       <ProcessOverview />
 
-      <RegisterMatrix />
+      <CapabilityGrid />
 
-      {/* ── Product surfaces — full-bleed alternating bands (white ·
-          bg-primary/5) for section division; each band's inner column matches
-          the hero's width. The hero demo does the showing; the sections below
-          each add one thing. ── */}
-      <section id="anyone" className="w-full scroll-mt-20">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <AnyoneCanAnswer />
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* The section IS the room: full-bleed tint, a floor gradient, and
-          overflow-hidden so the foreground phone crops at the section edge */}
-      <section
-        id="watch"
-        className="relative w-full scroll-mt-20 overflow-hidden bg-primary/5"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
-        />
-        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <WatchItHappen />
-          </FadeIn>
-        </div>
-      </section>
+      {/* "Create or curate your favpoll" and "Watch it live" lived here until
+          2026-08-08. Both were single-capability deep-dives that the
+          capability grid above now summarises and /features covers properly —
+          Custom topics duplicated the first, Live display the second. The page
+          was ten sections and meandering. Recover them from
+          `git show main~1:apps/web/components/landing/anyone-can-answer.tsx`
+          if they are wanted on /features. ── */}
 
       {/* ── The record — three favpolls, one topic, one permanent ranking.
           The vignette acts out the principle line (many polls feed the
