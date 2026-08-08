@@ -65,13 +65,22 @@ export function CapabilityGrid() {
         </SectionEyebrow>
         {/* No card chrome: bordered boxes on a tinted band read as buttons,
             and these are not links — the section has one, at the bottom. */}
+        {/* SUBGRID (2026-08-08). Each card spans three of the parent's row
+            tracks — header, sentence, examples — so all three align across a
+            row however the copy wraps. mt-auto alone was not enough: it
+            bottom-anchors the list, so a card whose bullets wrap to two lines
+            each (Custom topics) grew UPWARDS and its first bullet started a
+            line above its neighbours'. Bottoms matched, tops drifted. */}
         <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((c) => (
-            <div key={c.key} className="flex flex-col">
+            <div
+              key={c.key}
+              className="row-span-3 grid grid-rows-subgrid gap-y-3"
+            >
               {/* HowItWorksThreeBeat's header grammar — icon beside the label,
                   primary, uppercase, tracking-widest — at text-base rather
                   than its text-lg, which wraps at four columns. */}
-              <div className="mb-3 flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5">
                 <c.icon className="h-6 w-6 shrink-0 text-primary" />
                 <h3 className="text-base font-medium tracking-widest text-primary uppercase">
                   {t(`home.capability.${c.key}.name` as never)}
@@ -85,10 +94,7 @@ export function CapabilityGrid() {
                   "range" line (founder rewrite, 2026-08-08): one sentence
                   trying to hold both ends read as a formula, and every one of
                   the eight had the same shape. */}
-              {/* mt-auto: grid items stretch to the tallest in their row, so this
-                  pins the examples to the bottom of every card and they line
-                  up across the row however long the sentence above runs. */}
-              <ul className="mt-auto list-disc space-y-1 pt-3 pl-4 text-sm leading-relaxed text-muted-foreground marker:text-primary-muted">
+              <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted-foreground marker:text-primary-muted">
                 <li>{t(`home.capability.${c.key}.b1` as never)}</li>
                 <li>{t(`home.capability.${c.key}.b2` as never)}</li>
               </ul>
