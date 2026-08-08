@@ -41,17 +41,16 @@ const CAPABILITIES: {
   key: string
   icon: typeof Tv
 }[] = [
-  { key: "display", icon: Tv },
-  { key: "reveal", icon: Quote },
-  // MessageCircleQuestion, not ListChecks: a checklist is the icon for
-  // PICKING from a list, which is the thing this feature is the
-  // alternative to. A topic IS a question, so draw the question.
+  // Ordered by when each one happens, and the two rows are the two phases —
+  // no labels needed, the break does the work. Row 1 is what the organiser
+  // puts in place before anyone arrives; row 2 is what happens to a guest and
+  // what is left afterwards. The previous order was inherited from the
+  // matrix's array and chosen by nobody.
   { key: "topics", icon: MessageCircleQuestion },
   { key: "cards", icon: QrCode },
+  { key: "display", icon: Tv },
   { key: "fund", icon: HeartHandshake },
-  // Keepsake rather than the record (founder, 2026-08-08): the record is
-  // unshipped and would need a Coming soon label on a list of things you
-  // can have today. The keepsake exists — a single A4 sheet of the day.
+  { key: "reveal", icon: Quote },
   { key: "keepsake", icon: FileHeart },
 ]
 
