@@ -85,7 +85,10 @@ export function CapabilityGrid() {
                   "range" line (founder rewrite, 2026-08-08): one sentence
                   trying to hold both ends read as a formula, and every one of
                   the eight had the same shape. */}
-              <ul className="mt-3 list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted-foreground marker:text-primary-muted">
+              {/* mt-auto: grid items stretch to the tallest in their row, so this
+                  pins the examples to the bottom of every card and they line
+                  up across the row however long the sentence above runs. */}
+              <ul className="mt-auto list-disc space-y-1 pt-3 pl-4 text-sm leading-relaxed text-muted-foreground marker:text-primary-muted">
                 <li>{t(`home.capability.${c.key}.b1` as never)}</li>
                 <li>{t(`home.capability.${c.key}.b2` as never)}</li>
               </ul>
