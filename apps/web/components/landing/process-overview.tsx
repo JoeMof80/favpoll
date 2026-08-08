@@ -221,18 +221,24 @@ export function ProcessOverview() {
                 composite of bg-primary/5 over the page. Getting this wrong is
                 what left the header transparent for its whole life before
                 2026-08-06. */}
-            {/* pb-8 and a 36-deep fade, up from pb-6/h-20: the headline runs
-                to two lines now, so beats reached the fade sooner and their
-                text was legible THROUGH it rather than dissolving under it.
-                The solid backdrop has to clear the header's own descenders
-                before the gradient starts doing the work. */}
+            {/* EYEBROW ONLY, no headline (founder, 2026-08-09, after five
+                attempts none of which landed). This column is STICKY — it
+                stays pinned for the ~300vh it takes to scroll six beats, so
+                by dwell time it is the most-looked-at line on the page. A
+                merely-fine heading becomes irritating at that duration, which
+                is the bar nothing cleared. It is also the third piece of
+                framing on a section whose six beats are already labelled and
+                numbered. The capability grid and "Open right now" are both
+                eyebrow-only for the same reason.
+
+                Rendered as the h2 so the beat labels below do not skip a
+                level. The solid backdrop and its fade still have to clear the
+                text's descenders before the gradient does the work, or the
+                scrolling beats read THROUGH the header rather than under it. */}
             <div className="relative z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-transparent md:sticky md:top-28">
-              <SectionEyebrow className="mb-2">
+              <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
-              <h2 className="max-w-md text-3xl font-light tracking-tight text-foreground md:text-4xl">
-                {t("home.overview.headline")}
-              </h2>
             </div>
             {BEATS.map((beat, i) => (
               <div
