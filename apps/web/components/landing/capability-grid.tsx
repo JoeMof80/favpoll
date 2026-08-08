@@ -82,16 +82,17 @@ export function CapabilityGrid() {
             </div>
           ))}
         </div>
-        <div className="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        {/* The no-rules line went with the matrix (2026-08-08). It was
+            insurance against a grid that implied some features belonged to
+            some registers; this one gates nothing, so the disclaimer read as
+            an answer to a question nobody had asked. */}
+        <div className="mt-10">
           <Link
             href="/features"
             className="text-base font-medium text-primary underline-offset-4 hover:underline"
           >
             {t("home.capability.link" as never)}
           </Link>
-          <p className="text-sm text-muted-foreground italic">
-            {t("home.capability.norules" as never)}
-          </p>
         </div>
       </div>
     </section>

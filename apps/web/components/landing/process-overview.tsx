@@ -18,7 +18,6 @@
 // six 1–6 would have mixed the two actors in one list.
 
 import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
@@ -275,21 +274,6 @@ export function ProcessOverview() {
                 </p>
               </div>
             ))}
-
-            {/* ONE link, at the end of the arc. The temptation was a link per
-                beat, pointing at a features section each — but this is a
-                narrative whose whole mechanic is continuous downward scroll,
-                and six exits mid-story turn it into a menu. Six anchors held
-                in step with another page's headings would also be one more
-                thing defined twice. */}
-            <div className="max-w-md pt-4 max-md:mt-10">
-              <Link
-                href="/features"
-                className="text-base font-medium text-primary underline-offset-4 hover:underline"
-              >
-                {t("home.overview.more")}
-              </Link>
-            </div>
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
