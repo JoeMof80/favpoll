@@ -302,9 +302,9 @@ export const SCENES: HeroScene[] = [
     // (logo_url) and the card already renders it.
     heading: "Walking for St Luke's",
     eyebrow: "A cause",
-    context: "Our team of 12 · 11 miles",
+    context: "A sponsored dog walk · 5 miles",
     blurb:
-      "A team walk for our local hospice — pledge your favourite, and every penny goes to St Luke's.",
+      "A sponsored dog walk for our local hospice — pledge your favourite, and every penny goes to St Luke's.",
     poll: {
       id: "demo-poll-cause",
       // "helps St Luke's care for people" garden-paths — "St Luke's care" reads
@@ -313,18 +313,69 @@ export const SCENES: HeroScene[] = [
       personal_reveal:
         "Hospice care is free. Every pledge helps St Luke's keep it that way.",
       topic: {
-        title: "Hot drink",
+        // A REAL topic (2026-08-09). "Hot drink" was not one — the catalogue
+        // has 135 topics and that was not among them, so the demo showed a
+        // question nobody could pick, with ten items written by hand. Dog
+        // breed is real, carries all 48 of its seeded favourites, and pairs
+        // with the occasion: a sponsored dog walk asks this question of
+        // itself. Ten chips left the picker looking sparse; 48 fills it the
+        // way a guest's actually does.
+        title: "Dog breed",
         favourites: [
-          { id: "hd-chai", label: "Chai" },
-          { id: "hd-coffee", label: "Coffee" },
-          { id: "hd-espresso", label: "Espresso" },
-          { id: "hd-flatwhite", label: "Flat white" },
-          { id: "hd-greentea", label: "Green tea" },
-          { id: "hd-hotchoc", label: "Hot chocolate" },
-          { id: "hd-latte", label: "Latte" },
-          { id: "hd-mocha", label: "Mocha" },
-          { id: "hd-peppermint", label: "Peppermint tea" },
-          { id: "hd-tea", label: "Tea" },
+          { id: "db-bassethound", label: "Basset Hound" },
+          { id: "db-beagle", label: "Beagle" },
+          { id: "db-bernesemountaindog", label: "Bernese Mountain Dog" },
+          { id: "db-bichonfrise", label: "Bichon Frise" },
+          { id: "db-bordercollie", label: "Border Collie" },
+          { id: "db-borderterrier", label: "Border Terrier" },
+          { id: "db-boxer", label: "Boxer" },
+          { id: "db-britishbulldog", label: "British Bulldog" },
+          {
+            id: "db-cavalierkingcharlesspaniel",
+            label: "Cavalier King Charles Spaniel",
+          },
+          { id: "db-chihuahua", label: "Chihuahua" },
+          { id: "db-cockapoo", label: "Cockapoo" },
+          { id: "db-cockerspaniel", label: "Cocker Spaniel" },
+          { id: "db-corgi", label: "Corgi" },
+          { id: "db-dachshund", label: "Dachshund" },
+          { id: "db-dalmatian", label: "Dalmatian" },
+          { id: "db-dobermann", label: "Dobermann" },
+          { id: "db-englishsetter", label: "English Setter" },
+          { id: "db-frenchbulldog", label: "French Bulldog" },
+          { id: "db-germanshepherd", label: "German Shepherd" },
+          { id: "db-goldenretriever", label: "Golden Retriever" },
+          { id: "db-greatdane", label: "Great Dane" },
+          { id: "db-greyhound", label: "Greyhound" },
+          { id: "db-jackrussell", label: "Jack Russell" },
+          { id: "db-labradoodle", label: "Labradoodle" },
+          { id: "db-labrador", label: "Labrador" },
+          { id: "db-lurcher", label: "Lurcher" },
+          { id: "db-newfoundland", label: "Newfoundland" },
+          { id: "db-oldenglishsheepdog", label: "Old English Sheepdog" },
+          { id: "db-pointer", label: "Pointer" },
+          { id: "db-pomeranian", label: "Pomeranian" },
+          { id: "db-poodle", label: "Poodle" },
+          { id: "db-pug", label: "Pug" },
+          { id: "db-rottweiler", label: "Rottweiler" },
+          { id: "db-roughcollie", label: "Rough Collie" },
+          { id: "db-saintbernard", label: "Saint Bernard" },
+          { id: "db-samoyed", label: "Samoyed" },
+          { id: "db-schnauzer", label: "Schnauzer" },
+          { id: "db-shihtzu", label: "Shih Tzu" },
+          { id: "db-siberianhusky", label: "Siberian Husky" },
+          { id: "db-spaniel", label: "Spaniel" },
+          { id: "db-springerspaniel", label: "Springer Spaniel" },
+          {
+            id: "db-staffordshirebullterrier",
+            label: "Staffordshire Bull Terrier",
+          },
+          { id: "db-vizsla", label: "Vizsla" },
+          { id: "db-weimaraner", label: "Weimaraner" },
+          { id: "db-welshterrier", label: "Welsh Terrier" },
+          { id: "db-westhighlandterrier", label: "West Highland Terrier" },
+          { id: "db-whippet", label: "Whippet" },
+          { id: "db-yorkshireterrier", label: "Yorkshire Terrier" },
         ],
       },
     },
@@ -339,15 +390,18 @@ export const SCENES: HeroScene[] = [
         registered_number: "515595",
       },
     ],
-    selectedIndex: 1,
+    // Cockapoo — the runner-up in the standings, so the pick the demo makes
+    // is one the results then show climbing. Same pattern as the memorial
+    // scene, whose pick is Blue behind Purple.
+    selectedIndex: 10,
     pledgeAmount: "£10",
     results: [
-      { label: "Tea", amount: "£240", widthPercent: 100 },
-      { label: "Coffee", amount: "£205", widthPercent: 85 },
-      { label: "Hot chocolate", amount: "£120", widthPercent: 50 },
-      { label: "Latte", amount: "£85", widthPercent: 35 },
-      { label: "Chai", amount: "£55", widthPercent: 23 },
-      { label: "Flat white", amount: "£35", widthPercent: 15 },
+      { label: "Labrador", amount: "£240", widthPercent: 100 },
+      { label: "Cockapoo", amount: "£205", widthPercent: 85 },
+      { label: "Border Collie", amount: "£120", widthPercent: 50 },
+      { label: "Greyhound", amount: "£85", widthPercent: 35 },
+      { label: "Jack Russell", amount: "£55", widthPercent: 23 },
+      { label: "Whippet", amount: "£35", widthPercent: 15 },
     ],
     total: "£740",
   },

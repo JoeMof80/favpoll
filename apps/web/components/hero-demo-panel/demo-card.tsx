@@ -229,18 +229,31 @@ export function DemoCard({
   const dispAmount = amountActive ? amountNum : 0
   const dispAmountStr = amountActive ? amountStr : ""
 
+  // £2 of the £10 moved to the shared fund (founder, 2026-08-09). The demo
+  // used to hide this row by withholding onFundStep, so the one beat about
+  // deciding what to give never showed the decision that makes favpoll
+  // unusual — that some of it can go to guests who cannot pledge. This is
+  // StepAmount's own split row, not a drawing of one: the favourite ticks
+  // DOWN as the fund ticks up, and the total is unchanged, which is exactly
+  // what the real control does.
+  const FUND_PART = 2
+
   const renderAmountStep = (amt: number, amtStr: string) => (
     <StepAmount
       pledgeAmount={amtStr}
       updatePledgeAmount={() => {}}
       useSharedFund={false}
-      hasFund={false}
+      hasFund
       ownBreakdown={{
         lines: [{ label: charityName, amount: amt }],
         total: { label: "Total", amount: amt },
       }}
       fundBreakdown={null}
-      favouriteBreakdown={[{ label: selected.label, amount: amt }]}
+      favouriteBreakdown={[
+        { label: selected.label, amount: Math.max(0, amt - FUND_PART) },
+      ]}
+      fundPart={FUND_PART}
+      onFundStep={() => {}}
       toggleFund={() => {}}
       tipAmount={0}
       setTipAmount={() => {}}
