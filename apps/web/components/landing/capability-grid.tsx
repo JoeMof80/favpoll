@@ -5,9 +5,7 @@ import {
   ListChecks,
   QrCode,
   Quote,
-  Target,
   Tv,
-  Users,
 } from "lucide-react"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -31,6 +29,14 @@ import { t } from "@/lib/i18n"
 //
 // Copy lives in messages/en-GB.json, per the landing-page convention.
 
+// SIX, not eight (founder, 2026-08-08). Pledge goal and Guest wall left for
+// /features: this section is the TRAILER, and a target and a donor feed are
+// what any giving platform has — standard features dilute a trailer. They
+// stay on the reference page for the opposite reason, since an evaluator
+// scanning for the expected reads absence as absence.
+//
+// Three columns rather than four: wider cards stop the longer bullets
+// wrapping to two lines, which is what made the rows uneven.
 const CAPABILITIES: {
   key: string
   icon: typeof Tv
@@ -40,8 +46,6 @@ const CAPABILITIES: {
   { key: "topics", icon: ListChecks },
   { key: "cards", icon: QrCode },
   { key: "fund", icon: HeartHandshake },
-  { key: "goal", icon: Target },
-  { key: "wall", icon: Users },
   // Keepsake rather than the record (founder, 2026-08-08): the record is
   // unshipped and would need a Coming soon label on a list of things you
   // can have today. The keepsake exists — a single A4 sheet of the day.
@@ -61,7 +65,7 @@ export function CapabilityGrid() {
         </SectionEyebrow>
         {/* No card chrome: bordered boxes on a tinted band read as buttons,
             and these are not links — the section has one, at the bottom. */}
-        <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((c) => (
             <div key={c.key} className="flex flex-col">
               {/* HowItWorksThreeBeat's header grammar — icon beside the label,
