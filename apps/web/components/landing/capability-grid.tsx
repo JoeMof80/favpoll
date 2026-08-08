@@ -52,12 +52,13 @@ export function CapabilityGrid() {
   return (
     <section className="w-full bg-primary/5">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
-        <SectionEyebrow className="mb-2">
+        {/* Eyebrow only, no heading (founder, 2026-08-08): the heading was
+            arguing a point eight labelled capabilities underneath already
+            prove, and the page had one section too many doing that. Rendered
+            as the h2 so the item headings below do not skip a level. */}
+        <SectionEyebrow as="h2" className="mb-10">
           {t("home.capability.eyebrow" as never)}
         </SectionEyebrow>
-        <h2 className="mb-10 max-w-xl text-3xl font-light tracking-tight text-foreground">
-          {t("home.capability.heading" as never)}
-        </h2>
         {/* No card chrome: bordered boxes on a tinted band read as buttons,
             and these are not links — the section has one, at the bottom. */}
         <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-4">
