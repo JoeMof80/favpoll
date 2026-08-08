@@ -56,7 +56,9 @@ const CAPABILITIES: {
 
 export function CapabilityGrid() {
   return (
-    <section className="w-full bg-primary/5">
+    // White: Start to finish above it is tinted again (founder, 2026-08-09),
+    // and two tinted bands back to back read as one.
+    <section className="w-full">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         {/* Eyebrow only, no heading (founder, 2026-08-08): the heading was
             arguing a point eight labelled capabilities underneath already

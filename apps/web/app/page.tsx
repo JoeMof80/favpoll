@@ -1,5 +1,4 @@
 import { CapabilityGrid } from "@/components/landing/capability-grid"
-import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -140,6 +139,29 @@ export default async function HomePage() {
           `git show main~1:apps/web/components/landing/anyone-can-answer.tsx`
           if they are wanted on /features. ── */}
 
+      {/* ── The shelf: real favpoll cards always sit on the brand pastel
+          (bg-muted), matching /favpolls — white cards on light purple is the
+          convention wherever the actual product appears; the illustration
+          vignettes above keep the fainter bg-primary/5. In dark mode both
+          resolve to cards lifted off the purple page. ── */}
+      {normalised.length > 0 && (
+        <section id="live" className="w-full scroll-mt-20 bg-muted">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <FadeIn>
+              <div className="mb-6 flex items-baseline justify-between">
+                <SectionEyebrow>Open right now</SectionEyebrow>
+                <Button variant="ghost" asChild>
+                  <Link href="/favpolls">See all →</Link>
+                </Button>
+              </div>
+            </FadeIn>
+            <FadeIn>
+              <LiveFavpollsCarousel favpolls={normalised} />
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
       {/* ── The record — three favpolls, one topic, one permanent ranking.
           The vignette acts out the principle line (many polls feed the
           record; a pledge on any of them moves its standing — nothing moves
@@ -168,49 +190,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── The shelf: real favpoll cards always sit on the brand pastel
-          (bg-muted), matching /favpolls — white cards on light purple is the
-          convention wherever the actual product appears; the illustration
-          vignettes above keep the fainter bg-primary/5. In dark mode both
-          resolve to cards lifted off the purple page. ── */}
-      {normalised.length > 0 && (
-        <section id="live" className="w-full scroll-mt-20 bg-muted">
-          <div className="mx-auto w-full max-w-330 px-6 py-16">
-            <FadeIn>
-              <div className="mb-6 flex items-baseline justify-between">
-                <SectionEyebrow>Open right now</SectionEyebrow>
-                <Button variant="ghost" asChild>
-                  <Link href="/favpolls">See all →</Link>
-                </Button>
-              </div>
-            </FadeIn>
-            <FadeIn>
-              <LiveFavpollsCarousel favpolls={normalised} />
-            </FadeIn>
-          </div>
-        </section>
-      )}
-
-      {/* ── The closing sequence (founder, 2026-08-08): what you'd do, then
-          why it's safe, then the button. Both of these used to sit high on
-          the page and neither was landing there — Create/Share/Watch is the
-          ORGANISER arc, and following the guest arc immediately with a
-          second three-beat "how it works" read as an anticlimax rather than
-          as new information. The trust facts were worse off: mid-page, a
-          plain text grid between two visual sections is neither early
-          reassurance nor a last objection cleared. Here they are the
-          argument that ends the page. ── */}
-      {/* Create · Share · Watch — the ORGANISER arc in real-component
-          vignettes. (The guest arc lives in ProcessOverview at the top; this
-          section's old Pick/Pledge/Reveal text strip duplicated it and was
-          removed, founder call 2026-08-04.) */}
-      <section id="how" className="w-full scroll-mt-20">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <HowItWorksThreeBeat />
-          </FadeIn>
-        </div>
-      </section>
+      {/* Create · Share · Watch was retired here on 2026-08-09. By this point
+          the page has told the arc twice — Start to finish shows it end to
+          end, the capability grid names the parts — so a third telling in
+          three generic verbs was glib. Its one non-duplicated asset was the
+          wizard vignette, the only glimpse of what CREATING a favpoll looks
+          like; that belongs on /features#organisers, which has no artefact.
+          Recover it from
+          `git show main:apps/web/components/landing/how-it-works-three-beat.tsx`. ── */}
 
       {/* ── The validator's checklist — universal trust facts (page
           architecture model, 2026-08-04): register-neutral versions of

@@ -201,11 +201,12 @@ export function ProcessOverview() {
   }, [])
 
   return (
-    // WHITE band (founder reorder, 2026-08-08). It was tinted in #536 to keep
-    // the page alternating; moving Create/Share/Watch to the closing sequence
-    // removed a white band from between this and RegisterMatrix, which flipped
-    // the parity of everything after it. Flipping this one back costs two
-    // changes; flipping RegisterMatrix instead cascaded into five.
+    // TINTED again (founder, 2026-08-09 — they preferred it that way, and it
+    // was tinted from #536 until the 08-08 reorder forced a parity flip).
+    // Retiring Create/Share/Watch freed a band, so the whole page now runs
+    // purple · tint · white · muted · white · tint · purple with no two pale
+    // bands touching — bg-muted and --band-tint are close enough that adjacent
+    // they read as one.
     // overflow-x-clip, not -hidden: the TV's vignette is authored oversized so
     // it survives being scaled down, and in the right-hand column its spill
     // ran 34px past the page edge and put the whole document into horizontal
@@ -213,7 +214,7 @@ export function ProcessOverview() {
     // `hidden` would, re-anchoring the sticky column to this section and
     // killing the pinned media (the display screen uses clip for the same
     // reason).
-    <section className="w-full overflow-x-clip">
+    <section className="w-full overflow-x-clip bg-primary/5">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         {/* 5 columns, not 3 (2026-08-06): the display still is a 900px-wide
             desktop layout, and the old third-column width put its ranking
@@ -228,17 +229,16 @@ export function ProcessOverview() {
           <div className="md:col-span-3 md:pb-[30vh]">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
-            {/* Backdrop follows the band: bg-background now this section is
-                white. --band-tint stays defined for the next tinted band that
-                needs an opaque header — it is the composite of bg-primary/5
-                over the page, measured, and getting it wrong is what left
-                this header transparent for its whole life before 2026-08-06. */}
+            {/* Backdrop follows the band: bg-band-tint, the measured opaque
+                composite of bg-primary/5 over the page. Getting this wrong is
+                what left the header transparent for its whole life before
+                2026-08-06. */}
             {/* pb-8 and a 36-deep fade, up from pb-6/h-20: the headline runs
                 to two lines now, so beats reached the fade sooner and their
                 text was legible THROUGH it rather than dissolving under it.
                 The solid backdrop has to clear the header's own descenders
                 before the gradient starts doing the work. */}
-            <div className="relative z-10 bg-background pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-background after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-background after:via-background/80 after:to-transparent md:sticky md:top-28">
+            <div className="relative z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-transparent md:sticky md:top-28">
               <SectionEyebrow className="mb-2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
