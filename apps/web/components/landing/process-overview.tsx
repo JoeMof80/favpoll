@@ -13,9 +13,12 @@
 // is a browser page an organiser casts to a screen. One chassis around all
 // six would have stated something false about both ends.
 //
-// The bookends are deliberately UNNUMBERED. The four guest beats are things
-// a guest does; the card and the screen are the organiser's. Numbering all
-// six 1–6 would have mixed the two actors in one list.
+// ALL SIX ARE NUMBERED (founder rewrite, 2026-08-09). They were not: the
+// card and the screen were treated as the organiser's and left unnumbered,
+// on the reasoning that numbering all six would mix two actors in one list.
+// The rewrite reframes the section as one GUEST journey, and it is right —
+// a guest scans the card and a guest watches the screen. Every beat is
+// something they do.
 
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
@@ -44,8 +47,6 @@ type Beat = {
   label: string
   body: string
   medium: Medium
-  /** Guest beats are numbered; the organiser's bookends are not. */
-  numbered: boolean
 }
 
 const BEATS: Beat[] = [
@@ -54,7 +55,6 @@ const BEATS: Beat[] = [
     label: t("landing.how.card.label"),
     body: t("landing.how.card.body"),
     medium: { kind: "card" },
-    numbered: false,
   },
   {
     // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
@@ -65,44 +65,32 @@ const BEATS: Beat[] = [
     label: t("landing.how.arrive.label"),
     body: t("landing.how.arrive.body"),
     medium: { kind: "phone", phase: "arriving" },
-    numbered: true,
   },
   {
     key: "selected",
     label: t("landing.how.pick.label"),
     body: t("landing.how.pick.body"),
     medium: { kind: "phone", phase: "selected" },
-    numbered: true,
   },
   {
     key: "amount-picked",
     label: t("landing.how.pledge.label"),
     body: t("landing.how.pledge.body"),
     medium: { kind: "phone", phase: "amount-picked" },
-    numbered: true,
   },
   {
     key: "reveal",
     label: t("landing.how.reveal.label"),
     body: t("landing.how.reveal.body"),
     medium: { kind: "phone", phase: "reveal" },
-    numbered: true,
   },
   {
     key: "room",
     label: t("landing.how.room.label"),
     body: t("landing.how.room.body"),
     medium: { kind: "display" },
-    numbered: false,
   },
 ]
-
-// Running 1–4 across the numbered beats only.
-const NUMBERS = BEATS.reduce<(number | null)[]>((acc, beat) => {
-  const used = acc.filter((n) => n !== null).length
-  acc.push(beat.numbered ? used + 1 : null)
-  return acc
-}, [])
 
 // Each medium is laid out at its OWN natural size and scaled to fit the
 // media column, because each is a different real object:
@@ -233,18 +221,24 @@ export function ProcessOverview() {
                 composite of bg-primary/5 over the page. Getting this wrong is
                 what left the header transparent for its whole life before
                 2026-08-06. */}
-            {/* pb-8 and a 36-deep fade, up from pb-6/h-20: the headline runs
-                to two lines now, so beats reached the fade sooner and their
-                text was legible THROUGH it rather than dissolving under it.
-                The solid backdrop has to clear the header's own descenders
-                before the gradient starts doing the work. */}
+            {/* EYEBROW ONLY, no headline (founder, 2026-08-09, after five
+                attempts none of which landed). This column is STICKY — it
+                stays pinned for the ~300vh it takes to scroll six beats, so
+                by dwell time it is the most-looked-at line on the page. A
+                merely-fine heading becomes irritating at that duration, which
+                is the bar nothing cleared. It is also the third piece of
+                framing on a section whose six beats are already labelled and
+                numbered. The capability grid and "Open right now" are both
+                eyebrow-only for the same reason.
+
+                Rendered as the h2 so the beat labels below do not skip a
+                level. The solid backdrop and its fade still have to clear the
+                text's descenders before the gradient does the work, or the
+                scrolling beats read THROUGH the header rather than under it. */}
             <div className="relative z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-transparent md:sticky md:top-28">
-              <SectionEyebrow className="mb-2">
+              <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
-              <h2 className="max-w-md text-3xl font-light tracking-tight text-foreground md:text-4xl">
-                {t("home.overview.headline")}
-              </h2>
             </div>
             {BEATS.map((beat, i) => (
               <div
@@ -258,16 +252,8 @@ export function ProcessOverview() {
                   i === active ? "md:opacity-100" : "md:opacity-30"
                 )}
               >
-                <p
-                  className={cn(
-                    "mb-2 text-xs font-medium tracking-widest uppercase",
-                    // The bookends are the organiser's, and read quieter for
-                    // it — same rhythm, no number, muted.
-                    beat.numbered ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  {NUMBERS[i] !== null && `${NUMBERS[i]}. `}
-                  {beat.label}
+                <p className="mb-2 text-xs font-medium tracking-widest text-primary uppercase">
+                  {i + 1}. {beat.label}
                 </p>
                 <p className="text-lg leading-relaxed text-muted-foreground">
                   {beat.body}
