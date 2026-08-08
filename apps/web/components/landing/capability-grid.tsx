@@ -2,7 +2,7 @@ import Link from "next/link"
 import {
   FileHeart,
   HeartHandshake,
-  ListChecks,
+  MessageCircleQuestion,
   QrCode,
   Quote,
   Tv,
@@ -43,7 +43,10 @@ const CAPABILITIES: {
 }[] = [
   { key: "display", icon: Tv },
   { key: "reveal", icon: Quote },
-  { key: "topics", icon: ListChecks },
+  // MessageCircleQuestion, not ListChecks: a checklist is the icon for
+  // PICKING from a list, which is the thing this feature is the
+  // alternative to. A topic IS a question, so draw the question.
+  { key: "topics", icon: MessageCircleQuestion },
   { key: "cards", icon: QrCode },
   { key: "fund", icon: HeartHandshake },
   // Keepsake rather than the record (founder, 2026-08-08): the record is
