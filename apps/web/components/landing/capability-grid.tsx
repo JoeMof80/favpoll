@@ -76,9 +76,15 @@ export function CapabilityGrid() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t(`home.capability.${c.key}.line` as never)}
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground italic">
-                {t(`home.capability.${c.key}.range` as never)}
-              </p>
+              {/* Two examples per capability, spanning the registers — the
+                  quiet use and the loud one. They replaced a single italic
+                  "range" line (founder rewrite, 2026-08-08): one sentence
+                  trying to hold both ends read as a formula, and every one of
+                  the eight had the same shape. */}
+              <ul className="mt-3 list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted-foreground marker:text-primary-muted">
+                <li>{t(`home.capability.${c.key}.b1` as never)}</li>
+                <li>{t(`home.capability.${c.key}.b2` as never)}</li>
+              </ul>
             </div>
           ))}
         </div>
