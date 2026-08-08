@@ -158,9 +158,11 @@ over-promises, reads gated, or goes vague.
 
 Canonical string lives in `messages/en-GB.json` under `landing.headline` — edit
 there, never inline. The hero CTA carries `landing.cta.free` ("Free to create")
-**beside** the button; the closing CTA keeps the fuller
-`landing.cta.caption` ("Free to create · 100% goes to charity"), because in the
-hero the 100% is already the stat row in the same band.
+**beside** the button. The closing CTA carries **nothing** under its button:
+`landing.cta.caption` ("Free to create · 100% goes to charity") was retired
+2026-08-08 when the trust grid moved to sit directly above it, which says the
+same at more length. Before that the fee was stated three times on one page —
+hero button, trust grid, closing caption.
 
 History: "Pick your favourite. Pledge its worth. Reveal its standing."
 (2026-07-17 → 2026-08-06 — see above; the "worth" anchor survives it, the

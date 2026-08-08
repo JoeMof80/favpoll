@@ -1,4 +1,4 @@
-import { RegisterMatrix } from "@/components/landing/register-matrix"
+import { CapabilityGrid } from "@/components/landing/capability-grid"
 import { HowItWorksThreeBeat } from "@/components/landing/how-it-works-three-beat"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { LandingHero } from "@/components/landing/hero"
 import { HeroTexture } from "@/components/landing/hero-texture"
-import { AnyoneCanAnswer } from "@/components/landing/anyone-can-answer"
-import { WatchItHappen } from "@/components/landing/watch-it-happen"
 import { RecordFlow } from "@/components/landing/record-flow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
@@ -132,66 +130,15 @@ export default async function HomePage() {
 
       <ProcessOverview />
 
-      {/* ── Create · Share · Watch — the ORGANISER arc in real-component
-          vignettes. (The guest arc lives in ProcessOverview above; this
-          section's old Pick/Pledge/Reveal text strip duplicated it and
-          was removed, founder call 2026-08-04.) ── */}
-      <section id="how" className="w-full scroll-mt-20">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <HowItWorksThreeBeat />
-          </FadeIn>
-        </div>
-      </section>
+      <CapabilityGrid />
 
-      <RegisterMatrix />
-
-      {/* ── The validator's checklist — universal trust facts (page
-          architecture model, 2026-08-04): register-neutral versions of
-          the reassurance grid the register pages carry. ── */}
-      <section className="w-full">
-        <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
-          {(["free", "charity", "nofave", "phone"] as const).map((key) => (
-            <div key={key}>
-              <p className="mb-1 font-medium text-foreground">
-                {t(`home.assure.${key}.label`)}
-              </p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {t(`home.assure.${key}.body`)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Product surfaces — full-bleed alternating bands (white ·
-          bg-primary/5) for section division; each band's inner column matches
-          the hero's width. The hero demo does the showing; the sections below
-          each add one thing. ── */}
-      <section id="anyone" className="w-full scroll-mt-20">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <AnyoneCanAnswer />
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* The section IS the room: full-bleed tint, a floor gradient, and
-          overflow-hidden so the foreground phone crops at the section edge */}
-      <section
-        id="watch"
-        className="relative w-full scroll-mt-20 overflow-hidden bg-primary/5"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
-        />
-        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <WatchItHappen />
-          </FadeIn>
-        </div>
-      </section>
+      {/* "Create or curate your favpoll" and "Watch it live" lived here until
+          2026-08-08. Both were single-capability deep-dives that the
+          capability grid above now summarises and /features covers properly —
+          Custom topics duplicated the first, Live display the second. The page
+          was ten sections and meandering. Recover them from
+          `git show main~1:apps/web/components/landing/anyone-can-answer.tsx`
+          if they are wanted on /features. ── */}
 
       {/* ── The record — three favpolls, one topic, one permanent ranking.
           The vignette acts out the principle line (many polls feed the
@@ -244,6 +191,45 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── The closing sequence (founder, 2026-08-08): what you'd do, then
+          why it's safe, then the button. Both of these used to sit high on
+          the page and neither was landing there — Create/Share/Watch is the
+          ORGANISER arc, and following the guest arc immediately with a
+          second three-beat "how it works" read as an anticlimax rather than
+          as new information. The trust facts were worse off: mid-page, a
+          plain text grid between two visual sections is neither early
+          reassurance nor a last objection cleared. Here they are the
+          argument that ends the page. ── */}
+      {/* Create · Share · Watch — the ORGANISER arc in real-component
+          vignettes. (The guest arc lives in ProcessOverview at the top; this
+          section's old Pick/Pledge/Reveal text strip duplicated it and was
+          removed, founder call 2026-08-04.) */}
+      <section id="how" className="w-full scroll-mt-20">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <HowItWorksThreeBeat />
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── The validator's checklist — universal trust facts (page
+          architecture model, 2026-08-04): register-neutral versions of
+          the reassurance grid the register pages carry. ── */}
+      <section className="w-full bg-primary/5">
+        <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
+          {(["free", "charity", "nofave", "phone"] as const).map((key) => (
+            <div key={key}>
+              <p className="mb-1 font-medium text-foreground">
+                {t(`home.assure.${key}.label`)}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t(`home.assure.${key}.body`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── Final CTA: the brand statement on the monogram band, closing
           the page the way the hero opened it ── */}
       <section className="relative w-full bg-primary text-primary-foreground">
@@ -253,12 +239,14 @@ export default async function HomePage() {
             <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
               {t("landing.subheader")}
             </h2>
+            {/* No caption under this button any more (2026-08-08). It read
+                "Free to create · 100% goes to charity", which the trust grid
+                now directly above says at more length — and the fee was
+                being stated three times on one page (hero button, that grid,
+                here). landing.cta.caption is retired with it. */}
             <Button asChild size="lg" variant="secondary">
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
-            <p className="mt-3 text-xs opacity-80">
-              {t("landing.cta.caption")}
-            </p>
           </FadeIn>
         </div>
       </section>
