@@ -13,9 +13,12 @@
 // is a browser page an organiser casts to a screen. One chassis around all
 // six would have stated something false about both ends.
 //
-// The bookends are deliberately UNNUMBERED. The four guest beats are things
-// a guest does; the card and the screen are the organiser's. Numbering all
-// six 1–6 would have mixed the two actors in one list.
+// ALL SIX ARE NUMBERED (founder rewrite, 2026-08-09). They were not: the
+// card and the screen were treated as the organiser's and left unnumbered,
+// on the reasoning that numbering all six would mix two actors in one list.
+// The rewrite reframes the section as one GUEST journey, and it is right —
+// a guest scans the card and a guest watches the screen. Every beat is
+// something they do.
 
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
@@ -44,8 +47,6 @@ type Beat = {
   label: string
   body: string
   medium: Medium
-  /** Guest beats are numbered; the organiser's bookends are not. */
-  numbered: boolean
 }
 
 const BEATS: Beat[] = [
@@ -54,7 +55,6 @@ const BEATS: Beat[] = [
     label: t("landing.how.card.label"),
     body: t("landing.how.card.body"),
     medium: { kind: "card" },
-    numbered: false,
   },
   {
     // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
@@ -65,44 +65,32 @@ const BEATS: Beat[] = [
     label: t("landing.how.arrive.label"),
     body: t("landing.how.arrive.body"),
     medium: { kind: "phone", phase: "arriving" },
-    numbered: true,
   },
   {
     key: "selected",
     label: t("landing.how.pick.label"),
     body: t("landing.how.pick.body"),
     medium: { kind: "phone", phase: "selected" },
-    numbered: true,
   },
   {
     key: "amount-picked",
     label: t("landing.how.pledge.label"),
     body: t("landing.how.pledge.body"),
     medium: { kind: "phone", phase: "amount-picked" },
-    numbered: true,
   },
   {
     key: "reveal",
     label: t("landing.how.reveal.label"),
     body: t("landing.how.reveal.body"),
     medium: { kind: "phone", phase: "reveal" },
-    numbered: true,
   },
   {
     key: "room",
     label: t("landing.how.room.label"),
     body: t("landing.how.room.body"),
     medium: { kind: "display" },
-    numbered: false,
   },
 ]
-
-// Running 1–4 across the numbered beats only.
-const NUMBERS = BEATS.reduce<(number | null)[]>((acc, beat) => {
-  const used = acc.filter((n) => n !== null).length
-  acc.push(beat.numbered ? used + 1 : null)
-  return acc
-}, [])
 
 // Each medium is laid out at its OWN natural size and scaled to fit the
 // media column, because each is a different real object:
@@ -258,16 +246,8 @@ export function ProcessOverview() {
                   i === active ? "md:opacity-100" : "md:opacity-30"
                 )}
               >
-                <p
-                  className={cn(
-                    "mb-2 text-xs font-medium tracking-widest uppercase",
-                    // The bookends are the organiser's, and read quieter for
-                    // it — same rhythm, no number, muted.
-                    beat.numbered ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  {NUMBERS[i] !== null && `${NUMBERS[i]}. `}
-                  {beat.label}
+                <p className="mb-2 text-xs font-medium tracking-widest text-primary uppercase">
+                  {i + 1}. {beat.label}
                 </p>
                 <p className="text-lg leading-relaxed text-muted-foreground">
                   {beat.body}

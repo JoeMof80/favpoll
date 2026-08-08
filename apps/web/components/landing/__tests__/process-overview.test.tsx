@@ -51,30 +51,24 @@ vi.mock("@/components/print-pack/pack-card", async () => {
 })
 
 describe("ProcessOverview", () => {
-  it("numbers the four guest beats and leaves the bookends unnumbered", () => {
+  it("numbers all six beats of the journey", () => {
     render(<ProcessOverview />)
 
-    // The guest's own beats carry a running 1–4.
-    const guestLabels = [
+    // Every beat is numbered since the 2026-08-09 rewrite: the section is one
+    // GUEST journey, and a guest both scans the card and watches the screen.
+    // Before that the two ends were treated as the organiser's and left
+    // unnumbered.
+    const labels = [
+      t("landing.how.card.label"),
       t("landing.how.arrive.label"),
       t("landing.how.pick.label"),
       t("landing.how.pledge.label"),
       t("landing.how.reveal.label"),
+      t("landing.how.room.label"),
     ]
-    guestLabels.forEach((label, i) => {
+    labels.forEach((label, i) => {
       expect(screen.getByText(`${i + 1}. ${label}`)).toBeInTheDocument()
     })
-
-    // The organiser's bookends appear, but never with a number in front:
-    // the two actors must not read as one numbered list.
-    for (const label of [
-      t("landing.how.card.label"),
-      t("landing.how.room.label"),
-    ]) {
-      const el = screen.getByText(label)
-      expect(el).toBeInTheDocument()
-      expect(el.textContent).not.toMatch(/^\d+\./)
-    }
   })
 
   it("frames each beat as the object it actually is", () => {
