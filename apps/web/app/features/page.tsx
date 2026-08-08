@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { FadeIn } from "@/components/landing/fade-in"
+import { WizardVignette } from "@/components/landing/wizard-vignette"
 import {
   PackArtefact,
   PhoneArtefact,
@@ -230,7 +231,14 @@ export default function FeaturesPage() {
           heading="Setting one up."
           lead="A favpoll asks one question and gathers the answers. Everything below is set when you create it, and most of it can be changed afterwards."
         >
-          <ItemList items={ORGANISER} />
+          {/* The list says what you set; the vignette shows what setting it
+              looks like. This section had no artefact until the homepage
+              retired Create/Share/Watch and freed one — see
+              components/landing/wizard-vignette.tsx. */}
+          <div className="flex flex-col gap-10">
+            <ItemList items={ORGANISER} />
+            <WizardVignette />
+          </div>
         </Section>
 
         {/* The print pack — the most tangible thing favpoll makes, and the
