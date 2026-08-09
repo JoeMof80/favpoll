@@ -124,22 +124,28 @@ export default function FeaturesPage() {
           What is left is a page TITLE, which is not the same thing: one line,
           no lead, no CTA, so the h1 exists for the document and for search
           without pretending to be a landing page. */}
-      <div className="mx-auto w-full max-w-330 px-6 pt-14 pb-9">
-        <SectionEyebrow as="p" className="mb-2">
-          Features
-        </SectionEyebrow>
-        <h1 className="text-3xl font-medium tracking-tight text-foreground">
-          Everything a favpoll can do.
-        </h1>
-      </div>
-
-      <div className="mx-auto w-full max-w-330 px-6">
+      {/* pb-16: the menu is sticky, so its last items ride down to the very
+          end of the grid. Without a gap they finish flush against the CTA
+          band and read as sitting ON it. */}
+      <div className="mx-auto w-full max-w-330 px-6 pt-14 pb-16">
         {/* The menu is a COLUMN of the page grid rather than a floating
             overlay, so it can never sit on top of the content it indexes. */}
         <div className="grid gap-10 lg:grid-cols-[14rem_1fr]">
           <FeatureNav sections={SECTIONS} />
 
           <div className="min-w-0">
+            {/* The page title lives in the CONTENT column (founder,
+                2026-08-09), not above the grid. Above it, it sat over the
+                menu and read as a label FOR the menu; here it aligns with
+                the section headings it introduces, and the menu starts at
+                the top of the column it indexes. */}
+            <SectionEyebrow as="p" className="mb-2">
+              Features
+            </SectionEyebrow>
+            <h1 className="text-3xl font-medium tracking-tight text-foreground">
+              Everything a favpoll can do.
+            </h1>
+
             <Feature
               id="topics"
               title="Custom topics"
