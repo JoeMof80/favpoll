@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getFavpollHeadline } from "@/lib/display"
 import { PackDocument } from "@/components/print-pack/pack-document"
+import { QrExport } from "@/components/print-pack/qr-export"
 import { PrintButton } from "@/components/keepsake/print-button"
 import { Button } from "@/components/ui/button"
 
@@ -87,6 +88,10 @@ export default async function PackPage({ params }: Props) {
             code — if any card is going to struggle, it is that one.
           </AlertDescription>
         </Alert>
+        <QrExport
+          value={data.qrUrl}
+          name={`favpoll-qr-${favpoll.short_code}`}
+        />
         <PackDocument data={data} />
       </div>
     </div>
