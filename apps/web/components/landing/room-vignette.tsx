@@ -80,9 +80,13 @@ export function RoomVignette() {
     // 2026-08-09). Narrowing the frame had shrunk both objects to keep them
     // apart, and the display came out 317 x 270 — the shape of a dialog, not
     // of a television, in the one section about putting favpoll on a
-    // television. It now takes the width it needs (362 x 270) and the phone
-    // gives it up, cropping at the frame's left edge — which is what a thing
-    // in the near foreground does anyway.
+    // television.
+    //
+    // Settled at 336 wide, with the phone a size down and standing 24px off
+    // the frame's left edge. The first attempt took the width straight off
+    // the phone's share and pushed it into the crop, which bought the display
+    // its shape and lost the ROOM — two objects touching two edges with no
+    // air between them. A room is mostly the space in it.
     //
     // The frame supplies the crop, which is the part that matters: the phone
     // is absolutely positioned and taller than the stage on purpose, so
@@ -110,7 +114,7 @@ export function RoomVignette() {
           >
             {/* ── The display, in the distance ── */}
             <div
-              className="absolute top-8 right-4 w-[28rem] [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
+              className="absolute top-8 right-4 w-[26rem] [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
               style={{ transformOrigin: "right center" }}
             >
               <p className="truncate text-[11px] font-medium tracking-widest text-primary uppercase">
@@ -169,7 +173,7 @@ export function RoomVignette() {
 
             {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-            <div className="absolute -bottom-56 -left-6 h-[24rem] w-56 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
+            <div className="absolute -bottom-56 left-6 h-[24rem] w-52 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
               {/* Side buttons */}
               <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
               <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
