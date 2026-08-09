@@ -92,12 +92,14 @@ function Feature({
   artefact?: React.ReactNode
 }) {
   return (
-    // scroll-mt-16, not 28 (founder, 2026-08-09). The site header is 57px and
-    // sticky, and the section carries 56px of its own top padding, so a 112px
-    // scroll margin landed the heading 168px down — a screenful of the
-    // PREVIOUS section's whitespace above the thing you clicked. 64px clears
-    // the header by 7px and puts the heading at 120px.
-    <section id={id} className="scroll-mt-16 border-b border-border py-14">
+    // scroll-mt-14 = 56px, which is the header's height EXACTLY: h-14 of
+    // content plus a 1px bottom border, measured 57px at every breakpoint.
+    // It must not exceed that. scroll-mt-28 landed the heading 168px down —
+    // a screenful of the previous section's whitespace above the thing you
+    // clicked — and scroll-mt-16 left a 7px sliver below the header showing
+    // the descenders of whatever sat above. Landing 1px UNDER the header
+    // costs nothing, because that pixel is the section's own top padding.
+    <section id={id} className="scroll-mt-14 border-b border-border py-14">
       <FadeIn>
         <h2 className="mb-3 text-2xl font-medium tracking-tight text-foreground">
           {title}
