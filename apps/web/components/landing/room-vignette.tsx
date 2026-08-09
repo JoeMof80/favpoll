@@ -20,6 +20,7 @@ import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { formatPounds } from "@/lib/i18n"
+import { Vignette } from "@/components/landing/vignette"
 
 const MAX = 450
 const GOAL = 900
@@ -71,13 +72,12 @@ export function RoomVignette() {
   const confirmed = step >= 3
 
   return (
-    // The room's own chrome, which used to live on the homepage's #watch
-    // SECTION wrapper: a tint, a floor gradient, and — the one that matters —
-    // overflow-hidden. The phone in the foreground is absolutely positioned
-    // and taller than the stage on purpose, so without the crop it spills out
-    // of whatever contains it. Carried into the component (2026-08-09) so it
-    // travels with the vignette instead of being re-derived by every host.
-    <div className="relative overflow-hidden rounded-xl bg-primary/5">
+    // WIDE: this is a scene rather than a single object — a display on a far
+    // wall and a phone in the near foreground need the depth. The shared frame
+    // supplies the crop, which is the part that matters: the phone is
+    // absolutely positioned and taller than the stage on purpose, so without
+    // overflow-hidden it spills out of whatever contains it.
+    <Vignette wide bleed>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
@@ -212,6 +212,6 @@ export function RoomVignette() {
           </div>
         </div>
       </div>
-    </div>
+    </Vignette>
   )
 }

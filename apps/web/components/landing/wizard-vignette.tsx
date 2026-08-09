@@ -1,4 +1,5 @@
 import { Chip } from "@/components/ui/chip"
+import { Vignette } from "@/components/landing/vignette"
 
 // The wizard, in miniature — the four overlays an organiser fills in, stacked
 // in creation order, fanning on hover.
@@ -29,10 +30,9 @@ const DIALOG =
 
 export function WizardVignette() {
   return (
-    <div
-      aria-hidden="true"
-      className="group relative h-80 max-w-2xl overflow-hidden rounded-xl border border-border bg-primary/5 select-none"
-    >
+    // interactive: the fan is a group-hover effect, and the frame's default
+    // inert would stop :hover matching at all.
+    <Vignette interactive bleed className="group h-80">
       {/* Fixed-width canvas, centred — the deck holds its shape at any card
           width, single-column mobile included. */}
       <div inert className="relative mx-auto h-full w-[22rem]">
@@ -99,6 +99,6 @@ export function WizardVignette() {
           </p>
         </div>
       </div>
-    </div>
+    </Vignette>
   )
 }

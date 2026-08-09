@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Chip } from "@/components/ui/chip"
 import { InputGroupButton } from "@/components/ui/input-group"
+import { Vignette } from "@/components/landing/vignette"
 
 // The custom-topic exemplar: a family in-joke no canon could ever hold —
 // the purest case for the create path. Items are meaningless to strangers
@@ -124,9 +125,9 @@ export function TopicPickerVignette() {
         : []
 
   return (
-    <>
+    <Vignette>
       {/* The app's own two dialogs, replayed in sequence */}
-      <div className="relative min-h-72" aria-hidden="true">
+      <div className="relative min-h-72">
         {/* Dialog 1 — the wizard's "Pick a topic" overlay */}
         <div className="absolute top-0 left-0 w-[88%] -rotate-1 rounded-xl border border-border bg-background p-5 shadow-lg">
           <div className="flex h-9 items-center gap-2">
@@ -246,6 +247,6 @@ export function TopicPickerVignette() {
           )}
         </AnimatePresence>
       </div>
-    </>
+    </Vignette>
   )
 }

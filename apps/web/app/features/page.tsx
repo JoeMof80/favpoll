@@ -2,16 +2,16 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { HeroTexture } from "@/components/landing/hero-texture"
 import { FadeIn } from "@/components/landing/fade-in"
 import { FeatureNav } from "@/components/landing/feature-nav"
 import { WizardVignette } from "@/components/landing/wizard-vignette"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { RoomVignette } from "@/components/landing/room-vignette"
-import {
-  PackArtefact,
-  PhoneArtefact,
-} from "@/components/landing/feature-artefacts"
+import { PackVignette } from "@/components/landing/pack-vignette"
+import { FundVignette } from "@/components/landing/fund-vignette"
+import { RevealVignette } from "@/components/landing/reveal-vignette"
+import { GoalVignette } from "@/components/landing/goal-vignette"
+import { GuestWallVignette } from "@/components/landing/guest-wall-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
 //
@@ -114,21 +114,25 @@ function Feature({
 export default function FeaturesPage() {
   return (
     <main className="flex flex-col">
-      <section className="relative bg-primary text-primary-foreground">
-        <HeroTexture />
-        <div className="relative mx-auto max-w-330 px-6 py-16 md:py-20">
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
+      {/* Plain header, not the purple band the page opened with (founder,
+          2026-08-09). A full-bleed primary block is the homepage's move, and
+          it made this page announce itself before saying anything — a
+          reference does not need a poster, and the band pushed the first
+          feature below the fold on a laptop. */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-330 px-6 pt-14 pb-10">
+          <SectionEyebrow as="p" className="mb-3">
             Features
-          </p>
-          <h1 className="max-w-3xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
+          </SectionEyebrow>
+          <h1 className="max-w-3xl text-4xl leading-[1.12] font-light tracking-tight text-foreground md:text-5xl">
             Everything a favpoll can do.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-90">
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             From the card on the table to the screen in the room — and every
             penny to the charity.
           </p>
-          <div className="mt-8">
-            <Button asChild size="lg" variant="secondary">
+          <div className="mt-7">
+            <Button asChild size="lg">
               <Link href="/favpolls">See favpoll in action →</Link>
             </Button>
           </div>
@@ -172,7 +176,7 @@ export default function FeaturesPage() {
               id="stationery"
               title="QR-coded stationery"
               lead="A pack to print: an A4 poster for the door, A5 cards for the tables, and eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket. Each carries the topic, the charity and its registered number, and a code that opens the favpoll on a phone."
-              artefact={<PackArtefact />}
+              artefact={<PackVignette />}
             />
 
             <Feature
@@ -186,26 +190,28 @@ export default function FeaturesPage() {
               id="shared-fund"
               title="Shared fund"
               lead="Nobody needs to be able to pay. A guest can move part of their own pledge to the shared fund, and a guest without means — a child, usually — draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
-              artefact={<PhoneArtefact phase="amount-picked" />}
+              artefact={<FundVignette />}
             />
 
             <Feature
               id="reveal"
               title="Personal reveal"
               lead="A favpoll can hold a favourite back — the subject's own — and show it only once a guest has pledged one of their own. It is a gift rather than a gate: the guest shares something of themselves, and the favpoll shares something back."
-              artefact={<PhoneArtefact phase="reveal" />}
+              artefact={<RevealVignette />}
             />
 
             <Feature
               id="goal"
               title="Pledge goal"
               lead="Set a target and the room can watch it come. A goal is a milestone, not a finish line — the favpoll stays open until its closing date, and every pledge after the goal still counts."
+              artefact={<GoalVignette />}
             />
 
             <Feature
               id="guest-wall"
               title="Guest wall"
-              lead="Who backed what, as it happens, with a short message if they leave one. It scrolls on the big screen during the day and reads back afterwards as a record of who came."
+              lead="Who backed what, as it happens. It scrolls on the big screen during the day and reads back afterwards as a record of who came. Names and favourites only — never amounts, and anyone can pledge as “Someone”."
+              artefact={<GuestWallVignette />}
             />
 
             <Feature
