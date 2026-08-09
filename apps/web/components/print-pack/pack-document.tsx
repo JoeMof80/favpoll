@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { PackCard, SCALE, buildPackSteps } from "./pack-card"
+import { SCALE, buildPackSteps } from "./pack-card"
+import { PackSheet } from "./pack-sheet"
 import type { PackData } from "./pack-card"
 
 // Pre-event material for an organiser to print and place at the venue:
@@ -71,66 +72,36 @@ export function PackDocument({ data }: { data: PackData }) {
   const hideWhenOtherPrints = (key: keyof typeof SCALE) =>
     printTarget && printTarget !== key ? "print:hidden" : ""
 
-  // Each section is one A4 sheet: distinct pages on screen (border +
-  // shadow + gap), seamless in print where break-after-page splits them.
-  const sheet =
-    "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
-
   return (
     // .paper pins the light token values across the whole pack, so the cards
     // print the same whatever theme the organiser is viewing in — see the
     // block in globals.css for the measurements that forced it.
     <div className="paper flex flex-col gap-8 print:block">
-      {/* ── A4 card: landscape design ROTATED 90° on a portrait sheet
-          (founder, 2026-08-02) — every sheet stays portrait, one print
-          job covers the pack, and the poster comes out landscape when
-          the paper is turned. The card keeps real mm dimensions in the
-          pre-rotation box. ── */}
+      {/* The three sheets live in ./pack-sheet, shared with the features
+          page so the pack it depicts and the pack it prints cannot drift. */}
       <div className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" onPrint={setPrintTarget} />
-        <section
-          className={`${sheet} flex min-h-[277mm] break-after-page items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2`}
-        >
-          {/* Print fragmentation uses PRE-transform boxes, so a rotated
-              250mm-wide element split across pages in the print dialog
-              (founder-caught twice, 2026-08-02; headless zero-margin
-              PDFs masked it). The half-size/scale(2) sandwich keeps the
-              layout box at 125 × 90 mm — far inside any printable area,
-              one fragment — while painting at the full 250 × 180.
-              -rotate-90: the poster reads by turning the page clockwise. */}
-          <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
-            <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
-              <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
-                <PackCard data={data} steps={steps} scale="a4" />
-              </div>
-            </div>
-          </div>
-        </section>
+        <PackSheet
+          data={data}
+          steps={steps}
+          scale="a4"
+          className="break-after-page"
+        />
       </div>
 
-      {/* ── A5 cards: two per sheet, for tables and easels ── */}
       <div className={hideWhenOtherPrints("a5")}>
         <SheetPrintButton target="a5" onPrint={setPrintTarget} />
-        <section
-          className={`${sheet} flex min-h-[277mm] break-after-page flex-col items-center px-6 py-6 print:min-h-0`}
-        >
-          <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
-            <PackCard data={data} steps={steps} scale="a5" />
-            <PackCard data={data} steps={steps} scale="a5" />
-          </div>
-        </section>
+        <PackSheet
+          data={data}
+          steps={steps}
+          scale="a5"
+          className="break-after-page"
+        />
       </div>
 
-      {/* ── Wallet cards: credit-card size (85.6 × 54 mm) ── */}
       <div className={hideWhenOtherPrints("wallet")}>
         <SheetPrintButton target="wallet" onPrint={setPrintTarget} />
-        <section className={`${sheet} min-h-[277mm] px-6 py-8 print:min-h-0`}>
-          <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <PackCard key={i} data={data} steps={steps} scale="wallet" />
-            ))}
-          </div>
-        </section>
+        <PackSheet data={data} steps={steps} scale="wallet" />
       </div>
     </div>
   )
