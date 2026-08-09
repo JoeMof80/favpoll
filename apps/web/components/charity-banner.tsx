@@ -67,8 +67,16 @@ export function CharityBanner({
             aria-valuemax={goalAmount}
             aria-valuenow={Math.min(totalRaised, goalAmount)}
           >
+            {/* Green once the goal is met (2026-08-09), which is what the
+                live display has always done. The banner filling to the end
+                and staying the same colour was the one surface where
+                reaching the goal looked like any other pledge landing.
+                The bar caps at 100%; the total above it does not — a goal is
+                a milestone, not a finish line. */}
             <div
-              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+              className={`h-full rounded-full transition-[width] duration-700 ease-out ${
+                totalRaised >= goalAmount ? "bg-success" : "bg-primary"
+              }`}
               style={{
                 width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
               }}

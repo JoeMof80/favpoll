@@ -1,68 +1,68 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { HeroTexture } from "@/components/landing/hero-texture"
 import { FadeIn } from "@/components/landing/fade-in"
-import { WizardVignette } from "@/components/landing/wizard-vignette"
-import {
-  PackArtefact,
-  PhoneArtefact,
-  DisplayArtefact,
-} from "@/components/landing/feature-artefacts"
+import { HeroTexture } from "@/components/landing/hero-texture"
+import { t } from "@/lib/i18n"
+import { FeatureNav } from "@/components/landing/feature-nav"
+import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
+import { RoomVignette } from "@/components/landing/room-vignette"
+import { PackVignette } from "@/components/landing/pack-vignette"
+import { FundVignette } from "@/components/landing/fund-vignette"
+import { RevealVignette } from "@/components/landing/reveal-vignette"
+import { GoalVignette } from "@/components/landing/goal-vignette"
+import { GuestWallVignette } from "@/components/landing/guest-wall-vignette"
 
-// What a favpoll actually does, for the reader who has understood the idea
-// and now wants the capability list — a hospice fundraising manager, a
-// charity partner, someone deciding whether to recommend it. The homepage
-// tells the story; this page answers "but what does it do".
+// /features, organised BY FEATURE (founder redesign, 2026-08-09).
 //
-// Grouped by READER (organiser, guest, the room, charity) rather than by
-// feature, because those are the three people in every favpoll and the order
-// they arrive in. Section ids are stable: the process overview links here,
-// and deep links into a section should keep working.
+// It was organised by READER — for organisers, for guests, for charities —
+// which is an ARGUMENT, and arguments belong on About, which already makes
+// them. A features page is a REFERENCE, and references are organised by the
+// thing you look up: the same reason documentation is organised by API rather
+// than by persona.
 //
-// Copy lives inline rather than in messages/en-GB.json, following /about —
-// the nearest neighbour and the other long-form content page. The landing
-// and register pages use t() because their strings are tuned and re-tuned in
-// isolation; prose this long is unreadable as key/value pairs.
+// The restructure removed two duplications rather than relocating them. The
+// old #charities section restated About#money, and #beyond's will
+// instructions restated About#wills; both now point at About instead.
+//
+// And it unlocks the homepage: the capability grid's six cards each have a
+// section here, so they can become links. That was the reason to do it.
 //
 // Deliberately NOT here: Gift Aid, which is effectively confirmed but not
-// contractually settled — it is the most attractive line this page could
-// carry and the most damaging to get wrong. And the keepsake page, which
-// needs work before it is advertised.
+// contractually settled — the most attractive line this page could carry and
+// the most damaging to get wrong.
 
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: the print pack, the live display, the shared fund, and 100% of every pledge to a registered charity.",
+    "What a favpoll does: the print pack, the live display, the shared fund, the personal reveal, and 100% of every pledge to a registered charity.",
 }
 
-type Item = { label: string; body: string }
+const SECTIONS = [
+  { id: "topics", label: "Custom topics" },
+  { id: "stationery", label: "QR-coded stationery" },
+  { id: "display", label: "Live display" },
+  { id: "shared-fund", label: "Shared fund" },
+  { id: "reveal", label: "Personal reveal" },
+  { id: "goal", label: "Pledge goal" },
+  { id: "guest-wall", label: "Guest wall" },
+  { id: "keepsake", label: "Keepsake" },
+  { id: "basics", label: "The basics" },
+  { id: "money", label: "Where the money goes" },
+]
 
-const ORGANISER: Item[] = [
+const BASICS: { label: string; body: string }[] = [
   {
     label: "Free to create",
     body: "No fee to set one up, and none taken from the gift.",
-  },
-  {
-    label: "A topic, or your own items",
-    body: "Pick one of favpoll's topics — favourite biscuit, favourite song, favourite dog breed — or add items nobody has thought of yet.",
   },
   {
     label: "One to three charities",
     body: "Name up to three. The proceeds are split equally between them.",
   },
   {
-    label: "A goal, if you want one",
-    body: "A milestone rather than a finish line: the favpoll stays open either way, and every pledge after it still counts.",
-  },
-  {
-    label: "A closing date, up to 90 days",
+    label: "Up to 90 days",
     body: "It closes on its own when the date arrives, and the proceeds go on their way.",
-  },
-  {
-    label: "The story",
-    body: "A photo, a few lines about the person or the cause, and the reveal that waits for guests who have pledged.",
   },
   {
     label: "Editable after publishing",
@@ -72,113 +72,72 @@ const ORGANISER: Item[] = [
     label: "Private if you need it",
     body: "An unlisted favpoll is reachable only by the people you share it with, and never appears on the public favpolls page.",
   },
-]
-
-const GUEST: Item[] = [
   {
     label: "Nothing to sign up for",
     body: "A guest pledges with an email address. No account, no app.",
   },
-  {
-    label: "Their own favourite",
-    body: "Pick from the list, or add one that isn't on it.",
-  },
-  {
-    label: "Pledge what it's worth",
-    body: "The amount is theirs to decide. Card payments are handled by Stripe.",
-  },
-  {
-    label: "The reveal",
-    body: "Pledging shows where their favourite stands — and, where the organiser has written one, the favourite the favpoll was holding.",
-  },
-  {
-    label: "The shared fund",
-    body: "Anyone can top it up so a guest without means — a child, usually — still takes part. Nobody sees who used it.",
-  },
 ]
 
-const ROOM: Item[] = [
-  {
-    label: "Standings that move",
-    body: "The rankings re-order as pledges land, so the room watches its own answer arrive.",
-  },
-  {
-    label: "The guest wall",
-    body: "Who backed what, as it happens.",
-  },
-  {
-    label: "A code the room can scan",
-    body: "Large enough to read from across the room, and shown on both sides of the screen on a wide one.",
-  },
-  {
-    label: "Two ways to run it",
-    body: "The fundraiser leads with the total climbing. The tribute turns the volume down: the person leads, and the money stays quiet.",
-  },
-]
-
-const CHARITY: Item[] = [
-  {
-    label: "100% of every pledge",
-    body: "favpoll takes no fee from donations. The whole pledge reaches the charity.",
-  },
-  {
-    label: "Registered charities only",
-    body: "favpoll is not a crowdfunding platform. The recipient is always a registered charity — never a project fund, and never the organiser.",
-  },
-  {
-    label: "The number is shown",
-    body: "The registered charity number appears on the printed cards, on the favpoll page and on the screen in the room.",
-  },
-  {
-    label: "Paid out on close",
-    body: "When a favpoll closes, the proceeds go to the charities the organiser named.",
-  },
-]
-
-function ItemList({ items }: { items: Item[] }) {
-  return (
-    <dl className="grid max-w-4xl gap-x-10 gap-y-6 sm:grid-cols-2">
-      {items.map((item) => (
-        <div key={item.label}>
-          <dt className="mb-1 text-base font-medium text-foreground">
-            {item.label}
-          </dt>
-          <dd className="text-base leading-relaxed text-muted-foreground">
-            {item.body}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
-
-function Section({
+function Feature({
   id,
-  eyebrow,
-  heading,
+  title,
   lead,
+  bullets,
   children,
+  artefact,
 }: {
   id: string
-  eyebrow: string
-  heading: string
-  lead?: string
-  children: React.ReactNode
+  title: string
+  /** One line saying what it is — the homepage card's line, elaborated. */
+  lead: string
+  /**
+   * The specifics. A features page is scanned, not read, and each section
+   * elaborates a homepage card that is itself a line plus two bullets — so
+   * the same grammar with more of them makes the relationship visible
+   * instead of asserted (founder, 2026-08-09).
+   *
+   * Two sections deliberately stay prose: the personal reveal and where the
+   * money goes. Both are ARGUMENTS rather than lists — "a gift rather than a
+   * gate", and the 0% fee — and an argument dies as a fragment. A page with
+   * no prose anywhere also has no voice, and those two are where favpoll's
+   * voice belongs.
+   */
+  bullets?: string[]
+  children?: React.ReactNode
+  artefact?: React.ReactNode
 }) {
   return (
-    <section id={id} className="scroll-mt-20 border-b border-border py-16">
+    // scroll-mt-14 = 56px, which is the header's height EXACTLY: h-14 of
+    // content plus a 1px bottom border, measured 57px at every breakpoint.
+    // It must not exceed that. scroll-mt-28 landed the heading 168px down —
+    // a screenful of the previous section's whitespace above the thing you
+    // clicked — and scroll-mt-16 left a 7px sliver below the header showing
+    // the descenders of whatever sat above. Landing 1px UNDER the header
+    // costs nothing, because that pixel is the section's own top padding.
+    <section id={id} className="scroll-mt-14 border-b border-border py-14">
       <FadeIn>
-        <SectionEyebrow className="mb-2">{eyebrow}</SectionEyebrow>
-        <h2 className="mb-4 max-w-xl text-3xl font-light tracking-tight text-foreground">
-          {heading}
+        <h2 className="mb-3 text-2xl font-medium tracking-tight text-foreground">
+          {title}
         </h2>
-        {lead && (
-          <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            {lead}
-          </p>
+        <p className="mb-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+          {lead}
+        </p>
+        {bullets && (
+          // The capability grid's list grammar, one size up: this is the
+          // reference, that is the trailer.
+          <ul className="mb-6 max-w-2xl list-disc space-y-1.5 pl-5 text-base leading-relaxed text-muted-foreground marker:text-primary-muted">
+            {bullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
         )}
+        {children}
       </FadeIn>
-      <FadeIn delay={0.08}>{children}</FadeIn>
+      {artefact && (
+        <FadeIn delay={0.08}>
+          <div className="mt-8">{artefact}</div>
+        </FadeIn>
+      )}
     </section>
   )
 }
@@ -186,170 +145,207 @@ function Section({
 export default function FeaturesPage() {
   return (
     <main className="flex flex-col">
-      <section className="relative bg-primary text-primary-foreground">
-        <HeroTexture />
-        <div className="relative mx-auto max-w-330 px-6 py-16 md:py-20">
-          <p className="mb-4 text-xs font-medium tracking-widest uppercase opacity-80">
-            Features
-          </p>
-          <h1 className="max-w-3xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-            Everything a favpoll can do.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-90">
-            From the card on the table to the screen in the room — and every
-            penny to the charity.
-          </p>
-          <div className="mt-8">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls">See favpoll in action →</Link>
-            </Button>
+      {/* NO HERO (founder, 2026-08-09). It had a purple band, then a plain
+          one, and the second was not the fix — the page does not want a hero
+          at all. Most visitors arrive from a homepage capability card, which
+          links to #topics or #reveal, so they land mid-page and never see the
+          top; the rest scroll to find a feature. A hero addresses neither, and
+          both pay for it in vertical space before the first fact.
+          What is left is a page TITLE, which is not the same thing: one line,
+          no lead, no CTA, so the h1 exists for the document and for search
+          without pretending to be a landing page. */}
+      {/* pb-16: the menu is sticky, so its last items ride down to the very
+          end of the grid. Without a gap they finish flush against the CTA
+          band and read as sitting ON it. */}
+      <div className="mx-auto w-full max-w-330 px-6 pt-14 pb-16">
+        {/* The menu is a COLUMN of the page grid rather than a floating
+            overlay, so it can never sit on top of the content it indexes. */}
+        <div className="grid gap-10 lg:grid-cols-[14rem_1fr]">
+          <FeatureNav sections={SECTIONS} />
+
+          <div className="min-w-0">
+            {/* The page title lives in the CONTENT column (founder,
+                2026-08-09), not above the grid. Above it, it sat over the
+                menu and read as a label FOR the menu; here it aligns with
+                the section headings it introduces, and the menu starts at
+                the top of the column it indexes.
+                One word, and no eyebrow above it. "Everything a favpoll can
+                do." was the last of the hero still standing — a claim, on a
+                page whose whole job is to list rather than to argue. The
+                eyebrow went with it: it said "Features" directly above a
+                heading, which is the same word twice. */}
+            <h1 className="text-3xl font-medium tracking-tight text-foreground">
+              Features
+            </h1>
+
+            <Feature
+              id="topics"
+              title="Custom topics"
+              lead="Write the question yourself when the ready-made list has not got it."
+              bullets={[
+                "The list of ready-made favpoll topics is long and always growing",
+                "Add a topic that is missing, or one specific to the event — a family in-joke, say",
+                "Add any missing favourite to a topic",
+                "Guests can add missing favourites too, at the discretion of the organiser",
+              ]}
+              artefact={<TopicPickerVignette />}
+            />
+
+            <Feature
+              id="stationery"
+              title="QR-coded stationery"
+              lead="Printable templates, each carrying a code that opens the favpoll on a phone."
+              bullets={[
+                "An A4 poster for the door",
+                "Two A5 cards to a sheet, for tables and easels",
+                "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
+                "Every card carries the topic, the charity and its registered number",
+              ]}
+              artefact={<PackVignette />}
+            />
+
+            <Feature
+              id="display"
+              title="Live display"
+              lead="Open it on any screen in the room — a television, a projector, a laptop on a table."
+              bullets={[
+                "The standings re-order as pledges land",
+                "A code big enough to read from across the room stays on screen throughout",
+                "Run it loud: the fundraiser leads with the total climbing",
+                "Run it quiet: the tribute leads with the person, and the money stays out of it",
+              ]}
+              artefact={<RoomVignette />}
+            />
+
+            <Feature
+              id="shared-fund"
+              title="Shared fund"
+              lead="Nobody needs to be able to pay."
+              bullets={[
+                "Anyone can put money in outright — a gift with no favourite attached",
+                "Or move part of their own pledge across, which costs them nothing more",
+                "A guest without means, a child usually, draws on it to take part",
+                "Nobody sees who used it, and the money reaches the charity either way",
+              ]}
+              artefact={<FundVignette />}
+            />
+
+            <Feature
+              id="reveal"
+              title="Personal reveal"
+              lead="A favpoll can hold a favourite back — the subject's own — and show it only once a guest has pledged one of their own. It is a gift rather than a gate: the guest shares something of themselves, and the favpoll shares something back. An organiser can write it about someone, or the person can write it themselves in advance, in their own voice."
+              artefact={<RevealVignette />}
+            />
+
+            <Feature
+              id="goal"
+              title="Pledge goal"
+              lead="Set a target and the room can watch it come."
+              bullets={[
+                "The bar turns green the moment the goal is met",
+                "A goal is a milestone, not a finish line — the favpoll stays open until its closing date",
+                "Every pledge after the goal still counts",
+              ]}
+              artefact={<GoalVignette />}
+            />
+
+            <Feature
+              id="guest-wall"
+              title="Guest wall"
+              lead="Who backed what, as it happens."
+              bullets={[
+                "Scrolls on the big screen during the day",
+                "Reads back afterwards as a record of who came",
+                "Names and favourites only — never amounts",
+                "Anyone can pledge as “Someone”",
+              ]}
+              artefact={<GuestWallVignette />}
+            />
+
+            <Feature
+              id="keepsake"
+              title="Keepsake"
+              lead="When a favpoll closes, the day becomes a single sheet to print."
+              bullets={[
+                "The standings, the reveal and the total raised",
+                "Everyone who took part",
+                "No per-guest amounts — what people gave stays theirs",
+              ]}
+            >
+              {/* PLACEHOLDER (2026-08-09). The keepsake EXISTS — it is not
+                  "coming soon" — but it needs work and carries the dark-mode
+                  print bug #535 fixed on the pack. No artefact until that is
+                  done; the section exists so the homepage card has somewhere
+                  honest to land. */}
+              <p className="max-w-2xl text-sm text-muted-foreground italic">
+                A picture of one is coming — the page is being reworked.
+              </p>
+            </Feature>
+
+            <Feature
+              id="basics"
+              title="The basics"
+              lead="True of every favpoll, whatever the occasion."
+            >
+              <dl className="grid max-w-4xl gap-x-10 gap-y-6 sm:grid-cols-2">
+                {BASICS.map((item) => (
+                  <div key={item.label}>
+                    <dt className="mb-1 text-base font-medium text-foreground">
+                      {item.label}
+                    </dt>
+                    <dd className="text-base leading-relaxed text-muted-foreground">
+                      {item.body}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Feature>
+
+            {/* Money and wills POINT AT About rather than restating it — the
+                old by-reader sections here duplicated About#money and
+                About#wills, which make those arguments properly. */}
+            <Feature
+              id="money"
+              title="Where the money goes"
+              lead="favpoll takes no fee. 100% of every pledge reaches the charity in full, and the recipient is always a registered charity — never a project fund, and never the organiser. Payments are processed by Stripe; favpoll is supported by optional contributions from guests who choose to add one."
+            >
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link
+                  href="/about#money"
+                  className="text-base font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  The full detail →
+                </Link>
+                <Link
+                  href="/about#wills"
+                  className="text-base font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  Writing a favpoll into a will →
+                </Link>
+              </div>
+            </Feature>
           </div>
         </div>
-      </section>
-
-      <div className="mx-auto w-full max-w-330 px-6">
-        {/* The fee, on its own and near the top. It is the most unusual thing
-            about the product and the first question a charity partner asks;
-            buried inside the charities section it reads as a detail. */}
-        <section className="border-b border-border py-12">
-          <FadeIn>
-            <p className="max-w-3xl text-2xl leading-relaxed font-light tracking-tight text-foreground">
-              favpoll takes no fee. 100% of every pledge reaches the charity in
-              full.
-            </p>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              Payments are processed by Stripe. favpoll is supported by optional
-              contributions from guests who choose to add one — never by the
-              pledge itself.
-            </p>
-          </FadeIn>
-        </section>
-
-        <Section
-          id="organisers"
-          eyebrow="For organisers"
-          heading="Setting one up."
-          lead="A favpoll asks one question and gathers the answers. Everything below is set when you create it, and most of it can be changed afterwards."
-        >
-          {/* The list says what you set; the vignette shows what setting it
-              looks like. This section had no artefact until the homepage
-              retired Create/Share/Watch and freed one — see
-              components/landing/wizard-vignette.tsx. */}
-          <div className="flex flex-col gap-10">
-            <ItemList items={ORGANISER} />
-            <WizardVignette />
-          </div>
-        </Section>
-
-        {/* The print pack — the most tangible thing favpoll makes, and the
-            one that appears nowhere else on the site. */}
-        <section
-          id="print-pack"
-          className="scroll-mt-20 border-b border-border py-16"
-        >
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <FadeIn>
-              <SectionEyebrow className="mb-2">The print pack</SectionEyebrow>
-              <h2 className="mb-4 max-w-xl text-3xl font-light tracking-tight text-foreground">
-                Something to put on the tables.
-              </h2>
-              <p className="mb-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-                Every favpoll comes with a pack to print: an A4 poster for the
-                door, A5 cards for the tables, and eight wallet cards to a sheet
-                — credit-card size, so they slip into an order of service or a
-                pocket.
-              </p>
-              <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-                Each one carries the topic, the charity and its registered
-                number, the three steps a guest needs, and a code that opens the
-                favpoll on their phone.
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.08}>
-              <PackArtefact />
-            </FadeIn>
-          </div>
-        </section>
-
-        <Section
-          id="guests"
-          eyebrow="For guests"
-          heading="Taking part."
-          lead="A guest scans a code or follows a link. There is nothing between them and the question."
-        >
-          <div className="grid items-start gap-10 lg:grid-cols-[1fr_auto]">
-            <ItemList items={GUEST} />
-            <PhoneArtefact />
-          </div>
-        </Section>
-
-        <Section
-          id="the-room"
-          eyebrow="On the day"
-          heading="The screen in the room."
-          lead="Open the live display on any screen — a television, a projector, a laptop on a table — and the room follows one question together."
-        >
-          <div className="flex flex-col gap-10">
-            <ItemList items={ROOM} />
-            <DisplayArtefact />
-          </div>
-        </Section>
-
-        <Section
-          id="charities"
-          eyebrow="For charities"
-          heading="Where the money goes."
-        >
-          <ItemList items={CHARITY} />
-        </Section>
-
-        <Section
-          id="beyond"
-          eyebrow="Beyond the day"
-          heading="What outlasts it."
-        >
-          <div className="grid max-w-4xl gap-x-10 gap-y-6 sm:grid-cols-2">
-            <div>
-              <p className="mb-1 text-base font-medium text-foreground">
-                Written into a will
-              </p>
-              <p className="text-base leading-relaxed text-muted-foreground">
-                A favpoll can be specified in a will or a letter of wishes — the
-                questions and the reveal written in advance, for an executor to
-                create when the time comes.
-              </p>
-            </div>
-            <div>
-              <p className="mb-1 flex items-center gap-2 text-base font-medium text-foreground">
-                The record
-                <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  Coming soon
-                </span>
-              </p>
-              <p className="text-base leading-relaxed text-muted-foreground">
-                Every pledge adds to a permanent ranking of favourites. Nothing
-                on it is gamed or free — every standing was paid for.
-              </p>
-            </div>
-          </div>
-        </Section>
-
-        <section className="py-16">
-          <FadeIn>
-            <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              Start one.
-            </h2>
-            <div className="flex flex-wrap items-center gap-4">
-              <Button asChild size="lg">
-                <Link href="/favpolls/new">Create a favpoll</Link>
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                Free to create · 100% goes to charity
-              </p>
-            </div>
-          </FadeIn>
-        </section>
       </div>
+
+      {/* The homepage's closing CTA, verbatim (founder, 2026-08-09). A visitor
+          who skipped the homepage by following a link here should still reach
+          the same place by scrolling to the bottom — same band, same brand
+          statement, same button. Familiarity is the point, so this is not a
+          variation on it. */}
+      <section className="relative w-full bg-primary text-primary-foreground">
+        <HeroTexture />
+        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
+              {t("landing.subheader")}
+            </h2>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+            </Button>
+          </FadeIn>
+        </div>
+      </section>
     </main>
   )
 }
