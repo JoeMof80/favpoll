@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { t } from "@/lib/i18n"
@@ -93,7 +92,12 @@ function Feature({
   artefact?: React.ReactNode
 }) {
   return (
-    <section id={id} className="scroll-mt-28 border-b border-border py-14">
+    // scroll-mt-16, not 28 (founder, 2026-08-09). The site header is 57px and
+    // sticky, and the section carries 56px of its own top padding, so a 112px
+    // scroll margin landed the heading 168px down — a screenful of the
+    // PREVIOUS section's whitespace above the thing you clicked. 64px clears
+    // the header by 7px and puts the heading at 120px.
+    <section id={id} className="scroll-mt-16 border-b border-border py-14">
       <FadeIn>
         <h2 className="mb-3 text-2xl font-medium tracking-tight text-foreground">
           {title}
@@ -138,12 +142,14 @@ export default function FeaturesPage() {
                 2026-08-09), not above the grid. Above it, it sat over the
                 menu and read as a label FOR the menu; here it aligns with
                 the section headings it introduces, and the menu starts at
-                the top of the column it indexes. */}
-            <SectionEyebrow as="p" className="mb-2">
-              Features
-            </SectionEyebrow>
+                the top of the column it indexes.
+                One word, and no eyebrow above it. "Everything a favpoll can
+                do." was the last of the hero still standing — a claim, on a
+                page whose whole job is to list rather than to argue. The
+                eyebrow went with it: it said "Features" directly above a
+                heading, which is the same word twice. */}
             <h1 className="text-3xl font-medium tracking-tight text-foreground">
-              Everything a favpoll can do.
+              Features
             </h1>
 
             <Feature

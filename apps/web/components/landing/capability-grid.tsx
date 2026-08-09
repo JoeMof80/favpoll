@@ -73,8 +73,12 @@ export function CapabilityGrid() {
         <SectionEyebrow as="h2" className="mb-10">
           {t("home.capability.eyebrow" as never)}
         </SectionEyebrow>
-        {/* No card chrome: bordered boxes on a tinted band read as buttons,
-            and these are not links — the section has one, at the bottom. */}
+        {/* CARD CHROME (founder, 2026-08-09). The note here used to say
+            bordered boxes read as buttons and these were not links. Both
+            halves have since stopped being true: the band is white now, and
+            every card links to its own section on /features. A link that
+            looks like body copy is a link nobody clicks, so they look like
+            what they are. */}
         {/* SUBGRID (2026-08-08). Each card spans three of the parent's row
             tracks — header, sentence, examples — so all three align across a
             row however the copy wraps. mt-auto alone was not enough: it
@@ -86,14 +90,14 @@ export function CapabilityGrid() {
             <Link
               key={c.key}
               href={c.href}
-              className="group row-span-3 grid grid-rows-subgrid gap-y-3"
+              className="group row-span-3 grid grid-rows-subgrid gap-y-3 rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/40 hover:bg-primary/5"
             >
               {/* HowItWorksThreeBeat's header grammar — icon beside the label,
                   primary, uppercase, tracking-widest — at text-base rather
                   than its text-lg, which wraps at four columns. */}
               <div className="flex items-center gap-2.5">
                 <c.icon className="h-6 w-6 shrink-0 text-primary" />
-                <h3 className="text-base font-medium tracking-widest text-primary uppercase group-hover:underline">
+                <h3 className="text-base font-medium tracking-widest text-primary uppercase">
                   {t(`home.capability.${c.key}.name` as never)}
                 </h3>
               </div>
@@ -111,18 +115,6 @@ export function CapabilityGrid() {
               </ul>
             </Link>
           ))}
-        </div>
-        {/* The no-rules line went with the matrix (2026-08-08). It was
-            insurance against a grid that implied some features belonged to
-            some registers; this one gates nothing, so the disclaimer read as
-            an answer to a question nobody had asked. */}
-        <div className="mt-10">
-          <Link
-            href="/features"
-            className="text-base font-medium text-primary underline-offset-4 hover:underline"
-          >
-            {t("home.capability.link" as never)}
-          </Link>
         </div>
       </div>
     </section>
