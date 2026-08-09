@@ -157,14 +157,14 @@ export default function FeaturesPage() {
             <Feature
               id="topics"
               title="Custom topics"
-              lead="Pick a topic favpoll keeps — favourite biscuit, favourite dog breed, favourite song — or write the question yourself. Guests can add favourites nobody thought of, with your blessing."
+              lead="The ready-made list is long and never finished. Write the question yourself when the one you want is not on it — a family in-joke, something only this room would get — and add any favourite a topic is missing. Guests can add the ones nobody thought of, and an organiser can hide anything they would rather not keep."
               artefact={<TopicPickerVignette />}
             />
 
             <Feature
               id="stationery"
               title="QR-coded stationery"
-              lead="A pack to print: an A4 poster for the door, A5 cards for the tables, and eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket. Each carries the topic, the charity and its registered number, and a code that opens the favpoll on a phone."
+              lead="Three sheets to print: an A4 poster for the door, two A5 cards for the tables, and eight wallet cards — credit-card size, so they slip into an order of service or a pocket. Each carries the topic, the charity and its registered number, and a code that opens the favpoll on a phone."
               artefact={<PackVignette />}
             />
 
@@ -178,14 +178,14 @@ export default function FeaturesPage() {
             <Feature
               id="shared-fund"
               title="Shared fund"
-              lead="Nobody needs to be able to pay. Anyone can put money into the shared fund — outright, or by moving part of their own pledge across — and a guest without means, a child usually, draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
+              lead="Nobody needs to be able to pay. Anyone can put money into the shared fund — outright, as a gift with no favourite attached, or by moving part of their own pledge across — and a guest without means, a child usually, draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
               artefact={<FundVignette />}
             />
 
             <Feature
               id="reveal"
               title="Personal reveal"
-              lead="A favpoll can hold a favourite back — the subject's own — and show it only once a guest has pledged one of their own. It is a gift rather than a gate: the guest shares something of themselves, and the favpoll shares something back."
+              lead="A favpoll can hold a favourite back — the subject's own — and show it only once a guest has pledged one of their own. It is a gift rather than a gate: the guest shares something of themselves, and the favpoll shares something back. An organiser can write it about someone, or the person can write it themselves in advance, in their own voice."
               artefact={<RevealVignette />}
             />
 
