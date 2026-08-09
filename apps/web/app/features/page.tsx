@@ -178,7 +178,7 @@ export default function FeaturesPage() {
             <Feature
               id="shared-fund"
               title="Shared fund"
-              lead="Nobody needs to be able to pay. A guest can move part of their own pledge to the shared fund, and a guest without means — a child, usually — draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
+              lead="Nobody needs to be able to pay. Anyone can put money into the shared fund — outright, or by moving part of their own pledge across — and a guest without means, a child usually, draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
               artefact={<FundVignette />}
             />
 

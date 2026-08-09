@@ -1,97 +1,103 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Minus, Plus } from "lucide-react"
 import { useReducedMotion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Vignette } from "@/components/landing/vignette"
-import { formatPoundsExact } from "@/lib/i18n"
 
-// The shared-fund split, as it happens inside the pledge dialog.
+// THE shared fund dialog — SeedFundModal in its guest variant, the one a
+// guest opens to put money in the pot for somebody else.
 //
-// Mirrors StepAmount's breakdown panel with the app's own copy and its own
-// controls, the way TopicPickerVignette mirrors the two topic dialogs. Not
-// the whole StepAmount: it wants a dozen props, a Stripe-shaped total and a
-// tip row, and the section is about ONE row of it.
+// It showed StepAmount's split row before (founder, 2026-08-09): the control
+// for moving part of your OWN pledge across. That is a shared-fund feature
+// but it is not the shared fund dialog, and the section is about the fund
+// itself — a thing anyone can top up, that a guest with no means draws on.
 //
-// The thing worth showing is the arithmetic, because it is the part people
-// get wrong when it is only described: moving money to the fund does not
-// cost the guest a penny more. The favourite ticks DOWN as the fund ticks
-// UP and the total never moves — which is why the total is on screen.
+// Mirrored rather than mounted, the way TopicPickerVignette mirrors the two
+// topic dialogs: SeedFundModal wants a favpoll id, hits the payment-intent
+// route and renders through a portal. The copy and the controls here are its
+// own, to the word.
 
-const TOTAL = 5
-const FAVOURITE = "Cockapoo"
-const TARGET_FUND = 2
+const PRESETS = [10, 25, 50] as const
+const PICKED = 25
 
-const STEP_MS = 1100
-const HOLD_MS = 3600
+const IDLE_MS = 1600
+const PRESS_MS = 320
+const HOLD_MS = 4400
 
 export function FundVignette() {
   const reduced = useReducedMotion()
-  const [fund, setFund] = useState(reduced ? TARGET_FUND : 0)
+  // -1 idle · 0 pressing · 1 filled
+  const [phase, setPhase] = useState(reduced ? 1 : -1)
 
   useEffect(() => {
     if (reduced) return
-    const id = setTimeout(
-      () => setFund((f) => (f >= TARGET_FUND ? 0 : f + 1)),
-      fund >= TARGET_FUND ? HOLD_MS : STEP_MS
-    )
+    const next = phase === -1 ? 0 : phase === 0 ? 1 : -1
+    const wait = phase === -1 ? IDLE_MS : phase === 0 ? PRESS_MS : HOLD_MS
+    const id = setTimeout(() => setPhase(next), wait)
     return () => clearTimeout(id)
-  }, [fund, reduced])
+  }, [phase, reduced])
+
+  const filled = phase === 1
+  const pressing = phase === 0
 
   return (
     <Vignette>
-      {/* The dialog's own panel — one card, the breakdown region of it */}
-      <div className="mx-auto max-w-sm rounded-xl border border-border bg-background p-5 shadow-lg">
-        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-          Your favourite · its worth
+      {/* ResponsiveOverlay's dialog shape at sm and up: sm:max-w-lg, a title
+          row, then the body. */}
+      <div className="mx-auto max-w-lg rounded-xl border border-border bg-background p-5 shadow-lg">
+        <p className="text-lg font-semibold tracking-tight text-foreground">
+          Help others take part
         </p>
 
-        <div className="mt-3 space-y-3">
-          <div className="flex justify-between">
-            <span className="text-sm">{FAVOURITE}</span>
-            <span className="text-sm font-semibold tabular-nums">
-              {formatPoundsExact(TOTAL - fund)}
-            </span>
-          </div>
-
-          {/* Whole pounds move from the favourite to the fund. The stepper is
-              the real one — outline icon-xs Buttons — so it disables at the
-              ends exactly as the dialog's does. */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Shared fund</span>
-            <div className="flex items-center gap-1.5">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-xs"
-                aria-label="Move £1 back to your favourite"
-                disabled={fund <= 0}
-              >
-                <Minus />
-              </Button>
-              <span className="w-14 text-center text-sm font-semibold tabular-nums">
-                {formatPoundsExact(fund)}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-xs"
-                aria-label="Move £1 to the shared fund"
-                disabled={fund >= TOTAL - 1}
-              >
-                <Plus />
-              </Button>
-            </div>
-          </div>
+        {/* Amount field — £ beside a borderless number input, as the dialog
+            has it. Fixed height so the card cannot resize as it fills. */}
+        <div className="flex items-baseline gap-1.5 py-4">
+          <span className="text-2xl text-muted-foreground select-none">£</span>
+          <span
+            className={
+              filled
+                ? "text-3xl text-foreground"
+                : "text-3xl text-muted-foreground/50"
+            }
+          >
+            {filled ? PICKED : 0}
+          </span>
         </div>
 
-        {/* The total, which never moves — the whole point of the row above */}
-        <div className="mt-4 flex justify-between border-t border-border pt-3">
-          <span className="text-sm font-medium">Total charged</span>
-          <span className="text-sm font-semibold tabular-nums">
-            {formatPoundsExact(TOTAL)}
-          </span>
+        <div className="flex gap-2">
+          {PRESETS.map((preset) => (
+            <Button
+              key={preset}
+              type="button"
+              variant="outline"
+              className={
+                preset === PICKED && pressing
+                  ? "flex-1 scale-[0.97] brightness-95"
+                  : "flex-1"
+              }
+            >
+              £{preset}
+            </Button>
+          ))}
+        </div>
+
+        <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+          Anyone can add to the shared fund. You&rsquo;re helping guests who
+          can&rsquo;t pledge on their own &mdash; children, students, or anyone
+          who&rsquo;d rather not &mdash; still be part of this moment.
+        </p>
+
+        {/* The dialog's footer: the primary is disabled until an amount is
+            entered, which is why it starts grey and only lights up once the
+            preset lands. */}
+        <div className="mt-5 flex flex-col gap-3">
+          <Button type="button" className="w-full" disabled={!filled}>
+            Add to fund
+          </Button>
+          <Button type="button" variant="ghost" className="w-full">
+            No thanks
+          </Button>
         </div>
       </div>
     </Vignette>
