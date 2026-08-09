@@ -82,12 +82,27 @@ function Feature({
   id,
   title,
   lead,
+  bullets,
   children,
   artefact,
 }: {
   id: string
   title: string
+  /** One line saying what it is — the homepage card's line, elaborated. */
   lead: string
+  /**
+   * The specifics. A features page is scanned, not read, and each section
+   * elaborates a homepage card that is itself a line plus two bullets — so
+   * the same grammar with more of them makes the relationship visible
+   * instead of asserted (founder, 2026-08-09).
+   *
+   * Two sections deliberately stay prose: the personal reveal and where the
+   * money goes. Both are ARGUMENTS rather than lists — "a gift rather than a
+   * gate", and the 0% fee — and an argument dies as a fragment. A page with
+   * no prose anywhere also has no voice, and those two are where favpoll's
+   * voice belongs.
+   */
+  bullets?: string[]
   children?: React.ReactNode
   artefact?: React.ReactNode
 }) {
@@ -104,9 +119,18 @@ function Feature({
         <h2 className="mb-3 text-2xl font-medium tracking-tight text-foreground">
           {title}
         </h2>
-        <p className="mb-6 max-w-2xl text-base leading-relaxed text-muted-foreground">
+        <p className="mb-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
           {lead}
         </p>
+        {bullets && (
+          // The capability grid's list grammar, one size up: this is the
+          // reference, that is the trailer.
+          <ul className="mb-6 max-w-2xl list-disc space-y-1.5 pl-5 text-base leading-relaxed text-muted-foreground marker:text-primary-muted">
+            {bullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        )}
         {children}
       </FadeIn>
       {artefact && (
@@ -157,28 +181,52 @@ export default function FeaturesPage() {
             <Feature
               id="topics"
               title="Custom topics"
-              lead="The list of ready-made favpoll topics is long and always growing. Organisers are welcome to add a topic that is missing, or one specific to the event — a family in-joke, say — and to add any favourite a topic has not got. Likewise, guests can add missing favourites to any favpoll topic, at the discretion of the organiser."
+              lead="Write the question yourself when the ready-made list has not got it."
+              bullets={[
+                "The list of ready-made favpoll topics is long and always growing",
+                "Add a topic that is missing, or one specific to the event — a family in-joke, say",
+                "Add any missing favourite to a topic",
+                "Guests can add missing favourites too, at the discretion of the organiser",
+              ]}
               artefact={<TopicPickerVignette />}
             />
 
             <Feature
               id="stationery"
               title="QR-coded stationery"
-              lead="Three sheets to print: an A4 poster for the door, two A5 cards for the tables, and eight wallet cards — credit-card size, so they slip into an order of service or a pocket. Each carries the topic, the charity and its registered number, and a code that opens the favpoll on a phone."
+              lead="Printable templates, each carrying a code that opens the favpoll on a phone."
+              bullets={[
+                "An A4 poster for the door",
+                "Two A5 cards to a sheet, for tables and easels",
+                "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
+                "Every card carries the topic, the charity and its registered number",
+              ]}
               artefact={<PackVignette />}
             />
 
             <Feature
               id="display"
               title="Live display"
-              lead="Open it on any screen in the room — a television, a projector, a laptop on a table. The standings re-order as pledges land, and a code big enough to read from across the room stays on screen throughout. Two ways to run it: the fundraiser leads with the total climbing, the tribute turns the volume down so the person leads and the money stays quiet."
+              lead="Open it on any screen in the room — a television, a projector, a laptop on a table."
+              bullets={[
+                "The standings re-order as pledges land",
+                "A code big enough to read from across the room stays on screen throughout",
+                "Run it loud: the fundraiser leads with the total climbing",
+                "Run it quiet: the tribute leads with the person, and the money stays out of it",
+              ]}
               artefact={<RoomVignette />}
             />
 
             <Feature
               id="shared-fund"
               title="Shared fund"
-              lead="Nobody needs to be able to pay. Anyone can put money into the shared fund — outright, as a gift with no favourite attached, or by moving part of their own pledge across — and a guest without means, a child usually, draws on it to take part. Nobody sees who used it, and the money reaches the charity either way."
+              lead="Nobody needs to be able to pay."
+              bullets={[
+                "Anyone can put money in outright — a gift with no favourite attached",
+                "Or move part of their own pledge across, which costs them nothing more",
+                "A guest without means, a child usually, draws on it to take part",
+                "Nobody sees who used it, and the money reaches the charity either way",
+              ]}
               artefact={<FundVignette />}
             />
 
@@ -192,21 +240,37 @@ export default function FeaturesPage() {
             <Feature
               id="goal"
               title="Pledge goal"
-              lead="Set a target and the room can watch it come. A goal is a milestone, not a finish line — the favpoll stays open until its closing date, and every pledge after the goal still counts."
+              lead="Set a target and the room can watch it come."
+              bullets={[
+                "The bar turns green the moment the goal is met",
+                "A goal is a milestone, not a finish line — the favpoll stays open until its closing date",
+                "Every pledge after the goal still counts",
+              ]}
               artefact={<GoalVignette />}
             />
 
             <Feature
               id="guest-wall"
               title="Guest wall"
-              lead="Who backed what, as it happens. It scrolls on the big screen during the day and reads back afterwards as a record of who came. Names and favourites only — never amounts, and anyone can pledge as “Someone”."
+              lead="Who backed what, as it happens."
+              bullets={[
+                "Scrolls on the big screen during the day",
+                "Reads back afterwards as a record of who came",
+                "Names and favourites only — never amounts",
+                "Anyone can pledge as “Someone”",
+              ]}
               artefact={<GuestWallVignette />}
             />
 
             <Feature
               id="keepsake"
               title="Keepsake"
-              lead="When a favpoll closes, the day becomes a single sheet to print — the standings, the reveal, the total raised, and everyone who took part. No per-guest amounts: what people gave stays theirs."
+              lead="When a favpoll closes, the day becomes a single sheet to print."
+              bullets={[
+                "The standings, the reveal and the total raised",
+                "Everyone who took part",
+                "No per-guest amounts — what people gave stays theirs",
+              ]}
             >
               {/* PLACEHOLDER (2026-08-09). The keepsake EXISTS — it is not
                   "coming soon" — but it needs work and carries the dark-mode
