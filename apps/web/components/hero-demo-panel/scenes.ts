@@ -402,8 +402,12 @@ export const SCENES: HeroScene[] = [
       { label: "Greyhound", amount: "£85", widthPercent: 35 },
       { label: "Jack Russell", amount: "£55", widthPercent: 23 },
       { label: "Whippet", amount: "£35", widthPercent: 15 },
+      { label: "Springer Spaniel", amount: "£30", widthPercent: 13 },
+      { label: "Dachshund", amount: "£25", widthPercent: 10 },
+      { label: "Golden Retriever", amount: "£20", widthPercent: 8 },
+      { label: "Pug", amount: "£15", widthPercent: 6 },
     ],
-    total: "£740",
+    total: "£830",
   },
 ]
 
