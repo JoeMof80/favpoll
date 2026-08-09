@@ -18,6 +18,34 @@ import type { PackData } from "./pack-card"
 const SHEET =
   "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
 
+// THE SAFE BOX. Every sheet lays out inside this, and it is why the A6 sheet
+// is no longer full bleed (founder-caught in the print dialog, 2026-08-10):
+// four A6 tile A4 exactly, so a full-bleed sheet has nothing left for the
+// printer's own margin and Chrome fragments it across two pages. A postcard
+// cut a few mm under A6 still takes a stamp — Royal Mail's letter limit is
+// 240 x 165mm — so the exactness was never worth the fragility.
+//
+// 196 x 264mm sits inside Chrome's 10mm default (190 x 277) on the short
+// edge and well inside it on the long one, with room for printers whose
+// hardware margin is worse.
+const SAFE_W = "196mm"
+const SAFE_H = "264mm"
+
+// Dashed cut guides, drawn ON the sheet rather than round each card. They are
+// what a border used to imply, without the border's problem: a printed rule
+// round a card shows every millimetre you cut off-line, whereas a dashed line
+// down the middle is aimed at, not compared against.
+function CutGuides({ quarters = false }: { quarters?: boolean }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
+      {quarters && (
+        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
+      )}
+    </div>
+  )
+}
+
 export function PackSheet({
   data,
   steps,
@@ -48,7 +76,7 @@ export function PackSheet({
         <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
           <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
             <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
-              <PackCard data={data} steps={steps} scale="a4" />
+              <PackCard data={data} steps={steps} scale="a4" bleed />
             </div>
           </div>
         </div>
@@ -58,27 +86,39 @@ export function PackSheet({
 
   if (scale === "a6") {
     return (
-      // FULL BLEED, and it has to be: four A6 cards tile an A4 sheet exactly
-      // (2 x 105 = 210mm, 2 x 148.5 = 297mm), so there is no room left for a
-      // printer margin. Anything less than the whole sheet and they stop
-      // being A6 — which matters, because a postcard gets posted and A6 is
-      // what fits the envelope and the letter rate.
-      //
-      // Same rotate-onto-portrait sandwich as the poster: the cards are
-      // landscape and four of them make a 297 x 210 block, which is turned
-      // 90 degrees so this sheet stays portrait like every other one and a
-      // single print job still covers the pack. The half-size/scale(2) pair
-      // keeps the pre-transform layout box small enough not to fragment
-      // across pages in the print dialog.
+      // Four postcards, quartered. The cards are landscape and four make a
+      // 264 x 196 block, turned 90 degrees onto a portrait sheet — the
+      // poster's trick, so every sheet in the pack stays portrait and one
+      // print job still covers it. The half-size/scale(2) sandwich comes with
+      // it: print fragmentation uses PRE-transform boxes, and that is what
+      // stops a rotated sheet splitting across pages.
       <section
-        className={`${SHEET} flex items-center justify-center overflow-hidden p-0 print:break-inside-avoid ${className}`}
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
       >
-        <div className="flex h-[297mm] w-[210mm] max-w-full break-inside-avoid items-center justify-center">
-          <div className="h-[105mm] w-[148.5mm] [transform:rotate(-90deg)_scale(2)]">
-            <div className="grid h-[210mm] w-[297mm] origin-top-left scale-50 grid-cols-2 grid-rows-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <PackCard key={i} data={data} steps={steps} scale="a6" />
-              ))}
+        <div
+          className="flex max-w-full break-inside-avoid items-center justify-center"
+          style={{ width: SAFE_W, height: SAFE_H }}
+        >
+          <div
+            className="[transform:rotate(-90deg)_scale(2)]"
+            style={{ width: "132mm", height: "98mm" }}
+          >
+            <div
+              className="relative origin-top-left scale-50"
+              style={{ width: "264mm", height: "196mm" }}
+            >
+              <div className="grid h-full w-full grid-cols-2 grid-rows-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <PackCard
+                    key={i}
+                    data={data}
+                    steps={steps}
+                    scale="a6"
+                    bleed
+                  />
+                ))}
+              </div>
+              <CutGuides quarters />
             </div>
           </div>
         </div>
@@ -88,13 +128,19 @@ export function PackSheet({
 
   if (scale === "a5") {
     return (
-      // Two per sheet, for tables and easels.
+      // Two per sheet, for tables and easels — the sheet cut in half.
       <section
-        className={`${SHEET} flex min-h-[277mm] flex-col items-center px-6 py-6 print:min-h-0 ${className}`}
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:p-2 ${className}`}
       >
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
-          <PackCard data={data} steps={steps} scale="a5" />
-          <PackCard data={data} steps={steps} scale="a5" />
+        <div
+          className="relative max-w-full break-inside-avoid"
+          style={{ width: SAFE_W, height: SAFE_H }}
+        >
+          <div className="grid h-full w-full grid-rows-2">
+            <PackCard data={data} steps={steps} scale="a5" bleed />
+            <PackCard data={data} steps={steps} scale="a5" bleed />
+          </div>
+          <CutGuides />
         </div>
       </section>
     )

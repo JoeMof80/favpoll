@@ -198,15 +198,30 @@ export function PackCard({
   data,
   steps,
   scale,
+  bleed = false,
 }: {
   data: PackData
   steps: string[] | null
   scale: keyof typeof SCALE
+  /**
+   * Fill the cell rather than draw a card (founder, 2026-08-10). Sheets that
+   * are cut into halves and quarters do not want a border round each card:
+   * the cut IS the edge, and a printed border only shows how badly you cut.
+   * The dashed guides live on the sheet, so the card drops its own chrome and
+   * its fixed size and fills whatever it is given.
+   *
+   * The wallet sheet keeps borders, because eight cards on a sheet are cut
+   * individually and there is nothing else to aim at.
+   */
+  bleed?: boolean
 }) {
   const s = SCALE[scale]
+  // Strip the radius with the border: a rounded corner on a card you cut from
+  // a shared sheet leaves a white nick at every corner.
+  const box = bleed ? "h-full w-full" : `border border-border ${s.card}`
   return (
     <div
-      className={`flex flex-col overflow-hidden border border-border bg-white [print-color-adjust:exact] ${s.card}`}
+      className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
     >
       {/* Header — eyebrow + name, brand bottom-aligned with the eyebrow */}
       <div className={`flex flex-col ${s.headerPad}`}>
