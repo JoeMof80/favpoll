@@ -56,6 +56,36 @@ export function PackSheet({
     )
   }
 
+  if (scale === "a6") {
+    return (
+      // FULL BLEED, and it has to be: four A6 cards tile an A4 sheet exactly
+      // (2 x 105 = 210mm, 2 x 148.5 = 297mm), so there is no room left for a
+      // printer margin. Anything less than the whole sheet and they stop
+      // being A6 — which matters, because a postcard gets posted and A6 is
+      // what fits the envelope and the letter rate.
+      //
+      // Same rotate-onto-portrait sandwich as the poster: the cards are
+      // landscape and four of them make a 297 x 210 block, which is turned
+      // 90 degrees so this sheet stays portrait like every other one and a
+      // single print job still covers the pack. The half-size/scale(2) pair
+      // keeps the pre-transform layout box small enough not to fragment
+      // across pages in the print dialog.
+      <section
+        className={`${SHEET} flex items-center justify-center overflow-hidden p-0 print:break-inside-avoid ${className}`}
+      >
+        <div className="flex h-[297mm] w-[210mm] max-w-full break-inside-avoid items-center justify-center">
+          <div className="h-[105mm] w-[148.5mm] [transform:rotate(-90deg)_scale(2)]">
+            <div className="grid h-[210mm] w-[297mm] origin-top-left scale-50 grid-cols-2 grid-rows-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <PackCard key={i} data={data} steps={steps} scale="a6" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (scale === "a5") {
     return (
       // Two per sheet, for tables and easels.

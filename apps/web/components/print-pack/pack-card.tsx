@@ -95,6 +95,30 @@ export const SCALE = {
     footer: "pb-[4mm] text-[10.5pt]",
     footerPad: "px-[8mm]",
   },
+  // A6 postcard, 148 x 105mm landscape — four tile an A4 sheet EXACTLY
+  // (2 x 105 = 210, 2 x 148.5 = 297), which is why that sheet is full-bleed.
+  // Values are a5's at ~0.8, the ratio of the two card widths.
+  a6: {
+    card: "h-[105mm] w-[148mm] rounded-2xl",
+    headerPad: "px-[6mm] pt-[4mm] pb-[3mm]",
+    eyebrow: "text-[8.5pt] tracking-[0.12em]",
+    name: "text-[19pt]",
+    brandSvg: { width: 19, height: 17 },
+    brandText: "text-[11pt]",
+    brandGap: "gap-[1.2mm]",
+    topicRow: "px-[6mm] py-[2.5mm]",
+    topic: "text-[13pt] tracking-[0.09em]",
+    bodyPad: "px-[6mm] pt-[4mm] pb-[3mm]",
+    bodyGap: "gap-[5mm]",
+    steps: "gap-[3mm] text-[10.5pt] leading-relaxed",
+    stepGap: "gap-[2.5mm]",
+    numWidth: "w-[6mm]",
+    // 134px = 35.4mm, so each of the 33 modules is 1.07mm — nearly three
+    // times the ~0.4mm printed floor. No risk at this size.
+    qr: 134,
+    footer: "pb-[3mm] text-[8.5pt]",
+    footerPad: "px-[6mm]",
+  },
   wallet: {
     card: "h-[54mm] w-[85.6mm] rounded-xl",
     headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
