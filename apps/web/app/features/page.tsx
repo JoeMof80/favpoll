@@ -3,8 +3,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { FadeIn } from "@/components/landing/fade-in"
+import { HeroTexture } from "@/components/landing/hero-texture"
+import { t } from "@/lib/i18n"
 import { FeatureNav } from "@/components/landing/feature-nav"
-import { WizardVignette } from "@/components/landing/wizard-vignette"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { RoomVignette } from "@/components/landing/room-vignette"
 import { PackVignette } from "@/components/landing/pack-vignette"
@@ -114,30 +115,23 @@ function Feature({
 export default function FeaturesPage() {
   return (
     <main className="flex flex-col">
-      {/* Plain header, not the purple band the page opened with (founder,
-          2026-08-09). A full-bleed primary block is the homepage's move, and
-          it made this page announce itself before saying anything — a
-          reference does not need a poster, and the band pushed the first
-          feature below the fold on a laptop. */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-330 px-6 pt-14 pb-10">
-          <SectionEyebrow as="p" className="mb-3">
-            Features
-          </SectionEyebrow>
-          <h1 className="max-w-3xl text-4xl leading-[1.12] font-light tracking-tight text-foreground md:text-5xl">
-            Everything a favpoll can do.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            From the card on the table to the screen in the room — and every
-            penny to the charity.
-          </p>
-          <div className="mt-7">
-            <Button asChild size="lg">
-              <Link href="/favpolls">See favpoll in action →</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* NO HERO (founder, 2026-08-09). It had a purple band, then a plain
+          one, and the second was not the fix — the page does not want a hero
+          at all. Most visitors arrive from a homepage capability card, which
+          links to #topics or #reveal, so they land mid-page and never see the
+          top; the rest scroll to find a feature. A hero addresses neither, and
+          both pay for it in vertical space before the first fact.
+          What is left is a page TITLE, which is not the same thing: one line,
+          no lead, no CTA, so the h1 exists for the document and for search
+          without pretending to be a landing page. */}
+      <div className="mx-auto w-full max-w-330 px-6 pt-14 pb-9">
+        <SectionEyebrow as="p" className="mb-2">
+          Features
+        </SectionEyebrow>
+        <h1 className="text-3xl font-medium tracking-tight text-foreground">
+          Everything a favpoll can do.
+        </h1>
+      </div>
 
       <div className="mx-auto w-full max-w-330 px-6">
         {/* The menu is a COLUMN of the page grid rather than a floating
@@ -146,25 +140,6 @@ export default function FeaturesPage() {
           <FeatureNav sections={SECTIONS} />
 
           <div className="min-w-0">
-            {/* Opener — setting one up, before any single feature. The wizard
-                vignette shows charity, topic, name and About together, so it
-                belongs here rather than under any one of them. */}
-            <section className="border-b border-border py-14">
-              <FadeIn>
-                <SectionEyebrow className="mb-2">Setting one up</SectionEyebrow>
-                <h2 className="mb-3 max-w-xl text-2xl font-medium tracking-tight text-foreground">
-                  Four things, and it exists.
-                </h2>
-                <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                  A charity, a topic, whose favpoll it is, and a few lines about
-                  them. Everything below is optional.
-                </p>
-              </FadeIn>
-              <FadeIn delay={0.08}>
-                <WizardVignette />
-              </FadeIn>
-            </section>
-
             <Feature
               id="topics"
               title="Custom topics"
@@ -271,25 +246,28 @@ export default function FeaturesPage() {
                 </Link>
               </div>
             </Feature>
-
-            <section className="py-14">
-              <FadeIn>
-                <h2 className="mb-6 max-w-xl text-2xl font-medium tracking-tight text-foreground">
-                  Start one.
-                </h2>
-                <div className="flex flex-wrap items-center gap-4">
-                  <Button asChild size="lg">
-                    <Link href="/favpolls/new">Create a favpoll</Link>
-                  </Button>
-                  <p className="text-sm text-muted-foreground">
-                    Free to create · 100% goes to charity
-                  </p>
-                </div>
-              </FadeIn>
-            </section>
           </div>
         </div>
       </div>
+
+      {/* The homepage's closing CTA, verbatim (founder, 2026-08-09). A visitor
+          who skipped the homepage by following a link here should still reach
+          the same place by scrolling to the bottom — same band, same brand
+          statement, same button. Familiarity is the point, so this is not a
+          variation on it. */}
+      <section className="relative w-full bg-primary text-primary-foreground">
+        <HeroTexture />
+        <div className="relative mx-auto w-full max-w-330 px-6 py-16">
+          <FadeIn>
+            <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
+              {t("landing.subheader")}
+            </h2>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+            </Button>
+          </FadeIn>
+        </div>
+      </section>
     </main>
   )
 }

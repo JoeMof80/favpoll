@@ -72,12 +72,16 @@ export function RoomVignette() {
   const confirmed = step >= 3
 
   return (
-    // WIDE: this is a scene rather than a single object — a display on a far
-    // wall and a phone in the near foreground need the depth. The shared frame
-    // supplies the crop, which is the part that matters: the phone is
-    // absolutely positioned and taller than the stage on purpose, so without
-    // overflow-hidden it spills out of whatever contains it.
-    <Vignette wide bleed>
+    // Same width as every other vignette (founder, 2026-08-09) — it was the
+    // one section that sat wider, which read as a mistake rather than as
+    // emphasis. The scene was authored for the wider frame, so the display
+    // and the phone are each a size down to keep the gap between them: at the
+    // old widths the phone's right edge and the display's left edge met.
+    //
+    // The frame supplies the crop, which is the part that matters: the phone
+    // is absolutely positioned and taller than the stage on purpose, so
+    // without overflow-hidden it spills out of whatever contains it.
+    <Vignette bleed>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
@@ -89,7 +93,7 @@ export function RoomVignette() {
         <div className="relative h-[22rem]" aria-hidden="true">
           {/* ── The display, in the distance ── */}
           <div
-            className="absolute top-10 right-6 w-80 [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
+            className="absolute top-10 right-4 w-72 [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
             style={{ transformOrigin: "right center" }}
           >
             <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
@@ -148,7 +152,7 @@ export function RoomVignette() {
 
           {/* ── The phone, near — making the pledge. Cropped at the scene
             edge (only the top matters); side buttons + island for realism. */}
-          <div className="absolute -bottom-56 left-[7%] h-[26rem] w-60 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
+          <div className="absolute -bottom-56 left-[4%] h-[24rem] w-56 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
             {/* Side buttons */}
             <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
             <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
