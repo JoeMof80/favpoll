@@ -74,9 +74,15 @@ export function RoomVignette() {
   return (
     // Same width as every other vignette (founder, 2026-08-09) — it was the
     // one section that sat wider, which read as a mistake rather than as
-    // emphasis. The scene was authored for the wider frame, so the display
-    // and the phone are each a size down to keep the gap between them: at the
-    // old widths the phone's right edge and the display's left edge met.
+    // emphasis.
+    //
+    // Room made for the SCREEN rather than shared evenly (founder,
+    // 2026-08-09). Narrowing the frame had shrunk both objects to keep them
+    // apart, and the display came out 317 x 270 — the shape of a dialog, not
+    // of a television, in the one section about putting favpoll on a
+    // television. It now takes the width it needs (362 x 270) and the phone
+    // gives it up, cropping at the frame's left edge — which is what a thing
+    // in the near foreground does anyway.
     //
     // The frame supplies the crop, which is the part that matters: the phone
     // is absolutely positioned and taller than the stage on purpose, so
@@ -87,131 +93,143 @@ export function RoomVignette() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/10 to-transparent"
       />
       <div className="relative px-6 py-10">
-        {/* The stage: display on the far wall, a guest's phone in the near
-          foreground. The section itself is the room (tint + floor gradient
-          + crop edge live on the #watch section wrapper). */}
-        <div className="relative h-[22rem]" aria-hidden="true">
-          {/* ── The display, in the distance ── */}
+        {/* ONE STAGE, AUTHORED ONCE AND SCALED (2026-08-09). The display and
+            the phone used to be sized independently against whatever width
+            the frame happened to have, which worked at 1440 and buried the
+            display under the phone at 390 — the whole scene fitted, so an
+            overflow check passed, and only a screenshot showed the labels
+            gone.
+            The stage is now a fixed 624 x 352 room, and narrow frames scale
+            the room rather than resize the furniture. The composition is
+            therefore the same everywhere by construction, and there is one
+            number per breakpoint to keep true instead of four. */}
+        <div className="relative h-[165px] sm:h-[306px] md:h-[352px]">
           <div
-            className="absolute top-10 right-4 w-72 [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
-            style={{ transformOrigin: "right center" }}
+            className="absolute top-0 left-0 h-[352px] w-[624px] origin-top-left scale-[0.47] sm:scale-[0.87] md:scale-100"
+            aria-hidden="true"
           >
-            <p className="truncate text-[10px] font-medium tracking-widest text-primary uppercase">
-              Jess&apos;s 30th birthday
-            </p>
+            {/* ── The display, in the distance ── */}
+            <div
+              className="absolute top-8 right-4 w-[28rem] [transform:perspective(900px)_rotateY(-20deg)_rotateX(1deg)] rounded-lg border-[6px] border-foreground/80 bg-background p-4 shadow-md"
+              style={{ transformOrigin: "right center" }}
+            >
+              <p className="truncate text-[11px] font-medium tracking-widest text-primary uppercase">
+                Jess&apos;s 30th birthday
+              </p>
 
-            {/* Telethon strip — value and status on their own fixed-height
+              {/* Telethon strip — value and status on their own fixed-height
               lines so the frame never resizes as the message changes (a real
               display doesn't grow). */}
-            <div className="mt-1">
-              <p className="text-xl leading-tight font-medium text-foreground tabular-nums">
-                {formatPounds(total)}
-              </p>
-              <p
-                className={`truncate text-xs leading-tight ${
-                  goalReached
-                    ? "font-medium text-success"
-                    : "font-normal text-muted-foreground"
-                }`}
-              >
-                {goalReached
-                  ? "goal reached — every pledge still counts"
-                  : `of the ${formatPounds(GOAL)} goal`}
-              </p>
-            </div>
-            <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
-                style={{
-                  width: `${Math.min(100, (total / GOAL) * 100)}%`,
-                  transition: reduced ? "none" : "width 700ms ease-out",
-                }}
-              />
-            </div>
-
-            {/* Topic heading — labels the bars, as the guest/live page does */}
-            <p className="mb-1.5 text-[10px] font-medium tracking-widest text-primary uppercase">
-              Favourite Dog Breed
-            </p>
-
-            <div className="space-y-1.5 [&_span]:text-xs">
-              {LABELS.map((label, i) => (
-                <RankingBar
-                  key={label}
-                  label={label}
-                  amount={formatPounds(bars[i])}
-                  widthPercent={Math.round((bars[i] / MAX) * 100)}
-                  barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
-                  barStyle={{
+              <div className="mt-1">
+                <p className="text-2xl leading-tight font-medium text-foreground tabular-nums">
+                  {formatPounds(total)}
+                </p>
+                <p
+                  className={`truncate text-xs leading-tight ${
+                    goalReached
+                      ? "font-medium text-success"
+                      : "font-normal text-muted-foreground"
+                  }`}
+                >
+                  {goalReached
+                    ? "goal reached — every pledge still counts"
+                    : `of the ${formatPounds(GOAL)} goal`}
+                </p>
+              </div>
+              <div className="mt-1.5 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full rounded-full ${goalReached ? "bg-success" : "bg-primary"}`}
+                  style={{
+                    width: `${Math.min(100, (total / GOAL) * 100)}%`,
                     transition: reduced ? "none" : "width 700ms ease-out",
                   }}
                 />
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* ── The phone, near — making the pledge. Cropped at the scene
-            edge (only the top matters); side buttons + island for realism. */}
-          <div className="absolute -bottom-56 left-[4%] h-[24rem] w-56 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
-            {/* Side buttons */}
-            <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
-            <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
-            <div className="absolute top-28 -right-[9px] h-12 w-[3px] rounded-full bg-foreground/80" />
-            {/* Island */}
-            <div className="absolute top-3 left-1/2 h-[18px] w-20 -translate-x-1/2 rounded-full bg-foreground/80" />
-            <div className="px-5 pt-12 pb-6">
-              <p className="text-center text-[11px] font-medium tracking-widest text-primary uppercase">
-                Favourite dog breed
+              {/* Topic heading — labels the bars, as the guest/live page does */}
+              <p className="mb-1.5 text-[11px] font-medium tracking-widest text-primary uppercase">
+                Favourite Dog Breed
               </p>
 
-              {!confirmed ? (
-                <>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    Your favourite
-                  </p>
-                  <p className="mt-1 w-fit rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                    Cocker Spaniel
-                  </p>
-                  <p className="mt-3 text-[11px] text-muted-foreground">
-                    Your pledge
-                  </p>
-                  <div className="mt-1 grid grid-cols-4 gap-1">
-                    {PRESETS.map((p) => (
-                      <span
-                        key={p}
-                        className={`rounded-md border px-1 py-1 text-center text-[11px] transition-colors ${
-                          p === "£50" && amountPicked
-                            ? "border-primary bg-secondary font-medium text-secondary-foreground"
-                            : "border-border text-muted-foreground"
-                        }`}
-                      >
-                        {p}
-                      </span>
-                    ))}
+              <div className="space-y-1.5 [&_span]:text-sm">
+                {LABELS.map((label, i) => (
+                  <RankingBar
+                    key={label}
+                    label={label}
+                    amount={formatPounds(bars[i])}
+                    widthPercent={Math.round((bars[i] / MAX) * 100)}
+                    barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
+                    barStyle={{
+                      transition: reduced ? "none" : "width 700ms ease-out",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* ── The phone, near — making the pledge. Cropped at the scene
+            edge (only the top matters); side buttons + island for realism. */}
+            <div className="absolute -bottom-56 -left-6 h-[24rem] w-56 rounded-[3rem] border-[7px] border-foreground/80 bg-background shadow-2xl">
+              {/* Side buttons */}
+              <div className="absolute top-24 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
+              <div className="absolute top-36 -left-[9px] h-8 w-[3px] rounded-full bg-foreground/80" />
+              <div className="absolute top-28 -right-[9px] h-12 w-[3px] rounded-full bg-foreground/80" />
+              {/* Island */}
+              <div className="absolute top-3 left-1/2 h-[18px] w-20 -translate-x-1/2 rounded-full bg-foreground/80" />
+              <div className="px-5 pt-12 pb-6">
+                <p className="text-center text-[11px] font-medium tracking-widest text-primary uppercase">
+                  Favourite dog breed
+                </p>
+
+                {!confirmed ? (
+                  <>
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      Your favourite
+                    </p>
+                    <p className="mt-1 w-fit rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                      Cocker Spaniel
+                    </p>
+                    <p className="mt-3 text-[11px] text-muted-foreground">
+                      Your pledge
+                    </p>
+                    <div className="mt-1 grid grid-cols-4 gap-1">
+                      {PRESETS.map((p) => (
+                        <span
+                          key={p}
+                          className={`rounded-md border px-1 py-1 text-center text-[11px] transition-colors ${
+                            p === "£50" && amountPicked
+                              ? "border-primary bg-secondary font-medium text-secondary-foreground"
+                              : "border-border text-muted-foreground"
+                          }`}
+                        >
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                    <div
+                      className={`mt-4 rounded-lg py-2 text-center text-xs font-medium transition-all ${
+                        amountPicked
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      } ${pledgePressed ? "scale-[0.97] brightness-95" : ""}`}
+                    >
+                      Pledge{amountPicked ? " £50" : ""}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-6">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-success/15 text-success">
+                      ✓
+                    </span>
+                    <p className="text-xs font-medium text-foreground">
+                      £50 to Dogs Trust
+                    </p>
+                    <p className="text-center text-[10px] leading-relaxed text-muted-foreground">
+                      Jess&apos;s favourite is waiting for you
+                    </p>
                   </div>
-                  <div
-                    className={`mt-4 rounded-lg py-2 text-center text-xs font-medium transition-all ${
-                      amountPicked
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    } ${pledgePressed ? "scale-[0.97] brightness-95" : ""}`}
-                  >
-                    Pledge{amountPicked ? " £50" : ""}
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center gap-2 py-6">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-success/15 text-success">
-                    ✓
-                  </span>
-                  <p className="text-xs font-medium text-foreground">
-                    £50 to Dogs Trust
-                  </p>
-                  <p className="text-center text-[10px] leading-relaxed text-muted-foreground">
-                    Jess&apos;s favourite is waiting for you
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
