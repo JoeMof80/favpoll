@@ -2,12 +2,9 @@
 
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
-import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import { PackCard } from "@/components/print-pack/pack-card"
-import { DisplayStill } from "@/components/landing/display-still"
 import {
   DEMO_SCENE,
-  DEMO_QR_URL,
   DEMO_PACK_DATA,
   DEMO_PACK_STEPS,
 } from "@/components/landing/demo-fixture"
@@ -55,7 +52,12 @@ export function PackArtefact() {
   )
 }
 
-export function PhoneArtefact() {
+export function PhoneArtefact({
+  phase = "reveal",
+}: {
+  /** Which beat of the guest arc to freeze on. */
+  phase?: "amount-picked" | "reveal"
+}) {
   return (
     <div
       className="pointer-events-none flex justify-center select-none"
@@ -70,54 +72,13 @@ export function PhoneArtefact() {
           <PhoneFrame>
             <DemoCard
               scene={DEMO_SCENE}
-              phase="reveal"
+              phase={phase}
               barWidths={DEMO_SCENE.results.map((r) => r.widthPercent)}
               prefersReducedMotion
               device="phone"
               className="rounded-none border-0"
             />
           </PhoneFrame>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function DisplayArtefact() {
-  return (
-    <div
-      className="pointer-events-none flex justify-center select-none"
-      aria-hidden="true"
-    >
-      {/* 940 wide inside the TV bezel. The display needs a wide layout or its
-          banner collapses to its mobile form and stops reading as a screen in
-          a room, so it is rendered full size and scaled down. */}
-      {/* The base size is 300, not 400: at a 390px viewport the page has
-          342px of usable width after its padding, and a 400px box put the
-          whole document into horizontal scroll. */}
-      {/* Box sizes are the scaled result, MEASURED at each stop rather than
-          derived from one ratio — because the display's own layout is
-          viewport-keyed. Below lg its guest wall stops sitting beside the
-          rankings and stacks under them, so the same 940-wide screen is
-          ~1240 tall instead of 697. Heights: 396 / 722 / 509.
-
-          (That is the fourth time this branch has met a component asking the
-          window instead of its container. It is worth knowing about anything
-          rendered at a fixed width inside a frame.) */}
-      <div
-        data-artefact-box
-        className="h-[400px] w-[300px] sm:h-[725px] sm:w-[545px] lg:h-[510px] lg:w-[686px]"
-      >
-        {/* w-max matters: scaling does not affect layout, so without it this
-            wrapper took the fixed box's width, the 900px display inside
-            overflowed, and TvFrame's overflow-hidden sliced the screen in
-            half. It has to size to its content and then be scaled down. */}
-        <div className="w-max origin-top-left scale-[0.32] sm:scale-[0.58] lg:scale-[0.73]">
-          <TvFrame>
-            <div className="w-[900px]">
-              <DisplayStill scene={DEMO_SCENE} qrUrl={DEMO_QR_URL} />
-            </div>
-          </TvFrame>
         </div>
       </div>
     </div>

@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test"
 
-// The features page shows three real components — the wallet card, the guest
+// Section ids follow the 2026-08-09 by-feature redesign. The live display's
+// artefact moved to RoomVignette, which crops itself rather than scaling into
+// a fixed box, so it is not one of these — this test is about the boxes whose
+// sizes are MEASURED CONSTANTS.
+//
+// The features page shows real components — the wallet card, the guest
 // page in a phone, and the live display in a TV — each laid out at its own
 // natural size and scaled down into a fixed box.
 //
@@ -15,9 +20,9 @@ import { test, expect } from "@playwright/test"
 // It has to be a browser.
 
 const ARTEFACTS = [
-  { name: "wallet card", section: "print-pack" },
-  { name: "phone", section: "guests" },
-  { name: "display", section: "the-room" },
+  { name: "wallet card", section: "stationery" },
+  { name: "shared-fund phone", section: "shared-fund" },
+  { name: "reveal phone", section: "reveal" },
 ] as const
 
 // Widths that straddle the display's own breakpoints, since that is what

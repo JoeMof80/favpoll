@@ -37,21 +37,27 @@ import { t } from "@/lib/i18n"
 //
 // Three columns rather than four: wider cards stop the longer bullets
 // wrapping to two lines, which is what made the rows uneven.
+// Each card links to its own section on /features (2026-08-09). They could
+// not before: that page was organised by READER, so three of these six landed
+// in a list where you had to hunt for the bullet you clicked, and Keepsake
+// had nowhere to go at all. Reorganising it by feature gave every card a
+// destination, which is what made the cards worth making clickable.
 const CAPABILITIES: {
   key: string
   icon: typeof Tv
+  href: string
 }[] = [
   // Ordered by when each one happens, and the two rows are the two phases —
   // no labels needed, the break does the work. Row 1 is what the organiser
   // puts in place before anyone arrives; row 2 is what happens to a guest and
   // what is left afterwards. The previous order was inherited from the
   // matrix's array and chosen by nobody.
-  { key: "topics", icon: MessageCircleQuestion },
-  { key: "cards", icon: QrCode },
-  { key: "display", icon: Tv },
-  { key: "fund", icon: HeartHandshake },
-  { key: "reveal", icon: Quote },
-  { key: "keepsake", icon: FileHeart },
+  { key: "topics", href: "/features#topics", icon: MessageCircleQuestion },
+  { key: "cards", href: "/features#stationery", icon: QrCode },
+  { key: "display", href: "/features#display", icon: Tv },
+  { key: "fund", href: "/features#shared-fund", icon: HeartHandshake },
+  { key: "reveal", href: "/features#reveal", icon: Quote },
+  { key: "keepsake", href: "/features#keepsake", icon: FileHeart },
 ]
 
 export function CapabilityGrid() {
@@ -77,16 +83,17 @@ export function CapabilityGrid() {
             line above its neighbours'. Bottoms matched, tops drifted. */}
         <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((c) => (
-            <div
+            <Link
               key={c.key}
-              className="row-span-3 grid grid-rows-subgrid gap-y-3"
+              href={c.href}
+              className="group row-span-3 grid grid-rows-subgrid gap-y-3"
             >
               {/* HowItWorksThreeBeat's header grammar — icon beside the label,
                   primary, uppercase, tracking-widest — at text-base rather
                   than its text-lg, which wraps at four columns. */}
               <div className="flex items-center gap-2.5">
                 <c.icon className="h-6 w-6 shrink-0 text-primary" />
-                <h3 className="text-base font-medium tracking-widest text-primary uppercase">
+                <h3 className="text-base font-medium tracking-widest text-primary uppercase group-hover:underline">
                   {t(`home.capability.${c.key}.name` as never)}
                 </h3>
               </div>
@@ -102,7 +109,7 @@ export function CapabilityGrid() {
                 <li>{t(`home.capability.${c.key}.b1` as never)}</li>
                 <li>{t(`home.capability.${c.key}.b2` as never)}</li>
               </ul>
-            </div>
+            </Link>
           ))}
         </div>
         {/* The no-rules line went with the matrix (2026-08-08). It was
