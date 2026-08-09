@@ -157,7 +157,7 @@ export default function FeaturesPage() {
             <Feature
               id="topics"
               title="Custom topics"
-              lead="The ready-made list is long and never finished. Write the question yourself when the one you want is not on it — a family in-joke, something only this room would get — and add any favourite a topic is missing. Guests can add the ones nobody thought of, and an organiser can hide anything they would rather not keep."
+              lead="The list of ready-made favpoll topics is long and always growing. Organisers are welcome to add a topic that is missing, or one specific to the event — a family in-joke, say — and to add any favourite a topic has not got. Likewise, guests can add missing favourites to any favpoll topic, at the discretion of the organiser."
               artefact={<TopicPickerVignette />}
             />
 
