@@ -112,7 +112,7 @@ export function PackDocument({ data }: { data: PackData }) {
       </div>
       {/* The three sheets live in ./pack-sheet, shared with the features
           page so the pack it depicts and the pack it prints cannot drift. */}
-      <div className={hideWhenOtherPrints("a4")}>
+      <div data-sheet="a4" className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" onPrint={setPrintTarget} />
         <PackSheet
           data={data}
@@ -122,7 +122,7 @@ export function PackDocument({ data }: { data: PackData }) {
         />
       </div>
 
-      <div className={hideWhenOtherPrints("a5")}>
+      <div data-sheet="a5" className={hideWhenOtherPrints("a5")}>
         <SheetPrintButton target="a5" onPrint={setPrintTarget} />
         <PackSheet
           data={data}
@@ -132,7 +132,7 @@ export function PackDocument({ data }: { data: PackData }) {
         />
       </div>
 
-      <div className={hideWhenOtherPrints("a6")}>
+      <div data-sheet="a6" className={hideWhenOtherPrints("a6")}>
         <SheetPrintButton target="a6" onPrint={setPrintTarget} />
         <PackSheet
           data={data}
@@ -145,7 +145,11 @@ export function PackDocument({ data }: { data: PackData }) {
       {(Object.keys(AVERY_SHEETS) as AveryCode[]).map((code) => {
         const sheet = AVERY_SHEETS[code]
         return (
-          <div key={code} className={hideWhenOtherPrints(code)}>
+          <div
+            key={code}
+            data-sheet={code}
+            className={hideWhenOtherPrints(code)}
+          >
             <div className="mb-2 flex items-baseline justify-between gap-3 print:hidden">
               <p className="text-sm font-medium text-foreground">
                 {sheet.label}{" "}
@@ -169,7 +173,7 @@ export function PackDocument({ data }: { data: PackData }) {
         )
       })}
 
-      <div className={hideWhenOtherPrints("wallet")}>
+      <div data-sheet="wallet" className={hideWhenOtherPrints("wallet")}>
         <SheetPrintButton target="wallet" onPrint={setPrintTarget} />
         <PackSheet data={data} steps={steps} scale="wallet" />
       </div>

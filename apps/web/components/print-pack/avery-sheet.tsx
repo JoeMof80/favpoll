@@ -173,12 +173,14 @@ export function AverySheet({
         )}
 
         {/* Cut lines on the grid's own boundaries, so they are the same lines
-            the die cut would follow. Drawn over the cards, never between two
-            that are already separated by stock. */}
+            the die cut would follow.
+            THE PERIMETER TOO, not only the divisions between cards: the grid
+            does not reach the paper's edge, so the outside needs trimming as
+            much as the middle needs dividing. */}
         {guides && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 border border-dashed border-border"
           >
             {Array.from({ length: sheet.grid.rows - 1 }).map((_, i) => (
               <div

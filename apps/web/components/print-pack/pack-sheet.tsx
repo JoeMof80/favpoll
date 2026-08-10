@@ -47,7 +47,12 @@ const SHEET =
 // down the middle is aimed at, not compared against.
 function CutGuides({ quarters = false }: { quarters?: boolean }) {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+    // The perimeter as well as the divisions — the cards do not reach the
+    // paper's edge, so the outside needs trimming too.
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 border border-dashed border-border"
+    >
       <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
       {quarters && (
         <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
