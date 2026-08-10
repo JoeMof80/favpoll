@@ -1,4 +1,5 @@
 import { PackSheet } from "@/components/print-pack/pack-sheet"
+import { AverySheet } from "@/components/print-pack/avery-sheet"
 import { Vignette } from "@/components/landing/vignette"
 import {
   DEMO_PACK_DATA,
@@ -31,7 +32,20 @@ import {
 const SHEET_W = 794
 const SHEET_H = 1047
 const GUTTER = 24
-const SHEETS = ["a4", "a5", "a6", "tent", "wallet"] as const
+
+// FIVE, and portrait ones. The pack is nine sheets now and a row of nine at
+// this width gives each 67px, which conveys nothing. These five carry the
+// range — a poster, table cards, postcards, labels, wallet cards — and the
+// bullets beside the vignette do the enumerating. The tent and place formats
+// are landscape and would break the row's rhythm; they are named in the copy.
+const SHEETS = [
+  { kind: "plain", id: "a4" },
+  { kind: "plain", id: "a5" },
+  { kind: "plain", id: "a6" },
+  { kind: "avery", id: "L7418" },
+  { kind: "plain", id: "wallet" },
+] as const
+
 const ROW_W = SHEET_W * SHEETS.length + GUTTER * (SHEETS.length - 1)
 
 export function PackVignette() {
@@ -53,13 +67,22 @@ export function PackVignette() {
           className="paper paper-screen flex origin-top-left scale-[0.072] gap-6 sm:scale-[0.133] lg:scale-[0.153]"
           style={{ width: ROW_W, height: SHEET_H }}
         >
-          {SHEETS.map((scale) => (
-            <div key={scale} style={{ width: SHEET_W }}>
-              <PackSheet
-                data={DEMO_PACK_DATA}
-                steps={DEMO_PACK_STEPS}
-                scale={scale}
-              />
+          {SHEETS.map((s) => (
+            <div key={s.id} style={{ width: SHEET_W }}>
+              {s.kind === "avery" ? (
+                <AverySheet
+                  data={DEMO_PACK_DATA}
+                  steps={DEMO_PACK_STEPS}
+                  code={s.id}
+                  guides
+                />
+              ) : (
+                <PackSheet
+                  data={DEMO_PACK_DATA}
+                  steps={DEMO_PACK_STEPS}
+                  scale={s.id as "a4" | "a5" | "a6" | "wallet"}
+                />
+              )}
             </div>
           ))}
         </div>

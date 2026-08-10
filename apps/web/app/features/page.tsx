@@ -199,10 +199,10 @@ export default function FeaturesPage() {
                 "An A4 poster for the door",
                 "Two A5 cards to a sheet, for tables and easels",
                 "Four A6 postcards to a sheet — postcard size, so they take a stamp",
-                "Four tent cards to a sheet — folded, printed both sides, so a code faces either way across a table",
+                "Tent cards and place cards, folded and printed both sides, so a code faces either way across a table",
+                "Self-adhesive labels, big and small — stick a code on an order of service, a favour bag, a menu",
                 "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
-                "Avery-matched sheets too — tent and place cards laid out to L4794, L4796 and C32253, so the print lands on the perforations",
-                "Every card carries the topic, the charity and its registered number",
+                "Every sheet is laid out to Avery card you can buy, with cut lines you can switch on to use plain paper instead",
               ]}
               artefact={<PackVignette />}
             />

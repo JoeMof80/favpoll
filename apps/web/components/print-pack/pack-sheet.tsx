@@ -94,46 +94,6 @@ export function PackSheet({
     )
   }
 
-  if (scale === "tent") {
-    return (
-      // TENT CARDS, four to a sheet. Each flat piece is 88 x 100mm and carries
-      // the face TWICE — the upper copy rotated 180 degrees — so that when it
-      // is folded along the middle both sides stand upright. A guest on either
-      // side of the table gets a code; a tent card with one blank face is a
-      // tent card half the room cannot use.
-      //
-      // Portrait sheet, no rotation, no page rules. The postcard sheet spent
-      // three attempts learning that lesson.
-      <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
-      >
-        <div className="relative h-[200mm] w-[176mm] max-w-full break-inside-avoid">
-          <div className="grid h-full w-full grid-cols-2 grid-rows-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="relative flex flex-col">
-                {/* Upper face, upside down — it comes the right way up as the
-                    card is folded back over itself. */}
-                <div className="h-1/2 w-full rotate-180">
-                  <PackCard data={data} steps={steps} scale="tent" bleed />
-                </div>
-                <div className="h-1/2 w-full">
-                  <PackCard data={data} steps={steps} scale="tent" bleed />
-                </div>
-                {/* The fold, distinguished from the cuts: a finer dotted rule,
-                    and it says so. */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dotted border-border/70"
-                />
-              </div>
-            ))}
-          </div>
-          <CutGuides quarters />
-        </div>
-      </section>
-    )
-  }
-
   if (scale === "a6") {
     return (
       // Four postcards, quartered — portrait cards on a portrait sheet, so

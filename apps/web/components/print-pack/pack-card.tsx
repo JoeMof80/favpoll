@@ -58,6 +58,8 @@ export function buildPackSteps(data: PackData): string[] | null {
 export const SCALE = {
   // Landscape design, rotated 90° onto a portrait sheet (2026-08-02).
   a4: {
+    stack: false,
+    charityFooter: false,
     card: "h-full w-full rounded-3xl",
     headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
@@ -77,6 +79,8 @@ export const SCALE = {
     footerPad: "px-[12mm]",
   },
   a5: {
+    stack: false,
+    charityFooter: false,
     card: "h-[125mm] w-full max-w-[190mm] rounded-2xl",
     headerPad: "px-[8mm] pt-[5mm] pb-[3.5mm]",
     eyebrow: "text-[10.5pt] tracking-[0.12em]",
@@ -107,6 +111,7 @@ export const SCALE = {
   // in a 95mm-wide card, so the QR goes underneath.
   a6: {
     stack: true,
+    charityFooter: false,
     card: "h-[148mm] w-[105mm] rounded-2xl",
     headerPad: "px-[7mm] pt-[6mm] pb-[3mm]",
     eyebrow: "text-[8pt] tracking-[0.12em]",
@@ -127,36 +132,6 @@ export const SCALE = {
     footer: "pb-[2.5mm] text-[7.5pt]",
     footerPad: "px-[7mm]",
   },
-  // TENT CARD FACE, 88 x 50mm. One standing side of a folded card — the flat
-  // piece is 88 x 100 and carries this twice, the top copy upside down, so
-  // both sides read upright once folded. See PackSheet's tent branch.
-  //
-  // Wallet's density, because the face is nearly the wallet card's size
-  // (88 x 50 against 85.6 x 54) and that typography is the one in this table
-  // proven to hold the whole mechanic in a small space.
-  tent: {
-    stack: false,
-    card: "h-[50mm] w-[88mm] rounded-lg",
-    headerPad: "px-[3.5mm] pt-[3mm] pb-[2mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[10.5pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[8pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[3.5mm] py-[1.5mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    bodyPad: "px-[3.5mm] pt-[2.5mm] pb-[1mm]",
-    bodyGap: "gap-[3mm]",
-    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[3.5mm]",
-    // 88px = 23.3mm, so each of the 33 modules is 0.7mm — comfortably over
-    // the ~0.4mm printed floor, and a tent card sits closer to the reader
-    // than a poster does.
-    qr: 88,
-    footer: "pb-[1.5mm] text-[5.5pt]",
-    footerPad: "px-[3.5mm]",
-  },
   // ── AVERY-MATCHED FACES ──────────────────────────────────────────────────
   // Sizes are Avery UK's own, read off their Word templates (2026-08-09/10).
   // These print on LANDSCAPE A4 and so live on their own route — see
@@ -167,6 +142,7 @@ export const SCALE = {
   // L4794 tent card, 120 x 45mm. Two panels make a card, 4 cards to a sheet.
   averyTent: {
     stack: false,
+    charityFooter: false,
     card: "h-[45mm] w-[120mm] rounded-none",
     headerPad: "px-[5mm] pt-[2mm] pb-[1.5mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -191,6 +167,7 @@ export const SCALE = {
   // for a welcome table.
   averyTentLarge: {
     stack: false,
+    charityFooter: false,
     card: "h-[60mm] w-[210mm] rounded-none",
     headerPad: "px-[8mm] pt-[2.5mm] pb-[2mm]",
     eyebrow: "text-[8pt] tracking-[0.14em]",
@@ -215,6 +192,7 @@ export const SCALE = {
   // reduced content as the plain place card: no steps in a 40mm face.
   averyPlace: {
     stack: false,
+    charityFooter: false,
     card: "h-[40mm] w-[110mm] rounded-none",
     headerPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -238,8 +216,69 @@ export const SCALE = {
     footerPad: "px-[5mm]",
   },
 
+  // L7418 label, 86 x 55mm, 8 to a sheet. Avery's self-adhesive business
+  // card — the wallet card that sticks to things: an order of service, a
+  // favour bag, a menu, a bottle. Portrait sheet, so no orientation problem.
+  // Wallet's density, since the face is within a millimetre of it.
+  l7418: {
+    stack: false,
+    charityFooter: false,
+    card: "h-[55mm] w-[86mm] rounded-none",
+    headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
+    eyebrow: "text-[6pt] tracking-[0.14em]",
+    name: "text-[10pt]",
+    brandSvg: { width: 12, height: 11 },
+    brandText: "text-[8pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[3mm] py-[1.5mm]",
+    topic: "text-[8.5pt] tracking-[0.09em]",
+    bodyPad: "px-[3mm] pt-[3mm] pb-[1mm]",
+    bodyGap: "gap-[3mm]",
+    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[3.5mm]",
+    // 92px = 24.3mm — 0.74mm a module, the same as the wallet card.
+    qr: 92,
+    footer: "pb-[2mm] text-[5.5pt]",
+    footerPad: "px-[3mm]",
+  },
+
+  // L7160 label, 63.5 x 38.1mm, 21 to a sheet. The small one — for favour
+  // bags and place settings, where you want a lot of them.
+  //
+  // NO STEPS at this size: 38mm holds the name, the topic, a scannable code
+  // and one line. That line is the CHARITY — see charityFooter below.
+  l7160: {
+    stack: false,
+    charityFooter: true,
+    // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
+    // hold the steps, and the steps are where every other format names where
+    // the money goes. A public artefact that shows a code and a topic but
+    // never says which charity is not one favpoll should print.
+    card: "h-[38.1mm] w-[63.5mm] rounded-none",
+    headerPad: "px-[2.5mm] pt-[2mm] pb-[1mm]",
+    eyebrow: "text-[5pt] tracking-[0.12em]",
+    name: "text-[8pt]",
+    brandSvg: { width: 9, height: 8 },
+    brandText: "text-[6pt]",
+    brandGap: "gap-[0.7mm]",
+    topicRow: "px-[2.5mm] py-[0.8mm]",
+    topic: "text-[6.5pt] tracking-[0.08em]",
+    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    bodyGap: "gap-[2mm]",
+    steps: "gap-[1mm] text-[5pt] leading-snug",
+    stepGap: "gap-[1mm]",
+    numWidth: "w-[2.5mm]",
+    // 56px = 14.8mm — 0.45mm a module. Over the ~0.4mm floor; the smallest
+    // code favpoll prints after C32253.
+    qr: 56,
+    footer: "pb-[1mm] text-[4.5pt]",
+    footerPad: "px-[2.5mm]",
+  },
+
   wallet: {
     stack: false,
+    charityFooter: false,
     card: "h-[54mm] w-[85.6mm] rounded-xl",
     headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -401,11 +440,15 @@ export function PackCard({
             className="shrink-0"
           />
         </div>
-        {data.topicTitle && (
+        {(data.topicTitle || s.charityFooter) && (
           <p
             className={`mt-auto text-center text-muted-foreground/80 ${s.footer}`}
           >
-            {mechanicFooter(data.topicTitle)}
+            {s.charityFooter
+              ? charityLabel(data.charityNames)
+              : data.topicTitle
+                ? mechanicFooter(data.topicTitle)
+                : null}
           </p>
         )}
       </div>
