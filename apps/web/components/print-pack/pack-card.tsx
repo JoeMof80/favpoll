@@ -101,22 +101,22 @@ export const SCALE = {
   a6: {
     card: "h-[105mm] w-[148mm] rounded-2xl",
     headerPad: "px-[6mm] pt-[4mm] pb-[3mm]",
-    eyebrow: "text-[8.5pt] tracking-[0.12em]",
-    name: "text-[19pt]",
-    brandSvg: { width: 19, height: 17 },
-    brandText: "text-[11pt]",
+    eyebrow: "text-[7.5pt] tracking-[0.12em]",
+    name: "text-[17pt]",
+    brandSvg: { width: 17, height: 15 },
+    brandText: "text-[10pt]",
     brandGap: "gap-[1.2mm]",
     topicRow: "px-[6mm] py-[2.5mm]",
-    topic: "text-[13pt] tracking-[0.09em]",
+    topic: "text-[11.5pt] tracking-[0.09em]",
     bodyPad: "px-[6mm] pt-[4mm] pb-[3mm]",
     bodyGap: "gap-[5mm]",
-    steps: "gap-[3mm] text-[10.5pt] leading-relaxed",
+    steps: "gap-[2.5mm] text-[9pt] leading-relaxed",
     stepGap: "gap-[2.5mm]",
     numWidth: "w-[6mm]",
-    // 134px = 35.4mm, so each of the 33 modules is 1.07mm — nearly three
-    // times the ~0.4mm printed floor. No risk at this size.
-    qr: 134,
-    footer: "pb-[3mm] text-[8.5pt]",
+    // 112px = 29.6mm, so each of the 33 modules is 0.9mm — over twice the
+    // ~0.4mm printed floor. The wallet card remains the only one near it.
+    qr: 112,
+    footer: "pb-[2.5mm] text-[7.5pt]",
     footerPad: "px-[6mm]",
   },
   wallet: {

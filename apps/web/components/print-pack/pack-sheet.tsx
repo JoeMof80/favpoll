@@ -25,11 +25,21 @@ const SHEET =
 // cut a few mm under A6 still takes a stamp — Royal Mail's letter limit is
 // 240 x 165mm — so the exactness was never worth the fragility.
 //
-// 196 x 264mm sits inside Chrome's 10mm default (190 x 277) on the short
-// edge and well inside it on the long one, with room for printers whose
-// hardware margin is worse.
-const SAFE_W = "196mm"
-const SAFE_H = "264mm"
+// 180 x 250mm, which is the POSTER's footprint — the one geometry in this
+// pack with a long history of printing correctly.
+//
+// It was 196 x 264 for one commit and that was too wide: the printable width
+// at Chrome's 10mm default is 190mm. A rotated block ignores max-w-full
+// (transforms do not affect layout), so Chrome saw content overflowing the
+// page and SHRANK THE WHOLE DOCUMENT to fit — every sheet came out at about
+// two thirds size in the top corner of its page.
+//
+// That failure also passed a page-count check, which is why counting pages is
+// not enough on its own: scaling to fit is not fragmenting. Assert the
+// geometry.
+// The footprint every rotated/cut sheet uses: h-[250mm] w-[180mm], set as
+// Tailwind classes rather than inline styles so it is literally the same
+// declaration the poster has always used.
 
 // Dashed cut guides, drawn ON the sheet rather than round each card. They are
 // what a border used to imply, without the border's problem: a printed rule
@@ -86,41 +96,19 @@ export function PackSheet({
 
   if (scale === "a6") {
     return (
-      // Four postcards, quartered. The cards are landscape and four make a
-      // 264 x 196 block, turned 90 degrees onto a portrait sheet — the
-      // poster's trick, so every sheet in the pack stays portrait and one
-      // print job still covers it. The half-size/scale(2) sandwich comes with
-      // it: print fragmentation uses PRE-transform boxes, and that is what
-      // stops a rotated sheet splitting across pages.
+      // Four postcards, quartered — on a LANDSCAPE page, so the cards sit
+      // flat. See the .sheet-landscape rule in globals.css for why this one
+      // sheet does not use the poster's rotate-onto-portrait sandwich.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+        className={`${SHEET} sheet-landscape flex items-center justify-center p-6 print:break-inside-avoid print:p-0 ${className}`}
       >
-        <div
-          className="flex max-w-full break-inside-avoid items-center justify-center"
-          style={{ width: SAFE_W, height: SAFE_H }}
-        >
-          <div
-            className="[transform:rotate(-90deg)_scale(2)]"
-            style={{ width: "132mm", height: "98mm" }}
-          >
-            <div
-              className="relative origin-top-left scale-50"
-              style={{ width: "264mm", height: "196mm" }}
-            >
-              <div className="grid h-full w-full grid-cols-2 grid-rows-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <PackCard
-                    key={i}
-                    data={data}
-                    steps={steps}
-                    scale="a6"
-                    bleed
-                  />
-                ))}
-              </div>
-              <CutGuides quarters />
-            </div>
+        <div className="relative h-[188mm] w-[276mm] max-w-full break-inside-avoid">
+          <div className="grid h-full w-full grid-cols-2 grid-rows-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <PackCard key={i} data={data} steps={steps} scale="a6" bleed />
+            ))}
           </div>
+          <CutGuides quarters />
         </div>
       </section>
     )
@@ -132,10 +120,7 @@ export function PackSheet({
       <section
         className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:p-2 ${className}`}
       >
-        <div
-          className="relative max-w-full break-inside-avoid"
-          style={{ width: SAFE_W, height: SAFE_H }}
-        >
+        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-rows-2">
             <PackCard data={data} steps={steps} scale="a5" bleed />
             <PackCard data={data} steps={steps} scale="a5" bleed />
