@@ -95,29 +95,37 @@ export const SCALE = {
     footer: "pb-[4mm] text-[10.5pt]",
     footerPad: "px-[8mm]",
   },
-  // A6 postcard, 148 x 105mm landscape — four tile an A4 sheet EXACTLY
-  // (2 x 105 = 210, 2 x 148.5 = 297), which is why that sheet is full-bleed.
-  // Values are a5's at ~0.8, the ratio of the two card widths.
+  // A6 postcard, PORTRAIT (2026-08-10). A quarter of a portrait A4 is a
+  // portrait A6, so this is what the geometry actually asks for. The previous
+  // landscape version needed the sheet rotated or the page turned landscape,
+  // and neither survived: the rotate sandwich printed at 0.685 scale for
+  // reasons a long bisect never found, and Chrome ignores a NAMED @page's
+  // orientation, so the sheet came out portrait anyway with the block in a
+  // corner. Nothing here needs either trick.
+  //
+  // `stack` is the consequence: the steps and the QR cannot sit side by side
+  // in a 95mm-wide card, so the QR goes underneath.
   a6: {
-    card: "h-[105mm] w-[148mm] rounded-2xl",
-    headerPad: "px-[6mm] pt-[4mm] pb-[3mm]",
-    eyebrow: "text-[7.5pt] tracking-[0.12em]",
+    stack: true,
+    card: "h-[148mm] w-[105mm] rounded-2xl",
+    headerPad: "px-[7mm] pt-[6mm] pb-[3mm]",
+    eyebrow: "text-[8pt] tracking-[0.12em]",
     name: "text-[17pt]",
     brandSvg: { width: 17, height: 15 },
     brandText: "text-[10pt]",
     brandGap: "gap-[1.2mm]",
-    topicRow: "px-[6mm] py-[2.5mm]",
-    topic: "text-[11.5pt] tracking-[0.09em]",
-    bodyPad: "px-[6mm] pt-[4mm] pb-[3mm]",
+    topicRow: "px-[7mm] py-[2.5mm]",
+    topic: "text-[12pt] tracking-[0.09em]",
+    bodyPad: "px-[7mm] pt-[5mm] pb-[3mm]",
     bodyGap: "gap-[5mm]",
-    steps: "gap-[2.5mm] text-[9pt] leading-relaxed",
+    steps: "gap-[3mm] text-[9.5pt] leading-relaxed",
     stepGap: "gap-[2.5mm]",
-    numWidth: "w-[6mm]",
-    // 112px = 29.6mm, so each of the 33 modules is 0.9mm — over twice the
-    // ~0.4mm printed floor. The wallet card remains the only one near it.
-    qr: 112,
+    numWidth: "w-[5mm]",
+    // 128px = 33.9mm, so each of the 33 modules is 1.03mm — over twice the
+    // ~0.4mm printed floor.
+    qr: 128,
     footer: "pb-[2.5mm] text-[7.5pt]",
-    footerPad: "px-[6mm]",
+    footerPad: "px-[7mm]",
   },
   wallet: {
     card: "h-[54mm] w-[85.6mm] rounded-xl",
@@ -253,7 +261,11 @@ export function PackCard({
       <div
         className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
       >
-        <div className={`flex flex-1 items-start ${s.bodyGap}`}>
+        {/* Portrait cards stack: the steps and a 34mm code will not sit side
+            by side in a 95mm-wide card. */}
+        <div
+          className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        >
           {steps && (
             <div
               className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}

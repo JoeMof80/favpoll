@@ -96,13 +96,13 @@ export function PackSheet({
 
   if (scale === "a6") {
     return (
-      // Four postcards, quartered — on a LANDSCAPE page, so the cards sit
-      // flat. See the .sheet-landscape rule in globals.css for why this one
-      // sheet does not use the poster's rotate-onto-portrait sandwich.
+      // Four postcards, quartered — portrait cards on a portrait sheet, so
+      // there is no rotation and no page-orientation rule. Every sheet in the
+      // pack prints portrait in one job, which is where this started.
       <section
-        className={`${SHEET} sheet-landscape flex items-center justify-center p-6 print:break-inside-avoid print:p-0 ${className}`}
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
       >
-        <div className="relative h-[188mm] w-[276mm] max-w-full break-inside-avoid">
+        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-cols-2 grid-rows-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <PackCard key={i} data={data} steps={steps} scale="a6" bleed />

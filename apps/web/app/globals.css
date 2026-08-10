@@ -339,19 +339,3 @@ button:not(:disabled),
 select:not(:disabled) {
   cursor: pointer;
 }
-
-/* A named landscape page for the postcard sheet (2026-08-10).
-   Four A6 cards are landscape and will not sit two-across on portrait A4, so
-   this sheet used the poster's rotate-onto-portrait sandwich. It printed at
-   0.685 scale in the top corner of its page and a long bisect never found
-   why — the markup chain was byte-identical to the poster's, which prints
-   correctly. Rather than keep fighting a transform, the sheet asks for a
-   landscape page and lays the cards out flat. No transform, nothing to go
-   wrong, and the reader does not have to turn the paper. */
-@page sheet-landscape {
-  size: A4 landscape;
-  margin: 10mm;
-}
-.sheet-landscape {
-  page: sheet-landscape;
-}
