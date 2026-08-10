@@ -33,17 +33,17 @@ const SHEET_W = 794
 const SHEET_H = 1047
 const GUTTER = 24
 
-// FIVE, and portrait ones. The pack is nine sheets now and a row of nine at
-// this width gives each 67px, which conveys nothing. These five carry the
-// range — a poster, table cards, postcards, labels, wallet cards — and the
-// bullets beside the vignette do the enumerating. The tent and place formats
-// are landscape and would break the row's rhythm; they are named in the copy.
+// FOUR, and portrait ones. The pack is eight sheets and a row of eight at
+// this width gives each 75px, which conveys nothing. These four carry the
+// range — a poster, table cards, postcards, and the card-and-label sheet —
+// and the bullets beside the vignette do the enumerating. The tent and place
+// formats are landscape and would break the row's rhythm; they are named in
+// the copy.
 const SHEETS = [
   { kind: "plain", id: "a4" },
   { kind: "plain", id: "a5" },
   { kind: "plain", id: "a6" },
   { kind: "avery", id: "L7418" },
-  { kind: "plain", id: "wallet" },
 ] as const
 
 const ROW_W = SHEET_W * SHEETS.length + GUTTER * (SHEETS.length - 1)
@@ -56,7 +56,7 @@ export function PackVignette() {
           0.12 / 0.22 / 0.255 give 294, 538 and 624 wide. */}
       <div
         data-artefact-box
-        className="h-[76px] w-[293px] sm:h-[140px] sm:w-[541px] lg:h-[161px] lg:w-[622px]"
+        className="h-[95px] w-[293px] sm:h-[175px] sm:w-[543px] lg:h-[202px] lg:w-[624px]"
       >
         {/* .paper pins the light token values — the cards force bg-white, so
             without them a dark-mode visitor gets white ink on a white card
@@ -64,7 +64,7 @@ export function PackVignette() {
             darkens it for ink that survives a domestic printer, which on a
             screen just outlines every row. */}
         <div
-          className="paper paper-screen flex origin-top-left scale-[0.072] gap-6 sm:scale-[0.133] lg:scale-[0.153]"
+          className="paper paper-screen flex origin-top-left scale-[0.09] gap-6 sm:scale-[0.167] lg:scale-[0.192]"
           style={{ width: ROW_W, height: SHEET_H }}
         >
           {SHEETS.map((s) => (
@@ -80,7 +80,7 @@ export function PackVignette() {
                 <PackSheet
                   data={DEMO_PACK_DATA}
                   steps={DEMO_PACK_STEPS}
-                  scale={s.id as "a4" | "a5" | "a6" | "wallet"}
+                  scale={s.id as "a4" | "a5" | "a6"}
                 />
               )}
             </div>

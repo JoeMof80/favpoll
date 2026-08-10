@@ -45,18 +45,29 @@ const SHEET =
 // what a border used to imply, without the border's problem: a printed rule
 // round a card shows every millimetre you cut off-line, whereas a dashed line
 // down the middle is aimed at, not compared against.
-function CutGuides({ quarters = false }: { quarters?: boolean }) {
+function CutGuides({ cols = 1, rows = 1 }: { cols?: number; rows?: number }) {
   return (
     // The perimeter as well as the divisions — the cards do not reach the
-    // paper's edge, so the outside needs trimming too.
+    // paper's edge, so the outside needs trimming too. A sheet with one card
+    // on it (the poster) gets the perimeter and nothing else.
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 border border-dashed border-border"
     >
-      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
-      {quarters && (
-        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
-      )}
+      {Array.from({ length: rows - 1 }).map((_, i) => (
+        <div
+          key={`r${i}`}
+          className="absolute inset-x-0 border-t border-dashed border-border"
+          style={{ top: `${((i + 1) / rows) * 100}%` }}
+        />
+      ))}
+      {Array.from({ length: cols - 1 }).map((_, i) => (
+        <div
+          key={`c${i}`}
+          className="absolute inset-y-0 border-l border-dashed border-border"
+          style={{ left: `${((i + 1) / cols) * 100}%` }}
+        />
+      ))}
     </div>
   )
 }
@@ -65,11 +76,14 @@ export function PackSheet({
   data,
   steps,
   scale,
+  guides = true,
   className = "",
 }: {
   data: PackData
   steps: string[] | null
   scale: keyof typeof SCALE
+  /** Dashed cut lines, for plain paper. Toggled for the whole pack. */
+  guides?: boolean
   /** Sheet-level extras from the host — break-after-page, print:hidden. */
   className?: string
 }) {
@@ -90,8 +104,9 @@ export function PackSheet({
             while painting at the full 250 × 180. */}
         <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
           <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
-            <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
+            <div className="relative h-[180mm] w-[250mm] origin-top-left scale-50">
               <PackCard data={data} steps={steps} scale="a4" bleed />
+              {guides && <CutGuides />}
             </div>
           </div>
         </div>
@@ -113,7 +128,7 @@ export function PackSheet({
               <PackCard key={i} data={data} steps={steps} scale="a6" bleed />
             ))}
           </div>
-          <CutGuides quarters />
+          {guides && <CutGuides cols={2} rows={2} />}
         </div>
       </section>
     )
@@ -130,22 +145,15 @@ export function PackSheet({
             <PackCard data={data} steps={steps} scale="a5" bleed />
             <PackCard data={data} steps={steps} scale="a5" bleed />
           </div>
-          <CutGuides />
+          {guides && <CutGuides cols={1} rows={2} />}
         </div>
       </section>
     )
   }
 
-  // Wallet cards: credit-card size (85.6 × 54 mm), eight to a sheet.
-  return (
-    <section
-      className={`${SHEET} min-h-[277mm] px-6 py-8 print:min-h-0 ${className}`}
-    >
-      <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <PackCard key={i} data={data} steps={steps} scale="wallet" />
-        ))}
-      </div>
-    </section>
-  )
+  // The wallet-card sheet was here. It is gone (founder, 2026-08-10): L7418
+  // is the same card at 86 x 55, eight to a sheet, and with cut lines turned
+  // on it IS this sheet — printed on plain card instead of label stock. One
+  // layout per format, the same call made for the tent and place cards.
+  return null
 }

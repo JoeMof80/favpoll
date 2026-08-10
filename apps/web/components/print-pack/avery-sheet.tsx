@@ -36,9 +36,11 @@ export type AverySheetDef = {
 // their product pages (cards: 4, 1, 4).
 export const AVERY_SHEETS: Record<string, AverySheetDef> = {
   L7418: {
-    label: "Labels",
+    // Two uses, one layout: cut lines on plain card and it is the wallet-card
+    // sheet; cut lines off on L7418 stock and it is a sheet of labels.
+    label: "Wallet cards & labels",
     code: "L7418",
-    note: "86 × 55 mm · 8 to a sheet · self-adhesive",
+    note: "86 × 55 mm · 8 to a sheet",
     face: "l7418",
     orientation: "portrait",
     folded: false,

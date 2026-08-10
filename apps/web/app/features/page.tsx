@@ -200,8 +200,8 @@ export default function FeaturesPage() {
                 "Two A5 cards to a sheet, for tables and easels",
                 "Four A6 postcards to a sheet — postcard size, so they take a stamp",
                 "Tent cards and place cards, folded and printed both sides, so a code faces either way across a table",
-                "Self-adhesive labels, big and small — stick a code on an order of service, a favour bag, a menu",
-                "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
+                "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket, or print the same sheet on labels and stick them to anything",
+                "Twenty-one small labels to a sheet, for favour bags and place settings",
                 "Every sheet is laid out to Avery card you can buy, with cut lines you can switch on to use plain paper instead",
               ]}
               artefact={<PackVignette />}

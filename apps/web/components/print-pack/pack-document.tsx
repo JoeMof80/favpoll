@@ -117,6 +117,7 @@ export function PackDocument({ data }: { data: PackData }) {
         <PackSheet
           data={data}
           steps={steps}
+          guides={guides}
           scale="a4"
           className="break-after-page"
         />
@@ -127,6 +128,7 @@ export function PackDocument({ data }: { data: PackData }) {
         <PackSheet
           data={data}
           steps={steps}
+          guides={guides}
           scale="a5"
           className="break-after-page"
         />
@@ -137,6 +139,7 @@ export function PackDocument({ data }: { data: PackData }) {
         <PackSheet
           data={data}
           steps={steps}
+          guides={guides}
           scale="a6"
           className="break-after-page"
         />
@@ -172,11 +175,6 @@ export function PackDocument({ data }: { data: PackData }) {
           </div>
         )
       })}
-
-      <div data-sheet="wallet" className={hideWhenOtherPrints("wallet")}>
-        <SheetPrintButton target="wallet" onPrint={setPrintTarget} />
-        <PackSheet data={data} steps={steps} scale="wallet" />
-      </div>
     </div>
   )
 }

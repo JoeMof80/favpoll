@@ -275,43 +275,6 @@ export const SCALE = {
     footer: "pb-[1mm] text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
-
-  wallet: {
-    stack: false,
-    charityFooter: false,
-    card: "h-[54mm] w-[85.6mm] rounded-xl",
-    headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[10pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[8pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[3mm] py-[1.5mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    bodyPad: "px-[3mm] pt-[3mm] pb-[1mm]",
-    bodyGap: "gap-[3mm]",
-    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[3.5mm]",
-    // 58 → 92 (2026-08-06). The guest URL is https://favpoll.com/favpolls/<uuid>
-    // = 65 chars, which at error-correction H is a 49x49 QR; at 58px (15.35mm)
-    // that put each module at 0.313mm, under the ~0.4mm floor printed codes
-    // need, so domestic printers' ink spread merged adjacent modules and the
-    // card scanned only reluctantly.
-    //
-    // 92px = 24.3mm, and the QR now encodes the SHORT /p/<code> URL (34
-    // chars = 33x33, not 65 chars = 49x49), so each module is 0.737mm —
-    // 2.35x the 0.313mm that failed. 92 is the CEILING: measured, the steps
-    // column does not reflow down to a 51.9mm track and nothing spills the
-    // fixed 54mm card, but past 92 the row itself starts to grow.
-    //
-    // The code grows LEFTWARD, since it is the last item in the flex row and
-    // its right edge is pinned by the card padding. That is why enlarging it
-    // reads as "moved towards the centre" rather than "got bigger".
-    qr: 92,
-    footer: "pb-[2mm] text-[5.5pt]",
-    footerPad: "px-[3mm]",
-  },
 } as const
 
 function BrandMark({ size }: { size: (typeof SCALE)[keyof typeof SCALE] }) {
