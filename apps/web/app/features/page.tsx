@@ -200,6 +200,7 @@ export default function FeaturesPage() {
                 "Two A5 cards to a sheet, for tables and easels",
                 "Four A6 postcards to a sheet — postcard size, so they take a stamp",
                 "Four tent cards to a sheet — folded, printed both sides, so a code faces either way across a table",
+                "Six place cards to a sheet — one for each setting",
                 "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
                 "Every card carries the topic, the charity and its registered number",
               ]}

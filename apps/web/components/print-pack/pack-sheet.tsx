@@ -45,13 +45,23 @@ const SHEET =
 // what a border used to imply, without the border's problem: a printed rule
 // round a card shows every millimetre you cut off-line, whereas a dashed line
 // down the middle is aimed at, not compared against.
-function CutGuides({ quarters = false }: { quarters?: boolean }) {
+function CutGuides({ cols = 1, rows = 2 }: { cols?: number; rows?: number }) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
-      {quarters && (
-        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
-      )}
+      {Array.from({ length: rows - 1 }).map((_, i) => (
+        <div
+          key={`r${i}`}
+          className="absolute inset-x-0 border-t border-dashed border-border"
+          style={{ top: `${((i + 1) / rows) * 100}%` }}
+        />
+      ))}
+      {Array.from({ length: cols - 1 }).map((_, i) => (
+        <div
+          key={`c${i}`}
+          className="absolute inset-y-0 border-l border-dashed border-border"
+          style={{ left: `${((i + 1) / cols) * 100}%` }}
+        />
+      ))}
     </div>
   )
 }
@@ -94,6 +104,43 @@ export function PackSheet({
     )
   }
 
+  if (scale === "place") {
+    return (
+      // PLACE CARDS, six to a sheet — one per setting, so the sheet is worth
+      // more than the tent card's four. Folded and printed on both faces the
+      // same way: the upper copy is upside down and comes the right way up as
+      // the card is folded back over itself.
+      //
+      // steps={null} deliberately. Three numbered steps do not fit beside a
+      // code in a 40mm face, and a card at arm's length that gets picked up
+      // does not need them — the name, the topic, the code and the
+      // shared-fund line say it.
+      <section
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+      >
+        <div className="relative h-[240mm] w-[176mm] max-w-full break-inside-avoid">
+          <div className="grid h-full w-full grid-cols-2 grid-rows-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="relative flex flex-col">
+                <div className="h-1/2 w-full rotate-180">
+                  <PackCard data={data} steps={null} scale="place" bleed />
+                </div>
+                <div className="h-1/2 w-full">
+                  <PackCard data={data} steps={null} scale="place" bleed />
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dotted border-border/70"
+                />
+              </div>
+            ))}
+          </div>
+          <CutGuides cols={2} rows={3} />
+        </div>
+      </section>
+    )
+  }
+
   if (scale === "tent") {
     return (
       // TENT CARDS, four to a sheet. Each flat piece is 88 x 100mm and carries
@@ -128,7 +175,7 @@ export function PackSheet({
               </div>
             ))}
           </div>
-          <CutGuides quarters />
+          <CutGuides cols={2} rows={2} />
         </div>
       </section>
     )
@@ -148,7 +195,7 @@ export function PackSheet({
               <PackCard key={i} data={data} steps={steps} scale="a6" bleed />
             ))}
           </div>
-          <CutGuides quarters />
+          <CutGuides cols={2} rows={2} />
         </div>
       </section>
     )
@@ -165,7 +212,7 @@ export function PackSheet({
             <PackCard data={data} steps={steps} scale="a5" bleed />
             <PackCard data={data} steps={steps} scale="a5" bleed />
           </div>
-          <CutGuides />
+          <CutGuides cols={1} rows={2} />
         </div>
       </section>
     )

@@ -58,6 +58,7 @@ export function buildPackSteps(data: PackData): string[] | null {
 export const SCALE = {
   // Landscape design, rotated 90° onto a portrait sheet (2026-08-02).
   a4: {
+    stack: false,
     card: "h-full w-full rounded-3xl",
     headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
@@ -77,6 +78,7 @@ export const SCALE = {
     footerPad: "px-[12mm]",
   },
   a5: {
+    stack: false,
     card: "h-[125mm] w-full max-w-[190mm] rounded-2xl",
     headerPad: "px-[8mm] pt-[5mm] pb-[3.5mm]",
     eyebrow: "text-[10.5pt] tracking-[0.12em]",
@@ -154,6 +156,39 @@ export const SCALE = {
     // the ~0.4mm printed floor, and a tent card sits closer to the reader
     // than a poster does.
     qr: 88,
+    footer: "pb-[1.5mm] text-[5.5pt]",
+    footerPad: "px-[3.5mm]",
+  },
+  // PLACE CARD FACE, 88 x 40mm. A folded card at each setting, so you want
+  // MANY — six to a sheet against the tent card's four, and 10mm shorter in
+  // the face to get them.
+  //
+  // At 40mm the three mechanic steps do not fit beside a code, so this format
+  // is passed steps={null} and shows the name, the topic, the code and the
+  // shared-fund line. That is the right content anyway: a place card is at
+  // arm's length and gets picked up, where a poster is read across a room.
+  place: {
+    stack: false,
+    card: "h-[40mm] w-[88mm] rounded-lg",
+    headerPad: "px-[3.5mm] pt-[2mm] pb-[1.5mm]",
+    eyebrow: "text-[6pt] tracking-[0.14em]",
+    name: "text-[11pt]",
+    brandSvg: { width: 12, height: 11 },
+    brandText: "text-[8pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[3.5mm] py-[1.5mm]",
+    topic: "text-[8.5pt] tracking-[0.09em]",
+    bodyPad: "px-[3.5mm] pt-[1.5mm] pb-[1mm]",
+    bodyGap: "gap-[2mm]",
+    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[3.5mm]",
+    // 60px = 15.9mm, so each of the 33 modules is 0.48mm. That is over the
+    // ~0.4mm printed floor but it is the SMALLEST code in the pack, so this
+    // is the card the "test one before you print the batch" notice is really
+    // about. It came down from 68px because at 18mm the shared-fund line was
+    // pushed out of a 40mm face and clipped.
+    qr: 60,
     footer: "pb-[1.5mm] text-[5.5pt]",
     footerPad: "px-[3.5mm]",
   },
@@ -294,8 +329,16 @@ export function PackCard({
       >
         {/* Portrait cards stack: the steps and a 34mm code will not sit side
             by side in a 95mm-wide card. */}
+        {/* No steps (the place card) leaves the code as the only child, and a
+            lone code shunted to one edge reads as a mistake — centre it. */}
         <div
-          className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+          className={`flex flex-1 ${
+            s.stack
+              ? "flex-col items-center"
+              : steps
+                ? "items-start"
+                : "items-center justify-center"
+          } ${s.bodyGap}`}
         >
           {steps && (
             <div

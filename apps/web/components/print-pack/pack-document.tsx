@@ -119,6 +119,16 @@ export function PackDocument({ data }: { data: PackData }) {
         />
       </div>
 
+      <div className={hideWhenOtherPrints("place")}>
+        <SheetPrintButton target="place" onPrint={setPrintTarget} />
+        <PackSheet
+          data={data}
+          steps={steps}
+          scale="place"
+          className="break-after-page"
+        />
+      </div>
+
       <div className={hideWhenOtherPrints("wallet")}>
         <SheetPrintButton target="wallet" onPrint={setPrintTarget} />
         <PackSheet data={data} steps={steps} scale="wallet" />
