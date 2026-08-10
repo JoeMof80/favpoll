@@ -18,6 +18,44 @@ import type { PackData } from "./pack-card"
 const SHEET =
   "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
 
+// THE SAFE BOX. Every sheet lays out inside this, and it is why the A6 sheet
+// is no longer full bleed (founder-caught in the print dialog, 2026-08-10):
+// four A6 tile A4 exactly, so a full-bleed sheet has nothing left for the
+// printer's own margin and Chrome fragments it across two pages. A postcard
+// cut a few mm under A6 still takes a stamp — Royal Mail's letter limit is
+// 240 x 165mm — so the exactness was never worth the fragility.
+//
+// 180 x 250mm, which is the POSTER's footprint — the one geometry in this
+// pack with a long history of printing correctly.
+//
+// It was 196 x 264 for one commit and that was too wide: the printable width
+// at Chrome's 10mm default is 190mm. A rotated block ignores max-w-full
+// (transforms do not affect layout), so Chrome saw content overflowing the
+// page and SHRANK THE WHOLE DOCUMENT to fit — every sheet came out at about
+// two thirds size in the top corner of its page.
+//
+// That failure also passed a page-count check, which is why counting pages is
+// not enough on its own: scaling to fit is not fragmenting. Assert the
+// geometry.
+// The footprint every rotated/cut sheet uses: h-[250mm] w-[180mm], set as
+// Tailwind classes rather than inline styles so it is literally the same
+// declaration the poster has always used.
+
+// Dashed cut guides, drawn ON the sheet rather than round each card. They are
+// what a border used to imply, without the border's problem: a printed rule
+// round a card shows every millimetre you cut off-line, whereas a dashed line
+// down the middle is aimed at, not compared against.
+function CutGuides({ quarters = false }: { quarters?: boolean }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
+      {quarters && (
+        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
+      )}
+    </div>
+  )
+}
+
 export function PackSheet({
   data,
   steps,
@@ -48,7 +86,7 @@ export function PackSheet({
         <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
           <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
             <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
-              <PackCard data={data} steps={steps} scale="a4" />
+              <PackCard data={data} steps={steps} scale="a4" bleed />
             </div>
           </div>
         </div>
@@ -56,15 +94,38 @@ export function PackSheet({
     )
   }
 
+  if (scale === "a6") {
+    return (
+      // Four postcards, quartered — portrait cards on a portrait sheet, so
+      // there is no rotation and no page-orientation rule. Every sheet in the
+      // pack prints portrait in one job, which is where this started.
+      <section
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+      >
+        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
+          <div className="grid h-full w-full grid-cols-2 grid-rows-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <PackCard key={i} data={data} steps={steps} scale="a6" bleed />
+            ))}
+          </div>
+          <CutGuides quarters />
+        </div>
+      </section>
+    )
+  }
+
   if (scale === "a5") {
     return (
-      // Two per sheet, for tables and easels.
+      // Two per sheet, for tables and easels — the sheet cut in half.
       <section
-        className={`${SHEET} flex min-h-[277mm] flex-col items-center px-6 py-6 print:min-h-0 ${className}`}
+        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:p-2 ${className}`}
       >
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-[6mm]">
-          <PackCard data={data} steps={steps} scale="a5" />
-          <PackCard data={data} steps={steps} scale="a5" />
+        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
+          <div className="grid h-full w-full grid-rows-2">
+            <PackCard data={data} steps={steps} scale="a5" bleed />
+            <PackCard data={data} steps={steps} scale="a5" bleed />
+          </div>
+          <CutGuides />
         </div>
       </section>
     )

@@ -95,6 +95,38 @@ export const SCALE = {
     footer: "pb-[4mm] text-[10.5pt]",
     footerPad: "px-[8mm]",
   },
+  // A6 postcard, PORTRAIT (2026-08-10). A quarter of a portrait A4 is a
+  // portrait A6, so this is what the geometry actually asks for. The previous
+  // landscape version needed the sheet rotated or the page turned landscape,
+  // and neither survived: the rotate sandwich printed at 0.685 scale for
+  // reasons a long bisect never found, and Chrome ignores a NAMED @page's
+  // orientation, so the sheet came out portrait anyway with the block in a
+  // corner. Nothing here needs either trick.
+  //
+  // `stack` is the consequence: the steps and the QR cannot sit side by side
+  // in a 95mm-wide card, so the QR goes underneath.
+  a6: {
+    stack: true,
+    card: "h-[148mm] w-[105mm] rounded-2xl",
+    headerPad: "px-[7mm] pt-[6mm] pb-[3mm]",
+    eyebrow: "text-[8pt] tracking-[0.12em]",
+    name: "text-[17pt]",
+    brandSvg: { width: 17, height: 15 },
+    brandText: "text-[10pt]",
+    brandGap: "gap-[1.2mm]",
+    topicRow: "px-[7mm] py-[2.5mm]",
+    topic: "text-[12pt] tracking-[0.09em]",
+    bodyPad: "px-[7mm] pt-[5mm] pb-[3mm]",
+    bodyGap: "gap-[5mm]",
+    steps: "gap-[3mm] text-[9.5pt] leading-relaxed",
+    stepGap: "gap-[2.5mm]",
+    numWidth: "w-[5mm]",
+    // 128px = 33.9mm, so each of the 33 modules is 1.03mm — over twice the
+    // ~0.4mm printed floor.
+    qr: 128,
+    footer: "pb-[2.5mm] text-[7.5pt]",
+    footerPad: "px-[7mm]",
+  },
   wallet: {
     card: "h-[54mm] w-[85.6mm] rounded-xl",
     headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
@@ -174,15 +206,30 @@ export function PackCard({
   data,
   steps,
   scale,
+  bleed = false,
 }: {
   data: PackData
   steps: string[] | null
   scale: keyof typeof SCALE
+  /**
+   * Fill the cell rather than draw a card (founder, 2026-08-10). Sheets that
+   * are cut into halves and quarters do not want a border round each card:
+   * the cut IS the edge, and a printed border only shows how badly you cut.
+   * The dashed guides live on the sheet, so the card drops its own chrome and
+   * its fixed size and fills whatever it is given.
+   *
+   * The wallet sheet keeps borders, because eight cards on a sheet are cut
+   * individually and there is nothing else to aim at.
+   */
+  bleed?: boolean
 }) {
   const s = SCALE[scale]
+  // Strip the radius with the border: a rounded corner on a card you cut from
+  // a shared sheet leaves a white nick at every corner.
+  const box = bleed ? "h-full w-full" : `border border-border ${s.card}`
   return (
     <div
-      className={`flex flex-col overflow-hidden border border-border bg-white [print-color-adjust:exact] ${s.card}`}
+      className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
     >
       {/* Header — eyebrow + name, brand bottom-aligned with the eyebrow */}
       <div className={`flex flex-col ${s.headerPad}`}>
@@ -214,7 +261,11 @@ export function PackCard({
       <div
         className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
       >
-        <div className={`flex flex-1 items-start ${s.bodyGap}`}>
+        {/* Portrait cards stack: the steps and a 34mm code will not sit side
+            by side in a 95mm-wide card. */}
+        <div
+          className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        >
           {steps && (
             <div
               className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
