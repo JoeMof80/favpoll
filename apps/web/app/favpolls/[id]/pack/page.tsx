@@ -88,6 +88,25 @@ export default async function PackPage({ params }: Props) {
             code — if any card is going to struggle, it is that one.
           </AlertDescription>
         </Alert>
+        {/* Avery-matched sheets are all LANDSCAPE, so they cannot share this
+            print job — Chrome ignores a per-sheet page orientation. Their own
+            route makes the whole document landscape, which is the only way it
+            works. */}
+        <div className="mb-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background px-5 py-4 print:hidden">
+          <div className="min-w-0">
+            <h2 className="text-base font-medium text-foreground">
+              Printing on Avery card?
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              Tent cards and place cards laid out to Avery&rsquo;s die-cut
+              stock, so the print lands on the perforations. They print
+              landscape, so they are a separate sheet set.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Link href={`/favpolls/${id}/pack/avery`}>Avery sheets</Link>
+          </Button>
+        </div>
         <QrExport
           value={data.qrUrl}
           name={`favpoll-qr-${favpoll.short_code}`}
