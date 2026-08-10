@@ -157,6 +157,87 @@ export const SCALE = {
     footer: "pb-[1.5mm] text-[5.5pt]",
     footerPad: "px-[3.5mm]",
   },
+  // ── AVERY-MATCHED FACES ──────────────────────────────────────────────────
+  // Sizes are Avery UK's own, read off their Word templates (2026-08-09/10).
+  // These print on LANDSCAPE A4 and so live on their own route — see
+  // app/favpolls/[id]/pack/avery. Nothing here draws a cut or fold line: the
+  // stock is already die-cut and scored, and a printed rule would land on the
+  // card rather than between them.
+
+  // L4794 tent card, 120 x 45mm. Two panels make a card, 4 cards to a sheet.
+  averyTent: {
+    stack: false,
+    card: "h-[45mm] w-[120mm] rounded-none",
+    headerPad: "px-[5mm] pt-[2mm] pb-[1.5mm]",
+    eyebrow: "text-[6pt] tracking-[0.14em]",
+    name: "text-[11pt]",
+    brandSvg: { width: 12, height: 11 },
+    brandText: "text-[8pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[5mm] py-[1mm]",
+    topic: "text-[8.5pt] tracking-[0.09em]",
+    bodyPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
+    bodyGap: "gap-[4mm]",
+    steps: "gap-[1.5mm] text-[7pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[4mm]",
+    // 60px = 15.9mm — 0.48mm a module, over the ~0.4mm printed floor.
+    qr: 60,
+    footer: "pb-[1.5mm] text-[6pt]",
+    footerPad: "px-[5mm]",
+  },
+
+  // L4796 tent card, 210 x 60mm. Two panels, 1 card to a sheet — the big one,
+  // for a welcome table.
+  averyTentLarge: {
+    stack: false,
+    card: "h-[60mm] w-[210mm] rounded-none",
+    headerPad: "px-[8mm] pt-[2.5mm] pb-[2mm]",
+    eyebrow: "text-[8pt] tracking-[0.14em]",
+    name: "text-[17pt]",
+    brandSvg: { width: 18, height: 16 },
+    brandText: "text-[11pt]",
+    brandGap: "gap-[1.5mm]",
+    topicRow: "px-[8mm] py-[1.5mm]",
+    topic: "text-[12pt] tracking-[0.09em]",
+    bodyPad: "px-[8mm] pt-[2mm] pb-[1.5mm]",
+    bodyGap: "gap-[8mm]",
+    steps: "gap-[2mm] text-[9pt] leading-snug",
+    stepGap: "gap-[2mm]",
+    numWidth: "w-[5mm]",
+    // 84px = 22.2mm — 0.67mm a module.
+    qr: 84,
+    footer: "pb-[2mm] text-[7.5pt]",
+    footerPad: "px-[8mm]",
+  },
+
+  // C32253 place card, 110 x 40mm. Two panels, 4 cards to a sheet. Same
+  // reduced content as the plain place card: no steps in a 40mm face.
+  averyPlace: {
+    stack: false,
+    card: "h-[40mm] w-[110mm] rounded-none",
+    headerPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
+    eyebrow: "text-[6pt] tracking-[0.14em]",
+    name: "text-[11pt]",
+    brandSvg: { width: 13, height: 12 },
+    brandText: "text-[8.5pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[5mm] py-[1mm]",
+    topic: "text-[8.5pt] tracking-[0.09em]",
+    bodyPad: "px-[5mm] pt-[1mm] pb-[0.5mm]",
+    bodyGap: "gap-[3mm]",
+    steps: "gap-[1.5mm] text-[7pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[4mm]",
+    // 52px = 13.8mm — 0.42mm a module. That is the tightest code favpoll
+    // prints: over the ~0.4mm floor, but only just. The face is 40mm and the
+    // shared-fund line is worth keeping, so this is where the millimetres
+    // went. Test one before a batch.
+    qr: 52,
+    footer: "pb-[1.5mm] text-[6pt]",
+    footerPad: "px-[5mm]",
+  },
+
   wallet: {
     stack: false,
     card: "h-[54mm] w-[85.6mm] rounded-xl",

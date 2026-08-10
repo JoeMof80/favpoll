@@ -201,6 +201,7 @@ export default function FeaturesPage() {
                 "Four A6 postcards to a sheet — postcard size, so they take a stamp",
                 "Four tent cards to a sheet — folded, printed both sides, so a code faces either way across a table",
                 "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket",
+                "Avery-matched sheets too — tent and place cards laid out to L4794, L4796 and C32253, so the print lands on the perforations",
                 "Every card carries the topic, the charity and its registered number",
               ]}
               artefact={<PackVignette />}
