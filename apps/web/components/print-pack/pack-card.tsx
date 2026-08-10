@@ -127,7 +127,38 @@ export const SCALE = {
     footer: "pb-[2.5mm] text-[7.5pt]",
     footerPad: "px-[7mm]",
   },
+  // TENT CARD FACE, 88 x 50mm. One standing side of a folded card — the flat
+  // piece is 88 x 100 and carries this twice, the top copy upside down, so
+  // both sides read upright once folded. See PackSheet's tent branch.
+  //
+  // Wallet's density, because the face is nearly the wallet card's size
+  // (88 x 50 against 85.6 x 54) and that typography is the one in this table
+  // proven to hold the whole mechanic in a small space.
+  tent: {
+    stack: false,
+    card: "h-[50mm] w-[88mm] rounded-lg",
+    headerPad: "px-[3.5mm] pt-[3mm] pb-[2mm]",
+    eyebrow: "text-[6pt] tracking-[0.14em]",
+    name: "text-[10.5pt]",
+    brandSvg: { width: 12, height: 11 },
+    brandText: "text-[8pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[3.5mm] py-[1.5mm]",
+    topic: "text-[8.5pt] tracking-[0.09em]",
+    bodyPad: "px-[3.5mm] pt-[2.5mm] pb-[1mm]",
+    bodyGap: "gap-[3mm]",
+    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[3.5mm]",
+    // 88px = 23.3mm, so each of the 33 modules is 0.7mm — comfortably over
+    // the ~0.4mm printed floor, and a tent card sits closer to the reader
+    // than a poster does.
+    qr: 88,
+    footer: "pb-[1.5mm] text-[5.5pt]",
+    footerPad: "px-[3.5mm]",
+  },
   wallet: {
+    stack: false,
     card: "h-[54mm] w-[85.6mm] rounded-xl",
     headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
