@@ -15,6 +15,15 @@ import type { PackData } from "./pack-card"
 
 // Distinct pages on screen (border + shadow), seamless in print where
 // break-after-page splits them.
+// Which way up each plain sheet prints. The poster and the postcards are
+// landscape because their cards are — and since the pack sets @page from the
+// sheet being printed, that no longer costs a second route or a rotation.
+export const PLAIN_ORIENTATION = {
+  a4: "landscape",
+  a5: "portrait",
+  a6: "landscape",
+} as const
+
 const SHEET =
   "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
 
@@ -89,26 +98,17 @@ export function PackSheet({
 }) {
   if (scale === "a4") {
     return (
-      // The A4 card: a landscape design ROTATED 90° onto a portrait sheet
-      // (founder, 2026-08-02) — every sheet stays portrait, one print job
-      // covers the pack, and the poster comes out landscape when the paper is
-      // turned. The card keeps real mm dimensions in the pre-rotation box.
+      // The poster, on a LANDSCAPE page (founder, 2026-08-10). It used to be a
+      // landscape design rotated 90 degrees onto a portrait sheet, with a
+      // half-size/scale(2) sandwich to stop print fragmentation splitting the
+      // rotated box across two pages. None of that is needed once the page
+      // itself can be landscape — the design simply sits on it.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+        className={`${SHEET} flex min-h-[150mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-0 ${className}`}
       >
-        {/* Print fragmentation uses PRE-transform boxes, so a rotated
-            250mm-wide element split across pages in the print dialog
-            (founder-caught twice, 2026-08-02; headless zero-margin PDFs
-            masked it). The half-size/scale(2) sandwich keeps the layout box
-            at 125 × 90 mm — far inside any printable area, one fragment —
-            while painting at the full 250 × 180. */}
-        <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
-          <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
-            <div className="relative h-[180mm] w-[250mm] origin-top-left scale-50">
-              <PackCard data={data} steps={steps} scale="a4" bleed />
-              {guides && <CutGuides />}
-            </div>
-          </div>
+        <div className="relative h-[180mm] w-[250mm] max-w-full break-inside-avoid">
+          <PackCard data={data} steps={steps} scale="a4" bleed />
+          {guides && <CutGuides />}
         </div>
       </section>
     )
@@ -116,13 +116,13 @@ export function PackSheet({
 
   if (scale === "a6") {
     return (
-      // Four postcards, quartered — portrait cards on a portrait sheet, so
-      // there is no rotation and no page-orientation rule. Every sheet in the
-      // pack prints portrait in one job, which is where this started.
+      // Four postcards, quartered, on a LANDSCAPE page — the cards are
+      // landscape now, and two across is 277mm, which is a landscape A4's
+      // printable width and not a portrait one's.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+        className={`${SHEET} flex min-h-[150mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-0 ${className}`}
       >
-        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
+        <div className="relative h-[190mm] w-[277mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-cols-2 grid-rows-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <PackCard key={i} data={data} steps={steps} scale="a6" bleed />

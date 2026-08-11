@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SCALE, buildPackSteps } from "./pack-card"
-import { PackSheet } from "./pack-sheet"
+import { PackSheet, PLAIN_ORIENTATION } from "./pack-sheet"
 import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
 import type { AveryCode } from "./avery-sheet"
 import { Switch } from "@/components/ui/switch"
@@ -85,8 +85,10 @@ export function PackDocument({ data }: { data: PackData }) {
   // instead be set from whatever is being printed. One route, right way up.
   const landscape =
     printTarget !== null &&
-    printTarget in AVERY_SHEETS &&
-    AVERY_SHEETS[printTarget as AveryCode].orientation === "landscape"
+    (printTarget in AVERY_SHEETS
+      ? AVERY_SHEETS[printTarget as AveryCode].orientation === "landscape"
+      : PLAIN_ORIENTATION[printTarget as keyof typeof PLAIN_ORIENTATION] ===
+        "landscape")
 
   return (
     // .paper pins the light token values across the whole pack, so the cards

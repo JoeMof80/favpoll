@@ -99,39 +99,40 @@ export const SCALE = {
     footer: "pb-[4mm] text-[10.5pt]",
     footerPad: "px-[8mm]",
   },
-  // A6 postcard, PORTRAIT (2026-08-10). A quarter of a portrait A4 is a
-  // portrait A6, so this is what the geometry actually asks for. The previous
-  // landscape version needed the sheet rotated or the page turned landscape,
-  // and neither survived: the rotate sandwich printed at 0.685 scale for
-  // reasons a long bisect never found, and Chrome ignores a NAMED @page's
-  // orientation, so the sheet came out portrait anyway with the block in a
-  // corner. Nothing here needs either trick.
+  // A6 postcard, LANDSCAPE (founder, 2026-08-10). It was portrait, because
+  // four portrait A6 tile a portrait A4 — but the sheet can be landscape now
+  // that the pack sets @page per sheet, and a landscape postcard is both the
+  // commoner shape and the one this card design was drawn for. `stack` goes
+  // with it: at 138mm wide the steps sit beside the code again.
   //
-  // `stack` is the consequence: the steps and the QR cannot sit side by side
-  // in a 95mm-wide card, so the QR goes underneath.
+  // 138.5 x 95mm is a quarter of the landscape printable area, so a few mm
+  // under a true A6. Royal Mail's letter limit is 240 x 165mm, so it still
+  // takes a stamp.
+  //
+  // Values are a5's at ~0.77, the ratio of the two card widths.
   a6: {
-    stack: true,
+    stack: false,
     charityFooter: false,
-    card: "h-[148mm] w-[105mm] rounded-2xl",
-    headerPad: "px-[7mm] pt-[6mm] pb-[3mm]",
+    card: "h-[95mm] w-[138.5mm] rounded-2xl",
+    headerPad: "px-[6mm] pt-[4mm] pb-[2.5mm]",
     eyebrow: "text-[8pt] tracking-[0.12em]",
-    name: "text-[17pt]",
-    brandSvg: { width: 17, height: 15 },
-    brandText: "text-[10pt]",
+    name: "text-[18pt]",
+    brandSvg: { width: 18, height: 16 },
+    brandText: "text-[11pt]",
     brandGap: "gap-[1.2mm]",
-    topicRow: "px-[7mm] py-[2.5mm]",
+    topicRow: "px-[6mm] py-[2mm]",
     topic: "text-[12pt] tracking-[0.09em]",
-    bodyPad: "px-[7mm] pt-[5mm] pb-[3mm]",
-    bodyGap: "gap-[5mm]",
-    steps: "gap-[3mm] text-[9.5pt] leading-relaxed",
+    bodyPad: "px-[6mm] pt-[3.5mm] pb-[2.5mm]",
+    bodyGap: "gap-[4.5mm]",
+    steps: "gap-[2.5mm] text-[10pt] leading-relaxed",
     stepGap: "gap-[2.5mm]",
-    numWidth: "w-[5mm]",
-    // 128px = 33.9mm, so each of the 33 modules is 1.03mm — over twice the
-    // ~0.4mm printed floor.
+    numWidth: "w-[6mm]",
+    // 128px = 33.9mm — 1.03mm a module.
     qr: 128,
-    footer: "pb-[2.5mm] text-[7.5pt]",
-    footerPad: "px-[7mm]",
+    footer: "pb-[2.5mm] text-[8pt]",
+    footerPad: "px-[6mm]",
   },
+
   // ── AVERY-MATCHED FACES ──────────────────────────────────────────────────
   // Sizes are Avery UK's own, read off their Word templates (2026-08-09/10).
   // These print on LANDSCAPE A4 and so live on their own route — see
