@@ -64,12 +64,11 @@ export default async function PackPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:bg-background print:py-0">
-      {/* Wide enough for a full landscape A4 (297mm = 1123px) plus padding. The
-          poster and postcard sheets are landscape now and 277mm across; at
-          980px they were clamped by max-w-full on screen, so the preview
-          showed a squeezed sheet that printed correctly. */}
-      <div className="mx-auto max-w-[1160px] px-4 print:max-w-none print:px-0">
+    <div className="min-h-screen bg-muted/30 py-8 print:min-h-0 print:bg-background print:py-0">
+      {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
+          padding — every sheet renders at true page size now, so nothing is
+          scaled to fit and what you see is what prints. */}
+      <div className="mx-auto max-w-[1220px] px-4 print:max-w-none print:px-0">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">
             <Link href={`/favpolls/${id}`}>

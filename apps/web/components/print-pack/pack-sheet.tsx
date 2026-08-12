@@ -27,6 +27,33 @@ export const PLAIN_ORIENTATION = {
 const SHEET =
   "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
 
+// EVERY SHEET IS A PAGE, on screen and in print (founder, 2026-08-10).
+//
+// The sections used to be min-h with print:min-h-0, so each one hugged its
+// content: on screen they were a row of boxes at eight different heights,
+// none of them A4-shaped, and in print the content sat at the top-left print
+// margin instead of on the page's middle.
+//
+// That second half was a real compatibility bug. Avery CENTRE their grids —
+// L4794's 240 x 180 block has ~28.5mm side and ~15mm top margins on a
+// landscape A4 — so top-aligned content lands about 5mm high and misses the
+// perforations. Getting the card sizes right is not enough; the block has to
+// be in the right PLACE.
+//
+// Screen shows the paper (210 x 297). Print shows the printable area, which
+// is the paper less the @page margin of 10mm a side, so content centres
+// inside what the printer can actually reach.
+//
+// This also retired break-after-page. A sheet that is exactly one printable
+// page tall paginates on its own, and the explicit break was producing a
+// BLANK SECOND PAGE whenever one sheet was printed with the others hidden —
+// which is how the per-sheet buttons work, so it happened every time.
+export function pageClasses(orientation: "portrait" | "landscape") {
+  return orientation === "landscape"
+    ? "h-[210mm] w-[297mm] print:h-[190mm] print:w-[277mm]"
+    : "h-[297mm] w-[210mm] print:h-[277mm] print:w-[190mm]"
+}
+
 // THE SAFE BOX. Every sheet lays out inside this, and it is why the A6 sheet
 // is no longer full bleed (founder-caught in the print dialog, 2026-08-10):
 // four A6 tile A4 exactly, so a full-bleed sheet has nothing left for the
@@ -104,7 +131,7 @@ export function PackSheet({
       // rotated box across two pages. None of that is needed once the page
       // itself can be landscape — the design simply sits on it.
       <section
-        className={`${SHEET} flex min-h-[150mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-0 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center print:break-inside-avoid ${className}`}
       >
         <div className="relative h-[180mm] w-[250mm] max-w-full break-inside-avoid">
           <PackCard data={data} steps={steps} scale="a4" bleed />
@@ -120,7 +147,7 @@ export function PackSheet({
       // landscape now, and two across is 277mm, which is a landscape A4's
       // printable width and not a portrait one's.
       <section
-        className={`${SHEET} flex min-h-[150mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-0 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center print:break-inside-avoid ${className}`}
       >
         <div className="relative h-[190mm] w-[277mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-cols-2 grid-rows-2">
@@ -138,7 +165,7 @@ export function PackSheet({
     return (
       // Two per sheet, for tables and easels — the sheet cut in half.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:p-2 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center ${className}`}
       >
         <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-rows-2">

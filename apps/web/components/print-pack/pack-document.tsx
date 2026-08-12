@@ -116,35 +116,17 @@ export function PackDocument({ data }: { data: PackData }) {
           page so the pack it depicts and the pack it prints cannot drift. */}
       <div data-sheet="a4" className={hideWhenOtherPrints("a4")}>
         <SheetPrintButton target="a4" onPrint={setPrintTarget} />
-        <PackSheet
-          data={data}
-          steps={steps}
-          guides={guides}
-          scale="a4"
-          className="break-after-page"
-        />
+        <PackSheet data={data} steps={steps} guides={guides} scale="a4" />
       </div>
 
       <div data-sheet="a5" className={hideWhenOtherPrints("a5")}>
         <SheetPrintButton target="a5" onPrint={setPrintTarget} />
-        <PackSheet
-          data={data}
-          steps={steps}
-          guides={guides}
-          scale="a5"
-          className="break-after-page"
-        />
+        <PackSheet data={data} steps={steps} guides={guides} scale="a5" />
       </div>
 
       <div data-sheet="a6" className={hideWhenOtherPrints("a6")}>
         <SheetPrintButton target="a6" onPrint={setPrintTarget} />
-        <PackSheet
-          data={data}
-          steps={steps}
-          guides={guides}
-          scale="a6"
-          className="break-after-page"
-        />
+        <PackSheet data={data} steps={steps} guides={guides} scale="a6" />
       </div>
 
       {(Object.keys(AVERY_SHEETS) as AveryCode[]).map((code) => {
@@ -167,13 +149,7 @@ export function PackDocument({ data }: { data: PackData }) {
               </p>
             </div>
             <SheetPrintButton target={code} onPrint={setPrintTarget} />
-            <AverySheet
-              data={data}
-              steps={steps}
-              code={code}
-              guides={guides}
-              className="break-after-page"
-            />
+            <AverySheet data={data} steps={steps} code={code} guides={guides} />
           </div>
         )
       })}

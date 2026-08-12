@@ -1,4 +1,5 @@
 import { PackCard } from "./pack-card"
+import { pageClasses } from "./pack-sheet"
 import type { PackData } from "./pack-card"
 
 // Sheets laid out to Avery UK's own stock, so print lands on the die cuts
@@ -116,7 +117,10 @@ export function AverySheet({
 
   return (
     <section
-      className={`flex min-h-[150mm] items-center justify-center rounded-lg border border-border bg-background p-6 shadow-sm print:min-h-0 print:break-inside-avoid print:rounded-none print:border-0 print:p-0 print:shadow-none ${className}`}
+      // A page, not a box round the cards — see pageClasses. Avery centre
+      // their grids, so a sheet that shrank to its content put every card a
+      // few mm off the die cut.
+      className={`${pageClasses(sheet.orientation)} mx-auto flex items-center justify-center rounded-lg border border-border bg-background shadow-sm print:break-inside-avoid print:rounded-none print:border-0 print:shadow-none ${className}`}
     >
       <div
         className="relative grid max-w-full break-inside-avoid"
