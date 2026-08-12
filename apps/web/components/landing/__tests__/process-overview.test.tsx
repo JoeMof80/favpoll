@@ -86,7 +86,7 @@ describe("ProcessOverview", () => {
 
     // The card is paper at wallet size; the display hangs in a TV, not a
     // browser window and not a phone.
-    expect(screen.getByTestId("pack-card").dataset.scale).toBe("wallet")
+    expect(screen.getByTestId("pack-card").dataset.scale).toBe("l7418")
     expect(screen.getByTestId("tv-frame")).toContainElement(
       screen.getByTestId("display-still")
     )

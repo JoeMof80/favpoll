@@ -64,8 +64,11 @@ export default async function PackPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:bg-background print:py-0">
-      <div className="mx-auto max-w-[820px] px-4 print:px-0">
+    <div className="min-h-screen bg-muted/30 py-8 print:min-h-0 print:bg-background print:py-0">
+      {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
+          padding — every sheet renders at true page size now, so nothing is
+          scaled to fit and what you see is what prints. */}
+      <div className="mx-auto max-w-[1220px] px-4 print:max-w-none print:px-0">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">
             <Link href={`/favpolls/${id}`}>
@@ -88,25 +91,6 @@ export default async function PackPage({ params }: Props) {
             code — if any card is going to struggle, it is that one.
           </AlertDescription>
         </Alert>
-        {/* Avery-matched sheets are all LANDSCAPE, so they cannot share this
-            print job — Chrome ignores a per-sheet page orientation. Their own
-            route makes the whole document landscape, which is the only way it
-            works. */}
-        <div className="mb-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background px-5 py-4 print:hidden">
-          <div className="min-w-0">
-            <h2 className="text-base font-medium text-foreground">
-              Printing on Avery card?
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Tent cards and place cards laid out to Avery&rsquo;s die-cut
-              stock, so the print lands on the perforations. They print
-              landscape, so they are a separate sheet set.
-            </p>
-          </div>
-          <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link href={`/favpolls/${id}/pack/avery`}>Avery sheets</Link>
-          </Button>
-        </div>
         <QrExport
           value={data.qrUrl}
           name={`favpoll-qr-${favpoll.short_code}`}

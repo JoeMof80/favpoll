@@ -15,8 +15,44 @@ import type { PackData } from "./pack-card"
 
 // Distinct pages on screen (border + shadow), seamless in print where
 // break-after-page splits them.
+// Which way up each plain sheet prints. The poster and the postcards are
+// landscape because their cards are — and since the pack sets @page from the
+// sheet being printed, that no longer costs a second route or a rotation.
+export const PLAIN_ORIENTATION = {
+  a4: "landscape",
+  a5: "portrait",
+  a6: "landscape",
+} as const
+
 const SHEET =
   "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
+
+// EVERY SHEET IS A PAGE, on screen and in print (founder, 2026-08-10).
+//
+// The sections used to be min-h with print:min-h-0, so each one hugged its
+// content: on screen they were a row of boxes at eight different heights,
+// none of them A4-shaped, and in print the content sat at the top-left print
+// margin instead of on the page's middle.
+//
+// That second half was a real compatibility bug. Avery CENTRE their grids —
+// L4794's 240 x 180 block has ~28.5mm side and ~15mm top margins on a
+// landscape A4 — so top-aligned content lands about 5mm high and misses the
+// perforations. Getting the card sizes right is not enough; the block has to
+// be in the right PLACE.
+//
+// Screen shows the paper (210 x 297). Print shows the printable area, which
+// is the paper less the @page margin of 10mm a side, so content centres
+// inside what the printer can actually reach.
+//
+// This also retired break-after-page. A sheet that is exactly one printable
+// page tall paginates on its own, and the explicit break was producing a
+// BLANK SECOND PAGE whenever one sheet was printed with the others hidden —
+// which is how the per-sheet buttons work, so it happened every time.
+export function pageClasses(orientation: "portrait" | "landscape") {
+  return orientation === "landscape"
+    ? "h-[210mm] w-[297mm] print:h-[190mm] print:w-[277mm]"
+    : "h-[297mm] w-[210mm] print:h-[277mm] print:w-[190mm]"
+}
 
 // THE SAFE BOX. Every sheet lays out inside this, and it is why the A6 sheet
 // is no longer full bleed (founder-caught in the print dialog, 2026-08-10):
@@ -45,13 +81,29 @@ const SHEET =
 // what a border used to imply, without the border's problem: a printed rule
 // round a card shows every millimetre you cut off-line, whereas a dashed line
 // down the middle is aimed at, not compared against.
-function CutGuides({ quarters = false }: { quarters?: boolean }) {
+function CutGuides({ cols = 1, rows = 1 }: { cols?: number; rows?: number }) {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border" />
-      {quarters && (
-        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-border" />
-      )}
+    // The perimeter as well as the divisions — the cards do not reach the
+    // paper's edge, so the outside needs trimming too. A sheet with one card
+    // on it (the poster) gets the perimeter and nothing else.
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 border border-dashed border-border"
+    >
+      {Array.from({ length: rows - 1 }).map((_, i) => (
+        <div
+          key={`r${i}`}
+          className="absolute inset-x-0 border-t border-dashed border-border"
+          style={{ top: `${((i + 1) / rows) * 100}%` }}
+        />
+      ))}
+      {Array.from({ length: cols - 1 }).map((_, i) => (
+        <div
+          key={`c${i}`}
+          className="absolute inset-y-0 border-l border-dashed border-border"
+          style={{ left: `${((i + 1) / cols) * 100}%` }}
+        />
+      ))}
     </div>
   )
 }
@@ -60,75 +112,30 @@ export function PackSheet({
   data,
   steps,
   scale,
+  guides = true,
   className = "",
 }: {
   data: PackData
   steps: string[] | null
   scale: keyof typeof SCALE
+  /** Dashed cut lines, for plain paper. Toggled for the whole pack. */
+  guides?: boolean
   /** Sheet-level extras from the host — break-after-page, print:hidden. */
   className?: string
 }) {
   if (scale === "a4") {
     return (
-      // The A4 card: a landscape design ROTATED 90° onto a portrait sheet
-      // (founder, 2026-08-02) — every sheet stays portrait, one print job
-      // covers the pack, and the poster comes out landscape when the paper is
-      // turned. The card keeps real mm dimensions in the pre-rotation box.
+      // The poster, on a LANDSCAPE page (founder, 2026-08-10). It used to be a
+      // landscape design rotated 90 degrees onto a portrait sheet, with a
+      // half-size/scale(2) sandwich to stop print fragmentation splitting the
+      // rotated box across two pages. None of that is needed once the page
+      // itself can be landscape — the design simply sits on it.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center print:break-inside-avoid ${className}`}
       >
-        {/* Print fragmentation uses PRE-transform boxes, so a rotated
-            250mm-wide element split across pages in the print dialog
-            (founder-caught twice, 2026-08-02; headless zero-margin PDFs
-            masked it). The half-size/scale(2) sandwich keeps the layout box
-            at 125 × 90 mm — far inside any printable area, one fragment —
-            while painting at the full 250 × 180. */}
-        <div className="flex h-[250mm] w-[180mm] max-w-full break-inside-avoid items-center justify-center">
-          <div className="h-[90mm] w-[125mm] [transform:rotate(-90deg)_scale(2)]">
-            <div className="h-[180mm] w-[250mm] origin-top-left scale-50">
-              <PackCard data={data} steps={steps} scale="a4" bleed />
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  if (scale === "tent") {
-    return (
-      // TENT CARDS, four to a sheet. Each flat piece is 88 x 100mm and carries
-      // the face TWICE — the upper copy rotated 180 degrees — so that when it
-      // is folded along the middle both sides stand upright. A guest on either
-      // side of the table gets a code; a tent card with one blank face is a
-      // tent card half the room cannot use.
-      //
-      // Portrait sheet, no rotation, no page rules. The postcard sheet spent
-      // three attempts learning that lesson.
-      <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
-      >
-        <div className="relative h-[200mm] w-[176mm] max-w-full break-inside-avoid">
-          <div className="grid h-full w-full grid-cols-2 grid-rows-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="relative flex flex-col">
-                {/* Upper face, upside down — it comes the right way up as the
-                    card is folded back over itself. */}
-                <div className="h-1/2 w-full rotate-180">
-                  <PackCard data={data} steps={steps} scale="tent" bleed />
-                </div>
-                <div className="h-1/2 w-full">
-                  <PackCard data={data} steps={steps} scale="tent" bleed />
-                </div>
-                {/* The fold, distinguished from the cuts: a finer dotted rule,
-                    and it says so. */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dotted border-border/70"
-                />
-              </div>
-            ))}
-          </div>
-          <CutGuides quarters />
+        <div className="relative h-[180mm] w-[250mm] max-w-full break-inside-avoid">
+          <PackCard data={data} steps={steps} scale="a4" bleed />
+          {guides && <CutGuides />}
         </div>
       </section>
     )
@@ -136,19 +143,19 @@ export function PackSheet({
 
   if (scale === "a6") {
     return (
-      // Four postcards, quartered — portrait cards on a portrait sheet, so
-      // there is no rotation and no page-orientation rule. Every sheet in the
-      // pack prints portrait in one job, which is where this started.
+      // Four postcards, quartered, on a LANDSCAPE page — the cards are
+      // landscape now, and two across is 277mm, which is a landscape A4's
+      // printable width and not a portrait one's.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:break-inside-avoid print:p-2 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center print:break-inside-avoid ${className}`}
       >
-        <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
+        <div className="relative h-[190mm] w-[277mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-cols-2 grid-rows-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <PackCard key={i} data={data} steps={steps} scale="a6" bleed />
             ))}
           </div>
-          <CutGuides quarters />
+          {guides && <CutGuides cols={2} rows={2} />}
         </div>
       </section>
     )
@@ -158,29 +165,22 @@ export function PackSheet({
     return (
       // Two per sheet, for tables and easels — the sheet cut in half.
       <section
-        className={`${SHEET} flex min-h-[277mm] items-center justify-center p-6 print:min-h-0 print:p-2 ${className}`}
+        className={`${SHEET} ${pageClasses(PLAIN_ORIENTATION[scale])} mx-auto flex items-center justify-center ${className}`}
       >
         <div className="relative h-[250mm] w-[180mm] max-w-full break-inside-avoid">
           <div className="grid h-full w-full grid-rows-2">
             <PackCard data={data} steps={steps} scale="a5" bleed />
             <PackCard data={data} steps={steps} scale="a5" bleed />
           </div>
-          <CutGuides />
+          {guides && <CutGuides cols={1} rows={2} />}
         </div>
       </section>
     )
   }
 
-  // Wallet cards: credit-card size (85.6 × 54 mm), eight to a sheet.
-  return (
-    <section
-      className={`${SHEET} min-h-[277mm] px-6 py-8 print:min-h-0 ${className}`}
-    >
-      <div className="grid grid-cols-2 justify-items-center gap-x-[4mm] gap-y-[4mm]">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <PackCard key={i} data={data} steps={steps} scale="wallet" />
-        ))}
-      </div>
-    </section>
-  )
+  // The wallet-card sheet was here. It is gone (founder, 2026-08-10): L7418
+  // is the same card at 86 x 55, eight to a sheet, and with cut lines turned
+  // on it IS this sheet — printed on plain card instead of label stock. One
+  // layout per format, the same call made for the tent and place cards.
+  return null
 }

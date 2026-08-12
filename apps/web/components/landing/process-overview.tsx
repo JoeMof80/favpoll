@@ -130,7 +130,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
           "-rotate-2"
         )}
       >
-        <PackCard data={PACK_DATA} steps={PACK_STEPS} scale="wallet" />
+        <PackCard data={PACK_DATA} steps={PACK_STEPS} scale="l7418" />
       </div>
     )
   }
