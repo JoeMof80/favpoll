@@ -264,15 +264,25 @@ describe("OrganizerRow", () => {
     })
 
     it("shows closing date, pledge count and reveal status", () => {
+      // A date RELATIVE to now, not a fixed one. This was pinned to
+      // 2026-08-12, so from the 13th the favpoll was closed, the row said
+      // "Closed", and the test failed for good — a time bomb that had nothing
+      // to do with whatever change happened to be in flight when it went off.
+      const closesAt = new Date(Date.now() + 45 * 86400000)
+      const closesLabel = closesAt.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
       const fp = makeFavpoll({
-        closes_at: "2026-08-12T17:00:00Z",
+        closes_at: closesAt.toISOString(),
         pledge_count: 12,
         has_reveal: true,
       })
       render(<OrganizerRow favpoll={fp} />)
       expand()
       expect(screen.getByText("Closes")).toBeInTheDocument()
-      expect(screen.getByText("12 August 2026")).toBeInTheDocument()
+      expect(screen.getByText(closesLabel)).toBeInTheDocument()
       expect(screen.getByText("Pledges")).toBeInTheDocument()
       expect(screen.getByText("12")).toBeInTheDocument()
       expect(screen.getByText("Written")).toBeInTheDocument()

@@ -6,61 +6,58 @@ import {
   DEMO_PACK_STEPS,
 } from "@/components/landing/demo-fixture"
 
-// The pack as it looks BEFORE it is printed: three sheets of A4, carrying
-// one poster, two table cards and eight wallet cards (founder, 2026-08-09).
+// The pack as it looks BEFORE it is printed — real PackSheets, shared with
+// PackDocument, so the pack this page depicts and the pack the printer
+// produces cannot drift apart.
 //
-// It showed three loose cards fanned on a table, which got the three SIZES
-// across but not the thing an organiser actually receives. "Eight wallet
-// cards to a sheet" is a sentence in the lead; a sheet with eight cards
-// ruled on it is the same fact, already understood.
+// A FAN, NOT A ROW (founder, 2026-08-13). Laid side by side, every sheet had
+// to fit the frame's width at once and each came out 127px tall — you could
+// see that there were sheets, not what was on them. Overlapping buys back
+// the width: four sheets take 2354px of fan instead of 3906px of row, so the
+// same frame renders them half as large again.
 //
-// These are the REAL PackSheets, shared with PackDocument, so the pack this
-// page depicts and the pack the printer produces cannot drift apart.
+// What is lost to the overlap is each sheet's right-hand edge, and that is
+// the cheapest thing to lose: what distinguishes these is the COUNT and the
+// GRID on each — one poster, two table cards, four folded tents, eight
+// labels — and both read from the left.
+//
+// FOUR, chosen for range rather than completeness. One card and eight; flat
+// and folded; landscape and portrait. The postcards and the place cards sit
+// between these on every axis, so they are named in the bullets beside the
+// vignette instead.
 
-// An A4 sheet is 210mm wide and the pack's sheets are 277mm of usable print
-// height — 794 x 1047px at 96dpi. FIVE in a row with 24px gutters is
-// 4066 x 1047, which the boxes below are that multiplied by the scale.
-// The A6 postcard and tent sheets joined them (2026-08-09/10) and the scale dropped to
-// suit; the sheets get small, but what distinguishes them is the COUNT on
-// each — 1, 2, 4, 8 — and a count survives shrinking better than type does.
-//
-// SIDE BY SIDE, not fanned. Overlapping them would hide the right-hand
-// column of the wallet sheet and the lower of the two A5 cards, which is
-// precisely what distinguishes the three. All three sheets are the same
-// size here, so there is no size relationship to preserve — only a layout
-// one, and layout has to be seen whole.
-// A4 at 96dpi: portrait 794 x 1123px, landscape 1123 x 794. The sheets are
-// true pages now — each renders at the size it prints — so the row mixes both
-// orientations and is centred on the tallest.
-//
-// Four of them, portrait and landscape alternating, is 3906px wide: the
-// poster (landscape), the A5 pair (portrait), the postcards (landscape) and
-// the wallet-card-and-label sheet (portrait). That is the range; the tent and
-// place cards are named in the bullets beside it.
+// A4 at 96dpi: portrait 794 x 1123px, landscape 1123 x 794.
 const PORTRAIT = { w: 794, h: 1123 }
 const LANDSCAPE = { w: 1123, h: 794 }
-const GUTTER = 24
 
+// Authored at full page size and scaled once, so the overlap is designed
+// rather than whatever the flex gap happened to leave. x/y are the top-left
+// of each sheet within the fan; the tilts are small and alternate, which
+// reads as a stack someone has spread rather than a diagram.
+// Ordered so the FOLDED sheet finishes the fan, uncovered. It is the one
+// with something to notice — cards printed twice, the upper half upside
+// down — and it was unreadable when it sat third with a label sheet over it.
+// The three in front of it are recognisable from a sliver: one big card, two
+// cards, a grid of eight.
 const SHEETS = [
-  { kind: "plain", id: "a4", page: LANDSCAPE },
-  { kind: "plain", id: "a5", page: PORTRAIT },
-  { kind: "plain", id: "a6", page: LANDSCAPE },
-  { kind: "avery", id: "L7418", page: PORTRAIT },
+  { kind: "plain", id: "a4", page: LANDSCAPE, x: 0, y: 150, rot: -2.5 },
+  { kind: "plain", id: "a5", page: PORTRAIT, x: 500, y: 10, rot: 1.5 },
+  { kind: "avery", id: "L7418", page: PORTRAIT, x: 950, y: 30, rot: -1.5 },
+  { kind: "avery", id: "L4794", page: LANDSCAPE, x: 1430, y: 190, rot: 2 },
 ] as const
 
-const ROW_W =
-  SHEETS.reduce((n, s) => n + s.page.w, 0) + GUTTER * (SHEETS.length - 1)
-const ROW_H = Math.max(...SHEETS.map((s) => s.page.h))
+const FAN_W = Math.max(...SHEETS.map((s) => s.x + s.page.w)) // 2553
+const FAN_H = Math.max(...SHEETS.map((s) => s.y + s.page.h)) // 1153
 
 export function PackVignette() {
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — measured to fit rather than
           computed at runtime, matching the process overview.
-          0.12 / 0.22 / 0.255 give 294, 538 and 624 wide. */}
+          0.115 / 0.213 / 0.2444 of 2553 x 1153 give the sizes below. */}
       <div
         data-artefact-box
-        className="h-[84px] w-[293px] sm:h-[156px] sm:w-[543px] lg:h-[180px] lg:w-[625px]"
+        className="h-[133px] w-[294px] sm:h-[246px] sm:w-[544px] lg:h-[282px] lg:w-[624px]"
       >
         {/* .paper pins the light token values — the cards force bg-white, so
             without them a dark-mode visitor gets white ink on a white card
@@ -68,11 +65,20 @@ export function PackVignette() {
             darkens it for ink that survives a domestic printer, which on a
             screen just outlines every row. */}
         <div
-          className="paper paper-screen flex origin-top-left scale-[0.075] items-center gap-6 sm:scale-[0.139] lg:scale-[0.16]"
-          style={{ width: ROW_W, height: ROW_H }}
+          className="paper paper-screen relative origin-top-left scale-[0.115] sm:scale-[0.213] lg:scale-[0.2444]"
+          style={{ width: FAN_W, height: FAN_H }}
         >
           {SHEETS.map((s) => (
-            <div key={s.id} style={{ width: s.page.w }}>
+            <div
+              key={s.id}
+              className="absolute drop-shadow-xl"
+              style={{
+                left: s.x,
+                top: s.y,
+                width: s.page.w,
+                transform: `rotate(${s.rot}deg)`,
+              }}
+            >
               {s.kind === "avery" ? (
                 <AverySheet
                   data={DEMO_PACK_DATA}
@@ -84,7 +90,7 @@ export function PackVignette() {
                 <PackSheet
                   data={DEMO_PACK_DATA}
                   steps={DEMO_PACK_STEPS}
-                  scale={s.id as "a4" | "a5" | "a6"}
+                  scale={s.id as "a4" | "a5"}
                 />
               )}
             </div>
