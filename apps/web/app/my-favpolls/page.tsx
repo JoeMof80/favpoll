@@ -35,6 +35,7 @@ export default async function MyFavpollsPage() {
       total_raised,
       goal_amount,
       is_listed,
+      allow_guest_items,
       created_at,
       protagonists!favpolls_protagonist_id_fkey ( name ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description ) ),
@@ -61,6 +62,7 @@ export default async function MyFavpollsPage() {
     total_raised: number
     goal_amount: number | null
     is_listed: boolean
+    allow_guest_items: boolean | null
     created_at: string
     protagonists: { name: string } | null
     favpoll_charities: {
@@ -105,6 +107,7 @@ export default async function MyFavpollsPage() {
     total_raised: ev.total_raised,
     goal_amount: ev.goal_amount ?? null,
     is_listed: ev.is_listed ?? true,
+    allow_guest_items: ev.allow_guest_items ?? true,
     created_at: ev.created_at,
     protagonist: ev.protagonists ?? null,
     charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),

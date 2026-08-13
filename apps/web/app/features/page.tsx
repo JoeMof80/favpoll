@@ -186,7 +186,7 @@ export default function FeaturesPage() {
                 "The list of ready-made favpoll topics is long and always growing",
                 "Add a topic that is missing, or one specific to the event — a family in-joke, say",
                 "Add any missing favourite to a topic",
-                "Guests can add missing favourites too, at the discretion of the organiser",
+                "Guests can add missing favourites too, with no account needed — switch that off for any favpoll, and hide anything you would rather not keep",
               ]}
               artefact={<TopicPickerVignette />}
             />

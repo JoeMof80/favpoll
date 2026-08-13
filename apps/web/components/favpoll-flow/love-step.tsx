@@ -218,6 +218,21 @@ export function LoveStep({
           </InputGroup>
         )}
 
+        {/* A PERSISTENT hint (2026-08-13). The Add only appears once a search
+            matches nothing, so writing your own topic was found only by
+            organisers who already suspected they could. Said plainly, and
+            quietly — the catalogue is still the better answer where it has
+            one, because canon topics aggregate into the record and a one-off
+            does not.
+            OUTSIDE the externalSearch branch, deliberately. The wizard owns
+            the search box and passes it in, so anything inside that branch
+            never renders in the only place this component is actually used. */}
+        {!showCreate && (
+          <p className="mb-3 text-xs text-muted-foreground">
+            Is your topic missing? Type it and click Add
+          </p>
+        )}
+
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             Filters

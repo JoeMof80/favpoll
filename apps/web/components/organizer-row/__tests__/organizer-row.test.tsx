@@ -172,7 +172,9 @@ describe("OrganizerRow", () => {
         "true"
       )
       expect(screen.getByTestId("qr-svg")).toBeInTheDocument()
-      expect(screen.getByRole("switch")).toBeInTheDocument()
+      expect(
+        screen.getByRole("switch", { name: /listed/i })
+      ).toBeInTheDocument()
     })
 
     it("offers a second guest-link copy inside the share zone", () => {
@@ -367,7 +369,7 @@ describe("OrganizerRow", () => {
       const { setFavpollListed } = await import("@/app/favpolls/[id]/actions")
       render(<OrganizerRow favpoll={makeFavpoll({ is_listed: true })} />)
       expand()
-      fireEvent.click(screen.getByRole("switch"))
+      fireEvent.click(screen.getByRole("switch", { name: /listed/i }))
       await waitFor(() => {
         expect(setFavpollListed).toHaveBeenCalledWith("fp-1", false)
       })
@@ -380,7 +382,7 @@ describe("OrganizerRow", () => {
       )
       render(<OrganizerRow favpoll={makeFavpoll({ is_listed: true })} />)
       expand()
-      fireEvent.click(screen.getByRole("switch"))
+      fireEvent.click(screen.getByRole("switch", { name: /listed/i }))
       await waitFor(() => {
         expect(screen.getByText("Listed")).toBeInTheDocument()
       })

@@ -11,6 +11,11 @@
 //      they search for one the organiser never thought of, nothing matches,
 //      and the same Add makes it theirs (founder, 2026-08-09).
 //
+// Both pickers now carry a PERSISTENT hint under the field, and so does this
+// (2026-08-13). The Add used to appear only once a search matched nothing,
+// which meant the option was found only by people who already suspected it —
+// so the vignette was depicting a discoverable affordance that was not one.
+//
 // Beat 3 was added because the lead gives guest additions a third of its
 // sentence and the picture stopped at the organiser. It extends rather than
 // interrupts: the guest picker is a search field with an Add, which is the
@@ -275,6 +280,13 @@ export function TopicPickerVignette() {
                       </InputGroupButton>
                     </InputGroupAddon>
                   )}
+                  {!searchAddVisible && (
+                    <InputGroupAddon align="block-end" className="pt-0 pb-2">
+                      <span className="text-xs text-muted-foreground">
+                        Is your topic missing? Type it and click Add
+                      </span>
+                    </InputGroupAddon>
+                  )}
                 </InputGroup>
               </div>
               <div className="flex min-h-8 flex-wrap gap-1.5 px-5 py-4">
@@ -421,6 +433,13 @@ export function TopicPickerVignette() {
                     </InputGroupButton>
                   )}
                 </div>
+                {!guestNoMatch && (
+                  <InputGroupAddon align="block-end" className="px-5 pt-0 pb-3">
+                    <span className="text-xs text-muted-foreground">
+                      Is yours missing? Type it and click Add
+                    </span>
+                  </InputGroupAddon>
+                )}
               </InputGroup>
               {/* The organiser's three, which the guest reads before finding
                   theirs is not among them. */}

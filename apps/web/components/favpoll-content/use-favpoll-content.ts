@@ -68,7 +68,11 @@ export function useFavpollContent({
   )
 
   function addItemHandler(poll: FavpollPollWithItems) {
-    if (poll.topics.is_finite || isClosed || !clerkUserId) return undefined
+    // No clerkUserId check on the GUEST path (2026-08-13). Guests pledge with
+    // an email and no account, so gating this on sign-in withheld it from
+    // almost everyone it was for. The server action rate-limits by IP and
+    // flags the favourite for review instead.
+    if (poll.topics.is_finite || isClosed) return undefined
     const isOrganiser = clerkUserId === favpoll.created_by
     if (isOrganiser) {
       return async (label: string) => {

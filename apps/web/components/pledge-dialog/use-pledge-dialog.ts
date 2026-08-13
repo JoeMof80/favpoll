@@ -53,12 +53,12 @@ export function usePledgeDialog({
         item.label.toLowerCase().includes(lowerSearch)
       )
     : sortedItems
-  const showCreate = !!(
-    !pollWithItems.topics.is_finite &&
-    onAddItem &&
-    lowerSearch &&
-    filteredItems.length === 0
-  )
+  // Whether adding is possible AT ALL — an open topic, and a handler, which
+  // the page withholds when the organiser has turned guest additions off.
+  // showCreate is this plus "and the search found nothing", so canAdd is what
+  // the persistent hint keys on.
+  const canAdd = !!(!pollWithItems.topics.is_finite && onAddItem)
+  const showCreate = !!(canAdd && lowerSearch && filteredItems.length === 0)
 
   function toggleDraft(id: string) {
     setDraftIds((prev) =>
@@ -226,6 +226,7 @@ export function usePledgeDialog({
     },
     sortedItems,
     filteredItems,
+    canAdd,
     showCreate,
     addingItem,
     addError,

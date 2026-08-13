@@ -132,6 +132,7 @@ export function PledgeDialog({
       onDeselect={dialog.toggleDraft}
       topicTitle={topicTitle}
       showCreate={dialog.showCreate}
+      canAdd={dialog.canAdd}
       addingItem={dialog.addingItem}
     />
   )

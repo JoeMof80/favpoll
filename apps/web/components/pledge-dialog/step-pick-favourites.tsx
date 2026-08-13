@@ -19,6 +19,8 @@ type PickerHeaderProps = {
   topicTitle?: string
   showCreate: boolean
   addingItem: boolean
+  /** Adding is possible at all — open topic, and the organiser allows it. */
+  canAdd: boolean
 }
 
 export function PickerHeader({
@@ -31,6 +33,7 @@ export function PickerHeader({
   topicTitle,
   showCreate,
   addingItem,
+  canAdd,
 }: PickerHeaderProps) {
   const placeholder = topicTitle
     ? `Search for your favourite ${topicTitle.toLowerCase()}…`
@@ -102,6 +105,23 @@ export function PickerHeader({
           </InputGroupButton>
         )}
       </div>
+
+      {/* A PERSISTENT hint, not one that waits to be discovered (2026-08-13).
+          The Add button only appears once a search matches nothing, so the
+          only people who found out they could add were the ones who already
+          suspected it. A guest who scans the chips, does not see theirs and
+          picks a near-miss never learns — which is exactly the guest the
+          feature exists for.
+          Suppressed when adding is impossible: a finite topic, or an
+          organiser who has turned it off. Never advertise what cannot be
+          done. */}
+      {canAdd && !showCreate && (
+        <InputGroupAddon align="block-end" className="px-5 pt-0 pb-3">
+          <span className="text-xs text-muted-foreground">
+            Is yours missing? Type it and click Add
+          </span>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   )
 }
