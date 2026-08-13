@@ -186,74 +186,121 @@ export function TopicPickerVignette() {
   const guestPicked = phase.kind === "guest-adding" || phase.kind === "hold"
   const guestAddPressed = phase.kind === "guest-adding"
 
+  // ONE DIALOG AT A TIME (founder, 2026-08-13). The three used to stack and
+  // fan, which showed a state the app never has — you only ever see one
+  // overlay. Stepping through is truer, and it lets each dialog take the
+  // whole frame instead of 86% of it at a tilt, so the type is legible.
+  //
+  // What the stack conveyed for free was that there ARE three surfaces. The
+  // caption and dots pay that back, and name who is acting, which the stack
+  // never did: the first two are the organiser, the third a guest on a
+  // different day.
+  const step =
+    phase.kind === "search" || phase.kind === "create"
+      ? 0
+      : phase.kind === "typing" || phase.kind === "adding"
+        ? 1
+        : 2
+  const CAPTIONS = [
+    "An organiser writes a question the list has not got",
+    "…and adds the answers",
+    "Later, a guest adds one nobody thought of",
+  ]
+
   return (
     <Vignette>
-      <div className="relative min-h-[27.5rem]">
-        {/* ── 1. The wizard's "Pick a topic" overlay ── */}
-        <div className="absolute top-0 left-0 w-[86%] -rotate-1 rounded-xl border border-border bg-background p-5 shadow-lg">
-          <div className="flex h-9 items-center gap-2">
+      {/* Caption + dots, so a glance says where in the sequence this is and
+          that there are three steps — the one thing the stack gave away for
+          nothing. */}
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">{CAPTIONS[step]}</p>
+        <div className="flex shrink-0 gap-1.5">
+          {CAPTIONS.map((c, i) => (
             <span
-              className={
-                searchText
-                  ? "flex-1 text-base text-foreground"
-                  : "flex-1 text-base text-muted-foreground/50"
-              }
-            >
-              {searchText || "Search topics…"}
-              {searchTyping && <span className="opacity-40">|</span>}
-            </span>
-            {searchAddVisible && (
-              <InputGroupButton
-                className={searchAddPressed ? "scale-[0.96] brightness-95" : ""}
-              >
-                Add
-              </InputGroupButton>
-            )}
-          </div>
-          <div className="mt-4 flex min-h-8 flex-wrap gap-1.5">
-            <AnimatePresence initial={false}>
-              {topicsVisible &&
-                SUGGESTED_TOPICS.map((label) => (
-                  <motion.span
-                    key={label}
-                    initial={false}
-                    exit={reduced ? undefined : { opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.2, ease: "easeIn" }}
-                  >
-                    <Chip size="lg" readOnly>
-                      {label}
-                    </Chip>
-                  </motion.span>
-                ))}
-              {!topicsVisible && (
-                <motion.p
-                  key="no-match"
-                  initial={reduced ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-sm text-muted-foreground/60"
-                >
-                  No matching topics — add your own.
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
+              key={c}
+              className={`h-1.5 w-1.5 rounded-full ${i === step ? "bg-primary" : "bg-border"}`}
+            />
+          ))}
         </div>
+      </div>
 
-        {/* ── 2. TopicItemsDialog, sliding in front once the topic exists ── */}
-        <AnimatePresence initial={false}>
-          {(itemsOpen || reduced) && (
+      {/* One dialog, one size, one place. min-h is the TALLEST step —
+          measured at 191px across a full loop, 208 here for headroom — so the frame never resizes as the sequence advances
+          and the section below does not jump three times a loop. */}
+      <div className="relative min-h-52">
+        <AnimatePresence initial={false} mode="wait">
+          {step === 0 && (
             <motion.div
-              key="items-dialog"
-              initial={reduced ? false : { opacity: 0, y: 16, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={reduced ? undefined : { opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute top-16 left-[8%] w-[88%] rotate-1 rounded-xl border border-border bg-background p-5 shadow-xl"
+              key="topic"
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="absolute inset-x-0 top-0 rounded-xl border border-border bg-background p-5 shadow-lg"
+            >
+              <div className="flex h-9 items-center gap-2">
+                <span
+                  className={
+                    searchText
+                      ? "flex-1 text-base text-foreground"
+                      : "flex-1 text-base text-muted-foreground/50"
+                  }
+                >
+                  {searchText || "Search topics…"}
+                  {searchTyping && <span className="opacity-40">|</span>}
+                </span>
+                {searchAddVisible && (
+                  <InputGroupButton
+                    className={
+                      searchAddPressed ? "scale-[0.96] brightness-95" : ""
+                    }
+                  >
+                    Add
+                  </InputGroupButton>
+                )}
+              </div>
+              <div className="mt-4 flex min-h-8 flex-wrap gap-1.5">
+                <AnimatePresence initial={false}>
+                  {topicsVisible &&
+                    SUGGESTED_TOPICS.map((label) => (
+                      <motion.span
+                        key={label}
+                        initial={false}
+                        exit={reduced ? undefined : { opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2, ease: "easeIn" }}
+                      >
+                        <Chip size="lg" readOnly>
+                          {label}
+                        </Chip>
+                      </motion.span>
+                    ))}
+                  {!topicsVisible && (
+                    <motion.p
+                      key="no-match"
+                      initial={reduced ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-sm text-muted-foreground/60"
+                    >
+                      No matching topics — add your own.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 1 && (
+            <motion.div
+              key="items"
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="absolute inset-x-0 top-0 rounded-xl border border-border bg-background p-5 shadow-lg"
             >
               <p className="text-lg font-medium tracking-tight text-foreground">
                 {HEADING}
               </p>
-
               <div className="mt-3 flex h-9 items-center gap-2">
                 <span
                   className={
@@ -275,7 +322,6 @@ export function TopicPickerVignette() {
                   </InputGroupButton>
                 )}
               </div>
-
               <div className="mt-4">
                 <p className="mb-2 text-[11px] font-medium tracking-widest text-primary uppercase">
                   Added by you
@@ -303,32 +349,26 @@ export function TopicPickerVignette() {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
 
-        {/* ── 3. A guest's favourite picker, inside the pledge dialog.
-              Sits BELOW dialog 2's chips rather than over them: the guest's
-              addition only means anything beside the organiser's three, and
-              a stack that covered them would leave the last frame showing a
-              favourite with nothing to be missing from. 276px is measured:
-              dialog 2's chips end at 273, so this clears them and overlaps
-              only its padding. ── */}
-        <AnimatePresence initial={false}>
-          {(guestOpen || reduced) && (
+          {step === 2 && (
             <motion.div
-              key="guest-picker"
-              initial={reduced ? false : { opacity: 0, y: 16, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={reduced ? undefined : { opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute top-[17.25rem] left-[3%] w-[90%] -rotate-1 rounded-xl border border-border bg-background p-5 shadow-2xl"
+              key="guest"
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="absolute inset-x-0 top-0 rounded-xl border border-border bg-background p-5 shadow-lg"
             >
               <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
                 Your favourite
               </p>
-
               <div className="mt-2 flex min-h-9 flex-wrap items-center gap-2">
                 {guestPicked ? (
-                  <Chip size="lg" readOnly selected>
+                  // `selected`, NOT `readOnly selected` — readOnly wins in
+                  // Chip and renders the muted outline, so the favourite the
+                  // guest just picked looked unpicked. The frame is inert
+                  // already, so nothing here needs readOnly to be inert.
+                  <Chip size="lg" selected>
                     {GUEST_ITEM}
                   </Chip>
                 ) : (
@@ -356,7 +396,6 @@ export function TopicPickerVignette() {
                   </InputGroupButton>
                 )}
               </div>
-
               {/* The organiser's three, which the guest reads before finding
                   theirs is not among them. */}
               <div className="mt-4 flex min-h-8 flex-wrap gap-1.5">
