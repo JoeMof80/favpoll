@@ -37,6 +37,15 @@ function sortItems(items: Favourite[]): Favourite[] {
   })
 }
 
+// The word Add in the hint, wearing the button's own chrome — the
+// instruction says "click Add", so it has to point at something the
+// reader will recognise when they see it.
+const ADD_TOKEN = (
+  <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+    Add
+  </span>
+)
+
 export function LoveStep({
   topics,
   categories,
@@ -208,6 +217,7 @@ export function LoveStep({
             {showCreate && (
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
+                  variant="secondary"
                   onClick={handleCreateTopic}
                   data-testid="create-topic-chip"
                 >
@@ -229,7 +239,7 @@ export function LoveStep({
             never renders in the only place this component is actually used. */}
         {!showCreate && (
           <p className="mb-3 text-xs text-muted-foreground">
-            Is your topic missing? Type it and click Add
+            Is your topic missing? Type it and click {ADD_TOKEN}
           </p>
         )}
 

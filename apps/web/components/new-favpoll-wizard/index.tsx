@@ -177,7 +177,10 @@ export function NewFavpollWizard({ data }: Props) {
               className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
             />
             {loveShowCreate && (
-              <InputGroupButton onClick={handleCreateLoveTopic}>
+              <InputGroupButton
+                variant="secondary"
+                onClick={handleCreateLoveTopic}
+              >
                 Add
               </InputGroupButton>
             )}

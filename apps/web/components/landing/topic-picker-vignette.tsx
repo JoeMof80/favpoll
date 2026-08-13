@@ -84,6 +84,15 @@ type Phase =
   | { kind: "guest-adding" } // dialog 3: Add pressed
   | { kind: "hold" }
 
+// The word Add in the hint, wearing the button's own chrome — the
+// instruction says "click Add", so it has to point at something the
+// reader will recognise when they see it.
+const ADD_TOKEN = (
+  <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+    Add
+  </span>
+)
+
 export function TopicPickerVignette() {
   const reduced = useReducedMotion()
   const [phase, setPhase] = useState<Phase>(
@@ -283,7 +292,7 @@ export function TopicPickerVignette() {
                   {!searchAddVisible && (
                     <InputGroupAddon align="block-end" className="pt-0 pb-2">
                       <span className="text-xs text-muted-foreground">
-                        Is your topic missing? Type it and click Add
+                        Is your topic missing? Type it and click {ADD_TOKEN}
                       </span>
                     </InputGroupAddon>
                   )}
@@ -436,7 +445,7 @@ export function TopicPickerVignette() {
                 {!guestNoMatch && (
                   <InputGroupAddon align="block-end" className="px-5 pt-0 pb-3">
                     <span className="text-xs text-muted-foreground">
-                      Is yours missing? Type it and click Add
+                      Is yours missing? Type it and click {ADD_TOKEN}
                     </span>
                   </InputGroupAddon>
                 )}

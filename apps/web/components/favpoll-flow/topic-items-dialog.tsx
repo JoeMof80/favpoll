@@ -95,7 +95,9 @@ export function TopicItemsDialog({
               className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
             />
             {showAddRow && (
-              <InputGroupButton onClick={handleAdd}>Add</InputGroupButton>
+              <InputGroupButton variant="secondary" onClick={handleAdd}>
+                Add
+              </InputGroupButton>
             )}
           </div>
         </div>
