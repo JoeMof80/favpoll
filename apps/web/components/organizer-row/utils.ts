@@ -19,6 +19,7 @@ export type OrganizerFavpoll = {
   total_raised: number
   goal_amount: number | null
   is_listed: boolean
+  allow_guest_items?: boolean
   created_at: string
   protagonist: { name: string } | null
   charities: {

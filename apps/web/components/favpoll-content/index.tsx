@@ -120,7 +120,14 @@ export function FavpollContent({
         pot={pot}
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}
-        onAddItem={addItemHandler(pollWithItems)}
+        // Withheld when the organiser has turned guest additions off. The
+        // server action checks this too — hiding a control is not a
+        // permission check.
+        onAddItem={
+          favpoll.allow_guest_items === false
+            ? undefined
+            : addItemHandler(pollWithItems)
+        }
         isListed={isListed}
         open={pledgeDialogOpen}
         onOpenChange={setPledgeDialogOpen}

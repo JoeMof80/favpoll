@@ -182,6 +182,60 @@ describe("LoveStep — items panel", () => {
   })
 })
 
+describe("LoveStep — custom topic hint", () => {
+  // The hint exists because the Add button only appears once a search matches
+  // nothing — so writing your own topic was discoverable only by organisers
+  // who already suspected they could. It has to be there BEFORE you type.
+  it("shows the hint with an empty search", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/is your topic missing\?/i)).toBeInTheDocument()
+  })
+
+  // THE CONFIGURATION THE WIZARD ACTUALLY USES. It owns the search box and
+  // passes it in, which skips love-step's own field entirely — the first
+  // version of this hint lived inside that field and so never rendered in the
+  // app at all, while the test above passed. A test that renders a component
+  // in a shape nothing uses proves nothing.
+  it("shows the hint when the search is owned by the wizard", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+        search=""
+        onSearchChange={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/is your topic missing\?/i)).toBeInTheDocument()
+  })
+
+  it("drops the hint once Add appears, so the two never both show", () => {
+    render(
+      <LoveStep
+        topics={TOPICS}
+        categories={CATEGORIES}
+        value={EMPTY_VALUE}
+        onChange={vi.fn()}
+      />
+    )
+    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
+      target: { value: "Grandad story" },
+    })
+    expect(screen.getByTestId("create-topic-chip")).toBeInTheDocument()
+    expect(
+      screen.queryByText(/is your topic missing\?/i)
+    ).not.toBeInTheDocument()
+  })
+})
+
 describe("LoveStep — suggested topics", () => {
   const SUGGESTED = [makeTopic("t-colour", "Colour", [], true)]
 

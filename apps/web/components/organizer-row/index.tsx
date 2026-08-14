@@ -19,7 +19,11 @@ import { BrandedQR } from "@/components/branded-qr"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
-import { deleteFavpoll, setFavpollListed } from "@/app/favpolls/[id]/actions"
+import {
+  deleteFavpoll,
+  setFavpollListed,
+  setFavpollGuestItems,
+} from "@/app/favpolls/[id]/actions"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -54,6 +58,10 @@ export function OrganizerRow({ favpoll }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [listed, setListed] = useState(favpoll.is_listed)
   const [listingPending, setListingPending] = useState(false)
+  const [guestItems, setGuestItems] = useState(
+    favpoll.allow_guest_items !== false
+  )
+  const [guestItemsPending, setGuestItemsPending] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [copiedGuest, setCopiedGuest] = useState(false)
   const [copiedDisplay, setCopiedDisplay] = useState(false)
@@ -101,6 +109,18 @@ export function OrganizerRow({ favpoll }: Props) {
       setListed(!value)
     } finally {
       setListingPending(false)
+    }
+  }
+
+  async function handleToggleGuestItems(value: boolean) {
+    setGuestItems(value)
+    setGuestItemsPending(true)
+    try {
+      await setFavpollGuestItems(favpoll.id, value)
+    } catch {
+      setGuestItems(!value)
+    } finally {
+      setGuestItemsPending(false)
     }
   }
 
@@ -391,6 +411,29 @@ export function OrganizerRow({ favpoll }: Props) {
           {/* Manage — uniform label-over-value facts; the visibility switch
               sits under its label at the same weight as everything else */}
           <div className="grid min-w-0 grid-cols-2 content-start gap-x-6 gap-y-4 sm:order-1">
+            <div>
+              {/* The organiser's say on guest additions, exercised UP FRONT.
+                  Before this it was only after the fact — hide it from the
+                  standings once it had appeared — which is a thin reading of
+                  the discretion the features page promises. A finite topic
+                  still cannot be added to whatever this says. */}
+              <p className="text-xs text-muted-foreground">Guest additions</p>
+              <div className="mt-1 flex items-center gap-2">
+                <Switch
+                  checked={guestItems}
+                  onCheckedChange={handleToggleGuestItems}
+                  disabled={guestItemsPending}
+                  aria-label={
+                    guestItems
+                      ? "Guests can add favourites — click to stop them"
+                      : "Guests cannot add favourites — click to allow it"
+                  }
+                />
+                <span className="text-sm text-foreground">
+                  {guestItems ? "Allowed" : "Off"}
+                </span>
+              </div>
+            </div>
             <div>
               <p className="text-xs text-muted-foreground">Visibility</p>
               <div className="mt-1 flex items-center gap-2">

@@ -166,7 +166,7 @@ export function ItemAddField({
               />
               {showCreate && (
                 <InputGroupAddon align="inline-end">
-                  <InputGroupButton onClick={handleCreate}>
+                  <InputGroupButton variant="secondary" onClick={handleCreate}>
                     Add
                   </InputGroupButton>
                 </InputGroupAddon>

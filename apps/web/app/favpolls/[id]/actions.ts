@@ -1,9 +1,14 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import { headers } from "next/headers"
+import {
+  isRateLimited,
+  ipFromHeaders,
+  RATE_LIMIT_MESSAGE,
+} from "@/lib/rate-limit"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
-import { isRateLimited } from "@/lib/rate-limit"
 import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
 
 type PledgeAllocationInput = {
@@ -263,13 +268,32 @@ export async function addGuestItem(
   topicId: string,
   label: string
 ) {
+  // NO ACCOUNT REQUIRED (founder, 2026-08-13). Guests pledge with an email
+  // and nothing else, so requiring sign-in here made "guests can add missing
+  // favourites" false for almost every guest — the door was advertised and
+  // most people could not open it. added_by is nullable and carries whoever
+  // was signed in, if anyone.
+  //
+  // What replaces the account as a check: the same fail-open IP limiter the
+  // contact form and extension requests use, plus review_status
+  // "pending_review" on the favourite and an email to the organiser, who can
+  // hide it. An unauthenticated write needs all three.
   const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
-
-  // Guest item creation is a spam surface; 20/hour per user is far above
-  // any real guest's use of it.
+  const ip = ipFromHeaders(await headers())
   if (
-    await isRateLimited("guest-item", userId, [
+    await isRateLimited("guest-item", ip, [
+      { name: "10m", max: 8, windowSeconds: 600 },
+      { name: "1d", max: 40, windowSeconds: 86_400 },
+    ])
+  ) {
+    throw new Error(RATE_LIMIT_MESSAGE)
+  }
+
+  // The pre-existing per-user limit, now keyed on the IP when there is no
+  // user — otherwise every anonymous guest would share a single "null"
+  // bucket and the first eight would spend it for the whole internet.
+  if (
+    await isRateLimited("guest-item-actor", userId ?? `ip:${ip}`, [
       { name: "1h", max: 20, windowSeconds: 3600 },
     ])
   ) {
@@ -309,13 +333,26 @@ export async function addGuestItem(
     favouriteId = newItem.id
   }
 
+  // The organiser's setting is checked HERE, not only where the button is
+  // drawn. Hiding a control is not a permission check, and this action is
+  // callable directly.
+  const { data: owner } = await supabase
+    .from("favpoll_polls")
+    .select("favpolls(allow_guest_items)")
+    .eq("id", favpollPollId)
+    .single()
+  const allowed =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (owner?.favpolls as any)?.allow_guest_items !== false
+  if (!allowed) throw new Error("This favpoll is not taking new favourites")
+
   const { error: epiErr } = await supabase
     .from("favpoll_poll_favourites")
     .insert({
       favpoll_poll_id: favpollPollId,
       favourite_id: favouriteId,
       is_guest_added: true,
-      added_by: userId,
+      added_by: userId ?? null,
     })
   if (epiErr) throw new Error(epiErr.message)
 
@@ -624,6 +661,31 @@ export async function deleteFavpoll(favpollId: string) {
       .delete()
       .eq("id", favpoll.protagonist_id)
   }
+}
+
+export async function setFavpollGuestItems(
+  favpollId: string,
+  allowGuestItems: boolean
+) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: favpoll } = await supabase
+    .from("favpolls")
+    .select("created_by")
+    .eq("id", favpollId)
+    .single()
+
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from("favpolls")
+    .update({ allow_guest_items: allowGuestItems })
+    .eq("id", favpollId)
+
+  if (error) throw new Error(error.message)
 }
 
 export async function setFavpollListed(favpollId: string, isListed: boolean) {

@@ -103,6 +103,9 @@ export type Favpoll = {
   /** Optional pledge goal in pounds (same unit as total_raised); null = no goal. */
   goal_amount?: number | null;
   is_private: boolean;
+  /** Organiser setting: may guests add a favourite that is not listed?
+   *  Topic.is_finite still overrides — a finite topic can never be added to. */
+  allow_guest_items?: boolean;
   is_plural: boolean | null;
   is_exemplar?: boolean;
   is_listed?: boolean;

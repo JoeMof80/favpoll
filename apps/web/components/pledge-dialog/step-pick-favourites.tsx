@@ -19,7 +19,18 @@ type PickerHeaderProps = {
   topicTitle?: string
   showCreate: boolean
   addingItem: boolean
+  /** Adding is possible at all — open topic, and the organiser allows it. */
+  canAdd: boolean
 }
+
+// The word Add in the hint, wearing the button's own chrome — the
+// instruction says "click Add", so it has to point at something the
+// reader will recognise when they see it.
+const ADD_TOKEN = (
+  <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+    Add
+  </span>
+)
 
 export function PickerHeader({
   search,
@@ -31,6 +42,7 @@ export function PickerHeader({
   topicTitle,
   showCreate,
   addingItem,
+  canAdd,
 }: PickerHeaderProps) {
   const placeholder = topicTitle
     ? `Search for your favourite ${topicTitle.toLowerCase()}…`
@@ -91,6 +103,7 @@ export function PickerHeader({
         />
         {showCreate && (
           <InputGroupButton
+            variant="secondary"
             onMouseDown={(e) => {
               e.preventDefault()
               onAdd()
@@ -102,6 +115,23 @@ export function PickerHeader({
           </InputGroupButton>
         )}
       </div>
+
+      {/* A PERSISTENT hint, not one that waits to be discovered (2026-08-13).
+          The Add button only appears once a search matches nothing, so the
+          only people who found out they could add were the ones who already
+          suspected it. A guest who scans the chips, does not see theirs and
+          picks a near-miss never learns — which is exactly the guest the
+          feature exists for.
+          Suppressed when adding is impossible: a finite topic, or an
+          organiser who has turned it off. Never advertise what cannot be
+          done. */}
+      {canAdd && !showCreate && (
+        <InputGroupAddon align="block-end" className="px-5 pt-0 pb-3">
+          <span className="text-xs text-muted-foreground">
+            Is yours missing? Type it and click {ADD_TOKEN}
+          </span>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   )
 }

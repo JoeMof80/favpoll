@@ -134,11 +134,20 @@ describe("useFavpollContent — addItemHandler", () => {
     expect(result.current.addItemHandler(poll)).toBeUndefined()
   })
 
-  it("returns undefined when clerkUserId is null (guest)", () => {
+  // Reversed 2026-08-13. This used to assert that a signed-out guest got no
+  // handler, which made "guests can add missing favourites" false for almost
+  // every guest — they pledge with an email and no account. The server action
+  // rate-limits by IP and flags the favourite for review instead of demanding
+  // sign-in.
+  it("returns a handler for a signed-out guest", async () => {
+    mockActions.addGuestItem.mockClear()
     const { result } = renderHook(() =>
       useFavpollContent({ ...defaults, clerkUserId: null })
     )
-    expect(result.current.addItemHandler(poll)).toBeUndefined()
+    const handler = result.current.addItemHandler(poll)
+    expect(handler).toBeDefined()
+    await handler!("Stewart Lee")
+    expect(mockActions.addGuestItem).toHaveBeenCalled()
   })
 
   it("returns a function for the organiser that calls addOrganizerItem", async () => {

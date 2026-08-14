@@ -664,6 +664,7 @@ export function DemoCard({
                         onDeselect={() => {}}
                         topicTitle={topicTitle}
                         showCreate={false}
+                        canAdd={false}
                         addingItem={false}
                       />
                     </div>
