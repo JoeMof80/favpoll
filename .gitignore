@@ -58,3 +58,6 @@ next-env.d.ts
 storybook-static
 apps/web/storybook-static
 .vercel
+
+# Local exports of the skill docs — the .md files are the source
+.claude/commands/*.pdf
