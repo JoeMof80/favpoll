@@ -46,7 +46,7 @@ const SOCIALS: { label: string; href: string; path: string }[] = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer data-site-chrome className="border-t border-border bg-background">
       <div className="mx-auto max-w-330 px-6 py-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.6fr]">
           {/* Brand */}

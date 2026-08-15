@@ -5,10 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { getFavpollHeadline } from "@/lib/display"
 import { deriveRankHistory, type PledgeEvent } from "@/lib/rank-history"
-import {
-  KeepsakeDocument,
-  type KeepsakeStanding,
-} from "@/components/keepsake/keepsake-document"
+import { type KeepsakeStanding } from "@/components/keepsake/keepsake-document"
+import { KeepsakeView } from "@/components/keepsake/keepsake-view"
+import { deriveRegister } from "@/lib/registers"
 import { ExportCsvButton } from "@/components/keepsake/export-csv-button"
 import { PrintButton } from "@/components/keepsake/print-button"
 import { Button } from "@/components/ui/button"
@@ -167,8 +166,19 @@ export default async function KeepsakePage({ params }: Props) {
     guestNames,
   }
 
+  // The SAME derivation the live display uses (app/live/[slug]): memorials
+  // open quiet, everything else opens with the total. Duplicating the rule
+  // rather than the decision — if the display's rule changes, this should
+  // follow it.
+  const register = deriveRegister(
+    favpoll.occasion_type,
+    favpoll.subject === "cause" ? null : protagonist?.name,
+    favpoll.subject
+  )
+  const defaultVariant = register === "remembering" ? "tribute" : "fundraiser"
+
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:bg-background print:py-0">
+    <div className="min-h-screen bg-muted/30 py-8 print:min-h-0 print:bg-background print:py-0">
       <div className="mx-auto max-w-[720px] px-4 print:px-0">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">
@@ -182,9 +192,11 @@ export default async function KeepsakePage({ params }: Props) {
             <PrintButton />
           </div>
         </div>
-        <div className="rounded-lg border border-border bg-background shadow-sm print:border-0 print:shadow-none">
-          <KeepsakeDocument data={data} />
-        </div>
+        <KeepsakeView
+          data={data}
+          favpollId={id}
+          defaultVariant={defaultVariant}
+        />
       </div>
     </div>
   )

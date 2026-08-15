@@ -24,6 +24,16 @@ type Props = {
   caption?: string
   /** ISO date per step; when present, renders a few dated x-axis ticks */
   axisLabels?: string[]
+  /**
+   * Draw only the top N in colour; everything below is a faint background
+   * line with no dot and no label (founder, 2026-08-15). Fifteen lines
+   * crossing is a tangle you can read the winner out of and nothing else —
+   * the crowd still needs to be THERE, because the race being crowded is
+   * part of the story, it just does not need to be legible.
+   */
+  highlightTop?: number
+  /** Lanes drawn before the rest are clamped to the floor row. */
+  maxSeries?: number
   /** Preview mode: lines only (no labels/axis/title/caption), fits any
    *  width. Used as the clickable teaser in the topic right column. */
   compact?: boolean
@@ -42,6 +52,8 @@ export function BumpChart({
   title = "The story of the poll",
   caption = "Positions only — how each favourite ranked as pledges came in.",
   axisLabels,
+  highlightTop,
+  maxSeries = MAX_SERIES,
   compact = false,
   className,
 }: Props) {
@@ -52,9 +64,9 @@ export function BumpChart({
   // cap is clamped to a floor row so it stays in frame ("fell out of view")
   const series = [...allSeries]
     .sort((a, b) => a.finalRank - b.finalRank)
-    .slice(0, MAX_SERIES)
+    .slice(0, maxSeries)
   const capped = allSeries.length > series.length
-  const rankFloor = MAX_SERIES + 1
+  const rankFloor = maxSeries + 1
   const clamp = (rank: number) => Math.min(rank, rankFloor)
 
   const maxRank = Math.max(
@@ -135,6 +147,7 @@ export function BumpChart({
         >
           {series.map((s) => {
             const isLeader = s.finalRank === 1
+            const isMinor = !!highlightTop && s.finalRank > highlightTop
             const path = s.points
               .map(
                 (p, j) =>
@@ -148,33 +161,36 @@ export function BumpChart({
                   d={path}
                   fill="none"
                   stroke={isLeader ? "currentColor" : "var(--chart-3)"}
-                  strokeWidth={isLeader ? 2.5 : 1.5}
+                  strokeWidth={isLeader ? 2.5 : isMinor ? 1 : 1.5}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={isLeader ? 1 : 0.55}
+                  opacity={isLeader ? 1 : isMinor ? 0.18 : 0.55}
                 />
-                {s.points.map((p) => (
-                  <circle
-                    key={p.step}
-                    cx={x(p.step)}
-                    cy={y(clamp(p.rank))}
-                    r={DOT_R}
-                    fill={isLeader ? "currentColor" : "var(--chart-3)"}
-                    opacity={isLeader ? 1 : 0.55}
-                  />
-                ))}
-                <text
-                  x={x(last.step) + 8}
-                  y={y(clamp(last.rank))}
-                  dominantBaseline="middle"
-                  className={
-                    isLeader
-                      ? "fill-foreground text-[13px] font-medium"
-                      : "fill-muted-foreground text-[13px]"
-                  }
-                >
-                  {s.label}
-                </text>
+                {!isMinor &&
+                  s.points.map((p) => (
+                    <circle
+                      key={p.step}
+                      cx={x(p.step)}
+                      cy={y(clamp(p.rank))}
+                      r={DOT_R}
+                      fill={isLeader ? "currentColor" : "var(--chart-3)"}
+                      opacity={isLeader ? 1 : 0.55}
+                    />
+                  ))}
+                {!isMinor && (
+                  <text
+                    x={x(last.step) + 8}
+                    y={y(clamp(last.rank))}
+                    dominantBaseline="middle"
+                    className={
+                      isLeader
+                        ? "fill-foreground text-[13px] font-medium"
+                        : "fill-muted-foreground text-[13px]"
+                    }
+                  >
+                    {s.label}
+                  </text>
+                )}
               </g>
             )
           })}
@@ -195,7 +211,7 @@ export function BumpChart({
         </svg>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        {capped ? `${caption} Top ${MAX_SERIES} shown.` : caption}
+        {capped ? `${caption} Top ${maxSeries} shown.` : caption}
       </p>
     </div>
   )
