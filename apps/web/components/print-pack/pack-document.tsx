@@ -106,12 +106,17 @@ export function PackDocument({
     <div className="print:block">
       <style>{`@page { size: A4 ${landscape ? "landscape" : "portrait"}; margin: 10mm; }`}</style>
 
-      {/* A landscape A4 is 1123 wide, a portrait one 1123 tall — the pack has
-          both, so "Fit" sizes to the biggest in each axis rather than to
-          whatever happens to be on top. */}
+      {/* THE SELECTED SHEET's dimensions, not the pack's envelope. An A4 is
+          794 x 1123 one way round and 1123 x 794 the other, and this used to
+          pass 1123 for BOTH axes — the biggest each axis ever gets — so every
+          sheet was fitted to a square that no sheet is. A landscape poster got
+          sized as though it were also portrait-tall and sat well under the
+          space it had. The pack showed all eight at once when that was
+          written; it shows one at a time now, so the envelope has no one left
+          to protect. The same `landscape` that sets @page sets this. */}
       <PrintWorkspace
-        widestPx={1123}
-        tallestPx={1123}
+        widestPx={landscape ? 1123 : 794}
+        tallestPx={landscape ? 794 : 1123}
         leading={leading}
         toolbar={
           <>
