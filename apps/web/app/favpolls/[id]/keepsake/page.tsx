@@ -177,10 +177,10 @@ export default async function KeepsakePage({ params }: Props) {
   const defaultVariant = register === "remembering" ? "tribute" : "fundraiser"
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:min-h-0 print:bg-background print:py-0">
+    <div className="min-h-screen bg-muted/30 pb-8 print:min-h-0 print:bg-background print:pb-0">
       {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
           padding — the keepsake is landscape now. */}
-      <div className="mx-auto max-w-[1240px] px-4 print:max-w-none print:px-0">
+      <div className="print:max-w-none">
         <KeepsakeView
           data={data}
           favpollId={id}

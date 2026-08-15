@@ -62,11 +62,11 @@ export default async function PackPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:min-h-0 print:bg-background print:py-0">
+    <div className="min-h-screen bg-muted/30 pb-8 print:min-h-0 print:bg-background print:pb-0">
       {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
           padding — every sheet renders at true page size now, so nothing is
           scaled to fit and what you see is what prints. */}
-      <div className="mx-auto max-w-[1280px] px-4 print:max-w-none print:px-0">
+      <div className="print:max-w-none">
         <PackDocument
           data={data}
           leading={

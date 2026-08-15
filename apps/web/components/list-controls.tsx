@@ -1,6 +1,10 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import {
+  SegmentedControl,
+  ToolbarLabel,
+} from "@/components/ui/segmented-control"
 import { ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
@@ -57,39 +61,19 @@ export function ListControls({
 
       {segments && segments.length > 0 && (
         <>
-          <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
-            Status
-          </span>
-          <div
-            className="flex items-center rounded-lg border border-border bg-background p-0.5 shadow-xs"
-            role="group"
-            aria-label={segmentsLabel}
-          >
-            {segments.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onSegmentChange?.(opt.value)}
-                className={cn(
-                  "rounded-md px-3 py-1 text-sm font-medium transition-colors",
-                  segmentValue === opt.value
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-pressed={segmentValue === opt.value}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+          <ToolbarLabel>Status</ToolbarLabel>
+          <SegmentedControl
+            options={segments}
+            value={segmentValue ?? segments[0].value}
+            onChange={(v) => onSegmentChange?.(v)}
+            label={segmentsLabel}
+          />
         </>
       )}
 
       {sortOptions && sortOptions.length > 0 && (
         <>
-          <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
-            Sort
-          </span>
+          <ToolbarLabel>Sort</ToolbarLabel>
           <span className="relative inline-flex items-center">
             <select
               value={sortValue}

@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { ToolbarBand } from "@/components/ui/toolbar-band"
+import {
+  SegmentedControl,
+  ToolbarLabel,
+} from "@/components/ui/segmented-control"
 
 // A print workspace: the sheet stops being a card in a scrolling page and
 // becomes a piece of paper on a desk, with the controls of a print app round
@@ -90,63 +94,50 @@ export function PrintWorkspace({
     <div ref={frameRef} className="w-full">
       {/* Sticky, so the controls stay with you down a long pack. Never
           printed — this is the desk, not the paper. */}
-      {/* ONE toolbar (founder, 2026-08-15). The page carried its own row of
-          back-link and Save-as-PDF above this one, which was two bars doing
-          one job — and Save as PDF had become the same action as Print this
-          sheet once the pack showed one sheet at a time.
-          Styled as the favpolls list band is: a muted sticky band, small
-          uppercase labels, and controls in white segmented groups. Two
-          toolbars in one product should not be two designs. */}
-      <div className="sticky top-14 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-muted px-4 py-2.5 print:hidden">
+      {/* ONE toolbar, and the SAME band the favpolls lists use (founder,
+          2026-08-15). The page carried a back-link and a Save-as-PDF row
+          above the workspace's own bar — two bars doing one job, and Save as
+          PDF had become the same action as Print this sheet once the pack
+          showed one sheet at a time.
+          The band is full-bleed, so this component owns the centred column
+          beneath it rather than sitting inside the page's. */}
+      <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {leading}
-        <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
-          Zoom
-        </span>
-        <div
-          className="flex items-center rounded-lg border border-border bg-background p-0.5 shadow-xs"
-          role="group"
-          aria-label="Zoom"
-        >
-          {presets.map((z) => (
-            <button
-              key={String(z)}
-              type="button"
-              onClick={() => setZoom(z)}
-              aria-pressed={zoom === z}
-              className={cn(
-                "rounded-md px-3 py-1 text-sm font-medium transition-colors",
-                zoom === z
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {z === "fit" ? "Fit" : `${Math.round(z * 100)}%`}
-            </button>
-          ))}
-        </div>
+        <ToolbarLabel>Zoom</ToolbarLabel>
+        <SegmentedControl
+          label="Zoom"
+          value={String(zoom)}
+          onChange={(v) => setZoom(v === "fit" ? "fit" : (Number(v) as Zoom))}
+          options={presets.map((z) => ({
+            value: String(z),
+            label: z === "fit" ? "Fit" : `${Math.round(z * 100)}%`,
+          }))}
+        />
         {toolbar && (
           <div className="ml-auto flex flex-wrap items-center gap-3">
             {toolbar}
           </div>
         )}
-      </div>
+      </ToolbarBand>
 
       {/* The desk. A tinted, inset surface so the white of the paper is read
           as paper rather than as the page background. */}
-      <div className="rounded-lg bg-muted/40 p-6 inset-shadow-sm print:bg-transparent print:p-0">
-        {/* The scaled box reserves the SCALED height. A transform does not
+      <div className="mx-auto max-w-330 px-4 py-6 print:max-w-none print:p-0">
+        <div className="rounded-lg bg-muted/40 p-6 inset-shadow-sm print:bg-transparent print:p-0">
+          {/* The scaled box reserves the SCALED height. A transform does not
             affect layout, so without this the surface keeps the unscaled
             height and leaves a hole under a zoomed-out sheet. */}
-        <div
-          style={{ height: innerHeight ? innerHeight * scale : undefined }}
-          className="print:!h-auto"
-        >
           <div
-            ref={innerRef}
-            style={{ transform: `scale(${scale})` }}
-            className="flex origin-top flex-col items-center gap-6 print:!transform-none print:gap-0"
+            style={{ height: innerHeight ? innerHeight * scale : undefined }}
+            className="print:!h-auto"
           >
-            {children}
+            <div
+              ref={innerRef}
+              style={{ transform: `scale(${scale})` }}
+              className="flex origin-top flex-col items-center gap-6 print:!transform-none print:gap-0"
+            >
+              {children}
+            </div>
           </div>
         </div>
       </div>

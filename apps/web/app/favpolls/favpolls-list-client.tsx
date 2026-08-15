@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ToolbarBand } from "@/components/ui/toolbar-band"
 import type { ComponentProps, ReactNode } from "react"
 import { FavpollListCard } from "@/components/favpoll-list-card"
 import { FavpollListCardEmpty } from "@/components/favpoll-list-card-empty"
@@ -54,25 +55,22 @@ export function FavpollsListClient({
   return (
     <>
       {/* One sticky band: occasion rail + list controls */}
-      <div className="sticky top-14 z-30 border-b border-border bg-muted">
-        <div className="mx-auto max-w-330 px-4 pt-3 pb-2.5">
-          <ListControls
-            search={search}
-            onSearchChange={setSearch}
-            searchPlaceholder="Search by name, topic or charity…"
-            searchLabel="Search favpolls"
-            segments={STATUS_OPTIONS}
-            segmentValue={status}
-            onSegmentChange={(v) => setStatus(v as PublicStatusFilter)}
-            sortOptions={SORT_OPTIONS}
-            sortValue={sort}
-            onSortChange={(v) => setSort(v as PublicSortKey)}
-            shown={displayed.length}
-            total={favpolls.length}
-          />
-        </div>
-        {rail}
-      </div>
+      <ToolbarBand below={rail}>
+        <ListControls
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by name, topic or charity…"
+          searchLabel="Search favpolls"
+          segments={STATUS_OPTIONS}
+          segmentValue={status}
+          onSegmentChange={(v) => setStatus(v as PublicStatusFilter)}
+          sortOptions={SORT_OPTIONS}
+          sortValue={sort}
+          onSortChange={(v) => setSort(v as PublicSortKey)}
+          shown={displayed.length}
+          total={favpolls.length}
+        />
+      </ToolbarBand>
 
       <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
         {favpolls.length === 0 ? (
