@@ -1,10 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  SegmentedControl,
+  ToolbarLabel,
+} from "@/components/ui/segmented-control"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PrintWorkspace } from "@/components/print-workspace"
+import { ExportCsvButton } from "./export-csv-button"
 import {
   KeepsakeDocument,
   type KeepsakeData,
@@ -26,15 +30,12 @@ export function KeepsakeView({
   favpollId,
   defaultVariant,
   leading,
-  exportCsv,
 }: {
   data: KeepsakeData
   favpollId: string
   defaultVariant: KeepsakeVariant
   /** The way back, at the far left of the one toolbar. */
   leading?: React.ReactNode
-  /** The CSV export, folded in from the page's own header row. */
-  exportCsv?: React.ReactNode
 }) {
   const [variant, setVariant] = useState<KeepsakeVariant>(defaultVariant)
   const key = `favpoll:keepsake-variant:${favpollId}`
@@ -69,17 +70,26 @@ export function KeepsakeView({
         leading={leading}
         toolbar={
           <div className="flex flex-wrap items-center gap-3">
-            <Tabs
+            <ToolbarLabel>Style</ToolbarLabel>
+            <SegmentedControl
+              label="How the keepsake is told"
               value={variant}
-              onValueChange={(v) => choose(v as KeepsakeVariant)}
-              className="shrink-0"
-            >
-              <TabsList variant="line">
-                <TabsTrigger value="tribute">Tribute</TabsTrigger>
-                <TabsTrigger value="fundraiser">Fundraiser</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            {exportCsv}
+              onChange={(v) => choose(v as KeepsakeVariant)}
+              options={[
+                { value: "tribute", label: "Tribute" },
+                { value: "fundraiser", label: "Fundraiser" },
+              ]}
+            />
+            {/* Rendered HERE rather than taken as an `exportCsv` element prop.
+                Passed in from the server page it produced a React key warning
+                on every visit ("passed a child from KeepsakePage") — bisected
+                to this prop exactly. The pack passes `qrExport` the same way
+                and does NOT warn, so the mechanism is not simply "server page
+                hands a client element across", and I have not pinned it down.
+                What is certain: this component already receives `data`, so the
+                element was never needed, and rendering it here is both simpler
+                and silent. */}
+            <ExportCsvButton data={data} />
             <Button
               type="button"
               variant="secondary"

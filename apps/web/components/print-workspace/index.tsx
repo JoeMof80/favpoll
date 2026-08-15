@@ -120,24 +120,25 @@ export function PrintWorkspace({
         )}
       </ToolbarBand>
 
-      {/* The desk. A tinted, inset surface so the white of the paper is read
-          as paper rather than as the page background. */}
-      <div className="mx-auto max-w-330 px-4 py-6 print:max-w-none print:p-0">
-        <div className="rounded-lg bg-muted/40 p-6 inset-shadow-sm print:bg-transparent print:p-0">
-          {/* The scaled box reserves the SCALED height. A transform does not
-            affect layout, so without this the surface keeps the unscaled
-            height and leaves a hole under a zoomed-out sheet. */}
+      {/* NO DESK (founder, 2026-08-15). There was a tinted card holding the
+          paper, sitting on a tinted page — two surfaces doing one job, and
+          the inner one only announced where the workspace ended. The page
+          background is the desk; the paper is what has the white and the
+          shadow, which is all the depth the metaphor needed. */}
+      <div className="mx-auto flex max-w-330 justify-center px-4 py-8 print:max-w-none print:p-0">
+        {/* The scaled box reserves the SCALED height. A transform does not
+            affect layout, so without this the page keeps the unscaled height
+            and leaves a hole under a zoomed-out sheet. */}
+        <div
+          style={{ height: innerHeight ? innerHeight * scale : undefined }}
+          className="print:!h-auto"
+        >
           <div
-            style={{ height: innerHeight ? innerHeight * scale : undefined }}
-            className="print:!h-auto"
+            ref={innerRef}
+            style={{ transform: `scale(${scale})` }}
+            className="flex origin-top flex-col items-center gap-6 print:!transform-none print:gap-0"
           >
-            <div
-              ref={innerRef}
-              style={{ transform: `scale(${scale})` }}
-              className="flex origin-top flex-col items-center gap-6 print:!transform-none print:gap-0"
-            >
-              {children}
-            </div>
+            {children}
           </div>
         </div>
       </div>

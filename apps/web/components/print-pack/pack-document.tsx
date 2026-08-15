@@ -21,7 +21,7 @@ import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
 import type { AveryCode } from "./avery-sheet"
 import { Switch } from "@/components/ui/switch"
 import { PrintWorkspace } from "@/components/print-workspace"
-import { Label } from "@/components/ui/label"
+import { ToolbarLabel } from "@/components/ui/segmented-control"
 import type { PackData } from "./pack-card"
 
 // Pre-event material for an organiser to print and place at the venue:
@@ -118,9 +118,7 @@ export function PackDocument({
             {/* A dropdown, not tabs (founder, 2026-08-15). Eight tabs is a
                 scrolling strip that pushed the paper down the page; the
                 sheet you want is a choice, and a choice is a menu. */}
-            <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
-              Sheet
-            </span>
+            <ToolbarLabel>Sheet</ToolbarLabel>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="button" variant="outline" size="sm">
@@ -145,16 +143,12 @@ export function PackDocument({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-2">
-              <Label htmlFor="cut-guides" className="text-sm font-normal">
-                Cut lines
-              </Label>
-              <Switch
-                id="cut-guides"
-                checked={guides}
-                onCheckedChange={setGuides}
-              />
-            </div>
+            <ToolbarLabel>Cut lines</ToolbarLabel>
+            <Switch
+              aria-label="Cut lines"
+              checked={guides}
+              onCheckedChange={setGuides}
+            />
 
             {qrExport}
 
@@ -193,7 +187,7 @@ export function PackDocument({
               onClick={() => setPrinting(true)}
             >
               <Printer data-icon="inline-start" aria-hidden="true" />
-              Print this sheet
+              Print
             </Button>
           </>
         }

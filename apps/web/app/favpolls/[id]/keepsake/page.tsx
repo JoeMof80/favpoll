@@ -8,7 +8,6 @@ import { deriveRankHistory, type PledgeEvent } from "@/lib/rank-history"
 import { type KeepsakeStanding } from "@/components/keepsake/keepsake-document"
 import { KeepsakeView } from "@/components/keepsake/keepsake-view"
 import { deriveRegister } from "@/lib/registers"
-import { ExportCsvButton } from "@/components/keepsake/export-csv-button"
 import { Button } from "@/components/ui/button"
 
 type Props = { params: Promise<{ id: string }> }
@@ -193,7 +192,6 @@ export default async function KeepsakePage({ params }: Props) {
               </Link>
             </Button>
           }
-          exportCsv={<ExportCsvButton data={data} />}
         />
       </div>
     </div>
