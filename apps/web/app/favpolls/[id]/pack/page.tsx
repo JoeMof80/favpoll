@@ -62,7 +62,12 @@ export default async function PackPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-8 print:min-h-0 print:bg-background print:pb-0">
+    // The desk is the TOOLBAR's surface, continued (founder, 2026-08-15) —
+    // bg-muted, the same token ToolbarBand uses, so the band and the desk read
+    // as one surface with the paper laid on it rather than as a bar sitting on
+    // a differently-tinted page. It was bg-muted/30: close enough to look like
+    // a mistake, far enough to show a seam under the band.
+    <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
       {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
           padding — every sheet renders at true page size now, so nothing is
           scaled to fit and what you see is what prints. */}

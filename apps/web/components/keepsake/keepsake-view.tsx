@@ -106,6 +106,11 @@ export function KeepsakeView({
           around it stays themed. Without this a dark-mode organiser printed a
           keepsake in near-white ink on white paper. Same fix as the print
           pack (#535); the keepsake never got it. */}
+        {/* NO BORDER, and the pack now follows this sheet rather than the
+            other way round (founder, 2026-08-15). White paper on a muted desk
+            separates on its own; an outline as well drew the sheet as a UI
+            card, which is the read this whole workspace is trying to avoid.
+            The shadow is the only edge paper actually has. */}
         <div className="paper h-[210mm] w-[297mm] overflow-hidden bg-background shadow-lg print:h-[190mm] print:w-[277mm] print:shadow-none">
           <KeepsakeDocument data={data} variant={variant} />
         </div>

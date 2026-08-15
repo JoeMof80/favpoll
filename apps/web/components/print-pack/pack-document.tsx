@@ -100,10 +100,10 @@ export function PackDocument({
   const current = SHEETS.find((s) => s.id === selected)!
 
   return (
-    // .paper pins the light token values across the whole pack, so the cards
-    // print the same whatever theme the organiser is viewing in — see the
-    // block in globals.css for the measurements that forced it.
-    <div className="paper print:block">
+    // .paper pins the light token values so the cards print the same whatever
+    // theme the organiser views in — but it belongs on the SHEETS, not here.
+    // See pack-sheet.tsx: wrapping the whole pack put the toolbar inside it.
+    <div className="print:block">
       <style>{`@page { size: A4 ${landscape ? "landscape" : "portrait"}; margin: 10mm; }`}</style>
 
       {/* A landscape A4 is 1123 wide, a portrait one 1123 tall — the pack has

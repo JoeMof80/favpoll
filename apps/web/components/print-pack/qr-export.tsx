@@ -85,10 +85,15 @@ export function QrExport({ value, name }: { value: string; name: string }) {
   }
 
   return (
-    // .paper on the trigger's own wrapper: the colour is resolved from HERE
-    // when a download is asked for, so it has to sit in the pinned scope even
-    // though nothing here is printed.
-    <div ref={scopeRef} className="paper contents">
+    <>
+      {/* The pinned scope download() reads --foreground from. A PROBE, not a
+          wrapper (2026-08-15): it used to wrap the trigger and its menu, so
+          the toolbar's own controls sat inside pinned LIGHT tokens and came
+          out near-white on a dark band in dark mode. Nothing here is printed —
+          the export only ever needed an element to call getComputedStyle on.
+          Custom properties compute on a display:none element, so `hidden`
+          costs no layout and no paint. */}
+      <div ref={scopeRef} hidden className="paper" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -124,6 +129,6 @@ export function QrExport({ value, name }: { value: string; name: string }) {
           </p>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </>
   )
 }

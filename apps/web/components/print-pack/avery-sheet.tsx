@@ -120,7 +120,7 @@ export function AverySheet({
       // A page, not a box round the cards — see pageClasses. Avery centre
       // their grids, so a sheet that shrank to its content put every card a
       // few mm off the die cut.
-      className={`${pageClasses(sheet.orientation)} mx-auto flex items-center justify-center border border-border bg-background shadow-sm print:break-inside-avoid print:border-0 print:shadow-none ${className}`}
+      className={`${pageClasses(sheet.orientation)} paper mx-auto flex items-center justify-center bg-background shadow-lg print:break-inside-avoid print:shadow-none ${className}`}
     >
       <div
         className="relative grid max-w-full break-inside-avoid"
