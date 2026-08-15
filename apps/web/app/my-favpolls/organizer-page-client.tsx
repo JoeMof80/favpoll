@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ToolbarBand } from "@/components/ui/toolbar-band"
 import { ListControls } from "@/components/list-controls"
 import { OrganizerRow } from "@/components/organizer-row"
 import {
@@ -36,24 +37,22 @@ export function OrganizerPageClient({ favpolls }: Props) {
   return (
     <>
       {/* The list-page sticky band — controls only; no rail here */}
-      <div className="sticky top-14 z-30 border-b border-border bg-muted">
-        <div className="mx-auto max-w-330 px-4 py-3">
-          <ListControls
-            search={search}
-            onSearchChange={setSearch}
-            searchPlaceholder="Search by name or topic…"
-            searchLabel="Search your favpolls"
-            segments={STATUS_OPTIONS}
-            segmentValue={status}
-            onSegmentChange={(v) => setStatus(v as StatusFilter)}
-            sortOptions={SORT_OPTIONS}
-            sortValue={sort}
-            onSortChange={(v) => setSort(v as SortKey)}
-            shown={displayed.length}
-            total={favpolls.length}
-          />
-        </div>
-      </div>
+      <ToolbarBand>
+        <ListControls
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by name or topic…"
+          searchLabel="Search your favpolls"
+          segments={STATUS_OPTIONS}
+          segmentValue={status}
+          onSegmentChange={(v) => setStatus(v as StatusFilter)}
+          sortOptions={SORT_OPTIONS}
+          sortValue={sort}
+          onSortChange={(v) => setSort(v as SortKey)}
+          shown={displayed.length}
+          total={favpolls.length}
+        />
+      </ToolbarBand>
 
       <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
         {/* Row list */}

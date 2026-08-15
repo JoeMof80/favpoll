@@ -271,10 +271,13 @@
   }
 }
 
-/* Keepsake and any print view: drop the site chrome. */
+/* Keepsake and any print view: drop the site chrome.
+   BY ATTRIBUTE, not by element (2026-08-15). `header, footer` also matched
+   the keepsake's OWN <header> and <footer>, so the sheet printed with no
+   logo, no name and no brand statement — the two things a keepsake is for.
+   A print rule that hides chrome has to know what chrome is. */
 @media print {
-  header,
-  footer,
+  [data-site-chrome],
   [data-sonner-toaster] {
     display: none !important;
   }
@@ -312,6 +315,20 @@
   --primary-foreground: oklch(0.99 0 0);
   --border: oklch(0.66 0.02 278);
   --border-strong: oklch(0.75 0.1 278);
+
+  /* Added for the keepsake (2026-08-15). This block was written for the print
+     pack and pinned only what a pack card uses — so the keepsake, which is a
+     richer document, still leaked dark-theme values through: its name renders
+     in --reveal-foreground and went near-white on white, and every standings
+     bar sits on a --muted track that came out dark.
+     Anything printed on paper needs its whole palette pinned, not the subset
+     the first artefact happened to touch. */
+  --muted: oklch(0.96 0.03 278);
+  --primary-muted: oklch(0.62 0.14 278);
+  --reveal-foreground: oklch(0.29 0.1 278);
+  --chart-1: oklch(0.44 0.18 278);
+  --chart-2: oklch(0.62 0.14 278);
+  --chart-3: oklch(0.75 0.1 278);
 }
 
 /* A pack card shown ON SCREEN rather than printed. Used with .paper, and

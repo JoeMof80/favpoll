@@ -33,6 +33,11 @@ export function HeaderBar({
 }) {
   return (
     <header
+      // Marks this as SITE chrome for the print rule in globals.css. That
+      // rule used to hide `header, footer` by element, which also hid the
+      // keepsake's own <header> and <footer> — so the sheet printed with no
+      // name and no brand line.
+      data-site-chrome
       className={
         staticMenu
           ? "border-b border-border bg-background"

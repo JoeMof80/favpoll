@@ -273,17 +273,9 @@ export default function FeaturesPage() {
                 "The standings, the reveal and the total raised",
                 "Everyone who took part",
                 "No per-guest amounts — what people gave stays theirs",
+                "Two ways to tell it: the person leads, or what was raised does",
               ]}
-            >
-              {/* PLACEHOLDER (2026-08-09). The keepsake EXISTS — it is not
-                  "coming soon" — but it needs work and carries the dark-mode
-                  print bug #535 fixed on the pack. No artefact until that is
-                  done; the section exists so the homepage card has somewhere
-                  honest to land. */}
-              <p className="max-w-2xl text-sm text-muted-foreground italic">
-                A picture of one is coming — the page is being reworked.
-              </p>
-            </Feature>
+            />
 
             <Feature
               id="basics"

@@ -25,7 +25,21 @@ export const PLAIN_ORIENTATION = {
 } as const
 
 const SHEET =
-  "bg-background border border-border rounded-lg shadow-sm print:border-0 print:rounded-none print:shadow-none"
+  // SQUARE CORNERS (founder, 2026-08-15). These represent sheets of paper,
+  // and paper does not have rounded corners — the radius was making a page
+  // read as a UI card. The CARDS printed on a sheet keep theirs: those are a
+  // design, not the stock.
+  //
+  // `paper` lives HERE, on the sheet, not on the pack (2026-08-15). It used to
+  // wrap the whole document, which meant the toolbar sat inside it too and
+  // inherited pinned LIGHT tokens: in dark mode the pack's controls band came
+  // out near-white, and its bottom rule came out darker than every other band
+  // in the app. Paper tokens belong to the thing that is paper.
+  //
+  // NO BORDER, matching the keepsake (founder, 2026-08-15). The outline made a
+  // sheet read as a UI card; white paper on the muted desk already separates,
+  // and the shadow is the only edge real paper has.
+  "paper bg-background shadow-lg print:shadow-none"
 
 // EVERY SHEET IS A PAGE, on screen and in print (founder, 2026-08-10).
 //
