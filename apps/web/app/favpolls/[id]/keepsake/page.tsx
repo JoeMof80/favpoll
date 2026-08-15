@@ -9,7 +9,6 @@ import { type KeepsakeStanding } from "@/components/keepsake/keepsake-document"
 import { KeepsakeView } from "@/components/keepsake/keepsake-view"
 import { deriveRegister } from "@/lib/registers"
 import { ExportCsvButton } from "@/components/keepsake/export-csv-button"
-import { PrintButton } from "@/components/keepsake/print-button"
 import { Button } from "@/components/ui/button"
 
 type Props = { params: Promise<{ id: string }> }
@@ -182,22 +181,19 @@ export default async function KeepsakePage({ params }: Props) {
       {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
           padding — the keepsake is landscape now. */}
       <div className="mx-auto max-w-[1240px] px-4 print:max-w-none print:px-0">
-        <div className="mb-4 flex items-center justify-between print:hidden">
-          <Button asChild variant="ghost" size="sm">
-            <Link href={`/favpolls/${id}`}>
-              <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-              Back to favpoll
-            </Link>
-          </Button>
-          <div className="flex items-center gap-1">
-            <ExportCsvButton data={data} />
-            <PrintButton />
-          </div>
-        </div>
         <KeepsakeView
           data={data}
           favpollId={id}
           defaultVariant={defaultVariant}
+          leading={
+            <Button asChild variant="ghost" size="sm">
+              <Link href={`/favpolls/${id}`}>
+                <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+                Back
+              </Link>
+            </Button>
+          }
+          exportCsv={<ExportCsvButton data={data} />}
         />
       </div>
     </div>

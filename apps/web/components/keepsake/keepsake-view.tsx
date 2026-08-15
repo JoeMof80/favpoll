@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Printer } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { PrintWorkspace } from "@/components/print-workspace"
 import {
   KeepsakeDocument,
@@ -23,10 +25,16 @@ export function KeepsakeView({
   data,
   favpollId,
   defaultVariant,
+  leading,
+  exportCsv,
 }: {
   data: KeepsakeData
   favpollId: string
   defaultVariant: KeepsakeVariant
+  /** The way back, at the far left of the one toolbar. */
+  leading?: React.ReactNode
+  /** The CSV export, folded in from the page's own header row. */
+  exportCsv?: React.ReactNode
 }) {
   const [variant, setVariant] = useState<KeepsakeVariant>(defaultVariant)
   const key = `favpoll:keepsake-variant:${favpollId}`
@@ -58,13 +66,9 @@ export function KeepsakeView({
         widestPx={1123}
         tallestPx={794}
         calm
+        leading={leading}
         toolbar={
-          <div className="flex items-center gap-3">
-            <p className="hidden text-sm text-muted-foreground sm:block">
-              {variant === "tribute"
-                ? "The person leads, and the money stays quiet."
-                : "What was raised leads, as the thing worth keeping."}
-            </p>
+          <div className="flex flex-wrap items-center gap-3">
             <Tabs
               value={variant}
               onValueChange={(v) => choose(v as KeepsakeVariant)}
@@ -75,6 +79,16 @@ export function KeepsakeView({
                 <TabsTrigger value="fundraiser">Fundraiser</TabsTrigger>
               </TabsList>
             </Tabs>
+            {exportCsv}
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => window.print()}
+            >
+              <Printer data-icon="inline-start" aria-hidden="true" />
+              Print
+            </Button>
           </div>
         }
       >

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // A print workspace: the sheet stops being a card in a scrolling page and
 // becomes a piece of paper on a desk, with the controls of a print app round
@@ -29,6 +30,7 @@ type Zoom = "fit" | (typeof ZOOMS)[number]
 
 export function PrintWorkspace({
   children,
+  leading,
   toolbar,
   /** Widest sheet in CSS px — 1123 for a landscape A4, 794 for portrait. */
   widestPx,
@@ -37,6 +39,8 @@ export function PrintWorkspace({
   calm = false,
 }: {
   children: React.ReactNode
+  /** Far-left of the toolbar — the way back. */
+  leading?: React.ReactNode
   toolbar?: React.ReactNode
   /** Widest sheet in CSS px — 1123 for a landscape A4, 794 for portrait. */
   widestPx: number
@@ -86,23 +90,44 @@ export function PrintWorkspace({
     <div ref={frameRef} className="w-full">
       {/* Sticky, so the controls stay with you down a long pack. Never
           printed — this is the desk, not the paper. */}
-      <div className="sticky top-14 z-20 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-background/95 px-3 py-2 backdrop-blur print:hidden">
-        <div className="flex items-center gap-1">
+      {/* ONE toolbar (founder, 2026-08-15). The page carried its own row of
+          back-link and Save-as-PDF above this one, which was two bars doing
+          one job — and Save as PDF had become the same action as Print this
+          sheet once the pack showed one sheet at a time.
+          Styled as the favpolls list band is: a muted sticky band, small
+          uppercase labels, and controls in white segmented groups. Two
+          toolbars in one product should not be two designs. */}
+      <div className="sticky top-14 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-muted px-4 py-2.5 print:hidden">
+        {leading}
+        <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
+          Zoom
+        </span>
+        <div
+          className="flex items-center rounded-lg border border-border bg-background p-0.5 shadow-xs"
+          role="group"
+          aria-label="Zoom"
+        >
           {presets.map((z) => (
-            <Button
+            <button
               key={String(z)}
               type="button"
-              variant={zoom === z ? "secondary" : "ghost"}
-              size="sm"
               onClick={() => setZoom(z)}
               aria-pressed={zoom === z}
+              className={cn(
+                "rounded-md px-3 py-1 text-sm font-medium transition-colors",
+                zoom === z
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
               {z === "fit" ? "Fit" : `${Math.round(z * 100)}%`}
-            </Button>
+            </button>
           ))}
         </div>
         {toolbar && (
-          <div className="flex flex-wrap items-center gap-2">{toolbar}</div>
+          <div className="ml-auto flex flex-wrap items-center gap-3">
+            {toolbar}
+          </div>
         )}
       </div>
 

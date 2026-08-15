@@ -1,11 +1,23 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Download, ScanLine } from "lucide-react"
+import { ChevronDown, Download } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { BrandedQR, buildQrOptions } from "@/components/branded-qr"
+import { buildQrOptions } from "@/components/branded-qr"
 
-// The code on its own, as a file.
+// The code on its own, as a file — a TOOLBAR MENU, not a card.
+//
+// It was a full-width panel with the code, two buttons and two lines of
+// explanation, above the paper (founder, 2026-08-15). Downloading the code is
+// a thing you do once, if at all; it does not need a third of the screen
+// every visit, above the thing you came to look at.
 //
 // favpoll will never template every kind of stationery — the printers people
 // already use, a wedding stationer's own design, an insert a funeral director
@@ -73,56 +85,45 @@ export function QrExport({ value, name }: { value: string; name: string }) {
   }
 
   return (
-    // .paper pins the light token values, so the downloaded code is the one
-    // the pack prints whatever theme the organiser is viewing in.
-    <section
-      ref={scopeRef}
-      className="paper paper-screen mb-4 rounded-lg border border-border bg-background px-5 py-4 print:hidden"
-    >
-      <div className="flex flex-wrap items-start gap-5">
-        <BrandedQR
-          value={value}
-          size={96}
-          aria-label="The code that opens this favpoll"
-        />
-        <div className="min-w-64 flex-1">
-          <h2 className="text-base font-medium text-foreground">
-            Using your own stationery
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Download the code and put it on anything — an order of service, a
-            stationer&rsquo;s own design, a menu you are printing already. Print
-            it at least {MIN_MM}mm across, with clear space around it, or it
-            will scan reluctantly.
+    // .paper on the trigger's own wrapper: the colour is resolved from HERE
+    // when a download is asked for, so it has to sit in the pinned scope even
+    // though nothing here is printed.
+    <div ref={scopeRef} className="paper contents">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={busy !== null}
+          >
+            <Download data-icon="inline-start" aria-hidden="true" />
+            {busy ? "Preparing…" : "Download code"}
+            <ChevronDown data-icon="inline-end" aria-hidden="true" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-72">
+          <DropdownMenuItem onSelect={() => download("svg")}>
+            <span className="flex min-w-0 flex-col">
+              <span>Download SVG</span>
+              <span className="text-xs text-muted-foreground">
+                Stays sharp at any size — give a printer this one
+              </span>
+            </span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => download("png")}>
+            Download PNG
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {/* The one number that decides whether an exported code works, kept
+              with the thing it governs. */}
+          <p className="px-2 py-1.5 text-xs leading-relaxed text-muted-foreground">
+            Put it on anything — an order of service, a stationer&rsquo;s own
+            design, a menu. Print it at least {MIN_MM}mm across with clear space
+            around it, or it will scan reluctantly.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={busy !== null}
-              onClick={() => download("svg")}
-            >
-              <Download data-icon="inline-start" aria-hidden="true" />
-              {busy === "svg" ? "Preparing…" : "Download SVG"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={busy !== null}
-              onClick={() => download("png")}
-            >
-              <Download data-icon="inline-start" aria-hidden="true" />
-              {busy === "png" ? "Preparing…" : "Download PNG"}
-            </Button>
-          </div>
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ScanLine className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            SVG stays sharp at any size — give a printer that one if they ask.
-          </p>
-        </div>
-      </div>
-    </section>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }

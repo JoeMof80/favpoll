@@ -3,7 +3,18 @@
 import { useEffect, useState } from "react"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ChevronDown, Download, ScanLine } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover"
 import { SCALE, buildPackSteps } from "./pack-card"
 import { PackSheet, PLAIN_ORIENTATION } from "./pack-sheet"
 import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
@@ -44,7 +55,17 @@ const SHEETS: { id: Target; label: string; note: string }[] = [
   })),
 ]
 
-export function PackDocument({ data }: { data: PackData }) {
+export function PackDocument({
+  data,
+  leading,
+  qrExport,
+}: {
+  data: PackData
+  /** The way back, rendered at the far left of the one toolbar. */
+  leading?: React.ReactNode
+  /** The download-the-code control, folded in from its own card. */
+  qrExport?: React.ReactNode
+}) {
   const steps = buildPackSteps(data)
 
   // ONE SHEET AT A TIME (founder, 2026-08-15). The pack showed all eight
@@ -91,8 +112,39 @@ export function PackDocument({ data }: { data: PackData }) {
       <PrintWorkspace
         widestPx={1123}
         tallestPx={1123}
+        leading={leading}
         toolbar={
-          <div className="flex flex-wrap items-center gap-3">
+          <>
+            {/* A dropdown, not tabs (founder, 2026-08-15). Eight tabs is a
+                scrolling strip that pushed the paper down the page; the
+                sheet you want is a choice, and a choice is a menu. */}
+            <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
+              Sheet
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" size="sm">
+                  {current.label}
+                  <ChevronDown data-icon="inline-end" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                {SHEETS.map((sheet) => (
+                  <DropdownMenuItem
+                    key={String(sheet.id)}
+                    onSelect={() => setSelected(sheet.id)}
+                  >
+                    <span className="flex min-w-0 flex-col">
+                      <span className="truncate">{sheet.label}</span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        {sheet.note}
+                      </span>
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <div className="flex items-center gap-2">
               <Label htmlFor="cut-guides" className="text-sm font-normal">
                 Cut lines
@@ -103,6 +155,37 @@ export function PackDocument({ data }: { data: PackData }) {
                 onCheckedChange={setGuides}
               />
             </div>
+
+            {qrExport}
+
+            {/* The printing advice was a full-width alert taking a third of
+                the screen above the paper. It is worth saying — it was born
+                of a card that scanned reluctantly — but it is worth saying
+                ONCE, to whoever asks. */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Before you print a batch"
+                >
+                  <ScanLine data-icon="inline-start" aria-hidden="true" />
+                  Before you print
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-80 text-sm leading-relaxed"
+              >
+                Print a single card and scan it with a phone camera, held at the
+                distance and in the light your guests will have. Home printers
+                vary more than you would expect, and the wallet card carries the
+                smallest code — if any card is going to struggle, it is that
+                one.
+              </PopoverContent>
+            </Popover>
+
             <Button
               type="button"
               variant="secondary"
@@ -112,28 +195,9 @@ export function PackDocument({ data }: { data: PackData }) {
               <Printer data-icon="inline-start" aria-hidden="true" />
               Print this sheet
             </Button>
-          </div>
+          </>
         }
       >
-        {/* The sheet picker sits with the other controls, and scrolls rather
-            than wrapping — eight tabs on two lines pushes the paper down the
-            screen, which is the thing you came to look at. */}
-        <div className="mb-4 w-full print:hidden">
-          <Tabs
-            value={String(selected)}
-            onValueChange={(v) => setSelected(v as Target)}
-          >
-            <TabsList variant="line" className="w-full overflow-x-auto">
-              {SHEETS.map((sheet) => (
-                <TabsTrigger key={String(sheet.id)} value={String(sheet.id)}>
-                  {sheet.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-          <p className="mt-2 text-xs text-muted-foreground">{current.note}</p>
-        </div>
-
         <div data-sheet={String(selected)}>
           {isAvery ? (
             <AverySheet
