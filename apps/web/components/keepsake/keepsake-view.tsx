@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PrintWorkspace } from "@/components/print-workspace"
 import {
   KeepsakeDocument,
   type KeepsakeData,
@@ -44,33 +45,47 @@ export function KeepsakeView({
   }
 
   return (
+    // CALM, deliberately. The pack is organiser admin and a workspace suits
+    // it exactly; the keepsake is closer to a gift and often a remembrance,
+    // and a tool-like canvas round a memorial reads cold. Same shell, fewer
+    // controls, and the sheet given the room.
+    //
+    // A keepsake is always one LANDSCAPE A4: 1123 wide, 794 tall.
     <>
-      <div className="mb-4 flex items-center justify-between gap-4 print:hidden">
-        <p className="text-sm text-muted-foreground">
-          {variant === "tribute"
-            ? "The person leads, and the money stays quiet."
-            : "What was raised leads, as the thing worth keeping."}
-        </p>
-        <Tabs
-          value={variant}
-          onValueChange={(v) => choose(v as KeepsakeVariant)}
-          className="shrink-0"
-        >
-          <TabsList variant="line">
-            <TabsTrigger value="tribute">Tribute</TabsTrigger>
-            <TabsTrigger value="fundraiser">Fundraiser</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {/* .paper pins the light token values on the SHEET only — the page
-          chrome around it stays themed. Without this a dark-mode organiser
-          printed a keepsake in near-white ink on white paper, or a solid
-          dark page with background graphics on. Same fix as the print pack
-          (#535); the keepsake never got it. */}
-      <div className="paper rounded-lg border border-border bg-background shadow-sm print:border-0 print:shadow-none">
-        <KeepsakeDocument data={data} variant={variant} />
-      </div>
+      {/* Landscape, because the document is — see keepsake-document. */}
+      <style>{`@page { size: A4 landscape; margin: 10mm; }`}</style>
+      <PrintWorkspace
+        widestPx={1123}
+        tallestPx={794}
+        calm
+        toolbar={
+          <div className="flex items-center gap-3">
+            <p className="hidden text-sm text-muted-foreground sm:block">
+              {variant === "tribute"
+                ? "The person leads, and the money stays quiet."
+                : "What was raised leads, as the thing worth keeping."}
+            </p>
+            <Tabs
+              value={variant}
+              onValueChange={(v) => choose(v as KeepsakeVariant)}
+              className="shrink-0"
+            >
+              <TabsList variant="line">
+                <TabsTrigger value="tribute">Tribute</TabsTrigger>
+                <TabsTrigger value="fundraiser">Fundraiser</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        }
+      >
+        {/* .paper pins the light token values on the SHEET only — the workspace
+          around it stays themed. Without this a dark-mode organiser printed a
+          keepsake in near-white ink on white paper. Same fix as the print
+          pack (#535); the keepsake never got it. */}
+        <div className="paper h-[210mm] w-[297mm] overflow-hidden bg-background shadow-lg print:h-[190mm] print:w-[277mm] print:shadow-none">
+          <KeepsakeDocument data={data} variant={variant} />
+        </div>
+      </PrintWorkspace>
     </>
   )
 }

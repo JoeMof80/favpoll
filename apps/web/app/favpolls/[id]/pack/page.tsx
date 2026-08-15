@@ -68,7 +68,7 @@ export default async function PackPage({ params }: Props) {
       {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
           padding — every sheet renders at true page size now, so nothing is
           scaled to fit and what you see is what prints. */}
-      <div className="mx-auto max-w-[1220px] px-4 print:max-w-none print:px-0">
+      <div className="mx-auto max-w-[1280px] px-4 print:max-w-none print:px-0">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">
             <Link href={`/favpolls/${id}`}>
