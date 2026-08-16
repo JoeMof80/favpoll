@@ -1,6 +1,8 @@
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { buildPackSteps } from "@/components/print-pack/pack-card"
 import type { PackData } from "@/components/print-pack/pack-card"
+import type { KeepsakeData } from "@/components/keepsake/keepsake-document"
+import { getFavpollHeadline } from "@/lib/display"
 
 // The one demo favpoll the marketing pages depict, and the data every
 // artefact of it is built from. Split out of process-overview (2026-08-07)
@@ -32,3 +34,43 @@ export const DEMO_PACK_DATA: PackData = {
 }
 
 export const DEMO_PACK_STEPS = buildPackSteps(DEMO_PACK_DATA)
+
+// The keepsake the features page depicts — built from the MEMORIAL scene,
+// not the cause one the rest of the page uses, for the reveal vignette's
+// reason: the keepsake is most itself when there is a person. Belinda and
+// purple is the exemplar the whole site uses.
+//
+// The prefix comes from the real getFavpollHeadline and the numbers from
+// the scene's results, parsed — so the sheet this page depicts and the
+// sheet the keepsake page prints cannot drift apart.
+
+const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+
+const pounds = (formatted: string) => Number(formatted.replace(/[£,]/g, ""))
+
+export const DEMO_KEEPSAKE_DATA: KeepsakeData = {
+  prefix: getFavpollHeadline({
+    occasionType: MEMORIAL_SCENE.occasion_type,
+    name: MEMORIAL_SCENE.protagonist?.name ?? "",
+    subject: "someone",
+    openingLine: MEMORIAL_SCENE.opening_line,
+  }).prefix,
+  name: MEMORIAL_SCENE.protagonist?.name ?? "",
+  context: MEMORIAL_SCENE.protagonist?.context ?? null,
+  topicTitle: MEMORIAL_SCENE.poll.topic.title,
+  reveal: MEMORIAL_SCENE.poll.personal_reveal,
+  totalRaised: pounds(MEMORIAL_SCENE.total),
+  charityNames: MEMORIAL_SCENE.charities.map((c) => c.name),
+  // The scene carries no dates; Belinda's context ends in 2024, so the
+  // favpoll closed that year. House format: ordinal, never ISO.
+  closedDate: "21st November 2024",
+  standings: MEMORIAL_SCENE.results.map((r) => ({
+    favouriteId:
+      MEMORIAL_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
+        ?.id ?? r.label,
+    label: r.label,
+    amount: pounds(r.amount),
+  })),
+  rankHistory: null,
+  guestNames: [],
+}

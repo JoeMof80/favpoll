@@ -31,7 +31,13 @@ const SECTIONS = [
   "reveal",
   "goal",
   "guest-wall",
+  "keepsake",
 ] as const
+
+// The artefacts scaled into measured boxes — the pack's fan and the
+// keepsake's pair of sheets. Their box sizes are constants that go stale
+// silently if the sheets' real dimensions move.
+const MEASURED_BOXES = ["stationery", "keepsake"] as const
 
 // Widths that straddle the artefacts' own breakpoints: below sm, between sm
 // and lg, and above lg.
@@ -64,36 +70,38 @@ test.describe("features page artefacts", () => {
         ).toBeGreaterThan(MIN_VIGNETTE_HEIGHT)
       }
 
-      // The pack is the one artefact scaled into a measured box.
-      const box = page.locator("#stationery [data-artefact-box]")
-      const fit = await box.evaluate((el) => {
-        const scaled = el.firstElementChild as HTMLElement
-        const b = el.getBoundingClientRect()
-        const s = scaled.getBoundingClientRect()
-        return {
-          boxW: b.width,
-          boxH: b.height,
-          renderW: s.width,
-          renderH: s.height,
-        }
-      })
+      for (const section of MEASURED_BOXES) {
+        const box = page.locator(`#${section} [data-artefact-box]`)
+        const fit = await box.evaluate((el) => {
+          const scaled = el.firstElementChild as HTMLElement
+          const b = el.getBoundingClientRect()
+          const s = scaled.getBoundingClientRect()
+          return {
+            boxW: b.width,
+            boxH: b.height,
+            renderW: s.width,
+            renderH: s.height,
+          }
+        })
 
-      // A pixel of slack for sub-pixel rounding in the scale.
-      expect(
-        fit.renderW,
-        `pack at ${width}px is ${Math.round(fit.renderW)}px wide in a ${Math.round(fit.boxW)}px box`
-      ).toBeLessThanOrEqual(fit.boxW + 2)
-      expect(
-        fit.renderH,
-        `pack at ${width}px is ${Math.round(fit.renderH)}px tall in a ${Math.round(fit.boxH)}px box`
-      ).toBeLessThanOrEqual(fit.boxH + 2)
+        // A pixel of slack for sub-pixel rounding in the scale.
+        expect(
+          fit.renderW,
+          `#${section} at ${width}px is ${Math.round(fit.renderW)}px wide in a ${Math.round(fit.boxW)}px box`
+        ).toBeLessThanOrEqual(fit.boxW + 2)
+        expect(
+          fit.renderH,
+          `#${section} at ${width}px is ${Math.round(fit.renderH)}px tall in a ${Math.round(fit.boxH)}px box`
+        ).toBeLessThanOrEqual(fit.boxH + 2)
 
-      // And not absurdly small — a box far larger than its content means the
-      // constants drifted the other way and the pack is floating in a hole.
-      expect(
-        fit.renderH,
-        `pack at ${width}px fills less than half its box`
-      ).toBeGreaterThan(fit.boxH * 0.5)
+        // And not absurdly small — a box far larger than its content means
+        // the constants drifted the other way and the artefact is floating
+        // in a hole.
+        expect(
+          fit.renderH,
+          `#${section} at ${width}px fills less than half its box`
+        ).toBeGreaterThan(fit.boxH * 0.5)
+      }
 
       // Nothing spills sideways.
       const overflow = await page.evaluate(
