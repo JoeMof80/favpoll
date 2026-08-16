@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchAllRows } from "@/lib/supabase/paginate"
-import { getFavpollHeadline } from "@/lib/display"
+import { formatFavpollDate, getFavpollHeadline } from "@/lib/display"
 import { deriveRankHistory, type PledgeEvent } from "@/lib/rank-history"
 import { type KeepsakeStanding } from "@/components/keepsake/keepsake-document"
 import { KeepsakeView } from "@/components/keepsake/keepsake-view"
@@ -97,6 +97,13 @@ export default async function KeepsakePage({ params }: Props) {
     .map(([favouriteId, v]) => ({ favouriteId, ...v }))
     .sort((a, b) => b.amount - a.amount)
 
+  // The total is the SUM OF THE STANDINGS PRINTED BESIDE IT — never
+  // favpoll.total_raised, which is settlement-only and sits at £0 until
+  // disbursement runs (the money model: poll surfaces show per-poll sums).
+  // A keepsake headlining £0.00 above five priced favourites is wrong in
+  // the way a guest would notice first.
+  const pollTotal = standings.reduce((sum, s) => sum + s.amount, 0)
+
   const rankHistory =
     events.length >= 8 ? deriveRankHistory(events, labels) : null
 
@@ -139,12 +146,9 @@ export default async function KeepsakePage({ params }: Props) {
     openingLine: favpoll.opening_line,
   })
 
+  // Ordinal, per the house date format: "23rd July 2026", never "23 July".
   const closedIso = favpoll.closed_at ?? favpoll.closes_at
-  const closedDate = new Date(closedIso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+  const closedDate = formatFavpollDate(new Date(closedIso))
 
   const data = {
     prefix,
@@ -153,7 +157,7 @@ export default async function KeepsakePage({ params }: Props) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     topicTitle: (poll.topics as any)?.title ?? "favourites",
     reveal: poll.personal_reveal,
-    totalRaised: favpoll.total_raised ?? 0,
+    totalRaised: pollTotal,
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
