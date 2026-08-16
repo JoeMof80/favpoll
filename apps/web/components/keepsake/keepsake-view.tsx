@@ -12,6 +12,7 @@ import { ExportCsvButton } from "./export-csv-button"
 import {
   KeepsakeDocument,
   type KeepsakeData,
+  type KeepsakeOrientation,
   type KeepsakeVariant,
 } from "./keepsake-document"
 
@@ -23,7 +24,11 @@ import {
 // guess about the day and the organiser was there. The display has always
 // worked this way; the sheet afterwards should not ask a different question.
 //
-// Remembered per favpoll, not globally — someone may keep one of each.
+// The ORIENTATION toggle (founder, 2026-08-16) works the same way — guests'
+// frames vary, so the organiser picks the paper. Landscape is the default:
+// it is the classic certificate shape.
+//
+// Both remembered per favpoll, not globally — someone may keep one of each.
 
 export function KeepsakeView({
   data,
@@ -38,20 +43,34 @@ export function KeepsakeView({
   leading?: React.ReactNode
 }) {
   const [variant, setVariant] = useState<KeepsakeVariant>(defaultVariant)
-  const key = `favpoll:keepsake-variant:${favpollId}`
+  const [orientation, setOrientation] =
+    useState<KeepsakeOrientation>("landscape")
+  const variantKey = `favpoll:keepsake-variant:${favpollId}`
+  const orientationKey = `favpoll:keepsake-orientation:${favpollId}`
 
   // Adopted after mount, not in the initial state: the server render knows
   // nothing of localStorage, and seeding from it directly would hydrate
   // against different markup. Same reason the display does it this way.
   useEffect(() => {
-    const stored = window.localStorage.getItem(key)
-    if (stored === "tribute" || stored === "fundraiser") setVariant(stored)
-  }, [key])
+    const storedVariant = window.localStorage.getItem(variantKey)
+    if (storedVariant === "tribute" || storedVariant === "fundraiser")
+      setVariant(storedVariant)
+    const storedOrientation = window.localStorage.getItem(orientationKey)
+    if (storedOrientation === "landscape" || storedOrientation === "portrait")
+      setOrientation(storedOrientation)
+  }, [variantKey, orientationKey])
 
-  function choose(next: KeepsakeVariant) {
+  function chooseVariant(next: KeepsakeVariant) {
     setVariant(next)
-    window.localStorage.setItem(key, next)
+    window.localStorage.setItem(variantKey, next)
   }
+
+  function chooseOrientation(next: KeepsakeOrientation) {
+    setOrientation(next)
+    window.localStorage.setItem(orientationKey, next)
+  }
+
+  const isPortrait = orientation === "portrait"
 
   return (
     // CALM, deliberately. The pack is organiser admin and a workspace suits
@@ -59,13 +78,14 @@ export function KeepsakeView({
     // and a tool-like canvas round a memorial reads cold. Same shell, fewer
     // controls, and the sheet given the room.
     //
-    // A keepsake is always one LANDSCAPE A4: 1123 wide, 794 tall.
+    // An A4: 1123 x 794px landscape, 794 x 1123 portrait.
     <>
-      {/* Landscape, because the document is — see keepsake-document. */}
-      <style>{`@page { size: A4 landscape; margin: 10mm; }`}</style>
+      {/* The @page follows the toggle, so the browser's print dialog opens
+          on the right paper without the organiser touching a setting. */}
+      <style>{`@page { size: A4 ${orientation}; margin: 10mm; }`}</style>
       <PrintWorkspace
-        widestPx={1123}
-        tallestPx={794}
+        widestPx={isPortrait ? 794 : 1123}
+        tallestPx={isPortrait ? 1123 : 794}
         calm
         leading={leading}
         toolbar={
@@ -74,10 +94,20 @@ export function KeepsakeView({
             <SegmentedControl
               label="How the keepsake is told"
               value={variant}
-              onChange={(v) => choose(v as KeepsakeVariant)}
+              onChange={(v) => chooseVariant(v as KeepsakeVariant)}
               options={[
                 { value: "tribute", label: "Tribute" },
                 { value: "fundraiser", label: "Fundraiser" },
+              ]}
+            />
+            <ToolbarLabel>Paper</ToolbarLabel>
+            <SegmentedControl
+              label="Which way the paper turns"
+              value={orientation}
+              onChange={(v) => chooseOrientation(v as KeepsakeOrientation)}
+              options={[
+                { value: "landscape", label: "Landscape" },
+                { value: "portrait", label: "Portrait" },
               ]}
             />
             {/* Rendered HERE rather than taken as an `exportCsv` element prop.
@@ -111,8 +141,18 @@ export function KeepsakeView({
             separates on its own; an outline as well drew the sheet as a UI
             card, which is the read this whole workspace is trying to avoid.
             The shadow is the only edge paper actually has. */}
-        <div className="paper h-[210mm] w-[297mm] overflow-hidden bg-background shadow-lg print:h-[190mm] print:w-[277mm] print:shadow-none">
-          <KeepsakeDocument data={data} variant={variant} />
+        <div
+          className={`paper overflow-hidden bg-background shadow-lg print:shadow-none ${
+            isPortrait
+              ? "h-[297mm] w-[210mm] print:h-[277mm] print:w-[190mm]"
+              : "h-[210mm] w-[297mm] print:h-[190mm] print:w-[277mm]"
+          }`}
+        >
+          <KeepsakeDocument
+            data={data}
+            variant={variant}
+            orientation={orientation}
+          />
         </div>
       </PrintWorkspace>
     </>
