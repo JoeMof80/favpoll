@@ -3,29 +3,35 @@ import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
 import { formatPoundsExact } from "@/lib/i18n"
 
-// The keepsake: "the story of the day" as a single A4 sheet. Ordinal
-// standings, the reveal, the total, and the guests who took part — no
-// per-guest amounts (the amounts-private default holds here too).
+// The keepsake: the story of the day as a single certificate. Something a
+// guest would KEEP — a brand-drawn frame, a centred composition — not a
+// report that happens to be printable. Ordinal standings, the reveal, the
+// total; no per-guest amounts (the amounts-private default holds here
+// too).
 //
-// TWO VARIANTS, and deliberately the SAME TWO the live display already has
-// (founder, 2026-08-15) — tribute and fundraiser, defaulted from the
-// register, overridable. Reusing that axis rather than inventing one means
-// the screen in the room and the sheet afterwards tell the same story the
-// same way, and there is no second vocabulary for an organiser to learn.
+// TWO VARIANTS, the SAME TWO the live display has (founder, 2026-08-15) —
+// tribute and fundraiser, defaulted from the register, overridable. Two
+// different documents in one frame (founder, 2026-08-15: "make them
+// meaningfully different, or consolidate them"):
 //
-//   tribute    — the person leads and the money stays quiet. The total is a
-//                line, not a headline, and the names get room.
-//   fundraiser — the total IS the headline, because on a fundraiser what
-//                was raised is the achievement being kept.
+//   tribute    — a remembrance. The topic and the reveal lead: the reveal
+//                is a bordered quote under the poll's topic ribbon, the
+//                standings are five dot-leader rows given room, and the
+//                money is one closing sentence. No bars, no chart —
+//                nothing that reads as a dashboard.
+//   fundraiser — an achievement. The amount raised is the centrepiece,
+//                and the race is the story: ten standings with bars and
+//                the bump chart.
 //
-// ONE SHEET, and LANDSCAPE (founder, 2026-08-15). Portrait made a tall thin
-// column of a document that has four things to say, so it either ran to two
-// pages or left the bottom third empty. Landscape gives two columns: the
-// words on the left, the numbers on the right, the day's header across the
-// top and the thanks across the foot.
+// TWO ORIENTATIONS (founder, 2026-08-16), a toggle like the variant. The
+// composition is centred, so portrait mostly means narrower and taller —
+// only the fundraiser's race zone changes shape, stacking the chart under
+// the standings instead of beside them.
 //
-// The extra room also let the sheet say MORE rather than less — a stat line
-// under the header, and the standings back to a comfortable single column.
+// EMPTY SPACE IS THE POINT (founder, 2026-08-16: "make better use of empty
+// space to convey quality") — the tribute shows five standings, not ten,
+// and the foot is a two-line colophon, not a names roll. The named-guest
+// list still travels in the CSV export; it just no longer prints.
 
 export type KeepsakeStanding = {
   favouriteId: string
@@ -44,7 +50,7 @@ export type KeepsakeData = {
   closedDate: string
   standings: KeepsakeStanding[]
   rankHistory: RankHistory | null
-  /** Non-anonymous guest names who pledged, for the thank-you line */
+  /** Non-anonymous guest names who pledged — CSV export only, not printed */
   guestNames: string[]
 }
 
@@ -55,165 +61,403 @@ function charityLabel(names: string[]): string {
 }
 
 export type KeepsakeVariant = "tribute" | "fundraiser"
+export type KeepsakeOrientation = "landscape" | "portrait"
 
-// Ten standings in ONE column, which landscape has the height for — portrait
-// needed two columns to fit ten at all. Twelve fitted a keepsake with a
-// reveal and overflowed a busy one by 4.5mm, so ten is the number that fits
-// BOTH worst cases: a long reveal, and a full thanks list.
-const TOP_N = 10
+// The tribute keeps five: the final word is really about the top few, and
+// "and N more favourites" carries the rest. The fundraiser keeps ten
+// because the crowded race is its character.
+const TOP_N_TRIBUTE = 5
+const TOP_N_FUNDRAISER = 10
 const CHART_LANES = 5
 const CHART_HIGHLIGHT = 5
-// Names are the POINT of a keepsake, so this cap is high and the remainder
-// is absorbed by the "and everyone who took part" line that was already
-// there. Uncapped, a busy favpoll's fifty names ran to 42mm and pushed a
-// keepsake with a reveal onto a second page.
-const MAX_NAMES = 26
 
 export function KeepsakeDocument({
   data,
   variant = "fundraiser",
+  orientation = "landscape",
 }: {
   data: KeepsakeData
   variant?: KeepsakeVariant
+  orientation?: KeepsakeOrientation
 }) {
   const max = data.standings[0]?.amount ?? 0
-  const shown = data.standings.slice(0, TOP_N)
-  const rest = data.standings.length - shown.length
   const isTribute = variant === "tribute"
-
-  const total = (
-    <>
-      <p className="text-sm text-muted-foreground">Together, guests raised</p>
-      <p
-        className={
-          isTribute
-            ? "mt-1 text-2xl font-medium text-foreground"
-            : "mt-1 text-5xl font-medium text-primary"
-        }
-      >
-        {formatPoundsExact(data.totalRaised)}
-      </p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        for {charityLabel(data.charityNames)}
-      </p>
-    </>
-  )
+  const isPortrait = orientation === "portrait"
+  const topN = isTribute ? TOP_N_TRIBUTE : TOP_N_FUNDRAISER
+  const shown = data.standings.slice(0, topN)
+  const rest = data.standings.length - shown.length
+  const restLine =
+    rest > 0
+      ? `and ${rest} more ${rest === 1 ? "favourite" : "favourites"}`
+      : null
+  const topicLine = `Favourite ${data.topicTitle.toLowerCase()}`
 
   return (
-    <article className="mx-auto flex h-full w-full max-w-[297mm] flex-col bg-background px-12 py-6 text-foreground print:px-8 print:py-4">
-      {/* ── Header band ── */}
-      <header className="flex flex-col items-center border-b border-border pb-4 text-center">
-        <span className="mb-1.5 inline-flex text-primary">
-          <svg width="30" height="27" viewBox="0 0 10 9" aria-hidden="true">
-            <FavpollMarkGlyph />
-          </svg>
-        </span>
-        <p className="text-xs font-medium tracking-widest text-primary uppercase">
-          {data.prefix}
-        </p>
-        <h1 className="mt-1 text-3xl font-medium tracking-tight text-reveal-foreground">
-          {data.name}
-        </h1>
-        {data.context && (
-          <p className="mt-1 text-sm text-muted-foreground">{data.context}</p>
-        )}
-        {/* The extra line landscape paid for: what the day amounted to, in
-            facts, before either column argues its case. */}
-        <p className="mt-2 text-xs text-muted-foreground">
-          {data.rankHistory ? `${data.rankHistory.steps} pledges · ` : ""}
-          {data.standings.length}{" "}
-          {data.standings.length === 1 ? "favourite" : "favourites"} · closed{" "}
-          {data.closedDate}
-        </p>
-      </header>
+    <article
+      data-variant={variant}
+      data-orientation={orientation}
+      className="relative h-full w-full bg-background text-foreground [-webkit-print-color-adjust:exact] [print-color-adjust:exact]"
+    >
+      {/* ── The frame (founder's design, 2026-08-16): the mark upright and
+          unmirrored in each corner, and the rules drawn in the mark's own
+          line language: the same 1-unit stroke and half opacity as the poll
+          lines, the horizontals running exactly in line with them and the
+          verticals dropped on the mark's one vertical axis — the dot centre
+          and both poll lines' left end-caps share glyph x=5. All geometry is
+          the glyph's at 2px per unit (viewBox 10×9, glyph inset 4mm):
+          poll-line centres 9px and 13px below the glyph top; the x=5 axis
+          10px in from the glyph's near edge; dot bottom at 18px. */}
+      {(
+        [
+          "top-[4mm] left-[4mm]",
+          "top-[4mm] right-[4mm]",
+          "bottom-[4mm] left-[4mm]",
+          "bottom-[4mm] right-[4mm]",
+        ] as const
+      ).map((pos) => (
+        <svg
+          key={pos}
+          aria-hidden="true"
+          width="20"
+          height="18"
+          viewBox="0 0 10 9"
+          className={`pointer-events-none absolute ${pos} text-primary`}
+        >
+          <FavpollMarkGlyph />
+        </svg>
+      ))}
+      {/* Horizontal rules — each pair continues the corner marks' poll
+          lines, starting a breath past the longer line's end, with the
+          mark's own 2-unit stagger (4px) between the two ends. The stagger
+          is frame-symmetric — outer line long, inner line short, on every
+          side (founder, 2026-08-16) — so at the bottom it runs opposite to
+          the adjacent glyph's bars. */}
+      {(
+        [
+          [
+            "top-[calc(4mm+8px)]",
+            "right-[calc(4mm+22px)] left-[calc(4mm+22px)]",
+          ],
+          [
+            "top-[calc(4mm+12px)]",
+            "right-[calc(4mm+26px)] left-[calc(4mm+26px)]",
+          ],
+          [
+            "bottom-[calc(4mm+8px)]",
+            "right-[calc(4mm+26px)] left-[calc(4mm+26px)]",
+          ],
+          [
+            "bottom-[calc(4mm+4px)]",
+            "right-[calc(4mm+22px)] left-[calc(4mm+22px)]",
+          ],
+        ] as const
+      ).map(([y, ends]) => (
+        <span
+          key={y}
+          aria-hidden="true"
+          className={`pointer-events-none absolute ${ends} ${y} h-[2px] rounded-full bg-primary/50`}
+        />
+      ))}
+      {/* Vertical rules — the outer line of each pair runs on the mark's
+          x=5 axis, straight through the dot and the poll lines' origins;
+          its partner sits one line-spacing inward and carries the same
+          stagger. */}
+      {(
+        [
+          [
+            "left-[calc(4mm+9px)]",
+            "top-[calc(4mm+21px)] bottom-[calc(4mm+21px)]",
+          ],
+          [
+            "left-[calc(4mm+13px)]",
+            "top-[calc(4mm+25px)] bottom-[calc(4mm+25px)]",
+          ],
+          [
+            "right-[calc(4mm+9px)]",
+            "top-[calc(4mm+21px)] bottom-[calc(4mm+21px)]",
+          ],
+          [
+            "right-[calc(4mm+13px)]",
+            "top-[calc(4mm+25px)] bottom-[calc(4mm+25px)]",
+          ],
+        ] as const
+      ).map(([x, ends]) => (
+        <span
+          key={x}
+          aria-hidden="true"
+          className={`pointer-events-none absolute ${ends} ${x} w-[2px] rounded-full bg-primary/50`}
+        />
+      ))}
 
-      {/* ── Two columns: the words, then the numbers ── */}
-      <div className="grid flex-1 grid-cols-[1fr_1.15fr] gap-10 pt-4">
-        <div className="flex flex-col">
-          {data.reveal && (
-            <p className="border-l-2 border-primary-muted pl-4 text-base leading-relaxed text-reveal-foreground italic">
-              {data.reveal}
+      {/* The print: compressions exist because the printed sheet is 20mm
+          shorter than the screen one (10mm margins each side) — the worst
+          landscape fundraiser case fits the screen and overlapped the foot
+          in print. */}
+      <div
+        className={`flex h-full w-full flex-col pt-[14mm] pb-[10mm] print:pt-[11mm] print:pb-[9mm] ${
+          isPortrait ? "px-[14mm]" : "px-[16mm]"
+        }`}
+      >
+        {/* ── The head: occasion, name. No seal — the frame carries the
+            brand now (founder, 2026-08-16: unsure about the seal; with the
+            mark in all four corners a fifth repetition crowded the top). */}
+        <header className="flex flex-col items-center text-center">
+          <p className="text-xs font-medium tracking-widest text-primary-muted uppercase">
+            {data.prefix}
+          </p>
+          <h1 className="mt-[1.5mm] text-4xl font-medium tracking-tight text-reveal-foreground">
+            {data.name}
+          </h1>
+          {data.context && (
+            <p className="mt-[1.5mm] text-sm text-muted-foreground">
+              {data.context}
             </p>
           )}
+        </header>
 
-          <section className={data.reveal ? "mt-5" : ""}>
-            <h2 className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-              Favourite {data.topicTitle.toLowerCase()} — the final word
-            </h2>
-            <ol className="mt-2 space-y-0.5">
-              {shown.map((s, i) => (
-                <li key={s.favouriteId} className="flex items-center gap-3">
-                  <span className="w-5 shrink-0 text-sm text-muted-foreground tabular-nums">
-                    {i + 1}
-                  </span>
-                  <span className="flex-1">
-                    <span className="flex items-baseline justify-between gap-2">
+        {isTribute ? (
+          /* ── Tribute: topic and reveal lead, the money closes quietly ──
+             The topic, reveal and standings are one grouped section
+             (founder, 2026-08-16) — they all tell the favourite's story —
+             so the distributed space falls around the group, not inside
+             it. Portrait spreads the blocks evenly down the tall middle;
+             centring them left one deep void above the topic and none
+             below (measured at 1600x1000). */
+          <div
+            className={`flex min-h-0 flex-1 flex-col items-center gap-[10mm] py-[4mm] ${
+              isPortrait ? "justify-evenly" : "justify-center"
+            }`}
+          >
+            <div className="flex w-full flex-col gap-[6mm]">
+              <section className="flex w-full flex-col items-center">
+                {/* The topic above the reveal, in the poll's own ribbon
+                    style (PollHeading: uppercase, tracked, primary) so the
+                    keepsake echoes what guests saw all day (founder,
+                    2026-08-16 — supersedes the earlier 2xl heading). */}
+                <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
+                  {topicLine}
+                </h2>
+                {/* The quote's pl matches the list's text gutter below (7mm
+                  number column + 8px gap − 2px rule), so the quote's text
+                  and the list's labels share a left edge. */}
+                {data.reveal && (
+                  <p className="mt-[5mm] max-w-[150mm] border-l-2 border-primary-muted pl-[calc(7mm+8px-2px)] text-left text-lg leading-relaxed text-primary/80 italic">
+                    {data.reveal}
+                  </p>
+                )}
+              </section>
+
+              <section className="w-full">
+                <ol className="mx-auto w-[150mm] max-w-full space-y-[3.5mm]">
+                  {shown.map((s, i) => (
+                    <li
+                      key={s.favouriteId}
+                      className="flex items-baseline gap-2"
+                    >
+                      {/* Left-aligned so the numeral sits flush with the box
+                        edge — and the quote's rule above it. */}
+                      <span className="w-[7mm] shrink-0 text-sm text-muted-foreground tabular-nums">
+                        {i + 1}
+                      </span>
                       <span
                         className={
-                          i === 0
-                            ? "font-medium text-foreground"
-                            : "text-foreground"
+                          i === 0 ? "font-medium text-foreground" : undefined
                         }
                       >
                         {s.label}
                       </span>
-                      <span className="text-sm text-muted-foreground tabular-nums">
+                      {/* The dot leader, sitting on the baseline: an empty flex
+                        item's baseline is its bottom edge, so the dotted
+                        border lands exactly where the text sits. */}
+                      <span
+                        aria-hidden="true"
+                        className="h-[0.16em] min-w-[6mm] flex-1 border-b border-dotted border-border"
+                      />
+                      <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
                         {formatPoundsExact(s.amount)}
                       </span>
-                    </span>
-                    <span className="mt-0.5 block h-1.5 overflow-hidden rounded-full bg-muted">
-                      <span
-                        className={`block h-full rounded-full ${i === 0 ? "bg-primary" : "bg-chart-3"}`}
-                        style={{
-                          width: `${max > 0 ? (s.amount / max) * 100 : 0}%`,
-                        }}
-                      />
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ol>
-            {rest > 0 && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                and {rest} more {rest === 1 ? "favourite" : "favourites"} — the
-                full list is in the CSV.
+                    </li>
+                  ))}
+                </ol>
+                {restLine && (
+                  <p className="mt-[3mm] text-center text-sm text-muted-foreground">
+                    {restLine}
+                  </p>
+                )}
+              </section>
+            </div>
+
+            <p className="text-base">
+              Together, guests gave{" "}
+              <span className="font-medium text-reveal-foreground">
+                {formatPoundsExact(data.totalRaised)}
+              </span>{" "}
+              to {charityLabel(data.charityNames)}.
+            </p>
+          </div>
+        ) : (
+          /* ── Fundraiser: the total is the centrepiece, the race the story ──
+             Without the chart the whole middle is one justify-evenly column —
+             total, reveal, standings — so all four gaps (head→total included)
+             come out equal (founder, 2026-08-16). No py: padding would add to
+             the first and last gaps and break the evenness. */
+          <div
+            className={
+              data.rankHistory
+                ? "flex min-h-0 flex-1 flex-col gap-[4mm] py-[2.5mm] print:gap-[3mm] print:py-[1mm]"
+                : "flex min-h-0 flex-1 flex-col justify-evenly"
+            }
+          >
+            <section className="text-center">
+              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                Together, guests raised
               </p>
-            )}
-          </section>
-        </div>
-
-        <div className="flex flex-col">
-          <section className="text-center">{total}</section>
-
-          {data.rankHistory && (
-            <section className="mt-5 break-inside-avoid">
-              <BumpChart
-                history={data.rankHistory}
-                title="The story of the day"
-                caption="Positions only — how each favourite ranked as pledges came in."
-                highlightTop={CHART_HIGHLIGHT}
-                maxSeries={CHART_LANES}
-              />
+              <p className="mt-[1mm] text-5xl font-medium tracking-tight text-primary print:text-4xl">
+                {formatPoundsExact(data.totalRaised)}
+              </p>
+              <p className="mt-[1.5mm] text-sm text-muted-foreground">
+                for {charityLabel(data.charityNames)}
+              </p>
             </section>
-          )}
-        </div>
-      </div>
 
-      {/* ── Thanks and the brand line, across the foot ── */}
-      <footer className="mt-3 border-t border-border pt-3 text-center">
-        {data.guestNames.length > 0 && (
-          <p className="mx-auto max-w-4xl text-sm leading-relaxed text-muted-foreground">
-            <span className="font-medium text-foreground">With thanks to </span>
-            {data.guestNames.slice(0, MAX_NAMES).join(", ")}
-            {" — and everyone who took part."}
-          </p>
+            {/* With the chart, this wrapper is the race zone (side by side in
+                landscape — a landscape shape — stacked in portrait). Without
+                it, the reveal and standings group into one section (founder,
+                2026-08-16) so the distributed space falls around them, not
+                between them. */}
+            <div
+              className={
+                data.rankHistory
+                  ? isPortrait
+                    ? "mx-auto flex min-h-0 w-full max-w-[160mm] flex-1 flex-col gap-[6mm]"
+                    : "grid min-h-0 flex-1 grid-cols-[1.05fr_1fr] items-start gap-[12mm]"
+                  : "mx-auto flex w-full max-w-[150mm] flex-col gap-[7mm]"
+              }
+            >
+              {/* The topic heads the reveal, as in the tribute (founder,
+                  2026-08-16); the standings carry it only when there is no
+                  reveal above them to do so. */}
+              {!data.rankHistory && data.reveal && (
+                <section className="mx-auto w-full max-w-[150mm]">
+                  <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
+                    {topicLine}
+                  </h2>
+                  <p className="mt-[3mm] border-l-2 border-primary-muted pl-[calc(7mm+8px-2px)] text-base leading-relaxed text-primary/80 italic">
+                    {data.reveal}
+                  </p>
+                </section>
+              )}
+              <section
+                className={
+                  data.rankHistory ? undefined : "mx-auto w-full max-w-[150mm]"
+                }
+              >
+                {(data.rankHistory || !data.reveal) && (
+                  <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
+                    {topicLine}
+                  </h2>
+                )}
+                {/* Compact rows when the chart shares the page; roomy ones
+                    when it does not. Print stays compact either way — the
+                    printed sheet is 20mm shorter. */}
+                <ol
+                  className={
+                    data.rankHistory
+                      ? "mt-[2mm] space-y-[1mm] text-sm print:space-y-[0.5mm]"
+                      : "mt-[3mm] space-y-[2.5mm] text-sm print:space-y-[0.5mm]"
+                  }
+                >
+                  {shown.map((s, i) => (
+                    <li key={s.favouriteId} className="flex items-center gap-2">
+                      <span className="w-[7mm] shrink-0 text-muted-foreground tabular-nums">
+                        {i + 1}
+                      </span>
+                      <span className="flex-1">
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span
+                            className={
+                              i === 0
+                                ? "font-medium text-foreground"
+                                : undefined
+                            }
+                          >
+                            {s.label}
+                          </span>
+                          <span className="text-muted-foreground tabular-nums">
+                            {formatPoundsExact(s.amount)}
+                          </span>
+                        </span>
+                        <span
+                          className={`mt-px block overflow-hidden rounded-full bg-muted print:h-[0.6mm] ${
+                            data.rankHistory ? "h-1" : "h-1.5"
+                          }`}
+                        >
+                          <span
+                            className={`block h-full rounded-full ${i === 0 ? "bg-primary" : "bg-chart-3"}`}
+                            style={{
+                              width: `${max > 0 ? (s.amount / max) * 100 : 0}%`,
+                            }}
+                          />
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                {restLine && (
+                  <p className="mt-[1.5mm] text-sm text-muted-foreground print:mt-[1mm]">
+                    {restLine}
+                  </p>
+                )}
+              </section>
+
+              {data.rankHistory && (
+                <section className="break-inside-avoid">
+                  <BumpChart
+                    history={data.rankHistory}
+                    title="The story of the day"
+                    caption="Positions only — how each favourite ranked as pledges came in."
+                    highlightTop={CHART_HIGHLIGHT}
+                    maxSeries={CHART_LANES}
+                  />
+                  {/* The reveal rides in the chart's column — the standings
+                      column is the tall one in landscape, and a centred
+                      reveal between the total and the race cost the exact
+                      height that pushed row ten into the foot. */}
+                  {data.reveal && (
+                    <p className="mt-[4mm] max-w-[110mm] border-l-2 border-primary-muted pl-4 text-base leading-relaxed text-primary/80 italic print:mt-[2mm] print:text-sm">
+                      {data.reveal}
+                    </p>
+                  )}
+                </section>
+              )}
+            </div>
+          </div>
         )}
-        <p className="mt-2 text-xs text-muted-foreground italic">
-          Expressions of joy, for charitable causes, in the name of those we
-          love.
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">favpoll.com</p>
-      </footer>
+
+        {/* ── The foot: the issuer signs — the full lockup (mark and
+            wordmark, as the site header draws it, at colophon scale), then
+            the brand statement, then the provenance line (founder,
+            2026-08-16: the mark moved here when the seal left the head;
+            the names roll and ornament were cut earlier; the named guests
+            still travel in the CSV) ── */}
+        <footer className="flex flex-col items-center text-center">
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <svg width="18" height="16.2" viewBox="0 0 10 9" aria-hidden="true">
+              <FavpollMarkGlyph />
+            </svg>
+            <span className="text-lg tracking-tight">
+              fav<span className="opacity-60">poll</span>
+            </span>
+          </span>
+          <p className="mt-[1.5mm] text-xs text-muted-foreground italic">
+            Expressions of joy, for charitable causes, in the name of those we
+            love.
+          </p>
+          <p className="mt-[1mm] text-xs text-muted-foreground">
+            Closed {data.closedDate} · favpoll.com
+          </p>
+        </footer>
+      </div>
     </article>
   )
 }
