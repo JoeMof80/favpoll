@@ -12,6 +12,7 @@ import { FundVignette } from "@/components/landing/fund-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
 import { GoalVignette } from "@/components/landing/goal-vignette"
 import { GuestWallVignette } from "@/components/landing/guest-wall-vignette"
+import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
 //
@@ -271,10 +272,12 @@ export default function FeaturesPage() {
               lead="When a favpoll closes, the day becomes a single sheet to print."
               bullets={[
                 "The standings, the reveal and the total raised",
-                "Everyone who took part",
-                "No per-guest amounts — what people gave stays theirs",
                 "Two ways to tell it: the person leads, or what was raised does",
+                "Portrait or landscape, and always a single sheet",
+                "No per-guest amounts — what people gave stays theirs",
+                "The full standings and everyone who took part export as a spreadsheet",
               ]}
+              artefact={<KeepsakeVignette />}
             />
 
             <Feature
