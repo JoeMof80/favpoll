@@ -11,7 +11,7 @@ import { PackVignette } from "@/components/landing/pack-vignette"
 import { FundVignette } from "@/components/landing/fund-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
 import { GoalVignette } from "@/components/landing/goal-vignette"
-import { GuestWallVignette } from "@/components/landing/guest-wall-vignette"
+import { WallOfFavouritesVignette } from "@/components/landing/wall-of-favourites-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
@@ -46,7 +46,7 @@ const SECTIONS = [
   { id: "shared-fund", label: "Shared fund" },
   { id: "reveal", label: "Personal reveal" },
   { id: "goal", label: "Pledge goal" },
-  { id: "guest-wall", label: "Guest wall" },
+  { id: "wall-of-favourites", label: "Wall of favourites" },
   { id: "keepsake", label: "Keepsake" },
   { id: "basics", label: "The basics" },
   { id: "money", label: "Where the money goes" },
@@ -254,8 +254,8 @@ export default function FeaturesPage() {
             />
 
             <Feature
-              id="guest-wall"
-              title="Guest wall"
+              id="wall-of-favourites"
+              title="Wall of favourites"
               lead="Who backed what, as it happens."
               bullets={[
                 "Scrolls on the big screen during the day",
@@ -263,7 +263,7 @@ export default function FeaturesPage() {
                 "Names and favourites only — never amounts",
                 "Anyone can pledge as “Someone”",
               ]}
-              artefact={<GuestWallVignette />}
+              artefact={<WallOfFavouritesVignette />}
             />
 
             <Feature

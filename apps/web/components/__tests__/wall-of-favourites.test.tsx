@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest"
 import { render, screen } from "@testing-library/react"
-import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
 
-const ENTRIES: GuestWallEntry[] = [
+const ENTRIES: WallEntry[] = [
   {
     id: "p1",
     name: "Alex",
@@ -17,36 +20,36 @@ const ENTRIES: GuestWallEntry[] = [
   },
 ]
 
-describe("GuestWall — teaser for un-entitled viewers", () => {
+describe("WallOfFavourites — teaser for un-entitled viewers", () => {
   it("shows the pledge teaser when teaseBacked and entries exist", () => {
-    render(<GuestWall entries={ENTRIES} teaseBacked />)
+    render(<WallOfFavourites entries={ENTRIES} teaseBacked />)
     expect(
-      screen.getByText("Pledge to see what each guest backed.")
+      screen.getByText("Pledge to see what everyone backed.")
     ).toBeInTheDocument()
   })
 
   it("shows no teaser for entitled viewers", () => {
-    render(<GuestWall entries={ENTRIES} teaseBacked={false} />)
+    render(<WallOfFavourites entries={ENTRIES} teaseBacked={false} />)
     expect(screen.queryByText(/Pledge to see what/)).toBeNull()
   })
 
   it("shows no teaser on an empty wall — the empty state explains instead", () => {
-    render(<GuestWall entries={[]} teaseBacked />)
+    render(<WallOfFavourites entries={[]} teaseBacked />)
     expect(screen.queryByText(/Pledge to see what/)).toBeNull()
     expect(
-      screen.getByText("Guests appear here as they pledge.")
+      screen.getByText("Names appear here as people pledge.")
     ).toBeInTheDocument()
   })
 
   it("renders stripped entries as plain 'pledged' with name or Someone", () => {
-    render(<GuestWall entries={ENTRIES} teaseBacked />)
+    render(<WallOfFavourites entries={ENTRIES} teaseBacked />)
     expect(screen.getByText("Alex")).toBeInTheDocument()
     expect(screen.getByText("Someone")).toBeInTheDocument()
     expect(screen.getAllByText("pledged")).toHaveLength(2)
   })
 })
 
-describe("GuestWall — expandable collapse", () => {
+describe("WallOfFavourites — expandable collapse", () => {
   const MANY = Array.from({ length: 12 }, (_, i) => ({
     id: `e${i}`,
     name: `Guest ${i}`,
@@ -55,24 +58,24 @@ describe("GuestWall — expandable collapse", () => {
   }))
 
   it("shows all rows in a scrollable list with an expand control", () => {
-    render(<GuestWall entries={MANY} expandable />)
+    render(<WallOfFavourites entries={MANY} expandable />)
     expect(screen.getAllByText(/Guest \d+/).length).toBe(12)
     expect(screen.getByRole("list", { name: "Recent pledges" })).toHaveClass(
       "max-h-72",
       "overflow-y-auto"
     )
     expect(
-      screen.getByRole("button", { name: "Expand guest wall" })
+      screen.getByRole("button", { name: "Expand wall of favourites" })
     ).toBeInTheDocument()
   })
 
   it("no expand control or height cap when not expandable", () => {
-    render(<GuestWall entries={MANY} />)
+    render(<WallOfFavourites entries={MANY} />)
     expect(
       screen.getByRole("list", { name: "Recent pledges" })
     ).not.toHaveClass("max-h-72")
     expect(
-      screen.queryByRole("button", { name: "Expand guest wall" })
+      screen.queryByRole("button", { name: "Expand wall of favourites" })
     ).toBeNull()
   })
 })

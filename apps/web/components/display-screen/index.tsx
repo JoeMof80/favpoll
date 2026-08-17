@@ -7,7 +7,10 @@ import { getFavpollHeadline, roomTypeScale } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
-import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { DisplayChrome } from "./display-chrome"
 import { DisplayPollSection } from "./display-poll-section"
@@ -17,7 +20,7 @@ import { formatPounds } from "@/lib/i18n"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
-// charities, live guest wall). Everything the room watches stays current via
+// charities, live wall of favourites). Everything the room watches stays current via
 // an interval router.refresh() — see the note inside.
 
 // The presence dial (founder, 2026-08-02): how loud the room's screen is.
@@ -47,7 +50,7 @@ type Props = {
    */
   qrUrl: string
   /** Server-rendered wall entries; refreshed by the interval refresh */
-  initialWallEntries?: GuestWallEntry[]
+  initialWallEntries?: WallEntry[]
   /** Full charity rows — renders the event page's CharityBanner */
   charities?: Charity[]
   /** Open favpolls: renders the event page's countdown card */
@@ -172,11 +175,11 @@ export function DisplayScreen({
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
   // The room's way in. It sits at the TOP OF THE RIGHT COLUMN, above the
-  // guest wall (founder, 2026-08-07).
+  // wall of favourites (founder, 2026-08-07).
   //
   // It used to live in the banner, which made a two-column design carry
   // three things and left the goal figure crowded. The obvious alternative
-  // — under the guest wall, where there is space — is the one place it must
+  // — under the wall of favourites, where there is space — is the one place it must
   // not go: that wall grows to twelve entries, so the code would sit lowest
   // exactly when the room is busiest and scanning matters most. Its height
   // here does not depend on how many people have pledged.
@@ -538,7 +541,7 @@ export function DisplayScreen({
           )}
         </div>
 
-        {/* ── Left: rankings · Right: the guest wall ── */}
+        {/* ── Left: rankings · Right: the wall of favourites ── */}
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_22.5rem]">
           <div>
             {poll && (
@@ -556,7 +559,11 @@ export function DisplayScreen({
 
           <div className="flex flex-col gap-8">
             {scanToPledge}
-            <GuestWall entries={initialWallEntries} animate maxEntries={12} />
+            <WallOfFavourites
+              entries={initialWallEntries}
+              animate
+              maxEntries={12}
+            />
           </div>
         </div>
       </div>

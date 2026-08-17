@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
 import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
@@ -41,7 +44,7 @@ type Props = {
   /** Whether a personal reveal exists (content withheld until entitled) */
   hasReveal: boolean
   revealIsQuote?: boolean
-  wallEntries: GuestWallEntry[]
+  wallEntries: WallEntry[]
   rankHistory: RankHistory | null
 }
 
@@ -235,7 +238,7 @@ export function FavpollContent({
         className="w-full"
       />
 
-      <GuestWall
+      <WallOfFavourites
         entries={wallEntries}
         teaseBacked={!localEntitled}
         animate

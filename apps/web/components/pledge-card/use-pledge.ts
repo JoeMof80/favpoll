@@ -59,7 +59,7 @@ export function usePledge({
   const hasFund = pot !== null && available > 0 && !!clerkUserId
 
   const [pledgeAmount, setPledgeAmount] = useState("")
-  // Guest-wall identity: guests may type a name (blank = "Someone");
+  // Wall identity: guests may type a name (blank = "Someone");
   // isAnonymous hides the name from the wall only — organisers always
   // see names, which the UI discloses at the point of choice.
   const [displayName, setDisplayName] = useState("")
