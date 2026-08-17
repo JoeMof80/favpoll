@@ -258,6 +258,18 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* In-page anchors SCROLL rather than teleport (2026-08-17). The home hero's
+     "See how it works" lands in the Guest journey, whose six beats fade in and
+     out by scroll position — an instant jump drops you into that arc with no
+     sense of having travelled, and the /features sticky menu had the same
+     abruptness. Guarded by prefers-reduced-motion, which is the whole reason
+     this is CSS rather than scrollIntoView at each call site: the opt-out is
+     honoured for free, everywhere. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   body {
     @apply bg-background text-foreground;
   }

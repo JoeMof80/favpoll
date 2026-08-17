@@ -1,7 +1,23 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, afterEach } from "vitest"
 import { render, screen, within } from "@testing-library/react"
 import { ProcessOverview } from "../process-overview"
 import { t } from "@/lib/i18n"
+
+// ONE BRANCH OF MEDIA RENDERS (2026-08-17). The section used to emit both the
+// pinned desktop column and the mobile still, letting CSS hide one — so these
+// tests had to scope past the duplicates. It now picks in JS, because mounting
+// both put the desktop column's whole weight on phones. jsdom's matchMedia
+// reports no match, so an unmocked render is the MOBILE branch.
+function stubViewport(matches: boolean) {
+  vi.stubGlobal("matchMedia", (media: string) => ({
+    matches,
+    media,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }))
+}
+
+afterEach(() => vi.unstubAllGlobals())
 
 // The media are stubbed down to markers: this asserts which FRAME wraps which
 // beat, not what any of them renders internally. Labels come from i18n rather
@@ -51,13 +67,14 @@ vi.mock("@/components/print-pack/pack-card", async () => {
 })
 
 describe("ProcessOverview", () => {
-  it("numbers all six beats of the journey", () => {
+  it("numbers all seven beats of the arc", () => {
     render(<ProcessOverview />)
 
-    // Every beat is numbered since the 2026-08-09 rewrite: the section is one
-    // GUEST journey, and a guest both scans the card and watches the screen.
-    // Before that the two ends were treated as the organiser's and left
-    // unnumbered.
+    // Every beat is numbered since the 2026-08-09 rewrite. That rewrite's
+    // reasoning was that all six were things a GUEST does; the keepsake beat
+    // added 2026-08-17 is the organiser's, and the numbering survived it
+    // because the section now frames the whole arc rather than one actor —
+    // paper → phone → room → paper.
     const labels = [
       t("landing.how.card.label"),
       t("landing.how.arrive.label"),
@@ -65,6 +82,7 @@ describe("ProcessOverview", () => {
       t("landing.how.pledge.label"),
       t("landing.how.reveal.label"),
       t("landing.how.room.label"),
+      t("landing.how.keepsake.label"),
     ]
     labels.forEach((label, i) => {
       expect(screen.getByText(`${i + 1}. ${label}`)).toBeInTheDocument()
@@ -72,16 +90,12 @@ describe("ProcessOverview", () => {
   })
 
   it("frames each beat as the object it actually is", () => {
-    const { container } = render(<ProcessOverview />)
-
-    // Scoped to the PINNED column: jsdom applies no media queries, so the
-    // mobile-only still renders here too and would inflate the counts.
-    const column = within(container.querySelector(".sticky")!.parentElement!)
+    render(<ProcessOverview />)
 
     // Four phone beats — the guest arc, and only the guest arc.
-    expect(column.getAllByTestId("phone-frame")).toHaveLength(4)
+    expect(screen.getAllByTestId("phone-frame")).toHaveLength(4)
     expect(
-      column.getAllByTestId("demo-card").map((el) => el.dataset.phase)
+      screen.getAllByTestId("demo-card").map((el) => el.dataset.phase)
     ).toEqual(["arriving", "selected", "amount-picked", "reveal"])
 
     // The card is paper at wallet size; the display hangs in a TV, not a
@@ -90,6 +104,31 @@ describe("ProcessOverview", () => {
     expect(screen.getByTestId("tv-frame")).toContainElement(
       screen.getByTestId("display-still")
     )
+  })
+
+  it("gives every beat its own medium on mobile, not one still at the end", () => {
+    // The whole point of the 2026-08-17 mobile fix: a phone used to get six
+    // texts and a single trailing phone frame, so the two ends of the arc —
+    // the printed card a guest scans and the display in the room — were
+    // desktop-only. Each beat's medium now sits under its own text.
+    render(<ProcessOverview />)
+    expect(screen.getByTestId("pack-card")).toBeInTheDocument()
+    expect(screen.getByTestId("tv-frame")).toBeInTheDocument()
+    expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
+  })
+
+  it("pins the six media in the sticky column on desktop", () => {
+    // And renders them ONLY there: both branches mounting is what this
+    // replaced, and a silent regression to that doubles what a phone loads.
+    stubViewport(true)
+    const { container } = render(<ProcessOverview />)
+    const column = within(container.querySelector(".sticky")!.parentElement!)
+
+    expect(column.getAllByTestId("phone-frame")).toHaveLength(4)
+    expect(column.getByTestId("pack-card")).toBeInTheDocument()
+    expect(column.getByTestId("tv-frame")).toBeInTheDocument()
+    // Nothing outside the pinned column.
+    expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
   })
 
   it("scopes the wallet card to .paper so dark mode cannot blank it", () => {
