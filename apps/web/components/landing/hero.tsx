@@ -9,6 +9,7 @@
 // nothing in the pitch column cycles.
 import Link from "next/link"
 import { useMemo } from "react"
+import { ArrowDown } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
@@ -22,6 +23,21 @@ import { CountUp } from "./count-up"
 import { HeroTexture } from "./hero-texture"
 
 const BEATS = ["Pick", "Pledge", "Reveal"] as const
+
+// NO ICONS BESIDE THE BEATS (founder, 2026-08-17, after trying them). The
+// headline was never the confusing part of this hero — pick, give and see are
+// already plain — so glyphs beside them decorated three clear verbs while the
+// actual gap (nothing says what a favpoll IS before the button asks you to
+// create one) went untouched. They also added a fourth object to a band that
+// already carries three router cards, and broke the h1's clean left edge,
+// which is the whole mechanism of a poster.
+//
+// This was the second attempt to answer that gap with pictures — HeroBeats,
+// three stills under the headline, failed the same way earlier the same day.
+// Two failures with the same shape: the hero can show what HAPPENS as many
+// ways as it likes, and no picture of a mechanic says what the thing is.
+// What did work was verbal and structural — the "See how it works" secondary
+// CTA, which offers the explanation rather than hoping visitors scroll.
 
 type Props = {
   liveCount?: number
@@ -232,6 +248,36 @@ export function LandingHero({
                 {ctaLabel ?? t("landing.cta.primary")}
               </Link>
             </Button>
+            {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
+                favpoll" names an invented noun, so on home it asks a
+                first-time visitor to make a thing nothing has yet defined —
+                unlike "Start fundraising", which names a goal the visitor
+                already arrived with. ProcessOverview directly below does
+                define it, and the page was relying on visitors scrolling to
+                find that out. This makes the other path an offer rather than
+                a hope. The register pages already carry their own
+                cta.secondary and their own demo, so they are unchanged.
+                Ghost in BAND ink — a wash and ring of the band's own
+                foreground, the router cards' idiom — so it reads as the
+                quieter of the two without vanishing when the theme flips. */}
+            {router && (
+              <Button
+                asChild
+                size="lg"
+                variant="ghost"
+                className="h-11 px-6 text-base text-primary-foreground ring-1 ring-primary-foreground/30 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              >
+                {/* The arrow says WHERE it goes (founder, 2026-08-17): every
+                    other button on this page navigates, and this one scrolls
+                    the reader down the same page — which is a different
+                    promise, and the only one a visitor can be disappointed by
+                    if they expect a new page. */}
+                <Link href="#how">
+                  {t("landing.cta.secondary")}
+                  <ArrowDown data-icon="inline-end" aria-hidden="true" />
+                </Link>
+              </Button>
+            )}
             {/* BESIDE the button, not beneath it (measured 2026-08-06): below
                 it, the extra line costs 16px and tips 1280x800 — which #524
                 worked to make fit exactly — over the fold. Inside the row it

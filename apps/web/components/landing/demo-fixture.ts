@@ -10,11 +10,39 @@ import { getFavpollHeadline } from "@/lib/display"
 // pages assembling their own PackData from the same scene is how the numbers
 // on a printed card and the numbers on a screen drift apart.
 //
-// The CAUSE scene (founder, 2026-08-06), not the memorial one: the most
-// neutral of the four — no protagonist, so the mechanic reads as itself
-// rather than as one register's story.
+// THE CELEBRATION SCENE (founder, 2026-08-17). It was the CAUSE one from
+// 2026-08-06, chosen as the most neutral of the four — no protagonist, so the
+// mechanic read as itself rather than as one register's story. Two things
+// broke that: the walkthrough gained a keepsake beat, and its reveal beat now
+// names the personal reveal. A faceless scene can do neither. Its
+// `personal_reveal` field held "Hospice care is free…" — a fact about a
+// charity — so the section taught favpoll's most distinctive mechanic using
+// its least distinctive instance, and a keepsake with nobody to lead on falls
+// back to the quieter of its two tellings.
+//
+// Celebration rather than memorial: Poppy's Sweet Sixteen has a protagonist
+// and a true first-person reveal ("Mint choc chip is the best, of course"),
+// without teaching favpoll through a funeral at the top of the funnel — the
+// overclaim the headline history keeps correcting. Belinda and purple still
+// carry the memorial exemplar on the reveal vignette and the features
+// keepsake, so the site shows both.
+//
+// KNOWN COST: St Luke's is a hospice prospect, and the cause scene was picked
+// partly so the example most visitors read would name them. That is now only
+// on the register pages. Reverse this one line if that trade stops being
+// worth it.
+export const DEMO_SCENE =
+  SCENES.find((s) => s.kind === "celebration") ?? SCENES[0]
 
-export const DEMO_SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
+// Derived rather than literal: `heading` and `eyebrow` exist ONLY on the
+// faceless cause scene, so a protagonist scene has to get its prefix the way
+// the product does — from the register.
+const DEMO_HEADLINE = getFavpollHeadline({
+  occasionType: DEMO_SCENE.occasion_type,
+  name: DEMO_SCENE.protagonist?.name ?? DEMO_SCENE.heading ?? "",
+  subject: DEMO_SCENE.protagonist ? "someone" : "cause",
+  openingLine: DEMO_SCENE.opening_line,
+})
 
 /**
  * A demo short link, in the real /p/<code> form the pack's QR encodes — 12
@@ -24,9 +52,9 @@ export const DEMO_SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
 export const DEMO_QR_URL = "https://favpoll.com/p/a1b2c3d4e5f6"
 
 export const DEMO_PACK_DATA: PackData = {
-  prefix: DEMO_SCENE.eyebrow ?? "A cause",
-  name: DEMO_SCENE.heading ?? "",
-  isCause: true,
+  prefix: DEMO_HEADLINE.prefix,
+  name: DEMO_HEADLINE.name,
+  isCause: !DEMO_SCENE.protagonist,
   topicTitle: DEMO_SCENE.poll.topic.title,
   hasReveal: !!DEMO_SCENE.poll.personal_reveal,
   charityNames: DEMO_SCENE.charities.map((c) => c.name),
@@ -47,6 +75,34 @@ export const DEMO_PACK_STEPS = buildPackSteps(DEMO_PACK_DATA)
 const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 
 const pounds = (formatted: string) => Number(formatted.replace(/[£,]/g, ""))
+
+// The keepsake for the HOME WALKTHROUGH, built from the SAME scene the rest of
+// that walkthrough runs on (2026-08-17, when a keepsake beat was added to How
+// It Works). Not DEMO_KEEPSAKE_DATA below: that one is Belinda's, and a
+// memorial sheet arriving after six beats about somebody's birthday is exactly
+// the drift this file exists to prevent — one favpoll, one set of numbers,
+// every artefact of it built from the same scene.
+export const DEMO_KEEPSAKE_WALKTHROUGH_DATA: KeepsakeData = {
+  prefix: DEMO_HEADLINE.prefix,
+  name: DEMO_HEADLINE.name,
+  context: DEMO_SCENE.protagonist?.context ?? DEMO_SCENE.context ?? null,
+  topicTitle: DEMO_SCENE.poll.topic.title,
+  reveal: DEMO_SCENE.poll.personal_reveal,
+  totalRaised: pounds(DEMO_SCENE.total),
+  charityNames: DEMO_SCENE.charities.map((c) => c.name),
+  // House format: ordinal, never ISO. A Sweet Sixteen, so the favpoll closed
+  // a few days after the party.
+  closedDate: "9th May 2026",
+  standings: DEMO_SCENE.results.map((r) => ({
+    favouriteId:
+      DEMO_SCENE.poll.topic.favourites.find((f) => f.label === r.label)?.id ??
+      r.label,
+    label: r.label,
+    amount: pounds(r.amount),
+  })),
+  rankHistory: null,
+  guestNames: [],
+}
 
 export const DEMO_KEEPSAKE_DATA: KeepsakeData = {
   prefix: getFavpollHeadline({

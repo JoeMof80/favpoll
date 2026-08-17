@@ -79,17 +79,25 @@ export async function createPledge(input: CreatePledgeInput) {
   if (pledgeErr || !pledge)
     throw new Error(pledgeErr?.message ?? "Failed to create pledge")
 
-  const { error: allocErr } = await supabase.from("pledge_allocations").insert(
-    input.allocations
-      .filter((a) => a.amount > 0)
-      .map((a) => ({
-        pledge_id: pledge.id,
-        favourite_id: a.favouriteId,
-        amount: a.amount,
-      }))
-  )
+  // Picking is optional (2026-08-17), so a pledge can legitimately have NO
+  // allocations — a gift with no favourite attached. Skip the insert rather
+  // than sending an empty array: the pledge row is already written by this
+  // point, so an error here would surface to a guest whose card has already
+  // been charged.
+  const allocations = input.allocations
+    .filter((a) => a.amount > 0)
+    .map((a) => ({
+      pledge_id: pledge.id,
+      favourite_id: a.favouriteId,
+      amount: a.amount,
+    }))
 
-  if (allocErr) throw new Error(allocErr.message)
+  if (allocations.length > 0) {
+    const { error: allocErr } = await supabase
+      .from("pledge_allocations")
+      .insert(allocations)
+    if (allocErr) throw new Error(allocErr.message)
+  }
 }
 
 type CreateGuestPledgeInput = {
@@ -213,17 +221,25 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   if (pledgeErr || !pledge)
     throw new Error(pledgeErr?.message ?? "Failed to create pledge")
 
-  const { error: allocErr } = await supabase.from("pledge_allocations").insert(
-    input.allocations
-      .filter((a) => a.amount > 0)
-      .map((a) => ({
-        pledge_id: pledge.id,
-        favourite_id: a.favouriteId,
-        amount: a.amount,
-      }))
-  )
+  // Picking is optional (2026-08-17), so a pledge can legitimately have NO
+  // allocations — a gift with no favourite attached. Skip the insert rather
+  // than sending an empty array: the pledge row is already written by this
+  // point, so an error here would surface to a guest whose card has already
+  // been charged.
+  const allocations = input.allocations
+    .filter((a) => a.amount > 0)
+    .map((a) => ({
+      pledge_id: pledge.id,
+      favourite_id: a.favouriteId,
+      amount: a.amount,
+    }))
 
-  if (allocErr) throw new Error(allocErr.message)
+  if (allocations.length > 0) {
+    const { error: allocErr } = await supabase
+      .from("pledge_allocations")
+      .insert(allocations)
+    if (allocErr) throw new Error(allocErr.message)
+  }
 
   // Fetch favpoll data for confirmation email
   const { data: pollData } = await supabase
@@ -538,16 +554,22 @@ export async function pledgeFromFund(input: {
     throw new Error(pledgeErr?.message ?? "Failed to create pledge")
   }
 
-  const { error: allocErr } = await supabase.from("pledge_allocations").insert(
-    input.allocations
-      .filter((a) => a.amount > 0)
-      .map((a) => ({
-        pledge_id: pledge.id,
-        favourite_id: a.favouriteId,
-        amount: a.amount,
-      }))
-  )
-  if (allocErr) throw new Error(allocErr.message)
+  // As above: no favourite picked is a valid pledge, and the fund
+  // reservation has already been spent by this point.
+  const allocations = input.allocations
+    .filter((a) => a.amount > 0)
+    .map((a) => ({
+      pledge_id: pledge.id,
+      favourite_id: a.favouriteId,
+      amount: a.amount,
+    }))
+
+  if (allocations.length > 0) {
+    const { error: allocErr } = await supabase
+      .from("pledge_allocations")
+      .insert(allocations)
+    if (allocErr) throw new Error(allocErr.message)
+  }
 }
 
 // Shared-fund credits: verified against Stripe (the payment IS the

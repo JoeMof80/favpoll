@@ -30,7 +30,9 @@ import {
   DEMO_QR_URL,
   DEMO_PACK_DATA as PACK_DATA,
   DEMO_PACK_STEPS as PACK_STEPS,
+  DEMO_KEEPSAKE_WALKTHROUGH_DATA,
 } from "@/components/landing/demo-fixture"
+import { KeepsakeDocument } from "@/components/keepsake/keepsake-document"
 import { DisplayStill } from "@/components/landing/display-still"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -41,6 +43,7 @@ type Medium =
   | { kind: "card" }
   | { kind: "phone"; phase: Phase }
   | { kind: "display" }
+  | { kind: "keepsake" }
 
 type Beat = {
   key: string
@@ -90,6 +93,24 @@ const BEATS: Beat[] = [
     body: t("landing.how.room.body"),
     medium: { kind: "display" },
   },
+  {
+    // SEVENTH BEAT (founder, 2026-08-17). The arc ended at the event, leaving
+    // "and then what?" unanswered — the one question a walkthrough of a thing
+    // that CLOSES has to answer. It also returns the medium to PAPER, so the
+    // arc now runs paper → phone → room → paper and shuts where it opened.
+    //
+    // It strains the 2026-08-09 principle that every beat is something a
+    // GUEST does, since the sheet is the organiser's to print. Written
+    // passively for that reason — what the day BECOMES, not who prints it —
+    // so the reader stays the guest all seven beats. That is the whole
+    // section's rule (founder, 2026-08-17): "you" is the guest throughout,
+    // never the organiser, because a reader cannot be both and the beats
+    // before this one are unambiguously the guest's.
+    key: "keepsake",
+    label: t("landing.how.keepsake.label"),
+    body: t("landing.how.keepsake.body"),
+    medium: { kind: "keepsake" },
+  },
 ]
 
 // Each medium is laid out at its OWN natural size and scaled to fit the
@@ -111,6 +132,72 @@ const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // column's width.
 const DISPLAY_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.50]"
 
+// MOBILE WELLS (2026-08-17). A transform-scaled element keeps its UNSCALED
+// layout box, which is why every medium needs a fixed well to sit in rather
+// than being allowed to size itself. These are the base scales above applied
+// to each object's real size: phone 868 x 0.52, card 204 x 0.75, display
+// 580 x 0.28, rounded up for the drop shadow and the card's 2° tilt.
+//
+// They only hold because EVERY medium is shrink-0 (see BeatMedium). The wells
+// are row-direction flex boxes and each medium carries an explicit width — the
+// phone its chassis, the display a w-[900px] child, the keepsake its A4 page —
+// so without it flex squeezes the box narrower than its content, the content
+// wraps and grows taller than the well, and it spills over the beats either
+// side. That is what broke Watch it live on mobile: a 940-wide TV crushed into
+// a phone's width, rendering ~680px tall inside a 184px well.
+const MOBILE_WELL: Record<Medium["kind"], string> = {
+  phone: "h-[451px]",
+  card: "h-[176px]",
+  display: "h-[184px]",
+  keepsake: "h-[390px]",
+}
+
+// A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
+// portrait, 1123 x 794 landscape. 1644 x 1123 was used here first and was
+// wrong — that is the FAN box the features vignette uses to hold TWO sheets
+// side by side, so a single sheet rendered into it came out at the wrong
+// aspect and read as a long thin slip rather than a sheet of paper.
+// PORTRAIT, and sized to FILL the column (founder, 2026-08-17: "keepsake
+// needs to be bigger"). Landscape wasted the column: a 1123-wide sheet has to
+// scale down far enough that its 794 of height leaves most of a 451-651px
+// well empty, so the sheet read as a stamp in a large space while the phone
+// and the TV both fill theirs. Portrait spends the well's height instead,
+// which is the dimension this section actually has to give away — and a
+// single sheet to print is the shape people picture when they read that.
+const A4_PORTRAIT = { w: 794, h: 1123 }
+// Width ~270 / ~373 / ~453 against a ~273 / ~376 / ~478px column; the xl step
+// is held at 0.57 rather than 0.60 so the 1123 of height stays inside the
+// 651px well rather than overflowing it by 23px.
+const KEEPSAKE_SCALE = "scale-[0.34] lg:scale-[0.47] xl:scale-[0.57]"
+
+// WEIGHT, NOT CHROME (founder, 2026-08-17). This was drawn as a miniature of
+// the real button, copying the ADD_TOKEN trick from love-step and the topic
+// vignette. That trick earns its keep there and not here: those hints sit
+// INSIDE the dialog, a few centimetres from the real Add and at nearly its
+// size, so matching chrome helps you spot the control. This is a marketing
+// page in 20-24px body copy, naming a button the reader meets on another
+// surface minutes or days later — the recognition payoff is small, the cost
+// is a solid primary pill pulling the eye to a footnote in a section whose
+// other six beats are plain sentences. It could not be faithful anyway: at
+// 0.8em of 24px type the token outgrew the real 14px button.
+//
+// Medium weight does the one job the chrome genuinely earned — in a NUMBERED
+// list of steps, "click Next" could be read as "go to the next step", and the
+// weight plus the capital marks it as the name of a control instead.
+const NEXT_TOKEN = <span className="font-medium">Next</span>
+
+// The copy stays a single string in messages/ with a {next} placeholder,
+// rather than being split into JSX here, so a locale pass still sees one
+// whole sentence.
+
+function withNextToken(body: string) {
+  const parts = body.split("{next}")
+  if (parts.length === 1) return body
+  return parts.flatMap((part, i) =>
+    i === 0 ? [part] : [<span key={i}>{NEXT_TOKEN}</span>, part]
+  )
+}
+
 function BeatMedium({ medium }: { medium: Medium }) {
   if (medium.kind === "card") {
     return (
@@ -125,7 +212,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
       // a hard outline round every row of the card.
       <div
         className={cn(
-          "paper paper-screen drop-shadow-xl",
+          "paper paper-screen shrink-0 drop-shadow-xl",
           CARD_SCALE,
           "-rotate-2"
         )}
@@ -134,9 +221,37 @@ function BeatMedium({ medium }: { medium: Medium }) {
       </div>
     )
   }
+  if (medium.kind === "keepsake") {
+    return (
+      // .paper for the same reason the wallet card needs it: the sheet forces
+      // a light background, so without the light tokens pinned a dark-mode
+      // visitor gets dark ink on dark paper (#535).
+      // TRIBUTE: the walkthrough runs on a scene with a protagonist now, so
+      // the sheet leads on the person rather than on what was raised — the
+      // keepsake at its fullest rather than its second telling.
+      // shrink-0 IS LOAD-BEARING. Every well is a row-direction flex box, and
+      // this is the only medium with an explicit width — so flex-shrink was
+      // squashing the 794 down toward the column's own width BEFORE the
+      // transform ran, and the sheet came out at roughly 0.59:1 instead of
+      // A4's 0.707:1. The others escape it by having no width of their own.
+      <div
+        className={cn(
+          "paper paper-screen shrink-0 drop-shadow-xl",
+          KEEPSAKE_SCALE
+        )}
+        style={{ width: A4_PORTRAIT.w, height: A4_PORTRAIT.h }}
+      >
+        <KeepsakeDocument
+          data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
+          variant="tribute"
+          orientation="portrait"
+        />
+      </div>
+    )
+  }
   if (medium.kind === "display") {
     return (
-      <div className={DISPLAY_SCALE}>
+      <div className={cn("shrink-0", DISPLAY_SCALE)}>
         <TvFrame>
           {/* No crop: the still shows its leaders and ends where they do — a
               fixed height cut the last bar in half and read as a broken
@@ -149,7 +264,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
     )
   }
   return (
-    <div className={PHONE_SCALE}>
+    <div className={cn("shrink-0", PHONE_SCALE)}>
       <PhoneFrame>
         <DemoCard
           scene={SCENE}
@@ -167,6 +282,25 @@ function BeatMedium({ medium }: { medium: Medium }) {
 export function ProcessOverview() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
+
+  // ONE BRANCH OF MEDIA, NOT BOTH (2026-08-17). The desktop column pins all
+  // six media and cross-fades them; mobile now shows each beat's own beneath
+  // its text. Left to CSS alone (`md:hidden` / `hidden md:block`) BOTH sets
+  // mount — twelve PackCard/PhoneFrame/TvFrame trees, half of them
+  // display:none — which would land the whole desktop column's weight on the
+  // phone, the exact device this change is meant to serve. So the branch is
+  // chosen in JS. Safe to do here and nowhere else: the media are already
+  // client-only behind `mounted` and aria-hidden, so there is no server
+  // markup to mismatch and nothing for a crawler to lose.
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return
+    const mq = window.matchMedia("(min-width: 768px)")
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener("change", update)
+    return () => mq.removeEventListener("change", update)
+  }, [])
 
   const [active, setActive] = useState(0)
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -202,7 +336,14 @@ export function ProcessOverview() {
     // `hidden` would, re-anchoring the sticky column to this section and
     // killing the pinned media (the display screen uses clip for the same
     // reason).
-    <section className="w-full overflow-x-clip bg-primary/5">
+    // id="how" is the hero's secondary CTA target (2026-08-17): the home hero
+    // asks a visitor to "Create a favpoll" before anything has said what a
+    // favpoll IS, so it now offers this section as the other path. scroll-mt-14
+    // = 56px = the header's exact height, the same figure /features uses.
+    <section
+      id="how"
+      className="w-full scroll-mt-14 overflow-x-clip bg-primary/5"
+    >
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         {/* 5 columns, not 3 (2026-08-06): the display still is a 900px-wide
             desktop layout, and the old third-column width put its ranking
@@ -247,17 +388,44 @@ export function ProcessOverview() {
                   blockRefs.current[i] = node
                 }}
                 className={cn(
-                  "flex max-w-md flex-col justify-center transition-opacity duration-300 md:min-h-[50vh]",
-                  "max-md:mt-10",
+                  "flex max-w-lg flex-col justify-center transition-opacity duration-300 md:min-h-[50vh]",
+                  "max-md:mt-12",
                   i === active ? "md:opacity-100" : "md:opacity-30"
                 )}
               >
-                <p className="mb-2 text-xs font-medium tracking-widest text-primary uppercase">
+                <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
                   {i + 1}. {beat.label}
                 </p>
-                <p className="text-lg leading-relaxed text-muted-foreground">
-                  {beat.body}
+                {/* Up from text-lg (founder, 2026-08-17). On desktop this
+                    column is sticky for the ~300vh the six beats take, so it
+                    is the longest-dwelt copy on the site; on mobile it is the
+                    only thing carrying the explanation. max-w-lg with it, or
+                    24px type in a 28rem column runs to ~30 characters a line
+                    and reads as a narrow ribbon. */}
+                <p className="text-xl leading-relaxed text-muted-foreground md:text-2xl">
+                  {withNextToken(beat.body)}
                 </p>
+                {/* MOBILE: this beat's OWN medium, under its text (founder,
+                    2026-08-17). The section used to stack six texts on mobile
+                    and then show ONE phone still at the very bottom, so the
+                    arc's two ends — the printed card a guest scans, and the
+                    display in the room — were desktop-only, and the card that
+                    carries the instructions was never seen on the device most
+                    visitors are holding. Same six media the desktop column
+                    pins; no extra components mounted. */}
+                <div className="mt-6 flex justify-center md:hidden">
+                  {mounted && !isDesktop && (
+                    <div
+                      aria-hidden="true"
+                      className={cn(
+                        "pointer-events-none flex items-center justify-center select-none",
+                        MOBILE_WELL[beat.medium.kind]
+                      )}
+                    >
+                      <BeatMedium medium={beat.medium} />
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -281,6 +449,7 @@ export function ProcessOverview() {
                 )}
               >
                 {mounted &&
+                  isDesktop &&
                   BEATS.map((beat, i) => (
                     <div
                       key={beat.key}
@@ -296,17 +465,7 @@ export function ProcessOverview() {
             </div>
           </div>
 
-          {/* Mobile — a single static frame beneath the texts */}
-          <div
-            className="pointer-events-none flex justify-center select-none md:hidden"
-            aria-hidden="true"
-          >
-            {mounted && (
-              <div className="flex h-[451px] items-center justify-center">
-                <BeatMedium medium={{ kind: "phone", phase: "reveal" }} />
-              </div>
-            )}
-          </div>
+          {/* No trailing mobile frame: each beat now carries its own, above. */}
         </div>
       </div>
     </section>

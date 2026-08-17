@@ -131,15 +131,22 @@ export function PackDocument({
                   <ChevronDown data-icon="inline-end" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuContent align="end" className="w-72">
                 {SHEETS.map((sheet) => (
                   <DropdownMenuItem
                     key={String(sheet.id)}
                     onSelect={() => setSelected(sheet.id)}
+                    className="items-start"
                   >
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate">{sheet.label}</span>
-                      <span className="truncate text-xs text-muted-foreground">
+                      {/* The note WRAPS, never truncates (founder, 2026-08-17).
+                          It ends in "fits Avery L7418" — the code you buy the
+                          stationery by — so an ellipsis eats precisely the one
+                          token the menu exists to tell you. Two lines on the
+                          longest notes is the correct trade; a fixed-width box
+                          clipping its own payload is not. */}
+                      <span className="text-xs leading-snug text-muted-foreground">
                         {sheet.note}
                       </span>
                     </span>
