@@ -61,3 +61,6 @@ apps/web/storybook-static
 
 # Local exports of the skill docs — the .md files are the source
 .claude/commands/*.pdf
+
+# Throwaway measurement harnesses (see session-handoff-2026-08-18 §6)
+zz-*
