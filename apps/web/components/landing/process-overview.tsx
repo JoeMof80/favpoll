@@ -170,7 +170,7 @@ const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
   card: { w: 332, h: 215 },
   phone: { w: PHONE_CHASSIS_WIDTH, h: PHONE_CHASSIS_HEIGHT },
   display: { w: DISPLAY_STILL_WIDTH + 40, h: 697 },
-  keepsake: { w: 1123, h: 794 },
+  keepsake: { w: 794, h: 1123 },
 }
 
 // EXPANDED: the scale at which each medium's own body copy becomes readable,
@@ -189,7 +189,24 @@ const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
 // stays the thumbnail it was, and the tap is what it is for.
 const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
   phone: 0.52,
+  // Portrait again (founder, 2026-08-18: "make the keepsake portrait and
+  // expandable like the iphone"). Portrait costs height — 342 wide is 483
+  // tall — so like the phone it sits as a thumbnail until asked.
+  keepsake: 0.3,
 }
+
+// ONLY THESE TWO CARRY A TOGGLE (founder, 2026-08-18): "there's no need for
+// the live screen to expand if it is already full width, so make it full
+// width. Likewise for the QR code stationery."
+//
+// Exactly right, and it is the rule the other two fail: a control that grows
+// something already filling its column is a control that does nothing worth
+// doing. The card and the display are landscape and fill the width at a size
+// their own copy survives — the card is life-size and the display's total and
+// topic read at a glance. The phone and the keepsake are PORTRAIT, so filling
+// the width would cost 717 and 483px of scroll apiece; they stay thumbnails
+// and open on a tap.
+const EXPANDABLE = new Set<Medium["kind"]>(["phone", "keepsake"])
 
 const EXPANDED_SCALE: Record<Medium["kind"], number> = {
   card: 1.5, // the card's smallest print — the shared-fund line — is ~7px
@@ -213,11 +230,11 @@ const EXPANDED_SCALE: Record<Medium["kind"], number> = {
 // scroll to show 794px of paper at a size nobody can read, where landscape
 // fills the column's width and costs 191. The desktop scale drops to match, so
 // the sheet reads the same there.
-const A4_LANDSCAPE = { w: 1123, h: 794 }
+const A4_PORTRAIT = { w: 794, h: 1123 }
 // Width ~270 / ~373 / ~453 against a ~273 / ~376 / ~478px column; the xl step
 // is held at 0.57 rather than 0.60 so the 1123 of height stays inside the
 // 651px well rather than overflowing it by 23px.
-const KEEPSAKE_SCALE = "scale-[0.24] lg:scale-[0.33] xl:scale-[0.42]"
+const KEEPSAKE_SCALE = "scale-[0.34] lg:scale-[0.47] xl:scale-[0.57]"
 
 // WEIGHT, NOT CHROME (founder, 2026-08-17). This was drawn as a miniature of
 // the real button, copying the ADD_TOKEN trick from love-step and the topic
@@ -299,12 +316,12 @@ function BeatMedium({
           "paper paper-screen shrink-0 drop-shadow-xl",
           !bare && KEEPSAKE_SCALE
         )}
-        style={{ width: A4_LANDSCAPE.w, height: A4_LANDSCAPE.h }}
+        style={{ width: A4_PORTRAIT.w, height: A4_PORTRAIT.h }}
       >
         <KeepsakeDocument
           data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
           variant="tribute"
-          orientation="landscape"
+          orientation="portrait"
         />
       </div>
     )
@@ -382,13 +399,15 @@ function MobileWell({
 
   const natural = NATURAL[beat.medium.kind]
   const fit = columnWidth ? columnWidth / natural.w : 0
+  const expandable = EXPANDABLE.has(beat.medium.kind)
   const cap = COLLAPSED_CAP[beat.medium.kind]
   const collapsed = cap ? Math.min(fit, cap) : fit
   // Never SHRINK on expand: the card and the two documents already fill the
   // column collapsed, and a toggle that made something smaller would be absurd.
-  const scale = expanded
-    ? Math.max(fit, EXPANDED_SCALE[beat.medium.kind])
-    : collapsed
+  const scale =
+    expandable && expanded
+      ? Math.max(fit, EXPANDED_SCALE[beat.medium.kind])
+      : collapsed
   const width = natural.w * scale
   const height = natural.h * scale
   const pans = width > columnWidth + 1
@@ -416,9 +435,23 @@ function MobileWell({
           className="pointer-events-none mx-auto select-none"
           style={{ width: width || undefined, height: height || undefined }}
         >
+          {/* THE NATURAL WIDTH IS SET HERE, not left to the box. A scaled
+              element lays out FIRST and scales after, so this div has to be
+              as wide as the object really is or the object is laid out into
+              the shrunken box instead.
+              The display is the one that proved it: TvFrame clips to its
+              bezel, so with this div at the column's 342 it clipped the
+              900px screen inside it and then scaled the remains down to
+              ~100px — a sliver of a TV with dead space beside it. The other
+              three carry explicit widths of their own (the phone its chassis,
+              the keepsake its A4 page, the card its printed size), which is
+              why only the display broke. */}
           <div
             className="origin-top-left"
-            style={{ transform: scale ? `scale(${scale})` : undefined }}
+            style={{
+              width: natural.w,
+              transform: scale ? `scale(${scale})` : undefined,
+            }}
           >
             <BeatMedium medium={beat.medium} bare />
           </div>
@@ -432,30 +465,38 @@ function MobileWell({
           The medium is pointer-events-none, so every tap lands here.
           Sticky-bottom so the chip stays reachable on an expanded medium that
           is taller than the screen. */}
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={expanded}
-        // The media are aria-hidden decoration everywhere else in this
-        // section, so this carries the whole accessible name — the beat's
-        // label plus what tapping does, since "Read the instructions" alone
-        // does not say that anything happens.
-        aria-label={
-          expanded
-            ? `${beat.label} — show less`
-            : `${beat.label} — see this larger`
-        }
-        className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-      >
-        <span className="sticky bottom-3 flex items-center gap-1.5 rounded-full bg-foreground/75 px-3 py-1.5 text-xs font-medium text-background backdrop-blur-sm">
-          {expanded ? (
-            <Minimize2 className="size-3.5" />
-          ) : (
-            <Maximize2 className="size-3.5" />
-          )}
-          {expanded ? "Tap to shrink" : "Tap to enlarge"}
-        </span>
-      </button>
+      {expandable && (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          // The media are aria-hidden decoration everywhere else in this
+          // section, so this carries the whole accessible name — the beat's
+          // label plus what tapping does, since "Read the instructions" alone
+          // does not say that anything happens.
+          aria-label={
+            expanded
+              ? `${beat.label} — show less`
+              : `${beat.label} — see this larger`
+          }
+          className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          {/* SOLID, not a tint (founder, 2026-08-18: "barely visible"). It was
+              bg-foreground/75 with a blur behind it, which over the white of a
+              screen or a sheet came out as pale grey text on pale grey — the
+              one thing a control announcing an interaction cannot be. Full
+              opacity, a shadow to lift it off whatever it sits on, and the
+              same treatment whatever is behind it. */}
+          <span className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-semibold text-background shadow-lg">
+            {expanded ? (
+              <Minimize2 className="size-3.5" />
+            ) : (
+              <Maximize2 className="size-3.5" />
+            )}
+            {expanded ? "Tap to shrink" : "Tap to enlarge"}
+          </span>
+        </button>
+      )}
     </div>
   )
 }
