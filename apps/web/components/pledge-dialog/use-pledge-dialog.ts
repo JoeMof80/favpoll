@@ -174,7 +174,19 @@ export function usePledgeDialog({
   }
 
   // --- navigation ---
-  const canAdvanceStep1 = draftIds.length > 0
+  // PICKING IS OPTIONAL (founder, 2026-08-17). This required at least one
+  // favourite, so a guest who could not decide was stuck on step 1 with a
+  // dead Next button and no way out but to close the dialog. Giving without
+  // backing anything is already a shape the product has — "a gift with no
+  // favourite attached" is how the shared fund describes it — and the money
+  // reaches the charity either way.
+  //
+  // Nothing downstream needed changing to allow it: computePledgeAllocations
+  // returns [] for an empty selection, and step 2 hides the favourite lines
+  // and the fund split behind `favouriteBreakdown.length > 0`, so the guest
+  // simply names an amount and pays. The pledge lands with a total and no
+  // allocations, counting towards the favpoll but towards no favourite.
+  const canAdvanceStep1 = true
 
   async function handleNext() {
     if (step === 1) {

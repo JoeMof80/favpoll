@@ -71,7 +71,10 @@ export default defineConfig({
     {
       name: "layout",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/features-artefacts.spec.ts",
+      testMatch: [
+        "**/features-artefacts.spec.ts",
+        "**/home-how-it-works.spec.ts",
+      ],
     },
   ],
 

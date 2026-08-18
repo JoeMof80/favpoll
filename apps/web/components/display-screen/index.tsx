@@ -84,7 +84,7 @@ type Props = {
 // the point a projector is involved, so the display keeps the small-screen
 // half of the shared heroNameSizeClass and swaps only the upper step.
 const figureSizeClass =
-  "text-3xl sm:text-[length:var(--display-figure,2.25rem)]"
+  "text-3xl @min-[40rem]:text-[length:var(--display-figure,2.25rem)]"
 
 export function DisplayScreen({
   protagonistName,
@@ -204,8 +204,19 @@ export function DisplayScreen({
     // The event page's frame (tinted surround, floating card) at broadcast
     // width — max-w-6xl rather than the page's 5xl, since a projector earns
     // a wider canvas.
+    // @container, and every breakpoint below is a CONTAINER query (2026-08-18).
+    // This layout describes its own box, not the window: the landing page
+    // renders it at a fixed 900px inside whatever viewport the visitor has, and
+    // with viewport md: rules a phone collapsed it to the stacked one-column
+    // form INSIDE that 900px box — 900 x 1176 portrait against 900 x 657
+    // landscape on a desktop. The homepage's "watch it live" beat is meant to
+    // show a screen in a room, and it was showing a tall slab.
+    //
+    // @3xl is 48rem, which is exactly what md was, so on the live route — where
+    // this fills the page and its box tracks the viewport — the breakpoint
+    // lands where it always did.
     <div
-      className={`overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+      className={`@container overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
       // The ramp is opt-in and live-only: it is vw-relative, and the
       // landing page renders a still at a fixed width inside the
       // visitor's viewport, where vw-scaled type would burst the layout.
@@ -265,7 +276,7 @@ export function DisplayScreen({
           full-width card, so the banner needs clearance beneath it. From md
           up the tinted gutters hold the chrome and py-8 suffices. */}
       <div
-        className={`mx-auto w-full max-w-6xl bg-background px-8 pb-8 md:px-12 md:pt-8 md:drop-shadow-lg ${
+        className={`mx-auto w-full max-w-6xl bg-background px-8 pb-8 @3xl:px-12 @3xl:pt-8 @3xl:drop-shadow-lg ${
           live ? "min-h-screen pt-16" : "pt-8"
         }`}
       >
@@ -275,21 +286,21 @@ export function DisplayScreen({
             the money to the quiet charity rows. ── */}
         <div className="mb-8 border-b border-border pb-6">
           {variant === "tribute" ? (
-            /* md:min-h-33 on BOTH variant rows = the avatar's height, the
+            /* @3xl:min-h-33 on BOTH variant rows = the avatar's height, the
                banner's tallest natural content — so switching views (or a
                missing photo) never shifts the rankings below. */
-            <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
+            <div className="flex flex-col gap-6 @3xl:min-h-33 @3xl:flex-row @3xl:items-stretch">
               {/* Col 1 — the favpoll page hero's EXACT grammar (founder,
                   2026-08-02): SectionEyebrow, hero-sized name,
                   text-xl/2xl primary subtitle, 26/33 photo-gated avatar
                   at the right. The QR sits at the column's right edge;
                   mobile stacks it centred beneath the heading. */}
-              {/* md:items-start (both variants' col 1): within the shared
+              {/* @3xl:items-start (both variants' col 1): within the shared
                   min-h envelope the columns top-align, so the eyebrow sits
                   on the same line in every view — centring drifted by half
                   the height slack (founder, 2026-08-03). */}
-              <div className="flex min-w-0 flex-1 flex-col gap-6 md:flex-row md:items-start md:gap-8">
-                <div className="flex min-w-0 flex-1 items-start gap-4 md:gap-6">
+              <div className="flex min-w-0 flex-1 flex-col gap-6 @3xl:flex-row @3xl:items-start @3xl:gap-8">
+                <div className="flex min-w-0 flex-1 items-start gap-4 @3xl:gap-6">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
                       <SectionEyebrow
@@ -305,17 +316,17 @@ export function DisplayScreen({
                       {protagonistName}
                     </h1>
                     {headline.suffix && (
-                      <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+                      <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary @3xl:text-2xl">
                         {headline.suffix}
                       </p>
                     )}
                   </div>
                   {avatar?.photoUrl && (
-                    <div className="h-26 w-26 shrink-0 md:h-33 md:w-33">
+                    <div className="h-26 w-26 shrink-0 @3xl:h-33 @3xl:w-33">
                       <ProtagonistAvatar
                         name={avatar.name}
                         photoUrl={avatar.photoUrl}
-                        className="h-full w-full md:h-full md:w-full"
+                        className="h-full w-full @3xl:h-full @3xl:w-full"
                       />
                     </div>
                   )}
@@ -326,7 +337,7 @@ export function DisplayScreen({
                   on the banner. No goal figure, no progress bar, no
                   goal-reached shout: at a wake the number climbing is not
                   the point. */}
-              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 @3xl:w-90 @3xl:self-stretch @3xl:border-t-0 @3xl:border-l @3xl:pt-0 @3xl:pl-6">
                 {/* Countdown above the charities (founder, 2026-08-03) —
                     the favpoll page's exact ramp (default md), not the
                     subtitle: this column is the banner's quiet side. */}
@@ -334,7 +345,7 @@ export function DisplayScreen({
                     upper blocks pin to one height so the charity card
                     below sits identically in both views. */}
                 {isOpen && closesAt && (
-                  <div className="md:min-h-14">
+                  <div className="@3xl:min-h-14">
                     <Countdown closesAt={closesAt} />
                   </div>
                 )}
@@ -372,9 +383,9 @@ export function DisplayScreen({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 md:min-h-33 md:flex-row md:items-stretch">
+            <div className="flex flex-col gap-6 @3xl:min-h-33 @3xl:flex-row @3xl:items-stretch">
               {/* Col 1 — goal progress (or closed total / countdown), QR beside */}
-              <div className="flex min-w-0 flex-1 items-center gap-8 md:items-start">
+              <div className="flex min-w-0 flex-1 items-center gap-8 @3xl:items-start">
                 <div className="min-w-0 flex-1">
                   {effectiveClosed ? (
                     <div>
@@ -483,11 +494,11 @@ export function DisplayScreen({
               </div>
 
               {/* Col 2 — compact identity above the charity rows */}
-              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 md:w-90 md:self-stretch md:border-t-0 md:border-l md:pt-0 md:pl-6">
+              <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-border pt-4 @3xl:w-90 @3xl:self-stretch @3xl:border-t-0 @3xl:border-l @3xl:pt-0 @3xl:pl-6">
                 {/* Photo at the right, no context line (founder,
                     2026-08-02) — the identity is a byline here, not the
                     story. */}
-                <div className="flex min-w-0 items-center gap-2.5 md:min-h-14">
+                <div className="flex min-w-0 items-center gap-2.5 @3xl:min-h-14">
                   <div className="min-w-0 flex-1">
                     {headline.prefix && (
                       /* mb-2 = the countdown label's rhythm, so this block
@@ -506,7 +517,7 @@ export function DisplayScreen({
                     <ProtagonistAvatar
                       name={avatar.name}
                       photoUrl={avatar.photoUrl}
-                      className="h-12 w-12 shrink-0 rounded-lg md:h-12 md:w-12"
+                      className="h-12 w-12 shrink-0 rounded-lg @3xl:h-12 @3xl:w-12"
                     />
                   )}
                 </div>
@@ -542,7 +553,7 @@ export function DisplayScreen({
         </div>
 
         {/* ── Left: rankings · Right: the wall of favourites ── */}
-        <div className="grid items-start gap-10 lg:grid-cols-[1fr_22.5rem]">
+        <div className="grid items-start gap-10 @5xl:grid-cols-[1fr_22.5rem]">
           <div>
             {poll && (
               <DisplayPollSection

@@ -7,31 +7,49 @@ import { HeroTexture } from "@/components/landing/hero-texture"
 import { FadeIn } from "@/components/landing/fade-in"
 import { ContactForm } from "@/components/contact-form"
 
-// Operational questions the marketing doesn't answer — the anxieties that
-// make an organiser hesitate before creating. Kept product-true (see the
-// brand skill): 90-day cap, editable before close, account-free pledging,
-// goal-as-milestone, unlisted privacy, shared fund. The fee question lives
-// in the "Where the money goes" section, not here.
+// The spec of the product — true of every favpoll, whatever the occasion.
+// Moved here from /features on 2026-08-16 (founder): the basics aren't a
+// feature, and About is where the product states what it is. The fee line
+// stays out — "Where the money goes" makes that argument above.
+const BASICS: { label: string; body: string }[] = [
+  {
+    label: "Free to create",
+    body: "No fee to set one up, and none taken from the gift.",
+  },
+  {
+    label: "One to three charities",
+    body: "Name up to three. The proceeds are split equally between them.",
+  },
+  {
+    label: "Up to 90 days",
+    body: "It closes on its own when the date arrives, and the proceeds go on their way.",
+  },
+  {
+    label: "Editable after publishing",
+    body: "Change the details, the charities or the closing date any time before it closes.",
+  },
+  {
+    label: "Private if you need it",
+    body: "An unlisted favpoll is reachable only by the people you share it with, and never appears on the public favpolls page.",
+  },
+  {
+    label: "Nothing to sign up for",
+    body: "A guest pledges with an email address. No account, no app.",
+  },
+]
+
+// Operational questions neither the marketing nor the basics answer — the
+// anxieties that make an organiser hesitate before creating. Kept
+// product-true (see the brand skill). Four items retired 2026-08-16 when
+// The basics arrived above: run length, editability, account-free pledging
+// and unlisted privacy restated the spec grid word for word. What remains
+// is the questions with a real answer behind them — goal-as-milestone, the
+// shared fund, and what closing means. The fee question lives in the
+// "Where the money goes" section, not here.
 const FAQ_ITEMS: { q: string; a: string }[] = [
-  {
-    q: "How long does a favpoll run?",
-    a: "You pick the closing date, up to 90 days from when you create it. When that date arrives, the favpoll closes on its own.",
-  },
-  {
-    q: "Can I change a favpoll after publishing it?",
-    a: "Yes. You can edit the details, the charities and the closing date any time before it closes.",
-  },
-  {
-    q: "Do guests need an account to pledge?",
-    a: "No. A guest pledges with just an email address — there's nothing to sign up for.",
-  },
   {
     q: "If I set a goal, does pledging stop once it's reached?",
     a: "No. A goal is a milestone, not a finish line. The favpoll stays open until its closing date, and every pledge after the goal still counts.",
-  },
-  {
-    q: "Can I keep a favpoll private?",
-    a: "Yes. An unlisted favpoll is reachable only by the people you share the link with, and never appears on the public favpolls page.",
   },
   {
     q: "Can someone pledge for a guest who can't pay?",
@@ -52,7 +70,8 @@ export const metadata: Metadata = {
 // A lean about page: the soul (the brand statement), the founder's plain
 // two-paragraph definition (2026-07-17 — a charity partner wants the
 // mechanics stated, not demoed) with the fee + record principles in its
-// tail, and a way to reach us. The Charity · Honour · Love triad was
+// tail, the spec (The basics, from /features 2026-08-16), and a way to
+// reach us. The Charity · Honour · Love triad was
 // retired from the page same day: it's internal mythology (a design
 // principle we evaluate copy against), not reader copy. No origin story
 // (press/investor material).
@@ -180,6 +199,35 @@ export default function AboutPage() {
               </p>
             </FadeIn>
           </div>
+        </section>
+
+        {/* ── The basics — the spec grid, moved from /features 2026-08-16.
+            The same dl grammar it had there: a spec sheet is scanned, and
+            label-plus-line is the scanning grammar. ── */}
+        <section
+          id="basics"
+          className="scroll-mt-20 border-b border-border py-16"
+        >
+          <FadeIn>
+            <SectionEyebrow className="mb-2">The basics</SectionEyebrow>
+            <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
+              True of every favpoll, whatever the occasion.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <dl className="grid max-w-4xl gap-x-10 gap-y-6 sm:grid-cols-2">
+              {BASICS.map((item) => (
+                <div key={item.label}>
+                  <dt className="mb-1 text-base font-medium text-foreground">
+                    {item.label}
+                  </dt>
+                  <dd className="text-base leading-relaxed text-muted-foreground">
+                    {item.body}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </FadeIn>
         </section>
 
         {/* ── FAQ — the operational questions the marketing doesn't answer.

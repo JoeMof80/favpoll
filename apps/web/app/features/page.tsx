@@ -26,21 +26,58 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 // old #charities section restated About#money, and #beyond's will
 // instructions restated About#wills; both now point at About instead.
 //
+// The principle was finished on 2026-08-16 (founder): #basics and #money left
+// the page entirely. Neither is a feature — the basics are the product's spec
+// and now live on About (where the FAQ already carried most of them), and
+// #money was a restatement of About#money with a link to itself. The page is
+// now the eight features and nothing else.
+//
 // And it unlocks the homepage: the capability grid's six cards each have a
 // section here, so they can become links. That was the reason to do it.
 //
 // Deliberately NOT here: Gift Aid, which is effectively confirmed but not
 // contractually settled — the most attractive line this page could carry and
 // the most damaging to get wrong.
+//
+// WHO "YOU" IS (founder question, 2026-08-17). The page addresses its reader
+// as the prospective ORGANISER: every second-person verb is an organiser's
+// action ("Set a target", "Run it loud", "Add the favourites yourself"), and
+// guests are NAMED in the third person wherever the capability is theirs
+// ("Anyone can pledge as Someone", "A guest without means draws on it",
+// "the guest shares something of themselves"). Every section already obeys
+// this, so it is the rule rather than an accident — and it is what lets one
+// list carry both actors without "you" changing referent mid-bullet.
+// "The organiser can…" was considered and rejected: it documents a third
+// party TO the very reader who would be that party, repeats a subject the
+// page can imply, and reads as manual rather than voice. A guest who wanders
+// in still finds their own row, precisely because guest capabilities are the
+// ones written in the third person.
+//
+// "GUEST" AND THE STANDALONE FAVPOLL (founder, 2026-08-17). "Guest" smuggles
+// in a gathering, and a favpoll needs no life event — so the word is spent
+// with care. The wall's record of who TOOK PART (not "who came") and the
+// keepsake's "the whole of it" (not "the day") are true of a standalone
+// favpoll with nobody in a room. EVENT-SHAPED features keep the event
+// language, because it is accurate rather than presumptuous — stationery for
+// tables and orders of service, a display on a screen "in the room", and the
+// personal reveal, which is protagonist-bound by definition.
+// Note "guest" ALSO has a domain meaning here — account-less pledger, as in
+// guest checkout (allow_guest_items, createGuestPledge, the organiser's
+// "Guest additions" toggle). That sense is register-neutral and stays.
+//
+// HOMEMADE TOPICS IS THE FOUNDER'S OWN COPY AND IS FINAL (2026-08-17). It
+// says "guests", by his decision, and the wording is not to be rewritten —
+// not to "anyone", not to a concrete example, not to an em dash. Rewriting it
+// has been reverted repeatedly; leave it alone.
 
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: the print pack, the live display, the shared fund, the personal reveal, and 100% of every pledge to a registered charity.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the personal reveal, a pledge goal, a wall of favourites and a printable keepsake.",
 }
 
 const SECTIONS = [
-  { id: "topics", label: "Custom topics" },
+  { id: "topics", label: "Homemade topics" },
   { id: "stationery", label: "QR-coded stationery" },
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared fund" },
@@ -48,35 +85,6 @@ const SECTIONS = [
   { id: "goal", label: "Pledge goal" },
   { id: "wall-of-favourites", label: "Wall of favourites" },
   { id: "keepsake", label: "Keepsake" },
-  { id: "basics", label: "The basics" },
-  { id: "money", label: "Where the money goes" },
-]
-
-const BASICS: { label: string; body: string }[] = [
-  {
-    label: "Free to create",
-    body: "No fee to set one up, and none taken from the gift.",
-  },
-  {
-    label: "One to three charities",
-    body: "Name up to three. The proceeds are split equally between them.",
-  },
-  {
-    label: "Up to 90 days",
-    body: "It closes on its own when the date arrives, and the proceeds go on their way.",
-  },
-  {
-    label: "Editable after publishing",
-    body: "Change the details, the charities or the closing date any time before it closes.",
-  },
-  {
-    label: "Private if you need it",
-    body: "An unlisted favpoll is reachable only by the people you share it with, and never appears on the public favpolls page.",
-  },
-  {
-    label: "Nothing to sign up for",
-    body: "A guest pledges with an email address. No account, no app.",
-  },
 ]
 
 function Feature({
@@ -84,7 +92,6 @@ function Feature({
   title,
   lead,
   bullets,
-  children,
   artefact,
 }: {
   id: string
@@ -97,14 +104,14 @@ function Feature({
    * the same grammar with more of them makes the relationship visible
    * instead of asserted (founder, 2026-08-09).
    *
-   * Two sections deliberately stay prose: the personal reveal and where the
-   * money goes. Both are ARGUMENTS rather than lists — "a gift rather than a
-   * gate", and the 0% fee — and an argument dies as a fragment. A page with
-   * no prose anywhere also has no voice, and those two are where favpoll's
-   * voice belongs.
+   * EVERY section carries them as of 2026-08-17 (founder). The personal
+   * reveal was the last holdout, kept as prose because an argument dies as a
+   * fragment — but the argument survives in its lead, and what the paragraph
+   * buried underneath it (who writes the reveal, and that it is optional)
+   * were facts a reader had to mine out. The lead is where this page argues;
+   * the bullets are where it answers.
    */
   bullets?: string[]
-  children?: React.ReactNode
   artefact?: React.ReactNode
 }) {
   return (
@@ -132,7 +139,6 @@ function Feature({
             ))}
           </ul>
         )}
-        {children}
       </FadeIn>
       {artefact && (
         <FadeIn delay={0.08}>
@@ -181,13 +187,13 @@ export default function FeaturesPage() {
 
             <Feature
               id="topics"
-              title="Custom topics"
-              lead="Write the question yourself when the ready-made list has not got it."
+              title="Homemade topics"
+              lead="Pick from many ready-made topics, or create your own."
               bullets={[
-                "The list of ready-made favpoll topics is long and always growing",
-                "Add a topic that is missing, or one specific to the event — a family in-joke, say",
-                "Add any missing favourite to a topic",
-                "Guests can add missing favourites too, with no account needed — switch that off for any favpoll, and hide anything you would rather not keep",
+                "A family in-joke, a talking point, or a topic specific to the event",
+                "Add missing favourites to any topic",
+                "Allow guests to add favourites of their own - no account needed",
+                "Hide guest-added favourites that don’t belong",
               ]}
               artefact={<TopicPickerVignette />}
             />
@@ -195,15 +201,18 @@ export default function FeaturesPage() {
             <Feature
               id="stationery"
               title="QR-coded stationery"
-              lead="Printable templates, each carrying a code that opens the favpoll on a phone."
+              // The only two strings on this page that live in messages/
+              // (founder, 2026-08-17): both name a PAPER SIZE, and A4 is wrong
+              // the moment there is an en-US market — the A4-vs-Letter trap the
+              // print-pack roadmap already carries. The rest of the page is
+              // prose a locale pass has to rewrite wholesale anyway; these two
+              // are a factual dependency worth flagging where translators look.
+              // Any future line naming a size belongs here too.
+              lead={t("features.stationery.lead")}
               bullets={[
-                "An A4 poster for the door",
-                "Two A5 cards to a sheet, for tables and easels",
-                "Four A6 postcards to a sheet — postcard size, so they take a stamp",
-                "Tent cards and place cards, folded and printed both sides, so a code faces either way across a table",
-                "Eight wallet cards to a sheet — credit-card size, so they slip into an order of service or a pocket, or print the same sheet on labels and stick them to anything",
-                "Twenty-one small labels to a sheet, for favour bags and place settings",
-                "Every sheet is laid out to Avery card you can buy, with cut lines you can switch on to use plain paper instead",
+                "Posters, cards, postcards, tent cards, place cards and labels",
+                "Print whichever stationery you need for your event",
+                t("features.stationery.paper"),
               ]}
               artefact={<PackVignette />}
             />
@@ -211,12 +220,11 @@ export default function FeaturesPage() {
             <Feature
               id="display"
               title="Live display"
-              lead="Open it on any screen in the room — a television, a projector, a laptop on a table."
+              lead="View your favpoll at a life event. Watch standings move as pledges arrive."
               bullets={[
-                "The standings re-order as pledges land",
-                "A code big enough to read from across the room stays on screen throughout",
-                "Run it loud: the fundraiser leads with the total climbing",
-                "Run it quiet: the tribute leads with the person, and the money stays out of it",
+                "Large QR codes visible from distance",
+                "Tribute mode to centre the person being honoured",
+                "Fundraiser mode for a telethon-style centrepiece",
               ]}
               artefact={<RoomVignette />}
             />
@@ -228,7 +236,7 @@ export default function FeaturesPage() {
               bullets={[
                 "Anyone can put money in outright — a gift with no favourite attached",
                 "Or move part of their own pledge across, which costs them nothing more",
-                "A guest without means, a child usually, draws on it to take part",
+                "A guest without means — a child, usually — draws on it to take part",
                 "Nobody sees who used it, and the money reaches the charity either way",
               ]}
               artefact={<FundVignette />}
@@ -237,17 +245,22 @@ export default function FeaturesPage() {
             <Feature
               id="reveal"
               title="Personal reveal"
-              lead="A favpoll can hold a favourite back — the subject's own — and show it only once a guest has pledged one of their own. It is a gift rather than a gate: the guest shares something of themselves, and the favpoll shares something back. An organiser can write it about someone, or the person can write it themselves in advance, in their own voice."
+              lead="A favpoll can hold one favourite back — the subject’s own — and share it the moment a guest has pledged."
+              bullets={[
+                "A gift, not a gate: the guest shares something of themselves, and the favpoll shares something back",
+                "Written by an organiser about someone, or by that person in advance, in their own voice",
+                "Optional, and set separately for each topic",
+              ]}
               artefact={<RevealVignette />}
             />
 
             <Feature
               id="goal"
               title="Pledge goal"
-              lead="Set a target and the room can watch it come."
+              lead="Set a target, and the room can watch it come."
               bullets={[
-                "The bar turns green the moment the goal is met",
-                "A goal is a milestone, not a finish line — the favpoll stays open until its closing date",
+                "The bar fills as pledges land, and turns green the moment the goal is met",
+                "A milestone, not a finish line — the favpoll runs to its closing date",
                 "Every pledge after the goal still counts",
               ]}
               artefact={<GoalVignette />}
@@ -258,10 +271,10 @@ export default function FeaturesPage() {
               title="Wall of favourites"
               lead="Who backed what, as it happens."
               bullets={[
-                "Scrolls on the big screen during the day",
-                "Reads back afterwards as a record of who came",
-                "Names and favourites only — never amounts",
-                "Anyone can pledge as “Someone”",
+                "Scrolls on the big screen through the day",
+                "Reads back afterwards as a record of who took part",
+                "Names and favourites only, never amounts",
+                "Anyone can pledge as “Someone” instead",
               ]}
               artefact={<WallOfFavouritesVignette />}
             />
@@ -269,59 +282,16 @@ export default function FeaturesPage() {
             <Feature
               id="keepsake"
               title="Keepsake"
-              lead="When a favpoll closes, the day becomes a single sheet to print."
+              lead="When a favpoll closes, the whole of it becomes a single sheet to print."
               bullets={[
                 "The standings, the reveal and the total raised",
                 "Two ways to tell it: the person leads, or what was raised does",
-                "Portrait or landscape, and always a single sheet",
-                "No per-guest amounts — what people gave stays theirs",
+                "Portrait or landscape, always one sheet",
+                "No individual amounts — what people gave stays theirs",
                 "The full standings and everyone who took part export as a spreadsheet",
               ]}
               artefact={<KeepsakeVignette />}
             />
-
-            <Feature
-              id="basics"
-              title="The basics"
-              lead="True of every favpoll, whatever the occasion."
-            >
-              <dl className="grid max-w-4xl gap-x-10 gap-y-6 sm:grid-cols-2">
-                {BASICS.map((item) => (
-                  <div key={item.label}>
-                    <dt className="mb-1 text-base font-medium text-foreground">
-                      {item.label}
-                    </dt>
-                    <dd className="text-base leading-relaxed text-muted-foreground">
-                      {item.body}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Feature>
-
-            {/* Money and wills POINT AT About rather than restating it — the
-                old by-reader sections here duplicated About#money and
-                About#wills, which make those arguments properly. */}
-            <Feature
-              id="money"
-              title="Where the money goes"
-              lead="favpoll takes no fee. 100% of every pledge reaches the charity in full, and the recipient is always a registered charity — never a project fund, and never the organiser. Payments are processed by Stripe; favpoll is supported by optional contributions from guests who choose to add one."
-            >
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <Link
-                  href="/about#money"
-                  className="text-base font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  The full detail →
-                </Link>
-                <Link
-                  href="/about#wills"
-                  className="text-base font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  Writing a favpoll into a will →
-                </Link>
-              </div>
-            </Feature>
           </div>
         </div>
       </div>
