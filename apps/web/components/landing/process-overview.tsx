@@ -23,7 +23,11 @@
 import { useEffect, useRef, useState } from "react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
-import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
+import {
+  PhoneFrame,
+  PHONE_SCREEN_WIDTH,
+  PHONE_SAFE_AREA_TOP,
+} from "@/components/hero-demo-panel/phone-frame"
 import { PackCard } from "@/components/print-pack/pack-card"
 import {
   DEMO_SCENE as SCENE,
@@ -200,6 +204,90 @@ const MOBILE_WELL: Record<Medium["kind"], string> = {
   keepsake: "h-[390px]",
 }
 
+// CROPPED ON MOBILE (founder, 2026-08-18): "it is difficult to view the iphone
+// screen on a iphone screen (fractal effect). Should we truncate the screen
+// with wavy lines, only showing the relevant part?"
+//
+// Right on both counts, and it is measurable. Whole objects scaled to fit a
+// 342px column paint their body copy at:
+//
+//   phone   0.52  ->  14px becomes 7.3px
+//   display 0.28  ->  14px becomes 3.9px
+//   keepsake 0.34 ->  14px becomes 4.8px
+//   card    0.75  ->  14px becomes 10.5px
+//
+// Three of the four were decorative rather than informative — a reader could
+// see that something was there and not one word of what. Showing the whole
+// object was costing the very thing the object was there to show.
+//
+// So each is cropped to the part that carries the beat, at a scale where that
+// part can be READ, and faded out at the bottom to say it continues. The card
+// is the exception and keeps its whole self: a wallet card is small in life,
+// 10.5px is legible, and a cropped card would be the only one of the four
+// where the crop lied about the object's real size.
+//
+// A FADE, NOT A TORN EDGE. The founder suggested wavy lines and they are the
+// honest convention for paper — but only one of these is paper, and a torn cut
+// across a phone screen states something false about the material. It would
+// also be the drawn-not-real register that the vignettes were pulled up on
+// (2026-08-14, "they look a bit cartoonish"). The fade already exists in this
+// section's own vocabulary: it is what the pinned header does to the beats
+// passing under it.
+//
+// THE CROP ALSO FIXES THE ROOM BEAT, which is the other half of the same
+// report. DisplayScreen has 37 viewport md: breakpoints and no container
+// queries, so at a phone viewport its two-column banner collapses even inside
+// a 900px box: the "TV" rendered 900 x 1176 PORTRAIT on mobile against
+// 900 x 657 landscape on desktop — a tall slab that reads as a tablet, not a
+// screen on a wall. A crop takes a landscape BAND out of that slab, which is
+// the shape a screen in a room is meant to be. The underlying defect is real
+// and is NOT fixed here: DisplayScreen needs container queries, and that is a
+// change to the component behind the live display, not to a marketing page.
+type Crop = {
+  natural: number
+  scale: number
+  height: number
+  /**
+   * An edge for the objects that lost theirs. Only the phone needs it: with
+   * the chassis gone its screen is a bare white rectangle butted against the
+   * band, which reads as a pasted screenshot rather than a device. A hairline
+   * and a radius on three sides is enough to make it an object again — no
+   * bottom edge, because the bottom is the fade.
+   */
+  frame?: string
+  /**
+   * Content pixels (unscaled) to skip off the top. The phone screen reserves
+   * a safe-area inset for the notch the chassis used to draw — with no chassis
+   * that is just dead white above the app header, and on a crop measured in
+   * hundreds of pixels it was the difference between the topic being in frame
+   * and out of it.
+   */
+  offsetTop?: number
+}
+
+const MOBILE_CROP: Partial<Record<Medium["kind"], Crop>> = {
+  // The guest's own screen at very nearly 1:1 — and WITHOUT the chassis, which
+  // is the fractal itself: a phone outline drawn around a phone screen on a
+  // phone. It cost 24px of bezel each side and said nothing the device in the
+  // reader's hand was not already saying. Body copy lands at ~12px.
+  phone: {
+    natural: PHONE_SCREEN_WIDTH,
+    scale: 0.877,
+    height: 316,
+    frame: "rounded-t-2xl border-x border-t border-border/70",
+    offsetTop: PHONE_SAFE_AREA_TOP,
+  },
+  // The top band: the goal, the total climbing against it, the bar, and the
+  // charity it is climbing for. £705 of £1,000 is set at 30px, so it survives
+  // the scale at ~11px and stays the thing the beat is about. The bezel's top
+  // and sides stay in frame, so it still reads as a screen.
+  display: { natural: 940, scale: 0.364, height: 175 },
+  // Down to the first standings: the frame's head, the occasion, the name at
+  // display size, and the topic. The name is the keepsake's whole point and it
+  // is the largest thing on the sheet, so it is the part that survives best.
+  keepsake: { natural: 794, scale: 0.431, height: 224 }, // A4_PORTRAIT.w, declared below
+}
+
 // A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
 // portrait, 1123 x 794 landscape. 1644 x 1123 was used here first and was
 // wrong — that is the FAN box the features vignette uses to hold TWO sheets
@@ -246,7 +334,21 @@ function withNextToken(body: string) {
   )
 }
 
-function BeatMedium({ medium }: { medium: Medium }) {
+function BeatMedium({
+  medium,
+  mobileCropped = false,
+}: {
+  medium: Medium
+  /**
+   * Mobile's cropped view. Only the phone changes shape for it: the chassis
+   * comes off, because an iPhone outline drawn around an iPhone screen on an
+   * iPhone is the fractal the crop exists to kill. The TV keeps its bezel —
+   * without it the display is just a page, and "in a room" is the beat — and
+   * the keepsake keeps its full sheet width, since a sheet cropped at the
+   * sides would read as damaged rather than continued.
+   */
+  mobileCropped?: boolean
+}) {
   if (medium.kind === "card") {
     return (
       // .paper pins the light token values, exactly as the print pack does.
@@ -285,7 +387,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
       <div
         className={cn(
           "paper paper-screen shrink-0 drop-shadow-xl",
-          KEEPSAKE_SCALE
+          !mobileCropped && KEEPSAKE_SCALE
         )}
         style={{ width: A4_PORTRAIT.w, height: A4_PORTRAIT.h }}
       >
@@ -299,7 +401,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
   }
   if (medium.kind === "display") {
     return (
-      <div className={cn("shrink-0", DISPLAY_SCALE)}>
+      <div className={cn("shrink-0", !mobileCropped && DISPLAY_SCALE)}>
         <TvFrame>
           {/* No crop: the still shows its leaders and ends where they do — a
               fixed height cut the last bar in half and read as a broken
@@ -308,6 +410,22 @@ function BeatMedium({ medium }: { medium: Medium }) {
             <DisplayStill scene={SCENE} qrUrl={DEMO_QR_URL} />
           </div>
         </TvFrame>
+      </div>
+    )
+  }
+  if (mobileCropped) {
+    // The screen alone, at its own width, so the crop above can put it at
+    // very nearly 1:1. No shrink-0 and no scale here — the crop owns both.
+    return (
+      <div style={{ width: PHONE_SCREEN_WIDTH }}>
+        <DemoCard
+          scene={SCENE}
+          phase={medium.phase}
+          barWidths={SCENE.results.map((r) => r.widthPercent)}
+          prefersReducedMotion
+          device="phone"
+          className="rounded-none border-0"
+        />
       </div>
     )
   }
@@ -323,6 +441,77 @@ function BeatMedium({ medium }: { medium: Medium }) {
           className="rounded-none border-0"
         />
       </PhoneFrame>
+    </div>
+  )
+}
+
+// The mobile medium: cropped to its legible band, faded out at the foot.
+//
+// Two boxes rather than one, and both are load-bearing. The OUTER carries the
+// natural width and the centring, so -translate-x-1/2 resolves against a width
+// that is actually set. The INNER carries the scale with origin-top, so the
+// object shrinks toward the top edge and the crop keeps the HEAD of the thing
+// rather than its middle. Scaling about the centre would slide the part worth
+// reading up out of frame.
+//
+// The window is overflow-hidden, which is the crop, and w-full, so it can
+// never widen its column — the min-content trap that clipped every beat's text
+// (see MOBILE_WELL above) is avoided here by construction rather than by care.
+function MobileMedium({ medium }: { medium: Medium }) {
+  const crop = MOBILE_CROP[medium.kind]
+
+  // The card, whole. Nothing to crop and nothing to fade.
+  if (!crop) {
+    return (
+      <div
+        aria-hidden="true"
+        data-beat-well=""
+        className={cn(
+          "pointer-events-none relative w-full select-none",
+          MOBILE_WELL[medium.kind]
+        )}
+      >
+        <div
+          data-beat-media=""
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        >
+          <BeatMedium medium={medium} />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      aria-hidden="true"
+      data-beat-well=""
+      className={cn(
+        "pointer-events-none relative w-full overflow-hidden select-none",
+        crop.frame
+      )}
+      style={{ height: crop.height }}
+    >
+      <div
+        data-beat-media=""
+        className="absolute top-0 left-1/2 -translate-x-1/2"
+        style={{ width: crop.natural }}
+      >
+        <div
+          className="origin-top"
+          style={{
+            // translate INSIDE the scale, so the offset is spent in the
+            // object's own pixels rather than the page's.
+            transform: `scale(${crop.scale}) translateY(${-(crop.offsetTop ?? 0)}px)`,
+          }}
+        >
+          <BeatMedium medium={medium} mobileCropped />
+        </div>
+      </div>
+      {/* The fade says "continues" without drawing an edge. to-band-tint, not
+          to-background: this section is bg-primary/5 over the page, and the
+          composite of that is what --band-tint is measured to be. Getting it
+          wrong here would leave a pale seam across the foot of every crop. */}
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-band-tint" />
     </div>
   )
 }
@@ -478,21 +667,7 @@ export function ProcessOverview() {
                     beats without one cost nothing to mount either. */}
                 <div className="mt-6 md:hidden">
                   {mounted && !isDesktop && MOBILE_MEDIA.has(beat.key) && (
-                    <div
-                      aria-hidden="true"
-                      data-beat-well=""
-                      className={cn(
-                        "pointer-events-none relative w-full select-none",
-                        MOBILE_WELL[beat.medium.kind]
-                      )}
-                    >
-                      <div
-                        data-beat-media=""
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                      >
-                        <BeatMedium medium={beat.medium} />
-                      </div>
-                    </div>
+                    <MobileMedium medium={beat.medium} />
                   )}
                 </div>
               </div>

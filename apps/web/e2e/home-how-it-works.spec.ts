@@ -43,6 +43,15 @@ const BEATS = [
 // that is two screens longer than it should be — which nothing else notices.
 const WITH_MEDIA = new Set(["card", "arriving", "room", "keepsake"])
 
+// Of those, three are CROPPED (2026-08-18): shown at a legible scale inside an
+// overflow-hidden window and faded out at the foot, because whole objects
+// scaled to a 342px column painted their body copy at 4-7px. Their content is
+// deliberately WIDER and TALLER than the window — that is what a crop is — so
+// for these the thing that must stay inside the viewport is the WINDOW, not
+// the content. The wallet card is the exception and is still shown whole, so
+// it is the one beat where the object itself must fit.
+const CROPPED = new Set(["arriving", "room", "keepsake"])
+
 // Phone widths that matter: the narrowest phone still in use, the iPhone
 // baseline the guest viewport is designed around, and a Pro Max. 320 is the
 // tight one — the keepsake's scaled sheet is ~270 wide in a 272px column, so
@@ -124,12 +133,60 @@ test.describe("home — how it works, on a phone", () => {
         })
 
         // It laid out at all — a collapsed medium is invisible inside its
-        // well and would otherwise pass every containment check trivially.
+        // window and would otherwise pass every containment check trivially.
         expect(
           mediaBox.width,
           `beat ${key}: medium collapsed to ${Math.round(mediaBox.width)}px wide`
         ).toBeGreaterThan(80)
 
+        const well = block.locator("[data-beat-well]")
+        const wellBox = await well.evaluate((el) => {
+          const r = el.getBoundingClientRect()
+          return {
+            left: r.left,
+            right: r.right,
+            top: r.top,
+            bottom: r.bottom,
+            height: r.height,
+            overflow: getComputedStyle(el).overflowX,
+          }
+        })
+
+        // The WINDOW is what the reader sees, cropped or not, and it must sit
+        // inside the viewport. This is the assertion that stands in for the
+        // original bug: a window wider than the phone means the column grew
+        // again.
+        expect(
+          wellBox.right,
+          `beat ${key}: media window runs ${Math.round(
+            wellBox.right - width
+          )}px past the right edge at ${width}px`
+        ).toBeLessThanOrEqual(width + SLACK)
+        expect(
+          wellBox.left,
+          `beat ${key}: media window starts ${Math.round(wellBox.left)}px left of the viewport`
+        ).toBeGreaterThanOrEqual(-SLACK)
+        expect(
+          wellBox.height,
+          `beat ${key}: media window collapsed to ${Math.round(wellBox.height)}px tall`
+        ).toBeGreaterThan(100)
+
+        if (CROPPED.has(key)) {
+          // The crop only holds because the window clips. Without this the
+          // content would spill over the beats either side and nothing else
+          // here would notice — the window's own box would still measure fine.
+          expect(
+            wellBox.overflow,
+            `beat ${key}: media window must clip its content — it is a crop`
+          ).toBe("hidden")
+          continue
+        }
+
+        // Uncropped (the wallet card): the object itself is on show, so it
+        // must fit the viewport AND the box reserved for it. MOBILE_WELL
+        // heights are derived constants and nothing else checks them — the
+        // TV's went stale at 184 against 340 rendered and spilled 78px onto
+        // the beat above and the heading below.
         expect(
           mediaBox.right,
           `beat ${key}: medium runs ${Math.round(
@@ -140,23 +197,6 @@ test.describe("home — how it works, on a phone", () => {
           mediaBox.left,
           `beat ${key}: medium starts ${Math.round(mediaBox.left)}px left of the viewport`
         ).toBeGreaterThanOrEqual(-SLACK)
-
-        // ── The medium fits the box reserved for it ───────────────────────
-        // MOBILE_WELL heights are DERIVED constants — each object's real
-        // height times its scale — and nothing was checking them. The TV's
-        // went stale (184 reserved, 340 rendered) and spilled 78px out of
-        // each end onto the beat above and the heading below, which is what
-        // put a live display on top of "7. Print a keepsake".
-        //
-        // Vertical only. Horizontally the medium is deliberately allowed to
-        // be wider than its well — that is the whole point of taking it out
-        // of flow — and the viewport checks above already bound that.
-        const wellBox = await block
-          .locator("[data-beat-well]")
-          .evaluate((el) => {
-            const r = el.getBoundingClientRect()
-            return { top: r.top, bottom: r.bottom }
-          })
         expect(
           mediaBox.top,
           `beat ${key}: medium spills ${Math.round(
