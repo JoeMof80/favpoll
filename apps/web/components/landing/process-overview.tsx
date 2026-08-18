@@ -162,10 +162,18 @@ const DISPLAY_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.50]"
 // same point and the scaled object sits centred. No per-medium width constants
 // — the visual widths (card ~251, phone ~215, display ~263, keepsake ~270)
 // would have to be re-derived every time a scale changed.
+// display was h-[184px] and the TV rendered 340 (2026-08-18) — 78px spilling
+// out of each end of the well and landing on the beat above and the heading
+// below. The 184 came from the note above: 580 unscaled x 0.28. But the still
+// is not 580 tall any more and has not been for some time — it is content-
+// sized on purpose ("No crop", see BeatMedium), and it has since gained the
+// goal bar, the charity row, six ranking rows, the QR and the wall. A derived
+// constant with nothing checking it goes stale in exactly this silent way, so
+// the mobile spec now asserts every medium fits inside its own well.
 const MOBILE_WELL: Record<Medium["kind"], string> = {
   phone: "h-[451px]",
   card: "h-[176px]",
-  display: "h-[184px]",
+  display: "h-[340px]",
   keepsake: "h-[390px]",
 }
 
@@ -393,7 +401,17 @@ export function ProcessOverview() {
                 level. The solid backdrop and its fade still have to clear the
                 text's descenders before the gradient does the work, or the
                 scrolling beats read THROUGH the header rather than under it. */}
-            <div className="relative z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-36 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-transparent md:sticky md:top-28">
+            {/* THE SCRIM IS md: ONLY (2026-08-18). The backdrop and its fade
+                exist so the scrolling beats vanish UNDER a pinned header —
+                which only happens at md:, where the header is sticky. On a
+                phone it is position:relative and nothing scrolls beneath it,
+                but the ::after gradient rendered anyway: 144px of band-tint
+                fading down over whatever followed. Beat 1's label sits 48px
+                below the header, so the first beat of the section was always
+                greyed out, and looked like the desktop opacity treatment
+                leaking onto mobile. It was not — the beat's own opacity was 1
+                the whole time, it was being painted over. */}
+            <div className="relative z-10 bg-band-tint pb-8 md:sticky md:top-28 md:before:absolute md:before:inset-x-0 md:before:bottom-full md:before:h-14 md:before:bg-band-tint md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-transparent">
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
