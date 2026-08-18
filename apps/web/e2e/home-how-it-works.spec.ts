@@ -84,14 +84,16 @@ test.describe("home — how it works, on a phone", () => {
         ).toBeGreaterThanOrEqual(-SLACK)
 
         // ── The medium ────────────────────────────────────────────────────
-        // The CHILD of the positioning wrapper, not the wrapper itself. The
-        // wrapper only centres; the scale sits on the medium inside it, and a
-        // parent's rect does not shrink for a child's transform — so measuring
-        // the wrapper reports the unscaled 940 and fails on a page that is
-        // perfectly fine. Measuring the child reports the transformed box,
-        // which is what a reader actually sees. (This distinction is the same
-        // one the bug itself turned on, so it is worth being explicit about.)
-        const media = block.locator("[data-beat-media] > *")
+        // [data-beat-media] is the SIZED box: the component sets its width and
+        // height to the medium's natural size times the scale it measured for
+        // this column, so it is exactly the space the object occupies.
+        //
+        // Not its child. The child carries the transform with origin-top-left,
+        // and a transformed rect is not the laid-out box — at 430px it reports
+        // 440 wide inside a 382 box, and at 320 the TV's reports 64. Both are
+        // artefacts of measuring through a transform; the box around it is the
+        // thing a reader sees, and the scroller clips to it.
+        const media = block.locator("[data-beat-media]")
         await expect(media, `beat ${key} has its medium on mobile`).toHaveCount(
           1
         )
