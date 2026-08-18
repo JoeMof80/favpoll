@@ -173,27 +173,12 @@ const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
   keepsake: { w: 794, h: 1123 },
 }
 
-// EXPANDED: the scale at which each medium's own body copy becomes readable,
-// which is roughly 11px of rendered type. Collapsed is whatever fills the
-// column, so for the phone this is a 1.5x jump and for the two documents it
-// is more than double — which is why they have to pan.
-//
-// The founder asked for one interaction across all four (2026-08-18), and
-// this is what makes that honest rather than decorative: the display and the
-// keepsake already fill 98% of the column collapsed, so "expand" could only
-// have added 13% before hitting the screen edge. Their copy would still have
-// been 4px. Panning is the only thing that actually opens them.
-// COLLAPSED is fill-the-column for everything EXCEPT the phone. The phone is
-// portrait and there are four of them, so filling costs 717px each and takes
-// the section past 6 screens — the state the founder called ridiculous. It
-// stays the thumbnail it was, and the tap is what it is for.
-const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
-  phone: 0.52,
-  // Portrait again (founder, 2026-08-18: "make the keepsake portrait and
-  // expandable like the iphone"). Portrait costs height — 342 wide is 483
-  // tall — so like the phone it sits as a thumbnail until asked.
-  keepsake: 0.3,
-}
+// EXPANDED IS FILL-THE-COLUMN, nothing more (founder, 2026-08-18: "keepsake
+// expands too much"). It was a legibility scale — 0.7 — which put the sheet
+// at 556 wide and panning, and a document you have to drag sideways to read
+// on a marketing page is a worse answer than a small one you can see whole.
+// So expanding just lifts the thumbnail cap: the phone goes 215 -> 342, the
+// keepsake 238 -> 342. Nothing pans anywhere now.
 
 // ONLY THESE TWO CARRY A TOGGLE (founder, 2026-08-18): "there's no need for
 // the live screen to expand if it is already full width, so make it full
@@ -208,12 +193,17 @@ const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
 // and open on a tap.
 const EXPANDABLE = new Set<Medium["kind"]>(["phone", "keepsake"])
 
-const EXPANDED_SCALE: Record<Medium["kind"], number> = {
-  card: 1.5, // the card's smallest print — the shared-fund line — is ~7px
-  phone: 0.8,
-  display: 0.7,
-  keepsake: 0.7,
+// COLLAPSED is fill-the-column for the landscape media and a thumbnail for the
+// two portrait ones, which would otherwise cost 717px (phone) and 483px
+// (keepsake) of scroll each — four phones at full width took the section past
+// six screens, the state that was called ridiculous.
+const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
+  phone: 0.52,
+  keepsake: 0.3,
 }
+
+// Room for the drop shadows, taken off the column before anything is fitted.
+const SHADOW_ROOM = 14
 
 // A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
 // portrait, 1123 x 794 landscape. 1644 x 1123 was used here first and was
@@ -398,16 +388,18 @@ function MobileWell({
   }, [])
 
   const natural = NATURAL[beat.medium.kind]
-  const fit = columnWidth ? columnWidth / natural.w : 0
+  // SHADOW_ROOM off the column before fitting. Every medium carries a
+  // drop-shadow and the card is tilted 2° on top of that, so fitting the raw
+  // column width put the shadow outside the box and the scroller cut it off
+  // square — "QR code card shadow is truncated". The shadow is how these read
+  // as objects rather than pasted rectangles, so it gets its own space.
+  const fit = columnWidth ? (columnWidth - SHADOW_ROOM * 2) / natural.w : 0
   const expandable = EXPANDABLE.has(beat.medium.kind)
   const cap = COLLAPSED_CAP[beat.medium.kind]
   const collapsed = cap ? Math.min(fit, cap) : fit
   // Never SHRINK on expand: the card and the two documents already fill the
   // column collapsed, and a toggle that made something smaller would be absurd.
-  const scale =
-    expandable && expanded
-      ? Math.max(fit, EXPANDED_SCALE[beat.medium.kind])
-      : collapsed
+  const scale = expandable && expanded ? fit : collapsed
   const width = natural.w * scale
   const height = natural.h * scale
   const pans = width > columnWidth + 1
@@ -463,7 +455,7 @@ function MobileWell({
           its own — "Pledge your favourite" among them — and a <button> inside
           a <button> is invalid HTML that React reports as a hydration error.
           The medium is pointer-events-none, so every tap lands here.
-          Sticky-bottom so the chip stays reachable on an expanded medium that
+          Sticky-top so the chip stays reachable on an expanded medium that
           is taller than the screen. */}
       {expandable && (
         <button
@@ -479,15 +471,20 @@ function MobileWell({
               ? `${beat.label} — show less`
               : `${beat.label} — see this larger`
           }
-          className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="absolute inset-0 flex cursor-pointer items-start justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           {/* SOLID, not a tint (founder, 2026-08-18: "barely visible"). It was
               bg-foreground/75 with a blur behind it, which over the white of a
               screen or a sheet came out as pale grey text on pale grey — the
               one thing a control announcing an interaction cannot be. Full
               opacity, a shadow to lift it off whatever it sits on, and the
-              same treatment whatever is behind it. */}
-          <span className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-semibold text-background shadow-lg">
+              same treatment whatever is behind it.
+              AT THE TOP (founder, same day). Bottom-anchored it sat on the
+              foot of the sheet and the charity row of the phone — the parts
+              carrying each one's closing line — and on an expanded medium
+              taller than the screen you had to scroll past the whole thing to
+              find the way back. sticky keeps it in reach either way. */}
+          <span className="sticky top-0 flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-semibold text-background shadow-lg">
             {expanded ? (
               <Minimize2 className="size-3.5" />
             ) : (
