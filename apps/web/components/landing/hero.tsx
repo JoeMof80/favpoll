@@ -288,18 +288,24 @@ export function LandingHero({
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
                 quieter of the two without vanishing when the theme flips.
-                A HAIRLINE ring, not a 1px one (founder, 2026-08-18). At 1px
-                the two CTAs read as two pill buttons of equal weight and
-                competed; the style guide's ghost is a 0.5px border, and this
-                was simply heavier than the spec. Opacity goes up as the line
-                gets thinner (30 -> 45) so it holds its edge rather than
-                fading out with its own width. */}
+                NO RING AT ALL (founder, 2026-08-18: "it should have no border
+                or ring"). Tried at 1px, then at a 0.5px hairline, and the
+                founder took it all the way off. It is a deliberate departure
+                from the style guide, which puts a bordered ghost at the
+                secondary tier and reserves the borderless one for quiet
+                actions like cancel — worth knowing before anyone "restores"
+                the border as a fix.
+                It survives without one because two other things carry it: the
+                arrow, which no static line of copy on this band has, and the
+                hover wash. Padding drops 6 -> 3 with the border, so the wash
+                hugs the words instead of blooming a pill-sized box around
+                them, and h-11 stays so the two CTAs share a baseline. */}
             {router && (
               <Button
                 asChild
                 size="lg"
                 variant="ghost"
-                className="h-11 px-6 text-base text-primary-foreground ring-[0.5px] ring-primary-foreground/45 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="h-11 px-3 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
