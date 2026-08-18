@@ -97,7 +97,13 @@ test.describe("home — how it works, on a phone", () => {
         )
         const mediaBox = await media.evaluate((el) => {
           const r = el.getBoundingClientRect()
-          return { left: r.left, right: r.right, width: r.width }
+          return {
+            left: r.left,
+            right: r.right,
+            width: r.width,
+            top: r.top,
+            bottom: r.bottom,
+          }
         })
 
         // It laid out at all — a collapsed medium is invisible inside its
@@ -117,6 +123,35 @@ test.describe("home — how it works, on a phone", () => {
           mediaBox.left,
           `beat ${key}: medium starts ${Math.round(mediaBox.left)}px left of the viewport`
         ).toBeGreaterThanOrEqual(-SLACK)
+
+        // ── The medium fits the box reserved for it ───────────────────────
+        // MOBILE_WELL heights are DERIVED constants — each object's real
+        // height times its scale — and nothing was checking them. The TV's
+        // went stale (184 reserved, 340 rendered) and spilled 78px out of
+        // each end onto the beat above and the heading below, which is what
+        // put a live display on top of "7. Print a keepsake".
+        //
+        // Vertical only. Horizontally the medium is deliberately allowed to
+        // be wider than its well — that is the whole point of taking it out
+        // of flow — and the viewport checks above already bound that.
+        const wellBox = await block
+          .locator("[data-beat-well]")
+          .evaluate((el) => {
+            const r = el.getBoundingClientRect()
+            return { top: r.top, bottom: r.bottom }
+          })
+        expect(
+          mediaBox.top,
+          `beat ${key}: medium spills ${Math.round(
+            wellBox.top - mediaBox.top
+          )}px above its well — MOBILE_WELL is too short`
+        ).toBeGreaterThanOrEqual(wellBox.top - SLACK)
+        expect(
+          mediaBox.bottom,
+          `beat ${key}: medium spills ${Math.round(
+            mediaBox.bottom - wellBox.bottom
+          )}px below its well — MOBILE_WELL is too short`
+        ).toBeLessThanOrEqual(wellBox.bottom + SLACK)
       }
     })
   }
