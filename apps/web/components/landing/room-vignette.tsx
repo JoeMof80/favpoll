@@ -19,6 +19,7 @@
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 import { RankingBar } from "@/components/ui/ranking-bar"
+import { BrandedQR } from "@/components/branded-qr"
 import { formatPounds } from "@/lib/i18n"
 import { Vignette } from "@/components/landing/vignette"
 
@@ -155,19 +156,42 @@ export function RoomVignette() {
                 Favourite Dog Breed
               </p>
 
-              <div className="space-y-1.5 [&_span]:text-sm">
-                {LABELS.map((label, i) => (
-                  <RankingBar
-                    key={label}
-                    label={label}
-                    amount={formatPounds(bars[i])}
-                    widthPercent={Math.round((bars[i] / MAX) * 100)}
-                    barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
-                    barStyle={{
-                      transition: reduced ? "none" : "width 700ms ease-out",
-                    }}
+              {/* THE CODE, WHICH THE ROOM WAS MISSING (founder, 2026-08-17).
+                  The real DisplayScreen always carries a scanToPledge block —
+                  a 160px BrandedQR over a "Scan to pledge" label — and this
+                  scene drew a display without one, while the section's own
+                  copy promises a code readable from across the room. A room
+                  with no code is a room nobody can pledge from.
+                  The REAL BrandedQR, not a drawn lookalike: its rounded
+                  modules and heart centre are the thing being shown off, and
+                  a hand-drawn grid of squares is exactly the sort of
+                  resemblance that quietly stops being true. */}
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1 space-y-1.5 [&_span]:text-sm">
+                  {LABELS.map((label, i) => (
+                    <RankingBar
+                      key={label}
+                      label={label}
+                      amount={formatPounds(bars[i])}
+                      widthPercent={Math.round((bars[i] / MAX) * 100)}
+                      barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
+                      barStyle={{
+                        transition: reduced ? "none" : "width 700ms ease-out",
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="flex shrink-0 flex-col items-center gap-1">
+                  <BrandedQR
+                    value="https://favpoll.com/p/jess30"
+                    size={76}
+                    colorVar="--qr"
+                    aria-label="Scan to pledge on your phone"
                   />
-                ))}
+                  <p className="text-[10px] font-medium text-qr">
+                    Scan to pledge
+                  </p>
+                </div>
               </div>
             </div>
 

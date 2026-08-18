@@ -124,7 +124,7 @@ export function CheckoutForm({
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       {showEmailCapture && (
-        /* Same bordered-unit grammar as the guest-wall block above — a bare
+        /* Same bordered-unit grammar as the wall block above — a bare
            underline between two bordered cards read as an afterthought, and
            this is the field the receipt and withdrawal link depend on. */
         <div className="rounded-lg border border-border bg-card">

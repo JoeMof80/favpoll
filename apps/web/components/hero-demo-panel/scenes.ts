@@ -161,7 +161,7 @@ export const SCENES: HeroScene[] = [
       name: "Poppy Chen",
       context: "Sweet Sixteen",
       about:
-        "Poppy wants to celebrate with ice cream. She has strong opinions about the best flavour. All proceeds go to St Ormond Street, who took such good care of her little brother.",
+        "Poppy wants to celebrate with ice cream. She has strong opinions about the best flavour. All proceeds go to Great Ormond Street, who took such good care of her little brother.",
       photo_url: "/demo/poppy.jpg",
     },
     poll: {

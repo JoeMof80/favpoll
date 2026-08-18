@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
-import { GuestWall, type GuestWallEntry } from "@/components/guest-wall"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
 import { Vignette } from "@/components/landing/vignette"
 
-// The guest wall, filling as pledges land.
+// The wall of favourites, filling as pledges land.
 //
-// The REAL GuestWall with animate — the rows spring in here exactly as they
+// The REAL WallOfFavourites with animate — the rows spring in here exactly as they
 // do on a favpoll, because it is the same AnimatePresence doing it.
 //
 // One entry is anonymous, on purpose. "Someone" is the anonymity model made
@@ -25,7 +28,7 @@ import { Vignette } from "@/components/landing/vignette"
 const BASE = Date.now()
 const mins = (n: number) => new Date(BASE - n * 60_000).toISOString()
 
-const ENTRIES: GuestWallEntry[] = [
+const ENTRIES: WallEntry[] = [
   { id: "w5", name: "Priya", labels: ["Cockapoo"], created_at: mins(0) },
   { id: "w4", name: null, labels: ["Greyhound"], created_at: mins(4) },
   {
@@ -50,7 +53,7 @@ const ORDER = [...ENTRIES].reverse()
 const STEP_MS = 1500
 const HOLD_MS = 4200
 
-export function GuestWallVignette() {
+export function WallOfFavouritesVignette() {
   const reduced = useReducedMotion()
   const [count, setCount] = useState(reduced ? ORDER.length : 1)
 
@@ -79,7 +82,7 @@ export function GuestWallVignette() {
         {/* w-full: the flex parent would otherwise shrink the card to its
             content, so it would change width as the longest row arrives. */}
         <div className="w-full">
-          <GuestWall
+          <WallOfFavourites
             entries={[...shown].reverse()}
             animate={!reduced}
             maxEntries={ENTRIES.length}

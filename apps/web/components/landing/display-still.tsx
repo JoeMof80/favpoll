@@ -17,11 +17,21 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 //
 // So there is now ONE definition of the display. Whatever changes there
 // changes here, including the parts a reduction would have quietly lost —
-// the goal-free "Raised so far" silhouette, the charity rows, the guest wall,
+// the goal-free "Raised so far" silhouette, the charity rows, the wall of favourites,
 // the two-column banner.
 
-/** Rendered at this width, then scaled by the caller — see the note there. */
-export const DISPLAY_STILL_WIDTH = 900
+/**
+ * Rendered at this width, then scaled by the caller — see the note there.
+ *
+ * 900 -> 1120 (2026-08-18). The display's body only splits into standings +
+ * sidebar at 64rem, so at 900 the still never reached its own two-column form:
+ * it stacked the QR and the wall UNDER the standings and came out portrait,
+ * 900 x 1097, which reads as a tablet rather than a screen on a wall. The
+ * breakpoints are container queries now, so the number that decides this is
+ * this one — the box the still is rendered in — rather than the visitor's
+ * window. 1120 clears 64rem with room for the surround's own padding.
+ */
+export const DISPLAY_STILL_WIDTH = 1120
 
 /**
  * Leaders shown. The real display lists every favourite, including the ones

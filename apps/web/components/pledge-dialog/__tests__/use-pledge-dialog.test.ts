@@ -117,9 +117,13 @@ describe("usePledgeDialog — initial state", () => {
     expect(result.current.draftIds).toEqual([])
   })
 
-  it("canAdvanceStep1 is false with no selections", () => {
+  it("canAdvanceStep1 is true with no selections — picking is optional", () => {
+    // Inverted 2026-08-17. It required a favourite, which left a guest who
+    // could not decide stuck on step 1 behind a dead Next button. Giving
+    // without backing anything is a shape the product already has, and the
+    // pledge lands with a total and no allocations.
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    expect(result.current.canAdvanceStep1).toBe(false)
+    expect(result.current.canAdvanceStep1).toBe(true)
   })
 })
 

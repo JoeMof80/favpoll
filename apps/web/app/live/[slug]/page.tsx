@@ -72,7 +72,7 @@ export default async function LiveDisplayPage({ params }: Props) {
             .range(from, to)
         )
       : Promise.resolve([]),
-    // Initial guest wall (kept live client-side via the wall endpoint). The
+    // Initial wall (kept live client-side via the wall endpoint). The
     // display is a public, organiser-sanctioned surface: backed-labels are
     // shown; anonymity still holds (anonymous → "Someone").
     pollId

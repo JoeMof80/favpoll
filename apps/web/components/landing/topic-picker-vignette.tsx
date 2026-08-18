@@ -58,7 +58,13 @@ const ITEMS = [
   "The allotment feud",
 ]
 // What the organiser never thought of, added by a guest at pledge time.
-const GUEST_ITEM = "The great chip pan fire"
+// KEEP IT HARMLESS (founder, 2026-08-17). This was "The great chip pan fire",
+// which is a house fire — the only item in the set implying danger, and this
+// topic is one a family will plausibly run at a funeral. The other three are
+// mishap, brush with fame and long-running grudge; a fourth in that key has
+// to be small, specific and fond, the kind of thing only someone who was
+// there still remembers.
+const GUEST_ITEM = "The day he won the meat raffle"
 
 // Real canonical topics shown in the picker before the search filters them out.
 const SUGGESTED_TOPICS = ["Colour", "Season", "Song", "Film", "Biscuit"]
@@ -216,15 +222,21 @@ export function TopicPickerVignette() {
   const guestPicked = phase.kind === "guest-adding" || phase.kind === "hold"
   const guestAddPressed = phase.kind === "guest-adding"
 
-  // ONE DIALOG AT A TIME (founder, 2026-08-13). The three used to stack and
-  // fan, which showed a state the app never has — you only ever see one
-  // overlay. Stepping through is truer, and it lets each dialog take the
-  // whole frame instead of 86% of it at a tilt, so the type is legible.
+  // A PROGRESSIVE STACK (founder, 2026-08-17) — completed steps stay on
+  // screen, receding behind the active one.
   //
-  // What the stack conveyed for free was that there ARE three surfaces. The
-  // caption and dots pay that back, and name who is acting, which the stack
-  // never did: the first two are the organiser, the third a guest on a
-  // different day.
+  // This revisits, but does not undo, ONE DIALOG AT A TIME (2026-08-13). That
+  // decision killed a stack which fanned all three dialogs at once, tilted, at
+  // 86% — so nothing was ever full size and the type was unreadable, and it
+  // showed three overlays open together, a state the app never has. Both
+  // faults are gone here: only the FRONT layer is a legible, full-size,
+  // untilted dialog, and the ones behind it are spent steps rather than
+  // simultaneous surfaces — the same thing a card stack means anywhere.
+  //
+  // What stepping alone could not carry is that the three ACCUMULATE: a topic
+  // you made, then favourites in it, then one a guest adds to the same list.
+  // Replacing each frame with the next showed three unrelated dialogs; leaving
+  // the spent ones visible is what makes it one growing thing.
   const step =
     phase.kind === "search" || phase.kind === "create"
       ? 0
@@ -232,16 +244,35 @@ export function TopicPickerVignette() {
         ? 1
         : 2
   const CAPTIONS = [
-    "An organiser writes a question the list has not got",
-    "…and adds the answers",
+    "An organiser writes a topic of their own",
+    "…and fills it with favourites",
     "Later, a guest adds one nobody thought of",
   ]
 
+  // Where a layer sits in the stack. Front (depth 0) is the live dialog:
+  // full size, full opacity, untilted. Each spent step recedes 14px upward,
+  // shrinks 3.5% and dims — enough of its top edge stays proud of the dialog
+  // in front to read as a step you have already done, without competing with
+  // the one being demonstrated.
+  const layer = (index: number) => {
+    const depth = step - index
+    return {
+      animate: {
+        opacity: depth === 0 ? 1 : 0.5,
+        y: -depth * 14,
+        scale: 1 - depth * 0.035,
+      },
+      // Front-most on top, so each new dialog covers the ones it followed.
+      style: { zIndex: 10 - depth, transformOrigin: "top center" as const },
+    }
+  }
+
   return (
     <Vignette>
-      {/* Caption + dots, so a glance says where in the sequence this is and
-          that there are three steps — the one thing the stack gave away for
-          nothing. */}
+      {/* Caption + dots. The stack now shows how far along you are, so these
+          carry the thing it cannot: WHO is acting and WHEN. The first two
+          layers are the organiser in one sitting; the third is a guest, days
+          later, on their own phone. */}
       <div className="mb-4 flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">{CAPTIONS[step]}</p>
         <div className="flex shrink-0 gap-1.5">
@@ -254,49 +285,62 @@ export function TopicPickerVignette() {
         </div>
       </div>
 
-      {/* One dialog, one size, one place. min-h is the tallest step — the
-          items dialog at 224px, with its footer — so the frame holds a single
-          height and the section below never jumps. */}
-      <div className="relative min-h-60">
-        <AnimatePresence initial={false} mode="wait">
-          {step === 0 && (
+      {/* One height for every step, so the section below never jumps: the
+          tallest dialog (items, ~212px with its footer) plus the top-8 the
+          stack is inset by, so two spent layers can recede upward inside the
+          frame instead of clipping against Vignette's overflow-hidden.
+          min-h-72 was tried first and left a dead band under the SHORTEST
+          step, which is the one the section opens on — the frame has to fit
+          the tallest dialog and not a pixel more. */}
+      <div className="relative min-h-64">
+        <AnimatePresence initial={false}>
+          {step >= 0 && (
             <motion.div
               key="topic"
               initial={reduced ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={layer(0).animate}
+              style={layer(0).style}
               exit={reduced ? undefined : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="absolute inset-x-0 top-0 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
             >
-              {/* love-step's picker: a bordered field in a header with a rule
-                  under it, then the topic chips below. */}
+              {/* COPY THE REAL SEARCH BOX, WHICH IS THE WIZARD'S, NOT
+                  LOVE-STEP'S (founder, 2026-08-17 — "the field has a border,
+                  the real version doesn't").
+                  LoveStep does contain a bordered InputGroup, but it renders
+                  only when `externalSearch === undefined`, and the wizard —
+                  the one place LoveStep is used — always passes a search in.
+                  So the field organisers actually see is the OVERLAY HEADER's
+                  bare input (new-favpoll-wizard/index.tsx): flex-1,
+                  bg-transparent, outline-none, no border and no box, with a
+                  variant="secondary" Add beside it. Mocking LoveStep's dead
+                  branch drew a box that exists nowhere in the product.
+                  NOT copied: the Filters row and the "Suggested for <charity>"
+                  strip, which sit between the field and the chips. */}
               <div className="border-b border-border px-5 py-4">
-                <InputGroup className="h-auto rounded-md">
+                <div className="mb-3 flex items-center gap-2">
                   <span
-                    className={`h-auto flex-1 px-3 py-2 text-base ${searchText ? "text-foreground" : "text-muted-foreground/50"}`}
+                    className={`flex-1 text-base ${searchText ? "text-foreground" : "text-muted-foreground/50"}`}
                   >
                     {searchText || "Search topics…"}
                     {searchTyping && <span className="opacity-40">|</span>}
                   </span>
                   {searchAddVisible && (
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        className={
-                          searchAddPressed ? "scale-[0.96] brightness-95" : ""
-                        }
-                      >
-                        Add
-                      </InputGroupButton>
-                    </InputGroupAddon>
+                    <InputGroupButton
+                      variant="secondary"
+                      className={
+                        searchAddPressed ? "scale-[0.96] brightness-95" : ""
+                      }
+                    >
+                      Add
+                    </InputGroupButton>
                   )}
-                  {!searchAddVisible && (
-                    <InputGroupAddon align="block-end" className="pt-0 pb-2">
-                      <span className="text-xs text-muted-foreground">
-                        Is your topic missing? Type it and click {ADD_TOKEN}
-                      </span>
-                    </InputGroupAddon>
-                  )}
-                </InputGroup>
+                </div>
+                {!searchAddVisible && (
+                  <p className="text-xs text-muted-foreground">
+                    Is your topic missing? Type it and click {ADD_TOKEN}
+                  </p>
+                )}
               </div>
               <div className="flex min-h-8 flex-wrap gap-1.5 px-5 py-4">
                 <AnimatePresence initial={false}>
@@ -318,7 +362,7 @@ export function TopicPickerVignette() {
                       key="no-match"
                       initial={reduced ? false : { opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-sm text-muted-foreground/60"
+                      className="w-full py-3 text-center text-sm text-muted-foreground"
                     >
                       No matching topics — add your own.
                     </motion.p>
@@ -328,14 +372,15 @@ export function TopicPickerVignette() {
             </motion.div>
           )}
 
-          {step === 1 && (
+          {step >= 1 && (
             <motion.div
               key="items"
               initial={reduced ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={layer(1).animate}
+              style={layer(1).style}
               exit={reduced ? undefined : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="absolute inset-x-0 top-0 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
             >
               {/* TopicItemsDialog's three bands: header (title + field), body
                   (the chips), and a footer with Cancel / Done behind a rule —
@@ -399,14 +444,15 @@ export function TopicPickerVignette() {
             </motion.div>
           )}
 
-          {step === 2 && (
+          {step >= 2 && (
             <motion.div
               key="guest"
               initial={reduced ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={layer(2).animate}
+              style={layer(2).style}
               exit={reduced ? undefined : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="absolute inset-x-0 top-0 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
             >
               {/* PickerHeader's own shape: a block-start addon carrying the
                   eyebrow, then a wrapping row of chips and the field. */}
