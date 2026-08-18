@@ -142,28 +142,47 @@ describe("ProcessOverview", () => {
     expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
   })
 
-  it("lets every mobile medium be opened in place", async () => {
-    // TOGGLE, NOT AN OVERLAY (founder, 2026-08-18). A fullscreen viewer was
-    // built first, for the phone alone, on the reasoning that the two
-    // documents gain nothing from a dialog that opens them at the size they
-    // already are. That was right about the dialog and wrong about the
-    // scope: expanding IN PLACE can pan, and panning is the only thing that
-    // ever makes a 1123px sheet readable on a 390px screen.
+  it("gives a toggle to the PORTRAIT media only", async () => {
+    // Founder, 2026-08-18: "there's no need for the live screen to expand if
+    // it is already full width, so make it full width. Likewise for the QR
+    // code stationery."
     //
-    // So all seven wells toggle. Asserted as seven rather than four so that
-    // dropping one back to inert is a decision someone has to make here.
+    // The rule that falls out of it: a control that grows something already
+    // filling its column does nothing worth doing. The card and the display
+    // are landscape and fill the width at a size their own copy survives. The
+    // phone and the keepsake are portrait, so filling would cost 717 and 483px
+    // of scroll apiece — they stay thumbnails and open on a tap.
+    //
+    // Asserted both ways. Four phones plus the keepsake is five, and the two
+    // landscape media must have NO button: a stray toggle on them would be the
+    // thing this beat was corrected for twice.
     render(<ProcessOverview />)
+
     const triggers = screen.getAllByRole("button", {
       name: /see this larger/i,
     })
-    expect(triggers).toHaveLength(7)
+    expect(triggers).toHaveLength(5)
+    expect(
+      triggers.map((b) => b.getAttribute("aria-label")?.split(" — ")[0])
+    ).toEqual([
+      t("landing.how.arrive.label"),
+      t("landing.how.pick.label"),
+      t("landing.how.pledge.label"),
+      t("landing.how.reveal.label"),
+      t("landing.how.keepsake.label"),
+    ])
 
-    // The name carries the beat, not just "enlarge" — seven identical buttons
-    // is what a screen reader would otherwise announce.
-    expect(triggers[0]).toHaveAccessibleName(
-      new RegExp(t("landing.how.card.label"), "i")
-    )
-    triggers.forEach((b) => expect(b).toHaveAttribute("aria-expanded", "false"))
+    for (const label of [
+      t("landing.how.card.label"),
+      t("landing.how.room.label"),
+    ]) {
+      expect(
+        screen.queryByRole("button", {
+          name: new RegExp(`${label}.*see this larger`, "i"),
+        }),
+        `${label} is full width already and must not offer a toggle`
+      ).toBeNull()
+    }
   })
 
   it("expands one medium at a time", async () => {
