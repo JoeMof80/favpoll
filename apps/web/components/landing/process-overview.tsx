@@ -479,18 +479,24 @@ function MobileWell({
               one thing a control announcing an interaction cannot be. Full
               opacity, a shadow to lift it off whatever it sits on, and the
               same treatment whatever is behind it.
+              ICON ONLY (founder, 2026-08-18). The words were doing the work of
+              an affordance on four phones and a sheet — five captions of
+              instruction on a section that has been called an instruction
+              manual once already. The glyph is the convention and it carries
+              on its own. Nothing is lost to a screen reader: the button's
+              aria-label was always the whole name, because the media it sits
+              on are aria-hidden.
               AT THE TOP (founder, same day). Bottom-anchored it sat on the
               foot of the sheet and the charity row of the phone — the parts
               carrying each one's closing line — and on an expanded medium
               taller than the screen you had to scroll past the whole thing to
               find the way back. sticky keeps it in reach either way. */}
-          <span className="sticky top-0 flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-semibold text-background shadow-lg">
+          <span className="sticky top-0 flex size-9 items-center justify-center rounded-full bg-foreground text-background shadow-lg">
             {expanded ? (
-              <Minimize2 className="size-3.5" />
+              <Minimize2 className="size-4" />
             ) : (
-              <Maximize2 className="size-3.5" />
+              <Maximize2 className="size-4" />
             )}
-            {expanded ? "Tap to shrink" : "Tap to enlarge"}
           </span>
         </button>
       )}
