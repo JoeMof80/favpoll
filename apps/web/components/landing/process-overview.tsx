@@ -128,8 +128,13 @@ const BEATS: Beat[] = [
 // ~273 / ~376 / ~478 px at md / lg / xl, and the phone is the tallest, so it
 // sets the well height at each stop.
 const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
-const PHONE_SCALE =
-  "scale-[0.64] min-[380px]:scale-[0.80] md:scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
+// NOT scaled to fill the mobile column, unlike the three below (founder,
+// 2026-08-18: "broken but also ridiculous"). Filling it means 0.80, which is a
+// 331 x 694 phone — and there are FOUR of them, so the section went from 4.6
+// screens to 5.9 and read as a stack of giant handsets. The other three media
+// are landscape or small and cost 40-50px each to enlarge; the phone costs 243
+// each. It stays a thumbnail here, and its detail belongs behind a tap.
+const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
 const CARD_SCALE =
   "scale-[0.80] min-[380px]:scale-100 md:scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // Down from the browser-framed version: the TV bezel adds 20px each way
@@ -177,7 +182,7 @@ const DISPLAY_SCALE =
 // constant with nothing checking it goes stale in exactly this silent way, so
 // the mobile spec now asserts every medium fits inside its own well.
 const MOBILE_WELL: Record<Medium["kind"], string> = {
-  phone: "h-[556px] min-[380px]:h-[695px]",
+  phone: "h-[451px]",
   card: "h-[176px] min-[380px]:h-[220px]",
   // Both LANDSCAPE since 2026-08-18, so both cost a fraction of the height
   // they did: the display renders 1160 x 697 at 0.23 (160 tall, was 340) and
