@@ -256,19 +256,25 @@ export function LandingHero({
                 className="h-11 px-6 text-base"
               >
                 <Link href="/favpolls/new">
-                  {ctaLabel ?? t("landing.cta.primary")}
+                  {ctaLabel ?? t("landing.cta.primaryFree")}
                 </Link>
               </Button>
-              {/* BESIDE the button, never beneath it (measured 2026-08-06,
-                  re-measured 2026-08-18 now that a second CTA exists). Below
-                  it the extra line costs ~16px, the LEFT column is what sets
-                  the hero's height, and the hero is 801px at 1280x800 — which
-                  #524 worked to make fit exactly. Inside the row it sits
-                  within the button's own 44px and costs nothing anywhere.
-                  "Free to create" only: the 100% is the stat tile 335px below
-                  in this same band, and the short form is also the only one
-                  that does not wrap at 390. */}
-              <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
+              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT (founder, 2026-08-18).
+                  Home's button now says "always free" itself, so a caption
+                  beside it would state the same fact twice in one row. The
+                  register pages keep it: their labels are already 28
+                  characters ("Create a celebration favpoll") and appending the
+                  promise makes 41, which is no longer a button.
+
+                  It stays BESIDE, never beneath (measured 2026-08-06,
+                  re-measured 08-18). Below costs ~16px, the LEFT column sets
+                  the hero's height, and the hero is already 1px past the fold
+                  at 1280x800 — which is the fit #524 worked for. "Free to
+                  create" only: the short form is the one that doesn't wrap at
+                  390. */}
+              {ctaLabel && (
+                <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
+              )}
             </div>
             {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
                 favpoll" names an invented noun, so on home it asks a
@@ -281,13 +287,19 @@ export function LandingHero({
                 cta.secondary and their own demo, so they are unchanged.
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
-                quieter of the two without vanishing when the theme flips. */}
+                quieter of the two without vanishing when the theme flips.
+                A HAIRLINE ring, not a 1px one (founder, 2026-08-18). At 1px
+                the two CTAs read as two pill buttons of equal weight and
+                competed; the style guide's ghost is a 0.5px border, and this
+                was simply heavier than the spec. Opacity goes up as the line
+                gets thinner (30 -> 45) so it holds its edge rather than
+                fading out with its own width. */}
             {router && (
               <Button
                 asChild
                 size="lg"
                 variant="ghost"
-                className="h-11 px-6 text-base text-primary-foreground ring-1 ring-primary-foreground/30 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="h-11 px-6 text-base text-primary-foreground ring-[0.5px] ring-primary-foreground/45 hover:bg-primary-foreground/10 hover:text-primary-foreground"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
