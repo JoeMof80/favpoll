@@ -50,9 +50,19 @@ vi.mock("@/components/hero-demo-panel/tv-frame", () => ({
   ),
 }))
 
-vi.mock("@/components/landing/display-still", () => ({
-  DisplayStill: () => <div data-testid="display-still" />,
-}))
+// Keep the real module: it also exports the width the still is RENDERED at,
+// which the section reads to size the box around it. A bare stub made that
+// undefined and the display box collapsed — the same trap phone-frame's mock
+// hit above.
+vi.mock("@/components/landing/display-still", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/components/landing/display-still")
+  >("@/components/landing/display-still")
+  return {
+    ...actual,
+    DisplayStill: () => <div data-testid="display-still" />,
+  }
+})
 
 vi.mock("@/components/print-pack/pack-card", async () => {
   const actual = await vi.importActual<
@@ -90,11 +100,6 @@ describe("ProcessOverview", () => {
   })
 
   it("frames each beat as the object it actually is", () => {
-    // DESKTOP, because that is where all seven media still render. Mobile
-    // carries four of them since 2026-08-18 (see MOBILE_MEDIA) and this test
-    // is about which FRAME belongs to which beat, not about how many a phone
-    // is shown — an unmocked render is the mobile branch, so it has to say so.
-    stubViewport(true)
     render(<ProcessOverview />)
 
     // Four phone beats — the guest arc, and only the guest arc.
@@ -111,33 +116,15 @@ describe("ProcessOverview", () => {
     )
   })
 
-  it("shows mobile the beats where the medium changes, not four phones in a row", () => {
-    // TWO CORRECTIONS, a day apart, and the second walks back part of the
-    // first without undoing it.
-    //
-    // 2026-08-17: a phone got six texts and ONE trailing phone frame, so both
-    // ends of the arc — the printed card a guest scans, the display in the
-    // room — were desktop-only. Every beat got its own medium.
-    //
-    // 2026-08-18: that made the section 4113px on a 390px phone, 41% of the
-    // homepage, of which beats 2-5 were four consecutive identical iPhone
-    // chassis (1804px). Long-winded, and it read as a manual. So mobile keeps
-    // the beats where the MEDIUM ITSELF changes — paper → phone → room →
-    // paper — and drops the three repeated phone stills.
-    //
-    // What the first fix was actually for survives intact, and that is what
-    // these first two assertions guard: the card and the display are still on
-    // the device most visitors hold.
+  it("gives every beat its own medium on mobile, not one still at the end", () => {
+    // The whole point of the 2026-08-17 mobile fix: a phone used to get six
+    // texts and a single trailing phone frame, so the two ends of the arc —
+    // the printed card a guest scans and the display in the room — were
+    // desktop-only. Each beat's medium now sits under its own text.
     render(<ProcessOverview />)
     expect(screen.getByTestId("pack-card")).toBeInTheDocument()
     expect(screen.getByTestId("tv-frame")).toBeInTheDocument()
-
-    // One phone, not four — and specifically the ARRIVING one, the state a
-    // guest actually lands in. Asserting the phase rather than the count is
-    // what stops this passing on any single arbitrary still.
-    const phones = screen.getAllByTestId("demo-card")
-    expect(phones).toHaveLength(1)
-    expect(phones[0].dataset.phase).toBe("arriving")
+    expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
   })
 
   it("pins the six media in the sticky column on desktop", () => {
