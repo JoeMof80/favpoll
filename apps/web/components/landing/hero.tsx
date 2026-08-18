@@ -235,19 +235,41 @@ export function LandingHero({
           >
             {subheader ?? t("landing.subheader")}
           </p>
-          <div className="flex flex-wrap items-center gap-3.5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —
                 poster-scale, not form-scale (founder call, 2026-07-28) */}
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="h-11 px-6 text-base"
-            >
-              <Link href="/favpolls/new">
-                {ctaLabel ?? t("landing.cta.primary")}
-              </Link>
-            </Button>
+            {/* The caption is GROUPED with the primary, not trailing the row
+                (founder, 2026-08-18: "the free to create label is in the wrong
+                place now"). It was written when the hero had one button and it
+                simply followed it; the second CTA landed between them, so
+                "Free to create" ended up reading as a note about SEEING HOW IT
+                WORKS — which is not a thing anyone creates. Proximity is the
+                whole fix: a tighter gap inside the pair than the row's own
+                gap, so the eye binds it to the button it describes. 8px
+                inside against 20px between: at 10 against 14 the pair did not
+                read as a pair, it read as three things evenly spaced. */}
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                size="lg"
+                variant="secondary"
+                className="h-11 px-6 text-base"
+              >
+                <Link href="/favpolls/new">
+                  {ctaLabel ?? t("landing.cta.primary")}
+                </Link>
+              </Button>
+              {/* BESIDE the button, never beneath it (measured 2026-08-06,
+                  re-measured 2026-08-18 now that a second CTA exists). Below
+                  it the extra line costs ~16px, the LEFT column is what sets
+                  the hero's height, and the hero is 801px at 1280x800 — which
+                  #524 worked to make fit exactly. Inside the row it sits
+                  within the button's own 44px and costs nothing anywhere.
+                  "Free to create" only: the 100% is the stat tile 335px below
+                  in this same band, and the short form is also the only one
+                  that does not wrap at 390. */}
+              <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
+            </div>
             {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
                 favpoll" names an invented noun, so on home it asks a
                 first-time visitor to make a thing nothing has yet defined —
@@ -278,14 +300,6 @@ export function LandingHero({
                 </Link>
               </Button>
             )}
-            {/* BESIDE the button, not beneath it (measured 2026-08-06): below
-                it, the extra line costs 16px and tips 1280x800 — which #524
-                worked to make fit exactly — over the fold. Inside the row it
-                sits within the button's own 44px and costs nothing at any
-                viewport. "Free to create" only: the 100% is already the stat
-                tile 335px below in this same band, and the short form is also
-                the only one that doesn't wrap at 390. */}
-            <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
           </div>
         </div>
 
