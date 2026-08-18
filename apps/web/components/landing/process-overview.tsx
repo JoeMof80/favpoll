@@ -145,6 +145,23 @@ const DISPLAY_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.50]"
 // wraps and grows taller than the well, and it spills over the beats either
 // side. That is what broke Watch it live on mobile: a 940-wide TV crushed into
 // a phone's width, rendering ~680px tall inside a 184px well.
+//
+// WIDTH IS THE OTHER HALF, and it was missing (2026-08-18). The unscaled box
+// is as wide as it is tall — phone 414, keepsake 794, TV 940 — and while it
+// sat in normal flow it set the text column's MIN-CONTENT width. A grid item
+// cannot shrink below that, so the column took the widest thing max-w-lg would
+// allow, 512px, inside a 342px track: every beat's text then wrapped at 512
+// and ran 146px past the right edge, where the section's overflow-x-clip cut
+// it off mid-word rather than scrolling. Measured at 390px: text column 512,
+// body right edge 536, grid scrollWidth 726 against a 342 track.
+//
+// So the medium is ABSOLUTELY POSITIONED in the well now. Out of flow, it
+// contributes no width at all, and the well is free to be w-full. Centring is
+// left-1/2 with -translate-x-1/2: the translate resolves against the medium's
+// own unscaled width and the scale runs about its centre, so both land on the
+// same point and the scaled object sits centred. No per-medium width constants
+// — the visual widths (card ~251, phone ~215, display ~263, keepsake ~270)
+// would have to be re-derived every time a scale changed.
 const MOBILE_WELL: Record<Medium["kind"], string> = {
   phone: "h-[451px]",
   card: "h-[176px]",
@@ -384,6 +401,7 @@ export function ProcessOverview() {
             {BEATS.map((beat, i) => (
               <div
                 key={beat.key}
+                data-beat={beat.key}
                 ref={(node) => {
                   blockRefs.current[i] = node
                 }}
@@ -413,16 +431,22 @@ export function ProcessOverview() {
                     carries the instructions was never seen on the device most
                     visitors are holding. Same six media the desktop column
                     pins; no extra components mounted. */}
-                <div className="mt-6 flex justify-center md:hidden">
+                <div className="mt-6 md:hidden">
                   {mounted && !isDesktop && (
                     <div
                       aria-hidden="true"
+                      data-beat-well=""
                       className={cn(
-                        "pointer-events-none flex items-center justify-center select-none",
+                        "pointer-events-none relative w-full select-none",
                         MOBILE_WELL[beat.medium.kind]
                       )}
                     >
-                      <BeatMedium medium={beat.medium} />
+                      <div
+                        data-beat-media=""
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                      >
+                        <BeatMedium medium={beat.medium} />
+                      </div>
                     </div>
                   )}
                 </div>
