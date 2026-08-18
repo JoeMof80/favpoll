@@ -142,52 +142,63 @@ describe("ProcessOverview", () => {
     expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
   })
 
-  it("offers a full-size view of the PHONE beats only, on mobile", async () => {
-    // Founder, 2026-08-18. The phone is the one medium a viewer genuinely
-    // helps: its screen is 390 wide, so a 390px viewport shows it at ~1:1,
-    // where the thumbnail's copy sits at 7.3px. Making it legible IN PLACE
-    // was tried and cost 243px per beat across four beats — "broken but also
-    // ridiculous". A tap costs nothing.
+  it("lets every mobile medium be opened in place", async () => {
+    // TOGGLE, NOT AN OVERLAY (founder, 2026-08-18). A fullscreen viewer was
+    // built first, for the phone alone, on the reasoning that the two
+    // documents gain nothing from a dialog that opens them at the size they
+    // already are. That was right about the dialog and wrong about the
+    // scope: expanding IN PLACE can pan, and panning is the only thing that
+    // ever makes a 1123px sheet readable on a 390px screen.
     //
-    // The card is already life-size and the two documents are 1120+ wide, so
-    // a viewer would open them at the size they already are. They stay inert,
-    // and that is asserted rather than assumed: a trigger on all seven would
-    // be four buttons that do nothing useful.
+    // So all seven wells toggle. Asserted as seven rather than four so that
+    // dropping one back to inert is a decision someone has to make here.
     render(<ProcessOverview />)
-
     const triggers = screen.getAllByRole("button", {
-      name: /see this screen full size/i,
+      name: /see this larger/i,
     })
-    expect(triggers).toHaveLength(4)
+    expect(triggers).toHaveLength(7)
 
-    // The name has to carry the beat, not just "enlarge" — four identical
-    // buttons in a list is what a screen reader would otherwise announce.
+    // The name carries the beat, not just "enlarge" — seven identical buttons
+    // is what a screen reader would otherwise announce.
     expect(triggers[0]).toHaveAccessibleName(
-      new RegExp(t("landing.how.arrive.label"), "i")
+      new RegExp(t("landing.how.card.label"), "i")
     )
+    triggers.forEach((b) => expect(b).toHaveAttribute("aria-expanded", "false"))
   })
 
-  it("opens the viewer on the beat that was tapped", async () => {
+  it("expands one medium at a time", async () => {
+    // One at a time is the whole point of collapsing: the section is 4.8
+    // screens closed and would be past 6 with every phone open, which is the
+    // state that was rejected as ridiculous.
     const user = userEvent.setup()
     render(<ProcessOverview />)
 
-    // The third phone beat, so a passing test cannot be the first one by
-    // accident — the viewer takes a beat as a prop and could easily always
-    // render the same one.
-    const triggers = screen.getAllByRole("button", {
-      name: /see this screen full size/i,
-    })
-    await user.click(triggers[2])
+    const open = () => screen.queryAllByRole("button", { name: /show less/i })
+    // BY NAME, never by index. An expanded trigger renames itself to "show
+    // less", so it leaves the /see this larger/ list and every position after
+    // it shifts — an index-based second click lands on the wrong beat and the
+    // test still passes for the wrong reason. (It did, once.)
+    const trigger = (label: string) =>
+      screen.getByRole("button", {
+        name: new RegExp(`${label}.*see this larger`, "i"),
+      })
 
-    const dialog = await screen.findByRole("dialog")
-    // Its own words travel with it: a reader who taps in from step 4 should
-    // not have to close the viewer to know which step they are looking at.
-    expect(
-      within(dialog).getByText(t("landing.how.pledge.label"))
-    ).toBeInTheDocument()
-    expect(within(dialog).getByTestId("demo-card").dataset.phase).toBe(
-      "amount-picked"
+    await user.click(trigger(t("landing.how.arrive.label")))
+    expect(open()).toHaveLength(1)
+    expect(open()[0]).toHaveAccessibleName(
+      new RegExp(t("landing.how.arrive.label"), "i")
     )
+
+    // A second beat replaces the first rather than joining it.
+    await user.click(trigger(t("landing.how.pick.label")))
+    expect(open()).toHaveLength(1)
+    expect(open()[0]).toHaveAccessibleName(
+      new RegExp(t("landing.how.pick.label"), "i")
+    )
+
+    // And tapping the open one closes it.
+    await user.click(open()[0])
+    expect(open()).toHaveLength(0)
   })
 
   it("scopes the wallet card to .paper so dark mode cannot blank it", () => {

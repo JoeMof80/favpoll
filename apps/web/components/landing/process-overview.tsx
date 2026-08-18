@@ -21,8 +21,7 @@
 // something they do.
 
 import { useEffect, useRef, useState } from "react"
-import { Maximize2 } from "lucide-react"
-import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import { Maximize2, Minimize2 } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -141,62 +140,62 @@ const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
 // are landscape or small and cost 40-50px each to enlarge; the phone costs 243
 // each. It stays a thumbnail here, and its detail belongs behind a tap.
 const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
-const CARD_SCALE =
-  "scale-[0.80] min-[380px]:scale-100 md:scale-[0.75] lg:scale-100 xl:scale-[1.15]"
+const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // Down from the browser-framed version: the TV bezel adds 20px each way
 // (940 overall), and at xl the old 0.53 already sat within a pixel of the
 // column's width.
-const DISPLAY_SCALE =
-  "scale-[0.23] min-[380px]:scale-[0.29] md:scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
+const DISPLAY_SCALE = "scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
 
-// MOBILE WELLS (2026-08-17). A transform-scaled element keeps its UNSCALED
-// layout box, which is why every medium needs a fixed well to sit in rather
-// than being allowed to size itself. These are the base scales above applied
-// to each object's real size: phone 868 x 0.52, card 204 x 0.75, display
-// 580 x 0.28, rounded up for the drop shadow and the card's 2° tilt.
+// MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
-// They only hold because EVERY medium is shrink-0 (see BeatMedium). The wells
-// are row-direction flex boxes and each medium carries an explicit width — the
-// phone its chassis, the display a w-[900px] child, the keepsake its A4 page —
-// so without it flex squeezes the box narrower than its content, the content
-// wraps and grows taller than the well, and it spills over the beats either
-// side. That is what broke Watch it live on mobile: a 940-wide TV crushed into
-// a phone's width, rendering ~680px tall inside a 184px well.
+// Every mobile size in this section used to be a hand-derived constant: a
+// well height per medium, and a scale per breakpoint. Three separate bugs in
+// one night came from those going stale — the TV reserved 184px and rendered
+// 340; the keepsake and display wells were 90 and 100px too tall the moment
+// their shapes changed; and the mobile scales turned out to have been sized
+// for the DESKTOP column all along, 273px against the 342 they were in.
 //
-// WIDTH IS THE OTHER HALF, and it was missing (2026-08-18). The unscaled box
-// is as wide as it is tall — phone 414, keepsake 794, TV 940 — and while it
-// sat in normal flow it set the text column's MIN-CONTENT width. A grid item
-// cannot shrink below that, so the column took the widest thing max-w-lg would
-// allow, 512px, inside a 342px track: every beat's text then wrapped at 512
-// and ran 146px past the right edge, where the section's overflow-x-clip cut
-// it off mid-word rather than scrolling. Measured at 390px: text column 512,
-// body right edge 536, grid scrollWidth 726 against a 342 track.
+// So the mobile path now measures the column it is actually in and derives
+// everything from it. There is nothing left to drift: collapsed always fills
+// the column exactly, and the well is always the height the medium actually
+// renders at.
 //
-// So the medium is ABSOLUTELY POSITIONED in the well now. Out of flow, it
-// contributes no width at all, and the well is free to be w-full. Centring is
-// left-1/2 with -translate-x-1/2: the translate resolves against the medium's
-// own unscaled width and the scale runs about its centre, so both land on the
-// same point and the scaled object sits centred. No per-medium width constants
-// — the visual widths (card ~251, phone ~215, display ~263, keepsake ~270)
-// would have to be re-derived every time a scale changed.
-// display was h-[184px] and the TV rendered 340 (2026-08-18) — 78px spilling
-// out of each end of the well and landing on the beat above and the heading
-// below. The 184 came from the note above: 580 unscaled x 0.28. But the still
-// is not 580 tall any more and has not been for some time — it is content-
-// sized on purpose ("No crop", see BeatMedium), and it has since gained the
-// goal bar, the charity row, six ranking rows, the QR and the wall. A derived
-// constant with nothing checking it goes stale in exactly this silent way, so
-// the mobile spec now asserts every medium fits inside its own well.
-const MOBILE_WELL: Record<Medium["kind"], string> = {
-  phone: "h-[451px]",
-  card: "h-[176px] min-[380px]:h-[220px]",
-  // Both LANDSCAPE since 2026-08-18, so both cost a fraction of the height
-  // they did: the display renders 1160 x 697 at 0.23 (160 tall, was 340) and
-  // the keepsake 1123 x 794 at 0.24 (191, was 390). Measured, not derived —
-  // the mobile spec asserts the medium fits its well, and these were 90 and
-  // 100px too tall when the shapes changed under them.
-  display: "h-[168px] min-[380px]:h-[210px]",
-  keepsake: "h-[200px] min-[380px]:h-[248px]",
+// Each medium's natural (unscaled) size, which IS fixed — these are real
+// objects at real dimensions, not layout choices:
+//   card     — 85.6 x 54mm at 96dpi, plus the 2° tilt's bounding box
+//   phone    — the chassis around a 390 x 844 guest viewport
+//   display  — the still's render width plus 20px of TV bezel each side
+//   keepsake — A4 landscape at 96dpi
+const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
+  card: { w: 332, h: 215 },
+  phone: { w: PHONE_CHASSIS_WIDTH, h: PHONE_CHASSIS_HEIGHT },
+  display: { w: DISPLAY_STILL_WIDTH + 40, h: 697 },
+  keepsake: { w: 1123, h: 794 },
+}
+
+// EXPANDED: the scale at which each medium's own body copy becomes readable,
+// which is roughly 11px of rendered type. Collapsed is whatever fills the
+// column, so for the phone this is a 1.5x jump and for the two documents it
+// is more than double — which is why they have to pan.
+//
+// The founder asked for one interaction across all four (2026-08-18), and
+// this is what makes that honest rather than decorative: the display and the
+// keepsake already fill 98% of the column collapsed, so "expand" could only
+// have added 13% before hitting the screen edge. Their copy would still have
+// been 4px. Panning is the only thing that actually opens them.
+// COLLAPSED is fill-the-column for everything EXCEPT the phone. The phone is
+// portrait and there are four of them, so filling costs 717px each and takes
+// the section past 6 screens — the state the founder called ridiculous. It
+// stays the thumbnail it was, and the tap is what it is for.
+const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
+  phone: 0.52,
+}
+
+const EXPANDED_SCALE: Record<Medium["kind"], number> = {
+  card: 1.5, // the card's smallest print — the shared-fund line — is ~7px
+  phone: 0.8,
+  display: 0.7,
+  keepsake: 0.7,
 }
 
 // A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
@@ -218,8 +217,7 @@ const A4_LANDSCAPE = { w: 1123, h: 794 }
 // Width ~270 / ~373 / ~453 against a ~273 / ~376 / ~478px column; the xl step
 // is held at 0.57 rather than 0.60 so the 1123 of height stays inside the
 // 651px well rather than overflowing it by 23px.
-const KEEPSAKE_SCALE =
-  "scale-[0.24] min-[380px]:scale-[0.30] md:scale-[0.24] lg:scale-[0.33] xl:scale-[0.42]"
+const KEEPSAKE_SCALE = "scale-[0.24] lg:scale-[0.33] xl:scale-[0.42]"
 
 // WEIGHT, NOT CHROME (founder, 2026-08-17). This was drawn as a miniature of
 // the real button, copying the ADD_TOKEN trick from love-step and the topic
@@ -249,7 +247,18 @@ function withNextToken(body: string) {
   )
 }
 
-function BeatMedium({ medium }: { medium: Medium }) {
+function BeatMedium({
+  medium,
+  bare = false,
+}: {
+  medium: Medium
+  /**
+   * Drop the per-breakpoint scale classes. The mobile path measures its
+   * column and supplies a scale numerically, so the class-based ones would
+   * compound with it and shrink everything twice.
+   */
+  bare?: boolean
+}) {
   if (medium.kind === "card") {
     return (
       // .paper pins the light token values, exactly as the print pack does.
@@ -264,7 +273,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
       <div
         className={cn(
           "paper paper-screen shrink-0 drop-shadow-xl",
-          CARD_SCALE,
+          !bare && CARD_SCALE,
           "-rotate-2"
         )}
       >
@@ -288,7 +297,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
       <div
         className={cn(
           "paper paper-screen shrink-0 drop-shadow-xl",
-          KEEPSAKE_SCALE
+          !bare && KEEPSAKE_SCALE
         )}
         style={{ width: A4_LANDSCAPE.w, height: A4_LANDSCAPE.h }}
       >
@@ -302,7 +311,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
   }
   if (medium.kind === "display") {
     return (
-      <div className={cn("shrink-0", DISPLAY_SCALE)}>
+      <div className={cn("shrink-0", !bare && DISPLAY_SCALE)}>
         <TvFrame>
           {/* No crop: the still shows its leaders and ends where they do — a
               fixed height cut the last bar in half and read as a broken
@@ -315,7 +324,7 @@ function BeatMedium({ medium }: { medium: Medium }) {
     )
   }
   return (
-    <div className={cn("shrink-0", PHONE_SCALE)}>
+    <div className={cn("shrink-0", !bare && PHONE_SCALE)}>
       <PhoneFrame>
         <DemoCard
           scene={SCENE}
@@ -338,121 +347,116 @@ function BeatMedium({ medium }: { medium: Medium }) {
 // enlarge" set beneath each of four phones would be four more lines of
 // instruction on a section that was called an instruction manual once
 // already. The chip sits on the object it acts on and says the same thing.
-function MobileWell({ beat, onOpen }: { beat: Beat; onOpen?: () => void }) {
-  return (
-    <div
-      data-beat-well=""
-      className={cn("relative w-full", MOBILE_WELL[beat.medium.kind])}
-    >
-      <div
-        aria-hidden="true"
-        data-beat-media=""
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
-      >
-        <BeatMedium medium={beat.medium} />
-      </div>
-
-      {/* The trigger is a SIBLING laid over the medium, never a wrapper around
-          it. The phone still renders the real DemoCard, which has its own
-          buttons — "Pledge your favourite" among them — and a <button> inside
-          a <button> is invalid HTML that React reports as a hydration error.
-          The medium is pointer-events-none, so every tap lands here. */}
-      {onOpen && (
-        <button
-          type="button"
-          onClick={onOpen}
-          // The media are aria-hidden decoration everywhere else in this
-          // section, so this carries the whole accessible name — the beat's
-          // label plus what tapping does, since "Read the instructions" alone
-          // does not say that anything opens.
-          aria-label={`${beat.label} — see this screen full size`}
-          className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        >
-          <span className="flex items-center gap-1.5 rounded-full bg-foreground/75 px-3 py-1.5 text-xs font-medium text-background backdrop-blur-sm">
-            <Maximize2 className="size-3.5" />
-            Tap to enlarge
-          </span>
-        </button>
-      )}
-    </div>
-  )
-}
-
-// TAP TO ENLARGE, phone beats only (founder, 2026-08-18).
+// The mobile medium: fills its column, and opens on a tap.
 //
-// The founder proposed this two turns before it was built and I argued
-// against it, on the grounds that "fullscreen" is not full size on a phone:
-// a 1123px keepsake fitted to a 390px screen lands at the same 0.30 it is
-// already at, so a viewer would show the same unreadable thing slightly
-// larger. That reasoning is sound for the two DOCUMENTS and wrong for the
-// phone, which is the case that mattered — a phone screen is 390 wide, so a
-// 390px viewport shows it at essentially 1:1.
+// TOGGLE IN PLACE, not a dialog (founder, 2026-08-18: "it would be better to
+// just toggle expanding the image when it is clicked"). A fullscreen overlay
+// was built first and this is better — no focus trap, no scroll lock, no
+// second surface, and the beat's text stays on screen beside the thing it
+// describes, which was the one thing the overlay had to re-render to keep.
 //
-// The alternative was making it legible in place, which was tried: filling
-// the column means 0.80, a 331 x 694 handset, four of them, and the section
-// went to 5.9 screens. "Broken but also ridiculous." A tap buys the same
-// legibility for no height at all.
-//
-// So: the phone only. The card is already life-size, and the display and the
-// keepsake gain nothing without pinch-zoom, which is a different piece of
-// work — a viewer that opens them at the size they already are would be
-// chrome pretending to be a feature.
-const VIEWER_SCALE = 0.94 // 414 chassis -> 389, inside a 390 viewport
-
-function PhoneViewer({
+// The scale is MEASURED off the column rather than tuned per breakpoint: see
+// NATURAL. Collapsed fills the column exactly at any width, so the same code
+// serves a 320px phone and a 430px one with nothing to keep in sync.
+function MobileWell({
   beat,
-  open,
-  onOpenChange,
+  expanded,
+  onToggle,
 }: {
   beat: Beat
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  expanded: boolean
+  onToggle: () => void
 }) {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [columnWidth, setColumnWidth] = useState(0)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    const update = () => setColumnWidth(node.getBoundingClientRect().width)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(node)
+    return () => ro.disconnect()
+  }, [])
+
+  const natural = NATURAL[beat.medium.kind]
+  const fit = columnWidth ? columnWidth / natural.w : 0
+  const cap = COLLAPSED_CAP[beat.medium.kind]
+  const collapsed = cap ? Math.min(fit, cap) : fit
+  // Never SHRINK on expand: the card and the two documents already fill the
+  // column collapsed, and a toggle that made something smaller would be absurd.
+  const scale = expanded
+    ? Math.max(fit, EXPANDED_SCALE[beat.medium.kind])
+    : collapsed
+  const width = natural.w * scale
+  const height = natural.h * scale
+  const pans = width > columnWidth + 1
+
   return (
-    <ResponsiveOverlay
-      open={open}
-      onOpenChange={onOpenChange}
-      title={beat.label}
-      description={beat.body}
-      fullscreenOnMobile
-      bodyClassName="p-0"
-      mobileBack={{ label: "Close", onClick: () => onOpenChange(false) }}
-    >
-      <div className="flex flex-col items-center gap-6 px-4 pb-8">
-        {/* The screen at 1:1, which is the entire point — the same object the
-            thumbnail shows, at the size it was designed for. */}
+    <div ref={ref} data-beat-well="" className="relative w-full">
+      {/* The scroller is the crop. It is only scrollable when the medium is
+          genuinely wider than the column — otherwise a stray horizontal drag
+          on a page that does not scroll sideways feels broken. */}
+      <div
+        data-beat-scroller=""
+        className={cn(
+          "w-full",
+          pans ? "overflow-x-auto" : "overflow-hidden",
+          // A transform does not change the layout box, so the height is
+          // reserved explicitly. This is the whole class of bug that the old
+          // hand-tuned well heights kept reintroducing.
+          "transition-[height] duration-300"
+        )}
+        style={{ height: height || undefined }}
+      >
         <div
-          style={{
-            width: PHONE_CHASSIS_WIDTH * VIEWER_SCALE,
-            height: PHONE_CHASSIS_HEIGHT * VIEWER_SCALE,
-          }}
+          aria-hidden="true"
+          data-beat-media=""
+          className="pointer-events-none mx-auto select-none"
+          style={{ width: width || undefined, height: height || undefined }}
         >
           <div
             className="origin-top-left"
-            style={{ transform: `scale(${VIEWER_SCALE})` }}
+            style={{ transform: scale ? `scale(${scale})` : undefined }}
           >
-            <PhoneFrame>
-              <DemoCard
-                scene={SCENE}
-                phase={
-                  beat.medium.kind === "phone" ? beat.medium.phase : "arriving"
-                }
-                barWidths={SCENE.results.map((r) => r.widthPercent)}
-                prefersReducedMotion
-                device="phone"
-                className="rounded-none border-0"
-              />
-            </PhoneFrame>
+            <BeatMedium medium={beat.medium} bare />
           </div>
         </div>
-        {/* The beat's own words travel with it: a reader who taps in from
-            step 4 should not have to close the viewer to remember which step
-            they are looking at. */}
-        <p className="max-w-lg text-center text-base leading-relaxed text-muted-foreground">
-          {withNextToken(beat.body)}
-        </p>
       </div>
-    </ResponsiveOverlay>
+
+      {/* The trigger is a SIBLING laid over the medium, never a wrapper around
+          it. The phone renders the real DemoCard, which has fifteen buttons of
+          its own — "Pledge your favourite" among them — and a <button> inside
+          a <button> is invalid HTML that React reports as a hydration error.
+          The medium is pointer-events-none, so every tap lands here.
+          Sticky-bottom so the chip stays reachable on an expanded medium that
+          is taller than the screen. */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        // The media are aria-hidden decoration everywhere else in this
+        // section, so this carries the whole accessible name — the beat's
+        // label plus what tapping does, since "Read the instructions" alone
+        // does not say that anything happens.
+        aria-label={
+          expanded
+            ? `${beat.label} — show less`
+            : `${beat.label} — see this larger`
+        }
+        className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      >
+        <span className="sticky bottom-3 flex items-center gap-1.5 rounded-full bg-foreground/75 px-3 py-1.5 text-xs font-medium text-background backdrop-blur-sm">
+          {expanded ? (
+            <Minimize2 className="size-3.5" />
+          ) : (
+            <Maximize2 className="size-3.5" />
+          )}
+          {expanded ? "Tap to shrink" : "Tap to enlarge"}
+        </span>
+      </button>
+    </div>
   )
 }
 
@@ -479,9 +483,11 @@ export function ProcessOverview() {
     return () => mq.removeEventListener("change", update)
   }, [])
 
-  // The beat whose phone is open in the viewer, or null. Mobile only — the
-  // desktop column pins its media at a size that never needed a tap.
-  const [viewerBeat, setViewerBeat] = useState<Beat | null>(null)
+  // The beat whose medium is expanded, or null. ONE AT A TIME: the point of
+  // collapsing by default is a section that is 4.8 screens rather than 5.9,
+  // and four expanded media would be worse than never having collapsed them.
+  // Mobile only — the desktop column pins its media and never needed a tap.
+  const [expandedBeat, setExpandedBeat] = useState<string | null>(null)
 
   const [active, setActive] = useState(0)
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -536,7 +542,14 @@ export function ProcessOverview() {
               without it the column ran out exactly as the LAST beat became
               active, so the TV — the payoff of the whole arc — pinned for a
               moment and then scrolled away under the nav. */}
-          <div className="md:col-span-3 md:pb-[30vh]">
+          {/* min-w-0 is load-bearing. A grid item will not shrink below its
+              min-content, and the media inside are 414-1160px wide objects, so
+              without it the column takes the widest thing max-w-lg allows —
+              512px inside a 342px track — and every beat's text wraps at 512
+              and runs off the right of the phone. That was the first bug of
+              this whole run and it comes straight back the moment the media
+              are in normal flow, which panning requires them to be. */}
+          <div className="min-w-0 md:col-span-3 md:pb-[30vh]">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
             {/* Backdrop follows the band: bg-band-tint, the measured opaque
@@ -609,10 +622,11 @@ export function ProcessOverview() {
                   {mounted && !isDesktop && (
                     <MobileWell
                       beat={beat}
-                      onOpen={
-                        beat.medium.kind === "phone"
-                          ? () => setViewerBeat(beat)
-                          : undefined
+                      expanded={expandedBeat === beat.key}
+                      onToggle={() =>
+                        setExpandedBeat((k) =>
+                          k === beat.key ? null : beat.key
+                        )
                       }
                     />
                   )}
@@ -658,17 +672,6 @@ export function ProcessOverview() {
 
           {/* No trailing mobile frame: each beat now carries its own, above. */}
         </div>
-
-        {/* One viewer for the section, not one per beat: only ever one is open,
-            and four mounted overlays on a phone is the weight this section has
-            twice been pulled up for. */}
-        {viewerBeat && (
-          <PhoneViewer
-            beat={viewerBeat}
-            open={!!viewerBeat}
-            onOpenChange={(open) => !open && setViewerBeat(null)}
-          />
-        )}
       </div>
     </section>
   )
