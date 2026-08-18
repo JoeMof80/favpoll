@@ -40,7 +40,7 @@ type CreatePledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
-  /** Hide the name from the public guest wall (organiser still sees it) */
+  /** Hide the name from the public wall of favourites (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
@@ -98,9 +98,9 @@ type CreateGuestPledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
-  /** Name shown on the guest wall; blank = appears as "Someone" */
+  /** Name shown on the wall of favourites; blank = appears as "Someone" */
   displayName?: string | null
-  /** Hide the name from the public guest wall (organiser still sees it) */
+  /** Hide the name from the public wall of favourites (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
@@ -478,18 +478,6 @@ export async function addOrganizerItem(favpollId: string, label: string) {
       added_by: userId,
     })
   if (epiErr) throw new Error(epiErr.message)
-}
-
-export async function removeFavpollPollFavourite(id: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
-
-  const supabase = createAdminClient()
-  const { error } = await supabase
-    .from("favpoll_poll_favourites")
-    .delete()
-    .eq("id", id)
-  if (error) throw new Error(error.message)
 }
 
 export async function pledgeFromFund(input: {
