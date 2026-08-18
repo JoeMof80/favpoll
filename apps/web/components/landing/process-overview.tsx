@@ -21,9 +21,15 @@
 // something they do.
 
 import { useEffect, useRef, useState } from "react"
+import { Maximize2 } from "lucide-react"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
-import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
+import {
+  PhoneFrame,
+  PHONE_CHASSIS_WIDTH,
+  PHONE_CHASSIS_HEIGHT,
+} from "@/components/hero-demo-panel/phone-frame"
 import { PackCard } from "@/components/print-pack/pack-card"
 import {
   DEMO_SCENE as SCENE,
@@ -324,6 +330,132 @@ function BeatMedium({ medium }: { medium: Medium }) {
   )
 }
 
+// The mobile well. A phone beat is a BUTTON that opens the viewer; every
+// other medium is inert, exactly as before.
+//
+// The affordance is a small chip rather than a caption. This is a marketing
+// page and the media are already the loudest thing in the column — "Tap to
+// enlarge" set beneath each of four phones would be four more lines of
+// instruction on a section that was called an instruction manual once
+// already. The chip sits on the object it acts on and says the same thing.
+function MobileWell({ beat, onOpen }: { beat: Beat; onOpen?: () => void }) {
+  return (
+    <div
+      data-beat-well=""
+      className={cn("relative w-full", MOBILE_WELL[beat.medium.kind])}
+    >
+      <div
+        aria-hidden="true"
+        data-beat-media=""
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
+      >
+        <BeatMedium medium={beat.medium} />
+      </div>
+
+      {/* The trigger is a SIBLING laid over the medium, never a wrapper around
+          it. The phone still renders the real DemoCard, which has its own
+          buttons — "Pledge your favourite" among them — and a <button> inside
+          a <button> is invalid HTML that React reports as a hydration error.
+          The medium is pointer-events-none, so every tap lands here. */}
+      {onOpen && (
+        <button
+          type="button"
+          onClick={onOpen}
+          // The media are aria-hidden decoration everywhere else in this
+          // section, so this carries the whole accessible name — the beat's
+          // label plus what tapping does, since "Read the instructions" alone
+          // does not say that anything opens.
+          aria-label={`${beat.label} — see this screen full size`}
+          className="absolute inset-0 flex cursor-pointer items-end justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <span className="flex items-center gap-1.5 rounded-full bg-foreground/75 px-3 py-1.5 text-xs font-medium text-background backdrop-blur-sm">
+            <Maximize2 className="size-3.5" />
+            Tap to enlarge
+          </span>
+        </button>
+      )}
+    </div>
+  )
+}
+
+// TAP TO ENLARGE, phone beats only (founder, 2026-08-18).
+//
+// The founder proposed this two turns before it was built and I argued
+// against it, on the grounds that "fullscreen" is not full size on a phone:
+// a 1123px keepsake fitted to a 390px screen lands at the same 0.30 it is
+// already at, so a viewer would show the same unreadable thing slightly
+// larger. That reasoning is sound for the two DOCUMENTS and wrong for the
+// phone, which is the case that mattered — a phone screen is 390 wide, so a
+// 390px viewport shows it at essentially 1:1.
+//
+// The alternative was making it legible in place, which was tried: filling
+// the column means 0.80, a 331 x 694 handset, four of them, and the section
+// went to 5.9 screens. "Broken but also ridiculous." A tap buys the same
+// legibility for no height at all.
+//
+// So: the phone only. The card is already life-size, and the display and the
+// keepsake gain nothing without pinch-zoom, which is a different piece of
+// work — a viewer that opens them at the size they already are would be
+// chrome pretending to be a feature.
+const VIEWER_SCALE = 0.94 // 414 chassis -> 389, inside a 390 viewport
+
+function PhoneViewer({
+  beat,
+  open,
+  onOpenChange,
+}: {
+  beat: Beat
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  return (
+    <ResponsiveOverlay
+      open={open}
+      onOpenChange={onOpenChange}
+      title={beat.label}
+      description={beat.body}
+      fullscreenOnMobile
+      bodyClassName="p-0"
+      mobileBack={{ label: "Close", onClick: () => onOpenChange(false) }}
+    >
+      <div className="flex flex-col items-center gap-6 px-4 pb-8">
+        {/* The screen at 1:1, which is the entire point — the same object the
+            thumbnail shows, at the size it was designed for. */}
+        <div
+          style={{
+            width: PHONE_CHASSIS_WIDTH * VIEWER_SCALE,
+            height: PHONE_CHASSIS_HEIGHT * VIEWER_SCALE,
+          }}
+        >
+          <div
+            className="origin-top-left"
+            style={{ transform: `scale(${VIEWER_SCALE})` }}
+          >
+            <PhoneFrame>
+              <DemoCard
+                scene={SCENE}
+                phase={
+                  beat.medium.kind === "phone" ? beat.medium.phase : "arriving"
+                }
+                barWidths={SCENE.results.map((r) => r.widthPercent)}
+                prefersReducedMotion
+                device="phone"
+                className="rounded-none border-0"
+              />
+            </PhoneFrame>
+          </div>
+        </div>
+        {/* The beat's own words travel with it: a reader who taps in from
+            step 4 should not have to close the viewer to remember which step
+            they are looking at. */}
+        <p className="max-w-lg text-center text-base leading-relaxed text-muted-foreground">
+          {withNextToken(beat.body)}
+        </p>
+      </div>
+    </ResponsiveOverlay>
+  )
+}
+
 export function ProcessOverview() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -346,6 +478,10 @@ export function ProcessOverview() {
     mq.addEventListener("change", update)
     return () => mq.removeEventListener("change", update)
   }, [])
+
+  // The beat whose phone is open in the viewer, or null. Mobile only — the
+  // desktop column pins its media at a size that never needed a tap.
+  const [viewerBeat, setViewerBeat] = useState<Beat | null>(null)
 
   const [active, setActive] = useState(0)
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -471,21 +607,14 @@ export function ProcessOverview() {
                     pins; no extra components mounted. */}
                 <div className="mt-6 md:hidden">
                   {mounted && !isDesktop && (
-                    <div
-                      aria-hidden="true"
-                      data-beat-well=""
-                      className={cn(
-                        "pointer-events-none relative w-full select-none",
-                        MOBILE_WELL[beat.medium.kind]
-                      )}
-                    >
-                      <div
-                        data-beat-media=""
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                      >
-                        <BeatMedium medium={beat.medium} />
-                      </div>
-                    </div>
+                    <MobileWell
+                      beat={beat}
+                      onOpen={
+                        beat.medium.kind === "phone"
+                          ? () => setViewerBeat(beat)
+                          : undefined
+                      }
+                    />
                   )}
                 </div>
               </div>
@@ -529,6 +658,17 @@ export function ProcessOverview() {
 
           {/* No trailing mobile frame: each beat now carries its own, above. */}
         </div>
+
+        {/* One viewer for the section, not one per beat: only ever one is open,
+            and four mounted overlays on a phone is the weight this section has
+            twice been pulled up for. */}
+        {viewerBeat && (
+          <PhoneViewer
+            beat={viewerBeat}
+            open={!!viewerBeat}
+            onOpenChange={(open) => !open && setViewerBeat(null)}
+          />
+        )}
       </div>
     </section>
   )

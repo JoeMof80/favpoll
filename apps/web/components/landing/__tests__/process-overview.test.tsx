@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest"
 import { render, screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { ProcessOverview } from "../process-overview"
 import { t } from "@/lib/i18n"
 
@@ -139,6 +140,54 @@ describe("ProcessOverview", () => {
     expect(column.getByTestId("tv-frame")).toBeInTheDocument()
     // Nothing outside the pinned column.
     expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
+  })
+
+  it("offers a full-size view of the PHONE beats only, on mobile", async () => {
+    // Founder, 2026-08-18. The phone is the one medium a viewer genuinely
+    // helps: its screen is 390 wide, so a 390px viewport shows it at ~1:1,
+    // where the thumbnail's copy sits at 7.3px. Making it legible IN PLACE
+    // was tried and cost 243px per beat across four beats — "broken but also
+    // ridiculous". A tap costs nothing.
+    //
+    // The card is already life-size and the two documents are 1120+ wide, so
+    // a viewer would open them at the size they already are. They stay inert,
+    // and that is asserted rather than assumed: a trigger on all seven would
+    // be four buttons that do nothing useful.
+    render(<ProcessOverview />)
+
+    const triggers = screen.getAllByRole("button", {
+      name: /see this screen full size/i,
+    })
+    expect(triggers).toHaveLength(4)
+
+    // The name has to carry the beat, not just "enlarge" — four identical
+    // buttons in a list is what a screen reader would otherwise announce.
+    expect(triggers[0]).toHaveAccessibleName(
+      new RegExp(t("landing.how.arrive.label"), "i")
+    )
+  })
+
+  it("opens the viewer on the beat that was tapped", async () => {
+    const user = userEvent.setup()
+    render(<ProcessOverview />)
+
+    // The third phone beat, so a passing test cannot be the first one by
+    // accident — the viewer takes a beat as a prop and could easily always
+    // render the same one.
+    const triggers = screen.getAllByRole("button", {
+      name: /see this screen full size/i,
+    })
+    await user.click(triggers[2])
+
+    const dialog = await screen.findByRole("dialog")
+    // Its own words travel with it: a reader who taps in from step 4 should
+    // not have to close the viewer to know which step they are looking at.
+    expect(
+      within(dialog).getByText(t("landing.how.pledge.label"))
+    ).toBeInTheDocument()
+    expect(within(dialog).getByTestId("demo-card").dataset.phase).toBe(
+      "amount-picked"
+    )
   })
 
   it("scopes the wallet card to .paper so dark mode cannot blank it", () => {
