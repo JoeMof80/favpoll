@@ -101,8 +101,8 @@ at 320 / 390 / 430.
 
 Four things were built and then deleted in the same session — a crop with a
 fade, a fullscreen viewer, an expand toggle, an icon button — and the reason is
-one sentence from the founder at the end: *"the user can just pinch their
-screen to view any of the elements properly, right?"*
+one sentence from the founder at the end: _"the user can just pinch their
+screen to view any of the elements properly, right?"_
 
 They can. The served meta is `width=device-width, initial-scale=1` with no
 `maximum-scale` and no `user-scalable=no`, and these are DOM elements rather
@@ -134,14 +134,13 @@ desktop-sized scales.
 - **The dev server itself went bad.** After ~15 edits it emitted
   `ChunkLoadError` on **fresh** loads, not just to a long-lived tab. That, not
   the browser, was the real cause of the recurring "broken" reports. `rm -rf
-  .next` and restart before diagnosing anything that looks impossible.
+.next` and restart before diagnosing anything that looks impossible.
 - **Test WebKit, not just Chromium.** Every report came from iOS Safari and
   every measurement here is now confirmed on both engines. WebKit is what
   proved three of the reports were stale renders — and, once, that one was not.
 - **Measure the laid-out box, not through a transform.** A parent's rect does
   not shrink for a child's transform, and a transformed child's rect is not the
-  laid-out box: at 430px it reported 440 inside a 382 box, and 64 for the TV at
-  320. Both broke a spec that was otherwise correct.
+  laid-out box: at 430px it reported 440 inside a 382 box, and 64 for the TV at 320. Both broke a spec that was otherwise correct.
 - **A scaled element lays out first and scales after.** The div carrying a
   transform must be given the object's natural width or the object lays out
   into the shrunken box — this clipped the display's 900px screen inside its
@@ -152,6 +151,14 @@ desktop-sized scales.
 - **Select test elements by name, never by index.** An expanded trigger renamed
   itself and left the list, shifting every position after it — the test passed
   against the wrong beat.
+- **`git add -A` committed two scratch harnesses again.** `zz-cmp.mjs` and
+  `zz-d.mjs`, throwaway Playwright measurement scripts, went in with an
+  `add -A apps/web` and were caught by CI's format check — prettier runs over
+  the whole package and neither had ever been formatted. This is exactly what
+  `session-handoff-2026-08-15.md` §7 records, with the same cause and the same
+  conclusion: **stage explicit paths on this repo.** That document was read at
+  the start of this session and the mistake was made anyway, so `zz-*` is
+  gitignored now rather than left to discipline.
 - **The E2E job races the preview deploy.** Every E2E failure this session was a
   cold or not-yet-deployed preview and passed on re-run. Pre-existing.
 - Vercel deploy failures all pointed at **cron-job pricing** — three crons
@@ -166,11 +173,17 @@ Highest first.
   to container queries. Thresholds are preserved exactly (`@3xl` = 48rem = the
   old `md`; `@5xl` = 64rem = the old `lg`) and the suite passes, but this is the
   component behind the live display and it shipped inside a marketing PR.
-- **#567 had no CI for most of its life.** `ci.yml` triggers on
+- **A stacked PR gets no CI, and deleting its base branch KILLS it.** #567 was
+  stacked on `refactor/wall-of-favourites`; merging that branch with
+  `--delete-branch` closed #567 outright, and a PR closed that way cannot be
+  reopened because its base no longer exists. It was rebuilt as #569 by
+  rebasing onto main. **Retarget a stacked PR to main BEFORE merging its
+  base.** The upside was accidental: #569 targets main, so CI finally ran —
+  and immediately failed on the two committed scratch files above, which had
+  sat in #567 unnoticed for hours. `ci.yml` triggers on
   `pull_request: branches: [main, staging]`, so a PR targeting another branch
-  runs only Vercel. A stacked PR gets no Actions checks until it is retargeted,
-  and retargeting fires `edited`, which is **not** in the default trigger types
-  — it needs a push or a close/reopen to run.
+  runs only Vercel — for #567 that was twelve commits with no Actions checks at
+  all.
 - **PayPal Giving Fund UK and CAF enquiries — still unsent.** Carried across
   many sessions now; the only item with launch risk.
 - **Goodstack nudge — overdue.**
