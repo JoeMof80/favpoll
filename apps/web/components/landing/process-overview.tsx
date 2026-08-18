@@ -170,6 +170,29 @@ const DISPLAY_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.50]"
 // goal bar, the charity row, six ranking rows, the QR and the wall. A derived
 // constant with nothing checking it goes stale in exactly this silent way, so
 // the mobile spec now asserts every medium fits inside its own well.
+// FOUR OF THE SEVEN CARRY A MEDIUM ON MOBILE (founder, 2026-08-18):
+// "the 7 steps, most showing a full iphone, is very long winded for a home
+// page and a bit instruction manual".
+//
+// Measured, they were right, and the number that mattered was not the length
+// but the REPETITION. At 390px the section ran 4113px — 4.9 phone screens, and
+// 41% of the whole homepage — of which 2690px was media. Beats 2-5 were four
+// consecutive identical iPhone chassis, 451px each: 1804px, better than two
+// screens, of the same phone outline with a different screenshot inside.
+//
+// Desktop does not have this problem and never did. Its media column is
+// PINNED — one frame swaps in place while the text scrolls — so seven beats
+// cost seven paragraphs and one frame. Stacking that column vertically is what
+// turned an argument into a manual.
+//
+// So mobile keeps the beats where the MEDIUM ITSELF changes, which is also the
+// arc the section is built on: paper -> phone -> room -> paper. Beats 3-5 are
+// the same phone doing three things their own sentences already say, and they
+// are the three the reader meets in the product anyway.
+//
+// The desktop column is untouched — it still pins all seven.
+const MOBILE_MEDIA = new Set(["card", "arriving", "room", "keepsake"])
+
 const MOBILE_WELL: Record<Medium["kind"], string> = {
   phone: "h-[451px]",
   card: "h-[176px]",
@@ -448,9 +471,13 @@ export function ProcessOverview() {
                     display in the room — were desktop-only, and the card that
                     carries the instructions was never seen on the device most
                     visitors are holding. Same six media the desktop column
-                    pins; no extra components mounted. */}
+                    pins; no extra components mounted.
+
+                    FOUR OF SEVEN since 2026-08-18 — see MOBILE_MEDIA. The
+                    element is dropped entirely rather than hidden, so the
+                    beats without one cost nothing to mount either. */}
                 <div className="mt-6 md:hidden">
-                  {mounted && !isDesktop && (
+                  {mounted && !isDesktop && MOBILE_MEDIA.has(beat.key) && (
                     <div
                       aria-hidden="true"
                       data-beat-well=""

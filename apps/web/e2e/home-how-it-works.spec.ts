@@ -35,6 +35,14 @@ const BEATS = [
   "keepsake",
 ] as const
 
+// Four of the seven carry a medium on mobile (2026-08-18) — the beats where
+// the medium itself changes, paper -> phone -> room -> paper. Mirrored from
+// MOBILE_MEDIA in process-overview.tsx and asserted BOTH ways: a beat in this
+// set must have its medium, and a beat outside it must not. Otherwise the
+// pruning could silently come undone and the only symptom would be a homepage
+// that is two screens longer than it should be — which nothing else notices.
+const WITH_MEDIA = new Set(["card", "arriving", "room", "keepsake"])
+
 // Phone widths that matter: the narrowest phone still in use, the iPhone
 // baseline the guest viewport is designed around, and a Pro Max. 320 is the
 // tight one — the keepsake's scaled sheet is ~270 wide in a 272px column, so
@@ -92,6 +100,15 @@ test.describe("home — how it works, on a phone", () => {
         // which is what a reader actually sees. (This distinction is the same
         // one the bug itself turned on, so it is worth being explicit about.)
         const media = block.locator("[data-beat-media] > *")
+
+        if (!WITH_MEDIA.has(key)) {
+          await expect(
+            media,
+            `beat ${key} should carry NO medium on mobile — it is one of the repeated phone stills that were pruned`
+          ).toHaveCount(0)
+          continue
+        }
+
         await expect(media, `beat ${key} has its medium on mobile`).toHaveCount(
           1
         )
