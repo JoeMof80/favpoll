@@ -21,7 +21,6 @@
 // something they do.
 
 import { useEffect, useRef, useState } from "react"
-import { Maximize2, Minimize2 } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -179,19 +178,6 @@ const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
 // on a marketing page is a worse answer than a small one you can see whole.
 // So expanding just lifts the thumbnail cap: the phone goes 215 -> 342, the
 // keepsake 238 -> 342. Nothing pans anywhere now.
-
-// ONLY THESE TWO CARRY A TOGGLE (founder, 2026-08-18): "there's no need for
-// the live screen to expand if it is already full width, so make it full
-// width. Likewise for the QR code stationery."
-//
-// Exactly right, and it is the rule the other two fail: a control that grows
-// something already filling its column is a control that does nothing worth
-// doing. The card and the display are landscape and fill the width at a size
-// their own copy survives — the card is life-size and the display's total and
-// topic read at a glance. The phone and the keepsake are PORTRAIT, so filling
-// the width would cost 717 and 483px of scroll apiece; they stay thumbnails
-// and open on a tap.
-const EXPANDABLE = new Set<Medium["kind"]>(["phone", "keepsake"])
 
 // COLLAPSED is fill-the-column for the landscape media and a thumbnail for the
 // two portrait ones, which would otherwise cost 717px (phone) and 483px
@@ -354,26 +340,26 @@ function BeatMedium({
 // enlarge" set beneath each of four phones would be four more lines of
 // instruction on a section that was called an instruction manual once
 // already. The chip sits on the object it acts on and says the same thing.
-// The mobile medium: fills its column, and opens on a tap.
+// The mobile medium: measured off its own column, and nothing else.
 //
-// TOGGLE IN PLACE, not a dialog (founder, 2026-08-18: "it would be better to
-// just toggle expanding the image when it is clicked"). A fullscreen overlay
-// was built first and this is better — no focus trap, no scroll lock, no
-// second surface, and the beat's text stays on screen beside the thing it
-// describes, which was the one thing the overlay had to re-render to keep.
+// NO EXPAND CONTROL (founder, 2026-08-18): "the user can just pinch their
+// screen to view any of the elements properly, right?" Right — the served
+// viewport is width=device-width, initial-scale=1 with no maximum-scale and
+// no user-scalable=no, so pinch works, and these are real DOM elements rather
+// than images, so zooming re-rasterises the type crisply instead of blurring
+// it. A toggle was doing, with a button and a state machine, what the
+// platform already does with a gesture everybody has.
+//
+// The deeper correction is worth keeping: on a homepage nobody needs to READ
+// a demo keepsake's standings. The seven paragraphs carry the argument and
+// the media only have to say that the thing is real and physical. Legibility
+// was accepted as a requirement here and never was one.
 //
 // The scale is MEASURED off the column rather than tuned per breakpoint: see
-// NATURAL. Collapsed fills the column exactly at any width, so the same code
-// serves a 320px phone and a 430px one with nothing to keep in sync.
-function MobileWell({
-  beat,
-  expanded,
-  onToggle,
-}: {
-  beat: Beat
-  expanded: boolean
-  onToggle: () => void
-}) {
+// NATURAL. It fills the column at any width, so the same code serves a 320px
+// phone and a 430px one with nothing to keep in sync — which is what the
+// hand-tuned constants that preceded it could not do, three bugs running.
+function MobileWell({ beat }: { beat: Beat }) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [columnWidth, setColumnWidth] = useState(0)
 
@@ -388,118 +374,44 @@ function MobileWell({
   }, [])
 
   const natural = NATURAL[beat.medium.kind]
-  // SHADOW_ROOM off the column before fitting. Every medium carries a
-  // drop-shadow and the card is tilted 2° on top of that, so fitting the raw
-  // column width put the shadow outside the box and the scroller cut it off
-  // square — "QR code card shadow is truncated". The shadow is how these read
-  // as objects rather than pasted rectangles, so it gets its own space.
+  // SHADOW_ROOM off the column before fitting, so the object sits ON the band
+  // rather than butting against its edges.
   const fit = columnWidth ? (columnWidth - SHADOW_ROOM * 2) / natural.w : 0
-  const expandable = EXPANDABLE.has(beat.medium.kind)
   const cap = COLLAPSED_CAP[beat.medium.kind]
-  const collapsed = cap ? Math.min(fit, cap) : fit
-  // Never SHRINK on expand: the card and the two documents already fill the
-  // column collapsed, and a toggle that made something smaller would be absurd.
-  const scale = expandable && expanded ? fit : collapsed
+  const scale = cap ? Math.min(fit, cap) : fit
   const width = natural.w * scale
   const height = natural.h * scale
-  const pans = width > columnWidth + 1
 
   return (
     <div ref={ref} data-beat-well="" className="relative w-full">
-      {/* The scroller is the crop. It is only scrollable when the medium is
-          genuinely wider than the column — otherwise a stray horizontal drag
-          on a page that does not scroll sideways feels broken. */}
+      {/* NOT a clipping box. It was overflow-hidden while an expanded medium
+          could be wider than the column and needed to pan; with the toggle
+          gone nothing ever exceeds its box, and the clipping was only cutting
+          the drop-shadows off square — top and bottom especially, where the
+          reserved height is the medium's exact height and left no room at all.
+          The shadow is how these read as objects resting on the band rather
+          than pasted rectangles, so it is allowed out. */}
       <div
-        data-beat-scroller=""
-        className={cn(
-          "w-full",
-          pans ? "overflow-x-auto" : "overflow-hidden",
-          // A transform does not change the layout box, so the height is
-          // reserved explicitly. This is the whole class of bug that the old
-          // hand-tuned well heights kept reintroducing.
-          "transition-[height] duration-300"
-        )}
-        style={{ height: height || undefined }}
+        data-beat-media=""
+        aria-hidden="true"
+        className="pointer-events-none mx-auto select-none"
+        style={{ width: width || undefined, height: height || undefined }}
       >
+        {/* The natural width is set HERE, not left to the box. A scaled
+            element lays out first and scales after, so this has to be as wide
+            as the object really is or the object is laid out into the shrunken
+            box instead — which is what clipped the display's 900px screen
+            inside its own bezel and left a ~100px sliver of a TV. */}
         <div
-          aria-hidden="true"
-          data-beat-media=""
-          className="pointer-events-none mx-auto select-none"
-          style={{ width: width || undefined, height: height || undefined }}
+          className="origin-top-left"
+          style={{
+            width: natural.w,
+            transform: scale ? `scale(${scale})` : undefined,
+          }}
         >
-          {/* THE NATURAL WIDTH IS SET HERE, not left to the box. A scaled
-              element lays out FIRST and scales after, so this div has to be
-              as wide as the object really is or the object is laid out into
-              the shrunken box instead.
-              The display is the one that proved it: TvFrame clips to its
-              bezel, so with this div at the column's 342 it clipped the
-              900px screen inside it and then scaled the remains down to
-              ~100px — a sliver of a TV with dead space beside it. The other
-              three carry explicit widths of their own (the phone its chassis,
-              the keepsake its A4 page, the card its printed size), which is
-              why only the display broke. */}
-          <div
-            className="origin-top-left"
-            style={{
-              width: natural.w,
-              transform: scale ? `scale(${scale})` : undefined,
-            }}
-          >
-            <BeatMedium medium={beat.medium} bare />
-          </div>
+          <BeatMedium medium={beat.medium} bare />
         </div>
       </div>
-
-      {/* The trigger is a SIBLING laid over the medium, never a wrapper around
-          it. The phone renders the real DemoCard, which has fifteen buttons of
-          its own — "Pledge your favourite" among them — and a <button> inside
-          a <button> is invalid HTML that React reports as a hydration error.
-          The medium is pointer-events-none, so every tap lands here.
-          Sticky-top so the chip stays reachable on an expanded medium that
-          is taller than the screen. */}
-      {expandable && (
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={expanded}
-          // The media are aria-hidden decoration everywhere else in this
-          // section, so this carries the whole accessible name — the beat's
-          // label plus what tapping does, since "Read the instructions" alone
-          // does not say that anything happens.
-          aria-label={
-            expanded
-              ? `${beat.label} — show less`
-              : `${beat.label} — see this larger`
-          }
-          className="absolute inset-0 flex cursor-pointer items-start justify-end p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        >
-          {/* SOLID, not a tint (founder, 2026-08-18: "barely visible"). It was
-              bg-foreground/75 with a blur behind it, which over the white of a
-              screen or a sheet came out as pale grey text on pale grey — the
-              one thing a control announcing an interaction cannot be. Full
-              opacity, a shadow to lift it off whatever it sits on, and the
-              same treatment whatever is behind it.
-              ICON ONLY (founder, 2026-08-18). The words were doing the work of
-              an affordance on four phones and a sheet — five captions of
-              instruction on a section that has been called an instruction
-              manual once already. The glyph is the convention and it carries
-              on its own. Nothing is lost to a screen reader: the button's
-              aria-label was always the whole name, because the media it sits
-              on are aria-hidden.
-              AT THE TOP (founder, same day). Bottom-anchored it sat on the
-              foot of the sheet and the charity row of the phone — the parts
-              carrying each one's closing line — and on an expanded medium
-              taller than the screen you had to scroll past the whole thing to
-              find the way back. sticky keeps it in reach either way. */}
-          <span className="sticky top-0 flex size-9 items-center justify-center rounded-full bg-foreground text-background shadow-lg">
-            {expanded ? (
-              <Minimize2 className="size-4" />
-            ) : (
-              <Maximize2 className="size-4" />
-            )}
-          </span>
-        </button>
-      )}
     </div>
   )
 }
@@ -526,12 +438,6 @@ export function ProcessOverview() {
     mq.addEventListener("change", update)
     return () => mq.removeEventListener("change", update)
   }, [])
-
-  // The beat whose medium is expanded, or null. ONE AT A TIME: the point of
-  // collapsing by default is a section that is 4.8 screens rather than 5.9,
-  // and four expanded media would be worse than never having collapsed them.
-  // Mobile only — the desktop column pins its media and never needed a tap.
-  const [expandedBeat, setExpandedBeat] = useState<string | null>(null)
 
   const [active, setActive] = useState(0)
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -663,17 +569,7 @@ export function ProcessOverview() {
                     visitors are holding. Same six media the desktop column
                     pins; no extra components mounted. */}
                 <div className="mt-6 md:hidden">
-                  {mounted && !isDesktop && (
-                    <MobileWell
-                      beat={beat}
-                      expanded={expandedBeat === beat.key}
-                      onToggle={() =>
-                        setExpandedBeat((k) =>
-                          k === beat.key ? null : beat.key
-                        )
-                      }
-                    />
-                  )}
+                  {mounted && !isDesktop && <MobileWell beat={beat} />}
                 </div>
               </div>
             ))}
