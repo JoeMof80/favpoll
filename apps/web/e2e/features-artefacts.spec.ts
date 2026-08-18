@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 
 // The features page shows REAL components as its artefacts — the printed
-// pack, the pledge dialog's fund split, PollReveal, CharityBanner, GuestWall,
+// pack, the pledge dialog's fund split, PollReveal, CharityBanner, WallOfFavourites,
 // and a room with the display in it. That is the point: a page drawn as
 // lookalikes would describe a product it could quietly stop resembling.
 //
@@ -30,7 +30,7 @@ const SECTIONS = [
   "shared-fund",
   "reveal",
   "goal",
-  "guest-wall",
+  "wall-of-favourites",
   "keepsake",
 ] as const
 

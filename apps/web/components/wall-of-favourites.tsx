@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Maximize2 } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 
-// The guest wall: presence, not size. Names (or "Someone") and what they
+// The wall of favourites: presence, not size. Names (or "Someone") and what they
 // backed — never amounts (anonymity model, decided 2026-07-05). Anonymous
 // pledges appear as "Someone" but count fully everywhere.
-export type GuestWallEntry = {
+export type WallEntry = {
   id: string
   /** null = anonymous or no name given → rendered as "Someone" */
   name: string | null
@@ -61,7 +61,7 @@ function backedLine(labels: string[]): string {
   return `backed ${labels[0]} and ${labels.length - 1} more`
 }
 
-function WallRow({ entry }: { entry: GuestWallEntry }) {
+function WallRow({ entry }: { entry: WallEntry }) {
   return (
     <>
       <span className="min-w-0 truncate">
@@ -77,14 +77,14 @@ function WallRow({ entry }: { entry: GuestWallEntry }) {
   )
 }
 
-export function GuestWall({
+export function WallOfFavourites({
   entries,
   teaseBacked = false,
   animate = false,
   maxEntries,
   expandable = false,
 }: {
-  entries: GuestWallEntry[]
+  entries: WallEntry[]
   /**
    * True for un-entitled viewers, whose entries arrive with the backed
    * favourites stripped — adds a line telling them pledging shows more.
@@ -106,7 +106,7 @@ export function GuestWall({
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <div className="flex items-start justify-between gap-2">
         <SectionEyebrow variant="muted" className="font-semibold">
-          Guest wall
+          Wall of favourites
         </SectionEyebrow>
         {/* Expand to a dialog (founder, 2026-08-02) — the card itself
             scrolls within a max height below */}
@@ -115,7 +115,7 @@ export function GuestWall({
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label="Expand guest wall"
+            aria-label="Expand wall of favourites"
             onClick={() => setAllOpen(true)}
           >
             <Maximize2 aria-hidden="true" />
@@ -124,7 +124,7 @@ export function GuestWall({
       </div>
       {shown.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">
-          Guests appear here as they pledge.
+          Names appear here as people pledge.
         </p>
       ) : (
         <>
@@ -153,7 +153,7 @@ export function GuestWall({
           </ul>
           {teaseBacked && (
             <p className="mt-2.5 text-xs text-muted-foreground">
-              Pledge to see what each guest backed.
+              Pledge to see what everyone backed.
             </p>
           )}
         </>
@@ -162,7 +162,7 @@ export function GuestWall({
         <ResponsiveOverlay
           open={allOpen}
           onOpenChange={setAllOpen}
-          title="Guest wall"
+          title="Wall of favourites"
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
           <ul className="space-y-2" aria-label="All pledges">
@@ -177,7 +177,7 @@ export function GuestWall({
           </ul>
           {teaseBacked && (
             <p className="mt-3 text-xs text-muted-foreground">
-              Pledge to see what each guest backed.
+              Pledge to see what everyone backed.
             </p>
           )}
         </ResponsiveOverlay>
