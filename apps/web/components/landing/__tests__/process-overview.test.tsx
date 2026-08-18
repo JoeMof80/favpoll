@@ -142,82 +142,25 @@ describe("ProcessOverview", () => {
     expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
   })
 
-  it("gives a toggle to the PORTRAIT media only", async () => {
-    // Founder, 2026-08-18: "there's no need for the live screen to expand if
-    // it is already full width, so make it full width. Likewise for the QR
-    // code stationery."
+  it("puts no controls on the mobile media", async () => {
+    // Founder, 2026-08-18: "the user can just pinch their screen to view any
+    // of the elements properly, right?" Right — the served viewport is
+    // width=device-width, initial-scale=1 with no maximum-scale and no
+    // user-scalable=no, so pinch works, and these are DOM elements rather than
+    // images, so zooming re-rasterises the type instead of blurring it.
     //
-    // The rule that falls out of it: a control that grows something already
-    // filling its column does nothing worth doing. The card and the display
-    // are landscape and fill the width at a size their own copy survives. The
-    // phone and the keepsake are portrait, so filling would cost 717 and 483px
-    // of scroll apiece — they stay thumbnails and open on a tap.
-    //
-    // Asserted both ways. Four phones plus the keepsake is five, and the two
-    // landscape media must have NO button: a stray toggle on them would be the
-    // thing this beat was corrected for twice.
+    // A fullscreen viewer and then an expand toggle were both built here and
+    // both removed. This asserts they stay gone: the media are aria-hidden
+    // decoration, and a control laid over them does what the platform already
+    // does with a gesture everybody has.
     render(<ProcessOverview />)
 
-    const triggers = screen.getAllByRole("button", {
-      name: /see this larger/i,
-    })
-    expect(triggers).toHaveLength(5)
-    expect(
-      triggers.map((b) => b.getAttribute("aria-label")?.split(" — ")[0])
-    ).toEqual([
-      t("landing.how.arrive.label"),
-      t("landing.how.pick.label"),
-      t("landing.how.pledge.label"),
-      t("landing.how.reveal.label"),
-      t("landing.how.keepsake.label"),
-    ])
-
-    for (const label of [
-      t("landing.how.card.label"),
-      t("landing.how.room.label"),
-    ]) {
-      expect(
-        screen.queryByRole("button", {
-          name: new RegExp(`${label}.*see this larger`, "i"),
-        }),
-        `${label} is full width already and must not offer a toggle`
-      ).toBeNull()
-    }
-  })
-
-  it("expands one medium at a time", async () => {
-    // One at a time is the whole point of collapsing: the section is 4.8
-    // screens closed and would be past 6 with every phone open, which is the
-    // state that was rejected as ridiculous.
-    const user = userEvent.setup()
-    render(<ProcessOverview />)
-
-    const open = () => screen.queryAllByRole("button", { name: /show less/i })
-    // BY NAME, never by index. An expanded trigger renames itself to "show
-    // less", so it leaves the /see this larger/ list and every position after
-    // it shifts — an index-based second click lands on the wrong beat and the
-    // test still passes for the wrong reason. (It did, once.)
-    const trigger = (label: string) =>
-      screen.getByRole("button", {
-        name: new RegExp(`${label}.*see this larger`, "i"),
-      })
-
-    await user.click(trigger(t("landing.how.arrive.label")))
-    expect(open()).toHaveLength(1)
-    expect(open()[0]).toHaveAccessibleName(
-      new RegExp(t("landing.how.arrive.label"), "i")
-    )
-
-    // A second beat replaces the first rather than joining it.
-    await user.click(trigger(t("landing.how.pick.label")))
-    expect(open()).toHaveLength(1)
-    expect(open()[0]).toHaveAccessibleName(
-      new RegExp(t("landing.how.pick.label"), "i")
-    )
-
-    // And tapping the open one closes it.
-    await user.click(open()[0])
-    expect(open()).toHaveLength(0)
+    const section = screen
+      .getByText(`1. ${t("landing.how.card.label")}`)
+      .closest("section")!
+    // The page's own chrome lives outside this section, so any button found
+    // here would be one this component put on a medium.
+    expect(within(section).queryAllByRole("button")).toHaveLength(0)
   })
 
   it("scopes the wallet card to .paper so dark mode cannot blank it", () => {
