@@ -128,12 +128,15 @@ const BEATS: Beat[] = [
 // ~273 / ~376 / ~478 px at md / lg / xl, and the phone is the tallest, so it
 // sets the well height at each stop.
 const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
-const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
-const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
+const PHONE_SCALE =
+  "scale-[0.64] min-[380px]:scale-[0.80] md:scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
+const CARD_SCALE =
+  "scale-[0.80] min-[380px]:scale-100 md:scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // Down from the browser-framed version: the TV bezel adds 20px each way
 // (940 overall), and at xl the old 0.53 already sat within a pixel of the
 // column's width.
-const DISPLAY_SCALE = "scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
+const DISPLAY_SCALE =
+  "scale-[0.23] min-[380px]:scale-[0.29] md:scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
 
 // MOBILE WELLS (2026-08-17). A transform-scaled element keeps its UNSCALED
 // layout box, which is why every medium needs a fixed well to sit in rather
@@ -174,15 +177,15 @@ const DISPLAY_SCALE = "scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
 // constant with nothing checking it goes stale in exactly this silent way, so
 // the mobile spec now asserts every medium fits inside its own well.
 const MOBILE_WELL: Record<Medium["kind"], string> = {
-  phone: "h-[451px]",
-  card: "h-[176px]",
+  phone: "h-[556px] min-[380px]:h-[695px]",
+  card: "h-[176px] min-[380px]:h-[220px]",
   // Both LANDSCAPE since 2026-08-18, so both cost a fraction of the height
   // they did: the display renders 1160 x 697 at 0.23 (160 tall, was 340) and
   // the keepsake 1123 x 794 at 0.24 (191, was 390). Measured, not derived —
   // the mobile spec asserts the medium fits its well, and these were 90 and
   // 100px too tall when the shapes changed under them.
-  display: "h-[168px]",
-  keepsake: "h-[200px]",
+  display: "h-[168px] min-[380px]:h-[210px]",
+  keepsake: "h-[200px] min-[380px]:h-[248px]",
 }
 
 // A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
@@ -204,7 +207,8 @@ const A4_LANDSCAPE = { w: 1123, h: 794 }
 // Width ~270 / ~373 / ~453 against a ~273 / ~376 / ~478px column; the xl step
 // is held at 0.57 rather than 0.60 so the 1123 of height stays inside the
 // 651px well rather than overflowing it by 23px.
-const KEEPSAKE_SCALE = "scale-[0.24] lg:scale-[0.33] xl:scale-[0.42]"
+const KEEPSAKE_SCALE =
+  "scale-[0.24] min-[380px]:scale-[0.30] md:scale-[0.24] lg:scale-[0.33] xl:scale-[0.42]"
 
 // WEIGHT, NOT CHROME (founder, 2026-08-17). This was drawn as a miniature of
 // the real button, copying the ADD_TOKEN trick from love-step and the topic
