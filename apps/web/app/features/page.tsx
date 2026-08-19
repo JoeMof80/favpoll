@@ -255,10 +255,9 @@ export default function FeaturesPage() {
               title="The reveal"
               lead="A message to be shared the moment someone has pledged, along with the standings."
               bullets={[
-                "Often the subject’s own favourite — but it could be a message about the topic, the charity, or anything else",
-                "The other half of it — a favourite given, and something given back",
-                "Written by an organiser about someone, or by that person in advance, in their own voice",
-                "Optional, and set separately for each topic",
+                "Often the subject’s own favourite but could be a message about the topic, the charity, or anything else",
+                "A gift in return for sharing a favourite",
+                "It could be a moment of poignance or not required at all, as set by the favpoll organiser",
               ]}
               artefact={<RevealVignette />}
             />
