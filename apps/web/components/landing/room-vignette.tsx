@@ -4,8 +4,9 @@
 // far wall (small, perspective-tilted, soft shadow) and a guest's iPhone in
 // the foreground (large, hard shadow) making a pledge. The scripted loop:
 // the phone picks £50 → Pledge presses → confirmation — and in the same
-// beat the distant display reacts: the wall gains the pledge, the bar
-// grows, and the running total crosses the £900 goal (the display's
+// beat the distant display reacts: the bar grows and the running total
+// crosses the £900 goal — and the wall gains the pledge in a callout beside
+// the room, since on the screen itself it would be 4px (the display's
 // goal-as-milestone moment — the poll never stops at goal; the room just
 // celebrates). A second guest's pledge then lands on its own, so the room
 // reads as live rather than waiting for you.
@@ -50,6 +51,35 @@ const LABELS = [
   "Greyhound",
 ] as const
 const PRESETS = ["£5", "£10", "£20", "£50"] as const
+
+// THE WALL, AS A MAGNIFIED DETAIL RATHER THAN ON THE SCREEN (founder,
+// 2026-08-19: "the Live Display vignette should show the Live wall updating as
+// the pledge arrives ... I wonder if adding it will decrease legibilty").
+//
+// It would, and by a wider margin than it looks. The stage is authored at
+// 624 x 352 and SCALED — 0.47 at base, 0.87 at sm — so the display's 10px
+// labels render at 4.3px on a phone and 9.1px at 1280, measured. A wall row
+// is four things (name, verb, favourite, time) and needs three rows to read
+// as a feed; there is no size below 4.3px for it to occupy. Putting it on the
+// screen would have made the screen worse to prove the wall exists.
+//
+// So it is a callout, and it sits OUTSIDE the scaled stage — that is the
+// whole trick. Anything inside inherits the 0.425 and is illegible by
+// construction; out here it renders at its own 11-12px at every width.
+//
+// Only the wall is magnified. The founder suggested the total as well, and it
+// does not need it: £905 is the largest thing in the frame at 24px authored
+// and reads today. Two callouts in a 342px-wide vignette is furniture.
+const WALL_ROWS = [
+  { name: "Priya", label: "Labrador" },
+  { name: "Raj", label: "Cocker Spaniel" },
+  { name: "Amara", label: "Labrador" },
+] as const
+
+// Rows visible per step. Raj's arrives on the beat his £50 lands — the same
+// beat the bar grows and the total crosses the goal — and Amara's follows on
+// its own, so the feed visibly accumulates rather than just appearing.
+const WALL_VISIBLE = [1, 1, 1, 2, 3]
 
 export function RoomVignette() {
   const reduced = useReducedMotion()
@@ -259,6 +289,41 @@ export function RoomVignette() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* The wall, magnified — a sibling of the stage, never a child of it.
+            OVERLAID AT md, STACKED BELOW AT BASE, because the room has a free
+            corner at 1280 and none at 390. Bottom-left sat squarely on the
+            phone at both widths, hiding the confirmation — the half of the
+            scene that shows the pledge being made. Top-left is clean at 1280
+            and lands on the display's total at 390, which is the payoff the
+            section exists to show. There is no third corner: at 390 the stage
+            is scaled to 0.47 and the two objects fill it.
+            So on a phone it stops being a callout and becomes a caption. It
+            reads the same either way — the wall gained a row when the pledge
+            landed — and nothing is covered to say it. */}
+        <div className="pointer-events-none mt-4 w-full rounded-lg border border-border bg-background/95 p-2.5 shadow-md backdrop-blur-sm md:absolute md:top-6 md:left-6 md:mt-0 md:w-[196px]">
+          <p className="mb-1.5 text-[9px] font-medium tracking-widest text-muted-foreground uppercase">
+            Wall of favourites
+          </p>
+          <div className="flex flex-col gap-1">
+            {WALL_ROWS.slice(0, WALL_VISIBLE[step])
+              .slice()
+              .reverse()
+              .map((row, i) => (
+                <p
+                  key={row.name}
+                  className={`text-[11px] leading-snug transition-all duration-500 md:text-xs ${
+                    i === 0 && step >= 3
+                      ? "text-foreground opacity-100"
+                      : "text-muted-foreground opacity-70"
+                  }`}
+                >
+                  <span className="font-medium">{row.name}</span> backed{" "}
+                  {row.label}
+                </p>
+              ))}
           </div>
         </div>
       </div>
