@@ -253,10 +253,10 @@ export default function FeaturesPage() {
             <Feature
               id="reveal"
               title="The reveal"
-              lead="A favpoll can hold something back and share it the moment a guest has pledged."
+              lead="A message to be shared the moment someone has pledged, along with the standings."
               bullets={[
-                "Most often the person’s own favourite — but it can be a message about the topic, the charity, or anything else worth saying",
-                "A gift, not a gate: the guest shares something of themselves, and the favpoll shares something back",
+                "Often the subject’s own favourite — but it could be a message about the topic, the charity, or anything else",
+                "The other half of it — a favourite given, and something given back",
                 "Written by an organiser about someone, or by that person in advance, in their own voice",
                 "Optional, and set separately for each topic",
               ]}
