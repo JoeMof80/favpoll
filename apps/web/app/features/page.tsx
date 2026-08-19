@@ -10,8 +10,6 @@ import { RoomVignette } from "@/components/landing/room-vignette"
 import { PackVignette } from "@/components/landing/pack-vignette"
 import { FundVignette } from "@/components/landing/fund-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
-import { GoalVignette } from "@/components/landing/goal-vignette"
-import { WallOfFavouritesVignette } from "@/components/landing/wall-of-favourites-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
@@ -81,7 +79,7 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the reveal, a pledge goal, a wall of favourites and a printable keepsake.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the reveal and a printable keepsake.",
 }
 
 const SECTIONS = [
@@ -90,8 +88,6 @@ const SECTIONS = [
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared fund" },
   { id: "reveal", label: "The reveal" },
-  { id: "goal", label: "Pledge goal" },
-  { id: "wall-of-favourites", label: "Wall of favourites" },
   { id: "keepsake", label: "Keepsake" },
 ]
 
@@ -233,6 +229,8 @@ export default function FeaturesPage() {
                 "Large QR codes visible from distance",
                 "Tribute mode to centre the person being honoured",
                 "Fundraiser mode for a telethon-style centrepiece",
+                "A pledge goal, if one is set, fills as pledges land and turns green the moment it is met",
+                "The wall of favourites scrolls alongside — who backed what, never amounts, and anyone can appear as “Someone”",
               ]}
               artefact={<RoomVignette />}
             />
@@ -260,31 +258,6 @@ export default function FeaturesPage() {
                 "It could be a moment of poignance or not required at all, as set by the favpoll organiser",
               ]}
               artefact={<RevealVignette />}
-            />
-
-            <Feature
-              id="goal"
-              title="Pledge goal"
-              lead="Set a target, and the room can watch it come."
-              bullets={[
-                "The bar fills as pledges land, and turns green the moment the goal is met",
-                "A milestone, not a finish line — the favpoll runs to its closing date",
-                "Every pledge after the goal still counts",
-              ]}
-              artefact={<GoalVignette />}
-            />
-
-            <Feature
-              id="wall-of-favourites"
-              title="Wall of favourites"
-              lead="Who backed what, as it happens."
-              bullets={[
-                "Scrolls on the big screen through the day",
-                "Reads back afterwards as a record of who took part",
-                "Names and favourites only, never amounts",
-                "Anyone can pledge as “Someone” instead",
-              ]}
-              artefact={<WallOfFavouritesVignette />}
             />
 
             <Feature

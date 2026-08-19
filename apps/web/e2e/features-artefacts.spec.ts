@@ -29,8 +29,6 @@ const SECTIONS = [
   "display",
   "shared-fund",
   "reveal",
-  "goal",
-  "wall-of-favourites",
   "keepsake",
 ] as const
 

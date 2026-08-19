@@ -56,6 +56,15 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "Yes. Anyone can top up a shared fund, so a child or a guest without means can still take part — and nobody sees who used it.",
   },
   {
+    // The wall left /features on 2026-08-19 — folded into the live display,
+    // where the founder judged it has most of its value. It lands here so its
+    // facts stay somewhere an evaluator can find them, which is the reason
+    // the capability grid gave for keeping it on /features in the first place
+    // ("absence reads as absence"). About is the spec now; /features is not.
+    q: "Can guests see who pledged?",
+    a: "Names and favourites, never amounts. The wall of favourites shows who backed what — on the favpoll itself and on the live display — and anyone can appear as “Someone” instead.",
+  },
+  {
     q: "What happens when a favpoll closes?",
     a: "Pledging ends and the standings are final. The proceeds go to the charities you chose, and any reveal is shared with the guests who pledged.",
   },
