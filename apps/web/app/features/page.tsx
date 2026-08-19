@@ -263,13 +263,11 @@ export default function FeaturesPage() {
             <Feature
               id="keepsake"
               title="Keepsake"
-              lead="When a favpoll closes, the whole of it becomes a single sheet to print."
+              lead="A printable memento of the favpoll, capturing all the detail that made it special."
               bullets={[
-                "The standings, the reveal and the total raised",
-                "Two ways to tell it: the person leads, or what was raised does",
-                "Portrait or landscape, always one sheet",
-                "No individual amounts — what people gave stays theirs",
-                "The full standings and everyone who took part export as a spreadsheet",
+                "Presented like a certificate, in A4 portrait or landscape",
+                "Tribute format emphasises the subject and topic",
+                "Fundraiser format emphasises the charity and the total raised",
               ]}
               artefact={<KeepsakeVignette />}
             />
