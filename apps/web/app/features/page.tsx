@@ -59,8 +59,16 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 // keepsake's "the whole of it" (not "the day") are true of a standalone
 // favpoll with nobody in a room. EVENT-SHAPED features keep the event
 // language, because it is accurate rather than presumptuous — stationery for
-// tables and orders of service, a display on a screen "in the room", and the
-// personal reveal, which is protagonist-bound by definition.
+// tables and orders of service, and a display on a screen "in the room".
+//
+// THE REVEAL IS NOT ON THAT LIST ANY MORE (founder, 2026-08-19). It was, as
+// "protagonist-bound by definition" — and it never was. The field holds any
+// message; the protagonist's favourite is the strongest thing to put in it,
+// not what it IS. The name asserted otherwise and every sentence about it
+// paid for that, hedging into "the subject's favourite, or a special message,
+// optionally". Its own home-page bullets had given the game away long before
+// anyone noticed: "The final word from a loved one" and "A humorous callback
+// to a speech" are messages, not favourites.
 // Note "guest" ALSO has a domain meaning here — account-less pledger, as in
 // guest checkout (allow_guest_items, createGuestPledge, the organiser's
 // "Guest additions" toggle). That sense is register-neutral and stays.
@@ -73,7 +81,7 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the personal reveal, a pledge goal, a wall of favourites and a printable keepsake.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the reveal, a pledge goal, a wall of favourites and a printable keepsake.",
 }
 
 const SECTIONS = [
@@ -81,7 +89,7 @@ const SECTIONS = [
   { id: "stationery", label: "QR-coded stationery" },
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared fund" },
-  { id: "reveal", label: "Personal reveal" },
+  { id: "reveal", label: "The reveal" },
   { id: "goal", label: "Pledge goal" },
   { id: "wall-of-favourites", label: "Wall of favourites" },
   { id: "keepsake", label: "Keepsake" },
@@ -244,9 +252,10 @@ export default function FeaturesPage() {
 
             <Feature
               id="reveal"
-              title="Personal reveal"
-              lead="A favpoll can hold one favourite back — the subject’s own — and share it the moment a guest has pledged."
+              title="The reveal"
+              lead="A favpoll can hold something back and share it the moment a guest has pledged."
               bullets={[
+                "Most often the person’s own favourite — but it can be a message about the topic, the charity, or anything else worth saying",
                 "A gift, not a gate: the guest shares something of themselves, and the favpoll shares something back",
                 "Written by an organiser about someone, or by that person in advance, in their own voice",
                 "Optional, and set separately for each topic",
