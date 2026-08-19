@@ -197,7 +197,28 @@ export function LandingHero({
           slabs; a third of the container is the fix. */}
       <div
         className={cn(
-          "relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:px-6",
+          // ONE LEFT RAIL WITH THE REST OF THE PAGE (founder, 2026-08-18: "do you
+          // think it would be better if the hero content lined up with the
+          // favpoll brand text?").
+          //
+          // It did not line up with anything. Below md the hero was CENTRED by
+          // a max-width with no padding, so its rail was (viewport - 348) / 2
+          // and drifted with the screen, while the header logo and every
+          // section on the page sit at a fixed 24:
+          //
+          //   390   header 24   sections 24   hero 21
+          //   430   header 24   sections 24   hero 41
+          //   700   header 24   sections 24   hero 150
+          //
+          // On a desktop it happened to land on 24, which is why it read as
+          // deliberate. Padding it like everything else pins it at 24 at every
+          // width, and md:max-w-330 still governs above.
+          //
+          // The cost, accepted: between 640 and 767 the content is no longer
+          // capped at 400, so the router cards stretch to the full padded
+          // width. That is what every other band does there, and md brings the
+          // two-column layout in at 768 regardless.
+          "relative mx-auto grid w-full gap-8 px-6 py-10 md:max-w-330",
           router
             ? // ROW (founder, 2026-08-05): statement on top, three doors
               // across the bottom. The cards don't change size doing this —
