@@ -65,6 +65,22 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "Names and favourites, never amounts. The wall of favourites shows who backed what — on the favpoll itself and on the live display — and anyone can appear as “Someone” instead.",
   },
   {
+    // THE PRIVACY PROMISE LANDS HERE (founder, 2026-08-19) because /features
+    // stopped making it. Two bullets carrying it were dropped from that page
+    // the same day — the shared fund's "nobody sees who used it" and the
+    // keepsake's "No individual amounts — what people gave stays theirs" —
+    // leaving the pitch silent on a question anyone giving money in front of
+    // other people actually asks.
+    //
+    // It is a decided model, not a description of current behaviour: the wall
+    // is "presence, not size ... never amounts" (2026-07-05), keepsake-csv.ts
+    // keeps per-guest amounts out of the export, and the organiser's own
+    // dashboard reads aggregates only — total_raised, goal_amount, and the
+    // pot's deposited/allocated. Nobody has a screen that shows who gave what.
+    q: "Does anyone see how much I gave?",
+    a: "No. favpoll shows presence, not size — the wall of favourites, the keepsake and the spreadsheet export carry names and favourites, never what any one person gave. Standings show what each favourite raised between everyone, and the organiser sees the total.",
+  },
+  {
     q: "What happens when a favpoll closes?",
     a: "Pledging ends and the standings are final. The proceeds go to the charities you chose, and any reveal is shared with the guests who pledged.",
   },
