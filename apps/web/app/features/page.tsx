@@ -232,12 +232,12 @@ export default function FeaturesPage() {
             <Feature
               id="shared-fund"
               title="Shared fund"
-              lead="Nobody needs to be able to pay."
+              lead="A float to help everybody take part or give without taking part."
               bullets={[
-                "Anyone can put money in outright — a gift with no favourite attached",
-                "Or move part of their own pledge across, which costs them nothing more",
-                "A guest without means — a child, usually — draws on it to take part",
-                "Nobody sees who used it, and the money reaches the charity either way",
+                "Give to charity without picking a favourite",
+                "Give more than your favourite is worth to you. e.g. £50 for your favourite, £50 to the shared fund",
+                "Help those without money take part. They can select from the shared fund at checkout",
+                "Anything remaining in the shared fund goes to the charity when the favpoll closes",
               ]}
               artefact={<FundVignette />}
             />
