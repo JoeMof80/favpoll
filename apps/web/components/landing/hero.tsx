@@ -347,15 +347,32 @@ export function LandingHero({
                 the border as a fix.
                 It survives without one because two other things carry it: the
                 arrow, which no static line of copy on this band has, and the
-                hover wash. Padding drops 6 -> 3 with the border, so the wash
-                hugs the words instead of blooming a pill-sized box around
-                them, and h-11 stays so the two CTAs share a baseline. */}
+                hover wash, and h-11 keeps both CTAs on one baseline.
+
+                PADDING MATCHES THE PRIMARY'S so the two LABELS start at the
+                same x (founder, 2026-08-18: "their text doesn't line up
+                because of the different margin"). Stacked, both boxes begin at
+                the column edge, so padding alone decides where each label
+                lands — at px-3 against the primary's px-6 they sat 12px apart.
+                An earlier pass pulled this the other way with -ml-3, putting
+                the words on the column RAIL: level with the headline, but 24px
+                left of the label directly above them. Wrong reading. Two
+                buttons stacked read as a pair, and a pair lines up with itself
+                before it lines up with the paragraph above.
+
+                pr-6 IS AN OVERRIDE, not a repetition of px-6. Button's lg size
+                carries has-data-[icon=inline-end]:pr-2, which trims the
+                trailing side when a button ends in an icon — fair for a SOLID
+                button, where the eye reads the filled edge. There is no edge
+                here until hover, so it only rendered the wash lopsided, 24
+                left against 8 right. Same variant, same property, declared
+                after, so it wins. */}
             {router && (
               <Button
                 asChild
                 size="lg"
                 variant="ghost"
-                className="-ml-3 h-11 px-3 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-3 md:ml-0"
+                className="h-11 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
