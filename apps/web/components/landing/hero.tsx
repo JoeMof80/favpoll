@@ -334,7 +334,7 @@ export function LandingHero({
                 asChild
                 size="lg"
                 variant="ghost"
-                className="h-11 px-3 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="h-11 px-3 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-3"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
