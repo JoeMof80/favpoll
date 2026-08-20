@@ -160,6 +160,9 @@ export function LiveVignette() {
   // Which row just moved — coloured for a beat so the money is visibly landing
   // somewhere rather than the numbers merely being different.
   const bumped = step === 2 ? 1 : step === 3 ? 0 : -1
+  // The beat a pledge actually lands on — used to tie the total and the wall
+  // row together with one accent.
+  const landing = step === 2 || step === 3
   const total = TOTALS[step]
   const reached = total >= GOAL
   const pressed = step === 1
@@ -171,44 +174,54 @@ export function LiveVignette() {
         aria-hidden="true"
         className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-6"
       >
-        {/* THE PHONE. Proportioned like one — the last version was 132 wide
-            against ~230 tall and read as an Apple Watch (founder, 2026-08-20).
-            A handset is about 2:1, its bezel is thin, and its corner radius is
-            roughly a seventh of its width, not a third. Narrower, thinner
-            bezel, tighter radius, and its own app chrome at the top, which is
-            what makes the height honest rather than padded. */}
-        <div className="w-[108px] shrink-0 rounded-[1.15rem] border-[5px] border-foreground/85 bg-foreground/85 shadow-lg sm:w-[118px]">
+        {/* THE PHONE — THE PROCESS, not the standings (founder, 2026-08-20:
+            "we don't need to show the rankings on the phone. we need to
+            emphasise the process of user pledging on their phone and the total
+            ticking up in sync with their name appearing on the wall").
+            The standings were duplicating the screen beside them, which made
+            the pair read as two views of one thing rather than as cause and
+            effect. What a guest does on their phone is choose a favourite,
+            choose an amount, and press once — so that is what it shows, and
+            the screen keeps the numbers.
+            Proportioned like a handset: about 2:1, thin bezel, and a corner
+            radius near a seventh of its width. At 1.6:1 with a 1.6rem radius
+            it read as an Apple Watch. */}
+        <div className="w-[112px] shrink-0 rounded-[1.15rem] border-[5px] border-foreground/85 bg-foreground/85 shadow-lg sm:w-[122px]">
           <div className="relative overflow-hidden rounded-[0.8rem] bg-background">
             <div className="absolute top-1 left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-full bg-foreground/25" />
             <div className="border-b border-border px-2 pt-3 pb-1.5">
               <p className="text-[8px] font-medium text-primary">favpoll</p>
             </div>
-            <div className="px-2 py-2">
+            <div className="px-2 py-2.5">
               <p className="text-[7px] font-medium tracking-widest text-muted-foreground uppercase">
                 Jess&apos;s 30th
               </p>
-              <p className="text-[8px] font-medium tracking-widest text-primary uppercase">
+              <p className="mt-0.5 text-[8px] font-medium tracking-widest text-primary uppercase">
                 {TOPIC}
               </p>
-              <div className="mt-1.5 flex flex-col gap-1.5">
-                {ranks.map(([label, amount], i) => (
-                  <Rank
-                    key={label}
-                    label={label}
-                    amount={amount}
-                    bumped={bumped === i}
-                    small
-                  />
-                ))}
-              </div>
+
+              <p className="mt-2 text-[7px] tracking-wide text-muted-foreground uppercase">
+                Your favourite
+              </p>
+              <p className="mt-0.5 rounded border border-border px-1.5 py-1 text-[9px] font-medium">
+                Cocker Spaniel
+              </p>
+
+              <p className="mt-2 text-[7px] tracking-wide text-muted-foreground uppercase">
+                Your pledge
+              </p>
+              <p className="mt-0.5 text-lg leading-none font-medium tabular-nums">
+                £50
+              </p>
+
               <div
-                className={`mt-2 rounded-md py-1.5 text-center text-[9px] font-medium transition-all duration-200 ${
+                className={`mt-2.5 rounded-md py-1.5 text-center text-[9px] font-medium transition-all duration-200 ${
                   step >= 2
                     ? "bg-success/15 text-success"
                     : "bg-primary text-primary-foreground"
                 } ${pressed ? "scale-[0.96] brightness-95" : ""}`}
               >
-                {step >= 2 ? "£50 sent" : "Pledge £50"}
+                {step >= 2 ? "Sent ✓" : "Pledge £50"}
               </div>
             </div>
           </div>
@@ -237,14 +250,23 @@ export function LiveVignette() {
             No stand: a stand made it a monitor on a desk. Mounted is a flush
             bezel and a cast shadow beneath, not furniture. */}
         <div className="w-full min-w-0 sm:max-w-[400px] sm:flex-1">
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-lg border-[7px] border-foreground/85 bg-background p-3 shadow-[0_18px_30px_-12px_rgba(0,0,0,0.45)]">
+          <div className="grid grid-cols-[1.5fr_1fr] gap-x-3 gap-y-3 rounded-lg border-[7px] border-foreground/85 bg-background p-3 shadow-[0_18px_30px_-12px_rgba(0,0,0,0.45)]">
             {/* TOP LEFT — the goal */}
             <div className="min-w-0">
               <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
                 Pledge goal
               </p>
               <p className="mt-0.5 flex items-baseline gap-1">
-                <span className="text-lg font-medium tabular-nums sm:text-xl">
+                {/* The total and the arriving wall row take the SAME accent
+                    on the beat the pledge lands. They sit diagonally apart in
+                    the quadrant layout, so without one thread tying them the
+                    eye reads two independent changes rather than one event —
+                    which is the whole thing this artefact exists to show. */}
+                <span
+                  className={`text-lg font-medium tabular-nums transition-colors duration-300 sm:text-xl ${
+                    landing ? "text-primary" : ""
+                  }`}
+                >
                   {formatPounds(total)}
                 </span>
                 <span className="text-[9px] text-muted-foreground">
@@ -275,7 +297,7 @@ export function LiveVignette() {
             {/* TOP RIGHT — the QR, which is how a guest gets from the screen
                 into the favpoll at all. */}
             <div className="flex min-w-0 flex-col items-center justify-start">
-              <BrandedQR value={QR_URL} size={52} logo={false} />
+              <BrandedQR value={QR_URL} size={74} logo={false} />
               <p className="mt-1 text-center text-[8px] leading-tight text-muted-foreground">
                 Scan to pledge
               </p>
@@ -313,9 +335,11 @@ export function LiveVignette() {
                   .map((row, i) => (
                     <p
                       key={row.name}
-                      className={`text-[8px] leading-snug transition-opacity duration-500 ${
+                      className={`text-[9px] leading-snug transition-all duration-500 ${
                         i === 0 && step >= 2
-                          ? "text-foreground opacity-100"
+                          ? landing
+                            ? "text-primary opacity-100"
+                            : "text-foreground opacity-100"
                           : "text-muted-foreground opacity-70"
                       }`}
                     >
