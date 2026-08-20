@@ -6,7 +6,7 @@ import { HeroTexture } from "@/components/landing/hero-texture"
 import { t } from "@/lib/i18n"
 import { FeatureNav } from "@/components/landing/feature-nav"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
-import { RoomVignette } from "@/components/landing/room-vignette"
+import { LiveVignette } from "@/components/landing/live-vignette"
 import { PackVignette } from "@/components/landing/pack-vignette"
 import { FundVignette } from "@/components/landing/fund-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
@@ -232,7 +232,7 @@ export default function FeaturesPage() {
                 "A pledge goal, if one is set, fills as pledges land and turns green the moment it is met",
                 "The wall of favourites scrolls alongside — who backed what, never amounts, and anyone can appear as “Someone”",
               ]}
-              artefact={<RoomVignette />}
+              artefact={<LiveVignette />}
             />
 
             <Feature
