@@ -1,151 +1,106 @@
 "use client"
 
-// The live section's artefact: a pledge landing and the goal moving in the
-// SAME BEAT — which is the one thing this section claims and the one thing
-// its previous artefact could not show.
+// The live section's artefact: the REAL display, with pledges landing on it.
 //
-// WHY THE ROOM WENT (founder, 2026-08-19: "we need to emphasise the real time
-// effect of the pledge landing and the goal updating simultaneously", and
-// before that "maybe this is the wrong vignette").
+// FAITHFUL, NOT A DRAWING OF ONE (founder, 2026-08-20): "how about we abandon
+// the phone and make the live display much more faithful to the real
+// experience. Maybe even reuse the display from 'How it works'. It needs to
+// represent the content that describes it, above ... That is the most
+// important thing."
 //
-// The room had two jobs and they fought. "On a big screen in a room" needs
-// distance and perspective, so the display was drawn small and tilted on a far
-// wall; "watch it change as pledges land" needs the numbers legible. The stage
-// was authored at 624 x 352 and scaled 0.47 at base, so the display's 10px
-// labels rendered at 4.3px on a phone — measured. The room won and the
-// real-time effect was invisible, which is why nobody noticed the wall
-// promised in that file's header had never been built.
+// So it is DisplayStill — the same component the homepage walkthrough uses,
+// which is DisplayScreen itself with live={false}. Nothing is drawn a second
+// time, which means this artefact cannot drift from the product the way a
+// hand-built lookalike does. The page's charter has always demanded real
+// components and never lookalikes; this was the last section not obeying it.
 //
-// A callout magnifying the wall beside the room was tried first and rejected:
-// it bolted legibility onto the side of the problem rather than removing it.
+// WHAT CAME BEFORE, so nobody rebuilds it. A room in perspective was tried
+// first: the display sat small on a far wall and its 10px labels rendered at
+// 4.3px, so the one thing this section claims — standings moving as pledges
+// land — could not be seen at all. A magnified wall callout beside it was
+// bolted on and rejected. Then a bespoke phone-and-screen pair, drawn by hand,
+// which took four rounds of corrections: a phone shaped like a watch, a screen
+// shaped like a letterbox, a missing QR, a layout "nothing like the real
+// thing". Every one of those was a fidelity bug that could only exist because
+// the thing was a drawing.
 //
-// So the screen is CROPPED rather than shrunk — the same move the keepsake and
-// the print pack landed on the day before. Show the part that carries the
-// beat, at a size it can be read, instead of the whole object at a size it
-// cannot. The bezel keeps "this is on a display"; the depth of field is what
-// the section could not afford.
+// THE PHONE IS GONE. It was there to supply the other end of the exchange, but
+// the display already shows it — money arrives, the standings move, a name
+// appears on the wall. Beside the screen it was a second object competing for
+// the width the screen needed in order to be legible at all.
 //
-// The phone stays because simultaneity needs two ends, but it is the CAUSE and
-// the screen is the subject — which also fixes an old inversion, since the
-// section is called Live display and the phone used to be the larger object.
+// THE BEAT IS DRIVEN THROUGH THE SCENE, not painted on top. Bumping a
+// favourite's amount moves the standings AND the total, because DisplayStill
+// derives the total from the pledges — so the sync is a property of the data
+// rather than two animations somebody has to keep in step. The wall grows a
+// name with it, which is the one thing the still could not do until it took a
+// wallNames prop.
 //
-// The wall is not here. The founder asked for it, then named the goal as the
-// real point; one frame carrying both ideas is how the last one failed. It is
-// covered in the section's bullets instead.
-// FOUR CORRECTIONS (founder, 2026-08-20): "phone should look like a phone.
-// QR code should be visible. live display should look wall mounted. Both the
-// phone and the display should show the topic and rankings too."
+// SAME WIDTH AS EVERY OTHER VIGNETTE (founder, 2026-08-09, and still in
+// force): "it was the one section that sat wider, which read as a mistake
+// rather than as emphasis." Vignette's `wide` was tried here and reversed on
+// finding that note — it buys the still 896px instead of 672, and with it 11.7
+// px of type instead of 8.6, which is a real gain and not mine to take.
 //
-// All four pull the same way — the objects were abstracted down to the beat
-// they had to carry, and lost the thing that made them recognisable. A phone
-// with no chassis is a card; a screen with a stand is a monitor on a desk, not
-// the thing in the room; and standings with no topic and no QR are numbers
-// with nothing to do with favpoll. They are drawn as themselves now, and the
-// beat still runs through them.
-//
-// The QR is the part that earns its place twice: it is how a guest gets from
-// the screen into the favpoll at all, so a display without one is missing the
-// mechanism the section above it just described.
-import { useEffect, useState } from "react"
+// SCALED TO ITS COLUMN, measured rather than tuned. The still is authored at
+// 1120 plus the TV's bezel, and its frame is ~294 wide on a phone against
+// ~750 at 1280 — so the scale is read off the container at runtime and the box
+// reserves the scaled height. No breakpoint to keep true, and nothing to go
+// stale, which is how the previous constants failed three times.
+import { useEffect, useRef, useState } from "react"
 import { useReducedMotion } from "framer-motion"
-import { formatPounds } from "@/lib/i18n"
-import { BrandedQR } from "@/components/branded-qr"
+import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
+import {
+  DisplayStill,
+  DISPLAY_STILL_WIDTH,
+} from "@/components/landing/display-still"
+import { DEMO_SCENE, DEMO_QR_URL } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
+import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
-const GOAL = 900
-const TOPIC = "Favourite dog breed"
-const QR_URL = "https://favpoll.com/j"
+/** The still's own width plus TvFrame's 20px bezel each side. */
+const NATURAL_W = DISPLAY_STILL_WIDTH + 40
 
-// 0: idle · 1: Pledge pressed · 2: it lands — Cocker Spaniel takes the £50 and
-// the goal is crossed · 3: someone else's £20 goes to the Labrador on its own,
-// so the screen reads as live rather than as waiting for you · hold → reset.
-const STEP_MS = [1600, 380, 2800, 2800]
-const LAST = STEP_MS.length - 1
-const TOTALS = [855, 855, 905, 925]
+/** Wall entries, in arrival order. null renders as "Someone". */
+const WALL: (string | null)[] = ["Priya", "Tom", null, "Aisha", "Dan"]
 
-// Standings per step. They move with the money — Raj's £50 onto the Cocker
-// Spaniel, Amara's £20 onto the Labrador — so the rankings, the total, the
-// goal and the wall are all one event rather than four decorations.
-const RANKS: readonly (readonly [string, number])[][] = [
-  [
-    ["Labrador", 320],
-    ["Cocker Spaniel", 270],
-    ["Border Terrier", 165],
-    ["Greyhound", 120],
-  ],
-  [
-    ["Labrador", 320],
-    ["Cocker Spaniel", 270],
-    ["Border Terrier", 165],
-    ["Greyhound", 120],
-  ],
-  [
-    ["Labrador", 320],
-    ["Cocker Spaniel", 320],
-    ["Border Terrier", 165],
-    ["Greyhound", 120],
-  ],
-  [
-    ["Labrador", 340],
-    ["Cocker Spaniel", 320],
-    ["Border Terrier", 165],
-    ["Greyhound", 120],
-  ],
+/** The pledges that land: which favourite takes the money, and how much. */
+const PLEDGES: { index: number; amount: number }[] = [
+  { index: 1, amount: 50 },
+  { index: 0, amount: 20 },
 ]
-const RANK_MAX = 340
 
-const WALL = [
-  { name: "Priya", label: "Labrador" },
-  { name: "Raj", label: "Cocker Spaniel" },
-  { name: "Amara", label: "Labrador" },
-] as const
-const WALL_VISIBLE = [1, 1, 2, 3]
+// 0: as the room finds it · 1: £50 lands on the runner-up · 2: £20 lands on
+// the leader, so the screen reads as live rather than as waiting for you.
+const STEP_MS = [2600, 3000, 3400]
+const LAST = STEP_MS.length - 1
 
-/** One standings row, at whatever size its container gives it. */
-function Rank({
-  label,
-  amount,
-  bumped,
-  small = false,
-}: {
-  label: string
-  amount: number
-  bumped: boolean
-  small?: boolean
-}) {
-  return (
-    <div>
-      <div
-        className={`flex items-baseline justify-between gap-2 ${
-          small ? "text-[9px]" : "text-[11px]"
-        }`}
-      >
-        <span className="truncate text-foreground">{label}</span>
-        <span
-          className={`shrink-0 tabular-nums transition-colors duration-300 ${
-            bumped ? "text-primary" : "text-muted-foreground"
-          }`}
-        >
-          {formatPounds(amount)}
-        </span>
-      </div>
-      <div
-        className={`mt-0.5 w-full overflow-hidden rounded-full bg-muted ${
-          small ? "h-0.5" : "h-1"
-        }`}
-      >
-        <div
-          className="h-full rounded-full bg-primary transition-all duration-700 ease-out"
-          style={{ width: `${(amount / RANK_MAX) * 100}%` }}
-        />
-      </div>
-    </div>
-  )
+function parseGBP(amount: string): number {
+  return parseInt(amount.replace(/[^0-9]/g, ""), 10) || 0
 }
+
+/** The scene as it stands once the first `n` pledges have landed. */
+function sceneAfter(n: number): HeroScene {
+  if (n === 0) return DEMO_SCENE
+  const results = DEMO_SCENE.results.map((r, i) => {
+    const added = PLEDGES.slice(0, n)
+      .filter((p) => p.index === i)
+      .reduce((sum, p) => sum + p.amount, 0)
+    return added ? { ...r, amount: `£${parseGBP(r.amount) + added}` } : r
+  })
+  return { ...DEMO_SCENE, results }
+}
+
+const SCENES = [sceneAfter(0), sceneAfter(1), sceneAfter(2)]
 
 export function LiveVignette() {
   const reduced = useReducedMotion()
-  const [step, setStep] = useState(reduced ? 2 : 0)
+  const [step, setStep] = useState(reduced ? LAST : 0)
+
+  const boxRef = useRef<HTMLDivElement | null>(null)
+  const innerRef = useRef<HTMLDivElement | null>(null)
+  const [width, setWidth] = useState(0)
+  const [naturalH, setNaturalH] = useState(0)
 
   useEffect(() => {
     if (reduced) return
@@ -156,199 +111,51 @@ export function LiveVignette() {
     return () => clearTimeout(id)
   }, [step, reduced])
 
-  const ranks = RANKS[step]
-  // Which row just moved — coloured for a beat so the money is visibly landing
-  // somewhere rather than the numbers merely being different.
-  const bumped = step === 2 ? 1 : step === 3 ? 0 : -1
-  // The beat a pledge actually lands on — used to tie the total and the wall
-  // row together with one accent.
-  const landing = step === 2 || step === 3
-  const total = TOTALS[step]
-  const reached = total >= GOAL
-  const pressed = step === 1
-  const pct = Math.min(100, (total / GOAL) * 100)
+  useEffect(() => {
+    const box = boxRef.current
+    const inner = innerRef.current
+    if (!box || !inner) return
+    const update = () => {
+      setWidth(box.getBoundingClientRect().width)
+      // The still is content-sized, so its height is READ rather than assumed.
+      // The constant it would otherwise need went stale three times.
+      setNaturalH(inner.offsetHeight)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(box)
+    ro.observe(inner)
+    return () => ro.disconnect()
+  }, [])
+
+  const scale = width ? width / NATURAL_W : 0
+  const wallNames = WALL.slice(0, 3 + step)
 
   return (
     <Vignette>
-      <div
-        aria-hidden="true"
-        className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-6"
-      >
-        {/* THE PHONE — THE PROCESS, not the standings (founder, 2026-08-20:
-            "we don't need to show the rankings on the phone. we need to
-            emphasise the process of user pledging on their phone and the total
-            ticking up in sync with their name appearing on the wall").
-            The standings were duplicating the screen beside them, which made
-            the pair read as two views of one thing rather than as cause and
-            effect. What a guest does on their phone is choose a favourite,
-            choose an amount, and press once — so that is what it shows, and
-            the screen keeps the numbers.
-            Proportioned like a handset: about 2:1, thin bezel, and a corner
-            radius near a seventh of its width. At 1.6:1 with a 1.6rem radius
-            it read as an Apple Watch. */}
-        <div className="w-[112px] shrink-0 rounded-[1.15rem] border-[5px] border-foreground/85 bg-foreground/85 shadow-lg sm:w-[122px]">
-          <div className="relative overflow-hidden rounded-[0.8rem] bg-background">
-            <div className="absolute top-1 left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-full bg-foreground/25" />
-            <div className="border-b border-border px-2 pt-3 pb-1.5">
-              <p className="text-[8px] font-medium text-primary">favpoll</p>
-            </div>
-            <div className="px-2 py-2.5">
-              <p className="text-[7px] font-medium tracking-widest text-muted-foreground uppercase">
-                Jess&apos;s 30th
-              </p>
-              <p className="mt-0.5 text-[8px] font-medium tracking-widest text-primary uppercase">
-                {TOPIC}
-              </p>
-
-              <p className="mt-2 text-[7px] tracking-wide text-muted-foreground uppercase">
-                Your favourite
-              </p>
-              <p className="mt-0.5 rounded border border-border px-1.5 py-1 text-[9px] font-medium">
-                Cocker Spaniel
-              </p>
-
-              <p className="mt-2 text-[7px] tracking-wide text-muted-foreground uppercase">
-                Your pledge
-              </p>
-              <p className="mt-0.5 text-lg leading-none font-medium tabular-nums">
-                £50
-              </p>
-
-              <div
-                className={`mt-2.5 rounded-md py-1.5 text-center text-[9px] font-medium transition-all duration-200 ${
-                  step >= 2
-                    ? "bg-success/15 text-success"
-                    : "bg-primary text-primary-foreground"
-                } ${pressed ? "scale-[0.96] brightness-95" : ""}`}
-              >
-                {step >= 2 ? "Sent ✓" : "Pledge £50"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* The beat travelling between them — the only thing in the frame that
-            says these are one event rather than two pictures. */}
-        <div className="flex shrink-0 items-center gap-1 sm:mt-16">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className={`h-1 w-1 rounded-full transition-all duration-300 ${
-                step >= 1
-                  ? "bg-primary opacity-100"
-                  : "bg-primary/30 opacity-40"
-              }`}
-              style={{ transitionDelay: `${i * 90}ms` }}
-            />
-          ))}
-        </div>
-
-        {/* THE SCREEN, WALL MOUNTED, IN QUADRANTS — the real display's own
-            layout (founder, 2026-08-20): "top left - pledge goal. top right -
-            QR code. bottom left - rankings. bottom right - wall". The previous
-            version stacked them, which was nothing like the thing it depicts.
-            No stand: a stand made it a monitor on a desk. Mounted is a flush
-            bezel and a cast shadow beneath, not furniture. */}
-        <div className="w-full min-w-0 sm:max-w-[400px] sm:flex-1">
-          <div className="grid grid-cols-[1.5fr_1fr] gap-x-3 gap-y-3 rounded-lg border-[7px] border-foreground/85 bg-background p-3 shadow-[0_18px_30px_-12px_rgba(0,0,0,0.45)]">
-            {/* TOP LEFT — the goal */}
-            <div className="min-w-0">
-              <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
-                Pledge goal
-              </p>
-              <p className="mt-0.5 flex items-baseline gap-1">
-                {/* The total and the arriving wall row take the SAME accent
-                    on the beat the pledge lands. They sit diagonally apart in
-                    the quadrant layout, so without one thread tying them the
-                    eye reads two independent changes rather than one event —
-                    which is the whole thing this artefact exists to show. */}
-                <span
-                  className={`text-lg font-medium tabular-nums transition-colors duration-300 sm:text-xl ${
-                    landing ? "text-primary" : ""
-                  }`}
-                >
-                  {formatPounds(total)}
-                </span>
-                <span className="text-[9px] text-muted-foreground">
-                  of {formatPounds(GOAL)}
-                </span>
-              </p>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className={`h-full rounded-full transition-all duration-700 ease-out ${
-                    reached ? "bg-success" : "bg-primary"
-                  }`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              {/* The green bar says the goal is met; only these words say the
-                  favpoll does not stop there. */}
-              <p
-                className={`mt-1 text-[8px] leading-tight transition-colors duration-300 ${
-                  reached ? "text-success" : "text-muted-foreground"
-                }`}
-              >
-                {reached
-                  ? "Goal reached — every pledge still counts"
-                  : "Updating as pledges land"}
-              </p>
-            </div>
-
-            {/* TOP RIGHT — the QR, which is how a guest gets from the screen
-                into the favpoll at all. */}
-            <div className="flex min-w-0 flex-col items-center justify-start">
-              <BrandedQR value={QR_URL} size={74} logo={false} />
-              <p className="mt-1 text-center text-[8px] leading-tight text-muted-foreground">
-                Scan to pledge
-              </p>
-            </div>
-
-            {/* BOTTOM LEFT — the standings */}
-            <div className="min-w-0">
-              <p className="text-[8px] font-medium tracking-widest text-primary uppercase">
-                {TOPIC}
-              </p>
-              <div className="mt-1 flex flex-col gap-1">
-                {ranks.map(([label, amount], i) => (
-                  <Rank
-                    key={label}
-                    label={label}
-                    amount={amount}
-                    bumped={bumped === i}
-                    small
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* BOTTOM RIGHT — the wall. HEIGHT RESERVED FOR THREE: the rows
-                arrive one at a time, and without a floor the screen grew
-                mid-loop and shunted the page below it down every cycle. */}
-            <div className="min-w-0">
-              <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
-                Wall of favourites
-              </p>
-              <div className="mt-1 flex min-h-[42px] flex-col gap-0.5">
-                {WALL.slice(0, WALL_VISIBLE[step])
-                  .slice()
-                  .reverse()
-                  .map((row, i) => (
-                    <p
-                      key={row.name}
-                      className={`text-[9px] leading-snug transition-all duration-500 ${
-                        i === 0 && step >= 2
-                          ? landing
-                            ? "text-primary opacity-100"
-                            : "text-foreground opacity-100"
-                          : "text-muted-foreground opacity-70"
-                      }`}
-                    >
-                      <span className="font-medium">{row.name}</span> backed{" "}
-                      {row.label}
-                    </p>
-                  ))}
-              </div>
-            </div>
+      <div ref={boxRef} aria-hidden="true" className="w-full">
+        {/* A transform does not change the layout box, so the scaled height is
+            reserved explicitly — the class of bug that once put a 940px TV in
+            a 184px well and spilled it over the beats either side. */}
+        <div
+          className="overflow-hidden"
+          style={{ height: naturalH && scale ? naturalH * scale : undefined }}
+        >
+          <div
+            ref={innerRef}
+            className="origin-top-left"
+            style={{
+              width: NATURAL_W,
+              transform: scale ? `scale(${scale})` : undefined,
+            }}
+          >
+            <TvFrame>
+              <DisplayStill
+                scene={SCENES[step]}
+                qrUrl={DEMO_QR_URL}
+                wallNames={wallNames}
+              />
+            </TvFrame>
           </div>
         </div>
       </div>

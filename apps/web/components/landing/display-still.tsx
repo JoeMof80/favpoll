@@ -69,9 +69,16 @@ const WALL_BASE_TIME = Date.now()
 export function DisplayStill({
   scene,
   qrUrl,
+  wallNames = WALL_NAMES,
 }: {
   scene: HeroScene
   qrUrl: string
+  /**
+   * Override the wall entries. Only /features' live artefact passes this, to
+   * grow the wall a name at a time as its pledges land — the still is
+   * otherwise a fixed picture and every other caller wants that.
+   */
+  wallNames?: (string | null)[]
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -81,7 +88,7 @@ export function DisplayStill({
   )
   const total = items.reduce((sum, item) => sum + item.all_time_pledged, 0)
 
-  const wall = WALL_NAMES.map((name, i) => ({
+  const wall = wallNames.map((name, i) => ({
     id: `wall-${i}`,
     name,
     labels: [ranked[i % ranked.length].label],
