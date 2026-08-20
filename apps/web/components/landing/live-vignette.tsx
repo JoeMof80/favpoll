@@ -46,6 +46,16 @@ const STEP_MS = [1500, 380, 2600, 2800]
 const LAST = STEP_MS.length - 1
 const TOTALS = [855, 855, 905, 925]
 
+// The wall, ON the screen — which is where it lives in the product, and what
+// gives the screen enough to hold. Rows arrive with the money: Raj's with his
+// £50 on the beat the goal is crossed, then Amara's on its own.
+const WALL = [
+  { name: "Priya", label: "Labrador" },
+  { name: "Raj", label: "Cocker Spaniel" },
+  { name: "Amara", label: "Labrador" },
+] as const
+const WALL_VISIBLE = [1, 1, 2, 3]
+
 export function LiveVignette() {
   const reduced = useReducedMotion()
   const [step, setStep] = useState(reduced ? 2 : 0)
@@ -68,7 +78,7 @@ export function LiveVignette() {
     <Vignette>
       <div
         aria-hidden="true"
-        className="flex items-center justify-center gap-4 sm:gap-6"
+        className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-6"
       >
         {/* THE CAUSE. Cropped to the moment — the amount already chosen and
             the button about to go — because the picking is step three's job
@@ -113,17 +123,21 @@ export function LiveVignette() {
           ))}
         </div>
 
-        {/* THE SUBJECT — the screen, cropped to the band that moves. */}
-        <div className="min-w-0 flex-1">
+        {/* THE SUBJECT — the screen. Capped rather than flex-1: left to fill
+            the frame it stretched to ~900px against four lines of content and
+            came out a letterbox with a stand under it, which is what the
+            founder saw ("this looks ridiculous"). A screen is a shape, not
+            whatever width is going spare. */}
+        <div className="w-full min-w-0 sm:max-w-[420px] sm:flex-1">
           <div className="rounded-md border-[5px] border-foreground/80 bg-background p-3 shadow-md sm:p-4">
             <p className="text-[9px] font-medium tracking-widest text-muted-foreground uppercase">
               Pledge goal
             </p>
             <p className="mt-1 flex items-baseline gap-1.5">
-              {/* tabular-nums so the number does not jitter its own width as it
-                ticks — the movement should read as the total changing, not as
-                the layout twitching. */}
-              <span className="text-2xl font-medium tabular-nums transition-colors duration-300 sm:text-3xl">
+              {/* tabular-nums so the number does not jitter its own width as
+                  it ticks — the movement should read as the total changing,
+                  not as the layout twitching. */}
+              <span className="text-2xl font-medium tabular-nums sm:text-3xl">
                 {formatPounds(total)}
               </span>
               <span className="text-[11px] text-muted-foreground">
@@ -139,7 +153,7 @@ export function LiveVignette() {
               />
             </div>
             <p
-              className={`mt-2 text-[10px] transition-colors duration-300 sm:text-[11px] ${
+              className={`mt-1.5 text-[10px] transition-colors duration-300 ${
                 reached ? "text-success" : "text-muted-foreground"
               }`}
             >
@@ -147,6 +161,35 @@ export function LiveVignette() {
                 ? "Goal reached — every pledge still counts"
                 : "Updating as pledges land"}
             </p>
+
+            <div className="mt-3 border-t border-border pt-2.5">
+              <p className="text-[9px] font-medium tracking-widest text-muted-foreground uppercase">
+                Wall of favourites
+              </p>
+              {/* HEIGHT RESERVED FOR THREE. The rows arrive one at a time, so
+                  without a floor the screen grew 38px mid-loop and shunted the
+                  whole page down every cycle — measured, vignette 414 -> 452
+                  at 390. A feed that pushes the article about is worse than a
+                  little empty space in a screen that is filling up. */}
+              <div className="mt-1.5 flex min-h-[54px] flex-col gap-1">
+                {WALL.slice(0, WALL_VISIBLE[step])
+                  .slice()
+                  .reverse()
+                  .map((row, i) => (
+                    <p
+                      key={row.name}
+                      className={`text-[11px] leading-snug transition-opacity duration-500 ${
+                        i === 0 && step >= 2
+                          ? "text-foreground opacity-100"
+                          : "text-muted-foreground opacity-70"
+                      }`}
+                    >
+                      <span className="font-medium">{row.name}</span> backed{" "}
+                      {row.label}
+                    </p>
+                  ))}
+              </div>
+            </div>
           </div>
           {/* The stand. Six pixels that turn a bordered box into a screen on a
               table, which is the whole of what the room used to be for. */}
