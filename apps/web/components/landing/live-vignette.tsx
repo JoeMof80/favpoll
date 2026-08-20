@@ -71,21 +71,25 @@ const RANKS: readonly (readonly [string, number])[][] = [
     ["Labrador", 320],
     ["Cocker Spaniel", 270],
     ["Border Terrier", 165],
+    ["Greyhound", 120],
   ],
   [
     ["Labrador", 320],
     ["Cocker Spaniel", 270],
     ["Border Terrier", 165],
+    ["Greyhound", 120],
   ],
   [
     ["Labrador", 320],
     ["Cocker Spaniel", 320],
     ["Border Terrier", 165],
+    ["Greyhound", 120],
   ],
   [
     ["Labrador", 340],
     ["Cocker Spaniel", 320],
     ["Border Terrier", 165],
+    ["Greyhound", 120],
   ],
 ]
 const RANK_MAX = 340
@@ -167,36 +171,45 @@ export function LiveVignette() {
         aria-hidden="true"
         className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-6"
       >
-        {/* THE PHONE, drawn as one: a chassis with real bezels, a rounded
-            screen inside it, and a notch. It was a rounded card before, which
-            is what the founder saw. It carries the topic and the standings for
-            the same reason the screen does — a guest who has pledged sees
-            exactly this, and without them the phone is a payment terminal. */}
-        <div className="w-[132px] shrink-0 rounded-[1.6rem] border-[6px] border-foreground/85 bg-foreground/85 p-0 shadow-lg sm:w-[146px]">
-          <div className="relative overflow-hidden rounded-[1.15rem] bg-background px-2.5 pt-3 pb-2.5">
-            <div className="absolute top-1 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-foreground/25" />
-            <p className="text-[8px] font-medium tracking-widest text-primary uppercase">
-              {TOPIC}
-            </p>
-            <div className="mt-1.5 flex flex-col gap-1.5">
-              {ranks.map(([label, amount], i) => (
-                <Rank
-                  key={label}
-                  label={label}
-                  amount={amount}
-                  bumped={bumped === i}
-                  small
-                />
-              ))}
+        {/* THE PHONE. Proportioned like one — the last version was 132 wide
+            against ~230 tall and read as an Apple Watch (founder, 2026-08-20).
+            A handset is about 2:1, its bezel is thin, and its corner radius is
+            roughly a seventh of its width, not a third. Narrower, thinner
+            bezel, tighter radius, and its own app chrome at the top, which is
+            what makes the height honest rather than padded. */}
+        <div className="w-[108px] shrink-0 rounded-[1.15rem] border-[5px] border-foreground/85 bg-foreground/85 shadow-lg sm:w-[118px]">
+          <div className="relative overflow-hidden rounded-[0.8rem] bg-background">
+            <div className="absolute top-1 left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-full bg-foreground/25" />
+            <div className="border-b border-border px-2 pt-3 pb-1.5">
+              <p className="text-[8px] font-medium text-primary">favpoll</p>
             </div>
-            <div
-              className={`mt-2.5 rounded-md py-1.5 text-center text-[10px] font-medium transition-all duration-200 ${
-                step >= 2
-                  ? "bg-success/15 text-success"
-                  : "bg-primary text-primary-foreground"
-              } ${pressed ? "scale-[0.96] brightness-95" : ""}`}
-            >
-              {step >= 2 ? "£50 sent" : "Pledge £50"}
+            <div className="px-2 py-2">
+              <p className="text-[7px] font-medium tracking-widest text-muted-foreground uppercase">
+                Jess&apos;s 30th
+              </p>
+              <p className="text-[8px] font-medium tracking-widest text-primary uppercase">
+                {TOPIC}
+              </p>
+              <div className="mt-1.5 flex flex-col gap-1.5">
+                {ranks.map(([label, amount], i) => (
+                  <Rank
+                    key={label}
+                    label={label}
+                    amount={amount}
+                    bumped={bumped === i}
+                    small
+                  />
+                ))}
+              </div>
+              <div
+                className={`mt-2 rounded-md py-1.5 text-center text-[9px] font-medium transition-all duration-200 ${
+                  step >= 2
+                    ? "bg-success/15 text-success"
+                    : "bg-primary text-primary-foreground"
+                } ${pressed ? "scale-[0.96] brightness-95" : ""}`}
+              >
+                {step >= 2 ? "£50 sent" : "Pledge £50"}
+              </div>
             </div>
           </div>
         </div>
@@ -217,50 +230,28 @@ export function LiveVignette() {
           ))}
         </div>
 
-        {/* THE SCREEN, WALL MOUNTED. No stand: a stand made it a monitor on a
-            desk, and this is the thing on the wall of the room. Mounted is
-            drawn with a thin flush bezel and a soft cast shadow beneath rather
-            than furniture — the shadow is what says "held off a surface".
-            Capped rather than flex-1: left to fill the frame it stretched to
-            ~900px against four lines and came out a letterbox. */}
-        <div className="w-full min-w-0 sm:max-w-[430px] sm:flex-1">
-          <div className="rounded-lg border-[7px] border-foreground/85 bg-background p-3 shadow-[0_18px_30px_-12px_rgba(0,0,0,0.45)] sm:p-3.5">
-            <div className="flex gap-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-medium tracking-widest text-primary uppercase">
-                  {TOPIC}
-                </p>
-                <div className="mt-1.5 flex flex-col gap-1.5">
-                  {ranks.map(([label, amount], i) => (
-                    <Rank
-                      key={label}
-                      label={label}
-                      amount={amount}
-                      bumped={bumped === i}
-                    />
-                  ))}
-                </div>
-              </div>
-              {/* The QR — how a guest gets from the screen into the favpoll,
-                  which is the mechanism the section's own lead describes. */}
-              <div className="flex w-[62px] shrink-0 flex-col items-center pt-3">
-                <BrandedQR value={QR_URL} size={54} logo={false} />
-                <p className="mt-1 text-center text-[8px] leading-tight text-muted-foreground">
-                  Scan to pledge
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-2.5 border-t border-border pt-2.5">
-              <p className="flex items-baseline gap-1.5">
-                <span className="text-xl font-medium tabular-nums sm:text-2xl">
+        {/* THE SCREEN, WALL MOUNTED, IN QUADRANTS — the real display's own
+            layout (founder, 2026-08-20): "top left - pledge goal. top right -
+            QR code. bottom left - rankings. bottom right - wall". The previous
+            version stacked them, which was nothing like the thing it depicts.
+            No stand: a stand made it a monitor on a desk. Mounted is a flush
+            bezel and a cast shadow beneath, not furniture. */}
+        <div className="w-full min-w-0 sm:max-w-[400px] sm:flex-1">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-lg border-[7px] border-foreground/85 bg-background p-3 shadow-[0_18px_30px_-12px_rgba(0,0,0,0.45)]">
+            {/* TOP LEFT — the goal */}
+            <div className="min-w-0">
+              <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
+                Pledge goal
+              </p>
+              <p className="mt-0.5 flex items-baseline gap-1">
+                <span className="text-lg font-medium tabular-nums sm:text-xl">
                   {formatPounds(total)}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[9px] text-muted-foreground">
                   of {formatPounds(GOAL)}
                 </span>
               </p>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ease-out ${
                     reached ? "bg-success" : "bg-primary"
@@ -268,12 +259,10 @@ export function LiveVignette() {
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              {/* Kept when the objects were redrawn, because the green bar
-                  says the goal is met and only these words say the favpoll
-                  does not stop there — which is the fact About's FAQ answers
-                  and the register pages lead on. */}
+              {/* The green bar says the goal is met; only these words say the
+                  favpoll does not stop there. */}
               <p
-                className={`mt-1.5 text-[9px] transition-colors duration-300 ${
+                className={`mt-1 text-[8px] leading-tight transition-colors duration-300 ${
                   reached ? "text-success" : "text-muted-foreground"
                 }`}
               >
@@ -281,17 +270,50 @@ export function LiveVignette() {
                   ? "Goal reached — every pledge still counts"
                   : "Updating as pledges land"}
               </p>
-              {/* HEIGHT RESERVED FOR THREE. The rows arrive one at a time, so
-                  without a floor the screen grew mid-loop and shunted the page
-                  below it down every cycle — measured, 414 -> 452 at 390. */}
-              <div className="mt-2 flex min-h-[42px] flex-col gap-0.5">
+            </div>
+
+            {/* TOP RIGHT — the QR, which is how a guest gets from the screen
+                into the favpoll at all. */}
+            <div className="flex min-w-0 flex-col items-center justify-start">
+              <BrandedQR value={QR_URL} size={52} logo={false} />
+              <p className="mt-1 text-center text-[8px] leading-tight text-muted-foreground">
+                Scan to pledge
+              </p>
+            </div>
+
+            {/* BOTTOM LEFT — the standings */}
+            <div className="min-w-0">
+              <p className="text-[8px] font-medium tracking-widest text-primary uppercase">
+                {TOPIC}
+              </p>
+              <div className="mt-1 flex flex-col gap-1">
+                {ranks.map(([label, amount], i) => (
+                  <Rank
+                    key={label}
+                    label={label}
+                    amount={amount}
+                    bumped={bumped === i}
+                    small
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* BOTTOM RIGHT — the wall. HEIGHT RESERVED FOR THREE: the rows
+                arrive one at a time, and without a floor the screen grew
+                mid-loop and shunted the page below it down every cycle. */}
+            <div className="min-w-0">
+              <p className="text-[8px] font-medium tracking-widest text-muted-foreground uppercase">
+                Wall of favourites
+              </p>
+              <div className="mt-1 flex min-h-[42px] flex-col gap-0.5">
                 {WALL.slice(0, WALL_VISIBLE[step])
                   .slice()
                   .reverse()
                   .map((row, i) => (
                     <p
                       key={row.name}
-                      className={`text-[9px] leading-snug transition-opacity duration-500 ${
+                      className={`text-[8px] leading-snug transition-opacity duration-500 ${
                         i === 0 && step >= 2
                           ? "text-foreground opacity-100"
                           : "text-muted-foreground opacity-70"
