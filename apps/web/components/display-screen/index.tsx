@@ -184,9 +184,21 @@ export function DisplayScreen({
   // exactly when the room is busiest and scanning matters most. Its height
   // here does not depend on how many people have pledged.
   //
-  // Still hidden from 1600px, where the gutter pair takes over.
+  // Hidden from 1600px ONLY WHEN LIVE, because that is the only case where the
+  // gutter pair takes over (founder, 2026-08-21: "why is the QR code not
+  // visible?"). The pair is rendered behind `live &&`, so on a still — the
+  // /features artefact and the homepage walkthrough, both live={false} — this
+  // was hiding the inline code above 1600 and nothing was replacing it. A
+  // display with no QR on any monitor wider than 1600, which is most of them.
+  //
+  // Measured before and after: at 1280 and 1512 the code rendered at 86px; at
+  // 1700 and 1920 the node existed and measured 0x0.
   const scanToPledge = (
-    <div className="flex flex-col items-center gap-1.5 min-[1600px]:hidden">
+    <div
+      className={`flex flex-col items-center gap-1.5 ${
+        live ? "min-[1600px]:hidden" : ""
+      }`}
+    >
       <BrandedQR
         value={qrUrl}
         size={160}
