@@ -69,9 +69,23 @@ const WALL_BASE_TIME = Date.now()
 export function DisplayStill({
   scene,
   qrUrl,
+  wallNames = WALL_NAMES,
+  wallReserveRows,
 }: {
   scene: HeroScene
   qrUrl: string
+  /**
+   * Override the wall entries. Only /features' live artefact passes this, to
+   * grow the wall a name at a time as its pledges land — the still is
+   * otherwise a fixed picture and every other caller wants that.
+   */
+  wallNames?: (string | null)[]
+  /**
+   * Rows the wall holds space for. /features' artefact grows its wall a name
+   * at a time and passes the count it ends on, so nothing beneath it moves
+   * while it fills.
+   */
+  wallReserveRows?: number
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -81,7 +95,7 @@ export function DisplayStill({
   )
   const total = items.reduce((sum, item) => sum + item.all_time_pledged, 0)
 
-  const wall = WALL_NAMES.map((name, i) => ({
+  const wall = wallNames.map((name, i) => ({
     id: `wall-${i}`,
     name,
     labels: [ranked[i % ranked.length].label],
@@ -92,7 +106,14 @@ export function DisplayStill({
     <div style={{ width: DISPLAY_STILL_WIDTH }}>
       <DisplayScreen
         live={false}
-        protagonistName={scene.heading ?? ""}
+        // protagonist FIRST, heading only as the fallback (founder,
+        // 2026-08-21: "the Happy Birthday feels redundant"). It was not
+        // redundant, it was orphaned: `heading` is documented as the h1 for
+        // NO-protagonist scenes, so on a scene that has one the name resolved
+        // to "" and the display rendered a bare "HAPPY BIRTHDAY" prefixing
+        // nothing. demo-fixture had already been doing it this way for the
+        // same scene. Affects the homepage walkthrough as well as /features.
+        protagonistName={scene.protagonist?.name ?? scene.heading ?? ""}
         dateLabel={null}
         openingLine={scene.opening_line}
         occasionType={scene.occasion_type}
@@ -114,6 +135,7 @@ export function DisplayStill({
           items: ranked.slice(0, RANKS_SHOWN),
         }}
         initialWallEntries={wall}
+        wallReserveRows={wallReserveRows}
         initialTotalRaised={total}
         goalAmount={DEMO_GOAL}
         favpollUrl="https://favpoll.com"
