@@ -186,6 +186,9 @@ export function LiveVignette() {
                   scene={SCENES[step]}
                   qrUrl={DEMO_QR_URL}
                   wallNames={wallNames}
+                  // The count it ends on, so the card is its final size from
+                  // the first frame and nothing below it moves as names land.
+                  wallReserveRows={3 + LAST}
                 />
               )}
             </TvFrame>

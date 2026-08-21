@@ -82,6 +82,7 @@ export function WallOfFavourites({
   teaseBacked = false,
   animate = false,
   maxEntries,
+  reserveRows,
   expandable = false,
 }: {
   entries: WallEntry[]
@@ -94,12 +95,31 @@ export function WallOfFavourites({
   animate?: boolean
   /** Cap the rows shown (e.g. the live display). */
   maxEntries?: number
+  /**
+   * Hold space for this many rows, whether or not they have arrived.
+   *
+   * The live display needs it: names land one at a time through an event, and
+   * a card that grows with them moved everything beneath it on every pledge —
+   * including, since 2026-08-21, the QR people are meant to be scanning. A
+   * scan target that walks down the screen during the busiest hour is the one
+   * thing this card must not do.
+   *
+   * Rows are text-sm (1.25rem of line box) with space-y-1.5 (0.375rem)
+   * between, so the reservation is derived from the same values the list is
+   * laid out with rather than a measured constant that would go stale.
+   */
+  reserveRows?: number
   /** Collapse long walls behind a "See all" dialog (guest page). */
   expandable?: boolean
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
   const shown = maxEntries ? entries.slice(0, maxEntries) : entries
+  const reserved = reserveRows
+    ? {
+        minHeight: `calc(${reserveRows} * 1.25rem + ${Math.max(0, reserveRows - 1)} * 0.375rem)`,
+      }
+    : undefined
   const animated = animate && !reduced
 
   return (
@@ -123,7 +143,7 @@ export function WallOfFavourites({
         )}
       </div>
       {shown.length === 0 ? (
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground" style={reserved}>
           Names appear here as people pledge.
         </p>
       ) : (
@@ -135,6 +155,7 @@ export function WallOfFavourites({
                 : "mt-2 space-y-1.5"
             }
             aria-label="Recent pledges"
+            style={reserved}
           >
             <AnimatePresence initial={false}>
               {shown.map((entry) => (

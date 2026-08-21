@@ -70,6 +70,7 @@ export function DisplayStill({
   scene,
   qrUrl,
   wallNames = WALL_NAMES,
+  wallReserveRows,
 }: {
   scene: HeroScene
   qrUrl: string
@@ -79,6 +80,12 @@ export function DisplayStill({
    * otherwise a fixed picture and every other caller wants that.
    */
   wallNames?: (string | null)[]
+  /**
+   * Rows the wall holds space for. /features' artefact grows its wall a name
+   * at a time and passes the count it ends on, so nothing beneath it moves
+   * while it fills.
+   */
+  wallReserveRows?: number
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -128,6 +135,7 @@ export function DisplayStill({
           items: ranked.slice(0, RANKS_SHOWN),
         }}
         initialWallEntries={wall}
+        wallReserveRows={wallReserveRows}
         initialTotalRaised={total}
         goalAmount={DEMO_GOAL}
         favpollUrl="https://favpoll.com"

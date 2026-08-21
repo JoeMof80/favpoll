@@ -78,6 +78,13 @@ type Props = {
    * marketing still IS the display.
    */
   live?: boolean
+  /**
+   * Rows the wall holds space for. Defaults to 12 on a live display, where
+   * names land through the event and a growing card would push the QR beneath
+   * it down the screen mid-scan. A still passes the number it will actually
+   * reach, so it does not carry rows of blank card.
+   */
+  wallReserveRows?: number
 }
 
 // The event heroes and the display agree on the figure size right up to
@@ -105,6 +112,7 @@ export function DisplayScreen({
   defaultVariant = "fundraiser",
   favpollId,
   live = true,
+  wallReserveRows,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
@@ -580,13 +588,27 @@ export function DisplayScreen({
             )}
           </div>
 
+          {/* WALL FIRST, THEN THE QR (founder, 2026-08-21). The code sits at
+              the foot of the column, which on a wall-mounted screen is nearer
+              eye level, and the wall leads with what the room is doing.
+              Safe only because the wall now RESERVES its height: it fills a
+              row at a time through an event, and while it grew it pushed
+              whatever sat beneath it down the screen on every pledge. With
+              the QR beneath, that would have been the scan target walking
+              away from people mid-scan. */}
           <div className="flex flex-col gap-8">
-            {scanToPledge}
             <WallOfFavourites
               entries={initialWallEntries}
               animate
               maxEntries={12}
+              // 12 on a LIVE display, where rows land through the event and
+              // the reservation is the whole point. A still does not fill up,
+              // so it reserves only what it will actually show — otherwise the
+              // artefact carries seven rows of blank card, and the screen it
+              // depicts grows 180px for nothing.
+              reserveRows={wallReserveRows ?? (live ? 12 : undefined)}
             />
+            {scanToPledge}
           </div>
         </div>
       </div>
