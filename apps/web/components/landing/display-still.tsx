@@ -99,7 +99,14 @@ export function DisplayStill({
     <div style={{ width: DISPLAY_STILL_WIDTH }}>
       <DisplayScreen
         live={false}
-        protagonistName={scene.heading ?? ""}
+        // protagonist FIRST, heading only as the fallback (founder,
+        // 2026-08-21: "the Happy Birthday feels redundant"). It was not
+        // redundant, it was orphaned: `heading` is documented as the h1 for
+        // NO-protagonist scenes, so on a scene that has one the name resolved
+        // to "" and the display rendered a bare "HAPPY BIRTHDAY" prefixing
+        // nothing. demo-fixture had already been doing it this way for the
+        // same scene. Affects the homepage walkthrough as well as /features.
+        protagonistName={scene.protagonist?.name ?? scene.heading ?? ""}
         dateLabel={null}
         openingLine={scene.opening_line}
         occasionType={scene.occasion_type}
