@@ -61,6 +61,13 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 /** The still's own width plus TvFrame's 20px bezel each side. */
 const NATURAL_W = DISPLAY_STILL_WIDTH + 40
 
+/**
+ * The still's measured height, used ONLY to hold the space open before it
+ * mounts. The real height replaces it the moment there is one — this exists so
+ * the page does not jump when a client-only artefact arrives.
+ */
+const FALLBACK_H = 697
+
 /** Wall entries, in arrival order. null renders as "Someone". */
 const WALL: (string | null)[] = ["Priya", "Tom", null, "Aisha", "Dan"]
 
@@ -94,6 +101,16 @@ function sceneAfter(n: number): HeroScene {
 const SCENES = [sceneAfter(0), sceneAfter(1), sceneAfter(2)]
 
 export function LiveVignette() {
+  // CLIENT-ONLY, and not merely as an optimisation. DisplayStill captures its
+  // clock ONCE at module load, to keep the wall's relative times ("4m ago")
+  // out of render — which is only safe because it has always been mounted
+  // client-side. Rendering it on the server broke that: the module was
+  // evaluated in a process that had been up for hours, so a fresh page served
+  // a wall reading "8h ago" — the server's uptime, not the favpoll's activity
+  // — and server and client disagreed about the time on top of it.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   const reduced = useReducedMotion()
   const [step, setStep] = useState(reduced ? LAST : 0)
 
@@ -119,14 +136,21 @@ export function LiveVignette() {
       setWidth(box.getBoundingClientRect().width)
       // The still is content-sized, so its height is READ rather than assumed.
       // The constant it would otherwise need went stale three times.
-      setNaturalH(inner.offsetHeight)
+      //
+      // IGNORE AN EMPTY FRAME. Before the still mounts, this measures a
+      // TvFrame with nothing in it — 48px of bezel — and writing that as the
+      // natural height collapsed the whole artefact to 92px, where it stayed
+      // because nothing measured it again. Anything shorter than a bezel is
+      // not the display.
+      const h = inner.offsetHeight
+      if (h > 200) setNaturalH(h)
     }
     update()
     const ro = new ResizeObserver(update)
     ro.observe(box)
     ro.observe(inner)
     return () => ro.disconnect()
-  }, [])
+  }, [mounted])
 
   const scale = width ? width / NATURAL_W : 0
   const wallNames = WALL.slice(0, 3 + step)
@@ -139,7 +163,14 @@ export function LiveVignette() {
             a 184px well and spilled it over the beats either side. */}
         <div
           className="overflow-hidden"
-          style={{ height: naturalH && scale ? naturalH * scale : undefined }}
+          style={{
+            // ASPECT-RATIO, not a computed height. A JS height needs a
+            // measurement first, so the frame before the observer fired
+            // rendered at 122px and the page jumped once on every load —
+            // measured. A ratio holds the space from first paint, and the
+            // real height replaces the fallback as soon as there is one.
+            aspectRatio: `${NATURAL_W} / ${naturalH || FALLBACK_H}`,
+          }}
         >
           <div
             ref={innerRef}
@@ -150,11 +181,13 @@ export function LiveVignette() {
             }}
           >
             <TvFrame>
-              <DisplayStill
-                scene={SCENES[step]}
-                qrUrl={DEMO_QR_URL}
-                wallNames={wallNames}
-              />
+              {mounted && (
+                <DisplayStill
+                  scene={SCENES[step]}
+                  qrUrl={DEMO_QR_URL}
+                  wallNames={wallNames}
+                />
+              )}
             </TvFrame>
           </div>
         </div>
