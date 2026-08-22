@@ -230,12 +230,24 @@ export function LandingHero({
               "md:grid-cols-1 md:gap-y-8 md:py-8"
             : // COLUMN: the demo hero the register pages mount — the demo
               // card is 400px, so the last-of-three column still holds it.
-              "md:grid-cols-[1fr_calc((100%-4rem)/3)] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
+              // minmax, NOT the bare third (2026-08-22). The demo card is a
+              // FIXED 400px and a grid item cannot shrink below its
+              // min-content, so whenever a third of the container came to
+              // less than 400 — which is every width below about 1300 — the
+              // column refused to shrink and the whole PAGE grew instead.
+              // Measured before: +157px of horizontal scroll at 768, +72 at
+              // 1024, +20 at 1180, on all three register pages.
+              // The floor is the card's own width; above ~1300 the third is
+              // wider and takes over, so the three-column rhythm the original
+              // was reaching for is unchanged where it was ever achieved.
+              "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
         )}
       >
         {/* Pitch (headline + CTA). Stats are a separate cell below, so on
             mobile the demo comes right after the pitch. */}
-        <div className={cn(!router && "md:col-start-1 md:row-start-1")}>
+        <div
+          className={cn("min-w-0", !router && "md:col-start-1 md:row-start-1")}
+        >
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
               Each sentence takes its own line so the triad never wraps
@@ -298,7 +310,15 @@ export function LandingHero({
                 gap, so the eye binds it to the button it describes. 8px
                 inside against 20px between: at 10 against 14 the pair did not
                 read as a pair, it read as three things evenly spaced. */}
-            <div className="flex items-center gap-2">
+            {/* flex-wrap so the pair can BREAK on a narrow phone (2026-08-22).
+                Grouping the caption with its button fixed the referent, but a
+                group that cannot wrap is a single unbreakable 306px unit — and
+                /celebrations has the longest label of the three registers
+                ("Create a celebration favpoll"), so it alone pushed a 320px
+                phone sideways by 10px. Wrapped, the caption drops under the
+                button and stays attached to it, which is all the grouping was
+                ever for. */}
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 asChild
                 size="lg"
@@ -572,8 +592,13 @@ export function LandingHero({
                 style={{ opacity: fading ? 0 : 1 }}
                 aria-live="polite"
               >
-                <div className="h-108 w-[19.4rem] sm:h-[34.8rem] sm:w-100">
-                  <div className="h-174 w-125 origin-top-left scale-[0.62] text-foreground sm:scale-80">
+                {/* A THIRD STOP BELOW 360 (2026-08-22). The card is 500 wide
+                    laid out and scaled to fit a fixed box — 0.62 gives 310,
+                    which is wider than the 272 a 320px phone has after the
+                    page's padding, so the smallest phones scrolled sideways
+                    by 14px. 0.54 gives 270 and fits. */}
+                <div className="h-94 w-[16.875rem] min-[360px]:h-108 min-[360px]:w-[19.4rem] sm:h-[34.8rem] sm:w-100">
+                  <div className="h-174 w-125 origin-top-left scale-[0.54] text-foreground min-[360px]:scale-[0.62] sm:scale-80">
                     <DemoFrame>
                       <DemoCard
                         scene={scene}
@@ -588,7 +613,7 @@ export function LandingHero({
                 </div>
                 {/* Beat indicator: which of the three beats the loop is in */}
                 <div
-                  className="mt-3 flex w-[19.4rem] items-center justify-start gap-4 sm:w-100 md:justify-center"
+                  className="mt-3 flex w-[16.875rem] items-center justify-start gap-4 min-[360px]:w-[19.4rem] sm:w-100 md:justify-center"
                   aria-hidden="true"
                 >
                   {BEATS.map((label, i) => (

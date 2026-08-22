@@ -74,6 +74,7 @@ export default defineConfig({
       testMatch: [
         "**/features-artefacts.spec.ts",
         "**/home-how-it-works.spec.ts",
+        "**/no-horizontal-overflow.spec.ts",
       ],
     },
   ],
