@@ -6,12 +6,10 @@ import { HeroTexture } from "@/components/landing/hero-texture"
 import { t } from "@/lib/i18n"
 import { FeatureNav } from "@/components/landing/feature-nav"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
-import { RoomVignette } from "@/components/landing/room-vignette"
+import { LiveVignette } from "@/components/landing/live-vignette"
 import { PackVignette } from "@/components/landing/pack-vignette"
 import { FundVignette } from "@/components/landing/fund-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
-import { GoalVignette } from "@/components/landing/goal-vignette"
-import { WallOfFavouritesVignette } from "@/components/landing/wall-of-favourites-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
@@ -59,8 +57,16 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 // keepsake's "the whole of it" (not "the day") are true of a standalone
 // favpoll with nobody in a room. EVENT-SHAPED features keep the event
 // language, because it is accurate rather than presumptuous — stationery for
-// tables and orders of service, a display on a screen "in the room", and the
-// personal reveal, which is protagonist-bound by definition.
+// tables and orders of service, and a display on a screen "in the room".
+//
+// THE REVEAL IS NOT ON THAT LIST ANY MORE (founder, 2026-08-19). It was, as
+// "protagonist-bound by definition" — and it never was. The field holds any
+// message; the protagonist's favourite is the strongest thing to put in it,
+// not what it IS. The name asserted otherwise and every sentence about it
+// paid for that, hedging into "the subject's favourite, or a special message,
+// optionally". Its own home-page bullets had given the game away long before
+// anyone noticed: "The final word from a loved one" and "A humorous callback
+// to a speech" are messages, not favourites.
 // Note "guest" ALSO has a domain meaning here — account-less pledger, as in
 // guest checkout (allow_guest_items, createGuestPledge, the organiser's
 // "Guest additions" toggle). That sense is register-neutral and stays.
@@ -73,7 +79,7 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the personal reveal, a pledge goal, a wall of favourites and a printable keepsake.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the reveal and a printable keepsake.",
 }
 
 const SECTIONS = [
@@ -81,9 +87,7 @@ const SECTIONS = [
   { id: "stationery", label: "QR-coded stationery" },
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared fund" },
-  { id: "reveal", label: "Personal reveal" },
-  { id: "goal", label: "Pledge goal" },
-  { id: "wall-of-favourites", label: "Wall of favourites" },
+  { id: "reveal", label: "The reveal" },
   { id: "keepsake", label: "Keepsake" },
 ]
 
@@ -225,70 +229,45 @@ export default function FeaturesPage() {
                 "Large QR codes visible from distance",
                 "Tribute mode to centre the person being honoured",
                 "Fundraiser mode for a telethon-style centrepiece",
+                "A pledge goal, if one is set, fills as pledges land and turns green the moment it is met",
+                "The wall of favourites updates in sync with the rankings as pledges arrive",
               ]}
-              artefact={<RoomVignette />}
+              artefact={<LiveVignette />}
             />
 
             <Feature
               id="shared-fund"
               title="Shared fund"
-              lead="Nobody needs to be able to pay."
+              lead="A float to help everybody take part or give without taking part."
               bullets={[
-                "Anyone can put money in outright — a gift with no favourite attached",
-                "Or move part of their own pledge across, which costs them nothing more",
-                "A guest without means — a child, usually — draws on it to take part",
-                "Nobody sees who used it, and the money reaches the charity either way",
+                "Give to charity without picking a favourite",
+                "Give more than your favourite is worth to you. e.g. £50 for your favourite, £50 to the shared fund",
+                "Help those without money take part. They can select from the shared fund at checkout",
+                "Anything remaining in the shared fund goes to the charity when the favpoll closes",
               ]}
               artefact={<FundVignette />}
             />
 
             <Feature
               id="reveal"
-              title="Personal reveal"
-              lead="A favpoll can hold one favourite back — the subject’s own — and share it the moment a guest has pledged."
+              title="The reveal"
+              lead="A message to be shared the moment someone has pledged, along with the standings."
               bullets={[
-                "A gift, not a gate: the guest shares something of themselves, and the favpoll shares something back",
-                "Written by an organiser about someone, or by that person in advance, in their own voice",
-                "Optional, and set separately for each topic",
+                "Often the subject’s own favourite but could be a message about the topic, the charity, or anything else",
+                "A gift in return for sharing a favourite",
+                "It could be a moment of poignance or not required at all, as set by the favpoll organiser",
               ]}
               artefact={<RevealVignette />}
             />
 
             <Feature
-              id="goal"
-              title="Pledge goal"
-              lead="Set a target, and the room can watch it come."
-              bullets={[
-                "The bar fills as pledges land, and turns green the moment the goal is met",
-                "A milestone, not a finish line — the favpoll runs to its closing date",
-                "Every pledge after the goal still counts",
-              ]}
-              artefact={<GoalVignette />}
-            />
-
-            <Feature
-              id="wall-of-favourites"
-              title="Wall of favourites"
-              lead="Who backed what, as it happens."
-              bullets={[
-                "Scrolls on the big screen through the day",
-                "Reads back afterwards as a record of who took part",
-                "Names and favourites only, never amounts",
-                "Anyone can pledge as “Someone” instead",
-              ]}
-              artefact={<WallOfFavouritesVignette />}
-            />
-
-            <Feature
               id="keepsake"
               title="Keepsake"
-              lead="When a favpoll closes, the whole of it becomes a single sheet to print."
+              lead="A printable memento of the favpoll, capturing all the detail that made it special."
               bullets={[
-                "The standings, the reveal and the total raised",
-                "Two ways to tell it: the person leads, or what was raised does",
-                "Portrait or landscape, always one sheet",
-                "No individual amounts — what people gave stays theirs",
-                "The full standings and everyone who took part export as a spreadsheet",
+                "Presented like a certificate, in A4 portrait or landscape",
+                "Tribute format emphasises the subject and topic",
+                "Fundraiser format emphasises the charity and the total raised",
               ]}
               artefact={<KeepsakeVignette />}
             />

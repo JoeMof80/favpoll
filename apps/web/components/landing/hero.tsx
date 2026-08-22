@@ -128,6 +128,35 @@ const ROUTER_CARDS = [
   },
 ] as const
 
+// The promise, set quieter than the action it qualifies (founder,
+// 2026-08-18: "can we style the '- always free' text slight differently?").
+//
+// SPLIT HERE, NOT IN messages/. The label stays ONE string so a locale pass
+// sees "Create a favpoll — always free" whole rather than two fragments it
+// has to reassemble in the right order — the same reasoning the retired
+// {next} token carried. Anything without the separator, which is every
+// register page's own ctaLabel, comes back untouched.
+//
+// opacity-80, NOT lower. Measured on the rendered pixels rather than eyeballed
+// — the tokens are oklch, so blending them by hand gets the wrong answer — and
+// the tail is 14px, which WCAG treats as normal text needing 4.5:1. Against
+// this button: 0.65 gives 3.3, 0.75 gives 4.13, 0.8 gives 4.63. The first two
+// look right and fail. The head sits at 7.34, so the two still read as
+// different weights.
+function withQuietTail(label: string) {
+  const [head, ...rest] = label.split(" — ")
+  if (!rest.length) return label
+  return (
+    <>
+      {head}
+      <span className="text-sm font-normal opacity-80">
+        {" — "}
+        {rest.join(" — ")}
+      </span>
+    </>
+  )
+}
+
 export function LandingHero({
   liveCount = 0,
   totalLive = 0,
@@ -168,7 +197,28 @@ export function LandingHero({
           slabs; a third of the container is the fix. */}
       <div
         className={cn(
-          "relative mx-auto grid w-full max-w-87 gap-8 px-0 py-10 sm:max-w-100 md:max-w-330 md:px-6",
+          // ONE LEFT RAIL WITH THE REST OF THE PAGE (founder, 2026-08-18: "do you
+          // think it would be better if the hero content lined up with the
+          // favpoll brand text?").
+          //
+          // It did not line up with anything. Below md the hero was CENTRED by
+          // a max-width with no padding, so its rail was (viewport - 348) / 2
+          // and drifted with the screen, while the header logo and every
+          // section on the page sit at a fixed 24:
+          //
+          //   390   header 24   sections 24   hero 21
+          //   430   header 24   sections 24   hero 41
+          //   700   header 24   sections 24   hero 150
+          //
+          // On a desktop it happened to land on 24, which is why it read as
+          // deliberate. Padding it like everything else pins it at 24 at every
+          // width, and md:max-w-330 still governs above.
+          //
+          // The cost, accepted: between 640 and 767 the content is no longer
+          // capped at 400, so the router cards stretch to the full padded
+          // width. That is what every other band does there, and md brings the
+          // two-column layout in at 768 regardless.
+          "relative mx-auto grid w-full gap-8 px-6 py-10 md:max-w-330",
           router
             ? // ROW (founder, 2026-08-05): statement on top, three doors
               // across the bottom. The cards don't change size doing this —
@@ -235,19 +285,47 @@ export function LandingHero({
           >
             {subheader ?? t("landing.subheader")}
           </p>
-          <div className="flex flex-wrap items-center gap-3.5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —
                 poster-scale, not form-scale (founder call, 2026-07-28) */}
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="h-11 px-6 text-base"
-            >
-              <Link href="/favpolls/new">
-                {ctaLabel ?? t("landing.cta.primary")}
-              </Link>
-            </Button>
+            {/* The caption is GROUPED with the primary, not trailing the row
+                (founder, 2026-08-18: "the free to create label is in the wrong
+                place now"). It was written when the hero had one button and it
+                simply followed it; the second CTA landed between them, so
+                "Free to create" ended up reading as a note about SEEING HOW IT
+                WORKS — which is not a thing anyone creates. Proximity is the
+                whole fix: a tighter gap inside the pair than the row's own
+                gap, so the eye binds it to the button it describes. 8px
+                inside against 20px between: at 10 against 14 the pair did not
+                read as a pair, it read as three things evenly spaced. */}
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                size="lg"
+                variant="secondary"
+                className="h-11 px-6 text-base"
+              >
+                <Link href="/favpolls/new">
+                  {withQuietTail(ctaLabel ?? t("landing.cta.primaryFree"))}
+                </Link>
+              </Button>
+              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT (founder, 2026-08-18).
+                  Home's button now says "always free" itself, so a caption
+                  beside it would state the same fact twice in one row. The
+                  register pages keep it: their labels are already 28
+                  characters ("Create a celebration favpoll") and appending the
+                  promise makes 41, which is no longer a button.
+
+                  It stays BESIDE, never beneath (measured 2026-08-06,
+                  re-measured 08-18). Below costs ~16px, the LEFT column sets
+                  the hero's height, and the hero is already 1px past the fold
+                  at 1280x800 — which is the fit #524 worked for. "Free to
+                  create" only: the short form is the one that doesn't wrap at
+                  390. */}
+              {ctaLabel && (
+                <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
+              )}
+            </div>
             {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
                 favpoll" names an invented noun, so on home it asks a
                 first-time visitor to make a thing nothing has yet defined —
@@ -259,13 +337,42 @@ export function LandingHero({
                 cta.secondary and their own demo, so they are unchanged.
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
-                quieter of the two without vanishing when the theme flips. */}
+                quieter of the two without vanishing when the theme flips.
+                NO RING AT ALL (founder, 2026-08-18: "it should have no border
+                or ring"). Tried at 1px, then at a 0.5px hairline, and the
+                founder took it all the way off. It is a deliberate departure
+                from the style guide, which puts a bordered ghost at the
+                secondary tier and reserves the borderless one for quiet
+                actions like cancel — worth knowing before anyone "restores"
+                the border as a fix.
+                It survives without one because two other things carry it: the
+                arrow, which no static line of copy on this band has, and the
+                hover wash, and h-11 keeps both CTAs on one baseline.
+
+                PADDING MATCHES THE PRIMARY'S so the two LABELS start at the
+                same x (founder, 2026-08-18: "their text doesn't line up
+                because of the different margin"). Stacked, both boxes begin at
+                the column edge, so padding alone decides where each label
+                lands — at px-3 against the primary's px-6 they sat 12px apart.
+                An earlier pass pulled this the other way with -ml-3, putting
+                the words on the column RAIL: level with the headline, but 24px
+                left of the label directly above them. Wrong reading. Two
+                buttons stacked read as a pair, and a pair lines up with itself
+                before it lines up with the paragraph above.
+
+                pr-6 IS AN OVERRIDE, not a repetition of px-6. Button's lg size
+                carries has-data-[icon=inline-end]:pr-2, which trims the
+                trailing side when a button ends in an icon — fair for a SOLID
+                button, where the eye reads the filled edge. There is no edge
+                here until hover, so it only rendered the wash lopsided, 24
+                left against 8 right. Same variant, same property, declared
+                after, so it wins. */}
             {router && (
               <Button
                 asChild
                 size="lg"
                 variant="ghost"
-                className="h-11 px-6 text-base text-primary-foreground ring-1 ring-primary-foreground/30 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="h-11 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
@@ -278,14 +385,6 @@ export function LandingHero({
                 </Link>
               </Button>
             )}
-            {/* BESIDE the button, not beneath it (measured 2026-08-06): below
-                it, the extra line costs 16px and tips 1280x800 — which #524
-                worked to make fit exactly — over the fold. Inside the row it
-                sits within the button's own 44px and costs nothing at any
-                viewport. "Free to create" only: the 100% is already the stat
-                tile 335px below in this same band, and the short form is also
-                the only one that doesn't wrap at 390. */}
-            <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
           </div>
         </div>
 

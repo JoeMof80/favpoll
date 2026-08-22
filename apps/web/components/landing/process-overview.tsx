@@ -212,33 +212,10 @@ const A4_PORTRAIT = { w: 794, h: 1123 }
 // 651px well rather than overflowing it by 23px.
 const KEEPSAKE_SCALE = "scale-[0.34] lg:scale-[0.47] xl:scale-[0.57]"
 
-// WEIGHT, NOT CHROME (founder, 2026-08-17). This was drawn as a miniature of
-// the real button, copying the ADD_TOKEN trick from love-step and the topic
-// vignette. That trick earns its keep there and not here: those hints sit
-// INSIDE the dialog, a few centimetres from the real Add and at nearly its
-// size, so matching chrome helps you spot the control. This is a marketing
-// page in 20-24px body copy, naming a button the reader meets on another
-// surface minutes or days later — the recognition payoff is small, the cost
-// is a solid primary pill pulling the eye to a footnote in a section whose
-// other six beats are plain sentences. It could not be faithful anyway: at
-// 0.8em of 24px type the token outgrew the real 14px button.
-//
-// Medium weight does the one job the chrome genuinely earned — in a NUMBERED
-// list of steps, "click Next" could be read as "go to the next step", and the
-// weight plus the capital marks it as the name of a control instead.
-const NEXT_TOKEN = <span className="font-medium">Next</span>
-
-// The copy stays a single string in messages/ with a {next} placeholder,
-// rather than being split into JSX here, so a locale pass still sees one
-// whole sentence.
-
-function withNextToken(body: string) {
-  const parts = body.split("{next}")
-  if (parts.length === 1) return body
-  return parts.flatMap((part, i) =>
-    i === 0 ? [part] : [<span key={i}>{NEXT_TOKEN}</span>, part]
-  )
-}
+// The "click Next" token is gone with the copy that carried it (founder,
+// 2026-08-18). Step 3 now ends "Can't decide? Give to the shared fund
+// instead", so there is no control to name and nothing to weight — the
+// {next} placeholder, NEXT_TOKEN and withNextToken went with it.
 
 function BeatMedium({
   medium,
@@ -558,7 +535,7 @@ export function ProcessOverview() {
                     24px type in a 28rem column runs to ~30 characters a line
                     and reads as a narrow ribbon. */}
                 <p className="text-xl leading-relaxed text-muted-foreground md:text-2xl">
-                  {withNextToken(beat.body)}
+                  {beat.body}
                 </p>
                 {/* MOBILE: this beat's OWN medium, under its text (founder,
                     2026-08-17). The section used to stack six texts on mobile
