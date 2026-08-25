@@ -68,9 +68,9 @@ beforeEach(() => {
 })
 
 describe("useWizardState — initial state", () => {
-  it("starts on the type step", () => {
+  it("starts on the event step", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    expect(result.current.step).toBe("type")
+    expect(result.current.step).toBe("event")
     expect(result.current.isFirst).toBe(true)
     expect(result.current.isLast).toBe(false)
   })
@@ -81,7 +81,7 @@ describe("useWizardState — initial state", () => {
   })
 })
 
-describe("useWizardState — type step nextDisabled gate", () => {
+describe("useWizardState — event step nextDisabled gate", () => {
   it("nextDisabled false once a category is set — who moved to the Generate control", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
@@ -117,7 +117,7 @@ describe("useWizardState — type step nextDisabled gate", () => {
 })
 
 describe("useWizardState — step navigation", () => {
-  it("advances to charity on handleNext from type", () => {
+  it("advances to charity on handleNext from event", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
       result.current.setCategory("celebration")
@@ -137,12 +137,12 @@ describe("useWizardState — step navigation", () => {
     expect(result.current.isLast).toBe(true)
   })
 
-  it("goes back from charity to type", () => {
+  it("goes back from charity to event", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
     act(() => result.current.handleNext())
     act(() => result.current.handleBack())
-    expect(result.current.step).toBe("type")
+    expect(result.current.step).toBe("event")
   })
 })
 

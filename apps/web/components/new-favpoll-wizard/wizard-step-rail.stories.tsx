@@ -20,8 +20,8 @@ type Story = StoryObj<typeof meta>
 
 const copy = getWizardCopy()
 
-export const OnType: Story = {
-  args: { currentStep: "type", copy },
+export const OnEvent: Story = {
+  args: { currentStep: "event", copy },
 }
 
 export const OnCharity: Story = {

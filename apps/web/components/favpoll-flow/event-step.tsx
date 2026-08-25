@@ -28,7 +28,7 @@ const CATEGORY_OPTIONS = [
 const ITEM_CLASS =
   "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-1 py-4 text-xs font-normal sm:px-4 sm:py-5 sm:text-sm [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
 
-export function TypeStep({ value, onChange }: Props) {
+export function EventStep({ value, onChange }: Props) {
   // The step-shell guidance asks the question, so there is no heading here.
   return (
     <ToggleGroup

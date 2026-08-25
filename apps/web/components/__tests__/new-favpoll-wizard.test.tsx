@@ -67,7 +67,7 @@ describe("NewFavpollWizard — structure", () => {
     const dots = screen.getAllByRole("listitem")
     expect(dots).toHaveLength(3)
     expect(dots[0]).toHaveAttribute("aria-current", "step")
-    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Type")
+    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Event")
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 
@@ -82,19 +82,21 @@ describe("NewFavpollWizard — structure", () => {
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  // The rail (desktop) and the progress strip (mobile) both name all three
-  // steps, so a per-step heading printed the current one a second time on the
-  // same screen — under a second, differently-worded question. The guidance
-  // stays; the heading does not (founder, 2026-08-25).
-  it("does not repeat the step name as a heading", () => {
+  // The heading is back (founder, 2026-08-25) — it anchors the panel the
+  // organiser is working in. What must not come back is the DOUBLE
+  // QUESTION: the rail line orients, the guidance asks. If this ever
+  // reverts to a heading-only assertion it proves nothing, because the
+  // step name changes.
+  it("renders the step heading and a single question", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    expect(
-      screen.queryByRole("heading", { name: "Type" })
-    ).not.toBeInTheDocument()
-    // The guidance the chips answer is still there.
+    expect(screen.getByRole("heading", { name: "Event" })).toBeInTheDocument()
     expect(
       screen.getByText("What kind of favpoll is this?")
     ).toBeInTheDocument()
+    // The rail states the options; it does not ask a second question.
+    expect(
+      screen.queryByText(/Who or what is this favpoll for/i)
+    ).not.toBeInTheDocument()
   })
 
   it("does not render who options on step 1 (moved to the Generate control)", () => {
@@ -106,10 +108,10 @@ describe("NewFavpollWizard — structure", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step order: Type → Charity → Topic
+// Step order: Event → Charity → Topic
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("NewFavpollWizard — step order is Type → Charity → Topic", () => {
+describe("NewFavpollWizard — step order is Event → Charity → Topic", () => {
   it("step 2 is Charity (shows 'Pick a charity')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
@@ -125,7 +127,7 @@ describe("NewFavpollWizard — step order is Type → Charity → Topic", () => 
 
   it("step 3 is Topic (shows 'Pick a topic')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    // Type
+    // Event
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     // Charity: open sheet, pick, Done
@@ -151,7 +153,7 @@ describe("NewFavpollWizard — redirect", () => {
   it("redirects to /favpolls/new/details when wizard is completed (person)", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
-    // Step 1: Type
+    // Step 1: Event
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 

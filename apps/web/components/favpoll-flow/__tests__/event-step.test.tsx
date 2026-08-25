@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
-import { TypeStep } from "../type-step"
+import { EventStep } from "../event-step"
 
 // ToggleGroup with type="single" renders items as role="radio".
 //
@@ -8,9 +8,9 @@ import { TypeStep } from "../type-step"
 // axis lives in the form's Generate control — pronoun and pair/group since
 // 2026-07-30, Cause since 2026-08-25.
 
-describe("TypeStep", () => {
+describe("EventStep", () => {
   it("renders exactly the three kinds", () => {
-    render(<TypeStep value={null} onChange={() => {}} />)
+    render(<EventStep value={null} onChange={() => {}} />)
     expect(screen.getAllByRole("radio")).toHaveLength(3)
     for (const name of ["Celebration", "Memorial", "Fundraiser"]) {
       expect(screen.getByRole("radio", { name })).toBeInTheDocument()
@@ -21,7 +21,7 @@ describe("TypeStep", () => {
   // conflation being removed: Cause answers WHO, these three answer WHAT
   // KIND, so they were never alternatives.
   it("does not render Cause, or any who option", () => {
-    render(<TypeStep value={null} onChange={() => {}} />)
+    render(<EventStep value={null} onChange={() => {}} />)
     for (const name of ["Cause", "He", "She", "They", "Pair", "Group"]) {
       expect(screen.queryByRole("radio", { name })).not.toBeInTheDocument()
     }
@@ -29,13 +29,13 @@ describe("TypeStep", () => {
 
   it("calls onChange with the picked category", () => {
     const onChange = vi.fn()
-    render(<TypeStep value={null} onChange={onChange} />)
+    render(<EventStep value={null} onChange={onChange} />)
     fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
     expect(onChange).toHaveBeenCalledWith("memorial")
   })
 
   it("marks the current value as checked", () => {
-    render(<TypeStep value="fundraiser" onChange={() => {}} />)
+    render(<EventStep value="fundraiser" onChange={() => {}} />)
     expect(screen.getByRole("radio", { name: "Fundraiser" })).toHaveAttribute(
       "aria-checked",
       "true"
@@ -44,7 +44,7 @@ describe("TypeStep", () => {
 
   it("ignores a deselect — the step has no empty answer", () => {
     const onChange = vi.fn()
-    render(<TypeStep value="memorial" onChange={onChange} />)
+    render(<EventStep value="memorial" onChange={onChange} />)
     fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
     expect(onChange).not.toHaveBeenCalled()
   })

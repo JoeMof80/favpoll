@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { TypeStep } from "@/components/favpoll-flow/type-step"
+import { EventStep } from "@/components/favpoll-flow/event-step"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
@@ -57,16 +57,22 @@ export function NewFavpollWizard({ data }: Props) {
           <div className="mx-auto w-full max-w-2xl">
             <WizardProgressStrip currentStep={w.step} />
 
-            {/* Type step */}
-            {w.step === "type" && (
-              <WizardStepShell guidance="What kind of favpoll is this?">
-                <TypeStep value={w.category} onChange={w.setCategory} />
+            {/* Event step */}
+            {w.step === "event" && (
+              <WizardStepShell
+                title="Event"
+                guidance="What kind of favpoll is this?"
+              >
+                <EventStep value={w.category} onChange={w.setCategory} />
               </WizardStepShell>
             )}
 
             {/* Charity step */}
             {w.step === "charity" && (
-              <WizardStepShell guidance={w.copy.charityGuidance}>
+              <WizardStepShell
+                title="Charity"
+                guidance={w.copy.charityGuidance}
+              >
                 {w.selectedCharities.length > 0 ? (
                   <WizardCharityCard
                     charities={w.selectedCharities}
@@ -89,7 +95,7 @@ export function NewFavpollWizard({ data }: Props) {
 
             {/* Topic step */}
             {w.step === "topic" && (
-              <WizardStepShell guidance={w.copy.topicGuidance}>
+              <WizardStepShell title="Topic" guidance={w.copy.topicGuidance}>
                 {w.topics.length > 0 ? (
                   <WizardTopicCard
                     topic={w.topics[0]}
