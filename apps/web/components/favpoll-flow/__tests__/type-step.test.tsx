@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
-import { HonourStep } from "../honour-step"
+import { TypeStep } from "../type-step"
 
 const DEFAULT_VALUE = {
   category: null as null,
@@ -13,9 +13,9 @@ const DEFAULT_VALUE = {
 // The who refinements (pronoun, pair/group) moved to the form's Generate
 // control (2026-07-30) — this step is now type-or-cause only.
 
-describe("HonourStep — category row", () => {
+describe("TypeStep — category row", () => {
   it("renders all three category options and A cause", () => {
-    render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
+    render(<TypeStep value={DEFAULT_VALUE} onChange={() => {}} />)
     expect(
       screen.getByRole("radio", { name: "Celebration" })
     ).toBeInTheDocument()
@@ -27,7 +27,7 @@ describe("HonourStep — category row", () => {
   })
 
   it("does not render the who options (moved to the Generate control)", () => {
-    render(<HonourStep value={DEFAULT_VALUE} onChange={() => {}} />)
+    render(<TypeStep value={DEFAULT_VALUE} onChange={() => {}} />)
     for (const name of ["He", "She", "They", "Pair", "Group"]) {
       expect(screen.queryByRole("radio", { name })).not.toBeInTheDocument()
     }
@@ -35,7 +35,7 @@ describe("HonourStep — category row", () => {
 
   it("calls onChange with the selected category on subject someone", () => {
     const onChange = vi.fn()
-    render(<HonourStep value={DEFAULT_VALUE} onChange={onChange} />)
+    render(<TypeStep value={DEFAULT_VALUE} onChange={onChange} />)
     fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
     expect(onChange).toHaveBeenCalledWith({
       category: "memorial",
@@ -48,7 +48,7 @@ describe("HonourStep — category row", () => {
   it("preserves grouping and pronoun when the category changes on the person path", () => {
     const onChange = vi.fn()
     render(
-      <HonourStep
+      <TypeStep
         value={{
           category: "celebration",
           subject: "someone",
@@ -69,7 +69,7 @@ describe("HonourStep — category row", () => {
 
   it("selected category item has aria-checked=true", () => {
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, category: "celebration" }}
         onChange={() => {}}
       />
@@ -81,11 +81,11 @@ describe("HonourStep — category row", () => {
   })
 })
 
-describe("HonourStep — cause fork", () => {
+describe("TypeStep — cause fork", () => {
   it("clicking A cause sets subject='cause' with category=null — a cause has no type", () => {
     const onChange = vi.fn()
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, category: "celebration" }}
         onChange={onChange}
       />
@@ -101,7 +101,7 @@ describe("HonourStep — cause fork", () => {
 
   it("A cause item has aria-checked=true when subject='cause'", () => {
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, subject: "cause" }}
         onChange={() => {}}
       />
@@ -114,7 +114,7 @@ describe("HonourStep — cause fork", () => {
 
   it("category row stays live and unselected for a cause", () => {
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, subject: "cause" }}
         onChange={() => {}}
       />
@@ -129,7 +129,7 @@ describe("HonourStep — cause fork", () => {
   it("clicking a type chip while A cause is selected hops back to the person path", () => {
     const onChange = vi.fn()
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, subject: "cause" }}
         onChange={onChange}
       />
@@ -145,7 +145,7 @@ describe("HonourStep — cause fork", () => {
 
   it("does not render a cause label input", () => {
     render(
-      <HonourStep
+      <TypeStep
         value={{ ...DEFAULT_VALUE, subject: "cause" }}
         onChange={() => {}}
       />

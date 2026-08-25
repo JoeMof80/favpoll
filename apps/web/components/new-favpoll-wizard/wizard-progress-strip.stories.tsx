@@ -10,14 +10,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const OnHonour: Story = {
-  args: { currentStep: "honour" },
+export const OnType: Story = {
+  args: { currentStep: "type" },
 }
 
 export const OnCharity: Story = {
   args: { currentStep: "charity" },
 }
 
-export const OnLove: Story = {
-  args: { currentStep: "love" },
+export const OnTopic: Story = {
+  args: { currentStep: "topic" },
 }

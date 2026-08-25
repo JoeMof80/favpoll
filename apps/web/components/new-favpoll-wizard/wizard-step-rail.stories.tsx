@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { WizardTriadRail } from "./wizard-triad-rail"
+import { WizardStepRail } from "./wizard-step-rail"
 import { getWizardCopy } from "@/lib/wizard-copy"
 
 const meta = {
-  title: "Wizard/WizardTriadRail",
-  component: WizardTriadRail,
+  title: "Wizard/WizardStepRail",
+  component: WizardStepRail,
   parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (
@@ -13,21 +13,21 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof WizardTriadRail>
+} satisfies Meta<typeof WizardStepRail>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 const copy = getWizardCopy("someone")
 
-export const OnHonour: Story = {
-  args: { currentStep: "honour", copy },
+export const OnType: Story = {
+  args: { currentStep: "type", copy },
 }
 
 export const OnCharity: Story = {
   args: { currentStep: "charity", copy },
 }
 
-export const OnLove: Story = {
-  args: { currentStep: "love", copy },
+export const OnTopic: Story = {
+  args: { currentStep: "topic", copy },
 }

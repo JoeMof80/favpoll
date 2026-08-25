@@ -16,9 +16,9 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Honour step: "Cause" alone — no type; Next must enable immediately
+ *   3. Type step: "Cause" alone — no type; Next must enable immediately
  *   4. Charity step: Marie Curie
- *   5. Love step: Colour topic
+ *   5. Topic step: Colour topic
  *   6. Details page: MUST render (the blank-page regression) → fill cause label
  *   7. Publish: set close date → Publish
  *   8. Skip shared fund modal
@@ -66,7 +66,7 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
-    // ── 2. Honour step — the cause fork ───────────────────────────────────────
+    // ── 2. Type step — the cause fork ───────────────────────────────────────
     // "Cause" sits alone below the OR divider. Selecting it is the complete
     // answer to step 1: no type question applies (category stays null), so
     // Next must enable from this single click.
@@ -108,7 +108,7 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await page.getByRole("button", { name: /next/i }).click()
 
-    // ── 4. Love step (topic picker) ───────────────────────────────────────────
+    // ── 4. Topic step (topic picker) ───────────────────────────────────────────
     const pickTopicBtn = page.getByRole("button", { name: /pick a topic/i })
     await expect(pickTopicBtn).toBeVisible({ timeout: 10_000 })
     await pickTopicBtn.click()

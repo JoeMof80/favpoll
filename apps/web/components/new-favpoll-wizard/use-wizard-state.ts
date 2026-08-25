@@ -15,12 +15,12 @@ import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 export const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
-export const STEPS: WizardStep[] = ["honour", "charity", "love"]
+export const STEPS: WizardStep[] = ["type", "charity", "topic"]
 
 export const STEP_LABELS: Record<WizardStep, string> = {
-  honour: "Honour",
+  type: "Type",
   charity: "Charity",
-  love: "Love",
+  topic: "Topic",
 }
 
 type WizardTopics = FavpollFormValues["topics"]
@@ -44,14 +44,14 @@ function sortTopicItems(items: Favourite[]): Favourite[] {
 export function useWizardState(data: WizardData) {
   const router = useRouter()
 
-  const [step, setStep] = useState<WizardStep>("honour")
+  const [step, setStep] = useState<WizardStep>("type")
   const [category, setCategory] = useState<FavpollCategory | null>(null)
   const [grouping, setGrouping] = useState<FavpollGrouping>("individual")
   const [subject, setSubject] = useState<FavpollSubject>("someone")
   const [pronoun, setPronoun] = useState<Pronoun | undefined>(undefined)
   const [topics, setTopics] = useState<WizardTopics>([])
   const [charityIds, setCharityIds] = useState<string[]>([])
-  const [loveOpen, setLoveOpen] = useState(false)
+  const [topicOpen, setTopicOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)
   const [itemsDialogOpen, setItemsDialogOpen] = useState(false)
 
@@ -84,7 +84,7 @@ export function useWizardState(data: WizardData) {
   // The who refinements (pronoun, pair/group) moved to the form's
   // Generate control (2026-07-30): the step gates on type-or-cause only.
   const nextDisabled =
-    step === "honour"
+    step === "type"
       ? subject !== "cause" && !category
       : step === "charity"
         ? charityIds.length === 0
@@ -134,13 +134,13 @@ export function useWizardState(data: WizardData) {
   }
 
   function handleNext() {
-    if (step === "honour") setStep("charity")
-    else if (step === "charity") setStep("love")
+    if (step === "type") setStep("charity")
+    else if (step === "charity") setStep("topic")
   }
 
   function handleBack() {
-    if (step === "love") setStep("charity")
-    else if (step === "charity") setStep("honour")
+    if (step === "topic") setStep("charity")
+    else if (step === "charity") setStep("type")
   }
 
   function handleFinish() {
@@ -188,8 +188,8 @@ export function useWizardState(data: WizardData) {
     pronoun,
     topics,
     charityIds,
-    loveOpen,
-    setLoveOpen,
+    topicOpen,
+    setTopicOpen,
     charityOpen,
     setCharityOpen,
     itemsDialogOpen,
