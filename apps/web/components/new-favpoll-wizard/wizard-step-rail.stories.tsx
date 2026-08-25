@@ -18,7 +18,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const copy = getWizardCopy("someone")
+const copy = getWizardCopy()
 
 export const OnType: Story = {
   args: { currentStep: "type", copy },

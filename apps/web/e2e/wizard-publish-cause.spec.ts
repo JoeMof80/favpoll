@@ -16,10 +16,13 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Type step: "Cause" alone — no type; Next must enable immediately
+ *   3. Type step: Fundraiser (Cause moved to the Generate control on
+ *      2026-08-25, so the wizard's three chips are the only answer here)
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour topic
- *   6. Details page: MUST render (the blank-page regression) → fill cause label
+ *   6. Details page: MUST render (the blank-page regression) → declare the
+ *      cause in the Generate control (who step → Cause → Done, WITHOUT
+ *      generating) → fill cause label
  *   7. Publish: set close date → Publish
  *   8. Skip shared fund modal
  *   9. Assert: favpoll page shows "In support of" + the cause label
@@ -66,14 +69,15 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
-    // ── 2. Type step — the cause fork ───────────────────────────────────────
-    // "Cause" sits alone below the OR divider. Selecting it is the complete
-    // answer to step 1: no type question applies (category stays null), so
-    // Next must enable from this single click.
-    const causeRadio = page.getByRole("radio", { name: "Cause" })
-    await expect(causeRadio).toBeVisible({ timeout: 10_000 })
-    await causeRadio.click()
-    await expect(causeRadio).toBeChecked()
+    // ── 2. Type step ────────────────────────────────────────────────────────
+    // Cause is no longer here — it is an answer on the Generate control's
+    // who step (2026-08-25). A cause organiser picks Fundraiser, which
+    // derives the cause register anyway (registers.ts: category
+    // "fundraiser" -> register "cause"), and declares the subject below.
+    const fundraiserRadio = page.getByRole("radio", { name: "Fundraiser" })
+    await expect(fundraiserRadio).toBeVisible({ timeout: 10_000 })
+    await fundraiserRadio.click()
+    await expect(fundraiserRadio).toBeChecked()
 
     const nextButton = page.getByRole("button", { name: /next/i })
     await expect(nextButton).toBeEnabled()
@@ -134,11 +138,24 @@ test.describe("wizard → publish flow (cause)", () => {
     await page.getByRole("button", { name: /set up/i }).click()
 
     // ── 5. Details page — the blank-page regression check ─────────────────────
-    // The cause handoff arrives with NO category param. Both the page's
-    // from-wizard gate and FormInner's guard must accept subject=cause, or
-    // this renders header-and-footer only (the exact 2026-07-13 regression).
+    // Both the page's from-wizard gate and FormInner's guard must render
+    // this, or it is header-and-footer only (the 2026-07-13 regression).
     await page.waitForURL(/\/favpolls\/new\/details/, { timeout: 10_000 })
     await page.waitForLoadState("domcontentloaded")
+
+    // ── 5b. Declare the cause, WITHOUT generating ─────────────────────────────
+    // The subject commits on the click rather than on generation, so Done
+    // closes the dialog with the cause set and no LLM call — which is the
+    // whole reason the commit was split out of onGenerate. If this ever
+    // needs an occasion pick to take effect, that split has regressed and
+    // every cause organiser is forced through a generation that overwrites
+    // their name, about and reveal.
+    await page.getByRole("button", { name: /generate an example/i }).click()
+    const whoDialog = page.getByRole("dialog")
+    await expect(whoDialog).toBeVisible({ timeout: 5_000 })
+    await whoDialog.getByRole("button", { name: "Cause", exact: true }).click()
+    await whoDialog.getByRole("button", { name: /^done$/i }).click()
+    await expect(whoDialog).not.toBeVisible({ timeout: 5_000 })
 
     // Exact button match: the same phrase also opens the About placeholder
     // ("What are you raising for? Tease the topic…") and echoes in Next's

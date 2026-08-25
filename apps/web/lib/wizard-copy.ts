@@ -1,5 +1,3 @@
-import type { FavpollSubject } from "@favpoll/types"
-
 export type WizardStep = "type" | "charity" | "topic"
 
 export type WizardCopy = {
@@ -8,30 +6,27 @@ export type WizardCopy = {
   topicGuidance: string
 }
 
-const SOMEONE: WizardCopy = {
+// ONE set of words, not two. The wizard used to branch this on `subject`,
+// which it knew because Cause was picked in step 1. Cause now moves to the
+// form's Generate control (2026-08-25), so by the time an organiser is in
+// the wizard nobody knows yet whether this is a person or a cause — and
+// copy that assumes a person ("What did they love?", "who you're
+// honouring") would address a cause organiser wrongly for two steps.
+//
+// So these lean on the favpoll rather than on its subject. DRAFT: awaiting
+// the founder's wording.
+export const WIZARD_COPY: WizardCopy = {
   rail: {
     type: "Who or what is this favpoll for?",
     charity: "Every pledge goes to the charity you pick.",
-    topic: "What did they love? Guests pledge on their favourites.",
+    topic: "Pick a topic, and guests pledge on their favourite.",
   },
   charityGuidance:
-    "Pick from many worthy causes, ideally a meaningful one to who you're honouring.",
+    "Every pledge goes straight to the charity you pick, so pick one that means something here.",
   topicGuidance:
-    "What did they love? Pick a topic close to their heart and let guests pledge on their favourite.",
+    "Pick a topic that fits, and let guests pledge on their favourite.",
 }
 
-const CAUSE: WizardCopy = {
-  rail: {
-    type: "Who or what is this favpoll for?",
-    charity: "Every pledge goes to the charity you pick.",
-    topic: "Pick a topic your supporters will love voting on.",
-  },
-  charityGuidance:
-    "Which charity are you raising for? Proceeds from every pledge go straight to them.",
-  topicGuidance:
-    "Pick a topic that suits your cause — something supporters will enjoy voting on.",
-}
-
-export function getWizardCopy(subject: FavpollSubject): WizardCopy {
-  return subject === "cause" ? CAUSE : SOMEONE
+export function getWizardCopy(): WizardCopy {
+  return WIZARD_COPY
 }

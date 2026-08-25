@@ -59,7 +59,7 @@ export function useWizardState(data: WizardData) {
   const isFirst = stepIndex === 0
   const isLast = stepIndex === STEPS.length - 1
 
-  const copy = getWizardCopy(subject)
+  const copy = getWizardCopy()
 
   const customLabels = topics[0]?.customLabels ?? []
   const customItemCount = topics[0]?.isCustom ? customLabels.length : null
@@ -81,11 +81,12 @@ export function useWizardState(data: WizardData) {
   const showItemsSection =
     topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
-  // The who refinements (pronoun, pair/group) moved to the form's
-  // Generate control (2026-07-30): the step gates on type-or-cause only.
+  // The whole who axis now lives in the form's Generate control —
+  // pronoun and pair/group since 2026-07-30, Cause since 2026-08-25 — so
+  // the step gates on the type alone.
   const nextDisabled =
     step === "type"
-      ? subject !== "cause" && !category
+      ? !category
       : step === "charity"
         ? charityIds.length === 0
         : topics.length === 0 ||

@@ -60,20 +60,7 @@ export function NewFavpollWizard({ data }: Props) {
             {/* Type step */}
             {w.step === "type" && (
               <WizardStepShell guidance="What kind of favpoll is this?">
-                <TypeStep
-                  value={{
-                    category: w.category,
-                    grouping: w.grouping,
-                    subject: w.subject,
-                    pronoun: w.pronoun,
-                  }}
-                  onChange={({ category, grouping, subject, pronoun }) => {
-                    w.setCategory(category)
-                    w.setGrouping(grouping)
-                    w.setSubject(subject)
-                    w.setPronoun(pronoun)
-                  }}
-                />
+                <TypeStep value={w.category} onChange={w.setCategory} />
               </WizardStepShell>
             )}
 

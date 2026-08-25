@@ -13,6 +13,7 @@ import { CommandPanel } from "./command-panel"
 import {
   GenerateExampleDialog,
   groupingForWho,
+  subjectForWho,
   type WhoValue,
 } from "./generate-example-dialog"
 import { GoalOverlay } from "./goal-overlay"
@@ -29,6 +30,7 @@ import type {
   Register,
   FavpollGrouping,
   FavpollCategory,
+  FavpollSubject,
   Pronoun,
 } from "@favpoll/types"
 
@@ -316,34 +318,66 @@ export function FormInner({
   // The who refinement (moved here from the wizard, 2026-07-30): pronoun
   // and pair/group only shape suggestions, so they live with Generate —
   // which also makes them editable after creation.
+  // Cause is a who answer now, so it round-trips through this value —
+  // it is checked FIRST because a cause has no grouping or pronoun to
+  // fall back on (2026-08-25).
   const whoValue =
-    groupingWatch === "couple"
-      ? "couple"
-      : groupingWatch === "group"
-        ? "group"
-        : (pronounWatch ?? "")
+    subjectWatch === "cause"
+      ? "cause"
+      : groupingWatch === "couple"
+        ? "couple"
+        : groupingWatch === "group"
+          ? "group"
+          : (pronounWatch ?? "")
 
   // The dialog hands back both selections at once (founder, 2026-07-30:
   // who then occasion, structurally ordered). setValue is synchronous, so
   // handleRegenerate's form.getValues() sees the fresh who.
+  // Subject arrives ahead of generation (see the dialog's onSubjectChange).
+  // Register is re-derived because a cause IS the cause register whatever
+  // the category says, and the hero swaps name <-> cause label off subject.
+  function handleSubjectChange(subject: FavpollSubject) {
+    form.setValue("subject", subject, { shouldDirty: true })
+    if (subject === "cause")
+      form.setValue("pronoun", undefined, { shouldDirty: true })
+    form.setValue(
+      "register",
+      deriveRegister(
+        (form.getValues("category") as FavpollCategory | null) ?? null,
+        form.getValues("grouping") ?? "individual",
+        subject
+      ),
+      { shouldDirty: true }
+    )
+  }
+
   function handleDialogGenerate(
     who: WhoValue | null,
     occ: OccasionSpec | null
   ) {
     if (who) {
       const grouping = groupingForWho(who)
+      const subject = subjectForWho(who)
+      // "cause" is a subject, never a pronoun — `pronoun` is a checked
+      // column (he/she/they), so letting it through would write an
+      // invalid value.
       const pronoun =
-        who === "couple" || who === "group" ? undefined : (who as Pronoun)
+        who === "couple" || who === "group" || who === "cause"
+          ? undefined
+          : (who as Pronoun)
       form.setValue("grouping", grouping, { shouldDirty: true })
       form.setValue("pronoun", pronoun, { shouldDirty: true })
-      // Register depends on grouping (celebrating one vs many) — re-derive
-      // so the generation uses the right grammar.
+      form.setValue("subject", subject, { shouldDirty: true })
+      // Register depends on grouping (celebrating one vs many) AND on
+      // subject (a cause is the cause register whatever the category) —
+      // re-derive from the fresh values so generation uses the right
+      // grammar.
       form.setValue(
         "register",
         deriveRegister(
           (form.getValues("category") as FavpollCategory | null) ?? null,
           grouping,
-          form.getValues("subject") ?? "someone"
+          subject
         ),
         { shouldDirty: true }
       )
@@ -443,10 +477,10 @@ export function FormInner({
                 open={generateOpen}
                 onOpenChange={setGenerateOpen}
                 category={category}
-                subject={subjectWatch === "cause" ? "cause" : "someone"}
                 who={whoValue as WhoValue | ""}
                 occasion={occasion}
                 onGenerate={handleDialogGenerate}
+                onSubjectChange={handleSubjectChange}
               />
               {/* Wrapped so a caller's click event can't land in the
                   occasionOverride parameter */}

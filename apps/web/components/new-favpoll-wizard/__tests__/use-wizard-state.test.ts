@@ -106,10 +106,13 @@ describe("useWizardState — type step nextDisabled gate", () => {
     expect(result.current.nextDisabled).toBe(false)
   })
 
-  it("nextDisabled false for cause subject without category — a cause has no type", () => {
+  // The gate used to pass on `subject === "cause"` with no category. Cause
+  // moved to the form's Generate control (2026-08-25), so the type is now
+  // the step's only question and there is no escape from it.
+  it("nextDisabled true for a cause subject with no category", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setSubject("cause"))
-    expect(result.current.nextDisabled).toBe(false)
+    expect(result.current.nextDisabled).toBe(true)
   })
 })
 

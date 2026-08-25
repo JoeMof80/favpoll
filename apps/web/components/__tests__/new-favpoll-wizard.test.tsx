@@ -198,86 +198,44 @@ describe("NewFavpollWizard — redirect", () => {
 // GUARDRAIL — cause: category auto-set to fundraiser, no causeLabel capture
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("NewFavpollWizard — cause guardrail", () => {
-  it("Next is enabled as soon as A cause is selected — a cause needs no type", () => {
+describe("NewFavpollWizard — Cause has left the wizard", () => {
+  // Cause answers WHO (no one), the three chips answer WHAT KIND — they
+  // were never alternatives, which is why a marathon runner is a person
+  // AND a fundraiser. Cause now lives on the who axis in the form's
+  // Generate control (founder, 2026-08-25).
+  it("offers no Cause option on step 1", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
+    expect(
+      screen.queryByRole("radio", { name: "Cause" })
+    ).not.toBeInTheDocument()
+    expect(screen.getAllByRole("radio")).toHaveLength(3)
+  })
+
+  // The gate used to pass on `subject === "cause"` with no category. There
+  // is no such escape now: the step has exactly one question.
+  it("requires a type before Next enables", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+    fireEvent.click(screen.getByRole("radio", { name: "Fundraiser" }))
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
-  it("shows no type selection for a cause — the plumbing category is not a chip choice", () => {
+  it("never asks for a cause label", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
-    const fundraiser = screen.getByRole("radio", { name: "Fundraiser" })
-    expect(fundraiser).toBeEnabled()
-    expect(fundraiser).toHaveAttribute("aria-checked", "false")
-  })
-
-  it("clicking a type chip while A cause is selected hops paths and re-gates Next", () => {
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
-    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
-    fireEvent.click(screen.getByRole("radio", { name: "Memorial" }))
-    // Cause deselects, the type is kept — and a type alone now satisfies
-    // the step (who moved to the Generate control).
-    expect(screen.getByRole("radio", { name: "Cause" })).toHaveAttribute(
-      "aria-checked",
-      "false"
-    )
-    expect(screen.getByRole("radio", { name: "Memorial" })).toHaveAttribute(
-      "aria-checked",
-      "true"
-    )
-    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
-  })
-
-  it("wizard does not show a cause label input on step 1", () => {
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
     expect(
       screen.queryByLabelText("What are you raising for?")
     ).not.toBeInTheDocument()
   })
-
-  it("redirect URL contains subject=cause and no pronoun for a cause favpoll", () => {
-    mockPush.mockClear()
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-
-    // Step 1: Type — cause (category auto-set to fundraiser)
-    fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
-    fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 2: Charity
-    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
-    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
-    fireEvent.click(screen.getByRole("button", { name: "Done" }))
-    fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 3: Topic
-    fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
-    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
-    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
-
-    const url: string = mockPush.mock.calls[0][0]
-    expect(url).toContain("subject=cause")
-    expect(url).not.toContain("category=")
-    expect(url).not.toContain("pronoun=")
-    expect(url).not.toContain("causeLabel")
-  })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Subject-aware Love copy
+// One set of copy — the wizard no longer knows the subject
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("NewFavpollWizard — Love step copy by subject", () => {
-  function reachTopicStep(subject: "person" | "cause") {
+describe("NewFavpollWizard — subject-neutral copy", () => {
+  function reachTopicStep() {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    if (subject === "cause") {
-      fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
-    } else {
-      fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
-    }
+    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
@@ -285,18 +243,20 @@ describe("NewFavpollWizard — Love step copy by subject", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
   }
 
-  it("shows person-specific guidance on the Love step", () => {
-    reachTopicStep("person")
-    expect(screen.getAllByText(/What did they love/i)[0]).toBeInTheDocument()
-  })
-
-  it("shows cause-specific guidance on the Love step", () => {
-    reachTopicStep("cause")
-    expect(screen.getAllByText(/suits your cause/i)[0]).toBeInTheDocument()
-  })
-
-  it("does not show cause copy for a person favpoll on the Love step", () => {
-    reachTopicStep("person")
+  // Both halves of the old branch assumed something the wizard can no
+  // longer know. "What did they love?" addresses a cause organiser as if
+  // there were a person; "suits your cause" addresses a widow as if there
+  // were not.
+  it("assumes neither a person nor a cause on the topic step", () => {
+    reachTopicStep()
+    expect(screen.queryByText(/What did they love/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/suits your cause/i)).not.toBeInTheDocument()
+  })
+
+  it("still guides the topic step", () => {
+    reachTopicStep()
+    expect(
+      screen.getAllByText(/let guests pledge on their favourite/i)[0]
+    ).toBeInTheDocument()
   })
 })
