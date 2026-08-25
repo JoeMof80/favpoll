@@ -9,7 +9,7 @@ import type {
   Pronoun,
 } from "@favpoll/types"
 
-type HonourValue = {
+type TypeValue = {
   category: FavpollCategory | null
   grouping: FavpollGrouping
   subject: FavpollSubject
@@ -17,8 +17,8 @@ type HonourValue = {
 }
 
 type Props = {
-  value: HonourValue
-  onChange: (value: HonourValue) => void
+  value: TypeValue
+  onChange: (value: TypeValue) => void
 }
 
 // The step forks: honouring someone (pick a type) OR backing a cause
@@ -34,7 +34,7 @@ const CATEGORY_OPTIONS = [
 const ITEM_CLASS =
   "flex h-auto w-full flex-col items-center gap-2 rounded-xl border border-border bg-background px-1 py-4 text-xs font-normal sm:px-4 sm:py-5 sm:text-sm [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:shrink-0 data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
 
-export function HonourStep({ value, onChange }: Props) {
+export function TypeStep({ value, onChange }: Props) {
   const isCause = value.subject === "cause"
 
   function handleCategoryChange(v: string) {

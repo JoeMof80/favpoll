@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import type { Category, Favourite, TopicWithMeta } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
-type LoveStepProps = {
+type TopicStepProps = {
   topics: TopicWithMeta[]
   categories: Category[]
   value: FavpollFormValues["topics"]
@@ -46,7 +46,7 @@ const ADD_TOKEN = (
   </span>
 )
 
-export function LoveStep({
+export function TopicStep({
   topics,
   categories,
   value,
@@ -56,7 +56,7 @@ export function LoveStep({
   primaryCharityName,
   search: externalSearch,
   onSearchChange,
-}: LoveStepProps) {
+}: TopicStepProps) {
   const [internalSearch, setInternalSearch] = useState("")
   const search = externalSearch ?? internalSearch
   const setSearch = onSearchChange ?? setInternalSearch

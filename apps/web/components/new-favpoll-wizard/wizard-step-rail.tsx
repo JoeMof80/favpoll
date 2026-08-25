@@ -7,9 +7,9 @@ import type { WizardStep } from "@/lib/wizard-copy"
 import type { WizardCopy } from "@/lib/wizard-copy"
 
 const STEP_ICONS: Record<WizardStep, React.ElementType> = {
-  honour: Award,
+  type: Award,
   charity: Gift,
-  love: Heart,
+  topic: Heart,
 }
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
   copy: WizardCopy
 }
 
-export function WizardTriadRail({ currentStep, copy }: Props) {
+export function WizardStepRail({ currentStep, copy }: Props) {
   const stepIndex = STEPS.indexOf(currentStep)
   return (
     <div className="hidden h-full flex-col gap-10 bg-primary/10 p-6 md:flex">

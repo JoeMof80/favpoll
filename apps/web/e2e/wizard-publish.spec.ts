@@ -11,9 +11,9 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Honour step: Memorial (the who refinements moved to Generate)
+ *   3. Type step: Memorial (the who refinements moved to Generate)
  *   4. Charity step: Marie Curie
- *   5. Love step: Colour topic
+ *   5. Topic step: Colour topic
  *   6. Details page: fill protagonist name
  *   7. Publish: set close date → Publish
  *   8. Skip shared fund modal
@@ -72,7 +72,7 @@ test.describe("wizard → publish flow", () => {
 
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
-    // ── 2. Honour step ────────────────────────────────────────────────────────
+    // ── 2. Type step ────────────────────────────────────────────────────────
     // One category row (Celebration/Memorial/Fundraiser) plus the Cause fork.
     // The who refinements (He/She/They/Pair/Group) left this step on
     // 2026-07-30 — they only shape generated suggestions, so they now live on
@@ -115,10 +115,10 @@ test.describe("wizard → publish flow", () => {
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
     await expect(page.getByText("Marie Curie")).toBeVisible()
 
-    // Next → (advances to Love step)
+    // Next → (advances to Topic step)
     await page.getByRole("button", { name: /next/i }).click()
 
-    // ── 4. Love step (topic picker) ───────────────────────────────────────────
+    // ── 4. Topic step (topic picker) ───────────────────────────────────────────
     // "Pick a topic" button opens the topic overlay.
     const pickTopicBtn = page.getByRole("button", { name: /pick a topic/i })
     await expect(pickTopicBtn).toBeVisible({ timeout: 10_000 })

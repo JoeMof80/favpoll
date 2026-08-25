@@ -4,12 +4,12 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { HonourStep } from "@/components/favpoll-flow/honour-step"
-import { LoveStep } from "@/components/favpoll-flow/love-step"
+import { TypeStep } from "@/components/favpoll-flow/type-step"
+import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { useWizardState } from "./use-wizard-state"
-import { WizardTriadRail } from "./wizard-triad-rail"
+import { WizardStepRail } from "./wizard-step-rail"
 import { WizardProgressStrip } from "./wizard-progress-strip"
 import { WizardNav } from "./wizard-nav"
 import { WizardCharityCard } from "./wizard-charity-card"
@@ -23,47 +23,44 @@ type Props = {
 
 export function NewFavpollWizard({ data }: Props) {
   const w = useWizardState(data)
-  const [loveSearch, setLoveSearch] = useState("")
+  const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 
-  const trimmedLoveSearch = loveSearch.trim()
-  const loveShowCreate =
-    trimmedLoveSearch.length > 0 &&
+  const trimmedTopicSearch = topicSearch.trim()
+  const topicShowCreate =
+    trimmedTopicSearch.length > 0 &&
     !data.topics
       .filter((t) => t.is_active !== false)
-      .some((t) => t.title.toLowerCase() === trimmedLoveSearch.toLowerCase())
+      .some((t) => t.title.toLowerCase() === trimmedTopicSearch.toLowerCase())
 
-  function handleCreateLoveTopic() {
-    if (!trimmedLoveSearch) return
+  function handleCreateTopic() {
+    if (!trimmedTopicSearch) return
     w.setTopics([
       {
         topicId: "",
-        title: trimmedLoveSearch,
+        title: trimmedTopicSearch,
         isCustom: true,
         items: [],
         customLabels: [],
       },
     ])
-    w.setLoveOpen(false)
-    setLoveSearch("")
+    w.setTopicOpen(false)
+    setTopicSearch("")
   }
 
   return (
     <main>
       <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
-        <WizardTriadRail currentStep={w.step} copy={w.copy} />
+        <WizardStepRail currentStep={w.step} copy={w.copy} />
 
         <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
           <div className="mx-auto w-full max-w-2xl">
             <WizardProgressStrip currentStep={w.step} />
 
-            {/* Honour step */}
-            {w.step === "honour" && (
-              <WizardStepShell
-                title="Honour"
-                guidance="What kind of favpoll is this?"
-              >
-                <HonourStep
+            {/* Type step */}
+            {w.step === "type" && (
+              <WizardStepShell guidance="What kind of favpoll is this?">
+                <TypeStep
                   value={{
                     category: w.category,
                     grouping: w.grouping,
@@ -82,10 +79,7 @@ export function NewFavpollWizard({ data }: Props) {
 
             {/* Charity step */}
             {w.step === "charity" && (
-              <WizardStepShell
-                title="Charity"
-                guidance={w.copy.charityGuidance}
-              >
+              <WizardStepShell guidance={w.copy.charityGuidance}>
                 {w.selectedCharities.length > 0 ? (
                   <WizardCharityCard
                     charities={w.selectedCharities}
@@ -106,22 +100,22 @@ export function NewFavpollWizard({ data }: Props) {
               </WizardStepShell>
             )}
 
-            {/* Love step */}
-            {w.step === "love" && (
-              <WizardStepShell title="Love" guidance={w.copy.loveGuidance}>
+            {/* Topic step */}
+            {w.step === "topic" && (
+              <WizardStepShell guidance={w.copy.topicGuidance}>
                 {w.topics.length > 0 ? (
                   <WizardTopicCard
                     topic={w.topics[0]}
                     sortedExistingItems={w.sortedExistingItems}
                     customLabels={w.customLabels}
                     showItemsSection={w.showItemsSection}
-                    onEdit={() => w.setLoveOpen(true)}
+                    onEdit={() => w.setTopicOpen(true)}
                     onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
                   />
                 ) : (
                   <Button
                     variant="secondary"
-                    onClick={() => w.setLoveOpen(true)}
+                    onClick={() => w.setTopicOpen(true)}
                   >
                     Pick a topic
                   </Button>
@@ -143,10 +137,10 @@ export function NewFavpollWizard({ data }: Props) {
 
       {/* Love overlay */}
       <ResponsiveOverlay
-        open={w.loveOpen}
+        open={w.topicOpen}
         onOpenChange={(o) => {
-          w.setLoveOpen(o)
-          if (!o) setLoveSearch("")
+          w.setTopicOpen(o)
+          if (!o) setTopicSearch("")
         }}
         title="Pick a topic"
         hideCloseButton
@@ -156,8 +150,8 @@ export function NewFavpollWizard({ data }: Props) {
         mobileSave={{
           label: "Done",
           onClick: () => {
-            w.setLoveOpen(false)
-            setLoveSearch("")
+            w.setTopicOpen(false)
+            setTopicSearch("")
           },
         }}
         header={
@@ -166,21 +160,18 @@ export function NewFavpollWizard({ data }: Props) {
               type="text"
               autoFocus
               placeholder="Search topics…"
-              value={loveSearch}
-              onChange={(e) => setLoveSearch(e.target.value)}
+              value={topicSearch}
+              onChange={(e) => setTopicSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && loveShowCreate) {
+                if (e.key === "Enter" && topicShowCreate) {
                   e.preventDefault()
-                  handleCreateLoveTopic()
+                  handleCreateTopic()
                 }
               }}
               className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
             />
-            {loveShowCreate && (
-              <InputGroupButton
-                variant="secondary"
-                onClick={handleCreateLoveTopic}
-              >
+            {topicShowCreate && (
+              <InputGroupButton variant="secondary" onClick={handleCreateTopic}>
                 Add
               </InputGroupButton>
             )}
@@ -193,8 +184,8 @@ export function NewFavpollWizard({ data }: Props) {
               variant="ghost"
               className="flex-1"
               onClick={() => {
-                w.setLoveOpen(false)
-                setLoveSearch("")
+                w.setTopicOpen(false)
+                setTopicSearch("")
               }}
             >
               Cancel
@@ -203,8 +194,8 @@ export function NewFavpollWizard({ data }: Props) {
               type="button"
               className="flex-1"
               onClick={() => {
-                w.setLoveOpen(false)
-                setLoveSearch("")
+                w.setTopicOpen(false)
+                setTopicSearch("")
               }}
             >
               Done
@@ -212,20 +203,20 @@ export function NewFavpollWizard({ data }: Props) {
           </div>
         }
       >
-        <LoveStep
+        <TopicStep
           topics={data.topics}
           categories={data.categories}
           value={w.topics}
           onChange={(v) => {
             w.setTopics(v)
-            w.setLoveOpen(false)
-            setLoveSearch("")
+            w.setTopicOpen(false)
+            setTopicSearch("")
           }}
           hideItemsPanel
           suggestedTopics={w.suggestedTopics}
           primaryCharityName={w.primaryCharity?.name}
-          search={loveSearch}
-          onSearchChange={setLoveSearch}
+          search={topicSearch}
+          onSearchChange={setTopicSearch}
         />
       </ResponsiveOverlay>
 

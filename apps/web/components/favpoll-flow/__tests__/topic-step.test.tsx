@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen, fireEvent, within } from "@testing-library/react"
 
-import { LoveStep } from "@/components/favpoll-flow/love-step"
+import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import type { Category, TopicWithMeta } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
@@ -85,10 +85,10 @@ function customTopic(
   ]
 }
 
-describe("LoveStep — items panel", () => {
+describe("TopicStep — items panel", () => {
   it("shows no items panel when nothing is selected", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -100,7 +100,7 @@ describe("LoveStep — items panel", () => {
 
   it("shows items panel when a canonical topic is selected", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={select("t-colour", "Colour")}
@@ -113,7 +113,7 @@ describe("LoveStep — items panel", () => {
 
   it("renders the selected topic's items as chips", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={select("t-colour", "Colour")}
@@ -126,7 +126,7 @@ describe("LoveStep — items panel", () => {
 
   it("shows finite topic without 'guests can add' hint", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={select("t-colour", "Colour")}
@@ -138,7 +138,7 @@ describe("LoveStep — items panel", () => {
 
   it("shows 'Guests can add their own' hint for infinite topics", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={select("t-biscuit", "Biscuit")}
@@ -161,7 +161,7 @@ describe("LoveStep — items panel", () => {
     )
 
     render(
-      <LoveStep
+      <TopicStep
         topics={[...TOPICS, topicWithMixedOrder]}
         categories={CATEGORIES}
         value={select("t-mixed", "Mixed")}
@@ -182,13 +182,13 @@ describe("LoveStep — items panel", () => {
   })
 })
 
-describe("LoveStep — custom topic hint", () => {
+describe("TopicStep — custom topic hint", () => {
   // The hint exists because the Add button only appears once a search matches
   // nothing — so writing your own topic was discoverable only by organisers
   // who already suspected they could. It has to be there BEFORE you type.
   it("shows the hint with an empty search", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -205,7 +205,7 @@ describe("LoveStep — custom topic hint", () => {
   // in a shape nothing uses proves nothing.
   it("shows the hint when the search is owned by the wizard", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -219,7 +219,7 @@ describe("LoveStep — custom topic hint", () => {
 
   it("drops the hint once Add appears, so the two never both show", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -236,12 +236,12 @@ describe("LoveStep — custom topic hint", () => {
   })
 })
 
-describe("LoveStep — suggested topics", () => {
+describe("TopicStep — suggested topics", () => {
   const SUGGESTED = [makeTopic("t-colour", "Colour", [], true)]
 
   it("shows suggested section heading when suggestedTopics is non-empty", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -255,7 +255,7 @@ describe("LoveStep — suggested topics", () => {
 
   it("does not show suggested section when suggestedTopics is empty", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -269,7 +269,7 @@ describe("LoveStep — suggested topics", () => {
 
   it("does not show suggested section when suggestedTopics is undefined", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -281,7 +281,7 @@ describe("LoveStep — suggested topics", () => {
 
   it("keeps suggested section visible when search is active (pinned)", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -298,7 +298,7 @@ describe("LoveStep — suggested topics", () => {
   it("selecting a suggested topic calls onChange with the topic", () => {
     const onChange = vi.fn()
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -317,10 +317,10 @@ describe("LoveStep — suggested topics", () => {
   })
 })
 
-describe("LoveStep — finite / infinite filters", () => {
+describe("TopicStep — finite / infinite filters", () => {
   it("Finite filter shows only finite topics", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -334,7 +334,7 @@ describe("LoveStep — finite / infinite filters", () => {
 
   it("Infinite filter shows only infinite topics", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -348,7 +348,7 @@ describe("LoveStep — finite / infinite filters", () => {
 
   it("All filter resets type filter", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -362,10 +362,10 @@ describe("LoveStep — finite / infinite filters", () => {
   })
 })
 
-describe("LoveStep — create topic option", () => {
+describe("TopicStep — create topic option", () => {
   it("shows create chip when search matches nothing", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -380,7 +380,7 @@ describe("LoveStep — create topic option", () => {
 
   it("shows create chip alongside matching chips when search partially matches an existing topic", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -396,7 +396,7 @@ describe("LoveStep — create topic option", () => {
 
   it("hides create chip when search is an exact match (case-insensitive)", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -413,7 +413,7 @@ describe("LoveStep — create topic option", () => {
   it("calls onChange with a new custom topic when create chip is clicked", () => {
     const onChange = vi.fn()
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={EMPTY_VALUE}
@@ -430,10 +430,10 @@ describe("LoveStep — create topic option", () => {
   })
 })
 
-describe("LoveStep — custom topic editable items panel", () => {
+describe("TopicStep — custom topic editable items panel", () => {
   it("shows items panel for a custom (new) topic", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={customTopic("My Topic")}
@@ -448,7 +448,7 @@ describe("LoveStep — custom topic editable items panel", () => {
 
   it("shows validation message when fewer than 2 items", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={customTopic("My Topic", ["One item"])}
@@ -462,7 +462,7 @@ describe("LoveStep — custom topic editable items panel", () => {
 
   it("hides validation message when 2 or more items exist", () => {
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={customTopic("My Topic", ["Item A", "Item B"])}
@@ -478,7 +478,7 @@ describe("LoveStep — custom topic editable items panel", () => {
     const onChange = vi.fn()
     const initial = customTopic("My Topic", [])
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={initial}
@@ -504,7 +504,7 @@ describe("LoveStep — custom topic editable items panel", () => {
     const onChange = vi.fn()
     const initial = customTopic("My Topic", ["Football", "Tennis"])
     render(
-      <LoveStep
+      <TopicStep
         topics={TOPICS}
         categories={CATEGORIES}
         value={initial}

@@ -68,9 +68,9 @@ beforeEach(() => {
 })
 
 describe("useWizardState — initial state", () => {
-  it("starts on honour step", () => {
+  it("starts on the type step", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    expect(result.current.step).toBe("honour")
+    expect(result.current.step).toBe("type")
     expect(result.current.isFirst).toBe(true)
     expect(result.current.isLast).toBe(false)
   })
@@ -81,7 +81,7 @@ describe("useWizardState — initial state", () => {
   })
 })
 
-describe("useWizardState — honour step nextDisabled gate", () => {
+describe("useWizardState — type step nextDisabled gate", () => {
   it("nextDisabled false once a category is set — who moved to the Generate control", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
@@ -114,7 +114,7 @@ describe("useWizardState — honour step nextDisabled gate", () => {
 })
 
 describe("useWizardState — step navigation", () => {
-  it("advances to charity on handleNext from honour", () => {
+  it("advances to charity on handleNext from type", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
       result.current.setCategory("celebration")
@@ -124,22 +124,22 @@ describe("useWizardState — step navigation", () => {
     expect(result.current.isFirst).toBe(false)
   })
 
-  it("advances to love on handleNext from charity", () => {
+  it("advances to topic on handleNext from charity", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
     act(() => result.current.handleNext())
     act(() => result.current.setCharityIds(["c1"]))
     act(() => result.current.handleNext())
-    expect(result.current.step).toBe("love")
+    expect(result.current.step).toBe("topic")
     expect(result.current.isLast).toBe(true)
   })
 
-  it("goes back from charity to honour", () => {
+  it("goes back from charity to type", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
     act(() => result.current.handleNext())
     act(() => result.current.handleBack())
-    expect(result.current.step).toBe("honour")
+    expect(result.current.step).toBe("type")
   })
 })
 
@@ -164,8 +164,8 @@ describe("useWizardState — charity step nextDisabled gate", () => {
   })
 })
 
-describe("useWizardState — love step nextDisabled gate", () => {
-  function advanceToLove(
+describe("useWizardState — topic step nextDisabled gate", () => {
+  function advanceToTopic(
     result: ReturnType<
       typeof renderHook<ReturnType<typeof useWizardState>, WizardData>
     >["result"]
@@ -178,13 +178,13 @@ describe("useWizardState — love step nextDisabled gate", () => {
 
   it("nextDisabled true when no topic selected", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    advanceToLove(result)
+    advanceToTopic(result)
     expect(result.current.nextDisabled).toBe(true)
   })
 
   it("nextDisabled false with existing topic", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    advanceToLove(result)
+    advanceToTopic(result)
     act(() => {
       result.current.setTopics([
         {
@@ -201,7 +201,7 @@ describe("useWizardState — love step nextDisabled gate", () => {
 
   it("nextDisabled true for custom topic with fewer than 2 labels", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    advanceToLove(result)
+    advanceToTopic(result)
     act(() => {
       result.current.setTopics([
         {
@@ -218,7 +218,7 @@ describe("useWizardState — love step nextDisabled gate", () => {
 
   it("nextDisabled false for custom topic with 2+ labels", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    advanceToLove(result)
+    advanceToTopic(result)
     act(() => {
       result.current.setTopics([
         {

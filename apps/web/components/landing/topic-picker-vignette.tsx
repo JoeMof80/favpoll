@@ -307,13 +307,13 @@ export function TopicPickerVignette() {
               {/* COPY THE REAL SEARCH BOX, WHICH IS THE WIZARD'S, NOT
                   LOVE-STEP'S (founder, 2026-08-17 — "the field has a border,
                   the real version doesn't").
-                  LoveStep does contain a bordered InputGroup, but it renders
+                  TopicStep does contain a bordered InputGroup, but it renders
                   only when `externalSearch === undefined`, and the wizard —
-                  the one place LoveStep is used — always passes a search in.
+                  the one place TopicStep is used — always passes a search in.
                   So the field organisers actually see is the OVERLAY HEADER's
                   bare input (new-favpoll-wizard/index.tsx): flex-1,
                   bg-transparent, outline-none, no border and no box, with a
-                  variant="secondary" Add beside it. Mocking LoveStep's dead
+                  variant="secondary" Add beside it. Mocking TopicStep's dead
                   branch drew a box that exists nowhere in the product.
                   NOT copied: the Filters row and the "Suggested for <charity>"
                   strip, which sit between the field and the chips. */}

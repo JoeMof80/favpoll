@@ -67,7 +67,7 @@ describe("NewFavpollWizard — structure", () => {
     const dots = screen.getAllByRole("listitem")
     expect(dots).toHaveLength(3)
     expect(dots[0]).toHaveAttribute("aria-current", "step")
-    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Honour")
+    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Type")
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 
@@ -82,6 +82,21 @@ describe("NewFavpollWizard — structure", () => {
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
   })
 
+  // The rail (desktop) and the progress strip (mobile) both name all three
+  // steps, so a per-step heading printed the current one a second time on the
+  // same screen — under a second, differently-worded question. The guidance
+  // stays; the heading does not (founder, 2026-08-25).
+  it("does not repeat the step name as a heading", () => {
+    render(<NewFavpollWizard data={MOCK_DATA} />)
+    expect(
+      screen.queryByRole("heading", { name: "Type" })
+    ).not.toBeInTheDocument()
+    // The guidance the chips answer is still there.
+    expect(
+      screen.getByText("What kind of favpoll is this?")
+    ).toBeInTheDocument()
+  })
+
   it("does not render who options on step 1 (moved to the Generate control)", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     for (const name of ["He", "She", "They", "Pair", "Group"]) {
@@ -91,10 +106,10 @@ describe("NewFavpollWizard — structure", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step order: Honour → Charity → Love
+// Step order: Type → Charity → Topic
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("NewFavpollWizard — step order is Honour → Charity → Love", () => {
+describe("NewFavpollWizard — step order is Type → Charity → Topic", () => {
   it("step 2 is Charity (shows 'Pick a charity')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
@@ -108,9 +123,9 @@ describe("NewFavpollWizard — step order is Honour → Charity → Love", () =>
     )
   })
 
-  it("step 3 is Love (shows 'Pick a topic')", () => {
+  it("step 3 is Topic (shows 'Pick a topic')", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-    // Honour
+    // Type
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     // Charity: open sheet, pick, Done
@@ -136,7 +151,7 @@ describe("NewFavpollWizard — redirect", () => {
   it("redirects to /favpolls/new/details when wizard is completed (person)", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
-    // Step 1: Honour
+    // Step 1: Type
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
@@ -146,7 +161,7 @@ describe("NewFavpollWizard — redirect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
-    // Step 3: Love
+    // Step 3: Topic
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
 
@@ -228,7 +243,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
     mockPush.mockClear()
     render(<NewFavpollWizard data={MOCK_DATA} />)
 
-    // Step 1: Honour — cause (category auto-set to fundraiser)
+    // Step 1: Type — cause (category auto-set to fundraiser)
     fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
@@ -238,7 +253,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
 
-    // Step 3: Love
+    // Step 3: Topic
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
     fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
@@ -256,7 +271,7 @@ describe("NewFavpollWizard — cause guardrail", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("NewFavpollWizard — Love step copy by subject", () => {
-  function reachLoveStep(subject: "person" | "cause") {
+  function reachTopicStep(subject: "person" | "cause") {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     if (subject === "cause") {
       fireEvent.click(screen.getByRole("radio", { name: "Cause" }))
@@ -271,17 +286,17 @@ describe("NewFavpollWizard — Love step copy by subject", () => {
   }
 
   it("shows person-specific guidance on the Love step", () => {
-    reachLoveStep("person")
+    reachTopicStep("person")
     expect(screen.getAllByText(/What did they love/i)[0]).toBeInTheDocument()
   })
 
   it("shows cause-specific guidance on the Love step", () => {
-    reachLoveStep("cause")
+    reachTopicStep("cause")
     expect(screen.getAllByText(/suits your cause/i)[0]).toBeInTheDocument()
   })
 
   it("does not show cause copy for a person favpoll on the Love step", () => {
-    reachLoveStep("person")
+    reachTopicStep("person")
     expect(screen.queryByText(/suits your cause/i)).not.toBeInTheDocument()
   })
 })
