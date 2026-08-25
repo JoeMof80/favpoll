@@ -103,3 +103,39 @@ describe("DisplayScreen — live={false}", () => {
     expect(stillRoot.style.getPropertyValue("--display-figure")).toBe("")
   })
 })
+
+describe("DisplayScreen — the scan-to-pledge code after close", () => {
+  // Both codes read "Scan to pledge". Once the favpoll is closed that is an
+  // instruction the app will refuse — the scan lands on a closed favpoll —
+  // so the room is shown a small broken promise on the largest screen it has.
+  it("drops every QR when the favpoll is already closed", () => {
+    render(<DisplayScreen {...BASE} live isClosed />)
+
+    expect(screen.queryAllByTestId("branded-qr")).toHaveLength(0)
+    expect(screen.queryByText("Scan to pledge")).not.toBeInTheDocument()
+  })
+
+  // The gate is `effectiveClosed`, not `isClosed`, so a display left running
+  // through the close loses its codes at the moment it flips — a past
+  // closesAt is the same code path the mid-event timeout takes.
+  it("drops them when the close date has passed, without isClosed", () => {
+    render(<DisplayScreen {...BASE} live closesAt="2020-01-01T00:00:00Z" />)
+
+    expect(screen.queryAllByTestId("branded-qr")).toHaveLength(0)
+  })
+
+  it("keeps all three while the favpoll is open", () => {
+    render(<DisplayScreen {...BASE} live closesAt="2999-01-01T00:00:00Z" />)
+
+    // One in the right column, two in the gutters.
+    expect(screen.getAllByTestId("branded-qr")).toHaveLength(3)
+  })
+
+  // display-still passes neither isClosed nor closesAt, so the homepage
+  // walkthrough and the /features artefact must not lose their code to this.
+  it("leaves the still's code alone", () => {
+    render(<DisplayScreen {...BASE} live={false} />)
+
+    expect(screen.getAllByTestId("branded-qr")).toHaveLength(1)
+  })
+})
