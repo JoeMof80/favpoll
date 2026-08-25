@@ -201,7 +201,18 @@ export function DisplayScreen({
   //
   // Measured before and after: at 1280 and 1512 the code rendered at 86px; at
   // 1700 and 1920 the node existed and measured 0x0.
-  const scanToPledge = (
+  //
+  // GONE ONCE THE FAVPOLL CLOSES (founder, 2026-08-25). Both codes are
+  // labelled "Scan to pledge", which after close is an instruction the app
+  // will refuse — the scan lands on a closed favpoll. `effectiveClosed`
+  // rather than `isClosed`, so the code also leaves at the moment a display
+  // flips mid-event, in step with the reveal typing out. Nothing sits below
+  // it in this column and the gutter pair is `fixed`, so neither removal
+  // reflows anything above them.
+  //
+  // The stills are untouched: display-still passes neither `isClosed` nor
+  // `closesAt`, so `effectiveClosed` is false there.
+  const scanToPledge = effectiveClosed ? null : (
     <div
       className={`flex flex-col items-center gap-1.5 ${
         live ? "min-[1600px]:hidden" : ""
@@ -274,6 +285,7 @@ export function DisplayScreen({
           landing page's scaled frame these two 200px codes landed in the
           middle of the rankings. Same trap as DisplayChrome above. */}
       {live &&
+        !effectiveClosed &&
         (["left", "right"] as const).map((side) => (
           <div
             key={side}
