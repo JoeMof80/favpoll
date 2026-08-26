@@ -78,6 +78,7 @@
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-surface-neutral: var(--surface-neutral);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -99,6 +100,12 @@
 
 :root {
   --background: oklch(1 0 0);
+  /* The only NEUTRAL surface in the palette (2026-08-26). Every other
+     neutral is chroma 0.03 at hue 278 — deliberately tinted toward the
+     brand — so a section band always reads faintly lavender. Same
+     lightness as --muted, so the section rhythm is unchanged; only the
+     tint is gone. */
+  --surface-neutral: oklch(0.965 0 0);
   --foreground: oklch(0.2 0.02 280);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.02 280);
@@ -194,6 +201,11 @@
 .dark {
   /* Brand purple (#534AB7) as background, surfaces step lighter */
   --background: oklch(0.44 0.18 278);
+  /* Dark's page background is PURPLE, not near-black, so a literal grey
+     band reads as dirty against it. The band keeps its job — a step
+     RECESSED from the page, as the light one is against white — with the
+     chroma pulled almost out rather than all the way. */
+  --surface-neutral: oklch(0.4 0.02 278);
   --foreground: oklch(0.97 0.01 278);
   --card: oklch(0.5 0.17 278);
   --card-foreground: oklch(0.97 0.01 278);
