@@ -108,12 +108,6 @@ const ARTEFACTS = [
   },
 ]
 
-const PRESENCE = [
-  t("memorials.presence.ambient"),
-  t("memorials.presence.screen"),
-  t("memorials.presence.rally"),
-]
-
 export default function MemorialsPage() {
   return (
     <main>
@@ -144,55 +138,17 @@ export default function MemorialsPage() {
         hideStats
       />
 
-      {/* ── Where it sits, and how loud ──────────────────────────────────────
-          "Made for the wake" and "As quiet or as present as the family wants"
-          were two sections asking one question: where in the day does this
-          go, and at what volume. Consolidated — but BELOW the hero, not
-          inside it (founder, 2026-08-26). Folded into the pitch column they
-          made the hero carry a statement, a placement, a presence dial and a
-          phone; the hero states, this answers.
+      {/* ── How to tailor it to a memorial ─────────────────────────────────
+          NOT a gallery of objects (founder, 2026-08-26). These four say how
+          an organiser might USE a favpoll at a memorial — where the code
+          goes, why the reveal lands hardest here, how quiet to keep the
+          room, what the family is left holding. Advice, with the thing
+          itself beside it.
 
-          The wake HEADING is gone but not lost: its body opens "The service
-          isn't the moment — the wake is", which is the heading in a
-          sentence. ── */}
-      <section className="w-full">
-        <div className="mx-auto grid w-full max-w-330 gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-16">
-          <div className="max-w-2xl">
-            <p className="mb-6 leading-relaxed text-muted-foreground">
-              {t("memorials.wake.body")}
-            </p>
-            <p className="border-l-2 border-memorial pl-4 text-lg text-foreground italic">
-              {t("memorials.wake.nocash")}
-            </p>
-          </div>
-          <div className="max-w-2xl">
-            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
-              {t("memorials.presence.title")}
-            </h2>
-            <ul className="space-y-4">
-              {PRESENCE.map((line) => (
-                <li key={line} className="flex gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial"
-                  />
-                  <p className="leading-relaxed text-muted-foreground">
-                    {line}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ── The artefacts — SHOWN, not described ────────────────────────────
-          Retiring the demo must not turn this page into prose: the one
-          documented failure with this audience is a celebrant reading a
-          written explanation and coming away thinking it was a guessing
-          game. So the demo's job passes to the three physical things, in
-          the order a family meets them: paper -> room -> paper, the arc How
-          It Works closes on (#569). ── */}
+          It absorbed the two sections that used to sit above: "Made for the
+          wake" and "As quiet or as present as the family wants". The order
+          of service and the tribute display both said the same things at
+          less use, so the page said them twice. ── */}
       <section id="artefacts" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <SectionEyebrow className="mb-10 text-memorial">
