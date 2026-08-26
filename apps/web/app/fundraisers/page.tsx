@@ -13,7 +13,7 @@ import { t } from "@/lib/i18n"
 export const metadata: Metadata = {
   title: "Fundraisers — favpoll",
   description:
-    "Fundraising with a favourite question. Every penny reaches the charity. Supporters back their favourite and the room watches the total climb.",
+    "Fundraise by sharing what we all love. Give to charity in support of the cause. Supporters back their favourite and the room watches the total climb.",
 }
 
 const STEPS = [
