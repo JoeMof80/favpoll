@@ -223,11 +223,13 @@ export function LandingHero({
         // Full-screen band (founder, 2026-08-05): the hero fills the
         // viewport below the h-14 nav, content vertically centred —
         // min-h, not h, so short phones never clip.
-        "relative flex items-center",
-        // A STILL is sized by its phone (651px at PHONE_SCALE's xl step)
-        // plus padding, which is hero enough. Forcing 100vh on top left a
-        // slab of empty band below the content (founder, 2026-08-26).
-        !still && "min-h-[calc(100vh-3.5rem)]",
+        // min-h, not h, so short phones never clip. EVERY variant fills the
+        // screen, stills included: the slab of empty band under the still
+        // was never this — it was the phone's box laying out at its
+        // unscaled 868px (see PHONE_SCALED_BOX). Fix the box and min-h does
+        // what it does on the home page, with items-center holding the
+        // content in the middle of it.
+        "relative flex min-h-[calc(100vh-3.5rem)] items-center",
         bandClassName ?? "bg-primary text-primary-foreground"
       )}
     >
