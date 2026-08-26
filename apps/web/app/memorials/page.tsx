@@ -140,7 +140,7 @@ export default function MemorialsPage() {
         headline={t("memorials.headline")}
         subheader={t("memorials.subheader")}
         ctaLabel={t("memorials.cta.primary")}
-        accentBarClassName="bg-memorial"
+        accentVar="memorial"
         hideStats
       />
 

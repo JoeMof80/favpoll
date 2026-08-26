@@ -57,6 +57,24 @@ type Props = {
    * router cards do it. Omitted = brand purple.
    */
   accentBarClassName?: string
+  /**
+   * Tint the card's CONTENT with a register accent — e.g. "memorial".
+   *
+   * Swaps two custom properties on the content block, so everything that
+   * already reads them follows: the leader bar and the other bars, the
+   * date line, the topic eyebrow, the reveal's rule, the charity total.
+   * A register page's demo should look like that register, not like the
+   * brand (founder, 2026-08-26).
+   *
+   * Scoped BELOW the HeaderBar deliberately. The logo is text-primary, so
+   * tinting the whole card would recolour favpoll's own mark — the one
+   * thing on this card that must stay brand.
+   *
+   * --<accent> is the ink step and --<accent>-on-band the light one; they
+   * map onto --primary and --chart-3, which is the pair the ranking bars
+   * and the accent text already use.
+   */
+  accentVar?: string
 }
 
 // Types `text` out character by character while `active`; shows full text
@@ -133,6 +151,7 @@ export function DemoCard({
   prefersReducedMotion,
   className,
   accentBarClassName,
+  accentVar,
   device = "browser",
 }: Props) {
   const favourites = scene.poll.topic.favourites
@@ -380,7 +399,17 @@ export function DemoCard({
 
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
-      <div className="flex-1 space-y-4 overflow-hidden">
+      <div
+        className="flex-1 space-y-4 overflow-hidden"
+        style={
+          accentVar
+            ? ({
+                "--primary": `var(--${accentVar})`,
+                "--chart-3": `var(--${accentVar}-on-band)`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
         {/* Hero */}
         <div className="relative">
           {/* pr-28, not pr-24 (2026-08-26). The avatar is 132px at md: and
@@ -542,7 +571,22 @@ export function DemoCard({
           the point of it. Corrected 2026-08-07 against a photograph of the
           real thing; what the lock withholds is the standings, never who the
           money goes to. */}
-      <div className="shrink-0 border-t border-border pt-3">{charityRow}</div>
+      {/* Same tint as the content block above — the charity total is
+          `text-primary` and would otherwise be the one line on a tinted
+          card still wearing the brand. */}
+      <div
+        className="shrink-0 border-t border-border pt-3"
+        style={
+          accentVar
+            ? ({
+                "--primary": `var(--${accentVar})`,
+                "--chart-3": `var(--${accentVar}-on-band)`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        {charityRow}
+      </div>
 
       {/* ── Mimicked pledge dialog ──
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no

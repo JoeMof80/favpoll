@@ -63,6 +63,8 @@ type Props = {
   bandClassName?: string
   /** Register accent for the demo's leader bar — see DemoCard. */
   accentBarClassName?: string
+  /** Register accent token for a still's whole card — see DemoCard. */
+  accentVar?: string
   /**
    * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
    * router replaces the demo column — the demos now live on the register
@@ -205,6 +207,7 @@ export function LandingHero({
   ctaLabel,
   bandClassName,
   accentBarClassName,
+  accentVar,
   router = false,
   still = false,
   children,
@@ -489,7 +492,7 @@ export function LandingHero({
                     barWidths={scene.results.map((r) => r.widthPercent)}
                     prefersReducedMotion
                     device="phone"
-                    accentBarClassName={accentBarClassName}
+                    accentVar={accentVar}
                     className="rounded-none border-0"
                   />
                 </PhoneFrame>
