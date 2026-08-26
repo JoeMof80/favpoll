@@ -126,7 +126,9 @@ describe("GenerateExampleDialog — steps", () => {
     expect(screen.queryByText("Pick an occasion")).not.toBeInTheDocument()
   })
 
-  it("opens straight onto occasions for a cause", () => {
+  // A cause used to skip step 1 entirely — it had no who. Cause IS a who
+  // answer now (2026-08-25), so the step opens with it already pressed.
+  it("opens on the who step for a cause, with Cause pressed", () => {
     render(
       <Wrapper
         defaultValues={{
@@ -138,10 +140,29 @@ describe("GenerateExampleDialog — steps", () => {
       />
     )
     openDialog()
-    expect(screen.getByText("Pick an occasion")).toBeInTheDocument()
+    expect(screen.getByText("Who is this favpoll for?")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Cause" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
     expect(
       screen.getByRole("option", { name: "Coffee morning" })
     ).toBeInTheDocument()
+  })
+
+  // The move's whole point: picking Cause switches the axis mid-dialog,
+  // on a form that started life as a person.
+  it("picking Cause on a person form switches to the cause occasions", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
+    expect(
+      screen.getByRole("option", { name: "Coffee morning" })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole("option", { name: "Birthday" })
+    ).not.toBeInTheDocument()
   })
 
   it("picking a who advances to its narrowed occasion list", () => {
@@ -258,5 +279,76 @@ describe("GenerateExampleDialog — generation", () => {
       "aria-selected",
       "true"
     )
+  })
+})
+
+describe("GenerateExampleDialog — Cause as a who answer", () => {
+  // `pronoun` is a CHECKED column (he/she/they). The who value flows into
+  // it for anything that is not couple/group, so a sixth who value that
+  // reached that branch would write an invalid pronoun.
+  it("never writes 'cause' into pronoun, and sets the cause subject", async () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
+    fireEvent.click(screen.getByRole("option", { name: "No occasion" }))
+    await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
+
+    expect(capturedForm.getValues("pronoun")).toBeUndefined()
+    expect(capturedForm.getValues("subject")).toBe("cause")
+    expect(capturedForm.getValues("register")).toBe("cause")
+  })
+
+  // A cause is the cause register whatever the category says — subject
+  // wins in deriveRegister, so a Celebration that turns out to be a cause
+  // must not stay on celebrating_one.
+  it("overrides the category's register when Cause is picked", async () => {
+    render(
+      <Wrapper
+        defaultValues={{ category: "celebration", topics: [CANONICAL_TOPIC] }}
+      />
+    )
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
+    fireEvent.click(screen.getByRole("option", { name: "No occasion" }))
+    await waitFor(() =>
+      expect(mockSafeGenerateDraft).toHaveBeenCalledWith(
+        expect.objectContaining({ register: "cause", subject: "cause" })
+      )
+    )
+  })
+})
+
+describe("GenerateExampleDialog — the subject lands without generating", () => {
+  // Everything else in the dialog is generation metadata and waits for
+  // onGenerate. Subject cannot: it decides whether a protagonist exists,
+  // and routes the one "about" box into protagonists.about or
+  // events.description. If it waited, declaring a cause would require an
+  // LLM round-trip that also overwrites name, about and reveal.
+  it("sets the cause subject on the click, before any occasion is picked", () => {
+    render(<Wrapper defaultValues={{ topics: [CANONICAL_TOPIC] }} />)
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
+
+    expect(capturedForm.getValues("subject")).toBe("cause")
+    expect(capturedForm.getValues("register")).toBe("cause")
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
+  })
+
+  it("returns to a person subject when a pronoun is picked instead", () => {
+    render(
+      <Wrapper
+        defaultValues={{
+          category: undefined,
+          subject: "cause",
+          register: "cause",
+          topics: [CANONICAL_TOPIC],
+        }}
+      />
+    )
+    openDialog()
+    fireEvent.click(screen.getByRole("button", { name: "She" }))
+
+    expect(capturedForm.getValues("subject")).toBe("someone")
+    expect(mockSafeGenerateDraft).not.toHaveBeenCalled()
   })
 })

@@ -185,6 +185,10 @@ describe("FormInner — generated-example submit guard", () => {
       />
     )
     fireEvent.click(screen.getByRole("button", { name: "Generate an example" }))
+    // Cause is a who answer now, so the dialog opens on the who step even
+    // for a cause (2026-08-25) — it is pressed already, and confirming it
+    // advances to the cause occasions.
+    fireEvent.click(screen.getByRole("button", { name: "Cause" }))
     fireEvent.click(screen.getByRole("option", { name: "No occasion" }))
     await waitFor(() => expect(mockSafeGenerateDraft).toHaveBeenCalled())
     fireEvent.click(screen.getByRole("button", { name: "Publish" }))

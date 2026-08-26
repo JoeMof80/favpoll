@@ -1,17 +1,32 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { occasionsForRegister, type OccasionSpec } from "@/lib/occasions"
 import { deriveRegister } from "@/lib/registers"
 import { cn } from "@/lib/utils"
-import type { FavpollCategory, FavpollGrouping } from "@favpoll/types"
+import type {
+  FavpollCategory,
+  FavpollGrouping,
+  FavpollSubject,
+} from "@favpoll/types"
 
-export type WhoValue = "he" | "she" | "they" | "couple" | "group"
+export type WhoValue = "he" | "she" | "they" | "couple" | "group" | "cause"
 
 export function groupingForWho(who: WhoValue | ""): FavpollGrouping {
   return who === "couple" ? "couple" : who === "group" ? "group" : "individual"
+}
+
+/**
+ * Cause is an answer to "who is this for?", not a pronoun — it is the
+ * answer that says NO ONE. It moved here from the wizard's type step
+ * (founder, 2026-08-25), where it sat beside Celebration / Memorial /
+ * Fundraiser as if subject and kind were one axis. They are not: a
+ * marathon runner is a person AND a fundraiser.
+ */
+export function subjectForWho(who: WhoValue | ""): FavpollSubject {
+  return who === "cause" ? "cause" : "someone"
 }
 
 // Word pills, no glyphs (founder, 2026-07-30) — both steps share the
@@ -30,11 +45,12 @@ const CHIP_OFF = "rounded-full"
 
 /**
  * The Generate control's two-step dialog (founder, 2026-07-30): step 1
- * picks the who (He/She/They/Pair/Group), step 2 the occasion — the who
- * narrows the occasion list, so the ordering is structural. Selecting an
- * occasion (or "No occasion") generates immediately; Done is the escape
- * hatch that closes without generating, like the wizard pickers. Causes
- * have no who and open straight onto occasions.
+ * picks the who (He/She/They/Pair/Group, or Cause), step 2 the occasion —
+ * the who narrows the occasion list, so the ordering is structural.
+ * Selecting an occasion (or "No occasion") generates immediately; Done is
+ * the escape hatch that closes without generating, like the wizard
+ * pickers. Cause is one of the who answers rather than a reason to skip
+ * the step (2026-08-25); it narrows step 2 to the cause occasions.
  *
  * Chrome follows the pledge-dialog grammar: per-step title carries the
  * question, close button hidden, search as a transparent header input,
@@ -47,37 +63,58 @@ export function GenerateExampleDialog({
   open,
   onOpenChange,
   category,
-  subject,
   who,
   occasion,
   onGenerate,
+  onSubjectChange,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   category: FavpollCategory | null | undefined
-  subject: "someone" | "cause"
-  /** Current who selection, "" when none yet. */
+  /** Current who selection, "" when none yet. Carries the subject: "cause". */
   who: WhoValue | ""
   occasion: OccasionSpec | null
   onGenerate: (who: WhoValue | null, occasion: OccasionSpec | null) => void
+  /**
+   * Commits the SUBJECT the moment it is picked, before any generation.
+   *
+   * Everything else in this dialog is generation metadata and waits for
+   * onGenerate — but subject is not: it decides whether a protagonist
+   * exists, and routes the organiser's one "about" box into
+   * protagonists.about or events.description. Left to onGenerate, the
+   * only way to declare a cause would be to run a generation, which
+   * would also overwrite the name, about and reveal with example copy.
+   */
+  onSubjectChange: (subject: FavpollSubject) => void
 }) {
-  const isCause = subject === "cause"
-  const [step, setStep] = useState<1 | 2>(isCause ? 2 : 1)
+  const [step, setStep] = useState<1 | 2>(1)
   const [localWho, setLocalWho] = useState<WhoValue | "">(who)
   const [search, setSearch] = useState("")
 
   // Re-opening starts from the top with the previous selections shown.
+  //
+  // Fires on the OPEN TRANSITION only. `who` is derived from form state
+  // that this dialog now writes (subject commits on click), so resetting
+  // whenever it changed sent the dialog back to step 1 the instant Cause
+  // was picked — the selection landed and the step bounced back.
+  const wasOpen = useRef(false)
   useEffect(() => {
-    if (!open) return
-    setStep(isCause ? 2 : 1)
-    setLocalWho(who)
-    setSearch("")
-  }, [open, isCause, who])
+    if (open && !wasOpen.current) {
+      setStep(1)
+      setLocalWho(who)
+      setSearch("")
+    }
+    wasOpen.current = open
+  }, [open, who])
 
+  // The local selection, not the `subject` prop: picking Cause on step 1
+  // must switch step 2 to the cause occasions (Fundraiser, Sponsored
+  // event, Charity night, In memoriam appeal) before anything is saved.
+  const localSubject = subjectForWho(localWho)
   const register = deriveRegister(
     category ?? null,
     groupingForWho(localWho),
-    subject
+    localSubject
   )
   const grouping = groupingForWho(localWho)
   const occasions = occasionsForRegister(
@@ -98,10 +135,14 @@ export function GenerateExampleDialog({
     setLocalWho(value)
     setSearch("")
     setStep(2)
+    // Structural, so it lands now — see onSubjectChange. Done can then
+    // close the dialog with the subject set and nothing generated.
+    const nextSubject = subjectForWho(value)
+    if (nextSubject !== subjectForWho(localWho)) onSubjectChange(nextSubject)
   }
 
   function handleOccasion(spec: OccasionSpec | null) {
-    onGenerate(isCause ? null : (localWho as WhoValue), spec)
+    onGenerate(localWho === "" ? null : (localWho as WhoValue), spec)
     close()
   }
 
@@ -116,9 +157,7 @@ export function GenerateExampleDialog({
       dialogContentClassName="flex-1 overflow-y-auto"
       fullscreenOnMobile
       mobileBack={
-        step === 2 && !isCause
-          ? { label: "Back", onClick: () => setStep(1) }
-          : undefined
+        step === 2 ? { label: "Back", onClick: () => setStep(1) } : undefined
       }
       mobileSave={{ label: "Done", onClick: close }}
       header={
@@ -135,7 +174,7 @@ export function GenerateExampleDialog({
       }
       footer={
         <div className="flex gap-2">
-          {step === 2 && !isCause ? (
+          {step === 2 ? (
             <Button
               type="button"
               variant="ghost"
@@ -162,7 +201,11 @@ export function GenerateExampleDialog({
     >
       {step === 1 ? (
         <div className="px-5 pt-1 pb-4">
-          <div className="flex flex-wrap gap-1.5">
+          {/* Five who-chips, a separator, then Cause. Cause is a different
+              axis — the answer that says no one — so it does not sit flush
+              as a sixth chip. Same grammar the wizard's type step used to
+              carry, moved here with it (founder, 2026-08-25). */}
+          <div className="flex flex-wrap items-center gap-1.5">
             {WHO_OPTIONS.map(({ value, label }) => (
               <Button
                 key={value}
@@ -176,6 +219,22 @@ export function GenerateExampleDialog({
                 {label}
               </Button>
             ))}
+            <span
+              className="px-1 text-xs font-medium tracking-widest text-muted-foreground uppercase"
+              aria-hidden="true"
+            >
+              or
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-pressed={localWho === "cause"}
+              onClick={() => handleWho("cause")}
+              className={cn(localWho === "cause" ? CHIP_ON : CHIP_OFF)}
+            >
+              Cause
+            </Button>
           </div>
           <p className="pt-3 text-[11px] text-muted-foreground">
             Examples are starting points — everything published is yours to
