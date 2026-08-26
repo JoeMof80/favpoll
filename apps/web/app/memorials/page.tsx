@@ -1,6 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { PackVignette } from "@/components/landing/pack-vignette"
+import {
+  MEMORIAL_PACK_DATA,
+  MEMORIAL_PACK_STEPS,
+} from "@/components/landing/demo-fixture"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
@@ -64,7 +68,12 @@ const ARTEFACTS = [
     key: "pack",
     label: t("memorials.artefacts.pack.label"),
     body: t("memorials.artefacts.pack.body"),
-    artefact: <PackVignette />,
+    // Belinda's pack, not the celebration default — the reveal and the
+    // keepsake below are hers, and the homepage card that opens this page
+    // carries her charity and her total.
+    artefact: (
+      <PackVignette data={MEMORIAL_PACK_DATA} steps={MEMORIAL_PACK_STEPS} />
+    ),
   },
   {
     // The PHONE beat, and the reason the arc was incomplete without it:

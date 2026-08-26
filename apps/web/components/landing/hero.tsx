@@ -77,6 +77,24 @@ type Props = {
 // Belinda's favourite COLOUR, which its reveal quote names). The card is a
 // signpost, not a rerun of the page's story. Charities are short by design:
 // the row sits beside the total at a third of the container's width.
+// DERIVED, not retyped (2026-08-26). This card carried Marie Curie and
+// "£1,005" — Belinda Hartley's charity and her exact total — with results
+// of £350 / £220 / £165 at 100 / 63 / 47%, which are her top three to the
+// pound and the percent. Only the LABELS had drifted, from her colours to
+// flowers, and the comment below still said "scene-sourced". So the card
+// was always meant to be her favpoll.
+//
+// It matters because this card opens /memorials, and that page now shows
+// her printed card, her reveal and her keepsake. One favpoll runs from
+// the homepage through every object on the page; a flower poll here broke
+// it at the first click.
+//
+// The other two cards are still literals. They have scenes too and could
+// drift the same way — unchecked.
+const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+const MEMORIAL_RESULTS = MEMORIAL_SCENE.results.slice(0, 3)
+const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
+
 const ROUTER_CARDS = [
   {
     kind: "memorial" as const,
@@ -84,15 +102,14 @@ const ROUTER_CARDS = [
     bar: "bg-memorial-on-band",
     title: t("home.router.memorials.title"),
     body: t("home.router.memorials.body"),
-    topic: "flower",
-    more: "+9 more flowers",
-    charity: "Marie Curie",
-    total: "£1,005",
-    results: [
-      { label: "Sweet pea", amount: "£350", widthPercent: 100 },
-      { label: "Daffodil", amount: "£220", widthPercent: 63 },
-      { label: "Rose", amount: "£165", widthPercent: 47 },
-    ],
+    topic: MEMORIAL_TOPIC,
+    // Naive plural, correct for "colour" and for every topic title in the
+    // seed that this card could show. A topic whose plural is irregular
+    // would need the noun back as a literal.
+    more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
+    charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
+    total: MEMORIAL_SCENE.total,
+    results: MEMORIAL_RESULTS,
   },
   {
     kind: "celebration" as const,
