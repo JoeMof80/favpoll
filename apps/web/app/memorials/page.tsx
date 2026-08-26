@@ -12,6 +12,7 @@ import { RevealVignette } from "@/components/landing/reveal-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -228,25 +229,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── How it works, in the memorial register ── */}
-      <section id="how" className="w-full scroll-mt-20">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <SectionEyebrow className="mb-10">
-            {t("memorials.how.title")}
-          </SectionEyebrow>
-          <ol className="grid gap-10 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <li key={step.label}>
-                <p className="mb-2 text-sm font-semibold text-primary">
-                  {i + 1}. {step.label}
-                </p>
-                <p className="leading-relaxed text-muted-foreground">
-                  {step.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
 
       {/* ── Reassurances ── */}
       <section className="w-full bg-primary/5">

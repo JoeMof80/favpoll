@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { t } from "@/lib/i18n"
 
 // Register landing #2 (see /memorials for the pattern notes). ACCENT,
@@ -57,25 +57,7 @@ export default function CelebrationsPage() {
       />
 
       {/* ── How it works, in the celebration register ── */}
-      <section id="how" className="w-full scroll-mt-20">
-        <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
-          <SectionEyebrow className="mb-10 text-center">
-            {t("celebrations.how.title")}
-          </SectionEyebrow>
-          <ol className="grid gap-10 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <li key={step.label}>
-                <p className="mb-2 text-sm font-semibold text-primary">
-                  {i + 1}. {step.label}
-                </p>
-                <p className="leading-relaxed text-muted-foreground">
-                  {step.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <HowItWorksSteps title={t("celebrations.how.title")} steps={STEPS} />
 
       {/* ── Placement: a beat in the speeches ── */}
       <section className="w-full bg-primary/5">
