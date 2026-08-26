@@ -141,7 +141,7 @@ export default function MemorialsPage() {
           volume — so they fold in beside it. The opening now answers a
           celebrant’s first question on the first screen instead of
           announcing something. ── */}
-      <section className="w-full">
+      <section className="w-full bg-primary text-primary-foreground">
         <div className="mx-auto w-full max-w-330 px-6 pt-16 pb-16 md:pt-24">
           {/* Text one side, the favpoll itself the other — the homepage's
               grammar, and the visual half of the continuity: the card you
@@ -164,12 +164,12 @@ export default function MemorialsPage() {
             <div className="max-w-2xl">
               <span
                 aria-hidden="true"
-                className="mb-6 block h-1 w-12 rounded-full bg-memorial"
+                className="mb-6 block h-1 w-12 rounded-full bg-memorial-on-band"
               />
-              <p className="mb-4 text-xs font-medium tracking-widest text-memorial uppercase">
+              <p className="mb-4 text-xs font-medium tracking-widest text-memorial-on-band uppercase">
                 {t("memorials.eyebrow")}
               </p>
-              <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight text-foreground md:text-5xl">
+              <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
                 {t("memorials.headline")
                   .split(". ")
                   .map((sentence, i, all) => (
@@ -179,7 +179,7 @@ export default function MemorialsPage() {
                     </span>
                   ))}
               </h1>
-              <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
+              <p className="mb-8 text-lg leading-relaxed opacity-80">
                 {t("memorials.subheader")}
               </p>
 
@@ -189,13 +189,13 @@ export default function MemorialsPage() {
                   HEADING is gone but not lost — its body opens "The service
                   isn't the moment — the wake is", which is the heading in a
                   sentence. */}
-              <p className="mb-6 leading-relaxed text-muted-foreground">
+              <p className="mb-6 leading-relaxed opacity-80">
                 {t("memorials.wake.body")}
               </p>
-              <p className="mb-10 border-l-2 border-memorial pl-4 text-lg text-foreground italic">
+              <p className="mb-10 border-l-2 border-memorial-on-band pl-4 text-lg italic">
                 {t("memorials.wake.nocash")}
               </p>
-              <p className="mb-4 font-medium text-foreground">
+              <p className="mb-4 font-medium">
                 {t("memorials.presence.title")}
               </p>
               <ul className="space-y-4">
@@ -203,11 +203,9 @@ export default function MemorialsPage() {
                   <li key={line} className="flex gap-3">
                     <span
                       aria-hidden="true"
-                      className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial"
+                      className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial-on-band"
                     />
-                    <p className="leading-relaxed text-muted-foreground">
-                      {line}
-                    </p>
+                    <p className="leading-relaxed opacity-80">{line}</p>
                   </li>
                 ))}
               </ul>
