@@ -70,6 +70,16 @@ jobs:
   e2e:
     name: E2E Tests (advisory)
     runs-on: ubuntu-latest
+    # PULL REQUESTS ONLY. `github.head_ref` is empty on a push, so the URL
+    # below fell through to the E2E_BASE_URL secret and the suite ran
+    # against whatever that pointed at — production, as it turned out.
+    # Every merge to main left a run's worth of "E2E ..." favpolls in the
+    # prod database, and the teardown could not clean them because its
+    # Supabase credentials are pinned to staging (see the env block at the
+    # end of this job). Found 2026-08-26 with ~45 of them listed publicly
+    # on /favpolls. A preview deployment only exists for a PR, so a push
+    # has no legitimate target.
+    if: github.event_name == 'pull_request'
     continue-on-error: true
     environment: "Preview – favpoll-web"
     steps:
@@ -102,6 +112,22 @@ jobs:
           fi
           # Prefer computed URL; fall back to the E2E_BASE_URL secret override.
           URL="${COMPUTED:-${{ secrets.E2E_BASE_URL }}}"
+
+          # The suite WRITES — it publishes favpolls and they persist. The
+          # teardown can only clean staging, so any other target leaves
+          # débris nobody sweeps up. Refuse rather than pollute: an empty
+          # URL or a production host is a hard failure, not a fallback.
+          if [ -z "$URL" ]; then
+            echo "[e2e] No base URL resolved — refusing to run."
+            exit 1
+          fi
+          case "$URL" in
+            *favpoll-web-git-*) ;;                       # branch preview: fine
+            *) echo "[e2e] REFUSING: '$URL' is not a branch preview."
+               echo "[e2e] This suite creates real favpolls and only staging is swept."
+               exit 1 ;;
+          esac
+
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "[e2e] Base URL: $URL"
 
