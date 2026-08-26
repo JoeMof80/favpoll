@@ -42,6 +42,20 @@ export const PHONE_SAFE_AREA_TOP = 48
  */
 export const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
 
+/**
+ * The box a PHONE_SCALE'd phone actually occupies — 414x868 multiplied
+ * through at each step (0.52 -> 215x451, 0.70 -> 290x608, 0.75 -> 311x651).
+ *
+ * A scaled element LAYS OUT AT ITS NATURAL SIZE and scales after, so a bare
+ * `origin-top-left scale-[…]` still reserves 868px of height and the phone
+ * sits at the top of it. In a centred hero that shows up twice: the row is
+ * 217px taller than the phone, and the phone cannot centre against anything
+ * because its box is the tallest thing in the row. Give the wrapper these
+ * dimensions and put the scale on a child (PackVignette does the same).
+ */
+export const PHONE_SCALED_BOX =
+  "h-[451px] w-[215px] lg:h-[608px] lg:w-[290px] xl:h-[651px] xl:w-[311px]"
+
 export const PHONE_CHASSIS_WIDTH = PHONE_SCREEN_WIDTH + BEZEL * 2
 export const PHONE_CHASSIS_HEIGHT = PHONE_SCREEN_HEIGHT + BEZEL * 2
 

@@ -15,6 +15,7 @@ import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import {
   PhoneFrame,
   PHONE_SCALE,
+  PHONE_SCALED_BOX,
 } from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { SceneKind } from "@/components/hero-demo-panel/scenes"
@@ -222,7 +223,11 @@ export function LandingHero({
         // Full-screen band (founder, 2026-08-05): the hero fills the
         // viewport below the h-14 nav, content vertically centred —
         // min-h, not h, so short phones never clip.
-        "relative flex min-h-[calc(100vh-3.5rem)] items-center",
+        "relative flex items-center",
+        // A STILL is sized by its phone (651px at PHONE_SCALE's xl step)
+        // plus padding, which is hero enough. Forcing 100vh on top left a
+        // slab of empty band below the content (founder, 2026-08-26).
+        !still && "min-h-[calc(100vh-3.5rem)]",
         bandClassName ?? "bg-primary text-primary-foreground"
       )}
     >
@@ -266,25 +271,39 @@ export function LandingHero({
               // not a look: the content is centred inside the min-height, so
               // it only shows on a short viewport, where it buys the fit.
               "md:grid-cols-1 md:gap-y-8 md:py-8"
-            : // COLUMN: the demo hero the register pages mount — the demo
-              // card is 400px, so the last-of-three column still holds it.
-              // minmax, NOT the bare third (2026-08-22). The demo card is a
-              // FIXED 400px and a grid item cannot shrink below its
-              // min-content, so whenever a third of the container came to
-              // less than 400 — which is every width below about 1300 — the
-              // column refused to shrink and the whole PAGE grew instead.
-              // Measured before: +157px of horizontal scroll at 768, +72 at
-              // 1024, +20 at 1180, on all three register pages.
-              // The floor is the card's own width; above ~1300 the third is
-              // wider and takes over, so the three-column rhythm the original
-              // was reaching for is unchanged where it was ever achieved.
-              "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
+            : still
+              ? // STILL: ONE ROW. The demo layout is grid-rows-[auto_auto]
+                // with the media spanning both, which works when the stats
+                // occupy row 2. A register page hides the stats, so row 2 is
+                // empty, the pitch sits in row 1 alone, and items-center
+                // centres it against nothing — every pixel of slack fell
+                // below the text while the phone ran on past it. One row
+                // makes the two columns siblings, so they centre against
+                // each other. The media track is `auto`: the phone is a
+                // fixed chassis and must not be squeezed by a 1fr share.
+                "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
+              : // COLUMN: the demo hero the register pages mount — the demo
+                // card is 400px, so the last-of-three column still holds it.
+                // minmax, NOT the bare third (2026-08-22). The demo card is a
+                // FIXED 400px and a grid item cannot shrink below its
+                // min-content, so whenever a third of the container came to
+                // less than 400 — which is every width below about 1300 — the
+                // column refused to shrink and the whole PAGE grew instead.
+                // Measured before: +157px of horizontal scroll at 768, +72 at
+                // 1024, +20 at 1180, on all three register pages.
+                // The floor is the card's own width; above ~1300 the third is
+                // wider and takes over, so the three-column rhythm the original
+                // was reaching for is unchanged where it was ever achieved.
+                "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
         )}
       >
         {/* Pitch (headline + CTA). Stats are a separate cell below, so on
             mobile the demo comes right after the pitch. */}
         <div
-          className={cn("min-w-0", !router && "md:col-start-1 md:row-start-1")}
+          className={cn(
+            "min-w-0",
+            !router && !still && "md:col-start-1 md:row-start-1"
+          )}
         >
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
@@ -455,22 +474,24 @@ export function LandingHero({
             to. */}
         <div
           className={cn(
-            !router && "md:col-start-2 md:row-span-2 md:row-start-1"
+            !router && !still && "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
           {still ? (
-            <div className={cn("origin-top-left", PHONE_SCALE)}>
-              <PhoneFrame>
-                <DemoCard
-                  scene={scene}
-                  phase="reveal"
-                  barWidths={scene.results.map((r) => r.widthPercent)}
-                  prefersReducedMotion
-                  device="phone"
-                  accentBarClassName={accentBarClassName}
-                  className="rounded-none border-0"
-                />
-              </PhoneFrame>
+            <div className={PHONE_SCALED_BOX}>
+              <div className={cn("origin-top-left", PHONE_SCALE)}>
+                <PhoneFrame>
+                  <DemoCard
+                    scene={scene}
+                    phase="reveal"
+                    barWidths={scene.results.map((r) => r.widthPercent)}
+                    prefersReducedMotion
+                    device="phone"
+                    accentBarClassName={accentBarClassName}
+                    className="rounded-none border-0"
+                  />
+                </PhoneFrame>
+              </div>
             </div>
           ) : router ? (
             /* Register router — one card per register, its accent as the
