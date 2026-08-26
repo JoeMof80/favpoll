@@ -396,7 +396,21 @@ export function DemoCard({
             >
               {cardPrefix}
             </SectionEyebrow>
-            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground">
+            {/* The app's own ramp is heroNameSizeClass = "text-3xl
+                sm:text-4xl" (lib/display.ts): a real phone gets text-3xl.
+                This card hardcoded text-4xl, and because it renders at a
+                fixed 390px inside whatever window the page has, sm: matched
+                and it never stepped down — so "Belinda Hartley" broke across
+                two lines on a handset that would have held it on one.
+                DisplayScreen already does exactly this: keep the
+                small-screen half of the shared ramp, swap only the upper
+                step (2026-08-26). */}
+            <h1
+              className={cn(
+                "line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground",
+                device === "phone" ? "text-3xl" : "text-4xl"
+              )}
+            >
               {title}
             </h1>
             {cardSuffix && (

@@ -49,7 +49,8 @@ const DEMO_HEADLINE = getFavpollHeadline({
  * hex characters, which is what keeps the printed code at 33x33 rather than
  * the 49x49 the old /favpolls/<uuid> URL forced.
  */
-const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+export const MEMORIAL_SCENE =
+  SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 
 export const DEMO_QR_URL = "https://favpoll.com/p/a1b2c3d4e5f6"
 

@@ -47,7 +47,7 @@
 // ~750 at 1280 — so the scale is read off the container at runtime and the box
 // reserves the scaled height. No breakpoint to keep true, and nothing to go
 // stale, which is how the previous constants failed three times.
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -87,20 +87,35 @@ function parseGBP(amount: string): number {
 }
 
 /** The scene as it stands once the first `n` pledges have landed. */
-function sceneAfter(n: number): HeroScene {
-  if (n === 0) return DEMO_SCENE
-  const results = DEMO_SCENE.results.map((r, i) => {
+function sceneAfter(base: HeroScene, n: number): HeroScene {
+  if (n === 0) return base
+  const results = base.results.map((r, i) => {
     const added = PLEDGES.slice(0, n)
       .filter((p) => p.index === i)
       .reduce((sum, p) => sum + p.amount, 0)
     return added ? { ...r, amount: `£${parseGBP(r.amount) + added}` } : r
   })
-  return { ...DEMO_SCENE, results }
+  return { ...base, results }
 }
 
-const SCENES = [sceneAfter(0), sceneAfter(1), sceneAfter(2)]
-
-export function LiveVignette() {
+/**
+ * Defaults to the celebration scene, which is what /features wants — that
+ * page is register-neutral. A register page passes its own: /memorials was
+ * showing Poppy Chen's birthday on the screen while its printed card, its
+ * reveal and its keepsake were all Belinda Hartley's, so a page a celebrant
+ * forwards to a bereaved family told two unrelated favpolls as one story
+ * (2026-08-26).
+ *
+ * PLEDGES indexes into results by position, and every scene carries six, so
+ * the same three pledges land wherever this is pointed.
+ */
+export function LiveVignette({
+  scene: base = DEMO_SCENE,
+}: { scene?: HeroScene } = {}) {
+  const scenes = useMemo(
+    () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
+    [base]
+  )
   // CLIENT-ONLY, and not merely as an optimisation. DisplayStill captures its
   // clock ONCE at module load, to keep the wall's relative times ("4m ago")
   // out of render — which is only safe because it has always been mounted
@@ -183,7 +198,7 @@ export function LiveVignette() {
             <TvFrame>
               {mounted && (
                 <DisplayStill
-                  scene={SCENES[step]}
+                  scene={scenes[step]}
                   qrUrl={DEMO_QR_URL}
                   wallNames={wallNames}
                   // The count it ends on, so the card is its final size from

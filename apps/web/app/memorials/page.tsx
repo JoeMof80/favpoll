@@ -5,6 +5,7 @@ import { PackVignette } from "@/components/landing/pack-vignette"
 import {
   MEMORIAL_PACK_DATA,
   MEMORIAL_PACK_STEPS,
+  MEMORIAL_SCENE,
 } from "@/components/landing/demo-fixture"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { RevealVignette } from "@/components/landing/reveal-vignette"
@@ -95,7 +96,9 @@ const ARTEFACTS = [
     key: "display",
     label: t("memorials.artefacts.display.label"),
     body: t("memorials.artefacts.display.body"),
-    artefact: <LiveVignette />,
+    // Belinda's screen, not the celebration default — the last object on
+    // the page that was still showing someone else's birthday.
+    artefact: <LiveVignette scene={MEMORIAL_SCENE} />,
   },
   {
     key: "keepsake",
@@ -139,32 +142,49 @@ export default function MemorialsPage() {
         ctaLabel={t("memorials.cta.primary")}
         accentBarClassName="bg-memorial"
         hideStats
-      >
-        <div className="mb-8 max-w-xl">
-          <p className="mb-6 leading-relaxed opacity-80">
-            {t("memorials.wake.body")}
-          </p>
-          {/* memorial-on-band, not memorial: --memorial is oklch(0.5 0.1
-              250), a mid blue that goes muddy on the purple band;
-              --memorial-on-band is what the homepage's router card bar
-              uses. */}
-          <p className="mb-8 border-l-2 border-memorial-on-band pl-4 text-lg italic">
-            {t("memorials.wake.nocash")}
-          </p>
-          <p className="mb-4 font-medium">{t("memorials.presence.title")}</p>
-          <ul className="space-y-3">
-            {PRESENCE.map((line) => (
-              <li key={line} className="flex gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial-on-band"
-                />
-                <p className="leading-relaxed opacity-80">{line}</p>
-              </li>
-            ))}
-          </ul>
+      />
+
+      {/* ── Where it sits, and how loud ──────────────────────────────────────
+          "Made for the wake" and "As quiet or as present as the family wants"
+          were two sections asking one question: where in the day does this
+          go, and at what volume. Consolidated — but BELOW the hero, not
+          inside it (founder, 2026-08-26). Folded into the pitch column they
+          made the hero carry a statement, a placement, a presence dial and a
+          phone; the hero states, this answers.
+
+          The wake HEADING is gone but not lost: its body opens "The service
+          isn't the moment — the wake is", which is the heading in a
+          sentence. ── */}
+      <section className="w-full">
+        <div className="mx-auto grid w-full max-w-330 gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-16">
+          <div className="max-w-2xl">
+            <p className="mb-6 leading-relaxed text-muted-foreground">
+              {t("memorials.wake.body")}
+            </p>
+            <p className="border-l-2 border-memorial pl-4 text-lg text-foreground italic">
+              {t("memorials.wake.nocash")}
+            </p>
+          </div>
+          <div className="max-w-2xl">
+            <h2 className="mb-6 text-3xl font-light tracking-tight text-foreground">
+              {t("memorials.presence.title")}
+            </h2>
+            <ul className="space-y-4">
+              {PRESENCE.map((line) => (
+                <li key={line} className="flex gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial"
+                  />
+                  <p className="leading-relaxed text-muted-foreground">
+                    {line}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </LandingHero>
+      </section>
 
       {/* ── The artefacts — SHOWN, not described ────────────────────────────
           Retiring the demo must not turn this page into prose: the one
