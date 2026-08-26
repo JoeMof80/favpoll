@@ -48,6 +48,7 @@ export default function FundraisersPage() {
         headline={t("fundraisers.headline")}
         subheader={t("fundraisers.subheader")}
         ctaLabel={t("fundraisers.cta.primary")}
+        ctaSecondaryLabel={t("fundraisers.cta.secondary")}
         accentBarClassName="bg-success-strong"
         hideStats
       />

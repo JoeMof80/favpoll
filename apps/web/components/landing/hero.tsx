@@ -59,6 +59,11 @@ type Props = {
   headline?: string
   subheader?: string
   ctaLabel?: string
+  /**
+   * Label for the second, quieter path. Home supplies its own via `router`;
+   * a register page passes its own string.
+   */
+  ctaSecondaryLabel?: string
   /** Band override, e.g. "bg-memorial text-memorial-foreground". */
   bandClassName?: string
   /** Register accent for the demo's leader bar — see DemoCard. */
@@ -205,6 +210,7 @@ export function LandingHero({
   headline,
   subheader,
   ctaLabel,
+  ctaSecondaryLabel,
   bandClassName,
   accentBarClassName,
   accentVar,
@@ -338,7 +344,8 @@ export function LandingHero({
               (shorter first beats), not a layout one. */}
           <h1
             className={cn(
-              "mb-6 max-w-3xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              "max-w-3xl",
               router && "2xl:text-6xl"
             )}
           >
@@ -354,6 +361,7 @@ export function LandingHero({
           <p
             className={cn(
               "mb-8 text-lg leading-relaxed opacity-80",
+              // The subheader must not be WIDER than the headline above it.
               router ? "max-w-2xl" : "max-w-md"
             )}
           >
@@ -416,8 +424,16 @@ export function LandingHero({
                 already arrived with. ProcessOverview directly below does
                 define it, and the page was relying on visitors scrolling to
                 find that out. This makes the other path an offer rather than
-                a hope. The register pages already carry their own
-                cta.secondary and their own demo, so they are unchanged.
+                a hope.
+
+                RESTORED ON THE REGISTER PAGES, 2026-08-26. This comment used
+                to say they "already carry their own cta.secondary" — they
+                carried the STRING and rendered nothing, so the only action in
+                a register hero was "Create a memorial favpoll". Nobody four
+                days into a bereavement clicks create before they have looked,
+                and the register pages are where a cold visitor most often
+                lands: a celebrant or a hospice forwards the link. They now
+                pass their own label.
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
                 quieter of the two without vanishing when the theme flips.
@@ -450,7 +466,7 @@ export function LandingHero({
                 here until hover, so it only rendered the wash lopsided, 24
                 left against 8 right. Same variant, same property, declared
                 after, so it wins. */}
-            {router && (
+            {(router || ctaSecondaryLabel) && (
               <Button
                 asChild
                 size="lg"
@@ -463,7 +479,7 @@ export function LandingHero({
                     promise, and the only one a visitor can be disappointed by
                     if they expect a new page. */}
                 <Link href="#how">
-                  {t("landing.cta.secondary")}
+                  {ctaSecondaryLabel ?? t("landing.cta.secondary")}
                   <ArrowDown data-icon="inline-end" aria-hidden="true" />
                 </Link>
               </Button>

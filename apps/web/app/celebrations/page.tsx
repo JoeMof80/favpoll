@@ -51,6 +51,7 @@ export default function CelebrationsPage() {
         headline={t("celebrations.headline")}
         subheader={t("celebrations.subheader")}
         ctaLabel={t("celebrations.cta.primary")}
+        ctaSecondaryLabel={t("celebrations.cta.secondary")}
         accentBarClassName="bg-warning-strong"
         hideStats
       />

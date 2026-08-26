@@ -134,6 +134,7 @@ export default function MemorialsPage() {
         headline={t("memorials.headline")}
         subheader={t("memorials.subheader")}
         ctaLabel={t("memorials.cta.primary")}
+        ctaSecondaryLabel={t("memorials.cta.secondary")}
         accentVar="memorial"
         hideStats
       />
