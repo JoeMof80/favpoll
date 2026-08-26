@@ -1,9 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { LandingHero } from "@/components/landing/hero"
 import { PackVignette } from "@/components/landing/pack-vignette"
-import { DemoCard } from "@/components/hero-demo-panel/demo-card"
-import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
-import { SCENES } from "@/components/hero-demo-panel/scenes"
 import {
   MEMORIAL_PACK_DATA,
   MEMORIAL_PACK_STEPS,
@@ -107,12 +105,6 @@ const ARTEFACTS = [
   },
 ]
 
-// The favpoll the whole page follows — the same one the homepage's memorial
-// router card shows, and the same one the pack, the reveal and the keepsake
-// below are built from.
-const SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
-const BAR_WIDTHS = SCENE.results.map((r) => r.widthPercent)
-
 const PRESENCE = [
   t("memorials.presence.ambient"),
   t("memorials.presence.screen"),
@@ -122,116 +114,57 @@ const PRESENCE = [
 export default function MemorialsPage() {
   return (
     <main>
-      {/* ── The opening — NOT the landing hero (founder, 2026-08-26).
-          The brand band is the homepage’s shout, and this page must not
-          shout: it is a forwarding artefact a celebrant sends to a family,
-          or reads deciding whether to. Centred type over a full-bleed
-          colour with a button under it is marketing-page grammar; a
-          bereaved reader gets a document instead.
+      {/* ── The opening — the REAL landing hero, register-configured.
+          Hand-rolling a band here lost the two things the component
+          actually does: HeroTexture's monogram shimmer, and
+          min-h-[calc(100vh-3.5rem)] so it fills the screen (founder,
+          2026-08-26). It is the hero; use the hero.
 
-          No CTA here either. A celebrant will not create a favpoll, and a
-          family needs to understand first — both are served better by the
-          purple close at the foot of the page, which still bookends the
-          brand colour and is where a CTA belongs.
+          `still` replaces the looping demo with a phone at phase "reveal"
+          — the state a guest is left holding, and the same handset size as
+          the homepage's guest arc, from the shared PHONE_SCALE.
 
-          UNDERSTATED, AND IT WORKS FOR ITS PLACE: the statement alone was
-          three lines floating in a lot of nothing. "Made for the wake" and
-          "As quiet or as present as the family wants" were two sections
+          The children slot carries the consolidation: "Made for the wake"
+          and "As quiet or as present as the family wants" were two sections
           asking one question — where in the day does this go, and at what
-          volume — so they fold in beside it. The opening now answers a
-          celebrant’s first question on the first screen instead of
-          announcing something. ── */}
-      <section className="w-full bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-330 px-6 pt-16 pb-16 md:pt-24">
-          {/* Text one side, the favpoll itself the other — the homepage's
-              grammar, and the visual half of the continuity: the card you
-              clicked showed Belinda's poll, and here it is on a phone, in
-              the state a guest is left in.
-
-              PHASE "reveal" — the last beat, personal reveal typed out. Not
-              "results": the reveal is what a memorial favpoll is FOR, and a
-              still of the standings alone would sell the wrong half.
-              prefersReducedMotion holds it settled rather than looping; a
-              hero that animates is the demo this page just removed.
-
-              SCALED WITH A SIZED BOX, not a bare transform. The chassis is
-              414x868 — a scaled element lays out at its natural size and
-              scales after, so the box has to be given the scaled dimensions
-              or the phone reserves 868px of hero (the trap recorded in
-              session-handoff-2026-08-18). PackVignette does the same thing
-              three sections down. */}
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
-            <div className="max-w-2xl">
-              <span
-                aria-hidden="true"
-                className="mb-6 block h-1 w-12 rounded-full bg-memorial-on-band"
-              />
-              <p className="mb-4 text-xs font-medium tracking-widest text-memorial-on-band uppercase">
-                {t("memorials.eyebrow")}
-              </p>
-              <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl">
-                {t("memorials.headline")
-                  .split(". ")
-                  .map((sentence, i, all) => (
-                    <span key={sentence} className="block">
-                      {sentence}
-                      {i < all.length - 1 ? "." : ""}
-                    </span>
-                  ))}
-              </h1>
-              <p className="mb-8 text-lg leading-relaxed opacity-80">
-                {t("memorials.subheader")}
-              </p>
-
-              {/* "Made for the wake" and "As quiet or as present as the
-                  family wants" were two sections asking one question: where
-                  in the day does this go, and at what volume. The wake
-                  HEADING is gone but not lost — its body opens "The service
-                  isn't the moment — the wake is", which is the heading in a
-                  sentence. */}
-              <p className="mb-6 leading-relaxed opacity-80">
-                {t("memorials.wake.body")}
-              </p>
-              <p className="mb-10 border-l-2 border-memorial-on-band pl-4 text-lg italic">
-                {t("memorials.wake.nocash")}
-              </p>
-              <p className="mb-4 font-medium">
-                {t("memorials.presence.title")}
-              </p>
-              <ul className="space-y-4">
-                {PRESENCE.map((line) => (
-                  <li key={line} className="flex gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial-on-band"
-                    />
-                    <p className="leading-relaxed opacity-80">{line}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="h-[521px] w-[248px] shrink-0 select-none lg:h-[556px] lg:w-[265px]"
-            >
-              <div className="origin-top-left scale-[0.6] lg:scale-[0.64]">
-                <PhoneFrame>
-                  <DemoCard
-                    scene={SCENE}
-                    phase="reveal"
-                    barWidths={BAR_WIDTHS}
-                    prefersReducedMotion
-                    device="phone"
-                    accentBarClassName="bg-memorial"
-                    className="rounded-none border-0"
-                  />
-                </PhoneFrame>
-              </div>
-            </div>
-          </div>
+          volume. The wake HEADING is gone but not lost; its body opens "The
+          service isn't the moment — the wake is", which is the heading in a
+          sentence. ── */}
+      <LandingHero
+        sceneKind="memorial"
+        still
+        eyebrow={t("memorials.eyebrow")}
+        headline={t("memorials.headline")}
+        subheader={t("memorials.subheader")}
+        ctaLabel={t("memorials.cta.primary")}
+        accentBarClassName="bg-memorial"
+        hideStats
+      >
+        <div className="mb-8 max-w-xl">
+          <p className="mb-6 leading-relaxed opacity-80">
+            {t("memorials.wake.body")}
+          </p>
+          {/* memorial-on-band, not memorial: --memorial is oklch(0.5 0.1
+              250), a mid blue that goes muddy on the purple band;
+              --memorial-on-band is what the homepage's router card bar
+              uses. */}
+          <p className="mb-8 border-l-2 border-memorial-on-band pl-4 text-lg italic">
+            {t("memorials.wake.nocash")}
+          </p>
+          <p className="mb-4 font-medium">{t("memorials.presence.title")}</p>
+          <ul className="space-y-3">
+            {PRESENCE.map((line) => (
+              <li key={line} className="flex gap-3">
+                <span
+                  aria-hidden="true"
+                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-memorial-on-band"
+                />
+                <p className="leading-relaxed opacity-80">{line}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
+      </LandingHero>
 
       {/* ── The artefacts — SHOWN, not described ────────────────────────────
           Retiring the demo must not turn this page into prose: the one

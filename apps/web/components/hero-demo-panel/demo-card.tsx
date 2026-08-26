@@ -383,13 +383,13 @@ export function DemoCard({
       <div className="flex-1 space-y-4 overflow-hidden">
         {/* Hero */}
         <div className="relative">
-          {/* The gutter the avatar sits in. On a PHONE it has to be
-              measured against the avatar's phone size — see below. */}
-          <div
-            className={
-              protagonist ? (device === "phone" ? "pr-20" : "pr-24") : ""
-            }
-          >
+          {/* pr-28, not pr-24 (2026-08-26). The avatar is 132px at md: and
+              is scaled 0.8, so it occupies 105.6px — the 96px pr-24 reserved
+              was never enough and it sat on the name by ten pixels, on EVERY
+              device, not just the phone. Short names hid it: "Poppy Chen"
+              clears the gutter and "Belinda Hartley" does not, so it only
+              surfaced when a memorial scene reached a card. */}
+          <div className={protagonist ? "pr-28" : ""}>
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
@@ -419,27 +419,11 @@ export function DemoCard({
               </p>
             </div>
           )}
-          {/* ProtagonistAvatar sizes itself with a VIEWPORT breakpoint —
-                h-20 w-20 md:h-33 md:w-33. This card renders at a fixed 390px
-                inside whatever window the page has, so on a desktop the md:
-                branch matched and the avatar came out 132px, scaled 0.8 to
-                105.6px, against a 96px pr-24 gutter: it sat on top of the
-                name. Long names showed it, short ones did not — "Belinda
-                Hartley" collided, "Poppy Chen" did not, which is why the
-                homepage never surfaced it (2026-08-26).
-                Same defect as #567's DisplayScreen, inverted: there a
-                component collapsed to its small form inside a big window,
-                here it inflates to its big form inside a small one. Pinned
-                to the phone size rather than left to the viewport, and the
-                gutter measured against it: 80 x 0.8 = 64px inside pr-20. */}
           {protagonist && (
             <div className="absolute top-0 right-0 origin-top-right scale-[0.8]">
               <ProtagonistAvatar
                 name={protagonist.name}
                 photoUrl={protagonist.photo_url}
-                className={
-                  device === "phone" ? "h-20 w-20 md:h-20 md:w-20" : undefined
-                }
               />
             </div>
           )}

@@ -34,6 +34,14 @@ const BEZEL = 12
  */
 export const PHONE_SAFE_AREA_TOP = 48
 
+/**
+ * The one scale a phone is shown at. Lived in process-overview; hoisted
+ * here 2026-08-26 so a second surface cannot pick its own and drift — the
+ * homepage's guest arc and the memorial hero now show the same-sized
+ * handset, which is the point of showing a handset at all.
+ */
+export const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
+
 export const PHONE_CHASSIS_WIDTH = PHONE_SCREEN_WIDTH + BEZEL * 2
 export const PHONE_CHASSIS_HEIGHT = PHONE_SCREEN_HEIGHT + BEZEL * 2
 

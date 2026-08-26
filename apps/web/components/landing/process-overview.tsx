@@ -27,6 +27,7 @@ import {
   PhoneFrame,
   PHONE_CHASSIS_WIDTH,
   PHONE_CHASSIS_HEIGHT,
+  PHONE_SCALE,
 } from "@/components/hero-demo-panel/phone-frame"
 import { PackCard } from "@/components/print-pack/pack-card"
 import {
@@ -138,7 +139,6 @@ const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
 // screens to 5.9 and read as a stack of giant handsets. The other three media
 // are landscape or small and cost 40-50px each to enlarge; the phone costs 243
 // each. It stays a thumbnail here, and its detail belongs behind a tap.
-const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
 const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // Down from the browser-framed version: the TV bezel adds 20px each way
 // (940 overall), and at xl the old 0.53 already sat within a pixel of the

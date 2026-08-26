@@ -12,6 +12,10 @@ import { useMemo } from "react"
 import { ArrowDown } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
+import {
+  PhoneFrame,
+  PHONE_SCALE,
+} from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
@@ -64,6 +68,21 @@ type Props = {
    * pages. Remove the prop on the home page to restore the demo hero.
    */
   router?: boolean
+  /**
+   * Show the scene as a STILL PHONE instead of the looping browser demo.
+   *
+   * /memorials is a forwarding artefact — a celebrant sends it to a family
+   * — and a looping demo is the wrong first note for it, as well as being
+   * the homepage's demo told a second time (founder, 2026-08-26). A still
+   * at phase "reveal" says the same thing once, in the state a guest is
+   * left holding, and the reveal is what a memorial favpoll is FOR.
+   *
+   * PhoneFrame at the shared PHONE_SCALE, so this handset and the one in
+   * the homepage's guest arc are the same size.
+   */
+  still?: boolean
+  /** Extra pitch-column content, under the subheader. */
+  children?: React.ReactNode
 }
 
 // The cards are glass on the brand band, so every accent mark uses the
@@ -186,6 +205,8 @@ export function LandingHero({
   bandClassName,
   accentBarClassName,
   router = false,
+  still = false,
+  children,
 }: Props) {
   const scenes = useMemo(
     () => (sceneKind ? SCENES.filter((s) => s.kind === sceneKind) : SCENES),
@@ -314,6 +335,7 @@ export function LandingHero({
           >
             {subheader ?? t("landing.subheader")}
           </p>
+          {children}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —
                 poster-scale, not form-scale (founder call, 2026-07-28) */}
@@ -436,7 +458,21 @@ export function LandingHero({
             !router && "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
-          {router ? (
+          {still ? (
+            <div className={cn("origin-top-left", PHONE_SCALE)}>
+              <PhoneFrame>
+                <DemoCard
+                  scene={scene}
+                  phase="reveal"
+                  barWidths={scene.results.map((r) => r.widthPercent)}
+                  prefersReducedMotion
+                  device="phone"
+                  accentBarClassName={accentBarClassName}
+                  className="rounded-none border-0"
+                />
+              </PhoneFrame>
+            </div>
+          ) : router ? (
             /* Register router — one card per register, its accent as the
                top rule; the demo lives on the page each card opens. */
             <nav
