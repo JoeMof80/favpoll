@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { PackVignette } from "@/components/landing/pack-vignette"
+import { DemoCard } from "@/components/hero-demo-panel/demo-card"
+import { PhoneFrame } from "@/components/hero-demo-panel/phone-frame"
+import { SCENES } from "@/components/hero-demo-panel/scenes"
 import {
   MEMORIAL_PACK_DATA,
   MEMORIAL_PACK_STEPS,
@@ -104,6 +107,12 @@ const ARTEFACTS = [
   },
 ]
 
+// The favpoll the whole page follows — the same one the homepage's memorial
+// router card shows, and the same one the pack, the reveal and the keepsake
+// below are built from.
+const SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+const BAR_WIDTHS = SCENE.results.map((r) => r.widthPercent)
+
 const PRESENCE = [
   t("memorials.presence.ambient"),
   t("memorials.presence.screen"),
@@ -134,14 +143,30 @@ export default function MemorialsPage() {
           announcing something. ── */}
       <section className="w-full">
         <div className="mx-auto w-full max-w-330 px-6 pt-16 pb-16 md:pt-24">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            {/* Left — what it is */}
+          {/* Text one side, the favpoll itself the other — the homepage's
+              grammar, and the visual half of the continuity: the card you
+              clicked showed Belinda's poll, and here it is on a phone, in
+              the state a guest is left in.
+
+              PHASE "reveal" — the last beat, personal reveal typed out. Not
+              "results": the reveal is what a memorial favpoll is FOR, and a
+              still of the standings alone would sell the wrong half.
+              prefersReducedMotion holds it settled rather than looping; a
+              hero that animates is the demo this page just removed.
+
+              SCALED WITH A SIZED BOX, not a bare transform. The chassis is
+              414x868 — a scaled element lays out at its natural size and
+              scales after, so the box has to be given the scaled dimensions
+              or the phone reserves 868px of hero (the trap recorded in
+              session-handoff-2026-08-18). PackVignette does the same thing
+              three sections down. */}
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
             <div className="max-w-2xl">
               <span
                 aria-hidden="true"
                 className="mb-6 block h-1 w-12 rounded-full bg-memorial"
               />
-              <p className="mb-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+              <p className="mb-4 text-xs font-medium tracking-widest text-memorial uppercase">
                 {t("memorials.eyebrow")}
               </p>
               <h1 className="mb-6 text-4xl leading-[1.12] font-light tracking-tight text-foreground md:text-5xl">
@@ -154,23 +179,16 @@ export default function MemorialsPage() {
                     </span>
                   ))}
               </h1>
-              <p className="text-lg leading-relaxed text-muted-foreground">
+              <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
                 {t("memorials.subheader")}
               </p>
-            </div>
 
-            {/* Right — where it sits, and how loud. "Made for the wake" and
-                "As quiet or as present as the family wants" were two
-                sections asking one question: where in the day does this go,
-                and at what volume (founder, 2026-08-26). Consolidated here,
-                they turn the opening from a statement into something that
-                answers a celebrant's first question on the first screen.
-
-                The wake HEADING is gone, not lost: its body opens "The
-                service isn’t the moment — the wake is", which is the
-                heading in a sentence. The presence label stays, because
-                without it the bullets are three unexplained options. */}
-            <div className="max-w-2xl lg:pt-2">
+              {/* "Made for the wake" and "As quiet or as present as the
+                  family wants" were two sections asking one question: where
+                  in the day does this go, and at what volume. The wake
+                  HEADING is gone but not lost — its body opens "The service
+                  isn't the moment — the wake is", which is the heading in a
+                  sentence. */}
               <p className="mb-6 leading-relaxed text-muted-foreground">
                 {t("memorials.wake.body")}
               </p>
@@ -194,6 +212,25 @@ export default function MemorialsPage() {
                 ))}
               </ul>
             </div>
+
+            <div
+              aria-hidden="true"
+              className="h-[521px] w-[248px] shrink-0 select-none lg:h-[556px] lg:w-[265px]"
+            >
+              <div className="origin-top-left scale-[0.6] lg:scale-[0.64]">
+                <PhoneFrame>
+                  <DemoCard
+                    scene={SCENE}
+                    phase="reveal"
+                    barWidths={BAR_WIDTHS}
+                    prefersReducedMotion
+                    device="phone"
+                    accentBarClassName="bg-memorial"
+                    className="rounded-none border-0"
+                  />
+                </PhoneFrame>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -210,7 +247,7 @@ export default function MemorialsPage() {
         className="w-full scroll-mt-20 bg-surface-neutral"
       >
         <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <SectionEyebrow className="mb-10">
+          <SectionEyebrow className="mb-10 text-memorial">
             {t("memorials.artefacts.title")}
           </SectionEyebrow>
           {/* The homepage's text-left / media-right row (see "The record"
