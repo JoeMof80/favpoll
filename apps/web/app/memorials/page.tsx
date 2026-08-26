@@ -193,10 +193,7 @@ export default function MemorialsPage() {
           game. So the demo's job passes to the three physical things, in
           the order a family meets them: paper -> room -> paper, the arc How
           It Works closes on (#569). ── */}
-      <section
-        id="artefacts"
-        className="w-full scroll-mt-20 bg-surface-neutral"
-      >
+      <section id="artefacts" className="w-full scroll-mt-20 bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <SectionEyebrow className="mb-10 text-memorial">
             {t("memorials.artefacts.title")}
