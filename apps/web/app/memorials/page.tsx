@@ -24,7 +24,10 @@ import { t } from "@/lib/i18n"
 // settings, and the reveal as keepsake, never quiz. Copy lives in
 // messages/en-GB.json (memorials.*); bands follow the landing's
 // alternating grammar (purple hero · white · bg-primary/5 · purple
-// close).
+// close). Moving How it works above the tailoring band on 2026-08-26 put
+// two tinted sections next to each other, so the tint moved down one:
+// reassurances went plain and the gatekeeper block took the tint, which
+// also stops it reading as an afterthought before the close.
 
 export const metadata: Metadata = {
   title: "Memorials — favpoll",
@@ -140,6 +143,19 @@ export default function MemorialsPage() {
         hideStats
       />
 
+      {/* ── How it works ─────────────────────────────────────────────────
+          DIRECTLY BELOW THE HERO (founder, 2026-08-26), which is where
+          /celebrations and /fundraisers already had it. Memorials became the
+          outlier earlier today when the tailoring band was inserted above it.
+
+          Three reasons, the last of them a defect: the mechanic has to come
+          before the application, because "include the QR code on the order of
+          service" means nothing until you know what scanning it leads to; and
+          the hero's second CTA says "See how it works" and targets #how, so
+          with a band in between it skipped the largest section on the page
+          and landed the reader two sections down. ── */}
+      <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
+
       {/* ── How to tailor it to a memorial ─────────────────────────────────
           NOT a gallery of objects (founder, 2026-08-26). These four say how
           an organiser might USE a favpoll at a memorial — where the code
@@ -228,11 +244,8 @@ export default function MemorialsPage() {
         </div>
       </section>
 
-      {/* ── How it works, in the memorial register ── */}
-      <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
-
       {/* ── Reassurances ── */}
-      <section className="w-full bg-primary/5">
+      <section className="w-full">
         <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
           {ASSURANCES.map((item) => (
             <div key={item.label}>
@@ -246,7 +259,7 @@ export default function MemorialsPage() {
       </section>
 
       {/* ── For the gatekeepers this page is forwarded by ── */}
-      <section className="w-full">
+      <section className="w-full bg-primary/5">
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
             {t("memorials.pro.title")}
