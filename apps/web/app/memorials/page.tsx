@@ -183,7 +183,23 @@ export default function MemorialsPage() {
           wake" and "As quiet or as present as the family wants". The order
           of service and the tribute display both said the same things at
           less use, so the page said them twice. ── */}
-      <section id="artefacts" className="w-full scroll-mt-20 bg-primary/5">
+      {/* overflow-x-clip, and it is load-bearing (2026-08-27). The live
+            artefact deliberately does not clip its own box, so TvFrame's
+            atmosphere can finish instead of being cut off square — but the
+            box it stops clipping is the still's UNSCALED 1960px one, and
+            with nothing containing that the document grew 11px wider than a
+            320px phone. The e2e overflow guard caught it; it went green
+            again here.
+
+            The section is the right place: it spans the full viewport, so
+            the clip edge is the screen edge rather than anything near the
+            set, and at every width above a small phone the atmosphere
+            finishes long before it. `clip` not `hidden` — hidden on one axis
+            makes the other a scroll container. */}
+      <section
+        id="artefacts"
+        className="w-full scroll-mt-20 overflow-x-clip bg-primary/5"
+      >
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <SectionEyebrow className="mb-10 text-memorial">
             {t("memorials.artefacts.title")}
