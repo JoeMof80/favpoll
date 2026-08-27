@@ -47,15 +47,29 @@ const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 // Colours are the memorial scene's topic. /celebrations and /fundraisers
 // borrow them for now; the component takes a per-step media override, so
 // each can pass its own when its turn in the rework comes.
-// The TOPIC's favourites rather than the six that have results, but not
-// all thirteen: at two pills a row that was seven rows against four lines
-// of text, and the cell read as a tall narrow list rather than a hint.
-// Ten, in compact pills that fit three a row — and the first ten
-// alphabetically happen to include Purple, Blue and Red, the three the
-// standings show two columns along.
+// Eight of the topic's thirteen. The hint column is 192px and a pill at
+// text-xs is ~90px, so TWO fit a row whatever the count — the only lever
+// on height is how many there are. Thirteen was seven rows against four
+// lines of text; ten was five. Eight is four, level with the text.
+//
+// Chosen rather than sliced, because a contiguous slice cannot hold all
+// three colours the rest of the band depends on: Blue is the pill lit
+// here, and Purple, Blue and Red are the standings two columns along.
+// Filtered from the topic so the labels stay the product's own, in the
+// order the real picker shows them.
+const SHOWN = new Set([
+  "Black",
+  "Blue",
+  "Green",
+  "Grey",
+  "Pink",
+  "Purple",
+  "Red",
+  "Yellow",
+])
 const TOPICS = MEMORIAL_SCENE.poll.topic.favourites
-  .slice(0, 10)
   .map((f) => f.label)
+  .filter((l) => SHOWN.has(l))
 const PICKED = "Blue"
 
 export function PickHint() {
@@ -107,8 +121,8 @@ export function PledgeHint() {
           as what was picked. Blue, because that is the pill lit one column
           to the left. */}
       <div className="flex justify-between">
-        <span className="text-sm">{PICKED}</span>
-        <span className="text-sm font-semibold tabular-nums">
+        <span className="text-xs">{PICKED}</span>
+        <span className="text-xs font-semibold tabular-nums">
           {formatPoundsExact(PICKED_AMOUNT)}
         </span>
       </div>
