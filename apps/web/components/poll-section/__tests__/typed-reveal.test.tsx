@@ -20,7 +20,7 @@ vi.mock("@/components/favpoll-card/poll-reveal", () => ({
 import { TypedReveal } from "../typed-reveal"
 
 const FULL_TEXT =
-  "Belinda said: My favourite colour was purple. I wore it to every occasion that mattered."
+  "My favourite colour was purple. I wore it to every occasion that mattered."
 const FIRST_NAME = "Belinda"
 
 function mockMatchMedia(prefersReduced: boolean) {

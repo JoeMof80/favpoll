@@ -115,7 +115,7 @@ const ARTEFACTS = [
     body: t("memorials.artefacts.display.body"),
     // Belinda's screen, not the celebration default — the last object on
     // the page that was still showing someone else's birthday.
-    artefact: <LiveVignette scene={MEMORIAL_SCENE} still />,
+    artefact: <LiveVignette scene={MEMORIAL_SCENE} still gutters />,
   },
   {
     key: "keepsake",

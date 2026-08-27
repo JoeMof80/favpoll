@@ -36,6 +36,14 @@ type Props = {
   dateLabel: string | null
   openingLine: string | null
   occasionType: string | null
+  /**
+   * Render the gutter QR pair on a STILL, anchored to this component's own
+   * box rather than the viewport (founder, 2026-08-27: the memorial's live
+   * artefact "doesn't have the gutters of the real thing where the QR codes
+   * sit"). Only meaningful when the caller renders wide enough for the
+   * gutters to exist at all — see DISPLAY_STILL_GUTTER_WIDTH.
+   */
+  gutters?: boolean
   /** Fallback label when full charity rows aren't provided (stories) */
   charityName: string | null
   goalAmount?: number | null
@@ -112,6 +120,7 @@ export function DisplayScreen({
   defaultVariant = "fundraiser",
   favpollId,
   live = true,
+  gutters = false,
   wallReserveRows,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
@@ -215,7 +224,12 @@ export function DisplayScreen({
   const scanToPledge = effectiveClosed ? null : (
     <div
       className={`flex flex-col items-center gap-1.5 ${
-        live ? "min-[1600px]:hidden" : ""
+        // The in-banner code and the gutter pair are ALTERNATIVES, never both
+        // — the real display swaps one for the other at 1600px. A still that
+        // asks for gutters has to make the same swap or it shows three codes
+        // where a room would see two, which is exactly the kind of drift this
+        // artefact exists to be incapable of.
+        gutters ? "hidden" : live ? "min-[1600px]:hidden" : ""
       }`}
     >
       <BrandedQR
@@ -247,7 +261,7 @@ export function DisplayScreen({
     // this fills the page and its box tracks the viewport — the breakpoint
     // lands where it always did.
     <div
-      className={`@container overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+      className={`@container overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""} ${gutters ? "relative" : ""}`}
       // The ramp is opt-in and live-only: it is vw-relative, and the
       // landing page renders a still at a fixed width inside the
       // visitor's viewport, where vw-scaled type would burst the layout.
@@ -280,19 +294,36 @@ export function DisplayScreen({
           its drop-shadow filter would otherwise become these boxes'
           containing block (DisplayChrome precedent).
 
-          Live only. A still has no gutters to pin them in, and `fixed`
-          resolves against the nearest TRANSFORMED ancestor — so inside the
-          landing page's scaled frame these two 200px codes landed in the
-          middle of the rankings. Same trap as DisplayChrome above. */}
-      {live &&
+          `fixed` is LIVE ONLY, and the reason is a trap worth keeping
+          written down: it resolves against the nearest TRANSFORMED ancestor,
+          so inside the landing page's scaled frame these two 200px codes
+          landed in the middle of the rankings. Same trap as DisplayChrome
+          above. A still that wants them passes `gutters` and gets the same
+          pair positioned against this component's own box instead. */}
+      {(live || gutters) &&
         !effectiveClosed &&
         (["left", "right"] as const).map((side) => (
           <div
             key={side}
-            className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
+            className={`pointer-events-none top-1/2 z-20 -translate-y-1/2 flex-col items-center gap-2 ${
+              gutters
+                ? // A STILL: anchored to this box, and always shown. 100% not
+                  // 100vw — the still's width IS the screen it depicts, and
+                  // the caller guarantees it is wide enough for the gutters to
+                  // exist. No min-[1600px] guard for the same reason: that
+                  // breakpoint asks the VIEWPORT whether a gutter fits, which
+                  // on a scaled still is a question about the visitor's
+                  // browser rather than about the screen being shown.
+                  "absolute flex"
+                : "fixed hidden min-[1600px]:flex"
+            } ${
               side === "left"
-                ? "left-[calc((100vw-72rem)/4-100px)]"
-                : "right-[calc((100vw-72rem)/4-100px)]"
+                ? gutters
+                  ? "left-[calc((100%-72rem)/4-100px)]"
+                  : "left-[calc((100vw-72rem)/4-100px)]"
+                : gutters
+                  ? "right-[calc((100%-72rem)/4-100px)]"
+                  : "right-[calc((100vw-72rem)/4-100px)]"
             }`}
           >
             <BrandedQR

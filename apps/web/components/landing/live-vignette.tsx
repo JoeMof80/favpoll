@@ -53,6 +53,7 @@ import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
   DisplayStill,
   DISPLAY_STILL_WIDTH,
+  DISPLAY_STILL_GUTTER_WIDTH,
 } from "@/components/landing/display-still"
 import { DEMO_SCENE, DEMO_QR_URL } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
@@ -60,6 +61,7 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 /** The still's own width plus TvFrame's 20px bezel each side. */
 const NATURAL_W = DISPLAY_STILL_WIDTH + 40
+const NATURAL_W_GUTTERS = DISPLAY_STILL_GUTTER_WIDTH + 40
 
 /**
  * The still's measured height, used ONLY to hold the space open before it
@@ -127,7 +129,9 @@ function sceneAfter(base: HeroScene, n: number): HeroScene {
 export function LiveVignette({
   scene: base = DEMO_SCENE,
   still = false,
-}: { scene?: HeroScene; still?: boolean } = {}) {
+  gutters = false,
+}: { scene?: HeroScene; still?: boolean; gutters?: boolean } = {}) {
+  const naturalW = gutters ? NATURAL_W_GUTTERS : NATURAL_W
   const scenes = useMemo(
     () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
     [base]
@@ -183,7 +187,7 @@ export function LiveVignette({
     return () => ro.disconnect()
   }, [mounted])
 
-  const scale = width ? width / NATURAL_W : 0
+  const scale = width ? width / naturalW : 0
   const wallNames = WALL.slice(0, 3 + step)
 
   return (
@@ -200,14 +204,14 @@ export function LiveVignette({
             // rendered at 122px and the page jumped once on every load —
             // measured. A ratio holds the space from first paint, and the
             // real height replaces the fallback as soon as there is one.
-            aspectRatio: `${NATURAL_W} / ${naturalH || FALLBACK_H}`,
+            aspectRatio: `${naturalW} / ${naturalH || FALLBACK_H}`,
           }}
         >
           <div
             ref={innerRef}
             className="origin-top-left"
             style={{
-              width: NATURAL_W,
+              width: naturalW,
               transform: scale ? `scale(${scale})` : undefined,
             }}
           >
@@ -220,6 +224,7 @@ export function LiveVignette({
                   // The count it ends on, so the card is its final size from
                   // the first frame and nothing below it moves as names land.
                   wallReserveRows={3 + LAST}
+                  gutters={gutters}
                 />
               )}
             </TvFrame>

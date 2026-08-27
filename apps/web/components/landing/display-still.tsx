@@ -34,6 +34,20 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 export const DISPLAY_STILL_WIDTH = 1120
 
 /**
+ * The width a still needs before the display HAS gutters (founder,
+ * 2026-08-27). The card is max-w-6xl — 72rem, 1152px — so at 1120 it fills
+ * the frame edge to edge and there is no tinted margin for a QR to sit in.
+ * 1600 is where the real display starts showing them: gutter = (1600-1152)/2
+ * = 224, which clears the 200px code. Below that the product itself keeps the
+ * in-banner QR instead, so a narrower "with gutters" still would be depicting
+ * a screen that does not exist.
+ *
+ * It costs legibility, and the trade is real: the same frame renders 1600
+ * where it rendered 1120, so everything on the screen comes out ~30% smaller.
+ */
+export const DISPLAY_STILL_GUTTER_WIDTH = 1600
+
+/**
  * Leaders shown. The real display lists every favourite, including the ones
  * on £0 — correct there, and four empty bars in a marketing still. Sorted
  * before slicing: sceneFavourites returns the topic's own (alphabetical)
@@ -71,6 +85,7 @@ export function DisplayStill({
   qrUrl,
   wallNames = WALL_NAMES,
   wallReserveRows,
+  gutters = false,
 }: {
   scene: HeroScene
   qrUrl: string
@@ -86,6 +101,12 @@ export function DisplayStill({
    * while it fills.
    */
   wallReserveRows?: number
+  /**
+   * Show the display's gutter QR pair, as a projector in a room shows them.
+   * The caller must render at DISPLAY_STILL_GUTTER_WIDTH for the gutters to
+   * exist — this only asks for the codes, it cannot make room for them.
+   */
+  gutters?: boolean
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -103,7 +124,11 @@ export function DisplayStill({
   }))
 
   return (
-    <div style={{ width: DISPLAY_STILL_WIDTH }}>
+    <div
+      style={{
+        width: gutters ? DISPLAY_STILL_GUTTER_WIDTH : DISPLAY_STILL_WIDTH,
+      }}
+    >
       <DisplayScreen
         live={false}
         // protagonist FIRST, heading only as the fallback (founder,
@@ -140,6 +165,20 @@ export function DisplayStill({
         goalAmount={DEMO_GOAL}
         favpollUrl="https://favpoll.com"
         qrUrl={qrUrl}
+        // THE PRESENCE DIAL, derived rather than defaulted (founder,
+        // 2026-08-27: "the live display isn't in tribute mode"). DisplayScreen
+        // falls back to "fundraiser" when nothing is passed, so every still on
+        // the site was running telethon theatre — the goal figure as the
+        // heading — including the one beside copy that says "Display the
+        // favpoll in tribute mode at the wake".
+        //
+        // The rule is the product's own, from /live/[slug]: register
+        // "remembering" takes tribute, everything else fundraiser. A memorial
+        // scene IS the remembering register (deriveRegister: category
+        // "memorial" -> "remembering"), so the scene's kind decides it and the
+        // celebration and cause stills keep the louder variant they want.
+        defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
+        gutters={gutters}
       />
     </div>
   )

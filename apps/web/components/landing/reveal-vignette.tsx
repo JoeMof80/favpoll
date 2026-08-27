@@ -25,8 +25,10 @@ import { Vignette } from "@/components/landing/vignette"
 // reveal needs a person: the cause scene has no protagonist, so its reveal is
 // a fact about hospices, which is a fine reveal and a poor illustration of
 // this feature. Belinda and purple is the exemplar the whole site uses.
-const REVEAL =
-  "Belinda said: My favourite colour was purple. I wore it to every occasion that mattered."
+// DERIVED, never typed. This was a hardcoded copy of the scene's own string
+// and drifted the moment the scene changed — a second definition of the one
+// sentence the whole vignette exists to show.
+const REVEAL = MEMORIAL_SCENE.poll.personal_reveal ?? ""
 
 // The decoy — real text, blurred past reading, exactly as poll-section does
 // it. Never the actual reveal: a blur is a picture, not a lock, and anyone
