@@ -30,19 +30,12 @@ import type { Charity } from "@favpoll/types"
 
 const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 
-// The scene's own topic plus the ones the register copy names, so the pills
-// and the sentence beside them agree.
-const TOPICS = [
-  "Colour",
-  "Song",
-  "Flower",
-  "Walk",
-  "Seaside town",
-  "Dog breed",
-  "Film",
-  "Comfort food",
-]
-const PICKED = "Song"
+// Colour is picked because it is the SCENE's topic: the hero's phone, the
+// printed pack and the standings two columns to the right are all Belinda's
+// favourite colour, so the pill that is lit is the favpoll the rest of the
+// page is about.
+const TOPICS = ["Colour", "Song", "Flower", "Dog breed", "Film", "Comfort food"]
+const PICKED = "Colour"
 
 export function PickHint() {
   return (
