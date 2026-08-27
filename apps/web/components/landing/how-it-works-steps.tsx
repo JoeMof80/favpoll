@@ -74,6 +74,20 @@ export function HowItWorksSteps({
                its own content rather than a share of the track — these are
                chips and bars, and a fixed fraction would either starve the
                text or stretch four chips across nothing. */
+            /* NO RULES ANYWHERE IN THIS BAND (founder, 2026-08-27, ending
+               a day that tried all three positions). They sat between each
+               beat's words and its hint first, which divided the wrong
+               thing: those two are ONE statement said twice, once in prose
+               and once in the product's own controls, and a rule there
+               argued they were two. Moving them between the beats divided
+               the right thing but cost the layout — a rule needs padding
+               beside it, and padding only the second and third columns left
+               the first 40px wider, so the same sentence set four lines
+               there and five next to it.
+
+               And nothing needed dividing. The beats are already numbered,
+               already headed in tracked uppercase, already 40px apart. A
+               rule was drawing a seam the numbering had drawn better. */
             <li key={step.label} className="min-w-0">
               {/* The second column only from xl. At lg the three beats are
                   already sharing 1320px, so splitting each again left the
@@ -98,16 +112,14 @@ export function HowItWorksSteps({
                     {step.body}
                   </p>
                 </div>
-                {/* A rule between the words and the hint (founder,
-                    2026-08-27) — vertical once they sit side by side,
-                    horizontal while stacked. Padding rather than gap on the
-                    xl side, so the rule sits between two equal margins
-                    instead of hard against the hint.
+                {/* NO RULE HERE any more — see the note on the <li>. The
+                    padding stays: it is what keeps the hint off the prose
+                    once the two sit side by side at xl.
                     The comment lives OUTSIDE the && : a JSX comment beside
                     an element inside one expression is two roots, which is
                     a parse error tsc does not catch. Third time tonight. */}
                 {(step.media ?? DEFAULT_MEDIA[i]) && (
-                  <div className="w-48 shrink-0 border-t border-border pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-6">
+                  <div className="w-48 shrink-0 pt-5 xl:pt-0 xl:pl-6">
                     {step.media ?? DEFAULT_MEDIA[i]}
                   </div>
                 )}
