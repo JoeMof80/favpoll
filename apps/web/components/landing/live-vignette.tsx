@@ -83,9 +83,27 @@ const NATURAL_H_ROOM = DISPLAY_STILL_ROOM.h + 40
 // every pixel of side padding shrinks the scale and with it the display's
 // type — while height is free, the section having no shortage of it. Hence a
 // generous skirt below, where the wall shadow actually falls, and a thin
-// margin at the sides. 40/40/120 costs 4% of the type; padding it evenly to
-// clear the whole -inset-28 pocket would have cost 10%.
-const ROOM_PAD = { side: 40, top: 40, bottom: 120 }
+// margin at the sides.
+//
+// THE NUMBERS ARE MEASURED, after the first pass still truncated the shadow
+// (founder, 2026-08-27: "shadow is trucnated"). A blurred box does not end at
+// its bounding rect — it ends a blur-radius past it — and 120 was set against
+// the rect. The wall shadow's box finishes 339px down a 361px clip, but its
+// 60px blur carries the tail to 399, so 38 scaled pixels of it were being cut
+// off square. That is exactly the hard horizontal line under the set.
+//
+// 270 below contains the shadow AND the panel's spill, both of which finish
+// at 399. 120 above contains the pocket's own ellipse (-inset-28 = 112) if
+// not the whole of its 110px blur.
+//
+// THE SIDES STAY THIN, deliberately. Containing the pocket's blur there would
+// need ~460px of padding a side — the box would go 2880 wide and the display's
+// type would drop from 6.7px to 4.7. The pocket is a 20%-black ellipse blurred
+// 110px, so what is being cut at the sides is its faintest extreme; the wall
+// shadow, at the bottom, is the one with an edge you can see. And the Vignette
+// itself clips 24px out regardless, so no amount of padding here would let
+// side atmosphere finish naturally.
+const ROOM_PAD = { side: 40, top: 120, bottom: 270 }
 const ROOM_BOX_W = NATURAL_W_ROOM + ROOM_PAD.side * 2
 const ROOM_BOX_H = NATURAL_H_ROOM + ROOM_PAD.top + ROOM_PAD.bottom
 
