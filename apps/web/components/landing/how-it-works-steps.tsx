@@ -60,6 +60,11 @@ export function HowItWorksSteps({
     <section id="how" className="w-full scroll-mt-20">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         <SectionEyebrow className="mb-10">{title}</SectionEyebrow>
+        {/* SEPARATORS between the beats (founder, 2026-08-27). Padding
+            rather than gap, so each rule sits CENTRED between two cells
+            instead of hard against the left edge of the second — with a gap
+            the border lands on the cell and the whitespace all falls one
+            side of it. Horizontal when stacked, vertical from lg. */}
         <ol className="grid gap-10 lg:grid-cols-3">
           {steps.map((step, i) => (
             /* A SECOND COLUMN PER BEAT (founder, 2026-08-27): the words
@@ -76,12 +81,20 @@ export function HowItWorksSteps({
                   already sharing 1320px, so splitting each again left the
                   text at 155px — about twenty characters a line. Below xl
                   the hint drops under its own paragraph instead. */}
-              <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
-                <p className="leading-relaxed text-muted-foreground">
+              <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
+                <p className="leading-relaxed text-muted-foreground xl:pr-6">
                   {step.body}
                 </p>
+                {/* A rule between the words and the hint (founder,
+                    2026-08-27) — vertical once they sit side by side,
+                    horizontal while stacked. Padding rather than gap on the
+                    xl side, so the rule sits between two equal margins
+                    instead of hard against the hint.
+                    The comment lives OUTSIDE the && : a JSX comment beside
+                    an element inside one expression is two roots, which is
+                    a parse error tsc does not catch. Third time tonight. */}
                 {(step.media ?? DEFAULT_MEDIA[i]) && (
-                  <div className="w-44 shrink-0">
+                  <div className="w-48 shrink-0 border-t border-border pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-6">
                     {step.media ?? DEFAULT_MEDIA[i]}
                   </div>
                 )}
