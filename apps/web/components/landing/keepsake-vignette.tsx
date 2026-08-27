@@ -32,6 +32,68 @@ const FAN_H = Math.max(
   FUNDRAISER.y + FUNDRAISER.page.h
 ) // 1123
 
+// THE DETAIL CROP (founder, 2026-08-27): "The Tribute Keepsake should show
+// specifically that with [Belinda's] details."
+//
+// The data was already hers — DEMO_KEEPSAKE_DATA is built from
+// MEMORIAL_SCENE and the fixture carries a comment guarding it from drifting
+// to the birthday scene. The fault was SCALE. Two A4 sheets fanned across
+// 1644px and scaled to 0.28 put her name at 10px and her reveal at 5px, so
+// the sheet was legible as an object and illegible as a keepsake — the
+// section's recurring defect, a whole document shrunk until nothing on it
+// reads.
+//
+// So: ONE sheet, the tribute, cropped to its head — the prefix, the name,
+// the topic and the reveal, which is the half a family would actually look
+// at. Full width, both side edges kept, running off the bottom: cropping
+// horizontally as well would cut the document's own corner marks, and a
+// frame with no edges stops reading as paper.
+//
+// The pair stays on /features, where "two ways to tell it" is the point
+// being made. Here the idea beside it says "a tribute style keepsake",
+// singular, so the fundraiser sheet was illustrating a claim the copy does
+// not make.
+const TRIBUTE_CROP_H = 470
+
+export function KeepsakeVignetteDetail() {
+  return (
+    <Vignette className="flex justify-center">
+      <div
+        data-artefact-box
+        className="h-[122px] w-[292px] sm:h-[197px] sm:w-[472px] lg:h-[241px] lg:w-[575px]"
+      >
+        {/* .paper / .paper-screen for the reason the fan below uses them:
+            ink on paper, pinned to the light values whatever the viewer's
+            theme (#535). overflow-hidden ON the scaled element: it is the
+            crop window, authored at the sheet's width and a fraction of its
+            height, with the full-height document positioned inside it. */}
+        <div
+          className="paper paper-screen relative origin-top-left scale-[0.26] overflow-hidden shadow-xl sm:scale-[0.42] lg:scale-[0.512]"
+          style={{ width: LANDSCAPE.w, height: TRIBUTE_CROP_H }}
+        >
+          <div
+            className="absolute inset-x-0 top-0"
+            style={{ height: LANDSCAPE.h }}
+          >
+            <KeepsakeDocument
+              data={DEMO_KEEPSAKE_DATA}
+              variant="tribute"
+              orientation="landscape"
+            />
+          </div>
+          {/* The cut, softened — a hard slice across a page reads as a
+              rendering fault rather than as a crop. */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+          {/* lg is 0.512, NOT the 0.5556 that would fill 624px: Vignette's
+              px-6 takes 48 off the frame, so the widest a scaled sheet may
+              be is 576. At 0.5556 the sheet ran 623px inside a 576px well
+              and the frame clipped it — measured at 1280 and 1536. */}
+        </div>
+      </div>
+    </Vignette>
+  )
+}
+
 export function KeepsakeVignette() {
   return (
     <Vignette className="flex justify-center">

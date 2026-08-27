@@ -109,9 +109,25 @@ function sceneAfter(base: HeroScene, n: number): HeroScene {
  * PLEDGES indexes into results by position, and every scene carries six, so
  * the same three pledges land wherever this is pointed.
  */
+/**
+ * `still` holds the screen at its settled state — every pledge landed, the
+ * wall full — with no timer running (founder, 2026-08-27: "i'm not sure
+ * there is any need to animate these vignettes").
+ *
+ * A PROP RATHER THAN A DELETION, because /features shows this too and that
+ * page is not covered by the call. It also costs nothing: `reduced` already
+ * had to render exactly this state for prefers-reduced-motion, so `still` is
+ * that same branch reached deliberately rather than by an OS setting.
+ *
+ * The stepping was never load-bearing on a register page. What the idea
+ * beside it claims — a screen the room can glance at — is a property of the
+ * display, not of watching numbers move; and the movement was the one thing
+ * making a real component read as a demo of itself.
+ */
 export function LiveVignette({
   scene: base = DEMO_SCENE,
-}: { scene?: HeroScene } = {}) {
+  still = false,
+}: { scene?: HeroScene; still?: boolean } = {}) {
   const scenes = useMemo(
     () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
     [base]
@@ -127,7 +143,7 @@ export function LiveVignette({
   useEffect(() => setMounted(true), [])
 
   const reduced = useReducedMotion()
-  const [step, setStep] = useState(reduced ? LAST : 0)
+  const [step, setStep] = useState(reduced || still ? LAST : 0)
 
   const boxRef = useRef<HTMLDivElement | null>(null)
   const innerRef = useRef<HTMLDivElement | null>(null)
@@ -135,13 +151,13 @@ export function LiveVignette({
   const [naturalH, setNaturalH] = useState(0)
 
   useEffect(() => {
-    if (reduced) return
+    if (reduced || still) return
     const id = setTimeout(
       () => setStep((s) => (s >= LAST ? 0 : s + 1)),
       STEP_MS[step]
     )
     return () => clearTimeout(id)
-  }, [step, reduced])
+  }, [step, reduced, still])
 
   useEffect(() => {
     const box = boxRef.current

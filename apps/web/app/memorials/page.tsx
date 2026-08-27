@@ -1,15 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
-import { PackVignette } from "@/components/landing/pack-vignette"
-import {
-  MEMORIAL_PACK_DATA,
-  MEMORIAL_PACK_STEPS,
-  MEMORIAL_SCENE,
-} from "@/components/landing/demo-fixture"
+import { OrderOfServiceVignette } from "@/components/landing/order-of-service-vignette"
+import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import { LiveVignette } from "@/components/landing/live-vignette"
-import { RevealVignette } from "@/components/landing/reveal-vignette"
-import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
+import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
+import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
@@ -66,20 +62,34 @@ const ASSURANCES = [
   },
 ]
 
-// Paper -> room -> paper: the printed card a guest scans, the display in
-// the room, the keepsake afterwards. The same arc How It Works closes on
-// (#569), and the sequence a celebrant needs to picture handing to a family.
+// Paper -> phone -> room -> paper: the order of service a guest scans, the
+// reveal it opens, the display in the room, the keepsake afterwards. The
+// same arc How It Works closes on (#569), and the sequence a celebrant needs
+// to picture handing to a family.
+//
+// ONE OBJECT PER IDEA, EACH AT A SIZE IT CAN BE READ AT (founder,
+// 2026-08-27). Three of these four used to shrink a whole document to fit —
+// a four-sheet pack fan, two A4 keepsakes, a screen stepping through pledges
+// — and the section's shared defect was that you could see THAT there was a
+// sheet without seeing what was on it. Each now crops to the part carrying
+// the meaning, at a scale that reads, and none of them move.
+//
+// The vignettes are shared with /features, which is register-neutral and
+// keeps the fuller versions: the pack fan, the paired keepsake, the reveal's
+// locked-then-given arc, the display with pledges landing. Every change here
+// arrived as a prop or a sibling export rather than an edit to what that
+// page shows.
 const ARTEFACTS = [
   {
     key: "pack",
     label: t("memorials.artefacts.pack.label"),
     body: t("memorials.artefacts.pack.body"),
-    // Belinda's pack, not the celebration default — the reveal and the
-    // keepsake below are hers, and the homepage card that opens this page
-    // carries her charity and her total.
-    artefact: (
-      <PackVignette data={MEMORIAL_PACK_DATA} steps={MEMORIAL_PACK_STEPS} />
-    ),
+    // NOT PackVignette, which showed favpoll's own A4/A5 and Avery sheets
+    // beside copy about the family's order of service — the one place in
+    // this section where the picture contradicted the words. This is that
+    // page's footer with the QR on it, which is what the idea describes.
+    // NOTE the print pack is no longer depicted anywhere on /memorials.
+    artefact: <OrderOfServiceVignette />,
   },
   {
     // The PHONE beat, and the reason the arc was incomplete without it:
@@ -94,7 +104,10 @@ const ARTEFACTS = [
     key: "reveal",
     label: t("memorials.artefacts.reveal.label"),
     body: t("memorials.artefacts.reveal.body"),
-    artefact: <RevealVignette />,
+    // The hero's own PhoneFrame at half size, still, holding the reveal
+    // already given — so the device at the top of this page and the device
+    // here are one object at two scales.
+    artefact: <RevealVignettePhone />,
   },
   {
     key: "display",
@@ -102,13 +115,16 @@ const ARTEFACTS = [
     body: t("memorials.artefacts.display.body"),
     // Belinda's screen, not the celebration default — the last object on
     // the page that was still showing someone else's birthday.
-    artefact: <LiveVignette scene={MEMORIAL_SCENE} />,
+    artefact: <LiveVignette scene={MEMORIAL_SCENE} still />,
   },
   {
     key: "keepsake",
     label: t("memorials.artefacts.keepsake.label"),
     body: t("memorials.artefacts.keepsake.body"),
-    artefact: <KeepsakeVignette />,
+    // Cropped to the tribute's head — the prefix, her name, the topic and
+    // the reveal. The data was always hers; two whole sheets at 0.28 put it
+    // at 5px.
+    artefact: <KeepsakeVignetteDetail />,
   },
 ]
 
