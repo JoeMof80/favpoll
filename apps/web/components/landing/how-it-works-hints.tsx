@@ -120,29 +120,35 @@ export function PledgeHint() {
           without it — a colour and an amount over an itemised bill reads
           as what was picked. Blue, because that is the pill lit one column
           to the left. */}
-      <div className="flex justify-between">
-        <span className="text-xs">{PICKED}</span>
-        <span className="text-xs font-semibold tabular-nums">
-          {formatPoundsExact(PICKED_AMOUNT)}
-        </span>
-      </div>
-      {/* The REAL PledgeBreakdown — the itemised bill a guest sees before
+      {/* Favourite row and bill in ONE block, so the only gap between them
+          is PledgeBreakdown's own border-t/pt-3. As siblings of the outer
+          space-y-3 they got that PLUS 12px, which read as a break between
+          two unrelated things rather than a rule under a heading. */}
+      <div>
+        <div className="flex justify-between">
+          <span className="text-xs">{PICKED}</span>
+          <span className="text-xs font-semibold tabular-nums">
+            {formatPoundsExact(PICKED_AMOUNT)}
+          </span>
+        </div>
+        {/* The REAL PledgeBreakdown — the itemised bill a guest sees before
           confirming, with the same line/total grammar and the same labels
           ("To <charity>", "Total charged"). A charity row alone said where
           the money went; this says how it splits (founder, 2026-08-27). */}
-      <PledgeBreakdown
-        lines={[
-          { label: `To ${CHARITY.name}`, amount: PICKED_AMOUNT },
-          // £0, deliberately (founder, 2026-08-27). A non-zero shared-fund
-          // line reads as money diverted AWAY from the charity, directly
-          // against the sentence beside it — "Every penny goes to the
-          // chosen charity" — and against the 0% promise. The line still
-          // earns its place at zero: it shows the split exists without
-          // showing it taking anything.
-          { label: "Shared fund", amount: 0 },
-        ]}
-        total={{ label: "Total charged", amount: PICKED_AMOUNT }}
-      />
+        <PledgeBreakdown
+          lines={[
+            { label: `To ${CHARITY.name}`, amount: PICKED_AMOUNT },
+            // £0, deliberately (founder, 2026-08-27). A non-zero shared-fund
+            // line reads as money diverted AWAY from the charity, directly
+            // against the sentence beside it — "Every penny goes to the
+            // chosen charity" — and against the 0% promise. The line still
+            // earns its place at zero: it shows the split exists without
+            // showing it taking anything.
+            { label: "Shared fund", amount: 0 },
+          ]}
+          total={{ label: "Total charged", amount: PICKED_AMOUNT }}
+        />
+      </div>
     </div>
   )
 }
