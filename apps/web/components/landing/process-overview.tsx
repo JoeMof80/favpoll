@@ -37,7 +37,7 @@ import {
   DEMO_PACK_STEPS as PACK_STEPS,
   DEMO_KEEPSAKE_WALKTHROUGH_DATA,
 } from "@/components/landing/demo-fixture"
-import { KeepsakeDocument } from "@/components/keepsake/keepsake-document"
+import { KeepsakeSheet } from "@/components/keepsake/keepsake-sheet"
 import {
   DisplayStill,
   DISPLAY_STILL_WIDTH,
@@ -206,7 +206,6 @@ const SHADOW_ROOM = 14
 // scroll to show 794px of paper at a size nobody can read, where landscape
 // fills the column's width and costs 191. The desktop scale drops to match, so
 // the sheet reads the same there.
-const A4_PORTRAIT = { w: 794, h: 1123 }
 // Width ~270 / ~373 / ~453 against a ~273 / ~376 / ~478px column; the xl step
 // is held at 0.57 rather than 0.60 so the 1123 of height stays inside the
 // 651px well rather than overflowing it by 23px.
@@ -253,30 +252,19 @@ function BeatMedium({
   }
   if (medium.kind === "keepsake") {
     return (
-      // .paper for the same reason the wallet card needs it: the sheet forces
-      // a light background, so without the light tokens pinned a dark-mode
-      // visitor gets dark ink on dark paper (#535).
       // TRIBUTE: the walkthrough runs on a scene with a protagonist now, so
       // the sheet leads on the person rather than on what was raised — the
       // keepsake at its fullest rather than its second telling.
-      // shrink-0 IS LOAD-BEARING. Every well is a row-direction flex box, and
-      // this is the only medium with an explicit width — so flex-shrink was
-      // squashing the 794 down toward the column's own width BEFORE the
-      // transform ran, and the sheet came out at roughly 0.59:1 instead of
-      // A4's 0.707:1. The others escape it by having no width of their own.
-      <div
-        className={cn(
-          "paper paper-screen shrink-0 drop-shadow-xl",
-          !bare && KEEPSAKE_SCALE
-        )}
-        style={{ width: A4_PORTRAIT.w, height: A4_PORTRAIT.h }}
-      >
-        <KeepsakeDocument
-          data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
-          variant="tribute"
-          orientation="portrait"
-        />
-      </div>
+      //
+      // The paper mount, the load-bearing shrink-0 and the explicit A4 box
+      // now live in KeepsakeSheet, shared with the /memorials Ideas section
+      // (2026-08-27). The reasoning for each is recorded there.
+      <KeepsakeSheet
+        data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
+        variant="tribute"
+        orientation="portrait"
+        className={cn(!bare && KEEPSAKE_SCALE)}
+      />
     )
   }
   if (medium.kind === "display") {
