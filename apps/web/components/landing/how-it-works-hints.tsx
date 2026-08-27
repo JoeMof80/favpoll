@@ -124,11 +124,14 @@ export function PledgeHint() {
           is PledgeBreakdown's own border-t/pt-3. As siblings of the outer
           space-y-3 they got that PLUS 12px, which read as a break between
           two unrelated things rather than a rule under a heading. */}
-      <div>
-        {/* pb-3 matches PledgeBreakdown's own pt-3, so the rule between
-            them sits centred. Without it the gap was 0 above and 12px
-            below. */}
-        <div className="flex justify-between pb-3">
+      {/* 6px each side of the rule, not 12. PledgeBreakdown's own pt-3 is
+          sized for a full-width dialog; in a 192px hint it left the
+          favourite row floating clear of the bill it heads. The child
+          selector overrides the real component's padding from outside
+          rather than changing it — every other surface still wants its
+          12px. */}
+      <div className="[&>div+div]:pt-1.5">
+        <div className="flex justify-between pb-1.5">
           <span className="text-xs">{PICKED}</span>
           <span className="text-xs font-semibold tabular-nums">
             {formatPoundsExact(PICKED_AMOUNT)}
