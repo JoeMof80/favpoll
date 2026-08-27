@@ -91,44 +91,68 @@ export function OrderOfServiceVignette() {
             WebkitMaskComposite: "source-in",
           }}
         >
-          {/* Content sits in the CRISP corner. The left padding clears the
-              mask's fade so no line is half-dissolved — a word thinning out
-              mid-stroke reads as a rendering fault rather than as a page
-              continuing, the finding that killed the cropped dialog corners
-              in the How It Works hints. */}
-          <div className="flex h-full flex-col items-center justify-end pr-11 pb-10 pl-28 text-center">
-            {/* Eaten by the top fade, on purpose: a crop needs something
-                disappearing into it, or the sheet reads as a short page
-                rather than a long one. */}
+          {/* THE PAGE'S OWN TEXT, high and centred on the sheet — the
+              order of service, dissolving into the crop. ONE LINE, and it is
+              not a caption for the block below it (founder, 2026-08-27: "it
+              makes no sense where you've put 'the family thank you' text
+              either. it doesn't fucking relate to the QR code position").
+              An earlier pass stacked the two in one centred column with a
+              line of thanks directly above the code, which welded a line of
+              the family's page onto favpoll's block and made both belong to
+              neither. The thanks then came out altogether — "that just adds
+              noise". What is left does the only job this text has: naming
+              the page as an order of service, and having something to
+              dissolve into the crop so the sheet reads as longer than the
+              frame. */}
+          <div className="absolute inset-x-0 top-11 px-14 text-center">
             <p className="text-[11px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
               Music on Leaving
             </p>
-            <p className="mt-3 font-serif text-[14px] leading-relaxed text-foreground">
-              The family thank you for your
-              <br />
-              kindness and support today.
-            </p>
+          </div>
 
-            <div className="mt-8 w-full">
-              <p className="text-[9px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
-                {PREFIX}
-              </p>
-              <p className="mt-1 text-[19px] leading-tight font-medium text-foreground">
-                {NAME}
-              </p>
-              <p className="mt-3 border-t border-b border-border py-2 text-[11px] font-medium tracking-[0.14em] text-primary uppercase">
-                {TOPIC_LABEL}
-              </p>
-              <div className="mt-4 flex flex-col items-center gap-3">
-                {/* Illustrative, not scannable: 118px natural falls to ~69px
-                    on a phone, under the module floor a 33x33 code needs.
-                    Nobody should be told to scan this one. */}
-                <BrandedQR
-                  value={DEMO_QR_URL}
-                  size={118}
-                  aria-label="favpoll QR code"
-                />
-                <FavpollLogo className="text-[15px] font-medium" />
+          {/* THE BLOCK, FRAMED AND IN THE CORNER (founder, 2026-08-27). Both
+              halves of that matter. The frame is what marks it as an insert
+              rather than a stray paragraph of the page — the family's printer
+              set a box, the way a donations panel has always been a box. And
+              the corner is where it belongs: this is the page's smallest
+              possible ask, tucked out of the way of the service, not a panel
+              taking the middle of the sheet. It was centred and half the page
+              tall before, which claimed the page rather than sitting on it.
+
+              Anchored bottom-right so it holds the corner the mask leaves
+              crisp — the artefact's subject sits in the one region that is
+              unambiguously a page corner. */}
+          <div className="absolute right-8 bottom-8 w-[152px] rounded-md border border-border px-3 pt-2.5 pb-3 text-center shadow-md">
+            <p className="text-[8px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+              {PREFIX}
+            </p>
+            <p className="mt-0.5 text-[13px] leading-tight font-medium text-foreground">
+              {NAME}
+            </p>
+            <p className="mt-2 border-t border-b border-border py-1.5 text-[8px] font-medium tracking-[0.14em] text-primary uppercase">
+              {TOPIC_LABEL}
+            </p>
+            <div className="mt-2.5 flex flex-col items-center gap-2">
+              {/* Illustrative, not scannable: 80px natural falls to ~47px on
+                  a phone, under the module floor a 33x33 code needs. Nobody
+                  should be told to scan this one. */}
+              <BrandedQR
+                value={DEMO_QR_URL}
+                size={80}
+                aria-label="favpoll QR code"
+              />
+              {/* SCALED, not just set in a smaller type size (founder,
+                  2026-08-27: "the favpoll branding is too big for an order of
+                  service. it should be minimal"). FavpollLogo's mark is a
+                  hardcoded 24 x 22 svg, so className moves the wordmark and
+                  leaves the heart at full size — the lockup gets more
+                  mark-heavy the smaller you set it, which is the opposite of
+                  what a footnote on someone's order of service wants. A
+                  transform takes both together. The fixed-height wrapper
+                  reclaims the space the untransformed box would still
+                  occupy. */}
+              <div className="flex h-3.5 items-center justify-center">
+                <FavpollLogo className="origin-center scale-[0.58] text-[11px] font-medium" />
               </div>
             </div>
           </div>
