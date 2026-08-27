@@ -4,9 +4,11 @@ import { useEffect, useState } from "react"
 import { Lock } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { PollHeading } from "@/components/poll-heading"
 import {
   PhoneFrame,
   PHONE_CHASSIS_HEIGHT,
+  PHONE_CHASSIS_WIDTH,
 } from "@/components/hero-demo-panel/phone-frame"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
@@ -35,7 +37,7 @@ const DECOY =
 // Derived, never typed — the callout names the same person and the same
 // topic the card behind it does, because it reads them off the same scene.
 const FIRST_NAME = (MEMORIAL_SCENE.protagonist?.name ?? "").split(/[\s&]+/)[0]
-const TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
+const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
 
 const LOCKED_MS = 2600
 const TYPE_TARGET_MS = 2100
@@ -71,40 +73,61 @@ const HOLD_MS = 5200
 // makes the transform land on exactly the intended box.
 const MAGNIFY = 5 / 3
 
-// The composition, at natural size: the phone's chassis, and a callout that
-// starts inside its right edge and finishes clear of it.
-const SCENE_W = 740
+// The composition, at natural size: the phone centred, and the magnified
+// reveal laid ACROSS it (founder, 2026-08-27: "it should sit on top, not to
+// the side").
+//
+// On top rather than beside, because beside made it a second panel the eye
+// reads after the phone — two things in a row. Laid over the reveal it is
+// plainly the SAME thing at two sizes, which is the only way a magnification
+// reads as one. It overhangs both edges by ~53px, so the phone still shows
+// through on both sides and the panel cannot be mistaken for the screen.
+//
+// `top` puts it over the card's own reveal block rather than anywhere
+// convenient, and the number is MEASURED rather than judged. The phone
+// renders that block — PollHeading's ribbon through the end of the quote —
+// at y 339 to 479 in this space, centre 409; the panel is 290 tall, so it
+// starts at 264. Guessing put it at 340 and left it sitting 76px low, over
+// the standings instead of over the thing it magnifies.
+const SCENE_W = 560
 const SCENE_H = PHONE_CHASSIS_HEIGHT
-const CALLOUT = { left: 300, top: 340, width: 264 }
+const PHONE_LEFT = Math.round((SCENE_W - PHONE_CHASSIS_WIDTH) / 2)
+const CALLOUT = { left: 20, top: 264, width: 312 }
 
 export function RevealVignettePhone() {
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — the pack and keepsake
-          idiom. 0.28 / 0.42 / 0.5 of 740 x 868 give the sizes below; lg is
+          idiom. 0.28 / 0.42 / 0.5 of 560 x 868 give the sizes below; lg is
           two thirds of the hero's own 0.75 at xl, so this reads as the same
           handset further away. */}
       <div
         data-artefact-box
-        className="h-[243px] w-[207px] sm:h-[365px] sm:w-[311px] lg:h-[434px] lg:w-[370px]"
+        className="h-[243px] w-[157px] sm:h-[365px] sm:w-[235px] lg:h-[434px] lg:w-[280px]"
       >
         <div
           className="relative origin-top-left scale-[0.28] sm:scale-[0.42] lg:scale-[0.5]"
           style={{ width: SCENE_W, height: SCENE_H }}
         >
-          <PhoneFrame className="absolute top-0 left-0">
-            <DemoCard
-              scene={MEMORIAL_SCENE}
-              phase="reveal"
-              barWidths={MEMORIAL_SCENE.results.map((r) => r.widthPercent)}
-              prefersReducedMotion
-              device="phone"
-              accentVar="memorial"
-              className="rounded-none border-0"
-            />
-          </PhoneFrame>
+          {/* Wrapped rather than positioned directly: PhoneFrame takes a
+              className and no style, and widening a component four surfaces
+              share to place one vignette is the wrong trade. */}
+          <div className="absolute top-0" style={{ left: PHONE_LEFT }}>
+            <PhoneFrame>
+              <DemoCard
+                scene={MEMORIAL_SCENE}
+                phase="reveal"
+                barWidths={MEMORIAL_SCENE.results.map((r) => r.widthPercent)}
+                prefersReducedMotion
+                device="phone"
+                accentVar="memorial"
+                className="rounded-none border-0"
+              />
+            </PhoneFrame>
+          </div>
 
           <div
+            data-magnifier
             className="absolute rounded-xl border border-border bg-background p-4 shadow-2xl"
             style={{
               left: CALLOUT.left,
@@ -114,11 +137,20 @@ export function RevealVignettePhone() {
               transformOrigin: "top left",
             }}
           >
-            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
-              {FIRST_NAME}&apos;s favourite {TOPIC}
-            </p>
-            <div className="mt-3">
-              <PollReveal personalReveal={REVEAL} />
+            {/* EXACTLY THE CARD'S REVEAL BLOCK (founder, 2026-08-27: "the
+                magified section should resemble exactly the reveal"). The
+                same two components in the same order with the same space-y-4
+                between them, which is how DemoCard and the real poll-section
+                both lay it out — PollHeading's inert ribbon over PollReveal.
+                It was a hand-set eyebrow reading "Belinda's favourite colour"
+                before: right words, wrong object. A magnifier that shows
+                something the screen underneath does not is not a magnifier. */}
+            <div className="space-y-4">
+              <PollHeading topicTitle={TOPIC_TITLE} size="lg" inert />
+              <PollReveal
+                personalReveal={REVEAL}
+                protagonistFirstName={FIRST_NAME}
+              />
             </div>
           </div>
         </div>
