@@ -59,12 +59,13 @@ export function HowItWorksSteps({
   return (
     <section id="how" className="w-full scroll-mt-20">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
-        <SectionEyebrow className="mb-10">{title}</SectionEyebrow>
-        {/* SEPARATORS between the beats (founder, 2026-08-27). Padding
-            rather than gap, so each rule sits CENTRED between two cells
-            instead of hard against the left edge of the second — with a gap
-            the border lands on the cell and the whitespace all falls one
-            side of it. Horizontal when stacked, vertical from lg. */}
+        {/* as="h2" matches the home page's How It Works exactly: the same
+            SectionEyebrow rendered as a heading rather than its default
+            paragraph, and the right element for a section title the page
+            outline should carry. */}
+        <SectionEyebrow as="h2" className="mb-10">
+          {title}
+        </SectionEyebrow>
         <ol className="grid gap-10 lg:grid-cols-3">
           {steps.map((step, i) => (
             /* A SECOND COLUMN PER BEAT (founder, 2026-08-27): the words
@@ -74,17 +75,23 @@ export function HowItWorksSteps({
                chips and bars, and a fixed fraction would either starve the
                text or stretch four chips across nothing. */
             <li key={step.label} className="min-w-0">
-              <p className="mb-2 text-sm font-semibold text-primary">
-                {i + 1}. {step.label}
-              </p>
               {/* The second column only from xl. At lg the three beats are
                   already sharing 1320px, so splitting each again left the
                   text at 155px — about twenty characters a line. Below xl
                   the hint drops under its own paragraph instead. */}
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
-                <p className="leading-relaxed text-muted-foreground xl:pr-6">
-                  {step.body}
-                </p>
+                {/* The numbered label lives IN the left column with its
+                    own body (founder, 2026-08-27), not spanning above both.
+                    Spanning, the rule beside the hint began below it and the
+                    label floated free of the pair it heads. */}
+                <div className="min-w-0 xl:pr-6">
+                  <p className="mb-2 text-sm font-semibold text-primary">
+                    {i + 1}. {step.label}
+                  </p>
+                  <p className="leading-relaxed text-muted-foreground">
+                    {step.body}
+                  </p>
+                </div>
                 {/* A rule between the words and the hint (founder,
                     2026-08-27) — vertical once they sit side by side,
                     horizontal while stacked. Padding rather than gap on the
