@@ -155,54 +155,69 @@ they CAN answer regardless, and question 4 is worth having anyway: appearing
 on their register is exactly the credential that reassures a charity finance
 team on a cold approach.
 
-**To:** the Fundraising Regulator's general enquiries address
+**STATUS: SENT 27 August** to the general enquiries address, and submitted
+again on the 27th through the **Code Advice Service form** — the better door,
+because they advise on the Code, so "would you expect" gets an answer where
+"what does the Act require" gets "seek your own legal advice". The form
+version opens by naming the email so it reads as a follow-up rather than a
+duplicate, and is kept paste-ready in
+`fundraising-regulator-form-PASTE.txt`. Contact preference set to phone: the
+recurring failure with every organisation so far has been silence, and their
+own form says a call is quicker.
+
 **Subject:** Guidance: does a platform taking no fee need agreements in place before soliciting?
+
+WHAT WAS ACTUALLY SENT — shorter than the draft it replaced. The prose
+"how it works" became a scannable list, and the paragraph explaining why
+question 2 matters was cut to a single sentence. Question 2 was also
+UNHOOKED from question 1 ("Whether or not that applies"): as first drafted it
+began "If so", so an answer of "no, you are not a professional fundraiser"
+would have left the one question that decides the product unanswered.
 
 > Hello,
 >
-> I am the founder of favpoll (favpoll.com), a UK platform due to launch
-> shortly, and I would like to get our position right before we take a penny.
-> We are Josmo Services Ltd, a company, not a charity.
+> I am the founder of favpoll (favpoll.com), a UK platform (company, not
+> charity) due to launch shortly, and I would like to get our position right
+> before we begin operating.
 >
-> **How it works.** Someone marking an occasion — most often a funeral — sets
-> up a favpoll and chooses a registered charity. Guests pledge small amounts.
-> We deduct **nothing** from those pledges: 100% of a pledge goes to the
-> charity. Card processing is charged separately to the donor at checkout,
-> shown to them as its own line, and we retain none of it. Our own income is
-> an optional contribution a guest may add on top of their pledge, and in
-> future printed stationery. We intend to collect as agent for the charity and
-> to pass Gift Aid declarations to them to claim, rather than claiming
-> anything ourselves. Funds reach the charity by bank transfer within 10
-> working days of a favpoll closing.
+> **How it works:**
 >
-> **My questions:**
+> - Someone marking an occasion (e.g. a memorial service) sets up a page and
+>   chooses a registered charity.
+> - Guests pledge small amounts.
+> - We deduct nothing from those pledges: 100% of a pledge goes to the
+>   charity.
+> - Card processing is charged separately to the donor at checkout, shown to
+>   them as its own line, and we retain none of it.
+> - Our own income is an optional contribution a guest may add on top of their
+>   pledge.
+> - We intend to collect as agent for the charity and to pass Gift Aid
+>   declarations to them to claim, rather than claiming anything ourselves.
+> - Funds reach the charity by bank transfer within 10 working days of the
+>   closing date.
+>
+> **Questions:**
 >
 > 1. Given we take nothing from donations, and the only sum we keep is an
 >    optional contribution the donor chooses to add, would you regard favpoll
 >    as a professional fundraiser and/or a commercial participator under Part
 >    II of the Charities Act 1992?
->
-> 2. If so, does the written agreement under s.59 need to be in place before
->    donations are **solicited**, or before funds are **paid over**? This is
->    the question that shapes our product. A family arranging a funeral often
->    has days, not weeks, and if a favpoll cannot go live until the charity's
->    finance team has signed, most bereaved families will not be able to use
->    it at all. If the agreement is needed only before payment, we would
->    publish immediately and complete the paperwork while the favpoll runs,
->    refunding every guest in full if we could not conclude it.
->
+> 2. Whether or not that applies, would you expect a written agreement with
+>    the charity to be in place before donations are solicited, or may it be
+>    concluded while the page is running? A family arranging a funeral often
+>    has days, not weeks — and we would refund every guest in full if we could
+>    not conclude one.
 > 3. What solicitation statement would you expect us to make to donors, given
 >    our deduction from their pledge is nil, and the only amounts alongside it
 >    are the card fee (which goes to the payment provider) and a contribution
 >    they opt into?
->
-> 4. Can a company in our position register with the Fundraising Regulator?
->    We would like to, and we expect charities to check.
+> 4. Can a company in our position register with the Fundraising Regulator? We
+>    would like to, and we expect charities to check.
 >
 > I am happy to talk it through on a call, or to send a link to a working
 > demonstration if that is easier than a description.
 >
-> Thanks for your time,
+> Thanks for your assistance,
 >
 > Joseph Moffatt
 > Founder, favpoll — favpoll.com
