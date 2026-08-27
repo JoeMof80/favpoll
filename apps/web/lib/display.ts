@@ -218,11 +218,27 @@ export function roomTypeScaleAtWidth(width: number): RoomTypeScale {
 }
 
 /**
- * The display as a screen in a room: 16:9, and wide enough that the card
- * (max-w-6xl — 72rem, 1152px) leaves 224px gutters for the QR pair, which is
- * where the real display starts showing them.
+ * The display as a screen in a room: 1920 x 1080, the size a projector
+ * actually is.
+ *
+ * IT WAS 1600 x 900, the narrowest width at which the display has gutters at
+ * all — the card is max-w-6xl (72rem, 1152px), so the gutter there is
+ * (1600-1152)/2 = 224 against a 200px code, twelve pixels a side. Faithful,
+ * and it read as a code crammed into a margin (founder, 2026-08-27: "QR codes
+ * slightly too big"). At 1920 the gutter is 384 and the same 200px code has
+ * 92px either side, which is the room it has on a real screen.
+ *
+ * SHRINKING THE CODE WOULD HAVE BEEN THE WRONG FIX: 200px is the product's
+ * own decision, sized to scan from across a room, and an artefact whose whole
+ * charter is to be the real thing does not get to quietly re-take it.
+ *
+ * AND IT COSTS NOTHING IN LEGIBILITY, which is why this is free rather than a
+ * trade. The type ramp is linear in width and the still's scale is inversely
+ * linear in it, so on-screen type is constant across the change: the figure
+ * goes 41.6px at 1600 and 49.9px at 1920, rendered at 0.351 and 0.294, which
+ * is 14.6px either way. Only the gutters grow.
  *
  * Lives here rather than with the still so DisplayScreen can resolve the type
  * ramp against it without importing its own caller.
  */
-export const DISPLAY_ROOM = { w: 1600, h: 900 } as const
+export const DISPLAY_ROOM = { w: 1920, h: 1080 } as const

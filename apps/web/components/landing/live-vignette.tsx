@@ -65,6 +65,30 @@ const NATURAL_W = DISPLAY_STILL_WIDTH + 40
 const NATURAL_W_ROOM = DISPLAY_STILL_ROOM.w + 40
 const NATURAL_H_ROOM = DISPLAY_STILL_ROOM.h + 40
 
+// ROOM FOR THE SET'S OWN ATMOSPHERE (founder, 2026-08-27: "Can we give this a
+// shadow like the homepage version to suggest a wall mount?").
+//
+// TvFrame has always cast one — a dim pocket, the panel's spill on the wall,
+// an elliptical shadow beneath the set — and this vignette was CLIPPING all
+// three. They are authored outside the chassis (-inset-28, -bottom-10) and
+// the reserved box was sized to exactly the chassis, so the homepage had the
+// wall mount and this did not, from one `overflow-hidden`.
+//
+// The clip cannot simply go: with overflow visible, `aspect-ratio` yields to
+// the box's automatic minimum size, and the unscaled 1120px-tall frame inside
+// blew the vignette out to 2400px. Measured, on the first attempt.
+//
+// So the box grows instead and the frame sits inset within it. ASYMMETRICALLY,
+// because the two axes cost differently: width is the binding constraint —
+// every pixel of side padding shrinks the scale and with it the display's
+// type — while height is free, the section having no shortage of it. Hence a
+// generous skirt below, where the wall shadow actually falls, and a thin
+// margin at the sides. 40/40/120 costs 4% of the type; padding it evenly to
+// clear the whole -inset-28 pocket would have cost 10%.
+const ROOM_PAD = { side: 40, top: 40, bottom: 120 }
+const ROOM_BOX_W = NATURAL_W_ROOM + ROOM_PAD.side * 2
+const ROOM_BOX_H = NATURAL_H_ROOM + ROOM_PAD.top + ROOM_PAD.bottom
+
 /**
  * The still's measured height, used ONLY to hold the space open before it
  * mounts. The real height replaces it the moment there is one — this exists so
@@ -133,7 +157,7 @@ export function LiveVignette({
   still = false,
   room = false,
 }: { scene?: HeroScene; still?: boolean; room?: boolean } = {}) {
-  const naturalW = room ? NATURAL_W_ROOM : NATURAL_W
+  const naturalW = room ? ROOM_BOX_W : NATURAL_W
   const scenes = useMemo(
     () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
     [base]
@@ -211,7 +235,7 @@ export function LiveVignette({
             // exists for the content-sized still, whose height cannot be
             // known before it mounts.
             aspectRatio: `${naturalW} / ${
-              room ? NATURAL_H_ROOM : naturalH || FALLBACK_H
+              room ? ROOM_BOX_H : naturalH || FALLBACK_H
             }`,
           }}
         >
@@ -223,19 +247,34 @@ export function LiveVignette({
               transform: scale ? `scale(${scale})` : undefined,
             }}
           >
-            <TvFrame>
-              {mounted && (
-                <DisplayStill
-                  scene={scenes[step]}
-                  qrUrl={DEMO_QR_URL}
-                  wallNames={wallNames}
-                  // The count it ends on, so the card is its final size from
-                  // the first frame and nothing below it moves as names land.
-                  wallReserveRows={3 + LAST}
-                  room={room}
-                />
-              )}
-            </TvFrame>
+            {/* The inset that gives the atmosphere somewhere to land. Zero
+                outside room mode, where the box is the frame. */}
+            <div
+              style={
+                room
+                  ? {
+                      paddingLeft: ROOM_PAD.side,
+                      paddingRight: ROOM_PAD.side,
+                      paddingTop: ROOM_PAD.top,
+                      paddingBottom: ROOM_PAD.bottom,
+                    }
+                  : undefined
+              }
+            >
+              <TvFrame>
+                {mounted && (
+                  <DisplayStill
+                    scene={scenes[step]}
+                    qrUrl={DEMO_QR_URL}
+                    wallNames={wallNames}
+                    // The count it ends on, so the card is its final size from
+                    // the first frame and nothing below it moves as names land.
+                    wallReserveRows={3 + LAST}
+                    room={room}
+                  />
+                )}
+              </TvFrame>
+            </div>
           </div>
         </div>
       </div>
