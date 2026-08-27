@@ -6,6 +6,7 @@
 import { Button } from "@/components/ui/button"
 import { CharityRow } from "@/components/charity-row"
 import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
+import { formatPoundsExact } from "@/lib/i18n"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import type { Charity } from "@favpoll/types"
@@ -67,7 +68,7 @@ export function PickHint() {
           tabIndex={-1}
           variant={t === PICKED ? "default" : "outline"}
           size="sm"
-          className="pointer-events-none h-6 rounded-full px-2.5 text-[11px]"
+          className="pointer-events-none rounded-full text-xs"
         >
           {t}
         </Button>
@@ -96,6 +97,23 @@ export function PledgeHint() {
             £{p}
           </Button>
         ))}
+      </div>
+      {/* The favourite and its worth, the way StepAmount shows it — a
+          small uppercase label over a label/amount row, above the bill
+          rather than inside it. In the bill it would double-count against
+          "To Marie Curie"; the real step keeps them separate for the same
+          reason. Blue, because that is the pill lit one column to the
+          left: one guest, three beats. */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          Your favourite · its worth
+        </p>
+        <div className="flex justify-between">
+          <span className="text-sm">{PICKED}</span>
+          <span className="text-sm font-semibold tabular-nums">
+            {formatPoundsExact(PICKED_AMOUNT)}
+          </span>
+        </div>
       </div>
       {/* The REAL PledgeBreakdown — the itemised bill a guest sees before
           confirming, with the same line/total grammar and the same labels
