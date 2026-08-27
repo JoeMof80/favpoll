@@ -65,47 +65,33 @@ const NATURAL_W = DISPLAY_STILL_WIDTH + 40
 const NATURAL_W_ROOM = DISPLAY_STILL_ROOM.w + 40
 const NATURAL_H_ROOM = DISPLAY_STILL_ROOM.h + 40
 
-// ROOM FOR THE SET'S OWN ATMOSPHERE (founder, 2026-08-27: "Can we give this a
-// shadow like the homepage version to suggest a wall mount?").
+// NOTHING CLIPS THE SET'S ATMOSPHERE (founder, 2026-08-27, after two passes
+// of padding failed to stop it being "trucnated").
 //
-// TvFrame has always cast one — a dim pocket, the panel's spill on the wall,
-// an elliptical shadow beneath the set — and this vignette was CLIPPING all
-// three. They are authored outside the chassis (-inset-28, -bottom-10) and
-// the reserved box was sized to exactly the chassis, so the homepage had the
-// wall mount and this did not, from one `overflow-hidden`.
+// TvFrame casts a dim pocket, the panel's spill on the wall and an elliptical
+// shadow beneath it, all authored OUTSIDE the chassis (-inset-28, -bottom-10)
+// and blurred 60-110px past even that. Two boxes were cutting them: this
+// vignette's reserved box, and Vignette's own overflow-hidden — which the
+// memorials page had already stripped the border, radius and tint from,
+// leaving an invisible clip nobody could see doing it.
 //
-// The clip cannot simply go: with overflow visible, `aspect-ratio` yields to
-// the box's automatic minimum size, and the unscaled 1120px-tall frame inside
-// blew the vignette out to 2400px. Measured, on the first attempt.
+// PADDING THE BOX WAS THE WRONG ANSWER, twice. It buys room in exchange for
+// scale on the width axis, and it cannot win: containing the pocket's blur
+// needs ~460px a side, which would take the type from 6.7px to 4.7. Worse,
+// every increase makes the failure MORE visible rather than less — more soft
+// glow renders, and it still ends against a hard rectangular edge, so the
+// second pass turned a thin cut under the set into a grey rectangle hanging
+// above it.
 //
-// So the box grows instead and the frame sits inset within it. ASYMMETRICALLY,
-// because the two axes cost differently: width is the binding constraint —
-// every pixel of side padding shrinks the scale and with it the display's
-// type — while height is free, the section having no shortage of it. Hence a
-// generous skirt below, where the wall shadow actually falls, and a thin
-// margin at the sides.
-//
-// THE NUMBERS ARE MEASURED, after the first pass still truncated the shadow
-// (founder, 2026-08-27: "shadow is trucnated"). A blurred box does not end at
-// its bounding rect — it ends a blur-radius past it — and 120 was set against
-// the rect. The wall shadow's box finishes 339px down a 361px clip, but its
-// 60px blur carries the tail to 399, so 38 scaled pixels of it were being cut
-// off square. That is exactly the hard horizontal line under the set.
-//
-// 270 below contains the shadow AND the panel's spill, both of which finish
-// at 399. 120 above contains the pocket's own ellipse (-inset-28 = 112) if
-// not the whole of its 110px blur.
-//
-// THE SIDES STAY THIN, deliberately. Containing the pocket's blur there would
-// need ~460px of padding a side — the box would go 2880 wide and the display's
-// type would drop from 6.7px to 4.7. The pocket is a 20%-black ellipse blurred
-// 110px, so what is being cut at the sides is its faintest extreme; the wall
-// shadow, at the bottom, is the one with an edge you can see. And the Vignette
-// itself clips 24px out regardless, so no amount of padding here would let
-// side atmosphere finish naturally.
-const ROOM_PAD = { side: 40, top: 120, bottom: 270 }
-const ROOM_BOX_W = NATURAL_W_ROOM + ROOM_PAD.side * 2
-const ROOM_BOX_H = NATURAL_H_ROOM + ROOM_PAD.top + ROOM_PAD.bottom
+// So the clip goes. The catch, which is why it could not simply be deleted:
+// with overflow visible, `aspect-ratio` yields to the box's automatic minimum
+// size, and the unscaled 1120px-tall frame inside blew the vignette out to
+// 2400px with the sticky header across it — measured. `height: 0` on the
+// scaled wrapper fixes that at the root: a transform does not affect layout
+// anyway, so the wrapper contributes no height, the ratio governs the box,
+// and the frame paints freely outside it. The atmosphere now finishes on the
+// section background exactly as it does on the home page, which never clipped
+// it and is why the wall mount read correctly there all along.
 
 /**
  * The still's measured height, used ONLY to hold the space open before it
@@ -175,7 +161,7 @@ export function LiveVignette({
   still = false,
   room = false,
 }: { scene?: HeroScene; still?: boolean; room?: boolean } = {}) {
-  const naturalW = room ? ROOM_BOX_W : NATURAL_W
+  const naturalW = room ? NATURAL_W_ROOM : NATURAL_W
   const scenes = useMemo(
     () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
     [base]
@@ -241,7 +227,7 @@ export function LiveVignette({
             reserved explicitly — the class of bug that once put a 940px TV in
             a 184px well and spilled it over the beats either side. */}
         <div
-          className="overflow-hidden"
+          className={room ? undefined : "overflow-hidden"}
           style={{
             // ASPECT-RATIO, not a computed height. A JS height needs a
             // measurement first, so the frame before the observer fired
@@ -253,7 +239,7 @@ export function LiveVignette({
             // exists for the content-sized still, whose height cannot be
             // known before it mounts.
             aspectRatio: `${naturalW} / ${
-              room ? ROOM_BOX_H : naturalH || FALLBACK_H
+              room ? NATURAL_H_ROOM : naturalH || FALLBACK_H
             }`,
           }}
         >
@@ -262,37 +248,26 @@ export function LiveVignette({
             className="origin-top-left"
             style={{
               width: naturalW,
+              // height 0 ONLY in room mode — see the note above. The
+              // content-sized still still needs its real height here,
+              // because the observer reads it back to size the box.
+              ...(room ? { height: 0 } : null),
               transform: scale ? `scale(${scale})` : undefined,
             }}
           >
-            {/* The inset that gives the atmosphere somewhere to land. Zero
-                outside room mode, where the box is the frame. */}
-            <div
-              style={
-                room
-                  ? {
-                      paddingLeft: ROOM_PAD.side,
-                      paddingRight: ROOM_PAD.side,
-                      paddingTop: ROOM_PAD.top,
-                      paddingBottom: ROOM_PAD.bottom,
-                    }
-                  : undefined
-              }
-            >
-              <TvFrame>
-                {mounted && (
-                  <DisplayStill
-                    scene={scenes[step]}
-                    qrUrl={DEMO_QR_URL}
-                    wallNames={wallNames}
-                    // The count it ends on, so the card is its final size from
-                    // the first frame and nothing below it moves as names land.
-                    wallReserveRows={3 + LAST}
-                    room={room}
-                  />
-                )}
-              </TvFrame>
-            </div>
+            <TvFrame>
+              {mounted && (
+                <DisplayStill
+                  scene={scenes[step]}
+                  qrUrl={DEMO_QR_URL}
+                  wallNames={wallNames}
+                  // The count it ends on, so the card is its final size from
+                  // the first frame and nothing below it moves as names land.
+                  wallReserveRows={3 + LAST}
+                  room={room}
+                />
+              )}
+            </TvFrame>
           </div>
         </div>
       </div>

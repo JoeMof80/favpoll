@@ -247,7 +247,11 @@ export default function MemorialsPage() {
                   </figcaption>
                   <div
                     className={cn(
-                      "min-w-0 [&_[data-vignette]]:max-w-none [&_[data-vignette]]:rounded-none [&_[data-vignette]]:border-0 [&_[data-vignette]]:bg-transparent",
+                      // overflow-visible with the rest of the frame: stripping the
+                      // border, radius and tint left an INVISIBLE clip still
+                      // cutting the live display's wall shadow, which is a
+                      // frame doing damage after it has been told to go away.
+                      "min-w-0 [&_[data-vignette]]:max-w-none [&_[data-vignette]]:overflow-visible [&_[data-vignette]]:rounded-none [&_[data-vignette]]:border-0 [&_[data-vignette]]:bg-transparent",
                       mediaLeft && "lg:order-1"
                     )}
                   >
