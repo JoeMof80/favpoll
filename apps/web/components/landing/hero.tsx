@@ -345,7 +345,11 @@ export function LandingHero({
           <h1
             className={cn(
               "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
-              "max-w-3xl",
+              // EXPERIMENT (2026-08-26): register headlines capped so every
+              // beat wraps to exactly two lines — 446-595px is the window
+              // where the widest beat (892) does not reach three and the
+              // narrowest (595) does not stay on one.
+              sceneKind ? "max-w-xl" : "max-w-3xl",
               router && "2xl:text-6xl"
             )}
           >
@@ -362,7 +366,7 @@ export function LandingHero({
             className={cn(
               "mb-8 text-lg leading-relaxed opacity-80",
               // The subheader must not be WIDER than the headline above it.
-              router ? "max-w-2xl" : "max-w-md"
+              sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
             )}
           >
             {subheader ?? t("landing.subheader")}

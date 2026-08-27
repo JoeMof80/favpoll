@@ -20,6 +20,7 @@ export function HeaderBar({
   children,
   overlay,
   staticMenu = false,
+  section,
 }: {
   children?: React.ReactNode
   /**
@@ -30,6 +31,8 @@ export function HeaderBar({
   overlay?: React.ReactNode
   /** Render the hamburger as a glyph, and the logo without its link. */
   staticMenu?: boolean
+  /** Section name shown beside the mark, e.g. "For memorials". */
+  section?: string
 }) {
   return (
     <header
@@ -45,13 +48,30 @@ export function HeaderBar({
       }
     >
       <div className="mx-auto flex h-14 items-center justify-between px-6">
-        {staticMenu ? (
-          <FavpollLogo />
-        ) : (
-          <Link href="/" aria-label="favpoll home">
+        {/* PROTOTYPE (2026-08-26): section marker beside the mark on the
+            register pages. They share the home page's hero component, panel
+            width, alignment and texture, so clicking a router card can read
+            as "nothing happened". Names match the footer's. */}
+        <div className="flex items-center gap-3">
+          {staticMenu ? (
             <FavpollLogo />
-          </Link>
-        )}
+          ) : (
+            <Link href="/" aria-label="favpoll home">
+              <FavpollLogo />
+            </Link>
+          )}
+          {section && (
+            <>
+              <span
+                aria-hidden="true"
+                className="h-4 w-px shrink-0 bg-border"
+              />
+              <span className="text-sm font-medium text-muted-foreground">
+                {section}
+              </span>
+            </>
+          )}
+        </div>
 
         {staticMenu ? (
           <Menu className="h-5 w-5 text-muted-foreground" aria-hidden="true" />

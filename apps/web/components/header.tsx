@@ -5,14 +5,26 @@ import { Show, SignInButton, SignUpButton, useClerk } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { HeaderBar } from "@/components/header-bar"
+
+// PROTOTYPE (2026-08-26): the register pages share home's hero component,
+// panel width, alignment and texture, so clicking a router card can read as
+// "nothing happened". Names match the footer's.
+const SECTION_NAMES: Record<string, string> = {
+  "/memorials": "For memorials",
+  "/celebrations": "For celebrations",
+  "/fundraisers": "For fundraisers",
+}
 
 const MOBILE_LINK =
   "block w-full rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 
 export function Header() {
+  const pathname = usePathname()
+  const section = SECTION_NAMES[pathname ?? ""]
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
   const clerk = useClerk()
@@ -35,6 +47,7 @@ export function Header() {
 
   return (
     <HeaderBar
+      section={section}
       overlay={
         /* Mobile menu — a dropdown below the header (logo + hamburger stay
            in view). A scrim blurs and freezes the page behind it; the header
