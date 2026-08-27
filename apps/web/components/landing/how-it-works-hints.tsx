@@ -125,7 +125,10 @@ export function PledgeHint() {
           space-y-3 they got that PLUS 12px, which read as a break between
           two unrelated things rather than a rule under a heading. */}
       <div>
-        <div className="flex justify-between">
+        {/* pb-3 matches PledgeBreakdown's own pt-3, so the rule between
+            them sits centred. Without it the gap was 0 above and 12px
+            below. */}
+        <div className="flex justify-between pb-3">
           <span className="text-xs">{PICKED}</span>
           <span className="text-xs font-semibold tabular-nums">
             {formatPoundsExact(PICKED_AMOUNT)}
