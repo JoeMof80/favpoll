@@ -85,7 +85,13 @@ export function HowItWorksSteps({
                     Spanning, the rule beside the hint began below it and the
                     label floated free of the pair it heads. */}
                 <div className="min-w-0 xl:pr-6">
-                  <p className="mb-2 text-sm font-semibold text-primary">
+                  {/* The home page's beat-label style, to the class:
+                      text-sm font-medium tracking-widest text-primary
+                      uppercase. This band is meant to read as a miniature
+                      of that section, so the labels have to be the same
+                      thing at a smaller scale — not a different treatment
+                      wearing the same words. */}
+                  <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
                     {i + 1}. {step.label}
                   </p>
                   <p className="leading-relaxed text-muted-foreground">
