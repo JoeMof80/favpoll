@@ -53,7 +53,7 @@ import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
   DisplayStill,
   DISPLAY_STILL_WIDTH,
-  DISPLAY_STILL_GUTTER_WIDTH,
+  DISPLAY_STILL_ROOM,
 } from "@/components/landing/display-still"
 import { DEMO_SCENE, DEMO_QR_URL } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
@@ -61,7 +61,9 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 /** The still's own width plus TvFrame's 20px bezel each side. */
 const NATURAL_W = DISPLAY_STILL_WIDTH + 40
-const NATURAL_W_GUTTERS = DISPLAY_STILL_GUTTER_WIDTH + 40
+/** Room mode is 16:9 plus the same bezel on all four sides. */
+const NATURAL_W_ROOM = DISPLAY_STILL_ROOM.w + 40
+const NATURAL_H_ROOM = DISPLAY_STILL_ROOM.h + 40
 
 /**
  * The still's measured height, used ONLY to hold the space open before it
@@ -129,9 +131,9 @@ function sceneAfter(base: HeroScene, n: number): HeroScene {
 export function LiveVignette({
   scene: base = DEMO_SCENE,
   still = false,
-  gutters = false,
-}: { scene?: HeroScene; still?: boolean; gutters?: boolean } = {}) {
-  const naturalW = gutters ? NATURAL_W_GUTTERS : NATURAL_W
+  room = false,
+}: { scene?: HeroScene; still?: boolean; room?: boolean } = {}) {
+  const naturalW = room ? NATURAL_W_ROOM : NATURAL_W
   const scenes = useMemo(
     () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
     [base]
@@ -204,7 +206,13 @@ export function LiveVignette({
             // rendered at 122px and the page jumped once on every load —
             // measured. A ratio holds the space from first paint, and the
             // real height replaces the fallback as soon as there is one.
-            aspectRatio: `${naturalW} / ${naturalH || FALLBACK_H}`,
+            // Room mode DECLARES its height, so the ratio is known from the
+            // first paint and the measured fallback never runs — that path
+            // exists for the content-sized still, whose height cannot be
+            // known before it mounts.
+            aspectRatio: `${naturalW} / ${
+              room ? NATURAL_H_ROOM : naturalH || FALLBACK_H
+            }`,
           }}
         >
           <div
@@ -224,7 +232,7 @@ export function LiveVignette({
                   // The count it ends on, so the card is its final size from
                   // the first frame and nothing below it moves as names land.
                   wallReserveRows={3 + LAST}
-                  gutters={gutters}
+                  room={room}
                 />
               )}
             </TvFrame>

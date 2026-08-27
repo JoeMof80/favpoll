@@ -2,6 +2,7 @@
 
 import { DisplayScreen } from "@/components/display-screen"
 import { sceneFavourites } from "@/components/hero-demo-panel/scene-favourites"
+import { DISPLAY_ROOM } from "@/lib/display"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 // The live display as the closing beat of the guest arc — the REAL component,
@@ -34,18 +35,27 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 export const DISPLAY_STILL_WIDTH = 1120
 
 /**
- * The width a still needs before the display HAS gutters (founder,
- * 2026-08-27). The card is max-w-6xl — 72rem, 1152px — so at 1120 it fills
- * the frame edge to edge and there is no tinted margin for a QR to sit in.
- * 1600 is where the real display starts showing them: gutter = (1600-1152)/2
- * = 224, which clears the 200px code. Below that the product itself keeps the
- * in-banner QR instead, so a narrower "with gutters" still would be depicting
- * a screen that does not exist.
+ * The still as a SCREEN IN A ROOM, rather than as a picture of its content
+ * (founder, 2026-08-27: "display too wide (or too short) ... Why don't we
+ * make it an exact match of the real thing including the logo?").
  *
- * It costs legibility, and the trade is real: the same frame renders 1600
- * where it rendered 1120, so everything on the screen comes out ~30% smaller.
+ * 1600 WIDE, because that is where the real display has gutters at all: the
+ * card is max-w-6xl — 72rem, 1152px — so a 1120 still fills its frame edge to
+ * edge with no tinted margin for a code to sit in. At 1600 the gutter is
+ * (1600-1152)/2 = 224, which clears the 200px code. Below that the product
+ * itself keeps the in-banner QR, so a narrower "with gutters" still would
+ * depict a screen that does not exist.
+ *
+ * 900 TALL, and the height is the half that was missing. Gutters alone made
+ * the artefact 1640 x 700 — 2.35:1, a letterbox — because the box was still
+ * sized by its CONTENT while the width had grown by 480px of gutter. A screen
+ * is not content-shaped. 16:9 is, so the height is declared and the card
+ * fills it, exactly as `min-h-screen` fills a projector.
+ *
+ * It costs ~27% of the on-screen type against the 1120 still, the extra width
+ * being pure gutter.
  */
-export const DISPLAY_STILL_GUTTER_WIDTH = 1600
+export const DISPLAY_STILL_ROOM = DISPLAY_ROOM
 
 /**
  * Leaders shown. The real display lists every favourite, including the ones
@@ -85,7 +95,7 @@ export function DisplayStill({
   qrUrl,
   wallNames = WALL_NAMES,
   wallReserveRows,
-  gutters = false,
+  room = false,
 }: {
   scene: HeroScene
   qrUrl: string
@@ -102,11 +112,10 @@ export function DisplayStill({
    */
   wallReserveRows?: number
   /**
-   * Show the display's gutter QR pair, as a projector in a room shows them.
-   * The caller must render at DISPLAY_STILL_GUTTER_WIDTH for the gutters to
-   * exist — this only asks for the codes, it cannot make room for them.
+   * Render as a screen in a room — 16:9, the brand mark in the corner, the
+   * gutter QR pair — rather than as a picture of the display's content.
    */
-  gutters?: boolean
+  room?: boolean
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -125,9 +134,11 @@ export function DisplayStill({
 
   return (
     <div
-      style={{
-        width: gutters ? DISPLAY_STILL_GUTTER_WIDTH : DISPLAY_STILL_WIDTH,
-      }}
+      style={
+        room
+          ? { width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }
+          : { width: DISPLAY_STILL_WIDTH }
+      }
     >
       <DisplayScreen
         live={false}
@@ -178,7 +189,7 @@ export function DisplayStill({
         // "memorial" -> "remembering"), so the scene's kind decides it and the
         // celebration and cause stills keep the louder variant they want.
         defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
-        gutters={gutters}
+        room={room}
       />
     </div>
   )
