@@ -30,12 +30,23 @@ import type { Charity } from "@favpoll/types"
 
 const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 
-// Colour is picked because it is the SCENE's topic: the hero's phone, the
-// printed pack and the standings two columns to the right are all Belinda's
-// favourite colour, so the pill that is lit is the favpoll the rest of the
-// page is about.
-const TOPICS = ["Colour", "Song", "Flower", "Dog breed", "Film", "Comfort food"]
-const PICKED = "Colour"
+// FAVOURITES, NOT TOPICS (founder, 2026-08-27). The beat is the GUEST
+// picking, not the organiser choosing what the poll is about — the same
+// correction the home page's own How It Works made when it reframed itself
+// as one guest journey ("numbering all six would mix two actors in one
+// list"). Topic pills illustrated the organiser's move and so contradicted
+// the words beside them.
+//
+// The scene's own six colours, and BLUE picked — the scene's selectedIndex,
+// and deliberately not Purple: purple is Belinda's answer, and showing the
+// guest land on it would give the reveal away two columns before the
+// standings do.
+//
+// Colours are the memorial scene's topic. /celebrations and /fundraisers
+// borrow them for now; the component takes a per-step media override, so
+// each can pass its own when its turn in the rework comes.
+const TOPICS = MEMORIAL_SCENE.results.map((r) => r.label)
+const PICKED = "Blue"
 
 export function PickHint() {
   return (
