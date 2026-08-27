@@ -46,9 +46,15 @@ const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 // Colours are the memorial scene's topic. /celebrations and /fundraisers
 // borrow them for now; the component takes a per-step media override, so
 // each can pass its own when its turn in the rework comes.
-// The TOPIC's favourites rather than the six that have results — the
-// topic carries thirteen, and the column has room for more than six.
-const TOPICS = MEMORIAL_SCENE.poll.topic.favourites.map((f) => f.label)
+// The TOPIC's favourites rather than the six that have results, but not
+// all thirteen: at two pills a row that was seven rows against four lines
+// of text, and the cell read as a tall narrow list rather than a hint.
+// Ten, in compact pills that fit three a row — and the first ten
+// alphabetically happen to include Purple, Blue and Red, the three the
+// standings show two columns along.
+const TOPICS = MEMORIAL_SCENE.poll.topic.favourites
+  .slice(0, 10)
+  .map((f) => f.label)
 const PICKED = "Blue"
 
 export function PickHint() {
@@ -61,7 +67,7 @@ export function PickHint() {
           tabIndex={-1}
           variant={t === PICKED ? "default" : "outline"}
           size="sm"
-          className="pointer-events-none rounded-full text-xs"
+          className="pointer-events-none h-6 rounded-full px-2.5 text-[11px]"
         >
           {t}
         </Button>
@@ -97,8 +103,14 @@ export function PledgeHint() {
           the money went; this says how it splits (founder, 2026-08-27). */}
       <PledgeBreakdown
         lines={[
-          { label: `To ${CHARITY.name}`, amount: 18 },
-          { label: "Shared fund", amount: 2 },
+          { label: `To ${CHARITY.name}`, amount: PICKED_AMOUNT },
+          // £0, deliberately (founder, 2026-08-27). A non-zero shared-fund
+          // line reads as money diverted AWAY from the charity, directly
+          // against the sentence beside it — "Every penny goes to the
+          // chosen charity" — and against the 0% promise. The line still
+          // earns its place at zero: it shows the split exists without
+          // showing it taking anything.
+          { label: "Shared fund", amount: 0 },
         ]}
         total={{ label: "Total charged", amount: PICKED_AMOUNT }}
       />
