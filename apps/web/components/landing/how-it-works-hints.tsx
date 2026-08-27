@@ -5,6 +5,7 @@
 
 import { Button } from "@/components/ui/button"
 import { CharityRow } from "@/components/charity-row"
+import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import type { Charity } from "@favpoll/types"
@@ -45,7 +46,9 @@ const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 // Colours are the memorial scene's topic. /celebrations and /fundraisers
 // borrow them for now; the component takes a per-step media override, so
 // each can pass its own when its turn in the rework comes.
-const TOPICS = MEMORIAL_SCENE.results.map((r) => r.label)
+// The TOPIC's favourites rather than the six that have results — the
+// topic carries thirteen, and the column has room for more than six.
+const TOPICS = MEMORIAL_SCENE.poll.topic.favourites.map((f) => f.label)
 const PICKED = "Blue"
 
 export function PickHint() {
@@ -88,9 +91,17 @@ export function PledgeHint() {
           </Button>
         ))}
       </div>
-      <div className="border-t border-border pt-3">
-        <CharityRow charity={CHARITY} amountRaised={PICKED_AMOUNT} size="sm" />
-      </div>
+      {/* The REAL PledgeBreakdown — the itemised bill a guest sees before
+          confirming, with the same line/total grammar and the same labels
+          ("To <charity>", "Total charged"). A charity row alone said where
+          the money went; this says how it splits (founder, 2026-08-27). */}
+      <PledgeBreakdown
+        lines={[
+          { label: `To ${CHARITY.name}`, amount: 18 },
+          { label: "Shared fund", amount: 2 },
+        ]}
+        total={{ label: "Total charged", amount: PICKED_AMOUNT }}
+      />
     </div>
   )
 }
