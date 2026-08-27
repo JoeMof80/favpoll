@@ -98,22 +98,19 @@ export function PledgeHint() {
           </Button>
         ))}
       </div>
-      {/* The favourite and its worth, the way StepAmount shows it — a
-          small uppercase label over a label/amount row, above the bill
-          rather than inside it. In the bill it would double-count against
-          "To Marie Curie"; the real step keeps them separate for the same
-          reason. Blue, because that is the pill lit one column to the
-          left: one guest, three beats. */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-          Your favourite · its worth
-        </p>
-        <div className="flex justify-between">
-          <span className="text-sm">{PICKED}</span>
-          <span className="text-sm font-semibold tabular-nums">
-            {formatPoundsExact(PICKED_AMOUNT)}
-          </span>
-        </div>
+      {/* The favourite row, as StepAmount lays it out — above the bill
+          rather than inside it, where it would double-count against "To
+          Marie Curie". WITHOUT the real step's "Your favourite · its
+          worth" label (founder, 2026-08-27): it wrapped to two lines at
+          this width and the cell got too tall, and the row is legible
+          without it — a colour and an amount over an itemised bill reads
+          as what was picked. Blue, because that is the pill lit one column
+          to the left. */}
+      <div className="flex justify-between">
+        <span className="text-sm">{PICKED}</span>
+        <span className="text-sm font-semibold tabular-nums">
+          {formatPoundsExact(PICKED_AMOUNT)}
+        </span>
       </div>
       {/* The REAL PledgeBreakdown — the itemised bill a guest sees before
           confirming, with the same line/total grammar and the same labels
