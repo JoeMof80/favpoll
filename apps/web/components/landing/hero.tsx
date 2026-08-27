@@ -398,26 +398,44 @@ export function LandingHero({
                 asChild
                 size="lg"
                 variant="secondary"
-                className="h-11 px-6 text-base"
+                // WRAPPING, WHICH TAKES FOUR CLASSES, NOT ONE (2026-08-27).
+                // The register labels were 25-28 characters and carrying the
+                // promise makes the longest 42 — a 356px button inside a
+                // 272px content column on a 320px phone. Measured: the page
+                // went sideways on all three registers.
+                //
+                // whitespace-normal alone did nothing, and the reason is worth
+                // recording: Button is `shrink-0`, so a flex item that is
+                // allowed to wrap still never gets narrow enough to. `shrink`
+                // restores flex-shrink:1. And the label is TWO flex items —
+                // the head as an anonymous one, withQuietTail's span as the
+                // other — so without flex-wrap they stay side by side and each
+                // wraps internally into a pair of narrow columns. flex-wrap
+                // drops the quiet tail to its own line instead. h-auto with
+                // min-h-11 lets the button grow for it while keeping the 44px
+                // tap target at every width that still fits one line, which is
+                // 390 up.
+                className="h-auto min-h-11 shrink flex-wrap px-6 py-2 text-base whitespace-normal"
               >
                 <Link href="/favpolls/new">
                   {withQuietTail(ctaLabel ?? t("landing.cta.primaryFree"))}
                 </Link>
               </Button>
-              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT (founder, 2026-08-18).
-                  Home's button now says "always free" itself, so a caption
-                  beside it would state the same fact twice in one row. The
-                  register pages keep it: their labels are already 28
-                  characters ("Create a celebration favpoll") and appending the
-                  promise makes 41, which is no longer a button.
-
-                  It stays BESIDE, never beneath (measured 2026-08-06,
-                  re-measured 08-18). Below costs ~16px, the LEFT column sets
-                  the hero's height, and the hero is already 1px past the fold
-                  at 1280x800 — which is the fit #524 worked for. "Free to
-                  create" only: the short form is the one that doesn't wrap at
-                  390. */}
-              {ctaLabel && (
+              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT — now keyed on the
+                  LABEL rather than on which page it is (founder, 2026-08-27:
+                  "'free to create' should be part of the button like the
+                  homepage").
+                  Home has said "always free" inside its button since
+                  2026-08-18; the register pages kept a caption beside theirs
+                  because appending the promise to a 28-character label makes
+                  42, and 42 characters was judged not a button. It fits: the
+                  tail sets in withQuietTail's smaller, quieter type, and the
+                  row already flex-wraps, so the longest of the three measures
+                  well inside a 390px phone.
+                  A label carrying a quiet tail says it itself, so a caption
+                  beside it would state the same fact twice in one row. Any
+                  future label without one still gets the caption. */}
+              {ctaLabel && !ctaLabel.includes(" — ") && (
                 <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
               )}
             </div>

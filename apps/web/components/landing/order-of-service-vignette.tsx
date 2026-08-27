@@ -138,6 +138,13 @@ export function OrderOfServiceVignette() {
               halves of that matter. The frame is what marks it as an insert
               rather than a stray paragraph of the page — the family's printer
               set a box, the way a donations panel has always been a box. And
+              NO SHADOW ON IT (founder, 2026-08-27). One was added when the
+              PAPER needed one and it landed on the wrong element: printed
+              ink does not float above the page it is printed on, so a lifted
+              panel says "sticker" — which is the very reading the label
+              template was dropped for. The sheet keeps its drop shadow; the
+              block is part of the sheet.
+
               the corner is where it belongs: this is the page's smallest
               possible ask, tucked out of the way of the service, not a panel
               taking the middle of the sheet. It was centred and half the page
@@ -146,7 +153,7 @@ export function OrderOfServiceVignette() {
               Anchored bottom-right so it holds the corner the mask leaves
               crisp — the artefact's subject sits in the one region that is
               unambiguously a page corner. */}
-            <div className="absolute right-8 bottom-8 w-[152px] rounded-md border border-border px-3 pt-2.5 pb-3 text-center shadow-md">
+            <div className="absolute right-8 bottom-8 w-[152px] rounded-md border border-border px-3 pt-2.5 pb-3 text-center">
               <p className="text-[8px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
                 {PREFIX}
               </p>
