@@ -66,7 +66,7 @@ export function HowItWorksSteps({
         <SectionEyebrow as="h2" className="mb-10">
           {title}
         </SectionEyebrow>
-        <ol className="grid gap-10 lg:grid-cols-3">
+        <ol className="grid gap-10 lg:grid-cols-3 lg:gap-x-16">
           {steps.map((step, i) => (
             /* A SECOND COLUMN PER BEAT (founder, 2026-08-27): the words
                on the left, the hint beside them. minmax(0,1fr) on the text
@@ -98,7 +98,7 @@ export function HowItWorksSteps({
                     own body (founder, 2026-08-27), not spanning above both.
                     Spanning, the rule beside the hint began below it and the
                     label floated free of the pair it heads. */}
-                <div className="min-w-0 xl:pr-6">
+                <div className="min-w-0 xl:pr-2">
                   {/* The home page's beat-label style, to the class:
                       text-sm font-medium tracking-widest text-primary
                       uppercase. This band is meant to read as a miniature
@@ -112,14 +112,36 @@ export function HowItWorksSteps({
                     {step.body}
                   </p>
                 </div>
-                {/* NO RULE HERE any more — see the note on the <li>. The
-                    padding stays: it is what keeps the hint off the prose
-                    once the two sit side by side at xl.
+                {/* SPACING, NOT A RULE, IS WHAT GROUPS THESE (founder,
+                    2026-08-27: "it all looks slightly cramped").
+                    Measured: the gap INSIDE a beat was 48px and the gap
+                    BETWEEN beats 40px — each beat's two halves spaced further
+                    apart than neighbouring beats are. So the eye never bound
+                    the prose to its own hint and the band read as six evenly
+                    spaced columns rather than three pairs. That is the whole
+                    of the cramped feeling, and it is why a rule seemed to
+                    help: it was standing in for spacing that was inverted.
+                    Now 16 inside against 64 between — 1:4. The precedent is
+                    the hero CTA caption, whose note records the same failure
+                    and the same threshold: "at 10 against 14 the pair did not
+                    read as a pair, it read as three things evenly spaced."
+
+                    THE NUMBERS WERE SEARCHED, not picked. Five combinations
+                    were measured against two things at once: how strong the
+                    ratio is, and whether the longest body still sets four
+                    lines. 32/64 gave 1:2 but cost the prose 8px and pushed
+                    beat one to five, breaking it as "but they can /
+                    participate without / one."; 48 between fixed the lines
+                    and gave back only 1:1.5, under the threshold above.
+                    Taking the width out of the INSIDE gap instead is what
+                    won: it strengthens the grouping and pays for itself, so
+                    the prose is back to its original 181px at four lines
+                    everywhere.
                     The comment lives OUTSIDE the && : a JSX comment beside
                     an element inside one expression is two roots, which is
                     a parse error tsc does not catch. Third time tonight. */}
                 {(step.media ?? DEFAULT_MEDIA[i]) && (
-                  <div className="w-48 shrink-0 pt-5 xl:pt-0 xl:pl-6">
+                  <div className="w-48 shrink-0 pt-5 xl:pt-0 xl:pl-2">
                     {step.media ?? DEFAULT_MEDIA[i]}
                   </div>
                 )}

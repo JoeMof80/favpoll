@@ -47,10 +47,15 @@ const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 // Colours are the memorial scene's topic. /celebrations and /fundraisers
 // borrow them for now; the component takes a per-step media override, so
 // each can pass its own when its turn in the rework comes.
-// Eight of the topic's thirteen. The hint column is 192px and a pill at
-// text-xs is ~90px, so TWO fit a row whatever the count — the only lever
-// on height is how many there are. Thirteen was seven rows against four
-// lines of text; ten was five. Eight is four, level with the text.
+// Eight of the topic's thirteen. Thirteen ran seven rows against four
+// lines of text; ten was five; eight is level with it.
+//
+// THREE TO A ROW SINCE 2026-08-27, not two. This note used to say two fit
+// "whatever the count", which was true at the column's old 168px of content
+// and stopped being true when the band's inside gap was cut to buy the prose
+// its width back: 184px takes three of these short labels, so eight is three
+// rows rather than four. Still level with four lines of text, by luck rather
+// than design — a topic with longer labels would drop back to two.
 //
 // Chosen rather than sliced, because a contiguous slice cannot hold all
 // three colours the rest of the band depends on: Blue is the pill lit
