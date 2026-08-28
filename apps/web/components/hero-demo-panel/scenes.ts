@@ -266,7 +266,7 @@ export const SCENES: HeroScene[] = [
       name: "Alex & Jordan",
       context: "12th September",
       about:
-        "Alex and Jordan would rather you gave to Barnardo's than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
+        "Alex and Jordan would rather you gave to WWF than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
       photo_url: "/demo/alex-jordan.jpg",
     },
     poll: {
@@ -291,7 +291,20 @@ export const SCENES: HeroScene[] = [
       //
       // First person and plural, the couple writing it in advance — the voice
       // the brand guide calls the most powerful version.
-      personal_reveal: "Ours is Japan. We fly on Tuesday for the honeymoon.",
+      // THE REVEAL RETRO-EXPLAINS THE CHARITY (founder, 2026-08-28), which is
+      // the best thing about this exemplar. Reading down the card, WWF is
+      // just a charity someone picked. Then the reveal says Chengdu and
+      // pandas, and you understand WHY — the charity was never arbitrary,
+      // you simply could not see the reason until you had unlocked it.
+      //
+      // That is the wizard's own charity guidance made visible: "pick one
+      // that means something here." A demo where the charity is incidental
+      // teaches the opposite.
+      //
+      // "will be", not "is": the topic asks for a favourite holiday
+      // destination and they have not been yet.
+      personal_reveal:
+        "Ours will be Chengdu. We fly on Tuesday, to see the pandas.",
       topic: {
         title: "Holiday destination",
         favourites: [
@@ -299,10 +312,12 @@ export const SCENES: HeroScene[] = [
           { id: "hd-amsterdam", label: "Amsterdam" },
           { id: "hd-bali", label: "Bali" },
           { id: "hd-barcelona", label: "Barcelona" },
+          { id: "hd-chengdu", label: "Chengdu" },
           { id: "hd-cornwall", label: "Cornwall" },
           { id: "hd-croatia", label: "Croatia" },
           { id: "hd-cyprus", label: "Cyprus" },
           { id: "hd-edinburgh", label: "Edinburgh" },
+          { id: "hd-greece", label: "Greece" },
           { id: "hd-iceland", label: "Iceland" },
           { id: "hd-ireland", label: "Ireland" },
           { id: "hd-italy", label: "Italy" },
@@ -328,27 +343,38 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        id: "ch-barnardos",
-        name: "Barnardo's",
+        id: "ch-wwf",
+        name: "WWF-UK",
         logo_url: null,
-        registered_number: "216250",
+        registered_number: "1081247",
       },
     ],
-    selectedIndex: 11,
+    selectedIndex: 4,
     pledgeAmount: "£20",
-    // The room picked Italy; the couple are going to Japan. Second place is
-    // not a verdict here, because they were never answering the same
-    // question — the guests said where they love, the couple said where they
-    // are GOING.
+    // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
+    // realistic"). The old set ran 210/175/130/95/60/35 — a near-arithmetic
+    // sequence, every gap 25 to 45, which is what authored numbers look like
+    // and not what forty people pledging 5s, 10s and 20s look like. Real
+    // standings are top-heavy and irregular.
+    //
+    // Chengdu sits LAST, on £30. A couple of guests happened to name it —
+    // enough that it is on the board, nowhere near enough to be the room's
+    // answer. That is truer than either extreme: absent, and the reveal has
+    // nothing to land against; high, and it stops being a surprise.
+    //
+    // The total is the sum of these six. It has to be: sceneFavourites
+    // derives the live display's total from `results`, so a scene whose
+    // `total` said anything else would show one number on the phone and a
+    // different one on the screen.
     results: [
-      { label: "Italy", amount: "£210", widthPercent: 100 },
-      { label: "Japan", amount: "£175", widthPercent: 83 },
-      { label: "Iceland", amount: "£130", widthPercent: 62 },
-      { label: "New York", amount: "£95", widthPercent: 45 },
-      { label: "Cornwall", amount: "£60", widthPercent: 29 },
-      { label: "Vietnam", amount: "£35", widthPercent: 17 },
+      { label: "Italy", amount: "£185", widthPercent: 100 },
+      { label: "Greece", amount: "£140", widthPercent: 76 },
+      { label: "Japan", amount: "£110", widthPercent: 59 },
+      { label: "New York", amount: "£75", widthPercent: 41 },
+      { label: "Cornwall", amount: "£55", widthPercent: 30 },
+      { label: "Chengdu", amount: "£30", widthPercent: 16 },
     ],
-    total: "£705",
+    total: "£595",
   },
   {
     // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —

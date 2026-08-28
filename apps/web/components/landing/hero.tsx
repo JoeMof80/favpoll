@@ -138,10 +138,9 @@ const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
 // /celebrations showed Poppy's ice cream and Great Ormond Street. Same total,
 // different everything else.
 //
-// The wedding scene was authored to the card's own cake poll, so the two now
-// agree by construction rather than by anyone remembering. The one visible
-// change is the "+N more" count, which was 6 against a topic that carries 18
-// favourites.
+// Derived, the card follows the scene wherever it goes — which it promptly
+// did, twice in a day: cake became holiday destinations, and Barnardo's
+// became WWF. Neither needed an edit here, which is the point.
 const WEDDING_SCENE =
   SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
 const WEDDING_RESULTS = WEDDING_SCENE.results.slice(0, 3)

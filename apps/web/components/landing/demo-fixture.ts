@@ -54,7 +54,7 @@ export const MEMORIAL_SCENE =
 
 /**
  * The celebration register's exemplar (founder, 2026-08-28) — Sarah & Tom's
- * wedding, favourite cake, Barnardo's.
+ * wedding, favourite holiday destination, WWF-UK.
  *
  * Found by OCCASION TYPE, not by kind: there are two celebration scenes now,
  * and `find(kind === "celebration")` returns whichever comes first in SCENES.
@@ -112,7 +112,7 @@ export const MEMORIAL_PACK_DATA: PackData = {
 
 export const MEMORIAL_PACK_STEPS = buildPackSteps(MEMORIAL_PACK_DATA)
 
-/** The same pack for the WEDDING scene — Sarah & Tom, cake, Barnardo's. */
+/** The same pack for the WEDDING scene — Alex & Jordan, destinations, WWF. */
 const WEDDING_HEADLINE = getFavpollHeadline({
   occasionType: WEDDING_SCENE.occasion_type,
   name: WEDDING_SCENE.protagonist?.name ?? "",
