@@ -10,6 +10,8 @@ import { formatPoundsExact } from "@/lib/i18n"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import type { Charity } from "@favpoll/types"
+import type { HeroScene } from "@/components/hero-demo-panel/scenes"
+import { cardFeeFor } from "@/lib/card-fee"
 
 // A HINT OF EACH BEAT (founder, 2026-08-27), built from the app's own
 // Button, CharityRow and RankingBar — so a hint cannot show a control the
@@ -29,8 +31,6 @@ import type { Charity } from "@favpoll/types"
 // something says where the money goes, and a ranked list is a leaderboard
 // until the same. Marie Curie is the memorial scene's own charity, so these
 // agree with the phone in the hero and the pack below it.
-
-const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 
 // FAVOURITES, NOT TOPICS (founder, 2026-08-27). The beat is the GUEST
 // picking, not the organiser choosing what the poll is about — the same
@@ -62,7 +62,7 @@ const CHARITY = MEMORIAL_SCENE.charities[0] as Charity
 // here, and Purple, Blue and Red are the standings two columns along.
 // Filtered from the topic so the labels stay the product's own, in the
 // order the real picker shows them.
-const SHOWN = new Set([
+const MEMORIAL_SHOWN = [
   "Black",
   "Blue",
   "Green",
@@ -71,16 +71,45 @@ const SHOWN = new Set([
   "Purple",
   "Red",
   "Yellow",
-])
-const TOPICS = MEMORIAL_SCENE.poll.topic.favourites
-  .map((f) => f.label)
-  .filter((l) => SHOWN.has(l))
-const PICKED = "Blue"
+]
 
-export function PickHint() {
+/**
+ * Per-scene hint data. WHICH labels and WHICH is lit cannot be derived —
+ * both are judgement calls the scene does not carry.
+ *
+ * `shown` because a contiguous slice will not do: it has to hold the labels
+ * the rest of the band depends on, and it has to leave OUT the protagonist's
+ * own answer. Alphabetically the wedding's first eight destinations include
+ * Chengdu, which would give the reveal away two columns before the standings
+ * do — the same trap the memorial avoids by omitting Purple.
+ *
+ * `picked` is a GUEST's pick, never the protagonist's. Never
+ * scene.selectedIndex, which points at exactly the answer that must stay
+ * hidden.
+ */
+export type HintScene = {
+  scene: HeroScene
+  shown: string[]
+  picked: string
+}
+
+export const MEMORIAL_HINTS: HintScene = {
+  scene: MEMORIAL_SCENE,
+  shown: MEMORIAL_SHOWN,
+  picked: "Blue",
+}
+
+const labelsFor = ({ scene, shown }: HintScene) =>
+  scene.poll.topic.favourites
+    .map((f) => f.label)
+    .filter((l) => shown.includes(l))
+
+export function PickHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
+  const topics = labelsFor(hints)
+  const PICKED = hints.picked
   return (
     <div className="flex flex-wrap gap-1.5" aria-hidden="true">
-      {TOPICS.map((t) => (
+      {topics.map((t) => (
         <Button
           key={t}
           type="button"
@@ -100,7 +129,14 @@ export function PickHint() {
 const PRESETS = [5, 10, 20, 50]
 const PICKED_AMOUNT = 20
 
-export function PledgeHint() {
+export function PledgeHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
+  const CHARITY = hints.scene.charities[0] as Charity
+  const PICKED = hints.picked
+  // THE CARD FEE, because the real dialog charges one (lib/card-fee) and this
+  // hint claims to be that dialog. It went in on 2026-08-27 and this bill
+  // still said "Total charged £20" against a real total of £20.51 — a hint
+  // showing a total the product would not take.
+  const CARD_FEE = cardFeeFor(PICKED_AMOUNT)
   return (
     <div className="space-y-3" aria-hidden="true">
       <div className="grid grid-cols-4 gap-1.5">
@@ -156,19 +192,28 @@ export function PledgeHint() {
             // earns its place at zero: it shows the split exists without
             // showing it taking anything.
             { label: "Shared fund", amount: 0 },
+            // The guest's, not the charity's and not favpoll's — it goes to
+            // Stripe. Shown here for the same reason the real dialog shows
+            // it: the guest is paying it.
+            { label: "Card fee", amount: CARD_FEE },
           ]}
-          total={{ label: "Total charged", amount: PICKED_AMOUNT }}
+          total={{
+            label: "Total charged",
+            amount: Math.round((PICKED_AMOUNT + CARD_FEE) * 100) / 100,
+          }}
         />
       </div>
     </div>
   )
 }
 
-export function RankHint() {
+export function RankHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
+  const CHARITY = hints.scene.charities[0] as Charity
+  const SCENE = hints.scene
   return (
     <div className="space-y-3" aria-hidden="true">
       <div className="space-y-2">
-        {MEMORIAL_SCENE.results.slice(0, 3).map((r, i) => (
+        {SCENE.results.slice(0, 3).map((r, i) => (
           <RankingBar
             key={r.label}
             label={r.label}
@@ -184,7 +229,7 @@ export function RankHint() {
       <div className="border-t border-border pt-3">
         <CharityRow
           charity={CHARITY}
-          amountRaised={Number(MEMORIAL_SCENE.total.replace(/[^0-9.]/g, ""))}
+          amountRaised={Number(SCENE.total.replace(/[^0-9.]/g, ""))}
           size="sm"
         />
       </div>

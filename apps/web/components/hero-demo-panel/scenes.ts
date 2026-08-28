@@ -227,6 +227,173 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
+    // ── Wedding: the celebration register's exemplar (founder, 2026-08-28).
+    //
+    //    THE BEHAVIOUR ALREADY EXISTS THERE. "Donations in lieu of favours"
+    //    is standard at UK weddings, so favpoll is not introducing giving at
+    //    a life event — it is improving something guests already do badly. A
+    //    card on the table saying "we have donated to X" becomes something
+    //    they take part in. That is a far easier sell than persuading anyone
+    //    to run a game at a teenager's birthday.
+    //
+    //    It also suits the product's constraints better than any other
+    //    celebration: table stationery is native (a tent card at each place
+    //    setting needs no justification), guest counts and budgets are real,
+    //    and the planning horizon is months — which is what the 90-day poll
+    //    and the charity-onboarding window both want.
+    //
+    //    THE REGISTER STAYS BROAD. kind is "celebration" and the page still
+    //    says birthdays, retirements, weddings. A wedding is the best single
+    //    exemplar OF that breadth, not a narrowing of it.
+    //
+    //    celebrating_many, not celebrating_one — "Wedding" is already in that
+    //    register in lib/registers, and getFavpollHeadline already gives it
+    //    "Congratulations to". The couple needed no new modelling; even the
+    //    first-name derivation splits on "&" already.
+    kind: "celebration",
+    occasion_type: "Wedding",
+    opening_line: null,
+    protagonist: {
+      // ALEX & JORDAN, to match the portrait. public/demo/alex-jordan.jpg
+      // arrived in #144 — "protagonist portraits for five of six hero demo
+      // scenes" — and has sat unused ever since: a couple photograph
+      // authored for a couple scene that was never built. Naming them
+      // anything else would leave the asset and the scene disagreeing, which
+      // is the drift this file exists to prevent.
+      //
+      // It reads as a couple without presuming which kind, which a wedding
+      // exemplar should.
+      name: "Alex & Jordan",
+      // "At the boathouse" (founder, 2026-08-28), and short enough not to
+      // wrap — which is why the venue-and-date version went. At phone width
+      // it took two lines, and no binding of the date fixed the fact that a
+      // subtitle taking two lines is a subtitle carrying too much.
+      //
+      // Lowercase, and descriptive rather than a name. That is the better
+      // call for a second reason: the cause scene deliberately keeps St
+      // Luke's "named but not branded" because a real name on a demo card
+      // reads as endorsement. "At the boathouse" is not a venue's name at
+      // all, so the question does not arise.
+      //
+      // The date is gone with it and is not missed. The field is only a
+      // label — Poppy's is "Sweet Sixteen", which is not a date either.
+      context: "At the boathouse",
+      about:
+        "The happy couple have requested donations to the WWF rather than gifts, given their passion for conservation.",
+      photo_url: "/demo/alex-jordan.jpg",
+    },
+    poll: {
+      id: "demo-poll-wedding",
+      // THE HONEYMOON IS THE REVEAL, and it is why this topic beats every
+      // other wedding candidate (founder, 2026-08-28).
+      //
+      // Cake was the first attempt and it failed a test worth naming: NEVER
+      // PICK A TOPIC THAT COLLIDES WITH A CHOICE THE COUPLE HAS ALREADY MADE
+      // AND PUT ON DISPLAY. There is a real cake in the room, chosen and paid
+      // for and often made by family — so inviting guests to pick a different
+      // favourite turns the poll into a referendum on it by proximity, and
+      // the couple's answer placing second reads as a verdict rather than a
+      // joke. Flowers fail the same test; first dance song fails it worst,
+      // because that one actually gets played.
+      //
+      // A honeymoon collides with nothing. Better still, the couple's answer
+      // is not competing with the guests' at all — it is NEWS. That turns the
+      // reveal into something a room genuinely wants to unlock, which is the
+      // withhold/reveal mechanic working at full strength rather than as a
+      // formality. The About withholds it in as many words.
+      //
+      // First person and plural, the couple writing it in advance — the voice
+      // the brand guide calls the most powerful version.
+      // THE REVEAL RETRO-EXPLAINS THE CHARITY (founder, 2026-08-28), which is
+      // the best thing about this exemplar. Reading down the card, WWF is
+      // just a charity someone picked. Then the reveal says Chengdu and
+      // pandas, and you understand WHY — the charity was never arbitrary,
+      // you simply could not see the reason until you had unlocked it.
+      //
+      // That is the wizard's own charity guidance made visible: "pick one
+      // that means something here." A demo where the charity is incidental
+      // teaches the opposite.
+      //
+      // "will hopefully be", not "is" (founder wording, 2026-08-28), and it
+      // solves the tense problem better than the "will be" it replaced. The
+      // topic asks for a favourite holiday destination; they have not been
+      // yet. The hope is not about whether they are GOING — that is booked —
+      // it is about whether Chengdu turns out to be the favourite, which is
+      // the honest answer to the question actually asked.
+      personal_reveal:
+        "Ours will hopefully be Chengdu. We're planning to visit the pandas on our honeymoon.",
+      topic: {
+        title: "Holiday destination",
+        favourites: [
+          { id: "hd-amalfi", label: "Amalfi Coast" },
+          { id: "hd-amsterdam", label: "Amsterdam" },
+          { id: "hd-bali", label: "Bali" },
+          { id: "hd-barcelona", label: "Barcelona" },
+          { id: "hd-chengdu", label: "Chengdu" },
+          { id: "hd-cornwall", label: "Cornwall" },
+          { id: "hd-croatia", label: "Croatia" },
+          { id: "hd-cyprus", label: "Cyprus" },
+          { id: "hd-edinburgh", label: "Edinburgh" },
+          { id: "hd-greece", label: "Greece" },
+          { id: "hd-iceland", label: "Iceland" },
+          { id: "hd-ireland", label: "Ireland" },
+          { id: "hd-italy", label: "Italy" },
+          { id: "hd-japan", label: "Japan" },
+          { id: "hd-lakes", label: "Lake District" },
+          { id: "hd-lisbon", label: "Lisbon" },
+          { id: "hd-maldives", label: "Maldives" },
+          { id: "hd-morocco", label: "Morocco" },
+          { id: "hd-newyork", label: "New York" },
+          { id: "hd-norway", label: "Norway" },
+          { id: "hd-paris", label: "Paris" },
+          { id: "hd-portugal", label: "Portugal" },
+          { id: "hd-santorini", label: "Santorini" },
+          { id: "hd-scotland", label: "Scotland" },
+          { id: "hd-srilanka", label: "Sri Lanka" },
+          { id: "hd-thailand", label: "Thailand" },
+          { id: "hd-tuscany", label: "Tuscany" },
+          { id: "hd-venice", label: "Venice" },
+          { id: "hd-vietnam", label: "Vietnam" },
+          { id: "hd-yorkshire", label: "Yorkshire Dales" },
+        ],
+      },
+    },
+    charities: [
+      {
+        id: "ch-wwf",
+        name: "WWF-UK",
+        logo_url: null,
+        registered_number: "1081247",
+      },
+    ],
+    selectedIndex: 4,
+    pledgeAmount: "£20",
+    // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
+    // realistic"). The old set ran 210/175/130/95/60/35 — a near-arithmetic
+    // sequence, every gap 25 to 45, which is what authored numbers look like
+    // and not what forty people pledging 5s, 10s and 20s look like. Real
+    // standings are top-heavy and irregular.
+    //
+    // Chengdu sits LAST, on £30. A couple of guests happened to name it —
+    // enough that it is on the board, nowhere near enough to be the room's
+    // answer. That is truer than either extreme: absent, and the reveal has
+    // nothing to land against; high, and it stops being a surprise.
+    //
+    // The total is the sum of these six. It has to be: sceneFavourites
+    // derives the live display's total from `results`, so a scene whose
+    // `total` said anything else would show one number on the phone and a
+    // different one on the screen.
+    results: [
+      { label: "Italy", amount: "£185", widthPercent: 100 },
+      { label: "Greece", amount: "£140", widthPercent: 76 },
+      { label: "Japan", amount: "£110", widthPercent: 59 },
+      { label: "New York", amount: "£75", widthPercent: 41 },
+      { label: "Cornwall", amount: "£55", widthPercent: 30 },
+      { label: "Chengdu", amount: "£30", widthPercent: 16 },
+    ],
+    total: "£595",
+  },
+  {
     // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —
     //    so it keeps a protagonist (the runner). Register-wise it derives to
     //    `cause`, but it is nothing like a faceless appeal. ──

@@ -4,11 +4,17 @@ import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { t } from "@/lib/i18n"
+import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // Register landing #3 (see /memorials for the pattern notes; /celebrations
 // for the accent decision). Fundraising wears the success green — ALREADY
 // the product's goal-reached colour, so the accent is semantic, not
 // decorative: this is the register where the goal is the protagonist.
+
+// The shelf below renders live data but the page has no request-dependent
+// APIs, so Next would cache the FIRST render for ever. 60s, matching home.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Fundraisers — favpoll",
@@ -37,7 +43,11 @@ const PRESENCE = [
   t("fundraisers.presence.rally"),
 ]
 
-export default function FundraisersPage() {
+export default async function FundraisersPage() {
+  const live = await fetchLiveFavpolls({
+    registers: REGISTERS_BY_PAGE.fundraisers,
+  })
+
   return (
     <main>
       {/* ── Hero — the REAL landing hero, register-configured (v2):
@@ -55,6 +65,10 @@ export default function FundraisersPage() {
 
       {/* ── How it works, in the rally register ── */}
       <HowItWorksSteps title={t("fundraisers.how.title")} steps={STEPS} />
+
+      {/* No Ideas band on this page yet — it is the register still awaiting
+          its rework — so the shelf sits directly after How It Works. */}
+      <OpenRightNow favpolls={live} />
 
       {/* ── The room: goal + live display ── */}
       <section className="w-full bg-primary/5">

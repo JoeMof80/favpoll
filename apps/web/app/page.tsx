@@ -1,12 +1,10 @@
 import { CapabilityGrid } from "@/components/landing/capability-grid"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
-import { createAdminClient } from "@/lib/supabase/admin"
-import { withLiveTotals } from "@/lib/live-totals"
-import { LiveFavpollsCarousel } from "@/components/live-favpolls-carousel"
+import { fetchLiveFavpolls } from "@/lib/live-favpolls"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { LandingHero } from "@/components/landing/hero"
+import { OpenRightNow } from "@/components/landing/open-right-now"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { RecordFlow } from "@/components/landing/record-flow"
 import { FadeIn } from "@/components/landing/fade-in"
@@ -20,105 +18,12 @@ import { t } from "@/lib/i18n"
 export const revalidate = 60
 
 export default async function HomePage() {
-  const supabase = createAdminClient()
-
-  const { data: favpolls } = await supabase
-    .from("favpolls")
-    .select(
-      `
-      id,
-      opening_line,
-      description,
-      closes_at,
-      occasion_type,
-      total_raised,
-      subject,
-      cause_label,
-      category,
-      protagonist:protagonists ( name, photo_url ),
-      charities:favpoll_charities (
-        charity:charities ( id, name, logo_url, registered_number )
-      ),
-      favpoll_polls (
-        id,
-        topic_id,
-        topics (
-          title,
-          is_finite,
-          favourites ( id, label )
-        ),
-        favpoll_poll_favourites (
-          favourites ( id, label )
-        )
-      )
-    `
-    )
-    .eq("is_private", false)
-    .eq("is_listed", true)
-    .is("closed_at", null)
-    .gt("closes_at", new Date().toISOString())
-    .order("created_at", { ascending: false })
-    .limit(6)
-
-  type RawFavourite = { id: string; label: string }
-  type RawEpf = { favourites: RawFavourite }
-  type RawPoll = {
-    id: string
-    topic_id: string | null
-    topics: {
-      title: string
-      is_finite: boolean
-      favourites: RawFavourite[]
-    } | null
-    favpoll_poll_favourites: RawEpf[]
-  }
-  type RawFavpoll = {
-    id: string
-    opening_line: string
-    description: string | null
-    closes_at: string
-    occasion_type: string | null
-    total_raised: number
-    subject: string | null
-    cause_label: string | null
-    category: string | null
-    protagonist: { name: string; photo_url: string | null } | null // null for cause favpolls
-    charities: { charity: import("@favpoll/types").Charity }[]
-    favpoll_polls: RawPoll | null
-  }
-
-  // Live favpolls carry a settlement total_raised of 0 until close — overlay
-  // the real sums so the carousel cards and the hero's "raised by open
-  // favpolls" stat are live (see lib/live-totals).
-  const withTotals = await withLiveTotals(
-    supabase,
-    (favpolls ?? []) as unknown as RawFavpoll[]
-  )
-
-  const normalised = withTotals.map((ev) => {
-    const rawPoll = ev.favpoll_polls ?? null
-    let poll: {
-      id: string
-      topic_id: string | null
-      topic: { title: string; favourites: RawFavourite[] } | null
-    } | null = null
-    if (rawPoll) {
-      const isFinite = rawPoll.topics?.is_finite ?? false
-      const favourites = isFinite
-        ? (rawPoll.topics?.favourites ?? [])
-        : (rawPoll.favpoll_poll_favourites ?? [])
-            .map((epf) => epf.favourites)
-            .filter(Boolean)
-      poll = {
-        id: rawPoll.id,
-        topic_id: rawPoll.topic_id,
-        topic: rawPoll.topics
-          ? { title: rawPoll.topics.title, favourites }
-          : null,
-      }
-    }
-    return { ...ev, poll }
-  })
+  // The shelf's query lives in lib/live-favpolls now, shared with the three
+  // register pages, which show the same shelf filtered to their own register
+  // (2026-08-28). It was ~90 lines of select, row types and topic
+  // normalisation; four copies would have drifted the first time a column
+  // moved.
+  const normalised = await fetchLiveFavpolls()
 
   const totalLive = normalised.reduce((sum, f) => sum + f.total_raised, 0)
 
@@ -144,23 +49,11 @@ export default async function HomePage() {
           convention wherever the actual product appears; the illustration
           vignettes above keep the fainter bg-primary/5. In dark mode both
           resolve to cards lifted off the purple page. ── */}
-      {normalised.length > 0 && (
-        <section id="live" className="w-full scroll-mt-20 bg-muted">
-          <div className="mx-auto w-full max-w-330 px-6 py-16">
-            <FadeIn>
-              <div className="mb-6 flex items-baseline justify-between">
-                <SectionEyebrow>Open right now</SectionEyebrow>
-                <Button variant="ghost" asChild>
-                  <Link href="/favpolls">See all →</Link>
-                </Button>
-              </div>
-            </FadeIn>
-            <FadeIn>
-              <LiveFavpollsCarousel favpolls={normalised} />
-            </FadeIn>
-          </div>
-        </section>
-      )}
+      {/* minimum={1}, keeping home's own threshold. The component's default
+          of three is for the REGISTER pages, which show a slice that can be
+          thin long after the whole is healthy. Home shows every open favpoll
+          there is, so one is still the truth about the platform. */}
+      <OpenRightNow favpolls={normalised} minimum={1} />
 
       {/* ── The record — three favpolls, one topic, one permanent ranking.
           The vignette acts out the principle line (many polls feed the

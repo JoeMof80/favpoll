@@ -18,7 +18,7 @@ import {
   PHONE_SCALED_BOX,
 } from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
-import type { SceneKind } from "@/components/hero-demo-panel/scenes"
+import type { HeroScene, SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { cn } from "@/lib/utils"
@@ -54,6 +54,16 @@ type Props = {
   /** Register landing v2 (2026-08-03): play ONLY this kind's scenes on a
    *  loop and hide the kind nav — the page IS the kind. Home omits it. */
   sceneKind?: SceneKind
+  /**
+   * Play exactly THIS scene, rather than every scene of a kind.
+   *
+   * Needed the moment a register gained a second scene (2026-08-28):
+   * /celebrations has both Poppy's birthday and Alex & Jordan's wedding, and
+   * `sceneKind` filters to BOTH — so useDemoLoop would cycle them, which a
+   * page asking for `still` plainly does not want. One scene in, nothing to
+   * cycle to.
+   */
+  scene?: HeroScene
   /** Copy overrides — literal strings (t() stays statically typed at the
    *  call site). Defaults = the home landing's keys. */
   headline?: string
@@ -116,11 +126,25 @@ type Props = {
 // the homepage through every object on the page; a flower poll here broke
 // it at the first click.
 //
-// The other two cards are still literals. They have scenes too and could
-// drift the same way — unchecked.
+// The FUNDRAISER card is still a literal. It has a scene too and could drift
+// the same way — unchecked.
 const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 const MEMORIAL_RESULTS = MEMORIAL_SCENE.results.slice(0, 3)
 const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
+
+// DERIVED NOW, like the memorial above (2026-08-28). The comment below used
+// to end "The other two cards are still literals... unchecked" — and the
+// celebration one had indeed drifted: it showed cake and Barnardo's while
+// /celebrations showed Poppy's ice cream and Great Ormond Street. Same total,
+// different everything else.
+//
+// Derived, the card follows the scene wherever it goes — which it promptly
+// did, twice in a day: cake became holiday destinations, and Barnardo's
+// became WWF. Neither needed an edit here, which is the point.
+const WEDDING_SCENE =
+  SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
+const WEDDING_RESULTS = WEDDING_SCENE.results.slice(0, 3)
+const WEDDING_TOPIC = WEDDING_SCENE.poll.topic.title.toLowerCase()
 
 const ROUTER_CARDS = [
   {
@@ -144,15 +168,11 @@ const ROUTER_CARDS = [
     bar: "bg-warning-on-band",
     title: t("home.router.celebrations.title"),
     body: t("home.router.celebrations.body"),
-    topic: "cake",
-    more: "+6 more cakes",
-    charity: "Barnardo's",
-    total: "£705",
-    results: [
-      { label: "Victoria sponge", amount: "£210", widthPercent: 100 },
-      { label: "Lemon drizzle", amount: "£175", widthPercent: 83 },
-      { label: "Carrot cake", amount: "£130", widthPercent: 62 },
-    ],
+    topic: WEDDING_TOPIC,
+    more: `+${WEDDING_SCENE.poll.topic.favourites.length - WEDDING_RESULTS.length} more ${WEDDING_TOPIC}s`,
+    charity: WEDDING_SCENE.charities[0]?.name ?? "",
+    total: WEDDING_SCENE.total,
+    results: WEDDING_RESULTS,
   },
   {
     kind: "fundraiser" as const,
@@ -207,6 +227,7 @@ export function LandingHero({
   hideStats = false,
   eyebrow,
   sceneKind,
+  scene: sceneOverride,
   headline,
   subheader,
   ctaLabel,
@@ -219,8 +240,13 @@ export function LandingHero({
   children,
 }: Props) {
   const scenes = useMemo(
-    () => (sceneKind ? SCENES.filter((s) => s.kind === sceneKind) : SCENES),
-    [sceneKind]
+    () =>
+      sceneOverride
+        ? [sceneOverride]
+        : sceneKind
+          ? SCENES.filter((s) => s.kind === sceneKind)
+          : SCENES,
+    [sceneKind, sceneOverride]
   )
   const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
     useDemoLoop(scenes)

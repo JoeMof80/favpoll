@@ -1,5 +1,6 @@
 "use client"
 
+import { protagonistShortName } from "@/lib/display"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
 import { RankingBar } from "@/components/ui/ranking-bar"
@@ -79,7 +80,7 @@ export function PollSection({
     onViewChange,
   })
 
-  const personFirstName = protagonistName.split(/[\s&]+/)[0]
+  const personFirstName = protagonistShortName(protagonistName)
   // Causes get no possessive at all: "Winter Appeal for the Trussell
   // Trust's favourite" overflowed the pill AND reads wrong — a cause's
   // reveal is "our pick", not a personal favourite (found on-device,

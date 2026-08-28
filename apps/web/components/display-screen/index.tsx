@@ -8,6 +8,7 @@ import {
   roomTypeScale,
   roomTypeScaleAtWidth,
   DISPLAY_ROOM,
+  protagonistShortName,
 } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
@@ -662,7 +663,7 @@ export function DisplayScreen({
                 justClosed={localClosed && wasOpenAtMount}
                 protagonistFirstName={
                   avatar
-                    ? protagonistName.split(/[\s&]+/)[0]
+                    ? protagonistShortName(protagonistName)
                     : protagonistName || null
                 }
               />

@@ -52,6 +52,19 @@ const DEMO_HEADLINE = getFavpollHeadline({
 export const MEMORIAL_SCENE =
   SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 
+/**
+ * The celebration register's exemplar (founder, 2026-08-28) — Alex & Jordan's
+ * wedding, favourite holiday destination, WWF-UK.
+ *
+ * Found by OCCASION TYPE, not by kind: there are two celebration scenes now,
+ * and `find(kind === "celebration")` returns whichever comes first in SCENES.
+ * DEMO_SCENE above deliberately still resolves to Poppy's birthday, because
+ * the home walkthrough and /features run on it and this change is scoped to
+ * the register page.
+ */
+export const WEDDING_SCENE =
+  SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
+
 export const DEMO_QR_URL = "https://favpoll.com/p/a1b2c3d4e5f6"
 
 export const DEMO_PACK_DATA: PackData = {
@@ -98,6 +111,26 @@ export const MEMORIAL_PACK_DATA: PackData = {
 }
 
 export const MEMORIAL_PACK_STEPS = buildPackSteps(MEMORIAL_PACK_DATA)
+
+/** The same pack for the WEDDING scene — Alex & Jordan, destinations, WWF. */
+const WEDDING_HEADLINE = getFavpollHeadline({
+  occasionType: WEDDING_SCENE.occasion_type,
+  name: WEDDING_SCENE.protagonist?.name ?? "",
+  subject: "someone",
+  openingLine: WEDDING_SCENE.opening_line,
+})
+
+export const WEDDING_PACK_DATA: PackData = {
+  prefix: WEDDING_HEADLINE.prefix,
+  name: WEDDING_HEADLINE.name,
+  isCause: false,
+  topicTitle: WEDDING_SCENE.poll.topic.title,
+  hasReveal: !!WEDDING_SCENE.poll.personal_reveal,
+  charityNames: WEDDING_SCENE.charities.map((c) => c.name),
+  qrUrl: DEMO_QR_URL,
+}
+
+export const WEDDING_PACK_STEPS = buildPackSteps(WEDDING_PACK_DATA)
 
 // The keepsake the features page depicts — built from the MEMORIAL scene,
 // not the cause one the rest of the page uses, for the reveal vignette's
@@ -157,6 +190,29 @@ export const DEMO_KEEPSAKE_DATA: KeepsakeData = {
   standings: MEMORIAL_SCENE.results.map((r) => ({
     favouriteId:
       MEMORIAL_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
+        ?.id ?? r.label,
+    label: r.label,
+    amount: pounds(r.amount),
+  })),
+  rankHistory: null,
+  guestNames: [],
+}
+
+/** And the keepsake, so every object on /celebrations is the same favpoll. */
+export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
+  prefix: WEDDING_HEADLINE.prefix,
+  name: WEDDING_HEADLINE.name,
+  context: WEDDING_SCENE.protagonist?.context ?? null,
+  topicTitle: WEDDING_SCENE.poll.topic.title,
+  reveal: WEDDING_SCENE.poll.personal_reveal,
+  totalRaised: pounds(WEDDING_SCENE.total),
+  charityNames: WEDDING_SCENE.charities.map((c) => c.name),
+  // House format: ordinal, never ISO. The favpoll closed a few days after
+  // the wedding.
+  closedDate: "20th September 2026",
+  standings: WEDDING_SCENE.results.map((r) => ({
+    favouriteId:
+      WEDDING_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
         ?.id ?? r.label,
     label: r.label,
     amount: pounds(r.amount),

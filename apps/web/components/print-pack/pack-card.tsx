@@ -1,3 +1,4 @@
+import { protagonistShortName } from "@/lib/display"
 import { BrandedQR } from "@/components/branded-qr"
 import { buildMechanicSteps, mechanicFooter } from "@/lib/mechanic-steps"
 
@@ -43,7 +44,9 @@ export function charityLabel(names: string[]): string {
 export function buildPackSteps(data: PackData): string[] | null {
   if (!data.topicTitle) return null
   const charities = charityLabel(data.charityNames)
-  const firstName = data.isCause ? null : data.name.split(/[\s&]+/)[0] || null
+  const firstName = data.isCause
+    ? null
+    : protagonistShortName(data.name) || null
   return buildMechanicSteps({
     topicTitle: data.topicTitle,
     charityLine: charities === "charity" ? null : charities,
