@@ -10,7 +10,7 @@ import {
   type HintScene,
 } from "@/components/landing/how-it-works-hints"
 import { IdeasSection } from "@/components/landing/ideas-section"
-import { TentCardVignette } from "@/components/landing/tent-card-vignette"
+import { FoldedCardVignette } from "@/components/landing/folded-card-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
@@ -101,20 +101,28 @@ const IDEAS = [
     key: "cards",
     label: t("celebrations.artefacts.cards.label"),
     body: t("celebrations.artefacts.cards.body"),
-    // A tent card, not the pack fan: the copy names the object on the
-    // table, so the picture is that object. Sarah & Tom's, so it matches
-    // the handset above it and the keepsake below.
+    // A PLACE CARD, because the copy now says place names (founder,
+    // 2026-08-28). Avery C32253, 110 x 40mm — a different face from the tent
+    // card that was here, and the picture has to follow the words or it is
+    // the same label/artefact mismatch the order of service had on
+    // /memorials. Alex & Jordan's, so it matches the handset above it and
+    // the keepsake below.
     artefact: (
-      <TentCardVignette data={WEDDING_PACK_DATA} steps={WEDDING_PACK_STEPS} />
+      <FoldedCardVignette
+        face="averyPlace"
+        data={WEDDING_PACK_DATA}
+        steps={WEDDING_PACK_STEPS}
+      />
     ),
   },
   {
     key: "reveal",
     label: t("celebrations.artefacts.reveal.label"),
     body: t("celebrations.artefacts.reveal.body"),
-    // The couple's own favourite comes SECOND in their standings — the room
-    // preferred the Victoria sponge — which makes this a better register for
-    // the reveal than the memorial it was built for.
+    // The couple's answer is not competing with the guests' at all — the
+    // room says where it loves, they say where they are GOING — which makes
+    // this a better register for the reveal than the memorial it was built
+    // for.
     artefact: <RevealVignettePhone scene={WEDDING_SCENE} />,
   },
   {

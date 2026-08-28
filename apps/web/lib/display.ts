@@ -242,3 +242,26 @@ export function roomTypeScaleAtWidth(width: number): RoomTypeScale {
  * ramp against it without importing its own caller.
  */
 export const DISPLAY_ROOM = { w: 1920, h: 1080 } as const
+
+/**
+ * How a protagonist is referred to in the possessive — "Belinda's favourite",
+ * "Alex & Jordan's favourite".
+ *
+ * A FIRST NAME IS NOT ALWAYS THE ANSWER. Six places independently did
+ * `name.split(/[\s&]+/)[0]`, which is right for one person and wrong for two:
+ * "Alex & Jordan" came out as "Alex", so a couple's own place card told
+ * guests that ALEX had a favourite and said nothing about Jordan. The same
+ * class of bug as the avatar initials that read "S&" — a couple is a
+ * first-class case, since Wedding and Anniversary are both in the
+ * celebrating_many register.
+ *
+ * So: a joined name is kept whole, and only a single person is shortened.
+ * Deliberately not "their", which reads as a third party rather than as the
+ * people the favpoll is for.
+ */
+export function protagonistShortName(name: string): string {
+  const trimmed = name.trim()
+  if (!trimmed) return ""
+  const joined = /\s&\s|\sand\s/i.test(trimmed)
+  return joined ? trimmed : trimmed.split(/\s+/)[0]
+}

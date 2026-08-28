@@ -53,7 +53,7 @@ export const MEMORIAL_SCENE =
   SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 
 /**
- * The celebration register's exemplar (founder, 2026-08-28) — Sarah & Tom's
+ * The celebration register's exemplar (founder, 2026-08-28) — Alex & Jordan's
  * wedding, favourite holiday destination, WWF-UK.
  *
  * Found by OCCASION TYPE, not by kind: there are two celebration scenes now,

@@ -14,7 +14,7 @@ import { RankingBar } from "@/components/ui/ranking-bar"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { getFavpollHeadline } from "@/lib/display"
+import { getFavpollHeadline, protagonistShortName } from "@/lib/display"
 import {
   PickerHeader,
   PickerItems,
@@ -171,7 +171,7 @@ export function DemoCard({
   // own heading, the eyebrow is the register label, and the avatar + the
   // person-named reveal lock fall away.
   const protagonist = scene.protagonist
-  const firstName = protagonist ? protagonist.name.split(/[\s&]+/)[0] : null
+  const firstName = protagonist ? protagonistShortName(protagonist.name) : null
   const aboutText = protagonist?.about ?? scene.blurb ?? ""
 
   // Instructions for the lock card, from the same builder the guest page and

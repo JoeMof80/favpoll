@@ -58,7 +58,7 @@ type Props = {
    * Play exactly THIS scene, rather than every scene of a kind.
    *
    * Needed the moment a register gained a second scene (2026-08-28):
-   * /celebrations has both Poppy's birthday and Sarah & Tom's wedding, and
+   * /celebrations has both Poppy's birthday and Alex & Jordan's wedding, and
    * `sceneKind` filters to BOTH — so useDemoLoop would cycle them, which a
    * page asking for `still` plainly does not want. One scene in, nothing to
    * cycle to.

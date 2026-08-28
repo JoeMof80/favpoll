@@ -13,6 +13,7 @@ import {
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
+import { protagonistShortName } from "@/lib/display"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 // The personal reveal, locked and then given.
@@ -47,7 +48,7 @@ const ACCENT_BY_KIND: Record<string, string> = {
   cause: "success",
 }
 
-const FIRST_NAME = (MEMORIAL_SCENE.protagonist?.name ?? "").split(/[\s&]+/)[0]
+const FIRST_NAME = protagonistShortName(MEMORIAL_SCENE.protagonist?.name ?? "")
 const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
 
 const LOCKED_MS = 2600
@@ -100,10 +101,49 @@ const MAGNIFY = 5 / 3
 // at y 339 to 479 in this space, centre 409; the panel is 290 tall, so it
 // starts at 264. Guessing put it at 340 and left it sitting 76px low, over
 // the standings instead of over the thing it magnifies.
-const SCENE_W = 560
+// A TRUE MAGNIFICATION IS A RATIO, NOT A FEELING (founder, 2026-08-28:
+// "adjust the width ... so it really looks like a magnified version").
+//
+// The panel was authored 312 wide, which is a number I picked to make it
+// overhang nicely. Measured, the card's own reveal block is 350 wide in this
+// space — so the panel's CONTENT was 467 against the 583 a true magnification
+// needs, about 80%. Close enough to look deliberate and wrong enough that the
+// two blocks broke their lines in different places, which is exactly what
+// stops a magnifier reading as one.
+//
+// Authored at the source width now, so the ratio of width to type size is
+// identical on both and the line breaks correspond. MAGNIFY is untouched, so
+// nothing changes size — only the line length, which is the whole point.
+const SOURCE_W = 350
+/** The panel's own padding, which is chrome rather than magnified content. */
+const CALLOUT_PAD = 16
+const CALLOUT_W = SOURCE_W + CALLOUT_PAD * 2
+
+const SCENE_W = Math.round(CALLOUT_W * MAGNIFY) + 24
 const SCENE_H = PHONE_CHASSIS_HEIGHT
 const PHONE_LEFT = Math.round((SCENE_W - PHONE_CHASSIS_WIDTH) / 2)
-const CALLOUT = { left: 20, top: 264, width: 312 }
+/**
+ * Where the card's own reveal block is centred, in this space — PollHeading's
+ * ribbon through the end of the quote runs y 339 to 479.
+ *
+ * CENTRED BY TRANSFORM, not by a hardcoded top. It was `top: 264`, computed
+ * once against a 290-tall panel — and the panel's height is not a constant:
+ * it depends on how long the scene's reveal is. Authoring the panel at the
+ * source width changed it, and the memorial's dropped to 241, leaving it 24px
+ * off-centre on that page while the wedding stayed right.
+ *
+ * translateY(calc(-50% * MAGNIFY)) is the fix, and the MAGNIFY factor in it
+ * is the whole trick: -50% resolves against the panel's UNSCALED height, so
+ * without it the panel would settle half its unscaled height up and still be
+ * wrong by the scale. Multiplied through, any scene's reveal centres on the
+ * block it magnifies, whatever length it is.
+ */
+const REVEAL_CENTRE_Y = 409
+
+const CALLOUT = {
+  left: Math.round((SCENE_W - CALLOUT_W * MAGNIFY) / 2),
+  width: CALLOUT_W,
+}
 
 export function RevealVignettePhone({
   scene = MEMORIAL_SCENE,
@@ -112,16 +152,26 @@ export function RevealVignettePhone({
   // can point this at its own favpoll. The memorial stays the default: this
   // vignette was built for it, and /features expects it.
   const reveal = scene.poll.personal_reveal ?? ""
-  const firstName = (scene.protagonist?.name ?? "").split(/[\s&]+/)[0]
+  const firstName = protagonistShortName(scene.protagonist?.name ?? "")
+  const accentVar = ACCENT_BY_KIND[scene.kind] ?? "memorial"
+  // THE PANEL TAKES THE SAME ACCENT AS THE CARD. DemoCard swaps --primary
+  // and --chart-3 on its own content block, and the panel is a SIBLING of the
+  // phone rather than a child of the card — so it inherited neither, and a
+  // magnifier over an amber ribbon was rendering it in brand purple. A
+  // magnification that changes the colour of what it magnifies is not one.
+  const accentStyle = {
+    "--primary": `var(--${accentVar})`,
+    "--chart-3": `var(--${accentVar}-on-band)`,
+  } as React.CSSProperties
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — the pack and keepsake
-          idiom. 0.28 / 0.42 / 0.5 of 560 x 868 give the sizes below; lg is
+          idiom. 0.28 / 0.42 / 0.5 of 661 x 868 give the sizes below; lg is
           two thirds of the hero's own 0.75 at xl, so this reads as the same
           handset further away. */}
       <div
         data-artefact-box
-        className="h-[243px] w-[157px] sm:h-[365px] sm:w-[235px] lg:h-[434px] lg:w-[280px]"
+        className="h-[243px] w-[185px] sm:h-[365px] sm:w-[278px] lg:h-[434px] lg:w-[330px]"
       >
         <div
           className="relative origin-top-left scale-[0.28] sm:scale-[0.42] lg:scale-[0.5]"
@@ -138,7 +188,7 @@ export function RevealVignettePhone({
                 barWidths={scene.results.map((r) => r.widthPercent)}
                 prefersReducedMotion
                 device="phone"
-                accentVar={ACCENT_BY_KIND[scene.kind] ?? "memorial"}
+                accentVar={accentVar}
                 className="rounded-none border-0"
               />
             </PhoneFrame>
@@ -148,10 +198,11 @@ export function RevealVignettePhone({
             data-magnifier
             className="absolute rounded-xl border border-border bg-background p-4 shadow-2xl"
             style={{
+              ...accentStyle,
               left: CALLOUT.left,
-              top: CALLOUT.top,
+              top: REVEAL_CENTRE_Y,
               width: CALLOUT.width,
-              transform: `scale(${MAGNIFY})`,
+              transform: `translateY(calc(-50% * ${MAGNIFY})) scale(${MAGNIFY})`,
               transformOrigin: "top left",
             }}
           >

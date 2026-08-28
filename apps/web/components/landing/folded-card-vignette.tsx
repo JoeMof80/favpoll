@@ -67,9 +67,26 @@ import type { PackData } from "@/components/print-pack/pack-card"
 // reversed and hovering behind the card, which is the sort of detail that
 // makes an image quietly wrong.
 
-// 120 x 45mm at 96dpi.
-const CARD_W = 453
-const CARD_H = 170
+// THE PACK'S TWO FOLDED FACES, at 96dpi. Both stand the same way, so both
+// use this vignette — the geometry below is about a fold, not about a tent.
+// Renamed from TentCardVignette when /celebrations moved to place names
+// (founder, 2026-08-28): a component called Tent rendering a place card is
+// the same mismatch as a picture of a pack fan under copy about one card.
+const FACES = {
+  // Avery L4794 tent card, 120 x 45mm, 4 to a sheet.
+  averyTent: {
+    w: 453,
+    h: 170,
+    box: "h-[128px] w-[249px] sm:h-[163px] sm:w-[317px] lg:h-[186px] lg:w-[362px]",
+  },
+  // Avery C32253 place card, 110 x 40mm, 4 to a sheet. Carries less than the
+  // tent by design — no numbered steps fit a 40mm face.
+  averyPlace: {
+    w: 416,
+    h: 151,
+    box: "h-[118px] w-[229px] sm:h-[150px] sm:w-[291px] lg:h-[171px] lg:w-[333px]",
+  },
+} as const
 
 /** Half the fold's opening: each panel leans this far off vertical.
  *
@@ -97,19 +114,20 @@ const TURN = 40
  */
 const TILT = 5
 
-export function TentCardVignette({
+export function FoldedCardVignette({
   data = DEMO_PACK_DATA,
   steps = DEMO_PACK_STEPS,
+  face = "averyTent",
 }: {
   data?: PackData
   steps?: typeof DEMO_PACK_STEPS
+  face?: keyof typeof FACES
 } = {}) {
+  const CARD_W = FACES[face].w
+  const CARD_H = FACES[face].h
   return (
     <Vignette className="flex justify-center">
-      <div
-        data-artefact-box
-        className="h-[128px] w-[249px] sm:h-[163px] sm:w-[317px] lg:h-[186px] lg:w-[362px]"
-      >
+      <div data-artefact-box className={FACES[face].box}>
         {/* Authored at the card's real size and scaled to the column, the way
             every printed artefact on this site is. */}
         <div
@@ -147,7 +165,7 @@ export function TentCardVignette({
                 transform: `rotateX(${SPLAY}deg)`,
               }}
             >
-              <PackCard data={data} steps={steps} scale="averyTent" bleed />
+              <PackCard data={data} steps={steps} scale={face} bleed />
             </div>
           </div>
         </div>
