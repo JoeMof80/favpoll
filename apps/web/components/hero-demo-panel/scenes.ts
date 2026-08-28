@@ -266,7 +266,7 @@ export const SCENES: HeroScene[] = [
       name: "Alex & Jordan",
       context: "12th September",
       about:
-        "Alex and Jordan would rather you gave to WWF than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
+        "The happy couple have requested donations to the WWF rather than gifts, given their passion for conservation.",
       photo_url: "/demo/alex-jordan.jpg",
     },
     poll: {
@@ -301,10 +301,14 @@ export const SCENES: HeroScene[] = [
       // that means something here." A demo where the charity is incidental
       // teaches the opposite.
       //
-      // "will be", not "is": the topic asks for a favourite holiday
-      // destination and they have not been yet.
+      // "will hopefully be", not "is" (founder wording, 2026-08-28), and it
+      // solves the tense problem better than the "will be" it replaced. The
+      // topic asks for a favourite holiday destination; they have not been
+      // yet. The hope is not about whether they are GOING — that is booked —
+      // it is about whether Chengdu turns out to be the favourite, which is
+      // the honest answer to the question actually asked.
       personal_reveal:
-        "Ours will be Chengdu. We fly on Tuesday, to see the pandas.",
+        "Ours will hopefully be Chengdu. We're heading there on our honeymoon, to see the pandas.",
       topic: {
         title: "Holiday destination",
         favourites: [
