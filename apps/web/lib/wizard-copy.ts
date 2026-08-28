@@ -1,4 +1,4 @@
-export type WizardStep = "type" | "charity" | "topic"
+export type WizardStep = "event" | "charity" | "topic"
 
 export type WizardCopy = {
   rail: Record<WizardStep, string>
@@ -17,7 +17,7 @@ export type WizardCopy = {
 // the founder's wording.
 export const WIZARD_COPY: WizardCopy = {
   rail: {
-    type: "Who or what is this favpoll for?",
+    event: "Celebration, memorial or fundraiser.",
     charity: "Every pledge goes to the charity you pick.",
     topic: "Pick a topic, and guests pledge on their favourite.",
   },

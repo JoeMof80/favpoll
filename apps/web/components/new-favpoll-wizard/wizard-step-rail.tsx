@@ -1,15 +1,23 @@
 "use client"
 
-import { Award, Gift, Heart } from "lucide-react"
+import { Calendar, Gift, Shapes } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { STEPS, STEP_LABELS } from "./use-wizard-state"
 import type { WizardStep } from "@/lib/wizard-copy"
 import type { WizardCopy } from "@/lib/wizard-copy"
 
+// Concrete objects, all three — a calendar, a gift, an assortment. A list
+// or a grid would drop interface furniture into a set of real things.
+//
+// Heart marked this step when it was the Love step, and it said affection
+// for a PERSON — which the wizard deliberately no longer knows, since
+// Cause moved to the Generate control (2026-08-25). Shapes says what a
+// topic actually is: different things to pick among, which holds for an
+// infinite topic as well as a finite one.
 const STEP_ICONS: Record<WizardStep, React.ElementType> = {
-  type: Award,
+  event: Calendar,
   charity: Gift,
-  topic: Heart,
+  topic: Shapes,
 }
 
 type Props = {

@@ -11,7 +11,7 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Type step: Memorial (the who refinements moved to Generate)
+ *   3. Event step: Memorial (the who refinements moved to Generate)
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour topic
  *   6. Details page: fill protagonist name
@@ -72,7 +72,7 @@ test.describe("wizard → publish flow", () => {
 
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
-    // ── 2. Type step ────────────────────────────────────────────────────────
+    // ── 2. Event step ────────────────────────────────────────────────────────
     // One category row (Celebration/Memorial/Fundraiser) plus the Cause fork.
     // The who refinements (He/She/They/Pair/Group) left this step on
     // 2026-07-30 — they only shape generated suggestions, so they now live on

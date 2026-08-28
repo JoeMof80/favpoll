@@ -16,7 +16,7 @@
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
  *   2. Navigate to /favpolls/new wizard
- *   3. Type step: Fundraiser (Cause moved to the Generate control on
+ *   3. Event step: Fundraiser (Cause moved to the Generate control on
  *      2026-08-25, so the wizard's three chips are the only answer here)
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour topic
@@ -69,7 +69,7 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
-    // ── 2. Type step ────────────────────────────────────────────────────────
+    // ── 2. Event step ────────────────────────────────────────────────────────
     // Cause is no longer here — it is an answer on the Generate control's
     // who step (2026-08-25). A cause organiser picks Fundraiser, which
     // derives the cause register anyway (registers.ts: category

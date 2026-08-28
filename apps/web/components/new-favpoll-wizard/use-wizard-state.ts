@@ -15,10 +15,10 @@ import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 export const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
-export const STEPS: WizardStep[] = ["type", "charity", "topic"]
+export const STEPS: WizardStep[] = ["event", "charity", "topic"]
 
 export const STEP_LABELS: Record<WizardStep, string> = {
-  type: "Type",
+  event: "Event",
   charity: "Charity",
   topic: "Topic",
 }
@@ -44,7 +44,7 @@ function sortTopicItems(items: Favourite[]): Favourite[] {
 export function useWizardState(data: WizardData) {
   const router = useRouter()
 
-  const [step, setStep] = useState<WizardStep>("type")
+  const [step, setStep] = useState<WizardStep>("event")
   const [category, setCategory] = useState<FavpollCategory | null>(null)
   const [grouping, setGrouping] = useState<FavpollGrouping>("individual")
   const [subject, setSubject] = useState<FavpollSubject>("someone")
@@ -85,7 +85,7 @@ export function useWizardState(data: WizardData) {
   // pronoun and pair/group since 2026-07-30, Cause since 2026-08-25 — so
   // the step gates on the type alone.
   const nextDisabled =
-    step === "type"
+    step === "event"
       ? !category
       : step === "charity"
         ? charityIds.length === 0
@@ -135,13 +135,13 @@ export function useWizardState(data: WizardData) {
   }
 
   function handleNext() {
-    if (step === "type") setStep("charity")
+    if (step === "event") setStep("charity")
     else if (step === "charity") setStep("topic")
   }
 
   function handleBack() {
     if (step === "topic") setStep("charity")
-    else if (step === "charity") setStep("type")
+    else if (step === "charity") setStep("event")
   }
 
   function handleFinish() {
