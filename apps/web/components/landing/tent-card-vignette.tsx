@@ -14,27 +14,46 @@ import type { PackData } from "@/components/print-pack/pack-card"
 // pack itself is the feature. Beside copy that says "print a card for every
 // table so guests can play along between courses", the reader wants the
 // object on the table, not the catalogue it came from. Same correction the
-// order of service made on /memorials: the copy named one artefact and the
-// picture showed the stationery range.
+// order of service made on /memorials.
 //
 // THE REAL PackCard at `averyTent` — Avery L4794, 120 x 45mm, four to a
 // sheet — so the card standing here is the card that comes off the printer.
 //
-// STANDING, NOT LYING FLAT, and that is the whole reason a tent card is the
-// right format for a party: it faces a guest without anyone having to pick it
-// up. Three cheap cues do it, and none of them draws a 3D card:
-//   · the FOLD as the top edge, with the far panel's sliver above it
-//   · a slight perspective, so the face leans away at the top
-//   · a contact shadow beneath, tight and dark, where card meets table
-// A drawn isometric card would be a lookalike; this is the real face with
-// light on it.
+// AT AN ANGLE, AND ACTUALLY FOLDED (founder, 2026-08-28: "it doesn't work. i
+// think it needs to be at an angle"). The first pass faced the card straight
+// on with a 9-degree lean and a sliver of the back panel above the fold, and
+// it read as a flat card with a grey bar over it — because straight on, a
+// tent card and a flat card have the SAME silhouette. Nothing about the
+// viewing angle said folded.
+//
+// So it is a real fold now: two panels sharing a top edge, each rotated away
+// from it in opposite directions, making the Λ a tent card actually is. The
+// whole thing then turns on rotateY, which is what does the work — from three
+// quarters the ridge has length, the near panel foreshortens, and the far
+// panel shows as the sliver of card stock behind it. That silhouette belongs
+// to nothing but a folded card.
+//
+// The far panel is BLANK stock, not a second PackCard. Both faces of a real
+// tent card are printed — that is the point, a guest either side of the table
+// gets a code — but the far one faces AWAY, so what a viewer in front of it
+// sees is the back of the paper. Printing it here would show the design
+// reversed and hovering behind the card, which is the sort of detail that
+// makes an image quietly wrong.
 
 // 120 x 45mm at 96dpi.
 const CARD_W = 453
 const CARD_H = 170
 
-/** How much of the folded-over back panel shows above the near face. */
-const FOLD = 9
+/** Half the fold's opening: each panel leans this far off vertical.
+ *
+ * SIGNS MATTER AND I HAD THEM BACKWARDS. About a TOP origin, a positive
+ * rotateX swings the bottom edge TOWARD the viewer. So the printed near
+ * panel takes +SPLAY and the blank far panel -SPLAY. Inverted, the blank
+ * panel leant forward and painted over the printed one — the card rendered
+ * as a white slab with the tent's silhouette peeking out behind it. */
+const SPLAY = 15
+/** The turn. Everything reads as a fold at this angle and as a card at 0. */
+const TURN = 22
 
 export function TentCardVignette({
   data = DEMO_PACK_DATA,
@@ -47,77 +66,75 @@ export function TentCardVignette({
     <Vignette className="flex justify-center">
       <div
         data-artefact-box
-        className="h-[152px] w-[294px] sm:h-[227px] sm:w-[440px] lg:h-[258px] lg:w-[500px]"
+        className="h-[151px] w-[294px] sm:h-[226px] sm:w-[440px] lg:h-[257px] lg:w-[500px]"
       >
-        {/* Authored at the card's real size and scaled to the column, the
-            way every printed artefact on this site is. */}
+        {/* Authored at the card's real size and scaled to the column, the way
+            every printed artefact on this site is. */}
         <div
           className="relative origin-top-left scale-[0.649] sm:scale-[0.971] lg:scale-[1.104]"
-          style={{ width: CARD_W, height: FOLD + CARD_H + 40 }}
+          style={{ width: CARD_W, height: CARD_H + 63, perspective: 1500 }}
         >
-          {/* The far panel — only its top edge shows past the fold, which is
-              what you actually see of a tent card's back from in front.
-              INSET on both sides and DARKER: it is behind, and further from
-              the light. It sits above the near face rather than under it,
-              which the first pass got wrong — the sliver was at top 0 and so
-              was the face, so the face covered the one cue that says this
-              card is folded rather than propped. */}
           <div
-            className="paper paper-screen absolute bg-background"
+            className="relative"
             style={{
-              left: 14,
-              top: 0,
-              width: CARD_W - 28,
-              height: FOLD,
-              filter: "brightness(0.9)",
+              transformStyle: "preserve-3d",
+              transform: `rotateX(6deg) rotateY(-${TURN}deg)`,
             }}
-          />
-
-          {/* The near face, leaning away at the top, and starting BELOW the
-              fold so the far edge stays visible. perspective on the wrapper
-              rather than the card, so the fold stays a straight horizontal
-              edge and only the face tilts. */}
-          <div
-            className="absolute inset-x-0"
-            style={{ top: FOLD, perspective: 900 }}
           >
+            {/* THE FAR PANEL — plain stock, leaning away from the fold. Its
+                own shading rather than a filter: `paper` pins the light
+                tokens, so a brightness filter would fight them. */}
             <div
-              className="paper paper-screen relative origin-top overflow-hidden"
+              className="paper paper-screen absolute inset-0 bg-background"
+              style={{
+                transformOrigin: "top center",
+                transform: `rotateX(-${SPLAY}deg)`,
+                boxShadow: "inset 0 0 0 100vmax rgb(0 0 0 / 0.07)",
+              }}
+            />
+
+            {/* THE NEAR PANEL — the printed face, leaning toward the viewer.
+                Same origin, opposite rotation: the two share the top edge and
+                that shared edge IS the fold. */}
+            <div
+              className="paper paper-screen relative overflow-hidden"
               style={{
                 width: CARD_W,
                 height: CARD_H,
-                transform: "rotateX(11deg)",
+                transformOrigin: "top center",
+                transform: `rotateX(${SPLAY}deg)`,
               }}
             >
               <PackCard data={data} steps={steps} scale="averyTent" bleed />
-              {/* The fold: a crease, not a border. A hairline plus the light
-                  falling off just under it — a printed border along the top
-                  of a folded card is the one line that is definitely not
-                  there. */}
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-foreground/15" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-foreground/8 to-transparent" />
+              {/* The crease. A hairline and the light falling off just under
+                  it — a printed border along the top of a folded card is the
+                  one line that is definitely not there. */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-foreground/20" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-foreground/10 to-transparent" />
             </div>
           </div>
 
-          {/* Contact shadow. Tight and dark where the card meets the table,
-              spreading as it leaves — the thing that makes an object sit on
-              a surface rather than float above one. */}
+          {/* Contact shadow, cast flat on the table and turned with the card.
+              Tight and dark where the paper meets the surface, spreading as
+              it leaves — the thing that makes an object sit on a table rather
+              than float above one. */}
           <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/35 blur-[6px]"
+            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/30 blur-[7px]"
             style={{
-              left: 24,
-              top: CARD_H + 2,
-              width: CARD_W - 48,
-              height: 10,
+              left: 40,
+              top: CARD_H * 0.965,
+              width: CARD_W - 80,
+              height: 14,
+              transform: `rotateY(-${TURN}deg)`,
             }}
           />
           <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/15 blur-2xl"
+            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/14 blur-2xl"
             style={{
               left: 0,
-              top: FOLD + CARD_H,
+              top: CARD_H * 0.95,
               width: CARD_W,
-              height: 30,
+              height: 34,
             }}
           />
         </div>
