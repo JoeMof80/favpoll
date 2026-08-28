@@ -21,6 +21,8 @@ import {
   WEDDING_KEEPSAKE_DATA,
 } from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
+import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // Register landing #2 (see /memorials for the pattern notes). ACCENT,
 // NOT REBRAND (founder decision, 2026-08-03): brand chrome stays purple
@@ -29,6 +31,10 @@ import { t } from "@/lib/i18n"
 // alongside the brand purple), applied to the hero band, quote rule and
 // bullet dots. Structure deliberately parallels the other register
 // pages so the three can be shaped against each other.
+
+// The shelf below renders live data but the page has no request-dependent
+// APIs, so Next would cache the FIRST render for ever. 60s, matching home.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Celebrations — favpoll",
@@ -147,7 +153,11 @@ const IDEAS = [
   },
 ]
 
-export default function CelebrationsPage() {
+export default async function CelebrationsPage() {
+  const live = await fetchLiveFavpolls({
+    registers: REGISTERS_BY_PAGE.celebrations,
+  })
+
   return (
     <main>
       {/* ── The opening — the REAL landing hero, register-configured, and
@@ -191,6 +201,8 @@ export default function CelebrationsPage() {
         ideas={IDEAS}
         accentClassName="text-warning-strong"
       />
+
+      <OpenRightNow favpolls={live} />
 
       {/* ── Close — the landing's purple monogram close, one line.
           MATCHED TO /memorials (founder, 2026-08-28) in all three ways it

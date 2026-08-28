@@ -7,11 +7,11 @@ import { LiveVignette } from "@/components/landing/live-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { IdeasSection } from "@/components/landing/ideas-section"
-import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
+import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // The first register landing page (sequencing decision 2026-08-01:
 // memorial FIRST — the warm channel is Joy, funeral directors, St
@@ -25,6 +25,10 @@ import { t } from "@/lib/i18n"
 // two tinted sections next to each other, so the tint moved down one:
 // reassurances went plain and the gatekeeper block took the tint, which
 // also stops it reading as an afterthought before the close.
+
+// The shelf below renders live data but the page has no request-dependent
+// APIs, so Next would cache the FIRST render for ever. 60s, matching home.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Memorials — favpoll",
@@ -129,7 +133,11 @@ const ARTEFACTS = [
   },
 ]
 
-export default function MemorialsPage() {
+export default async function MemorialsPage() {
+  const live = await fetchLiveFavpolls({
+    registers: REGISTERS_BY_PAGE.memorials,
+  })
+
   return (
     <main>
       {/* ── The opening — the REAL landing hero, register-configured.
@@ -189,6 +197,8 @@ export default function MemorialsPage() {
         ideas={ARTEFACTS}
         accentClassName="text-memorial"
       />
+
+      <OpenRightNow favpolls={live} />
 
       {/* ── Reassurances ── */}
       <section className="w-full">
