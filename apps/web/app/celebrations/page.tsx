@@ -9,8 +9,10 @@ import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import {
-  DEMO_SCENE,
-  DEMO_KEEPSAKE_WALKTHROUGH_DATA,
+  WEDDING_SCENE,
+  WEDDING_PACK_DATA,
+  WEDDING_PACK_STEPS,
+  WEDDING_KEEPSAKE_DATA,
 } from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
 
@@ -59,18 +61,20 @@ const IDEAS = [
     label: t("celebrations.artefacts.cards.label"),
     body: t("celebrations.artefacts.cards.body"),
     // A tent card, not the pack fan: the copy names the object on the
-    // table, so the picture is that object. TentCardVignette's defaults are
-    // the celebration pack, so this needs no register twin.
-    artefact: <TentCardVignette />,
+    // table, so the picture is that object. Sarah & Tom's, so it matches
+    // the handset above it and the keepsake below.
+    artefact: (
+      <TentCardVignette data={WEDDING_PACK_DATA} steps={WEDDING_PACK_STEPS} />
+    ),
   },
   {
     key: "reveal",
     label: t("celebrations.artefacts.reveal.label"),
     body: t("celebrations.artefacts.reveal.body"),
-    // Poppy's own favourite comes FOURTH in her standings — the room
-    // disagreed with her — which makes this the better register for the
-    // reveal than the memorial it was built for.
-    artefact: <RevealVignettePhone scene={DEMO_SCENE} />,
+    // The couple's own favourite comes SECOND in their standings — the room
+    // preferred the Victoria sponge — which makes this a better register for
+    // the reveal than the memorial it was built for.
+    artefact: <RevealVignettePhone scene={WEDDING_SCENE} />,
   },
   {
     key: "display",
@@ -80,15 +84,13 @@ const IDEAS = [
     // presence dial from the scene's register, so a memorial gets tribute
     // and everything else gets the goal bar. A party screen should be loud
     // where a wake's is quiet.
-    artefact: <LiveVignette scene={DEMO_SCENE} still room />,
+    artefact: <LiveVignette scene={WEDDING_SCENE} still room />,
   },
   {
     key: "keepsake",
     label: t("celebrations.artefacts.keepsake.label"),
     body: t("celebrations.artefacts.keepsake.body"),
-    // The walkthrough's own sheet — Poppy's — which until now had nowhere
-    // to live outside the home page's How It Works.
-    artefact: <KeepsakeVignetteDetail data={DEMO_KEEPSAKE_WALKTHROUGH_DATA} />,
+    artefact: <KeepsakeVignetteDetail data={WEDDING_KEEPSAKE_DATA} />,
   },
 ]
 
@@ -114,6 +116,7 @@ export default function CelebrationsPage() {
           --warning-on-band already exist, for light and dark. ── */}
       <LandingHero
         sceneKind="celebration"
+        scene={WEDDING_SCENE}
         still
         eyebrow={t("celebrations.eyebrow")}
         headline={t("celebrations.headline")}

@@ -7,9 +7,19 @@ type Props = {
 }
 
 export function ProtagonistAvatar({ name, photoUrl, className }: Props) {
+  // JOINERS ARE NOT NAMES. Splitting on spaces alone made "Sarah & Tom" into
+  // the initials "S&", because "&" was taken as the second word and its first
+  // character is itself. Couples are a first-class case — "Wedding" and
+  // "Anniversary" are both in the celebrating_many register, and the
+  // first-name derivation elsewhere already splits on "&" — so the ampersand
+  // has to be dropped before initials are taken, not after.
+  //
+  // "and" goes too, for "Sarah and Tom", which is how most people write it.
+  // Taking the first TWO surviving words gives ST for a couple and SC for a
+  // person, which is the same rule doing the right thing in both cases.
   const initials = name
-    .split(" ")
-    .filter(Boolean)
+    .split(/[\s&]+/)
+    .filter((w) => w && w.toLowerCase() !== "and")
     .slice(0, 2)
     .map((w) => w[0])
     .join("")

@@ -227,6 +227,94 @@ export const SCENES: HeroScene[] = [
     total: "£705",
   },
   {
+    // ── Wedding: the celebration register's exemplar (founder, 2026-08-28).
+    //
+    //    THE BEHAVIOUR ALREADY EXISTS THERE. "Donations in lieu of favours"
+    //    is standard at UK weddings, so favpoll is not introducing giving at
+    //    a life event — it is improving something guests already do badly. A
+    //    card on the table saying "we have donated to X" becomes something
+    //    they take part in. That is a far easier sell than persuading anyone
+    //    to run a game at a teenager's birthday.
+    //
+    //    It also suits the product's constraints better than any other
+    //    celebration: table stationery is native (a tent card at each place
+    //    setting needs no justification), guest counts and budgets are real,
+    //    and the planning horizon is months — which is what the 90-day poll
+    //    and the charity-onboarding window both want.
+    //
+    //    THE REGISTER STAYS BROAD. kind is "celebration" and the page still
+    //    says birthdays, retirements, weddings. A wedding is the best single
+    //    exemplar OF that breadth, not a narrowing of it.
+    //
+    //    celebrating_many, not celebrating_one — "Wedding" is already in that
+    //    register in lib/registers, and getFavpollHeadline already gives it
+    //    "Congratulations to". The couple needed no new modelling; even the
+    //    first-name derivation splits on "&" already.
+    kind: "celebration",
+    occasion_type: "Wedding",
+    opening_line: null,
+    protagonist: {
+      name: "Sarah & Tom",
+      context: "12th September",
+      about:
+        "Sarah and Tom would rather you gave to Barnardo's than bought them a gift. There is cake at the reception, and strong opinions about which kind is best.",
+      // No couple photograph in public/demo yet — ProtagonistAvatar falls
+      // back without one. A real wedding scene wants one.
+      photo_url: null,
+    },
+    poll: {
+      id: "demo-poll-wedding",
+      // First person and plural, the couple writing it in advance — the
+      // voice the brand guide calls the most powerful version. It withholds
+      // in the About and discloses here, and the room does not agree with
+      // them: theirs comes SECOND in the standings below.
+      personal_reveal:
+        "Ours is the lemon drizzle. We shared a slice on our first date and have argued about it ever since.",
+      topic: {
+        title: "Cake",
+        favourites: [
+          { id: "ck-bakewell", label: "Bakewell tart" },
+          { id: "ck-banana", label: "Banana bread" },
+          { id: "ck-battenberg", label: "Battenberg" },
+          { id: "ck-blackforest", label: "Black Forest gateau" },
+          { id: "ck-carrot", label: "Carrot cake" },
+          { id: "ck-cheesecake", label: "Cheesecake" },
+          { id: "ck-chocfudge", label: "Chocolate fudge" },
+          { id: "ck-christmas", label: "Christmas cake" },
+          { id: "ck-coffeewalnut", label: "Coffee and walnut" },
+          { id: "ck-fruit", label: "Fruit cake" },
+          { id: "ck-ginger", label: "Ginger cake" },
+          { id: "ck-lemondrizzle", label: "Lemon drizzle" },
+          { id: "ck-madeira", label: "Madeira" },
+          { id: "ck-redvelvet", label: "Red velvet" },
+          { id: "ck-rockyroad", label: "Rocky road" },
+          { id: "ck-stickytoffee", label: "Sticky toffee" },
+          { id: "ck-swissroll", label: "Swiss roll" },
+          { id: "ck-victoria", label: "Victoria sponge" },
+        ],
+      },
+    },
+    charities: [
+      {
+        id: "ch-barnardos",
+        name: "Barnardo's",
+        logo_url: null,
+        registered_number: "216250",
+      },
+    ],
+    selectedIndex: 11,
+    pledgeAmount: "£20",
+    results: [
+      { label: "Victoria sponge", amount: "£210", widthPercent: 100 },
+      { label: "Lemon drizzle", amount: "£175", widthPercent: 83 },
+      { label: "Carrot cake", amount: "£130", widthPercent: 62 },
+      { label: "Coffee and walnut", amount: "£95", widthPercent: 45 },
+      { label: "Chocolate fudge", amount: "£60", widthPercent: 29 },
+      { label: "Bakewell tart", amount: "£35", widthPercent: 17 },
+    ],
+    total: "£705",
+  },
+  {
     // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —
     //    so it keeps a protagonist (the runner). Register-wise it derives to
     //    `cause`, but it is nothing like a faceless appeal. ──
