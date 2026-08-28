@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { cardFeeFor, chargeWithCardFee } from "@/lib/card-fee"
+import { formatPoundsExact } from "@/lib/i18n"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
@@ -108,7 +110,12 @@ export function SeedFundModal({
     return (
       <StripeCheckout
         clientSecret={clientSecret}
-        chargeAmount={numeric}
+        // WITH THE CARD FEE, because the PaymentIntent has it. The route
+        // adds the fee server-side to every charge it creates (lib/card-fee),
+        // so passing the bare amount here would show a total lower than the
+        // one actually taken — the worst kind of payment bug, and a silent
+        // one.
+        chargeAmount={chargeWithCardFee(numeric)}
         onSuccess={handlePaymentSuccess}
         onClose={handlePaymentCancel}
       />
@@ -204,6 +211,16 @@ export function SeedFundModal({
           className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       </div>
+
+      {/* The fee, said before the card screen rather than on it. The whole
+          amount reaches the fund and therefore the charity; the fee is added
+          on top and goes to the payment provider. */}
+      {isValid && (
+        <p className="-mt-2 text-xs text-muted-foreground">
+          Plus a {formatPoundsExact(cardFeeFor(numeric))} card fee — every penny
+          of your {formatPoundsExact(numeric)} reaches the fund.
+        </p>
+      )}
 
       {/* Preset buttons */}
       <div className="flex gap-2">
