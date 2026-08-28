@@ -3,6 +3,12 @@ import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
+import {
+  PickHint,
+  PledgeHint,
+  RankHint,
+  type HintScene,
+} from "@/components/landing/how-it-works-hints"
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { TentCardVignette } from "@/components/landing/tent-card-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
@@ -55,6 +61,41 @@ const PRESENCE = [
 // register's own objects. Every one is the real component pointed at the
 // CELEBRATION scene, so Poppy Chen's favpoll runs from the homepage router
 // card through the hero and on through all four.
+// The band's hints run on the WEDDING scene, not the memorial one they
+// default to. Until now /celebrations showed Belinda's colours and Marie
+// Curie under a wedding headline — the hints file said as much: the other
+// registers "borrow them for now ... each can pass its own when its turn in
+// the rework comes."
+//
+// `shown` is eight of the topic's twenty-eight, chosen not sliced. Short
+// labels, because the hint column is 184px and long place names drop it to
+// one pill a row; and CHENGDU IS DELIBERATELY ABSENT, exactly as Purple is
+// on the memorial — it is the couple's own answer, and lighting it here
+// would give the reveal away two columns before the standings do.
+//
+// `picked` is Greece: a guest's pick, second in the standings, and not the
+// scene's selectedIndex, which points at Chengdu.
+const WEDDING_HINTS: HintScene = {
+  scene: WEDDING_SCENE,
+  shown: [
+    "Bali",
+    "Cornwall",
+    "Greece",
+    "Iceland",
+    "Italy",
+    "Japan",
+    "Norway",
+    "Venice",
+  ],
+  picked: "Greece",
+}
+
+const STEP_MEDIA = [
+  <PickHint key="pick" hints={WEDDING_HINTS} />,
+  <PledgeHint key="pledge" hints={WEDDING_HINTS} />,
+  <RankHint key="rank" hints={WEDDING_HINTS} />,
+]
+
 const IDEAS = [
   {
     key: "cards",
@@ -128,7 +169,10 @@ export default function CelebrationsPage() {
       />
 
       {/* ── How it works, in the celebration register ── */}
-      <HowItWorksSteps title={t("celebrations.how.title")} steps={STEPS} />
+      <HowItWorksSteps
+        title={t("celebrations.how.title")}
+        steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
+      />
 
       <IdeasSection
         title={t("celebrations.artefacts.title")}
