@@ -62,6 +62,24 @@ export const MEMORIAL_SCENE =
  * the home walkthrough and /features run on it and this change is scoped to
  * the register page.
  */
+/**
+ * The fundraiser register's exemplar (founder, 2026-08-28) — Marcus Bell's
+ * London Marathon, favourite dance, British Heart Foundation.
+ *
+ * MARCUS RATHER THAN THE CAUSE SCENE, and the reason is structural. This
+ * register holds two shapes: a person doing a sponsored challenge, who keeps
+ * a protagonist, and a faceless cause, which has none. The four-artefact band
+ * turns on there being someone whose answer is worth revealing — a cause has
+ * no personal reveal at all, so its strongest beat would have nothing to
+ * magnify. The page still has to read true for a cause, but that is a copy
+ * problem rather than an artefact one.
+ *
+ * Found by kind, which is unambiguous: he is the only "fundraiser" scene,
+ * where the cause scene carries kind "cause".
+ */
+export const FUNDRAISER_SCENE =
+  SCENES.find((s) => s.kind === "fundraiser") ?? SCENES[0]
+
 export const WEDDING_SCENE =
   SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
 
@@ -131,6 +149,26 @@ export const WEDDING_PACK_DATA: PackData = {
 }
 
 export const WEDDING_PACK_STEPS = buildPackSteps(WEDDING_PACK_DATA)
+
+/** The same pack for the FUNDRAISER scene — Marcus, dance, BHF. */
+const FUNDRAISER_HEADLINE = getFavpollHeadline({
+  occasionType: FUNDRAISER_SCENE.occasion_type,
+  name: FUNDRAISER_SCENE.protagonist?.name ?? "",
+  subject: "someone",
+  openingLine: FUNDRAISER_SCENE.opening_line,
+})
+
+export const FUNDRAISER_PACK_DATA: PackData = {
+  prefix: FUNDRAISER_HEADLINE.prefix,
+  name: FUNDRAISER_HEADLINE.name,
+  isCause: false,
+  topicTitle: FUNDRAISER_SCENE.poll.topic.title,
+  hasReveal: !!FUNDRAISER_SCENE.poll.personal_reveal,
+  charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
+  qrUrl: DEMO_QR_URL,
+}
+
+export const FUNDRAISER_PACK_STEPS = buildPackSteps(FUNDRAISER_PACK_DATA)
 
 // The keepsake the features page depicts — built from the MEMORIAL scene,
 // not the cause one the rest of the page uses, for the reveal vignette's
@@ -213,6 +251,29 @@ export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
   standings: WEDDING_SCENE.results.map((r) => ({
     favouriteId:
       WEDDING_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
+        ?.id ?? r.label,
+    label: r.label,
+    amount: pounds(r.amount),
+  })),
+  rankHistory: null,
+  guestNames: [],
+}
+
+/** And the keepsake, so every object on /fundraisers is the same favpoll. */
+export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
+  prefix: FUNDRAISER_HEADLINE.prefix,
+  name: FUNDRAISER_HEADLINE.name,
+  context: FUNDRAISER_SCENE.protagonist?.context ?? null,
+  topicTitle: FUNDRAISER_SCENE.poll.topic.title,
+  reveal: FUNDRAISER_SCENE.poll.personal_reveal,
+  totalRaised: pounds(FUNDRAISER_SCENE.total),
+  charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
+  // House format: ordinal, never ISO. The favpoll closed the week after the
+  // race.
+  closedDate: "3rd May 2026",
+  standings: FUNDRAISER_SCENE.results.map((r) => ({
+    favouriteId:
+      FUNDRAISER_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
         ?.id ?? r.label,
     label: r.label,
     amount: pounds(r.amount),

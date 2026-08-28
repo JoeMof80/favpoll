@@ -19,11 +19,14 @@ export type Idea = {
  *
  * COPY AND ARTEFACTS STAY WITH THE PAGES. A memorial's four are an order of
  * service, a reveal, a quiet display and a tribute keepsake; a celebration's
- * are table cards, a reveal, a display with its goal bar, and a celebration
- * keepsake. Only the frame is shared.
+ * are place names, a reveal, a display with its goal bar, and a celebration
+ * keepsake; a fundraiser's are a poster, a reveal, that same goal on a big
+ * screen, and the fundraiser keepsake that leads on the total. Only the frame
+ * is shared — each register's paper is the paper it actually has.
  *
  * `accentClassName` is the section eyebrow's colour — text-memorial,
- * text-warning-strong — so each register's band carries its own.
+ * text-warning-strong, text-success-strong — so each register's band carries
+ * its own.
  */
 export function IdeasSection({
   title,
