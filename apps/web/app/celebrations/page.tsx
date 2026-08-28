@@ -139,6 +139,16 @@ const IDEAS = [
     key: "keepsake",
     label: t("celebrations.artefacts.keepsake.label"),
     body: t("celebrations.artefacts.keepsake.body"),
+    // TRIBUTE variant, despite the name, and it is right for a wedding:
+    // tribute leads on the people and their reveal, fundraiser leads on the
+    // money. A wedding memento opening with the total is the wrong way round.
+    //
+    // The copy here says the ORGANISER prints and sends; /memorials says the
+    // family INVITES GUESTS to print their own. That divergence is
+    // deliberate and both halves are true — the keepsake route carries no
+    // auth check, only `if (!isClosed) notFound()`, so anyone with the link
+    // can print one. Do not flatten them to match; the registers want
+    // different things.
     artefact: <KeepsakeVignetteDetail data={WEDDING_KEEPSAKE_DATA} />,
   },
 ]
