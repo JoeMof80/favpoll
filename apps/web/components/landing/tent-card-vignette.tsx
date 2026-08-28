@@ -108,12 +108,12 @@ export function TentCardVignette({
     <Vignette className="flex justify-center">
       <div
         data-artefact-box
-        className="h-[151px] w-[294px] sm:h-[226px] sm:w-[440px] lg:h-[257px] lg:w-[500px]"
+        className="h-[128px] w-[249px] sm:h-[163px] sm:w-[317px] lg:h-[186px] lg:w-[362px]"
       >
         {/* Authored at the card's real size and scaled to the column, the way
             every printed artefact on this site is. */}
         <div
-          className="relative origin-top-left scale-[0.649] sm:scale-[0.971] lg:scale-[1.104]"
+          className="relative origin-top-left scale-[0.55] sm:scale-[0.7] lg:scale-[0.8]"
           style={{ width: CARD_W, height: CARD_H + 63, perspective: 900 }}
         >
           <div
