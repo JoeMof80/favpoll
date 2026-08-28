@@ -171,13 +171,74 @@ export const heroNameSizeClass = "text-3xl sm:text-4xl"
  * Each is clamp(today's size, vw-relative, ceiling): unchanged at 1440 and
  * below, growing to the cap at about 2880.
  */
-export const roomTypeScale = {
+const ROOM_TYPE_RAMP = {
   /** Money figure / protagonist name — today's sm:text-4xl at the floor. */
-  "--display-figure": "clamp(2.25rem, 2.6vw, 4.5rem)",
+  "--display-figure": { floor: 2.25, vw: 2.6, cap: 4.5 },
   /** "FAVOURITE HOT DRINK" — today's md:text-2xl at the floor. */
-  "--display-topic": "clamp(1.5rem, 1.7vw, 3rem)",
+  "--display-topic": { floor: 1.5, vw: 1.7, cap: 3 },
   /** Ranking labels and amounts — today's text-lg at the floor. */
-  "--display-rank": "clamp(1.125rem, 1.25vw, 2.25rem)",
+  "--display-rank": { floor: 1.125, vw: 1.25, cap: 2.25 },
   /** Bar thickness, so the bars keep their weight against the labels. */
-  "--display-bar": "clamp(0.5rem, 0.55vw, 1rem)",
+  "--display-bar": { floor: 0.5, vw: 0.55, cap: 1 },
 } as const
+
+type RoomTypeScale = Record<keyof typeof ROOM_TYPE_RAMP, string>
+
+const RAMP_KEYS = Object.keys(ROOM_TYPE_RAMP) as (keyof typeof ROOM_TYPE_RAMP)[]
+
+export const roomTypeScale = RAMP_KEYS.reduce((out, key) => {
+  const r = ROOM_TYPE_RAMP[key]
+  out[key] = `clamp(${r.floor}rem, ${r.vw}vw, ${r.cap}rem)`
+  return out
+}, {} as RoomTypeScale)
+
+/**
+ * The same ramp RESOLVED AT A FIXED WIDTH, for a still.
+ *
+ * A still depicting a screen has a width of its own and must not use the vw
+ * form: vw would track the visitor's browser window, so the same depicted
+ * screen would render different type on a laptop and a large monitor — which
+ * is the bug the note above warns about, and the reason `live` gated the ramp
+ * in the first place. Resolving the clamp against the DEPICTED width gives a
+ * still the room's own type without ever consulting the viewport.
+ *
+ * One definition of the ramp, two renderings of it, so a change to the
+ * projector's type cannot miss the still that claims to show it.
+ */
+export function roomTypeScaleAtWidth(width: number): RoomTypeScale {
+  return RAMP_KEYS.reduce((out, key) => {
+    const r = ROOM_TYPE_RAMP[key]
+    const px = Math.min(
+      Math.max(r.floor * 16, (r.vw / 100) * width),
+      r.cap * 16
+    )
+    out[key] = `${px}px`
+    return out
+  }, {} as RoomTypeScale)
+}
+
+/**
+ * The display as a screen in a room: 1920 x 1080, the size a projector
+ * actually is.
+ *
+ * IT WAS 1600 x 900, the narrowest width at which the display has gutters at
+ * all — the card is max-w-6xl (72rem, 1152px), so the gutter there is
+ * (1600-1152)/2 = 224 against a 200px code, twelve pixels a side. Faithful,
+ * and it read as a code crammed into a margin (founder, 2026-08-27: "QR codes
+ * slightly too big"). At 1920 the gutter is 384 and the same 200px code has
+ * 92px either side, which is the room it has on a real screen.
+ *
+ * SHRINKING THE CODE WOULD HAVE BEEN THE WRONG FIX: 200px is the product's
+ * own decision, sized to scan from across a room, and an artefact whose whole
+ * charter is to be the real thing does not get to quietly re-take it.
+ *
+ * AND IT COSTS NOTHING IN LEGIBILITY, which is why this is free rather than a
+ * trade. The type ramp is linear in width and the still's scale is inversely
+ * linear in it, so on-screen type is constant across the change: the figure
+ * goes 41.6px at 1600 and 49.9px at 1920, rendered at 0.351 and 0.294, which
+ * is 14.6px either way. Only the gutters grow.
+ *
+ * Lives here rather than with the still so DisplayScreen can resolve the type
+ * ramp against it without importing its own caller.
+ */
+export const DISPLAY_ROOM = { w: 1920, h: 1080 } as const

@@ -5,6 +5,7 @@ import {
   DEMO_PACK_DATA,
   DEMO_PACK_STEPS,
 } from "@/components/landing/demo-fixture"
+import type { PackData } from "@/components/print-pack/pack-card"
 
 // The pack as it looks BEFORE it is printed — real PackSheets, shared with
 // PackDocument, so the pack this page depicts and the pack the printer
@@ -49,7 +50,20 @@ const SHEETS = [
 const FAN_W = Math.max(...SHEETS.map((s) => s.x + s.page.w)) // 2553
 const FAN_H = Math.max(...SHEETS.map((s) => s.y + s.page.h)) // 1153
 
-export function PackVignette() {
+/**
+ * Defaults to the celebration pack, which is what /features wants — that
+ * page is register-neutral. A register page passes its own: /memorials
+ * shows Belinda's pack, so the printed card matches the reveal and the
+ * keepsake beside it rather than being a different person's birthday
+ * (2026-08-26).
+ */
+export function PackVignette({
+  data = DEMO_PACK_DATA,
+  steps = DEMO_PACK_STEPS,
+}: {
+  data?: PackData
+  steps?: typeof DEMO_PACK_STEPS
+} = {}) {
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — measured to fit rather than
@@ -80,16 +94,11 @@ export function PackVignette() {
               }}
             >
               {s.kind === "avery" ? (
-                <AverySheet
-                  data={DEMO_PACK_DATA}
-                  steps={DEMO_PACK_STEPS}
-                  code={s.id}
-                  guides
-                />
+                <AverySheet data={data} steps={steps} code={s.id} guides />
               ) : (
                 <PackSheet
-                  data={DEMO_PACK_DATA}
-                  steps={DEMO_PACK_STEPS}
+                  data={data}
+                  steps={steps}
                   scale={s.id as "a4" | "a5"}
                 />
               )}

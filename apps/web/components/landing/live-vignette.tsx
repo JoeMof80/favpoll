@@ -47,12 +47,13 @@
 // ~750 at 1280 — so the scale is read off the container at runtime and the box
 // reserves the scaled height. No breakpoint to keep true, and nothing to go
 // stale, which is how the previous constants failed three times.
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useReducedMotion } from "framer-motion"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
   DisplayStill,
   DISPLAY_STILL_WIDTH,
+  DISPLAY_STILL_ROOM,
 } from "@/components/landing/display-still"
 import { DEMO_SCENE, DEMO_QR_URL } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
@@ -60,6 +61,37 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 /** The still's own width plus TvFrame's 20px bezel each side. */
 const NATURAL_W = DISPLAY_STILL_WIDTH + 40
+/** Room mode is 16:9 plus the same bezel on all four sides. */
+const NATURAL_W_ROOM = DISPLAY_STILL_ROOM.w + 40
+const NATURAL_H_ROOM = DISPLAY_STILL_ROOM.h + 40
+
+// NOTHING CLIPS THE SET'S ATMOSPHERE (founder, 2026-08-27, after two passes
+// of padding failed to stop it being "trucnated").
+//
+// TvFrame casts a dim pocket, the panel's spill on the wall and an elliptical
+// shadow beneath it, all authored OUTSIDE the chassis (-inset-28, -bottom-10)
+// and blurred 60-110px past even that. Two boxes were cutting them: this
+// vignette's reserved box, and Vignette's own overflow-hidden — which the
+// memorials page had already stripped the border, radius and tint from,
+// leaving an invisible clip nobody could see doing it.
+//
+// PADDING THE BOX WAS THE WRONG ANSWER, twice. It buys room in exchange for
+// scale on the width axis, and it cannot win: containing the pocket's blur
+// needs ~460px a side, which would take the type from 6.7px to 4.7. Worse,
+// every increase makes the failure MORE visible rather than less — more soft
+// glow renders, and it still ends against a hard rectangular edge, so the
+// second pass turned a thin cut under the set into a grey rectangle hanging
+// above it.
+//
+// So the clip goes. The catch, which is why it could not simply be deleted:
+// with overflow visible, `aspect-ratio` yields to the box's automatic minimum
+// size, and the unscaled 1120px-tall frame inside blew the vignette out to
+// 2400px with the sticky header across it — measured. `height: 0` on the
+// scaled wrapper fixes that at the root: a transform does not affect layout
+// anyway, so the wrapper contributes no height, the ratio governs the box,
+// and the frame paints freely outside it. The atmosphere now finishes on the
+// section background exactly as it does on the home page, which never clipped
+// it and is why the wall mount read correctly there all along.
 
 /**
  * The still's measured height, used ONLY to hold the space open before it
@@ -87,20 +119,53 @@ function parseGBP(amount: string): number {
 }
 
 /** The scene as it stands once the first `n` pledges have landed. */
-function sceneAfter(n: number): HeroScene {
-  if (n === 0) return DEMO_SCENE
-  const results = DEMO_SCENE.results.map((r, i) => {
+function sceneAfter(base: HeroScene, n: number): HeroScene {
+  if (n === 0) return base
+  const results = base.results.map((r, i) => {
     const added = PLEDGES.slice(0, n)
       .filter((p) => p.index === i)
       .reduce((sum, p) => sum + p.amount, 0)
     return added ? { ...r, amount: `£${parseGBP(r.amount) + added}` } : r
   })
-  return { ...DEMO_SCENE, results }
+  return { ...base, results }
 }
 
-const SCENES = [sceneAfter(0), sceneAfter(1), sceneAfter(2)]
-
-export function LiveVignette() {
+/**
+ * Defaults to the celebration scene, which is what /features wants — that
+ * page is register-neutral. A register page passes its own: /memorials was
+ * showing Poppy Chen's birthday on the screen while its printed card, its
+ * reveal and its keepsake were all Belinda Hartley's, so a page a celebrant
+ * forwards to a bereaved family told two unrelated favpolls as one story
+ * (2026-08-26).
+ *
+ * PLEDGES indexes into results by position, and every scene carries six, so
+ * the same three pledges land wherever this is pointed.
+ */
+/**
+ * `still` holds the screen at its settled state — every pledge landed, the
+ * wall full — with no timer running (founder, 2026-08-27: "i'm not sure
+ * there is any need to animate these vignettes").
+ *
+ * A PROP RATHER THAN A DELETION, because /features shows this too and that
+ * page is not covered by the call. It also costs nothing: `reduced` already
+ * had to render exactly this state for prefers-reduced-motion, so `still` is
+ * that same branch reached deliberately rather than by an OS setting.
+ *
+ * The stepping was never load-bearing on a register page. What the idea
+ * beside it claims — a screen the room can glance at — is a property of the
+ * display, not of watching numbers move; and the movement was the one thing
+ * making a real component read as a demo of itself.
+ */
+export function LiveVignette({
+  scene: base = DEMO_SCENE,
+  still = false,
+  room = false,
+}: { scene?: HeroScene; still?: boolean; room?: boolean } = {}) {
+  const naturalW = room ? NATURAL_W_ROOM : NATURAL_W
+  const scenes = useMemo(
+    () => [sceneAfter(base, 0), sceneAfter(base, 1), sceneAfter(base, 2)],
+    [base]
+  )
   // CLIENT-ONLY, and not merely as an optimisation. DisplayStill captures its
   // clock ONCE at module load, to keep the wall's relative times ("4m ago")
   // out of render — which is only safe because it has always been mounted
@@ -112,7 +177,7 @@ export function LiveVignette() {
   useEffect(() => setMounted(true), [])
 
   const reduced = useReducedMotion()
-  const [step, setStep] = useState(reduced ? LAST : 0)
+  const [step, setStep] = useState(reduced || still ? LAST : 0)
 
   const boxRef = useRef<HTMLDivElement | null>(null)
   const innerRef = useRef<HTMLDivElement | null>(null)
@@ -120,13 +185,13 @@ export function LiveVignette() {
   const [naturalH, setNaturalH] = useState(0)
 
   useEffect(() => {
-    if (reduced) return
+    if (reduced || still) return
     const id = setTimeout(
       () => setStep((s) => (s >= LAST ? 0 : s + 1)),
       STEP_MS[step]
     )
     return () => clearTimeout(id)
-  }, [step, reduced])
+  }, [step, reduced, still])
 
   useEffect(() => {
     const box = boxRef.current
@@ -152,7 +217,7 @@ export function LiveVignette() {
     return () => ro.disconnect()
   }, [mounted])
 
-  const scale = width ? width / NATURAL_W : 0
+  const scale = width ? width / naturalW : 0
   const wallNames = WALL.slice(0, 3 + step)
 
   return (
@@ -162,33 +227,44 @@ export function LiveVignette() {
             reserved explicitly — the class of bug that once put a 940px TV in
             a 184px well and spilled it over the beats either side. */}
         <div
-          className="overflow-hidden"
+          className={room ? undefined : "overflow-hidden"}
           style={{
             // ASPECT-RATIO, not a computed height. A JS height needs a
             // measurement first, so the frame before the observer fired
             // rendered at 122px and the page jumped once on every load —
             // measured. A ratio holds the space from first paint, and the
             // real height replaces the fallback as soon as there is one.
-            aspectRatio: `${NATURAL_W} / ${naturalH || FALLBACK_H}`,
+            // Room mode DECLARES its height, so the ratio is known from the
+            // first paint and the measured fallback never runs — that path
+            // exists for the content-sized still, whose height cannot be
+            // known before it mounts.
+            aspectRatio: `${naturalW} / ${
+              room ? NATURAL_H_ROOM : naturalH || FALLBACK_H
+            }`,
           }}
         >
           <div
             ref={innerRef}
             className="origin-top-left"
             style={{
-              width: NATURAL_W,
+              width: naturalW,
+              // height 0 ONLY in room mode — see the note above. The
+              // content-sized still still needs its real height here,
+              // because the observer reads it back to size the box.
+              ...(room ? { height: 0 } : null),
               transform: scale ? `scale(${scale})` : undefined,
             }}
           >
             <TvFrame>
               {mounted && (
                 <DisplayStill
-                  scene={SCENES[step]}
+                  scene={scenes[step]}
                   qrUrl={DEMO_QR_URL}
                   wallNames={wallNames}
                   // The count it ends on, so the card is its final size from
                   // the first frame and nothing below it moves as names land.
                   wallReserveRows={3 + LAST}
+                  room={room}
                 />
               )}
             </TvFrame>

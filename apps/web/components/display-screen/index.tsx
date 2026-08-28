@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { getFavpollHeadline, roomTypeScale } from "@/lib/display"
+import {
+  getFavpollHeadline,
+  roomTypeScale,
+  roomTypeScaleAtWidth,
+  DISPLAY_ROOM,
+} from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
@@ -13,6 +18,7 @@ import {
 } from "@/components/wall-of-favourites"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { DisplayChrome } from "./display-chrome"
+import { FavpollLogo } from "@/components/favpoll-logo"
 import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 import type { Charity } from "@favpoll/types"
@@ -36,6 +42,26 @@ type Props = {
   dateLabel: string | null
   openingLine: string | null
   occasionType: string | null
+  /**
+   * THE DISPLAY AS A ROOM SEES IT, on a still (founder, 2026-08-27: "Why
+   * don't we make it an exact match of the real thing including the logo?").
+   *
+   * `live` strips four things that only make sense on a screen someone is
+   * presenting FROM — the refresh interval, the presenter menu, the vw type
+   * ramp, and viewport-anchored positioning. Three of those a still is right
+   * to lose. The fourth threw out the room's own furniture with them: the
+   * brand mark in the corner and the two gutter codes are what the ROOM sees,
+   * not what the presenter drives, and a still without them is not the
+   * display.
+   *
+   * So `room` puts them back, anchored to this component's own box rather
+   * than the viewport. It still does not bring the presenter menu: nobody can
+   * drive it, and a dropdown that opens nothing is worse than an absent one.
+   *
+   * Only meaningful when the caller renders at DISPLAY_STILL_ROOM — the
+   * gutters have to exist before anything can sit in them.
+   */
+  room?: boolean
   /** Fallback label when full charity rows aren't provided (stories) */
   charityName: string | null
   goalAmount?: number | null
@@ -112,6 +138,7 @@ export function DisplayScreen({
   defaultVariant = "fundraiser",
   favpollId,
   live = true,
+  room = false,
   wallReserveRows,
 }: Props) {
   const [totalRaised, setTotalRaised] = useState(initialTotalRaised)
@@ -215,7 +242,12 @@ export function DisplayScreen({
   const scanToPledge = effectiveClosed ? null : (
     <div
       className={`flex flex-col items-center gap-1.5 ${
-        live ? "min-[1600px]:hidden" : ""
+        // The in-banner code and the gutter pair are ALTERNATIVES, never both
+        // — the real display swaps one for the other at 1600px. A still in
+        // room mode has to make the same swap or it shows three codes where a
+        // room would see two, which is exactly the kind of drift this artefact
+        // exists to be incapable of.
+        room ? "hidden" : live ? "min-[1600px]:hidden" : ""
       }`}
     >
       <BrandedQR
@@ -247,17 +279,37 @@ export function DisplayScreen({
     // this fills the page and its box tracks the viewport — the breakpoint
     // lands where it always did.
     <div
-      className={`@container overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""}`}
+      className={`@container overflow-x-clip bg-primary/5 ${live ? "min-h-screen" : ""} ${room ? "relative h-full" : ""}`}
       // The ramp is opt-in and live-only: it is vw-relative, and the
       // landing page renders a still at a fixed width inside the
       // visitor's viewport, where vw-scaled type would burst the layout.
-      style={live ? (roomTypeScale as React.CSSProperties) : undefined}
+      // Room mode gets the SAME ramp resolved against the depicted width
+      // (see roomTypeScaleAtWidth). Without it a still renders every size at
+      // the clamp's floor — the projector's type turned all the way down on
+      // the one artefact whose job is to show a projector.
+      style={
+        live
+          ? (roomTypeScale as React.CSSProperties)
+          : room
+            ? (roomTypeScaleAtWidth(DISPLAY_ROOM.w) as React.CSSProperties)
+            : undefined
+      }
     >
       {/* Outside the card: its drop-shadow filter would otherwise become the
           containing block for the chrome's fixed corner positioning */}
       {/* Presenter controls only exist for a presenter — a still has nobody
           to drive them, and the bar is `fixed`, which inside the landing
           page's scaled frame would anchor to that frame rather than a room. */}
+      {/* THE BRAND MARK, at DisplayChrome's own geometry — the app header's
+          h-14 row, items-center, px-6 — so it lands where the room sees it.
+          Absolute rather than fixed, for the reason the QR pair is: `fixed`
+          resolves against the nearest transformed ancestor, and this whole
+          artefact lives inside a scaled frame. */}
+      {room && (
+        <div className="pointer-events-none absolute top-0 right-0 left-0 z-20 flex h-14 items-center px-6">
+          <FavpollLogo />
+        </div>
+      )}
       {live && (
         <DisplayChrome
           eventUrl={favpollUrl}
@@ -280,19 +332,36 @@ export function DisplayScreen({
           its drop-shadow filter would otherwise become these boxes'
           containing block (DisplayChrome precedent).
 
-          Live only. A still has no gutters to pin them in, and `fixed`
-          resolves against the nearest TRANSFORMED ancestor — so inside the
-          landing page's scaled frame these two 200px codes landed in the
-          middle of the rankings. Same trap as DisplayChrome above. */}
-      {live &&
+          `fixed` is LIVE ONLY, and the reason is a trap worth keeping
+          written down: it resolves against the nearest TRANSFORMED ancestor,
+          so inside the landing page's scaled frame these two 200px codes
+          landed in the middle of the rankings. Same trap as DisplayChrome
+          above. A still that wants them passes `room` and gets the same
+          pair positioned against this component's own box instead. */}
+      {(live || room) &&
         !effectiveClosed &&
         (["left", "right"] as const).map((side) => (
           <div
             key={side}
-            className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1600px]:flex ${
+            className={`pointer-events-none top-1/2 z-20 -translate-y-1/2 flex-col items-center gap-2 ${
+              room
+                ? // A STILL: anchored to this box, and always shown. 100% not
+                  // 100vw — the still's width IS the screen it depicts, and
+                  // the caller guarantees it is wide enough for the gutters to
+                  // exist. No min-[1600px] guard for the same reason: that
+                  // breakpoint asks the VIEWPORT whether a gutter fits, which
+                  // on a scaled still is a question about the visitor's
+                  // browser rather than about the screen being shown.
+                  "absolute flex"
+                : "fixed hidden min-[1600px]:flex"
+            } ${
               side === "left"
-                ? "left-[calc((100vw-72rem)/4-100px)]"
-                : "right-[calc((100vw-72rem)/4-100px)]"
+                ? room
+                  ? "left-[calc((100%-72rem)/4-100px)]"
+                  : "left-[calc((100vw-72rem)/4-100px)]"
+                : room
+                  ? "right-[calc((100%-72rem)/4-100px)]"
+                  : "right-[calc((100vw-72rem)/4-100px)]"
             }`}
           >
             <BrandedQR
@@ -309,7 +378,7 @@ export function DisplayScreen({
           up the tinted gutters hold the chrome and py-8 suffices. */}
       <div
         className={`mx-auto w-full max-w-6xl bg-background px-8 pb-8 @3xl:px-12 @3xl:pt-8 @3xl:drop-shadow-lg ${
-          live ? "min-h-screen pt-16" : "pt-8"
+          live ? "min-h-screen pt-16" : room ? "min-h-full pt-8" : "pt-8"
         }`}
       >
         {/* ── Banner: ONE row, two columns (founder, 2026-08-02). The

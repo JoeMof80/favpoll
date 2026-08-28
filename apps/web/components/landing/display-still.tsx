@@ -2,6 +2,7 @@
 
 import { DisplayScreen } from "@/components/display-screen"
 import { sceneFavourites } from "@/components/hero-demo-panel/scene-favourites"
+import { DISPLAY_ROOM } from "@/lib/display"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 // The live display as the closing beat of the guest arc — the REAL component,
@@ -32,6 +33,29 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
  * window. 1120 clears 64rem with room for the surround's own padding.
  */
 export const DISPLAY_STILL_WIDTH = 1120
+
+/**
+ * The still as a SCREEN IN A ROOM, rather than as a picture of its content
+ * (founder, 2026-08-27: "display too wide (or too short) ... Why don't we
+ * make it an exact match of the real thing including the logo?").
+ *
+ * 1600 WIDE, because that is where the real display has gutters at all: the
+ * card is max-w-6xl — 72rem, 1152px — so a 1120 still fills its frame edge to
+ * edge with no tinted margin for a code to sit in. At 1600 the gutter is
+ * (1600-1152)/2 = 224, which clears the 200px code. Below that the product
+ * itself keeps the in-banner QR, so a narrower "with gutters" still would
+ * depict a screen that does not exist.
+ *
+ * 900 TALL, and the height is the half that was missing. Gutters alone made
+ * the artefact 1640 x 700 — 2.35:1, a letterbox — because the box was still
+ * sized by its CONTENT while the width had grown by 480px of gutter. A screen
+ * is not content-shaped. 16:9 is, so the height is declared and the card
+ * fills it, exactly as `min-h-screen` fills a projector.
+ *
+ * It costs ~27% of the on-screen type against the 1120 still, the extra width
+ * being pure gutter.
+ */
+export const DISPLAY_STILL_ROOM = DISPLAY_ROOM
 
 /**
  * Leaders shown. The real display lists every favourite, including the ones
@@ -71,6 +95,7 @@ export function DisplayStill({
   qrUrl,
   wallNames = WALL_NAMES,
   wallReserveRows,
+  room = false,
 }: {
   scene: HeroScene
   qrUrl: string
@@ -86,6 +111,11 @@ export function DisplayStill({
    * while it fills.
    */
   wallReserveRows?: number
+  /**
+   * Render as a screen in a room — 16:9, the brand mark in the corner, the
+   * gutter QR pair — rather than as a picture of the display's content.
+   */
+  room?: boolean
 }) {
   const topicId = `${scene.poll.id}-topic`
   const items = sceneFavourites(scene, topicId)
@@ -103,7 +133,13 @@ export function DisplayStill({
   }))
 
   return (
-    <div style={{ width: DISPLAY_STILL_WIDTH }}>
+    <div
+      style={
+        room
+          ? { width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }
+          : { width: DISPLAY_STILL_WIDTH }
+      }
+    >
       <DisplayScreen
         live={false}
         // protagonist FIRST, heading only as the fallback (founder,
@@ -140,6 +176,20 @@ export function DisplayStill({
         goalAmount={DEMO_GOAL}
         favpollUrl="https://favpoll.com"
         qrUrl={qrUrl}
+        // THE PRESENCE DIAL, derived rather than defaulted (founder,
+        // 2026-08-27: "the live display isn't in tribute mode"). DisplayScreen
+        // falls back to "fundraiser" when nothing is passed, so every still on
+        // the site was running telethon theatre — the goal figure as the
+        // heading — including the one beside copy that says "Display the
+        // favpoll in tribute mode at the wake".
+        //
+        // The rule is the product's own, from /live/[slug]: register
+        // "remembering" takes tribute, everything else fundraiser. A memorial
+        // scene IS the remembering register (deriveRegister: category
+        // "memorial" -> "remembering"), so the scene's kind decides it and the
+        // celebration and cause stills keep the louder variant they want.
+        defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
+        room={room}
       />
     </div>
   )
