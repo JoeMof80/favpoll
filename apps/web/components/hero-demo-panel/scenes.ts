@@ -264,23 +264,20 @@ export const SCENES: HeroScene[] = [
       // It reads as a couple without presuming which kind, which a wedding
       // exemplar should.
       name: "Alex & Jordan",
-      // VENUE · DATE, the format the two event scenes already use ("London
-      // Marathon · 26.2 miles", "A sponsored dog walk · 5 miles"), and the
-      // format a wedding invitation uses anyway.
+      // "At the boathouse" (founder, 2026-08-28), and short enough not to
+      // wrap — which is why the venue-and-date version went. At phone width
+      // it took two lines, and no binding of the date fixed the fact that a
+      // subtitle taking two lines is a subtitle carrying too much.
       //
-      // A bare "12th September" was the only context line on any scene that
-      // was just a date. It said nothing the headline had not — the card
-      // already reads "Congratulations to" — and left the tense open: had the
-      // wedding happened, or was it coming?
+      // Lowercase, and descriptive rather than a name. That is the better
+      // call for a second reason: the cause scene deliberately keeps St
+      // Luke's "named but not branded" because a real name on a demo card
+      // reads as endorsement. "At the boathouse" is not a venue's name at
+      // all, so the question does not arise.
       //
-      // INVENTED, and it has to stay that way. The cause scene makes the same
-      // call about St Luke's: a real name on a demo card reads as endorsement
-      // before anyone has had a conversation about it.
-      // NON-BREAKING SPACE inside the date. At phone width the line wraps,
-      // and left alone it broke as "The Boathouse · 12th / September" —
-      // splitting the date itself, which is the one place it must not break.
-      // Bound together, it wraps after the separator instead.
-      context: "The Boathouse · 12th\u00A0September",
+      // The date is gone with it and is not missed. The field is only a
+      // label — Poppy's is "Sweet Sixteen", which is not a date either.
+      context: "At the boathouse",
       about:
         "The happy couple have requested donations to the WWF rather than gifts, given their passion for conservation.",
       photo_url: "/demo/alex-jordan.jpg",
