@@ -9,6 +9,7 @@ import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
+import { IdeasSection } from "@/components/landing/ideas-section"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -183,102 +184,11 @@ export default function MemorialsPage() {
           wake" and "As quiet or as present as the family wants". The order
           of service and the tribute display both said the same things at
           less use, so the page said them twice. ── */}
-      {/* overflow-x-clip, and it is load-bearing (2026-08-27). The live
-            artefact deliberately does not clip its own box, so TvFrame's
-            atmosphere can finish instead of being cut off square — but the
-            box it stops clipping is the still's UNSCALED 1960px one, and
-            with nothing containing that the document grew 11px wider than a
-            320px phone. The e2e overflow guard caught it; it went green
-            again here.
-
-            The section is the right place: it spans the full viewport, so
-            the clip edge is the screen edge rather than anything near the
-            set, and at every width above a small phone the atmosphere
-            finishes long before it. `clip` not `hidden` — hidden on one axis
-            makes the other a scroll container. */}
-      <section
-        id="artefacts"
-        className="w-full scroll-mt-20 overflow-x-clip bg-primary/5"
-      >
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <SectionEyebrow className="mb-10 text-memorial">
-            {t("memorials.artefacts.title")}
-          </SectionEyebrow>
-          {/* The homepage's text-left / media-right row (see "The record"
-              on the landing page): grid, items-center, gap-8, two columns
-              from lg.
-
-              NOT grid-cols-2. Equal halves give each column ~472px at 1024,
-              and PackVignette is a FIXED 624px at lg — a grid item cannot
-              shrink below its min-content, so equal halves would grow the
-              page by ~150px at exactly the width the two-column layout
-              switches on. #567, #571 and this page's own hero have all been
-              this bug. The media track is sized to the media instead
-              (39rem = 624px), and the text track takes what is left, with
-              minmax(0,·) so IT can shrink rather than the page.
-
-              The frame comes off: the vignettes wrap themselves in
-              Vignette's tinted, bordered box, which reads as a card on
-              /features where each sits alone in a section. Beside a column
-              of text it reads as a widget. The vignettes take no props, so
-              the frame is stripped here rather than there — /features keeps
-              its cards. */}
-          <div className="space-y-16 lg:space-y-24">
-            {ARTEFACTS.map(({ key, label, body, artefact }, i) => {
-              // ALTERNATING SIDES. Four rows the same way round is a
-              // column of text with a column of pictures beside it; the
-              // eye stops reading and starts scanning. Swapping every
-              // other row makes each one its own beat (founder,
-              // 2026-08-26).
-              //
-              // Implemented as grid ORDER, not source order: the caption
-              // stays first in the DOM on every row, so the reading and
-              // tab order never depend on which way the row is facing.
-              // Below lg both columns stack and the flag does nothing —
-              // text always first, which is the order that makes sense
-              // when the image is underneath it.
-              const mediaLeft = i % 2 === 1
-              return (
-                <figure
-                  key={key}
-                  className={cn(
-                    "grid items-center gap-8 lg:gap-16",
-                    mediaLeft
-                      ? "lg:grid-cols-[39rem_minmax(0,1fr)]"
-                      : "lg:grid-cols-[minmax(0,1fr)_39rem]"
-                  )}
-                >
-                  <figcaption
-                    className={cn(
-                      "max-w-md min-w-0",
-                      mediaLeft && "lg:order-2"
-                    )}
-                  >
-                    <p className="mb-3 text-3xl font-light tracking-tight text-foreground">
-                      {label}
-                    </p>
-                    <p className="leading-relaxed text-muted-foreground">
-                      {body}
-                    </p>
-                  </figcaption>
-                  <div
-                    className={cn(
-                      // overflow-visible with the rest of the frame: stripping the
-                      // border, radius and tint left an INVISIBLE clip still
-                      // cutting the live display's wall shadow, which is a
-                      // frame doing damage after it has been told to go away.
-                      "min-w-0 [&_[data-vignette]]:max-w-none [&_[data-vignette]]:overflow-visible [&_[data-vignette]]:rounded-none [&_[data-vignette]]:border-0 [&_[data-vignette]]:bg-transparent",
-                      mediaLeft && "lg:order-1"
-                    )}
-                  >
-                    {artefact}
-                  </div>
-                </figure>
-              )
-            })}
-          </div>
-        </div>
-      </section>
+      <IdeasSection
+        title={t("memorials.artefacts.title")}
+        ideas={ARTEFACTS}
+        accentClassName="text-memorial"
+      />
 
       {/* ── Reassurances ── */}
       <section className="w-full">

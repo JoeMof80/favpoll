@@ -13,6 +13,7 @@ import {
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import { Vignette } from "@/components/landing/vignette"
+import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 // The personal reveal, locked and then given.
 //
@@ -38,6 +39,14 @@ const DECOY =
 
 // Derived, never typed — the callout names the same person and the same
 // topic the card behind it does, because it reads them off the same scene.
+/** The register accent each scene's card wears — see DemoCard's accentVar. */
+const ACCENT_BY_KIND: Record<string, string> = {
+  memorial: "memorial",
+  celebration: "warning",
+  fundraiser: "success",
+  cause: "success",
+}
+
 const FIRST_NAME = (MEMORIAL_SCENE.protagonist?.name ?? "").split(/[\s&]+/)[0]
 const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
 
@@ -96,7 +105,14 @@ const SCENE_H = PHONE_CHASSIS_HEIGHT
 const PHONE_LEFT = Math.round((SCENE_W - PHONE_CHASSIS_WIDTH) / 2)
 const CALLOUT = { left: 20, top: 264, width: 312 }
 
-export function RevealVignettePhone() {
+export function RevealVignettePhone({
+  scene = MEMORIAL_SCENE,
+}: { scene?: HeroScene } = {}) {
+  // Derived per scene rather than from the module consts, so a register page
+  // can point this at its own favpoll. The memorial stays the default: this
+  // vignette was built for it, and /features expects it.
+  const reveal = scene.poll.personal_reveal ?? ""
+  const firstName = (scene.protagonist?.name ?? "").split(/[\s&]+/)[0]
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — the pack and keepsake
@@ -117,12 +133,12 @@ export function RevealVignettePhone() {
           <div className="absolute top-0" style={{ left: PHONE_LEFT }}>
             <PhoneFrame>
               <DemoCard
-                scene={MEMORIAL_SCENE}
+                scene={scene}
                 phase="reveal"
-                barWidths={MEMORIAL_SCENE.results.map((r) => r.widthPercent)}
+                barWidths={scene.results.map((r) => r.widthPercent)}
                 prefersReducedMotion
                 device="phone"
-                accentVar="memorial"
+                accentVar={ACCENT_BY_KIND[scene.kind] ?? "memorial"}
                 className="rounded-none border-0"
               />
             </PhoneFrame>
@@ -148,10 +164,14 @@ export function RevealVignettePhone() {
                 before: right words, wrong object. A magnifier that shows
                 something the screen underneath does not is not a magnifier. */}
             <div className="space-y-4">
-              <PollHeading topicTitle={TOPIC_TITLE} size="lg" inert />
+              <PollHeading
+                topicTitle={scene.poll.topic.title}
+                size="lg"
+                inert
+              />
               <PollReveal
-                personalReveal={REVEAL}
-                protagonistFirstName={FIRST_NAME}
+                personalReveal={reveal}
+                protagonistFirstName={firstName}
               />
             </div>
           </div>

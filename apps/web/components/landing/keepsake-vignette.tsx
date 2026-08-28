@@ -2,6 +2,10 @@ import { KeepsakeDocument } from "@/components/keepsake/keepsake-document"
 import { KeepsakeSheet } from "@/components/keepsake/keepsake-sheet"
 import { Vignette } from "@/components/landing/vignette"
 import { DEMO_KEEPSAKE_DATA } from "@/components/landing/demo-fixture"
+import type {
+  KeepsakeData,
+  KeepsakeVariant,
+} from "@/components/keepsake/keepsake-document"
 
 // The keepsake as it comes off the printer — the real KeepsakeDocument,
 // shared with the keepsake page, so the sheet this page depicts and the
@@ -58,7 +62,10 @@ const FAN_H = Math.max(
 // fundraiser sheet was illustrating a claim the copy does not make.
 const KEEPSAKE_SCALE = "scale-[0.34] lg:scale-[0.47] xl:scale-[0.57]"
 
-export function KeepsakeVignetteDetail() {
+export function KeepsakeVignetteDetail({
+  data = DEMO_KEEPSAKE_DATA,
+  variant = "tribute",
+}: { data?: KeepsakeData; variant?: KeepsakeVariant } = {}) {
   return (
     <Vignette className="flex justify-center">
       {/* The box reserves the SCALED size: a transform does not change the
@@ -70,8 +77,8 @@ export function KeepsakeVignetteDetail() {
         className="h-[382px] w-[270px] lg:h-[528px] lg:w-[373px] xl:h-[640px] xl:w-[453px]"
       >
         <KeepsakeSheet
-          data={DEMO_KEEPSAKE_DATA}
-          variant="tribute"
+          data={data}
+          variant={variant}
           orientation="portrait"
           className={`origin-top-left ${KEEPSAKE_SCALE}`}
         />

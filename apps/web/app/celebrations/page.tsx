@@ -3,6 +3,15 @@ import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
+import { IdeasSection } from "@/components/landing/ideas-section"
+import { TentCardVignette } from "@/components/landing/tent-card-vignette"
+import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
+import { LiveVignette } from "@/components/landing/live-vignette"
+import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
+import {
+  DEMO_SCENE,
+  DEMO_KEEPSAKE_WALKTHROUGH_DATA,
+} from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
 
 // Register landing #2 (see /memorials for the pattern notes). ACCENT,
@@ -40,6 +49,49 @@ const PRESENCE = [
   t("celebrations.presence.rally"),
 ]
 
+// Cards -> phone -> room -> paper, the same arc /memorials runs, in the
+// register's own objects. Every one is the real component pointed at the
+// CELEBRATION scene, so Poppy Chen's favpoll runs from the homepage router
+// card through the hero and on through all four.
+const IDEAS = [
+  {
+    key: "cards",
+    label: t("celebrations.artefacts.cards.label"),
+    body: t("celebrations.artefacts.cards.body"),
+    // A tent card, not the pack fan: the copy names the object on the
+    // table, so the picture is that object. TentCardVignette's defaults are
+    // the celebration pack, so this needs no register twin.
+    artefact: <TentCardVignette />,
+  },
+  {
+    key: "reveal",
+    label: t("celebrations.artefacts.reveal.label"),
+    body: t("celebrations.artefacts.reveal.body"),
+    // Poppy's own favourite comes FOURTH in her standings — the room
+    // disagreed with her — which makes this the better register for the
+    // reveal than the memorial it was built for.
+    artefact: <RevealVignettePhone scene={DEMO_SCENE} />,
+  },
+  {
+    key: "display",
+    label: t("celebrations.artefacts.display.label"),
+    body: t("celebrations.artefacts.display.body"),
+    // FUNDRAISER variant, and it comes for free: DisplayStill derives the
+    // presence dial from the scene's register, so a memorial gets tribute
+    // and everything else gets the goal bar. A party screen should be loud
+    // where a wake's is quiet.
+    artefact: <LiveVignette scene={DEMO_SCENE} still room />,
+  },
+  {
+    key: "keepsake",
+    label: t("celebrations.artefacts.keepsake.label"),
+    body: t("celebrations.artefacts.keepsake.body"),
+    // The walkthrough's own sheet — Poppy's — which until now had nowhere
+    // to live outside the home page's How It Works.
+    artefact: <KeepsakeVignetteDetail data={DEMO_KEEPSAKE_WALKTHROUGH_DATA} />,
+  },
+]
+
 export default function CelebrationsPage() {
   return (
     <main>
@@ -75,7 +127,16 @@ export default function CelebrationsPage() {
       {/* ── How it works, in the celebration register ── */}
       <HowItWorksSteps title={t("celebrations.how.title")} steps={STEPS} />
 
-      {/* ── Placement: a beat in the speeches ── */}
+      <IdeasSection
+        title={t("celebrations.artefacts.title")}
+        ideas={IDEAS}
+        accentClassName="text-warning-strong"
+      />
+
+      {/* ── Placement: a beat in the speeches ──
+          KEPT FOR NOW (founder, 2026-08-28): the Ideas section above
+          overlaps both this and the presence dial below, and the founder is
+          drawing the Ideas copy from them. They go when that copy settles. */}
       <section className="w-full bg-primary/5">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
