@@ -257,40 +257,65 @@ export const SCENES: HeroScene[] = [
       name: "Sarah & Tom",
       context: "12th September",
       about:
-        "Sarah and Tom would rather you gave to Barnardo's than bought them a gift. There is cake at the reception, and strong opinions about which kind is best.",
+        "Sarah and Tom would rather you gave to Barnardo's than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
       // No couple photograph in public/demo yet — ProtagonistAvatar falls
       // back without one. A real wedding scene wants one.
       photo_url: null,
     },
     poll: {
       id: "demo-poll-wedding",
-      // First person and plural, the couple writing it in advance — the
-      // voice the brand guide calls the most powerful version. It withholds
-      // in the About and discloses here, and the room does not agree with
-      // them: theirs comes SECOND in the standings below.
-      personal_reveal:
-        "Ours is the lemon drizzle. We shared a slice on our first date and have argued about it ever since.",
+      // THE HONEYMOON IS THE REVEAL, and it is why this topic beats every
+      // other wedding candidate (founder, 2026-08-28).
+      //
+      // Cake was the first attempt and it failed a test worth naming: NEVER
+      // PICK A TOPIC THAT COLLIDES WITH A CHOICE THE COUPLE HAS ALREADY MADE
+      // AND PUT ON DISPLAY. There is a real cake in the room, chosen and paid
+      // for and often made by family — so inviting guests to pick a different
+      // favourite turns the poll into a referendum on it by proximity, and
+      // the couple's answer placing second reads as a verdict rather than a
+      // joke. Flowers fail the same test; first dance song fails it worst,
+      // because that one actually gets played.
+      //
+      // A honeymoon collides with nothing. Better still, the couple's answer
+      // is not competing with the guests' at all — it is NEWS. That turns the
+      // reveal into something a room genuinely wants to unlock, which is the
+      // withhold/reveal mechanic working at full strength rather than as a
+      // formality. The About withholds it in as many words.
+      //
+      // First person and plural, the couple writing it in advance — the voice
+      // the brand guide calls the most powerful version.
+      personal_reveal: "Ours is Japan. We fly on Tuesday for the honeymoon.",
       topic: {
-        title: "Cake",
+        title: "Holiday destination",
         favourites: [
-          { id: "ck-bakewell", label: "Bakewell tart" },
-          { id: "ck-banana", label: "Banana bread" },
-          { id: "ck-battenberg", label: "Battenberg" },
-          { id: "ck-blackforest", label: "Black Forest gateau" },
-          { id: "ck-carrot", label: "Carrot cake" },
-          { id: "ck-cheesecake", label: "Cheesecake" },
-          { id: "ck-chocfudge", label: "Chocolate fudge" },
-          { id: "ck-christmas", label: "Christmas cake" },
-          { id: "ck-coffeewalnut", label: "Coffee and walnut" },
-          { id: "ck-fruit", label: "Fruit cake" },
-          { id: "ck-ginger", label: "Ginger cake" },
-          { id: "ck-lemondrizzle", label: "Lemon drizzle" },
-          { id: "ck-madeira", label: "Madeira" },
-          { id: "ck-redvelvet", label: "Red velvet" },
-          { id: "ck-rockyroad", label: "Rocky road" },
-          { id: "ck-stickytoffee", label: "Sticky toffee" },
-          { id: "ck-swissroll", label: "Swiss roll" },
-          { id: "ck-victoria", label: "Victoria sponge" },
+          { id: "hd-amalfi", label: "Amalfi Coast" },
+          { id: "hd-amsterdam", label: "Amsterdam" },
+          { id: "hd-bali", label: "Bali" },
+          { id: "hd-barcelona", label: "Barcelona" },
+          { id: "hd-cornwall", label: "Cornwall" },
+          { id: "hd-croatia", label: "Croatia" },
+          { id: "hd-cyprus", label: "Cyprus" },
+          { id: "hd-edinburgh", label: "Edinburgh" },
+          { id: "hd-iceland", label: "Iceland" },
+          { id: "hd-ireland", label: "Ireland" },
+          { id: "hd-italy", label: "Italy" },
+          { id: "hd-japan", label: "Japan" },
+          { id: "hd-lakes", label: "Lake District" },
+          { id: "hd-lisbon", label: "Lisbon" },
+          { id: "hd-maldives", label: "Maldives" },
+          { id: "hd-morocco", label: "Morocco" },
+          { id: "hd-newyork", label: "New York" },
+          { id: "hd-norway", label: "Norway" },
+          { id: "hd-paris", label: "Paris" },
+          { id: "hd-portugal", label: "Portugal" },
+          { id: "hd-santorini", label: "Santorini" },
+          { id: "hd-scotland", label: "Scotland" },
+          { id: "hd-srilanka", label: "Sri Lanka" },
+          { id: "hd-thailand", label: "Thailand" },
+          { id: "hd-tuscany", label: "Tuscany" },
+          { id: "hd-venice", label: "Venice" },
+          { id: "hd-vietnam", label: "Vietnam" },
+          { id: "hd-yorkshire", label: "Yorkshire Dales" },
         ],
       },
     },
@@ -304,13 +329,17 @@ export const SCENES: HeroScene[] = [
     ],
     selectedIndex: 11,
     pledgeAmount: "£20",
+    // The room picked Italy; the couple are going to Japan. Second place is
+    // not a verdict here, because they were never answering the same
+    // question — the guests said where they love, the couple said where they
+    // are GOING.
     results: [
-      { label: "Victoria sponge", amount: "£210", widthPercent: 100 },
-      { label: "Lemon drizzle", amount: "£175", widthPercent: 83 },
-      { label: "Carrot cake", amount: "£130", widthPercent: 62 },
-      { label: "Coffee and walnut", amount: "£95", widthPercent: 45 },
-      { label: "Chocolate fudge", amount: "£60", widthPercent: 29 },
-      { label: "Bakewell tart", amount: "£35", widthPercent: 17 },
+      { label: "Italy", amount: "£210", widthPercent: 100 },
+      { label: "Japan", amount: "£175", widthPercent: 83 },
+      { label: "Iceland", amount: "£130", widthPercent: 62 },
+      { label: "New York", amount: "£95", widthPercent: 45 },
+      { label: "Cornwall", amount: "£60", widthPercent: 29 },
+      { label: "Vietnam", amount: "£35", widthPercent: 17 },
     ],
     total: "£705",
   },
