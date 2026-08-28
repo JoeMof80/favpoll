@@ -46,25 +46,44 @@ import { Vignette } from "@/components/landing/vignette"
 // This vignette typed "Favourite Grandad story" INTO the topic search, which
 // no organiser would, and which beat 3 would have rendered as "Search for
 // your favourite favourite grandad story…".
-const TOPIC = "Grandad story"
-const HEADING = `Favourite ${TOPIC}`
+/**
+ * What the vignette types. PARAMETERISED 2026-08-28, when /fundraisers needed
+ * this same sequence to show ITS favpoll — Marcus Bell's mascot — rather than
+ * the grandad stories /features runs. A picture of the custom-topic mechanic
+ * beside copy about Marcus, typing someone else's topic, is the same
+ * continuity break the flowers and the cake were on the router cards.
+ *
+ * PASS A MODULE-LEVEL CONSTANT, never an object literal written inline. The
+ * animation effect lists `scene` in its dependencies, so a fresh reference on
+ * every render would restart the sequence on every render.
+ */
+export type TopicPickerScene = {
+  topic: string
+  items: [string, string, string]
+  guestItem: string
+}
 
-// A family in-joke no catalogue could ever hold — the purest case for the
-// create path. The items are meaningless to strangers and everything to the
-// guest list.
-const ITEMS = [
-  "The wheelbarrow incident",
-  "The time he met Elvis",
-  "The allotment feud",
-]
-// What the organiser never thought of, added by a guest at pledge time.
-// KEEP IT HARMLESS (founder, 2026-08-17). This was "The great chip pan fire",
-// which is a house fire — the only item in the set implying danger, and this
-// topic is one a family will plausibly run at a funeral. The other three are
-// mishap, brush with fame and long-running grudge; a fourth in that key has
-// to be small, specific and fond, the kind of thing only someone who was
-// there still remembers.
-const GUEST_ITEM = "The day he won the meat raffle"
+/**
+ * A family in-joke no catalogue could ever hold — the purest case for the
+ * create path. The items are meaningless to strangers and everything to the
+ * guest list.
+ *
+ * The guest item is KEPT HARMLESS (founder, 2026-08-17). It was "The great
+ * chip pan fire", which is a house fire — the only item in the set implying
+ * danger, and this topic is one a family will plausibly run at a funeral. The
+ * other three are mishap, brush with fame and long-running grudge; a fourth
+ * in that key has to be small, specific and fond, the kind of thing only
+ * someone who was there still remembers.
+ */
+export const GRANDAD_STORY_TOPIC: TopicPickerScene = {
+  topic: "Grandad story",
+  items: [
+    "The wheelbarrow incident",
+    "The time he met Elvis",
+    "The allotment feud",
+  ],
+  guestItem: "The day he won the meat raffle",
+}
 
 // Real canonical topics shown in the picker before the search filters them out.
 const SUGGESTED_TOPICS = ["Colour", "Season", "Song", "Film", "Biscuit"]
@@ -99,7 +118,14 @@ const ADD_TOKEN = (
   </span>
 )
 
-export function TopicPickerVignette() {
+export function TopicPickerVignette({
+  scene = GRANDAD_STORY_TOPIC,
+}: { scene?: TopicPickerScene } = {}) {
+  // Read into the names the body already uses, so parameterising this cost
+  // four lines rather than twenty scattered renames.
+  const { topic: TOPIC, items: ITEMS, guestItem: GUEST_ITEM } = scene
+  const HEADING = `Favourite ${TOPIC}`
+
   const reduced = useReducedMotion()
   const [phase, setPhase] = useState<Phase>(
     reduced ? { kind: "hold" } : { kind: "search", count: 0 }
@@ -176,7 +202,7 @@ export function TopicPickerVignette() {
       id = setTimeout(() => setPhase({ kind: "search", count: 0 }), HOLD_MS)
     }
     return () => clearTimeout(id)
-  }, [phase, reduced])
+  }, [phase, reduced, scene])
 
   // ── Dialog 1 (Pick a topic) ────────────────────────────────────────────────
   const searchText =

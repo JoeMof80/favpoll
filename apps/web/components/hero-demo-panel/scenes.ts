@@ -62,7 +62,7 @@ export type HeroScene = {
   eyebrow?: string
   /**
    * Sub-heading line for no-protagonist scenes — the cause's equivalent of a
-   * protagonist's `context` ("1945 - 2024", "London Marathon · 26.2 miles").
+   * protagonist's `context` ("1945 - 2024", "London Marathon run").
    * The real product stores this on favpolls.context for cause favpolls (see
    * the favpoll_cause_photo_context migration); the scene type had it only
    * inside `protagonist`, so cause scenes could not show one at all.
@@ -396,36 +396,55 @@ export const SCENES: HeroScene[] = [
   {
     // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —
     //    so it keeps a protagonist (the runner). Register-wise it derives to
-    //    `cause`, but it is nothing like a faceless appeal. ──
+    //    `cause`, but it is nothing like a faceless appeal.
+    //
+    //    THE HOMEMADE TOPIC (founder, 2026-08-28). This scene is the site's
+    //    one exemplar of a topic an organiser wrote themselves, which is why
+    //    it is a mascot and not the favourite Dance it ran until now. Dance
+    //    could sit in the catalogue tomorrow — it is a preference, like
+    //    Colour or Season. A list of the specific objects Marcus's colleagues
+    //    offered to lend him could not, and that is the whole point of it.
+    //
+    //    IT ALSO DECIDES SOMETHING, which no other scene does. The winner
+    //    actually rides the 26.2 miles, so a pledge here changes an outcome
+    //    rather than recording an opinion — a reason to give more, and one
+    //    that suits this register and no other. Do not spread it: the
+    //    memorial and the wedding measure what people love, and should. ──
     kind: "fundraiser",
     occasion_type: "Sponsored event",
     opening_line: null,
     protagonist: {
       name: "Marcus Bell",
-      context: "London Marathon · 26.2 miles",
+      context: "London Marathon run",
       about:
-        "Running his first marathon for the British Heart Foundation, in memory of his dad. There's one dance he's promised to bust out at the finish line.",
+        "Running his first marathon for the British Heart Foundation, in memory of his dad. Whichever mascot wins rides the whole 26.2 miles, pinned to his vest.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {
       id: "demo-poll-fundraiser",
+      // The joke has something underneath it, and the reveal is where that
+      // lands. The room backed the rubber duck because the rubber duck is
+      // funny and funny raises money, which is true of every workplace
+      // fundraiser; only after pledging do you find out what Marcus was
+      // quietly hoping for. Second sentence does all the work and never says
+      // anything heavy.
       personal_reveal:
-        "Northern Soul. Marcus has been spinning at all-nighters since he was nineteen.",
+        "Kevin the gnome. He stood in Dad's front garden for thirty years.",
       topic: {
-        title: "Dance",
+        title: "Mascot",
+        // EIGHT, where Colour has twelve and Holiday destination
+        // twenty-eight. A homemade list should look homemade: nobody sits
+        // down and writes thirty of these, and the short list is itself a
+        // signal that no catalogue supplied it.
         favourites: [
-          { id: "d-ballet", label: "Ballet" },
-          { id: "d-ballroom", label: "Ballroom" },
-          { id: "d-breakdancing", label: "Breakdancing" },
-          { id: "d-charleston", label: "Charleston" },
-          { id: "d-disco", label: "Disco" },
-          { id: "d-flamenco", label: "Flamenco" },
-          { id: "d-jive", label: "Jive" },
-          { id: "d-linedancing", label: "Line dancing" },
-          { id: "d-northernsoul", label: "Northern Soul" },
-          { id: "d-salsa", label: "Salsa" },
-          { id: "d-tango", label: "Tango" },
-          { id: "d-waltz", label: "Waltz" },
+          { id: "m-barnaby", label: "Barnaby the bear" },
+          { id: "m-conker", label: "Conker" },
+          { id: "m-dice", label: "Fluffy dice" },
+          { id: "m-gnome", label: "Kevin the gnome" },
+          { id: "m-heart", label: "Knitted heart" },
+          { id: "m-2p", label: "Lucky 2p" },
+          { id: "m-duck", label: "Rubber duck" },
+          { id: "m-spoon", label: "Wooden spoon" },
         ],
       },
     },
@@ -437,15 +456,19 @@ export const SCENES: HeroScene[] = [
         registered_number: "225971",
       },
     ],
-    selectedIndex: 9,
+    // Rubber duck (index 6) — a GUEST's pick, not Marcus's. Kevin is third,
+    // the same shape Northern Soul had and Purple has on the memorial: the
+    // demo selection must never land on the protagonist's own answer, or the
+    // reveal is spent before it arrives.
+    selectedIndex: 6,
     pledgeAmount: "£20",
     results: [
-      { label: "Salsa", amount: "£240", widthPercent: 100 },
-      { label: "Ballroom", amount: "£190", widthPercent: 79 },
-      { label: "Northern Soul", amount: "£150", widthPercent: 63 },
-      { label: "Tango", amount: "£110", widthPercent: 46 },
-      { label: "Jive", amount: "£75", widthPercent: 31 },
-      { label: "Disco", amount: "£45", widthPercent: 19 },
+      { label: "Rubber duck", amount: "£240", widthPercent: 100 },
+      { label: "Barnaby the bear", amount: "£190", widthPercent: 79 },
+      { label: "Kevin the gnome", amount: "£150", widthPercent: 63 },
+      { label: "Knitted heart", amount: "£110", widthPercent: 46 },
+      { label: "Lucky 2p", amount: "£75", widthPercent: 31 },
+      { label: "Fluffy dice", amount: "£45", widthPercent: 19 },
     ],
     total: "£810",
   },

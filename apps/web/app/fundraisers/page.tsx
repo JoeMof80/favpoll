@@ -12,13 +12,14 @@ import {
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { PosterVignette } from "@/components/landing/poster-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
-import { LiveVignette } from "@/components/landing/live-vignette"
+import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import {
   FUNDRAISER_SCENE,
   FUNDRAISER_PACK_DATA,
   FUNDRAISER_PACK_STEPS,
   FUNDRAISER_KEEPSAKE_DATA,
+  FUNDRAISER_TOPIC_PICKER,
 } from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
 import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
@@ -58,30 +59,28 @@ const STEPS = [
 // they default to — the last of the three registers to stop showing
 // Belinda's colours under its own headline.
 //
-// `shown` is eight of the topic's twelve, chosen not sliced: the short
-// labels, because the hint column is 184px and "Breakdancing" or "Line
-// dancing" drops it to one pill a row. NORTHERN SOUL IS DELIBERATELY ABSENT,
-// exactly as Purple is on the memorial and Chengdu on the wedding — it is
-// Marcus's own answer, and lighting it here would give the reveal away two
-// columns before the standings do.
+// `shown` is seven of the topic's eight, and seven is nearly all of them
+// because a homemade list IS short — where the memorial withholds one of
+// twelve and the wedding one of twenty-eight. KEVIN IS THE ONE HELD BACK, as
+// Purple and Chengdu are: he is Marcus's own answer, and lighting him here
+// would give the reveal away two columns before the standings do.
 //
-// `picked` is Salsa: a guest's pick, top of the standings, and the scene's
-// own selectedIndex. On the wedding those two had to differ, because that
-// scene points its selection at the couple's answer; this one already points
-// at a guest's, so the hint and the demo agree.
+// `picked` is the rubber duck: a guest's pick, top of the standings, and the
+// scene's own selectedIndex. On the wedding those two had to differ, because
+// that scene points its selection at the couple's answer; this one already
+// points at a guest's, so the hint and the demo agree.
 const FUNDRAISER_HINTS: HintScene = {
   scene: FUNDRAISER_SCENE,
   shown: [
-    "Ballet",
-    "Ballroom",
-    "Charleston",
-    "Disco",
-    "Jive",
-    "Salsa",
-    "Tango",
-    "Waltz",
+    "Barnaby the bear",
+    "Conker",
+    "Fluffy dice",
+    "Knitted heart",
+    "Lucky 2p",
+    "Rubber duck",
+    "Wooden spoon",
   ],
-  picked: "Salsa",
+  picked: "Rubber duck",
 }
 
 const STEP_MEDIA = [
@@ -90,10 +89,27 @@ const STEP_MEDIA = [
   <RankHint key="rank" hints={FUNDRAISER_HINTS} />,
 ]
 
-// Paper -> phone -> room -> paper, the arc /memorials set and /celebrations
-// followed, in this register's own objects. Every one is the real component
-// pointed at the FUNDRAISER scene, so Marcus Bell's marathon runs from the
-// homepage router card through the hero and on through all four.
+// Topic -> paper -> phone -> paper: make it, put it up, give and be told,
+// keep it. The other two pages run paper -> phone -> room -> paper; this one
+// diverges twice, and both are the exemplar deciding the pictures.
+//
+// THE LIVE DISPLAY IS GONE (founder, 2026-08-28: "removing the live display
+// since it isn't a live event"). Its copy said supporters "can scan from
+// their seats", and a marathon has no seats — the same words-and-picture
+// mismatch that made the order of service wrong on /memorials and the tent
+// card wrong on /celebrations. The register does hold room events, quiz
+// nights and galas among them, but the page has to be true to the favpoll it
+// is actually showing. The display keeps its place on /celebrations.
+//
+// THE TOPIC PICKER TAKES ITS PLACE, and goes FIRST rather than slotting into
+// the gap. It is the only artefact here about making the favpoll rather than
+// running it, so chronology puts it at the front — and this is the one page
+// whose exemplar earns it, since a mascot list is a topic no catalogue could
+// ever stock.
+//
+// Every one is the real component pointed at the FUNDRAISER scene, so Marcus
+// Bell's marathon runs from the homepage router card through the hero and on
+// through all four.
 //
 // MARCUS, NOT THE CAUSE SCENE — see FUNDRAISER_SCENE for why the artefacts
 // decided it. The page still has to read true for a faceless cause, and that
@@ -101,6 +117,16 @@ const STEP_MEDIA = [
 // and only the reveal one assumes there is a person with an answer, which is
 // the one idea a cause would skip anyway.
 const IDEAS = [
+  {
+    key: "topic",
+    label: t("fundraisers.artefacts.topic.label"),
+    body: t("fundraisers.artefacts.topic.body"),
+    // THE ONE MOVING ARTEFACT on any of the three pages, and it has to be:
+    // the sequence is the content. Frozen, it would show only the third
+    // dialog — a guest adding a favourite — which is the end of a story the
+    // reader never saw start. Reduced motion still gets the final frame.
+    artefact: <TopicPickerVignette scene={FUNDRAISER_TOPIC_PICKER} />,
+  },
   {
     key: "poster",
     label: t("fundraisers.artefacts.poster.label"),
@@ -120,20 +146,11 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
-    // The reveal earns its place here in a way it does not on a cause: a
-    // sponsored challenge already runs on a promise, and Marcus's About
-    // withholds one ("there's one dance he's promised to bust out at the
-    // finish line") that the reveal then names.
+    // The reveal earns its place here in a way it does not on a cause, and
+    // the mascot topic sharpened it: Marcus's About says the winner rides the
+    // whole 26.2 miles, so the room is deciding an outcome, and only after
+    // pledging do you learn which one he was hoping for.
     artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
-  },
-  {
-    key: "display",
-    label: t("fundraisers.artefacts.display.label"),
-    body: t("fundraisers.artefacts.display.body"),
-    // FUNDRAISER variant, and here it is the point rather than a
-    // consequence: DisplayStill derives the presence dial from the scene's
-    // register, and this is the register the goal bar was drawn for.
-    artefact: <LiveVignette scene={FUNDRAISER_SCENE} still room />,
   },
   {
     key: "keepsake",

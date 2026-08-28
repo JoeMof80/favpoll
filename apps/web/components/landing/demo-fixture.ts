@@ -1,6 +1,7 @@
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { buildPackSteps } from "@/components/print-pack/pack-card"
 import type { PackData } from "@/components/print-pack/pack-card"
+import type { TopicPickerScene } from "@/components/landing/topic-picker-vignette"
 import type { KeepsakeData } from "@/components/keepsake/keepsake-document"
 import { getFavpollHeadline } from "@/lib/display"
 
@@ -280,4 +281,25 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
   })),
   rankHistory: null,
   guestNames: [],
+}
+
+/**
+ * What the topic picker types on /fundraisers — Marcus's own mascot topic,
+ * so the dialogs show the favpoll the rest of the page shows.
+ *
+ * THREE ITEMS, NOT THE POLL'S EIGHT. The vignette depicts the mechanic, not a
+ * transcript: three typed by the organiser and one added by a guest is enough
+ * to show both halves of it, and eight would make the sequence outlast anyone
+ * watching. The guest's is "Lucky 2p" — small, specific and exactly the kind
+ * of thing an organiser does not think of, which is the whole reason guests
+ * can add.
+ *
+ * Module-level, as TopicPickerScene requires: the animation effect depends on
+ * this reference, so an inline literal would restart the sequence every
+ * render.
+ */
+export const FUNDRAISER_TOPIC_PICKER: TopicPickerScene = {
+  topic: FUNDRAISER_SCENE.poll.topic.title,
+  items: ["Kevin the gnome", "Barnaby the bear", "Rubber duck"],
+  guestItem: "Lucky 2p",
 }
