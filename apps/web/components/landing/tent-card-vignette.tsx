@@ -51,9 +51,24 @@ const CARD_H = 170
  * panel takes +SPLAY and the blank far panel -SPLAY. Inverted, the blank
  * panel leant forward and painted over the printed one — the card rendered
  * as a white slab with the tent's silhouette peeking out behind it. */
-const SPLAY = 15
+const SPLAY = 17
 /** The turn. Everything reads as a fold at this angle and as a card at 0. */
-const TURN = 22
+const TURN = 40
+
+/**
+ * Looking DOWN on it, which was the other half of "looks weird".
+ *
+ * The scene was rotateX(+6), and about the scene's own centre a positive
+ * rotateX brings the bottom toward the viewer — so we were looking UP at the
+ * card from somewhere below the tabletop. Nobody sees a table card from
+ * there, and the eye knows it even when it cannot name it: the object read as
+ * a plank tilting in mid-air rather than as paper sitting on a surface.
+ *
+ * Negative puts the eye above the card, where a guest's actually is. It also
+ * earns the ridge: from above, the fold has a visible top surface, which is
+ * the single most tent-card-shaped thing in the picture.
+ */
+const TILT = 5
 
 export function TentCardVignette({
   data = DEMO_PACK_DATA,
@@ -72,13 +87,13 @@ export function TentCardVignette({
             every printed artefact on this site is. */}
         <div
           className="relative origin-top-left scale-[0.649] sm:scale-[0.971] lg:scale-[1.104]"
-          style={{ width: CARD_W, height: CARD_H + 63, perspective: 1500 }}
+          style={{ width: CARD_W, height: CARD_H + 63, perspective: 900 }}
         >
           <div
             className="relative"
             style={{
               transformStyle: "preserve-3d",
-              transform: `rotateX(6deg) rotateY(-${TURN}deg)`,
+              transform: `rotateX(-${TILT}deg) rotateY(-${TURN}deg)`,
             }}
           >
             {/* THE FAR PANEL — plain stock, leaning away from the fold. Its
@@ -119,7 +134,7 @@ export function TentCardVignette({
               it leaves — the thing that makes an object sit on a table rather
               than float above one. */}
           <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/30 blur-[7px]"
+            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/40 blur-[6px]"
             style={{
               left: 40,
               top: CARD_H * 0.965,
@@ -129,7 +144,7 @@ export function TentCardVignette({
             }}
           />
           <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/14 blur-2xl"
+            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/18 blur-2xl"
             style={{
               left: 0,
               top: CARD_H * 0.95,
