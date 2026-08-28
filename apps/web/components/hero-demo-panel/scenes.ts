@@ -321,7 +321,7 @@ export const SCENES: HeroScene[] = [
       // it is about whether Chengdu turns out to be the favourite, which is
       // the honest answer to the question actually asked.
       personal_reveal:
-        "Ours will hopefully be Chengdu. We're heading there on our honeymoon, to see the pandas.",
+        "Ours will hopefully be Chengdu. We're planning to visit the pandas on our honeymoon.",
       topic: {
         title: "Holiday destination",
         favourites: [
