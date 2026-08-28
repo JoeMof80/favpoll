@@ -264,7 +264,23 @@ export const SCENES: HeroScene[] = [
       // It reads as a couple without presuming which kind, which a wedding
       // exemplar should.
       name: "Alex & Jordan",
-      context: "12th September",
+      // VENUE · DATE, the format the two event scenes already use ("London
+      // Marathon · 26.2 miles", "A sponsored dog walk · 5 miles"), and the
+      // format a wedding invitation uses anyway.
+      //
+      // A bare "12th September" was the only context line on any scene that
+      // was just a date. It said nothing the headline had not — the card
+      // already reads "Congratulations to" — and left the tense open: had the
+      // wedding happened, or was it coming?
+      //
+      // INVENTED, and it has to stay that way. The cause scene makes the same
+      // call about St Luke's: a real name on a demo card reads as endorsement
+      // before anyone has had a conversation about it.
+      // NON-BREAKING SPACE inside the date. At phone width the line wraps,
+      // and left alone it broke as "The Boathouse · 12th / September" —
+      // splitting the date itself, which is the one place it must not break.
+      // Bound together, it wraps after the separator instead.
+      context: "The Boathouse · 12th\u00A0September",
       about:
         "The happy couple have requested donations to the WWF rather than gifts, given their passion for conservation.",
       photo_url: "/demo/alex-jordan.jpg",
