@@ -51,12 +51,6 @@ const STEPS = [
   },
 ]
 
-const PRESENCE = [
-  t("celebrations.presence.ambient"),
-  t("celebrations.presence.screen"),
-  t("celebrations.presence.rally"),
-]
-
 // Cards -> phone -> room -> paper, the same arc /memorials runs, in the
 // register's own objects. Every one is the real component pointed at the
 // CELEBRATION scene, so Poppy Chen's favpoll runs from the homepage router
@@ -198,51 +192,19 @@ export default function CelebrationsPage() {
         accentClassName="text-warning-strong"
       />
 
-      {/* ── Placement: a beat in the speeches ──
-          KEPT FOR NOW (founder, 2026-08-28): the Ideas section above
-          overlaps both this and the presence dial below, and the founder is
-          drawing the Ideas copy from them. They go when that copy settles. */}
-      <section className="w-full bg-primary/5">
-        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
-          <h2 className="mb-4 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
-            {t("celebrations.moment.title")}
-          </h2>
-          <p className="mb-6 leading-relaxed text-muted-foreground">
-            {t("celebrations.moment.body")}
-          </p>
-          <p className="border-l-2 border-warning-strong pl-4 text-lg text-foreground italic">
-            {t("celebrations.moment.line")}
-          </p>
-        </div>
-      </section>
-
-      {/* ── The presence dial, party end first ── */}
-      <section className="w-full">
-        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
-          <h2 className="mb-6 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
-            {t("celebrations.presence.title")}
-          </h2>
-          <ul className="space-y-4">
-            {PRESENCE.map((line) => (
-              <li key={line} className="flex gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning-strong"
-                />
-                <p className="leading-relaxed text-muted-foreground">{line}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Close — gold band, brand CTA ── */}
+      {/* ── Close — the landing's purple monogram close, one line.
+          MATCHED TO /memorials (founder, 2026-08-28) in all three ways it
+          differed: max-w-330 rather than max-w-3xl so it sits on the same
+          panel width as every other section, left-aligned rather than
+          centred, and — the one that was not merely cosmetic — the button
+          takes `variant="secondary"`. A default Button is PRIMARY, and this
+          band is bg-primary: purple on purple. ── */}
       <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
+        <div className="mx-auto w-full max-w-330 px-6 py-16">
           <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
             {t("celebrations.close.headline")}
           </p>
-          <Button asChild size="lg">
+          <Button asChild size="lg" variant="secondary">
             <Link href="/favpolls/new">{t("celebrations.close.cta")}</Link>
           </Button>
         </div>
