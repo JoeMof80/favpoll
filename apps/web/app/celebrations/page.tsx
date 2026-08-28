@@ -43,16 +43,32 @@ const PRESENCE = [
 export default function CelebrationsPage() {
   return (
     <main>
-      {/* ── Hero — the REAL landing hero, register-configured (v2):
-          the demo loops the celebration story on the register's band. ── */}
+      {/* ── The opening — the REAL landing hero, register-configured, and
+          now the same shape as /memorials (founder, 2026-08-28).
+
+          `still` replaces the looping demo with a phone at phase "reveal".
+          The reasoning that put it on /memorials was half register-specific
+          and half not: "a looping demo is the wrong first note" for a page a
+          celebrant forwards to a bereaved family does NOT transfer to a
+          sixteenth birthday. What does transfer is the continuity — the
+          homepage's router card opens this page, and a visitor who tapped a
+          card showing a favpoll should land on that favpoll, not on a demo
+          starting over from the beginning.
+
+          accentVar over accentBarClassName. The bar class only tinted the
+          leader; accentVar swaps --primary and --chart-3 across the whole
+          card, so the handset carries the register's amber the way the
+          memorial one carries its blue. Both --warning and
+          --warning-on-band already exist, for light and dark. ── */}
       <LandingHero
         sceneKind="celebration"
+        still
         eyebrow={t("celebrations.eyebrow")}
         headline={t("celebrations.headline")}
         subheader={t("celebrations.subheader")}
         ctaLabel={t("celebrations.cta.primary")}
         ctaSecondaryLabel={t("celebrations.cta.secondary")}
-        accentBarClassName="bg-warning-strong"
+        accentVar="warning"
         hideStats
       />
 
