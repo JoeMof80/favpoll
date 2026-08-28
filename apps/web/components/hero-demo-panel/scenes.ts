@@ -405,11 +405,32 @@ export const SCENES: HeroScene[] = [
     //    Colour or Season. A list of the specific objects Marcus's colleagues
     //    offered to lend him could not, and that is the whole point of it.
     //
-    //    IT ALSO DECIDES SOMETHING, which no other scene does. The winner
+    //    IT ALSO DECIDES SOMETHING, which no other scene does. A mascot
     //    actually rides the 26.2 miles, so a pledge here changes an outcome
     //    rather than recording an opinion — a reason to give more, and one
     //    that suits this register and no other. Do not spread it: the
-    //    memorial and the wedding measure what people love, and should. ──
+    //    memorial and the wedding measure what people love, and should.
+    //
+    //    "LEADING WHEN HE SETS OFF", NOT "WINS" (founder, 2026-08-29: "the
+    //    poll has to end before the marathon"). It did, and that was the
+    //    defect. A consequence taken at the CLOSE forces the favpoll to end
+    //    the day before the thing everyone cares about — where /memorials
+    //    runs through and past the funeral and /celebrations through and
+    //    past the wedding, both containing their event. It would also have
+    //    cut off the "he did it" sponsorship, which is when a great deal of
+    //    a sponsored fundraiser's money actually lands.
+    //
+    //    A snapshot fixes it and costs one clause, because the standings are
+    //    live to anyone who has pledged: "leading" is a thing a supporter can
+    //    go and look at, not a fiction written to dodge the problem. The
+    //    urgency survives — pledge before race day or you have no say — and
+    //    the poll runs on afterwards for the total. It is also how people
+    //    really phrase these: nobody says "the winner of the poll", they say
+    //    whoever is top when I set off comes with me.
+    //
+    //    FUNDRAISER_KEEPSAKE_DATA depends on this. It closes 3rd May, the
+    //    week after the race, which only makes sense while the favpoll
+    //    outlives the marathon. ──
     kind: "fundraiser",
     occasion_type: "Sponsored event",
     opening_line: null,
@@ -417,7 +438,7 @@ export const SCENES: HeroScene[] = [
       name: "Marcus Bell",
       context: "London Marathon run",
       about:
-        "Running his first marathon for the British Heart Foundation, in memory of his dad. Whichever mascot wins rides the whole 26.2 miles, pinned to his vest.",
+        "Running his first marathon for the British Heart Foundation, in memory of his dad. Whichever mascot is leading when he sets off rides the whole 26.2 miles, pinned to his vest.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {

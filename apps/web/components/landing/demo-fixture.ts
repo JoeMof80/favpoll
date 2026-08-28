@@ -269,8 +269,11 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
   reveal: FUNDRAISER_SCENE.poll.personal_reveal,
   totalRaised: pounds(FUNDRAISER_SCENE.total),
   charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
-  // House format: ordinal, never ISO. The favpoll closed the week after the
-  // race.
+  // House format: ordinal, never ISO. The favpoll closed the week AFTER the
+  // race, and that is load-bearing rather than incidental: the mascot is
+  // taken from whoever leads when Marcus sets off, not from the close, so the
+  // poll runs through race day and collects the sponsorship that lands once
+  // he has finished. A date before the marathon would contradict the About.
   closedDate: "3rd May 2026",
   standings: FUNDRAISER_SCENE.results.map((r) => ({
     favouriteId:

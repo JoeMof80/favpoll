@@ -147,9 +147,9 @@ const IDEAS = [
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
     // The reveal earns its place here in a way it does not on a cause, and
-    // the mascot topic sharpened it: Marcus's About says the winner rides the
-    // whole 26.2 miles, so the room is deciding an outcome, and only after
-    // pledging do you learn which one he was hoping for.
+    // the mascot topic sharpened it: whichever mascot leads when Marcus sets
+    // off rides the whole 26.2 miles, so the room is deciding an outcome, and
+    // only after pledging do you learn which one he was hoping for.
     artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
   },
   {
