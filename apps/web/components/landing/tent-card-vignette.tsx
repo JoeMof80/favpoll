@@ -33,7 +33,18 @@ import type { PackData } from "@/components/print-pack/pack-card"
 // panel shows as the sliver of card stock behind it. That silhouette belongs
 // to nothing but a folded card.
 //
-// NO SHADOW (founder, 2026-08-28: "maybe remove the shadow altogether").
+// NO PAINTED SHADING ANYWHERE ON IT, top or bottom (founder, 2026-08-28:
+// "maybe remove the shadow altogether", then "the shadow at the top is
+// always weird"). Both were the same mistake in two places: shading added to
+// SAY something the geometry already says.
+//
+// The crease went first. A hairline and a gradient falling off under the fold
+// were meant to read as a fold — but the fold is already the ridge where two
+// panels meet at 40 degrees, and the gradient only darkened the top of a
+// printed face, which no real card does. It had survived every version, which
+// is how it earned "always".
+//
+// NO SHADOW UNDERNEATH EITHER.
 // Right, and the reason is worth keeping. Three shadows were tried — a pair
 // of 2D ellipses, then those turned with the card, then a proper ground plane
 // laid flat inside the 3D scene with rotateX(90deg) — and each was wrong in a
@@ -137,11 +148,6 @@ export function TentCardVignette({
               }}
             >
               <PackCard data={data} steps={steps} scale="averyTent" bleed />
-              {/* The crease. A hairline and the light falling off just under
-                  it — a printed border along the top of a folded card is the
-                  one line that is definitely not there. */}
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-foreground/20" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-foreground/10 to-transparent" />
             </div>
           </div>
         </div>
