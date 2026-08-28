@@ -33,6 +33,22 @@ import type { PackData } from "@/components/print-pack/pack-card"
 // panel shows as the sliver of card stock behind it. That silhouette belongs
 // to nothing but a folded card.
 //
+// NO SHADOW (founder, 2026-08-28: "maybe remove the shadow altogether").
+// Right, and the reason is worth keeping. Three shadows were tried — a pair
+// of 2D ellipses, then those turned with the card, then a proper ground plane
+// laid flat inside the 3D scene with rotateX(90deg) — and each was wrong in a
+// new way: the ellipses floated free of both bottom edges, and the ground
+// plane, seen almost edge-on through the scene's own rotation, stretched off
+// to the corner as a grey streak.
+//
+// The common cause is that THERE IS NO TABLE. A cast shadow is a statement
+// about a surface, and this vignette has no surface for it to be about — the
+// pack fan, the keepsake and the order of service all sit on nothing too,
+// they just do not claim otherwise. Without one the card reads as an object
+// on the page, which is what every other artefact here reads as. The drop
+// shadows those carry are the CSS kind that hugs the paper's own edge, not a
+// cast shadow implying a floor.
+//
 // The far panel is BLANK stock, not a second PackCard. Both faces of a real
 // tent card are printed — that is the point, a guest either side of the table
 // gets a code — but the far one faces AWAY, so what a viewer in front of it
@@ -104,7 +120,7 @@ export function TentCardVignette({
               style={{
                 transformOrigin: "top center",
                 transform: `rotateX(-${SPLAY}deg)`,
-                boxShadow: "inset 0 0 0 100vmax rgb(0 0 0 / 0.07)",
+                boxShadow: "inset 0 0 0 100vmax rgb(0 0 0 / 0.11)",
               }}
             />
 
@@ -128,30 +144,6 @@ export function TentCardVignette({
               <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-foreground/10 to-transparent" />
             </div>
           </div>
-
-          {/* Contact shadow, cast flat on the table and turned with the card.
-              Tight and dark where the paper meets the surface, spreading as
-              it leaves — the thing that makes an object sit on a table rather
-              than float above one. */}
-          <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/40 blur-[6px]"
-            style={{
-              left: 40,
-              top: CARD_H * 0.965,
-              width: CARD_W - 80,
-              height: 14,
-              transform: `rotateY(-${TURN}deg)`,
-            }}
-          />
-          <div
-            className="pointer-events-none absolute rounded-[50%] bg-zinc-950/18 blur-2xl"
-            style={{
-              left: 0,
-              top: CARD_H * 0.95,
-              width: CARD_W,
-              height: 34,
-            }}
-          />
         </div>
       </div>
     </Vignette>
