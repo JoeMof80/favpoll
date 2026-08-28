@@ -254,13 +254,20 @@ export const SCENES: HeroScene[] = [
     occasion_type: "Wedding",
     opening_line: null,
     protagonist: {
-      name: "Sarah & Tom",
+      // ALEX & JORDAN, to match the portrait. public/demo/alex-jordan.jpg
+      // arrived in #144 — "protagonist portraits for five of six hero demo
+      // scenes" — and has sat unused ever since: a couple photograph
+      // authored for a couple scene that was never built. Naming them
+      // anything else would leave the asset and the scene disagreeing, which
+      // is the drift this file exists to prevent.
+      //
+      // It reads as a couple without presuming which kind, which a wedding
+      // exemplar should.
+      name: "Alex & Jordan",
       context: "12th September",
       about:
-        "Sarah and Tom would rather you gave to Barnardo's than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
-      // No couple photograph in public/demo yet — ProtagonistAvatar falls
-      // back without one. A real wedding scene wants one.
-      photo_url: null,
+        "Alex and Jordan would rather you gave to Barnardo's than bought them a gift. They have somewhere in mind for the honeymoon, but they are not telling anyone yet.",
+      photo_url: "/demo/alex-jordan.jpg",
     },
     poll: {
       id: "demo-poll-wedding",
