@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
 import { Button } from "@/components/ui/button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { t } from "@/lib/i18n"
 
 // Register landing #2 (see /memorials for the pattern notes). ACCENT,
@@ -16,7 +16,7 @@ import { t } from "@/lib/i18n"
 export const metadata: Metadata = {
   title: "Celebrations — favpoll",
   description:
-    "Make their day about what they love. Give in their name. A favpoll turns everyone's favourites into pledges to a charity they choose.",
+    "Celebrate them by sharing what they love. Give to charity in their name. A favpoll turns everyone's favourites into pledges to a charity they choose.",
 }
 
 const STEPS = [
@@ -51,30 +51,13 @@ export default function CelebrationsPage() {
         headline={t("celebrations.headline")}
         subheader={t("celebrations.subheader")}
         ctaLabel={t("celebrations.cta.primary")}
+        ctaSecondaryLabel={t("celebrations.cta.secondary")}
         accentBarClassName="bg-warning-strong"
         hideStats
       />
 
       {/* ── How it works, in the celebration register ── */}
-      <section id="how" className="w-full scroll-mt-20">
-        <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
-          <SectionEyebrow className="mb-10 text-center">
-            {t("celebrations.how.title")}
-          </SectionEyebrow>
-          <ol className="grid gap-10 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <li key={step.label}>
-                <p className="mb-2 text-sm font-semibold text-primary">
-                  {i + 1}. {step.label}
-                </p>
-                <p className="leading-relaxed text-muted-foreground">
-                  {step.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <HowItWorksSteps title={t("celebrations.how.title")} steps={STEPS} />
 
       {/* ── Placement: a beat in the speeches ── */}
       <section className="w-full bg-primary/5">

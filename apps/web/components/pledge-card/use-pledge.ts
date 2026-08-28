@@ -9,6 +9,7 @@ import {
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
+import { cardFeeFor } from "@/lib/card-fee"
 import type {
   FavpollPollWithItems,
   FavpollPot,
@@ -100,9 +101,14 @@ export function usePledge({
 
   const ownBase = isPledgeValid ? numericPledge : 0
   const ownTopUp = isTopUpValid ? numericTopUp : 0
-  // No platform fee — 100% of the pledge goes to charity (decided 2026-07).
-  // The optional contribution rides the same charge but is favpoll's, not
-  // the charity's: it lives in tip_amount, never total_amount.
+  // THREE SEPARATE THINGS, and they had been conflated (2026-08-27):
+  //   · No PLATFORM fee — 100% of the pledge goes to charity (decided
+  //     2026-07). Absolute, and the reason a charity signs quickly.
+  //   · The CARD fee is the guest's, added to the charge and passed to
+  //     Stripe. favpoll keeps none of it. See lib/card-fee for why it moved
+  //     off favpoll and onto the guest rather than onto the charity.
+  //   · The optional CONTRIBUTION is favpoll's, and its only income. It
+  //     rides the same charge and lives in tip_amount, never total_amount.
   const tipAmount =
     touchedTip !== null ? touchedTip : suggestTip ? defaultTipFor(ownBase) : 0
   // If a touched tip isn't one of the current tier's chips (e.g. £3 chosen
@@ -113,7 +119,13 @@ export function usePledge({
     ? baseTipOptions
     : [...baseTipOptions, tipAmount].sort((a, b) => a - b)
   const ownTip = ownBase > 0 ? tipAmount : 0
-  const ownCharge = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
+  // The card fee the GUEST covers, so the charity receives the pledge whole
+  // (see lib/card-fee). Computed here to DISPLAY it; the server computes it
+  // again from the same helper and that one is what is charged.
+  // Nothing when the shared fund pays — no card, no fee.
+  const ownNet = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
+  const ownCardFee = useSharedFund ? 0 : cardFeeFor(ownNet)
+  const ownCharge = Math.round((ownNet + ownCardFee) * 100) / 100
 
   const fundBarPct =
     isPledgeValid && available > 0 ? numericPledge / available : 0
@@ -146,6 +158,10 @@ export function usePledge({
               label: `To ${charityLabel}`,
               amount: Math.round((numericPledge + ownTopUp) * 100) / 100,
             },
+            // SHOWN, ALWAYS, never folded into the total. The guest is paying
+            // it, so they are told — and it is the line that proves the
+            // charity line above is whole rather than net of something.
+            { label: "Card fee", amount: ownCardFee },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }

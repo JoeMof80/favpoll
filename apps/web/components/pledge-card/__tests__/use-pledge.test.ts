@@ -30,6 +30,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
 vi.mock("@/app/favpolls/[id]/actions", () => mockActions)
 
 import { usePledge } from "@/components/pledge-card/use-pledge"
+import { cardFeeFor } from "@/lib/card-fee"
 
 // --- fixtures ---
 
@@ -260,7 +261,7 @@ describe("usePledge — optional contribution (tip)", () => {
       result.current.updatePledgeAmount("10")
     })
     expect(result.current.tipAmount).toBe(1) // <£15 tier → £1
-    expect(result.current.ownCharge).toBe(11)
+    expect(result.current.ownCharge).toBeCloseTo(11 + cardFeeFor(11), 2)
   })
 
   it("defaults to None when suggestTip is false (memorial register)", () => {
@@ -269,7 +270,7 @@ describe("usePledge — optional contribution (tip)", () => {
       result.current.updatePledgeAmount("10")
     })
     expect(result.current.tipAmount).toBe(0)
-    expect(result.current.ownCharge).toBe(10)
+    expect(result.current.ownCharge).toBeCloseTo(10 + cardFeeFor(10), 2)
   })
 
   it("scales chip options and the suggestion with the pledge", () => {
@@ -281,7 +282,7 @@ describe("usePledge — optional contribution (tip)", () => {
     })
     expect(result.current.tipOptions).toEqual([0, 2, 5, 10])
     expect(result.current.tipAmount).toBe(5) // ~10% suggestion
-    expect(result.current.ownCharge).toBe(55)
+    expect(result.current.ownCharge).toBeCloseTo(55 + cardFeeFor(55), 2)
 
     act(() => {
       result.current.updatePledgeAmount("20")
@@ -303,7 +304,7 @@ describe("usePledge — optional contribution (tip)", () => {
       result.current.updatePledgeAmount("50") // tier jump
     })
     expect(result.current.tipAmount).toBe(0) // explicit None sticks
-    expect(result.current.ownCharge).toBe(50)
+    expect(result.current.ownCharge).toBeCloseTo(50 + cardFeeFor(50), 2)
   })
 
   it("surfaces a preserved tip that isn't in the new tier as an extra chip", () => {
@@ -321,7 +322,7 @@ describe("usePledge — optional contribution (tip)", () => {
     // £3 preserved AND visible: injected into the chip set, still selected
     expect(result.current.tipAmount).toBe(3)
     expect(result.current.tipOptions).toEqual([0, 2, 3, 5, 10])
-    expect(result.current.ownCharge).toBe(53)
+    expect(result.current.ownCharge).toBeCloseTo(53 + cardFeeFor(53), 2)
   })
 
   it("the breakdown carries no duplicate tip line — total includes it", () => {
@@ -333,7 +334,10 @@ describe("usePledge — optional contribution (tip)", () => {
     })
     const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
     expect(labels).not.toContain("For favpoll")
-    expect(result.current.ownBreakdown!.total.amount).toBe(11)
+    expect(result.current.ownBreakdown!.total.amount).toBeCloseTo(
+      11 + cardFeeFor(11),
+      2
+    )
   })
 
   it("never touches the charity amount — total_amount stays the pledge", async () => {
@@ -362,30 +366,37 @@ describe("usePledge — ownCharge", () => {
     expect(result.current.ownCharge).toBe(0)
   })
 
-  it("ownCharge equals the pledge exactly — no platform fee", () => {
+  it("ownCharge is the pledge plus the card fee — no platform fee", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
     })
-    expect(result.current.ownCharge).toBe(10)
+    expect(result.current.ownCharge).toBeCloseTo(10 + cardFeeFor(10), 2)
   })
 
-  it("ownCharge = pledge + topUp with no fee applied", () => {
+  it("ownCharge = pledge + topUp + the card fee covering them", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
       result.current.setTopUpAmount("5")
     })
-    expect(result.current.ownCharge).toBe(15)
+    expect(result.current.ownCharge).toBeCloseTo(15 + cardFeeFor(15), 2)
   })
 
-  it("ownBreakdown has no fee line", () => {
+  // INVERTED 2026-08-27, when the card fee moved from favpoll to the guest.
+  // The line the old test forbade is now required: the guest is paying it, so
+  // the guest is shown it. What must still never appear is a PLATFORM fee —
+  // the charity line below proves that separately.
+  it("ownBreakdown carries the card fee as its own visible line", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
     })
-    const labels = result.current.ownBreakdown!.lines.map((l) => l.label)
-    expect(labels.join(" ")).not.toMatch(/fee/i)
+    const lines = result.current.ownBreakdown!.lines
+    expect(lines).toContainEqual({
+      label: "Card fee",
+      amount: cardFeeFor(10),
+    })
   })
 
   it("fundOverAvailable is false when pledge is within available balance", () => {
@@ -599,7 +610,7 @@ describe("usePledge — ownBreakdown", () => {
     expect(result.current.ownBreakdown).toBeNull()
   })
 
-  it("includes charity and total lines when valid — total equals the pledge", () => {
+  it("charity line is the pledge WHOLE; the card fee rides beside it", () => {
     const { result } = renderHook(() => usePledge(baseOptions))
     act(() => {
       result.current.updatePledgeAmount("10")
@@ -607,8 +618,14 @@ describe("usePledge — ownBreakdown", () => {
 
     expect(result.current.ownBreakdown).not.toBeNull()
     const lines = result.current.ownBreakdown!.lines
+    // The invariant that matters: nothing is deducted from the charity's
+    // amount. The card fee is ADDED to what the guest pays, never taken out
+    // of what the charity receives.
     expect(lines[0]).toMatchObject({ label: "To Oxfam", amount: 10 })
-    expect(result.current.ownBreakdown!.total).toMatchObject({ amount: 10 })
+    expect(result.current.ownBreakdown!.total.amount).toBeCloseTo(
+      10 + cardFeeFor(10),
+      2
+    )
   })
 
   it("folds a top-up into the single charity line — all of it reaches the charity", () => {
@@ -618,8 +635,11 @@ describe("usePledge — ownBreakdown", () => {
       result.current.setTopUpAmount("5")
     })
     const lines = result.current.ownBreakdown!.lines
-    expect(lines).toHaveLength(1)
+    // Two lines now: the charity's, and the card fee. Still exactly ONE
+    // charity line, and it still carries the top-up whole.
+    expect(lines).toHaveLength(2)
     expect(lines[0]).toMatchObject({ label: "To Oxfam", amount: 15 })
+    expect(lines[1]).toMatchObject({ label: "Card fee" })
   })
 })
 

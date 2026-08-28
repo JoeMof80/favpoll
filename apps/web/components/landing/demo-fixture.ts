@@ -49,6 +49,9 @@ const DEMO_HEADLINE = getFavpollHeadline({
  * hex characters, which is what keeps the printed code at 33x33 rather than
  * the 49x49 the old /favpolls/<uuid> URL forced.
  */
+export const MEMORIAL_SCENE =
+  SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+
 export const DEMO_QR_URL = "https://favpoll.com/p/a1b2c3d4e5f6"
 
 export const DEMO_PACK_DATA: PackData = {
@@ -63,6 +66,39 @@ export const DEMO_PACK_DATA: PackData = {
 
 export const DEMO_PACK_STEPS = buildPackSteps(DEMO_PACK_DATA)
 
+/**
+ * The same pack, for the MEMORIAL scene — Belinda Hartley, favourite
+ * colour, Marie Curie.
+ *
+ * /features is register-neutral and keeps the celebration pack above.
+ * /memorials cannot: a page a celebrant forwards to a bereaved family
+ * showed a printed birthday card for Poppy Chen, and beside it Belinda's
+ * reveal and Belinda's keepsake — two unrelated favpolls told as one
+ * story (2026-08-26).
+ *
+ * The homepage's memorial router card already carries Belinda's charity
+ * and her exact total, so one favpoll now runs from that card through
+ * every object on the page.
+ */
+const MEMORIAL_HEADLINE = getFavpollHeadline({
+  occasionType: MEMORIAL_SCENE.occasion_type,
+  name: MEMORIAL_SCENE.protagonist?.name ?? "",
+  subject: "someone",
+  openingLine: MEMORIAL_SCENE.opening_line,
+})
+
+export const MEMORIAL_PACK_DATA: PackData = {
+  prefix: MEMORIAL_HEADLINE.prefix,
+  name: MEMORIAL_HEADLINE.name,
+  isCause: false,
+  topicTitle: MEMORIAL_SCENE.poll.topic.title,
+  hasReveal: !!MEMORIAL_SCENE.poll.personal_reveal,
+  charityNames: MEMORIAL_SCENE.charities.map((c) => c.name),
+  qrUrl: DEMO_QR_URL,
+}
+
+export const MEMORIAL_PACK_STEPS = buildPackSteps(MEMORIAL_PACK_DATA)
+
 // The keepsake the features page depicts — built from the MEMORIAL scene,
 // not the cause one the rest of the page uses, for the reveal vignette's
 // reason: the keepsake is most itself when there is a person. Belinda and
@@ -71,8 +107,6 @@ export const DEMO_PACK_STEPS = buildPackSteps(DEMO_PACK_DATA)
 // The prefix comes from the real getFavpollHeadline and the numbers from
 // the scene's results, parsed — so the sheet this page depicts and the
 // sheet the keepsake page prints cannot drift apart.
-
-const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 
 const pounds = (formatted: string) => Number(formatted.replace(/[£,]/g, ""))
 

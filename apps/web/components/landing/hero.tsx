@@ -12,6 +12,11 @@ import { useMemo } from "react"
 import { ArrowDown } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
+import {
+  PhoneFrame,
+  PHONE_SCALE,
+  PHONE_SCALED_BOX,
+} from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
@@ -54,16 +59,38 @@ type Props = {
   headline?: string
   subheader?: string
   ctaLabel?: string
+  /**
+   * Label for the second, quieter path. Home supplies its own via `router`;
+   * a register page passes its own string.
+   */
+  ctaSecondaryLabel?: string
   /** Band override, e.g. "bg-memorial text-memorial-foreground". */
   bandClassName?: string
   /** Register accent for the demo's leader bar — see DemoCard. */
   accentBarClassName?: string
+  /** Register accent token for a still's whole card — see DemoCard. */
+  accentVar?: string
   /**
    * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
    * router replaces the demo column — the demos now live on the register
    * pages. Remove the prop on the home page to restore the demo hero.
    */
   router?: boolean
+  /**
+   * Show the scene as a STILL PHONE instead of the looping browser demo.
+   *
+   * /memorials is a forwarding artefact — a celebrant sends it to a family
+   * — and a looping demo is the wrong first note for it, as well as being
+   * the homepage's demo told a second time (founder, 2026-08-26). A still
+   * at phase "reveal" says the same thing once, in the state a guest is
+   * left holding, and the reveal is what a memorial favpoll is FOR.
+   *
+   * PhoneFrame at the shared PHONE_SCALE, so this handset and the one in
+   * the homepage's guest arc are the same size.
+   */
+  still?: boolean
+  /** Extra pitch-column content, under the subheader. */
+  children?: React.ReactNode
 }
 
 // The cards are glass on the brand band, so every accent mark uses the
@@ -77,6 +104,24 @@ type Props = {
 // Belinda's favourite COLOUR, which its reveal quote names). The card is a
 // signpost, not a rerun of the page's story. Charities are short by design:
 // the row sits beside the total at a third of the container's width.
+// DERIVED, not retyped (2026-08-26). This card carried Marie Curie and
+// "£1,005" — Belinda Hartley's charity and her exact total — with results
+// of £350 / £220 / £165 at 100 / 63 / 47%, which are her top three to the
+// pound and the percent. Only the LABELS had drifted, from her colours to
+// flowers, and the comment below still said "scene-sourced". So the card
+// was always meant to be her favpoll.
+//
+// It matters because this card opens /memorials, and that page now shows
+// her printed card, her reveal and her keepsake. One favpoll runs from
+// the homepage through every object on the page; a flower poll here broke
+// it at the first click.
+//
+// The other two cards are still literals. They have scenes too and could
+// drift the same way — unchecked.
+const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
+const MEMORIAL_RESULTS = MEMORIAL_SCENE.results.slice(0, 3)
+const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
+
 const ROUTER_CARDS = [
   {
     kind: "memorial" as const,
@@ -84,15 +129,14 @@ const ROUTER_CARDS = [
     bar: "bg-memorial-on-band",
     title: t("home.router.memorials.title"),
     body: t("home.router.memorials.body"),
-    topic: "flower",
-    more: "+9 more flowers",
-    charity: "Marie Curie",
-    total: "£1,005",
-    results: [
-      { label: "Sweet pea", amount: "£350", widthPercent: 100 },
-      { label: "Daffodil", amount: "£220", widthPercent: 63 },
-      { label: "Rose", amount: "£165", widthPercent: 47 },
-    ],
+    topic: MEMORIAL_TOPIC,
+    // Naive plural, correct for "colour" and for every topic title in the
+    // seed that this card could show. A topic whose plural is irregular
+    // would need the noun back as a literal.
+    more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
+    charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
+    total: MEMORIAL_SCENE.total,
+    results: MEMORIAL_RESULTS,
   },
   {
     kind: "celebration" as const,
@@ -166,9 +210,13 @@ export function LandingHero({
   headline,
   subheader,
   ctaLabel,
+  ctaSecondaryLabel,
   bandClassName,
   accentBarClassName,
+  accentVar,
   router = false,
+  still = false,
+  children,
 }: Props) {
   const scenes = useMemo(
     () => (sceneKind ? SCENES.filter((s) => s.kind === sceneKind) : SCENES),
@@ -184,6 +232,12 @@ export function LandingHero({
         // Full-screen band (founder, 2026-08-05): the hero fills the
         // viewport below the h-14 nav, content vertically centred —
         // min-h, not h, so short phones never clip.
+        // min-h, not h, so short phones never clip. EVERY variant fills the
+        // screen, stills included: the slab of empty band under the still
+        // was never this — it was the phone's box laying out at its
+        // unscaled 868px (see PHONE_SCALED_BOX). Fix the box and min-h does
+        // what it does on the home page, with items-center holding the
+        // content in the middle of it.
         "relative flex min-h-[calc(100vh-3.5rem)] items-center",
         bandClassName ?? "bg-primary text-primary-foreground"
       )}
@@ -228,25 +282,39 @@ export function LandingHero({
               // not a look: the content is centred inside the min-height, so
               // it only shows on a short viewport, where it buys the fit.
               "md:grid-cols-1 md:gap-y-8 md:py-8"
-            : // COLUMN: the demo hero the register pages mount — the demo
-              // card is 400px, so the last-of-three column still holds it.
-              // minmax, NOT the bare third (2026-08-22). The demo card is a
-              // FIXED 400px and a grid item cannot shrink below its
-              // min-content, so whenever a third of the container came to
-              // less than 400 — which is every width below about 1300 — the
-              // column refused to shrink and the whole PAGE grew instead.
-              // Measured before: +157px of horizontal scroll at 768, +72 at
-              // 1024, +20 at 1180, on all three register pages.
-              // The floor is the card's own width; above ~1300 the third is
-              // wider and takes over, so the three-column rhythm the original
-              // was reaching for is unchanged where it was ever achieved.
-              "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
+            : still
+              ? // STILL: ONE ROW. The demo layout is grid-rows-[auto_auto]
+                // with the media spanning both, which works when the stats
+                // occupy row 2. A register page hides the stats, so row 2 is
+                // empty, the pitch sits in row 1 alone, and items-center
+                // centres it against nothing — every pixel of slack fell
+                // below the text while the phone ran on past it. One row
+                // makes the two columns siblings, so they centre against
+                // each other. The media track is `auto`: the phone is a
+                // fixed chassis and must not be squeezed by a 1fr share.
+                "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
+              : // COLUMN: the demo hero the register pages mount — the demo
+                // card is 400px, so the last-of-three column still holds it.
+                // minmax, NOT the bare third (2026-08-22). The demo card is a
+                // FIXED 400px and a grid item cannot shrink below its
+                // min-content, so whenever a third of the container came to
+                // less than 400 — which is every width below about 1300 — the
+                // column refused to shrink and the whole PAGE grew instead.
+                // Measured before: +157px of horizontal scroll at 768, +72 at
+                // 1024, +20 at 1180, on all three register pages.
+                // The floor is the card's own width; above ~1300 the third is
+                // wider and takes over, so the three-column rhythm the original
+                // was reaching for is unchanged where it was ever achieved.
+                "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
         )}
       >
         {/* Pitch (headline + CTA). Stats are a separate cell below, so on
             mobile the demo comes right after the pitch. */}
         <div
-          className={cn("min-w-0", !router && "md:col-start-1 md:row-start-1")}
+          className={cn(
+            "min-w-0",
+            !router && !still && "md:col-start-1 md:row-start-1"
+          )}
         >
           {/* Single, register-agnostic headline — names the three-beat
               mechanic the demo plays out; the subheader carries the soul.
@@ -276,7 +344,12 @@ export function LandingHero({
               (shorter first beats), not a layout one. */}
           <h1
             className={cn(
-              "mb-6 max-w-3xl text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
+              // EXPERIMENT (2026-08-26): register headlines capped so every
+              // beat wraps to exactly two lines — 446-595px is the window
+              // where the widest beat (892) does not reach three and the
+              // narrowest (595) does not stay on one.
+              sceneKind ? "max-w-xl" : "max-w-3xl",
               router && "2xl:text-6xl"
             )}
           >
@@ -292,11 +365,13 @@ export function LandingHero({
           <p
             className={cn(
               "mb-8 text-lg leading-relaxed opacity-80",
-              router ? "max-w-2xl" : "max-w-md"
+              // The subheader must not be WIDER than the headline above it.
+              sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
             )}
           >
             {subheader ?? t("landing.subheader")}
           </p>
+          {children}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —
                 poster-scale, not form-scale (founder call, 2026-07-28) */}
@@ -323,26 +398,44 @@ export function LandingHero({
                 asChild
                 size="lg"
                 variant="secondary"
-                className="h-11 px-6 text-base"
+                // WRAPPING, WHICH TAKES FOUR CLASSES, NOT ONE (2026-08-27).
+                // The register labels were 25-28 characters and carrying the
+                // promise makes the longest 42 — a 356px button inside a
+                // 272px content column on a 320px phone. Measured: the page
+                // went sideways on all three registers.
+                //
+                // whitespace-normal alone did nothing, and the reason is worth
+                // recording: Button is `shrink-0`, so a flex item that is
+                // allowed to wrap still never gets narrow enough to. `shrink`
+                // restores flex-shrink:1. And the label is TWO flex items —
+                // the head as an anonymous one, withQuietTail's span as the
+                // other — so without flex-wrap they stay side by side and each
+                // wraps internally into a pair of narrow columns. flex-wrap
+                // drops the quiet tail to its own line instead. h-auto with
+                // min-h-11 lets the button grow for it while keeping the 44px
+                // tap target at every width that still fits one line, which is
+                // 390 up.
+                className="h-auto min-h-11 shrink flex-wrap px-6 py-2 text-base whitespace-normal"
               >
                 <Link href="/favpolls/new">
                   {withQuietTail(ctaLabel ?? t("landing.cta.primaryFree"))}
                 </Link>
               </Button>
-              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT (founder, 2026-08-18).
-                  Home's button now says "always free" itself, so a caption
-                  beside it would state the same fact twice in one row. The
-                  register pages keep it: their labels are already 28
-                  characters ("Create a celebration favpoll") and appending the
-                  promise makes 41, which is no longer a button.
-
-                  It stays BESIDE, never beneath (measured 2026-08-06,
-                  re-measured 08-18). Below costs ~16px, the LEFT column sets
-                  the hero's height, and the hero is already 1px past the fold
-                  at 1280x800 — which is the fit #524 worked for. "Free to
-                  create" only: the short form is the one that doesn't wrap at
-                  390. */}
-              {ctaLabel && (
+              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT — now keyed on the
+                  LABEL rather than on which page it is (founder, 2026-08-27:
+                  "'free to create' should be part of the button like the
+                  homepage").
+                  Home has said "always free" inside its button since
+                  2026-08-18; the register pages kept a caption beside theirs
+                  because appending the promise to a 28-character label makes
+                  42, and 42 characters was judged not a button. It fits: the
+                  tail sets in withQuietTail's smaller, quieter type, and the
+                  row already flex-wraps, so the longest of the three measures
+                  well inside a 390px phone.
+                  A label carrying a quiet tail says it itself, so a caption
+                  beside it would state the same fact twice in one row. Any
+                  future label without one still gets the caption. */}
+              {ctaLabel && !ctaLabel.includes(" — ") && (
                 <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
               )}
             </div>
@@ -353,8 +446,16 @@ export function LandingHero({
                 already arrived with. ProcessOverview directly below does
                 define it, and the page was relying on visitors scrolling to
                 find that out. This makes the other path an offer rather than
-                a hope. The register pages already carry their own
-                cta.secondary and their own demo, so they are unchanged.
+                a hope.
+
+                RESTORED ON THE REGISTER PAGES, 2026-08-26. This comment used
+                to say they "already carry their own cta.secondary" — they
+                carried the STRING and rendered nothing, so the only action in
+                a register hero was "Create a memorial favpoll". Nobody four
+                days into a bereavement clicks create before they have looked,
+                and the register pages are where a cold visitor most often
+                lands: a celebrant or a hospice forwards the link. They now
+                pass their own label.
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
                 quieter of the two without vanishing when the theme flips.
@@ -387,7 +488,7 @@ export function LandingHero({
                 here until hover, so it only rendered the wash lopsided, 24
                 left against 8 right. Same variant, same property, declared
                 after, so it wins. */}
-            {router && (
+            {(router || ctaSecondaryLabel) && (
               <Button
                 asChild
                 size="lg"
@@ -400,7 +501,7 @@ export function LandingHero({
                     promise, and the only one a visitor can be disappointed by
                     if they expect a new page. */}
                 <Link href="#how">
-                  {t("landing.cta.secondary")}
+                  {ctaSecondaryLabel ?? t("landing.cta.secondary")}
                   <ArrowDown data-icon="inline-end" aria-hidden="true" />
                 </Link>
               </Button>
@@ -416,10 +517,26 @@ export function LandingHero({
             to. */}
         <div
           className={cn(
-            !router && "md:col-start-2 md:row-span-2 md:row-start-1"
+            !router && !still && "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
-          {router ? (
+          {still ? (
+            <div className={PHONE_SCALED_BOX}>
+              <div className={cn("origin-top-left", PHONE_SCALE)}>
+                <PhoneFrame>
+                  <DemoCard
+                    scene={scene}
+                    phase="reveal"
+                    barWidths={scene.results.map((r) => r.widthPercent)}
+                    prefersReducedMotion
+                    device="phone"
+                    accentVar={accentVar}
+                    className="rounded-none border-0"
+                  />
+                </PhoneFrame>
+              </div>
+            </div>
+          ) : router ? (
             /* Register router — one card per register, its accent as the
                top rule; the demo lives on the page each card opens. */
             <nav

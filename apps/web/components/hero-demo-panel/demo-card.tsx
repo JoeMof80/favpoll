@@ -57,6 +57,24 @@ type Props = {
    * router cards do it. Omitted = brand purple.
    */
   accentBarClassName?: string
+  /**
+   * Tint the card's CONTENT with a register accent — e.g. "memorial".
+   *
+   * Swaps two custom properties on the content block, so everything that
+   * already reads them follows: the leader bar and the other bars, the
+   * date line, the topic eyebrow, the reveal's rule, the charity total.
+   * A register page's demo should look like that register, not like the
+   * brand (founder, 2026-08-26).
+   *
+   * Scoped BELOW the HeaderBar deliberately. The logo is text-primary, so
+   * tinting the whole card would recolour favpoll's own mark — the one
+   * thing on this card that must stay brand.
+   *
+   * --<accent> is the ink step and --<accent>-on-band the light one; they
+   * map onto --primary and --chart-3, which is the pair the ranking bars
+   * and the accent text already use.
+   */
+  accentVar?: string
 }
 
 // Types `text` out character by character while `active`; shows full text
@@ -133,6 +151,7 @@ export function DemoCard({
   prefersReducedMotion,
   className,
   accentBarClassName,
+  accentVar,
   device = "browser",
 }: Props) {
   const favourites = scene.poll.topic.favourites
@@ -380,17 +399,47 @@ export function DemoCard({
 
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
-      <div className="flex-1 space-y-4 overflow-hidden">
+      <div
+        className="flex-1 space-y-4 overflow-hidden"
+        style={
+          accentVar
+            ? ({
+                "--primary": `var(--${accentVar})`,
+                "--chart-3": `var(--${accentVar}-on-band)`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
         {/* Hero */}
         <div className="relative">
-          <div className={protagonist ? "pr-24" : ""}>
+          {/* pr-28, not pr-24 (2026-08-26). The avatar is 132px at md: and
+              is scaled 0.8, so it occupies 105.6px — the 96px pr-24 reserved
+              was never enough and it sat on the name by ten pixels, on EVERY
+              device, not just the phone. Short names hid it: "Poppy Chen"
+              clears the gutter and "Belinda Hartley" does not, so it only
+              surfaced when a memorial scene reached a card. */}
+          <div className={protagonist ? "pr-28" : ""}>
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
             >
               {cardPrefix}
             </SectionEyebrow>
-            <h1 className="line-clamp-2 text-4xl leading-tight font-medium tracking-tight wrap-break-word text-foreground">
+            {/* The app's own ramp is heroNameSizeClass = "text-3xl
+                sm:text-4xl" (lib/display.ts): a real phone gets text-3xl.
+                This card hardcoded text-4xl, and because it renders at a
+                fixed 390px inside whatever window the page has, sm: matched
+                and it never stepped down — so "Belinda Hartley" broke across
+                two lines on a handset that would have held it on one.
+                DisplayScreen already does exactly this: keep the
+                small-screen half of the shared ramp, swap only the upper
+                step (2026-08-26). */}
+            <h1
+              className={cn(
+                "line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground",
+                device === "phone" ? "text-3xl" : "text-4xl"
+              )}
+            >
               {title}
             </h1>
             {cardSuffix && (
@@ -522,7 +571,22 @@ export function DemoCard({
           the point of it. Corrected 2026-08-07 against a photograph of the
           real thing; what the lock withholds is the standings, never who the
           money goes to. */}
-      <div className="shrink-0 border-t border-border pt-3">{charityRow}</div>
+      {/* Same tint as the content block above — the charity total is
+          `text-primary` and would otherwise be the one line on a tinted
+          card still wearing the brand. */}
+      <div
+        className="shrink-0 border-t border-border pt-3"
+        style={
+          accentVar
+            ? ({
+                "--primary": `var(--${accentVar})`,
+                "--chart-3": `var(--${accentVar}-on-band)`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        {charityRow}
+      </div>
 
       {/* ── Mimicked pledge dialog ──
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
