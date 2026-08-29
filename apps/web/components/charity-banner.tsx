@@ -2,6 +2,7 @@ import { Pencil, Target } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import { Button } from "@/components/ui/button"
 import { CharityRow } from "./charity-row"
+import { GoalProgress } from "./goal-progress"
 import { formatPounds } from "@/lib/i18n"
 
 type Props = {
@@ -59,29 +60,11 @@ export function CharityBanner({
           ) : null}
         </p>
         {goalAmount ? (
-          <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
-            role="progressbar"
-            aria-label="Progress towards the pledge goal"
-            aria-valuemin={0}
-            aria-valuemax={goalAmount}
-            aria-valuenow={Math.min(totalRaised, goalAmount)}
-          >
-            {/* Green once the goal is met (2026-08-09), which is what the
-                live display has always done. The banner filling to the end
-                and staying the same colour was the one surface where
-                reaching the goal looked like any other pledge landing.
-                The bar caps at 100%; the total above it does not — a goal is
-                a milestone, not a finish line. */}
-            <div
-              className={`h-full rounded-full transition-[width] duration-700 ease-out ${
-                totalRaised >= goalAmount ? "bg-success" : "bg-primary"
-              }`}
-              style={{
-                width: `${Math.min(100, (totalRaised / goalAmount) * 100)}%`,
-              }}
-            />
-          </div>
+          <GoalProgress
+            totalRaised={totalRaised}
+            goalAmount={goalAmount}
+            className="mt-2"
+          />
         ) : null}
         {!goalAmount && onEditGoal ? (
           <Button

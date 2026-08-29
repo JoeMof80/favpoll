@@ -26,7 +26,7 @@ import type {
 } from "@favpoll/types"
 import { charityNames as joinCharityNames } from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
-import { FavpollListCardCharityCarousel } from "../favpoll-list-card/favpoll-list-card-charity-carousel"
+import { MobileCharityFooter } from "./mobile-charity-footer"
 import { PageLayout } from "../page-layout"
 import { Gift, FileText } from "lucide-react"
 import { formatPoundsExact } from "@/lib/i18n"
@@ -96,11 +96,6 @@ export function FavpollContent({
         year: "numeric",
       })
     : null
-
-  const perCharity =
-    favpoll.favpoll_charities.length > 0
-      ? totalRaised / favpoll.favpoll_charities.length
-      : 0
 
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
   // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
@@ -291,22 +286,11 @@ export function FavpollContent({
           onCancel={() => setShowGuestFund(false)}
         />
       )}
-      {/* Fixed charity carousel — mobile only, always visible */}
-      {favpoll.favpoll_charities.length > 0 && (
-        <div
-          className="fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
-          style={{
-            paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
-          }}
-        >
-          <FavpollListCardCharityCarousel
-            charities={favpoll.favpoll_charities.map((ec) => ({
-              charity: ec.charities,
-            }))}
-            perCharity={perCharity}
-          />
-        </div>
-      )}
+      <MobileCharityFooter
+        charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
+        totalRaised={totalRaised}
+        goalAmount={favpoll.goal_amount ?? null}
+      />
     </PageLayout>
   )
 }
