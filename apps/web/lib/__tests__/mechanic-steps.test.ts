@@ -77,22 +77,22 @@ describe("buildMechanicSteps", () => {
 })
 
 describe("isMessageReveal", () => {
-  const MASCOTS = [
-    "Barnaby the bear",
-    "Conker",
-    "Fluffy dice",
-    "Kevin the gnome",
-    "Knitted heart",
-    "Lucky 2p",
-    "Rubber duck",
-    "Wooden spoon",
+  const HATS = [
+    "Beret",
+    "Bowler",
+    "Deerstalker",
+    "Fez",
+    "Sombrero",
+    "Stetson",
+    "Top hat",
+    "Viking helmet",
   ]
 
   it("calls a reveal that names no option a message", () => {
     expect(
       isMessageReveal(
-        "The winner rides round my neck, on Dad's old bootlace. He'd have said that was asking for trouble.",
-        MASCOTS
+        "Thank you, all of you. I'll see you at the finish, whatever I end up in.",
+        HATS
       )
     ).toBe(true)
   })
@@ -121,19 +121,19 @@ describe("isMessageReveal", () => {
     // Testing the whole reveal would misread this as a favourite disclosure.
     expect(
       isMessageReveal(
-        "Thank you, all of you. Even whoever nominated the Wooden spoon.",
-        MASCOTS
+        "Thank you, all of you. Even whoever nominated the Viking helmet.",
+        HATS
       )
     ).toBe(true)
   })
 
   it("is case- and substring-tolerant", () => {
-    expect(isMessageReveal("kevin the gnome, obviously.", MASCOTS)).toBe(false)
+    expect(isMessageReveal("the FEZ, obviously.", HATS)).toBe(false)
   })
 
   it("fails towards today when there is nothing to decide with", () => {
-    expect(isMessageReveal(null, MASCOTS)).toBe(false)
-    expect(isMessageReveal("   ", MASCOTS)).toBe(false)
+    expect(isMessageReveal(null, HATS)).toBe(false)
+    expect(isMessageReveal("   ", HATS)).toBe(false)
     expect(isMessageReveal("A message with no list to check.", [])).toBe(false)
     expect(isMessageReveal("A message with no list to check.", null)).toBe(
       false
@@ -143,7 +143,7 @@ describe("isMessageReveal", () => {
 
 describe("buildMechanicSteps — message reveals", () => {
   const base = {
-    topicTitle: "Mascot",
+    topicTitle: "Hat",
     charityLine: "British Heart Foundation",
     isCause: false,
     hasReveal: true,

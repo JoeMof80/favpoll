@@ -699,7 +699,7 @@ export function LandingHero({
                             was uniform text-sm, which held while both names
                             were short — "Marie Curie", "WWF-UK" — and broke
                             the day the fundraiser card started deriving its
-                            own: "British Heart Foundation" needs 159px at
+                            own: "British Heart Foundation" needed 159px at
                             14px and the column gives 133–159 depending on how
                             the grid is folded, so it truncated mid-word at
                             three of five widths. At 12px it needs 136 and

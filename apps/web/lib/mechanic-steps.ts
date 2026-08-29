@@ -42,21 +42,26 @@ export function isQuoteReveal(reveal: string | null | undefined): boolean {
  * WHY IT EXISTS (founder, 2026-08-29: "lets have Marcus reveal something
  * other than his favourite"). Most reveals name one: "Purple. She wore it to
  * every important occasion." But a favpoll whose poll DECIDES something —
- * Marcus Bell's marathon mascot, where the leader actually rides with him —
- * cannot have one. The reveal is written at creation, before any pledge, so
- * the organiser's "favourite" would be a bet on an undecided result rather
- * than a fact about them: unwritable in advance, and reading as either
- * campaigning or losing whichever way it lands. A message is the only shape
- * that works there, and it is a good shape generally — the brand guide says
- * an empty reveal is fine and not to force one, which means those favpolls
- * have nothing at all behind the lock today.
+ * one whose TOPIC IS the outcome — cannot have one. The reveal is written at
+ * creation, before any pledge, so the organiser's "favourite" would be a bet
+ * on an undecided result rather than a fact about them: unwritable in
+ * advance, and reading as either campaigning or losing whichever way it
+ * lands.
+ *
+ * The demo scene that prompted this has since moved on — /fundraisers now
+ * runs a hat, where the guest picks a real favourite and only the WINNER is
+ * made physical, so its reveal is a favourite again. The shape it
+ * unlocked stands on its own merits: the brand guide says an empty reveal is
+ * fine and not to force one, which means those favpolls have nothing at all
+ * behind the lock today. Nothing on the marketing pages demonstrates it, and
+ * that is worth knowing.
  *
  * DERIVED, NOT STORED, exactly as isQuoteReveal is. No column, no migration
  * and no wizard field: an organiser who writes a message instead of a
  * favourite simply gets copy that says so.
  *
  * THE OPENING SENTENCE ONLY. The house pattern puts the favourite there —
- * "Purple.", "Kevin the gnome.", "Ours will hopefully be Chengdu." — and
+ * "Purple.", "The fez.", "Ours will hopefully be Chengdu." — and
  * testing the whole reveal would misread a message that happens to mention an
  * option in passing.
  *

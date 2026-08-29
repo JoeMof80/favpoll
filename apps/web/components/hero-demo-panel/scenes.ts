@@ -398,39 +398,55 @@ export const SCENES: HeroScene[] = [
     //    so it keeps a protagonist (the runner). Register-wise it derives to
     //    `cause`, but it is nothing like a faceless appeal.
     //
-    //    THE HOMEMADE TOPIC (founder, 2026-08-28). This scene is the site's
-    //    one exemplar of a topic an organiser wrote themselves, which is why
-    //    it is a mascot and not the favourite Dance it ran until now. Dance
-    //    could sit in the catalogue tomorrow — it is a preference, like
-    //    Colour or Season. A list of the specific objects Marcus's colleagues
-    //    offered to lend him could not, and that is the whole point of it.
+    //    THE HOMEMADE TOPIC (founder, 2026-08-28), and the shape it took five
+    //    goes to find. Dance, a Mascot, his dad's own objects, a chippy
+    //    order, a cake costume — each failed one of FOUR tests that have to
+    //    pass together. Worth keeping, because the next person to improve
+    //    this scene will re-derive them otherwise.
     //
-    //    IT ALSO DECIDES SOMETHING, which no other scene does. A mascot
-    //    actually rides the 26.2 miles, so a pledge here changes an outcome
-    //    rather than recording an opinion — a reason to give more, and one
-    //    that suits this register and no other. Do not spread it: the
-    //    memorial and the wedding measure what people love, and should.
+    //    1. HOMEMADE means the topic could only ever exist for THIS favpoll,
+    //       not merely that the catalogue lacks it today. Dance and chippy
+    //       order fail: they are good topics, which is exactly why they would
+    //       be catalogue topics (founder: "it feels like it should already be
+    //       a topic").
+    //    2. THE GUEST MUST HOLD A REAL PREFERENCE. Mascots and a dead man's
+    //       pockets fail: a gnome against a rubber duck, or a hankie against
+    //       a keyring, gives the guest nothing of their own to say (founder:
+    //       "some of the mementos are meaningless and create a false
+    //       choice").
+    //    3. THE REVEAL MUST BE WRITABLE ON DAY ONE. Any topic that IS the
+    //       outcome fails: the organiser's "favourite" becomes a bet on an
+    //       undecided result rather than a fact about them.
+    //    4. THE CONSEQUENCE MUST BE SOURCEABLE AT THE LAST MINUTE. The cake
+    //       costume died here (founder: "how is Marcus supposed to source
+    //       different cake costumes on the day of the marathon?"). A costume
+    //       is ordered weeks ahead, which drags the decision back before the
+    //       race and revives the very problem test 3 solved.
     //
-    //    "LEADING WHEN HE SETS OFF", NOT "WINS" (founder, 2026-08-29: "the
-    //    poll has to end before the marathon"). It did, and that was the
-    //    defect. A consequence taken at the CLOSE forces the favpoll to end
-    //    the day before the thing everyone cares about — where /memorials
-    //    runs through and past the funeral and /celebrations through and
-    //    past the wedding, both containing their event. It would also have
-    //    cut off the "he did it" sponsorship, which is when a great deal of
-    //    a sponsored fundraiser's money actually lands.
+    //    A HAT passes all four, and it is test 4 that it passes where
+    //    everything else failed: a hat costs a fiver, packs flat, and Marcus
+    //    can plausibly own all eight and pick on the morning. That is exactly
+    //    the property that made the founder's original illustration work
+    //    (2026-08-29: "favourite colour and the leading colour will be
+    //    Marcus's socks on the run") — socks and hats are both bought the
+    //    night before.
     //
-    //    A snapshot fixes it and costs one clause, because the standings are
-    //    live to anyone who has pledged: "leading" is a thing a supporter can
-    //    go and look at, not a fiction written to dodge the problem. The
-    //    urgency survives — pledge before race day or you have no say — and
-    //    the poll runs on afterwards for the total. It is also how people
-    //    really phrase these: nobody says "the winner of the poll", they say
-    //    whoever is top when I set off comes with me.
+    //    The rule underneath it: a REAL favourite, with the winner made
+    //    physical. The guest picks a hat, which is a visual, funny, genuinely
+    //    held preference; the winner becomes what he wears for 26.2 miles;
+    //    and the homemade-ness lives in the FRAMING, because nobody has a
+    //    favourite hat in the abstract — it only means anything as "which
+    //    should he wear", which no catalogue will ever stock.
     //
-    //    FUNDRAISER_KEEPSAKE_DATA depends on this. It closes 3rd May, the
-    //    week after the race, which only makes sense while the favpoll
-    //    outlives the marathon. ──
+    //    A NOTE ON THE RECORD, since it was argued the other way earlier: a
+    //    homemade topic contributes nothing to the all-time rankings, and
+    //    that is true of EVERY homemade topic by definition — the grandad
+    //    stories on /features aggregate to nothing either. It is a property
+    //    of the create path, not a fault in this scene.
+    //
+    //    IT DECIDES SOMETHING, which no other scene does. Do not spread it:
+    //    the memorial and the wedding measure what people love and stop
+    //    there, and should.
     kind: "fundraiser",
     occasion_type: "Sponsored event",
     opening_line: null,
@@ -438,69 +454,74 @@ export const SCENES: HeroScene[] = [
       name: "Marcus Bell",
       context: "London Marathon run",
       about:
-        "Running his first marathon for the British Heart Foundation, in memory of his dad. The leading mascot will join Marcus for the full 26.2 miles.",
+        "Running his first marathon for Mind. The leading hat is the one he wears for all 26.2 miles.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {
       id: "demo-poll-fundraiser",
-      // A MESSAGE, NOT A FAVOURITE (founder, 2026-08-29: "Marcus won't know
-      // which mascot will win when he writes the reveal"). Exactly so, and it
-      // is structural rather than a wording problem: a poll that DECIDES
-      // something cannot carry a favourite reveal. The reveal is written at
-      // creation, before any pledge, so Marcus's "favourite mascot" would be
-      // a bet on an undecided result rather than a fact about him — where
-      // Belinda's purple and the couple's Chengdu are settled and true
-      // whatever the room does. Unwritable in advance, and reading as either
-      // campaigning or losing whichever way it landed.
+      // A FAVOURITE, and the topic is what allows one. The message reveal
+      // existed because a poll whose topic WAS the outcome had none to
+      // disclose. Marcus's favourite hat is a plain fact about him: true the
+      // day he writes it, unchanged by whatever the room picks, and costing
+      // him nothing when the room picks the sombrero. It lands after a
+      // pledge, so it cannot campaign for anything either.
       //
-      // What he CAN know on day one is where the winner rides, which is the
-      // founder's own suggestion and the thing that unlocks it. The bootlace
-      // does the honouring without a word of sentiment, and nobody loses.
-      //
-      // isMessageReveal picks this up with no field to set: the opening
-      // sentence names none of the eight mascots, so step 3 on the poster and
-      // the unlock pill both say "message" rather than "favourite".
+      // isMessageReveal reads "fez" as one of the options, so the poster and
+      // the pill promise a favourite again, with nothing to set.
       personal_reveal:
-        "The winner rides round my neck, on Dad's old bootlace. He'd have said that was asking for trouble.",
+        "The fez. I've had one since a stag do in 2013 and I've been waiting for an excuse.",
       topic: {
-        title: "Mascot",
+        title: "Hat",
         // EIGHT, where Colour has twelve and Holiday destination
         // twenty-eight. A homemade list should look homemade: nobody sits
         // down and writes thirty of these, and the short list is itself a
         // signal that no catalogue supplied it.
         favourites: [
-          { id: "m-barnaby", label: "Barnaby the bear" },
-          { id: "m-conker", label: "Conker" },
-          { id: "m-dice", label: "Fluffy dice" },
-          { id: "m-gnome", label: "Kevin the gnome" },
-          { id: "m-heart", label: "Knitted heart" },
-          { id: "m-2p", label: "Lucky 2p" },
-          { id: "m-duck", label: "Rubber duck" },
-          { id: "m-spoon", label: "Wooden spoon" },
+          { id: "h-beret", label: "Beret" },
+          { id: "h-bowler", label: "Bowler" },
+          { id: "h-deerstalker", label: "Deerstalker" },
+          { id: "h-fez", label: "Fez" },
+          { id: "h-sombrero", label: "Sombrero" },
+          { id: "h-stetson", label: "Stetson" },
+          { id: "h-tophat", label: "Top hat" },
+          { id: "h-viking", label: "Viking helmet" },
         ],
       },
     },
     charities: [
       {
-        id: "ch-bhf",
-        name: "British Heart Foundation",
+        // Mind (founder, 2026-08-29: "it could be a silly idea for a mental
+        // health charity to choose which hat Marcus should wear"), and the
+        // pairing is better than a joke. Being visible and refusing to take
+        // yourself too seriously is what mental health campaigns actually run
+        // on, so a ridiculous hat is on-message rather than at odds with the
+        // cause.
+        //
+        // It also takes the last of the memorial shadow off this page. The
+        // scene ran "in memory of his dad" for a while, which sat close to
+        // /memorials; Marcus now needs no bereavement to justify a marathon.
+        //
+        // 219830 is from scripts/seed.ts, the repo's own charity data, not
+        // from memory.
+        id: "ch-mind",
+        name: "Mind",
         logo_url: null,
-        registered_number: "225971",
+        registered_number: "219830",
       },
     ],
-    // Rubber duck (index 6) — a GUEST's pick, not Marcus's. Kevin is third,
-    // the same shape Northern Soul had and Purple has on the memorial: the
-    // demo selection must never land on the protagonist's own answer, or the
-    // reveal is spent before it arrives.
-    selectedIndex: 6,
+    // Sombrero (index 4) — a GUEST's pick, and the one a room lands on.
+    // Marcus's fez comes third, the same shape Purple has on the memorial:
+    // the demo selection must never land on the protagonist's own answer, or
+    // the reveal is spent before it arrives.
+    selectedIndex: 4,
     pledgeAmount: "£20",
     results: [
-      { label: "Rubber duck", amount: "£240", widthPercent: 100 },
-      { label: "Barnaby the bear", amount: "£190", widthPercent: 79 },
-      { label: "Kevin the gnome", amount: "£150", widthPercent: 63 },
-      { label: "Knitted heart", amount: "£110", widthPercent: 46 },
-      { label: "Lucky 2p", amount: "£75", widthPercent: 31 },
-      { label: "Fluffy dice", amount: "£45", widthPercent: 19 },
+      { label: "Sombrero", amount: "£240", widthPercent: 100 },
+      { label: "Viking helmet", amount: "£190", widthPercent: 79 },
+      { label: "Fez", amount: "£150", widthPercent: 63 },
+      { label: "Top hat", amount: "£110", widthPercent: 46 },
+      { label: "Deerstalker", amount: "£75", widthPercent: 31 },
+      { label: "Beret", amount: "£45", widthPercent: 19 },
     ],
     total: "£810",
   },

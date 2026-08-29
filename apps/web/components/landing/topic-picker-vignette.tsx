@@ -48,7 +48,7 @@ import { Vignette } from "@/components/landing/vignette"
 // your favourite favourite grandad story…".
 /**
  * What the vignette types. PARAMETERISED 2026-08-28, when /fundraisers needed
- * this same sequence to show ITS favpoll — Marcus Bell's mascot — rather than
+ * this same sequence to show ITS favpoll — Marcus Bell's hat — rather than
  * the grandad stories /features runs. A picture of the custom-topic mechanic
  * beside copy about Marcus, typing someone else's topic, is the same
  * continuity break the flowers and the cake were on the router cards.

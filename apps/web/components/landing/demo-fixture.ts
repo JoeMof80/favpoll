@@ -66,7 +66,7 @@ export const MEMORIAL_SCENE =
  */
 /**
  * The fundraiser register's exemplar (founder, 2026-08-28) — Marcus Bell's
- * London Marathon, favourite dance, British Heart Foundation.
+ * London Marathon, favourite hat, Mind.
  *
  * MARCUS RATHER THAN THE CAUSE SCENE, and the reason is structural. This
  * register holds two shapes: a person doing a sponsored challenge, who keeps
@@ -164,7 +164,7 @@ export const WEDDING_PACK_DATA: PackData = {
 
 export const WEDDING_PACK_STEPS = buildPackSteps(WEDDING_PACK_DATA)
 
-/** The same pack for the FUNDRAISER scene — Marcus, mascots, BHF. */
+/** The same pack for the FUNDRAISER scene — Marcus, hats, Mind. */
 const FUNDRAISER_HEADLINE = getFavpollHeadline({
   occasionType: FUNDRAISER_SCENE.occasion_type,
   name: FUNDRAISER_SCENE.protagonist?.name ?? "",
@@ -287,10 +287,10 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
   totalRaised: pounds(FUNDRAISER_SCENE.total),
   charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
   // House format: ordinal, never ISO. The favpoll closed the week AFTER the
-  // race, and that is load-bearing rather than incidental: the mascot is
-  // taken from whoever leads when Marcus sets off, not from the close, so the
-  // poll runs through race day and collects the sponsorship that lands once
-  // he has finished. A date before the marathon would contradict the About.
+  // race, and that is load-bearing rather than incidental: the hat is taken
+  // from whichever is leading on race morning, not from the close, so the
+  // poll runs through the marathon and collects the sponsorship that lands
+  // once he has finished. A date before the race would contradict the About.
   closedDate: "3rd May 2026",
   standings: FUNDRAISER_SCENE.results.map((r) => ({
     favouriteId:
@@ -304,15 +304,16 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
 }
 
 /**
- * What the topic picker types on /fundraisers — Marcus's own mascot topic,
- * so the dialogs show the favpoll the rest of the page shows.
+ * What the topic picker types on /fundraisers — Marcus's own hat topic, so
+ * the dialogs show the favpoll the rest of the page shows.
  *
  * THREE ITEMS, NOT THE POLL'S EIGHT. The vignette depicts the mechanic, not a
  * transcript: three typed by the organiser and one added by a guest is enough
  * to show both halves of it, and eight would make the sequence outlast anyone
  * watching. The guest's is "Lucky 2p" — small, specific and exactly the kind
- * of thing an organiser does not think of, which is the whole reason guests
- * can add.
+ * The guest's is the deerstalker — specific, a bit obscure, and exactly the
+ * kind of thing an organiser does not think of, which is the whole reason
+ * guests can add.
  *
  * Module-level, as TopicPickerScene requires: the animation effect depends on
  * this reference, so an inline literal would restart the sequence every
@@ -320,6 +321,6 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
  */
 export const FUNDRAISER_TOPIC_PICKER: TopicPickerScene = {
   topic: FUNDRAISER_SCENE.poll.topic.title,
-  items: ["Kevin the gnome", "Barnaby the bear", "Rubber duck"],
-  guestItem: "Lucky 2p",
+  items: ["Sombrero", "Viking helmet", "Fez"],
+  guestItem: "Deerstalker",
 }

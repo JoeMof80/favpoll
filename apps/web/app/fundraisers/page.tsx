@@ -59,29 +59,25 @@ const STEPS = [
 // they default to — the last of the three registers to stop showing
 // Belinda's colours under its own headline.
 //
-// ALL EIGHT ARE SHOWN, where the memorial withholds Purple and the wedding
-// withholds Chengdu. Those two hold back the protagonist's own answer,
-// because lighting it in the hint column would spend the reveal two columns
-// before the standings do. Marcus has no answer to protect: his reveal is a
-// message about where the winner rides, not a mascot. So the whole list can
-// appear — and a homemade list is short enough that it fits, which is a
-// difference worth showing rather than hiding.
+// `shown` is seven of the topic's eight, and THE FEZ IS THE ONE HELD BACK,
+// exactly as Purple is on the memorial and Chengdu on the wedding: it is
+// Marcus's own answer, and lighting it here would give the reveal away two
+// columns before the standings do.
 //
-// `picked` is the rubber duck: a guest's pick, top of the standings, and the
+// `picked` is the sombrero: a guest's pick, top of the standings, and the
 // scene's own selectedIndex.
 const FUNDRAISER_HINTS: HintScene = {
   scene: FUNDRAISER_SCENE,
   shown: [
-    "Barnaby the bear",
-    "Conker",
-    "Fluffy dice",
-    "Kevin the gnome",
-    "Knitted heart",
-    "Lucky 2p",
-    "Rubber duck",
-    "Wooden spoon",
+    "Beret",
+    "Bowler",
+    "Deerstalker",
+    "Sombrero",
+    "Stetson",
+    "Top hat",
+    "Viking helmet",
   ],
-  picked: "Rubber duck",
+  picked: "Sombrero",
 }
 
 const STEP_MEDIA = [
@@ -105,8 +101,8 @@ const STEP_MEDIA = [
 // THE TOPIC PICKER TAKES ITS PLACE, and goes FIRST rather than slotting into
 // the gap. It is the only artefact here about making the favpoll rather than
 // running it, so chronology puts it at the front — and this is the one page
-// whose exemplar earns it, since a mascot list is a topic no catalogue could
-// ever stock.
+// whose exemplar earns it: nobody has a favourite hat in the abstract, so
+// "which should he wear" is a topic no catalogue could ever stock.
 //
 // Every one is the real component pointed at the FUNDRAISER scene, so Marcus
 // Bell's marathon runs from the homepage router card through the hero and on
@@ -147,12 +143,10 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
-    // THE ONLY MESSAGE REVEAL ON THE SITE, and the page that needed one. A
-    // poll that decides an outcome cannot disclose a favourite (see the
-    // scene), so Marcus gives back something he can actually know in advance:
-    // where the winner rides. The product follows without a field being set —
-    // isMessageReveal reads it off the text — so the poster above this row
-    // promises a message too.
+    // A favourite again, and the topic is what allows it: Marcus's own hat is
+    // a fact about him, not a bid on the vote, so it can be written on day one
+    // and costs him nothing when the room picks the sombrero. It lands after a
+    // pledge, so it cannot campaign either.
     artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
   },
   {
