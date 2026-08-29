@@ -121,11 +121,20 @@ const IDEAS = [
     key: "topic",
     label: t("fundraisers.artefacts.topic.label"),
     body: t("fundraisers.artefacts.topic.body"),
-    // THE ONE MOVING ARTEFACT on any of the three pages, and it has to be:
-    // the sequence is the content. Frozen, it would show only the third
-    // dialog — a guest adding a favourite — which is the end of a story the
-    // reader never saw start. Reduced motion still gets the final frame.
-    artefact: <TopicPickerVignette scene={FUNDRAISER_TOPIC_PICKER} />,
+    // STILL (founder, 2026-08-29: "it should probably just show the dialog
+    // with the homemade topic that Marcus already created"). It ran the full
+    // three-dialog sequence until now, which was the wrong picture twice
+    // over: it was the only moving artefact on any of the three register
+    // pages, and it depicted the topic being MADE when everything else on
+    // this page depicts a favpoll that already exists.
+    //
+    // Held, it shows the items dialog with "Favourite marathon hat" and all
+    // eight hats as chips under "Added by you" — which is the whole claim of
+    // the idea beside it, in one frame, with no waiting.
+    //
+    // The full sequence stays on /features, where how a custom topic gets
+    // made is the point being explained.
+    artefact: <TopicPickerVignette scene={FUNDRAISER_TOPIC_PICKER} still />,
   },
   {
     key: "poster",

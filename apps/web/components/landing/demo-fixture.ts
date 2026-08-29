@@ -304,16 +304,17 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
 }
 
 /**
- * What the topic picker types on /fundraisers — Marcus's own hat topic, so
- * the dialogs show the favpoll the rest of the page shows.
+ * What the topic picker shows on /fundraisers — Marcus's own hat topic, so
+ * the dialog holds the favpoll the rest of the page holds.
  *
- * THREE ITEMS, NOT THE POLL'S EIGHT. The vignette depicts the mechanic, not a
- * transcript: three typed by the organiser and one added by a guest is enough
- * to show both halves of it, and eight would make the sequence outlast anyone
- * watching. The guest's is "Lucky 2p" — small, specific and exactly the kind
- * The guest's is the deerstalker — specific, a bit obscure, and exactly the
- * kind of thing an organiser does not think of, which is the whole reason
- * guests can add.
+ * ALL EIGHT, where /features types three. This one is rendered STILL, so
+ * nothing is typed and the whole list can sit there as chips — which is the
+ * better picture anyway, because the standings two rows below show eight and
+ * a dialog showing three would look like a different poll. If this ever goes
+ * back to animating, cut it: the animated path types every item in turn.
+ *
+ * `guestItem` is unused while still (it belongs to the third dialog, which a
+ * still does not render) and is kept so the scene stays whole.
  *
  * Module-level, as TopicPickerScene requires: the animation effect depends on
  * this reference, so an inline literal would restart the sequence every
@@ -321,6 +322,15 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
  */
 export const FUNDRAISER_TOPIC_PICKER: TopicPickerScene = {
   topic: FUNDRAISER_SCENE.poll.topic.title,
-  items: ["Sombrero", "Viking helmet", "Fez"],
+  items: [
+    "Sombrero",
+    "Viking helmet",
+    "Fez",
+    "Top hat",
+    "Deerstalker",
+    "Beret",
+    "Bowler",
+    "Stetson",
+  ],
   guestItem: "Deerstalker",
 }
