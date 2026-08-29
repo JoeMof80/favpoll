@@ -16,7 +16,10 @@ const SCAN_DIRS = [
   "apps/admin/lib",
 ];
 
-const ALLOWLIST = [];
+// Satori (next/og) draws the share cards from inline styles with no
+// stylesheet, no CSS variables and no oklch — so this one file mirrors the
+// tokens as hex. Every other file goes through globals.css.
+const ALLOWLIST = ["apps/web/lib/og/palette.ts"];
 
 // Bracketed Tailwind hex utilities: bg-[#...], text-[#...], border-[#...], …
 const UTILITY_HEX =
