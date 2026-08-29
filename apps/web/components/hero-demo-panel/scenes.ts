@@ -438,6 +438,14 @@ export const SCENES: HeroScene[] = [
     //    favourite hat in the abstract — it only means anything as "which
     //    should he wear", which no catalogue will ever stock.
     //
+    //    "MARATHON HAT", NOT "HAT" (founder, 2026-08-29). A hat is a thing
+    //    that exists generically and reads like a catalogue entry; a marathon
+    //    hat only means anything for this one event, which is the homemade
+    //    test stated exactly. It survives the three transformations the
+    //    product puts a topic title through — "Favourite marathon hat", "pick
+    //    your favourite marathon hat", "+5 more marathon hats" — which is
+    //    what rules out anything possessive.
+    //
     //    A NOTE ON THE RECORD, since it was argued the other way earlier: a
     //    homemade topic contributes nothing to the all-time rankings, and
     //    that is true of EVERY homemade topic by definition — the grandad
@@ -459,19 +467,30 @@ export const SCENES: HeroScene[] = [
     },
     poll: {
       id: "demo-poll-fundraiser",
-      // A FAVOURITE, and the topic is what allows one. The message reveal
-      // existed because a poll whose topic WAS the outcome had none to
-      // disclose. Marcus's favourite hat is a plain fact about him: true the
-      // day he writes it, unchanged by whatever the room picks, and costing
-      // him nothing when the room picks the sombrero. It lands after a
-      // pledge, so it cannot campaign for anything either.
+      // A REMARK, NOT HIS FAVOURITE (founder, 2026-08-29: "the reveal
+      // shouldn't be Marcus' favourite. it should be a remark or comment").
+      // Right, and for a reason worth keeping: on a poll with a consequence,
+      // the protagonist's own favourite is hollow. Marcus has no real stake
+      // in hats — he wears whatever the room picks — so disclosing that he
+      // likes the fez only invites "then why not just wear the fez?". The
+      // memorial and the wedding disclose a favourite because theirs are
+      // facts the poll cannot touch; his is not.
       //
-      // isMessageReveal reads "fez" as one of the options, so the poster and
-      // the pill promise a favourite again, with nothing to set.
+      // A remark has none of that. It is writable on day one, it cannot
+      // campaign, and it gives back something better than a preference
+      // nobody asked about. "How many of these I own" also answers the
+      // question the whole topic rests on — why a man has eight hats to
+      // choose between — inside the fiction rather than in a comment.
+      //
+      // THIS IS THE ONLY SURFACE DEMONSTRATING isMessageReveal. The opening
+      // sentence names no hat, so the poster's step 3 and the unlock pill
+      // both say "message" rather than "favourite", with no field set. If a
+      // future edit gives Marcus a favourite back, that capability goes
+      // undemonstrated again — see lib/mechanic-steps.ts.
       personal_reveal:
-        "The fez. I've had one since a stag do in 2013 and I've been waiting for an excuse.",
+        "Thank you. I've agreed to wear whatever wins, and I'm already regretting how many of these I own.",
       topic: {
-        title: "Hat",
+        title: "Marathon hat",
         // EIGHT, where Colour has twelve and Holiday destination
         // twenty-eight. A homemade list should look homemade: nobody sits
         // down and writes thirty of these, and the short list is itself a
@@ -510,9 +529,11 @@ export const SCENES: HeroScene[] = [
       },
     ],
     // Sombrero (index 4) — a GUEST's pick, and the one a room lands on.
-    // Marcus's fez comes third, the same shape Purple has on the memorial:
-    // the demo selection must never land on the protagonist's own answer, or
-    // the reveal is spent before it arrives.
+    //
+    // Nothing has to be dodged here, unlike the memorial and the wedding: with
+    // the reveal a remark rather than a favourite, Marcus has no answer for a
+    // selection to collide with. The sombrero is simply the funniest thing to
+    // land on, and the standings agree with it.
     selectedIndex: 4,
     pledgeAmount: "£20",
     results: [

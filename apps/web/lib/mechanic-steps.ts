@@ -48,20 +48,21 @@ export function isQuoteReveal(reveal: string | null | undefined): boolean {
  * advance, and reading as either campaigning or losing whichever way it
  * lands.
  *
- * The demo scene that prompted this has since moved on — /fundraisers now
- * runs a hat, where the guest picks a real favourite and only the WINNER is
- * made physical, so its reveal is a favourite again. The shape it
- * unlocked stands on its own merits: the brand guide says an empty reveal is
- * fine and not to force one, which means those favpolls have nothing at all
- * behind the lock today. Nothing on the marketing pages demonstrates it, and
- * that is worth knowing.
+ * /fundraisers is the one surface demonstrating it: Marcus Bell wears
+ * whichever hat the room picks, so his OWN favourite hat would be a hollow
+ * thing to disclose, and he gives back a remark instead. If a future edit
+ * gives him a favourite again, this capability goes undemonstrated.
+ *
+ * It stands on its own merits either way: the brand guide says an empty
+ * reveal is fine and not to force one, which means those favpolls have
+ * nothing at all behind the lock today.
  *
  * DERIVED, NOT STORED, exactly as isQuoteReveal is. No column, no migration
  * and no wizard field: an organiser who writes a message instead of a
  * favourite simply gets copy that says so.
  *
  * THE OPENING SENTENCE ONLY. The house pattern puts the favourite there —
- * "Purple.", "The fez.", "Ours will hopefully be Chengdu." — and
+ * "Purple.", "Ours will hopefully be Chengdu." — and
  * testing the whole reveal would misread a message that happens to mention an
  * option in passing.
  *

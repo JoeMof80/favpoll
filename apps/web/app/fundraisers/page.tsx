@@ -59,10 +59,12 @@ const STEPS = [
 // they default to — the last of the three registers to stop showing
 // Belinda's colours under its own headline.
 //
-// `shown` is seven of the topic's eight, and THE FEZ IS THE ONE HELD BACK,
-// exactly as Purple is on the memorial and Chengdu on the wedding: it is
-// Marcus's own answer, and lighting it here would give the reveal away two
-// columns before the standings do.
+// ALL EIGHT ARE SHOWN, where the memorial withholds Purple and the wedding
+// withholds Chengdu. Those two hold back the protagonist's own answer, so
+// that lighting it in the hint column does not spend the reveal two columns
+// before the standings do. Marcus has no answer to protect — his reveal is a
+// remark — so the whole list can appear, and a homemade list is short enough
+// that it fits.
 //
 // `picked` is the sombrero: a guest's pick, top of the standings, and the
 // scene's own selectedIndex.
@@ -72,6 +74,7 @@ const FUNDRAISER_HINTS: HintScene = {
     "Beret",
     "Bowler",
     "Deerstalker",
+    "Fez",
     "Sombrero",
     "Stetson",
     "Top hat",
@@ -143,10 +146,11 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
-    // A favourite again, and the topic is what allows it: Marcus's own hat is
-    // a fact about him, not a bid on the vote, so it can be written on day one
-    // and costs him nothing when the room picks the sombrero. It lands after a
-    // pledge, so it cannot campaign either.
+    // THE ONLY MESSAGE REVEAL ON THE SITE, and the only surface demonstrating
+    // isMessageReveal. On a poll with a consequence the protagonist's own
+    // favourite is hollow — Marcus wears whatever the room picks — so he gives
+    // back a remark instead. The product follows with no field set: the poster
+    // one row above promises a message too.
     artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
   },
   {
