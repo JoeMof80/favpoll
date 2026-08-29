@@ -3,6 +3,7 @@ import {
   buildMechanicSteps,
   isQuoteReveal,
   mechanicFooter,
+  isMessageReveal,
 } from "../mechanic-steps"
 
 describe("buildMechanicSteps", () => {
@@ -71,6 +72,124 @@ describe("buildMechanicSteps", () => {
   it("footer routes the favourite-less guest to the shared fund", () => {
     expect(mechanicFooter("Seaside town")).toBe(
       "Don't have a favourite seaside town? That's okay — you can still give to the shared fund."
+    )
+  })
+})
+
+describe("isMessageReveal", () => {
+  const MASCOTS = [
+    "Barnaby the bear",
+    "Conker",
+    "Fluffy dice",
+    "Kevin the gnome",
+    "Knitted heart",
+    "Lucky 2p",
+    "Rubber duck",
+    "Wooden spoon",
+  ]
+
+  it("calls a reveal that names no option a message", () => {
+    expect(
+      isMessageReveal(
+        "The winner rides round my neck, on Dad's old bootlace. He'd have said that was asking for trouble.",
+        MASCOTS
+      )
+    ).toBe(true)
+  })
+
+  it("does not call the house pattern a message", () => {
+    // The favourite leads: "Purple. She wore it..."
+    expect(
+      isMessageReveal("Purple. She wore it to every important occasion.", [
+        "Purple",
+        "Blue",
+      ])
+    ).toBe(false)
+  })
+
+  it("finds a favourite anywhere in the opening sentence, not just at the start", () => {
+    // The wedding's shape — the option lands at the END of sentence one.
+    expect(
+      isMessageReveal(
+        "Ours will hopefully be Chengdu. We're planning to visit the pandas on our honeymoon.",
+        ["Italy", "Chengdu", "Japan"]
+      )
+    ).toBe(false)
+  })
+
+  it("ignores an option mentioned only after the opening sentence", () => {
+    // Testing the whole reveal would misread this as a favourite disclosure.
+    expect(
+      isMessageReveal(
+        "Thank you, all of you. Even whoever nominated the Wooden spoon.",
+        MASCOTS
+      )
+    ).toBe(true)
+  })
+
+  it("is case- and substring-tolerant", () => {
+    expect(isMessageReveal("kevin the gnome, obviously.", MASCOTS)).toBe(false)
+  })
+
+  it("fails towards today when there is nothing to decide with", () => {
+    expect(isMessageReveal(null, MASCOTS)).toBe(false)
+    expect(isMessageReveal("   ", MASCOTS)).toBe(false)
+    expect(isMessageReveal("A message with no list to check.", [])).toBe(false)
+    expect(isMessageReveal("A message with no list to check.", null)).toBe(
+      false
+    )
+  })
+})
+
+describe("buildMechanicSteps — message reveals", () => {
+  const base = {
+    topicTitle: "Mascot",
+    charityLine: "British Heart Foundation",
+    isCause: false,
+    hasReveal: true,
+  }
+
+  it("promises a message rather than a favourite", () => {
+    const steps = buildMechanicSteps({
+      ...base,
+      firstName: "Marcus",
+      revealIsMessage: true,
+    })
+    expect(steps[2]).toBe(
+      "Marcus's message will be revealed along with the standings"
+    )
+  })
+
+  it("falls back to an unnamed message with no protagonist", () => {
+    const steps = buildMechanicSteps({
+      ...base,
+      firstName: null,
+      revealIsMessage: true,
+    })
+    expect(steps[2]).toBe("A message will be revealed along with the standings")
+  })
+
+  it("beats both isCause and revealIsQuote", () => {
+    const steps = buildMechanicSteps({
+      ...base,
+      firstName: "Marcus",
+      isCause: true,
+      revealIsQuote: true,
+      revealIsMessage: true,
+    })
+    expect(steps[2]).toBe(
+      "Marcus's message will be revealed along with the standings"
+    )
+  })
+
+  it("leaves favourite reveals exactly as they were", () => {
+    const steps = buildMechanicSteps({
+      ...base,
+      firstName: "Belinda",
+      revealIsMessage: false,
+    })
+    expect(steps[2]).toBe(
+      "Belinda's favourite will be revealed along with the standings"
     )
   })
 })

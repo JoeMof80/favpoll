@@ -59,22 +59,23 @@ const STEPS = [
 // they default to — the last of the three registers to stop showing
 // Belinda's colours under its own headline.
 //
-// `shown` is seven of the topic's eight, and seven is nearly all of them
-// because a homemade list IS short — where the memorial withholds one of
-// twelve and the wedding one of twenty-eight. KEVIN IS THE ONE HELD BACK, as
-// Purple and Chengdu are: he is Marcus's own answer, and lighting him here
-// would give the reveal away two columns before the standings do.
+// ALL EIGHT ARE SHOWN, where the memorial withholds Purple and the wedding
+// withholds Chengdu. Those two hold back the protagonist's own answer,
+// because lighting it in the hint column would spend the reveal two columns
+// before the standings do. Marcus has no answer to protect: his reveal is a
+// message about where the winner rides, not a mascot. So the whole list can
+// appear — and a homemade list is short enough that it fits, which is a
+// difference worth showing rather than hiding.
 //
 // `picked` is the rubber duck: a guest's pick, top of the standings, and the
-// scene's own selectedIndex. On the wedding those two had to differ, because
-// that scene points its selection at the couple's answer; this one already
-// points at a guest's, so the hint and the demo agree.
+// scene's own selectedIndex.
 const FUNDRAISER_HINTS: HintScene = {
   scene: FUNDRAISER_SCENE,
   shown: [
     "Barnaby the bear",
     "Conker",
     "Fluffy dice",
+    "Kevin the gnome",
     "Knitted heart",
     "Lucky 2p",
     "Rubber duck",
@@ -146,10 +147,12 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
-    // The reveal earns its place here in a way it does not on a cause, and
-    // the mascot topic sharpened it: whichever mascot leads when Marcus sets
-    // off rides the whole 26.2 miles, so the room is deciding an outcome, and
-    // only after pledging do you learn which one he was hoping for.
+    // THE ONLY MESSAGE REVEAL ON THE SITE, and the page that needed one. A
+    // poll that decides an outcome cannot disclose a favourite (see the
+    // scene), so Marcus gives back something he can actually know in advance:
+    // where the winner rides. The product follows without a field being set —
+    // isMessageReveal reads it off the text — so the poster above this row
+    // promises a message too.
     artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
   },
   {

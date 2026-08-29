@@ -6,7 +6,11 @@ import { LockCardContent } from "@/components/lock-card-content"
 import { HeaderBar } from "@/components/header-bar"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
-import { buildMechanicSteps, isQuoteReveal } from "@/lib/mechanic-steps"
+import {
+  buildMechanicSteps,
+  isQuoteReveal,
+  isMessageReveal,
+} from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -183,6 +187,10 @@ export function DemoCard({
     isCause: !protagonist,
     hasReveal: Boolean(scene.poll.personal_reveal),
     revealIsQuote: isQuoteReveal(scene.poll.personal_reveal),
+    revealIsMessage: isMessageReveal(
+      scene.poll.personal_reveal,
+      scene.poll.topic.favourites.map((f) => f.label)
+    ),
   })
 
   const headline = protagonist

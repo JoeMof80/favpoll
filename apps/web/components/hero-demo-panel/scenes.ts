@@ -438,19 +438,30 @@ export const SCENES: HeroScene[] = [
       name: "Marcus Bell",
       context: "London Marathon run",
       about:
-        "Running his first marathon for the British Heart Foundation, in memory of his dad. Whichever mascot is leading when he sets off rides the whole 26.2 miles, pinned to his vest.",
+        "Running his first marathon for the British Heart Foundation, in memory of his dad. The leading mascot will join Marcus for the full 26.2 miles.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {
       id: "demo-poll-fundraiser",
-      // The joke has something underneath it, and the reveal is where that
-      // lands. The room backed the rubber duck because the rubber duck is
-      // funny and funny raises money, which is true of every workplace
-      // fundraiser; only after pledging do you find out what Marcus was
-      // quietly hoping for. Second sentence does all the work and never says
-      // anything heavy.
+      // A MESSAGE, NOT A FAVOURITE (founder, 2026-08-29: "Marcus won't know
+      // which mascot will win when he writes the reveal"). Exactly so, and it
+      // is structural rather than a wording problem: a poll that DECIDES
+      // something cannot carry a favourite reveal. The reveal is written at
+      // creation, before any pledge, so Marcus's "favourite mascot" would be
+      // a bet on an undecided result rather than a fact about him — where
+      // Belinda's purple and the couple's Chengdu are settled and true
+      // whatever the room does. Unwritable in advance, and reading as either
+      // campaigning or losing whichever way it landed.
+      //
+      // What he CAN know on day one is where the winner rides, which is the
+      // founder's own suggestion and the thing that unlocks it. The bootlace
+      // does the honouring without a word of sentiment, and nobody loses.
+      //
+      // isMessageReveal picks this up with no field to set: the opening
+      // sentence names none of the eight mascots, so step 3 on the poster and
+      // the unlock pill both say "message" rather than "favourite".
       personal_reveal:
-        "Kevin the gnome. He stood in Dad's front garden for thirty years.",
+        "The winner rides round my neck, on Dad's old bootlace. He'd have said that was asking for trouble.",
       topic: {
         title: "Mascot",
         // EIGHT, where Colour has twelve and Holiday destination

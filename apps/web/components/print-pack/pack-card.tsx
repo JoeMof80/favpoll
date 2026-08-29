@@ -20,6 +20,7 @@ export type PackData = {
   topicTitle: string | null
   hasReveal: boolean
   revealIsQuote?: boolean
+  revealIsMessage?: boolean
   charityNames: string[]
   /**
    * What the QR encodes — the SHORT form (/p/<code>), not the shareable
@@ -54,6 +55,7 @@ export function buildPackSteps(data: PackData): string[] | null {
     isCause: data.isCause,
     hasReveal: data.hasReveal,
     revealIsQuote: data.revealIsQuote,
+    revealIsMessage: data.revealIsMessage,
   })
 }
 

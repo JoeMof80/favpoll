@@ -1,4 +1,4 @@
-import { isQuoteReveal } from "@/lib/mechanic-steps"
+import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -19,7 +19,11 @@ export default async function PackPage({ params }: Props) {
     .select(
       `id, short_code, subject, cause_label, occasion_type, opening_line, is_private,
        protagonists!favpolls_protagonist_id_fkey ( name ),
-       favpoll_polls ( personal_reveal, topics ( title ) ),
+       favpoll_polls (
+         personal_reveal,
+         topics ( title, favourites ( label ) ),
+         favpoll_poll_favourites ( favourites ( label ) )
+       ),
        favpoll_charities ( charities ( name ) )`
     )
     .eq("id", id)
@@ -51,6 +55,22 @@ export default async function PackPage({ params }: Props) {
     topicTitle: firstPoll?.topics?.title ?? null,
     hasReveal: Boolean(firstPoll?.personal_reveal),
     revealIsQuote: isQuoteReveal(firstPoll?.personal_reveal),
+    // The two favourites joins above exist only for this: step 3 has to know
+    // whether the reveal names one of the options or is a message.
+    //
+    // BOTH SOURCES, matching /favpolls. The topic's own list is not the whole
+    // list — a poll also carries favpoll_poll_favourites, which is where a
+    // custom topic's items and anything a guest added live. Checking only the
+    // canonical list would read a reveal naming an ADDED favourite as a
+    // message, and print the wrong promise on the pack.
+    revealIsMessage: isMessageReveal(firstPoll?.personal_reveal, [
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((firstPoll?.topics?.favourites ?? []) as any[]).map((f) => f.label),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((firstPoll?.favpoll_poll_favourites ?? []) as any[]).map(
+        (epf) => epf?.favourites?.label
+      ),
+    ]),
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name

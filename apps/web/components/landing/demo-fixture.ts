@@ -1,5 +1,6 @@
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { buildPackSteps } from "@/components/print-pack/pack-card"
+import { isMessageReveal } from "@/lib/mechanic-steps"
 import type { PackData } from "@/components/print-pack/pack-card"
 import type { TopicPickerScene } from "@/components/landing/topic-picker-vignette"
 import type { KeepsakeData } from "@/components/keepsake/keepsake-document"
@@ -92,6 +93,10 @@ export const DEMO_PACK_DATA: PackData = {
   isCause: !DEMO_SCENE.protagonist,
   topicTitle: DEMO_SCENE.poll.topic.title,
   hasReveal: !!DEMO_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    DEMO_SCENE.poll.personal_reveal,
+    DEMO_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: DEMO_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
@@ -125,6 +130,10 @@ export const MEMORIAL_PACK_DATA: PackData = {
   isCause: false,
   topicTitle: MEMORIAL_SCENE.poll.topic.title,
   hasReveal: !!MEMORIAL_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    MEMORIAL_SCENE.poll.personal_reveal,
+    MEMORIAL_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: MEMORIAL_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
@@ -145,13 +154,17 @@ export const WEDDING_PACK_DATA: PackData = {
   isCause: false,
   topicTitle: WEDDING_SCENE.poll.topic.title,
   hasReveal: !!WEDDING_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    WEDDING_SCENE.poll.personal_reveal,
+    WEDDING_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: WEDDING_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
 
 export const WEDDING_PACK_STEPS = buildPackSteps(WEDDING_PACK_DATA)
 
-/** The same pack for the FUNDRAISER scene — Marcus, dance, BHF. */
+/** The same pack for the FUNDRAISER scene — Marcus, mascots, BHF. */
 const FUNDRAISER_HEADLINE = getFavpollHeadline({
   occasionType: FUNDRAISER_SCENE.occasion_type,
   name: FUNDRAISER_SCENE.protagonist?.name ?? "",
@@ -165,6 +178,10 @@ export const FUNDRAISER_PACK_DATA: PackData = {
   isCause: false,
   topicTitle: FUNDRAISER_SCENE.poll.topic.title,
   hasReveal: !!FUNDRAISER_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    FUNDRAISER_SCENE.poll.personal_reveal,
+    FUNDRAISER_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
