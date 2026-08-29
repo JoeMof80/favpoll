@@ -10,14 +10,12 @@ import {
   type HintScene,
 } from "@/components/landing/how-it-works-hints"
 import { IdeasSection } from "@/components/landing/ideas-section"
-import { PosterVignette } from "@/components/landing/poster-vignette"
+import { ShareVignette } from "@/components/landing/share-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import {
   FUNDRAISER_SCENE,
-  FUNDRAISER_PACK_DATA,
-  FUNDRAISER_PACK_STEPS,
   FUNDRAISER_KEEPSAKE_DATA,
   FUNDRAISER_TOPIC_PICKER,
 } from "@/components/landing/demo-fixture"
@@ -89,7 +87,7 @@ const STEP_MEDIA = [
   <RankHint key="rank" hints={FUNDRAISER_HINTS} />,
 ]
 
-// Topic -> paper -> phone -> paper: make it, put it up, give and be told,
+// Topic -> link -> phone -> paper: make it, send it, give and be told,
 // keep it. The other two pages run paper -> phone -> room -> paper; this one
 // diverges twice, and both are the exemplar deciding the pictures.
 //
@@ -101,8 +99,8 @@ const STEP_MEDIA = [
 // nights and galas among them, but the page has to be true to the favpoll it
 // is actually showing. The display keeps its place on /celebrations.
 //
-// THE TOPIC PICKER TAKES ITS PLACE, and goes FIRST rather than slotting into
-// the gap. It is the only artefact here about making the favpoll rather than
+// THE TOPIC PICKER GOES FIRST rather than slotting into the gap left by the
+// display. It is the only artefact here about making the favpoll rather than
 // running it, so chronology puts it at the front — and this is the one page
 // whose exemplar earns it: nobody has a favourite hat in the abstract, so
 // "which should he wear" is a topic no catalogue could ever stock.
@@ -137,19 +135,15 @@ const IDEAS = [
     artefact: <TopicPickerVignette scene={FUNDRAISER_TOPIC_PICKER} still />,
   },
   {
-    key: "poster",
-    label: t("fundraisers.artefacts.poster.label"),
-    body: t("fundraisers.artefacts.poster.body"),
-    // A4, whole, rather than the order of service's torn corner or the
-    // celebration's folded card. Each register's paper is the paper it
-    // actually has: a sponsored event prints no document for a room, so the
-    // object is the sheet on the wall.
-    artefact: (
-      <PosterVignette
-        data={FUNDRAISER_PACK_DATA}
-        steps={FUNDRAISER_PACK_STEPS}
-      />
-    ),
+    key: "share",
+    label: t("fundraisers.artefacts.share.label"),
+    body: t("fundraisers.artefacts.share.body"),
+    // A LINK, NOT A POSTER (founder, 2026-08-29). A QR code needs somebody to
+    // walk past it: a memorial has a wake and a wedding has a room, so their
+    // paper reaches people who are already there. Marcus's marathon has no
+    // venue at all, so a noticeboard was the wrong picture of how this favpoll
+    // spreads. See ShareVignette for what replaced it.
+    artefact: <ShareVignette />,
   },
   {
     key: "reveal",

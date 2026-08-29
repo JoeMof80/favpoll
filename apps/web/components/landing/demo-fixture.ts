@@ -164,30 +164,6 @@ export const WEDDING_PACK_DATA: PackData = {
 
 export const WEDDING_PACK_STEPS = buildPackSteps(WEDDING_PACK_DATA)
 
-/** The same pack for the FUNDRAISER scene — Marcus, hats, Mind. */
-const FUNDRAISER_HEADLINE = getFavpollHeadline({
-  occasionType: FUNDRAISER_SCENE.occasion_type,
-  name: FUNDRAISER_SCENE.protagonist?.name ?? "",
-  subject: "someone",
-  openingLine: FUNDRAISER_SCENE.opening_line,
-})
-
-export const FUNDRAISER_PACK_DATA: PackData = {
-  prefix: FUNDRAISER_HEADLINE.prefix,
-  name: FUNDRAISER_HEADLINE.name,
-  isCause: false,
-  topicTitle: FUNDRAISER_SCENE.poll.topic.title,
-  hasReveal: !!FUNDRAISER_SCENE.poll.personal_reveal,
-  revealIsMessage: isMessageReveal(
-    FUNDRAISER_SCENE.poll.personal_reveal,
-    FUNDRAISER_SCENE.poll.topic.favourites.map((f) => f.label)
-  ),
-  charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
-  qrUrl: DEMO_QR_URL,
-}
-
-export const FUNDRAISER_PACK_STEPS = buildPackSteps(FUNDRAISER_PACK_DATA)
-
 // The keepsake the features page depicts — built from the MEMORIAL scene,
 // not the cause one the rest of the page uses, for the reveal vignette's
 // reason: the keepsake is most itself when there is a person. Belinda and
@@ -277,7 +253,21 @@ export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
   guestNames: [],
 }
 
-/** And the keepsake, so every object on /fundraisers is the same favpoll. */
+/**
+ * The keepsake, so every object on /fundraisers is the same favpoll.
+ *
+ * The headline survives alone here. /fundraisers dropped its poster for a
+ * share artefact (2026-08-29), which took FUNDRAISER_PACK_DATA and _STEPS
+ * with it — this page prints nothing now — but the keepsake still needs the
+ * "In support of / Marcus Bell" split that getFavpollHeadline works out.
+ */
+const FUNDRAISER_HEADLINE = getFavpollHeadline({
+  occasionType: FUNDRAISER_SCENE.occasion_type,
+  name: FUNDRAISER_SCENE.protagonist?.name ?? "",
+  subject: "someone",
+  openingLine: FUNDRAISER_SCENE.opening_line,
+})
+
 export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
   prefix: FUNDRAISER_HEADLINE.prefix,
   name: FUNDRAISER_HEADLINE.name,
