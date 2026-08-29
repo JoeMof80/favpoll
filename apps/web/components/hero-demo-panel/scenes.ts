@@ -84,6 +84,8 @@ export type HeroScene = {
     logo_url: string | null
     registered_number: string | null
   }[]
+  /** favpolls.goal_amount — pounds; null = no goal (most favpolls). */
+  goal_amount: number | null
 
   // ── Demo-only ─────────────────────────────────────────────────────────────
   /** Index into poll.topic.favourites — the item selected in the animation */
@@ -141,6 +143,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "207994",
       },
     ],
+    goal_amount: null,
     selectedIndex: 1,
     pledgeAmount: "£10",
     results: [
@@ -214,6 +217,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "235825",
       },
     ],
+    goal_amount: null,
     selectedIndex: 15,
     pledgeAmount: "£20",
     results: [
@@ -366,6 +370,7 @@ export const SCENES: HeroScene[] = [
         registered_number: "1081247",
       },
     ],
+    goal_amount: null,
     selectedIndex: 4,
     pledgeAmount: "£20",
     // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
@@ -536,6 +541,14 @@ export const SCENES: HeroScene[] = [
     // the reveal a remark rather than a favourite, Marcus has no answer for a
     // selection to collide with. The sombrero is simply the funniest thing to
     // land on, and the standings agree with it.
+    // £1,000, with £810 raised: 81% and short. The goal is what makes this a
+    // FUNDRAISER rather than a poll with a charity attached — /fundraisers'
+    // copy says "reach the goal" and Marcus's reveal says "If we reach the
+    // goal", and until 2026-08-30 neither pointed at a number the page
+    // showed. Unreached on purpose: a reached goal would make the reveal's
+    // condition a past event, and the landing's goal vignette already owns
+    // the crossing moment. Agrees with DisplayStill's fallback DEMO_GOAL.
+    goal_amount: 1000,
     selectedIndex: 4,
     pledgeAmount: "£20",
     results: [
@@ -659,6 +672,7 @@ export const SCENES: HeroScene[] = [
     // Cockapoo — the runner-up in the standings, so the pick the demo makes
     // is one the results then show climbing. Same pattern as the memorial
     // scene, whose pick is Blue behind Purple.
+    goal_amount: null,
     selectedIndex: 10,
     pledgeAmount: "£10",
     results: [
