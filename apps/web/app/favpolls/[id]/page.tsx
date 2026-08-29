@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
+import { favpollMetadata } from "@/lib/og/favpoll-og"
+import { getFavpollOgSource } from "@/lib/og/favpoll-og-data"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -21,6 +24,17 @@ import type {
 
 type Props = {
   params: Promise<{ id: string }>
+}
+
+// The link preview. Its own small fetch rather than the page's — Next runs
+// generateMetadata and the page in parallel, and the preview needs only a
+// sliver of what the page loads. Private favpolls preview as a private
+// favpoll, nothing more (the card route makes the same call).
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params
+  const src = await getFavpollOgSource(id)
+  if (!src) return {}
+  return favpollMetadata(src)
 }
 
 export default async function FavpollPage({ params }: Props) {
