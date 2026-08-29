@@ -16,9 +16,16 @@ type Props = {
 // phone the right column — CharityBanner, its goal bar, the share button —
 // is not rendered at all (PageLayout hides it below md), so until 2026-08-29
 // a guest on a phone never saw the pledge goal: the most motivating number a
-// fundraiser has, invisible on the device most guests hold. The goal rides
-// under the charity row here in the banner's exact words, so the two
-// surfaces cannot drift.
+// fundraiser has, invisible on the device most guests hold.
+//
+// WITH A GOAL, THE ROW SHOWS THE TOTAL. The row's figure is normally the
+// per-charity split (what the list card shows), but a goal is a
+// whole-favpoll number, and "of the £500 goal" under a £300 split would
+// read wrong. So when a goal is set the figure is the favpoll total, with
+// the goal beneath it in the "Charity no." line's style (founder, 2026-08-29:
+// the caption "underneath the total, inline with the charity no"). With one
+// charity — nearly every favpoll — total and split are the same number. The
+// split stays on the desktop banner, where each charity has its own row.
 //
 // THE FOOTER PUBLISHES ITS HEIGHT. Two other things have to clear it — the
 // share FAB (FavpollSubheader) and the page's bottom padding (PageLayout) —
@@ -55,7 +62,6 @@ export function MobileCharityFooter({
   }, [])
 
   if (charities.length === 0) return null
-  const perCharity = totalRaised / charities.length
 
   return (
     <div
@@ -65,23 +71,17 @@ export function MobileCharityFooter({
     >
       <FavpollListCardCharityCarousel
         charities={charities.map((charity) => ({ charity }))}
-        perCharity={perCharity}
+        perCharity={goalAmount ? totalRaised : totalRaised / charities.length}
+        amountCaption={
+          goalAmount ? `of the ${formatPounds(goalAmount)} goal` : undefined
+        }
       />
       {goalAmount ? (
-        <div className="mt-2">
-          <GoalProgress
-            totalRaised={totalRaised}
-            goalAmount={goalAmount}
-            className="h-1"
-          />
-          <p
-            className="mt-1 text-right text-xs text-muted-foreground"
-            aria-live="polite"
-          >
-            {formatPounds(totalRaised)} raised of the {formatPounds(goalAmount)}{" "}
-            goal
-          </p>
-        </div>
+        <GoalProgress
+          totalRaised={totalRaised}
+          goalAmount={goalAmount}
+          className="mt-2 h-1"
+        />
       ) : null}
     </div>
   )

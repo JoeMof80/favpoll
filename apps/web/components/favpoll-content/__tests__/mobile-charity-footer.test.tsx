@@ -34,7 +34,7 @@ describe("MobileCharityFooter", () => {
     expect(screen.queryByText(/goal/)).toBeNull()
   })
 
-  it("adds the goal bar and the banner's caption when a goal is set", () => {
+  it("with a goal: the total, the goal beneath it, and the bar", () => {
     render(
       <MobileCharityFooter
         charities={[mind]}
@@ -47,22 +47,44 @@ describe("MobileCharityFooter", () => {
     })
     expect(bar).toHaveAttribute("aria-valuemax", "500")
     expect(bar).toHaveAttribute("aria-valuenow", "40")
-    expect(screen.getByText("£40 raised of the £500 goal")).toHaveAttribute(
-      "aria-live",
-      "polite"
-    )
+    expect(screen.getByText("£40")).toBeInTheDocument()
+    expect(screen.getByText("of the £500 goal")).toBeInTheDocument()
+    expect(screen.queryByText(/raised/)).toBeNull()
   })
 
-  it("splits the total across charities per row but keeps the goal against the whole", () => {
+  it("shows £0 under a goal — the caption needs a figure above it", () => {
     render(
+      <MobileCharityFooter
+        charities={[mind]}
+        totalRaised={0}
+        goalAmount={500}
+      />
+    )
+    expect(screen.getByText("£0")).toBeInTheDocument()
+    expect(screen.getByText("of the £500 goal")).toBeInTheDocument()
+  })
+
+  it("splits the total per charity without a goal, but shows the whole total against a goal", () => {
+    const { rerender } = render(
+      <MobileCharityFooter
+        charities={[mind, crisis]}
+        totalRaised={600}
+        goalAmount={null}
+      />
+    )
+    expect(screen.getAllByText("£300")).toHaveLength(2)
+    expect(screen.queryByText(/goal/)).toBeNull()
+
+    rerender(
       <MobileCharityFooter
         charities={[mind, crisis]}
         totalRaised={600}
         goalAmount={500}
       />
     )
-    expect(screen.getAllByText("£300")).toHaveLength(2)
-    expect(screen.getByText("£600 raised of the £500 goal")).toBeInTheDocument()
+    expect(screen.queryByText("£300")).toBeNull()
+    expect(screen.getAllByText("£600")).toHaveLength(2)
+    expect(screen.getAllByText("of the £500 goal")).toHaveLength(2)
     expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
       "bg-success"
     )
