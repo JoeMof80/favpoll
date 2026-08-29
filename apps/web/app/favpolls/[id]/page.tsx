@@ -1,4 +1,4 @@
-import { isQuoteReveal } from "@/lib/mechanic-steps"
+import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -259,6 +259,12 @@ export default async function FavpollPage({ params }: Props) {
   // Also content-free: quote-or-not, so step 3 can promise "their own
   // words" without leaking the reveal (founder, 2026-08-03).
   const revealIsQuote = isQuoteReveal(pollWithItems?.personal_reveal)
+  // Content-free for the same reason: one bit, "does the reveal name one of
+  // the options", never which. See isMessageReveal.
+  const revealIsMessage = isMessageReveal(
+    pollWithItems?.personal_reveal,
+    pollWithItems?.topics.favourites.map((f) => f.label)
+  )
 
   // Gate sensitive data server-side for un-entitled viewers of open polls
   if (!entitled && pollWithItems) {
@@ -342,6 +348,7 @@ export default async function FavpollPage({ params }: Props) {
         entitled={entitled}
         hasReveal={hasReveal}
         revealIsQuote={revealIsQuote}
+        revealIsMessage={revealIsMessage}
       />
     </>
   )

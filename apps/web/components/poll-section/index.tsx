@@ -44,6 +44,7 @@ type Props = {
   hasReveal?: boolean
   /** Content-free quote flag — step 3 promises "their own words". */
   revealIsQuote?: boolean
+  revealIsMessage?: boolean
   /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
   charityLine?: string | null
   /** Real item list — may be zeroed until entitled */
@@ -67,6 +68,7 @@ export function PollSection({
   personalReveal,
   hasReveal = true,
   revealIsQuote = false,
+  revealIsMessage = false,
   charityLine = null,
   initialItems,
   onOpenPledgeDialog,
@@ -100,15 +102,20 @@ export function PollSection({
     isCause,
     hasReveal,
     revealIsQuote,
+    revealIsMessage,
   })
 
   const unlockAriaLabel = !hasReveal
     ? "Pledge your favourite to see the results"
-    : isCause
-      ? "Pledge to reveal our pick and see the results"
-      : displayFirstName
-        ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
-        : "Pledge to see the reveal and results"
+    : revealIsMessage
+      ? displayFirstName
+        ? `Pledge to reveal ${displayFirstName}'s message and see the results`
+        : "Pledge to see the message and results"
+      : isCause
+        ? "Pledge to reveal our pick and see the results"
+        : displayFirstName
+          ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
+          : "Pledge to see the reveal and results"
 
   return (
     <section

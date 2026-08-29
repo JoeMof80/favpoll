@@ -46,25 +46,49 @@ import { Vignette } from "@/components/landing/vignette"
 // This vignette typed "Favourite Grandad story" INTO the topic search, which
 // no organiser would, and which beat 3 would have rendered as "Search for
 // your favourite favourite grandad story…".
-const TOPIC = "Grandad story"
-const HEADING = `Favourite ${TOPIC}`
+/**
+ * What the vignette types. PARAMETERISED 2026-08-28, when /fundraisers needed
+ * this same sequence to show ITS favpoll — Marcus Bell's hat — rather than
+ * the grandad stories /features runs. A picture of the custom-topic mechanic
+ * beside copy about Marcus, typing someone else's topic, is the same
+ * continuity break the flowers and the cake were on the router cards.
+ *
+ * PASS A MODULE-LEVEL CONSTANT, never an object literal written inline. The
+ * animation effect lists `scene` in its dependencies, so a fresh reference on
+ * every render would restart the sequence on every render.
+ */
+export type TopicPickerScene = {
+  topic: string
+  /**
+   * The favourites the organiser adds. The ANIMATED path types every one of
+   * them, so keep this to about three for a scene that animates; a still may
+   * carry the whole list, since nothing is typed.
+   */
+  items: string[]
+  guestItem: string
+}
 
-// A family in-joke no catalogue could ever hold — the purest case for the
-// create path. The items are meaningless to strangers and everything to the
-// guest list.
-const ITEMS = [
-  "The wheelbarrow incident",
-  "The time he met Elvis",
-  "The allotment feud",
-]
-// What the organiser never thought of, added by a guest at pledge time.
-// KEEP IT HARMLESS (founder, 2026-08-17). This was "The great chip pan fire",
-// which is a house fire — the only item in the set implying danger, and this
-// topic is one a family will plausibly run at a funeral. The other three are
-// mishap, brush with fame and long-running grudge; a fourth in that key has
-// to be small, specific and fond, the kind of thing only someone who was
-// there still remembers.
-const GUEST_ITEM = "The day he won the meat raffle"
+/**
+ * A family in-joke no catalogue could ever hold — the purest case for the
+ * create path. The items are meaningless to strangers and everything to the
+ * guest list.
+ *
+ * The guest item is KEPT HARMLESS (founder, 2026-08-17). It was "The great
+ * chip pan fire", which is a house fire — the only item in the set implying
+ * danger, and this topic is one a family will plausibly run at a funeral. The
+ * other three are mishap, brush with fame and long-running grudge; a fourth
+ * in that key has to be small, specific and fond, the kind of thing only
+ * someone who was there still remembers.
+ */
+export const GRANDAD_STORY_TOPIC: TopicPickerScene = {
+  topic: "Grandad story",
+  items: [
+    "The wheelbarrow incident",
+    "The time he met Elvis",
+    "The allotment feud",
+  ],
+  guestItem: "The day he won the meat raffle",
+}
 
 // Real canonical topics shown in the picker before the search filters them out.
 const SUGGESTED_TOPICS = ["Colour", "Season", "Song", "Film", "Biscuit"]
@@ -89,6 +113,14 @@ type Phase =
   | { kind: "guest-typing"; count: number } // dialog 3: the guest searches
   | { kind: "guest-adding" } // dialog 3: Add pressed
   | { kind: "hold" }
+  // The finished items dialog, held (founder, 2026-08-29: "it should probably
+  // just show the dialog with the homemade topic that Marcus already
+  // created"). It needed no new logic in any derivation below: every one is a
+  // test on `phase.kind`, and "still" falls through all of them to exactly the
+  // wanted state — itemsOpen true, inputText empty so the placeholder shows,
+  // `added` the whole list rather than a slice, and guestOpen false. Only
+  // `step` had to be told about it.
+  | { kind: "still" }
 
 // The word Add in the hint, wearing the button's own chrome — the
 // instruction says "click Add", so it has to point at something the
@@ -99,14 +131,26 @@ const ADD_TOKEN = (
   </span>
 )
 
-export function TopicPickerVignette() {
+export function TopicPickerVignette({
+  scene = GRANDAD_STORY_TOPIC,
+  still = false,
+}: { scene?: TopicPickerScene; still?: boolean } = {}) {
+  // Read into the names the body already uses, so parameterising this cost
+  // four lines rather than twenty scattered renames.
+  const { topic: TOPIC, items: ITEMS, guestItem: GUEST_ITEM } = scene
+  const HEADING = `Favourite ${TOPIC}`
+
   const reduced = useReducedMotion()
   const [phase, setPhase] = useState<Phase>(
-    reduced ? { kind: "hold" } : { kind: "search", count: 0 }
+    still
+      ? { kind: "still" }
+      : reduced
+        ? { kind: "hold" }
+        : { kind: "search", count: 0 }
   )
 
   useEffect(() => {
-    if (reduced) return
+    if (still || reduced) return
     let id: ReturnType<typeof setTimeout>
 
     if (phase.kind === "search") {
@@ -176,7 +220,7 @@ export function TopicPickerVignette() {
       id = setTimeout(() => setPhase({ kind: "search", count: 0 }), HOLD_MS)
     }
     return () => clearTimeout(id)
-  }, [phase, reduced])
+  }, [phase, reduced, scene, still])
 
   // ── Dialog 1 (Pick a topic) ────────────────────────────────────────────────
   const searchText =
@@ -237,8 +281,12 @@ export function TopicPickerVignette() {
   // you made, then favourites in it, then one a guest adds to the same list.
   // Replacing each frame with the next showed three unrelated dialogs; leaving
   // the spent ones visible is what makes it one growing thing.
-  const step =
-    phase.kind === "search" || phase.kind === "create"
+  // 1 when still: the items dialog is the one being shown, so it sits at
+  // depth 0. Left at 2 it would recede behind a third dialog that never
+  // renders, leaving nothing in front.
+  const step = still
+    ? 1
+    : phase.kind === "search" || phase.kind === "create"
       ? 0
       : phase.kind === "typing" || phase.kind === "adding"
         ? 1
@@ -273,17 +321,21 @@ export function TopicPickerVignette() {
           carry the thing it cannot: WHO is acting and WHEN. The first two
           layers are the organiser in one sitting; the third is a guest, days
           later, on their own phone. */}
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">{CAPTIONS[step]}</p>
-        <div className="flex shrink-0 gap-1.5">
-          {CAPTIONS.map((c, i) => (
-            <span
-              key={c}
-              className={`h-1.5 w-1.5 rounded-full ${i === step ? "bg-primary" : "bg-border"}`}
-            />
-          ))}
+      {/* No caption or dots on a still: both describe progress through a
+          sequence, and a held frame is not going anywhere. */}
+      {!still && (
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">{CAPTIONS[step]}</p>
+          <div className="flex shrink-0 gap-1.5">
+            {CAPTIONS.map((c, i) => (
+              <span
+                key={c}
+                className={`h-1.5 w-1.5 rounded-full ${i === step ? "bg-primary" : "bg-border"}`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* One height for every step, so the section below never jumps: the
           tallest dialog (items, ~212px with its footer) plus the top-8 the
@@ -294,7 +346,7 @@ export function TopicPickerVignette() {
           the tallest dialog and not a pixel more. */}
       <div className="relative min-h-64">
         <AnimatePresence initial={false}>
-          {step >= 0 && (
+          {step >= 0 && !still && (
             <motion.div
               key="topic"
               initial={reduced ? false : { opacity: 0, y: 8 }}

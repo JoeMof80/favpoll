@@ -44,6 +44,7 @@ type Props = {
   /** Whether a personal reveal exists (content withheld until entitled) */
   hasReveal: boolean
   revealIsQuote?: boolean
+  revealIsMessage?: boolean
   wallEntries: WallEntry[]
   rankHistory: RankHistory | null
 }
@@ -60,6 +61,7 @@ export function FavpollContent({
   entitled,
   hasReveal,
   revealIsQuote = false,
+  revealIsMessage = false,
   wallEntries,
   rankHistory,
 }: Props) {
@@ -166,6 +168,7 @@ export function FavpollContent({
             personalReveal={effectiveReveal}
             hasReveal={hasReveal}
             revealIsQuote={revealIsQuote}
+            revealIsMessage={revealIsMessage}
             charityLine={charityLine || null}
             initialItems={effectiveItems}
             onOpenPledgeDialog={

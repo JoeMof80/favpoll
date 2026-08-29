@@ -62,7 +62,7 @@ export type HeroScene = {
   eyebrow?: string
   /**
    * Sub-heading line for no-protagonist scenes — the cause's equivalent of a
-   * protagonist's `context` ("1945 - 2024", "London Marathon · 26.2 miles").
+   * protagonist's `context` ("1945 - 2024", "London Marathon run").
    * The real product stores this on favpolls.context for cause favpolls (see
    * the favpoll_cause_photo_context migration); the scene type had it only
    * inside `protagonist`, so cause scenes could not show one at all.
@@ -396,56 +396,155 @@ export const SCENES: HeroScene[] = [
   {
     // ── Fundraiser: a person doing a sponsored challenge. A Type, not a Who —
     //    so it keeps a protagonist (the runner). Register-wise it derives to
-    //    `cause`, but it is nothing like a faceless appeal. ──
+    //    `cause`, but it is nothing like a faceless appeal.
+    //
+    //    THE HOMEMADE TOPIC (founder, 2026-08-28), and the shape it took five
+    //    goes to find. Dance, a Mascot, his dad's own objects, a chippy
+    //    order, a cake costume — each failed one of FOUR tests that have to
+    //    pass together. Worth keeping, because the next person to improve
+    //    this scene will re-derive them otherwise.
+    //
+    //    1. HOMEMADE means the topic could only ever exist for THIS favpoll,
+    //       not merely that the catalogue lacks it today. Dance and chippy
+    //       order fail: they are good topics, which is exactly why they would
+    //       be catalogue topics (founder: "it feels like it should already be
+    //       a topic").
+    //    2. THE GUEST MUST HOLD A REAL PREFERENCE. Mascots and a dead man's
+    //       pockets fail: a gnome against a rubber duck, or a hankie against
+    //       a keyring, gives the guest nothing of their own to say (founder:
+    //       "some of the mementos are meaningless and create a false
+    //       choice").
+    //    3. THE REVEAL MUST BE WRITABLE ON DAY ONE. Any topic that IS the
+    //       outcome fails: the organiser's "favourite" becomes a bet on an
+    //       undecided result rather than a fact about them.
+    //    4. THE CONSEQUENCE MUST BE SOURCEABLE AT THE LAST MINUTE. The cake
+    //       costume died here (founder: "how is Marcus supposed to source
+    //       different cake costumes on the day of the marathon?"). A costume
+    //       is ordered weeks ahead, which drags the decision back before the
+    //       race and revives the very problem test 3 solved.
+    //
+    //    A HAT passes all four, and it is test 4 that it passes where
+    //    everything else failed: a hat costs a fiver, packs flat, and Marcus
+    //    can plausibly own all eight and pick on the morning. That is exactly
+    //    the property that made the founder's original illustration work
+    //    (2026-08-29: "favourite colour and the leading colour will be
+    //    Marcus's socks on the run") — socks and hats are both bought the
+    //    night before.
+    //
+    //    The rule underneath it: a REAL favourite, with the winner made
+    //    physical. The guest picks a hat, which is a visual, funny, genuinely
+    //    held preference; the winner becomes what he wears for 26.2 miles;
+    //    and the homemade-ness lives in the FRAMING, because nobody has a
+    //    favourite hat in the abstract — it only means anything as "which
+    //    should he wear", which no catalogue will ever stock.
+    //
+    //    "MARATHON HAT", NOT "HAT" (founder, 2026-08-29). A hat is a thing
+    //    that exists generically and reads like a catalogue entry; a marathon
+    //    hat only means anything for this one event, which is the homemade
+    //    test stated exactly. It survives the three transformations the
+    //    product puts a topic title through — "Favourite marathon hat", "pick
+    //    your favourite marathon hat", "+5 more marathon hats" — which is
+    //    what rules out anything possessive.
+    //
+    //    A NOTE ON THE RECORD, since it was argued the other way earlier: a
+    //    homemade topic contributes nothing to the all-time rankings, and
+    //    that is true of EVERY homemade topic by definition — the grandad
+    //    stories on /features aggregate to nothing either. It is a property
+    //    of the create path, not a fault in this scene.
+    //
+    //    IT DECIDES SOMETHING, which no other scene does. Do not spread it:
+    //    the memorial and the wedding measure what people love and stop
+    //    there, and should.
     kind: "fundraiser",
     occasion_type: "Sponsored event",
     opening_line: null,
     protagonist: {
       name: "Marcus Bell",
-      context: "London Marathon · 26.2 miles",
+      context: "London Marathon run",
       about:
-        "Running his first marathon for the British Heart Foundation, in memory of his dad. There's one dance he's promised to bust out at the finish line.",
+        "Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {
       id: "demo-poll-fundraiser",
+      // A REMARK, NOT HIS FAVOURITE (founder, 2026-08-29: "the reveal
+      // shouldn't be Marcus' favourite. it should be a remark or comment").
+      // Right, and for a reason worth keeping: on a poll with a consequence,
+      // the protagonist's own favourite is hollow. Marcus has no real stake
+      // in hats — he wears whatever the room picks — so disclosing that he
+      // likes the fez only invites "then why not just wear the fez?". The
+      // memorial and the wedding disclose a favourite because theirs are
+      // facts the poll cannot touch; his is not.
+      //
+      // A remark has none of that. It is writable on day one, it cannot
+      // campaign, and it gives back something better than a preference
+      // nobody asked about.
+      //
+      // The exclamation mark is deliberate and allowed here. The brand rule
+      // bans them in anything MEMORIAL-adjacent; this is a man in a sombrero
+      // running for a mental health charity, and the joke is the point.
+      //
+      // THIS IS THE ONLY SURFACE DEMONSTRATING isMessageReveal. The opening
+      // sentence names no hat, so the poster's step 3 and the unlock pill
+      // both say "message" rather than "favourite", with no field set. If a
+      // future edit gives Marcus a favourite back, that capability goes
+      // undemonstrated again — see lib/mechanic-steps.ts.
       personal_reveal:
-        "Northern Soul. Marcus has been spinning at all-nighters since he was nineteen.",
+        "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
       topic: {
-        title: "Dance",
+        title: "Marathon hat",
+        // EIGHT, where Colour has twelve and Holiday destination
+        // twenty-eight. A homemade list should look homemade: nobody sits
+        // down and writes thirty of these, and the short list is itself a
+        // signal that no catalogue supplied it.
         favourites: [
-          { id: "d-ballet", label: "Ballet" },
-          { id: "d-ballroom", label: "Ballroom" },
-          { id: "d-breakdancing", label: "Breakdancing" },
-          { id: "d-charleston", label: "Charleston" },
-          { id: "d-disco", label: "Disco" },
-          { id: "d-flamenco", label: "Flamenco" },
-          { id: "d-jive", label: "Jive" },
-          { id: "d-linedancing", label: "Line dancing" },
-          { id: "d-northernsoul", label: "Northern Soul" },
-          { id: "d-salsa", label: "Salsa" },
-          { id: "d-tango", label: "Tango" },
-          { id: "d-waltz", label: "Waltz" },
+          { id: "h-beret", label: "Beret" },
+          { id: "h-bowler", label: "Bowler" },
+          { id: "h-deerstalker", label: "Deerstalker" },
+          { id: "h-fez", label: "Fez" },
+          { id: "h-sombrero", label: "Sombrero" },
+          { id: "h-stetson", label: "Stetson" },
+          { id: "h-tophat", label: "Top hat" },
+          { id: "h-viking", label: "Viking helmet" },
         ],
       },
     },
     charities: [
       {
-        id: "ch-bhf",
-        name: "British Heart Foundation",
+        // Mind (founder, 2026-08-29: "it could be a silly idea for a mental
+        // health charity to choose which hat Marcus should wear"), and the
+        // pairing is better than a joke. Being visible and refusing to take
+        // yourself too seriously is what mental health campaigns actually run
+        // on, so a ridiculous hat is on-message rather than at odds with the
+        // cause.
+        //
+        // It also takes the last of the memorial shadow off this page. The
+        // scene ran "in memory of his dad" for a while, which sat close to
+        // /memorials; Marcus now needs no bereavement to justify a marathon.
+        //
+        // 219830 is from scripts/seed.ts, the repo's own charity data, not
+        // from memory.
+        id: "ch-mind",
+        name: "Mind",
         logo_url: null,
-        registered_number: "225971",
+        registered_number: "219830",
       },
     ],
-    selectedIndex: 9,
+    // Sombrero (index 4) — a GUEST's pick, and the one a room lands on.
+    //
+    // Nothing has to be dodged here, unlike the memorial and the wedding: with
+    // the reveal a remark rather than a favourite, Marcus has no answer for a
+    // selection to collide with. The sombrero is simply the funniest thing to
+    // land on, and the standings agree with it.
+    selectedIndex: 4,
     pledgeAmount: "£20",
     results: [
-      { label: "Salsa", amount: "£240", widthPercent: 100 },
-      { label: "Ballroom", amount: "£190", widthPercent: 79 },
-      { label: "Northern Soul", amount: "£150", widthPercent: 63 },
-      { label: "Tango", amount: "£110", widthPercent: 46 },
-      { label: "Jive", amount: "£75", widthPercent: 31 },
-      { label: "Disco", amount: "£45", widthPercent: 19 },
+      { label: "Sombrero", amount: "£240", widthPercent: 100 },
+      { label: "Viking helmet", amount: "£190", widthPercent: 79 },
+      { label: "Fez", amount: "£150", widthPercent: 63 },
+      { label: "Top hat", amount: "£110", widthPercent: 46 },
+      { label: "Deerstalker", amount: "£75", widthPercent: 31 },
+      { label: "Beret", amount: "£45", widthPercent: 19 },
     ],
     total: "£810",
   },

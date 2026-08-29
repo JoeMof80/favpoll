@@ -8,7 +8,16 @@ import { cn } from "@/lib/utils"
 // protagonist's first name; it must never contain the reveal text or real
 // standings (see the server-side gating decision in PROJECT.md).
 
-export function revealLockLabel(firstName: string | null): string {
+export function revealLockLabel(
+  firstName: string | null,
+  /** The reveal is a message, not a named favourite (see isMessageReveal). */
+  revealIsMessage = false
+): string {
+  if (revealIsMessage) {
+    return firstName
+      ? `Pledge to reveal ${firstName}'s message`
+      : "Pledge to reveal the message"
+  }
   return firstName
     ? `Pledge to reveal ${firstName}'s favourite`
     : "Pledge to reveal the favourite"

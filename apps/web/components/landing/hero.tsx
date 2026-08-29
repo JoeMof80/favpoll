@@ -126,8 +126,8 @@ type Props = {
 // the homepage through every object on the page; a flower poll here broke
 // it at the first click.
 //
-// The FUNDRAISER card is still a literal. It has a scene too and could drift
-// the same way — unchecked.
+// All three are derived now (2026-08-28) — see FUNDRAISER_SCENE below for the
+// last one.
 const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
 const MEMORIAL_RESULTS = MEMORIAL_SCENE.results.slice(0, 3)
 const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
@@ -145,6 +145,24 @@ const WEDDING_SCENE =
   SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
 const WEDDING_RESULTS = WEDDING_SCENE.results.slice(0, 3)
 const WEDDING_TOPIC = WEDDING_SCENE.poll.topic.title.toLowerCase()
+
+// AND THE THIRD (2026-08-28), which the comment above had flagged as
+// "unchecked" — rightly. It showed Hobnobs and Macmillan, but its total was
+// "£810" and its bars £240 / £190 / £150 at 100 / 79 / 63%: Marcus Bell's
+// total and his top three to the pound and the percent, the same signature
+// the memorial card carried under its flowers. It was always his favpoll;
+// only the labels and the charity had drifted.
+//
+// Now that /fundraisers opens on his marathon and runs it through the poster,
+// the reveal, the display and the keepsake, a biscuit poll here broke that
+// chain at the first click — exactly as the flowers and the cake did.
+//
+// Found by kind, unambiguously: he is the only "fundraiser" scene, where the
+// faceless cause carries kind "cause".
+const FUNDRAISER_SCENE =
+  SCENES.find((s) => s.kind === "fundraiser") ?? SCENES[0]
+const FUNDRAISER_RESULTS = FUNDRAISER_SCENE.results.slice(0, 3)
+const FUNDRAISER_TOPIC = FUNDRAISER_SCENE.poll.topic.title.toLowerCase()
 
 const ROUTER_CARDS = [
   {
@@ -180,15 +198,11 @@ const ROUTER_CARDS = [
     bar: "bg-success-on-band",
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
-    topic: "biscuit",
-    more: "+8 more biscuits",
-    charity: "Macmillan",
-    total: "£810",
-    results: [
-      { label: "Hobnob", amount: "£240", widthPercent: 100 },
-      { label: "Digestive", amount: "£190", widthPercent: 79 },
-      { label: "Custard cream", amount: "£150", widthPercent: 63 },
-    ],
+    topic: FUNDRAISER_TOPIC,
+    more: `+${FUNDRAISER_SCENE.poll.topic.favourites.length - FUNDRAISER_RESULTS.length} more ${FUNDRAISER_TOPIC}s`,
+    charity: FUNDRAISER_SCENE.charities[0]?.name ?? "",
+    total: FUNDRAISER_SCENE.total,
+    results: FUNDRAISER_RESULTS,
   },
 ] as const
 
@@ -680,8 +694,24 @@ export function LandingHero({
                       {/* Where it all goes — charity + running total. No rule
                           above it (founder, 2026-08-05); the spacing carries
                           the break. */}
-                      <div className="flex items-center justify-between gap-3 pt-1.5 text-sm">
-                        <span className="min-w-0 truncate text-primary-foreground/70">
+                      <div className="flex items-baseline justify-between gap-2 pt-1.5 text-sm">
+                        {/* text-xs on the charity alone (2026-08-28). The row
+                            was uniform text-sm, which held while both names
+                            were short — "Marie Curie", "WWF-UK" — and broke
+                            the day the fundraiser card started deriving its
+                            own: "British Heart Foundation" needed 159px at
+                            14px and the column gives 133–159 depending on how
+                            the grid is folded, so it truncated mid-word at
+                            three of five widths. At 12px it needs 136 and
+                            fits at every one.
+                            Truncate stays as the fallback — real charity
+                            names run to "Great Ormond Street Hospital
+                            Children's Charity" and nothing sizes for that —
+                            but the card's own exemplar should not need it.
+                            items-baseline, not items-center: two type sizes
+                            on one row centre-align to nothing, and the
+                            baseline is what the eye reads them along. */}
+                        <span className="min-w-0 truncate text-xs text-primary-foreground/70">
                           {card.charity}
                         </span>
                         <span className="shrink-0 font-medium text-primary-foreground">

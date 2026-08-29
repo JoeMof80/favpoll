@@ -1,6 +1,8 @@
 import { SCENES } from "@/components/hero-demo-panel/scenes"
 import { buildPackSteps } from "@/components/print-pack/pack-card"
+import { isMessageReveal } from "@/lib/mechanic-steps"
 import type { PackData } from "@/components/print-pack/pack-card"
+import type { TopicPickerScene } from "@/components/landing/topic-picker-vignette"
 import type { KeepsakeData } from "@/components/keepsake/keepsake-document"
 import { getFavpollHeadline } from "@/lib/display"
 
@@ -62,6 +64,24 @@ export const MEMORIAL_SCENE =
  * the home walkthrough and /features run on it and this change is scoped to
  * the register page.
  */
+/**
+ * The fundraiser register's exemplar (founder, 2026-08-28) — Marcus Bell's
+ * London Marathon, favourite hat, Mind.
+ *
+ * MARCUS RATHER THAN THE CAUSE SCENE, and the reason is structural. This
+ * register holds two shapes: a person doing a sponsored challenge, who keeps
+ * a protagonist, and a faceless cause, which has none. The four-artefact band
+ * turns on there being someone whose answer is worth revealing — a cause has
+ * no personal reveal at all, so its strongest beat would have nothing to
+ * magnify. The page still has to read true for a cause, but that is a copy
+ * problem rather than an artefact one.
+ *
+ * Found by kind, which is unambiguous: he is the only "fundraiser" scene,
+ * where the cause scene carries kind "cause".
+ */
+export const FUNDRAISER_SCENE =
+  SCENES.find((s) => s.kind === "fundraiser") ?? SCENES[0]
+
 export const WEDDING_SCENE =
   SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
 
@@ -73,6 +93,10 @@ export const DEMO_PACK_DATA: PackData = {
   isCause: !DEMO_SCENE.protagonist,
   topicTitle: DEMO_SCENE.poll.topic.title,
   hasReveal: !!DEMO_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    DEMO_SCENE.poll.personal_reveal,
+    DEMO_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: DEMO_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
@@ -106,6 +130,10 @@ export const MEMORIAL_PACK_DATA: PackData = {
   isCause: false,
   topicTitle: MEMORIAL_SCENE.poll.topic.title,
   hasReveal: !!MEMORIAL_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    MEMORIAL_SCENE.poll.personal_reveal,
+    MEMORIAL_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: MEMORIAL_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
@@ -126,6 +154,10 @@ export const WEDDING_PACK_DATA: PackData = {
   isCause: false,
   topicTitle: WEDDING_SCENE.poll.topic.title,
   hasReveal: !!WEDDING_SCENE.poll.personal_reveal,
+  revealIsMessage: isMessageReveal(
+    WEDDING_SCENE.poll.personal_reveal,
+    WEDDING_SCENE.poll.topic.favourites.map((f) => f.label)
+  ),
   charityNames: WEDDING_SCENE.charities.map((c) => c.name),
   qrUrl: DEMO_QR_URL,
 }
@@ -219,4 +251,76 @@ export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
   })),
   rankHistory: null,
   guestNames: [],
+}
+
+/**
+ * The keepsake, so every object on /fundraisers is the same favpoll.
+ *
+ * The headline survives alone here. /fundraisers dropped its poster for a
+ * share artefact (2026-08-29), which took FUNDRAISER_PACK_DATA and _STEPS
+ * with it — this page prints nothing now — but the keepsake still needs the
+ * "In support of / Marcus Bell" split that getFavpollHeadline works out.
+ */
+const FUNDRAISER_HEADLINE = getFavpollHeadline({
+  occasionType: FUNDRAISER_SCENE.occasion_type,
+  name: FUNDRAISER_SCENE.protagonist?.name ?? "",
+  subject: "someone",
+  openingLine: FUNDRAISER_SCENE.opening_line,
+})
+
+export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
+  prefix: FUNDRAISER_HEADLINE.prefix,
+  name: FUNDRAISER_HEADLINE.name,
+  context: FUNDRAISER_SCENE.protagonist?.context ?? null,
+  topicTitle: FUNDRAISER_SCENE.poll.topic.title,
+  reveal: FUNDRAISER_SCENE.poll.personal_reveal,
+  totalRaised: pounds(FUNDRAISER_SCENE.total),
+  charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
+  // House format: ordinal, never ISO. The favpoll closed the week AFTER the
+  // race, and that is load-bearing rather than incidental: the hat is taken
+  // from whichever is leading on race morning, not from the close, so the
+  // poll runs through the marathon and collects the sponsorship that lands
+  // once he has finished. A date before the race would contradict the About.
+  closedDate: "3rd May 2026",
+  standings: FUNDRAISER_SCENE.results.map((r) => ({
+    favouriteId:
+      FUNDRAISER_SCENE.poll.topic.favourites.find((f) => f.label === r.label)
+        ?.id ?? r.label,
+    label: r.label,
+    amount: pounds(r.amount),
+  })),
+  rankHistory: null,
+  guestNames: [],
+}
+
+/**
+ * What the topic picker shows on /fundraisers — Marcus's own hat topic, so
+ * the dialog holds the favpoll the rest of the page holds.
+ *
+ * ALL EIGHT, where /features types three. This one is rendered STILL, so
+ * nothing is typed and the whole list can sit there as chips — which is the
+ * better picture anyway, because the standings two rows below show eight and
+ * a dialog showing three would look like a different poll. If this ever goes
+ * back to animating, cut it: the animated path types every item in turn.
+ *
+ * `guestItem` is unused while still (it belongs to the third dialog, which a
+ * still does not render) and is kept so the scene stays whole.
+ *
+ * Module-level, as TopicPickerScene requires: the animation effect depends on
+ * this reference, so an inline literal would restart the sequence every
+ * render.
+ */
+export const FUNDRAISER_TOPIC_PICKER: TopicPickerScene = {
+  topic: FUNDRAISER_SCENE.poll.topic.title,
+  items: [
+    "Sombrero",
+    "Viking helmet",
+    "Fez",
+    "Top hat",
+    "Deerstalker",
+    "Beret",
+    "Bowler",
+    "Stetson",
+  ],
+  guestItem: "Deerstalker",
 }
