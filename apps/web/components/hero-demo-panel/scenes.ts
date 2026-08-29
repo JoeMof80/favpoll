@@ -462,7 +462,7 @@ export const SCENES: HeroScene[] = [
       name: "Marcus Bell",
       context: "London Marathon run",
       about:
-        "Running his first marathon for Mind. The leading hat is the one he wears for all 26.2 miles.",
+        "Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
       photo_url: "/demo/marcus.jpg",
     },
     poll: {
@@ -478,9 +478,11 @@ export const SCENES: HeroScene[] = [
       //
       // A remark has none of that. It is writable on day one, it cannot
       // campaign, and it gives back something better than a preference
-      // nobody asked about. "How many of these I own" also answers the
-      // question the whole topic rests on — why a man has eight hats to
-      // choose between — inside the fiction rather than in a comment.
+      // nobody asked about.
+      //
+      // The exclamation mark is deliberate and allowed here. The brand rule
+      // bans them in anything MEMORIAL-adjacent; this is a man in a sombrero
+      // running for a mental health charity, and the joke is the point.
       //
       // THIS IS THE ONLY SURFACE DEMONSTRATING isMessageReveal. The opening
       // sentence names no hat, so the poster's step 3 and the unlock pill
@@ -488,7 +490,7 @@ export const SCENES: HeroScene[] = [
       // future edit gives Marcus a favourite back, that capability goes
       // undemonstrated again — see lib/mechanic-steps.ts.
       personal_reveal:
-        "Thank you. I've agreed to wear whatever wins, and I'm already regretting how many of these I own.",
+        "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
       topic: {
         title: "Marathon hat",
         // EIGHT, where Colour has twelve and Holiday destination
