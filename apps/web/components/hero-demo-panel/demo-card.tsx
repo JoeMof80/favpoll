@@ -6,6 +6,7 @@ import { LockCardContent } from "@/components/lock-card-content"
 import { HeaderBar } from "@/components/header-bar"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
+import { GoalProgress } from "@/components/goal-progress"
 import {
   buildMechanicSteps,
   isQuoteReveal,
@@ -165,6 +166,7 @@ export function DemoCard({
   const charity = scene.charities[0]
   const charityName = charity.name
   const raisedNum = Number(scene.total.replace(/[^0-9.]/g, "")) || 0
+  const goal = scene.goal_amount
   const amountNum = Number(scene.pledgeAmount.replace(/[^0-9.]/g, "")) || 0
   const amountStr = String(amountNum)
   const revealText = scene.poll.personal_reveal
@@ -360,6 +362,9 @@ export function DemoCard({
         created_at: "2024-01-01T00:00:00Z",
       }}
       amountRaised={raisedNum}
+      // The goal under the total, as the guest page's mobile footer shows it
+      // (2026-08-29): one figure, the goal beneath, the bar under the row.
+      amountCaption={goal ? `of the ${formatPounds(goal)} goal` : undefined}
     />
   )
 
@@ -594,6 +599,13 @@ export function DemoCard({
         }
       >
         {charityRow}
+        {goal ? (
+          <GoalProgress
+            totalRaised={raisedNum}
+            goalAmount={goal}
+            className="mt-2 h-1"
+          />
+        ) : null}
       </div>
 
       {/* ── Mimicked pledge dialog ──

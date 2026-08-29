@@ -15,6 +15,12 @@ type Props = {
    * hydration. Only enable where the row is not inside another anchor.
    */
   linkToCharity?: boolean
+  /**
+   * A second line under the amount, in the "Charity no." line's style —
+   * the mobile footer's "of the £500 goal". Forces the amount to show even
+   * at £0, since the caption only makes sense beneath a figure.
+   */
+  amountCaption?: React.ReactNode
 }
 
 export function CharityRow({
@@ -22,6 +28,7 @@ export function CharityRow({
   amountRaised,
   size = "lg",
   linkToCharity = false,
+  amountCaption,
 }: Props) {
   const logoClass = size === "lg" ? "h-8 w-8" : "h-6 w-6"
   const nameClass = size === "lg" ? "text-sm" : "text-sm"
@@ -70,10 +77,17 @@ export function CharityRow({
           </p>
         )}
       </div>
-      {amountRaised > 0 && (
-        <p className={`shrink-0 ${amountClass} font-medium text-primary`}>
-          {formatPounds(amountRaised)}
-        </p>
+      {(amountRaised > 0 || amountCaption) && (
+        <div className="flex shrink-0 flex-col items-end" aria-live="polite">
+          <p className={`${amountClass} font-medium text-primary`}>
+            {formatPounds(amountRaised)}
+          </p>
+          {amountCaption && (
+            <p className="text-xs whitespace-nowrap text-muted-foreground">
+              {amountCaption}
+            </p>
+          )}
+        </div>
       )}
     </div>
   )

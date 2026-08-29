@@ -173,7 +173,9 @@ export function DisplayStill({
         initialWallEntries={wall}
         wallReserveRows={wallReserveRows}
         initialTotalRaised={total}
-        goalAmount={DEMO_GOAL}
+        // The scene's own goal where it has one (the fundraiser), the
+        // demo constant otherwise — see DEMO_GOAL.
+        goalAmount={scene.goal_amount ?? DEMO_GOAL}
         favpollUrl="https://favpoll.com"
         qrUrl={qrUrl}
         // THE PRESENCE DIAL, derived rather than defaulted (founder,

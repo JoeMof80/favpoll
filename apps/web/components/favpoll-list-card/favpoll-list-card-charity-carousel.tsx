@@ -10,12 +10,15 @@ type Props = {
   charities: { charity: Charity }[]
   perCharity: number
   size?: FavpollCardSize
+  /** Under the amount on every row — see CharityRow. */
+  amountCaption?: React.ReactNode
 }
 
 export function FavpollListCardCharityCarousel({
   charities,
   perCharity,
   size,
+  amountCaption,
 }: Props) {
   const [emblaRef] = useEmblaCarousel(
     { axis: "y", loop: true, dragFree: false },
@@ -30,6 +33,7 @@ export function FavpollListCardCharityCarousel({
         charity={charities[0].charity}
         amountRaised={perCharity}
         size={size}
+        amountCaption={amountCaption}
       />
     )
   }
@@ -50,6 +54,7 @@ export function FavpollListCardCharityCarousel({
               charity={charity}
               amountRaised={perCharity}
               size={size}
+              amountCaption={amountCaption}
             />
           </div>
         ))}

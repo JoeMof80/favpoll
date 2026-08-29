@@ -218,6 +218,37 @@ describe("DemoCard — bar widths", () => {
 
 // ── Dialog mimics ─────────────────────────────────────────────────────────────
 
+describe("DemoCard — pledge goal", () => {
+  const fundraiser = SCENES.find((s) => s.kind === "fundraiser")!
+
+  it("the fundraiser scene shows its goal under the total, and the bar (2026-08-30)", () => {
+    render(
+      <DemoCard
+        scene={fundraiser}
+        phase="arriving"
+        barWidths={DECOY_WIDTHS}
+        prefersReducedMotion
+      />
+    )
+    expect(screen.getByText("£810")).toBeInTheDocument()
+    expect(screen.getByText("of the £1,000 goal")).toBeInTheDocument()
+    const bar = screen.getByRole("progressbar", {
+      name: "Progress towards the pledge goal",
+    })
+    expect(bar).toHaveAttribute("aria-valuemax", "1000")
+    expect(bar).toHaveAttribute("aria-valuenow", "810")
+    // Short of the goal on purpose: the reveal's "If we reach the goal" is
+    // a live condition, and the bar stays brand-coloured rather than green.
+    expect(bar.firstElementChild).toHaveClass("bg-primary")
+  })
+
+  it("scenes without a goal show no bar and no caption", () => {
+    renderCard("arriving")
+    expect(screen.queryByRole("progressbar")).toBeNull()
+    expect(screen.queryByText(/goal/)).toBeNull()
+  })
+})
+
 describe("DemoCard — dialog mimics", () => {
   it("shows picker header and items in picking phase", () => {
     renderCard("picking")
