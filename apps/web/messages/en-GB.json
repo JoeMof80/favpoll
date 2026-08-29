@@ -151,5 +151,18 @@
   "home.assure.nofave.body": "Guests without a pick can still give to the shared fund.",
   "home.assure.phone.label": "No app to install",
   "home.assure.phone.body": "Works in the browser on any phone, from a QR code.",
-  "home.shines.title": "What shines where"
+  "home.shines.title": "What shines where",
+  "og.alt": "A favpoll",
+  "og.fallbackName": "A favpoll",
+  "og.private.title": "A private favpoll — favpoll",
+  "og.private.description": "This favpoll is private. Sign in to see it.",
+  "og.pick": "Pick your favourite {topic}",
+  "og.pickNoTopic": "Pick your favourite",
+  "og.charityFallback": "charity",
+  "og.description.open": "{who} {pick}, give what it's worth, and every pound goes to {charities}.",
+  "og.description.closed": "{who} This favpoll has closed. Every pound raised goes to {charities}.",
+  "og.card.closed": "Favourite {topic} — closed",
+  "og.card.closedNoTopic": "This favpoll has closed",
+  "og.card.goes": "Every pound goes to {charities}",
+  "og.card.goesClosed": "Every pound raised goes to {charities}"
 }

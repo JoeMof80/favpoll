@@ -3,6 +3,7 @@ import { BrandCard, FavpollCard, OG_SIZE } from "@/lib/og/cards"
 import { favpollOgCard } from "@/lib/og/favpoll-og"
 import { getFavpollOgSource } from "@/lib/og/favpoll-og-data"
 import { ogFonts } from "@/lib/og/fonts"
+import { ogCopy } from "@/lib/og/copy"
 import { fetchPhotoDataUrl } from "@/lib/og/photo"
 
 // A favpoll's share card: the picture WhatsApp, Slack, iMessage and the rest
@@ -19,7 +20,7 @@ import { fetchPhotoDataUrl } from "@/lib/og/photo"
 // `immutable, max-age=31536000` — right for a static brand card, wrong for
 // one that carries an organiser's editable name and photo. Crawlers keep
 // their own copies for days anyway; the CDN need not add a year to that.
-export const alt = "A favpoll"
+export const alt = ogCopy("og.alt")
 export const size = OG_SIZE
 export const contentType = "image/png"
 

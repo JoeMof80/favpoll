@@ -2,6 +2,7 @@ import {
   FAVPOLL_MARK_PATHS,
   FAVPOLL_MARK_VIEWBOX,
 } from "@/components/favpoll-logo"
+import { ogCopy } from "./copy"
 import { joinCharities, type FavpollOgCard } from "./favpoll-og"
 import { OG_PALETTE as P } from "./palette"
 import { HEADLINE_BEATS, SITE_DESCRIPTION } from "./site"
@@ -217,11 +218,11 @@ export function FavpollCard({
           >
             {card.isClosed
               ? card.topic
-                ? `Favourite ${card.topic} — closed`
-                : "This favpoll has closed"
+                ? ogCopy("og.card.closed", { topic: card.topic })
+                : ogCopy("og.card.closedNoTopic")
               : card.topic
-                ? `Pick your favourite ${card.topic}`
-                : "Pick your favourite"}
+                ? ogCopy("og.pick", { topic: card.topic })
+                : ogCopy("og.pickNoTopic")}
           </div>
           {card.charities.length > 0 && (
             <div
@@ -233,7 +234,9 @@ export function FavpollCard({
                 lineClamp: 2,
               }}
             >
-              {`Every pound ${card.isClosed ? "raised " : ""}goes to ${joinCharities(card.charities)}`}
+              {ogCopy(card.isClosed ? "og.card.goesClosed" : "og.card.goes", {
+                charities: joinCharities(card.charities),
+              })}
             </div>
           )}
         </div>

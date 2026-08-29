@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { getFavpollHeadline } from "@/lib/display"
+import { ogCopy } from "./copy"
 import { OG_SITE } from "./site"
 
 // What a favpoll looks like to the people it is shared with, before they
@@ -42,8 +43,8 @@ export type FavpollOgCard = {
 }
 
 export const PRIVATE_OG = {
-  title: "A private favpoll — favpoll",
-  description: "This favpoll is private. Sign in to see it.",
+  title: ogCopy("og.private.title"),
+  description: ogCopy("og.private.description"),
 } as const
 
 export function favpollOgCard(
@@ -52,7 +53,8 @@ export function favpollOgCard(
 ): FavpollOgCard {
   const isCause = src.subject === "cause"
   const name =
-    (isCause ? src.cause_label : src.protagonists?.name)?.trim() || "A favpoll"
+    (isCause ? src.cause_label : src.protagonists?.name)?.trim() ||
+    ogCopy("og.fallbackName")
 
   const { prefix } = getFavpollHeadline({
     occasionType: src.occasion_type,
@@ -116,21 +118,17 @@ export function favpollOgTitle(card: FavpollOgCard): string {
 // form states what happened instead of asking for a pick.
 export function favpollOgDescription(card: FavpollOgCard): string {
   const who = card.eyebrow ? `${card.eyebrow} ${card.name}.` : `${card.name}.`
+  const charities =
+    card.charities.length > 0
+      ? joinCharities(card.charities)
+      : ogCopy("og.charityFallback")
   if (card.isClosed) {
-    const went =
-      card.charities.length > 0
-        ? `Every pound raised goes to ${joinCharities(card.charities)}.`
-        : "Every pound raised goes to charity."
-    return `${who} This favpoll has closed. ${went}`
+    return ogCopy("og.description.closed", { who, charities })
   }
   const pick = card.topic
-    ? `Pick your favourite ${card.topic}`
-    : "Pick your favourite"
-  const goes =
-    card.charities.length > 0
-      ? `every pound goes to ${joinCharities(card.charities)}`
-      : "every pound goes to charity"
-  return `${who} ${pick}, give what it's worth, and ${goes}.`
+    ? ogCopy("og.pick", { topic: card.topic })
+    : ogCopy("og.pickNoTopic")
+  return ogCopy("og.description.open", { who, pick, charities })
 }
 
 export function favpollMetadata(src: FavpollOgSource): Metadata {
