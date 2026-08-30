@@ -24,18 +24,15 @@ export type Idea = {
  * screen, and the fundraiser keepsake that leads on the total. Only the frame
  * is shared — each register's paper is the paper it actually has.
  *
- * `accentClassName` is the section eyebrow's colour — text-memorial,
- * text-warning-strong, text-success-strong — so each register's band carries
- * its own.
+ * The eyebrow takes the page palette's primary — each register page wears
+ * its own (RegisterScope), so nothing is passed in (2026-08-30).
  */
 export function IdeasSection({
   title,
   ideas,
-  accentClassName,
 }: {
   title: string
   ideas: Idea[]
-  accentClassName?: string
 }) {
   return (
     // overflow-x-clip is LOAD-BEARING. The live artefact deliberately does
@@ -51,9 +48,7 @@ export function IdeasSection({
       className="w-full scroll-mt-20 overflow-x-clip bg-primary/5"
     >
       <div className="mx-auto w-full max-w-330 px-6 py-16">
-        <SectionEyebrow className={cn("mb-10", accentClassName)}>
-          {title}
-        </SectionEyebrow>
+        <SectionEyebrow className="mb-10">{title}</SectionEyebrow>
         {/* The homepage's text-left / media-right row (see "The record" on
             the landing page): grid, items-center, gap-8, two columns from lg.
 

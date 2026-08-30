@@ -1,3 +1,4 @@
+import { RegisterScope } from "@/components/register-scope"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -139,8 +140,9 @@ export default async function MemorialsPage() {
   })
 
   return (
-    <main>
-      {/* ── The opening — the REAL landing hero, register-configured.
+    <RegisterScope palette="memorial">
+      <main>
+        {/* ── The opening — the REAL landing hero, register-configured.
           Hand-rolling a band here lost the two things the component
           actually does: HeroTexture's monogram shimmer, and
           min-h-[calc(100vh-3.5rem)] so it fills the screen (founder,
@@ -156,19 +158,18 @@ export default async function MemorialsPage() {
           volume. The wake HEADING is gone but not lost; its body opens "The
           service isn't the moment — the wake is", which is the heading in a
           sentence. ── */}
-      <LandingHero
-        sceneKind="memorial"
-        still
-        eyebrow={t("memorials.eyebrow")}
-        headline={t("memorials.headline")}
-        subheader={t("memorials.subheader")}
-        ctaLabel={t("memorials.cta.primary")}
-        ctaSecondaryLabel={t("memorials.cta.secondary")}
-        accentVar="memorial"
-        hideStats
-      />
+        <LandingHero
+          sceneKind="memorial"
+          still
+          eyebrow={t("memorials.eyebrow")}
+          headline={t("memorials.headline")}
+          subheader={t("memorials.subheader")}
+          ctaLabel={t("memorials.cta.primary")}
+          ctaSecondaryLabel={t("memorials.cta.secondary")}
+          hideStats
+        />
 
-      {/* ── How it works ─────────────────────────────────────────────────
+        {/* ── How it works ─────────────────────────────────────────────────
           DIRECTLY BELOW THE HERO (founder, 2026-08-26), which is where
           /celebrations and /fundraisers already had it. Memorials became the
           outlier earlier today when the tailoring band was inserted above it.
@@ -179,9 +180,9 @@ export default async function MemorialsPage() {
           the hero's second CTA says "See how it works" and targets #how, so
           with a band in between it skipped the largest section on the page
           and landed the reader two sections down. ── */}
-      <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
+        <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
 
-      {/* ── How to tailor it to a memorial ─────────────────────────────────
+        {/* ── How to tailor it to a memorial ─────────────────────────────────
           NOT a gallery of objects (founder, 2026-08-26). These four say how
           an organiser might USE a favpoll at a memorial — where the code
           goes, why the reveal lands hardest here, how quiet to keep the
@@ -192,56 +193,56 @@ export default async function MemorialsPage() {
           wake" and "As quiet or as present as the family wants". The order
           of service and the tribute display both said the same things at
           less use, so the page said them twice. ── */}
-      <IdeasSection
-        title={t("memorials.artefacts.title")}
-        ideas={ARTEFACTS}
-        accentClassName="text-memorial"
-      />
+        <IdeasSection
+          title={t("memorials.artefacts.title")}
+          ideas={ARTEFACTS}
+        />
 
-      <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} />
 
-      {/* ── Reassurances ── */}
-      <section className="w-full">
-        <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
-          {ASSURANCES.map((item) => (
-            <div key={item.label}>
-              <p className="mb-1 font-medium text-foreground">{item.label}</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {item.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* ── Reassurances ── */}
+        <section className="w-full">
+          <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
+            {ASSURANCES.map((item) => (
+              <div key={item.label}>
+                <p className="mb-1 font-medium text-foreground">{item.label}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* ── For the gatekeepers this page is forwarded by ── */}
-      <section className="w-full bg-primary/5">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-            {t("memorials.pro.title")}
-          </h2>
-          <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
-            {t("memorials.pro.body")}
-          </p>
-          <Button asChild variant="outline">
-            <a href="mailto:joseph.moffatt@favpoll.com">
-              {t("memorials.pro.cta")}
-            </a>
-          </Button>
-        </div>
-      </section>
+        {/* ── For the gatekeepers this page is forwarded by ── */}
+        <section className="w-full bg-primary/5">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
+              {t("memorials.pro.title")}
+            </h2>
+            <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
+              {t("memorials.pro.body")}
+            </p>
+            <Button asChild variant="outline">
+              <a href="mailto:joseph.moffatt@favpoll.com">
+                {t("memorials.pro.cta")}
+              </a>
+            </Button>
+          </div>
+        </section>
 
-      {/* ── Close — the landing's purple monogram close, one line ── */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
-            {t("memorials.close.headline")}
-          </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/favpolls/new">{t("memorials.close.cta")}</Link>
-          </Button>
-        </div>
-      </section>
-    </main>
+        {/* ── Close — the landing's purple monogram close, one line ── */}
+        <section className="bg-primary text-primary-foreground">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
+              {t("memorials.close.headline")}
+            </p>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("memorials.close.cta")}</Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+    </RegisterScope>
   )
 }

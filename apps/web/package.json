@@ -14,6 +14,7 @@
     "seed:scale": "tsx --env-file=.env.local ../../scripts/seed-scale.ts",
     "test": "vitest",
     "test:run": "vitest run",
+    "tokens": "node scripts/generate-register-tokens.mjs",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",

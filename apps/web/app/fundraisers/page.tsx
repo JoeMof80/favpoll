@@ -1,3 +1,4 @@
+import { RegisterScope } from "@/components/register-scope"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -180,53 +181,48 @@ export default async function FundraisersPage() {
   })
 
   return (
-    <main>
-      {/* ── The opening — the REAL landing hero, register-configured, now
+    <RegisterScope palette="fundraiser">
+      <main>
+        {/* ── The opening — the REAL landing hero, register-configured, now
           the same shape as the other two (see /celebrations for the `still`
-          and accentVar reasoning). accentVar="success" swaps --primary and
-          --chart-3 across the whole card, so the handset carries the
-          register's green the way the memorial one carries its blue; the old
-          accentBarClassName only tinted the leader bar. ── */}
-      <LandingHero
-        sceneKind="fundraiser"
-        scene={FUNDRAISER_SCENE}
-        still
-        eyebrow={t("fundraisers.eyebrow")}
-        headline={t("fundraisers.headline")}
-        subheader={t("fundraisers.subheader")}
-        ctaLabel={t("fundraisers.cta.primary")}
-        ctaSecondaryLabel={t("fundraisers.cta.secondary")}
-        accentVar="success"
-        hideStats
-      />
+          reasoning). The page wears the fundraiser palette (RegisterScope)
+          and the handset wears its scene's — green, both (2026-08-30). ── */}
+        <LandingHero
+          sceneKind="fundraiser"
+          scene={FUNDRAISER_SCENE}
+          still
+          eyebrow={t("fundraisers.eyebrow")}
+          headline={t("fundraisers.headline")}
+          subheader={t("fundraisers.subheader")}
+          ctaLabel={t("fundraisers.cta.primary")}
+          ctaSecondaryLabel={t("fundraisers.cta.secondary")}
+          hideStats
+        />
 
-      {/* ── How it works, in the rally register ── */}
-      <HowItWorksSteps
-        title={t("fundraisers.how.title")}
-        steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
-      />
+        {/* ── How it works, in the rally register ── */}
+        <HowItWorksSteps
+          title={t("fundraisers.how.title")}
+          steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
+        />
 
-      <IdeasSection
-        title={t("fundraisers.artefacts.title")}
-        ideas={IDEAS}
-        accentClassName="text-success-strong"
-      />
+        <IdeasSection title={t("fundraisers.artefacts.title")} ideas={IDEAS} />
 
-      <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} />
 
-      {/* ── Close — matched to the other two registers: max-w-330,
+        {/* ── Close — matched to the other two registers: max-w-330,
           left-aligned, and variant="secondary" because a default Button is
           PRIMARY and this band is bg-primary. ── */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
-            {t("fundraisers.close.headline")}
-          </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/favpolls/new">{t("fundraisers.close.cta")}</Link>
-          </Button>
-        </div>
-      </section>
-    </main>
+        <section className="bg-primary text-primary-foreground">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
+              {t("fundraisers.close.headline")}
+            </p>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("fundraisers.close.cta")}</Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+    </RegisterScope>
   )
 }

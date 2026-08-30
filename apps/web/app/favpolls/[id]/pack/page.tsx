@@ -1,3 +1,5 @@
+import { RegisterScope } from "@/components/register-scope"
+import { paletteForFavpoll } from "@/lib/register-palette"
 import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -87,29 +89,31 @@ export default async function PackPage({ params }: Props) {
     // as one surface with the paper laid on it rather than as a bar sitting on
     // a differently-tinted page. It was bg-muted/30: close enough to look like
     // a mistake, far enough to show a seam under the band.
-    <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
-      {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
+    <RegisterScope palette={paletteForFavpoll(favpoll)}>
+      <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
+        {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
           padding — every sheet renders at true page size now, so nothing is
           scaled to fit and what you see is what prints. */}
-      <div className="print:max-w-none">
-        <PackDocument
-          data={data}
-          leading={
-            <Button asChild variant="ghost" size="sm">
-              <Link href={`/favpolls/${id}`}>
-                <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-                Back
-              </Link>
-            </Button>
-          }
-          qrExport={
-            <QrExport
-              value={data.qrUrl}
-              name={`favpoll-qr-${favpoll.short_code}`}
-            />
-          }
-        />
+        <div className="print:max-w-none">
+          <PackDocument
+            data={data}
+            leading={
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/favpolls/${id}`}>
+                  <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+                  Back
+                </Link>
+              </Button>
+            }
+            qrExport={
+              <QrExport
+                value={data.qrUrl}
+                name={`favpoll-qr-${favpoll.short_code}`}
+              />
+            }
+          />
+        </div>
       </div>
-    </div>
+    </RegisterScope>
   )
 }

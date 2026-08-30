@@ -1,3 +1,4 @@
+import { RegisterScope } from "@/components/register-scope"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -159,8 +160,9 @@ export default async function CelebrationsPage() {
   })
 
   return (
-    <main>
-      {/* ── The opening — the REAL landing hero, register-configured, and
+    <RegisterScope palette="celebration">
+      <main>
+        {/* ── The opening — the REAL landing hero, register-configured, and
           now the same shape as /memorials (founder, 2026-08-28).
 
           `still` replaces the looping demo with a phone at phase "reveal".
@@ -172,55 +174,49 @@ export default async function CelebrationsPage() {
           card showing a favpoll should land on that favpoll, not on a demo
           starting over from the beginning.
 
-          accentVar over accentBarClassName. The bar class only tinted the
-          leader; accentVar swaps --primary and --chart-3 across the whole
-          card, so the handset carries the register's amber the way the
-          memorial one carries its blue. Both --warning and
-          --warning-on-band already exist, for light and dark. ── */}
-      <LandingHero
-        sceneKind="celebration"
-        scene={WEDDING_SCENE}
-        still
-        eyebrow={t("celebrations.eyebrow")}
-        headline={t("celebrations.headline")}
-        subheader={t("celebrations.subheader")}
-        ctaLabel={t("celebrations.cta.primary")}
-        ctaSecondaryLabel={t("celebrations.cta.secondary")}
-        accentVar="warning"
-        hideStats
-      />
+          The page wears the celebration palette (RegisterScope), and the
+          handset inside the hero wears its scene's — both magenta here —
+          so nothing is tinted by hand any more (2026-08-30). ── */}
+        <LandingHero
+          sceneKind="celebration"
+          scene={WEDDING_SCENE}
+          still
+          eyebrow={t("celebrations.eyebrow")}
+          headline={t("celebrations.headline")}
+          subheader={t("celebrations.subheader")}
+          ctaLabel={t("celebrations.cta.primary")}
+          ctaSecondaryLabel={t("celebrations.cta.secondary")}
+          hideStats
+        />
 
-      {/* ── How it works, in the celebration register ── */}
-      <HowItWorksSteps
-        title={t("celebrations.how.title")}
-        steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
-      />
+        {/* ── How it works, in the celebration register ── */}
+        <HowItWorksSteps
+          title={t("celebrations.how.title")}
+          steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
+        />
 
-      <IdeasSection
-        title={t("celebrations.artefacts.title")}
-        ideas={IDEAS}
-        accentClassName="text-warning-strong"
-      />
+        <IdeasSection title={t("celebrations.artefacts.title")} ideas={IDEAS} />
 
-      <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} />
 
-      {/* ── Close — the landing's purple monogram close, one line.
+        {/* ── Close — the landing's purple monogram close, one line.
           MATCHED TO /memorials (founder, 2026-08-28) in all three ways it
           differed: max-w-330 rather than max-w-3xl so it sits on the same
           panel width as every other section, left-aligned rather than
           centred, and — the one that was not merely cosmetic — the button
           takes `variant="secondary"`. A default Button is PRIMARY, and this
           band is bg-primary: purple on purple. ── */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
-            {t("celebrations.close.headline")}
-          </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/favpolls/new">{t("celebrations.close.cta")}</Link>
-          </Button>
-        </div>
-      </section>
-    </main>
+        <section className="bg-primary text-primary-foreground">
+          <div className="mx-auto w-full max-w-330 px-6 py-16">
+            <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
+              {t("celebrations.close.headline")}
+            </p>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/favpolls/new">{t("celebrations.close.cta")}</Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+    </RegisterScope>
   )
 }

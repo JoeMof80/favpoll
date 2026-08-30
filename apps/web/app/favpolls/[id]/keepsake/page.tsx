@@ -1,3 +1,5 @@
+import { RegisterScope } from "@/components/register-scope"
+import { paletteForRegister } from "@/lib/register-palette"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -185,24 +187,26 @@ export default async function KeepsakePage({ params }: Props) {
     // as one surface with the paper laid on it rather than as a bar sitting on
     // a differently-tinted page. It was bg-muted/30: close enough to look like
     // a mistake, far enough to show a seam under the band.
-    <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
-      {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
+    <RegisterScope palette={paletteForRegister(register)}>
+      <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
+        {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
           padding — the keepsake is landscape now. */}
-      <div className="print:max-w-none">
-        <KeepsakeView
-          data={data}
-          favpollId={id}
-          defaultVariant={defaultVariant}
-          leading={
-            <Button asChild variant="ghost" size="sm">
-              <Link href={`/favpolls/${id}`}>
-                <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-                Back
-              </Link>
-            </Button>
-          }
-        />
+        <div className="print:max-w-none">
+          <KeepsakeView
+            data={data}
+            favpollId={id}
+            defaultVariant={defaultVariant}
+            leading={
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/favpolls/${id}`}>
+                  <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+                  Back
+                </Link>
+              </Button>
+            }
+          />
+        </div>
       </div>
-    </div>
+    </RegisterScope>
   )
 }

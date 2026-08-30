@@ -74,12 +74,8 @@ type Props = {
    * a register page passes its own string.
    */
   ctaSecondaryLabel?: string
-  /** Band override, e.g. "bg-memorial text-memorial-foreground". */
+  /** Band override — the default is the page palette's primary. */
   bandClassName?: string
-  /** Register accent for the demo's leader bar — see DemoCard. */
-  accentBarClassName?: string
-  /** Register accent token for a still's whole card — see DemoCard. */
-  accentVar?: string
   /**
    * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
    * router replaces the demo column — the demos now live on the register
@@ -103,9 +99,11 @@ type Props = {
   children?: React.ReactNode
 }
 
-// The cards are glass on the brand band, so every accent mark uses the
-// *-on-band variant (see globals.css) — the base accents are tuned for page
-// surfaces and go invisible here in one theme or the other.
+// Each card WEARS its register's palette (data-register, 2026-08-30): its
+// dot and bars are that palette's --chart-4 — light enough to read on the
+// deep default band in light, deep enough on the pale band in dark — and in
+// dark its ink is the register colour. The retired accent tokens did this by
+// hand for one purple band; the palette does it for any.
 //
 // Each card carries its OWN miniature poll rather than reading the register's
 // demo scene (founder, 2026-08-05): the topic has to be synonymous with the
@@ -168,7 +166,6 @@ const ROUTER_CARDS = [
   {
     kind: "memorial" as const,
     href: "/memorials",
-    bar: "bg-memorial-on-band",
     title: t("home.router.memorials.title"),
     body: t("home.router.memorials.body"),
     topic: MEMORIAL_TOPIC,
@@ -183,7 +180,6 @@ const ROUTER_CARDS = [
   {
     kind: "celebration" as const,
     href: "/celebrations",
-    bar: "bg-warning-on-band",
     title: t("home.router.celebrations.title"),
     body: t("home.router.celebrations.body"),
     topic: WEDDING_TOPIC,
@@ -195,7 +191,6 @@ const ROUTER_CARDS = [
   {
     kind: "fundraiser" as const,
     href: "/fundraisers",
-    bar: "bg-success-on-band",
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
     topic: FUNDRAISER_TOPIC,
@@ -247,8 +242,6 @@ export function LandingHero({
   ctaLabel,
   ctaSecondaryLabel,
   bandClassName,
-  accentBarClassName,
-  accentVar,
   router = false,
   still = false,
   children,
@@ -570,7 +563,6 @@ export function LandingHero({
                     barWidths={scene.results.map((r) => r.widthPercent)}
                     prefersReducedMotion
                     device="phone"
-                    accentVar={accentVar}
                     className="rounded-none border-0"
                   />
                 </PhoneFrame>
@@ -587,6 +579,7 @@ export function LandingHero({
                 <Link
                   key={card.kind}
                   href={card.href}
+                  data-register={card.kind}
                   className={cn(
                     // Glass, not white (founder, 2026-08-05): a translucent
                     // wash of the band's OWN foreground, so the cards sit in
@@ -597,7 +590,8 @@ export function LandingHero({
                     // wash of its own ink inverts with it. ring, not border, so
                     // nothing fights the accent's border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
-                    // reads from the dot and the bars.
+                    // reads from the card's own palette: the dot, the bars,
+                    // and in dark the ink.
                     "group @container block rounded-xl bg-primary-foreground/12 p-5 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
                   )}
                 >
@@ -643,8 +637,7 @@ export function LandingHero({
                         <span
                           aria-hidden="true"
                           className={cn(
-                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle",
-                            card.bar
+                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-chart-4 align-middle"
                           )}
                         />
                         {card.title}
@@ -677,7 +670,7 @@ export function LandingHero({
                           label={r.label}
                           amount={r.amount}
                           widthPercent={r.widthPercent}
-                          barClassName={card.bar}
+                          barClassName="bg-chart-4"
                           tone="band"
                         />
                       ))}
@@ -778,7 +771,6 @@ export function LandingHero({
                         phase={phase}
                         barWidths={barWidths}
                         prefersReducedMotion={prefersReducedMotion}
-                        accentBarClassName={accentBarClassName}
                         className="rounded-t-none border-t-0"
                       />
                     </DemoFrame>
