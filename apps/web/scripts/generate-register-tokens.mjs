@@ -173,7 +173,38 @@ export function ramp({ h, c, pL, dL }) {
       oklchToLinear(0.97, 0.01 * f, h)
     ),
   }
-  return { light, dark }
+  // PAPER — anything printed, or shown as a sheet on screen (the pack, the
+  // keepsake): the palette's LIGHT values pinned regardless of the .dark
+  // ancestor, because the sheet forces white and dark ink on it went
+  // near-white on white (measured 2026-08-06). --border is deliberately
+  // darker than the app's (0.91 → 0.66): a 1px rule at the app value
+  // measured 1.31:1 against paper and dithered to nothing on a domestic
+  // printer. Generated per palette (2026-08-31) so a memorial's keepsake
+  // prints purple and a fundraiser's green — .paper used to pin the
+  // original purple by hand, which is why every sheet was purple whatever
+  // the register.
+  const paper = {
+    "--background": "oklch(1 0 0)",
+    "--foreground": ok(0.2, 0.02),
+    "--muted-foreground": ok(0.52, 0.06),
+    "--primary": ok(pL, 0.18),
+    "--primary-foreground": "oklch(0.99 0 0)",
+    "--border": ok(0.66, 0.02),
+    "--border-strong": ok(0.75, 0.1),
+    "--muted": ok(0.96, 0.03),
+    "--primary-muted": ok(0.62, 0.14),
+    "--reveal-foreground": ok(0.29, 0.1),
+    "--qr": ok(0.29, 0.1),
+    "--chart-1": ok(pL, 0.18),
+    "--chart-2": ok(0.62, 0.14),
+    "--chart-3": ok(0.75, 0.1),
+    "--chart-4": ok(0.85, 0.06),
+    "--chart-5": ok(0.96, 0.03),
+  }
+  // A sheet shown on screen keeps the app's border weight — the print
+  // border reads as a hard outline drawn around every row at card size.
+  const paperScreen = { "--border": ok(0.91, 0.02) }
+  return { light, dark, paper, paperScreen }
 }
 
 // ── Contrast pairs worth knowing (WCAG: 4.5 text, 3 non-text) ───────────────
@@ -235,6 +266,37 @@ export function renderCss() {
     } else {
       css += `:root:has([data-register-page="${key}"]):not(.dark),\n:root:not(.dark) [data-register="${key}"] {\n${block(light)}\n}\n`
       css += `:root.dark:has([data-register-page="${key}"]),\n:root.dark [data-register="${key}"] {\n${block(dark)}\n}\n`
+    }
+  }
+  // THEME-LIGHT (founder, 2026-08-31: "the iPhone and live display should
+  // show light mode on the How it works demo when dark mode is set"). A
+  // device shown INSIDE the page — a phone in a frame, a screen in a TV — is
+  // its own surface with its own theme, and a demo of one reads best in
+  // light. `.theme-light` pins the full light ramp: the default palette on
+  // the element itself, and each register's on any register-scoped element
+  // inside it (or on itself), at the dark scope rules' own specificity
+  // (0,3,0) and after them, so it wins. Paper is the same idea with the
+  // print-dark border and fewer tokens.
+  css += `\n/* Theme-light — a device shown inside the page keeps light mode whatever the page's theme; see the generator. */\n`
+  for (const [key, p] of Object.entries(PALETTES)) {
+    const { light } = ramp(p)
+    if (key === "default") {
+      css += `.theme-light {\n${block(light)}\n}\n`
+    } else {
+      css += `:root .theme-light[data-register="${key}"],\n:root .theme-light [data-register="${key}"] {\n${block(light)}\n}\n`
+    }
+  }
+  // Paper after everything: the default sheet, then each register's, and the
+  // on-screen border override after each so it wins at equal specificity.
+  css += `\n/* Paper — the light values pinned for print and on-screen sheets; see the generator. */\n`
+  for (const [key, p] of Object.entries(PALETTES)) {
+    const { paper, paperScreen } = ramp(p)
+    if (key === "default") {
+      css += `.paper {\n${block(paper)}\n}\n.paper-screen {\n${block(paperScreen)}\n}\n`
+    } else {
+      const sel = (cls) =>
+        `:root:has([data-register-page="${key}"]) .${cls},\n[data-register="${key}"] .${cls},\n.${cls}[data-register="${key}"]`
+      css += `${sel("paper")} {\n${block(paper)}\n}\n${sel("paper-screen")} {\n${block(paperScreen)}\n}\n`
     }
   }
   return css

@@ -26,7 +26,10 @@ import {
   REGISTER_LINK_HOVER,
   REGISTER_LINK_INK,
 } from "@/components/register-link"
-import type { RegisterPalette } from "@/lib/register-palette"
+import {
+  paletteForSceneKind,
+  type RegisterPalette,
+} from "@/lib/register-palette"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -46,7 +49,7 @@ import {
 import { KeepsakeSheet } from "@/components/keepsake/keepsake-sheet"
 import {
   DisplayStill,
-  DISPLAY_STILL_WIDTH,
+  DISPLAY_STILL_ROOM,
 } from "@/components/landing/display-still"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
@@ -171,10 +174,14 @@ const WELL = "h-[451px] lg:h-[608px] xl:h-[651px]"
 // are landscape or small and cost 40-50px each to enlarge; the phone costs 243
 // each. It stays a thumbnail here, and its detail belongs behind a tap.
 const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
-// Down from the browser-framed version: the TV bezel adds 20px each way
-// (940 overall), and at xl the old 0.53 already sat within a pixel of the
-// column's width.
-const DISPLAY_SCALE = "scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
+// ROOM MODE (founder, 2026-08-31: "update the live screen on the homepage to
+// be more realistic, like we did on the register pages"). The beat used to
+// show the tall 1120px still; it now shows what /memorials and /celebrations
+// show — the real 16:9 screen, the brand mark in the corner, the way the
+// display fills a TV. 1920 wide plus the bezel is 1960, so the column widths
+// above (273 / 376 / 478) give these scales; the TV stands 1120 tall
+// unscaled, which at every stop sits inside the well the phone sets.
+const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
 
 // MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
@@ -199,7 +206,7 @@ const DISPLAY_SCALE = "scale-[0.23] lg:scale-[0.32] xl:scale-[0.41]"
 const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
   card: { w: 332, h: 215 },
   phone: { w: PHONE_CHASSIS_WIDTH, h: PHONE_CHASSIS_HEIGHT },
-  display: { w: DISPLAY_STILL_WIDTH + 40, h: 697 },
+  display: { w: DISPLAY_STILL_ROOM.w + 40, h: DISPLAY_STILL_ROOM.h + 40 },
   keepsake: { w: 794, h: 1123 },
 }
 
@@ -271,6 +278,7 @@ function BeatMedium({
       // for ink that survives a domestic printer, which on screen just draws
       // a hard outline round every row of the card.
       <div
+        data-register={paletteForSceneKind(SCENE.kind)}
         className={cn(
           "paper paper-screen shrink-0 drop-shadow-xl",
           !bare && CARD_SCALE,
@@ -290,30 +298,40 @@ function BeatMedium({
       // The paper mount, the load-bearing shrink-0 and the explicit A4 box
       // now live in KeepsakeSheet, shared with the /memorials Ideas section
       // (2026-08-27). The reasoning for each is recorded there.
-      <KeepsakeSheet
-        data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
-        variant="tribute"
-        orientation="portrait"
-        className={cn(!bare && KEEPSAKE_SCALE)}
-      />
+      <div data-register={paletteForSceneKind(SCENE.kind)} className="contents">
+        <KeepsakeSheet
+          data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
+          variant="tribute"
+          orientation="portrait"
+          className={cn(!bare && KEEPSAKE_SCALE)}
+        />
+      </div>
     )
   }
   if (medium.kind === "display") {
     return (
-      <div className={cn("shrink-0", !bare && DISPLAY_SCALE)}>
+      <div
+        data-register={paletteForSceneKind(SCENE.kind)}
+        // theme-light: a screen in a TV keeps light mode whatever the page's
+        // theme (founder, 2026-08-31) — see register-tokens.css.
+        className={cn("theme-light shrink-0", !bare && DISPLAY_SCALE)}
+      >
         <TvFrame>
-          {/* No crop: the still shows its leaders and ends where they do — a
-              fixed height cut the last bar in half and read as a broken
-              screenshot rather than a screen. */}
-          <div style={{ width: DISPLAY_STILL_WIDTH }}>
-            <DisplayStill scene={SCENE} qrUrl={DEMO_QR_URL} />
+          {/* The screen itself, 16:9 — what the projector shows, not a cropped
+              page (room mode, 2026-08-31). */}
+          <div style={{ width: DISPLAY_STILL_ROOM.w }}>
+            <DisplayStill scene={SCENE} qrUrl={DEMO_QR_URL} room />
           </div>
         </TvFrame>
       </div>
     )
   }
   return (
-    <div className={cn("shrink-0", !bare && PHONE_SCALE)}>
+    <div
+      // theme-light: a phone in a frame keeps light mode whatever the page's
+      // theme (founder, 2026-08-31) — see register-tokens.css.
+      className={cn("theme-light shrink-0", !bare && PHONE_SCALE)}
+    >
       <PhoneFrame>
         <DemoCard
           scene={SCENE}
