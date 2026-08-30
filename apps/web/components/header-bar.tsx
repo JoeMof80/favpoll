@@ -21,6 +21,7 @@ export function HeaderBar({
   overlay,
   staticMenu = false,
   section,
+  nav,
 }: {
   children?: React.ReactNode
   /**
@@ -31,8 +32,16 @@ export function HeaderBar({
   overlay?: React.ReactNode
   /** Render the hamburger as a glyph, and the logo without its link. */
   staticMenu?: boolean
-  /** Section name shown beside the mark, e.g. "For memorials". */
+  /**
+   * Section name shown beside the mark on MOBILE, e.g. "For memorials" —
+   * the orientation cue for a screen too narrow for `nav`.
+   */
   section?: string
+  /**
+   * Desktop links beside the mark — the register links (2026-08-31). Hidden
+   * below md, where `section` stands in.
+   */
+  nav?: React.ReactNode
 }) {
   return (
     <header
@@ -48,10 +57,11 @@ export function HeaderBar({
       }
     >
       <div className="mx-auto flex h-14 items-center justify-between px-6">
-        {/* PROTOTYPE (2026-08-26): section marker beside the mark on the
-            register pages. They share the home page's hero component, panel
-            width, alignment and texture, so clicking a router card can read
-            as "nothing happened". Names match the footer's. */}
+        {/* Beside the mark: on desktop the register links (the active one in
+            text-primary, which since #585 is the page's own colour — the
+            header says where you are by being that colour); on mobile the
+            section name, kept from the 2026-08-26 marker, because three
+            links do not fit beside a logo at 390px. */}
         <div className="flex items-center gap-3">
           {staticMenu ? (
             <FavpollLogo />
@@ -60,13 +70,29 @@ export function HeaderBar({
               <FavpollLogo />
             </Link>
           )}
+          {nav && (
+            <>
+              <span
+                aria-hidden="true"
+                className="hidden h-4 w-px shrink-0 bg-border md:block"
+              />
+              <nav
+                aria-label="Kinds of favpoll"
+                className="hidden items-center gap-1 md:flex"
+              >
+                {nav}
+              </nav>
+            </>
+          )}
           {section && (
             <>
               <span
                 aria-hidden="true"
-                className="h-4 w-px shrink-0 bg-border"
+                className={`h-4 w-px shrink-0 bg-border ${nav ? "md:hidden" : ""}`}
               />
-              <span className="text-sm font-medium text-muted-foreground">
+              <span
+                className={`text-sm font-medium text-muted-foreground ${nav ? "md:hidden" : ""}`}
+              >
                 {section}
               </span>
             </>
