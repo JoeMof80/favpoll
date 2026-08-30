@@ -572,7 +572,13 @@ export const SCENES: HeroScene[] = [
     //    charity (mirrors the live subject="cause" shape). ──
     kind: "cause",
     occasion_type: "Cause",
-    opening_line: null,
+    // "Walkies for St Mark's Hospice" (2026-08-31, founder asked for a better
+    // opening line than the register's "In support of"). The word every dog
+    // in Britain knows, and it makes the card, the wallet card and the
+    // keepsake all say what the event is before the context line does. The
+    // fundraiser register carries a light touch; a hospice's sponsored dog
+    // walk is exactly where it belongs.
+    opening_line: "Walkies for",
     protagonist: null,
     // Hospice, not YoungMinds (founder, 2026-08-06): hospices are the channel
     // being approached next, and this scene carries the whole guest arc in
@@ -591,9 +597,12 @@ export const SCENES: HeroScene[] = [
     // register prefix doubled the verb.
     heading: "St Mark's Hospice",
     eyebrow: "A cause",
-    context: "Sponsored dog walk · 5 miles",
+    // No distance (founder, 2026-08-31): "· 5 miles" wrapped the context
+    // line on a phone and added nothing the walk needs.
+    context: "Sponsored dog walk",
+    // The About and the reveal are the founder's, verbatim (2026-08-31).
     blurb:
-      "A sponsored dog walk for our local hospice — pledge your favourite, and every penny goes to St Mark's.",
+      "5 miles for our local hospice. Pledge your favourite biscuit and every penny goes to St Mark’s.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
@@ -601,81 +610,52 @@ export const SCENES: HeroScene[] = [
     photo_url: "/demo/biscuit.jpg",
     poll: {
       id: "demo-poll-cause",
-      // A REAL FAVOURITE, OWNED BY A CAUSE (founder, 2026-08-31, option A).
-      // The old reveal — "Hospice care is free…" — was a fact about the
-      // charity, not a gift back, and it is why the home journey left this
-      // scene on 2026-08-17: a reveal beat with nothing revealed. A cause
-      // cannot bet on its own poll (the Marcus lesson), but it can own a
-      // favourite that is TRUE on day one: the hospice's therapy dog is a
-      // beagle, and that is a fact whatever the walkers pick. The opening
-      // sentence names Beagle, so isMessageReveal is false and the copy says
-      // "Our pick will be revealed" — which it is.
+      // A MESSAGE, NOT A FAVOURITE (founder, 2026-08-31). The opening sentence
+      // names Biscuit the dog, not a biscuit, so isMessageReveal is true and
+      // the copy says "A message will be revealed" — and it is one: the dog
+      // is named after his favourite treat, and the walkers' pick decides
+      // which treat he gets. A cause cannot bet on its own poll (the Marcus
+      // lesson); this gives something back without doing so.
       personal_reveal:
-        "Ours is Biscuit, the hospice's therapy dog — a beagle who does the rounds every Tuesday. Thank you for walking with us.",
+        "Our favourite is Biscuit, our therapy dog. Named after his favourite treat, he’s a good boy who can expect some after the walk.",
       topic: {
-        // A REAL topic (2026-08-09). "Hot drink" was not one — the catalogue
-        // has 135 topics and that was not among them, so the demo showed a
-        // question nobody could pick, with ten items written by hand. Dog
-        // breed is real, carries all 48 of its seeded favourites, and pairs
-        // with the occasion: a sponsored dog walk asks this question of
-        // itself. Ten chips left the picker looking sparse; 48 fills it the
-        // way a guest's actually does.
-        title: "Dog breed",
+        // BISCUIT (founder, 2026-08-31), and the dog is named after it. A real
+        // catalogue topic carrying all 31 of its seeded favourites, as Dog
+        // breed carried its 48 before it — a demo whose picker is the real
+        // list, not a hand-written ten.
+        title: "Biscuit",
         favourites: [
-          { id: "db-bassethound", label: "Basset Hound" },
-          { id: "db-beagle", label: "Beagle" },
-          { id: "db-bernesemountaindog", label: "Bernese Mountain Dog" },
-          { id: "db-bichonfrise", label: "Bichon Frise" },
-          { id: "db-bordercollie", label: "Border Collie" },
-          { id: "db-borderterrier", label: "Border Terrier" },
-          { id: "db-boxer", label: "Boxer" },
-          { id: "db-britishbulldog", label: "British Bulldog" },
-          {
-            id: "db-cavalierkingcharlesspaniel",
-            label: "Cavalier King Charles Spaniel",
-          },
-          { id: "db-chihuahua", label: "Chihuahua" },
-          { id: "db-cockapoo", label: "Cockapoo" },
-          { id: "db-cockerspaniel", label: "Cocker Spaniel" },
-          { id: "db-corgi", label: "Corgi" },
-          { id: "db-dachshund", label: "Dachshund" },
-          { id: "db-dalmatian", label: "Dalmatian" },
-          { id: "db-dobermann", label: "Dobermann" },
-          { id: "db-englishsetter", label: "English Setter" },
-          { id: "db-frenchbulldog", label: "French Bulldog" },
-          { id: "db-germanshepherd", label: "German Shepherd" },
-          { id: "db-goldenretriever", label: "Golden Retriever" },
-          { id: "db-greatdane", label: "Great Dane" },
-          { id: "db-greyhound", label: "Greyhound" },
-          { id: "db-jackrussell", label: "Jack Russell" },
-          { id: "db-labradoodle", label: "Labradoodle" },
-          { id: "db-labrador", label: "Labrador" },
-          { id: "db-lurcher", label: "Lurcher" },
-          { id: "db-newfoundland", label: "Newfoundland" },
-          { id: "db-oldenglishsheepdog", label: "Old English Sheepdog" },
-          { id: "db-pointer", label: "Pointer" },
-          { id: "db-pomeranian", label: "Pomeranian" },
-          { id: "db-poodle", label: "Poodle" },
-          { id: "db-pug", label: "Pug" },
-          { id: "db-rottweiler", label: "Rottweiler" },
-          { id: "db-roughcollie", label: "Rough Collie" },
-          { id: "db-saintbernard", label: "Saint Bernard" },
-          { id: "db-samoyed", label: "Samoyed" },
-          { id: "db-schnauzer", label: "Schnauzer" },
-          { id: "db-shihtzu", label: "Shih Tzu" },
-          { id: "db-siberianhusky", label: "Siberian Husky" },
-          { id: "db-spaniel", label: "Spaniel" },
-          { id: "db-springerspaniel", label: "Springer Spaniel" },
-          {
-            id: "db-staffordshirebullterrier",
-            label: "Staffordshire Bull Terrier",
-          },
-          { id: "db-vizsla", label: "Vizsla" },
-          { id: "db-weimaraner", label: "Weimaraner" },
-          { id: "db-welshterrier", label: "Welsh Terrier" },
-          { id: "db-westhighlandterrier", label: "West Highland Terrier" },
-          { id: "db-whippet", label: "Whippet" },
-          { id: "db-yorkshireterrier", label: "Yorkshire Terrier" },
+          { id: "b-biscoff", label: "Biscoff" },
+          { id: "b-bourbon", label: "Bourbon" },
+          { id: "b-chocoleibniz", label: "Choco Leibniz" },
+          { id: "b-chocolatechipcookie", label: "Chocolate chip cookie" },
+          { id: "b-chocolatedigestive", label: "Chocolate digestive" },
+          { id: "b-chocolatefinger", label: "Chocolate finger" },
+          { id: "b-custardcream", label: "Custard cream" },
+          { id: "b-digestive", label: "Digestive" },
+          { id: "b-figroll", label: "Fig roll" },
+          { id: "b-foxscrunchcream", label: "Fox's Crunch Cream" },
+          { id: "b-garibaldi", label: "Garibaldi" },
+          { id: "b-gingernut", label: "Ginger nut" },
+          { id: "b-gingerbread", label: "Gingerbread" },
+          { id: "b-hobnob", label: "Hobnob" },
+          { id: "b-icedgems", label: "Iced gems" },
+          { id: "b-jaffacake", label: "Jaffa Cake" },
+          { id: "b-jammiedodger", label: "Jammie Dodger" },
+          { id: "b-lemonpuff", label: "Lemon puff" },
+          { id: "b-maltedmilk", label: "Malted milk" },
+          { id: "b-marylandcookie", label: "Maryland cookie" },
+          { id: "b-nicebiscuit", label: "Nice biscuit" },
+          { id: "b-oreo", label: "Oreo" },
+          { id: "b-partyring", label: "Party ring" },
+          { id: "b-penguin", label: "Penguin" },
+          { id: "b-pinkwafer", label: "Pink Wafer" },
+          { id: "b-richtea", label: "Rich Tea" },
+          { id: "b-shortbread", label: "Shortbread" },
+          { id: "b-tunnockscaramelwafer", label: "Tunnock's Caramel Wafer" },
+          { id: "b-tunnocksteacake", label: "Tunnock's Tea Cake" },
+          { id: "b-viennesewhirl", label: "Viennese Whirl" },
+          { id: "b-wagonwheel", label: "Wagon Wheel" },
         ],
       },
     },
@@ -689,23 +669,26 @@ export const SCENES: HeroScene[] = [
         registered_number: null,
       },
     ],
-    // Cockapoo — the runner-up in the standings, so the pick the demo makes
-    // is one the results then show climbing. Same pattern as the memorial
-    // scene, whose pick is Blue behind Purple.
+    // Hobnob — the runner-up in the standings, so the pick the demo makes is
+    // one the results then show climbing. Same pattern as the memorial
+    // scene, whose pick is Blue behind Purple. Index into the alphabetical
+    // favourites above.
     goal_amount: null,
-    selectedIndex: 10,
+    selectedIndex: 13,
     pledgeAmount: "£10",
+    // The total is the sum of these ten — sceneFavourites derives the live
+    // display's total from `results`.
     results: [
-      { label: "Labrador", amount: "£240", widthPercent: 100 },
-      { label: "Cockapoo", amount: "£205", widthPercent: 85 },
-      { label: "Border Collie", amount: "£120", widthPercent: 50 },
-      { label: "Greyhound", amount: "£85", widthPercent: 35 },
-      { label: "Jack Russell", amount: "£55", widthPercent: 23 },
-      { label: "Whippet", amount: "£35", widthPercent: 15 },
-      { label: "Springer Spaniel", amount: "£30", widthPercent: 13 },
-      { label: "Dachshund", amount: "£25", widthPercent: 10 },
-      { label: "Golden Retriever", amount: "£20", widthPercent: 8 },
-      { label: "Pug", amount: "£15", widthPercent: 6 },
+      { label: "Chocolate digestive", amount: "£240", widthPercent: 100 },
+      { label: "Hobnob", amount: "£205", widthPercent: 85 },
+      { label: "Custard cream", amount: "£120", widthPercent: 50 },
+      { label: "Jaffa Cake", amount: "£85", widthPercent: 35 },
+      { label: "Bourbon", amount: "£55", widthPercent: 23 },
+      { label: "Shortbread", amount: "£35", widthPercent: 15 },
+      { label: "Jammie Dodger", amount: "£30", widthPercent: 13 },
+      { label: "Rich Tea", amount: "£25", widthPercent: 10 },
+      { label: "Digestive", amount: "£20", widthPercent: 8 },
+      { label: "Ginger nut", amount: "£15", widthPercent: 6 },
     ],
     total: "£830",
   },

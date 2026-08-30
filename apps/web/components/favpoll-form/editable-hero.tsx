@@ -74,7 +74,7 @@ export function EditableHero({ isGenerating = false, onRegenerate }: Props) {
               }
             >
               <h1
-                className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+                className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(name)}`}
               >
                 {subject === "cause"
                   ? causeLabel || (

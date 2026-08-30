@@ -20,7 +20,11 @@ import { RankingBar } from "@/components/ui/ranking-bar"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { getFavpollHeadline, protagonistShortName } from "@/lib/display"
+import {
+  getFavpollHeadline,
+  heroNameMobileSizeClass,
+  protagonistShortName,
+} from "@/lib/display"
 import {
   PickerHeader,
   PickerItems,
@@ -180,7 +184,11 @@ export function DemoCard({
     : null
 
   const title = protagonist ? protagonist.name : (scene.heading ?? "")
-  const cardPrefix = protagonist ? headline!.prefix : (scene.eyebrow ?? "")
+  // A cause's prefix is its opening line when it has one — what the real
+  // page shows (getFavpollHeadline) — and the register label otherwise.
+  const cardPrefix = protagonist
+    ? headline!.prefix
+    : (scene.opening_line ?? scene.eyebrow ?? "")
   // Causes get their context line in the same slot a protagonist's dates use.
   const cardSuffix = protagonist ? headline!.suffix : (scene.context ?? null)
 
@@ -416,7 +424,7 @@ export function DemoCard({
             <h1
               className={cn(
                 "line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground",
-                device === "phone" ? "text-3xl" : "text-4xl"
+                device === "phone" ? heroNameMobileSizeClass(title) : "text-4xl"
               )}
             >
               {title}
