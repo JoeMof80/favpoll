@@ -581,18 +581,28 @@ export function LandingHero({
                   href={card.href}
                   data-register={card.kind}
                   className={cn(
-                    // Glass, not white (founder, 2026-08-05): a translucent
-                    // wash of the band's OWN foreground, so the cards sit in
-                    // the hero rather than on it. Everything inside takes band
-                    // ink (text-primary-foreground), which is what makes this
-                    // survive the theme flip — the band inverts (purple with
-                    // white ink in light, pale with purple ink in dark), and a
-                    // wash of its own ink inverts with it. ring, not border, so
-                    // nothing fights the accent's border-t-4.
+                    // WHITE, WITH THE REGISTER AS INK (founder, 2026-08-31:
+                    // "make them white with their brand colors as text,
+                    // similar to how the header behaves on the white
+                    // background, with tinted background on hover"). One
+                    // remap does it (the register-ink utility in globals.css):
+                    // inside the card --primary-foreground IS the register's
+                    // --primary, so every inner class that
+                    // took band ink (text-primary-foreground/75, the bars'
+                    // band tone, the ring) now takes purple, magenta or
+                    // green on white without being touched. Hover is the
+                    // register's --accent tint, the header's ghost hover. In
+                    // dark the scope's --primary is near-white and its
+                    // --background the register's dark page, so the card is
+                    // near-white with that as ink — the same picture,
+                    // inverted the way the pages invert. Glass (2026-08-05),
+                    // tinted glass and a solid band were all rendered on
+                    // #588 before this. ring, not border, so nothing fights
+                    // the accent's border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the card's own palette: the dot, the bars,
                     // and in dark the ink.
-                    "group @container block rounded-xl bg-primary-foreground/12 p-5 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
+                    "group register-ink @container block rounded-xl bg-background p-5 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/20 transition-all hover:bg-accent motion-safe:hover:-translate-y-0.5 dark:bg-primary dark:hover:bg-chart-1"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
@@ -637,7 +647,7 @@ export function LandingHero({
                         <span
                           aria-hidden="true"
                           className={cn(
-                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-chart-4 align-middle"
+                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle dark:bg-primary-foreground"
                           )}
                         />
                         {card.title}
@@ -670,7 +680,7 @@ export function LandingHero({
                           label={r.label}
                           amount={r.amount}
                           widthPercent={r.widthPercent}
-                          barClassName="bg-chart-4"
+                          barClassName="bg-chart-2 dark:bg-chart-4"
                           tone="band"
                         />
                       ))}
