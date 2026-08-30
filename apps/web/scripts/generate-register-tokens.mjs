@@ -268,6 +268,24 @@ export function renderCss() {
       css += `:root.dark:has([data-register-page="${key}"]),\n:root.dark [data-register="${key}"] {\n${block(dark)}\n}\n`
     }
   }
+  // THEME-LIGHT (founder, 2026-08-31: "the iPhone and live display should
+  // show light mode on the How it works demo when dark mode is set"). A
+  // device shown INSIDE the page — a phone in a frame, a screen in a TV — is
+  // its own surface with its own theme, and a demo of one reads best in
+  // light. `.theme-light` pins the full light ramp: the default palette on
+  // the element itself, and each register's on any register-scoped element
+  // inside it (or on itself), at the dark scope rules' own specificity
+  // (0,3,0) and after them, so it wins. Paper is the same idea with the
+  // print-dark border and fewer tokens.
+  css += `\n/* Theme-light — a device shown inside the page keeps light mode whatever the page's theme; see the generator. */\n`
+  for (const [key, p] of Object.entries(PALETTES)) {
+    const { light } = ramp(p)
+    if (key === "default") {
+      css += `.theme-light {\n${block(light)}\n}\n`
+    } else {
+      css += `:root .theme-light[data-register="${key}"],\n:root .theme-light [data-register="${key}"] {\n${block(light)}\n}\n`
+    }
+  }
   // Paper after everything: the default sheet, then each register's, and the
   // on-screen border override after each so it wins at equal specificity.
   css += `\n/* Paper — the light values pinned for print and on-screen sheets; see the generator. */\n`
