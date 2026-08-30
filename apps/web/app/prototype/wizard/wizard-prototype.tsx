@@ -460,14 +460,13 @@ export function WizardPrototype({ data }: { data: Data }) {
           </div>
         )
       case "story":
+        // Only the About and the reveal (founder, round 9) — the name block
+        // belongs to the previous step, the topic ribbon to the topic step.
+        // EditableHero's first block is hidden; the About block loses its
+        // page margins.
         return (
-          <div className="[&>div:first-child>div:first-child]:!pt-0 [&>div:first-child>div:nth-child(2)]:md:mb-4">
+          <div className="[&>div:first-child>div:first-child]:hidden [&>div:first-child>div:nth-child(2)]:!my-0">
             <EditableHero />
-            {topicTitle && (
-              <div className="mt-6">
-                <PollHeading topicTitle={topicTitle} inert />
-              </div>
-            )}
             {revealQuote}
           </div>
         )
