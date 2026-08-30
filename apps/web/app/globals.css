@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* PROTOTYPE (2026-08-30) — register colour system; delete with app/prototype/register-colours.
+   Kept directly after the tailwindcss import: a relative @import placed after @source was dropped. */
+@import "./prototype-register-colours.css";
 
 /* Workspace packages are symlinked through node_modules, which Tailwind's
    auto-detection skips — without this, shared components (e.g. the theme

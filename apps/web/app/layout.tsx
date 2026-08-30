@@ -8,6 +8,7 @@ import { HeaderMount } from "@/components/header-mount"
 import { SiteFooterMount } from "@/components/site-footer-mount"
 import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
+import { PrototypeRegisterSwitcher } from "@/components/prototype-register-switcher"
 import {
   OG_SITE,
   SITE_DESCRIPTION,
@@ -74,6 +75,8 @@ export default function RootLayout({
               <SiteFooterMount />
             </EditModeProvider>
             <Toaster position="bottom-center" />
+            {/* PROTOTYPE (2026-08-30) — delete with app/prototype/register-colours */}
+            <PrototypeRegisterSwitcher />
           </ThemeProvider>
         </body>
       </html>

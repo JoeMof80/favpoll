@@ -1,0 +1,457 @@
+{
+  "memorial": {
+    "h": 278,
+    "c": 0.18,
+    "pL": 0.44,
+    "dL": 0.44,
+    "label": "Memorial — purple (today's brand, unchanged)",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 8.08,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.14,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.57,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 8.31,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.76,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.79,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.26,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 7.61,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 4.72,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 7.61,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 4.71,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 5.81,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 4.94,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "celebration": {
+    "h": 74,
+    "c": 0.15,
+    "pL": 0.53,
+    "dL": 0.42,
+    "label": "Celebration — amber / gold",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 5.24,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.12,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.55,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 5.39,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.71,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.66,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.25,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 7.91,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 4.92,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 7.91,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 4.91,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 6.11,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 5.28,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "fundraiser": {
+    "h": 160,
+    "c": 0.13,
+    "pL": 0.5,
+    "dL": 0.41,
+    "label": "Fundraiser — green",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 5.35,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.04,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.39,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 5.51,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.47,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.22,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.16,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 7.29,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 4.64,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 7.29,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 4.65,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 5.78,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 5.16,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "blue": {
+    "h": 252,
+    "c": 0.15,
+    "pL": 0.46,
+    "dL": 0.43,
+    "label": "Default candidate — forget-me-not blue",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 6.92,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.09,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.49,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 7.12,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.63,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.58,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.22,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 7.4,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 4.64,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 7.4,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 4.64,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 5.77,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 4.98,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "ink": {
+    "h": 270,
+    "c": 0.035,
+    "pL": 0.27,
+    "dL": 0.25,
+    "label": "Default candidate — ink",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 14.69,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.11,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.51,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 15.12,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.65,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.58,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.23,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 14.71,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 9.19,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 14.71,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 9.18,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 12.1,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 10.58,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  }
+}
