@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { CharityBanner } from "@/components/charity-banner"
+import { CharityRow } from "@/components/charity-row"
 import { GoalProgress } from "@/components/goal-progress"
 import { EventStep } from "@/components/favpoll-flow/event-step"
 import { PollHeading } from "@/components/poll-heading"
@@ -361,14 +361,6 @@ export function WizardPrototype({ data }: { data: Data }) {
   // the poll without the reveal; THEIR PAGE shows the hero, the topic ribbon
   // and the reveal quote, without the tabs and bars. The whole page appears
   // once, at the publish step.
-  const captions: Record<StepKey, string | null> = {
-    kind: null,
-    charity: "The charity banner",
-    topic: "The poll",
-    words: "Their page",
-    goal: "The goal",
-    finish: null,
-  }
   const topicTitle = v.topics?.[0]?.title
 
   const revealQuote = (
@@ -387,13 +379,15 @@ export function WizardPrototype({ data }: { data: Data }) {
     </div>
   )
 
+  // Rows only (founder, round 6): the banner's total/goal footer belongs to
+  // the goal step, not here.
   const charityArtefact =
     chosenCharities.length > 0 ? (
-      <CharityBanner
-        charities={chosenCharities}
-        totalRaised={0}
-        goalAmount={v.goalAmount ?? null}
-      />
+      <div className="space-y-3 rounded-lg border border-border bg-card px-5 py-4">
+        {chosenCharities.map((c) => (
+          <CharityRow key={c.id} charity={c} amountRaised={0} />
+        ))}
+      </div>
     ) : (
       <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
         The charity you pick appears here
@@ -459,9 +453,6 @@ export function WizardPrototype({ data }: { data: Data }) {
       data-proto-preview=""
       className="pointer-events-none rounded-xl border border-border bg-background p-6 shadow-sm select-none"
     >
-      <p className="mb-4 text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
-        {captions[current]} — live
-      </p>
       {artefact}
     </div>
   ) : null
