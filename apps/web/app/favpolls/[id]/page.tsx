@@ -1,3 +1,5 @@
+import { RegisterScope } from "@/components/register-scope"
+import { paletteForFavpoll } from "@/lib/register-palette"
 import type { Metadata } from "next"
 import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { favpollMetadata } from "@/lib/og/favpoll-og"
@@ -337,33 +339,35 @@ export default async function FavpollPage({ params }: Props) {
       : null
 
   return (
-    <>
-      <FavpollSubheader
-        favpollId={id}
-        favpollName={
-          typedFavpoll.subject === "cause"
-            ? (typedFavpoll.cause_label ?? "favpoll")
-            : (typedFavpoll.protagonists?.name ?? "favpoll")
-        }
-        isOrganiser={isOrganiser}
-        isClosed={isClosed}
-      />
-      <FavpollContent
-        favpoll={typedFavpoll}
-        pollWithItems={visiblePoll}
-        pot={pot ?? null}
-        userPotAllocation={userPotAllocation}
-        totalRaised={totalRaised}
-        isClosed={isClosed}
-        wallEntries={wallEntries}
-        rankHistory={rankHistory}
-        clerkUserId={userId}
-        isOrganiser={isOrganiser}
-        entitled={entitled}
-        hasReveal={hasReveal}
-        revealIsQuote={revealIsQuote}
-        revealIsMessage={revealIsMessage}
-      />
-    </>
+    <RegisterScope palette={paletteForFavpoll(typedFavpoll)}>
+      <>
+        <FavpollSubheader
+          favpollId={id}
+          favpollName={
+            typedFavpoll.subject === "cause"
+              ? (typedFavpoll.cause_label ?? "favpoll")
+              : (typedFavpoll.protagonists?.name ?? "favpoll")
+          }
+          isOrganiser={isOrganiser}
+          isClosed={isClosed}
+        />
+        <FavpollContent
+          favpoll={typedFavpoll}
+          pollWithItems={visiblePoll}
+          pot={pot ?? null}
+          userPotAllocation={userPotAllocation}
+          totalRaised={totalRaised}
+          isClosed={isClosed}
+          wallEntries={wallEntries}
+          rankHistory={rankHistory}
+          clerkUserId={userId}
+          isOrganiser={isOrganiser}
+          entitled={entitled}
+          hasReveal={hasReveal}
+          revealIsQuote={revealIsQuote}
+          revealIsMessage={revealIsMessage}
+        />
+      </>
+    </RegisterScope>
   )
 }

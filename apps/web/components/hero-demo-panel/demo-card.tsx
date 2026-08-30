@@ -14,6 +14,7 @@ import {
 } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { paletteForSceneKind } from "@/lib/register-palette"
 import { Button } from "@/components/ui/button"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -55,31 +56,6 @@ type Props = {
    * trap as the display's gutter QRs and its type ramp.
    */
   device?: "browser" | "phone"
-  /**
-   * Register accent for the LEADER bar only (founder, 2026-08-05): the
-   * register pages wear standard purple/white branding, and the accent
-   * survives as small marks — a bar, a rule, a dot — the way the home
-   * router cards do it. Omitted = brand purple.
-   */
-  accentBarClassName?: string
-  /**
-   * Tint the card's CONTENT with a register accent — e.g. "memorial".
-   *
-   * Swaps two custom properties on the content block, so everything that
-   * already reads them follows: the leader bar and the other bars, the
-   * date line, the topic eyebrow, the reveal's rule, the charity total.
-   * A register page's demo should look like that register, not like the
-   * brand (founder, 2026-08-26).
-   *
-   * Scoped BELOW the HeaderBar deliberately. The logo is text-primary, so
-   * tinting the whole card would recolour favpoll's own mark — the one
-   * thing on this card that must stay brand.
-   *
-   * --<accent> is the ink step and --<accent>-on-band the light one; they
-   * map onto --primary and --chart-3, which is the pair the ranking bars
-   * and the accent text already use.
-   */
-  accentVar?: string
 }
 
 // Types `text` out character by character while `active`; shows full text
@@ -155,8 +131,6 @@ export function DemoCard({
   barWidths,
   prefersReducedMotion,
   className,
-  accentBarClassName,
-  accentVar,
   device = "browser",
 }: Props) {
   const favourites = scene.poll.topic.favourites
@@ -334,9 +308,7 @@ export function DemoCard({
             label={result.label}
             amount={result.amount}
             widthPercent={barWidths[i] ?? 0}
-            barClassName={
-              i === 0 ? (accentBarClassName ?? "bg-primary") : "bg-chart-3"
-            }
+            barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
             barStyle={{
               transition:
                 animate && !prefersReducedMotion
@@ -378,6 +350,10 @@ export function DemoCard({
 
   return (
     <div
+      // The card wears its scene's palette, header and logo included — the
+      // register IS the palette (2026-08-30), so a memorial card is purple on
+      // a blue home page and a celebration card is magenta beside it.
+      data-register={paletteForSceneKind(scene.kind)}
       className={cn(
         "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-background p-5",
         className
@@ -412,17 +388,7 @@ export function DemoCard({
 
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
-      <div
-        className="flex-1 space-y-4 overflow-hidden"
-        style={
-          accentVar
-            ? ({
-                "--primary": `var(--${accentVar})`,
-                "--chart-3": `var(--${accentVar}-on-band)`,
-              } as React.CSSProperties)
-            : undefined
-        }
-      >
+      <div className="flex-1 space-y-4 overflow-hidden">
         {/* Hero */}
         <div className="relative">
           {/* pr-28, not pr-24 (2026-08-26). The avatar is 132px at md: and
@@ -587,17 +553,7 @@ export function DemoCard({
       {/* Same tint as the content block above — the charity total is
           `text-primary` and would otherwise be the one line on a tinted
           card still wearing the brand. */}
-      <div
-        className="shrink-0 border-t border-border pt-3"
-        style={
-          accentVar
-            ? ({
-                "--primary": `var(--${accentVar})`,
-                "--chart-3": `var(--${accentVar}-on-band)`,
-              } as React.CSSProperties)
-            : undefined
-        }
-      >
+      <div className="shrink-0 border-t border-border pt-3">
         {charityRow}
         {goal ? (
           <GoalProgress

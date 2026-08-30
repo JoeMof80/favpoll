@@ -1,3 +1,5 @@
+import { RegisterScope } from "@/components/register-scope"
+import { paletteForRegister } from "@/lib/register-palette"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -176,33 +178,37 @@ export default async function LiveDisplayPage({ params }: Props) {
     : (favpoll.protagonists?.name ?? "")
 
   return (
-    <DisplayScreen
-      protagonistName={displayName}
-      dateLabel={isCause ? null : (favpoll.protagonists?.context ?? null)}
-      openingLine={favpoll.opening_line ?? null}
-      occasionType={favpoll.occasion_type ?? null}
-      charityName={charityName}
-      goalAmount={favpoll.goal_amount ?? null}
-      poll={displayPoll}
-      initialTotalRaised={initialTotalRaised}
-      favpollUrl={`${baseUrl}/favpolls/${id}`}
-      // QR target is the short form; favpollUrl stays long because the chrome
-      // navigates to it. See app/p/[code]/page.tsx.
-      qrUrl={`${baseUrl}/p/${favpoll.short_code}`}
-      initialWallEntries={initialWallEntries}
-      charities={charityRows}
-      closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
-      isClosed={!!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()}
-      defaultVariant={defaultVariant}
-      favpollId={id}
-      avatar={
-        isCause
-          ? null
-          : {
-              name: displayName,
-              photoUrl: favpoll.protagonists?.photo_url ?? null,
-            }
-      }
-    />
+    <RegisterScope palette={paletteForRegister(register)}>
+      <DisplayScreen
+        protagonistName={displayName}
+        dateLabel={isCause ? null : (favpoll.protagonists?.context ?? null)}
+        openingLine={favpoll.opening_line ?? null}
+        occasionType={favpoll.occasion_type ?? null}
+        charityName={charityName}
+        goalAmount={favpoll.goal_amount ?? null}
+        poll={displayPoll}
+        initialTotalRaised={initialTotalRaised}
+        favpollUrl={`${baseUrl}/favpolls/${id}`}
+        // QR target is the short form; favpollUrl stays long because the chrome
+        // navigates to it. See app/p/[code]/page.tsx.
+        qrUrl={`${baseUrl}/p/${favpoll.short_code}`}
+        initialWallEntries={initialWallEntries}
+        charities={charityRows}
+        closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
+        isClosed={
+          !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
+        }
+        defaultVariant={defaultVariant}
+        favpollId={id}
+        avatar={
+          isCause
+            ? null
+            : {
+                name: displayName,
+                photoUrl: favpoll.protagonists?.photo_url ?? null,
+              }
+        }
+      />
+    </RegisterScope>
   )
 }

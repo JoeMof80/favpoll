@@ -1,5 +1,6 @@
 "use client"
 
+import { paletteForSceneKind } from "@/lib/register-palette"
 import { useEffect, useState } from "react"
 import { Lock } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
@@ -40,13 +41,6 @@ const DECOY =
 
 // Derived, never typed — the callout names the same person and the same
 // topic the card behind it does, because it reads them off the same scene.
-/** The register accent each scene's card wears — see DemoCard's accentVar. */
-const ACCENT_BY_KIND: Record<string, string> = {
-  memorial: "memorial",
-  celebration: "warning",
-  fundraiser: "success",
-  cause: "success",
-}
 
 const FIRST_NAME = protagonistShortName(MEMORIAL_SCENE.protagonist?.name ?? "")
 const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
@@ -153,16 +147,11 @@ export function RevealVignettePhone({
   // vignette was built for it, and /features expects it.
   const reveal = scene.poll.personal_reveal ?? ""
   const firstName = protagonistShortName(scene.protagonist?.name ?? "")
-  const accentVar = ACCENT_BY_KIND[scene.kind] ?? "memorial"
-  // THE PANEL TAKES THE SAME ACCENT AS THE CARD. DemoCard swaps --primary
-  // and --chart-3 on its own content block, and the panel is a SIBLING of the
-  // phone rather than a child of the card — so it inherited neither, and a
-  // magnifier over an amber ribbon was rendering it in brand purple. A
-  // magnification that changes the colour of what it magnifies is not one.
-  const accentStyle = {
-    "--primary": `var(--${accentVar})`,
-    "--chart-3": `var(--${accentVar}-on-band)`,
-  } as React.CSSProperties
+  // THE PANEL TAKES THE SAME PALETTE AS THE CARD: the artefact box wears the
+  // scene's register, so the phone and the magnifier beside it — a sibling,
+  // not a child — recolour together. A magnification that changes the colour
+  // of what it magnifies is not one.
+  const palette = paletteForSceneKind(scene.kind)
   return (
     <Vignette className="flex justify-center">
       {/* Fixed box per breakpoint, scale inside — the pack and keepsake
@@ -171,6 +160,7 @@ export function RevealVignettePhone({
           handset further away. */}
       <div
         data-artefact-box
+        data-register={palette}
         className="h-[243px] w-[185px] sm:h-[365px] sm:w-[278px] lg:h-[434px] lg:w-[330px]"
       >
         <div
@@ -188,7 +178,6 @@ export function RevealVignettePhone({
                 barWidths={scene.results.map((r) => r.widthPercent)}
                 prefersReducedMotion
                 device="phone"
-                accentVar={accentVar}
                 className="rounded-none border-0"
               />
             </PhoneFrame>
@@ -198,7 +187,6 @@ export function RevealVignettePhone({
             data-magnifier
             className="absolute rounded-xl border border-border bg-background p-4 shadow-2xl"
             style={{
-              ...accentStyle,
               left: CALLOUT.left,
               top: REVEAL_CENTRE_Y,
               width: CALLOUT.width,

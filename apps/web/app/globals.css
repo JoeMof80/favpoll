@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* The colour system — four generated palettes, one recipe (see that file's
+   header and scripts/generate-register-tokens.mjs). Directly after the
+   tailwindcss import on purpose: a relative @import placed after @source is
+   dropped by the CSS pipeline (measured 2026-08-30). */
+@import "./register-tokens.css";
 
 /* Workspace packages are symlinked through node_modules, which Tailwind's
    auto-detection skips — without this, shared components (e.g. the theme
@@ -43,34 +48,16 @@
      roughly double and shows a seam. color-mix keeps it exactly in step with
      both --primary and --background, so it tracks the theme flip for free. */
   --color-band-tint: var(--band-tint);
-  /* Register accents (founder, 2026-08-03): purple stays the brand AND
-     the neutral default; each register gets its own accent — memorial =
-     forget-me-not blue (below), celebration = warning gold, fundraiser =
-     success green. */
-  --color-memorial: var(--memorial);
-  --color-memorial-foreground: var(--memorial-foreground);
-  --color-memorial-muted: var(--memorial-muted);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-muted: var(--warning-muted);
-  /* On-band register accents (2026-08-05). The brand band INVERTS between
-     themes (dark purple with white ink in light; near-white with purple ink
-     in dark) but the base accents do not, so each one dies in one theme:
-     measured on the hero's glass cards, memorial scored 1.04:1 in light and
-     gold 1.31:1 in dark. These variants flip WITH the band and clear the
-     3:1 non-text floor in both (3.8–5.6). Use them for any accent mark that
-     sits on the brand band; the base tokens stay correct on page surfaces. */
   /* Deep variants for accent MARKS on light surfaces (bars, rules, dots) —
      the same job --destructive-strong already does for error text on a soft
      surface. Gold and green are pitched light for band/surface use, so on a
-     pale track they measure 1.94:1 and 3.04:1; these clear 4.5. Memorial
-     needs none — its base sits at 0.5 and already measures 5.28. */
+     pale track they measure 1.94:1 and 3.04:1; these clear 4.5. */
   --color-warning-strong: var(--warning-strong);
   --color-success-strong: var(--success-strong);
-  --color-memorial-on-band: var(--memorial-on-band);
-  --color-warning-on-band: var(--warning-on-band);
-  --color-success-on-band: var(--success-on-band);
   --color-destructive: var(--destructive);
   --color-destructive-muted: var(--destructive-muted);
   --color-destructive-strong: var(--destructive-strong);
@@ -97,28 +84,23 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Status and shape tokens only. Everything else — primary, surfaces, ink,
+   borders, charts, the band tint, the QR ink — is set per palette in
+   app/register-tokens.css (generated), whose :root / .dark blocks come
+   BEFORE these, so nothing here may have a dark-mode counterpart. The
+   register-palette decision (2026-08-30): a blue default, purple / magenta
+   / green for memorial / celebration / fundraiser, and no accent colours —
+   the register IS the palette. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.2 0.02 280);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 280);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 280);
-  /* Primary: #534AB7 */
-  --primary: oklch(0.44 0.18 278);
-  --primary-foreground: oklch(0.99 0 0);
-  /* Secondary/muted: #EEEDFE */
-  --secondary: oklch(0.96 0.03 278);
-  --secondary-foreground: oklch(0.44 0.18 278);
-  --muted: oklch(0.96 0.03 278);
-  --muted-foreground: oklch(0.52 0.06 278);
-  --accent: oklch(0.92 0.05 278);
-  --accent-foreground: oklch(0.44 0.18 278);
   --destructive: oklch(0.577 0.245 27.325);
   /* Soft error surface: #FEF2F2 */
   --destructive-muted: oklch(0.97 0.01 17);
   /* Error text on soft surface: #991B1B */
   --destructive-strong: oklch(0.44 0.16 27);
+  /* STATUS colours, never brand: success = shared fund healthy, pledge
+     confirmations; warning = closing soon, fund near limit. A fundraiser
+     page's brand is a green one hue-step from --success, so "goal reached"
+     has to be a state said in words there, not a green fill. */
   /* Success/shared fund: #1D9E75 */
   --success: oklch(0.62 0.12 165);
   --success-foreground: oklch(0.99 0 0);
@@ -129,85 +111,13 @@
   /* Deep gold/green for marks on light surfaces — see @theme note. */
   --warning-strong: oklch(0.54 0.14 71);
   --success-strong: oklch(0.52 0.12 165);
-  --border: oklch(0.91 0.02 278);
-  /* Strong purple border: #AFA9EC */
-  --border-strong: oklch(0.75 0.1 278);
-  --input: oklch(0.91 0.02 278);
-  /* Mid: #7F77DD */
-  --primary-muted: oklch(0.62 0.14 278);
-  /* Reveal/quote ink: #26215C */
-  --reveal-foreground: oklch(0.29 0.1 278);
-  /* Display-screen QR ink (founder, 2026-08-03): brand-tinted so the big
-     gutter codes stop shouting next to the rankings, bounded by scan
-     contrast — deep purple on light, soft lavender on dark (dark modules
-     on a dark field would be invisible to a camera, so dark mode tones
-     DOWN from white rather than mirroring the light theme). */
-  --qr: oklch(0.29 0.1 278);
-  /* The tinted band's colour as an OPAQUE value, for the sticky headers that
-     have to paint over it. MUST equal what `bg-primary/5` composites to over
-     --background; if either of those changes, re-measure.
-
-     Two bugs are buried here, both fixed 2026-08-06.
-     1. It was authored as color-mix(in oklab, var(--primary) 5%,
-        var(--background)) in #536, and the build dropped the declaration —
-        color-mix() with var() inside cannot be resolved statically, so
-        neither this property nor the bg-band-tint utility ever reached the
-        browser. Every neighbouring token survived; this one alone used
-        color-mix. The process overview's pinned header was transparent for
-        its whole life, with the step text scrolling straight through it.
-     2. An oklab mix is the wrong maths anyway: a /5 opacity composites in
-        sRGB, so the oklab value was 1-3 sRGB units off and read as a faint
-        rectangle over the band.
-
-     Kept in sRGB deliberately, against the oklch convention above: this is a
-     MEASURED composite (canvas, both themes), and converting it to oklch
-     reintroduces exactly the rounding error being fixed. */
-  --band-tint: rgb(245, 245, 251);
-  /* Memorial register accent: forget-me-not blue — remembrance
-     symbolism, calm, and clear of purple (278), gold (71), green (165)
-     and the destructive reds. */
-  --memorial: oklch(0.5 0.1 250);
-  --memorial-foreground: oklch(0.99 0 0);
-  --memorial-muted: oklch(0.96 0.02 250);
-  /* Light theme: the band is deep purple, so on-band accents go light.
-     Lightness keeps the register-energy order (gold > green > blue). */
-  --memorial-on-band: oklch(0.84 0.08 250);
-  --warning-on-band: oklch(0.9 0.11 85);
-  --success-on-band: oklch(0.85 0.11 165);
-  --ring: oklch(0.62 0.14 278);
-  --chart-1: oklch(0.44 0.18 278);
-  --chart-2: oklch(0.62 0.14 278);
-  --chart-3: oklch(0.75 0.1 278);
-  --chart-4: oklch(0.85 0.06 278);
-  --chart-5: oklch(0.96 0.03 278);
   --radius: 0.5rem;
-  --sidebar: oklch(0.98 0.01 278);
-  --sidebar-foreground: oklch(0.2 0.02 280);
-  --sidebar-primary: oklch(0.44 0.18 278);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.96 0.03 278);
-  --sidebar-accent-foreground: oklch(0.44 0.18 278);
-  --sidebar-border: oklch(0.91 0.02 278);
-  --sidebar-ring: oklch(0.62 0.14 278);
 }
 
 .dark {
-  /* Brand purple (#534AB7) as background, surfaces step lighter */
-  --background: oklch(0.44 0.18 278);
-  --foreground: oklch(0.97 0.01 278);
-  --card: oklch(0.5 0.17 278);
-  --card-foreground: oklch(0.97 0.01 278);
-  --popover: oklch(0.5 0.17 278);
-  --popover-foreground: oklch(0.97 0.01 278);
-  /* Primary: near-white so logo reads clearly on brand purple */
-  --primary: oklch(0.97 0.01 278);
-  --primary-foreground: oklch(0.44 0.18 278);
-  --secondary: oklch(0.52 0.15 278);
-  --secondary-foreground: oklch(0.97 0.01 278);
-  --muted: oklch(0.38 0.18 278);
-  --muted-foreground: oklch(0.82 0.07 278);
-  --accent: oklch(0.55 0.14 278);
-  --accent-foreground: oklch(0.97 0.01 278);
+  /* Hue-free tokens only — the palette's dark set (the brand colour as the
+     page, surfaces stepping lighter, --primary near-white so the logo
+     reads) is in app/register-tokens.css. */
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-muted: oklch(0.3 0.08 25);
   --destructive-strong: oklch(0.85 0.1 25);
@@ -221,37 +131,7 @@
   --border: oklch(1 0 0 / 18%);
   --border-strong: oklch(1 0 0 / 32%);
   --input: oklch(1 0 0 / 15%);
-  --primary-muted: oklch(0.82 0.08 278);
-  --reveal-foreground: oklch(0.95 0.03 278);
-  /* 0.85 L failed a decoder test against the brand-purple field (0.44 L)
-     — 0.92 is the toned floor that still machine-reads. */
-  --qr: oklch(0.92 0.05 278);
-  /* 5% --primary (near-white) over --background (brand purple), measured.
-     There was no dark value at all before, so even once the token resolved
-     it would have painted the LIGHT tint over a purple band. */
-  --band-tint: rgb(74, 68, 181);
-  --memorial: oklch(0.58 0.09 250);
-  --memorial-foreground: oklch(0.99 0 0);
-  --memorial-muted: oklch(0.35 0.05 250);
-  /* Dark theme: the band is near-white, so on-band accents go dark —
-     same register-energy order, mirrored. */
-  --memorial-on-band: oklch(0.45 0.11 250);
-  --warning-on-band: oklch(0.55 0.13 71);
-  --success-on-band: oklch(0.5 0.12 165);
-  --ring: oklch(0.82 0.08 278);
-  --chart-1: oklch(0.92 0.05 278);
-  --chart-2: oklch(0.78 0.1 278);
-  --chart-3: oklch(0.64 0.14 278);
-  --chart-4: oklch(0.52 0.15 278);
-  --chart-5: oklch(0.38 0.18 278);
-  --sidebar: oklch(0.5 0.17 278);
-  --sidebar-foreground: oklch(0.97 0.01 278);
-  --sidebar-primary: oklch(0.97 0.01 278);
-  --sidebar-primary-foreground: oklch(0.44 0.18 278);
-  --sidebar-accent: oklch(0.52 0.15 278);
-  --sidebar-accent-foreground: oklch(0.97 0.01 278);
   --sidebar-border: oklch(1 0 0 / 18%);
-  --sidebar-ring: oklch(0.82 0.08 278);
 }
 
 @layer base {

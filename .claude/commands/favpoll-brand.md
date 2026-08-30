@@ -425,22 +425,23 @@ These are the canonical values from the favpoll style guide. Use them whenever b
 
 ### Colours
 
-In code, **never hardcode these hexes** — use the design tokens defined in `globals.css` (CI blocks bracketed hexes via `pnpm lint:colors`). The hexes below are the brand reference values behind the tokens.
+**Since 2026-08-30 favpoll carries a flexible identity** — one mark, wordmark, type and voice, and **four palettes** (Premier-League style). In code, **never hardcode hexes** — the palettes are generated from one recipe by `apps/web/scripts/generate-register-tokens.mjs` (`pnpm tokens`) and applied per page with `RegisterScope`; the hexes below are reference values for the primaries.
 
 ```
-Purple primary:   #534AB7   — token: --primary          — buttons, logo, links, brand moments
-Purple mid:       #7F77DD   — token: --primary-muted    — section labels, reveal border (--chart-2 for record bars)
-Purple light:     #EEEDFE   — token: --secondary/--muted — backgrounds, reveals, selected states
-Purple border:    #AFA9EC   — token: --border-strong    — borders on purple-tinted surfaces
-Purple dark:      #3C3489   — retired; use --secondary-foreground on purple surfaces
-Purple 900:       #26215C   — token: --reveal-foreground — reveal/quote ink
+Default — blue:        oklch(0.46 0.15 252) ≈ #2B62B8  — home, the shelf, the record, about, neutral favpolls
+Memorial — purple:     oklch(0.44 0.18 278) = #534AB7  — the original brand hue; remembering
+Celebration — magenta: oklch(0.50 0.17 345) ≈ #B03A76  — celebrating (birthdays, weddings, retirements)
+Fundraiser — green:    oklch(0.50 0.13 160) ≈ #1F7F58  — fundraisers and causes
 
+Each palette sets the full ramp (primary, primary-muted, secondary/muted,
+accent, borders, reveal ink, QR ink, charts, band tint) in light and dark;
+the logo recolours with the page. There is NO gold: one --primary is both a
+button fill and text on white, and a gold that can do both is bronze. The
+register accent system (forget-me-not dot, on-band gold/green) is retired.
+
+Status colours — never brand:
 Green:            #1D9E75   — token: --success          — shared fund, positive states
-
-Warm greys (#F1EFE8, #D3D1C7, #888780, #5F5E5A, #2C2C2A) are retired —
-use --background, --border, --muted-foreground, --foreground instead.
-
-Amber:            #EF9F27   — token: --warning          — warnings, progress near limit
+Amber:            #EF9F27   — token: --warning          — warnings, closing soon, fund near limit
 Red:                         token: --destructive       — errors, validation failures
 ```
 
