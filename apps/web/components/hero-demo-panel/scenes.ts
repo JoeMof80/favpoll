@@ -617,7 +617,7 @@ export const SCENES: HeroScene[] = [
       // which treat he gets. A cause cannot bet on its own poll (the Marcus
       // lesson); this gives something back without doing so.
       personal_reveal:
-        "Our favourite is Biscuit the hospice therapy dog, named after his favourite treat. He’s a good boy who can expect some treats after the walk.",
+        "Our favourite is Biscuit, our therapy dog. Named after his favourite treat, he’s a good boy who can expect some after the walk.",
       topic: {
         // BISCUIT (founder, 2026-08-31), and the dog is named after it. A real
         // catalogue topic carrying all 31 of its seeded favourites, as Dog
