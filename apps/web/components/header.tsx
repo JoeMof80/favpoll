@@ -10,21 +10,26 @@ import { Button } from "@/components/ui/button"
 import { MenuButton } from "@favpoll/ui"
 import { HeaderBar } from "@/components/header-bar"
 
-// PROTOTYPE (2026-08-26): the register pages share home's hero component,
-// panel width, alignment and texture, so clicking a router card can read as
-// "nothing happened". Names match the footer's.
-const SECTION_NAMES: Record<string, string> = {
-  "/memorials": "For memorials",
-  "/celebrations": "For celebrations",
-  "/fundraisers": "For fundraisers",
-}
+// The three kinds of favpoll, in the header (founder, 2026-08-31: "it seems
+// obvious"). Until now the register pages were reachable from exactly one
+// place — the home router cards — so a hospice or a celebrant landing
+// anywhere else had no route to "For memorials". Desktop shows the three as
+// links beside the mark; the active one is text-primary, which since #585 is
+// the page's own colour, so the header says where you are by BEING that
+// colour. Mobile keeps the section name beside the mark (the 2026-08-26
+// marker) and carries the three links at the top of the menu.
+const REGISTER_LINKS = [
+  { href: "/memorials", label: "Memorials", section: "For memorials" },
+  { href: "/celebrations", label: "Celebrations", section: "For celebrations" },
+  { href: "/fundraisers", label: "Fundraisers", section: "For fundraisers" },
+] as const
 
 const MOBILE_LINK =
   "block w-full rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 
 export function Header() {
   const pathname = usePathname()
-  const section = SECTION_NAMES[pathname ?? ""]
+  const section = REGISTER_LINKS.find((r) => r.href === pathname)?.section
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
   const clerk = useClerk()
@@ -48,6 +53,22 @@ export function Header() {
   return (
     <HeaderBar
       section={section}
+      nav={REGISTER_LINKS.map((r) => {
+        const active = pathname === r.href
+        return (
+          <Button
+            key={r.href}
+            asChild
+            variant="ghost"
+            size="sm"
+            className={active ? "text-primary" : "text-muted-foreground"}
+          >
+            <Link href={r.href} aria-current={active ? "page" : undefined}>
+              {r.label}
+            </Link>
+          </Button>
+        )
+      })}
       overlay={
         /* Mobile menu — a dropdown below the header (logo + hamburger stay
            in view). A scrim blurs and freezes the page behind it; the header
@@ -63,6 +84,25 @@ export function Header() {
             />
             <div className="absolute inset-x-0 top-full z-40 border-b border-border bg-background px-4 pt-2 pb-4 shadow-lg md:hidden">
               <nav className="space-y-0.5">
+                {REGISTER_LINKS.map((r) => {
+                  const active = pathname === r.href
+                  return (
+                    <Link
+                      key={r.href}
+                      href={r.href}
+                      className={
+                        active
+                          ? `${MOBILE_LINK} font-medium text-primary`
+                          : MOBILE_LINK
+                      }
+                      aria-current={active ? "page" : undefined}
+                      onClick={close}
+                    >
+                      {r.label}
+                    </Link>
+                  )
+                })}
+                <div className="my-1 border-t border-border" />
                 <Link href="/favpolls" className={MOBILE_LINK} onClick={close}>
                   All favpolls
                 </Link>
