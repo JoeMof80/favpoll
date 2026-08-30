@@ -26,7 +26,10 @@ import {
   REGISTER_LINK_HOVER,
   REGISTER_LINK_INK,
 } from "@/components/register-link"
-import type { RegisterPalette } from "@/lib/register-palette"
+import {
+  paletteForSceneKind,
+  type RegisterPalette,
+} from "@/lib/register-palette"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -290,17 +293,22 @@ function BeatMedium({
       // The paper mount, the load-bearing shrink-0 and the explicit A4 box
       // now live in KeepsakeSheet, shared with the /memorials Ideas section
       // (2026-08-27). The reasoning for each is recorded there.
-      <KeepsakeSheet
-        data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
-        variant="tribute"
-        orientation="portrait"
-        className={cn(!bare && KEEPSAKE_SCALE)}
-      />
+      <div data-register={paletteForSceneKind(SCENE.kind)} className="contents">
+        <KeepsakeSheet
+          data={DEMO_KEEPSAKE_WALKTHROUGH_DATA}
+          variant="tribute"
+          orientation="portrait"
+          className={cn(!bare && KEEPSAKE_SCALE)}
+        />
+      </div>
     )
   }
   if (medium.kind === "display") {
     return (
-      <div className={cn("shrink-0", !bare && DISPLAY_SCALE)}>
+      <div
+        data-register={paletteForSceneKind(SCENE.kind)}
+        className={cn("shrink-0", !bare && DISPLAY_SCALE)}
+      >
         <TvFrame>
           {/* No crop: the still shows its leaders and ends where they do — a
               fixed height cut the last bar in half and read as a broken
