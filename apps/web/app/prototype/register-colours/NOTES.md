@@ -25,6 +25,7 @@ the two that today's purple fails too (eyebrow `primary-muted` on white 3.5–3.
 `border-strong` on white 2.2) — baseline, inherited by the recipe.
 
 **First observations (Claude, 2026-08-30 — before the founder has looked):**
+
 - The logo recolours for free (currentColor), and five distinct identities
   come out of four numbers each; the recipe holds.
 - Amber can only be a primary at L 0.53, which reads as bronze rather than

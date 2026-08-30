@@ -38,7 +38,25 @@ export const PALETTES = {
     c: 0.15,
     pL: 0.53,
     dL: 0.42,
-    label: "Celebration — amber / gold",
+    label: "Celebration A — amber (founder: too brown / rusty)",
+  },
+  // Founder round 1 (2026-08-30): A read as bronze. B and C push the hue
+  // toward yellow, drop chroma, and sit at the highest lightness that still
+  // holds white button text; the dark page goes deeper and greyer so it
+  // reads as evening rather than rust.
+  "gold-b": {
+    h: 82,
+    c: 0.13,
+    pL: 0.55,
+    dL: 0.36,
+    label: "Celebration B — ochre gold",
+  },
+  "gold-c": {
+    h: 90,
+    c: 0.12,
+    pL: 0.56,
+    dL: 0.34,
+    label: "Celebration C — old gold",
   },
   fundraiser: {
     h: 160,

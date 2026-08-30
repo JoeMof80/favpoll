@@ -74,7 +74,7 @@
   --band-tint: rgb(75, 70, 182);
 }
 
-/* Celebration — amber / gold — h 74, c 0.15, primary L 0.53, dark bg L 0.42 */
+/* Celebration A — amber (founder: too brown / rusty) — h 74, c 0.15, primary L 0.53, dark bg L 0.42 */
 :root[data-register="celebration"]:not(.dark) {
   --foreground: oklch(0.2 0.017 74);
   --card-foreground: oklch(0.2 0.017 74);
@@ -139,6 +139,140 @@
   --sidebar-accent-foreground: oklch(0.97 0.008 74);
   --sidebar-ring: oklch(0.82 0.067 74);
   --band-tint: rgb(129, 67, 12);
+}
+
+/* Celebration B — ochre gold — h 82, c 0.13, primary L 0.55, dark bg L 0.36 */
+:root[data-register="gold-b"]:not(.dark) {
+  --foreground: oklch(0.2 0.014 82);
+  --card-foreground: oklch(0.2 0.014 82);
+  --popover-foreground: oklch(0.2 0.014 82);
+  --primary: oklch(0.55 0.13 82);
+  --secondary: oklch(0.96 0.022 82);
+  --secondary-foreground: oklch(0.55 0.13 82);
+  --muted: oklch(0.96 0.022 82);
+  --muted-foreground: oklch(0.52 0.043 82);
+  --accent: oklch(0.92 0.036 82);
+  --accent-foreground: oklch(0.55 0.13 82);
+  --border: oklch(0.91 0.014 82);
+  --border-strong: oklch(0.75 0.072 82);
+  --input: oklch(0.91 0.014 82);
+  --primary-muted: oklch(0.62 0.101 82);
+  --reveal-foreground: oklch(0.29 0.072 82);
+  --qr: oklch(0.29 0.072 82);
+  --ring: oklch(0.62 0.101 82);
+  --chart-1: oklch(0.55 0.13 82);
+  --chart-2: oklch(0.62 0.101 82);
+  --chart-3: oklch(0.75 0.072 82);
+  --chart-4: oklch(0.85 0.043 82);
+  --chart-5: oklch(0.96 0.022 82);
+  --sidebar: oklch(0.98 0.007 82);
+  --sidebar-foreground: oklch(0.2 0.014 82);
+  --sidebar-primary: oklch(0.55 0.13 82);
+  --sidebar-accent: oklch(0.96 0.022 82);
+  --sidebar-accent-foreground: oklch(0.55 0.13 82);
+  --sidebar-border: oklch(0.91 0.014 82);
+  --sidebar-ring: oklch(0.62 0.101 82);
+  --band-tint: rgb(250, 247, 242);
+}
+:root.dark[data-register="gold-b"] {
+  --background: oklch(0.36 0.13 82);
+  --foreground: oklch(0.97 0.007 82);
+  --card: oklch(0.42 0.123 82);
+  --card-foreground: oklch(0.97 0.007 82);
+  --popover: oklch(0.42 0.123 82);
+  --popover-foreground: oklch(0.97 0.007 82);
+  --primary: oklch(0.97 0.007 82);
+  --primary-foreground: oklch(0.36 0.13 82);
+  --secondary: oklch(0.44 0.108 82);
+  --secondary-foreground: oklch(0.97 0.007 82);
+  --muted: oklch(0.3 0.13 82);
+  --muted-foreground: oklch(0.82 0.051 82);
+  --accent: oklch(0.47 0.101 82);
+  --accent-foreground: oklch(0.97 0.007 82);
+  --primary-muted: oklch(0.82 0.058 82);
+  --reveal-foreground: oklch(0.95 0.022 82);
+  --qr: oklch(0.92 0.036 82);
+  --ring: oklch(0.82 0.058 82);
+  --chart-1: oklch(0.92 0.036 82);
+  --chart-2: oklch(0.78 0.072 82);
+  --chart-3: oklch(0.64 0.101 82);
+  --chart-4: oklch(0.44 0.108 82);
+  --chart-5: oklch(0.3 0.13 82);
+  --sidebar: oklch(0.42 0.123 82);
+  --sidebar-foreground: oklch(0.97 0.007 82);
+  --sidebar-primary: oklch(0.97 0.007 82);
+  --sidebar-primary-foreground: oklch(0.36 0.13 82);
+  --sidebar-accent: oklch(0.44 0.108 82);
+  --sidebar-accent-foreground: oklch(0.97 0.007 82);
+  --sidebar-ring: oklch(0.82 0.058 82);
+  --band-tint: rgb(101, 59, 12);
+}
+
+/* Celebration C — old gold — h 90, c 0.12, primary L 0.56, dark bg L 0.34 */
+:root[data-register="gold-c"]:not(.dark) {
+  --foreground: oklch(0.2 0.013 90);
+  --card-foreground: oklch(0.2 0.013 90);
+  --popover-foreground: oklch(0.2 0.013 90);
+  --primary: oklch(0.56 0.12 90);
+  --secondary: oklch(0.96 0.02 90);
+  --secondary-foreground: oklch(0.56 0.12 90);
+  --muted: oklch(0.96 0.02 90);
+  --muted-foreground: oklch(0.52 0.04 90);
+  --accent: oklch(0.92 0.033 90);
+  --accent-foreground: oklch(0.56 0.12 90);
+  --border: oklch(0.91 0.013 90);
+  --border-strong: oklch(0.75 0.067 90);
+  --input: oklch(0.91 0.013 90);
+  --primary-muted: oklch(0.62 0.093 90);
+  --reveal-foreground: oklch(0.29 0.067 90);
+  --qr: oklch(0.29 0.067 90);
+  --ring: oklch(0.62 0.093 90);
+  --chart-1: oklch(0.56 0.12 90);
+  --chart-2: oklch(0.62 0.093 90);
+  --chart-3: oklch(0.75 0.067 90);
+  --chart-4: oklch(0.85 0.04 90);
+  --chart-5: oklch(0.96 0.02 90);
+  --sidebar: oklch(0.98 0.007 90);
+  --sidebar-foreground: oklch(0.2 0.013 90);
+  --sidebar-primary: oklch(0.56 0.12 90);
+  --sidebar-accent: oklch(0.96 0.02 90);
+  --sidebar-accent-foreground: oklch(0.56 0.12 90);
+  --sidebar-border: oklch(0.91 0.013 90);
+  --sidebar-ring: oklch(0.62 0.093 90);
+  --band-tint: rgb(249, 248, 242);
+}
+:root.dark[data-register="gold-c"] {
+  --background: oklch(0.34 0.12 90);
+  --foreground: oklch(0.97 0.007 90);
+  --card: oklch(0.4 0.113 90);
+  --card-foreground: oklch(0.97 0.007 90);
+  --popover: oklch(0.4 0.113 90);
+  --popover-foreground: oklch(0.97 0.007 90);
+  --primary: oklch(0.97 0.007 90);
+  --primary-foreground: oklch(0.34 0.12 90);
+  --secondary: oklch(0.42 0.1 90);
+  --secondary-foreground: oklch(0.97 0.007 90);
+  --muted: oklch(0.28 0.12 90);
+  --muted-foreground: oklch(0.82 0.047 90);
+  --accent: oklch(0.45 0.093 90);
+  --accent-foreground: oklch(0.97 0.007 90);
+  --primary-muted: oklch(0.82 0.053 90);
+  --reveal-foreground: oklch(0.95 0.02 90);
+  --qr: oklch(0.92 0.033 90);
+  --ring: oklch(0.82 0.053 90);
+  --chart-1: oklch(0.92 0.033 90);
+  --chart-2: oklch(0.78 0.067 90);
+  --chart-3: oklch(0.64 0.093 90);
+  --chart-4: oklch(0.42 0.1 90);
+  --chart-5: oklch(0.28 0.12 90);
+  --sidebar: oklch(0.4 0.113 90);
+  --sidebar-foreground: oklch(0.97 0.007 90);
+  --sidebar-primary: oklch(0.97 0.007 90);
+  --sidebar-primary-foreground: oklch(0.34 0.12 90);
+  --sidebar-accent: oklch(0.42 0.1 90);
+  --sidebar-accent-foreground: oklch(0.97 0.007 90);
+  --sidebar-ring: oklch(0.82 0.053 90);
+  --band-tint: rgb(88, 59, 12);
 }
 
 /* Fundraiser — green — h 160, c 0.13, primary L 0.5, dark bg L 0.41 */

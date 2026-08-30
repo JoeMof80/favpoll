@@ -18,7 +18,9 @@ import { Button } from "@/components/ui/button"
 export const REGISTER_VARIANTS = [
   { key: "current", label: "Current — purple everywhere" },
   { key: "memorial", label: "Memorial — purple" },
-  { key: "celebration", label: "Celebration — amber / gold" },
+  { key: "celebration", label: "Celebration A — amber" },
+  { key: "gold-b", label: "Celebration B — ochre gold" },
+  { key: "gold-c", label: "Celebration C — old gold" },
   { key: "fundraiser", label: "Fundraiser — green" },
   { key: "blue", label: "Default candidate — blue" },
   { key: "ink", label: "Default candidate — ink" },

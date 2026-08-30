@@ -95,7 +95,7 @@
     "c": 0.15,
     "pL": 0.53,
     "dL": 0.42,
-    "label": "Celebration — amber / gold",
+    "label": "Celebration A — amber (founder: too brown / rusty)",
     "contrast": {
       "light": [
         {
@@ -175,6 +175,188 @@
         {
           "name": "reveal ink on secondary",
           "ratio": 5.28,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "gold-b": {
+    "h": 82,
+    "c": 0.13,
+    "pL": 0.55,
+    "dL": 0.36,
+    "label": "Celebration B — ochre gold",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 4.77,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.11,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.52,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 4.91,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.68,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.61,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.23,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 10.03,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 6.26,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 10.03,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 6.25,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 7.81,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 6.77,
+          "floor": 4.5,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "gold-c": {
+    "h": 90,
+    "c": 0.12,
+    "pL": 0.56,
+    "dL": 0.34,
+    "label": "Celebration C — old gold",
+    "contrast": {
+      "light": [
+        {
+          "name": "button text on primary",
+          "ratio": 4.54,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "body ink on page",
+          "ratio": 18.1,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 5.5,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "brand text / links on page",
+          "ratio": 4.67,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 3.65,
+          "floor": 4.5,
+          "pass": false
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 12.58,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "border-strong on page (non-text)",
+          "ratio": 2.22,
+          "floor": 3,
+          "pass": false
+        }
+      ],
+      "dark": [
+        {
+          "name": "body ink on page (brand bg)",
+          "ratio": 10.76,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "muted text on page",
+          "ratio": 6.73,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "button text on primary (near-white)",
+          "ratio": 10.76,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "eyebrow (primary-muted) on page",
+          "ratio": 6.73,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "ink on card",
+          "ratio": 8.43,
+          "floor": 4.5,
+          "pass": true
+        },
+        {
+          "name": "reveal ink on secondary",
+          "ratio": 7.32,
           "floor": 4.5,
           "pass": true
         }
