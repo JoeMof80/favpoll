@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, useWatch } from "react-hook-form"
+import { RegisterScope } from "@/components/register-scope"
+import { paletteForRegister } from "@/lib/register-palette"
+import { deriveRegister } from "@/lib/registers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
@@ -183,6 +186,20 @@ export function FavpollForm({
   }
 
   const watchedTopics = useWatch({ control: form.control, name: "topics" })
+
+  // THE FORM WEARS THE REGISTER (founder, 2026-08-31: "the theme should
+  // carry through to the event page"). The wizard's colour used to stop at
+  // the handoff — this page came up blue. Derived live from the form's own
+  // values, the way the product derives it, so it follows the wizard's
+  // params on create, the saved favpoll on edit, and the Generate control's
+  // who/kind changes as they are made. The page (create or edit) does not
+  // wrap this; the form owns its colour.
+  const watchedCategory = useWatch({ control: form.control, name: "category" })
+  const watchedGrouping = useWatch({ control: form.control, name: "grouping" })
+  const watchedSubject = useWatch({ control: form.control, name: "subject" })
+  const palette = paletteForRegister(
+    deriveRegister(watchedCategory ?? null, watchedGrouping, watchedSubject)
+  )
   const hasUnsavedDraft =
     mode === "create" &&
     ((watchedTopics[0]?.isCustom ?? false) ||
@@ -220,28 +237,32 @@ export function FavpollForm({
 
   if (seedFavpollId) {
     return (
-      <SeedFundModal
-        favpollId={seedFavpollId}
-        isListed={form.getValues("isListed") ?? true}
-        onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
-      />
+      <RegisterScope palette={palette}>
+        <SeedFundModal
+          favpollId={seedFavpollId}
+          isListed={form.getValues("isListed") ?? true}
+          onComplete={() => router.push(`/favpolls/${seedFavpollId}`)}
+        />
+      </RegisterScope>
     )
   }
 
   return (
-    <Form {...form}>
-      <FormInner
-        form={form}
-        charities={charities}
-        topics={topics}
-        mode={mode}
-        submitting={submitting}
-        error={error}
-        onSubmit={handleSubmit}
-        hasNewTopicDraft={hasNewTopicDraft}
-        closesAt={editClosesAt}
-        onClosesAtChange={handleClosesAtChange}
-      />
-    </Form>
+    <RegisterScope palette={palette}>
+      <Form {...form}>
+        <FormInner
+          form={form}
+          charities={charities}
+          topics={topics}
+          mode={mode}
+          submitting={submitting}
+          error={error}
+          onSubmit={handleSubmit}
+          hasNewTopicDraft={hasNewTopicDraft}
+          closesAt={editClosesAt}
+          onClosesAtChange={handleClosesAtChange}
+        />
+      </Form>
+    </RegisterScope>
   )
 }
