@@ -193,11 +193,11 @@ export function WizardPrototype({ data }: { data: Data }) {
       case "topic":
         return (
           <div className="space-y-3">
-            {(v.topics?.length ?? 0) > 0 ? (
+            {v.topics?.[0] ? (
               <p className="text-sm">
-                <span className="font-medium">{v.topics![0]!.title}</span>{" "}
+                <span className="font-medium">{v.topics[0].title}</span>{" "}
                 <span className="text-muted-foreground">
-                  · {v.topics![0]!.items.length} favourites
+                  · {(v.topics[0].items ?? []).length} favourites
                 </span>
               </p>
             ) : (
@@ -372,12 +372,12 @@ export function WizardPrototype({ data }: { data: Data }) {
   const preview = (
     <div
       aria-hidden="true"
-      className={cn(
-        "pointer-events-none rounded-xl border border-border bg-background p-6 shadow-sm select-none",
-        !showReveal &&
-          '[&_[aria-label="Add reveal"]]:hidden [&_[aria-label="Edit reveal"]]:hidden'
-      )}
+      data-proto-preview=""
+      className="pointer-events-none rounded-xl border border-border bg-background p-6 shadow-sm select-none"
     >
+      {!showReveal && (
+        <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
+      )}
       <p className="mb-4 text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
         The favpoll page — live
       </p>
