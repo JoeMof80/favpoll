@@ -452,10 +452,16 @@ export function WizardPrototype({ data }: { data: Data }) {
           </div>
         )
       case "identity":
-        return <EditableHero />
+        // The hero alone (founder, round 8): no About here — that is the
+        // next step's job — and no page top-padding inside a preview card.
+        return (
+          <div className="[&>div:first-child]:!pt-0 [&>div:nth-child(2)]:hidden">
+            <EditableHero />
+          </div>
+        )
       case "story":
         return (
-          <div>
+          <div className="[&>div:first-child>div:first-child]:!pt-0 [&>div:first-child>div:nth-child(2)]:md:mb-4">
             <EditableHero />
             {topicTitle && (
               <div className="mt-6">
@@ -480,7 +486,7 @@ export function WizardPrototype({ data }: { data: Data }) {
     <div
       aria-hidden="true"
       data-proto-preview=""
-      className="pointer-events-none w-[604px] max-w-full rounded-xl border border-border bg-background p-6 shadow-sm select-none [&>*]:mx-auto [&>*]:w-[556px] [&>*]:max-w-full"
+      className="pointer-events-none w-[596px] max-w-full rounded-xl border border-border bg-background p-5 shadow-sm select-none [&>*]:mx-auto [&>*]:w-[556px] [&>*]:max-w-full"
     >
       {artefact}
     </div>
