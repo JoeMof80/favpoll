@@ -42,6 +42,22 @@ describe("EventStep", () => {
     )
   })
 
+  // Each kind wears its own register (2026-08-31): the icon and label are
+  // purple, magenta, green — the register-ink idiom the header uses.
+  it("scopes each kind to its own register palette", () => {
+    render(<EventStep value={null} onChange={() => {}} />)
+    for (const [name, palette] of [
+      ["Celebration", "celebration"],
+      ["Memorial", "memorial"],
+      ["Fundraiser", "fundraiser"],
+    ]) {
+      expect(screen.getByRole("radio", { name })).toHaveAttribute(
+        "data-register",
+        palette
+      )
+    }
+  })
+
   it("ignores a deselect — the step has no empty answer", () => {
     const onChange = vi.fn()
     render(<EventStep value="memorial" onChange={onChange} />)
