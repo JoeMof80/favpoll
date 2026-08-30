@@ -12,29 +12,20 @@ import { getFavpollHeadline } from "@/lib/display"
 // pages assembling their own PackData from the same scene is how the numbers
 // on a printed card and the numbers on a screen drift apart.
 //
-// THE CELEBRATION SCENE (founder, 2026-08-17). It was the CAUSE one from
-// 2026-08-06, chosen as the most neutral of the four — no protagonist, so the
-// mechanic read as itself rather than as one register's story. Two things
-// broke that: the walkthrough gained a keepsake beat, and its reveal beat now
-// names the personal reveal. A faceless scene can do neither. Its
-// `personal_reveal` field held "Hospice care is free…" — a fact about a
-// charity — so the section taught favpoll's most distinctive mechanic using
-// its least distinctive instance, and a keepsake with nobody to lead on falls
-// back to the quieter of its two tellings.
+// THE CAUSE SCENE AGAIN (founder, 2026-08-31). It was the cause from
+// 2026-08-06 — the most neutral of the four, no protagonist, the mechanic
+// read as itself — and moved to Poppy's Sweet Sixteen on 2026-08-17 because
+// the journey had gained a reveal beat and a keepsake beat, and the cause's
+// reveal was "Hospice care is free…": a fact about a charity, nothing
+// revealed. Two things changed. The celebration page now carries that
+// exemplar itself, so home was showing the same favpoll twice; and the cause
+// now OWNS a real favourite — Biscuit, the hospice's therapy dog, a beagle —
+// which is true on day one, so the reveal beat reveals something. The
+// keepsake beat still falls back to the quieter of its two tellings (nobody
+// to lead on); that is the cost, and it is the honest picture of a cause.
 //
-// Celebration rather than memorial: Poppy's Sweet Sixteen has a protagonist
-// and a true first-person reveal ("Mint choc chip is the best, of course"),
-// without teaching favpoll through a funeral at the top of the funnel — the
-// overclaim the headline history keeps correcting. Belinda and purple still
-// carry the memorial exemplar on the reveal vignette and the features
-// keepsake, so the site shows both.
-//
-// KNOWN COST: St Luke's is a hospice prospect, and the cause scene was picked
-// partly so the example most visitors read would name them. That is now only
-// on the register pages. Reverse this one line if that trade stops being
-// worth it.
-export const DEMO_SCENE =
-  SCENES.find((s) => s.kind === "celebration") ?? SCENES[0]
+// The hospice is fictional for now (St Mark's); see the scene's note.
+export const DEMO_SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
 
 // Derived rather than literal: `heading` and `eyebrow` exist ONLY on the
 // faceless cause scene, so a protagonist scene has to get its prefix the way

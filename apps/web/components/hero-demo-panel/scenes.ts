@@ -70,6 +70,12 @@ export type HeroScene = {
   context?: string
   /** typed "about"-equivalent line for no-protagonist scenes */
   blurb?: string
+  /**
+   * A faceless cause's own photo — favpolls.photo_url on a cause favpoll,
+   * which CauseHero renders in the avatar slot. Null = no avatar, as on the
+   * real page.
+   */
+  photo_url?: string | null
   poll: {
     id: string
     personal_reveal: string
@@ -569,28 +575,44 @@ export const SCENES: HeroScene[] = [
     opening_line: null,
     protagonist: null,
     // Hospice, not YoungMinds (founder, 2026-08-06): hospices are the channel
-    // being approached next, and this scene now carries the whole guest arc in
+    // being approached next, and this scene carries the whole guest arc in
     // ProcessOverview, so it is the example most visitors will read.
     //
-    // NAMED but not BRANDED, deliberately. St Luke's is a prospect, not a
-    // customer: naming them matches how the other scenes name Marie Curie,
-    // Macmillan and Barnardo's, but a logo on the homepage would read as
-    // endorsement before any conversation — and the mark is theirs to grant.
-    // The occasion is a generic team walk rather than one of their real named
-    // appeals, for the same reason. If they say yes, the logo is one field
-    // (logo_url) and the card already renders it.
-    heading: "Walking for St Luke's",
+    // FICTIONAL, FOR NOW (founder, 2026-08-31). It was St Luke's (Cheshire)
+    // Hospice — a real prospect, named but not branded, with their real
+    // charity number. Naming a prospect on the homepage before a conversation
+    // is the wrong opening, so the scene wears a made-up hospice until there
+    // is a real one to name: no number (the card prints it, and a fake one
+    // is worse than none), no logo. When a hospice says yes, this is a name,
+    // a number and a logo_url.
+    //
+    // THE HEADING IS THE CAUSE, the context is the event. "Walking for St
+    // Luke's" rendered as "In support of / Walking for St Luke's" — the
+    // register prefix doubled the verb.
+    heading: "St Mark's Hospice",
     eyebrow: "A cause",
-    context: "A sponsored dog walk · 5 miles",
+    context: "Sponsored dog walk · 5 miles",
     blurb:
-      "A sponsored dog walk for our local hospice — pledge your favourite, and every penny goes to St Luke's.",
+      "A sponsored dog walk for our local hospice — pledge your favourite, and every penny goes to St Mark's.",
+    // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
+    // page unless it uploads one; this one has the thing itself — a beagle
+    // mid-walk — which says "sponsored dog walk" before a word is read and
+    // pairs with the topic. Set to "/demo/biscuit.jpg" when the photo lands;
+    // null renders no avatar, exactly as the product does.
+    photo_url: null,
     poll: {
       id: "demo-poll-cause",
-      // "helps St Luke's care for people" garden-paths — "St Luke's care" reads
-      // as a noun before the verb arrives. Leading with the fact avoids that
-      // and teaches the thing most people do not know about hospices.
+      // A REAL FAVOURITE, OWNED BY A CAUSE (founder, 2026-08-31, option A).
+      // The old reveal — "Hospice care is free…" — was a fact about the
+      // charity, not a gift back, and it is why the home journey left this
+      // scene on 2026-08-17: a reveal beat with nothing revealed. A cause
+      // cannot bet on its own poll (the Marcus lesson), but it can own a
+      // favourite that is TRUE on day one: the hospice's therapy dog is a
+      // beagle, and that is a fact whatever the walkers pick. The opening
+      // sentence names Beagle, so isMessageReveal is false and the copy says
+      // "Our pick will be revealed" — which it is.
       personal_reveal:
-        "Hospice care is free. Every pledge helps St Luke's keep it that way.",
+        "Ours is Biscuit, the hospice's therapy dog — a beagle who does the rounds every Tuesday. Thank you for walking with us.",
       topic: {
         // A REAL topic (2026-08-09). "Hot drink" was not one — the catalogue
         // has 135 topics and that was not among them, so the demo showed a
@@ -660,13 +682,12 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        // Registered name and number as published on slhospice.co.uk. The card
-        // prints the number, so it has to be right — getting a prospect's
-        // charity number wrong on your own homepage is not a good opening.
-        id: "ch-slh",
-        name: "St Luke's (Cheshire) Hospice",
+        // Fictional (see the scene note): no number, because the card prints
+        // it and a made-up charity number is worse than none.
+        id: "ch-stmarks",
+        name: "St Mark's Hospice",
         logo_url: null,
-        registered_number: "515595",
+        registered_number: null,
       },
     ],
     // Cockapoo — the runner-up in the standings, so the pick the demo makes
