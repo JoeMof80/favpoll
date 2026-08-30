@@ -20,7 +20,13 @@
 // a guest scans the card and a guest watches the screen. Every beat is
 // something they do.
 
-import { useEffect, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
+import Link from "next/link"
+import {
+  REGISTER_LINK_HOVER,
+  REGISTER_LINK_INK,
+} from "@/components/register-link"
+import type { RegisterPalette } from "@/lib/register-palette"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { TvFrame } from "@/components/hero-demo-panel/tv-frame"
 import {
@@ -46,6 +52,31 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
+
+const SEE_IT_FOR: {
+  palette: RegisterPalette
+  slug: string
+  key:
+    | "home.overview.seeIt.memorial"
+    | "home.overview.seeIt.celebration"
+    | "home.overview.seeIt.fundraiser"
+}[] = [
+  {
+    palette: "memorial",
+    slug: "memorials",
+    key: "home.overview.seeIt.memorial",
+  },
+  {
+    palette: "celebration",
+    slug: "celebrations",
+    key: "home.overview.seeIt.celebration",
+  },
+  {
+    palette: "fundraiser",
+    slug: "fundraisers",
+    key: "home.overview.seeIt.fundraiser",
+  },
+]
 
 type Medium =
   | { kind: "card" }
@@ -538,6 +569,34 @@ export function ProcessOverview() {
                 </div>
               </div>
             ))}
+            {/* SEE IT FOR A MEMORIAL · A CELEBRATION · A FUNDRAISER (founder,
+                2026-08-31). This is the ONE universal journey, on the hospice
+                scene; the per-kind version — with that kind's own paper,
+                display and keepsake — is each register page's #how. A kind
+                picker was considered for this section and turned down: a
+                fundraiser has no wallet card and a memorial's display has no
+                goal, so switching in place would show false objects or
+                rebuild the three pages here. Three links in the register-ink
+                idiom hand the visitor to the page that already does it. */}
+            <p className="mt-12 max-w-lg text-base text-muted-foreground md:mt-16">
+              {t("home.overview.seeIt.lead")}{" "}
+              {SEE_IT_FOR.map((r, i) => (
+                <Fragment key={r.palette}>
+                  {i > 0 && <span aria-hidden="true"> · </span>}
+                  <Link
+                    href={`/${r.slug}#how`}
+                    data-register={r.palette}
+                    className={cn(
+                      "-mx-1 rounded-md px-1 font-medium transition-colors",
+                      REGISTER_LINK_INK,
+                      REGISTER_LINK_HOVER
+                    )}
+                  >
+                    {t(r.key)}
+                  </Link>
+                </Fragment>
+              ))}
+            </p>
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
