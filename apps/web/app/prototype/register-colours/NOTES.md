@@ -37,4 +37,17 @@ the two that today's purple fails too (eyebrow `primary-muted` on white 3.5–3.
   (memorial = forget-me-not blue) collide with a blue default — in the new
   system those dots become purple / amber / green. Not in this prototype.
 
-**Verdict.** _(founder to fill in)_
+**Founder round 1 (2026-08-30).** "Exactly what I meant." Gold too brown /
+rusty to feel celebratory; loves blue and ink; ink maybe the default for the
+bolder colours but bland as a brand in itself; "the blue is beautiful".
+
+**Why gold cannot work here.** One `--primary` is both a fill under white
+text (buttons) and text on white (links, totals, the wordmark). A gold that
+can be the wordmark on white is a dark gold, and dark gold is bronze or
+olive: amber h74 / ochre h82 / old gold h90 were all built and rejected.
+
+**Founder round 2.** Option 2 — change celebration's family. Coral (h28),
+rose (h5) and warm magenta (h345) added; all clear every measured pair by a
+margin (button text 5.3 / 6.1 / 6.4).
+
+**Verdict.** _(founder to fill in: which warm; blue as default)_

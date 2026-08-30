@@ -33,30 +33,19 @@ export const PALETTES = {
     dL: 0.44,
     label: "Memorial — purple (today's brand, unchanged)",
   },
-  celebration: {
-    h: 74,
-    c: 0.15,
-    pL: 0.53,
-    dL: 0.42,
-    label: "Celebration A — amber (founder: too brown / rusty)",
-  },
-  // Founder round 1 (2026-08-30): A read as bronze. B and C push the hue
-  // toward yellow, drop chroma, and sit at the highest lightness that still
-  // holds white button text; the dark page goes deeper and greyer so it
-  // reads as evening rather than rust.
-  "gold-b": {
-    h: 82,
-    c: 0.13,
-    pL: 0.55,
-    dL: 0.36,
-    label: "Celebration B — ochre gold",
-  },
-  "gold-c": {
-    h: 90,
-    c: 0.12,
-    pL: 0.56,
-    dL: 0.34,
-    label: "Celebration C — old gold",
+  // Founder round 2 (2026-08-30): gold is out. Any gold that can be the
+  // wordmark on white is a dark gold, and dark gold is bronze or olive
+  // (amber h74, ochre h82 and old gold h90 were all tried and rejected).
+  // Celebration moves to the warm family that stays festive at the
+  // lightness the system needs and clean in dark mode.
+  coral: { h: 28, c: 0.16, pL: 0.54, dL: 0.4, label: "Celebration — coral" },
+  rose: { h: 5, c: 0.16, pL: 0.51, dL: 0.4, label: "Celebration — rose" },
+  magenta: {
+    h: 345,
+    c: 0.17,
+    pL: 0.5,
+    dL: 0.41,
+    label: "Celebration — warm magenta",
   },
   fundraiser: {
     h: 160,
