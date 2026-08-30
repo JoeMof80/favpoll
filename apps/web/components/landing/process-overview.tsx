@@ -274,6 +274,7 @@ function BeatMedium({
       // for ink that survives a domestic printer, which on screen just draws
       // a hard outline round every row of the card.
       <div
+        data-register={paletteForSceneKind(SCENE.kind)}
         className={cn(
           "paper paper-screen shrink-0 drop-shadow-xl",
           !bare && CARD_SCALE,
