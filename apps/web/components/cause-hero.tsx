@@ -36,7 +36,7 @@ export function CauseHero({ favpoll }: Props) {
 
   const title = (
     <h1
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name)}`}
     >
       {favpoll.cause_label}
     </h1>

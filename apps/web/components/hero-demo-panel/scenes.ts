@@ -572,7 +572,13 @@ export const SCENES: HeroScene[] = [
     //    charity (mirrors the live subject="cause" shape). ──
     kind: "cause",
     occasion_type: "Cause",
-    opening_line: null,
+    // "Walkies for St Mark's Hospice" (2026-08-31, founder asked for a better
+    // opening line than the register's "In support of"). The word every dog
+    // in Britain knows, and it makes the card, the wallet card and the
+    // keepsake all say what the event is before the context line does. The
+    // fundraiser register carries a light touch; a hospice's sponsored dog
+    // walk is exactly where it belongs.
+    opening_line: "Walkies for",
     protagonist: null,
     // Hospice, not YoungMinds (founder, 2026-08-06): hospices are the channel
     // being approached next, and this scene carries the whole guest arc in
@@ -591,7 +597,9 @@ export const SCENES: HeroScene[] = [
     // register prefix doubled the verb.
     heading: "St Mark's Hospice",
     eyebrow: "A cause",
-    context: "Sponsored dog walk · 5 miles",
+    // No distance (founder, 2026-08-31): "· 5 miles" wrapped the context
+    // line on a phone and added nothing the walk needs.
+    context: "Sponsored dog walk",
     blurb:
       "A sponsored dog walk for our local hospice — pledge your favourite, and every penny goes to St Mark's.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real

@@ -135,15 +135,32 @@ export function getFavpollHeadline(params: {
 }
 
 /**
- * Hero name size — ONE standard size for every name (founder call,
- * 2026-07-29: the compact size reads fine — better, even — in all cases,
- * and it rarely wraps, so the sticky hero's height stays predictable).
+ * Hero name size — ONE standard size (founder call, 2026-07-29: the compact
+ * size reads fine — better, even — in all cases, and it rarely wraps, so the
+ * sticky hero's height stays predictable), with ONE step down for names that
+ * would wrap on a phone (founder, 2026-08-31: "St Mark's Hospice" broke onto
+ * two lines beside its avatar — "it would be better to reduce the size").
+ *
+ * Measured on the real cause page at 390px: the name column beside the
+ * avatar is 222px, and 30px medium Plus Jakarta runs ~13.5px a character, so
+ * sixteen characters is the last that fits on one line; at 24px it is
+ * twenty. Below the threshold nothing changes. Long names beyond it still
+ * wrap rather than truncate — the hero is the one canonical surface where
+ * the full name must appear; the h1's two-line clamp guards absurd input.
+ *
  * Shared here so the three heroes (BaseFavpollHero, CauseHero,
- * EditableHero) cannot drift apart. Long names still wrap rather than
- * truncate — the hero is the one canonical surface where the full name
- * must appear; the h1's two-line clamp guards absurd input.
+ * EditableHero) and the demo card cannot drift apart.
  */
-export const heroNameSizeClass = "text-3xl sm:text-4xl"
+export const HERO_NAME_STEP_DOWN_AT = 16
+
+/** The phone half of the ramp on its own — the demo card's phone frame. */
+export function heroNameMobileSizeClass(name: string): string {
+  return name.trim().length >= HERO_NAME_STEP_DOWN_AT ? "text-2xl" : "text-3xl"
+}
+
+export function heroNameSizeClass(name: string): string {
+  return `${heroNameMobileSizeClass(name)} sm:text-4xl`
+}
 
 /**
  * The projector type ramp (founder, 2026-08-06).

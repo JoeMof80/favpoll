@@ -41,7 +41,7 @@ export function BaseFavpollHero({
 
   const title = (
     <h1
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name)}`}
     >
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
