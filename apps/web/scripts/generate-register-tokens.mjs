@@ -268,6 +268,14 @@ export function renderCss() {
       css += `:root.dark:has([data-register-page="${key}"]),\n:root.dark [data-register="${key}"] {\n${block(dark)}\n}\n`
     }
   }
+  // RE-RESOLVE THE INK (2026-08-31). Pinning the tokens is not enough: an
+  // element with no colour class of its own INHERITS body's computed colour,
+  // which was resolved from the dark --foreground before the scope applied —
+  // so the journey's pledge sheet drew "Hobnob £8.00" near-white on white
+  // while its muted labels (explicit text-muted-foreground) re-resolved and
+  // showed. Setting `color` on the scope makes descendants inherit the
+  // pinned value. Applies to theme-light and paper alike.
+  const INK = "  color: var(--foreground);"
   // THEME-LIGHT (founder, 2026-08-31: "the iPhone and live display should
   // show light mode on the How it works demo when dark mode is set"). A
   // device shown INSIDE the page — a phone in a frame, a screen in a TV — is
@@ -281,9 +289,9 @@ export function renderCss() {
   for (const [key, p] of Object.entries(PALETTES)) {
     const { light } = ramp(p)
     if (key === "default") {
-      css += `.theme-light {\n${block(light)}\n}\n`
+      css += `.theme-light {\n${block(light)}\n${INK}\n}\n`
     } else {
-      css += `:root .theme-light[data-register="${key}"],\n:root .theme-light [data-register="${key}"] {\n${block(light)}\n}\n`
+      css += `:root .theme-light[data-register="${key}"],\n:root .theme-light [data-register="${key}"] {\n${block(light)}\n${INK}\n}\n`
     }
   }
   // Paper after everything: the default sheet, then each register's, and the
@@ -292,11 +300,11 @@ export function renderCss() {
   for (const [key, p] of Object.entries(PALETTES)) {
     const { paper, paperScreen } = ramp(p)
     if (key === "default") {
-      css += `.paper {\n${block(paper)}\n}\n.paper-screen {\n${block(paperScreen)}\n}\n`
+      css += `.paper {\n${block(paper)}\n${INK}\n}\n.paper-screen {\n${block(paperScreen)}\n}\n`
     } else {
       const sel = (cls) =>
         `:root:has([data-register-page="${key}"]) .${cls},\n[data-register="${key}"] .${cls},\n.${cls}[data-register="${key}"]`
-      css += `${sel("paper")} {\n${block(paper)}\n}\n${sel("paper-screen")} {\n${block(paperScreen)}\n}\n`
+      css += `${sel("paper")} {\n${block(paper)}\n${INK}\n}\n${sel("paper-screen")} {\n${block(paperScreen)}\n}\n`
     }
   }
   return css

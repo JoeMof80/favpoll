@@ -340,6 +340,7 @@
   --sidebar-border: oklch(0.91 0.017 252);
   --sidebar-ring: oklch(0.62 0.117 252);
   --band-tint: rgb(242, 247, 251);
+  color: var(--foreground);
 }
 :root .theme-light[data-register="memorial"],
 :root .theme-light [data-register="memorial"] {
@@ -378,6 +379,7 @@
   --sidebar-border: oklch(0.91 0.02 278);
   --sidebar-ring: oklch(0.62 0.14 278);
   --band-tint: rgb(246, 245, 251);
+  color: var(--foreground);
 }
 :root .theme-light[data-register="celebration"],
 :root .theme-light [data-register="celebration"] {
@@ -416,6 +418,7 @@
   --sidebar-border: oklch(0.91 0.019 345);
   --sidebar-ring: oklch(0.62 0.132 345);
   --band-tint: rgb(250, 245, 248);
+  color: var(--foreground);
 }
 :root .theme-light[data-register="fundraiser"],
 :root .theme-light [data-register="fundraiser"] {
@@ -454,6 +457,7 @@
   --sidebar-border: oklch(0.91 0.014 160);
   --sidebar-ring: oklch(0.62 0.101 160);
   --band-tint: rgb(242, 248, 246);
+  color: var(--foreground);
 }
 
 /* Paper — the light values pinned for print and on-screen sheets; see the generator. */
@@ -474,6 +478,7 @@
   --chart-3: oklch(0.75 0.083 252);
   --chart-4: oklch(0.85 0.05 252);
   --chart-5: oklch(0.96 0.025 252);
+  color: var(--foreground);
 }
 .paper-screen {
   --border: oklch(0.91 0.017 252);
@@ -497,6 +502,7 @@
   --chart-3: oklch(0.75 0.1 278);
   --chart-4: oklch(0.85 0.06 278);
   --chart-5: oklch(0.96 0.03 278);
+  color: var(--foreground);
 }
 :root:has([data-register-page="memorial"]) .paper-screen,
 [data-register="memorial"] .paper-screen,
@@ -522,6 +528,7 @@
   --chart-3: oklch(0.75 0.094 345);
   --chart-4: oklch(0.85 0.057 345);
   --chart-5: oklch(0.96 0.028 345);
+  color: var(--foreground);
 }
 :root:has([data-register-page="celebration"]) .paper-screen,
 [data-register="celebration"] .paper-screen,
@@ -547,6 +554,7 @@
   --chart-3: oklch(0.75 0.072 160);
   --chart-4: oklch(0.85 0.043 160);
   --chart-5: oklch(0.96 0.022 160);
+  color: var(--foreground);
 }
 :root:has([data-register-page="fundraiser"]) .paper-screen,
 [data-register="fundraiser"] .paper-screen,
