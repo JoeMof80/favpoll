@@ -1,5 +1,3 @@
-import { RegisterScope } from "@/components/register-scope"
-import { paletteForFavpoll } from "@/lib/register-palette"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -118,17 +116,17 @@ export default async function EditFavpollPage({ params }: Props) {
   }
 
   return (
-    <RegisterScope palette={paletteForFavpoll(favpoll)}>
-      <FavpollForm
-        mode="edit"
-        charities={(charities ?? []) as Charity[]}
-        topics={enrichedTopics}
-        favpollId={id}
-        protagonistId={favpoll.protagonist_id ?? undefined}
-        existingPollId={rawPoll?.id}
-        defaultValues={defaultValues}
-        initialClosesAt={favpoll.closes_at}
-      />
-    </RegisterScope>
+    // No RegisterScope here: FavpollForm wears the register itself, live
+    // from its values (2026-08-31), so create and edit behave the same.
+    <FavpollForm
+      mode="edit"
+      charities={(charities ?? []) as Charity[]}
+      topics={enrichedTopics}
+      favpollId={id}
+      protagonistId={favpoll.protagonist_id ?? undefined}
+      existingPollId={rawPoll?.id}
+      defaultValues={defaultValues}
+      initialClosesAt={favpoll.closes_at}
+    />
   )
 }
