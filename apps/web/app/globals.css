@@ -134,6 +134,21 @@
   --sidebar-border: oklch(1 0 0 / 18%);
 }
 
+/* A register-scoped element whose ink is its OWN colour (2026-08-31) — the
+   home router cards: white, with the register as text, the way the header
+   links behave. Inside it --primary-foreground is the register's --primary
+   in light and its dark page colour in dark, so every class that took band
+   ink (text-primary-foreground/75, RankingBar's band tone, the ring) takes
+   the register colour untouched. Written at the scope rules' own specificity
+   (0,4,0 > 0,3,0): a utility class alone loses to
+   `:root:not(.dark) [data-register]` on the same element. */
+:root:not(.dark) [data-register].register-ink {
+  --primary-foreground: var(--primary);
+}
+:root.dark [data-register].register-ink {
+  --primary-foreground: var(--background);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

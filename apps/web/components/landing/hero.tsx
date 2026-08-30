@@ -581,24 +581,28 @@ export function LandingHero({
                   href={card.href}
                   data-register={card.kind}
                   className={cn(
-                    // TINTED GLASS (founder, 2026-08-31: the cards "should
-                    // better match the pages they link to"). Still the
-                    // 2026-08-05 glass — translucent, blurred, sitting IN the
-                    // hero rather than on it — but the wash is each card's own
-                    // register colour rather than the band's foreground:
-                    // bg-primary/25 is a purple, magenta or green glass on the
-                    // blue band, and in dark, where --primary is near-white,
-                    // the register's dark page colour (--background) washes
-                    // the pale band instead. Everything inside keeps band ink
-                    // (text-primary-foreground), which inverts with the band.
-                    // The solid version — each card its page's band in
-                    // miniature — was rendered on #588 and judged too loud.
-                    // ring, not border, so nothing fights the accent's
-                    // border-t-4.
+                    // WHITE, WITH THE REGISTER AS INK (founder, 2026-08-31:
+                    // "make them white with their brand colors as text,
+                    // similar to how the header behaves on the white
+                    // background, with tinted background on hover"). One
+                    // remap does it (the register-ink utility in globals.css):
+                    // inside the card --primary-foreground IS the register's
+                    // --primary, so every inner class that
+                    // took band ink (text-primary-foreground/75, the bars'
+                    // band tone, the ring) now takes purple, magenta or
+                    // green on white without being touched. Hover is the
+                    // register's --accent tint, the header's ghost hover. In
+                    // dark the scope's --primary is near-white and its
+                    // --background the register's dark page, so the card is
+                    // near-white with that as ink — the same picture,
+                    // inverted the way the pages invert. Glass (2026-08-05),
+                    // tinted glass and a solid band were all rendered on
+                    // #588 before this. ring, not border, so nothing fights
+                    // the accent's border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the card's own palette: the dot, the bars,
                     // and in dark the ink.
-                    "group @container block rounded-xl bg-primary/25 p-5 text-primary-foreground ring-1 ring-primary/40 backdrop-blur-md transition-all hover:bg-primary/35 motion-safe:hover:-translate-y-0.5 dark:bg-background/20 dark:ring-background/30 dark:hover:bg-background/30"
+                    "group register-ink @container block rounded-xl bg-background p-5 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/20 transition-all hover:bg-accent motion-safe:hover:-translate-y-0.5 dark:bg-primary dark:hover:bg-chart-1"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
@@ -643,7 +647,7 @@ export function LandingHero({
                         <span
                           aria-hidden="true"
                           className={cn(
-                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-chart-4 align-middle"
+                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle dark:bg-primary-foreground"
                           )}
                         />
                         {card.title}
@@ -676,7 +680,7 @@ export function LandingHero({
                           label={r.label}
                           amount={r.amount}
                           widthPercent={r.widthPercent}
-                          barClassName="bg-chart-4"
+                          barClassName="bg-chart-2 dark:bg-chart-4"
                           tone="band"
                         />
                       ))}
