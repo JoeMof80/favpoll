@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { CharityBanner } from "@/components/charity-banner"
 import { EventStep } from "@/components/favpoll-flow/event-step"
+import { PollHeading } from "@/components/poll-heading"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { EditableHero } from "@/components/favpoll-form/editable-hero"
@@ -353,71 +354,117 @@ export function WizardPrototype({ data }: { data: Data }) {
     }
   }
 
-  // THE ARTEFACT, NOT THE PAGE (founder, round 3: "the preview should show
-  // artefacts representing the real elements of the page. No need to show
-  // the full preview"). Each step shows only the piece it writes — the
-  // charity banner alone, the poll alone, the hero and reveal for the words
-  // step — the way the register pages present artefacts. The whole page
-  // appears once, at the publish step.
-  const regions: Record<StepKey, ("hero" | "poll" | "charity")[]> = {
-    kind: ["hero"],
-    charity: ["charity"],
-    topic: ["poll"],
-    words: ["hero", "poll"],
-    goal: ["charity"],
-    finish: ["hero", "poll", "charity"],
-  }
-  const shown = regions[current]
-  const captions: Record<StepKey, string> = {
-    kind: "The hero — it takes the kind's colour",
+  // THE ARTEFACT, NOT THE PAGE (founder, rounds 3-4): each step shows only
+  // the piece it writes. Round 4 tightened it — the EVENT step shows no
+  // preview at all (there isn't one for that question); the TOPIC step shows
+  // the poll without the reveal; THEIR PAGE shows the hero, the topic ribbon
+  // and the reveal quote, without the tabs and bars. The whole page appears
+  // once, at the publish step.
+  const captions: Record<StepKey, string | null> = {
+    kind: null,
     charity: "The charity banner",
     topic: "The poll",
-    words: "The hero and the reveal",
+    words: "Their page",
     goal: "The charity banner — with the goal",
     finish: "The favpoll page",
   }
+  const topicTitle = v.topics?.[0]?.title
 
-  const preview = (
+  const revealQuote = (
+    <div className="mt-4">
+      {showReveal ? (
+        <p
+          className={cn(
+            "border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal italic",
+            v.reveal ? "text-reveal-foreground" : "text-muted-foreground/40"
+          )}
+        >
+          {v.reveal ||
+            "Reveal their favourite here — guests see this only after they pledge. This could be a direct quote or a memory."}
+        </p>
+      ) : null}
+    </div>
+  )
+
+  const charityArtefact =
+    chosenCharities.length > 0 ? (
+      <CharityBanner
+        charities={chosenCharities}
+        totalRaised={0}
+        goalAmount={v.goalAmount ?? null}
+      />
+    ) : (
+      <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
+        The charity you pick appears here
+      </div>
+    )
+
+  const artefact = (() => {
+    switch (current) {
+      case "kind":
+        return null
+      case "charity":
+      case "goal":
+        return charityArtefact
+      case "topic":
+        // The poll without the reveal — the reveal belongs to Their page.
+        return (
+          <div className="[&_[aria-label='Add_reveal']]:hidden">
+            <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
+            <EditablePollArea />
+          </div>
+        )
+      case "words":
+        return (
+          <div>
+            <EditableHero />
+            {topicTitle && (
+              <div className="mt-6">
+                <PollHeading topicTitle={topicTitle} inert />
+              </div>
+            )}
+            {revealQuote}
+          </div>
+        )
+      case "finish":
+        return (
+          <div>
+            {!showReveal && (
+              <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
+            )}
+            <EditableHero />
+            <div className="mt-6">
+              <EditablePollArea />
+            </div>
+            <div className="mt-6">{charityArtefact}</div>
+          </div>
+        )
+    }
+  })()
+
+  const preview = artefact ? (
     <div
       aria-hidden="true"
       data-proto-preview=""
       className="pointer-events-none rounded-xl border border-border bg-background p-6 shadow-sm select-none"
     >
-      {!showReveal && (
-        <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
-      )}
       <p className="mb-4 text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
         {captions[current]} — live
       </p>
-      {shown.includes("hero") && <EditableHero />}
-      {shown.includes("poll") && (
-        <div className={shown.includes("hero") ? "mt-6" : undefined}>
-          <EditablePollArea />
-        </div>
-      )}
-      {shown.includes("charity") && (
-        <div className={shown.length > 1 ? "mt-6" : undefined}>
-          {chosenCharities.length > 0 ? (
-            <CharityBanner
-              charities={chosenCharities}
-              totalRaised={0}
-              goalAmount={v.goalAmount ?? null}
-            />
-          ) : (
-            <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
-              The charity you pick appears here
-            </div>
-          )}
-        </div>
-      )}
+      {artefact}
     </div>
-  )
+  ) : null
 
   return (
     <RegisterScope palette={palette}>
       <FormProvider {...form}>
         <main className="mx-auto max-w-6xl px-6 py-10">
-          <div className="grid gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] md:items-start">
+          <div
+            className={cn(
+              "grid gap-10 md:items-start",
+              preview && "md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]"
+            )}
+          >
             <div>
               <ol
                 role="list"
@@ -485,7 +532,7 @@ export function WizardPrototype({ data }: { data: Data }) {
                 </div>
               </div>
             </div>
-            <div className="md:sticky md:top-20">{preview}</div>
+            {preview && <div className="md:sticky md:top-20">{preview}</div>}
           </div>
         </main>
 
