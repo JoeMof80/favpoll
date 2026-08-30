@@ -597,9 +597,8 @@ export const SCENES: HeroScene[] = [
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
-    // pairs with the topic. Set to "/demo/biscuit.jpg" when the photo lands;
-    // null renders no avatar, exactly as the product does.
-    photo_url: null,
+    // pairs with the topic. (Founder's photo, 2026-08-31.)
+    photo_url: "/demo/biscuit.jpg",
     poll: {
       id: "demo-poll-cause",
       // A REAL FAVOURITE, OWNED BY A CAUSE (founder, 2026-08-31, option A).
