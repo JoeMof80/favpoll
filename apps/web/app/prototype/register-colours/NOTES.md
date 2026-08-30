@@ -50,4 +50,14 @@ olive: amber h74 / ochre h82 / old gold h90 were all built and rejected.
 rose (h5) and warm magenta (h345) added; all clear every measured pair by a
 margin (button text 5.3 / 6.1 / 6.4).
 
-**Verdict.** _(founder to fill in: which warm; blue as default)_
+**Verdict (founder, 2026-08-30).** Memorial = purple (h 278, today's tokens).
+Celebration = warm magenta (h 345, c 0.17, primary L 0.50, dark bg L 0.41) —
+coral (h 28) rejected as one hue step from `--destructive`, rose (h 5) as
+too close to the same family. Fundraiser = green (h 160). **Default = blue**
+(h 252, c 0.15, primary L 0.46, dark bg L 0.43); ink is functional but bland
+as a brand, not adopted. **The register accent system is retired** — the
+forget-me-not dot, the on-band gold/green variants, the demo cards'
+`accentVar` swap — because the register is now the palette; no gold anywhere.
+The three STATUS colours (`--success`, `--warning`, `--destructive`) stay,
+as status only. Known collision to design around: on a fundraiser page green
+is the brand, so "goal reached" must be a state with words, not a colour.
