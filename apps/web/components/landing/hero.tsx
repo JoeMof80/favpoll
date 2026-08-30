@@ -581,18 +581,22 @@ export function LandingHero({
                   href={card.href}
                   data-register={card.kind}
                   className={cn(
-                    // Glass, not white (founder, 2026-08-05): a translucent
-                    // wash of the band's OWN foreground, so the cards sit in
-                    // the hero rather than on it. Everything inside takes band
-                    // ink (text-primary-foreground), which is what makes this
-                    // survive the theme flip — the band inverts (purple with
-                    // white ink in light, pale with purple ink in dark), and a
-                    // wash of its own ink inverts with it. ring, not border, so
-                    // nothing fights the accent's border-t-4.
+                    // THE PAGE'S OWN BAND, IN MINIATURE (founder, 2026-08-31:
+                    // the cards "should better match the pages they link to").
+                    // Each card wears its register's palette, so bg-primary
+                    // is that page's hero colour — purple, magenta, green on
+                    // the blue band — with white ink, and in dark it inverts
+                    // exactly as the pages' own bands do (near-white, coloured
+                    // ink, a faint ring). Tinted glass was tried first and
+                    // barely registered in light: a 25% wash on a blue band
+                    // reads as slightly different blue. The 2026-08-05 glass
+                    // (a wash of the band's own foreground) survives only in
+                    // the ring. ring, not border, so nothing fights the
+                    // accent's border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the card's own palette: the dot, the bars,
                     // and in dark the ink.
-                    "group @container block rounded-xl bg-primary-foreground/12 p-5 text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur-md transition-all hover:bg-primary-foreground/18 motion-safe:hover:-translate-y-0.5"
+                    "group @container block rounded-xl bg-primary p-5 text-primary-foreground shadow-lg ring-1 ring-primary-foreground/25 transition-all hover:brightness-110 motion-safe:hover:-translate-y-0.5"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
