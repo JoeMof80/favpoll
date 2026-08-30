@@ -34,8 +34,23 @@ type Data = {
   suggestedTopicIds: Record<string, string[]>
 }
 
-type StepKey = "kind" | "charity" | "topic" | "words" | "goal" | "finish"
-const STEPS: StepKey[] = ["kind", "charity", "topic", "words", "goal", "finish"]
+type StepKey =
+  | "kind"
+  | "charity"
+  | "topic"
+  | "identity"
+  | "story"
+  | "goal"
+  | "finish"
+const STEPS: StepKey[] = [
+  "kind",
+  "charity",
+  "topic",
+  "identity",
+  "story",
+  "goal",
+  "finish",
+]
 
 const TITLES: Record<
   StepKey,
@@ -50,9 +65,11 @@ const TITLES: Record<
     title: "Topic",
     guidance: "Pick a topic, and guests pledge on their favourite.",
   },
-  words: {
-    title: "Their page",
-    guidance: "Who this is for, in their own words.",
+  identity: { title: "Name", guidance: "Who the page is about." },
+  story: {
+    title: "About & reveal",
+    guidance: "Introduce them — and what guests unlock when they pledge.",
+    skippable: true,
   },
   goal: {
     title: "Goal",
@@ -132,7 +149,8 @@ export function WizardPrototype({ data }: { data: Data }) {
     kind: !!v.category,
     charity: (v.charities?.length ?? 0) > 0,
     topic: (v.topics?.length ?? 0) > 0,
-    words: !!v.name?.trim(),
+    identity: !!v.name?.trim(),
+    story: true,
     goal: true,
     finish: true,
   }
@@ -216,17 +234,9 @@ export function WizardPrototype({ data }: { data: Data }) {
             </Button>
           </div>
         )
-      case "words":
+      case "identity":
         return (
           <div className="space-y-4">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={fillExample}
-            >
-              ✦ Generate an example
-            </Button>
             {field(
               "Name",
               false,
@@ -257,6 +267,19 @@ export function WizardPrototype({ data }: { data: Data }) {
                 onChange={(e) => form.setValue("context", e.target.value)}
               />
             )}
+          </div>
+        )
+      case "story":
+        return (
+          <div className="space-y-4">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={fillExample}
+            >
+              ✦ Generate an example
+            </Button>
             {field(
               "About",
               true,
@@ -428,7 +451,9 @@ export function WizardPrototype({ data }: { data: Data }) {
             <EditablePollArea />
           </div>
         )
-      case "words":
+      case "identity":
+        return <EditableHero />
+      case "story":
         return (
           <div>
             <EditableHero />
@@ -447,11 +472,15 @@ export function WizardPrototype({ data }: { data: Data }) {
     }
   })()
 
+  // THE REAL PAGE'S WIDTH (founder, round 7): the favpoll page's content
+  // column is max-w-5xl (1024) minus px-16 (128) minus the 300px rail and
+  // the 40px gap = 556px. The artefacts render at exactly that width, so
+  // line wraps and type sizes match the page they will become.
   const preview = artefact ? (
     <div
       aria-hidden="true"
       data-proto-preview=""
-      className="pointer-events-none rounded-xl border border-border bg-background p-6 shadow-sm select-none"
+      className="pointer-events-none w-[604px] max-w-full rounded-xl border border-border bg-background p-6 shadow-sm select-none [&>*]:mx-auto [&>*]:w-[556px] [&>*]:max-w-full"
     >
       {artefact}
     </div>
@@ -464,7 +493,7 @@ export function WizardPrototype({ data }: { data: Data }) {
           <div
             className={cn(
               "grid gap-10 md:items-start",
-              preview && "md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]"
+              preview && "md:grid-cols-[minmax(0,1fr)_auto]"
             )}
           >
             <div>
