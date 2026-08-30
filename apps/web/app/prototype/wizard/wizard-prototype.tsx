@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { CharityBanner } from "@/components/charity-banner"
+import { GoalProgress } from "@/components/goal-progress"
 import { EventStep } from "@/components/favpoll-flow/event-step"
 import { PollHeading } from "@/components/poll-heading"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
@@ -365,8 +366,8 @@ export function WizardPrototype({ data }: { data: Data }) {
     charity: "The charity banner",
     topic: "The poll",
     words: "Their page",
-    goal: "The charity banner — with the goal",
-    finish: "The favpoll page",
+    goal: "The goal",
+    finish: null,
   }
   const topicTitle = v.topics?.[0]?.title
 
@@ -404,8 +405,27 @@ export function WizardPrototype({ data }: { data: Data }) {
       case "kind":
         return null
       case "charity":
-      case "goal":
         return charityArtefact
+      case "goal":
+        // Just the goal element (founder, round 5) — the banner's bottom
+        // half, without the charities above it.
+        return (
+          <div className="rounded-lg border border-border bg-card px-5 py-4 text-right">
+            <p className="text-lg font-medium text-primary">£0</p>
+            <p className="text-xs text-muted-foreground">
+              {v.goalAmount
+                ? `raised of the £${v.goalAmount} goal`
+                : "raised so far"}
+            </p>
+            {v.goalAmount ? (
+              <GoalProgress
+                totalRaised={0}
+                goalAmount={v.goalAmount}
+                className="mt-2"
+              />
+            ) : null}
+          </div>
+        )
       case "topic":
         // The poll without the reveal — the reveal belongs to Their page.
         return (
@@ -427,18 +447,9 @@ export function WizardPrototype({ data }: { data: Data }) {
           </div>
         )
       case "finish":
-        return (
-          <div>
-            {!showReveal && (
-              <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
-            )}
-            <EditableHero />
-            <div className="mt-6">
-              <EditablePollArea />
-            </div>
-            <div className="mt-6">{charityArtefact}</div>
-          </div>
-        )
+        // No preview (founder, round 5): the payoff is the real page,
+        // right after publishing — not a picture of it beside the button.
+        return null
     }
   })()
 
