@@ -433,9 +433,11 @@ describe("LandingHero — reduced motion", () => {
     expect(heading).toBeTruthy()
     render(<LandingHero liveCount={6} totalLive={0} />)
     // Starts on the first scene (Belinda / remembering), not the cause scene.
-    expect(screen.queryByText(heading!)).toBeNull()
+    expect(screen.queryByRole("heading", { name: heading! })).toBeNull()
     fireEvent.click(screen.getByRole("button", { name: "Cause" }))
-    expect(screen.getByText(heading!)).toBeInTheDocument()
+    // By ROLE: a cause's heading is usually its charity's name too (St Mark's
+    // Hospice, in support of St Mark's Hospice), so the text appears twice.
+    expect(screen.getByRole("heading", { name: heading! })).toBeInTheDocument()
   })
 
   it("jumps the demo to the fundraiser scene when 'Fundraiser' is clicked", () => {
@@ -464,8 +466,14 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
 
   it("cause is faceless — renders its heading and no protagonist avatar", () => {
     renderScene(causeScene, "arriving")
-    expect(screen.getByText(causeScene.heading!)).toBeInTheDocument()
-    expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
+    expect(
+      screen.getByRole("heading", { name: causeScene.heading! })
+    ).toBeInTheDocument()
+    // No avatar unless the cause has its own photo (scene.photo_url) — the
+    // scene ships null until Biscuit's photo lands.
+    if (!causeScene.photo_url) {
+      expect(screen.queryByTestId("protagonist-avatar")).toBeNull()
+    }
   })
 
   it("cause shows the universal lock label", () => {

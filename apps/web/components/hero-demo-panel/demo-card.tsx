@@ -397,7 +397,7 @@ export function DemoCard({
               device, not just the phone. Short names hid it: "Poppy Chen"
               clears the gutter and "Belinda Hartley" does not, so it only
               surfaced when a memorial scene reached a card. */}
-          <div className={protagonist ? "pr-28" : ""}>
+          <div className={protagonist || scene.photo_url ? "pr-28" : ""}>
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
@@ -441,11 +441,15 @@ export function DemoCard({
               </p>
             </div>
           )}
-          {protagonist && (
+          {/* A protagonist's photo, or a faceless cause's own (the product
+              renders favpolls.photo_url in the same slot — CauseHero). */}
+          {(protagonist || scene.photo_url) && (
             <div className="absolute top-0 right-0 origin-top-right scale-[0.8]">
               <ProtagonistAvatar
-                name={protagonist.name}
-                photoUrl={protagonist.photo_url}
+                name={protagonist ? protagonist.name : title}
+                photoUrl={
+                  protagonist ? protagonist.photo_url : scene.photo_url!
+                }
               />
             </div>
           )}
