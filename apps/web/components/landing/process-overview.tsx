@@ -312,7 +312,9 @@ function BeatMedium({
     return (
       <div
         data-register={paletteForSceneKind(SCENE.kind)}
-        className={cn("shrink-0", !bare && DISPLAY_SCALE)}
+        // theme-light: a screen in a TV keeps light mode whatever the page's
+        // theme (founder, 2026-08-31) — see register-tokens.css.
+        className={cn("theme-light shrink-0", !bare && DISPLAY_SCALE)}
       >
         <TvFrame>
           {/* The screen itself, 16:9 — what the projector shows, not a cropped
@@ -325,7 +327,11 @@ function BeatMedium({
     )
   }
   return (
-    <div className={cn("shrink-0", !bare && PHONE_SCALE)}>
+    <div
+      // theme-light: a phone in a frame keeps light mode whatever the page's
+      // theme (founder, 2026-08-31) — see register-tokens.css.
+      className={cn("theme-light shrink-0", !bare && PHONE_SCALE)}
+    >
       <PhoneFrame>
         <DemoCard
           scene={SCENE}
