@@ -581,22 +581,24 @@ export function LandingHero({
                   href={card.href}
                   data-register={card.kind}
                   className={cn(
-                    // THE PAGE'S OWN BAND, IN MINIATURE (founder, 2026-08-31:
-                    // the cards "should better match the pages they link to").
-                    // Each card wears its register's palette, so bg-primary
-                    // is that page's hero colour — purple, magenta, green on
-                    // the blue band — with white ink, and in dark it inverts
-                    // exactly as the pages' own bands do (near-white, coloured
-                    // ink, a faint ring). Tinted glass was tried first and
-                    // barely registered in light: a 25% wash on a blue band
-                    // reads as slightly different blue. The 2026-08-05 glass
-                    // (a wash of the band's own foreground) survives only in
-                    // the ring. ring, not border, so nothing fights the
-                    // accent's border-t-4.
+                    // TINTED GLASS (founder, 2026-08-31: the cards "should
+                    // better match the pages they link to"). Still the
+                    // 2026-08-05 glass — translucent, blurred, sitting IN the
+                    // hero rather than on it — but the wash is each card's own
+                    // register colour rather than the band's foreground:
+                    // bg-primary/25 is a purple, magenta or green glass on the
+                    // blue band, and in dark, where --primary is near-white,
+                    // the register's dark page colour (--background) washes
+                    // the pale band instead. Everything inside keeps band ink
+                    // (text-primary-foreground), which inverts with the band.
+                    // The solid version — each card its page's band in
+                    // miniature — was rendered on #588 and judged too loud.
+                    // ring, not border, so nothing fights the accent's
+                    // border-t-4.
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the card's own palette: the dot, the bars,
                     // and in dark the ink.
-                    "group @container block rounded-xl bg-primary p-5 text-primary-foreground shadow-lg ring-1 ring-primary-foreground/25 transition-all hover:brightness-110 motion-safe:hover:-translate-y-0.5"
+                    "group @container block rounded-xl bg-primary/25 p-5 text-primary-foreground ring-1 ring-primary/40 backdrop-blur-md transition-all hover:bg-primary/35 motion-safe:hover:-translate-y-0.5 dark:bg-background/20 dark:ring-background/30 dark:hover:bg-background/30"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
