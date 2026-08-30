@@ -34,3 +34,19 @@ presentational and round 2 answers it by making Name primary and the rest
 quiet. The banner image is a real, separate exploration.
 
 **Verdict.** _(founder to fill in after round 2)_
+
+## Round 10 — the shape (2026-08-31)
+
+Founder: the live preview is overkill; the wizard is mostly right already —
+just add the extra steps. This round deletes the preview column entirely and
+rebuilds the prototype as the PRODUCTION wizard's exact chrome (rail, step
+shell, overlays, nav via useWizardState + the wizard components wholesale),
+with four steps appended after Topic:
+
+1. **Name** — name / opening line / context
+2. **About & reveal** — with Generate an example and the Include switch
+3. **Goal** — presets + custom, plus the shared-fund head start (the fund
+   itself always exists; only the seed is optional)
+4. **Publish** — Listed switch, close date, Publish (dead)
+
+Single column, phone-friendly, the payoff is the real page after Publish.

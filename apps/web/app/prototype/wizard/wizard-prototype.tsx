@@ -1,91 +1,103 @@
 "use client"
 
-// PROTOTYPE, round 2 (founder feedback on A) — see NOTES.md.
-// A single stepped flow: kind → charity (dialog) → topic (dialog) →
-// words (name/opening/context/about/reveal, one step, generate button)
-// → goal → publish. The live preview fades everything except the part
-// the step writes, to say "this IS the favpoll page".
-import { useMemo, useState } from "react"
-import { FormProvider, useForm, useWatch } from "react-hook-form"
-import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
+// PROTOTYPE, round 10 (founder: "Maybe we've got the Wizard mostly right
+// already") — see NOTES.md. The live preview is gone. This is the
+// PRODUCTION wizard's exact shape — rail, step shell, overlays, nav —
+// with four steps appended after Topic: Name, About & reveal, Goal (with
+// the shared-fund head start) and Publish. Single column, phone-friendly,
+// the payoff is landing on the real page after Publish.
+//
+// The event/charity/topic steps reuse useWizardState and the production
+// components wholesale; only the rail/strip are re-rendered locally
+// because the production ones hardcode the three-step list.
+import { useState } from "react"
+import {
+  BookOpen,
+  Calendar,
+  Flag,
+  Gift,
+  Shapes,
+  Target,
+  UserRound,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
-import { CharityRow } from "@/components/charity-row"
-import { GoalProgress } from "@/components/goal-progress"
 import { EventStep } from "@/components/favpoll-flow/event-step"
-import { PollHeading } from "@/components/poll-heading"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
-import { EditableHero } from "@/components/favpoll-form/editable-hero"
-import { EditablePollArea } from "@/components/favpoll-form/editable-poll-area"
-import type { FavpollFormValues } from "@/components/favpoll-form/schema"
+import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
+import { useWizardState } from "@/components/new-favpoll-wizard/use-wizard-state"
+import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
+import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
+import { WizardStepShell } from "@/components/new-favpoll-wizard/wizard-step-shell"
+import type { WizardData } from "@/components/new-favpoll-wizard/use-wizard-state"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 
-type Data = {
-  charities: Charity[]
-  topics: TopicWithMeta[]
-  categories: Category[]
-  suggestedTopicIds: Record<string, string[]>
-}
-
-type StepKey =
-  | "kind"
+type ProtoStep =
+  | "event"
   | "charity"
   | "topic"
-  | "identity"
+  | "info"
   | "story"
   | "goal"
-  | "finish"
-const STEPS: StepKey[] = [
-  "kind",
+  | "publish"
+
+const PROTO_STEPS: ProtoStep[] = [
+  "event",
   "charity",
   "topic",
-  "identity",
+  "info",
   "story",
   "goal",
-  "finish",
+  "publish",
 ]
 
-const TITLES: Record<
-  StepKey,
-  { title: string; guidance: string; skippable?: boolean }
-> = {
-  kind: { title: "Event", guidance: "What kind of favpoll is this?" },
-  charity: {
-    title: "Charity",
-    guidance: "Every pledge goes to the charity you pick.",
-  },
-  topic: {
-    title: "Topic",
-    guidance: "Pick a topic, and guests pledge on their favourite.",
-  },
-  identity: { title: "Name", guidance: "Who the page is about." },
-  story: {
-    title: "About & reveal",
-    guidance: "Introduce them — and what guests unlock when they pledge.",
-    skippable: true,
-  },
-  goal: {
-    title: "Goal",
-    guidance: "Optional — understood as progress, never as pressure.",
-    skippable: true,
-  },
-  finish: {
-    title: "Publish",
-    guidance: "How the favpoll appears, and a head start for guests.",
-  },
+const STEP_LABELS: Record<ProtoStep, string> = {
+  event: "Event",
+  charity: "Charity",
+  topic: "Topic",
+  info: "Name",
+  story: "About & reveal",
+  goal: "Goal",
+  publish: "Publish",
+}
+
+const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
+  event: Calendar,
+  charity: Gift,
+  topic: Shapes,
+  info: UserRound,
+  story: BookOpen,
+  goal: Target,
+  publish: Flag,
+}
+
+// Rail lines for the three production steps come from wizard-copy; the
+// four new ones follow the same register — the favpoll, not its subject.
+const RAIL: Record<ProtoStep, string> = {
+  event: "Celebration, memorial or fundraiser.",
+  charity: "Every pledge goes to the charity you pick.",
+  topic: "Pick a topic, and guests pledge on their favourite.",
+  info: "The name at the top of the page.",
+  story: "An introduction, and the reveal guests unlock.",
+  goal: "A goal, and a head start for guests.",
+  publish: "How it appears, and when it closes.",
 }
 
 // Canned example per kind, so "Generate an example" demonstrates the real
 // affordance without calling the model. The real build calls
 // safeGenerateDraft, exactly as the form does today.
-const EXAMPLES: Record<string, Partial<FavpollFormValues>> = {
+const EXAMPLES: Record<
+  string,
+  { name: string; context: string; about: string; reveal: string }
+> = {
   memorial: {
     name: "Margaret Whitfield",
     context: "1941 – 2026",
@@ -110,507 +122,611 @@ const EXAMPLES: Record<string, Partial<FavpollFormValues>> = {
   },
 }
 
-export function WizardPrototype({ data }: { data: Data }) {
-  const form = useForm<FavpollFormValues>({
-    defaultValues: {
-      grouping: "individual",
-      subject: "someone",
-      charities: [],
-      topics: [],
-      isListed: true,
-      register: "",
-    },
-  })
-  const v = useWatch({ control: form.control })
-  const palette = paletteForRegister(
-    deriveRegister(v.category ?? null, v.grouping ?? "individual", v.subject)
+function ProtoRail({ current }: { current: ProtoStep }) {
+  const idx = PROTO_STEPS.indexOf(current)
+  return (
+    <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
+      <div className="flex flex-1 flex-col justify-around gap-5">
+        {PROTO_STEPS.map((s) => {
+          const Icon = STEP_ICONS[s]
+          const isActive = s === current
+          return (
+            <div
+              key={s}
+              className={cn(
+                "space-y-1 transition-opacity",
+                isActive ? "opacity-100" : "opacity-60"
+              )}
+            >
+              <div className="flex items-center gap-2.5">
+                <Icon
+                  className={cn(
+                    "h-5 w-5 shrink-0",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )}
+                />
+                <p
+                  className={cn(
+                    "text-base font-medium tracking-widest uppercase",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {STEP_LABELS[s]}
+                </p>
+              </div>
+              <p className="pl-7.5 text-sm leading-relaxed text-muted-foreground">
+                {RAIL[s]}
+              </p>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
+}
 
-  const [step, setStep] = useState(0)
-  const [charityOpen, setCharityOpen] = useState(false)
-  const [topicOpen, setTopicOpen] = useState(false)
+function ProtoProgressStrip({ current }: { current: ProtoStep }) {
+  const idx = PROTO_STEPS.indexOf(current)
+  return (
+    <ol
+      role="list"
+      aria-label="Wizard steps"
+      className="mb-10 flex gap-1.5 md:hidden"
+    >
+      {PROTO_STEPS.map((s, i) => (
+        <li
+          key={s}
+          role="listitem"
+          aria-label={`Step ${i + 1} of ${PROTO_STEPS.length}: ${STEP_LABELS[s]}`}
+          aria-current={s === current ? "step" : undefined}
+          className="flex-1"
+        >
+          <span
+            className={cn(
+              "block h-1 rounded-full transition-colors",
+              i <= idx ? "bg-primary" : "bg-muted"
+            )}
+          />
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+export function WizardPrototype({ data }: { data: WizardData }) {
+  const w = useWizardState(data)
+  const [topicSearch, setTopicSearch] = useState("")
+  const [charitySearch, setCharitySearch] = useState("")
+
+  // The four appended steps' fields — plain local state; the real build
+  // would publish these from the final step.
+  const [stepIdx, setStepIdx] = useState(0)
+  const [name, setName] = useState("")
+  const [openingLine, setOpeningLine] = useState("")
+  const [context, setContext] = useState("")
+  const [about, setAbout] = useState("")
+  const [reveal, setReveal] = useState("")
   const [showReveal, setShowReveal] = useState(true)
+  const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
   const [goalDraft, setGoalDraft] = useState("")
-  const current = STEPS[Math.min(step, STEPS.length - 1)]!
+  const [fundSeed, setFundSeed] = useState("")
+  const [isListed, setIsListed] = useState(true)
+  const [closeDate, setCloseDate] = useState("")
 
-  const primaryCharity = data.charities.find((c) => v.charities?.[0] === c.id)
-  const chosenCharities = data.charities.filter((c) =>
-    v.charities?.includes(c.id)
-  )
-  const suggestedTopics = useMemo(
-    () =>
-      (primaryCharity ? (data.suggestedTopicIds[primaryCharity.id] ?? []) : [])
-        .map((id) => data.topics.find((t) => t.id === id))
-        .filter((t): t is TopicWithMeta => !!t),
-    [primaryCharity, data]
+  const current = PROTO_STEPS[Math.min(stepIdx, PROTO_STEPS.length - 1)]!
+  const isFirst = stepIdx === 0
+  const isLast = current === "publish"
+
+  const palette = paletteForRegister(
+    deriveRegister(w.category, w.grouping, w.subject)
   )
 
-  const canNext: Record<StepKey, boolean> = {
-    kind: !!v.category,
-    charity: (v.charities?.length ?? 0) > 0,
-    topic: (v.topics?.length ?? 0) > 0,
-    identity: !!v.name?.trim(),
-    story: true,
-    goal: true,
-    finish: true,
+  const trimmedTopicSearch = topicSearch.trim()
+  const topicShowCreate =
+    trimmedTopicSearch.length > 0 &&
+    !data.topics
+      .filter((t) => t.is_active !== false)
+      .some((t) => t.title.toLowerCase() === trimmedTopicSearch.toLowerCase())
+
+  function handleCreateTopic() {
+    if (!trimmedTopicSearch) return
+    w.setTopics([
+      {
+        topicId: "",
+        title: trimmedTopicSearch,
+        isCustom: true,
+        items: [],
+        customLabels: [],
+      },
+    ])
+    w.setTopicOpen(false)
+    setTopicSearch("")
   }
 
   function fillExample() {
-    const ex = EXAMPLES[v.category ?? "celebration"] ?? EXAMPLES.celebration
-    for (const [k, val] of Object.entries(ex))
-      form.setValue(k as keyof FavpollFormValues, val as never)
+    const ex = EXAMPLES[w.category ?? "celebration"] ?? EXAMPLES.celebration!
+    setName(ex.name)
+    setContext(ex.context)
+    setAbout(ex.about)
+    setReveal(ex.reveal)
   }
 
-  const field = (label: string, opt: boolean, node: React.ReactNode) => (
+  const nextDisabled: Record<ProtoStep, boolean> = {
+    event: !w.category,
+    charity: w.charityIds.length === 0,
+    topic:
+      w.topics.length === 0 ||
+      (w.topics[0]?.isCustom === true && w.customLabels.length < 2),
+    info: !name.trim(),
+    story: false,
+    goal: false,
+    publish: false,
+  }
+
+  const field = (
+    label: string,
+    opt: boolean,
+    node: React.ReactNode,
+    hint?: string
+  ) => (
     <label className="block space-y-1.5 text-sm">
-      <span className="font-medium">
+      <span className="block font-medium">
         {label}
         {opt && (
           <span className="font-normal text-muted-foreground"> — optional</span>
         )}
       </span>
       {node}
+      {hint && (
+        <span className="block text-xs text-muted-foreground">{hint}</span>
+      )}
     </label>
   )
 
-  const stepBody = (k: StepKey) => {
-    switch (k) {
-      case "kind":
-        return (
-          <EventStep
-            value={v.category ?? null}
-            onChange={(c) => form.setValue("category", c)}
-          />
-        )
-      case "charity":
-        return (
-          <div className="space-y-3">
-            {chosenCharities.length > 0 ? (
-              <ul className="space-y-2 text-sm">
-                {chosenCharities.map((c) => (
-                  <li
-                    key={c.id}
-                    className="rounded-lg border border-border px-3 py-2 font-medium"
-                  >
-                    {c.name}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No charity picked yet.
-              </p>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setCharityOpen(true)}
-            >
-              {chosenCharities.length ? "Change charity" : "Pick a charity"}
-            </Button>
-          </div>
-        )
-      case "topic":
-        return (
-          <div className="space-y-3">
-            {v.topics?.[0] ? (
-              <p className="text-sm">
-                <span className="font-medium">{v.topics[0].title}</span>{" "}
-                <span className="text-muted-foreground">
-                  · {(v.topics[0].items ?? []).length} favourites
-                </span>
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No topic picked yet.
-              </p>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setTopicOpen(true)}
-            >
-              {(v.topics?.length ?? 0) ? "Change topic" : "Pick a topic"}
-            </Button>
-          </div>
-        )
-      case "identity":
-        return (
-          <div className="space-y-4">
-            {field(
-              "Name",
-              false,
-              <Input
-                value={v.name ?? ""}
-                maxLength={40}
-                placeholder="Name or nickname"
-                onChange={(e) => form.setValue("name", e.target.value)}
-              />
-            )}
-            {field(
-              "Opening line",
-              true,
-              <Input
-                value={v.openingLine ?? ""}
-                maxLength={50}
-                placeholder="Replaces the default opening prefix"
-                onChange={(e) => form.setValue("openingLine", e.target.value)}
-              />
-            )}
-            {field(
-              "Context",
-              true,
-              <Input
-                value={v.context ?? ""}
-                maxLength={40}
-                placeholder="e.g. turning 40 · Class of 2024"
-                onChange={(e) => form.setValue("context", e.target.value)}
-              />
-            )}
-          </div>
-        )
-      case "story":
-        return (
-          <div className="space-y-4">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={fillExample}
-            >
-              ✦ Generate an example
-            </Button>
-            {field(
-              "About",
-              true,
-              <Textarea
-                rows={3}
-                maxLength={300}
-                value={v.about ?? ""}
-                placeholder="Two or three sentences — tease the topic and the cause, but don't give too much away."
-                onChange={(e) => form.setValue("about", e.target.value)}
-              />
-            )}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  The reveal{" "}
-                  <span className="font-normal text-muted-foreground">
-                    — optional
-                  </span>
-                </span>
-                <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                  Include
-                  <Switch
-                    checked={showReveal}
-                    onCheckedChange={setShowReveal}
-                  />
-                </label>
-              </div>
-              <Textarea
-                rows={3}
-                maxLength={280}
-                disabled={!showReveal}
-                className={showReveal ? undefined : "opacity-40"}
-                value={v.reveal ?? ""}
-                placeholder="Guests see this only after they pledge. A quote, a memory, or a message."
-                onChange={(e) => form.setValue("reveal", e.target.value)}
-              />
-            </div>
-          </div>
-        )
-      case "goal":
-        return (
-          <div className="flex gap-2">
-            {[100, 250, 500].map((g) => (
-              <Button
-                key={g}
-                type="button"
-                size="sm"
-                variant={v.goalAmount === g ? "default" : "outline"}
-                onClick={() => {
-                  form.setValue("goalAmount", g)
-                  setGoalDraft(String(g))
-                }}
-              >
-                £{g}
-              </Button>
-            ))}
-            <Input
-              className="w-28"
-              inputMode="numeric"
-              placeholder="£ other"
-              value={goalDraft}
-              onChange={(e) => {
-                setGoalDraft(e.target.value)
-                const n = parseInt(e.target.value, 10)
-                form.setValue(
-                  "goalAmount",
-                  Number.isFinite(n) && n > 0 ? n : undefined
-                )
-              }}
-            />
-          </div>
-        )
-      case "finish":
-        return (
-          <div className="space-y-4 text-sm">
-            <label className="flex items-center justify-between gap-4">
-              <span>
-                <span className="font-medium">Listed</span>{" "}
-                <span className="text-muted-foreground">
-                  — appears on the public favpolls page
-                </span>
-              </span>
-              <Switch
-                checked={v.isListed ?? true}
-                onCheckedChange={(c) => form.setValue("isListed", c)}
-              />
-            </label>
-            <p className="text-muted-foreground">
-              Close date and the shared-fund head start would live here too.
-            </p>
-            <Button type="button" className="w-full" disabled>
-              Publish — dead in this prototype
-            </Button>
-          </div>
-        )
-    }
-  }
-
-  // THE ARTEFACT, NOT THE PAGE (founder, rounds 3-4): each step shows only
-  // the piece it writes. Round 4 tightened it — the EVENT step shows no
-  // preview at all (there isn't one for that question); the TOPIC step shows
-  // the poll without the reveal; THEIR PAGE shows the hero, the topic ribbon
-  // and the reveal quote, without the tabs and bars. The whole page appears
-  // once, at the publish step.
-  const topicTitle = v.topics?.[0]?.title
-
-  const revealQuote = (
-    <div className="mt-4">
-      {showReveal ? (
-        <p
-          className={cn(
-            "border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal italic",
-            v.reveal ? "text-reveal-foreground" : "text-muted-foreground/40"
-          )}
-        >
-          {v.reveal ||
-            "Reveal their favourite here — guests see this only after they pledge. This could be a direct quote or a memory."}
-        </p>
-      ) : null}
-    </div>
-  )
-
-  // Rows only (founder, round 6): the banner's total/goal footer belongs to
-  // the goal step, not here.
-  const charityArtefact =
-    chosenCharities.length > 0 ? (
-      <div className="space-y-3 rounded-lg border border-border bg-card px-5 py-4">
-        {chosenCharities.map((c) => (
-          <CharityRow key={c.id} charity={c} amountRaised={0} />
-        ))}
-      </div>
-    ) : (
-      <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
-        The charity you pick appears here
-      </div>
-    )
-
-  const artefact = (() => {
-    switch (current) {
-      case "kind":
-        return null
-      case "charity":
-        return charityArtefact
-      case "goal":
-        // Just the goal element (founder, round 5) — the banner's bottom
-        // half, without the charities above it.
-        return (
-          <div className="rounded-lg border border-border bg-card px-5 py-4 text-right">
-            <p className="text-lg font-medium text-primary">£0</p>
-            <p className="text-xs text-muted-foreground">
-              {v.goalAmount
-                ? `raised of the £${v.goalAmount} goal`
-                : "raised so far"}
-            </p>
-            {v.goalAmount ? (
-              <GoalProgress
-                totalRaised={0}
-                goalAmount={v.goalAmount}
-                className="mt-2"
-              />
-            ) : null}
-          </div>
-        )
-      case "topic":
-        // The poll without the reveal — the reveal belongs to Their page.
-        return (
-          <div className="[&_[aria-label='Add_reveal']]:hidden">
-            <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
-            <EditablePollArea />
-          </div>
-        )
-      case "identity":
-        // The hero alone (founder, round 8): no About here — that is the
-        // next step's job — and no page top-padding inside a preview card.
-        return (
-          <div className="[&>div:first-child]:!pt-0 [&>div:nth-child(2)]:hidden">
-            <EditableHero />
-          </div>
-        )
-      case "story":
-        // Only the About and the reveal (founder, round 9) — the name block
-        // belongs to the previous step, the topic ribbon to the topic step.
-        // EditableHero's first block is hidden; the About block loses its
-        // page margins.
-        return (
-          <div className="[&>div:first-child]:hidden [&>div:nth-child(2)]:!my-0">
-            <EditableHero />
-            {revealQuote}
-          </div>
-        )
-      case "finish":
-        // No preview (founder, round 5): the payoff is the real page,
-        // right after publishing — not a picture of it beside the button.
-        return null
-    }
-  })()
-
-  // THE REAL PAGE'S WIDTH (founder, round 7): the favpoll page's content
-  // column is max-w-5xl (1024) minus px-16 (128) minus the 300px rail and
-  // the 40px gap = 556px. The artefacts render at exactly that width, so
-  // line wraps and type sizes match the page they will become.
-  const preview = artefact ? (
-    <div
-      aria-hidden="true"
-      data-proto-preview=""
-      className="pointer-events-none w-[596px] max-w-full rounded-xl border border-border bg-background p-5 shadow-sm select-none [&>*]:mx-auto [&>*]:w-[556px] [&>*]:max-w-full"
-    >
-      {artefact}
-    </div>
-  ) : null
-
   return (
     <RegisterScope palette={palette}>
-      <FormProvider {...form}>
-        <main className="mx-auto max-w-6xl px-6 py-10">
-          <div
-            className={cn(
-              "grid gap-10 md:items-start",
-              preview && "md:grid-cols-[minmax(0,1fr)_auto]"
-            )}
-          >
-            <div>
-              <ol
-                role="list"
-                className="mb-8 flex items-center gap-2"
-                aria-label="Steps"
-              >
-                {STEPS.map((k, i) => (
-                  <li
-                    key={k}
-                    role="listitem"
-                    aria-label={`Step ${i + 1} of ${STEPS.length}`}
-                    aria-current={i === step ? "step" : undefined}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all",
-                      i < step
-                        ? "w-6 bg-primary/50"
-                        : i === step
-                          ? "w-10 bg-primary"
-                          : "w-6 bg-muted"
-                    )}
-                  />
-                ))}
-              </ol>
-              <p className="text-sm font-medium tracking-[0.09em] text-primary-muted uppercase">
-                {TITLES[current].title}
-              </p>
-              <h1 className="mt-1 mb-6 text-2xl font-medium">
-                {TITLES[current].guidance}
-              </h1>
-              {stepBody(current)}
-              <div className="mt-8 flex items-center justify-between border-t border-border pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={step === 0}
-                  onClick={() => setStep((s) => Math.max(0, s - 1))}
+      <main>
+        <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
+          <ProtoRail current={current} />
+
+          <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
+            <div className="mx-auto w-full max-w-2xl">
+              <ProtoProgressStrip current={current} />
+
+              {current === "event" && (
+                <WizardStepShell
+                  title="Event"
+                  guidance="What kind of favpoll is this?"
                 >
-                  ← Back
-                </Button>
-                <div className="flex items-center gap-3">
-                  {TITLES[current].skippable && (
+                  <EventStep value={w.category} onChange={w.setCategory} />
+                </WizardStepShell>
+              )}
+
+              {current === "charity" && (
+                <WizardStepShell
+                  title="Charity"
+                  guidance={w.copy.charityGuidance}
+                >
+                  {w.selectedCharities.length > 0 ? (
+                    <WizardCharityCard
+                      charities={w.selectedCharities}
+                      onEdit={() => w.setCharityOpen(true)}
+                      onRemove={(id) =>
+                        w.setCharityIds((ids) => ids.filter((i) => i !== id))
+                      }
+                      onPickAnother={() => w.setCharityOpen(true)}
+                    />
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      onClick={() => w.setCharityOpen(true)}
+                    >
+                      Pick a charity
+                    </Button>
+                  )}
+                </WizardStepShell>
+              )}
+
+              {current === "topic" && (
+                <WizardStepShell title="Topic" guidance={w.copy.topicGuidance}>
+                  {w.topics.length > 0 ? (
+                    <WizardTopicCard
+                      topic={w.topics[0]!}
+                      sortedExistingItems={w.sortedExistingItems}
+                      customLabels={w.customLabels}
+                      showItemsSection={w.showItemsSection}
+                      onEdit={() => w.setTopicOpen(true)}
+                      onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
+                    />
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      onClick={() => w.setTopicOpen(true)}
+                    >
+                      Pick a topic
+                    </Button>
+                  )}
+                </WizardStepShell>
+              )}
+
+              {current === "info" && (
+                <WizardStepShell title="Name" guidance="Who the page is about.">
+                  <div className="space-y-4">
+                    {field(
+                      "Name",
+                      false,
+                      <Input
+                        value={name}
+                        maxLength={40}
+                        placeholder="Name or nickname"
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    )}
+                    {field(
+                      "Opening line",
+                      true,
+                      <Input
+                        value={openingLine}
+                        maxLength={50}
+                        placeholder="Replaces the default opening prefix"
+                        onChange={(e) => setOpeningLine(e.target.value)}
+                      />
+                    )}
+                    {field(
+                      "Context",
+                      true,
+                      <Input
+                        value={context}
+                        maxLength={40}
+                        placeholder="e.g. turning 40 · Class of 2024"
+                        onChange={(e) => setContext(e.target.value)}
+                      />
+                    )}
+                  </div>
+                </WizardStepShell>
+              )}
+
+              {current === "story" && (
+                <WizardStepShell
+                  title="About & reveal"
+                  guidance="Introduce them — and what guests unlock when they pledge."
+                >
+                  <div className="space-y-4">
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="secondary"
                       size="sm"
-                      onClick={() =>
-                        setStep((s) => Math.min(STEPS.length - 1, s + 1))
-                      }
+                      onClick={fillExample}
                     >
-                      Skip for now
+                      ✦ Generate an example
                     </Button>
-                  )}
-                  {current !== "finish" && (
-                    <Button
-                      type="button"
-                      disabled={!canNext[current]}
-                      onClick={() =>
-                        setStep((s) => Math.min(STEPS.length - 1, s + 1))
-                      }
-                    >
-                      Next
-                    </Button>
-                  )}
-                </div>
+                    {field(
+                      "About",
+                      true,
+                      <Textarea
+                        rows={3}
+                        maxLength={300}
+                        value={about}
+                        placeholder="Two or three sentences — tease the topic and the cause, but don't give too much away."
+                        onChange={(e) => setAbout(e.target.value)}
+                      />
+                    )}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          The reveal{" "}
+                          <span className="font-normal text-muted-foreground">
+                            — optional
+                          </span>
+                        </span>
+                        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                          Include
+                          <Switch
+                            checked={showReveal}
+                            onCheckedChange={setShowReveal}
+                          />
+                        </label>
+                      </div>
+                      <Textarea
+                        rows={3}
+                        maxLength={280}
+                        disabled={!showReveal}
+                        className={showReveal ? undefined : "opacity-40"}
+                        value={reveal}
+                        placeholder="Guests see this only after they pledge. A quote, a memory, or a message."
+                        onChange={(e) => setReveal(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </WizardStepShell>
+              )}
+
+              {current === "goal" && (
+                <WizardStepShell
+                  title="Goal"
+                  guidance="Optional — understood as progress, never as pressure."
+                >
+                  <div className="space-y-6">
+                    <div className="flex gap-2">
+                      {[100, 250, 500].map((g) => (
+                        <Button
+                          key={g}
+                          type="button"
+                          size="sm"
+                          variant={goalAmount === g ? "default" : "outline"}
+                          onClick={() => {
+                            setGoalAmount(g)
+                            setGoalDraft(String(g))
+                          }}
+                        >
+                          £{g}
+                        </Button>
+                      ))}
+                      <Input
+                        className="w-28"
+                        inputMode="numeric"
+                        placeholder="£ other"
+                        value={goalDraft}
+                        onChange={(e) => {
+                          setGoalDraft(e.target.value)
+                          const n = parseInt(e.target.value, 10)
+                          setGoalAmount(
+                            Number.isFinite(n) && n > 0 ? n : undefined
+                          )
+                        }}
+                      />
+                    </div>
+                    {field(
+                      "Shared fund head start",
+                      true,
+                      <Input
+                        className="w-40"
+                        inputMode="numeric"
+                        placeholder="£ amount"
+                        value={fundSeed}
+                        onChange={(e) => setFundSeed(e.target.value)}
+                      />,
+                      "Every favpoll has a shared fund. Put something in and guests can pledge from it without paying themselves."
+                    )}
+                  </div>
+                </WizardStepShell>
+              )}
+
+              {current === "publish" && (
+                <WizardStepShell
+                  title="Publish"
+                  guidance="How the favpoll appears, and when it closes."
+                >
+                  <div className="space-y-5 text-sm">
+                    <label className="flex items-center justify-between gap-4">
+                      <span>
+                        <span className="font-medium">Listed</span>{" "}
+                        <span className="text-muted-foreground">
+                          — appears on the public favpolls page
+                        </span>
+                      </span>
+                      <Switch
+                        checked={isListed}
+                        onCheckedChange={setIsListed}
+                      />
+                    </label>
+                    {field(
+                      "Close date",
+                      true,
+                      <Input
+                        type="date"
+                        className="w-44"
+                        value={closeDate}
+                        onChange={(e) => setCloseDate(e.target.value)}
+                      />,
+                      "90 days at most — it closes automatically either way."
+                    )}
+                  </div>
+                </WizardStepShell>
+              )}
+
+              <div className="mt-10 flex items-center justify-end gap-2 border-t border-border pt-2">
+                {!isFirst ? (
+                  <Button
+                    variant="ghost"
+                    size="lg"
+                    onClick={() => setStepIdx((s) => Math.max(0, s - 1))}
+                  >
+                    Back
+                  </Button>
+                ) : (
+                  <span />
+                )}
+                {isLast ? (
+                  <Button size="lg" disabled>
+                    Publish — dead in this prototype
+                  </Button>
+                ) : (
+                  <Button
+                    size="lg"
+                    disabled={nextDisabled[current]}
+                    onClick={() =>
+                      setStepIdx((s) => Math.min(PROTO_STEPS.length - 1, s + 1))
+                    }
+                  >
+                    Next
+                  </Button>
+                )}
               </div>
             </div>
-            {preview && <div className="md:sticky md:top-20">{preview}</div>}
           </div>
-        </main>
+        </div>
 
+        {/* Topic overlay — production markup */}
         <ResponsiveOverlay
-          open={charityOpen}
-          onOpenChange={setCharityOpen}
-          title="Pick a charity"
-        >
-          <CharityStep
-            charities={data.charities}
-            value={v.charities ?? []}
-            onChange={(ids) => {
-              form.setValue("charities", ids)
-              if (ids.length) setCharityOpen(false)
-            }}
-          />
-        </ResponsiveOverlay>
-        <ResponsiveOverlay
-          open={topicOpen}
-          onOpenChange={setTopicOpen}
+          open={w.topicOpen}
+          onOpenChange={(o) => {
+            w.setTopicOpen(o)
+            if (!o) setTopicSearch("")
+          }}
           title="Pick a topic"
+          hideCloseButton
+          headerClassName="px-5 pt-4 pb-2"
+          bodyClassName="p-0"
+          fullscreenOnMobile
+          mobileSave={{
+            label: "Done",
+            onClick: () => {
+              w.setTopicOpen(false)
+              setTopicSearch("")
+            },
+          }}
+          header={
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search topics…"
+                value={topicSearch}
+                onChange={(e) => setTopicSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && topicShowCreate) {
+                    e.preventDefault()
+                    handleCreateTopic()
+                  }
+                }}
+                className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+              />
+              {topicShowCreate && (
+                <InputGroupButton
+                  variant="secondary"
+                  onClick={handleCreateTopic}
+                >
+                  Add
+                </InputGroupButton>
+              )}
+            </div>
+          }
+          footer={
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="flex-1"
+                onClick={() => {
+                  w.setTopicOpen(false)
+                  setTopicSearch("")
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="flex-1"
+                onClick={() => {
+                  w.setTopicOpen(false)
+                  setTopicSearch("")
+                }}
+              >
+                Done
+              </Button>
+            </div>
+          }
         >
           <TopicStep
             topics={data.topics}
             categories={data.categories}
-            value={(v.topics ?? []) as FavpollFormValues["topics"]}
-            onChange={(t) => {
-              form.setValue("topics", t)
-              if (t.length) setTopicOpen(false)
+            value={w.topics}
+            onChange={(v) => {
+              w.setTopics(v)
+              w.setTopicOpen(false)
+              setTopicSearch("")
             }}
             hideItemsPanel
-            suggestedTopics={suggestedTopics}
-            primaryCharityName={primaryCharity?.name}
+            suggestedTopics={w.suggestedTopics}
+            primaryCharityName={w.primaryCharity?.name}
+            search={topicSearch}
+            onSearchChange={setTopicSearch}
           />
         </ResponsiveOverlay>
 
+        {/* Charity overlay — production markup */}
+        <ResponsiveOverlay
+          open={w.charityOpen}
+          onOpenChange={(o) => {
+            w.setCharityOpen(o)
+            if (!o) setCharitySearch("")
+          }}
+          title="Pick a charity"
+          hideCloseButton
+          headerClassName="px-5 pt-4 pb-2"
+          bodyClassName="p-0"
+          fullscreenOnMobile
+          mobileSave={{
+            label: "Done",
+            onClick: () => {
+              w.setCharityOpen(false)
+              setCharitySearch("")
+            },
+          }}
+          header={
+            <input
+              type="text"
+              autoFocus
+              placeholder="Search charities…"
+              value={charitySearch}
+              onChange={(e) => setCharitySearch(e.target.value)}
+              className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+            />
+          }
+          footer={
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="flex-1"
+                onClick={() => {
+                  w.setCharityOpen(false)
+                  setCharitySearch("")
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="flex-1"
+                onClick={() => {
+                  w.setCharityOpen(false)
+                  setCharitySearch("")
+                }}
+              >
+                Done
+              </Button>
+            </div>
+          }
+        >
+          <CharityStep
+            charities={data.charities}
+            value={w.charityIds}
+            onChange={w.setCharityIds}
+            search={charitySearch}
+          />
+        </ResponsiveOverlay>
+
+        {w.topics.length > 0 && (
+          <TopicItemsDialog
+            open={w.itemsDialogOpen}
+            onOpenChange={w.setItemsDialogOpen}
+            topicTitle={w.topics[0]!.title}
+            existingItems={w.dialogExistingItems}
+            addedItems={w.customLabels}
+            onAdd={w.handleAddItem}
+            onRemove={w.handleRemoveItem}
+            isNewTopic={w.topics[0]!.isCustom ?? false}
+          />
+        )}
+
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · A, round 2
+            PROTOTYPE · shape, round 10
           </div>
         )}
-      </FormProvider>
+      </main>
     </RegisterScope>
   )
 }
