@@ -11,6 +11,10 @@ import { cn } from "@/lib/utils"
 import { MenuButton } from "@favpoll/ui"
 import { HeaderBar } from "@/components/header-bar"
 import type { RegisterPalette } from "@/lib/register-palette"
+import {
+  REGISTER_LINK_ACTIVE,
+  REGISTER_LINK_INK,
+} from "@/components/register-link"
 
 // The three kinds of favpoll, in the header (founder, 2026-08-31: "it seems
 // obvious"). Until now the register pages were reachable from exactly one
@@ -49,11 +53,6 @@ const REGISTER_LINKS = [
   label: string
   section: string
 }[]
-
-// hover: keep the register's colour rather than the ghost/menu default ink.
-const REGISTER_LINK_INK =
-  "text-primary hover:text-primary dark:text-chart-2 dark:hover:text-chart-2"
-const REGISTER_LINK_ACTIVE = "bg-primary/10 font-medium dark:bg-chart-2/15"
 
 const MOBILE_LINK =
   "block w-full rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
