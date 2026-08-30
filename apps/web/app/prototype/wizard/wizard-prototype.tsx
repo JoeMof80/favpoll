@@ -465,7 +465,7 @@ export function WizardPrototype({ data }: { data: Data }) {
         // EditableHero's first block is hidden; the About block loses its
         // page margins.
         return (
-          <div className="[&>div:first-child>div:first-child]:hidden [&>div:first-child>div:nth-child(2)]:!my-0">
+          <div className="[&>div:first-child]:hidden [&>div:nth-child(2)]:!my-0">
             <EditableHero />
             {revealQuote}
           </div>
