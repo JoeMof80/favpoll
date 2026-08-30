@@ -353,21 +353,29 @@ export function WizardPrototype({ data }: { data: Data }) {
     }
   }
 
-  // Which preview regions the current step writes. Everything else fades,
-  // to say: this is the favpoll page, and you are filling THIS part in.
-  const focus: Record<StepKey, ("hero" | "poll" | "charity")[]> = {
-    kind: ["hero", "poll", "charity"],
+  // THE ARTEFACT, NOT THE PAGE (founder, round 3: "the preview should show
+  // artefacts representing the real elements of the page. No need to show
+  // the full preview"). Each step shows only the piece it writes — the
+  // charity banner alone, the poll alone, the hero and reveal for the words
+  // step — the way the register pages present artefacts. The whole page
+  // appears once, at the publish step.
+  const regions: Record<StepKey, ("hero" | "poll" | "charity")[]> = {
+    kind: ["hero"],
     charity: ["charity"],
     topic: ["poll"],
     words: ["hero", "poll"],
     goal: ["charity"],
     finish: ["hero", "poll", "charity"],
   }
-  const dim = (region: "hero" | "poll" | "charity") =>
-    cn(
-      "transition-opacity duration-300",
-      !focus[current].includes(region) && "opacity-25"
-    )
+  const shown = regions[current]
+  const captions: Record<StepKey, string> = {
+    kind: "The hero — it takes the kind's colour",
+    charity: "The charity banner",
+    topic: "The poll",
+    words: "The hero and the reveal",
+    goal: "The charity banner — with the goal",
+    finish: "The favpoll page",
+  }
 
   const preview = (
     <div
@@ -379,25 +387,29 @@ export function WizardPrototype({ data }: { data: Data }) {
         <style>{`[data-proto-preview] [aria-label="Add reveal"], [data-proto-preview] [aria-label="Edit reveal"] { display: none }`}</style>
       )}
       <p className="mb-4 text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
-        The favpoll page — live
+        {captions[current]} — live
       </p>
-      <div className={dim("hero")}>
-        <EditableHero />
-      </div>
-      <div className={cn("mt-6", dim("poll"))}>
-        <EditablePollArea />
-      </div>
-      <div className={cn("mt-6", dim("charity"))}>
-        {chosenCharities.length > 0 ? (
-          <CharityBanner
-            charities={chosenCharities}
-            totalRaised={0}
-            goalAmount={v.goalAmount ?? null}
-          />
-        ) : (
-          <div className="h-20 rounded-lg border border-dashed border-border" />
-        )}
-      </div>
+      {shown.includes("hero") && <EditableHero />}
+      {shown.includes("poll") && (
+        <div className={shown.includes("hero") ? "mt-6" : undefined}>
+          <EditablePollArea />
+        </div>
+      )}
+      {shown.includes("charity") && (
+        <div className={shown.length > 1 ? "mt-6" : undefined}>
+          {chosenCharities.length > 0 ? (
+            <CharityBanner
+              charities={chosenCharities}
+              totalRaised={0}
+              goalAmount={v.goalAmount ?? null}
+            />
+          ) : (
+            <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
+              The charity you pick appears here
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 
