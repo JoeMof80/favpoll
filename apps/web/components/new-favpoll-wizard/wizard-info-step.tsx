@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import { Check, Mars, NonBinary, Ribbon, UserRound, Venus } from "lucide-react"
+import {
+  Check,
+  ImagePlus,
+  Mars,
+  NonBinary,
+  Ribbon,
+  UserRound,
+  Venus,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -185,23 +193,33 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
 
       <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
         <span className="font-medium">Photo</span>
-        <span className="flex items-center gap-3">
-          {w.photoUrl && (
+        {/* The avatar IS the button (founder, 2026-09-01): tap the photo —
+            or the empty slot — to open the crop overlay. Same rounded-xl
+            shape the page's ProtagonistAvatar wears, so what you press is
+            what the favpoll shows. */}
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setPhotoOpen(true)}
+          aria-label={w.photoUrl ? "Change photo" : "Add a photo"}
+          className={cn(
+            "h-20 w-20 shrink-0 overflow-hidden rounded-xl border p-0 hover:ring-2 hover:ring-ring focus-visible:ring-2",
+            w.photoUrl
+              ? "border-border hover:bg-transparent"
+              : "border-dashed border-border-strong text-muted-foreground hover:bg-accent hover:text-foreground"
+          )}
+        >
+          {w.photoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={w.photoUrl}
               alt=""
-              className="h-11 w-11 rounded-lg border border-border object-cover"
+              className="h-full w-full object-cover"
             />
+          ) : (
+            <ImagePlus className="size-6" aria-hidden="true" />
           )}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setPhotoOpen(true)}
-          >
-            {w.photoUrl ? "Change photo" : "Add a photo"}
-          </Button>
-        </span>
+        </Button>
       </div>
 
       <FormProvider {...photoForm}>
