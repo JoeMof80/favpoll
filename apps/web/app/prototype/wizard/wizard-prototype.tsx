@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import {
   Check,
-  Speech,
+  UsersRound,
   BookOpen,
   Calendar,
   CalendarIcon,
@@ -701,11 +701,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                               <Button
                                 type="button"
                                 variant="ghost"
-                                size="icon-xs"
+                                size="icon-sm"
                                 aria-label={`Who: ${WHO_LABELS[who]}`}
-                                className="rounded-full text-muted-foreground/60 hover:text-foreground"
+                                className="text-muted-foreground/60 hover:text-foreground"
                               >
-                                <Speech className="h-4 w-4" />
+                                <UsersRound className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -1085,7 +1085,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 31
+            PROTOTYPE · shape, round 32
           </div>
         )}
       </main>
