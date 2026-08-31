@@ -163,19 +163,24 @@ function exampleFor(category: string | null | undefined, who: WhoValue) {
       reveal:
         "Our favourite is Biscuit, our therapy dog. Named after his favourite treat, he's a good boy who can have one after the walk.",
     }
-  const { sub, pos } = PRONOUNS[who]
+  const pk = who as "he" | "she" | "they"
+  const { sub, pos } = PRONOUNS[pk]
   const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
   switch (category) {
     case "memorial":
       return {
-        name: "Margaret Whitfield",
+        name: {
+          she: "Margaret Whitfield",
+          he: "Edward Whitfield",
+          they: "Sam Whitfield",
+        }[pk],
         context: "1941 – 2026",
-        about: `A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season ${sub} always loved most.`,
+        about: `A ${{ she: "headmistress", he: "headmaster", they: "headteacher" }[pk]} for forty-one years with a gift for knowing every pupil's name. There was a season ${sub} always loved most.`,
         reveal: `Autumn, always. ${cap(sub)} said it felt like coming home.`,
       }
     case "fundraiser":
       return {
-        name: "Marcus Bell",
+        name: { she: "Amira Bell", he: "Marcus Bell", they: "Sam Bell" }[pk],
         context: "London Marathon run",
         about: `Running ${pos} first marathon for Mind. Whichever hat is leading on the day, ${sub}'ll wear for all 26.2 miles.`,
         reveal:
@@ -183,7 +188,7 @@ function exampleFor(category: string | null | undefined, who: WhoValue) {
       }
     default:
       return {
-        name: "Poppy Chen",
+        name: { she: "Poppy Chen", he: "Alfie Chen", they: "Sam Chen" }[pk],
         context: "Sweet Sixteen",
         about:
           "Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",
@@ -490,8 +495,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   // publish these from the final step.
   const [stepIdx, setStepIdx] = useState(0)
   const [name, setName] = useState("")
-  const [who, setWho] = useState<WhoValue>("they")
-  const WhoIcon = WHO_ICONS[who]
+  const [who, setWho] = useState<WhoValue | "">("")
+  const WhoIcon = who ? WHO_ICONS[who] : UserRound
   const [openingLine, setOpeningLine] = useState("")
   const [context, setContext] = useState("")
   const [about, setAbout] = useState("")
@@ -544,7 +549,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   }
 
   function fillExample() {
-    const ex = exampleFor(w.category, who)
+    const ex = exampleFor(w.category, who || "they")
     setName(ex.name)
     setContext(ex.context)
     setAbout(ex.about)
@@ -651,6 +656,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                   ) : (
                     <Button
                       variant="secondary"
+                      size="lg"
+                      className="h-11 self-start px-6 md:text-base"
                       onClick={() => w.setCharityOpen(true)}
                     >
                       Pick a charity
@@ -673,6 +680,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                   ) : (
                     <Button
                       variant="secondary"
+                      size="lg"
+                      className="h-11 self-start px-6 md:text-base"
                       onClick={() => w.setTopicOpen(true)}
                     >
                       Pick a topic
@@ -710,7 +719,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           className="md:text-base"
                           value={name}
                           maxLength={40}
-                          placeholder={ph.name}
+                          placeholder={
+                            who
+                              ? `e.g. ${exampleFor(w.category, who).name}`
+                              : ph.name
+                          }
                           onChange={(e) => setName(e.target.value)}
                         />
                         <InputGroupAddon align="inline-end">
@@ -720,7 +733,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                                 type="button"
                                 variant="ghost"
                                 size="icon-sm"
-                                aria-label={`Who: ${WHO_LABELS[who]}`}
+                                aria-label={
+                                  who
+                                    ? `Who: ${WHO_LABELS[who]}`
+                                    : "Who is this favpoll for?"
+                                }
                                 className="text-muted-foreground/60 hover:text-foreground"
                               >
                                 <WhoIcon className="h-5 w-5" />
@@ -735,21 +752,26 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                                   "couple",
                                   "group",
                                 ] as WhoValue[]
-                              ).map((k) => (
-                                <DropdownMenuItem
-                                  key={k}
-                                  onClick={() => handleWho(k)}
-                                >
-                                  <span className="flex-1">
-                                    {WHO_LABELS[k]}
-                                  </span>
-                                  {who === k && <Check className="h-4 w-4" />}
-                                </DropdownMenuItem>
-                              ))}
+                              ).map((k) => {
+                                const Icon = WHO_ICONS[k]
+                                return (
+                                  <DropdownMenuItem
+                                    key={k}
+                                    onClick={() => handleWho(k)}
+                                  >
+                                    <Icon className="h-4 w-4 text-muted-foreground" />
+                                    <span className="flex-1">
+                                      {WHO_LABELS[k]}
+                                    </span>
+                                    {who === k && <Check className="h-4 w-4" />}
+                                  </DropdownMenuItem>
+                                )
+                              })}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() => handleWho("cause")}
                               >
+                                <Ribbon className="h-4 w-4 text-muted-foreground" />
                                 <span className="flex-1">Cause</span>
                                 {who === "cause" && (
                                   <Check className="h-4 w-4" />
@@ -1103,7 +1125,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 35
+            PROTOTYPE · shape, round 36
           </div>
         )}
       </main>
