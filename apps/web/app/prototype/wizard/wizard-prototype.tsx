@@ -13,6 +13,8 @@ import {
   Check,
   BookOpen,
   Calendar,
+  CalendarIcon,
+  Clock2Icon,
   Flag,
   Gift,
   Shapes,
@@ -20,13 +22,27 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
-import { CloseDateOverlay } from "@/components/favpoll-form/close-date-overlay"
-import { addDays } from "@/components/favpoll-form/date-helpers"
+import { Calendar as CalendarPicker } from "@/components/ui/calendar"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  addDays,
+  CLOSE_DATE_PRESETS,
+} from "@/components/favpoll-form/date-helpers"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { InputGroupButton } from "@/components/ui/input-group"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { EventStep } from "@/components/favpoll-flow/event-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
@@ -181,6 +197,125 @@ function ProtoShell({
   )
 }
 
+// The dropdown close-date picker (founder, round 28): the compact
+// DateTimePicker shape — button → calendar dropdown, time beside — with
+// the overlay's preset chips inside the dropdown. A preset or a day pick
+// closes it; time edits in place. First pick defaults to end of day.
+function ProtoDateTimePicker({
+  value,
+  onChange,
+}: {
+  value: Date | undefined
+  onChange: (d: Date) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const dateStr = value
+    ? value.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "Pick a close date"
+  const timeStr = value
+    ? `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
+    : "23:59"
+  const base = () => {
+    if (value) return new Date(value)
+    const d = new Date()
+    d.setHours(23, 59, 0, 0)
+    return d
+  }
+  function handleDaySelect(d: Date | undefined) {
+    if (!d) return
+    const next = base()
+    next.setFullYear(d.getFullYear(), d.getMonth(), d.getDate())
+    onChange(next)
+    setOpen(false)
+  }
+  function handlePreset(days: number) {
+    const b = base()
+    const next = addDays(new Date(), days)
+    next.setHours(b.getHours(), b.getMinutes(), 0, 0)
+    onChange(next)
+    setOpen(false)
+  }
+  function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const [h, m] = e.target.value.split(":").map(Number)
+    const next = base()
+    next.setHours(h ?? 23, m ?? 59, 0, 0)
+    onChange(next)
+  }
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return (
+    <div className="flex gap-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              INPUT_SIZE,
+              "w-56 justify-start gap-2 bg-background! font-normal"
+            )}
+          >
+            <CalendarIcon
+              className="h-4 w-4 shrink-0 text-muted-foreground/50"
+              aria-hidden
+            />
+            <span className={cn(!value && "text-muted-foreground/50")}>
+              {dateStr}
+            </span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Card size="sm" className="w-fit shadow-none ring-0">
+            <CardContent className="flex gap-3">
+              <CalendarPicker
+                mode="single"
+                captionLayout="dropdown"
+                selected={value}
+                defaultMonth={value ?? today}
+                startMonth={today}
+                endMonth={new Date(new Date().getFullYear() + 5, 11)}
+                disabled={{ before: today }}
+                onSelect={handleDaySelect}
+                className="p-0"
+              />
+              <div className="flex flex-col gap-1.5">
+                {CLOSE_DATE_PRESETS.map((p) => (
+                  <Button
+                    key={p.label}
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    className="rounded-full"
+                    onClick={() => handlePreset(p.days)}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </PopoverContent>
+      </Popover>
+      <InputGroup className={cn(INPUT_SIZE, "w-32 bg-background")}>
+        <InputGroupInput
+          type="time"
+          step="60"
+          value={timeStr}
+          onChange={handleTimeChange}
+          className="appearance-none tabular-nums [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        />
+        <InputGroupAddon align="inline-end">
+          <Clock2Icon className="h-4 w-4 text-muted-foreground/50" />
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
+  )
+}
+
 // The rail tracks the answers as they accumulate (founder, round 25):
 // each step shows a tick once its content is in, and the chosen thing
 // itself — the charity's name, the topic, the name — as a one-line
@@ -288,7 +423,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [goalDraft, setGoalDraft] = useState("")
   const [isListed, setIsListed] = useState(true)
   const [closesAt, setClosesAt] = useState<Date | undefined>(undefined)
-  const [closeOpen, setCloseOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
 
   // The real photo flow (HeroPhotoOverlay + crop) reads a form context;
@@ -606,18 +740,10 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     </div>
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
                       <span className="font-medium">Close date</span>
-                      <span className="flex items-center gap-3">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className={cn(INPUT_SIZE, "font-normal")}
-                          onClick={() => setCloseOpen(true)}
-                        >
-                          {closesAt
-                            ? `${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · ${String(closesAt.getHours()).padStart(2, "0")}:${String(closesAt.getMinutes()).padStart(2, "0")}`
-                            : "Pick a close date"}
-                        </Button>
-                      </span>
+                      <ProtoDateTimePicker
+                        value={closesAt}
+                        onChange={setClosesAt}
+                      />
                       <span className="block text-xs text-muted-foreground sm:col-start-2">
                         90 days at most — it closes automatically either way.
                       </span>
@@ -825,23 +951,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
           <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
         </FormProvider>
 
-        <CloseDateOverlay
-          open={closeOpen}
-          onOpenChange={setCloseOpen}
-          initialDate={
-            closesAt ??
-            (() => {
-              const d = addDays(new Date(), 90)
-              d.setHours(23, 59, 0, 0)
-              return d
-            })()
-          }
-          onSave={(d) => {
-            setClosesAt(d)
-            setCloseOpen(false)
-          }}
-        />
-
         {w.topics.length > 0 && (
           <TopicItemsDialog
             open={w.itemsDialogOpen}
@@ -857,7 +966,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 27
+            PROTOTYPE · shape, round 28
           </div>
         )}
       </main>
