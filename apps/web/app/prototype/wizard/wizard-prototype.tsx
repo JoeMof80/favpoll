@@ -58,17 +58,6 @@ const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
   publish: Flag,
 }
 
-// Rail lines for the three production steps come from wizard-copy; the
-// three new ones follow the same register — the favpoll, not its subject.
-const RAIL: Record<ProtoStep, string> = {
-  event: "Celebration, memorial or fundraiser.",
-  charity: "Every pledge goes to the charity you pick.",
-  topic: "Pick a topic, and guests pledge on their favourite.",
-  info: "The name at the top of the page.",
-  story: "An introduction, and the reveal guests unlock.",
-  publish: "A goal, a head start, and when it closes.",
-}
-
 // Canned example per kind, so "Generate an example" demonstrates the real
 // affordance without calling the model. The real build calls
 // safeGenerateDraft, exactly as the form does today.
@@ -116,7 +105,7 @@ function ProtoRail({ current }: { current: ProtoStep }) {
             <div
               key={s}
               className={cn(
-                "space-y-1 transition-opacity",
+                "transition-opacity",
                 isActive ? "opacity-100" : "opacity-60"
               )}
             >
@@ -136,9 +125,6 @@ function ProtoRail({ current }: { current: ProtoStep }) {
                   {STEP_LABELS[s]}
                 </p>
               </div>
-              <p className="pl-7.5 text-sm leading-relaxed text-muted-foreground">
-                {RAIL[s]}
-              </p>
             </div>
           )
         })}
@@ -715,7 +701,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 11
+            PROTOTYPE · shape, round 12
           </div>
         )}
       </main>
