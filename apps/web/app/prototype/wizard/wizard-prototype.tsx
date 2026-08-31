@@ -148,16 +148,21 @@ const PLACEHOLDERS: Record<string, Placeholders> = {
 
 function ProtoShell({
   title,
+  action,
   children,
 }: {
   title: string
+  action?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
     <div className="flex flex-col gap-5 py-6">
-      <h3 className="text-lg font-medium tracking-widest text-primary uppercase">
-        {title}
-      </h3>
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-lg font-medium tracking-widest text-primary uppercase">
+          {title}
+        </h3>
+        {action}
+      </div>
       {children}
     </div>
   )
@@ -426,8 +431,9 @@ export function WizardPrototype({ data }: { data: WizardData }) {
               )}
 
               {current === "story" && (
-                <ProtoShell title="Story">
-                  <div className="space-y-5">
+                <ProtoShell
+                  title="Story"
+                  action={
                     <Button
                       type="button"
                       variant="secondary"
@@ -436,6 +442,9 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     >
                       ✦ Generate an example
                     </Button>
+                  }
+                >
+                  <div className="space-y-5">
                     {field(
                       "About",
                       true,
@@ -761,7 +770,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 17
+            PROTOTYPE · shape, round 18
           </div>
         )}
       </main>
