@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import {
   Check,
+  Speech,
   BookOpen,
   Calendar,
   CalendarIcon,
@@ -34,6 +35,13 @@ import {
   CLOSE_DATE_PRESETS,
 } from "@/components/favpoll-form/date-helpers"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
+import type { Pronoun } from "@favpoll/types"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
@@ -86,35 +94,49 @@ const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
   publish: Flag,
 }
 
-// Canned example per kind, so "Generate an example" demonstrates the real
-// affordance without calling the model. The real build calls
-// safeGenerateDraft, exactly as the form does today.
-const EXAMPLES: Record<
-  string,
-  { name: string; context: string; about: string; reveal: string }
-> = {
-  memorial: {
-    name: "Margaret Whitfield",
-    context: "1941 – 2026",
-    about:
-      "A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season she always loved most.",
-    reveal: "Autumn, always. She said it felt like coming home.",
-  },
-  celebration: {
-    name: "Poppy Chen",
-    context: "Sweet Sixteen",
-    about:
-      "Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",
-    reveal: "Mint choc chip is the best, of course.",
-  },
-  fundraiser: {
-    name: "Marcus Bell",
-    context: "London Marathon run",
-    about:
-      "Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
-    reveal:
-      "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
-  },
+const PRONOUNS: Record<Pronoun, { sub: string; pos: string }> = {
+  she: { sub: "she", pos: "her" },
+  he: { sub: "he", pos: "his" },
+  they: { sub: "they", pos: "their" },
+}
+
+const PRONOUN_LABELS: Record<Pronoun, string> = {
+  she: "She / her",
+  he: "He / him",
+  they: "They / them",
+}
+
+// Canned example per kind, calibrated to the chosen pronoun — the same
+// inputs the real safeGenerateDraft call will take. They/them is the
+// default; nothing is ever inferred from the name.
+function exampleFor(category: string | null | undefined, pronoun: Pronoun) {
+  const { sub, pos } = PRONOUNS[pronoun]
+  const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
+  switch (category) {
+    case "memorial":
+      return {
+        name: "Margaret Whitfield",
+        context: "1941 – 2026",
+        about: `A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season ${sub} always loved most.`,
+        reveal: `Autumn, always. ${cap(sub)} said it felt like coming home.`,
+      }
+    case "fundraiser":
+      return {
+        name: "Marcus Bell",
+        context: "London Marathon run",
+        about: `Running ${pos} first marathon for Mind. Whichever hat is leading on the day, ${sub}'ll wear for all 26.2 miles.`,
+        reveal:
+          "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
+      }
+    default:
+      return {
+        name: "Poppy Chen",
+        context: "Sweet Sixteen",
+        about:
+          "Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",
+        reveal: "Mint choc chip is the best, of course.",
+      }
+  }
 }
 
 // Bigger inputs (founder, round 11) — the wizard column is generous, so
@@ -415,6 +437,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   // publish these from the final step.
   const [stepIdx, setStepIdx] = useState(0)
   const [name, setName] = useState("")
+  const [pronoun, setPronoun] = useState<Pronoun>("they")
   const [openingLine, setOpeningLine] = useState("")
   const [context, setContext] = useState("")
   const [about, setAbout] = useState("")
@@ -467,7 +490,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   }
 
   function fillExample() {
-    const ex = EXAMPLES[w.category ?? "celebration"] ?? EXAMPLES.celebration!
+    const ex = exampleFor(w.category, pronoun)
     setName(ex.name)
     setContext(ex.context)
     setAbout(ex.about)
@@ -615,13 +638,47 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     {field(
                       w.category === "fundraiser" ? "Name or cause" : "Name",
                       false,
-                      <Input
-                        className={INPUT_SIZE}
-                        value={name}
-                        maxLength={40}
-                        placeholder={ph.name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
+                      <InputGroup className={cn(INPUT_SIZE, "bg-background")}>
+                        <InputGroupInput
+                          className="md:text-base"
+                          value={name}
+                          maxLength={40}
+                          placeholder={ph.name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-xs"
+                                aria-label={`Pronoun: ${PRONOUN_LABELS[pronoun]}`}
+                                className="rounded-full text-muted-foreground/60 hover:text-foreground"
+                              >
+                                <Speech className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {(Object.keys(PRONOUN_LABELS) as Pronoun[]).map(
+                                (k) => (
+                                  <DropdownMenuItem
+                                    key={k}
+                                    onClick={() => setPronoun(k)}
+                                  >
+                                    <span className="flex-1">
+                                      {PRONOUN_LABELS[k]}
+                                    </span>
+                                    {pronoun === k && (
+                                      <Check className="h-4 w-4" />
+                                    )}
+                                  </DropdownMenuItem>
+                                )
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </InputGroupAddon>
+                      </InputGroup>
                     )}
                     {field(
                       "Context",
@@ -966,7 +1023,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 29
+            PROTOTYPE · shape, round 30
           </div>
         )}
       </main>
