@@ -11,12 +11,11 @@ import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import {
   Check,
-  UsersRound,
   BookOpen,
   Calendar,
   CalendarIcon,
   Clock2Icon,
-  Flag,
+  ClipboardList,
   Gift,
   Shapes,
   UserRound,
@@ -96,7 +95,7 @@ const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
   topic: Shapes,
   info: UserRound,
   story: BookOpen,
-  publish: Flag,
+  publish: ClipboardList,
 }
 
 const PRONOUNS: Record<"he" | "she" | "they", { sub: string; pos: string }> = {
@@ -705,7 +704,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                                 aria-label={`Who: ${WHO_LABELS[who]}`}
                                 className="text-muted-foreground/60 hover:text-foreground"
                               >
-                                <UsersRound className="h-5 w-5" />
+                                <UserRound className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -1085,7 +1084,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 32
+            PROTOTYPE · shape, round 33
           </div>
         )}
       </main>
