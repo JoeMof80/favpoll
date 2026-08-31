@@ -30,21 +30,33 @@ type Props = {
   currentStep: WizardStep
   summary: Record<WizardStep, string>
   done: Record<WizardStep, boolean>
+  /** Edit mode: rail entries become buttons that jump to their step. */
+  onStepClick?: (step: WizardStep) => void
 }
 
-export function WizardStepRail({ currentStep, summary, done }: Props) {
+export function WizardStepRail({
+  currentStep,
+  summary,
+  done,
+  onStepClick,
+}: Props) {
   return (
     <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
       <div className="flex flex-1 flex-col justify-around gap-5">
         {STEPS.map((s) => {
           const Icon = STEP_ICONS[s]
           const isActive = s === currentStep
+          const Entry = onStepClick ? "button" : "div"
           return (
-            <div
+            <Entry
               key={s}
+              {...(onStepClick
+                ? { type: "button" as const, onClick: () => onStepClick(s) }
+                : {})}
               className={cn(
-                "min-w-0 space-y-1 transition-opacity",
-                isActive || done[s] ? "opacity-100" : "opacity-60"
+                "min-w-0 space-y-1 text-left transition-opacity",
+                isActive || done[s] ? "opacity-100" : "opacity-60",
+                onStepClick && "cursor-pointer hover:opacity-100"
               )}
             >
               <div className="flex items-center gap-2.5">
@@ -74,7 +86,7 @@ export function WizardStepRail({ currentStep, summary, done }: Props) {
                   {summary[s]}
                 </p>
               )}
-            </div>
+            </Entry>
           )
         })}
       </div>

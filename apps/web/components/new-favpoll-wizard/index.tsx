@@ -22,14 +22,16 @@ import { WizardStepShell } from "./wizard-step-shell"
 import { WizardInfoStep } from "./wizard-info-step"
 import { WizardStoryStep } from "./wizard-story-step"
 import { WizardDetailsStep } from "./wizard-details-step"
-import type { WizardData } from "./use-wizard-state"
+import type { WizardData, WizardEditConfig } from "./use-wizard-state"
 
 type Props = {
   data: WizardData
+  /** Present at /favpolls/[id]/edit — prefilled, clickable rail, Save. */
+  edit?: WizardEditConfig
 }
 
-export function NewFavpollWizard({ data }: Props) {
-  const w = useWizardState(data)
+export function NewFavpollWizard({ data, edit }: Props) {
+  const w = useWizardState(data, edit)
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 
@@ -76,6 +78,16 @@ export function NewFavpollWizard({ data }: Props) {
     )
   }
 
+  // Money has moved: the step keeps its summary but takes no changes.
+  const lockedBody = (value: string) => (
+    <div className="space-y-2 text-sm">
+      <p className="text-base font-medium">{value || "—"}</p>
+      <p className="text-muted-foreground">
+        Locked — guests have already pledged.
+      </p>
+    </div>
+  )
+
   return (
     <RegisterScope palette={palette}>
       <main>
@@ -84,6 +96,7 @@ export function NewFavpollWizard({ data }: Props) {
             currentStep={w.step}
             summary={w.railSummary}
             done={w.railDone}
+            onStepClick={w.isEdit ? w.goToStep : undefined}
           />
 
           <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
@@ -92,13 +105,19 @@ export function NewFavpollWizard({ data }: Props) {
 
               {w.step === "event" && (
                 <WizardStepShell title="Event">
-                  <EventStep value={w.category} onChange={w.setCategory} />
+                  {w.stepLocked.event ? (
+                    lockedBody(w.railSummary.event)
+                  ) : (
+                    <EventStep value={w.category} onChange={w.setCategory} />
+                  )}
                 </WizardStepShell>
               )}
 
               {w.step === "charity" && (
                 <WizardStepShell title="Charity">
-                  {w.selectedCharities.length > 0 ? (
+                  {w.stepLocked.charity ? (
+                    lockedBody(w.railSummary.charity)
+                  ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
                       onEdit={() => w.setCharityOpen(true)}
@@ -122,7 +141,9 @@ export function NewFavpollWizard({ data }: Props) {
 
               {w.step === "topic" && (
                 <WizardStepShell title="Topic">
-                  {w.topics.length > 0 ? (
+                  {w.stepLocked.topic ? (
+                    lockedBody(w.railSummary.topic)
+                  ) : w.topics.length > 0 ? (
                     <WizardTopicCard
                       topic={w.topics[0]!}
                       sortedExistingItems={w.sortedExistingItems}
@@ -186,6 +207,8 @@ export function NewFavpollWizard({ data }: Props) {
                 isLast={w.isLast}
                 nextDisabled={w.nextDisabled}
                 submitting={w.submitting}
+                finishLabel={w.isEdit ? "Save" : "Publish"}
+                submittingLabel={w.isEdit ? "Saving…" : "Publishing…"}
                 onBack={w.handleBack}
                 onNext={w.handleNext}
                 onFinish={w.handleFinish}
