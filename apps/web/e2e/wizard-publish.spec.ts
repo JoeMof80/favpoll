@@ -11,9 +11,9 @@
  *   3. Event step: Memorial
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour
- *   6. Info step: fill the protagonist name
+ *   6. Header step: fill the protagonist name
  *   7. Story step: fill the About
- *   8. Details step: close date via the dropdown's "1 month" preset →
+ *   8. Settings step: close date via the dropdown's "1 month" preset →
  *      Publish
  *   9. Skip shared fund modal
  *  10. Assert: favpoll page shows correct headline prefix
@@ -120,8 +120,8 @@ test.describe("wizard → publish flow", () => {
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 5. Info step ──────────────────────────────────────────────────────────
-    await expect(page.getByRole("heading", { name: "Info" })).toBeVisible({
+    // ── 5. Header step ──────────────────────────────────────────────────────────
+    await expect(page.getByRole("heading", { name: "Header" })).toBeVisible({
       timeout: 10_000,
     })
     const nameInput = page.getByPlaceholder(/name or nickname|whitfield/i)
@@ -138,8 +138,8 @@ test.describe("wizard → publish flow", () => {
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 7. Details step: close date preset → Publish ─────────────────────────
-    await expect(page.getByRole("heading", { name: "Details" })).toBeVisible({
+    // ── 7. Settings step: close date preset → Publish ─────────────────────────
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible({
       timeout: 10_000,
     })
 

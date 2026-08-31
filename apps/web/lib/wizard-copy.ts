@@ -23,7 +23,7 @@ export const STEP_LABELS: Record<WizardStep, string> = {
   event: "Event",
   charity: "Charity",
   topic: "Topic",
-  info: "Info",
+  info: "Header",
   story: "Story",
-  details: "Details",
+  details: "Settings",
 }

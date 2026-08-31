@@ -91,10 +91,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
 
   return (
     <div className="space-y-5">
-      <WizardField
-        label="Opening line"
-        info="Replaces the default opening prefix."
-      >
+      <WizardField label="Opening line">
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
@@ -109,11 +106,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
         </InputGroup>
       </WizardField>
 
-      <WizardField
-        label={nameLabel}
-        required
-        info="Shown throughout the favpoll."
-      >
+      <WizardField label={nameLabel} required>
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
@@ -153,12 +146,21 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
                     </DropdownMenuItem>
                   )
                 })}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => w.handleWho("cause")}>
-                  <Ribbon className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">Cause</span>
-                  {w.who === "cause" && <Check className="h-4 w-4" />}
-                </DropdownMenuItem>
+                {/* Cause only under Fundraiser — a memorial or celebration
+                    is definitionally about someone, and subject "cause"
+                    would override the chosen type in deriveRegister. The
+                    who check keeps a prefilled cause representable in
+                    edit mode whatever its stored category. */}
+                {(w.category === "fundraiser" || w.who === "cause") && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => w.handleWho("cause")}>
+                      <Ribbon className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex-1">Cause</span>
+                      {w.who === "cause" && <Check className="h-4 w-4" />}
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
             <CharCounter value={w.name} max={40} />
@@ -166,7 +168,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
         </InputGroup>
       </WizardField>
 
-      <WizardField label="Context" info="Dates, years, or other context.">
+      <WizardField label="Context">
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
