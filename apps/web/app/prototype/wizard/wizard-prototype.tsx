@@ -43,9 +43,9 @@ const STEP_LABELS: Record<ProtoStep, string> = {
   event: "Event",
   charity: "Charity",
   topic: "Topic",
-  info: "Who",
+  info: "Info",
   story: "Story",
-  publish: "Finish",
+  publish: "Details",
 }
 
 const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
@@ -331,7 +331,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
               )}
 
               {current === "info" && (
-                <ProtoShell title="Who">
+                <ProtoShell title="Info">
                   {/* The page's own order (founder, round 11): opening line
                       above the name, context beneath — exactly as the hero
                       renders them. */}
@@ -430,7 +430,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
               )}
 
               {current === "publish" && (
-                <ProtoShell title="Finish">
+                <ProtoShell title="Details">
                   <div className="space-y-6">
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
                       <span className="block font-medium sm:pt-3">
@@ -709,7 +709,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 15
+            PROTOTYPE · shape, round 16
           </div>
         )}
       </main>
