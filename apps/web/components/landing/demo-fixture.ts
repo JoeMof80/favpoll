@@ -191,6 +191,7 @@ export const DEMO_KEEPSAKE_WALKTHROUGH_DATA: KeepsakeData = {
     amount: pounds(r.amount),
   })),
   rankHistory: null,
+  goalAmount: null,
   guestNames: [],
 }
 
@@ -218,6 +219,7 @@ export const DEMO_KEEPSAKE_DATA: KeepsakeData = {
     amount: pounds(r.amount),
   })),
   rankHistory: null,
+  goalAmount: null,
   guestNames: [],
 }
 
@@ -241,6 +243,7 @@ export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
     amount: pounds(r.amount),
   })),
   rankHistory: null,
+  goalAmount: null,
   guestNames: [],
 }
 
@@ -281,6 +284,7 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
     amount: pounds(r.amount),
   })),
   rankHistory: null,
+  goalAmount: null,
   guestNames: [],
 }
 

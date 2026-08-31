@@ -160,6 +160,7 @@ export default async function KeepsakePage({ params }: Props) {
     topicTitle: (poll.topics as any)?.title ?? "favourites",
     reveal: poll.personal_reveal,
     totalRaised: pollTotal,
+    goalAmount: favpoll.goal_amount ?? null,
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
