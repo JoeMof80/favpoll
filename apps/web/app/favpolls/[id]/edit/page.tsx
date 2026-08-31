@@ -1,22 +1,23 @@
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { FavpollForm } from "@/components/favpoll-form"
+import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
+import type { WizardEditConfig } from "@/components/new-favpoll-wizard/use-wizard-state"
+import { getWizardData } from "@/app/favpolls/new/wizard-data"
 import type {
-  Charity,
   FavpollCategory,
   FavpollGrouping,
   FavpollSubject,
   Pronoun,
-  Topic,
-  Favourite,
-  TopicWithMeta,
 } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
-import { deriveRegister } from "@/lib/registers"
 
 type Props = { params: Promise<{ id: string }> }
 
+// The wizard edits (extended-wizard Phase 2): the same six steps render
+// prefilled, the rail is clickable, the final button is Save. Once any
+// money has moved — a pledge or a shared-fund deposit — Event, Charity
+// and Topic lock (read-only here; updateFavpoll enforces the same rule).
 export default async function EditFavpollPage({ params }: Props) {
   const { id } = await params
   const { userId } = await auth()
@@ -35,36 +36,33 @@ export default async function EditFavpollPage({ params }: Props) {
   if (!favpoll) notFound()
   if (favpoll.created_by !== userId) redirect(`/favpolls/${id}`)
 
-  const [{ data: rawPoll }, { data: charities }, { data: topicsAll }] =
-    await Promise.all([
-      supabase
-        .from("favpoll_polls")
-        .select("*")
-        .eq("favpoll_id", id)
-        .maybeSingle(),
-      supabase
-        .from("charities")
-        .select("*")
-        .eq("is_active", true)
-        .order("name"),
-      supabase
-        .from("topics")
-        .select("*, favourites(*), topic_categories(category_id)")
-        .order("title"),
-    ])
+  const [data, { data: rawPoll }, { data: pot }] = await Promise.all([
+    getWizardData(),
+    supabase
+      .from("favpoll_polls")
+      .select("*")
+      .eq("favpoll_id", id)
+      .maybeSingle(),
+    supabase
+      .from("favpoll_pots")
+      .select("total_deposited")
+      .eq("favpoll_id", id)
+      .maybeSingle(),
+  ])
 
-  const enrichedTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
-    ...(t as Topic),
-    favourites: (t.favourites ?? []) as Favourite[],
-    category_ids: (t.topic_categories ?? []).map(
-      (tc: { category_id: string }) => tc.category_id
-    ),
-  }))
+  let pledgeCount = 0
+  if (rawPoll?.id) {
+    const { count } = await supabase
+      .from("pledges")
+      .select("id", { count: "exact", head: true })
+      .eq("favpoll_poll_id", rawPoll.id)
+    pledgeCount = count ?? 0
+  }
+  const locked = pledgeCount > 0 || (pot?.total_deposited ?? 0) > 0
 
-  // Build the pre-selected topic for the form
   let preselectedTopics: FavpollFormValues["topics"] = []
   if (rawPoll?.topic_id) {
-    const topic = enrichedTopics.find((t) => t.id === rawPoll.topic_id)
+    const topic = data.topics.find((t) => t.id === rawPoll.topic_id)
     if (topic) {
       preselectedTopics = [
         {
@@ -80,53 +78,45 @@ export default async function EditFavpollPage({ params }: Props) {
 
   const category = (favpoll.category ?? null) as FavpollCategory | null
   const grouping = (favpoll.grouping ?? "individual") as FavpollGrouping
-  const isCause = favpoll.subject === "cause"
+  const subject = (favpoll.subject ?? "someone") as FavpollSubject
+  const isCause = subject === "cause"
 
-  const defaultValues: Partial<FavpollFormValues> = {
-    category: category ?? undefined,
-    grouping,
-    register: deriveRegister(
+  const edit: WizardEditConfig = {
+    favpollId: id,
+    protagonistId: favpoll.protagonist_id ?? null,
+    existingPollId: rawPoll?.id ?? null,
+    locked,
+    initialClosesAt: favpoll.closes_at ?? null,
+    initial: {
       category,
       grouping,
-      (favpoll.subject ?? "someone") as FavpollSubject
-    ),
-    subject: (favpoll.subject ?? "someone") as FavpollSubject,
-    name: isCause ? "" : (favpoll.protagonists?.name ?? ""),
-    context: isCause
-      ? (favpoll.context ?? "")
-      : (favpoll.protagonists?.context ?? ""),
-    openingLine: favpoll.opening_line ?? "",
-    about: isCause
-      ? (favpoll.description ?? "")
-      : (favpoll.protagonists?.about ?? ""),
-    photoUrl: isCause
-      ? (favpoll.photo_url ?? undefined)
-      : (favpoll.protagonists?.photo_url ?? undefined),
-    causeLabel: isCause ? (favpoll.cause_label ?? "") : "",
-    pronoun: isCause
-      ? undefined
-      : ((favpoll.protagonists?.pronoun ?? undefined) as Pronoun | undefined),
-    charities: (favpoll.favpoll_charities ?? []).map(
-      (ec: { charity_id: string }) => ec.charity_id
-    ),
-    isListed: favpoll.is_listed ?? true,
-    goalAmount: favpoll.goal_amount ?? undefined,
-    reveal: rawPoll?.personal_reveal ?? "",
-    topics: preselectedTopics,
+      subject,
+      pronoun: isCause
+        ? undefined
+        : ((favpoll.protagonists?.pronoun ?? undefined) as Pronoun | undefined),
+      charityIds: (favpoll.favpoll_charities ?? []).map(
+        (ec: { charity_id: string }) => ec.charity_id
+      ),
+      topics: preselectedTopics,
+      openingLine: favpoll.opening_line ?? "",
+      // The cause's label lives in the Name field in the wizard.
+      name: isCause
+        ? (favpoll.cause_label ?? "")
+        : (favpoll.protagonists?.name ?? ""),
+      context: isCause
+        ? (favpoll.context ?? "")
+        : (favpoll.protagonists?.context ?? ""),
+      photoUrl: isCause
+        ? (favpoll.photo_url ?? null)
+        : (favpoll.protagonists?.photo_url ?? null),
+      about: isCause
+        ? (favpoll.description ?? "")
+        : (favpoll.protagonists?.about ?? ""),
+      reveal: rawPoll?.personal_reveal ?? "",
+      goalAmount: favpoll.goal_amount ?? undefined,
+      isListed: favpoll.is_listed ?? true,
+    },
   }
 
-  return (
-    // No RegisterScope here: FavpollForm wears the register itself, live
-    // from its values (2026-08-31), so create and edit behave the same.
-    <FavpollForm
-      mode="edit"
-      charities={(charities ?? []) as Charity[]}
-      topics={enrichedTopics}
-      favpollId={id}
-      protagonistId={favpoll.protagonist_id ?? undefined}
-      existingPollId={rawPoll?.id}
-      defaultValues={defaultValues}
-      initialClosesAt={favpoll.closes_at}
-    />
-  )
+  return <NewFavpollWizard data={data} edit={edit} />
 }

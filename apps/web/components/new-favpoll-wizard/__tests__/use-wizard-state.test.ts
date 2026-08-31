@@ -29,6 +29,10 @@ vi.mock("@/app/favpolls/new/actions", () => ({
 vi.mock("@/lib/actions/generate-draft", () => ({
   safeGenerateDraft: mockSafeGenerateDraft,
 }))
+const mockUpdateFavpoll = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
+vi.mock("@/app/favpolls/[id]/edit/actions", () => ({
+  updateFavpoll: mockUpdateFavpoll,
+}))
 
 const DATA: WizardData = {
   charities: [
@@ -113,6 +117,7 @@ function advanceToDetails(result: HookResult) {
 
 beforeEach(() => {
   mockPush.mockReset()
+  mockUpdateFavpoll.mockClear()
   mockCreateFavpoll.mockClear()
   mockUploadPersonPhoto.mockClear()
   mockSafeGenerateDraft.mockClear()
@@ -446,6 +451,96 @@ describe("useWizardState — listed follows the register", () => {
     expect(result.current.isListed).toBe(false)
     act(() => result.current.setIsListed(true))
     expect(result.current.isListed).toBe(true)
+  })
+})
+
+describe("useWizardState — edit mode (Phase 2)", () => {
+  const EDIT = {
+    favpollId: "f9",
+    protagonistId: "p9",
+    existingPollId: "poll9",
+    locked: false,
+    initialClosesAt: "2026-10-01T22:59:00.000Z",
+    initial: {
+      category: "memorial" as const,
+      grouping: "individual" as const,
+      subject: "someone" as const,
+      pronoun: "she" as const,
+      charityIds: ["c1"],
+      topics: [EXISTING_TOPIC],
+      openingLine: "In loving memory of",
+      name: "Margaret Whitfield",
+      context: "1941 – 2026",
+      photoUrl: null,
+      about: "A headmistress.",
+      reveal: "Autumn, always.",
+      goalAmount: 250,
+      isListed: false,
+    },
+  }
+
+  it("prefills every field, including who from the pronoun", () => {
+    const { result } = renderHook(() => useWizardState(DATA, EDIT))
+    expect(result.current.isEdit).toBe(true)
+    expect(result.current.category).toBe("memorial")
+    expect(result.current.name).toBe("Margaret Whitfield")
+    expect(result.current.openingLine).toBe("In loving memory of")
+    expect(result.current.about).toBe("A headmistress.")
+    expect(result.current.reveal).toBe("Autumn, always.")
+    expect(result.current.who).toBe("she")
+    expect(result.current.goalAmount).toBe(250)
+    expect(result.current.isListed).toBe(false)
+    expect(result.current.closesAt?.toISOString()).toBe(
+      "2026-10-01T22:59:00.000Z"
+    )
+    expect(result.current.railDone.event).toBe(true)
+    expect(result.current.nextDisabled).toBe(false)
+  })
+
+  it("Save calls updateFavpoll with the existing ids and navigates back", async () => {
+    const { result } = renderHook(() => useWizardState(DATA, EDIT))
+    act(() => result.current.setAbout("Edited about."))
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(mockUpdateFavpoll).toHaveBeenCalledOnce()
+    const [favpollId, protagonistId, input] = mockUpdateFavpoll.mock.calls[0]
+    expect(favpollId).toBe("f9")
+    expect(protagonistId).toBe("p9")
+    expect(input.protagonistAbout).toBe("Edited about.")
+    expect(input.poll.id).toBe("poll9")
+    expect(input.poll.topicId).toBe("t1")
+    expect(mockCreateFavpoll).not.toHaveBeenCalled()
+    expect(result.current.seedFavpollId).toBeNull()
+    expect(mockPush).toHaveBeenCalledWith("/favpolls/f9")
+  })
+
+  it("locked marks event, charity and topic only", () => {
+    const { result } = renderHook(() =>
+      useWizardState(DATA, { ...EDIT, locked: true })
+    )
+    expect(result.current.stepLocked.event).toBe(true)
+    expect(result.current.stepLocked.charity).toBe(true)
+    expect(result.current.stepLocked.topic).toBe(true)
+    expect(result.current.stepLocked.info).toBe(false)
+    expect(result.current.stepLocked.details).toBe(false)
+  })
+
+  it("a cause favpoll prefills who=cause and the label in the name field", () => {
+    const { result } = renderHook(() =>
+      useWizardState(DATA, {
+        ...EDIT,
+        initial: {
+          ...EDIT.initial,
+          subject: "cause" as const,
+          pronoun: undefined,
+          name: "St Mark's Hospice",
+        },
+      })
+    )
+    expect(result.current.who).toBe("cause")
+    expect(result.current.isCause).toBe(true)
+    expect(result.current.name).toBe("St Mark's Hospice")
   })
 })
 

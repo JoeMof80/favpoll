@@ -8,6 +8,7 @@ type Props = {
   nextDisabled: boolean
   submitting?: boolean
   finishLabel?: string
+  submittingLabel?: string
   onBack: () => void
   onNext: () => void
   onFinish: () => void
@@ -19,6 +20,7 @@ export function WizardNav({
   nextDisabled,
   submitting = false,
   finishLabel = "Publish",
+  submittingLabel = "Publishing…",
   onBack,
   onNext,
   onFinish,
@@ -43,7 +45,7 @@ export function WizardNav({
           disabled={nextDisabled || submitting}
           onClick={onFinish}
         >
-          {submitting ? "Publishing…" : finishLabel}
+          {submitting ? submittingLabel : finishLabel}
         </Button>
       ) : (
         <Button size="lg" disabled={nextDisabled} onClick={onNext}>

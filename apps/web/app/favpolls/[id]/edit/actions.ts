@@ -232,11 +232,60 @@ export async function updateFavpoll(
   // Verify ownership and fetch current closes_at/extension fields
   const { data: favpoll } = await supabase
     .from("favpolls")
-    .select("created_by, closes_at, hard_close_at, extension_count")
+    .select(
+      "created_by, closes_at, hard_close_at, extension_count, category, favpoll_charities(charity_id)"
+    )
     .eq("id", favpollId)
     .single()
 
   if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  // ── Step locking (extended-wizard Phase 2) ────────────────────────────
+  // Once money has moved — any pledge, or any shared-fund deposit — the
+  // event, charity and topic are structural: changing them would reroute
+  // funds or invalidate what guests pledged on. Enforced here regardless
+  // of what the UI showed.
+  const { data: currentPollRow } = await supabase
+    .from("favpoll_polls")
+    .select("id, topic_id")
+    .eq("favpoll_id", favpollId)
+    .maybeSingle()
+
+  let moneyMoved = false
+  if (currentPollRow) {
+    const { count } = await supabase
+      .from("pledges")
+      .select("id", { count: "exact", head: true })
+      .eq("favpoll_poll_id", currentPollRow.id)
+    moneyMoved = (count ?? 0) > 0
+  }
+  if (!moneyMoved) {
+    const { data: pot } = await supabase
+      .from("favpoll_pots")
+      .select("total_deposited")
+      .eq("favpoll_id", favpollId)
+      .maybeSingle()
+    moneyMoved = (pot?.total_deposited ?? 0) > 0
+  }
+  if (moneyMoved) {
+    const currentCharities = (favpoll.favpoll_charities ?? [])
+      .map((c: { charity_id: string }) => c.charity_id)
+      .sort()
+      .join(",")
+    const nextCharities = [...input.charityIds].sort().join(",")
+    const topicChanged = currentPollRow
+      ? currentPollRow.topic_id !== (input.poll.topicId || null)
+      : false
+    if (
+      (favpoll.category ?? null) !== (input.category ?? null) ||
+      currentCharities !== nextCharities ||
+      topicChanged
+    ) {
+      throw new Error(
+        "The event, charity and topic are locked once guests have pledged."
+      )
+    }
+  }
 
   const newClosesAt = new Date(input.closesAt).toISOString()
   const currentClosesAt = new Date(favpoll.closes_at)

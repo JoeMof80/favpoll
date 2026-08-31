@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
+import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
 import {
   groupingForWho,
@@ -34,6 +35,49 @@ export type WizardData = {
   suggestedTopicIds?: Record<string, string[]>
 }
 
+/**
+ * Edit-mode configuration (extended-wizard Phase 2): the wizard renders
+ * prefilled at /favpolls/[id]/edit, the rail is clickable, the final
+ * button is Save (updateFavpoll), and — once the favpoll has taken any
+ * money (a pledge or a shared-fund top-up) — Event, Charity and Topic
+ * lock: their steps render read-only and the server refuses changes.
+ */
+export type WizardEditConfig = {
+  favpollId: string
+  protagonistId: string | null
+  existingPollId: string | null
+  /** True once any pledge or shared-fund top-up exists. */
+  locked: boolean
+  initialClosesAt: string | null
+  initial: {
+    category: FavpollCategory | null
+    grouping: FavpollGrouping
+    subject: FavpollSubject
+    pronoun: Pronoun | undefined
+    charityIds: string[]
+    topics: WizardTopics
+    openingLine: string
+    name: string
+    context: string
+    photoUrl: string | null
+    about: string
+    reveal: string
+    goalAmount: number | undefined
+    isListed: boolean
+  }
+}
+
+function whoFor(
+  subject: FavpollSubject,
+  grouping: FavpollGrouping,
+  pronoun: Pronoun | undefined
+): WhoValue | "" {
+  if (subject === "cause") return "cause"
+  if (grouping === "couple") return "couple"
+  if (grouping === "group") return "group"
+  return pronoun ?? ""
+}
+
 function sortTopicItems(items: Favourite[]): Favourite[] {
   return [...items].sort((a, b) => {
     const aOrder = a.display_order ?? Infinity
@@ -43,33 +87,53 @@ function sortTopicItems(items: Favourite[]): Favourite[] {
   })
 }
 
-export function useWizardState(data: WizardData) {
+export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
+  const isEdit = !!edit
+  const init = edit?.initial
   const router = useRouter()
 
   const [step, setStep] = useState<WizardStep>("event")
-  const [category, setCategory] = useState<FavpollCategory | null>(null)
-  const [grouping, setGrouping] = useState<FavpollGrouping>("individual")
-  const [subject, setSubject] = useState<FavpollSubject>("someone")
-  const [pronoun, setPronoun] = useState<Pronoun | undefined>(undefined)
-  const [topics, setTopics] = useState<WizardTopics>([])
-  const [charityIds, setCharityIds] = useState<string[]>([])
+  const [category, setCategory] = useState<FavpollCategory | null>(
+    init?.category ?? null
+  )
+  const [grouping, setGrouping] = useState<FavpollGrouping>(
+    init?.grouping ?? "individual"
+  )
+  const [subject, setSubject] = useState<FavpollSubject>(
+    init?.subject ?? "someone"
+  )
+  const [pronoun, setPronoun] = useState<Pronoun | undefined>(init?.pronoun)
+  const [topics, setTopics] = useState<WizardTopics>(init?.topics ?? [])
+  const [charityIds, setCharityIds] = useState<string[]>(init?.charityIds ?? [])
   const [topicOpen, setTopicOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)
   const [itemsDialogOpen, setItemsDialogOpen] = useState(false)
 
   // The appended steps' fields (Info · Story · Details).
-  const [openingLine, setOpeningLine] = useState("")
-  const [name, setName] = useState("")
-  const [context, setContext] = useState("")
+  const [openingLine, setOpeningLine] = useState(init?.openingLine ?? "")
+  const [name, setName] = useState(init?.name ?? "")
+  const [context, setContext] = useState(init?.context ?? "")
   const [photo, setPhoto] = useState<File | null>(null)
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
-  const [about, setAbout] = useState("")
-  const [reveal, setReveal] = useState("")
-  const [who, setWho] = useState<WhoValue | "">("")
-  const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
-  const [goalDraft, setGoalDraft] = useState("")
-  const [closesAt, setClosesAt] = useState<Date | undefined>(undefined)
-  const [listedOverride, setListedOverride] = useState<boolean | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(
+    init?.photoUrl ?? null
+  )
+  const [about, setAbout] = useState(init?.about ?? "")
+  const [reveal, setReveal] = useState(init?.reveal ?? "")
+  const [who, setWho] = useState<WhoValue | "">(
+    init ? whoFor(init.subject, init.grouping, init.pronoun) : ""
+  )
+  const [goalAmount, setGoalAmount] = useState<number | undefined>(
+    init?.goalAmount
+  )
+  const [goalDraft, setGoalDraft] = useState(
+    init?.goalAmount ? String(init.goalAmount) : ""
+  )
+  const [closesAt, setClosesAt] = useState<Date | undefined>(
+    edit?.initialClosesAt ? new Date(edit.initialClosesAt) : undefined
+  )
+  const [listedOverride, setListedOverride] = useState<boolean | null>(
+    init ? init.isListed : null
+  )
 
   const [generating, setGenerating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -108,6 +172,17 @@ export function useWizardState(data: WizardData) {
     topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
   const isCause = subject === "cause"
+
+  // Money has moved: Event, Charity and Topic are read-only (Phase 2
+  // locking; the server enforces the same rule in updateFavpoll).
+  const stepLocked: Record<WizardStep, boolean> = {
+    event: !!edit?.locked,
+    charity: !!edit?.locked,
+    topic: !!edit?.locked,
+    info: false,
+    story: false,
+    details: false,
+  }
 
   const topicDone =
     topics.length > 0 &&
@@ -253,9 +328,10 @@ export function useWizardState(data: WizardData) {
     }
   }
 
-  // Publish — the whole payload in one call, exactly as the form's
-  // create branch did. SeedFundModal then offers the fund head start
-  // (a payment needs the created favpoll), and onComplete navigates.
+  // Publish (create) or Save (edit) — the whole payload in one call.
+  // Create: SeedFundModal then offers the fund head start (a payment
+  // needs the created favpoll), and onComplete navigates. Edit: navigate
+  // straight back to the page.
   async function handleFinish() {
     if (submitting) return
     setError(null)
@@ -277,6 +353,49 @@ export function useWizardState(data: WizardData) {
         closesAt ?? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
 
       sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
+
+      if (edit) {
+        await updateFavpoll(edit.favpollId, edit.protagonistId ?? "", {
+          protagonistName: isCause ? "" : name,
+          protagonistAbout: isCause ? null : about || null,
+          photoUrl: resolvedPhotoUrl,
+          dateLabel: context || null,
+          category: category ?? null,
+          grouping,
+          subject,
+          causeLabel: isCause ? name.trim() || null : null,
+          pronoun: isCause ? null : (pronoun ?? null),
+          openingLine: openingLine || null,
+          description: isCause ? about.trim() || null : null,
+          charityIds,
+          closesAt: resolvedClosesAt.toISOString(),
+          isPrivate: false,
+          isListed,
+          potAmount: null,
+          goalAmount: goalAmount ?? null,
+          poll: {
+            id: edit.existingPollId ?? undefined,
+            topicId: isCustomTopic ? null : selected.topicId,
+            topicIsCustom: isCustomTopic,
+            customTopicTitle: isCustomTopic ? selected.title : "",
+            customTopicItems: isCustomTopic
+              ? (selected.customLabels ?? [])
+              : [],
+            reveal: reveal || null,
+            infiniteItems:
+              !isCustomTopic && topicMeta && !topicMeta.is_finite
+                ? {
+                    canonicalItemIds: topicMeta.favourites
+                      .filter((i) => i.is_canonical)
+                      .map((i) => i.id),
+                    customLabels: selected.customLabels ?? [],
+                  }
+                : null,
+          },
+        })
+        router.push(`/favpolls/${edit.favpollId}`)
+        return
+      }
 
       const { favpollId } = await createFavpoll({
         protagonistName: isCause ? "" : name,
@@ -393,6 +512,8 @@ export function useWizardState(data: WizardData) {
     isListed,
     setIsListed: (v: boolean) => setListedOverride(v),
     isCause,
+    isEdit,
+    stepLocked,
     railSummary,
     railDone,
     generating,
