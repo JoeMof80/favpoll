@@ -68,3 +68,21 @@ is one click, no dialog. Pronouns are never derived from the name
 and they/them; the organiser edits freely. The Name label is dynamic —
 "Name or cause" under Fundraiser, since Cause lives inside that register
 in this wizard.
+
+## VERDICT (founder, 2026-08-31, round 41)
+
+**The extended wizard wins.** Forty-one rounds landed on: six steps
+(Event · Charity · Topic · Info · Story · Details), single column, no
+live preview — the payoff is the real page after Publish. Production
+chrome throughout (useWizardState, wizard cards, overlays, photo crop,
+calendar dropdown + presets, CharCounter, dialog helper copy). The who
+axis lives on the Name field (icon dropdown, founder's icon set, never
+inferred from the name) and calibrates one-click generation together
+with register, charity, topic and context.
+
+Founder: "i think I'm happy with this prototype. I'm strongly tempted
+to use this for editing as well as adding a favpoll." — so the build
+direction is create AND edit through this wizard (rail clickable,
+prefilled, Publish→Save), the favpoll page becomes pure guest-view, and
+the in-place edit system retires. Open design item: step locking for
+live favpolls (Event/Charity/Topic lock once pledges exist).
