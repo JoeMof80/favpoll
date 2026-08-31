@@ -18,10 +18,6 @@ import {
 import { cn } from "@/lib/utils"
 import { type PickerSize, INPUT_SIZE } from "./constants"
 
-// Matches the natural rendered width of the calendar popover:
-// 7 day columns × 28px (--cell-size = --spacing(7)) + CardContent px-3 (12px × 2)
-const CALENDAR_WIDTH = 220
-
 export function DateTimePicker({
   value,
   onChange,
@@ -31,10 +27,16 @@ export function DateTimePicker({
   value: Date | undefined
   onChange: (d: Date) => void
   size?: PickerSize
-  /** Optional chip column inside the calendar popover — {label, days from now}. A preset keeps the chosen time and closes the popover. */
+  /** Optional chip column inside the calendar popover — {label, days from now}. A preset keeps the chosen time; the popover stays open so the pick can be seen on the calendar. */
   presets?: { label: string; days: number }[]
 }) {
   const [open, setOpen] = useState(false)
+  const [month, setMonth] = useState<Date>(() => value ?? new Date())
+
+  function handleOpenChange(next: boolean) {
+    setOpen(next)
+    if (next) setMonth(value ?? new Date())
+  }
 
   const dateStr = value
     ? value.toLocaleDateString("en-GB", {
@@ -60,7 +62,7 @@ export function DateTimePicker({
     next.setDate(next.getDate() + days)
     next.setHours(base.getHours(), base.getMinutes(), 0, 0)
     onChange(next)
-    setOpen(false)
+    setMonth(next)
   }
 
   function handleDaySelect(d: Date | undefined) {
@@ -84,14 +86,13 @@ export function DateTimePicker({
   return (
     <div className="flex gap-2">
       {/* Date picker */}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
             type="button"
             variant="outline"
-            style={{ width: CALENDAR_WIDTH }}
             className={cn(
-              "cursor-pointer justify-start gap-2 bg-background! font-normal",
+              "min-w-0 flex-1 cursor-pointer justify-start gap-2 bg-background! font-normal",
               INPUT_SIZE[size],
               !value && "text-muted-foreground"
             )}
@@ -112,7 +113,8 @@ export function DateTimePicker({
                 mode="single"
                 captionLayout="dropdown"
                 selected={value}
-                defaultMonth={value ?? today}
+                month={month}
+                onMonthChange={setMonth}
                 startMonth={today}
                 endMonth={new Date(new Date().getFullYear() + 5, 11)}
                 disabled={{ before: today }}
@@ -126,7 +128,7 @@ export function DateTimePicker({
                       key={p.label}
                       type="button"
                       variant="outline"
-                      size="xs"
+                      size="sm"
                       className="rounded-full"
                       onClick={() => handlePreset(p.days)}
                     >
