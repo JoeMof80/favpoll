@@ -602,7 +602,15 @@ export function LandingHero({
                     // No accent top rule (founder, 2026-08-05) — the register
                     // reads from the card's own palette: the dot, the bars,
                     // and in dark the ink.
-                    "group register-ink @container block rounded-xl bg-background p-5 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/20 transition-all hover:bg-accent motion-safe:hover:-translate-y-0.5 dark:bg-primary dark:hover:bg-chart-1"
+                    // QUIETER (founder, 2026-08-31: "too two-tone — only the
+                    // headers and ranking bars should be in the branding
+                    // colour"). The root keeps the ink remap for the title
+                    // line and the bars; body, topic header and footer are
+                    // overridden to neutral greys in light. Dark keeps the
+                    // full ink scheme untouched — there the card is the
+                    // near-white block with the register as ink, and the
+                    // neutral tokens would vanish against it.
+                    "group register-ink @container block rounded-xl bg-background p-5 text-primary-foreground shadow-sm ring-1 ring-border transition-all hover:bg-accent motion-safe:hover:-translate-y-0.5 dark:bg-primary dark:ring-primary-foreground/20 dark:hover:bg-chart-1"
                   )}
                 >
                   {/* Two columns inside the card (founder, 2026-08-05):
@@ -652,7 +660,7 @@ export function LandingHero({
                         />
                         {card.title}
                       </p>
-                      <p className="text-sm leading-relaxed text-primary-foreground/75">
+                      <p className="text-sm leading-relaxed text-muted-foreground dark:text-primary-foreground/75">
                         {card.body}
                       </p>
                     </div>
@@ -671,7 +679,7 @@ export function LandingHero({
                           2026-08-05): the poll is the product's core, so its
                           question shouldn't be the smallest thing on the
                           card. */}
-                      <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-primary-foreground/70 uppercase">
+                      <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-muted-foreground uppercase dark:text-primary-foreground/70">
                         Favourite {card.topic}
                       </p>
                       {card.results.map((r) => (
@@ -691,7 +699,7 @@ export function LandingHero({
                           below, and every favpoll's shared fund takes pledges
                           that attach to no favourite, so a total can never be
                           just the sum of its visible rows. */}
-                      <p className="text-xs text-primary-foreground/55">
+                      <p className="text-xs text-muted-foreground dark:text-primary-foreground/55">
                         {card.more}
                       </p>
                       {/* Where it all goes — charity + running total. No rule
@@ -714,10 +722,10 @@ export function LandingHero({
                             items-baseline, not items-center: two type sizes
                             on one row centre-align to nothing, and the
                             baseline is what the eye reads them along. */}
-                        <span className="min-w-0 truncate text-xs text-primary-foreground/70">
+                        <span className="min-w-0 truncate text-xs text-muted-foreground dark:text-primary-foreground/70">
                           {card.charity}
                         </span>
-                        <span className="shrink-0 font-medium text-primary-foreground">
+                        <span className="shrink-0 font-medium text-foreground dark:text-primary-foreground">
                           {card.total}
                         </span>
                       </div>
