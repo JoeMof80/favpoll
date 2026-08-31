@@ -11,7 +11,6 @@ import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import {
   Check,
-  InfoIcon,
   BookOpen,
   Calendar,
   Flag,
@@ -21,12 +20,9 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
+import { CloseDateOverlay } from "@/components/favpoll-form/close-date-overlay"
+import { addDays } from "@/components/favpoll-form/date-helpers"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
@@ -290,10 +286,9 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [reveal, setReveal] = useState("")
   const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
   const [goalDraft, setGoalDraft] = useState("")
-  const [fundStart, setFundStart] = useState(false)
   const [isListed, setIsListed] = useState(true)
-  const [closeDate, setCloseDate] = useState("")
-  const [closeTime, setCloseTime] = useState("")
+  const [closesAt, setClosesAt] = useState<Date | undefined>(undefined)
+  const [closeOpen, setCloseOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
 
   // The real photo flow (HeroPhotoOverlay + crop) reads a form context;
@@ -355,9 +350,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     story: about.trim(),
     publish: [
       goalAmount ? `£${goalAmount} goal` : null,
-      fundStart ? "shared fund head start" : null,
-      closeDate
-        ? `closes ${closeDate}${closeTime ? ` ${closeTime}` : ""}`
+      closesAt
+        ? `closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
         : null,
       isListed ? null : "unlisted",
     ]
@@ -610,62 +604,24 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         />
                       </div>
                     </div>
-                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-                      <span className="flex items-center gap-1.5">
-                        <span className="font-medium">Shared fund</span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-xs"
-                              aria-label="About the shared fund"
-                              className="h-4 w-4 rounded-full"
-                            >
-                              <InfoIcon className="h-3 w-3" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            align="start"
-                            className="w-64 text-xs leading-relaxed"
-                          >
-                            Every favpoll has a shared fund. Put something in
-                            and guests can pledge from it without paying
-                            themselves.
-                          </PopoverContent>
-                        </Popover>
-                      </span>
+                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
+                      <span className="font-medium">Close date</span>
                       <span className="flex items-center gap-3">
-                        <Switch
-                          checked={fundStart}
-                          onCheckedChange={setFundStart}
-                          aria-label="Give the shared fund a head start"
-                        />
-                        <span className="text-muted-foreground">
-                          give it a head start after publishing
-                        </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={cn(INPUT_SIZE, "font-normal")}
+                          onClick={() => setCloseOpen(true)}
+                        >
+                          {closesAt
+                            ? `${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · ${String(closesAt.getHours()).padStart(2, "0")}:${String(closesAt.getMinutes()).padStart(2, "0")}`
+                            : "Pick a close date"}
+                        </Button>
+                      </span>
+                      <span className="block text-xs text-muted-foreground sm:col-start-2">
+                        90 days at most — it closes automatically either way.
                       </span>
                     </div>
-                    {field(
-                      "Close date",
-                      true,
-                      <div className="flex gap-2">
-                        <Input
-                          type="date"
-                          className={cn(INPUT_SIZE, "w-48")}
-                          value={closeDate}
-                          onChange={(e) => setCloseDate(e.target.value)}
-                        />
-                        <Input
-                          type="time"
-                          className={cn(INPUT_SIZE, "w-32")}
-                          aria-label="Close time"
-                          value={closeTime}
-                          onChange={(e) => setCloseTime(e.target.value)}
-                        />
-                      </div>,
-                      "90 days at most — it closes automatically either way."
-                    )}
                     <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
                       <span className="font-medium">Listed</span>
                       <span className="flex items-center gap-3">
@@ -869,6 +825,23 @@ export function WizardPrototype({ data }: { data: WizardData }) {
           <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
         </FormProvider>
 
+        <CloseDateOverlay
+          open={closeOpen}
+          onOpenChange={setCloseOpen}
+          initialDate={
+            closesAt ??
+            (() => {
+              const d = addDays(new Date(), 90)
+              d.setHours(23, 59, 0, 0)
+              return d
+            })()
+          }
+          onSave={(d) => {
+            setClosesAt(d)
+            setCloseOpen(false)
+          }}
+        />
+
         {w.topics.length > 0 && (
           <TopicItemsDialog
             open={w.itemsDialogOpen}
@@ -884,7 +857,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 26
+            PROTOTYPE · shape, round 27
           </div>
         )}
       </main>
