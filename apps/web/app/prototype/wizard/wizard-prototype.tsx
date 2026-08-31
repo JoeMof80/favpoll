@@ -761,7 +761,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           onChange={(e) => setName(e.target.value)}
                         />
                         <InputGroupAddon align="inline-end">
-                          <CharCounter value={name} max={40} />
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -814,6 +813,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          <CharCounter value={name} max={40} />
                         </InputGroupAddon>
                       </InputGroup>,
                       {
@@ -1200,7 +1200,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 39
+            PROTOTYPE · shape, round 40
           </div>
         )}
       </main>
