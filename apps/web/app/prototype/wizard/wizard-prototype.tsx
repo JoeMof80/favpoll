@@ -1,25 +1,14 @@
 "use client"
 
-// PROTOTYPE, round 10 (founder: "Maybe we've got the Wizard mostly right
-// already") — see NOTES.md. The live preview is gone. This is the
-// PRODUCTION wizard's exact shape — rail, step shell, overlays, nav —
-// with four steps appended after Topic: Name, About & reveal, Goal (with
-// the shared-fund head start) and Publish. Single column, phone-friendly,
-// the payoff is landing on the real page after Publish.
-//
-// The event/charity/topic steps reuse useWizardState and the production
-// components wholesale; only the rail/strip are re-rendered locally
-// because the production ones hardcode the three-step list.
+// PROTOTYPE, round 11 (founder: keep the triple, Opening line first;
+// merge Goal into Publish; bigger inputs) — see NOTES.md. The production
+// wizard's exact shape — rail, step shell, overlays, nav — with THREE
+// steps appended after Topic: Name (opening line → name → context, the
+// page's own order), About & reveal, and Publish (goal, head start,
+// listed, close date, button). No live preview; the payoff is landing on
+// the real page after Publish.
 import { useState } from "react"
-import {
-  BookOpen,
-  Calendar,
-  Flag,
-  Gift,
-  Shapes,
-  Target,
-  UserRound,
-} from "lucide-react"
+import { BookOpen, Calendar, Flag, Gift, Shapes, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -40,14 +29,7 @@ import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 
-type ProtoStep =
-  | "event"
-  | "charity"
-  | "topic"
-  | "info"
-  | "story"
-  | "goal"
-  | "publish"
+type ProtoStep = "event" | "charity" | "topic" | "info" | "story" | "publish"
 
 const PROTO_STEPS: ProtoStep[] = [
   "event",
@@ -55,7 +37,6 @@ const PROTO_STEPS: ProtoStep[] = [
   "topic",
   "info",
   "story",
-  "goal",
   "publish",
 ]
 
@@ -65,7 +46,6 @@ const STEP_LABELS: Record<ProtoStep, string> = {
   topic: "Topic",
   info: "Name",
   story: "About & reveal",
-  goal: "Goal",
   publish: "Publish",
 }
 
@@ -75,20 +55,18 @@ const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
   topic: Shapes,
   info: UserRound,
   story: BookOpen,
-  goal: Target,
   publish: Flag,
 }
 
 // Rail lines for the three production steps come from wizard-copy; the
-// four new ones follow the same register — the favpoll, not its subject.
+// three new ones follow the same register — the favpoll, not its subject.
 const RAIL: Record<ProtoStep, string> = {
   event: "Celebration, memorial or fundraiser.",
   charity: "Every pledge goes to the charity you pick.",
   topic: "Pick a topic, and guests pledge on their favourite.",
   info: "The name at the top of the page.",
   story: "An introduction, and the reveal guests unlock.",
-  goal: "A goal, and a head start for guests.",
-  publish: "How it appears, and when it closes.",
+  publish: "A goal, a head start, and when it closes.",
 }
 
 // Canned example per kind, so "Generate an example" demonstrates the real
@@ -122,8 +100,12 @@ const EXAMPLES: Record<
   },
 }
 
+// Bigger inputs (founder, round 11) — the wizard column is generous, so
+// the fields wear full text size instead of shadcn's md:text-sm shrink.
+const INPUT_SIZE = "h-11 md:text-base"
+const TEXTAREA_SIZE = "md:text-base"
+
 function ProtoRail({ current }: { current: ProtoStep }) {
-  const idx = PROTO_STEPS.indexOf(current)
   return (
     <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
       <div className="flex flex-1 flex-col justify-around gap-5">
@@ -198,8 +180,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 
-  // The four appended steps' fields — plain local state; the real build
-  // would publish these from the final step.
+  // The appended steps' fields — plain local state; the real build would
+  // publish these from the final step.
   const [stepIdx, setStepIdx] = useState(0)
   const [name, setName] = useState("")
   const [openingLine, setOpeningLine] = useState("")
@@ -259,7 +241,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
       (w.topics[0]?.isCustom === true && w.customLabels.length < 2),
     info: !name.trim(),
     story: false,
-    goal: false,
     publish: false,
   }
 
@@ -351,21 +332,15 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
               {current === "info" && (
                 <WizardStepShell title="Name" guidance="Who the page is about.">
-                  <div className="space-y-4">
-                    {field(
-                      "Name",
-                      false,
-                      <Input
-                        value={name}
-                        maxLength={40}
-                        placeholder="Name or nickname"
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    )}
+                  {/* The page's own order (founder, round 11): opening line
+                      above the name, context beneath — exactly as the hero
+                      renders them. */}
+                  <div className="space-y-5">
                     {field(
                       "Opening line",
                       true,
                       <Input
+                        className={INPUT_SIZE}
                         value={openingLine}
                         maxLength={50}
                         placeholder="Replaces the default opening prefix"
@@ -373,9 +348,21 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     )}
                     {field(
+                      "Name",
+                      false,
+                      <Input
+                        className={INPUT_SIZE}
+                        value={name}
+                        maxLength={40}
+                        placeholder="Name or nickname"
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    )}
+                    {field(
                       "Context",
                       true,
                       <Input
+                        className={INPUT_SIZE}
                         value={context}
                         maxLength={40}
                         placeholder="e.g. turning 40 · Class of 2024"
@@ -391,7 +378,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                   title="About & reveal"
                   guidance="Introduce them — and what guests unlock when they pledge."
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     <Button
                       type="button"
                       variant="secondary"
@@ -404,7 +391,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       "About",
                       true,
                       <Textarea
-                        rows={3}
+                        className={TEXTAREA_SIZE}
+                        rows={4}
                         maxLength={300}
                         value={about}
                         placeholder="Two or three sentences — tease the topic and the cause, but don't give too much away."
@@ -428,10 +416,13 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         </label>
                       </div>
                       <Textarea
-                        rows={3}
+                        className={cn(
+                          TEXTAREA_SIZE,
+                          !showReveal && "opacity-40"
+                        )}
+                        rows={4}
                         maxLength={280}
                         disabled={!showReveal}
-                        className={showReveal ? undefined : "opacity-40"}
                         value={reveal}
                         placeholder="Guests see this only after they pledge. A quote, a memory, or a message."
                         onChange={(e) => setReveal(e.target.value)}
@@ -441,46 +432,57 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                 </WizardStepShell>
               )}
 
-              {current === "goal" && (
+              {current === "publish" && (
                 <WizardStepShell
-                  title="Goal"
-                  guidance="Optional — understood as progress, never as pressure."
+                  title="Publish"
+                  guidance="The finishing touches — then it goes live."
                 >
                   <div className="space-y-6">
-                    <div className="flex gap-2">
-                      {[100, 250, 500].map((g) => (
-                        <Button
-                          key={g}
-                          type="button"
-                          size="sm"
-                          variant={goalAmount === g ? "default" : "outline"}
-                          onClick={() => {
-                            setGoalAmount(g)
-                            setGoalDraft(String(g))
+                    <div className="space-y-1.5 text-sm">
+                      <span className="block font-medium">
+                        Pledge goal{" "}
+                        <span className="font-normal text-muted-foreground">
+                          — optional
+                        </span>
+                      </span>
+                      <div className="flex gap-2">
+                        {[100, 250, 500].map((g) => (
+                          <Button
+                            key={g}
+                            type="button"
+                            variant={goalAmount === g ? "default" : "outline"}
+                            onClick={() => {
+                              setGoalAmount(g)
+                              setGoalDraft(String(g))
+                            }}
+                          >
+                            £{g}
+                          </Button>
+                        ))}
+                        <Input
+                          className={cn(INPUT_SIZE, "w-32")}
+                          inputMode="numeric"
+                          placeholder="£ other"
+                          aria-label="Custom goal amount"
+                          value={goalDraft}
+                          onChange={(e) => {
+                            setGoalDraft(e.target.value)
+                            const n = parseInt(e.target.value, 10)
+                            setGoalAmount(
+                              Number.isFinite(n) && n > 0 ? n : undefined
+                            )
                           }}
-                        >
-                          £{g}
-                        </Button>
-                      ))}
-                      <Input
-                        className="w-28"
-                        inputMode="numeric"
-                        placeholder="£ other"
-                        value={goalDraft}
-                        onChange={(e) => {
-                          setGoalDraft(e.target.value)
-                          const n = parseInt(e.target.value, 10)
-                          setGoalAmount(
-                            Number.isFinite(n) && n > 0 ? n : undefined
-                          )
-                        }}
-                      />
+                        />
+                      </div>
+                      <span className="block text-xs text-muted-foreground">
+                        Understood as progress, never as pressure.
+                      </span>
                     </div>
                     {field(
                       "Shared fund head start",
                       true,
                       <Input
-                        className="w-40"
+                        className={cn(INPUT_SIZE, "w-44")}
                         inputMode="numeric"
                         placeholder="£ amount"
                         value={fundSeed}
@@ -488,17 +490,18 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />,
                       "Every favpoll has a shared fund. Put something in and guests can pledge from it without paying themselves."
                     )}
-                  </div>
-                </WizardStepShell>
-              )}
-
-              {current === "publish" && (
-                <WizardStepShell
-                  title="Publish"
-                  guidance="How the favpoll appears, and when it closes."
-                >
-                  <div className="space-y-5 text-sm">
-                    <label className="flex items-center justify-between gap-4">
+                    {field(
+                      "Close date",
+                      true,
+                      <Input
+                        type="date"
+                        className={cn(INPUT_SIZE, "w-48")}
+                        value={closeDate}
+                        onChange={(e) => setCloseDate(e.target.value)}
+                      />,
+                      "90 days at most — it closes automatically either way."
+                    )}
+                    <label className="flex items-center justify-between gap-4 text-sm">
                       <span>
                         <span className="font-medium">Listed</span>{" "}
                         <span className="text-muted-foreground">
@@ -510,17 +513,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         onCheckedChange={setIsListed}
                       />
                     </label>
-                    {field(
-                      "Close date",
-                      true,
-                      <Input
-                        type="date"
-                        className="w-44"
-                        value={closeDate}
-                        onChange={(e) => setCloseDate(e.target.value)}
-                      />,
-                      "90 days at most — it closes automatically either way."
-                    )}
                   </div>
                 </WizardStepShell>
               )}
@@ -723,7 +715,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 10
+            PROTOTYPE · shape, round 11
           </div>
         )}
       </main>

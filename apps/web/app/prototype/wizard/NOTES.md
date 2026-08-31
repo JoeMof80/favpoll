@@ -50,3 +50,10 @@ with four steps appended after Topic:
 4. **Publish** — Listed switch, close date, Publish (dead)
 
 Single column, phone-friendly, the payoff is the real page after Publish.
+
+## Round 11 (2026-08-31)
+
+Founder: keep the triple (convinced — Name is an entity the whole product
+recomposes; Opening line defaults by register; Context owns a slot). Three
+changes: Opening line moves ABOVE Name — the page's own order; Goal merges
+into Publish (six steps); bigger inputs (h-11, full text size).
