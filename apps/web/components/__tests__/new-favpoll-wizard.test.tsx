@@ -204,7 +204,9 @@ describe("NewFavpollWizard — the wizard continues past Topic", () => {
       { target: { value: "About text." } }
     )
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { name: "Settings" })
+    ).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Publish" })).toBeInTheDocument()
   })
 })
