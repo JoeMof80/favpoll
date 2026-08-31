@@ -4,7 +4,8 @@ import {
 } from "@/components/favpoll-logo"
 import { ogCopy } from "./copy"
 import { joinCharities, type FavpollOgCard } from "./favpoll-og"
-import { OG_PALETTE as P } from "./palette"
+import { OG_PALETTES, type OgPalette } from "./palette"
+import type { RegisterPalette } from "@/lib/register-palette"
 import { HEADLINE_BEATS, SITE_DESCRIPTION } from "./site"
 
 // The share cards, as Satori JSX. Satori is not a browser: every box with
@@ -41,7 +42,7 @@ function Mark({ size, color }: { size: number; color: string }) {
 }
 
 // The FavpollLogo lockup — mark, then "fav" with "poll" at 60%.
-function Wordmark({ size }: { size: number }) {
+function Wordmark({ size, p }: { size: number; p: OgPalette }) {
   return (
     <div
       style={{
@@ -52,28 +53,28 @@ function Wordmark({ size }: { size: number }) {
         fontSize: size,
         fontWeight: 400,
         letterSpacing: -size * 0.025,
-        color: P.primary,
+        color: p.primary,
       }}
     >
-      <Mark size={size} color={P.primary} />
+      <Mark size={size} color={p.primary} />
       <div style={{ display: "flex" }}>
         <span>fav</span>
-        <span style={{ color: alpha(P.primary, 0.6) }}>poll</span>
+        <span style={{ color: alpha(p.primary, 0.6) }}>poll</span>
       </div>
     </div>
   )
 }
 
-function Frame({ children }: { children: React.ReactNode }) {
+function Frame({ children, p }: { children: React.ReactNode; p: OgPalette }) {
   return (
     <div
       style={{
         width: OG_SIZE.width,
         height: OG_SIZE.height,
         display: "flex",
-        background: P.background,
+        background: p.background,
         fontFamily: FONT,
-        color: P.foreground,
+        color: p.foreground,
       }}
     >
       {children}
@@ -81,7 +82,7 @@ function Frame({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Panel({ children }: { children: React.ReactNode }) {
+function Panel({ children, p }: { children: React.ReactNode; p: OgPalette }) {
   return (
     <div
       style={{
@@ -90,7 +91,7 @@ function Panel({ children }: { children: React.ReactNode }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: P.secondary,
+        background: p.secondary,
       }}
     >
       {children}
@@ -102,9 +103,11 @@ function Panel({ children }: { children: React.ReactNode }) {
 function Portrait({
   card,
   photo,
+  p,
 }: {
   card: FavpollOgCard
   photo: string | null
+  p: OgPalette
 }) {
   const tile = {
     width: TILE,
@@ -117,7 +120,7 @@ function Portrait({
 
   if (photo) {
     return (
-      <div style={{ ...tile, background: P.background, padding: 8 }}>
+      <div style={{ ...tile, background: p.background, padding: 8 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo}
@@ -134,19 +137,19 @@ function Portrait({
     <div
       style={{
         ...tile,
-        background: P.background,
-        border: `2px solid ${P.borderStrong}`,
+        background: p.background,
+        border: `2px solid ${p.borderStrong}`,
       }}
     >
       {card.isCause ? (
-        <Mark size={168} color={P.primary} />
+        <Mark size={168} color={p.primary} />
       ) : (
         <span
           style={{
             fontSize: card.initials.length > 1 ? 120 : 140,
             fontWeight: 500,
             letterSpacing: -4,
-            color: P.primary,
+            color: p.primary,
           }}
         >
           {card.initials}
@@ -159,15 +162,19 @@ function Portrait({
 export function FavpollCard({
   card,
   photo,
+  palette,
 }: {
   card: FavpollOgCard
   photo: string | null
+  /** The favpoll's register palette — null/omitted = the blue default. */
+  palette?: RegisterPalette | null
 }) {
+  const p = OG_PALETTES[palette ?? "default"]
   const longName = card.name.length > 22
   return (
-    <Frame>
-      <Panel>
-        <Portrait card={card} photo={photo} />
+    <Frame p={p}>
+      <Panel p={p}>
+        <Portrait card={card} photo={photo} p={p} />
       </Panel>
       <div
         style={{
@@ -186,7 +193,7 @@ export function FavpollCard({
                 fontWeight: 500,
                 letterSpacing: 2.4,
                 textTransform: "uppercase",
-                color: P.primaryMuted,
+                color: p.primaryMuted,
                 marginBottom: 16,
               }}
             >
@@ -199,7 +206,7 @@ export function FavpollCard({
               fontWeight: 500,
               lineHeight: 1.1,
               letterSpacing: longName ? -1 : -1.5,
-              color: P.foreground,
+              color: p.foreground,
               lineClamp: 2,
             }}
           >
@@ -212,7 +219,7 @@ export function FavpollCard({
               fontSize: 34,
               fontWeight: 400,
               lineHeight: 1.25,
-              color: P.foreground,
+              color: p.foreground,
               lineClamp: 2,
             }}
           >
@@ -230,7 +237,7 @@ export function FavpollCard({
                 fontSize: 26,
                 fontWeight: 400,
                 lineHeight: 1.3,
-                color: P.mutedForeground,
+                color: p.mutedForeground,
                 lineClamp: 2,
               }}
             >
@@ -240,15 +247,16 @@ export function FavpollCard({
             </div>
           )}
         </div>
-        <Wordmark size={36} />
+        <Wordmark size={36} p={p} />
       </div>
     </Frame>
   )
 }
 
 export function BrandCard() {
+  const p = OG_PALETTES.default
   return (
-    <Frame>
+    <Frame p={p}>
       <div
         style={{
           flex: 1,
@@ -258,7 +266,7 @@ export function BrandCard() {
           padding: "64px 64px 60px 72px",
         }}
       >
-        <Wordmark size={56} />
+        <Wordmark size={56} p={p} />
         <div
           style={{
             display: "flex",
@@ -267,7 +275,7 @@ export function BrandCard() {
             fontWeight: 500,
             lineHeight: 1.15,
             letterSpacing: -1.4,
-            color: P.foreground,
+            color: p.foreground,
           }}
         >
           {HEADLINE_BEATS.map((beat) => (
@@ -279,14 +287,14 @@ export function BrandCard() {
             fontSize: 26,
             fontWeight: 400,
             lineHeight: 1.4,
-            color: P.mutedForeground,
+            color: p.mutedForeground,
           }}
         >
           {SITE_DESCRIPTION}
         </div>
       </div>
-      <Panel>
-        <Mark size={260} color={P.primary} />
+      <Panel p={p}>
+        <Mark size={260} color={p.primary} />
       </Panel>
     </Frame>
   )

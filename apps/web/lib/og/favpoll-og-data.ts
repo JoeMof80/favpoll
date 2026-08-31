@@ -5,7 +5,7 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export const FAVPOLL_OG_SELECT =
-  "id, subject, cause_label, occasion_type, opening_line, is_private, is_listed, photo_url, closes_at, closed_at, " +
+  "id, subject, cause_label, occasion_type, category, opening_line, is_private, is_listed, photo_url, closes_at, closed_at, " +
   "protagonists!favpolls_protagonist_id_fkey(name, photo_url), " +
   "favpoll_charities(charities(name)), " +
   "favpoll_polls(topics(title))"

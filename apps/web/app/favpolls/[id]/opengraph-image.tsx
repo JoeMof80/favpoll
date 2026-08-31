@@ -46,5 +46,8 @@ export default async function Image({ params }: Props) {
   const card = favpollOgCard(src)
   const photo = await fetchPhotoDataUrl(card.photoUrl)
 
-  return new ImageResponse(<FavpollCard card={card} photo={photo} />, options)
+  return new ImageResponse(
+    <FavpollCard card={card} photo={photo} palette={card.palette} />,
+    options
+  )
 }

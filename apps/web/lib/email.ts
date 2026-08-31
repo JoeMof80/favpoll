@@ -52,7 +52,7 @@ export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
           : ""
       }`,
       cta: { label: `Return to ${protagonistName}'s favpoll`, url: favpollUrl },
-      footnoteHtml: `You can <a href="${withdrawUrl}" style="color:#534AB7;">withdraw your pledge</a> any time before the poll closes. <a href="${BASE_URL}/sign-up" style="color:#534AB7;">Create an account</a> with this address to keep your pledges together. If you did not make this pledge, you can safely ignore this email.`,
+      footnoteHtml: `You can <a href="${withdrawUrl}" style="color:#0058A8;">withdraw your pledge</a> any time before the poll closes. <a href="${BASE_URL}/sign-up" style="color:#0058A8;">Create an account</a> with this address to keep your pledges together. If you did not make this pledge, you can safely ignore this email.`,
     }),
   })
 }
@@ -127,7 +127,7 @@ export async function sendExtensionRequest(params: ExtensionRequestParams) {
     subject: `Extension request — favpoll ${favpollId}`,
     html: renderEmail({
       heading: "Extension request",
-      bodyHtml: `<p style="margin:0 0 12px;"><strong>Organiser:</strong> ${escapeHtml(organizerName ?? "Unknown")} (${escapeHtml(organizerEmail)})</p><p style="margin:0 0 12px;"><strong>Favpoll:</strong> <a href="${favpollUrl}" style="color:#534AB7;">${favpollUrl}</a></p><p style="margin:0;">${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+      bodyHtml: `<p style="margin:0 0 12px;"><strong>Organiser:</strong> ${escapeHtml(organizerName ?? "Unknown")} (${escapeHtml(organizerEmail)})</p><p style="margin:0 0 12px;"><strong>Favpoll:</strong> <a href="${favpollUrl}" style="color:#0058A8;">${favpollUrl}</a></p><p style="margin:0;">${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
     }),
   })
 }
