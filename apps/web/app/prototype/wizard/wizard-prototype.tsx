@@ -330,7 +330,7 @@ function ProtoDateTimePicker({
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   return (
-    <div className="flex gap-2">
+    <div className="flex w-full gap-2">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -338,7 +338,7 @@ function ProtoDateTimePicker({
             variant="outline"
             className={cn(
               INPUT_SIZE,
-              "w-56 justify-start gap-2 bg-background! font-normal"
+              "flex-1 justify-start gap-2 bg-background! font-normal"
             )}
           >
             <CalendarIcon
@@ -919,7 +919,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         Pledge goal
                       </span>
                       <div className="flex gap-2">
-                        {[100, 250, 500].map((g) => (
+                        {[100, 250, 500, 1000].map((g) => (
                           <Button
                             key={g}
                             type="button"
@@ -955,9 +955,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         value={closesAt}
                         onChange={setClosesAt}
                       />
-                      <span className="block text-xs text-muted-foreground sm:col-start-2">
-                        90 days at most — it closes automatically either way.
-                      </span>
                     </div>
                     <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
                       <span className="font-medium">Listed</span>
@@ -1177,7 +1174,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 37
+            PROTOTYPE · shape, round 38
           </div>
         )}
       </main>
