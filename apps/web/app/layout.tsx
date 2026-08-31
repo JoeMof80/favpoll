@@ -3,7 +3,6 @@ import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { ClerkProvider } from "@/components/clerk-provider"
 import { ThemeProvider } from "@favpoll/ui"
-import { EditModeProvider } from "@/lib/edit-mode-context"
 import { HeaderMount } from "@/components/header-mount"
 import { SiteFooterMount } from "@/components/site-footer-mount"
 import { cn } from "@/lib/utils"
@@ -68,11 +67,9 @@ export default function RootLayout({
       >
         <body>
           <ThemeProvider>
-            <EditModeProvider>
-              <HeaderMount />
-              {children}
-              <SiteFooterMount />
-            </EditModeProvider>
+            <HeaderMount />
+            {children}
+            <SiteFooterMount />
             <Toaster position="bottom-center" />
           </ThemeProvider>
         </body>

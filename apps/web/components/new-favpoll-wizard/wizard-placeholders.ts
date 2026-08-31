@@ -1,4 +1,4 @@
-import type { WhoValue } from "@/components/favpoll-form/generate-example-dialog"
+import type { WhoValue } from "@/lib/who"
 
 // Register-aware ghost text (extended-wizard prototype, rounds 17/36):
 // once the Event is picked the placeholders speak that kind's voice, and
