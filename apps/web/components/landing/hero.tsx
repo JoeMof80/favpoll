@@ -171,6 +171,7 @@ const ROUTER_CARDS = [
     topic: WEDDING_TOPIC,
     more: `+${WEDDING_SCENE.poll.topic.favourites.length - WEDDING_RESULTS.length} more ${WEDDING_TOPIC}s`,
     charity: WEDDING_SCENE.charities[0]?.name ?? "",
+    charityLogo: WEDDING_SCENE.charities[0]?.logo_url ?? null,
     total: WEDDING_SCENE.total,
     results: WEDDING_RESULTS,
   },
@@ -182,6 +183,7 @@ const ROUTER_CARDS = [
     topic: FUNDRAISER_TOPIC,
     more: `+${FUNDRAISER_SCENE.poll.topic.favourites.length - FUNDRAISER_RESULTS.length} more ${FUNDRAISER_TOPIC}s`,
     charity: FUNDRAISER_SCENE.charities[0]?.name ?? "",
+    charityLogo: FUNDRAISER_SCENE.charities[0]?.logo_url ?? null,
     total: FUNDRAISER_SCENE.total,
     results: FUNDRAISER_RESULTS,
   },
@@ -196,6 +198,7 @@ const ROUTER_CARDS = [
     // would need the noun back as a literal.
     more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
     charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
+    charityLogo: MEMORIAL_SCENE.charities[0]?.logo_url ?? null,
     total: MEMORIAL_SCENE.total,
     results: MEMORIAL_RESULTS,
   },
@@ -687,8 +690,18 @@ export function LandingHero({
                           2026-08-05): the poll is the product's core, so its
                           question shouldn't be the smallest thing on the
                           card. */}
+                      {/* Broken after "Favourite" on EVERY card (founder,
+                          2026-08-31): left to wrap naturally, two of the
+                          three topics broke and one didn't, so the first
+                          ranking row started at three different heights
+                          across the row. A deliberate two-line header is
+                          uniform whatever the exemplar topic. The first
+                          line sits quieter so the topic word leads. */}
                       <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-muted-foreground uppercase dark:text-primary-foreground/70">
-                        Favourite {card.topic}
+                        <span className="block text-muted-foreground/55 dark:text-primary-foreground/45">
+                          Favourite
+                        </span>
+                        {card.topic}
                       </p>
                       {card.results.map((r) => (
                         <RankingBar
@@ -713,7 +726,10 @@ export function LandingHero({
                       {/* Where it all goes — charity + running total. No rule
                           above it (founder, 2026-08-05); the spacing carries
                           the break. */}
-                      <div className="flex items-baseline justify-between gap-2 pt-1.5 text-sm">
+                      {/* items-center, not items-baseline (2026-08-31): with
+                          the avatar in the row it reads as a media row, and
+                          the tile has no baseline to align to. */}
+                      <div className="flex items-center justify-between gap-2 pt-1.5 text-sm">
                         {/* text-xs on the charity alone (2026-08-28). The row
                             was uniform text-sm, which held while both names
                             were short — "Marie Curie", "WWF-UK" — and broke
@@ -730,8 +746,31 @@ export function LandingHero({
                             items-baseline, not items-center: two type sizes
                             on one row centre-align to nothing, and the
                             baseline is what the eye reads them along. */}
-                        <span className="min-w-0 truncate text-xs text-muted-foreground dark:text-primary-foreground/70">
-                          {card.charity}
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          {/* CharityRow's avatar idiom: the logo, or the
+                              initial in a primary-tinted tile — which takes
+                              the register hue here, as it does on the
+                              register pages. Dark swaps to the ink tokens:
+                              on the near-white card, primary itself is
+                              near-white. */}
+                          {card.charityLogo ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={card.charityLogo}
+                              alt=""
+                              className="h-6 w-6 shrink-0 rounded object-contain"
+                            />
+                          ) : (
+                            <span
+                              aria-hidden="true"
+                              className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary dark:bg-primary-foreground/10 dark:text-primary-foreground"
+                            >
+                              {card.charity.charAt(0)}
+                            </span>
+                          )}
+                          <span className="min-w-0 truncate text-xs text-muted-foreground dark:text-primary-foreground/70">
+                            {card.charity}
+                          </span>
                         </span>
                         <span className="shrink-0 font-medium text-foreground dark:text-primary-foreground">
                           {card.total}
