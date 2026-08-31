@@ -43,8 +43,13 @@ export function CharityBanner({
           {formatPounds(totalRaised)}
         </p>
         <p className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
+          {/* SAID IN WORDS, not colour alone (open item, PROJECT.md): a
+              fundraiser page's brand green is one hue-step from --success,
+              so the bar turning green cannot carry the state there. */}
           {goalAmount
-            ? `raised of the ${formatPounds(goalAmount)} goal`
+            ? totalRaised >= goalAmount
+              ? `${formatPounds(goalAmount)} goal reached — every pledge still counts`
+              : `raised of the ${formatPounds(goalAmount)} goal`
             : "raised so far"}
           {goalAmount && onEditGoal ? (
             <Button

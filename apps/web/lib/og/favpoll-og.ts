@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
+import type { FavpollCategory } from "@favpoll/types"
 import { getFavpollHeadline } from "@/lib/display"
+import { paletteForFavpoll, type RegisterPalette } from "@/lib/register-palette"
 import { ogCopy } from "./copy"
 import { OG_SITE } from "./site"
 
@@ -15,6 +17,7 @@ export type FavpollOgSource = {
   subject: "someone" | "cause"
   cause_label: string | null
   occasion_type: string | null
+  category?: string | null
   opening_line: string | null
   is_private: boolean
   is_listed?: boolean | null
@@ -40,6 +43,8 @@ export type FavpollOgCard = {
   isCause: boolean
   /** Closed by the organiser or by the clock — the same test the page applies. */
   isClosed: boolean
+  /** The register's palette for the card's hexes — null = the blue default. */
+  palette: RegisterPalette | null
 }
 
 export const PRIVATE_OG = {
@@ -85,6 +90,10 @@ export function favpollOgCard(
     initials: initialsOf(name),
     isCause,
     isClosed: !!src.closed_at || new Date(src.closes_at) < now,
+    palette: paletteForFavpoll({
+      category: (src.category ?? null) as FavpollCategory | null,
+      subject: src.subject,
+    }),
   }
 }
 

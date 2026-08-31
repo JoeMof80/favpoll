@@ -84,7 +84,9 @@ describe("MobileCharityFooter", () => {
     )
     expect(screen.queryByText("£300")).toBeNull()
     expect(screen.getAllByText("£600")).toHaveLength(2)
-    expect(screen.getAllByText("of the £500 goal")).toHaveLength(2)
+    // Reached: said in words, not colour alone — a fundraiser page's brand
+    // green hides the bar's success turn.
+    expect(screen.getAllByText("£500 goal reached")).toHaveLength(2)
     expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
       "bg-success"
     )

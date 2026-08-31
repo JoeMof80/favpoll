@@ -73,7 +73,13 @@ export function MobileCharityFooter({
         charities={charities.map((charity) => ({ charity }))}
         perCharity={goalAmount ? totalRaised : totalRaised / charities.length}
         amountCaption={
-          goalAmount ? `of the ${formatPounds(goalAmount)} goal` : undefined
+          goalAmount
+            ? totalRaised >= goalAmount
+              ? // Words, not colour alone — on a fundraiser page the brand
+                // green hides the bar's success turn (PROJECT.md open item).
+                `${formatPounds(goalAmount)} goal reached`
+              : `of the ${formatPounds(goalAmount)} goal`
+            : undefined
         }
       />
       {goalAmount ? (
