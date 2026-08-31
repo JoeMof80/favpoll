@@ -254,16 +254,18 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     node: React.ReactNode,
     hint?: string
   ) => (
-    <label className="block space-y-1.5 text-sm">
-      <span className="block font-medium">
+    <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
+      <span className="block font-medium sm:pt-3">
         {label}
         {opt && (
           <span className="font-normal text-muted-foreground"> — optional</span>
         )}
       </span>
-      {node}
+      <div className="min-w-0">{node}</div>
       {hint && (
-        <span className="block text-xs text-muted-foreground">{hint}</span>
+        <span className="block text-xs text-muted-foreground sm:col-start-2">
+          {hint}
+        </span>
       )}
     </label>
   )
@@ -394,8 +396,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         onChange={(e) => setAbout(e.target.value)}
                       />
                     )}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
+                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
+                      <div className="flex items-center justify-between sm:block sm:space-y-2 sm:pt-3">
                         <span className="text-sm font-medium">
                           The reveal{" "}
                           <span className="font-normal text-muted-foreground">
@@ -430,8 +432,8 @@ export function WizardPrototype({ data }: { data: WizardData }) {
               {current === "publish" && (
                 <ProtoShell title="Publish">
                   <div className="space-y-6">
-                    <div className="space-y-1.5 text-sm">
-                      <span className="block font-medium">
+                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
+                      <span className="block font-medium sm:pt-3">
                         Pledge goal{" "}
                         <span className="font-normal text-muted-foreground">
                           — optional
@@ -466,7 +468,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           }}
                         />
                       </div>
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="block text-xs text-muted-foreground sm:col-start-2">
                         Understood as progress, never as pressure.
                       </span>
                     </div>
@@ -493,17 +495,17 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />,
                       "90 days at most — it closes automatically either way."
                     )}
-                    <label className="flex items-center justify-between gap-4 text-sm">
-                      <span>
-                        <span className="font-medium">Listed</span>{" "}
+                    <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+                      <span className="font-medium">Listed</span>
+                      <span className="flex items-center gap-3">
+                        <Switch
+                          checked={isListed}
+                          onCheckedChange={setIsListed}
+                        />
                         <span className="text-muted-foreground">
-                          — appears on the public favpolls page
+                          appears on the public favpolls page
                         </span>
                       </span>
-                      <Switch
-                        checked={isListed}
-                        onCheckedChange={setIsListed}
-                      />
                     </label>
                   </div>
                 </ProtoShell>
@@ -707,7 +709,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 13
+            PROTOTYPE · shape, round 14
           </div>
         )}
       </main>
