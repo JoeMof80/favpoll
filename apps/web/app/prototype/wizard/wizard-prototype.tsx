@@ -290,7 +290,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [reveal, setReveal] = useState("")
   const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
   const [goalDraft, setGoalDraft] = useState("")
-  const [fundSeed, setFundSeed] = useState("")
+  const [fundStart, setFundStart] = useState(false)
   const [isListed, setIsListed] = useState(true)
   const [closeDate, setCloseDate] = useState("")
   const [closeTime, setCloseTime] = useState("")
@@ -355,7 +355,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     story: about.trim(),
     publish: [
       goalAmount ? `£${goalAmount} goal` : null,
-      fundSeed ? `£${fundSeed} shared fund` : null,
+      fundStart ? "shared fund head start" : null,
       closeDate
         ? `closes ${closeDate}${closeTime ? ` ${closeTime}` : ""}`
         : null,
@@ -635,14 +635,16 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           </PopoverContent>
                         </Popover>
                       </span>
-                      <Input
-                        className={cn(INPUT_SIZE, "w-44")}
-                        inputMode="numeric"
-                        placeholder="£ amount"
-                        aria-label="Shared fund amount"
-                        value={fundSeed}
-                        onChange={(e) => setFundSeed(e.target.value)}
-                      />
+                      <span className="flex items-center gap-3">
+                        <Switch
+                          checked={fundStart}
+                          onCheckedChange={setFundStart}
+                          aria-label="Give the shared fund a head start"
+                        />
+                        <span className="text-muted-foreground">
+                          give it a head start after publishing
+                        </span>
+                      </span>
                     </div>
                     {field(
                       "Close date",
@@ -882,7 +884,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 25
+            PROTOTYPE · shape, round 26
           </div>
         )}
       </main>
