@@ -199,14 +199,16 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
             what the favpoll shows. */}
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => setPhotoOpen(true)}
           aria-label={w.photoUrl ? "Change photo" : "Add a photo"}
+          // No bespoke hover — the outline button's own quiet hover, the
+          // same as the date trigger's (founder, 2026-09-01: the ring and
+          // tint read as foreign next to the rest of the form).
           className={cn(
-            "h-20 w-20 shrink-0 overflow-hidden rounded-xl border p-0 hover:ring-2 hover:ring-ring focus-visible:ring-2",
-            w.photoUrl
-              ? "border-border hover:bg-transparent"
-              : "border-dashed border-border-strong text-muted-foreground hover:bg-accent hover:text-foreground"
+            "h-20 w-20 shrink-0 overflow-hidden rounded-xl p-0",
+            !w.photoUrl &&
+              "border-dashed border-border-strong text-muted-foreground"
           )}
         >
           {w.photoUrl ? (

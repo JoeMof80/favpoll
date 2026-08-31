@@ -163,19 +163,16 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
             <InputGroupAddon align="block-start" className="px-5 pt-4 pb-0">
               <InputGroupText>Photo</InputGroupText>
             </InputGroupAddon>
+            {/* Status only — picking moved onto the image itself (founder,
+                2026-09-01: "click the avatar or image to select an image
+                rather than the [upload] icon"). The header keeps the
+                filename and the remove control. */}
             <div className="flex w-full items-center gap-2 px-5 py-3">
-              <button
-                type="button"
-                className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <span className="shrink-0 text-foreground">Pick a photo</span>
-                <span className="truncate text-muted-foreground">
-                  {originalFilename ||
-                    (dialogPhotoUrl ? "Current photo" : "No file chosen")}
-                </span>
-              </button>
-              {originalFilename || dialogPhotoUrl ? (
+              <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                {originalFilename ||
+                  (dialogPhotoUrl ? "Current photo" : "No photo yet")}
+              </span>
+              {(originalFilename || dialogPhotoUrl) && (
                 <Button
                   type="button"
                   variant="ghost"
@@ -184,16 +181,6 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
                   onClick={clearPhoto}
                 >
                   <Trash2 className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Upload photo"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -255,13 +242,43 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
                 +
               </span>
             </div>
+            {/* Re-pick lives here while cropping — the image above is the
+                cropper's drag surface, so it cannot double as the picker. */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload data-icon="inline-start" aria-hidden="true" />
+              Choose a different photo
+            </Button>
           </div>
         ) : (
-          <div className="flex justify-center">
-            <ProtagonistAvatar
-              name={name || "Name"}
-              photoUrl={photoDraft?.previewUrl ?? dialogPhotoUrl ?? null}
-            />
+          /* The avatar IS the picker — tap the photo (or the empty slot)
+             to choose an image; the caption carries the affordance for
+             anyone who doesn't try. */
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label={
+                (photoDraft?.previewUrl ?? dialogPhotoUrl)
+                  ? "Choose a different photo"
+                  : "Choose a photo"
+              }
+              className="h-auto rounded-xl p-0"
+            >
+              <ProtagonistAvatar
+                name={name || "Name"}
+                photoUrl={photoDraft?.previewUrl ?? dialogPhotoUrl ?? null}
+              />
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Tap the photo to choose an image
+            </p>
           </div>
         )}
       </ResponsiveOverlay>
