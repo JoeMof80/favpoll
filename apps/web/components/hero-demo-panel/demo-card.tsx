@@ -309,7 +309,11 @@ export function DemoCard({
   )
 
   const renderRankings = (animate: boolean) => (
-    <ol className="space-y-2.5" aria-label="Current rankings">
+    <ol
+      data-register={paletteForSceneKind(scene.kind)}
+      className="space-y-2.5"
+      aria-label="Current rankings"
+    >
       {results.map((result, i) => (
         <li key={result.label}>
           <RankingBar
@@ -358,10 +362,10 @@ export function DemoCard({
 
   return (
     <div
-      // The card wears its scene's palette, header and logo included — the
-      // register IS the palette (2026-08-30), so a memorial card is purple on
-      // a blue home page and a celebration card is magenta beside it.
-      data-register={paletteForSceneKind(scene.kind)}
+      // The register's palette lives on the header and the ranking bars
+      // ONLY (founder, 2026-08-31: the whole-card scope of 2026-08-30 read
+      // too two-tone). The body of the card stays on the page's default
+      // blue; the scoped subtrees carry the scene's colour.
       className={cn(
         "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-background p-5",
         className
@@ -379,7 +383,10 @@ export function DemoCard({
           above the hero, with the rule under it. Full-bleed past the card's
           p-5, and the real HeaderBar rather than a lookalike — the version
           Header itself renders, minus the Clerk-aware hamburger. */}
-      <div className={cn("-mx-5 mb-4 shrink-0", isPhone ? "" : "-mt-5")}>
+      <div
+        data-register={paletteForSceneKind(scene.kind)}
+        className={cn("-mx-5 mb-4 shrink-0", isPhone ? "" : "-mt-5")}
+      >
         <HeaderBar staticMenu />
       </div>
 
