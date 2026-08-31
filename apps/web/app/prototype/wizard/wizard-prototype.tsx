@@ -10,6 +10,7 @@
 import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import {
+  Check,
   InfoIcon,
   BookOpen,
   Calendar,
@@ -184,7 +185,19 @@ function ProtoShell({
   )
 }
 
-function ProtoRail({ current }: { current: ProtoStep }) {
+// The rail tracks the answers as they accumulate (founder, round 25):
+// each step shows a tick once its content is in, and the chosen thing
+// itself — the charity's name, the topic, the name — as a one-line
+// summary beneath the label.
+function ProtoRail({
+  current,
+  summary,
+  done,
+}: {
+  current: ProtoStep
+  summary: Record<ProtoStep, string>
+  done: Record<ProtoStep, boolean>
+}) {
   return (
     <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
       <div className="flex flex-1 flex-col justify-around gap-5">
@@ -195,8 +208,8 @@ function ProtoRail({ current }: { current: ProtoStep }) {
             <div
               key={s}
               className={cn(
-                "transition-opacity",
-                isActive ? "opacity-100" : "opacity-60"
+                "min-w-0 space-y-1 transition-opacity",
+                isActive || done[s] ? "opacity-100" : "opacity-60"
               )}
             >
               <div className="flex items-center gap-2.5">
@@ -214,7 +227,18 @@ function ProtoRail({ current }: { current: ProtoStep }) {
                 >
                   {STEP_LABELS[s]}
                 </p>
+                {done[s] && (
+                  <Check
+                    aria-label="Done"
+                    className="h-4 w-4 shrink-0 text-primary"
+                  />
+                )}
               </div>
+              {summary[s] && (
+                <p className="truncate pl-7.5 text-sm text-muted-foreground">
+                  {summary[s]}
+                </p>
+              )}
             </div>
           )
         })}
@@ -321,6 +345,37 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     setReveal(ex.reveal)
   }
 
+  const railSummary: Record<ProtoStep, string> = {
+    event: w.category
+      ? w.category.charAt(0).toUpperCase() + w.category.slice(1)
+      : "",
+    charity: w.selectedCharities.map((c) => c.name).join(", "),
+    topic: w.topics[0]?.title ?? "",
+    info: name.trim(),
+    story: about.trim(),
+    publish: [
+      goalAmount ? `£${goalAmount} goal` : null,
+      fundSeed ? `£${fundSeed} shared fund` : null,
+      closeDate
+        ? `closes ${closeDate}${closeTime ? ` ${closeTime}` : ""}`
+        : null,
+      isListed ? null : "unlisted",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  }
+
+  const railDone: Record<ProtoStep, boolean> = {
+    event: !!w.category,
+    charity: w.charityIds.length > 0,
+    topic:
+      w.topics.length > 0 &&
+      !(w.topics[0]?.isCustom === true && w.customLabels.length < 2),
+    info: !!name.trim(),
+    story: !!about.trim(),
+    publish: false,
+  }
+
   const nextDisabled: Record<ProtoStep, boolean> = {
     event: !w.category,
     charity: w.charityIds.length === 0,
@@ -356,7 +411,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     <RegisterScope palette={palette}>
       <main>
         <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
-          <ProtoRail current={current} />
+          <ProtoRail current={current} summary={railSummary} done={railDone} />
 
           <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
             <div className="mx-auto w-full max-w-2xl">
@@ -827,7 +882,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 24
+            PROTOTYPE · shape, round 25
           </div>
         )}
       </main>
