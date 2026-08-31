@@ -26,31 +26,58 @@ type Props = {
    * action is pledging YOUR favourite; the steps present the reveal as a gift.
    */
   ctaLabel?: string
+  /**
+   * The list cards' size (founder, 2026-09-01: the shelf cards teach the
+   * mechanic too, but a 120px lock zone cannot hold the full card): smaller
+   * CTA bar, xs steps, no shared-fund footer — that line waits for the
+   * pledge dialog.
+   */
+  compact?: boolean
 }
 
 export function LockCardContent({
   steps,
   topicTitle,
   ctaLabel = "Pledge your favourite",
+  compact = false,
 }: Props) {
   return (
     <>
-      <span className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground">
-        <Lock className="h-4 w-4" aria-hidden="true" />
+      <span
+        className={
+          compact
+            ? "flex items-center justify-center gap-1.5 bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+            : "flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground"
+        }
+      >
+        <Lock
+          className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
+          aria-hidden="true"
+        />
         {ctaLabel}
       </span>
-      <span className="flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground">
+      <span
+        className={
+          compact
+            ? "flex flex-col gap-1 px-3 py-2.5 text-left text-xs leading-snug font-normal whitespace-normal text-muted-foreground"
+            : "flex flex-col gap-1.5 px-4 py-3 text-left text-sm leading-relaxed font-normal whitespace-normal text-muted-foreground"
+        }
+      >
         {steps.map((step, i) => (
           <span key={i} className="flex gap-2">
-            <span className="w-4 shrink-0 text-right font-semibold text-primary">
+            <span
+              className={`shrink-0 text-right font-semibold text-primary ${compact ? "w-3" : "w-4"}`}
+            >
               {i + 1}.
             </span>
             <span className="flex-1">{step}</span>
           </span>
         ))}
-        <span className="pt-1 text-[13px] text-muted-foreground/80">
-          {mechanicFooter(topicTitle)}
-        </span>
+        {!compact && (
+          <span className="pt-1 text-[13px] text-muted-foreground/80">
+            {mechanicFooter(topicTitle)}
+          </span>
+        )}
       </span>
     </>
   )
