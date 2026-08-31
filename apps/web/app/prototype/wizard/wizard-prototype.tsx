@@ -59,6 +59,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
+  InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { EventStep } from "@/components/favpoll-flow/event-step"
@@ -634,7 +635,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     extra?: {
       hint?: string
       info?: string
-      count?: readonly [string, number]
     }
   ) => (
     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
@@ -644,12 +644,9 @@ export function WizardPrototype({ data }: { data: WizardData }) {
         {extra?.info && infoPopover(extra.info)}
       </span>
       <div className="min-w-0">{node}</div>
-      {(extra?.hint || extra?.count) && (
-        <span className="flex items-center justify-between gap-3 text-xs text-muted-foreground sm:col-start-2">
-          <span>{extra?.hint}</span>
-          {extra?.count && (
-            <CharCounter value={extra.count[0]} max={extra.count[1]} />
-          )}
+      {extra?.hint && (
+        <span className="block text-xs text-muted-foreground sm:col-start-2">
+          {extra.hint}
         </span>
       )}
     </div>
@@ -686,7 +683,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     <Button
                       variant="secondary"
                       size="lg"
-                      className="h-11 self-start px-6 md:text-base"
+                      className="h-11 w-full md:text-base"
                       onClick={() => w.setCharityOpen(true)}
                     >
                       Pick a charity
@@ -710,7 +707,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     <Button
                       variant="secondary"
                       size="lg"
-                      className="h-11 self-start px-6 md:text-base"
+                      className="h-11 w-full md:text-base"
                       onClick={() => w.setTopicOpen(true)}
                     >
                       Pick a topic
@@ -728,16 +725,20 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     {field(
                       "Opening line",
                       true,
-                      <Input
-                        className={INPUT_SIZE}
-                        value={openingLine}
-                        maxLength={50}
-                        placeholder={ph.openingLine}
-                        onChange={(e) => setOpeningLine(e.target.value)}
-                      />,
+                      <InputGroup className={cn(INPUT_SIZE, "bg-background")}>
+                        <InputGroupInput
+                          className="md:text-base"
+                          value={openingLine}
+                          maxLength={50}
+                          placeholder={ph.openingLine}
+                          onChange={(e) => setOpeningLine(e.target.value)}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <CharCounter value={openingLine} max={50} />
+                        </InputGroupAddon>
+                      </InputGroup>,
                       {
                         info: "Replaces the default opening prefix.",
-                        count: [openingLine, 50] as const,
                       }
                     )}
                     {field(
@@ -760,6 +761,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           onChange={(e) => setName(e.target.value)}
                         />
                         <InputGroupAddon align="inline-end">
+                          <CharCounter value={name} max={40} />
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -816,22 +818,25 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       </InputGroup>,
                       {
                         info: "Shown throughout the favpoll.",
-                        count: [name, 40] as const,
                       }
                     )}
                     {field(
                       "Context",
                       true,
-                      <Input
-                        className={INPUT_SIZE}
-                        value={context}
-                        maxLength={40}
-                        placeholder={ph.context}
-                        onChange={(e) => setContext(e.target.value)}
-                      />,
+                      <InputGroup className={cn(INPUT_SIZE, "bg-background")}>
+                        <InputGroupInput
+                          className="md:text-base"
+                          value={context}
+                          maxLength={40}
+                          placeholder={ph.context}
+                          onChange={(e) => setContext(e.target.value)}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <CharCounter value={context} max={40} />
+                        </InputGroupAddon>
+                      </InputGroup>,
                       {
                         info: "Dates, years, or other context.",
-                        count: [context, 40] as const,
                       }
                     )}
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
@@ -875,36 +880,50 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     {field(
                       "About",
                       false,
-                      <Textarea
-                        className={TEXTAREA_SIZE}
-                        rows={4}
-                        maxLength={300}
-                        value={about}
-                        placeholder={ph.about}
-                        onChange={(e) => setAbout(e.target.value)}
-                      />,
+                      <InputGroup className="bg-background">
+                        <InputGroupTextarea
+                          className="md:text-base"
+                          rows={4}
+                          maxLength={300}
+                          value={about}
+                          placeholder={ph.about}
+                          onChange={(e) => setAbout(e.target.value)}
+                        />
+                        <div
+                          data-align="block-end"
+                          className="order-last flex w-full items-center justify-end px-3 py-1.5"
+                        >
+                          <CharCounter value={about} max={300} />
+                        </div>
+                      </InputGroup>,
                       {
                         info:
                           who === "cause"
                             ? "What you're raising for — and why it matters to you."
                             : "Introduce them in a sentence or two. Specific, personal details land harder than a list of facts.",
-                        count: [about, 300] as const,
                       }
                     )}
                     {field(
                       "The reveal",
                       true,
-                      <Textarea
-                        className={TEXTAREA_SIZE}
-                        rows={4}
-                        maxLength={280}
-                        value={reveal}
-                        placeholder={ph.reveal}
-                        onChange={(e) => setReveal(e.target.value)}
-                      />,
+                      <InputGroup className="bg-background">
+                        <InputGroupTextarea
+                          className="md:text-base"
+                          rows={4}
+                          maxLength={280}
+                          value={reveal}
+                          placeholder={ph.reveal}
+                          onChange={(e) => setReveal(e.target.value)}
+                        />
+                        <div
+                          data-align="block-end"
+                          className="order-last flex w-full items-center justify-end px-3 py-1.5"
+                        >
+                          <CharCounter value={reveal} max={280} />
+                        </div>
+                      </InputGroup>,
                       {
                         info: "A quote in their own words, a memory, or a message to guests — one sentence, with a detail only you'd know.",
-                        count: [reveal, 280] as const,
                       }
                     )}
                   </div>
@@ -919,7 +938,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         Pledge goal
                       </span>
                       <div className="flex gap-2">
-                        {[100, 250, 500, 1000].map((g) => (
+                        {[100, 250, 500].map((g) => (
                           <Button
                             key={g}
                             type="button"
@@ -933,20 +952,27 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                             £{g}
                           </Button>
                         ))}
-                        <Input
-                          className={cn(INPUT_SIZE, "w-32")}
-                          inputMode="numeric"
-                          placeholder="£ other"
-                          aria-label="Custom goal amount"
-                          value={goalDraft}
-                          onChange={(e) => {
-                            setGoalDraft(e.target.value)
-                            const n = parseInt(e.target.value, 10)
-                            setGoalAmount(
-                              Number.isFinite(n) && n > 0 ? n : undefined
-                            )
-                          }}
-                        />
+                        <InputGroup
+                          className={cn(INPUT_SIZE, "flex-1 bg-background")}
+                        >
+                          <InputGroupAddon align="inline-start">
+                            <span className="text-muted-foreground">£</span>
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            className="md:text-base"
+                            inputMode="numeric"
+                            placeholder="other"
+                            aria-label="Custom goal amount"
+                            value={goalDraft}
+                            onChange={(e) => {
+                              setGoalDraft(e.target.value)
+                              const n = parseInt(e.target.value, 10)
+                              setGoalAmount(
+                                Number.isFinite(n) && n > 0 ? n : undefined
+                              )
+                            }}
+                          />
+                        </InputGroup>
                       </div>
                     </div>
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
@@ -1174,7 +1200,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 38
+            PROTOTYPE · shape, round 39
           </div>
         )}
       </main>
