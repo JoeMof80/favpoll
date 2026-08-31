@@ -438,6 +438,17 @@ describe("useWizardState — handleFinish publishes", () => {
   })
 })
 
+describe("useWizardState — listed follows the register", () => {
+  it("a memorial defaults unlisted; the switch overrides", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    expect(result.current.isListed).toBe(true)
+    act(() => result.current.setCategory("memorial"))
+    expect(result.current.isListed).toBe(false)
+    act(() => result.current.setIsListed(true))
+    expect(result.current.isListed).toBe(true)
+  })
+})
+
 describe("useWizardState — suggestedTopics", () => {
   it("returns suggested topics for primary charity", () => {
     const { result } = renderHook(() => useWizardState(DATA))

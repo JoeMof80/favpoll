@@ -69,12 +69,19 @@ export function useWizardState(data: WizardData) {
   const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
   const [goalDraft, setGoalDraft] = useState("")
   const [closesAt, setClosesAt] = useState<Date | undefined>(undefined)
-  const [isListed, setIsListed] = useState(true)
+  const [listedOverride, setListedOverride] = useState<boolean | null>(null)
 
   const [generating, setGenerating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
+
+  const register = deriveRegister(category, grouping, subject)
+
+  // Listed follows the register — memorials default unlisted (the
+  // details page's rule: register !== "remembering") — until the
+  // organiser touches the switch.
+  const isListed = listedOverride ?? register !== "remembering"
 
   const stepIndex = STEPS.indexOf(step)
   const isFirst = stepIndex === 0
@@ -225,7 +232,7 @@ export function useWizardState(data: WizardData) {
     setGenerating(true)
     try {
       const result = await safeGenerateDraft({
-        register: deriveRegister(category, grouping, subject),
+        register,
         subject,
         topicId: topic.isCustom ? "" : topic.topicId,
         topicTitle: topic.isCustom ? topic.title : undefined,
@@ -384,7 +391,7 @@ export function useWizardState(data: WizardData) {
     closesAt,
     setClosesAt,
     isListed,
-    setIsListed,
+    setIsListed: (v: boolean) => setListedOverride(v),
     isCause,
     railSummary,
     railDone,
