@@ -347,6 +347,23 @@ next generation uses the right grammar. The paragraphs below describe
 the pre-revision wizard; the fork/any-order-answering grammar still
 applies to what remains.
 
+**2026-08-31 revision — the wizard publishes (extended-wizard verdict,
+references/extended-wizard-plan.md, Phase 1).** The wizard grew to SIX
+steps — Event · Charity · Topic · Info · Story · Details — and publishes
+itself: `handleFinish` calls `createFavpoll` with the full payload, then
+`SeedFundModal` offers the fund head start, then navigates to the page.
+The details handoff left the create path (`/favpolls/new/details` is a
+legacy fallback until Phase 3). The who axis moved AGAIN — from the
+Generate dialog to an icon dropdown on the Info step's Name field
+(He/She/They/Pair/Group ÷ Cause; Mars/Venus/NonBinary + the
+founder-drawn Pair/Group icons; pronouns never inferred from the name;
+picking Cause renames the field to "Cause" and the name field carries
+the cause label). Generation is ONE CLICK on the Story step, calibrated
+from register + charity + topic + name + context + who — no dialog.
+Listed defaults by register (`isListed = register !== "remembering"`)
+until the organiser touches the Details switch. The HONOUR-step
+paragraphs below are history.
+
 1. **Two complete paths, forked by an "OR" divider** (layout revised same day to the founder's second mock — the divider separates *complete answers to the step*, not options within the who question). Above the divider, the person path: five who options — **He / She / They** (`Mars`/`Venus`/`NonBinary` icons) / **Pair** (custom `PairIcon`) / **Group** (custom `GroupIcon`) — in a `grid-cols-4 sm:grid-cols-5` grid, followed by the category row. Below the divider, the cause path: **A cause** (`HeartHandshake` icon) alone. Person options set `subject='someone'` + grouping/pronoun (He/She/They → `grouping='individual'` + pronoun; couple/group → grouping + `pronoun=undefined`); "A cause" flips `subject='cause'`, `grouping='individual'`, `pronoun=undefined` with **`category=null` — a cause has no type** (`deriveRegister` is subject-first since the 2026-07-13 remodel, so no plumbing category is needed; memorial/celebration + cause was previously an allowed-but-incoherent state). The two who ToggleGroups share one selection model (selecting in one clears the other). Switching from cause back to a person starts the person path with no type chosen (cause carries `category=null` already). **No default selection** — Next is gated until a who option is chosen (`whoSelected = grouping !== "individual" || subject === "cause" || pronoun !== undefined`; the category gate is waived for cause — `(subject !== 'cause' && !category) || !whoSelected`). The wizard→details handoff omits the `category` param for a cause, and the details page's from-wizard gate is `Boolean(category) || subject === "cause"`. The cause-label input has been **removed** from the wizard — organisers enter the label on the details form instead. `pronoun` rides the redirect as a `pronoun` query param (only present for `subject='someone'`) and hydrates into `defaultValues.pronoun` on the details page.
 2. **Category row** (Celebration `Balloon` / Memorial `Flower2` / Fundraiser `Medal`): **always live, never dimmed or disabled** (any-order answering is the step's grammar — founder overruled an earlier disable-on-cause design because a fresh page already lets you pick a type before a who). For a cause it shows **no selection** (`category=null` — the remodel landed 2026-07-13, superseding the interim invisible-plumbing `fundraiser`) — and **clicking a type chip hops back to the person path** (subject→'someone', cause deselects, the clicked type is kept, who empties so Next re-gates). Touch either side of the OR and you're on that side. Active ToggleGroupItem style: solid fill (`bg-primary text-primary-foreground`).
 
@@ -431,8 +448,8 @@ Guest-added items land with `source = 'guest'`, `is_canonical = false`,
 /landing-v2                    -- RETIRED. Route and the whole components/landing-v2/ directory are deleted (PR feat/landing-polish); the surviving Venn lives at components/landing/honour-charity-love-venn.tsx. The unused root-level honour-charity-love-venn.tsx and favpoll-mark.tsx were deleted in the same pass.
 /about                         -- About page (leaned down 2026-07-08 for the three-surfaces model — audience: trust/charities/press/partners): brand-statement hero (purple band + monogram texture), Principles section (Charity·Honour·Love triad + Venn, no-fee line, record principle line linking /rankings — added 2026-07-11), contact form (ContactForm). The 2026-07-03 rich version (founding story, register sections, #money/#wills anchors) is gone — footer trust blurbs now link to /about plain. Server component; copy in the favpoll-brand voice.
 /favpolls                      -- Live favpolls grid (public, no auth)
-/favpolls/new                  -- New favpoll wizard (3-step page: Honour → Charity → Love)
-/favpolls/new/details          -- Create favpoll form (FavpollForm); reached from wizard with pre-populated query params
+/favpolls/new                  -- The six-step publishing wizard (Event · Charity · Topic · Info · Story · Details); creates the favpoll itself (createFavpoll) and offers SeedFundModal before navigating (2026-08-31)
+/favpolls/new/details          -- LEGACY create form fallback (FavpollForm); no longer reached from the wizard — retires in extended-wizard Phase 3
 /favpolls/[id]                 -- Favpoll page — guest pledge view + edit mode toggle
 /favpolls/[id]/edit            -- Edit favpoll (FavpollForm)
 /favpolls/[id]/opengraph-image -- The favpoll's share card (next/og, 1200×630 PNG), drawn by lib/og/cards.tsx from lib/og/favpoll-og-data.ts. Photo (or initials / the mark), eyebrow + name, "Pick your favourite <topic>" (closed: "Favourite <topic> — closed"), "Every pound goes to <charities>", wordmark. Private favpolls and unknown ids get the site card — this route has no sign-in gate in front of it. Cache-Control s-maxage=3600 (NOT ImageResponse's immutable default: the name and photo are editable). Nested routes (keepsake, pack) inherit it.
@@ -513,17 +530,22 @@ components/
 │   ├── tooltip.tsx
 │   └── tooltip-icon-button.tsx   -- Ghost icon button with tooltip; used by favpoll-list-card and poll-heading
 ├── new-favpoll-button.tsx          -- Client button that navigates to /favpolls/new; redirects signed-out users to /sign-in; accepts onBeforeOpen callback (used by header to close menu)
-├── new-favpoll-wizard/             -- 3-step wizard (Honour → Charity → Love); refactored from monolith into a directory
-│   ├── index.tsx                 -- Thin orchestrator (`NewFavpollWizard`); imports all sub-components and `useWizardState`; all session-storage and router logic lives in the hook. Love overlay header: controlled search `<input>` + an `InputGroupButton` "Add" that appears when `loveShowCreate` is true (trimmed search is non-empty and doesn't match any existing topic title). `handleCreateLoveTopic` sets the topic to `{ topicId: "", title, isCustom: true }` and closes the overlay. This duplicates LoveStep's own create-button logic because LoveStep suppresses its body input (and Add button) when controlled search props are passed.
-│   ├── use-wizard-state.ts       -- All wizard state, derived values, and handlers: step/category/grouping/subject/pronoun/topics/charityIds/overlay-opens, `nextDisabled`, `handleNext/Back/Finish` (writes sessionStorage, calls `router.push`). `pronoun: Pronoun | undefined` replaces the old `causeLabel` state; `whoSelected` gate = `grouping !== "individual" || subject === "cause" || pronoun !== undefined`. Exports `DRAFT_ADDITIONS_KEY`, `STEPS`, `STEP_LABELS`, `WizardData` type
-│   ├── wizard-triad-rail.tsx     -- Desktop left column: `bg-primary/10` tinted rail (`h-full`, `justify-around`), Award/Gift/Heart icons at `h-6 w-6`, `text-lg` labels, `opacity-60` for past/future; Props: `{ currentStep, copy }`
-│   ├── wizard-progress-strip.tsx -- Mobile `<ol>` segmented progress strip: coloured fill + HONOUR/CHARITY/LOVE text, `aria-label "Step N of 3: <Label>"`; Props: `{ currentStep }`
-│   ├── wizard-nav.tsx            -- Navigation row: Back (ghost) + Next/Set-up-my-event; Props: `{ isFirst, isLast, nextDisabled, onBack, onNext, onFinish }`
+├── new-favpoll-wizard/             -- The six-step publishing wizard (extended-wizard Phase 1, 2026-08-31)
+│   ├── index.tsx                 -- `NewFavpollWizard`: RegisterScope (wears the register as chosen), rail + strip + step shells + nav, charity/topic overlays, TopicItemsDialog; renders SeedFundModal when `seedFavpollId` is set. Story shell's `action` slot carries the one-click Generate button
+│   ├── use-wizard-state.ts       -- All wizard state and the publish path: step/category/grouping/subject/pronoun/topics/charityIds + openingLine/name/context/photo/about/reveal/who/goal/closesAt/listedOverride; `nextDisabled` per step (info→name, story→about); `railSummary`/`railDone`; `handleWho` commits grouping/subject/pronoun; `generateExample` calls safeGenerateDraft with the wizard's own calibration; `handleFinish` uploads the photo then calls `createFavpoll` and sets `seedFavpollId`; `isListed = listedOverride ?? register !== "remembering"`. Exports `DRAFT_ADDITIONS_KEY`, `WizardState`
+│   ├── wizard-step-rail.tsx      -- Desktop rail: icon + label per step (Calendar/Gift/Shapes/UserRound/BookOpen/ClipboardList), tick + one-line answer summary once a step's content is in; Props: `{ currentStep, summary, done }`
+│   ├── wizard-progress-strip.tsx -- Mobile `<ol>`: six bars, aria labels only (no text row); Props: `{ currentStep }`
+│   ├── wizard-nav.tsx            -- Back (ghost) + Next / Publish (submitting → "Publishing…"); Props: `{ isFirst, isLast, nextDisabled, submitting?, finishLabel?, onBack, onNext, onFinish }`
+│   ├── wizard-step-shell.tsx     -- Step wrapper: uppercase tracked h3 + optional `action` node on the heading row; NO guidance line (retired with the extended wizard)
+│   ├── wizard-field.tsx          -- `WizardField` (label | field grid row, quiet required asterisk, info popover, hint) + `WizardInfoPopover` + `WIZARD_INPUT_SIZE` (h-11)
+│   ├── wizard-placeholders.ts    -- Register-aware ghost text; the Name ghost follows the who selection (`ghostsFor(category, who)`)
+│   ├── wizard-info-step.tsx      -- Opening line / Name / Context / Photo in page order; who icon-dropdown on the Name field's inline-end addon (`!mr-0` pins the counter alignment); in-field CharCounters; HeroPhotoOverlay on a scoped FormProvider
+│   ├── wizard-story-step.tsx     -- About (required) + The reveal as InputGroup textareas with block-end CharCounters; dialog helper copy behind info icons (About's swaps for causes)
+│   ├── wizard-details-step.tsx   -- Pledge goal presets + £-prefixed flex-1 custom field; DateTimePicker with `presets={CLOSE_DATE_PRESETS}`; Listed switch
 │   ├── wizard-charity-card.tsx   -- Receipt card for selected charities: logo/initial, name, charity no., Edit+Remove buttons, "+ Pick another" link (hidden at max 3); Props: `{ charities, onEdit, onRemove(id), onPickAnother }`
 │   ├── wizard-topic-card.tsx     -- Topic card: topic label header, Edit+Remove buttons, chips (existing canonical + purple custom), "+ Add" / "+N more" overflow chip, "Add at least…" hint for custom topics with < 2 labels; Props: `{ topic, sortedExistingItems, customLabels, showItemsSection, onEdit, onRemove, onOpenItemsDialog }`
-│   ├── wizard-step-shell.tsx     -- Step wrapper: centred `h2` title + guidance paragraph; consumed by each wizard step; Props: `{ title, guidance, children }`
-│   ├── *.stories.tsx             -- Storybook stories for each sub-component (5 story files)
-│   └── __tests__/use-wizard-state.test.ts -- Hook unit tests: `nextDisabled` gates, step navigation, `causeLabel` URL param, sessionStorage writes
+│   ├── *.stories.tsx             -- Storybook stories for the sub-components
+│   └── __tests__/use-wizard-state.test.ts -- Hook unit tests: gates per step, navigation, who commit, rail summaries, generateExample calibration, handleFinish payloads (person/cause/custom topic/photo/error), listed-by-register
 ├── favpoll-form/                -- Canonical create/edit form; preview panel full-width + floating command panel
 │   ├── index.tsx                 -- FavpollForm (outer, router + form) + FormInner; preview panel full-width; CommandPanel floated fixed. No Settings overlay. initialClosesAt prop (ISO string) carries existing closes_at for edit mode; closesAt is not a form field — captured locally in the publish overlay (create) or passed through from initialClosesAt (edit). isPrivate always false; potAmount always null. After createEvent: sets seedEventId state → renders SeedFundModal instead of redirecting immediately. Generation is opt-in: no auto-call on mount. handleRegenerate() fires safeGenerateDraft on demand (via the "Generate a suggestion →" prompt or the Regenerate button in the About overlay), pre-fills about for both modes and reveal for cause favpolls, sets personRevealExample for person favpolls (never commits); manual-edit confirmation before overwrite; shows error toast when result is null.
 │   ├── seed-fund-modal.tsx       -- Post-publish shared fund seeding modal. Props: eventId, onComplete. States: amount (number), clientSecret, error, submitting. Preset buttons £10/£25/£50 set amount. "Seed fund" button (disabled when no amount) → POST /api/stripe/payment-intent with pot_top_up metadata → StripeCheckout. On success: topUpFund() then onComplete(). topUpFund failure swallowed. Cancel: returns to modal with error. "Skip for now" link calls onComplete() immediately. hideCloseButton on ResponsiveOverlay (no × button).
@@ -616,7 +638,7 @@ lib/
 ├── occasions.ts                  -- shortTopicLabel (DATE_LABEL_PLACEHOLDERS removed)
 ├── registers.ts                  -- Register type, deriveRegister(), suggestClosingDate(), getExampleName(), registerForOccasionType() (legacy), OCCASION_TYPES_BY_REGISTER (legacy)
 ├── display.ts                    -- charityNames, formatAmount, ordinal, formatRelativeDate, formatFavpollDate, getFavpollHeadline (accepts optional subject?: 'someone'|'cause' param; subject-aware prefix matrix — see Registers section for the full matrix)
-├── wizard-copy.ts                -- `getWizardCopy(subject: FavpollSubject)` → `{ leftPrompt, rail: { honour, charity, love }, charityGuidance, loveGuidance }`; branches on subject ('someone' | 'cause'); used by NewFavpollWizard to drive all step copy
+├── wizard-copy.ts                -- `WizardStep` (six values) + `STEPS` + `STEP_LABELS` — the pure step axis, importable by UI and stories without pulling server actions. The per-step marketing copy (WIZARD_COPY/getWizardCopy) retired with the rail subtext (2026-08-31)
 ├── i18n.ts                       -- formatCurrency(), t(), MARKET_DEFAULTS
 ├── email.ts                      -- Resend helpers
 ├── edit-mode-context.tsx
@@ -938,7 +960,7 @@ Never hardcode a test email — it will fail on every CI run after the first.
 | ---------------------------------------------------- | ----------------------------------- | --------------- |
 | Reveal appears after pledge (critical — see PR #120) | `reveal-after-pledge.spec.ts`       | None (guest)    |
 | Wizard → publish → verify public page                | `wizard-publish.spec.ts`            | Clerk organiser |
-| Cause wizard → publish → verify (no category; the faceless path — added after the 2026-07-13 blank-details regression shipped past unit tests; asserts is_listed=true, the inverse of the memorial spec) | `wizard-publish-cause.spec.ts` | Clerk organiser |
+| Cause wizard → publish → verify (the faceless path: Fundraiser + who-dropdown → Cause on the Info step; asserts is_listed=true, the inverse of the memorial spec) | `wizard-publish-cause.spec.ts` | Clerk organiser |
 
 The organiser project's `testMatch` is `**/wizard-publish*.spec.ts` — new organiser wizard specs named `wizard-publish-*.spec.ts` are picked up automatically.
 
