@@ -18,10 +18,11 @@ import {
   ClipboardList,
   Gift,
   Shapes,
+  Mars,
+  NonBinary,
   Ribbon,
   UserRound,
-  Users,
-  UsersRound,
+  Venus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
@@ -70,6 +71,7 @@ import type { WizardData } from "@/components/new-favpoll-wizard/use-wizard-stat
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
+import { GroupIcon, PairIcon } from "@/components/icons/people"
 import { cn } from "@/lib/utils"
 
 type ProtoStep = "event" | "charity" | "topic" | "info" | "story" | "publish"
@@ -110,15 +112,16 @@ const PRONOUNS: Record<"he" | "she" | "they", { sub: string; pos: string }> = {
 // The full who axis, mirroring the Generate dialog: three pronouns, Pair,
 // Group — and Cause, the answer that says no one. Word labels, no
 // per-option glyphs (founder, 2026-07-30).
-// The original who icons (f288249), retired from the chips by the
-// word-pills decision but revived on the TRIGGER, which reflects the
-// current selection: singles wear the round person the founder approved.
+// The gendered who icons (f8bff8f) and the founder-drawn Pair/Group
+// figures (8b03456, components/icons/people.tsx) — retired from the
+// chips by the word-pills decision, revived on the TRIGGER, which
+// reflects the current selection.
 const WHO_ICONS: Record<WhoValue, React.ElementType> = {
-  he: UserRound,
-  she: UserRound,
-  they: UserRound,
-  couple: Users,
-  group: UsersRound,
+  he: Mars,
+  she: Venus,
+  they: NonBinary,
+  couple: PairIcon,
+  group: GroupIcon,
   cause: Ribbon,
 }
 
@@ -1100,7 +1103,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 34
+            PROTOTYPE · shape, round 35
           </div>
         )}
       </main>
