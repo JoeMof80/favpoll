@@ -487,6 +487,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           <Button
                             key={g}
                             type="button"
+                            className="h-11 px-5 md:text-base"
                             variant={goalAmount === g ? "default" : "outline"}
                             onClick={() => {
                               setGoalAmount(g)
@@ -752,7 +753,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 19
+            PROTOTYPE · shape, round 20
           </div>
         )}
       </main>
