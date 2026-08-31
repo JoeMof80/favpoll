@@ -53,7 +53,13 @@ export function FavpollHeader({
             never engages — long names ran under the avatar */}
         <div className="flex min-w-0 flex-1 flex-col">
           {eyebrow && (
-            <span className="text-[11px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+            /* text-primary, not muted (founder, 2026-08-31: the shelf cards
+               "need to be theme coloured"). Both consumers — the list card
+               and the summary card — wear data-register, so the eyebrow is
+               the card's header line in its register's ink: purple on a
+               memorial, magenta on a celebration, green on a fundraiser,
+               brand blue on a neutral favpoll. */
+            <span className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
               {eyebrow}
             </span>
           )}
