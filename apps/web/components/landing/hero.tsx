@@ -164,22 +164,8 @@ const FUNDRAISER_TOPIC = FUNDRAISER_SCENE.poll.topic.title.toLowerCase()
 
 const ROUTER_CARDS = [
   {
-    kind: "memorial" as const,
-    href: "/memorials",
-    title: t("home.router.memorials.title"),
-    body: t("home.router.memorials.body"),
-    topic: MEMORIAL_TOPIC,
-    // Naive plural, correct for "colour" and for every topic title in the
-    // seed that this card could show. A topic whose plural is irregular
-    // would need the noun back as a literal.
-    more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
-    charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
-    total: MEMORIAL_SCENE.total,
-    results: MEMORIAL_RESULTS,
-  },
-  {
     kind: "celebration" as const,
-    href: "/celebrations",
+    href: "/celebration",
     title: t("home.router.celebrations.title"),
     body: t("home.router.celebrations.body"),
     topic: WEDDING_TOPIC,
@@ -190,7 +176,7 @@ const ROUTER_CARDS = [
   },
   {
     kind: "fundraiser" as const,
-    href: "/fundraisers",
+    href: "/fundraiser",
     title: t("home.router.fundraisers.title"),
     body: t("home.router.fundraisers.body"),
     topic: FUNDRAISER_TOPIC,
@@ -198,6 +184,20 @@ const ROUTER_CARDS = [
     charity: FUNDRAISER_SCENE.charities[0]?.name ?? "",
     total: FUNDRAISER_SCENE.total,
     results: FUNDRAISER_RESULTS,
+  },
+  {
+    kind: "memorial" as const,
+    href: "/memorial",
+    title: t("home.router.memorials.title"),
+    body: t("home.router.memorials.body"),
+    topic: MEMORIAL_TOPIC,
+    // Naive plural, correct for "colour" and for every topic title in the
+    // seed that this card could show. A topic whose plural is irregular
+    // would need the noun back as a literal.
+    more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
+    charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
+    total: MEMORIAL_SCENE.total,
+    results: MEMORIAL_RESULTS,
   },
 ] as const
 

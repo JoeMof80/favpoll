@@ -709,9 +709,9 @@ export type NavTab = {
 // so "A fundraiser" (a person's challenge) and "For a cause" (a faceless
 // appeal) read as the different things they are.
 const NAV_TAB_DEFS: { label: string; kind: SceneKind }[] = [
-  { label: "Memorial", kind: "memorial" },
   { label: "Celebration", kind: "celebration" },
   { label: "Fundraiser", kind: "fundraiser" },
+  { label: "Memorial", kind: "memorial" },
   { label: "Cause", kind: "cause" },
 ]
 

@@ -16,9 +16,9 @@ const INCLUDED = [
   /^\/charities(\/[^/]+)?$/,
   /^\/record$/,
   /^\/favpolls$/, // the listing only — not favpolls/[id] or the wizard
-  /^\/memorials$/, // register landing pages — marketing/trust surfaces
-  /^\/celebrations$/,
-  /^\/fundraisers$/,
+  /^\/celebration$/, // register landing pages — marketing/trust surfaces
+  /^\/fundraiser$/,
+  /^\/memorial$/,
 ]
 
 // App-wide footer, mounted in the root layout. A client pathname check is

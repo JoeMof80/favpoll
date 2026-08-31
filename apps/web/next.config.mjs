@@ -29,6 +29,10 @@ const nextConfig = {
         destination: "/record",
         permanent: true,
       },
+      // Register pages went singular (2026-08-31); keep old links alive.
+      { source: "/memorials", destination: "/memorial", permanent: true },
+      { source: "/celebrations", destination: "/celebration", permanent: true },
+      { source: "/fundraisers", destination: "/fundraiser", permanent: true },
     ]
   },
 }

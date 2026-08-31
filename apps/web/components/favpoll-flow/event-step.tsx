@@ -39,13 +39,13 @@ const CATEGORY_OPTIONS = [
     icon: Balloon,
     palette: "celebration",
   },
-  { value: "memorial", label: "Memorial", icon: Flower2, palette: "memorial" },
   {
     value: "fundraiser",
     label: "Fundraiser",
     icon: Medal,
     palette: "fundraiser",
   },
+  { value: "memorial", label: "Memorial", icon: Flower2, palette: "memorial" },
 ] as const satisfies readonly {
   value: FavpollCategory
   label: string

@@ -65,19 +65,19 @@ const SEE_IT_FOR: {
     | "home.overview.seeIt.fundraiser"
 }[] = [
   {
-    palette: "memorial",
-    slug: "memorials",
-    key: "home.overview.seeIt.memorial",
-  },
-  {
     palette: "celebration",
-    slug: "celebrations",
+    slug: "celebration",
     key: "home.overview.seeIt.celebration",
   },
   {
     palette: "fundraiser",
-    slug: "fundraisers",
+    slug: "fundraiser",
     key: "home.overview.seeIt.fundraiser",
+  },
+  {
+    palette: "memorial",
+    slug: "memorial",
+    key: "home.overview.seeIt.memorial",
   },
 ]
 
