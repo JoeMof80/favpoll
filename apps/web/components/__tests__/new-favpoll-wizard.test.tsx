@@ -12,6 +12,11 @@ vi.mock("@/app/favpolls/new/actions", () => ({
 vi.mock("@/lib/actions/generate-draft", () => ({
   safeGenerateDraft: vi.fn(),
 }))
+// SeedFundModal's chain reaches lib/email (Resend constructed at module
+// scope) — CI has no key, and the modal is irrelevant to these tests.
+vi.mock("@/components/favpoll-form/seed-fund-modal", () => ({
+  SeedFundModal: () => null,
+}))
 
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"

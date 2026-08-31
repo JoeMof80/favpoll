@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Button } from "@/components/ui/button"
@@ -39,11 +39,17 @@ function relativeTime(iso: string): string {
 // landing demo bakes Date.now() into its HTML at build). Keep the server's
 // text through hydration, then re-render once mounted so the client's clock
 // takes over.
+const emptySubscribe = () => () => {}
+
 function RelativeTime({ iso }: { iso: string }) {
-  const [, setMounted] = useState(false)
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // useSyncExternalStore serves the server snapshot through hydration and
+  // re-renders once with the client snapshot — the sanctioned form of the
+  // old setMounted-in-effect hack (react-hooks/set-state-in-effect).
+  useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
   return (
     <span
       className="shrink-0 text-xs text-muted-foreground"

@@ -89,7 +89,8 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await charityDialog.getByRole("button", { name: /^done$/i }).click()
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
-    await expect(page.getByText("Marie Curie")).toBeVisible()
+    // .first(): the rail summary echoes the charity name.
+    await expect(page.getByText("Marie Curie").first()).toBeVisible()
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
@@ -112,7 +113,8 @@ test.describe("wizard → publish flow (cause)", () => {
     await colourOption.click()
 
     await expect(topicDialog).not.toBeVisible({ timeout: 5_000 })
-    await expect(page.getByText("Colour")).toBeVisible()
+    // .first(): the rail summary echoes the topic title.
+    await expect(page.getByText("Colour").first()).toBeVisible()
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
