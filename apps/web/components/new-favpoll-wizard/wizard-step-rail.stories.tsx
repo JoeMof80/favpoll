@@ -1,33 +1,73 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { WizardStepRail } from "./wizard-step-rail"
-import { getWizardCopy } from "@/lib/wizard-copy"
 
-const meta = {
+const meta: Meta<typeof WizardStepRail> = {
   title: "Wizard/WizardStepRail",
   component: WizardStepRail,
-  parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (
-      <div style={{ width: 320, minHeight: "100vh" }}>
+      <div className="h-[640px] w-80">
         <Story />
       </div>
     ),
   ],
-} satisfies Meta<typeof WizardStepRail>
-
+}
 export default meta
-type Story = StoryObj<typeof meta>
 
-const copy = getWizardCopy()
+type Story = StoryObj<typeof WizardStepRail>
 
-export const OnEvent: Story = {
-  args: { currentStep: "event", copy },
+const EMPTY = {
+  event: "",
+  charity: "",
+  topic: "",
+  info: "",
+  story: "",
+  details: "",
+}
+const NONE = {
+  event: false,
+  charity: false,
+  topic: false,
+  info: false,
+  story: false,
+  details: false,
 }
 
-export const OnCharity: Story = {
-  args: { currentStep: "charity", copy },
+export const FirstStep: Story = {
+  args: { currentStep: "event", summary: EMPTY, done: NONE },
 }
 
-export const OnTopic: Story = {
-  args: { currentStep: "topic", copy },
+export const MidFlow: Story = {
+  args: {
+    currentStep: "info",
+    summary: {
+      ...EMPTY,
+      event: "Memorial",
+      charity: "Marie Curie",
+      topic: "Colour",
+    },
+    done: { ...NONE, event: true, charity: true, topic: true },
+  },
+}
+
+export const NearlyDone: Story = {
+  args: {
+    currentStep: "details",
+    summary: {
+      event: "Memorial",
+      charity: "Marie Curie",
+      topic: "Colour",
+      info: "Margaret Whitfield",
+      story: "A headmistress for forty-one years…",
+      details: "£250 goal · closes 14 Sept",
+    },
+    done: {
+      ...NONE,
+      event: true,
+      charity: true,
+      topic: true,
+      info: true,
+      story: true,
+    },
+  },
 }

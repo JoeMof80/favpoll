@@ -1,66 +1,79 @@
 "use client"
 
-import { Calendar, Gift, Shapes } from "lucide-react"
+import {
+  BookOpen,
+  Calendar,
+  Check,
+  ClipboardList,
+  Gift,
+  Shapes,
+  UserRound,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
-import { STEPS, STEP_LABELS } from "./use-wizard-state"
-import type { WizardStep } from "@/lib/wizard-copy"
-import type { WizardCopy } from "@/lib/wizard-copy"
+import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 
-// Concrete objects, all three — a calendar, a gift, an assortment. A list
-// or a grid would drop interface furniture into a set of real things.
-//
-// Heart marked this step when it was the Love step, and it said affection
-// for a PERSON — which the wizard deliberately no longer knows, since
-// Cause moved to the Generate control (2026-08-25). Shapes says what a
-// topic actually is: different things to pick among, which holds for an
-// infinite topic as well as a finite one.
+// Concrete objects, not interface furniture — a calendar, a gift, an
+// assortment, a person, a book, a clipboard. The rail tracks the answers
+// as they accumulate (extended-wizard prototype, round 25): each step
+// shows a tick once its content is in, and the chosen thing itself as a
+// one-line summary beneath the label.
 const STEP_ICONS: Record<WizardStep, React.ElementType> = {
   event: Calendar,
   charity: Gift,
   topic: Shapes,
+  info: UserRound,
+  story: BookOpen,
+  details: ClipboardList,
 }
 
 type Props = {
   currentStep: WizardStep
-  copy: WizardCopy
+  summary: Record<WizardStep, string>
+  done: Record<WizardStep, boolean>
 }
 
-export function WizardStepRail({ currentStep, copy }: Props) {
-  const stepIndex = STEPS.indexOf(currentStep)
+export function WizardStepRail({ currentStep, summary, done }: Props) {
   return (
-    <div className="hidden h-full flex-col gap-10 bg-primary/10 p-6 md:flex">
-      <div className="flex flex-1 flex-col justify-around gap-8">
+    <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
+      <div className="flex flex-1 flex-col justify-around gap-5">
         {STEPS.map((s) => {
           const Icon = STEP_ICONS[s]
           const isActive = s === currentStep
-          const isPast = STEPS.indexOf(s) < stepIndex
           return (
             <div
               key={s}
               className={cn(
-                "space-y-1.5 transition-opacity",
-                isActive ? "opacity-100" : isPast ? "opacity-60" : "opacity-60"
+                "min-w-0 space-y-1 transition-opacity",
+                isActive || done[s] ? "opacity-100" : "opacity-60"
               )}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
                   className={cn(
-                    "h-6 w-6 shrink-0",
+                    "h-5 w-5 shrink-0",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 />
                 <p
                   className={cn(
-                    "text-lg font-medium tracking-widest uppercase",
+                    "text-base font-medium tracking-widest uppercase",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
                   {STEP_LABELS[s]}
                 </p>
+                {done[s] && (
+                  <Check
+                    aria-label="Done"
+                    className="h-4 w-4 shrink-0 text-primary"
+                  />
+                )}
               </div>
-              <p className="pl-8.5 text-sm leading-relaxed text-muted-foreground">
-                {copy.rail[s]}
-              </p>
+              {summary[s] && (
+                <p className="truncate pl-7.5 text-sm text-muted-foreground">
+                  {summary[s]}
+                </p>
+              )}
             </div>
           )
         })}

@@ -1,6 +1,14 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { getWizardCopy, type WizardStep } from "@/lib/wizard-copy"
+import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
+import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
+import { safeGenerateDraft } from "@/lib/actions/generate-draft"
+import {
+  groupingForWho,
+  subjectForWho,
+  type WhoValue,
+} from "@/components/favpoll-form/generate-example-dialog"
+import { deriveRegister } from "@/lib/registers"
 import type {
   Category,
   Charity,
@@ -15,13 +23,7 @@ import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
 export const DRAFT_ADDITIONS_KEY = "favpoll_draft_additions"
 
-export const STEPS: WizardStep[] = ["event", "charity", "topic"]
-
-export const STEP_LABELS: Record<WizardStep, string> = {
-  event: "Event",
-  charity: "Charity",
-  topic: "Topic",
-}
+export { STEPS, STEP_LABELS }
 
 type WizardTopics = FavpollFormValues["topics"]
 
@@ -55,11 +57,35 @@ export function useWizardState(data: WizardData) {
   const [charityOpen, setCharityOpen] = useState(false)
   const [itemsDialogOpen, setItemsDialogOpen] = useState(false)
 
+  // The appended steps' fields (Info · Story · Details).
+  const [openingLine, setOpeningLine] = useState("")
+  const [name, setName] = useState("")
+  const [context, setContext] = useState("")
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const [about, setAbout] = useState("")
+  const [reveal, setReveal] = useState("")
+  const [who, setWho] = useState<WhoValue | "">("")
+  const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
+  const [goalDraft, setGoalDraft] = useState("")
+  const [closesAt, setClosesAt] = useState<Date | undefined>(undefined)
+  const [listedOverride, setListedOverride] = useState<boolean | null>(null)
+
+  const [generating, setGenerating] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
+
+  const register = deriveRegister(category, grouping, subject)
+
+  // Listed follows the register — memorials default unlisted (the
+  // details page's rule: register !== "remembering") — until the
+  // organiser touches the switch.
+  const isListed = listedOverride ?? register !== "remembering"
+
   const stepIndex = STEPS.indexOf(step)
   const isFirst = stepIndex === 0
   const isLast = stepIndex === STEPS.length - 1
-
-  const copy = getWizardCopy()
 
   const customLabels = topics[0]?.customLabels ?? []
   const customItemCount = topics[0]?.isCustom ? customLabels.length : null
@@ -81,18 +107,28 @@ export function useWizardState(data: WizardData) {
   const showItemsSection =
     topics.length > 0 && (topics[0]?.isCustom || !!selectedTopic)
 
-  // The whole who axis now lives in the form's Generate control —
-  // pronoun and pair/group since 2026-07-30, Cause since 2026-08-25 — so
-  // the step gates on the type alone.
+  const isCause = subject === "cause"
+
+  const topicDone =
+    topics.length > 0 &&
+    !(
+      topics[0]?.isCustom === true &&
+      customItemCount !== null &&
+      customItemCount < 2
+    )
+
   const nextDisabled =
     step === "event"
       ? !category
       : step === "charity"
         ? charityIds.length === 0
-        : topics.length === 0 ||
-          (topics[0]?.isCustom === true &&
-            customItemCount !== null &&
-            customItemCount < 2)
+        : step === "topic"
+          ? !topicDone
+          : step === "info"
+            ? !name.trim()
+            : step === "story"
+              ? !about.trim()
+              : false
 
   const selectedCharities = data.charities.filter((c) =>
     charityIds.includes(c.id)
@@ -108,6 +144,34 @@ export function useWizardState(data: WizardData) {
   )
     .map((id) => data.topics.find((t) => t.id === id))
     .filter((t): t is TopicWithMeta => !!t)
+
+  // The rail tracks the answers: a tick once a step's content is in, and
+  // the chosen thing itself as a one-line summary.
+  const railSummary: Record<WizardStep, string> = {
+    event: category ? category.charAt(0).toUpperCase() + category.slice(1) : "",
+    charity: selectedCharities.map((c) => c.name).join(", "),
+    topic: topics[0]?.title ?? "",
+    info: name.trim(),
+    story: about.trim(),
+    details: [
+      goalAmount ? `£${goalAmount} goal` : null,
+      closesAt
+        ? `closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
+        : null,
+      isListed ? null : "unlisted",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  }
+
+  const railDone: Record<WizardStep, boolean> = {
+    event: !!category,
+    charity: charityIds.length > 0,
+    topic: topicDone,
+    info: !!name.trim(),
+    story: !!about.trim(),
+    details: false,
+  }
 
   function handleAddItem(label: string) {
     const current = topics[0]
@@ -135,47 +199,135 @@ export function useWizardState(data: WizardData) {
   }
 
   function handleNext() {
-    if (step === "event") setStep("charity")
-    else if (step === "charity") setStep("topic")
+    setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]!)
   }
 
   function handleBack() {
-    if (step === "topic") setStep("charity")
-    else if (step === "charity") setStep("event")
+    setStep(STEPS[Math.max(stepIndex - 1, 0)]!)
   }
 
-  function handleFinish() {
+  function goToStep(target: WizardStep) {
+    setStep(target)
+  }
+
+  // The who axis lives on the Name field. Cause and Pair/Group are
+  // structural, not just generation metadata — they drive the register
+  // and route the About into protagonist vs description at publish.
+  // Pronouns are NEVER inferred from the name.
+  function handleWho(value: WhoValue) {
+    setWho(value)
+    setGrouping(groupingForWho(value))
+    setSubject(subjectForWho(value))
+    setPronoun(
+      value === "he" || value === "she" || value === "they" ? value : undefined
+    )
+  }
+
+  // One-click generation: by the Story step the wizard already holds
+  // register, charity, topic, name, context and who — the full
+  // calibration set. No dialog (extended-wizard verdict).
+  async function generateExample() {
     const topic = topics[0]
-    const params = new URLSearchParams({
-      grouping,
-      subject,
-      charityIds: charityIds.join(","),
-    })
-    // A cause carries no category — the param is simply absent.
-    if (category) {
-      params.set("category", category)
-    }
-    if (pronoun) {
-      params.set("pronoun", pronoun)
-    }
-    if (topic) {
-      if (topic.isCustom || customLabels.length > 0) {
-        sessionStorage.setItem(
-          DRAFT_ADDITIONS_KEY,
-          JSON.stringify({
-            topicRef: topic.isCustom
-              ? { kind: "new", title: topic.title }
-              : { kind: "existing", id: topic.topicId },
-            addedItems: customLabels,
-          })
-        )
-        params.set("draftAdditions", "1")
-      } else {
-        params.set("topicId", topic.topicId)
-        params.set("topicTitle", topic.title)
+    if (!topic || generating) return
+    setGenerating(true)
+    try {
+      const result = await safeGenerateDraft({
+        register,
+        subject,
+        topicId: topic.isCustom ? "" : topic.topicId,
+        topicTitle: topic.isCustom ? topic.title : undefined,
+        itemLabels: topic.isCustom ? (topic.customLabels ?? []) : undefined,
+        primaryCharityId: primaryCharity?.id ?? null,
+        pronoun,
+        displayName: name.trim() || null,
+      })
+      if (!result) return
+      setAbout(result.about)
+      setReveal(result.reveal)
+      if (isCause) {
+        if (!name.trim() && result.causeLabel) setName(result.causeLabel)
+        if (!context.trim() && result.context) setContext(result.context)
       }
+    } finally {
+      setGenerating(false)
     }
-    router.push(`/favpolls/new/details?${params}`)
+  }
+
+  // Publish — the whole payload in one call, exactly as the form's
+  // create branch did. SeedFundModal then offers the fund head start
+  // (a payment needs the created favpoll), and onComplete navigates.
+  async function handleFinish() {
+    if (submitting) return
+    setError(null)
+    setSubmitting(true)
+    try {
+      let resolvedPhotoUrl = photoUrl
+      if (photo) {
+        const fd = new FormData()
+        fd.append("photo", photo)
+        resolvedPhotoUrl = await uploadPersonPhoto(fd)
+      }
+
+      const selected = topics[0]
+      if (!selected) throw new Error("Missing topic")
+      const topicMeta = data.topics.find((t) => t.id === selected.topicId)
+      const isCustomTopic = selected.isCustom ?? false
+
+      const resolvedClosesAt =
+        closesAt ?? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+
+      sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
+
+      const { favpollId } = await createFavpoll({
+        protagonistName: isCause ? "" : name,
+        protagonistAbout: isCause ? null : about || null,
+        photoUrl: resolvedPhotoUrl,
+        dateLabel: context || null,
+        category: category ?? null,
+        grouping,
+        subject,
+        causeLabel: isCause ? name.trim() || null : null,
+        pronoun: isCause ? null : (pronoun ?? null),
+        openingLine: openingLine || null,
+        description: isCause ? about.trim() || null : null,
+        charityIds,
+        closesAt: resolvedClosesAt.toISOString(),
+        isPrivate: false,
+        isListed,
+        potAmount: null,
+        goalAmount: goalAmount ?? null,
+        poll: {
+          topicId: isCustomTopic ? null : selected.topicId,
+          customTopic: isCustomTopic
+            ? {
+                title: selected.title,
+                items: selected.customLabels ?? [],
+              }
+            : null,
+          reveal: reveal || null,
+          infiniteItems:
+            !isCustomTopic && topicMeta && !topicMeta.is_finite
+              ? {
+                  canonicalItemIds: topicMeta.favourites
+                    .filter((i) => i.is_canonical)
+                    .map((i) => i.id),
+                  customLabels: selected.customLabels ?? [],
+                }
+              : null,
+          addedItems: isCustomTopic ? [] : (selected.customLabels ?? []),
+        },
+      })
+      setSeedFavpollId(favpollId)
+    } catch (err) {
+      if (!(err instanceof Error)) throw err
+      setError(err.message || "Something went wrong")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  function completeSeed() {
+    if (seedFavpollId) router.push(`/favpolls/${seedFavpollId}`)
   }
 
   return {
@@ -195,7 +347,6 @@ export function useWizardState(data: WizardData) {
     setCharityOpen,
     itemsDialogOpen,
     setItemsDialogOpen,
-    copy,
     customLabels,
     selectedTopic,
     sortedExistingItems,
@@ -215,6 +366,43 @@ export function useWizardState(data: WizardData) {
     handleRemoveItem,
     handleNext,
     handleBack,
+    goToStep,
+    // Info · Story · Details
+    openingLine,
+    setOpeningLine,
+    name,
+    setName,
+    context,
+    setContext,
+    photo,
+    setPhoto,
+    photoUrl,
+    setPhotoUrl,
+    about,
+    setAbout,
+    reveal,
+    setReveal,
+    who,
+    handleWho,
+    goalAmount,
+    setGoalAmount,
+    goalDraft,
+    setGoalDraft,
+    closesAt,
+    setClosesAt,
+    isListed,
+    setIsListed: (v: boolean) => setListedOverride(v),
+    isCause,
+    railSummary,
+    railDone,
+    generating,
+    generateExample,
+    submitting,
+    error,
+    seedFavpollId,
+    completeSeed,
     handleFinish,
   }
 }
+
+export type WizardState = ReturnType<typeof useWizardState>

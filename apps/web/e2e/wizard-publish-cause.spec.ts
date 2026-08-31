@@ -1,38 +1,27 @@
 /**
  * e2e/wizard-publish-cause.spec.ts
  *
- * Tests the wizard → publish flow for a CAUSE favpoll — the faceless path
- * that forks away from the person path at step 1 and takes different
- * branches at every layer: no category (null since the 2026-07-13 remodel),
- * the details page's from-wizard gate, FormInner's subject-aware guard, the
- * CauseHero, and the cause-label field instead of a protagonist name.
- *
- * Exists because none of those branches are exercised by
- * wizard-publish.spec.ts (Memorial), and the first remodel regression
- * — FormInner's `if (!category) return null` blank-paging the details page —
- * shipped through 1024 green unit tests and was only caught by a manual
- * founder run-through of exactly this flow.
+ * Tests the six-step wizard → publish flow for a CAUSE favpoll — the
+ * faceless path. Cause lives on the Name field's who dropdown (the
+ * extended-wizard verdict): picking it renames the field to "Cause",
+ * commits subject='cause', and the name field carries the cause label.
  *
  * Flow:
  *   1. Sign in (via storageState from auth.setup.ts)
- *   2. Navigate to /favpolls/new wizard
- *   3. Event step: Fundraiser (Cause moved to the Generate control on
- *      2026-08-25, so the wizard's three chips are the only answer here)
+ *   2. Navigate to /favpolls/new
+ *   3. Event step: Fundraiser
  *   4. Charity step: Marie Curie
- *   5. Topic step: Colour topic
- *   6. Details page: MUST render (the blank-page regression) → declare the
- *      cause in the Generate control (who step → Cause → Done, WITHOUT
- *      generating) → fill cause label
- *   7. Publish: set close date → Publish
- *   8. Skip shared fund modal
- *   9. Assert: favpoll page shows "In support of" + the cause label
- *  10. Assert: Colour poll visible, countdown showing a real value
- *  11. Assert: IS listed on /favpolls (cause → is_listed = true — the
- *      inverse of the memorial spec's unlisted assertion)
+ *   5. Topic step: Colour
+ *   6. Info step: who dropdown → Cause → fill the cause label
+ *   7. Story step: fill the About
+ *   8. Details step: "1 month" preset → Publish
+ *   9. Skip shared fund modal
+ *  10. Assert: favpoll page shows "In support of" + the cause label
+ *  11. Assert: Colour poll visible, countdown showing a real value
+ *  12. Assert: IS listed on /favpolls (cause register defaults listed —
+ *      the inverse of the memorial spec's unlisted assertion)
  *
- * Prerequisites: same as wizard-publish.spec.ts (auth.setup.ts storageState,
- * E2E_TEST_EMAIL / E2E_TEST_PASSWORD in env; writes to staging Supabase and
- * the created favpoll is not cleaned up).
+ * Prerequisites: same as wizard-publish.spec.ts.
  */
 
 import { test, expect } from "@playwright/test"
@@ -52,7 +41,7 @@ test.beforeAll(() => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 test.describe("wizard → publish flow (cause)", () => {
-  test("creates a cause favpoll via wizard and verifies the published page", async ({
+  test("creates a cause favpoll via the six-step wizard and verifies the published page", async ({
     page,
   }) => {
     // ── 1. Navigate to the wizard ─────────────────────────────────────────────
@@ -70,16 +59,12 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(page).toHaveURL(/\/favpolls\/new/)
 
     // ── 2. Event step ────────────────────────────────────────────────────────
-    // Cause is no longer here — it is an answer on the Generate control's
-    // who step (2026-08-25). A cause organiser picks Fundraiser, which
-    // derives the cause register anyway (registers.ts: category
-    // "fundraiser" -> register "cause"), and declares the subject below.
     const fundraiserRadio = page.getByRole("radio", { name: "Fundraiser" })
     await expect(fundraiserRadio).toBeVisible({ timeout: 10_000 })
     await fundraiserRadio.click()
     await expect(fundraiserRadio).toBeChecked()
 
-    const nextButton = page.getByRole("button", { name: /next/i })
+    const nextButton = page.getByRole("button", { name: /^next$/i })
     await expect(nextButton).toBeEnabled()
     await nextButton.click()
 
@@ -96,23 +81,20 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(charitySearch).toBeVisible()
     await charitySearch.fill("Marie Curie")
 
-    // Charity options render as buttons (not ToggleGroup radios).
     const marieCurieOption = charityDialog
       .getByRole("button", { name: /marie curie/i })
       .first()
     await expect(marieCurieOption).toBeVisible({ timeout: 5_000 })
     await marieCurieOption.click()
 
-    // The charity overlay is multi-select (up to 3 charities) — it stays
-    // open after a pick; confirm with Done. (The topic overlay, single
-    // select, closes itself.)
     await charityDialog.getByRole("button", { name: /^done$/i }).click()
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
-    await expect(page.getByText("Marie Curie")).toBeVisible()
+    // .first(): the rail summary echoes the charity name.
+    await expect(page.getByText("Marie Curie").first()).toBeVisible()
 
-    await page.getByRole("button", { name: /next/i }).click()
+    await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 4. Topic step (topic picker) ───────────────────────────────────────────
+    // ── 4. Topic step ─────────────────────────────────────────────────────────
     const pickTopicBtn = page.getByRole("button", { name: /pick a topic/i })
     await expect(pickTopicBtn).toBeVisible({ timeout: 10_000 })
     await pickTopicBtn.click()
@@ -124,8 +106,6 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(topicSearch).toBeVisible()
     await topicSearch.fill("Colour")
 
-    // Topic chips render as buttons; "Colour" can appear twice when it is
-    // also in the "Suggested for {charity}" section — take the first.
     const colourOption = topicDialog
       .getByRole("button", { name: /^colour$/i })
       .first()
@@ -133,95 +113,69 @@ test.describe("wizard → publish flow (cause)", () => {
     await colourOption.click()
 
     await expect(topicDialog).not.toBeVisible({ timeout: 5_000 })
-    await expect(page.getByText("Colour")).toBeVisible()
+    // .first(): the rail summary echoes the topic title.
+    await expect(page.getByText("Colour").first()).toBeVisible()
 
-    await page.getByRole("button", { name: /set up/i }).click()
+    await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 5. Details page — the blank-page regression check ─────────────────────
-    // Both the page's from-wizard gate and FormInner's guard must render
-    // this, or it is header-and-footer only (the 2026-07-13 regression).
-    await page.waitForURL(/\/favpolls\/new\/details/, { timeout: 10_000 })
-    await page.waitForLoadState("domcontentloaded")
-
-    // ── 5b. Declare the cause, WITHOUT generating ─────────────────────────────
-    // The subject commits on the click rather than on generation, so Done
-    // closes the dialog with the cause set and no LLM call — which is the
-    // whole reason the commit was split out of onGenerate. If this ever
-    // needs an occasion pick to take effect, that split has regressed and
-    // every cause organiser is forced through a generation that overwrites
-    // their name, about and reveal.
-    await page.getByRole("button", { name: /generate an example/i }).click()
-    const whoDialog = page.getByRole("dialog")
-    await expect(whoDialog).toBeVisible({ timeout: 5_000 })
-    await whoDialog.getByRole("button", { name: "Cause", exact: true }).click()
-    await whoDialog.getByRole("button", { name: /^done$/i }).click()
-    await expect(whoDialog).not.toBeVisible({ timeout: 5_000 })
-
-    // Exact button match: the same phrase also opens the About placeholder
-    // ("What are you raising for? Tease the topic…") and echoes in Next's
-    // route announcer.
-    const causeLabelField = page.getByRole("button", {
-      name: "What are you raising for?",
-      exact: true,
+    // ── 5. Info step: declare the cause on the who dropdown ──────────────────
+    await expect(page.getByRole("heading", { name: "Info" })).toBeVisible({
+      timeout: 10_000,
     })
-    await expect(causeLabelField).toBeVisible({ timeout: 10_000 })
 
-    // Fill the cause label (the cause path's equivalent of the name field).
-    await causeLabelField.click()
-    const causeInput = page.getByPlaceholder(/dementia research/i)
+    await page.getByRole("button", { name: "Who is this favpoll for?" }).click()
+    await page.getByRole("menuitem", { name: "Cause" }).click()
+
+    // Picking Cause renames the field; its ghost becomes the cause
+    // exemplar. Fill the cause label in the same field.
+    const causeInput = page.getByPlaceholder(/name or nickname|st mark/i)
     await expect(causeInput).toBeVisible({ timeout: 5_000 })
     await causeInput.fill(TEST_CAUSE_LABEL)
-    await page.getByRole("button", { name: /save/i }).click()
-    await expect(page.getByText(TEST_CAUSE_LABEL)).toBeVisible()
 
-    // ── 6. Publish ────────────────────────────────────────────────────────────
+    await page.getByRole("button", { name: /^next$/i }).click()
+
+    // ── 6. Story step ─────────────────────────────────────────────────────────
+    await expect(page.getByRole("heading", { name: "Story" })).toBeVisible({
+      timeout: 10_000,
+    })
+    await page.locator("textarea").first().fill("An e2e cause about line.")
+
+    await page.getByRole("button", { name: /^next$/i }).click()
+
+    // ── 7. Details step: preset → Publish ────────────────────────────────────
+    await expect(page.getByRole("heading", { name: "Details" })).toBeVisible({
+      timeout: 10_000,
+    })
+
+    await page.getByRole("button", { name: /pick a close date/i }).click()
+    await page.getByRole("button", { name: "1 month", exact: true }).click()
+
     const publishButton = page.getByRole("button", { name: /^publish$/i })
-    await expect(publishButton).toBeVisible({ timeout: 10_000 })
+    await expect(publishButton).toBeEnabled({ timeout: 5_000 })
     await publishButton.click()
 
-    const closeDateDialog = page
-      .getByRole("dialog")
-      .or(page.locator("[data-radix-dialog-content]"))
-    await expect(closeDateDialog).toBeVisible({ timeout: 5_000 })
-
-    // Close-date presets (CLOSE_DATE_PRESETS in date-helpers.ts): pick the
-    // exact "1 month" chip — a broad fallback can match calendar internals
-    // and hang on an invisible button.
-    await closeDateDialog
-      .getByRole("button", { name: "1 month", exact: true })
-      .click()
-
-    const publishConfirm = closeDateDialog
-      .getByRole("button", { name: /^publish$/i })
-      .or(page.getByRole("button", { name: /^publish$/i }).last())
-    await expect(publishConfirm).toBeEnabled({ timeout: 5_000 })
-    await publishConfirm.click()
-
-    // ── 7. Skip shared fund modal ─────────────────────────────────────────────
+    // ── 8. Skip shared fund modal ─────────────────────────────────────────────
     const skipLink = page
       .getByRole("link", { name: /skip for now/i })
       .or(page.getByText(/skip for now/i))
     await expect(skipLink).toBeVisible({ timeout: 15_000 })
     await skipLink.click()
 
-    // ── 8. Verify: favpoll page renders the cause hero ────────────────────────
+    // ── 9. Verify: favpoll page renders the cause hero ────────────────────────
     await page.waitForURL(/\/favpolls\/[0-9a-f-]{36}$/, { timeout: 15_000 })
     await page.waitForLoadState("domcontentloaded")
 
-    // Cause headline prefix (getFavpollHeadline for subject=cause).
     await expect(page.getByText(/in support of/i)).toBeVisible({
       timeout: 10_000,
     })
-    // The cause label is the h1 — CauseHero, not the protagonist hero.
     await expect(
       page.getByRole("heading", { level: 1, name: TEST_CAUSE_LABEL })
     ).toBeVisible()
 
-    // Colour poll section is live.
     const pollSection = page.getByRole("region", { name: /colour poll/i })
     await expect(pollSection).toBeVisible({ timeout: 10_000 })
 
-    // ── 9. Verify: countdown shows a real value ───────────────────────────────
+    // ── 10. Verify: countdown shows a real value ──────────────────────────────
     await expect(page.getByText(/closes in/i)).toBeVisible()
     const countdownText = await page
       .getByRole("timer")
@@ -230,9 +184,7 @@ test.describe("wizard → publish flow (cause)", () => {
       .catch(() => "")
     expect(countdownText).not.toBe("--")
 
-    // ── 10. Verify: IS listed on /favpolls ───────────────────────────────────
-    // Cause → cause register → is_listed = true: the inverse of the memorial
-    // spec's unlisted assertion. The freshly created favpoll should appear.
+    // ── 11. Verify: IS listed on /favpolls ───────────────────────────────────
     await page.goto("/favpolls")
     await page.waitForLoadState("domcontentloaded")
 

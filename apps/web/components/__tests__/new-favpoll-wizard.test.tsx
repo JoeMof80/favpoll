@@ -5,6 +5,18 @@ const mockPush = vi.fn()
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }))
+vi.mock("@/app/favpolls/new/actions", () => ({
+  createFavpoll: vi.fn().mockResolvedValue({ favpollId: "f1" }),
+  uploadPersonPhoto: vi.fn(),
+}))
+vi.mock("@/lib/actions/generate-draft", () => ({
+  safeGenerateDraft: vi.fn(),
+}))
+// SeedFundModal's chain reaches lib/email (Resend constructed at module
+// scope) — CI has no key, and the modal is irrelevant to these tests.
+vi.mock("@/components/favpoll-form/seed-fund-modal", () => ({
+  SeedFundModal: () => null,
+}))
 
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
@@ -65,9 +77,9 @@ describe("NewFavpollWizard — structure", () => {
   it("renders step dots with correct aria roles", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     const dots = screen.getAllByRole("listitem")
-    expect(dots).toHaveLength(3)
+    expect(dots).toHaveLength(6)
     expect(dots[0]).toHaveAttribute("aria-current", "step")
-    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 3: Event")
+    expect(dots[0]).toHaveAttribute("aria-label", "Step 1 of 6: Event")
     expect(dots[1]).not.toHaveAttribute("aria-current")
   })
 
@@ -87,13 +99,15 @@ describe("NewFavpollWizard — structure", () => {
   // QUESTION: the rail line orients, the guidance asks. If this ever
   // reverts to a heading-only assertion it proves nothing, because the
   // step name changes.
-  it("renders the step heading and a single question", () => {
+  // The guidance line under the heading retired with the extended wizard
+  // (founder, prototype round 13: "they feel glib") — the heading and the
+  // fields say it all.
+  it("renders the step heading with no guidance question", () => {
     render(<NewFavpollWizard data={MOCK_DATA} />)
     expect(screen.getByRole("heading", { name: "Event" })).toBeInTheDocument()
     expect(
-      screen.getByText("What kind of favpoll is this?")
-    ).toBeInTheDocument()
-    // The rail states the options; it does not ask a second question.
+      screen.queryByText("What kind of favpoll is this?")
+    ).not.toBeInTheDocument()
     expect(
       screen.queryByText(/Who or what is this favpoll for/i)
     ).not.toBeInTheDocument()
@@ -146,53 +160,49 @@ describe("NewFavpollWizard — step order is Event → Charity → Topic", () =>
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Full redirect (person favpoll)
+// No details handoff — the wizard continues into Info and publishes itself
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("NewFavpollWizard — redirect", () => {
-  it("redirects to /favpolls/new/details when wizard is completed (person)", () => {
+describe("NewFavpollWizard — the wizard continues past Topic", () => {
+  function reachInfo() {
     render(<NewFavpollWizard data={MOCK_DATA} />)
-
-    // Step 1: Event
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 2: Charity
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-
-    // Step 3: Topic
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  }
 
-    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
-
-    expect(mockPush).toHaveBeenCalledWith(
-      expect.stringContaining("/favpolls/new/details")
-    )
+  it("Topic leads to Info — no /favpolls/new/details redirect", () => {
+    mockPush.mockClear()
+    reachInfo()
+    expect(screen.getByRole("heading", { name: "Info" })).toBeInTheDocument()
+    expect(mockPush).not.toHaveBeenCalled()
   })
 
-  it("redirect URL contains subject=someone and no pronoun for a person favpoll", () => {
-    mockPush.mockClear()
-    render(<NewFavpollWizard data={MOCK_DATA} />)
-
-    fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
+  it("Info gates on the name; Story and Details follow; Publish is the last button", () => {
+    reachInfo()
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
+    fireEvent.change(
+      screen.getByPlaceholderText(/Poppy Chen|Name or nickname/),
+      {
+        target: { value: "Poppy" },
+      }
+    )
+    expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
-    fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
-    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument()
+    fireEvent.change(
+      screen.getByPlaceholderText(/Sixteen on Saturday|tease the topic/),
+      { target: { value: "About text." } }
+    )
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
-    fireEvent.click(screen.getByRole("button", { name: "Colour" }))
-    fireEvent.click(screen.getByRole("button", { name: "Set up my favpoll" }))
-
-    const url: string = mockPush.mock.calls[0][0]
-    expect(url).toContain("subject=someone")
-    expect(url).toContain("grouping=individual")
-    expect(url).not.toContain("pronoun")
-    expect(url).not.toContain("causeLabel")
+    expect(screen.getByRole("heading", { name: "Details" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Publish" })).toBeInTheDocument()
   })
 })
 
@@ -255,10 +265,8 @@ describe("NewFavpollWizard — subject-neutral copy", () => {
     expect(screen.queryByText(/suits your cause/i)).not.toBeInTheDocument()
   })
 
-  it("still guides the topic step", () => {
+  it("the topic step stands on its heading alone", () => {
     reachTopicStep()
-    expect(
-      screen.getAllByText(/let guests pledge on their favourite/i)[0]
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Topic" })).toBeInTheDocument()
   })
 })
