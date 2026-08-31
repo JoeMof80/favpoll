@@ -95,6 +95,57 @@ const TEXTAREA_SIZE = "md:text-base"
 
 // The production step shell minus the guidance line (founder, round 13:
 // "they feel glib") — the heading and the fields say it all.
+// Register-aware ghost text (founder, round 17): once the Event is
+// picked, the placeholders speak that kind's voice — guidance without
+// prefilled text the organiser would have to notice and delete. The
+// opening line's ghost shows the register's default prefix: what the page
+// says if the field is left alone.
+type Placeholders = {
+  openingLine: string
+  name: string
+  context: string
+  about: string
+  reveal: string
+}
+
+const DEFAULT_PLACEHOLDERS: Placeholders = {
+  openingLine: "Replaces the default opening prefix",
+  name: "Name or nickname",
+  context: "e.g. turning 40 · Class of 2024",
+  about:
+    "Two or three sentences — tease the topic and the cause, but don't give too much away.",
+  reveal:
+    "Guests see this only after they pledge. A quote, a memory, or a message.",
+}
+
+const PLACEHOLDERS: Record<string, Placeholders> = {
+  memorial: {
+    openingLine: "e.g. In loving memory of",
+    name: "e.g. Margaret Whitfield",
+    context: "e.g. 1941 – 2026",
+    about:
+      "e.g. A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season she always loved most.",
+    reveal: "e.g. Autumn, always. She said it felt like coming home.",
+  },
+  celebration: {
+    openingLine: "e.g. Celebrating",
+    name: "e.g. Poppy Chen",
+    context: "e.g. Sweet Sixteen",
+    about:
+      "e.g. Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",
+    reveal: "e.g. Mint choc chip is the best, of course.",
+  },
+  fundraiser: {
+    openingLine: "e.g. Cheering on",
+    name: "e.g. Marcus Bell",
+    context: "e.g. London Marathon run",
+    about:
+      "e.g. Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
+    reveal:
+      "e.g. Thank you for your pledge — if we reach the goal, I'll eat the hat as well.",
+  },
+}
+
 function ProtoShell({
   title,
   children,
@@ -199,6 +250,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [isListed, setIsListed] = useState(true)
   const [closeDate, setCloseDate] = useState("")
 
+  const ph = PLACEHOLDERS[w.category ?? ""] ?? DEFAULT_PLACEHOLDERS
   const current = PROTO_STEPS[Math.min(stepIdx, PROTO_STEPS.length - 1)]!
   const isFirst = stepIdx === 0
   const isLast = current === "publish"
@@ -343,7 +395,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         className={INPUT_SIZE}
                         value={openingLine}
                         maxLength={50}
-                        placeholder="Replaces the default opening prefix"
+                        placeholder={ph.openingLine}
                         onChange={(e) => setOpeningLine(e.target.value)}
                       />
                     )}
@@ -354,7 +406,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         className={INPUT_SIZE}
                         value={name}
                         maxLength={40}
-                        placeholder="Name or nickname"
+                        placeholder={ph.name}
                         onChange={(e) => setName(e.target.value)}
                       />
                     )}
@@ -365,7 +417,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         className={INPUT_SIZE}
                         value={context}
                         maxLength={40}
-                        placeholder="e.g. turning 40 · Class of 2024"
+                        placeholder={ph.context}
                         onChange={(e) => setContext(e.target.value)}
                       />
                     )}
@@ -392,7 +444,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         rows={4}
                         maxLength={300}
                         value={about}
-                        placeholder="Two or three sentences — tease the topic and the cause, but don't give too much away."
+                        placeholder={ph.about}
                         onChange={(e) => setAbout(e.target.value)}
                       />
                     )}
@@ -421,7 +473,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         maxLength={280}
                         disabled={!showReveal}
                         value={reveal}
-                        placeholder="Guests see this only after they pledge. A quote, a memory, or a message."
+                        placeholder={ph.reveal}
                         onChange={(e) => setReveal(e.target.value)}
                       />
                     </div>
@@ -709,7 +761,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 16
+            PROTOTYPE · shape, round 17
           </div>
         )}
       </main>
