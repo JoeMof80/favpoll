@@ -673,7 +673,15 @@ export function LandingHero({
                         own column and must stay top-aligned with the label. */}
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none mt-auto space-y-1.5 select-none @min-[21rem]:mt-0"
+                      // The band-tone bars take their label/amount ink and
+                      // track from --primary-foreground, which register-ink
+                      // remapped to the register colour — so the text
+                      // matched the bars (founder, 2026-08-31: it
+                      // shouldn't). Re-point the variable to the neutral
+                      // foreground for this column in light; the bars keep
+                      // their chart fill. Dark restates register-ink's own
+                      // value, so nothing changes there.
+                      className="pointer-events-none mt-auto space-y-1.5 select-none [--primary-foreground:var(--foreground)] @min-[21rem]:mt-0 dark:[--primary-foreground:var(--background)]"
                     >
                       {/* text-sm, a step above the register label (founder,
                           2026-08-05): the poll is the product's core, so its
