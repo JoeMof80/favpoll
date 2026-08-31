@@ -514,7 +514,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
       charityIds: ["c1"],
       topics: [EXISTING_TOPIC],
       openingLine: "In loving memory of",
-      name: "Margaret Whitfield",
+      name: "Mary Whitfield",
       context: "1941 – 2026",
       photoUrl: null,
       about: "A headmistress.",
@@ -529,7 +529,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
     const { result } = renderHook(() => useWizardState(DATA, EDIT))
     expect(result.current.isEdit).toBe(true)
     expect(result.current.category).toBe("memorial")
-    expect(result.current.name).toBe("Margaret Whitfield")
+    expect(result.current.name).toBe("Mary Whitfield")
     expect(result.current.openingLine).toBe("In loving memory of")
     expect(result.current.about).toBe("A headmistress.")
     expect(result.current.reveal).toBe("Autumn, always.")
