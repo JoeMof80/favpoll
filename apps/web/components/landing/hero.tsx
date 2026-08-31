@@ -687,8 +687,18 @@ export function LandingHero({
                           2026-08-05): the poll is the product's core, so its
                           question shouldn't be the smallest thing on the
                           card. */}
+                      {/* Broken after "Favourite" on EVERY card (founder,
+                          2026-08-31): left to wrap naturally, two of the
+                          three topics broke and one didn't, so the first
+                          ranking row started at three different heights
+                          across the row. A deliberate two-line header is
+                          uniform whatever the exemplar topic. The first
+                          line sits quieter so the topic word leads. */}
                       <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-muted-foreground uppercase dark:text-primary-foreground/70">
-                        Favourite {card.topic}
+                        <span className="block text-muted-foreground/55 dark:text-primary-foreground/45">
+                          Favourite
+                        </span>
+                        {card.topic}
                       </p>
                       {card.results.map((r) => (
                         <RankingBar
