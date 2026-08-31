@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { RevealLockPill } from "@/components/reveal-lock"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
@@ -24,6 +23,9 @@ import type {
 } from "@favpoll/types"
 import { decoyWidth } from "@/lib/decoys"
 import { paletteForFavpoll } from "@/lib/register-palette"
+import { buildMechanicSteps } from "@/lib/mechanic-steps"
+import { joinCharities } from "@/lib/og/favpoll-og"
+import { LockCardContent } from "@/components/lock-card-content"
 
 type FavpollListCardFavpoll = {
   id: string
@@ -37,6 +39,11 @@ type FavpollListCardFavpoll = {
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
+  /** Content-free reveal flags (the page derives them server-side) —
+   *  they shape the lock card's step 3, never its content. */
+  hasReveal?: boolean
+  revealIsQuote?: boolean
+  revealIsMessage?: boolean
   protagonist: { name: string; photo_url?: string | null } | null
   charities: { charity: Charity }[]
   poll: {
@@ -234,7 +241,9 @@ export function FavpollListCard({
             {entitled ? (
               <FavpollListCardResults results={results ?? []} />
             ) : (
-              <div className="relative mt-1">
+              /* min-h holds room for the compact lock card — the decoy
+                 alone caps at 120px and the card wants ~170. */
+              <div className="relative mt-1 min-h-44">
                 <div
                   className="pointer-events-none blur-xs select-none"
                   aria-hidden="true"
@@ -242,16 +251,41 @@ export function FavpollListCard({
                 >
                   <FavpollListCardResults results={decoyResults} />
                 </div>
-                {/* Full-area unlock — the poll section's idiom: a ghost
-                    button over the decoy, the pointer-events-none pill
-                    riding inside it. */}
+                {/* Full-area unlock, the poll section's idiom — but the
+                    pill grew into the page's own teaching card
+                    (lock-card-content, compact), so the shelf and the
+                    favpoll page speak the same instructions (founder,
+                    2026-09-01). */}
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setPledgeOpen(true)}
-                  className="absolute inset-0 z-10 h-auto w-full rounded-none hover:bg-transparent"
+                  aria-label="Pledge your favourite"
+                  className="absolute inset-0 z-10 h-auto w-full items-start justify-center rounded-none p-0 pt-1.5 whitespace-normal hover:bg-transparent"
                 >
-                  <RevealLockPill size="sm" label="Pledge your favourite" />
+                  <span className="pointer-events-none flex w-full max-w-72 flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-lg ring-1 ring-border">
+                    <LockCardContent
+                      compact
+                      steps={buildMechanicSteps({
+                        topicTitle: pollWithItems.topics.title,
+                        charityLine:
+                          favpoll.charities.length > 0
+                            ? joinCharities(
+                                favpoll.charities.map((c) => c.charity.name)
+                              )
+                            : null,
+                        firstName:
+                          favpoll.subject === "cause"
+                            ? null
+                            : displayName.trim().split(/\s+/)[0] || null,
+                        isCause: favpoll.subject === "cause",
+                        hasReveal: favpoll.hasReveal ?? false,
+                        revealIsQuote: favpoll.revealIsQuote,
+                        revealIsMessage: favpoll.revealIsMessage,
+                      })}
+                      topicTitle={pollWithItems.topics.title}
+                    />
+                  </span>
                 </Button>
               </div>
             )}
