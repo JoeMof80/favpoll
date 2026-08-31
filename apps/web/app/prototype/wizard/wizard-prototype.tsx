@@ -18,7 +18,10 @@ import {
   ClipboardList,
   Gift,
   Shapes,
+  Ribbon,
   UserRound,
+  Users,
+  UsersRound,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
@@ -107,6 +110,18 @@ const PRONOUNS: Record<"he" | "she" | "they", { sub: string; pos: string }> = {
 // The full who axis, mirroring the Generate dialog: three pronouns, Pair,
 // Group — and Cause, the answer that says no one. Word labels, no
 // per-option glyphs (founder, 2026-07-30).
+// The original who icons (f288249), retired from the chips by the
+// word-pills decision but revived on the TRIGGER, which reflects the
+// current selection: singles wear the round person the founder approved.
+const WHO_ICONS: Record<WhoValue, React.ElementType> = {
+  he: UserRound,
+  she: UserRound,
+  they: UserRound,
+  couple: Users,
+  group: UsersRound,
+  cause: Ribbon,
+}
+
 const WHO_LABELS: Record<WhoValue, string> = {
   he: "He",
   she: "She",
@@ -473,6 +488,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [stepIdx, setStepIdx] = useState(0)
   const [name, setName] = useState("")
   const [who, setWho] = useState<WhoValue>("they")
+  const WhoIcon = WHO_ICONS[who]
   const [openingLine, setOpeningLine] = useState("")
   const [context, setContext] = useState("")
   const [about, setAbout] = useState("")
@@ -704,7 +720,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                                 aria-label={`Who: ${WHO_LABELS[who]}`}
                                 className="text-muted-foreground/60 hover:text-foreground"
                               >
-                                <UserRound className="h-5 w-5" />
+                                <WhoIcon className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -1084,7 +1100,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 33
+            PROTOTYPE · shape, round 34
           </div>
         )}
       </main>
