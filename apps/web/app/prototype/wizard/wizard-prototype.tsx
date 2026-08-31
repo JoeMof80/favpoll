@@ -327,9 +327,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
       <span className="block font-medium sm:pt-3">
         {label}
-        {opt && (
-          <span className="font-normal text-muted-foreground"> — optional</span>
-        )}
+        {!opt && <span className="text-muted-foreground"> *</span>}
       </span>
       <div className="min-w-0">{node}</div>
       {hint && (
@@ -491,10 +489,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                   <div className="space-y-6">
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
                       <span className="block font-medium sm:pt-3">
-                        Pledge goal{" "}
-                        <span className="font-normal text-muted-foreground">
-                          — optional
-                        </span>
+                        Pledge goal
                       </span>
                       <div className="flex gap-2">
                         {[100, 250, 500].map((g) => (
@@ -529,12 +524,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     </div>
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
                       <span className="flex items-center gap-1.5">
-                        <span className="font-medium">
-                          Shared fund{" "}
-                          <span className="font-normal text-muted-foreground">
-                            — optional
-                          </span>
-                        </span>
+                        <span className="font-medium">Shared fund</span>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
@@ -800,7 +790,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 22
+            PROTOTYPE · shape, round 23
           </div>
         )}
       </main>
