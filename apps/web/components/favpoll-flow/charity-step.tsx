@@ -42,6 +42,7 @@ export function CharityStep({
           {visible.map((c) => (
             <Chip
               key={c.id}
+              size="lg"
               selected={value.includes(c.id)}
               disabled={!value.includes(c.id) && atMax}
               onClick={() => toggle(c.id)}
