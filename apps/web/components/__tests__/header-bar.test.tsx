@@ -10,16 +10,16 @@ describe("HeaderBar", () => {
         nav={
           <>
             <a href="/memorial" aria-current="page">
-              Memorials
+              Memorial
             </a>
-            <a href="/celebration">Celebrations</a>
+            <a href="/celebration">Celebration</a>
           </>
         }
       />
     )
     const nav = screen.getByRole("navigation", { name: "Kinds of favpoll" })
     expect(nav).toHaveClass("hidden", "md:flex")
-    expect(screen.getByRole("link", { name: "Memorials" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Memorial" })).toHaveAttribute(
       "aria-current",
       "page"
     )
