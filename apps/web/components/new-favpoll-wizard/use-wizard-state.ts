@@ -4,11 +4,7 @@ import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
 import { safeGenerateDraft } from "@/lib/actions/generate-draft"
-import {
-  groupingForWho,
-  subjectForWho,
-  type WhoValue,
-} from "@/components/favpoll-form/generate-example-dialog"
+import { groupingForWho, subjectForWho, type WhoValue } from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
 import type {
   Category,
