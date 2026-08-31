@@ -1,32 +1,29 @@
-export type WizardStep = "event" | "charity" | "topic"
+// The wizard's step axis. Six steps since the extended-wizard verdict
+// (2026-08-31, references/extended-wizard-plan.md): the wizard carries
+// the whole creation, and the rail speaks in labels and answers — the
+// per-step marketing copy (WIZARD_COPY) retired with the subtext.
+export type WizardStep =
+  | "event"
+  | "charity"
+  | "topic"
+  | "info"
+  | "story"
+  | "details"
 
-export type WizardCopy = {
-  rail: Record<WizardStep, string>
-  charityGuidance: string
-  topicGuidance: string
-}
+export const STEPS: WizardStep[] = [
+  "event",
+  "charity",
+  "topic",
+  "info",
+  "story",
+  "details",
+]
 
-// ONE set of words, not two. The wizard used to branch this on `subject`,
-// which it knew because Cause was picked in step 1. Cause now moves to the
-// form's Generate control (2026-08-25), so by the time an organiser is in
-// the wizard nobody knows yet whether this is a person or a cause — and
-// copy that assumes a person ("What did they love?", "who you're
-// honouring") would address a cause organiser wrongly for two steps.
-//
-// So these lean on the favpoll rather than on its subject. DRAFT: awaiting
-// the founder's wording.
-export const WIZARD_COPY: WizardCopy = {
-  rail: {
-    event: "Celebration, memorial or fundraiser.",
-    charity: "Every pledge goes to the charity you pick.",
-    topic: "Pick a topic, and guests pledge on their favourite.",
-  },
-  charityGuidance:
-    "Every pledge goes straight to the charity you pick, so pick one that means something here.",
-  topicGuidance:
-    "Pick a topic that fits, and let guests pledge on their favourite.",
-}
-
-export function getWizardCopy(): WizardCopy {
-  return WIZARD_COPY
+export const STEP_LABELS: Record<WizardStep, string> = {
+  event: "Event",
+  charity: "Charity",
+  topic: "Topic",
+  info: "Info",
+  story: "Story",
+  details: "Details",
 }

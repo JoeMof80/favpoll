@@ -6,6 +6,8 @@ type Props = {
   isFirst: boolean
   isLast: boolean
   nextDisabled: boolean
+  submitting?: boolean
+  finishLabel?: string
   onBack: () => void
   onNext: () => void
   onFinish: () => void
@@ -15,6 +17,8 @@ export function WizardNav({
   isFirst,
   isLast,
   nextDisabled,
+  submitting = false,
+  finishLabel = "Publish",
   onBack,
   onNext,
   onFinish,
@@ -22,15 +26,24 @@ export function WizardNav({
   return (
     <div className="mt-10 flex items-center justify-end gap-2 border-t border-border pt-2">
       {!isFirst ? (
-        <Button variant="ghost" size="lg" onClick={onBack}>
+        <Button
+          variant="ghost"
+          size="lg"
+          disabled={submitting}
+          onClick={onBack}
+        >
           Back
         </Button>
       ) : (
         <span />
       )}
       {isLast ? (
-        <Button size="lg" disabled={nextDisabled} onClick={onFinish}>
-          Set up my favpoll
+        <Button
+          size="lg"
+          disabled={nextDisabled || submitting}
+          onClick={onFinish}
+        >
+          {submitting ? "Publishing…" : finishLabel}
         </Button>
       ) : (
         <Button size="lg" disabled={nextDisabled} onClick={onNext}>

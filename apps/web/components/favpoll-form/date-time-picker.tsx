@@ -26,10 +26,13 @@ export function DateTimePicker({
   value,
   onChange,
   size = "md",
+  presets,
 }: {
   value: Date | undefined
   onChange: (d: Date) => void
   size?: PickerSize
+  /** Optional chip column inside the calendar popover — {label, days from now}. A preset keeps the chosen time and closes the popover. */
+  presets?: { label: string; days: number }[]
 }) {
   const [open, setOpen] = useState(false)
 
@@ -44,6 +47,21 @@ export function DateTimePicker({
   const timeStr = value
     ? `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
     : "23:59"
+
+  function handlePreset(days: number) {
+    const base =
+      value ??
+      (() => {
+        const d = new Date()
+        d.setHours(23, 59, 0, 0)
+        return d
+      })()
+    const next = new Date()
+    next.setDate(next.getDate() + days)
+    next.setHours(base.getHours(), base.getMinutes(), 0, 0)
+    onChange(next)
+    setOpen(false)
+  }
 
   function handleDaySelect(d: Date | undefined) {
     if (!d) return
@@ -89,7 +107,7 @@ export function DateTimePicker({
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Card size="sm" className="w-fit shadow-none ring-0">
-            <CardContent>
+            <CardContent className={presets ? "flex gap-3" : undefined}>
               <Calendar
                 mode="single"
                 captionLayout="dropdown"
@@ -101,6 +119,22 @@ export function DateTimePicker({
                 onSelect={handleDaySelect}
                 className="p-0"
               />
+              {presets && (
+                <div className="flex flex-col gap-1.5">
+                  {presets.map((p) => (
+                    <Button
+                      key={p.label}
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      className="rounded-full"
+                      onClick={() => handlePreset(p.days)}
+                    >
+                      {p.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </PopoverContent>

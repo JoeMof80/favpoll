@@ -5,9 +5,29 @@ import { useWizardState, DRAFT_ADDITIONS_KEY } from "../use-wizard-state"
 import type { WizardData } from "../use-wizard-state"
 
 const mockPush = vi.hoisted(() => vi.fn())
+const mockCreateFavpoll = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ favpollId: "f1" })
+)
+const mockUploadPersonPhoto = vi.hoisted(() =>
+  vi.fn().mockResolvedValue("https://cdn/photo.jpg")
+)
+const mockSafeGenerateDraft = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    about: "Generated about.",
+    reveal: "Generated reveal.",
+    fromCache: false,
+  })
+)
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
+}))
+vi.mock("@/app/favpolls/new/actions", () => ({
+  createFavpoll: mockCreateFavpoll,
+  uploadPersonPhoto: mockUploadPersonPhoto,
+}))
+vi.mock("@/lib/actions/generate-draft", () => ({
+  safeGenerateDraft: mockSafeGenerateDraft,
 }))
 
 const DATA: WizardData = {
@@ -62,8 +82,40 @@ const DATA: WizardData = {
   suggestedTopicIds: { c1: ["t1"] },
 }
 
+type HookResult = ReturnType<
+  typeof renderHook<ReturnType<typeof useWizardState>, WizardData>
+>["result"]
+
+const EXISTING_TOPIC = {
+  topicId: "t1",
+  title: "Colour",
+  isCustom: false,
+  items: [],
+  customLabels: [],
+}
+
+function advanceToTopic(result: HookResult) {
+  act(() => result.current.setCategory("celebration"))
+  act(() => result.current.handleNext())
+  act(() => result.current.setCharityIds(["c1"]))
+  act(() => result.current.handleNext())
+}
+
+function advanceToDetails(result: HookResult) {
+  advanceToTopic(result)
+  act(() => result.current.setTopics([EXISTING_TOPIC]))
+  act(() => result.current.handleNext())
+  act(() => result.current.setName("Poppy Chen"))
+  act(() => result.current.handleNext())
+  act(() => result.current.setAbout("Sixteen on Saturday."))
+  act(() => result.current.handleNext())
+}
+
 beforeEach(() => {
   mockPush.mockReset()
+  mockCreateFavpoll.mockClear()
+  mockUploadPersonPhoto.mockClear()
+  mockSafeGenerateDraft.mockClear()
   sessionStorage.clear()
 })
 
@@ -82,33 +134,14 @@ describe("useWizardState — initial state", () => {
 })
 
 describe("useWizardState — event step nextDisabled gate", () => {
-  it("nextDisabled false once a category is set — who moved to the Generate control", () => {
+  it("nextDisabled false once a category is set", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setCategory("celebration"))
     expect(result.current.nextDisabled).toBe(false)
   })
 
-  it("nextDisabled false once category and pronoun are set", () => {
-    const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("celebration")
-      result.current.setPronoun("she")
-    })
-    expect(result.current.nextDisabled).toBe(false)
-  })
-
-  it("nextDisabled false for couple grouping + category", () => {
-    const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("celebration")
-      result.current.setGrouping("couple")
-    })
-    expect(result.current.nextDisabled).toBe(false)
-  })
-
-  // The gate used to pass on `subject === "cause"` with no category. Cause
-  // moved to the form's Generate control (2026-08-25), so the type is now
-  // the step's only question and there is no escape from it.
+  // The gate used to pass on `subject === "cause"` with no category. The
+  // type is the step's only question and there is no escape from it.
   it("nextDisabled true for a cause subject with no category", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => result.current.setSubject("cause"))
@@ -127,13 +160,13 @@ describe("useWizardState — step navigation", () => {
     expect(result.current.isFirst).toBe(false)
   })
 
-  it("advances to topic on handleNext from charity", () => {
+  it("topic is a middle step — details is the last", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => result.current.setCategory("celebration"))
-    act(() => result.current.handleNext())
-    act(() => result.current.setCharityIds(["c1"]))
-    act(() => result.current.handleNext())
+    advanceToTopic(result)
     expect(result.current.step).toBe("topic")
+    expect(result.current.isLast).toBe(false)
+    advanceToDetails(result)
+    expect(result.current.step).toBe("details")
     expect(result.current.isLast).toBe(true)
   })
 
@@ -143,6 +176,12 @@ describe("useWizardState — step navigation", () => {
     act(() => result.current.handleNext())
     act(() => result.current.handleBack())
     expect(result.current.step).toBe("event")
+  })
+
+  it("goToStep jumps directly", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.goToStep("story"))
+    expect(result.current.step).toBe("story")
   })
 })
 
@@ -168,17 +207,6 @@ describe("useWizardState — charity step nextDisabled gate", () => {
 })
 
 describe("useWizardState — topic step nextDisabled gate", () => {
-  function advanceToTopic(
-    result: ReturnType<
-      typeof renderHook<ReturnType<typeof useWizardState>, WizardData>
-    >["result"]
-  ) {
-    act(() => result.current.setCategory("celebration"))
-    act(() => result.current.handleNext())
-    act(() => result.current.setCharityIds(["c1"]))
-    act(() => result.current.handleNext())
-  }
-
   it("nextDisabled true when no topic selected", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     advanceToTopic(result)
@@ -188,17 +216,7 @@ describe("useWizardState — topic step nextDisabled gate", () => {
   it("nextDisabled false with existing topic", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     advanceToTopic(result)
-    act(() => {
-      result.current.setTopics([
-        {
-          topicId: "t1",
-          title: "Colour",
-          isCustom: false,
-          items: [],
-          customLabels: [],
-        },
-      ])
-    })
+    act(() => result.current.setTopics([EXISTING_TOPIC]))
     expect(result.current.nextDisabled).toBe(false)
   })
 
@@ -237,95 +255,133 @@ describe("useWizardState — topic step nextDisabled gate", () => {
   })
 })
 
-describe("useWizardState — handleFinish", () => {
-  function setupForFinish(
-    result: ReturnType<
-      typeof renderHook<ReturnType<typeof useWizardState>, WizardData>
-    >["result"]
-  ) {
-    act(() => result.current.setCategory("celebration"))
-    act(() => result.current.handleNext())
-    act(() => result.current.setCharityIds(["c1"]))
-    act(() => result.current.handleNext())
-  }
-
-  it("redirects with basic params for existing topic", () => {
+describe("useWizardState — info and story gates", () => {
+  it("info gates on name; story gates on about", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    setupForFinish(result)
-    act(() =>
-      result.current.setTopics([
-        {
-          topicId: "t1",
-          title: "Colour",
-          isCustom: false,
-          items: [],
-          customLabels: [],
-        },
-      ])
-    )
-    act(() => result.current.handleFinish())
-    expect(mockPush).toHaveBeenCalledOnce()
-    const url = mockPush.mock.calls[0][0] as string
-    expect(url).toContain("topicId=t1")
-    expect(url).toContain("topicTitle=Colour")
-    expect(url).toContain("charityIds=c1")
-    expect(url).toContain("category=celebration")
+    advanceToTopic(result)
+    act(() => result.current.setTopics([EXISTING_TOPIC]))
+    act(() => result.current.handleNext())
+    expect(result.current.step).toBe("info")
+    expect(result.current.nextDisabled).toBe(true)
+    act(() => result.current.setName("Poppy Chen"))
+    expect(result.current.nextDisabled).toBe(false)
+    act(() => result.current.handleNext())
+    expect(result.current.step).toBe("story")
+    expect(result.current.nextDisabled).toBe(true)
+    act(() => result.current.setAbout("Sixteen on Saturday."))
+    expect(result.current.nextDisabled).toBe(false)
   })
+})
 
-  it("includes pronoun in URL when pronoun is set", () => {
+describe("useWizardState — the who axis", () => {
+  it("handleWho commits grouping, subject and pronoun", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => {
-      result.current.setCategory("celebration")
-      result.current.setPronoun("she")
+    act(() => result.current.handleWho("she"))
+    expect(result.current.who).toBe("she")
+    expect(result.current.pronoun).toBe("she")
+    expect(result.current.grouping).toBe("individual")
+    expect(result.current.subject).toBe("someone")
+    act(() => result.current.handleWho("couple"))
+    expect(result.current.grouping).toBe("couple")
+    expect(result.current.pronoun).toBeUndefined()
+    act(() => result.current.handleWho("cause"))
+    expect(result.current.subject).toBe("cause")
+    expect(result.current.isCause).toBe(true)
+  })
+})
+
+describe("useWizardState — the rail tracks the answers", () => {
+  it("summaries and ticks accumulate", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    expect(result.current.railDone.event).toBe(false)
+    act(() => result.current.setCategory("memorial"))
+    act(() => result.current.setCharityIds(["c1", "c2"]))
+    act(() => result.current.setTopics([EXISTING_TOPIC]))
+    act(() => result.current.setName("Margaret"))
+    expect(result.current.railDone.event).toBe(true)
+    expect(result.current.railSummary.event).toBe("Memorial")
+    expect(result.current.railSummary.charity).toBe("Shelter, Crisis")
+    expect(result.current.railSummary.topic).toBe("Colour")
+    expect(result.current.railSummary.info).toBe("Margaret")
+    act(() => result.current.setGoalAmount(250))
+    act(() => result.current.setIsListed(false))
+    expect(result.current.railSummary.details).toContain("£250 goal")
+    expect(result.current.railSummary.details).toContain("unlisted")
+  })
+})
+
+describe("useWizardState — generateExample", () => {
+  it("calibrates from the wizard's own answers and fills the story", async () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.setCategory("memorial"))
+    act(() => result.current.setCharityIds(["c1"]))
+    act(() => result.current.setTopics([EXISTING_TOPIC]))
+    act(() => result.current.setName("Margaret"))
+    act(() => result.current.handleWho("she"))
+    await act(async () => {
+      await result.current.generateExample()
     })
-    act(() => result.current.handleNext())
-    act(() => result.current.setCharityIds(["c1"]))
-    act(() => result.current.handleNext())
-    act(() =>
-      result.current.setTopics([
-        {
-          topicId: "t1",
-          title: "Colour",
-          isCustom: false,
-          items: [],
-          customLabels: [],
-        },
-      ])
-    )
-    act(() => result.current.handleFinish())
-    const url = mockPush.mock.calls[0][0] as string
-    expect(url).toContain("pronoun=she")
-    expect(url).not.toContain("causeLabel")
+    expect(mockSafeGenerateDraft).toHaveBeenCalledOnce()
+    const input = mockSafeGenerateDraft.mock.calls[0][0]
+    expect(input.register).toBe("remembering")
+    expect(input.topicId).toBe("t1")
+    expect(input.primaryCharityId).toBe("c1")
+    expect(input.pronoun).toBe("she")
+    expect(input.displayName).toBe("Margaret")
+    expect(result.current.about).toBe("Generated about.")
+    expect(result.current.reveal).toBe("Generated reveal.")
+  })
+})
+
+describe("useWizardState — handleFinish publishes", () => {
+  it("creates the favpoll with the full payload and offers the fund", async () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    advanceToDetails(result)
+    act(() => result.current.setOpeningLine("Celebrating"))
+    act(() => result.current.setContext("Sweet Sixteen"))
+    act(() => result.current.setReveal("Mint choc chip."))
+    act(() => result.current.setGoalAmount(250))
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(mockCreateFavpoll).toHaveBeenCalledOnce()
+    const input = mockCreateFavpoll.mock.calls[0][0]
+    expect(input.protagonistName).toBe("Poppy Chen")
+    expect(input.protagonistAbout).toBe("Sixteen on Saturday.")
+    expect(input.openingLine).toBe("Celebrating")
+    expect(input.dateLabel).toBe("Sweet Sixteen")
+    expect(input.category).toBe("celebration")
+    expect(input.charityIds).toEqual(["c1"])
+    expect(input.goalAmount).toBe(250)
+    expect(input.isListed).toBe(true)
+    expect(input.poll.topicId).toBe("t1")
+    expect(input.poll.reveal).toBe("Mint choc chip.")
+    expect(typeof input.closesAt).toBe("string")
+    // The fund step comes before navigation — a payment needs the page.
+    expect(result.current.seedFavpollId).toBe("f1")
+    expect(mockPush).not.toHaveBeenCalled()
+    act(() => result.current.completeSeed())
+    expect(mockPush).toHaveBeenCalledWith("/favpolls/f1")
   })
 
-  it("cause URL carries no pronoun and no category — a cause has no type", () => {
+  it("a cause publishes causeLabel and description, never a protagonist", async () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => result.current.setSubject("cause"))
-    act(() => result.current.handleNext())
-    act(() => result.current.setCharityIds(["c1"]))
-    act(() => result.current.handleNext())
-    act(() =>
-      result.current.setTopics([
-        {
-          topicId: "t1",
-          title: "Colour",
-          isCustom: false,
-          items: [],
-          customLabels: [],
-        },
-      ])
-    )
-    act(() => result.current.handleFinish())
-    const url = mockPush.mock.calls[0][0] as string
-    expect(url).toContain("subject=cause")
-    expect(url).not.toContain("pronoun=")
-    expect(url).not.toContain("category=")
-    expect(url).not.toContain("causeLabel")
+    act(() => result.current.handleWho("cause"))
+    advanceToDetails(result)
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    const input = mockCreateFavpoll.mock.calls[0][0]
+    expect(input.subject).toBe("cause")
+    expect(input.protagonistName).toBe("")
+    expect(input.causeLabel).toBe("Poppy Chen")
+    expect(input.description).toBe("Sixteen on Saturday.")
+    expect(input.pronoun).toBeNull()
   })
 
-  it("writes sessionStorage and sets draftAdditions=1 for custom topic", () => {
+  it("a custom topic publishes customTopic and clears the draft key", async () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    setupForFinish(result)
+    advanceToTopic(result)
     act(() =>
       result.current.setTopics([
         {
@@ -337,36 +393,48 @@ describe("useWizardState — handleFinish", () => {
         },
       ])
     )
-    act(() => result.current.handleFinish())
-    const stored = sessionStorage.getItem(DRAFT_ADDITIONS_KEY)
-    expect(stored).not.toBeNull()
-    const parsed = JSON.parse(stored!)
-    expect(parsed.topicRef).toEqual({ kind: "new", title: "Memories" })
-    expect(parsed.addedItems).toEqual(["First", "Second"])
-    const url = mockPush.mock.calls[0][0] as string
-    expect(url).toContain("draftAdditions=1")
+    act(() => result.current.handleNext())
+    act(() => result.current.setName("Poppy"))
+    act(() => result.current.handleNext())
+    act(() => result.current.setAbout("About."))
+    act(() => result.current.handleNext())
+    sessionStorage.setItem(DRAFT_ADDITIONS_KEY, "{}")
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    const input = mockCreateFavpoll.mock.calls[0][0]
+    expect(input.poll.topicId).toBeNull()
+    expect(input.poll.customTopic).toEqual({
+      title: "Memories",
+      items: ["First", "Second"],
+    })
+    expect(sessionStorage.getItem(DRAFT_ADDITIONS_KEY)).toBeNull()
   })
 
-  it("writes sessionStorage for existing topic with custom additions", () => {
+  it("uploads the photo before publishing", async () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    setupForFinish(result)
+    advanceToDetails(result)
     act(() =>
-      result.current.setTopics([
-        {
-          topicId: "t1",
-          title: "Colour",
-          isCustom: false,
-          items: [],
-          customLabels: ["Violet"],
-        },
-      ])
+      result.current.setPhoto(new File(["x"], "p.jpg", { type: "image/jpeg" }))
     )
-    act(() => result.current.handleFinish())
-    const stored = sessionStorage.getItem(DRAFT_ADDITIONS_KEY)
-    expect(stored).not.toBeNull()
-    const parsed = JSON.parse(stored!)
-    expect(parsed.topicRef).toEqual({ kind: "existing", id: "t1" })
-    expect(parsed.addedItems).toEqual(["Violet"])
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(mockUploadPersonPhoto).toHaveBeenCalledOnce()
+    const input = mockCreateFavpoll.mock.calls[0][0]
+    expect(input.photoUrl).toBe("https://cdn/photo.jpg")
+  })
+
+  it("surfaces a create failure as error, no navigation", async () => {
+    mockCreateFavpoll.mockRejectedValueOnce(new Error("boom"))
+    const { result } = renderHook(() => useWizardState(DATA))
+    advanceToDetails(result)
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(result.current.error).toBe("boom")
+    expect(result.current.seedFavpollId).toBeNull()
+    expect(mockPush).not.toHaveBeenCalled()
   })
 })
 

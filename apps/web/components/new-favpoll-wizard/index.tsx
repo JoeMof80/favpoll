@@ -11,6 +11,7 @@ import { deriveRegister } from "@/lib/registers"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
+import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
 import { useWizardState } from "./use-wizard-state"
 import { WizardStepRail } from "./wizard-step-rail"
 import { WizardProgressStrip } from "./wizard-progress-strip"
@@ -18,6 +19,9 @@ import { WizardNav } from "./wizard-nav"
 import { WizardCharityCard } from "./wizard-charity-card"
 import { WizardTopicCard } from "./wizard-topic-card"
 import { WizardStepShell } from "./wizard-step-shell"
+import { WizardInfoStep } from "./wizard-info-step"
+import { WizardStoryStep } from "./wizard-story-step"
+import { WizardDetailsStep } from "./wizard-details-step"
 import type { WizardData } from "./use-wizard-state"
 
 type Props = {
@@ -51,43 +55,49 @@ export function NewFavpollWizard({ data }: Props) {
     setTopicSearch("")
   }
 
-  // THE WIZARD WEARS THE REGISTER AS IT IS CHOSEN (founder, 2026-08-31:
-  // "should we change the colours when the event is selected?"). The page
-  // is blue until the organiser picks a kind; from then on the header, the
-  // rail, the Next button and every step wear that kind's palette — the
-  // colour arriving is the confirmation, and it is the colour their favpoll
-  // will be. Derived the way the product derives it (deriveRegister), so a
-  // cause chosen later goes green the same way.
+  // THE WIZARD WEARS THE REGISTER AS IT IS CHOSEN (founder, 2026-08-31).
+  // Derived the way the product derives it, so a cause picked on the
+  // Name field's who control goes green the same way.
   const palette = paletteForRegister(
     deriveRegister(w.category, w.grouping, w.subject)
   )
+
+  // Publish succeeded — offer the shared-fund head start (a payment
+  // needs the created favpoll), then land on the real page.
+  if (w.seedFavpollId) {
+    return (
+      <RegisterScope palette={palette}>
+        <SeedFundModal
+          favpollId={w.seedFavpollId}
+          isListed={w.isListed}
+          onComplete={w.completeSeed}
+        />
+      </RegisterScope>
+    )
+  }
 
   return (
     <RegisterScope palette={palette}>
       <main>
         <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
-          <WizardStepRail currentStep={w.step} copy={w.copy} />
+          <WizardStepRail
+            currentStep={w.step}
+            summary={w.railSummary}
+            done={w.railDone}
+          />
 
           <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
             <div className="mx-auto w-full max-w-2xl">
               <WizardProgressStrip currentStep={w.step} />
 
-              {/* Event step */}
               {w.step === "event" && (
-                <WizardStepShell
-                  title="Event"
-                  guidance="What kind of favpoll is this?"
-                >
+                <WizardStepShell title="Event">
                   <EventStep value={w.category} onChange={w.setCategory} />
                 </WizardStepShell>
               )}
 
-              {/* Charity step */}
               {w.step === "charity" && (
-                <WizardStepShell
-                  title="Charity"
-                  guidance={w.copy.charityGuidance}
-                >
+                <WizardStepShell title="Charity">
                   {w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
@@ -100,6 +110,8 @@ export function NewFavpollWizard({ data }: Props) {
                   ) : (
                     <Button
                       variant="secondary"
+                      size="lg"
+                      className="h-11 w-full md:text-base"
                       onClick={() => w.setCharityOpen(true)}
                     >
                       Pick a charity
@@ -108,12 +120,11 @@ export function NewFavpollWizard({ data }: Props) {
                 </WizardStepShell>
               )}
 
-              {/* Topic step */}
               {w.step === "topic" && (
-                <WizardStepShell title="Topic" guidance={w.copy.topicGuidance}>
+                <WizardStepShell title="Topic">
                   {w.topics.length > 0 ? (
                     <WizardTopicCard
-                      topic={w.topics[0]}
+                      topic={w.topics[0]!}
                       sortedExistingItems={w.sortedExistingItems}
                       customLabels={w.customLabels}
                       showItemsSection={w.showItemsSection}
@@ -123,6 +134,8 @@ export function NewFavpollWizard({ data }: Props) {
                   ) : (
                     <Button
                       variant="secondary"
+                      size="lg"
+                      className="h-11 w-full md:text-base"
                       onClick={() => w.setTopicOpen(true)}
                     >
                       Pick a topic
@@ -131,10 +144,48 @@ export function NewFavpollWizard({ data }: Props) {
                 </WizardStepShell>
               )}
 
+              {w.step === "info" && (
+                <WizardStepShell title="Info">
+                  <WizardInfoStep w={w} />
+                </WizardStepShell>
+              )}
+
+              {w.step === "story" && (
+                <WizardStepShell
+                  title="Story"
+                  action={
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={w.generating || w.topics.length === 0}
+                      onClick={w.generateExample}
+                    >
+                      {w.generating ? "Generating…" : "✦ Generate an example"}
+                    </Button>
+                  }
+                >
+                  <WizardStoryStep w={w} />
+                </WizardStepShell>
+              )}
+
+              {w.step === "details" && (
+                <WizardStepShell title="Details">
+                  <WizardDetailsStep w={w} />
+                </WizardStepShell>
+              )}
+
+              {w.error && (
+                <p className="mt-6 text-sm text-destructive" role="alert">
+                  {w.error}
+                </p>
+              )}
+
               <WizardNav
                 isFirst={w.isFirst}
                 isLast={w.isLast}
                 nextDisabled={w.nextDisabled}
+                submitting={w.submitting}
                 onBack={w.handleBack}
                 onNext={w.handleNext}
                 onFinish={w.handleFinish}
@@ -143,7 +194,7 @@ export function NewFavpollWizard({ data }: Props) {
           </div>
         </div>
 
-        {/* Love overlay */}
+        {/* Topic overlay */}
         <ResponsiveOverlay
           open={w.topicOpen}
           onOpenChange={(o) => {
@@ -299,12 +350,12 @@ export function NewFavpollWizard({ data }: Props) {
           <TopicItemsDialog
             open={w.itemsDialogOpen}
             onOpenChange={w.setItemsDialogOpen}
-            topicTitle={w.topics[0].title}
+            topicTitle={w.topics[0]!.title}
             existingItems={w.dialogExistingItems}
             addedItems={w.customLabels}
             onAdd={w.handleAddItem}
             onRemove={w.handleRemoveItem}
-            isNewTopic={w.topics[0].isCustom ?? false}
+            isNewTopic={w.topics[0]!.isCustom ?? false}
           />
         )}
       </main>
