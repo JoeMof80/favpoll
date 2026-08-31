@@ -34,7 +34,7 @@ import { OpenRightNow } from "@/components/landing/open-right-now"
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: "Fundraisers — favpoll",
+  title: "Fundraiser — favpoll",
   description:
     "Fundraise by sharing what we all love. Give to charity in support of the cause. Supporters back their favourite and the room watches the total climb.",
 }

@@ -643,7 +643,7 @@ export function LandingHero({
                           theme's purple card 1.95:1. As a dot beside full
                           band ink the register still reads and the label is
                           legible. */}
-                      {/* Inline, not a flex child: "Fundraisers & causes"
+                      {/* Inline, not a flex child: a long title
                           wraps to two lines in this column, and a flex dot
                           centres itself across both. Inline keeps it on the
                           first line where it reads as a bullet. */}
