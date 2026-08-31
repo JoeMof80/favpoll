@@ -12,9 +12,9 @@
  *   3. Event step: Fundraiser
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour
- *   6. Info step: who dropdown → Cause → fill the cause label
+ *   6. Header step: who dropdown → Cause → fill the cause label
  *   7. Story step: fill the About
- *   8. Details step: "1 month" preset → Publish
+ *   8. Settings step: "1 month" preset → Publish
  *   9. Skip shared fund modal
  *  10. Assert: favpoll page shows "In support of" + the cause label
  *  11. Assert: Colour poll visible, countdown showing a real value
@@ -118,8 +118,8 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 5. Info step: declare the cause on the who dropdown ──────────────────
-    await expect(page.getByRole("heading", { name: "Info" })).toBeVisible({
+    // ── 5. Header step: declare the cause on the who dropdown ──────────────────
+    await expect(page.getByRole("heading", { name: "Header" })).toBeVisible({
       timeout: 10_000,
     })
 
@@ -142,8 +142,8 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 7. Details step: preset → Publish ────────────────────────────────────
-    await expect(page.getByRole("heading", { name: "Details" })).toBeVisible({
+    // ── 7. Settings step: preset → Publish ────────────────────────────────────
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible({
       timeout: 10_000,
     })
 

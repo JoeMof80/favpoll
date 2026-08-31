@@ -4,11 +4,7 @@ import { ClosingLabel } from "@/components/closing-label"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
-import type {
-  Charity,
-  FavpollCategory,
-  FavpollSubject,
-} from "@favpoll/types"
+import type { Charity, FavpollCategory, FavpollSubject } from "@favpoll/types"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import Link from "next/link"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"

@@ -98,15 +98,21 @@ const EXISTING_TOPIC = {
   customLabels: [],
 }
 
-function advanceToTopic(result: HookResult) {
-  act(() => result.current.setCategory("celebration"))
+function advanceToTopic(
+  result: HookResult,
+  category: "celebration" | "fundraiser" | "memorial" = "celebration"
+) {
+  act(() => result.current.handleCategory(category))
   act(() => result.current.handleNext())
   act(() => result.current.setCharityIds(["c1"]))
   act(() => result.current.handleNext())
 }
 
-function advanceToDetails(result: HookResult) {
-  advanceToTopic(result)
+function advanceToDetails(
+  result: HookResult,
+  category: "celebration" | "fundraiser" | "memorial" = "celebration"
+) {
+  advanceToTopic(result, category)
   act(() => result.current.setTopics([EXISTING_TOPIC]))
   act(() => result.current.handleNext())
   act(() => result.current.setName("Poppy Chen"))
@@ -141,7 +147,7 @@ describe("useWizardState — initial state", () => {
 describe("useWizardState — event step nextDisabled gate", () => {
   it("nextDisabled false once a category is set", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => result.current.setCategory("celebration"))
+    act(() => result.current.handleCategory("celebration"))
     expect(result.current.nextDisabled).toBe(false)
   })
 
@@ -158,7 +164,7 @@ describe("useWizardState — step navigation", () => {
   it("advances to charity on handleNext from event", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
-      result.current.setCategory("celebration")
+      result.current.handleCategory("celebration")
       result.current.handleNext()
     })
     expect(result.current.step).toBe("charity")
@@ -177,7 +183,7 @@ describe("useWizardState — step navigation", () => {
 
   it("goes back from charity to event", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => result.current.setCategory("celebration"))
+    act(() => result.current.handleCategory("celebration"))
     act(() => result.current.handleNext())
     act(() => result.current.handleBack())
     expect(result.current.step).toBe("event")
@@ -188,13 +194,22 @@ describe("useWizardState — step navigation", () => {
     act(() => result.current.goToStep("story"))
     expect(result.current.step).toBe("story")
   })
+
+  it("canJumpTo: create mode opens only steps already passed", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.handleCategory("celebration"))
+    act(() => result.current.handleNext())
+    expect(result.current.canJumpTo("event")).toBe(true)
+    expect(result.current.canJumpTo("charity")).toBe(false)
+    expect(result.current.canJumpTo("topic")).toBe(false)
+  })
 })
 
 describe("useWizardState — charity step nextDisabled gate", () => {
   it("nextDisabled true when no charities selected", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
-      result.current.setCategory("celebration")
+      result.current.handleCategory("celebration")
       result.current.handleNext()
     })
     expect(result.current.nextDisabled).toBe(true)
@@ -203,7 +218,7 @@ describe("useWizardState — charity step nextDisabled gate", () => {
   it("nextDisabled false once a charity is selected", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     act(() => {
-      result.current.setCategory("celebration")
+      result.current.handleCategory("celebration")
       result.current.handleNext()
       result.current.setCharityIds(["c1"])
     })
@@ -293,13 +308,28 @@ describe("useWizardState — the who axis", () => {
     expect(result.current.subject).toBe("cause")
     expect(result.current.isCause).toBe(true)
   })
+
+  it("switching the type away from fundraiser resets a cause who", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.handleCategory("fundraiser"))
+    act(() => result.current.handleWho("cause"))
+    act(() => result.current.handleCategory("memorial"))
+    expect(result.current.who).toBe("")
+    expect(result.current.subject).toBe("someone")
+    expect(result.current.grouping).toBe("individual")
+    expect(result.current.pronoun).toBeUndefined()
+    // A non-cause who survives the same switch.
+    act(() => result.current.handleWho("she"))
+    act(() => result.current.handleCategory("celebration"))
+    expect(result.current.who).toBe("she")
+  })
 })
 
 describe("useWizardState — the rail tracks the answers", () => {
   it("summaries and ticks accumulate", () => {
     const { result } = renderHook(() => useWizardState(DATA))
     expect(result.current.railDone.event).toBe(false)
-    act(() => result.current.setCategory("memorial"))
+    act(() => result.current.handleCategory("memorial"))
     act(() => result.current.setCharityIds(["c1", "c2"]))
     act(() => result.current.setTopics([EXISTING_TOPIC]))
     act(() => result.current.setName("Margaret"))
@@ -309,7 +339,7 @@ describe("useWizardState — the rail tracks the answers", () => {
     expect(result.current.railSummary.topic).toBe("Colour")
     expect(result.current.railSummary.info).toBe("Margaret")
     act(() => result.current.setGoalAmount(250))
-    act(() => result.current.setIsListed(false))
+    act(() => result.current.setVisibility("unlisted"))
     expect(result.current.railSummary.details).toContain("£250 goal")
     expect(result.current.railSummary.details).toContain("unlisted")
   })
@@ -318,7 +348,7 @@ describe("useWizardState — the rail tracks the answers", () => {
 describe("useWizardState — generateExample", () => {
   it("calibrates from the wizard's own answers and fills the story", async () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    act(() => result.current.setCategory("memorial"))
+    act(() => result.current.handleCategory("memorial"))
     act(() => result.current.setCharityIds(["c1"]))
     act(() => result.current.setTopics([EXISTING_TOPIC]))
     act(() => result.current.setName("Margaret"))
@@ -370,9 +400,12 @@ describe("useWizardState — handleFinish publishes", () => {
   })
 
   it("a cause publishes causeLabel and description, never a protagonist", async () => {
+    // Cause is only offered under Fundraiser, and the who axis lives on
+    // the Info step — after the category. Any other category resets a
+    // cause who (handleCategory).
     const { result } = renderHook(() => useWizardState(DATA))
+    advanceToDetails(result, "fundraiser")
     act(() => result.current.handleWho("cause"))
-    advanceToDetails(result)
     await act(async () => {
       await result.current.handleFinish()
     })
@@ -382,6 +415,18 @@ describe("useWizardState — handleFinish publishes", () => {
     expect(input.causeLabel).toBe("Poppy Chen")
     expect(input.description).toBe("Sixteen on Saturday.")
     expect(input.pronoun).toBeNull()
+  })
+
+  it("private visibility publishes isPrivate and not listed", async () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    advanceToDetails(result)
+    act(() => result.current.setVisibility("private"))
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    const input = mockCreateFavpoll.mock.calls[0][0]
+    expect(input.isPrivate).toBe(true)
+    expect(input.isListed).toBe(false)
   })
 
   it("a custom topic publishes customTopic and clears the draft key", async () => {
@@ -443,14 +488,14 @@ describe("useWizardState — handleFinish publishes", () => {
   })
 })
 
-describe("useWizardState — listed follows the register", () => {
-  it("a memorial defaults unlisted; the switch overrides", () => {
+describe("useWizardState — visibility follows the register", () => {
+  it("a memorial defaults to link only; the control overrides", () => {
     const { result } = renderHook(() => useWizardState(DATA))
-    expect(result.current.isListed).toBe(true)
-    act(() => result.current.setCategory("memorial"))
-    expect(result.current.isListed).toBe(false)
-    act(() => result.current.setIsListed(true))
-    expect(result.current.isListed).toBe(true)
+    expect(result.current.visibility).toBe("listed")
+    act(() => result.current.handleCategory("memorial"))
+    expect(result.current.visibility).toBe("unlisted")
+    act(() => result.current.setVisibility("listed"))
+    expect(result.current.visibility).toBe("listed")
   })
 })
 
@@ -476,6 +521,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
       reveal: "Autumn, always.",
       goalAmount: 250,
       isListed: false,
+      isPrivate: false,
     },
   }
 
@@ -489,12 +535,18 @@ describe("useWizardState — edit mode (Phase 2)", () => {
     expect(result.current.reveal).toBe("Autumn, always.")
     expect(result.current.who).toBe("she")
     expect(result.current.goalAmount).toBe(250)
-    expect(result.current.isListed).toBe(false)
+    expect(result.current.visibility).toBe("unlisted")
     expect(result.current.closesAt?.toISOString()).toBe(
       "2026-10-01T22:59:00.000Z"
     )
     expect(result.current.railDone.event).toBe(true)
     expect(result.current.nextDisabled).toBe(false)
+  })
+
+  it("canJumpTo opens every step in edit mode", () => {
+    const { result } = renderHook(() => useWizardState(DATA, EDIT))
+    expect(result.current.canJumpTo("details")).toBe(true)
+    expect(result.current.canJumpTo("story")).toBe(true)
   })
 
   it("Save calls updateFavpoll with the existing ids and navigates back", async () => {

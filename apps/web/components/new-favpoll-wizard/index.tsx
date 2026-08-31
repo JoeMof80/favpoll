@@ -71,7 +71,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
       <RegisterScope palette={palette}>
         <SeedFundModal
           favpollId={w.seedFavpollId}
-          isListed={w.isListed}
+          isListed={w.visibility === "listed"}
           onComplete={w.completeSeed}
         />
       </RegisterScope>
@@ -96,19 +96,25 @@ export function NewFavpollWizard({ data, edit }: Props) {
             currentStep={w.step}
             summary={w.railSummary}
             done={w.railDone}
-            onStepClick={w.isEdit ? w.goToStep : undefined}
+            onStepClick={w.goToStep}
+            canJump={w.canJumpTo}
           />
 
           <div className="px-6 pt-12 pb-10 md:px-12 md:pt-20">
             <div className="mx-auto w-full max-w-2xl">
-              <WizardProgressStrip currentStep={w.step} />
+              <WizardProgressStrip
+                currentStep={w.step}
+                done={w.railDone}
+                onStepClick={w.goToStep}
+                canJump={w.canJumpTo}
+              />
 
               {w.step === "event" && (
                 <WizardStepShell title="Event">
                   {w.stepLocked.event ? (
                     lockedBody(w.railSummary.event)
                   ) : (
-                    <EventStep value={w.category} onChange={w.setCategory} />
+                    <EventStep value={w.category} onChange={w.handleCategory} />
                   )}
                 </WizardStepShell>
               )}
@@ -166,7 +172,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               )}
 
               {w.step === "info" && (
-                <WizardStepShell title="Info">
+                <WizardStepShell title="Header">
                   <WizardInfoStep w={w} />
                 </WizardStepShell>
               )}
@@ -191,7 +197,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               )}
 
               {w.step === "details" && (
-                <WizardStepShell title="Details">
+                <WizardStepShell title="Settings">
                   <WizardDetailsStep w={w} />
                 </WizardStepShell>
               )}
