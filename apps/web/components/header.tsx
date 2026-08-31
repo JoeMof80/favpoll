@@ -30,22 +30,22 @@ import {
 // the menu, coloured the same way.
 const REGISTER_LINKS = [
   {
-    href: "/memorials",
-    palette: "memorial",
-    label: "Memorials",
-    section: "For memorials",
-  },
-  {
-    href: "/celebrations",
+    href: "/celebration",
     palette: "celebration",
-    label: "Celebrations",
+    label: "Celebration",
     section: "For celebrations",
   },
   {
-    href: "/fundraisers",
+    href: "/fundraiser",
     palette: "fundraiser",
-    label: "Fundraisers",
+    label: "Fundraiser",
     section: "For fundraisers",
+  },
+  {
+    href: "/memorial",
+    palette: "memorial",
+    label: "Memorial",
+    section: "For memorials",
   },
 ] as const satisfies readonly {
   href: string

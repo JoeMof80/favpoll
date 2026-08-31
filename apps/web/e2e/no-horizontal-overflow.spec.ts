@@ -28,9 +28,9 @@ const PAGES = [
   "/",
   "/features",
   "/about",
-  "/memorials",
-  "/celebrations",
-  "/fundraisers",
+  "/celebration",
+  "/fundraiser",
+  "/memorial",
 ] as const
 
 // The narrowest phone still in use, the iPhone baseline, a Pro Max, the two

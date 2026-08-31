@@ -9,10 +9,10 @@ describe("HeaderBar", () => {
         section="For memorials"
         nav={
           <>
-            <a href="/memorials" aria-current="page">
+            <a href="/memorial" aria-current="page">
               Memorials
             </a>
-            <a href="/celebrations">Celebrations</a>
+            <a href="/celebration">Celebrations</a>
           </>
         }
       />

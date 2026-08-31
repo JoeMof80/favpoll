@@ -167,9 +167,9 @@ describe("ProcessOverview", () => {
     stubViewport(false)
     render(<ProcessOverview />)
     const links = [
-      ["home.overview.seeIt.memorial", "/memorials#how", "memorial"],
-      ["home.overview.seeIt.celebration", "/celebrations#how", "celebration"],
-      ["home.overview.seeIt.fundraiser", "/fundraisers#how", "fundraiser"],
+      ["home.overview.seeIt.celebration", "/celebration#how", "celebration"],
+      ["home.overview.seeIt.fundraiser", "/fundraiser#how", "fundraiser"],
+      ["home.overview.seeIt.memorial", "/memorial#how", "memorial"],
     ] as const
     for (const [key, href, palette] of links) {
       const link = screen.getByRole("link", { name: t(key) })
