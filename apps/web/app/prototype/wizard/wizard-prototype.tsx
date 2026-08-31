@@ -253,6 +253,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [fundSeed, setFundSeed] = useState("")
   const [isListed, setIsListed] = useState(true)
   const [closeDate, setCloseDate] = useState("")
+  const [closeTime, setCloseTime] = useState("")
 
   const ph = PLACEHOLDERS[w.category ?? ""] ?? DEFAULT_PLACEHOLDERS
   const current = PROTO_STEPS[Math.min(stepIdx, PROTO_STEPS.length - 1)]!
@@ -512,12 +513,9 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                           }}
                         />
                       </div>
-                      <span className="block text-xs text-muted-foreground sm:col-start-2">
-                        Understood as progress, never as pressure.
-                      </span>
                     </div>
                     {field(
-                      "Shared fund head start",
+                      "Shared fund",
                       true,
                       <Input
                         className={cn(INPUT_SIZE, "w-44")}
@@ -531,12 +529,21 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                     {field(
                       "Close date",
                       true,
-                      <Input
-                        type="date"
-                        className={cn(INPUT_SIZE, "w-48")}
-                        value={closeDate}
-                        onChange={(e) => setCloseDate(e.target.value)}
-                      />,
+                      <div className="flex gap-2">
+                        <Input
+                          type="date"
+                          className={cn(INPUT_SIZE, "w-48")}
+                          value={closeDate}
+                          onChange={(e) => setCloseDate(e.target.value)}
+                        />
+                        <Input
+                          type="time"
+                          className={cn(INPUT_SIZE, "w-32")}
+                          aria-label="Close time"
+                          value={closeTime}
+                          onChange={(e) => setCloseTime(e.target.value)}
+                        />
+                      </div>,
                       "90 days at most — it closes automatically either way."
                     )}
                     <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
@@ -753,7 +760,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 20
+            PROTOTYPE · shape, round 21
           </div>
         )}
       </main>
