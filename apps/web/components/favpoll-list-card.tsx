@@ -16,8 +16,14 @@ import type { FavpollCardSize } from "./favpoll-card/types"
 import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-results"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import type { CardResultItem } from "./favpoll-list-card/use-favpoll-list-card-pledge"
-import type { Charity, FavpollPollWithItems } from "@favpoll/types"
+import type {
+  Charity,
+  FavpollCategory,
+  FavpollPollWithItems,
+  FavpollSubject,
+} from "@favpoll/types"
 import { decoyWidth } from "@/lib/decoys"
+import { paletteForFavpoll } from "@/lib/register-palette"
 
 type FavpollListCardFavpoll = {
   id: string
@@ -134,12 +140,20 @@ export function FavpollListCard({
       ? (favpoll.cause_label ?? "")
       : (favpoll.protagonist?.name ?? "")
 
+  // The card wears its own register's palette — one element on a mixed
+  // surface, so the attribute scopes the subtree (see RegisterScope notes).
+  const palette = paletteForFavpoll({
+    category: (favpoll.category ?? null) as FavpollCategory | null,
+    subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
+  })
+
   return (
     <li className={cn("list-none", className)}>
       {/* Interaction matches FavpollSummaryCard: the whole card navigates
           (stretched link below), with the same hover lift + shadow. The
           poll body sits above the link (relative) so pledging still works. */}
       <div
+        data-register={palette ?? undefined}
         className={cn(
           "group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
           // Your pledge, visible at a glance: a thicker purple border

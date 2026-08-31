@@ -48,7 +48,7 @@ export default async function CharityPage({ params }: Props) {
     .from("favpoll_charities")
     .select(
       `favpolls!inner (
-        id, occasion_type, subject, cause_label, opening_line, closes_at,
+        id, occasion_type, subject, cause_label, category, opening_line, closes_at,
         closed_at, total_raised, is_listed, is_private,
         protagonist:protagonists!favpolls_protagonist_id_fkey ( name ),
         favpoll_charities ( charity:charities ( id, name, logo_url, registered_number ) ),
@@ -69,6 +69,7 @@ export default async function CharityPage({ params }: Props) {
       occasion_type: f.occasion_type,
       subject: f.subject,
       cause_label: f.cause_label,
+      category: f.category,
       opening_line: f.opening_line ?? "",
       closes_at: f.closes_at,
       closed_at: f.closed_at,
