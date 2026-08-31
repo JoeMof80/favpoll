@@ -8,8 +8,21 @@
 // listed, close date, button). No live preview; the payoff is landing on
 // the real page after Publish.
 import { useState } from "react"
-import { BookOpen, Calendar, Flag, Gift, Shapes, UserRound } from "lucide-react"
+import {
+  InfoIcon,
+  BookOpen,
+  Calendar,
+  Flag,
+  Gift,
+  Shapes,
+  UserRound,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
@@ -514,18 +527,45 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         />
                       </div>
                     </div>
-                    {field(
-                      "Shared fund",
-                      true,
+                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+                      <span className="flex items-center gap-1.5">
+                        <span className="font-medium">
+                          Shared fund{" "}
+                          <span className="font-normal text-muted-foreground">
+                            — optional
+                          </span>
+                        </span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-xs"
+                              aria-label="About the shared fund"
+                              className="h-4 w-4 rounded-full"
+                            >
+                              <InfoIcon className="h-3 w-3" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            align="start"
+                            className="w-64 text-xs leading-relaxed"
+                          >
+                            Every favpoll has a shared fund. Put something in
+                            and guests can pledge from it without paying
+                            themselves.
+                          </PopoverContent>
+                        </Popover>
+                      </span>
                       <Input
                         className={cn(INPUT_SIZE, "w-44")}
                         inputMode="numeric"
                         placeholder="£ amount"
+                        aria-label="Shared fund amount"
                         value={fundSeed}
                         onChange={(e) => setFundSeed(e.target.value)}
-                      />,
-                      "Every favpoll has a shared fund. Put something in and guests can pledge from it without paying themselves."
-                    )}
+                      />
+                    </div>
                     {field(
                       "Close date",
                       true,
@@ -760,7 +800,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 21
+            PROTOTYPE · shape, round 22
           </div>
         )}
       </main>
