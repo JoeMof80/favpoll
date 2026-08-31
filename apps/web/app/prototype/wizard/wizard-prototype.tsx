@@ -613,7 +613,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     )}
                     {field(
-                      "Name",
+                      w.category === "fundraiser" ? "Name or cause" : "Name",
                       false,
                       <Input
                         className={INPUT_SIZE}
@@ -966,7 +966,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 28
+            PROTOTYPE · shape, round 29
           </div>
         )}
       </main>

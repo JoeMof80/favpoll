@@ -57,3 +57,14 @@ Founder: keep the triple (convinced — Name is an entity the whole product
 recomposes; Opening line defaults by register; Context owns a slot). Three
 changes: Opening line moves ABOVE Name — the page's own order; Goal merges
 into Publish (six steps); bigger inputs (h-11, full text size).
+
+## Generation design (founder, round 29 — for the real build)
+
+The extended wizard makes the Generate dialog's questions obsolete: by
+the Story step it already knows register, charity, topic, name and
+context, so safeGenerateDraft takes those as calibration and the button
+is one click, no dialog. Pronouns are never derived from the name
+(misgendering risk, worst on memorials): generated copy is name-anchored
+and they/them; the organiser edits freely. The Name label is dynamic —
+"Name or cause" under Fundraiser, since Cause lives inside that register
+in this wizard.
