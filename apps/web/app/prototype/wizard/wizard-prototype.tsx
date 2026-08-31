@@ -35,11 +35,16 @@ import {
   CLOSE_DATE_PRESETS,
 } from "@/components/favpoll-form/date-helpers"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
-import type { Pronoun } from "@favpoll/types"
+import {
+  groupingForWho,
+  subjectForWho,
+  type WhoValue,
+} from "@/components/favpoll-form/generate-example-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -94,23 +99,54 @@ const STEP_ICONS: Record<ProtoStep, React.ElementType> = {
   publish: Flag,
 }
 
-const PRONOUNS: Record<Pronoun, { sub: string; pos: string }> = {
+const PRONOUNS: Record<"he" | "she" | "they", { sub: string; pos: string }> = {
   she: { sub: "she", pos: "her" },
   he: { sub: "he", pos: "his" },
   they: { sub: "they", pos: "their" },
 }
 
-const PRONOUN_LABELS: Record<Pronoun, string> = {
-  she: "She / her",
-  he: "He / him",
-  they: "They / them",
+// The full who axis, mirroring the Generate dialog: three pronouns, Pair,
+// Group — and Cause, the answer that says no one. Word labels, no
+// per-option glyphs (founder, 2026-07-30).
+const WHO_LABELS: Record<WhoValue, string> = {
+  he: "He",
+  she: "She",
+  they: "They",
+  couple: "Pair",
+  group: "Group",
+  cause: "Cause",
 }
 
-// Canned example per kind, calibrated to the chosen pronoun — the same
-// inputs the real safeGenerateDraft call will take. They/them is the
-// default; nothing is ever inferred from the name.
-function exampleFor(category: string | null | undefined, pronoun: Pronoun) {
-  const { sub, pos } = PRONOUNS[pronoun]
+// Canned example per who and kind — the same calibration set the real
+// safeGenerateDraft call will take. They/them is the default; nothing is
+// ever inferred from the name.
+function exampleFor(category: string | null | undefined, who: WhoValue) {
+  if (who === "couple")
+    return {
+      name: "Priya & Daniel",
+      context: "Silver wedding",
+      about:
+        "Twenty-five years married, and still no agreement on the correct film. Settle it for them with a pledge.",
+      reveal: "Casablanca — the film from their first date.",
+    }
+  if (who === "group")
+    return {
+      name: "The Thursday Runners",
+      context: "Club relay",
+      about:
+        "A running club with one unresolved question: the correct post-run biscuit. Every pledge helps settle it.",
+      reveal: "The Hobnob, by club vote. Allegedly unanimous.",
+    }
+  if (who === "cause")
+    return {
+      name: "St Mark's Hospice",
+      context: "Sponsored dog walk",
+      about:
+        "5 miles for our local hospice. Pledge your favourite biscuit and every penny goes to St Mark's.",
+      reveal:
+        "Our favourite is Biscuit, our therapy dog. Named after his favourite treat, he's a good boy who can have one after the walk.",
+    }
+  const { sub, pos } = PRONOUNS[who]
   const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
   switch (category) {
     case "memorial":
@@ -437,7 +473,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   // publish these from the final step.
   const [stepIdx, setStepIdx] = useState(0)
   const [name, setName] = useState("")
-  const [pronoun, setPronoun] = useState<Pronoun>("they")
+  const [who, setWho] = useState<WhoValue>("they")
   const [openingLine, setOpeningLine] = useState("")
   const [context, setContext] = useState("")
   const [about, setAbout] = useState("")
@@ -490,11 +526,20 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   }
 
   function fillExample() {
-    const ex = exampleFor(w.category, pronoun)
+    const ex = exampleFor(w.category, who)
     setName(ex.name)
     setContext(ex.context)
     setAbout(ex.about)
     setReveal(ex.reveal)
+  }
+
+  // Cause and Pair/Group are structural, not just generation metadata —
+  // they drive the register (a cause wears fundraiser green) exactly as
+  // the Generate dialog commits subject on click.
+  function handleWho(k: WhoValue) {
+    setWho(k)
+    w.setGrouping(groupingForWho(k))
+    w.setSubject(subjectForWho(k))
   }
 
   const railSummary: Record<ProtoStep, string> = {
@@ -636,7 +681,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     )}
                     {field(
-                      w.category === "fundraiser" ? "Name or cause" : "Name",
+                      who === "cause"
+                        ? "Cause"
+                        : w.category === "fundraiser"
+                          ? "Name or cause"
+                          : "Name",
                       false,
                       <InputGroup className={cn(INPUT_SIZE, "bg-background")}>
                         <InputGroupInput
@@ -653,28 +702,41 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                                 type="button"
                                 variant="ghost"
                                 size="icon-xs"
-                                aria-label={`Pronoun: ${PRONOUN_LABELS[pronoun]}`}
+                                aria-label={`Who: ${WHO_LABELS[who]}`}
                                 className="rounded-full text-muted-foreground/60 hover:text-foreground"
                               >
                                 <Speech className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              {(Object.keys(PRONOUN_LABELS) as Pronoun[]).map(
-                                (k) => (
-                                  <DropdownMenuItem
-                                    key={k}
-                                    onClick={() => setPronoun(k)}
-                                  >
-                                    <span className="flex-1">
-                                      {PRONOUN_LABELS[k]}
-                                    </span>
-                                    {pronoun === k && (
-                                      <Check className="h-4 w-4" />
-                                    )}
-                                  </DropdownMenuItem>
-                                )
-                              )}
+                              {(
+                                [
+                                  "he",
+                                  "she",
+                                  "they",
+                                  "couple",
+                                  "group",
+                                ] as WhoValue[]
+                              ).map((k) => (
+                                <DropdownMenuItem
+                                  key={k}
+                                  onClick={() => handleWho(k)}
+                                >
+                                  <span className="flex-1">
+                                    {WHO_LABELS[k]}
+                                  </span>
+                                  {who === k && <Check className="h-4 w-4" />}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleWho("cause")}
+                              >
+                                <span className="flex-1">Cause</span>
+                                {who === "cause" && (
+                                  <Check className="h-4 w-4" />
+                                )}
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </InputGroupAddon>
@@ -1023,7 +1085,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 30
+            PROTOTYPE · shape, round 31
           </div>
         )}
       </main>
