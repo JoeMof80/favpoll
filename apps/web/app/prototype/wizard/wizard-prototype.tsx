@@ -7,7 +7,8 @@
 // page's own order), About & reveal, and Publish (goal, head start,
 // listed, close date, button). No live preview; the payoff is landing on
 // the real page after Publish.
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { FormProvider, useForm } from "react-hook-form"
 import {
   InfoIcon,
   BookOpen,
@@ -18,6 +19,8 @@ import {
   UserRound,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 import {
   Popover,
   PopoverContent,
@@ -267,6 +270,17 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [isListed, setIsListed] = useState(true)
   const [closeDate, setCloseDate] = useState("")
   const [closeTime, setCloseTime] = useState("")
+  const [photoOpen, setPhotoOpen] = useState(false)
+
+  // The real photo flow (HeroPhotoOverlay + crop) reads a form context;
+  // this scoped form carries just photo/photoUrl/name for it.
+  const photoForm = useForm<FavpollFormValues>({
+    defaultValues: { name: "" },
+  })
+  const photoUrl = photoForm.watch("photoUrl")
+  useEffect(() => {
+    photoForm.setValue("name", name)
+  }, [name, photoForm])
 
   const ph = PLACEHOLDERS[w.category ?? ""] ?? DEFAULT_PLACEHOLDERS
   const current = PROTO_STEPS[Math.min(stepIdx, PROTO_STEPS.length - 1)]!
@@ -437,6 +451,25 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         onChange={(e) => setContext(e.target.value)}
                       />
                     )}
+                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+                      <span className="font-medium">Photo</span>
+                      <span className="flex items-center gap-3">
+                        {photoUrl && (
+                          <img
+                            src={photoUrl}
+                            alt=""
+                            className="h-11 w-11 rounded-lg border border-border object-cover"
+                          />
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setPhotoOpen(true)}
+                        >
+                          {photoUrl ? "Change photo" : "Add a photo"}
+                        </Button>
+                      </span>
+                    </div>
                   </div>
                 </ProtoShell>
               )}
@@ -775,6 +808,10 @@ export function WizardPrototype({ data }: { data: WizardData }) {
           />
         </ResponsiveOverlay>
 
+        <FormProvider {...photoForm}>
+          <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
+        </FormProvider>
+
         {w.topics.length > 0 && (
           <TopicItemsDialog
             open={w.itemsDialogOpen}
@@ -790,7 +827,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 23
+            PROTOTYPE · shape, round 24
           </div>
         )}
       </main>
