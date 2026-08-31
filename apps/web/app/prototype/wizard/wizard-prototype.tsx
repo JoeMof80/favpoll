@@ -248,7 +248,6 @@ export function WizardPrototype({ data }: { data: WizardData }) {
   const [context, setContext] = useState("")
   const [about, setAbout] = useState("")
   const [reveal, setReveal] = useState("")
-  const [showReveal, setShowReveal] = useState(true)
   const [goalAmount, setGoalAmount] = useState<number | undefined>(undefined)
   const [goalDraft, setGoalDraft] = useState("")
   const [fundSeed, setFundSeed] = useState("")
@@ -301,7 +300,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
       w.topics.length === 0 ||
       (w.topics[0]?.isCustom === true && w.customLabels.length < 2),
     info: !name.trim(),
-    story: false,
+    story: !about.trim(),
     publish: false,
   }
 
@@ -447,7 +446,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                   <div className="space-y-5">
                     {field(
                       "About",
-                      true,
+                      false,
                       <Textarea
                         className={TEXTAREA_SIZE}
                         rows={4}
@@ -457,35 +456,18 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         onChange={(e) => setAbout(e.target.value)}
                       />
                     )}
-                    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
-                      <div className="flex items-center justify-between sm:block sm:space-y-2 sm:pt-3">
-                        <span className="text-sm font-medium">
-                          The reveal{" "}
-                          <span className="font-normal text-muted-foreground">
-                            — optional
-                          </span>
-                        </span>
-                        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                          Include
-                          <Switch
-                            checked={showReveal}
-                            onCheckedChange={setShowReveal}
-                          />
-                        </label>
-                      </div>
+                    {field(
+                      "The reveal",
+                      true,
                       <Textarea
-                        className={cn(
-                          TEXTAREA_SIZE,
-                          !showReveal && "opacity-40"
-                        )}
+                        className={TEXTAREA_SIZE}
                         rows={4}
                         maxLength={280}
-                        disabled={!showReveal}
                         value={reveal}
                         placeholder={ph.reveal}
                         onChange={(e) => setReveal(e.target.value)}
                       />
-                    </div>
+                    )}
                   </div>
                 </ProtoShell>
               )}
@@ -770,7 +752,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 18
+            PROTOTYPE · shape, round 19
           </div>
         )}
       </main>
