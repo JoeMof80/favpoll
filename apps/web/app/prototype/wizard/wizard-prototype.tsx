@@ -22,7 +22,6 @@ import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { useWizardState } from "@/components/new-favpoll-wizard/use-wizard-state"
 import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
 import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
-import { WizardStepShell } from "@/components/new-favpoll-wizard/wizard-step-shell"
 import type { WizardData } from "@/components/new-favpoll-wizard/use-wizard-state"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
@@ -93,6 +92,25 @@ const EXAMPLES: Record<
 // the fields wear full text size instead of shadcn's md:text-sm shrink.
 const INPUT_SIZE = "h-11 md:text-base"
 const TEXTAREA_SIZE = "md:text-base"
+
+// The production step shell minus the guidance line (founder, round 13:
+// "they feel glib") — the heading and the fields say it all.
+function ProtoShell({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col gap-5 py-6">
+      <h3 className="text-lg font-medium tracking-widest text-primary uppercase">
+        {title}
+      </h3>
+      {children}
+    </div>
+  )
+}
 
 function ProtoRail({ current }: { current: ProtoStep }) {
   return (
@@ -261,19 +279,13 @@ export function WizardPrototype({ data }: { data: WizardData }) {
               <ProtoProgressStrip current={current} />
 
               {current === "event" && (
-                <WizardStepShell
-                  title="Event"
-                  guidance="What kind of favpoll is this?"
-                >
+                <ProtoShell title="Event">
                   <EventStep value={w.category} onChange={w.setCategory} />
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               {current === "charity" && (
-                <WizardStepShell
-                  title="Charity"
-                  guidance={w.copy.charityGuidance}
-                >
+                <ProtoShell title="Charity">
                   {w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
@@ -291,11 +303,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       Pick a charity
                     </Button>
                   )}
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               {current === "topic" && (
-                <WizardStepShell title="Topic" guidance={w.copy.topicGuidance}>
+                <ProtoShell title="Topic">
                   {w.topics.length > 0 ? (
                     <WizardTopicCard
                       topic={w.topics[0]!}
@@ -313,11 +325,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       Pick a topic
                     </Button>
                   )}
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               {current === "info" && (
-                <WizardStepShell title="Name" guidance="Who the page is about.">
+                <ProtoShell title="Name">
                   {/* The page's own order (founder, round 11): opening line
                       above the name, context beneath — exactly as the hero
                       renders them. */}
@@ -356,14 +368,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     )}
                   </div>
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               {current === "story" && (
-                <WizardStepShell
-                  title="About & reveal"
-                  guidance="Introduce them — and what guests unlock when they pledge."
-                >
+                <ProtoShell title="About & reveal">
                   <div className="space-y-5">
                     <Button
                       type="button"
@@ -415,14 +424,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     </div>
                   </div>
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               {current === "publish" && (
-                <WizardStepShell
-                  title="Publish"
-                  guidance="The finishing touches — then it goes live."
-                >
+                <ProtoShell title="Publish">
                   <div className="space-y-6">
                     <div className="space-y-1.5 text-sm">
                       <span className="block font-medium">
@@ -500,7 +506,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                       />
                     </label>
                   </div>
-                </WizardStepShell>
+                </ProtoShell>
               )}
 
               <div className="mt-10 flex items-center justify-end gap-2 border-t border-border pt-2">
@@ -701,7 +707,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 12
+            PROTOTYPE · shape, round 13
           </div>
         )}
       </main>
