@@ -16,6 +16,7 @@ import {
   CalendarIcon,
   Clock2Icon,
   ClipboardList,
+  InfoIcon,
   Gift,
   Shapes,
   Mars,
@@ -71,6 +72,7 @@ import type { WizardData } from "@/components/new-favpoll-wizard/use-wizard-stat
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
+import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { GroupIcon, PairIcon } from "@/components/icons/people"
 import { cn } from "@/lib/utils"
 
@@ -606,24 +608,51 @@ export function WizardPrototype({ data }: { data: WizardData }) {
     publish: false,
   }
 
+  const infoPopover = (text: string) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          aria-label="About this field"
+          className="ml-1 h-4 w-4 rounded-full align-middle text-muted-foreground/60 hover:text-foreground"
+        >
+          <InfoIcon className="h-3 w-3" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-64 text-xs leading-relaxed">
+        {text}
+      </PopoverContent>
+    </Popover>
+  )
+
   const field = (
     label: string,
     opt: boolean,
     node: React.ReactNode,
-    hint?: string
+    extra?: {
+      hint?: string
+      info?: string
+      count?: readonly [string, number]
+    }
   ) => (
-    <label className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
+    <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6 sm:gap-y-1.5">
       <span className="block font-medium sm:pt-3">
         {label}
         {!opt && <span className="text-muted-foreground"> *</span>}
+        {extra?.info && infoPopover(extra.info)}
       </span>
       <div className="min-w-0">{node}</div>
-      {hint && (
-        <span className="block text-xs text-muted-foreground sm:col-start-2">
-          {hint}
+      {(extra?.hint || extra?.count) && (
+        <span className="flex items-center justify-between gap-3 text-xs text-muted-foreground sm:col-start-2">
+          <span>{extra?.hint}</span>
+          {extra?.count && (
+            <CharCounter value={extra.count[0]} max={extra.count[1]} />
+          )}
         </span>
       )}
-    </label>
+    </div>
   )
 
   return (
@@ -705,7 +734,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         maxLength={50}
                         placeholder={ph.openingLine}
                         onChange={(e) => setOpeningLine(e.target.value)}
-                      />
+                      />,
+                      {
+                        info: "Replaces the default opening prefix.",
+                        count: [openingLine, 50] as const,
+                      }
                     )}
                     {field(
                       who === "cause"
@@ -780,7 +813,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </InputGroupAddon>
-                      </InputGroup>
+                      </InputGroup>,
+                      {
+                        info: "Shown throughout the favpoll.",
+                        count: [name, 40] as const,
+                      }
                     )}
                     {field(
                       "Context",
@@ -791,7 +828,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         maxLength={40}
                         placeholder={ph.context}
                         onChange={(e) => setContext(e.target.value)}
-                      />
+                      />,
+                      {
+                        info: "Dates, years, or other context.",
+                        count: [context, 40] as const,
+                      }
                     )}
                     <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
                       <span className="font-medium">Photo</span>
@@ -841,7 +882,14 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         value={about}
                         placeholder={ph.about}
                         onChange={(e) => setAbout(e.target.value)}
-                      />
+                      />,
+                      {
+                        info:
+                          who === "cause"
+                            ? "What you're raising for — and why it matters to you."
+                            : "Introduce them in a sentence or two. Specific, personal details land harder than a list of facts.",
+                        count: [about, 300] as const,
+                      }
                     )}
                     {field(
                       "The reveal",
@@ -853,7 +901,11 @@ export function WizardPrototype({ data }: { data: WizardData }) {
                         value={reveal}
                         placeholder={ph.reveal}
                         onChange={(e) => setReveal(e.target.value)}
-                      />
+                      />,
+                      {
+                        info: "A quote in their own words, a memory, or a message to guests — one sentence, with a detail only you'd know.",
+                        count: [reveal, 280] as const,
+                      }
                     )}
                   </div>
                 </ProtoShell>
@@ -1125,7 +1177,7 @@ export function WizardPrototype({ data }: { data: WizardData }) {
 
         {process.env.NODE_ENV !== "production" && (
           <div className="fixed bottom-3 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1.5 font-mono text-xs text-white shadow-xl">
-            PROTOTYPE · shape, round 36
+            PROTOTYPE · shape, round 37
           </div>
         )}
       </main>
