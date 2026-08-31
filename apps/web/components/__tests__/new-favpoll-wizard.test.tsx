@@ -183,11 +183,11 @@ describe("NewFavpollWizard — the wizard continues past Topic", () => {
   it("Topic leads to Info — no /favpolls/new/details redirect", () => {
     mockPush.mockClear()
     reachInfo()
-    expect(screen.getByRole("heading", { name: "Info" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Header" })).toBeInTheDocument()
     expect(mockPush).not.toHaveBeenCalled()
   })
 
-  it("Info gates on the name; Story and Details follow; Publish is the last button", () => {
+  it("Header gates on the name; Story and Settings follow; Publish is the last button", () => {
     reachInfo()
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
     fireEvent.change(
@@ -204,7 +204,9 @@ describe("NewFavpollWizard — the wizard continues past Topic", () => {
       { target: { value: "About text." } }
     )
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    expect(screen.getByRole("heading", { name: "Details" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { name: "Settings" })
+    ).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Publish" })).toBeInTheDocument()
   })
 })

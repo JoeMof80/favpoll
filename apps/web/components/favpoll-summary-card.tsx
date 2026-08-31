@@ -4,7 +4,8 @@ import { ClosingLabel } from "@/components/closing-label"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
-import type { Charity } from "@favpoll/types"
+import type { Charity, FavpollCategory, FavpollSubject } from "@favpoll/types"
+import { paletteForFavpoll } from "@/lib/register-palette"
 import Link from "next/link"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
@@ -43,9 +44,17 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
       ? favpoll.total_raised / favpoll.charities.length
       : 0
 
+  // The card wears its own register's palette — one element on a mixed
+  // surface, so the attribute scopes the subtree (see RegisterScope notes).
+  const palette = paletteForFavpoll({
+    category: (favpoll.category ?? null) as FavpollCategory | null,
+    subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
+  })
+
   return (
     <Link
       href={`/favpolls/${favpoll.id}`}
+      data-register={palette ?? undefined}
       className={cn(
         // Hover matches FavpollListCard: border + shadow + lift — the card
         // shells share one interaction language wherever favpolls appear.

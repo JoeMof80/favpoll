@@ -115,6 +115,7 @@ export default async function EditFavpollPage({ params }: Props) {
       reveal: rawPoll?.personal_reveal ?? "",
       goalAmount: favpoll.goal_amount ?? undefined,
       isListed: favpoll.is_listed ?? true,
+      isPrivate: favpoll.is_private ?? false,
     },
   }
 

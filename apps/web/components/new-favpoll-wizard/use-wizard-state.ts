@@ -60,8 +60,15 @@ export type WizardEditConfig = {
     reveal: string
     goalAmount: number | undefined
     isListed: boolean
+    isPrivate: boolean
   }
 }
+
+// The three-notch visibility axis. Listed = browsable on /favpolls;
+// unlisted = by link, not by browsing; private = the page itself gates
+// on sign-in and link previews show a placeholder. is_listed/is_private
+// stay separate columns — this is the one place they meet as one control.
+export type WizardVisibility = "listed" | "unlisted" | "private"
 
 function whoFor(
   subject: FavpollSubject,
@@ -127,9 +134,16 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   const [closesAt, setClosesAt] = useState<Date | undefined>(
     edit?.initialClosesAt ? new Date(edit.initialClosesAt) : undefined
   )
-  const [listedOverride, setListedOverride] = useState<boolean | null>(
-    init ? init.isListed : null
-  )
+  const [visibilityOverride, setVisibilityOverride] =
+    useState<WizardVisibility | null>(
+      init
+        ? init.isPrivate
+          ? "private"
+          : init.isListed
+            ? "listed"
+            : "unlisted"
+        : null
+    )
 
   const [generating, setGenerating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -138,10 +152,13 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
 
   const register = deriveRegister(category, grouping, subject)
 
-  // Listed follows the register — memorials default unlisted (the
-  // details page's rule: register !== "remembering") — until the
-  // organiser touches the switch.
-  const isListed = listedOverride ?? register !== "remembering"
+  // Visibility follows the register — memorials default to link-only
+  // (the old rule: isListed = register !== "remembering") — until the
+  // organiser touches the control.
+  const visibility =
+    visibilityOverride ?? (register === "remembering" ? "unlisted" : "listed")
+  const isListed = visibility === "listed"
+  const isPrivate = visibility === "private"
 
   const stepIndex = STEPS.indexOf(step)
   const isFirst = stepIndex === 0
@@ -229,7 +246,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       closesAt
         ? `closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
         : null,
-      isListed ? null : "unlisted",
+      visibility === "listed" ? null : visibility,
     ]
       .filter(Boolean)
       .join(" · "),
@@ -281,6 +298,14 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     setStep(target)
   }
 
+  // Which steps a click may open. Edit mode: all of them (the favpoll
+  // exists; every answer is revisitable). Create mode: only steps
+  // already passed — a forward jump would skip the step gates
+  // (nextDisabled), so onward travel stays with the Next button.
+  function canJumpTo(target: WizardStep) {
+    return isEdit || STEPS.indexOf(target) < stepIndex
+  }
+
   // The who axis lives on the Name field. Cause and Pair/Group are
   // structural, not just generation metadata — they drive the register
   // and route the About into protagonist vs description at publish.
@@ -292,6 +317,21 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     setPronoun(
       value === "he" || value === "she" || value === "they" ? value : undefined
     )
+  }
+
+  // Cause only exists under Fundraiser (the who dropdown hides it
+  // elsewhere) — subject "cause" overrides the category in
+  // deriveRegister, so leaving it selected would silently turn a
+  // memorial into a cause. Switching type away resets the who axis
+  // to neutral instead of stranding a hidden answer.
+  function handleCategory(value: FavpollCategory | null) {
+    setCategory(value)
+    if (value !== "fundraiser" && who === "cause") {
+      setWho("")
+      setGrouping("individual")
+      setSubject("someone")
+      setPronoun(undefined)
+    }
   }
 
   // One-click generation: by the Story step the wizard already holds
@@ -365,7 +405,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
           description: isCause ? about.trim() || null : null,
           charityIds,
           closesAt: resolvedClosesAt.toISOString(),
-          isPrivate: false,
+          isPrivate,
           isListed,
           potAmount: null,
           goalAmount: goalAmount ?? null,
@@ -407,7 +447,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
         description: isCause ? about.trim() || null : null,
         charityIds,
         closesAt: resolvedClosesAt.toISOString(),
-        isPrivate: false,
+        isPrivate,
         isListed,
         potAmount: null,
         goalAmount: goalAmount ?? null,
@@ -471,7 +511,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     selectedCharities,
     primaryCharity,
     suggestedTopics,
-    setCategory,
+    handleCategory,
     setGrouping,
     setSubject,
     setPronoun,
@@ -482,6 +522,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     handleNext,
     handleBack,
     goToStep,
+    canJumpTo,
     // Info · Story · Details
     openingLine,
     setOpeningLine,
@@ -505,8 +546,8 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     setGoalDraft,
     closesAt,
     setClosesAt,
-    isListed,
-    setIsListed: (v: boolean) => setListedOverride(v),
+    visibility,
+    setVisibility: (v: WizardVisibility) => setVisibilityOverride(v),
     isCause,
     isEdit,
     stepLocked,

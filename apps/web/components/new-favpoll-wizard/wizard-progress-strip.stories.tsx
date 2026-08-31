@@ -10,14 +10,29 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const NONE_DONE = {
+  event: false,
+  charity: false,
+  topic: false,
+  info: false,
+  story: false,
+  details: false,
+}
+
 export const OnEvent: Story = {
-  args: { currentStep: "event" },
+  args: { currentStep: "event", done: NONE_DONE },
 }
 
 export const OnCharity: Story = {
-  args: { currentStep: "charity" },
+  args: {
+    currentStep: "charity",
+    done: { ...NONE_DONE, event: true },
+  },
 }
 
 export const OnTopic: Story = {
-  args: { currentStep: "topic" },
+  args: {
+    currentStep: "topic",
+    done: { ...NONE_DONE, event: true, charity: true },
+  },
 }

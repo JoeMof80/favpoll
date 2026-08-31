@@ -4,34 +4,36 @@ import {
   BookOpen,
   Calendar,
   Check,
-  ClipboardList,
   Gift,
+  Settings2,
   Shapes,
   UserRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 
-// Concrete objects, not interface furniture — a calendar, a gift, an
-// assortment, a person, a book, a clipboard. The rail tracks the answers
+// Concrete objects where one exists — a calendar, a gift, an assortment,
+// a person, a book; Settings wears its own glyph. The rail tracks the answers
 // as they accumulate (extended-wizard prototype, round 25): each step
 // shows a tick once its content is in, and the chosen thing itself as a
 // one-line summary beneath the label.
-const STEP_ICONS: Record<WizardStep, React.ElementType> = {
+export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
   event: Calendar,
   charity: Gift,
   topic: Shapes,
   info: UserRound,
   story: BookOpen,
-  details: ClipboardList,
+  details: Settings2,
 }
 
 type Props = {
   currentStep: WizardStep
   summary: Record<WizardStep, string>
   done: Record<WizardStep, boolean>
-  /** Edit mode: rail entries become buttons that jump to their step. */
+  /** Entries the canJump gate allows become buttons that jump to their step. */
   onStepClick?: (step: WizardStep) => void
+  /** Which steps a click may open (create mode: passed steps only). */
+  canJump?: (step: WizardStep) => boolean
 }
 
 export function WizardStepRail({
@@ -39,6 +41,7 @@ export function WizardStepRail({
   summary,
   done,
   onStepClick,
+  canJump,
 }: Props) {
   return (
     <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
@@ -46,17 +49,18 @@ export function WizardStepRail({
         {STEPS.map((s) => {
           const Icon = STEP_ICONS[s]
           const isActive = s === currentStep
-          const Entry = onStepClick ? "button" : "div"
+          const clickable = !!onStepClick && (canJump ? canJump(s) : true)
+          const Entry = clickable ? "button" : "div"
           return (
             <Entry
               key={s}
-              {...(onStepClick
-                ? { type: "button" as const, onClick: () => onStepClick(s) }
+              {...(clickable
+                ? { type: "button" as const, onClick: () => onStepClick?.(s) }
                 : {})}
               className={cn(
                 "min-w-0 space-y-1 text-left transition-opacity",
                 isActive || done[s] ? "opacity-100" : "opacity-60",
-                onStepClick && "cursor-pointer hover:opacity-100"
+                clickable && "cursor-pointer hover:opacity-100"
               )}
             >
               <div className="flex items-center gap-2.5">
@@ -81,11 +85,17 @@ export function WizardStepRail({
                   />
                 )}
               </div>
-              {summary[s] && (
-                <p className="truncate pl-7.5 text-sm text-muted-foreground">
-                  {summary[s]}
-                </p>
-              )}
+              {/* Always rendered — an empty summary keeps its line so the
+                  rail never reflows as answers accumulate (justify-around
+                  would otherwise redistribute every entry). */}
+              <p
+                className={cn(
+                  "truncate pl-7.5 text-sm text-muted-foreground",
+                  !summary[s] && "invisible"
+                )}
+              >
+                {summary[s] || " "}
+              </p>
             </Entry>
           )
         })}
