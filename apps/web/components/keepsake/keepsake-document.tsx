@@ -1,7 +1,7 @@
 import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
 import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
-import { formatPoundsExact } from "@/lib/i18n"
+import { formatPounds, formatPoundsExact } from "@/lib/i18n"
 
 // The keepsake: the story of the day as a single certificate. Something a
 // guest would KEEP — a brand-drawn frame, a centred composition — not a
@@ -46,6 +46,9 @@ export type KeepsakeData = {
   topicTitle: string
   reveal: string | null
   totalRaised: number
+  /** Pledge goal in pounds; null = none was set. Only a REACHED goal
+   *  prints — an unmet goal on a finished sheet reads as a shortfall. */
+  goalAmount: number | null
   charityNames: string[]
   closedDate: string
   standings: KeepsakeStanding[]
@@ -81,6 +84,8 @@ export function KeepsakeDocument({
   orientation?: KeepsakeOrientation
 }) {
   const max = data.standings[0]?.amount ?? 0
+  const goalReached =
+    data.goalAmount != null && data.totalRaised >= data.goalAmount
   const isTribute = variant === "tribute"
   const isPortrait = orientation === "portrait"
   const topN = isTribute ? TOP_N_TRIBUTE : TOP_N_FUNDRAISER
@@ -98,57 +103,63 @@ export function KeepsakeDocument({
       data-orientation={orientation}
       className="relative h-full w-full bg-background text-foreground [-webkit-print-color-adjust:exact] [print-color-adjust:exact]"
     >
-      {/* ── The frame (founder's design, 2026-08-16): the mark upright and
-          unmirrored in each corner, and the rules drawn in the mark's own
-          line language: the same 1-unit stroke and half opacity as the poll
-          lines, the horizontals running exactly in line with them and the
-          verticals dropped on the mark's one vertical axis — the dot centre
-          and both poll lines' left end-caps share glyph x=5. All geometry is
-          the glyph's at 2px per unit (viewBox 10×9, glyph inset 4mm):
-          poll-line centres 9px and 13px below the glyph top; the x=5 axis
-          10px in from the glyph's near edge; dot bottom at 18px. */}
+      {/* ── The frame (founder's design, 2026-08-16; corners rotated as a
+          pinwheel 2026-08-31 — TR 90°, BR 180°, BL 270°): the rules drawn
+          in the mark's own line language, each side's pair continuing the
+          poll lines of the glyph whose lines now point along it (TL feeds
+          the top, TR the right, BR the bottom, BL the left).
+
+          All geometry is the glyph's at 2px per unit, in a SQUARE 20×20
+          box (viewBox 10×10, the 10×9 glyph centred — the half-unit pad
+          is what keeps the rotated corners' features at one shared set of
+          offsets). Per corner, measured from its own two edges: the long
+          poll line's centre 10px in, the short line's 14px, both end-caps
+          on the axis 10px from the adjacent edge, line tips at 19px. */}
       {(
         [
-          "top-[4mm] left-[4mm]",
-          "top-[4mm] right-[4mm]",
-          "bottom-[4mm] left-[4mm]",
-          "bottom-[4mm] right-[4mm]",
+          ["top-[4mm] left-[4mm]", 0],
+          ["top-[4mm] right-[4mm]", 90],
+          ["bottom-[4mm] right-[4mm]", 180],
+          ["bottom-[4mm] left-[4mm]", 270],
         ] as const
-      ).map((pos) => (
+      ).map(([pos, rot]) => (
         <svg
           key={pos}
           aria-hidden="true"
           width="20"
-          height="18"
-          viewBox="0 0 10 9"
+          height="20"
+          viewBox="0 0 10 10"
           className={`pointer-events-none absolute ${pos} text-primary`}
         >
-          <FavpollMarkGlyph />
+          <g transform={`translate(5 5) rotate(${rot}) translate(-5 -4.5)`}>
+            <FavpollMarkGlyph />
+          </g>
         </svg>
       ))}
-      {/* Horizontal rules — each pair continues the corner marks' poll
-          lines, starting a breath past the longer line's end, with the
-          mark's own 2-unit stagger (4px) between the two ends. The stagger
-          is frame-symmetric — outer line long, inner line short, on every
-          side (founder, 2026-08-16) — so at the bottom it runs opposite to
-          the adjacent glyph's bars. */}
+      {/* Horizontal rules — the top pair continues TL's poll lines, the
+          bottom pair BR's (rotated 180°, its lines point back along the
+          bottom), so both pairs sit at the SAME offsets: long line centre
+          10px in from the edge, short 14px. Each starts a breath (3px)
+          past its glyph's line tip, with the mark's own 2-unit stagger
+          (4px) between the two ends — outer long, inner short, every
+          side. */}
       {(
         [
           [
-            "top-[calc(4mm+8px)]",
+            "top-[calc(4mm+9px)]",
             "right-[calc(4mm+22px)] left-[calc(4mm+22px)]",
           ],
           [
-            "top-[calc(4mm+12px)]",
+            "top-[calc(4mm+13px)]",
             "right-[calc(4mm+26px)] left-[calc(4mm+26px)]",
           ],
           [
-            "bottom-[calc(4mm+8px)]",
-            "right-[calc(4mm+26px)] left-[calc(4mm+26px)]",
-          ],
-          [
-            "bottom-[calc(4mm+4px)]",
+            "bottom-[calc(4mm+9px)]",
             "right-[calc(4mm+22px)] left-[calc(4mm+22px)]",
+          ],
+          [
+            "bottom-[calc(4mm+13px)]",
+            "right-[calc(4mm+26px)] left-[calc(4mm+26px)]",
           ],
         ] as const
       ).map(([y, ends]) => (
@@ -158,27 +169,28 @@ export function KeepsakeDocument({
           className={`pointer-events-none absolute ${ends} ${y} h-[2px] rounded-full bg-primary/50`}
         />
       ))}
-      {/* Vertical rules — the outer line of each pair runs on the mark's
-          x=5 axis, straight through the dot and the poll lines' origins;
-          its partner sits one line-spacing inward and carries the same
-          stagger. */}
+      {/* Vertical rules — with the pinwheel these are poll lines too: the
+          right pair continues TR's (rotated 90°, lines pointing down), the
+          left pair BL's (270°, pointing up). Same offsets as the
+          horizontals — long 10px in, short 14px — and the same 22/26 end
+          insets against the square corner boxes. */}
       {(
         [
           [
             "left-[calc(4mm+9px)]",
-            "top-[calc(4mm+21px)] bottom-[calc(4mm+21px)]",
+            "top-[calc(4mm+22px)] bottom-[calc(4mm+22px)]",
           ],
           [
             "left-[calc(4mm+13px)]",
-            "top-[calc(4mm+25px)] bottom-[calc(4mm+25px)]",
+            "top-[calc(4mm+26px)] bottom-[calc(4mm+26px)]",
           ],
           [
             "right-[calc(4mm+9px)]",
-            "top-[calc(4mm+21px)] bottom-[calc(4mm+21px)]",
+            "top-[calc(4mm+22px)] bottom-[calc(4mm+22px)]",
           ],
           [
             "right-[calc(4mm+13px)]",
-            "top-[calc(4mm+25px)] bottom-[calc(4mm+25px)]",
+            "top-[calc(4mm+26px)] bottom-[calc(4mm+26px)]",
           ],
         ] as const
       ).map(([x, ends]) => (
@@ -292,7 +304,12 @@ export function KeepsakeDocument({
               <span className="font-medium text-reveal-foreground">
                 {formatPoundsExact(data.totalRaised)}
               </span>{" "}
-              to {charityLabel(data.charityNames)}.
+              to {charityLabel(data.charityNames)}
+              {/* The reached goal joins the one money sentence — the
+                  tribute stays a remembrance, not a scoreboard. */}
+              {goalReached
+                ? ` — reaching the ${formatPounds(data.goalAmount!)} goal.`
+                : "."}
             </p>
           </div>
         ) : (
@@ -318,6 +335,11 @@ export function KeepsakeDocument({
               <p className="mt-[1.5mm] text-sm text-muted-foreground">
                 for {charityLabel(data.charityNames)}
               </p>
+              {goalReached && (
+                <p className="mt-[1.5mm] text-xs font-medium tracking-widest text-primary uppercase">
+                  {formatPounds(data.goalAmount!)} goal reached
+                </p>
+              )}
             </section>
 
             {/* With the chart, this wrapper is the race zone (side by side in

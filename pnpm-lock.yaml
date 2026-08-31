@@ -31,7 +31,7 @@ importers:
     dependencies:
       '@clerk/nextjs':
         specifier: ^7.3.3
-        version: 7.3.3(next@16.2.10(@babel/core@7.29.0)(@playwright/test@1.61.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 7.3.3(next@16.2.10(@playwright/test@1.61.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@favpoll/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -89,7 +89,7 @@ importers:
         version: 9.39.4(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.2.10
-        version: 16.2.10(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.2.10(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
       jsdom:
         specifier: ^29.1.1
         version: 29.1.1(@noble/hashes@1.8.0)
@@ -110,7 +110,7 @@ importers:
         version: 0.104.1(zod@4.4.3)
       '@clerk/nextjs':
         specifier: ^7.3.3
-        version: 7.3.3(next@16.2.10(@babel/core@7.29.0)(@playwright/test@1.61.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 7.3.3(next@16.2.10(@playwright/test@1.61.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@clerk/ui':
         specifier: ^1.9.1
         version: 1.9.1(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@19.2.14)(bs58@6.0.0)(react-dom@19.2.6(react@19.2.6))(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.6)(utf-8-validate@6.0.6))(react@19.2.6)(typescript@5.9.3)
@@ -153,6 +153,9 @@ importers:
       framer-motion:
         specifier: ^12.39.0
         version: 12.39.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      html-to-image:
+        specifier: ^1.11.13
+        version: 1.11.13
       lucide-react:
         specifier: ^1.14.0
         version: 1.14.0(react@19.2.6)
@@ -279,7 +282,7 @@ importers:
         version: 9.39.4(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.2.10
-        version: 16.2.10(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.2.10(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
       eslint-plugin-storybook:
         specifier: ^10.4.0
         version: 10.4.0(eslint@9.39.4(jiti@2.7.0))(storybook@10.4.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@testing-library/dom@10.4.1)(@types/react@19.2.14)(bufferutil@4.1.0)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(utf-8-validate@6.0.6))(typescript@5.9.3)
@@ -4037,6 +4040,7 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -4442,6 +4446,9 @@ packages:
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
+
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   http-errors@2.0.1:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
@@ -7017,7 +7024,7 @@ snapshots:
       - react
       - react-dom
 
-  '@clerk/nextjs@7.3.3(next@16.2.10(@babel/core@7.29.0)(@playwright/test@1.61.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@clerk/nextjs@7.3.3(next@16.2.10(@playwright/test@1.61.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@clerk/backend': 3.4.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@clerk/react': 6.6.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -9674,9 +9681,9 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.6(@types/node@20.19.41)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.5(@types/node@20.19.41)(typescript@5.9.3))(vite@8.0.13(@types/node@20.19.41)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))
+      vitest: 4.1.6(@types/node@25.6.2)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.5(@types/node@25.6.2)(typescript@5.9.3))(vite@8.0.13(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))
     optionalDependencies:
-      '@vitest/browser': 4.1.6(bufferutil@4.1.0)(msw@2.14.5(@types/node@20.19.41)(typescript@5.9.3))(utf-8-validate@6.0.6)(vite@8.0.13(@types/node@20.19.41)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))(vitest@4.1.6)
+      '@vitest/browser': 4.1.6(bufferutil@4.1.0)(msw@2.14.5(@types/node@25.6.2)(typescript@5.9.3))(utf-8-validate@6.0.6)(vite@8.0.13(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))(vitest@4.1.6)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -9748,7 +9755,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.6(@types/node@20.19.41)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.5(@types/node@20.19.41)(typescript@5.9.3))(vite@8.0.13(@types/node@20.19.41)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))
+      vitest: 4.1.6(@types/node@25.6.2)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.5(@types/node@25.6.2)(typescript@5.9.3))(vite@8.0.13(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.47.1)(yaml@2.8.4))
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -11212,6 +11219,8 @@ snapshots:
       - '@noble/hashes'
 
   html-escaper@2.0.2: {}
+
+  html-to-image@1.11.13: {}
 
   http-errors@2.0.1:
     dependencies:

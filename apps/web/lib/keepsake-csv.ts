@@ -36,11 +36,20 @@ export function buildKeepsakeCsv(data: KeepsakeCsvInput): string {
   return "﻿" + rows.map((r) => r.map(cell).join(",")).join("\r\n")
 }
 
-export function keepsakeCsvFilename(name: string): string {
-  const slug =
+function keepsakeSlug(name: string): string {
+  return (
     name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "favpoll"
-  return `favpoll-${slug}-results.csv`
+  )
+}
+
+export function keepsakeCsvFilename(name: string): string {
+  return `favpoll-${keepsakeSlug(name)}-results.csv`
+}
+
+/** The image export shares the CSV's slug so a folder of both sorts together. */
+export function keepsakeImageFilename(name: string): string {
+  return `favpoll-${keepsakeSlug(name)}-keepsake.png`
 }

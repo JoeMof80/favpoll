@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   SegmentedControl,
   ToolbarLabel,
@@ -9,6 +9,8 @@ import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PrintWorkspace } from "@/components/print-workspace"
 import { ExportCsvButton } from "./export-csv-button"
+import { ExportImageButton } from "./export-image-button"
+import { keepsakeImageFilename } from "@/lib/keepsake-csv"
 import {
   KeepsakeDocument,
   type KeepsakeData,
@@ -71,6 +73,8 @@ export function KeepsakeView({
   }
 
   const isPortrait = orientation === "portrait"
+  // The image export snapshots this node — the sheet itself, not the desk.
+  const sheetRef = useRef<HTMLDivElement>(null)
 
   return (
     // CALM, deliberately. The pack is organiser admin and a workspace suits
@@ -120,6 +124,10 @@ export function KeepsakeView({
                 element was never needed, and rendering it here is both simpler
                 and silent. */}
             <ExportCsvButton data={data} />
+            <ExportImageButton
+              sheetRef={sheetRef}
+              filename={keepsakeImageFilename(data.name)}
+            />
             <Button
               type="button"
               variant="secondary"
@@ -142,6 +150,7 @@ export function KeepsakeView({
             card, which is the read this whole workspace is trying to avoid.
             The shadow is the only edge paper actually has. */}
         <div
+          ref={sheetRef}
           className={`paper overflow-hidden bg-background shadow-lg print:shadow-none ${
             isPortrait
               ? "h-[297mm] w-[210mm] print:h-[277mm] print:w-[190mm]"
