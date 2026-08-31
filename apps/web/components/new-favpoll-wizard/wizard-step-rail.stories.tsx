@@ -57,7 +57,7 @@ export const NearlyDone: Story = {
       event: "Memorial",
       charity: "Marie Curie",
       topic: "Colour",
-      info: "Margaret Whitfield",
+      info: "Mary Whitfield",
       story: "A headmistress for forty-one years…",
       details: "£250 goal · closes 14 Sept",
     },

@@ -26,7 +26,7 @@ export const DEFAULT_GHOSTS: FieldGhosts = {
 const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   memorial: {
     openingLine: "e.g. In loving memory of",
-    name: "e.g. Margaret Whitfield",
+    name: "e.g. Mary Whitfield",
     context: "e.g. 1941 – 2026",
     about:
       "e.g. A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season she always loved most.",
@@ -53,7 +53,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
 
 const NAME_GHOSTS_BY_WHO: Record<string, Record<string, string>> = {
   memorial: {
-    she: "Margaret Whitfield",
+    she: "Mary Whitfield",
     he: "Edward Whitfield",
     they: "Sam Whitfield",
   },
