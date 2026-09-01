@@ -185,14 +185,20 @@ export function FavpollListCard({
     </div>
   )
 
-  const smallHeader = (
+  // withPhoto: the flip card's front already carries the large avatar, so
+  // its header goes without one (founder, 2026-09-01); entitled cards keep
+  // the header thumb — it is their only picture.
+  const headerFor = (withPhoto: boolean) => (
     <div className="p-3">
       <FavpollHeader
         linkCue
         hideEmptyAvatar
         protagonist={{
           name: displayName,
-          photo_url: isCause ? null : (favpoll.protagonist?.photo_url ?? null),
+          photo_url:
+            withPhoto && !isCause
+              ? (favpoll.protagonist?.photo_url ?? null)
+              : null,
         }}
         eyebrow={favpollEyebrow(favpoll)}
         size={size}
@@ -241,7 +247,7 @@ export function FavpollListCard({
              and a quiet named action ("How to pledge" / "Back to the
              story"). The lock pill and CTA button auditions both lost. */
           <>
-            {smallHeader}
+            {headerFor(false)}
             <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
               <div className="min-w-0 flex-1">
                 <PollHeading
@@ -271,17 +277,19 @@ export function FavpollListCard({
                   inert={flipped || undefined}
                   className="flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]"
                 >
-                  <div className="flex items-start gap-3 px-3 pt-2 pb-1">
-                    {aboutText && (
-                      <p className="line-clamp-4 min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">
-                        {aboutText}
-                      </p>
-                    )}
+                  {/* The avatar floats and the whole about wraps around it
+                      — no truncation (founder, 2026-09-01). */}
+                  <div className="px-3 pt-2 pb-1">
                     <ProtagonistAvatar
                       name={displayName}
                       photoUrl={frontPhoto}
-                      className="ml-auto h-24 w-24 md:h-24 md:w-24"
+                      className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
                     />
+                    {aboutText && (
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {aboutText}
+                      </p>
+                    )}
                   </div>
                   {/* The step row — dots say there is a second panel, the
                       quiet button names it. */}
@@ -394,7 +402,7 @@ export function FavpollListCard({
           </>
         ) : (
           <>
-            {smallHeader}
+            {headerFor(true)}
             {pollWithItems && topicItems.length > 0 && (
               <div className="relative border-t border-border bg-background px-3 py-2">
                 {/* Header, not a button (founder, 2026-08-02) — pledged
