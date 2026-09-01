@@ -34,16 +34,20 @@ would like to apply for advice from the clinic.
 UK private limited company. We are pre-launch, with annual turnover
 under £100,000.
 
-**What favpoll does:** someone marking an occasion (e.g. a memorial
-service) sets up a page and chooses a registered charity. Guests pledge
-small amounts. We deduct nothing: 100% of a pledge goes to the charity.
-Card processing is charged separately to the donor at checkout, shown as
-its own line, and we retain none of it. Our only income is an optional
-contribution a guest may add on top of their pledge. We intend to
-collect as agent for the charity, under a written agreement, and to pass
-Gift Aid declarations to the charity to claim rather than claiming
-anything ourselves. Funds reach the charity by bank transfer within 10
-working days of the closing date.
+**What favpoll does:**
+
+- Someone marking an occasion (e.g. a memorial service) sets up a page
+  and chooses a registered charity. Guests pledge small amounts.
+- We deduct nothing: 100% of a pledge goes to the charity.
+- Card processing is charged separately to the donor at checkout, shown
+  as its own line, and we retain none of it.
+- Our only income is an optional contribution a guest may add on top of
+  their pledge.
+- We intend to collect as agent for the charity, under a written
+  agreement, and to pass Gift Aid declarations to the charity to claim
+  rather than claiming anything ourselves.
+- Funds reach the charity by bank transfer within 10 working days of
+  the closing date.
 
 **The legal question:** the Fundraising Regulator has told us (by phone,
 1 September 2026) that whether we are a "professional fundraiser" or
