@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
@@ -75,6 +76,7 @@ export function FavpollListCard({
   clerkUserId = null,
   initialResults,
 }: Props) {
+  const router = useRouter()
   const poll = favpoll.poll
   const topicItems = poll?.topic?.favourites ?? []
   const perCharity =
@@ -91,13 +93,11 @@ export function FavpollListCard({
   const [pledgeOpen, setPledgeOpen] = useState(false)
   // THE SHOP WINDOW FLIPS (founder, 2026-09-01: /favpolls is a shop window
   // — the front sells THIS favpoll, the back sells what's behind it: the
-  // mechanic while locked, the standings once entitled). Locked cards
-  // open on the story; entitled cards open on the standings — the payoff
-  // face — with "Back to the story" one tap away (founder, 2026-09-01:
-  // the story must not vanish at the moment someone pledges).
-  const [flipped, setFlipped] = useState(
-    !!initialResults || !!favpoll.closed_at
-  )
+  // mechanic while locked, the standings once entitled). A PLEDGED card
+  // opens on the standings — the payoff face — with "Back to the story"
+  // one tap away; every other card, closed ones included, opens on the
+  // story (founder, 2026-09-01: pledged → standings, otherwise story).
+  const [flipped, setFlipped] = useState(!!initialResults)
 
   const isClosed = !!favpoll.closed_at
   const entitled = hasPledged || isClosed
@@ -210,18 +210,22 @@ export function FavpollListCard({
 
   return (
     <li className={cn("list-none", className)}>
-      {/* Interaction matches FavpollSummaryCard: the whole card navigates
-          (stretched link below), with the same hover lift + shadow. The
-          interactive pieces sit above the link (relative/z) so pledging
-          and flipping still work. */}
+      {/* THE WHOLE CARD NAVIGATES (founder, 2026-09-01) — every surface
+          except the contained buttons, which keep their own actions. The
+          stretched link below covers the static regions (and carries the
+          semantics: keyboard, middle-click); the flip faces sit above it,
+          so this delegated click catches them — anything that isn't a
+          button or link goes to the favpoll page. The pledge dialog and
+          tooltips are portalled, so their clicks never bubble here.
+          No pledged border any more (founder, 2026-09-01: retired — a
+          pledged card now says so by opening on the standings). */}
       <div
         data-register={palette ?? undefined}
-        className={cn(
-          "group relative flex h-full flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1",
-          // Your pledge, visible at a glance: a thicker purple border
-          // (strip + badge tried and rejected — founder call 2026-07-23)
-          hasPledged && "border-2 border-primary/50 hover:border-primary/70"
-        )}
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest("button,a")) return
+          router.push(`/favpolls/${favpoll.id}`)
+        }}
+        className="group relative flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
       >
         {/* Stretched link — covers the card; positioned siblings paint and
             hit-test above it. */}
