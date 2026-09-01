@@ -268,7 +268,7 @@ export function FavpollListCard({
                   lives here; the pledge-again gift is in the step row. */}
               <ClosingLabel
                 closesAt={favpoll.closes_at}
-                className="absolute top-2.5 right-3 whitespace-nowrap"
+                className="absolute top-2 right-3 whitespace-nowrap"
               />
             </div>
             {/* ONE FIXED BODY HEIGHT for every card (founder, 2026-09-01:
