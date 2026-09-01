@@ -79,7 +79,7 @@ describe("FavpollListCard — un-pledged live card", () => {
     // "How to pledge" instead.
     expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: /how to pledge/i })
+      screen.getByRole("button", { name: /^pledge$/i })
     ).toBeInTheDocument()
   })
 
