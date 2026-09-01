@@ -1,12 +1,12 @@
-import { ChevronRight } from "lucide-react"
 import type { CardProtagonist, FavpollCardSize } from "./types"
 
 type FavpollHeaderProps = {
   protagonist: CardProtagonist
   eyebrow?: string
   size?: FavpollCardSize
-  /** List cards: the header is a link to the favpoll page — show the
-   * goes-somewhere chevron (works on touch, where hover cues don't). */
+  /** List cards: tint the name on card hover. The chevron this once
+   * rendered retired (founder, 2026-09-01) — the whole card navigates
+   * now, so the goes-somewhere cue had nothing left to say. */
   linkCue?: boolean
   /** Public cards: no photo → no avatar at all (founder, 2026-08-02),
    * matching the hero's no-empty-avatar rule. */
@@ -69,23 +69,11 @@ export function FavpollHeader({
               on the favpoll page one tap away. */}
           <span
             title={protagonist.name}
-            className={
-              linkCue
-                ? `${nameClass} flex min-w-0 items-center gap-0.5 transition-colors group-hover:text-primary`
-                : `${nameClass} block min-w-0 truncate`
-            }
+            className={`${nameClass} block min-w-0 truncate${
+              linkCue ? "transition-colors group-hover:text-primary" : ""
+            }`}
           >
-            {linkCue ? (
-              <span className="min-w-0 truncate">{protagonist.name}</span>
-            ) : (
-              protagonist.name
-            )}
-            {linkCue && (
-              <ChevronRight
-                aria-hidden="true"
-                className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
-              />
-            )}
+            {protagonist.name}
           </span>
           {protagonist.context && (
             <span className="text-[12px] text-muted-foreground">
