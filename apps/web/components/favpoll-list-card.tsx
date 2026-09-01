@@ -305,7 +305,10 @@ export function FavpollListCard({
                       className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
                     />
                     {aboutText && (
-                      <p className="text-sm leading-relaxed text-muted-foreground">
+                      /* Clamped as a ceiling, not a squeeze (founder,
+                         2026-09-01: a max-length about may cut — the full
+                         page is one tap away). */
+                      <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">
                         {aboutText}
                       </p>
                     )}
@@ -336,10 +339,11 @@ export function FavpollListCard({
                   )}
                 >
                   {entitled ? (
-                    /* The pledge-again gift lives up in the topic row now
-                       — it was floating over the first standing here. */
-                    <div className="relative px-3 py-2">
-                      <FavpollListCardResults results={results ?? []} />
+                    /* fill: the standings grow into whatever height the
+                       story face earned — the old 120px cap left a void
+                       under three bars (founder, 2026-09-01). */
+                    <div className="relative flex min-h-0 flex-1 flex-col px-3 py-2">
+                      <FavpollListCardResults results={results ?? []} fill />
                     </div>
                   ) : (
                     /* min-h holds room for the compact lock card — the decoy
