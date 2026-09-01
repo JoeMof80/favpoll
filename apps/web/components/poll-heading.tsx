@@ -24,9 +24,11 @@ type Props = {
 // Plain spans, no aria theatre: sequential text already reads as one
 // phrase ("Favourite" "Colour"), and an sr-only twin collided with the
 // reveal's own sr-only machinery in poll-section.
-// One size for both lines — the eyebrow is quieter by OPACITY alone
-// (founder, 2026-09-01: "one or the other", and the hero card's line is
-// the same size too).
+// One size for both lines — the eyebrow is quieter by OPACITY alone,
+// like the hero card's. SETTLED (founder, 2026-09-01) after both
+// calibrations were rendered: size-only (#627) was tried and reverted;
+// "one or the other" holds, and opacity won. Don't re-litigate without
+// a new screenshot.
 const TOPIC_TEXT: Record<string, string> = {
   lg: "text-[17px]",
   md: "text-[15px]",
