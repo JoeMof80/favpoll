@@ -43,11 +43,6 @@ type FavpollListCardFavpoll = {
   is_exemplar?: boolean
   /** Cause favpolls carry their own photo; person favpolls keep it on the protagonist. */
   photo_url?: string | null
-  /** Content-free reveal flags (the page derives them server-side) —
-   *  they shape the lock card's step 3, never its content. */
-  hasReveal?: boolean
-  revealIsQuote?: boolean
-  revealIsMessage?: boolean
   protagonist: {
     name: string
     photo_url?: string | null
@@ -388,13 +383,6 @@ export function FavpollListCard({
                                       )
                                     )
                                   : null,
-                              firstName: isCause
-                                ? null
-                                : displayName.trim().split(/\s+/)[0] || null,
-                              isCause,
-                              hasReveal: favpoll.hasReveal ?? false,
-                              revealIsQuote: favpoll.revealIsQuote,
-                              revealIsMessage: favpoll.revealIsMessage,
                             })}
                             topicTitle={pollWithItems!.topics.title}
                           />

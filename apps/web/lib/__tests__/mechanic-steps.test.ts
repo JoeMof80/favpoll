@@ -7,57 +7,29 @@ import {
 } from "../mechanic-steps"
 
 describe("buildMechanicSteps", () => {
-  it("builds the person steps with charity and first name", () => {
+  // Step 3 stopped referencing the reveal (founder, 2026-09-01): five
+  // variants tried to explain a thing with multiple purposes. One
+  // universal promise now — the labels still speak about the reveal.
+  it("builds the three steps", () => {
     expect(
       buildMechanicSteps({
         topicTitle: "Seaside town",
         charityLine: "Samaritans",
-        firstName: "Clive",
-        isCause: false,
-        hasReveal: true,
       })
     ).toEqual([
       "Pick your favourite seaside town",
       "Pledge what it's worth — all money will go to Samaritans",
-      "Clive's favourite will be revealed along with the standings",
+      "The standings will be revealed",
     ])
   })
 
-  it("speaks as 'our pick' for causes", () => {
+  it("falls back to 'charity' without a charity line", () => {
     const steps = buildMechanicSteps({
       topicTitle: "Colour",
       charityLine: null,
-      firstName: null,
-      isCause: true,
-      hasReveal: true,
     })
     expect(steps[1]).toContain("all money will go to charity")
-    expect(steps[2]).toBe("Our pick will be revealed along with the standings")
-  })
-
-  it("promises only the standings when no reveal exists", () => {
-    const steps = buildMechanicSteps({
-      topicTitle: "Colour",
-      charityLine: "Oxfam",
-      firstName: "Joan",
-      isCause: false,
-      hasReveal: false,
-    })
     expect(steps[2]).toBe("The standings will be revealed")
-  })
-
-  it("promises their own words when the reveal is a quote", () => {
-    const steps = buildMechanicSteps({
-      topicTitle: "Colour",
-      charityLine: "Oxfam",
-      firstName: "Joan",
-      isCause: false,
-      hasReveal: true,
-      revealIsQuote: true,
-    })
-    expect(steps[2]).toBe(
-      "Joan's favourite will be revealed in their own words, along with the standings"
-    )
   })
 
   it("detects quote reveals by their opening mark only", () => {
@@ -137,59 +109,6 @@ describe("isMessageReveal", () => {
     expect(isMessageReveal("A message with no list to check.", [])).toBe(false)
     expect(isMessageReveal("A message with no list to check.", null)).toBe(
       false
-    )
-  })
-})
-
-describe("buildMechanicSteps — message reveals", () => {
-  const base = {
-    topicTitle: "Hat",
-    charityLine: "British Heart Foundation",
-    isCause: false,
-    hasReveal: true,
-  }
-
-  it("promises a message rather than a favourite", () => {
-    const steps = buildMechanicSteps({
-      ...base,
-      firstName: "Marcus",
-      revealIsMessage: true,
-    })
-    expect(steps[2]).toBe(
-      "Marcus's message will be revealed along with the standings"
-    )
-  })
-
-  it("falls back to an unnamed message with no protagonist", () => {
-    const steps = buildMechanicSteps({
-      ...base,
-      firstName: null,
-      revealIsMessage: true,
-    })
-    expect(steps[2]).toBe("A message will be revealed along with the standings")
-  })
-
-  it("beats both isCause and revealIsQuote", () => {
-    const steps = buildMechanicSteps({
-      ...base,
-      firstName: "Marcus",
-      isCause: true,
-      revealIsQuote: true,
-      revealIsMessage: true,
-    })
-    expect(steps[2]).toBe(
-      "Marcus's message will be revealed along with the standings"
-    )
-  })
-
-  it("leaves favourite reveals exactly as they were", () => {
-    const steps = buildMechanicSteps({
-      ...base,
-      firstName: "Belinda",
-      revealIsMessage: false,
-    })
-    expect(steps[2]).toBe(
-      "Belinda's favourite will be revealed along with the standings"
     )
   })
 })

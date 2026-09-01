@@ -98,11 +98,6 @@ export function PollSection({
   const lockSteps = buildMechanicSteps({
     topicTitle: poll.topics.title,
     charityLine,
-    firstName: displayFirstName,
-    isCause,
-    hasReveal,
-    revealIsQuote,
-    revealIsMessage,
   })
 
   const unlockAriaLabel = !hasReveal
