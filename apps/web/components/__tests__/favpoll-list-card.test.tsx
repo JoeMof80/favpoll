@@ -74,7 +74,9 @@ describe("FavpollListCard — un-pledged live card", () => {
 
   it("shows lock hint copy", () => {
     render(<FavpollListCard favpoll={BASE} />)
-    expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
+    // Twice since the flip card (2026-09-01): the story face's CTA and the
+    // mechanic face's lock-card bar.
+    expect(screen.getAllByText("Pledge your favourite")).toHaveLength(2)
   })
 
   it("all decoy amounts are '—'", () => {
@@ -151,13 +153,14 @@ describe("FavpollListCard — value row", () => {
     expect(container.querySelector('[class*="border-primary"]')).toBeNull()
   })
 
-  // The value/urgency row was removed 2026-07-22 (founder call): the raised
-  // figure duplicated the charity footer on single-charity cards, and the
-  // shelf's date-group headers carry urgency. Pin its absence.
-  it("does not render a raised/countdown row", () => {
+  // The raised figure stays off the card (2026-07-22 founder call: it
+  // duplicated the charity footer on single-charity cards). The countdown
+  // half of that pin was superseded 2026-09-01: the flip card's story face
+  // carries a ClosingLabel, the summary card's own vitals idiom.
+  it("no raised figure; the story face carries the closing label", () => {
     render(<FavpollListCard favpoll={{ ...BASE, total_raised: 90 }} />)
     expect(screen.queryByText("£90 raised")).not.toBeInTheDocument()
-    expect(screen.queryByText(/\d+ days/)).not.toBeInTheDocument()
+    expect(screen.getByText(/\d+ days/)).toBeInTheDocument()
   })
 })
 
