@@ -54,7 +54,8 @@ const FAVPOLL_SELECT = `
   occasion_type,
   total_raised,
   is_exemplar,
-  protagonist:protagonists ( name, photo_url ),
+  photo_url,
+  protagonist:protagonists ( name, photo_url, about ),
   charities:favpoll_charities (
     charity:charities ( id, name, logo_url, registered_number )
   ),
@@ -100,7 +101,12 @@ type RawFavpoll = {
   occasion_type: string | null
   total_raised: number
   is_exemplar: boolean
-  protagonist: { name: string; photo_url: string | null } | null
+  photo_url: string | null
+  protagonist: {
+    name: string
+    photo_url: string | null
+    about: string | null
+  } | null
   charities: { charity: import("@favpoll/types").Charity }[]
   favpoll_polls: RawPoll | null
 }
