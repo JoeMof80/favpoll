@@ -8,13 +8,17 @@ Fundraising Regulator said needs legal advice (Oliver's voicemail,
 1 Sep — see `fundraising-regulator-form-PASTE.txt` and the registration
 enquiry draft).
 
-**Channel:** their enquiry form at qmul.ac.uk/qlegal when live, else
-**qlegal@qmul.ac.uk**. As of 1 Sep the site still says "closed — reopens
-July/August 2026", which is now past: the form is likely live or
-imminent; the email works either way. Note their scope excludes
-disputes (fine — this is pure regulatory) and their cancellation rules
-are strict: 72 hours to reschedule, case closed after a missed
-appointment, two reschedules, or arriving 10+ minutes late.
+**Channel (updated 2 Sep):** the site STILL says "closed — reopens
+July/August 2026" even though that window has passed (founder
+screenshot, 2 Sep), so the page is stale and the enquiry form can't be
+relied on. Send the application by email to **qlegal@qmul.ac.uk** now —
+it either lands in the reopened intake or gets the matter queued with a
+reply about timing (the closing line below asks). Their LinkedIn
+(linkedin.com/company/qlegal) is the stated update channel for the
+form. Note their scope excludes disputes (fine — this is pure
+regulatory) and their cancellation rules are strict: 72 hours to
+reschedule, case closed after a missed appointment, two reschedules, or
+arriving 10+ minutes late.
 
 ---
 
@@ -67,6 +71,10 @@ There is no dispute involved — this is regulatory analysis for a
 pre-launch product. I can share our draft charity agreement, the exact
 checkout copy, and a link to a working demonstration. I am happy to
 attend in person or online, whichever suits the clinic.
+
+Your website still shows the clinic as closed to new enquiries, with
+reopening due in July/August — if the intake is not yet open, I would be
+grateful to be queued for when it is, or to hear when I should apply.
 
 Best wishes,
 
