@@ -256,20 +256,19 @@ export function FavpollListCard({
             {/* items-start: the closing label sits level with the
                 FAVOURITE eyebrow line, not centred against the two-line
                 header (founder, 2026-09-01). */}
-            <div className="flex items-start justify-between gap-2 border-t border-border px-3 py-2">
-              <div className="min-w-0 flex-1">
-                <PollHeading
-                  topicTitle={pollWithItems!.topics.title}
-                  size="md"
-                  inert
-                />
-              </div>
-              {/* The countdown always lives here; the pledge-again gift
-                  moved into the step row's second panel (founder,
-                  2026-09-01, third placement). */}
+            <div className="relative border-t border-border px-3 py-2">
+              <PollHeading
+                topicTitle={pollWithItems!.topics.title}
+                size="md"
+                inert
+              />
+              {/* Overlaid on the EYEBROW line only (founder, 2026-09-01:
+                  the topic line owns the FULL card width — no shrinking
+                  while there is space to its right). The countdown always
+                  lives here; the pledge-again gift is in the step row. */}
               <ClosingLabel
                 closesAt={favpoll.closes_at}
-                className="mt-0.5 shrink-0 whitespace-nowrap"
+                className="absolute top-2.5 right-3 whitespace-nowrap"
               />
             </div>
             {/* ONE FIXED BODY HEIGHT for every card (founder, 2026-09-01:
