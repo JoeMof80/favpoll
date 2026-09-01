@@ -71,7 +71,6 @@ export function NewFavpollWizard({ data, edit }: Props) {
       <RegisterScope palette={palette}>
         <SeedFundModal
           favpollId={w.seedFavpollId}
-          isListed={w.visibility === "listed"}
           onComplete={w.completeSeed}
         />
       </RegisterScope>
