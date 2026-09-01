@@ -9,7 +9,7 @@ import { paletteForFavpoll } from "@/lib/register-palette"
 import Link from "next/link"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
 import { FavpollHeader } from "./favpoll-card/favpoll-header"
-import { SectionLabel } from "./favpoll-card/section-label"
+import { PollHeading } from "@/components/poll-heading"
 
 export type FavpollSummaryCardFavpoll = {
   id: string
@@ -87,7 +87,10 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
       {topicTitle && (
         <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
           <div className="min-w-0 flex-1">
-            <SectionLabel title={topicTitle} size="md" />
+            {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
+                default mode, SectionLabel's old muted tone in the shared
+                two-line grammar. */}
+            <PollHeading topicTitle={topicTitle} size="md" />
           </div>
           <ClosingLabel
             closesAt={favpoll.closes_at}
