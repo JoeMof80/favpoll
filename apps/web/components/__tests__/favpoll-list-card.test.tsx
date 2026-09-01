@@ -74,9 +74,13 @@ describe("FavpollListCard — un-pledged live card", () => {
 
   it("shows lock hint copy", () => {
     render(<FavpollListCard favpoll={BASE} />)
-    // Twice since the flip card (2026-09-01): the story face's CTA and the
-    // mechanic face's lock-card bar.
-    expect(screen.getAllByText("Pledge your favourite")).toHaveLength(2)
+    // Once since flip v3 (2026-09-01): only the mechanic face's lock-card
+    // bar says it — the story face signals the journey with step dots and
+    // "How to pledge" instead.
+    expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: /how to pledge/i })
+    ).toBeInTheDocument()
   })
 
   it("all decoy amounts are '—'", () => {
@@ -93,10 +97,9 @@ describe("FavpollListCard — un-pledged live card", () => {
     const labels = Array.from(decoy.querySelectorAll(".truncate")).map(
       (el) => el.textContent
     )
-    // ITEMS: Purple, Blue, Red → alphabetical: Blue, Purple, Red — the
-    // story face's slim strip shows the first two (2026-09-01); the back
-    // face's full decoy carries the rest.
-    expect(labels).toEqual(["Blue", "Purple"])
+    // ITEMS: Purple, Blue, Red → alphabetical: Blue, Purple, Red (the
+    // mechanic face's decoy — the story face carries no strip since v3).
+    expect(labels).toEqual(["Blue", "Purple", "Red"])
   })
 
   it("no real currency string in decoy", () => {
