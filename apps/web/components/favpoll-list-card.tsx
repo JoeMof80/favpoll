@@ -7,7 +7,8 @@ import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
-import { Gift, Lock, Undo2 } from "lucide-react"
+import { Gift, Undo2 } from "lucide-react"
+import { RevealLockPill } from "@/components/reveal-lock"
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { PollHeading } from "@/components/poll-heading"
 import { ClosingLabel } from "@/components/closing-label"
@@ -234,88 +235,91 @@ export function FavpollListCard({
         )}
 
         {canFlip ? (
-          /* Two faces, one footprint: grid-stacked so the cell holds the
-             taller face and the grid row never jumps; a real Y-flip under
-             motion-safe, an instant swap under reduced motion. The hidden
-             face is inert — unreachable to keyboard and reader alike. */
-          <div className="flex-1 [perspective:1200px]">
-            <div
-              className={cn(
-                "grid h-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
-                flipped && "[transform:rotateY(180deg)]"
-              )}
-            >
-              {/* ── Front: the story ── */}
+          /* The established card shape holds (founder, 2026-09-01 v2):
+             header, topic row and charity footer are STATIC — only the
+             body between them flips. Front: the story (about left, the
+             hero's avatar-right grammar) over a slim locked strip whose
+             small pill is the flip affordance — the card's own pre-#621
+             idiom, no shouting button. Back: the teaching card. */
+          <>
+            {smallHeader}
+            <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <PollHeading
+                  topicTitle={pollWithItems!.topics.title}
+                  size="md"
+                  inert
+                />
+              </div>
+              <ClosingLabel
+                closesAt={favpoll.closes_at}
+                className="shrink-0 whitespace-nowrap"
+              />
+            </div>
+            {/* Two bodies, one footprint: grid-stacked so the cell holds
+               the taller body and the grid row never jumps; a real Y-flip
+               under motion-safe, an instant swap under reduced motion.
+               The hidden body is inert. */}
+            <div className="flex-1 [perspective:1200px]">
               <div
-                inert={flipped || undefined}
-                className="flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]"
+                className={cn(
+                  "grid h-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
+                  flipped && "[transform:rotateY(180deg)]"
+                )}
               >
-                <div className="p-3">
-                  <FavpollHeader
-                    linkCue
-                    hideEmptyAvatar
-                    protagonist={{ name: displayName, photo_url: null }}
-                    eyebrow={favpollEyebrow(favpoll)}
-                    size={size}
-                  />
-                </div>
-                <div className="flex items-start gap-3 px-3 pb-3">
-                  <ProtagonistAvatar
-                    name={displayName}
-                    photoUrl={frontPhoto}
-                    className="h-24 w-24 md:h-24 md:w-24"
-                  />
-                  {aboutText && (
-                    <p className="line-clamp-4 min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">
-                      {aboutText}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
-                  <div className="min-w-0 flex-1">
-                    <PollHeading
-                      topicTitle={pollWithItems!.topics.title}
-                      size="md"
-                      inert
+                {/* ── Front body: the story + the locked strip ── */}
+                <div
+                  inert={flipped || undefined}
+                  className="flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]"
+                >
+                  <div className="flex items-start gap-3 px-3 pt-2">
+                    {aboutText && (
+                      <p className="line-clamp-4 min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">
+                        {aboutText}
+                      </p>
+                    )}
+                    <ProtagonistAvatar
+                      name={displayName}
+                      photoUrl={frontPhoto}
+                      className="ml-auto h-24 w-24 md:h-24 md:w-24"
                     />
                   </div>
-                  <ClosingLabel
-                    closesAt={favpoll.closes_at}
-                    className="shrink-0 whitespace-nowrap"
-                  />
+                  {/* The slim locked strip — two shallow decoy rows and the
+                      small pill, the card's long-standing "something is
+                      locked here" picture. Tapping it turns the card. */}
+                  <div className="relative mt-1 px-3 pb-2">
+                    <div
+                      className="pointer-events-none h-16 overflow-hidden blur-xs select-none"
+                      aria-hidden="true"
+                      data-testid="list-card-decoy"
+                    >
+                      <FavpollListCardResults
+                        results={decoyResults.slice(0, 2)}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setFlipped(true)}
+                      aria-label="Pledge your favourite"
+                      className="absolute inset-0 z-10 h-auto w-full rounded-none hover:bg-transparent"
+                    >
+                      <RevealLockPill size="sm" label="Pledge your favourite" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="relative z-10 px-3 pb-3">
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={() => setFlipped(true)}
-                  >
-                    <Lock data-icon="inline-start" aria-hidden="true" />
-                    Pledge your favourite
-                  </Button>
-                </div>
-                {charityFooter}
-              </div>
 
-              {/* ── Back: the mechanic (the pre-flip card, unchanged) ── */}
-              <div
-                inert={!flipped || undefined}
-                className="relative flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden] [grid-area:1/1]"
-              >
-                {smallHeader}
-                <div className="relative border-t border-border bg-background px-3 py-2">
-                  <PollHeading
-                    topicTitle={pollWithItems!.topics.title}
-                    size="md"
-                    inert
-                  />
+                {/* ── Back body: the mechanic ── */}
+                <div
+                  inert={!flipped || undefined}
+                  className="relative flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden] [grid-area:1/1]"
+                >
                   {/* min-h holds room for the compact lock card — the decoy
                       alone caps at 120px and the card wants ~170. */}
-                  <div className="relative mt-1 min-h-44">
+                  <div className="relative min-h-44 px-3 py-2">
                     <div
                       className="pointer-events-none blur-xs select-none"
                       aria-hidden="true"
-                      data-testid="list-card-decoy"
                     >
                       <FavpollListCardResults results={decoyResults} />
                     </div>
@@ -354,23 +358,23 @@ export function FavpollListCard({
                       </span>
                     </Button>
                   </div>
+                  {/* The way home — inside the flipping body, riding the
+                      teaching card's CTA bar, so it wears the bar's ink. */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Back to the story"
+                    onClick={() => setFlipped(false)}
+                    className="absolute top-3 right-4 z-20 text-primary-foreground/70 hover:bg-transparent hover:text-primary-foreground"
+                  >
+                    <Undo2 aria-hidden="true" />
+                  </Button>
                 </div>
-                {charityFooter}
-                {/* The way home — quiet, clear of the Example badge slot
-                    (exemplars are closed and never flip). */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Back to the story"
-                  onClick={() => setFlipped(false)}
-                  className="absolute top-2 right-2 z-20 text-muted-foreground hover:text-foreground"
-                >
-                  <Undo2 aria-hidden="true" />
-                </Button>
               </div>
             </div>
-          </div>
+            {charityFooter}
+          </>
         ) : (
           <>
             {smallHeader}

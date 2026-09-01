@@ -93,8 +93,10 @@ describe("FavpollListCard — un-pledged live card", () => {
     const labels = Array.from(decoy.querySelectorAll(".truncate")).map(
       (el) => el.textContent
     )
-    // ITEMS: Purple, Blue, Red → alphabetical: Blue, Purple, Red
-    expect(labels).toEqual(["Blue", "Purple", "Red"])
+    // ITEMS: Purple, Blue, Red → alphabetical: Blue, Purple, Red — the
+    // story face's slim strip shows the first two (2026-09-01); the back
+    // face's full decoy carries the rest.
+    expect(labels).toEqual(["Blue", "Purple"])
   })
 
   it("no real currency string in decoy", () => {
