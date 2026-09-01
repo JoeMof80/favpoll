@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }))
+
 vi.mock("next/link", () => ({
   default: ({
     children,
@@ -141,7 +143,9 @@ describe("FavpollListCard — closed card", () => {
 // ─── Value + urgency row ──────────────────────────────────────────────────────
 
 describe("FavpollListCard — value row", () => {
-  it("marks a pledged card with the primary border", () => {
+  // The pledged border retired (founder, 2026-09-01) — a pledged card
+  // says so by opening on the standings face instead.
+  it("no primary border, even when pledged", () => {
     const { container } = render(
       <FavpollListCard
         favpoll={BASE}
@@ -150,12 +154,34 @@ describe("FavpollListCard — value row", () => {
         ]}
       />
     )
-    expect(container.querySelector('[class*="border-primary"]')).not.toBeNull()
+    expect(container.querySelector('[class*="border-primary"]')).toBeNull()
   })
 
-  it("plain border without a pledge", () => {
-    const { container } = render(<FavpollListCard favpoll={BASE} />)
-    expect(container.querySelector('[class*="border-primary"]')).toBeNull()
+  it("a pledged card opens on the standings face", () => {
+    const { container } = render(
+      <FavpollListCard
+        favpoll={BASE}
+        initialResults={[
+          { label: "Blue", amountPence: 2000, widthPercent: 100 },
+        ]}
+      />
+    )
+    // The story face is the hidden one — inert, faded out.
+    expect(
+      screen.getByRole("button", { name: /story/i }).closest("[inert]")
+    ).toBeNull()
+    expect(container.querySelector("[inert]")).not.toBeNull()
+  })
+
+  it("an unpledged card opens on the story face", () => {
+    render(<FavpollListCard favpoll={BASE} />)
+    // The way forward is visible; the back face (with the way back) is inert.
+    expect(
+      screen.getByRole("button", { name: /^pledge$/i }).closest("[inert]")
+    ).toBeNull()
+    expect(
+      screen.getByRole("button", { name: /story/i }).closest("[inert]")
+    ).not.toBeNull()
   })
 
   // The raised figure stays off the card (2026-07-22 founder call: it
