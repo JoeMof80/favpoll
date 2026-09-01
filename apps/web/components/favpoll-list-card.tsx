@@ -272,14 +272,16 @@ export function FavpollListCard({
                 className="mt-0.5 shrink-0 whitespace-nowrap"
               />
             </div>
-            {/* Two bodies, one footprint: grid-stacked so the cell holds
-               the taller body and the grid row never jumps; a real Y-flip
-               under motion-safe, an instant swap under reduced motion.
-               The hidden body is inert. */}
-            <div className="flex-1 [perspective:1200px]">
+            {/* ONE FIXED BODY HEIGHT for every card (founder, 2026-09-01:
+               "the favpoll height varies" — content-driven heights read
+               ragged, worst in the phone's single column). The faces are
+               ABSOLUTE inside it, so no face's content can size the card:
+               the story clamps, the standings scroll, the teaching card
+               fits. h-72 holds the tallest face with room. */}
+            <div className="h-72 [perspective:1200px]">
               <div
                 className={cn(
-                  "grid h-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
+                  "relative h-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
                   flipped && "[transform:rotateY(180deg)]"
                 )}
               >
@@ -292,7 +294,7 @@ export function FavpollListCard({
                 <div
                   inert={flipped || undefined}
                   className={cn(
-                    "flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]",
+                    "absolute inset-0 flex min-w-0 flex-col [backface-visibility:hidden]",
                     flipped && "pointer-events-none"
                   )}
                 >
@@ -334,7 +336,7 @@ export function FavpollListCard({
                 <div
                   inert={!flipped || undefined}
                   className={cn(
-                    "relative flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden] [grid-area:1/1]",
+                    "absolute inset-0 flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden]",
                     !flipped && "pointer-events-none"
                   )}
                 >

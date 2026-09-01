@@ -21,13 +21,10 @@ export function FavpollListCardResults({ results, fill = false }: Props) {
     <div
       className={
         fill
-          ? // max-h-72 is load-bearing, not styling: the flip faces are
-            // grid-stacked and a grid item's auto min-height is its
-            // CONTENT, so without a cap a 40-favourite poll sized the
-            // whole card to the full list (found on Favourite County,
-            // 2026-09-01). flex-1 still grows into a tall story's room;
-            // the cap bounds what the standings can demand for themselves.
-            "max-h-72 min-h-0 flex-1 overflow-y-auto pt-2.5"
+          ? // The flip body is a FIXED height with absolute faces
+            // (2026-09-01), so the list can simply fill it and scroll —
+            // content cannot size the card any more.
+            "min-h-0 flex-1 overflow-y-auto pt-2.5"
           : "max-h-30 overflow-y-auto pt-2.5"
       }
     >
