@@ -83,21 +83,19 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         />
       </div>
 
-      {/* Topic + countdown. items-start: the closing label sits level
-          with the FAVOURITE eyebrow line, not centred against the
-          two-line header (founder, 2026-09-01) — matching the list
-          cards. */}
+      {/* Topic + countdown. The label overlays the EYEBROW line only
+          (founder, 2026-09-01): the topic line owns the full card width
+          and never shrinks while there is space to its right — matching
+          the list cards. */}
       {topicTitle && (
-        <div className="flex items-start justify-between gap-2 border-t border-border px-3 py-2">
-          <div className="min-w-0 flex-1">
-            {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
-                default mode, SectionLabel's old muted tone in the shared
-                two-line grammar. */}
-            <PollHeading topicTitle={topicTitle} size="md" />
-          </div>
+        <div className="relative border-t border-border px-3 py-2">
+          {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
+              default mode, SectionLabel's old muted tone in the shared
+              two-line grammar. */}
+          <PollHeading topicTitle={topicTitle} size="md" />
           <ClosingLabel
             closesAt={favpoll.closes_at}
-            className="mt-0.5 shrink-0 whitespace-nowrap"
+            className="absolute top-2.5 right-3 whitespace-nowrap"
           />
         </div>
       )}
