@@ -177,8 +177,11 @@ describe("DemoCard — topic pill", () => {
   it("renders 'Favourite {topic}' in every phase", () => {
     for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
       const { unmount } = renderCard(phase)
+      // Two lines since the eyebrow split (2026-09-01): the quiet
+      // "Favourite" above the topic word at full size.
+      expect(screen.getByText("Favourite", { exact: true })).toBeInTheDocument()
       expect(
-        screen.getByText(`Favourite ${scene.poll.topic.title}`)
+        screen.getByText(scene.poll.topic.title, { exact: true })
       ).toBeInTheDocument()
       unmount()
     }
@@ -187,7 +190,7 @@ describe("DemoCard — topic pill", () => {
   it("renders the topic as a header ribbon, not a button (2026-08-02)", () => {
     for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
       const { unmount } = renderCard(phase)
-      const label = screen.getByText(`Favourite ${scene.poll.topic.title}`)
+      const label = screen.getByText(scene.poll.topic.title, { exact: true })
       expect(label.closest("button")).toBeNull()
       unmount()
     }
