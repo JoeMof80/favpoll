@@ -95,11 +95,14 @@ export function FavpollListCard({
   // can open it (uncontrolled mode ties opening to the banner alone).
   const [pledgeOpen, setPledgeOpen] = useState(false)
   // THE SHOP WINDOW FLIPS (founder, 2026-09-01: /favpolls is a shop window
-  // — the front sells THIS favpoll, the back sells the mechanic). Locked
-  // cards open on a story face — big avatar, the favpoll's own words — and
-  // the CTA turns the card over to the teaching face. Pledged and closed
-  // cards never flip: with nothing locked there is no lock theatre.
-  const [flipped, setFlipped] = useState(false)
+  // — the front sells THIS favpoll, the back sells what's behind it: the
+  // mechanic while locked, the standings once entitled). Locked cards
+  // open on the story; entitled cards open on the standings — the payoff
+  // face — with "Back to the story" one tap away (founder, 2026-09-01:
+  // the story must not vanish at the moment someone pledges).
+  const [flipped, setFlipped] = useState(
+    !!initialResults || !!favpoll.closed_at
+  )
 
   const isClosed = !!favpoll.closed_at
   const entitled = hasPledged || isClosed
@@ -115,6 +118,8 @@ export function FavpollListCard({
 
   async function handlePledgeSuccess(guestToken?: string) {
     setHasPledged(true)
+    // The back body swaps from mechanic to standings — stay on it.
+    setFlipped(true)
     if (!poll) return
     try {
       // The results API is entitlement-gated (same gate as the reveal):
@@ -206,7 +211,7 @@ export function FavpollListCard({
     </div>
   )
 
-  const canFlip = !!pollWithItems && topicItems.length > 0 && !entitled
+  const canFlip = !!pollWithItems && topicItems.length > 0
 
   return (
     <li className={cn("list-none", className)}>
@@ -248,7 +253,10 @@ export function FavpollListCard({
              story"). The lock pill and CTA button auditions both lost. */
           <>
             {headerFor(false)}
-            <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
+            {/* items-start: the closing label sits level with the
+                FAVOURITE eyebrow line, not centred against the two-line
+                header (founder, 2026-09-01). */}
+            <div className="flex items-start justify-between gap-2 border-t border-border px-3 py-2">
               <div className="min-w-0 flex-1">
                 <PollHeading
                   topicTitle={pollWithItems!.topics.title}
@@ -258,7 +266,7 @@ export function FavpollListCard({
               </div>
               <ClosingLabel
                 closesAt={favpoll.closes_at}
-                className="shrink-0 whitespace-nowrap"
+                className="mt-0.5 shrink-0 whitespace-nowrap"
               />
             </div>
             {/* Two bodies, one footprint: grid-stacked so the cell holds
@@ -273,9 +281,17 @@ export function FavpollListCard({
                 )}
               >
                 {/* ── Front body: step 1, the story ── */}
+                {/* pointer-events-none on the hidden body, not just inert:
+                    inert DISCARDS clicks rather than passing them through,
+                    and the rotated body's transform traps its z-10 inside
+                    its own stacking context — so the hidden face's step
+                    row was swallowing taps meant for the visible one. */}
                 <div
                   inert={flipped || undefined}
-                  className="flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]"
+                  className={cn(
+                    "flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]",
+                    flipped && "pointer-events-none"
+                  )}
                 >
                   {/* The avatar floats and the whole about wraps around it
                       — no truncation (founder, 2026-09-01). */}
@@ -312,62 +328,89 @@ export function FavpollListCard({
                       onClick={() => setFlipped(true)}
                       className="text-muted-foreground hover:text-foreground"
                     >
-                      How to pledge
+                      {entitled ? "See the standings" : "How to pledge"}
                       <ChevronRight data-icon="inline-end" aria-hidden="true" />
                     </Button>
                   </div>
                 </div>
 
-                {/* ── Back body: the mechanic ── */}
+                {/* ── Back body: the mechanic while locked, the standings
+                    once entitled ── */}
                 <div
                   inert={!flipped || undefined}
-                  className="relative flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden] [grid-area:1/1]"
+                  className={cn(
+                    "relative flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden] [grid-area:1/1]",
+                    !flipped && "pointer-events-none"
+                  )}
                 >
-                  {/* min-h holds room for the compact lock card — the decoy
-                      alone caps at 120px and the card wants ~170. */}
-                  <div className="relative min-h-44 px-3 py-2">
-                    <div
-                      className="pointer-events-none blur-xs select-none"
-                      aria-hidden="true"
-                      data-testid="list-card-decoy"
-                    >
-                      <FavpollListCardResults results={decoyResults} />
+                  {entitled ? (
+                    <div className="relative px-3 py-2">
+                      <FavpollListCardResults results={results ?? []} />
+                      {hasPledged && !isClosed && (
+                        <TooltipProvider>
+                          <Tooltip content="Pledge again" side="left">
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              aria-label="Pledge again"
+                              onClick={() => setPledgeOpen(true)}
+                              className="absolute top-2 right-3 z-10 transition-none"
+                            >
+                              <Gift aria-hidden="true" />
+                            </Button>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                     </div>
-                    {/* Full-area unlock, the poll section's idiom — the
+                  ) : (
+                    /* min-h holds room for the compact lock card — the decoy
+                       alone caps at 120px and the card wants ~170. */
+                    <div className="relative min-h-44 px-3 py-2">
+                      <div
+                        className="pointer-events-none blur-xs select-none"
+                        aria-hidden="true"
+                        data-testid="list-card-decoy"
+                      >
+                        <FavpollListCardResults results={decoyResults} />
+                      </div>
+                      {/* Full-area unlock, the poll section's idiom — the
                         page's own teaching card (lock-card-content,
                         compact), so the shelf and the favpoll page speak
                         the same instructions. */}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setPledgeOpen(true)}
-                      aria-label="Pledge your favourite"
-                      className="absolute inset-0 z-10 h-auto w-full items-start justify-center rounded-none p-0 pt-1.5 whitespace-normal hover:bg-transparent"
-                    >
-                      <span className="pointer-events-none flex w-full max-w-72 flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-lg ring-1 ring-border">
-                        <LockCardContent
-                          compact
-                          steps={buildMechanicSteps({
-                            topicTitle: pollWithItems!.topics.title,
-                            charityLine:
-                              favpoll.charities.length > 0
-                                ? joinCharities(
-                                    favpoll.charities.map((c) => c.charity.name)
-                                  )
-                                : null,
-                            firstName: isCause
-                              ? null
-                              : displayName.trim().split(/\s+/)[0] || null,
-                            isCause,
-                            hasReveal: favpoll.hasReveal ?? false,
-                            revealIsQuote: favpoll.revealIsQuote,
-                            revealIsMessage: favpoll.revealIsMessage,
-                          })}
-                          topicTitle={pollWithItems!.topics.title}
-                        />
-                      </span>
-                    </Button>
-                  </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setPledgeOpen(true)}
+                        aria-label="Pledge your favourite"
+                        className="absolute inset-0 z-10 h-auto w-full items-start justify-center rounded-none p-0 pt-1.5 whitespace-normal hover:bg-transparent"
+                      >
+                        <span className="pointer-events-none flex w-full max-w-72 flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-lg ring-1 ring-border">
+                          <LockCardContent
+                            compact
+                            steps={buildMechanicSteps({
+                              topicTitle: pollWithItems!.topics.title,
+                              charityLine:
+                                favpoll.charities.length > 0
+                                  ? joinCharities(
+                                      favpoll.charities.map(
+                                        (c) => c.charity.name
+                                      )
+                                    )
+                                  : null,
+                              firstName: isCause
+                                ? null
+                                : displayName.trim().split(/\s+/)[0] || null,
+                              isCause,
+                              hasReveal: favpoll.hasReveal ?? false,
+                              revealIsQuote: favpoll.revealIsQuote,
+                              revealIsMessage: favpoll.revealIsMessage,
+                            })}
+                            topicTitle={pollWithItems!.topics.title}
+                          />
+                        </span>
+                      </Button>
+                    </div>
+                  )}
                   {/* The mirrored step row — the way home. */}
                   <div className="relative z-10 mt-auto flex items-center justify-between px-3 pb-1.5">
                     <span className="flex items-center gap-1.5">
@@ -401,37 +444,9 @@ export function FavpollListCard({
             {charityFooter}
           </>
         ) : (
+          /* No poll body at all — header and charities only. */
           <>
             {headerFor(true)}
-            {pollWithItems && topicItems.length > 0 && (
-              <div className="relative border-t border-border bg-background px-3 py-2">
-                {/* Header, not a button (founder, 2026-08-02) — pledged
-                    cards get the quiet gift icon to pledge again. */}
-                <div className="relative">
-                  <PollHeading
-                    topicTitle={pollWithItems.topics.title}
-                    size="md"
-                    inert
-                  />
-                  {hasPledged && !isClosed && (
-                    <TooltipProvider>
-                      <Tooltip content="Pledge again" side="left">
-                        <Button
-                          type="button"
-                          size="icon-sm"
-                          aria-label="Pledge again"
-                          onClick={() => setPledgeOpen(true)}
-                          className="absolute top-1/2 right-0 z-10 -translate-y-1/2 transition-none active:not-aria-[haspopup]:-translate-y-1/2"
-                        >
-                          <Gift aria-hidden="true" />
-                        </Button>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </div>
-                <FavpollListCardResults results={results ?? []} />
-              </div>
-            )}
             {charityFooter}
           </>
         )}

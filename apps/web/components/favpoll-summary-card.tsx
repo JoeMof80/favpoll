@@ -83,9 +83,12 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         />
       </div>
 
-      {/* Topic + countdown */}
+      {/* Topic + countdown. items-start: the closing label sits level
+          with the FAVOURITE eyebrow line, not centred against the
+          two-line header (founder, 2026-09-01) — matching the list
+          cards. */}
       {topicTitle && (
-        <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
+        <div className="flex items-start justify-between gap-2 border-t border-border px-3 py-2">
           <div className="min-w-0 flex-1">
             {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
                 default mode, SectionLabel's old muted tone in the shared
@@ -94,7 +97,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
           </div>
           <ClosingLabel
             closesAt={favpoll.closes_at}
-            className="shrink-0 whitespace-nowrap"
+            className="mt-0.5 shrink-0 whitespace-nowrap"
           />
         </div>
       )}
