@@ -27,6 +27,8 @@ type Props = {
   /** false defaults the contribution to None (memorials) */
   suggestTip?: boolean
   isListed?: boolean
+  /** The favpoll's register palette — themes the portalled overlay. */
+  dataRegister?: string | null
   /** Controlled mode — if provided, the internal trigger button is suppressed */
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -44,6 +46,7 @@ export function PledgeDialog({
   onAddItem,
   suggestTip,
   isListed,
+  dataRegister,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: Props) {
@@ -228,6 +231,7 @@ export function PledgeDialog({
         open={open}
         onOpenChange={handleOpenChange}
         title={titleByStep[dialog.step]}
+        dataRegister={dataRegister}
         hideCloseButton
         header={
           dialog.step === 1
