@@ -24,27 +24,25 @@ type Props = {
 // Plain spans, no aria theatre: sequential text already reads as one
 // phrase ("Favourite" "Colour"), and an sr-only twin collided with the
 // reveal's own sr-only machinery in poll-section.
-// The eyebrow is quieter by SIZE alone — smaller, full-strength ink
-// (founder, 2026-09-01: one lever, not both; size won over opacity).
+// One size for both lines — the eyebrow is quieter by OPACITY alone
+// (founder, 2026-09-01: "one or the other", and the hero card's line is
+// the same size too).
 const TOPIC_TEXT: Record<string, string> = {
   lg: "text-[17px]",
   md: "text-[15px]",
   sm: "text-[11px]",
 }
-const EYEBROW_TEXT: Record<string, string> = {
-  lg: "text-[10px]",
-  md: "text-[10px]",
-  sm: "text-[8px]",
-}
 
 function HeadingLines({
   topicTitle,
   size,
+  eyebrowClass,
   topicClass,
   align = "start",
 }: {
   topicTitle: string
   size: FavpollCardSize
+  eyebrowClass: string
   topicClass: string
   align?: "start" | "center"
 }) {
@@ -58,9 +56,9 @@ function HeadingLines({
       >
         <span
           className={cn(
-            EYEBROW_TEXT[size],
-            topicClass,
-            "leading-tight tracking-[0.18em]"
+            TOPIC_TEXT[size],
+            eyebrowClass,
+            "leading-tight tracking-[0.09em]"
           )}
         >
           Favourite
@@ -95,6 +93,7 @@ export function PollHeading({
         <HeadingLines
           topicTitle={topicTitle}
           size={size}
+          eyebrowClass="text-primary-foreground/70"
           topicClass="text-primary-foreground"
           align="center"
         />
@@ -112,6 +111,7 @@ export function PollHeading({
         <HeadingLines
           topicTitle={topicTitle}
           size={size}
+          eyebrowClass="text-primary/55"
           topicClass="text-primary"
         />
       </div>
@@ -124,6 +124,7 @@ export function PollHeading({
       <HeadingLines
         topicTitle={topicTitle}
         size={size}
+        eyebrowClass="text-primary-muted/60"
         topicClass="text-primary-muted"
       />
     </div>
