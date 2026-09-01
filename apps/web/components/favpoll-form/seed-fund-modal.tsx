@@ -4,14 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cardFeeFor, chargeWithCardFee } from "@/lib/card-fee"
 import { formatPoundsExact } from "@/lib/i18n"
-import { Switch } from "@/components/ui/switch"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
-import {
-  topUpFund,
-  topUpFundAsGuest,
-  setFavpollListed,
-} from "@/app/favpolls/[id]/actions"
+import { topUpFund, topUpFundAsGuest } from "@/app/favpolls/[id]/actions"
 
 const PRESETS = [10, 25, 50]
 
@@ -22,7 +17,11 @@ type Props = {
   onCancel?: () => void
   /** "organiser" (default): post-publish seeding flow. "guest": add-to-fund from favpoll page. */
   variant?: "organiser" | "guest"
-  /** When true, shows an informational notice that this is a public favpoll. */
+  /** Guest variant only: when true, shows an informational notice that
+   * this is a public favpoll. The organiser variant carried a Listed
+   * SWITCH here until 2026-09-01 — retired: the wizard's Settings step
+   * owns visibility now (the three-way control), and this modal opens
+   * one step after it was just set. */
   isListed?: boolean
 }
 
@@ -40,18 +39,8 @@ export function SeedFundModal({
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [listingState, setListingState] = useState(isListed ?? true)
 
   const isGuest = variant === "guest"
-
-  async function handleToggleListed(value: boolean) {
-    setListingState(value)
-    try {
-      await setFavpollListed(favpollId, value)
-    } catch {
-      setListingState(!value)
-    }
-  }
 
   const numeric = parseFloat(amount)
   const isValid = !isNaN(numeric) && numeric > 0
@@ -239,23 +228,7 @@ export function SeedFundModal({
 
       {description}
 
-      {!isGuest && (
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-medium">
-              {listingState ? "Listed" : "Unlisted"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {listingState
-                ? "Appears on the public favpolls page."
-                : "Only reachable by people you give the link to."}
-            </p>
-          </div>
-          <Switch checked={listingState} onCheckedChange={handleToggleListed} />
-        </div>
-      )}
-
-      {isGuest && listingState && (
+      {isGuest && isListed && (
         <p className="mt-3 text-[11px] text-muted-foreground">
           This favpoll is publicly listed. Your contribution is always private.
         </p>
