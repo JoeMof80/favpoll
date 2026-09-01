@@ -95,7 +95,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
           <PollHeading topicTitle={topicTitle} size="md" />
           <ClosingLabel
             closesAt={favpoll.closes_at}
-            className="absolute top-2.5 right-3 whitespace-nowrap"
+            className="absolute top-2 right-3 whitespace-nowrap"
           />
         </div>
       )}
