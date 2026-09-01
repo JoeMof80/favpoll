@@ -7,8 +7,7 @@ import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
-import { Gift, Undo2 } from "lucide-react"
-import { RevealLockPill } from "@/components/reveal-lock"
+import { ChevronLeft, ChevronRight, Gift } from "lucide-react"
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { PollHeading } from "@/components/poll-heading"
 import { ClosingLabel } from "@/components/closing-label"
@@ -235,12 +234,12 @@ export function FavpollListCard({
         )}
 
         {canFlip ? (
-          /* The established card shape holds (founder, 2026-09-01 v2):
+          /* The established card shape holds (founder, 2026-09-01, v3):
              header, topic row and charity footer are STATIC — only the
-             body between them flips. Front: the story (about left, the
-             hero's avatar-right grammar) over a slim locked strip whose
-             small pill is the flip affordance — the card's own pre-#621
-             idiom, no shouting button. Back: the teaching card. */
+             body between them flips. The flip is presented as a two-step
+             JOURNEY, not a lock: each body ends in a step row — two dots
+             and a quiet named action ("How to pledge" / "Back to the
+             story"). The lock pill and CTA button auditions both lost. */
           <>
             {smallHeader}
             <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
@@ -267,12 +266,12 @@ export function FavpollListCard({
                   flipped && "[transform:rotateY(180deg)]"
                 )}
               >
-                {/* ── Front body: the story + the locked strip ── */}
+                {/* ── Front body: step 1, the story ── */}
                 <div
                   inert={flipped || undefined}
                   className="flex min-w-0 flex-col [backface-visibility:hidden] [grid-area:1/1]"
                 >
-                  <div className="flex items-start gap-3 px-3 pt-2">
+                  <div className="flex items-start gap-3 px-3 pt-2 pb-1">
                     {aboutText && (
                       <p className="line-clamp-4 min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">
                         {aboutText}
@@ -284,27 +283,29 @@ export function FavpollListCard({
                       className="ml-auto h-24 w-24 md:h-24 md:w-24"
                     />
                   </div>
-                  {/* The slim locked strip — two shallow decoy rows and the
-                      small pill, the card's long-standing "something is
-                      locked here" picture. Tapping it turns the card. */}
-                  <div className="relative mt-1 px-3 pb-2">
-                    <div
-                      className="pointer-events-none h-16 overflow-hidden blur-xs select-none"
-                      aria-hidden="true"
-                      data-testid="list-card-decoy"
-                    >
-                      <FavpollListCardResults
-                        results={decoyResults.slice(0, 2)}
+                  {/* The step row — dots say there is a second panel, the
+                      quiet button names it. */}
+                  <div className="relative z-10 mt-auto flex items-center justify-between px-3 pb-1.5">
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        aria-hidden="true"
+                        className="h-1.5 w-1.5 rounded-full bg-primary"
                       />
-                    </div>
+                      <span
+                        aria-hidden="true"
+                        className="h-1.5 w-1.5 rounded-full bg-border-strong"
+                      />
+                      <span className="sr-only">Step 1 of 2</span>
+                    </span>
                     <Button
                       type="button"
                       variant="ghost"
+                      size="sm"
                       onClick={() => setFlipped(true)}
-                      aria-label="Pledge your favourite"
-                      className="absolute inset-0 z-10 h-auto w-full rounded-none hover:bg-transparent"
+                      className="text-muted-foreground hover:text-foreground"
                     >
-                      <RevealLockPill size="sm" label="Pledge your favourite" />
+                      How to pledge
+                      <ChevronRight data-icon="inline-end" aria-hidden="true" />
                     </Button>
                   </div>
                 </div>
@@ -320,6 +321,7 @@ export function FavpollListCard({
                     <div
                       className="pointer-events-none blur-xs select-none"
                       aria-hidden="true"
+                      data-testid="list-card-decoy"
                     >
                       <FavpollListCardResults results={decoyResults} />
                     </div>
@@ -358,18 +360,33 @@ export function FavpollListCard({
                       </span>
                     </Button>
                   </div>
-                  {/* The way home — inside the flipping body, riding the
-                      teaching card's CTA bar, so it wears the bar's ink. */}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Back to the story"
-                    onClick={() => setFlipped(false)}
-                    className="absolute top-3 right-4 z-20 text-primary-foreground/70 hover:bg-transparent hover:text-primary-foreground"
-                  >
-                    <Undo2 aria-hidden="true" />
-                  </Button>
+                  {/* The mirrored step row — the way home. */}
+                  <div className="relative z-10 mt-auto flex items-center justify-between px-3 pb-1.5">
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        aria-hidden="true"
+                        className="h-1.5 w-1.5 rounded-full bg-border-strong"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="h-1.5 w-1.5 rounded-full bg-primary"
+                      />
+                      <span className="sr-only">Step 2 of 2</span>
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFlipped(false)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <ChevronLeft
+                        data-icon="inline-start"
+                        aria-hidden="true"
+                      />
+                      Back to the story
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
