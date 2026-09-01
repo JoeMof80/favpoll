@@ -18,9 +18,6 @@ export type PackData = {
   isCause: boolean
   /** First poll's topic title; null when no poll exists yet. */
   topicTitle: string | null
-  hasReveal: boolean
-  revealIsQuote?: boolean
-  revealIsMessage?: boolean
   charityNames: string[]
   /**
    * What the QR encodes — the SHORT form (/p/<code>), not the shareable
@@ -45,17 +42,9 @@ export function charityLabel(names: string[]): string {
 export function buildPackSteps(data: PackData): string[] | null {
   if (!data.topicTitle) return null
   const charities = charityLabel(data.charityNames)
-  const firstName = data.isCause
-    ? null
-    : protagonistShortName(data.name) || null
   return buildMechanicSteps({
     topicTitle: data.topicTitle,
     charityLine: charities === "charity" ? null : charities,
-    firstName,
-    isCause: data.isCause,
-    hasReveal: data.hasReveal,
-    revealIsQuote: data.revealIsQuote,
-    revealIsMessage: data.revealIsMessage,
   })
 }
 

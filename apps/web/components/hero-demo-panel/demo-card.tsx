@@ -7,11 +7,7 @@ import { HeaderBar } from "@/components/header-bar"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
 import { GoalProgress } from "@/components/goal-progress"
-import {
-  buildMechanicSteps,
-  isQuoteReveal,
-  isMessageReveal,
-} from "@/lib/mechanic-steps"
+import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { paletteForSceneKind } from "@/lib/register-palette"
@@ -163,14 +159,6 @@ export function DemoCard({
   const lockSteps = buildMechanicSteps({
     topicTitle,
     charityLine: charityName,
-    firstName,
-    isCause: !protagonist,
-    hasReveal: Boolean(scene.poll.personal_reveal),
-    revealIsQuote: isQuoteReveal(scene.poll.personal_reveal),
-    revealIsMessage: isMessageReveal(
-      scene.poll.personal_reveal,
-      scene.poll.topic.favourites.map((f) => f.label)
-    ),
   })
 
   const headline = protagonist

@@ -406,9 +406,7 @@ describe("PollSection — lock explainer", () => {
       )
     ).toBeInTheDocument()
     expect(
-      screen.getByText(
-        "Yusuf's favourite will be revealed along with the standings"
-      )
+      screen.getByText("The standings will be revealed")
     ).toBeInTheDocument()
     expect(
       screen.getByText(
@@ -427,35 +425,5 @@ describe("PollSection — lock explainer", () => {
       />
     )
     expect(screen.getByText(/all money will go to charity/)).toBeInTheDocument()
-  })
-
-  it("promises no reveal when the favpoll has none", () => {
-    render(
-      <PollSection
-        {...BASE_PROPS}
-        protagonistName="Yusuf"
-        isCause={false}
-        hasReveal={false}
-        onOpenPledgeDialog={vi.fn()}
-      />
-    )
-    expect(
-      screen.getByText("The standings will be revealed")
-    ).toBeInTheDocument()
-    expect(screen.queryByText(/favourite will be revealed/)).toBeNull()
-  })
-
-  it("speaks as 'our pick' for causes", () => {
-    render(
-      <PollSection
-        {...BASE_PROPS}
-        protagonistName="Winter Appeal"
-        isCause
-        onOpenPledgeDialog={vi.fn()}
-      />
-    )
-    expect(
-      screen.getByText(/Our pick will be revealed along with the standings/)
-    ).toBeInTheDocument()
   })
 })

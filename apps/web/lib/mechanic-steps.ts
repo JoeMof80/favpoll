@@ -1,38 +1,31 @@
 // The mechanic, as three numbered steps — ONE source for every surface
-// that teaches it (the guest page's lock card and the print pack's table
-// cards/poster, founder, 2026-08-01: guests should read the same
-// instructions on the table card as on the page the QR opens).
+// that teaches it (the guest page's lock card, the /favpolls flip cards
+// and the print pack's table cards/poster, founder, 2026-08-01: guests
+// should read the same instructions on the table card as on the page
+// the QR opens).
 //
 // Copy is the founder's card text (2026-08-02); the no-fee fact lives on
 // the poster and page microcopy rather than in step 2.
+//
+// STEP 3 NO LONGER REFERENCES THE REVEAL (founder, 2026-09-01): the
+// reveal can be a favourite, a quote, a message or absent, and the step
+// had grown five variants trying to explain it. "The standings will be
+// revealed" is true of every favpoll; whatever else was held back
+// arrives as the surprise it was written to be. The unlock LABELS
+// (reveal-lock.tsx, poll-section's aria copy) still speak about the
+// reveal — that is their job, and isQuoteReveal/isMessageReveal below
+// still serve them.
 
 export type MechanicStepsInput = {
   topicTitle: string
   /** "Marie Curie", "A & B", … — null falls back to "charity". */
   charityLine: string | null
-  /** Protagonist first name; null for causes or missing names. */
-  firstName: string | null
-  isCause: boolean
-  hasReveal: boolean
-  /**
-   * The reveal opens with a quotation mark (see isQuoteReveal) — step 3
-   * promises "their own words". A boolean, never the text: pre-pledge
-   * surfaces must not receive reveal content.
-   */
-  revealIsQuote?: boolean
-  /**
-   * The reveal is a message rather than a named favourite (see
-   * isMessageReveal). Takes precedence over both isCause and revealIsQuote:
-   * "our pick" would be wrong about a message, and "in their own words" is
-   * redundant of one.
-   */
-  revealIsMessage?: boolean
 }
 
 /** Inferred, never asked (founder, 2026-08-03): a reveal that opens with
  *  a quotation mark is a quote — no organiser-facing taxonomy UI. */
 export function isQuoteReveal(reveal: string | null | undefined): boolean {
-  return /^\s*["\u2018\u2019\u201C\u201D']/.test(reveal ?? "")
+  return /^\s*["‘’“”']/.test(reveal ?? "")
 }
 
 /**
@@ -92,34 +85,12 @@ export function isMessageReveal(
 export function buildMechanicSteps({
   topicTitle,
   charityLine,
-  firstName,
-  isCause,
-  hasReveal,
-  revealIsQuote = false,
-  revealIsMessage = false,
 }: MechanicStepsInput): string[] {
   const topic = topicTitle.toLowerCase()
-  // "in their own words" only when the reveal actually is a quote —
-  // dialled-up intrigue for the one kind that earns it.
-  const revealStep = !hasReveal
-    ? "The standings will be revealed"
-    : revealIsMessage
-      ? firstName
-        ? `${firstName}'s message will be revealed along with the standings`
-        : "A message will be revealed along with the standings"
-      : isCause
-        ? "Our pick will be revealed along with the standings"
-        : firstName
-          ? revealIsQuote
-            ? `${firstName}'s favourite will be revealed in their own words, along with the standings`
-            : `${firstName}'s favourite will be revealed along with the standings`
-          : revealIsQuote
-            ? "The favourite will be revealed in their own words, along with the standings"
-            : "The favourite will be revealed along with the standings"
   return [
     `Pick your favourite ${topic}`,
     `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
-    revealStep,
+    "The standings will be revealed",
   ]
 }
 

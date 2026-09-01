@@ -5,7 +5,6 @@ import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { withLiveTotals } from "@/lib/live-totals"
-import { isMessageReveal, isQuoteReveal } from "@/lib/mechanic-steps"
 import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
@@ -62,7 +61,6 @@ const FAVPOLL_SELECT = `
   favpoll_polls (
     id,
     topic_id,
-    personal_reveal,
     topics (
       title,
       is_finite,
@@ -79,8 +77,6 @@ type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
   topic_id: string | null
-  /** Server-side only — reduced to content-free flags before the client. */
-  personal_reveal: string | null
   topics: {
     title: string
     is_finite: boolean
@@ -253,11 +249,7 @@ export default async function FavpollsPage({
     }
   }
 
-  // Normalise once for the client list (and the exemplar shelf).
-  // personal_reveal NEVER crosses to the client from here — it reduces to
-  // the same content-free flags the favpoll page ships un-entitled viewers
-  // (hasReveal + how the lock card may speak about it), and favpoll_polls
-  // is stripped from the spread.
+  // Normalise once for the client list (and the exemplar shelf)
   const cardFavpolls = displayFavpolls.map((fp) => {
     const rawPoll = fp.favpoll_polls ?? null
     let poll: {
@@ -288,16 +280,8 @@ export default async function FavpollsPage({
           : null,
       }
     }
-    const reveal = rawPoll?.personal_reveal ?? null
-    const labels = (poll?.topic?.favourites ?? []).map((f) => f.label)
     const { favpoll_polls: _stripped, ...rest } = fp
-    return {
-      ...rest,
-      poll,
-      hasReveal: !!reveal?.trim(),
-      revealIsQuote: isQuoteReveal(reveal),
-      revealIsMessage: isMessageReveal(reveal, labels),
-    }
+    return { ...rest, poll }
   })
 
   // Register rail — the record's category rail, for occasions. Link-driven

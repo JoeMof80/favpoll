@@ -1,6 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
-import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -55,8 +54,6 @@ export default async function PackPage({ params }: Props) {
     name,
     isCause,
     topicTitle: firstPoll?.topics?.title ?? null,
-    hasReveal: Boolean(firstPoll?.personal_reveal),
-    revealIsQuote: isQuoteReveal(firstPoll?.personal_reveal),
     // The two favourites joins above exist only for this: step 3 has to know
     // whether the reveal names one of the options or is a message.
     //
@@ -65,14 +62,6 @@ export default async function PackPage({ params }: Props) {
     // custom topic's items and anything a guest added live. Checking only the
     // canonical list would read a reveal naming an ADDED favourite as a
     // message, and print the wrong promise on the pack.
-    revealIsMessage: isMessageReveal(firstPoll?.personal_reveal, [
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...((firstPoll?.topics?.favourites ?? []) as any[]).map((f) => f.label),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...((firstPoll?.favpoll_poll_favourites ?? []) as any[]).map(
-        (epf) => epf?.favourites?.label
-      ),
-    ]),
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
