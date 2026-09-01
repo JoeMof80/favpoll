@@ -264,10 +264,29 @@ export function FavpollListCard({
                   inert
                 />
               </div>
-              <ClosingLabel
-                closesAt={favpoll.closes_at}
-                className="mt-0.5 shrink-0 whitespace-nowrap"
-              />
+              {/* Once pledged (and still open), the countdown's slot hands
+                  over to the pledge-again gift (founder, 2026-09-01) — the
+                  urgency line is for people who haven't acted yet. */}
+              {hasPledged && !isClosed ? (
+                <TooltipProvider>
+                  <Tooltip content="Pledge again" side="left">
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      aria-label="Pledge again"
+                      onClick={() => setPledgeOpen(true)}
+                      className="relative z-10 -my-0.5 shrink-0 transition-none"
+                    >
+                      <Gift aria-hidden="true" />
+                    </Button>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <ClosingLabel
+                  closesAt={favpoll.closes_at}
+                  className="mt-0.5 shrink-0 whitespace-nowrap"
+                />
+              )}
             </div>
             {/* Two bodies, one footprint: grid-stacked so the cell holds
                the taller body and the grid row never jumps; a real Y-flip
@@ -344,23 +363,10 @@ export function FavpollListCard({
                   )}
                 >
                   {entitled ? (
+                    /* The pledge-again gift lives up in the topic row now
+                       — it was floating over the first standing here. */
                     <div className="relative px-3 py-2">
                       <FavpollListCardResults results={results ?? []} />
-                      {hasPledged && !isClosed && (
-                        <TooltipProvider>
-                          <Tooltip content="Pledge again" side="left">
-                            <Button
-                              type="button"
-                              size="icon-sm"
-                              aria-label="Pledge again"
-                              onClick={() => setPledgeOpen(true)}
-                              className="absolute top-2 right-3 z-10 transition-none"
-                            >
-                              <Gift aria-hidden="true" />
-                            </Button>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
                     </div>
                   ) : (
                     /* min-h holds room for the compact lock card — the decoy
