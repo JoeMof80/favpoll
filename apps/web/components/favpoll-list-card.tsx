@@ -443,6 +443,7 @@ export function FavpollListCard({
         {pollWithItems && (
           <PledgeDialog
             favpollId={favpoll.id}
+            dataRegister={palette}
             clerkUserId={clerkUserId}
             charityNames={favpoll.charities.map((c) => c.charity.name)}
             pollWithItems={pollWithItems}

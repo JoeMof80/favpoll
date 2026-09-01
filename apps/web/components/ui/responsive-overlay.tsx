@@ -32,6 +32,11 @@ type Props = {
   dialogClassName?: string
   /** Extra styles on the DialogContent root (e.g. to raise the max-height). Desktop only. */
   dialogStyle?: React.CSSProperties
+  /** Register palette for the overlay content. Overlays PORTAL to the body,
+   * so they escape any data-register scope on the trigger's card — a themed
+   * consumer passes its palette and the content root wears the attribute
+   * itself (founder, 2026-09-01: the pledge dialog matches its favpoll). */
+  dataRegister?: string | null
   /** Hides the × close button on both Sheet and Dialog. Use a skip/dismiss link in the footer instead. */
   hideCloseButton?: boolean
   /** Override classes on the header section (e.g. "p-0" when the header slot owns its own padding). */
@@ -119,6 +124,7 @@ export function ResponsiveOverlay({
   dialogContentClassName,
   dialogClassName,
   dialogStyle,
+  dataRegister,
   hideCloseButton = false,
   headerClassName,
   bodyClassName,
@@ -133,6 +139,7 @@ export function ResponsiveOverlay({
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
+          data-register={dataRegister ?? undefined}
           side="bottom"
           showCloseButton={false}
           onOpenAutoFocus={(e) => e.preventDefault()}
@@ -227,6 +234,7 @@ export function ResponsiveOverlay({
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
+          data-register={dataRegister ?? undefined}
           side="bottom"
           className="flex flex-col gap-0 p-0"
           style={{
@@ -278,6 +286,7 @@ export function ResponsiveOverlay({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        data-register={dataRegister ?? undefined}
         className={
           dialogClassName ??
           "flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
