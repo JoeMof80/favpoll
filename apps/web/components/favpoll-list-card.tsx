@@ -292,11 +292,19 @@ export function FavpollListCard({
                     and the rotated body's transform traps its z-10 inside
                     its own stacking context — so the hidden face's step
                     row was swallowing taps meant for the visible one. */}
+                {/* WebKit does not reliably honour backface-visibility on
+                    these faces (iOS Safari showed the hidden face's link
+                    mirrored through the visible one — founder screenshot,
+                    2026-09-01; Playwright's WebKit blended both faces
+                    outright). So the hidden face ALSO fades out, timed to
+                    the rotation's midpoint — edge-on, where nothing is
+                    readable — and backface-hidden stays as enhancement
+                    for engines that do it right. */}
                 <div
                   inert={flipped || undefined}
                   className={cn(
-                    "absolute inset-0 flex min-w-0 flex-col [backface-visibility:hidden]",
-                    flipped && "pointer-events-none"
+                    "absolute inset-0 flex min-w-0 flex-col transition-opacity delay-200 duration-100 [backface-visibility:hidden] motion-reduce:transition-none",
+                    flipped ? "pointer-events-none opacity-0" : "opacity-100"
                   )}
                 >
                   {/* The avatar floats, the about wraps around it, and the
@@ -335,8 +343,8 @@ export function FavpollListCard({
                 <div
                   inert={!flipped || undefined}
                   className={cn(
-                    "absolute inset-0 flex min-w-0 [transform:rotateY(180deg)] flex-col [backface-visibility:hidden]",
-                    !flipped && "pointer-events-none"
+                    "absolute inset-0 flex min-w-0 [transform:rotateY(180deg)] flex-col transition-opacity delay-200 duration-100 [backface-visibility:hidden] motion-reduce:transition-none",
+                    !flipped ? "pointer-events-none opacity-0" : "opacity-100"
                   )}
                 >
                   {entitled ? (
