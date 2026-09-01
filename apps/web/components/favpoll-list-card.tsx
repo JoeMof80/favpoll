@@ -222,6 +222,13 @@ export function FavpollListCard({
       <div
         data-register={palette ?? undefined}
         onClick={(e) => {
+          // The pledge dialog PORTALS to the body, but React bubbles its
+          // clicks through the React tree — straight back here. A click
+          // on the dialog or its scrim is not a click on the card
+          // (founder, 2026-09-01: dismissing the dialog by clicking
+          // outside navigated to the favpoll), so only clicks landing
+          // inside the card's own DOM subtree count.
+          if (!e.currentTarget.contains(e.target as Node)) return
           if ((e.target as HTMLElement).closest("button,a")) return
           router.push(`/favpolls/${favpoll.id}`)
         }}
