@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { SegmentedControl } from "@/components/ui/segmented-control"
 import {
   InputGroup,
   InputGroupAddon,
@@ -103,27 +103,19 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
           Visibility
         </span>
         <div className="space-y-1.5">
-          {/* spacing={0} — the segments fuse into one button-group bar
-              (shared borders, rounded ends). The on-state speaks through
-              tint and ink, not border: collapsed borders can't wear a
-              per-segment border colour cleanly. */}
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            spacing={0}
+          {/* SegmentedControl — the /favpolls toolbar's own status control
+              (founder, 2026-09-01: "use this UI"), replacing the fused
+              toggle-group bar. */}
+          <SegmentedControl
+            label="Who can see this favpoll"
             value={w.visibility}
-            onValueChange={(v) => v && w.setVisibility(v as WizardVisibility)}
-          >
-            {VISIBILITY_OPTIONS.map((o) => (
-              <ToggleGroupItem
-                key={o.value}
-                value={o.value}
-                className="h-11 bg-background !px-5 font-normal data-[state=on]:bg-primary/10 data-[state=on]:font-medium data-[state=on]:text-primary md:text-base"
-              >
-                {o.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            onChange={(v) => w.setVisibility(v as WizardVisibility)}
+            options={VISIBILITY_OPTIONS.map(({ value, label }) => ({
+              value,
+              label,
+            }))}
+            className="w-fit"
+          />
           <p className="text-muted-foreground">
             {VISIBILITY_OPTIONS.find((o) => o.value === w.visibility)?.hint}
           </p>
