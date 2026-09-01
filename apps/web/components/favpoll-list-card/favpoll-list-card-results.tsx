@@ -22,9 +22,10 @@ export function FavpollListCardResults({ results, fill = false }: Props) {
       className={
         fill
           ? // The flip body is a FIXED height with absolute faces
-            // (2026-09-01), so the list can simply fill it and scroll —
-            // content cannot size the card any more.
-            "min-h-0 flex-1 overflow-y-auto pt-2.5"
+            // (2026-09-01), so the list simply fills it and scrolls. No
+            // pt: the wrapper's own padding aligns the first standing
+            // with the other faces' content top (founder, 2026-09-01).
+            "min-h-0 flex-1 overflow-y-auto"
           : "max-h-30 overflow-y-auto pt-2.5"
       }
     >

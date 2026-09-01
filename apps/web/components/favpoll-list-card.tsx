@@ -275,10 +275,11 @@ export function FavpollListCard({
             {/* ONE FIXED BODY HEIGHT for every card (founder, 2026-09-01:
                "the favpoll height varies" — content-driven heights read
                ragged, worst in the phone's single column). The faces are
-               ABSOLUTE inside it, so no face's content can size the card:
-               the story clamps, the standings scroll, the teaching card
-               fits. h-72 holds the tallest face with room. */}
-            <div className="h-72 [perspective:1200px]">
+               ABSOLUTE inside it, so no face's content can size the card.
+               h-52 = the tallest teaching card (147px measured) plus its
+               padding, the step row and a breath — the founder's optimum;
+               the story and the standings both scroll within it. */}
+            <div className="h-52 [perspective:1200px]">
               <div
                 className={cn(
                   "relative h-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
@@ -298,21 +299,17 @@ export function FavpollListCard({
                     flipped && "pointer-events-none"
                   )}
                 >
-                  {/* The avatar floats and the whole about wraps around it
-                      — no truncation (founder, 2026-09-01). */}
-                  <div className="px-3 pt-2 pb-1">
+                  {/* The avatar floats, the about wraps around it, and the
+                      whole block SCROLLS instead of truncating (founder,
+                      2026-09-01) — the step row stays pinned beneath. */}
+                  <div className="min-h-0 flex-1 overflow-y-auto px-3 pt-2 pb-1">
                     <ProtagonistAvatar
                       name={displayName}
                       photoUrl={frontPhoto}
                       className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
                     />
                     {aboutText && (
-                      /* Ten lines fills the fixed h-72 body down to the
-                         step row (founder, 2026-09-01: clamping short of
-                         the space was pointless) — the ellipsis appears
-                         only when even the full body can't hold it; the
-                         favpoll page carries the rest. */
-                      <p className="line-clamp-10 text-sm leading-relaxed text-muted-foreground">
+                      <p className="text-sm leading-relaxed text-muted-foreground">
                         {aboutText}
                       </p>
                     )}
@@ -350,9 +347,9 @@ export function FavpollListCard({
                       <FavpollListCardResults results={results ?? []} fill />
                     </div>
                   ) : (
-                    /* min-h holds room for the compact lock card — the decoy
-                       alone caps at 120px and the card wants ~170. */
-                    <div className="relative min-h-44 px-3 py-2">
+                    /* flex-1 fills the fixed body above the step row —
+                       the old min-h went with the content-sized card. */
+                    <div className="relative min-h-0 flex-1 px-3 py-2">
                       <div
                         className="pointer-events-none blur-xs select-none"
                         aria-hidden="true"
