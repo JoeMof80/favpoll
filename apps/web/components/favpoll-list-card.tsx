@@ -307,10 +307,12 @@ export function FavpollListCard({
                       className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
                     />
                     {aboutText && (
-                      /* Clamped as a ceiling, not a squeeze (founder,
-                         2026-09-01: a max-length about may cut — the full
-                         page is one tap away). */
-                      <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">
+                      /* Ten lines fills the fixed h-72 body down to the
+                         step row (founder, 2026-09-01: clamping short of
+                         the space was pointless) — the ellipsis appears
+                         only when even the full body can't hold it; the
+                         favpoll page carries the rest. */
+                      <p className="line-clamp-10 text-sm leading-relaxed text-muted-foreground">
                         {aboutText}
                       </p>
                     )}
