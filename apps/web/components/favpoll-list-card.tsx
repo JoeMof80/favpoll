@@ -264,29 +264,13 @@ export function FavpollListCard({
                   inert
                 />
               </div>
-              {/* Once pledged (and still open), the countdown's slot hands
-                  over to the pledge-again gift (founder, 2026-09-01) — the
-                  urgency line is for people who haven't acted yet. */}
-              {hasPledged && !isClosed ? (
-                <TooltipProvider>
-                  <Tooltip content="Pledge again" side="left">
-                    <Button
-                      type="button"
-                      size="icon-sm"
-                      aria-label="Pledge again"
-                      onClick={() => setPledgeOpen(true)}
-                      className="relative z-10 -my-0.5 shrink-0 transition-none"
-                    >
-                      <Gift aria-hidden="true" />
-                    </Button>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
-                <ClosingLabel
-                  closesAt={favpoll.closes_at}
-                  className="mt-0.5 shrink-0 whitespace-nowrap"
-                />
-              )}
+              {/* The countdown always lives here; the pledge-again gift
+                  moved into the step row's second panel (founder,
+                  2026-09-01, third placement). */}
+              <ClosingLabel
+                closesAt={favpoll.closes_at}
+                className="mt-0.5 shrink-0 whitespace-nowrap"
+              />
             </div>
             {/* Two bodies, one footprint: grid-stacked so the cell holds
                the taller body and the grid row never jumps; a real Y-flip
@@ -326,20 +310,9 @@ export function FavpollListCard({
                       </p>
                     )}
                   </div>
-                  {/* The step row — dots say there is a second panel, the
-                      quiet button names it. */}
-                  <div className="relative z-10 mt-auto flex items-center justify-between px-3 pb-1.5">
-                    <span className="flex items-center gap-1.5">
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-primary"
-                      />
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-border-strong"
-                      />
-                      <span className="sr-only">Step 1 of 2</span>
-                    </span>
+                  {/* The step row shows only the way FORWARD (founder,
+                      2026-09-01: no inert labels — links or nothing). */}
+                  <div className="relative z-10 mt-auto flex items-center justify-end px-3 pb-1.5">
                     <Button
                       type="button"
                       variant="ghost"
@@ -347,7 +320,7 @@ export function FavpollListCard({
                       onClick={() => setFlipped(true)}
                       className="text-muted-foreground hover:text-foreground"
                     >
-                      {entitled ? "See the standings" : "How to pledge"}
+                      {entitled ? "Standings" : "Pledge"}
                       <ChevronRight data-icon="inline-end" aria-hidden="true" />
                     </Button>
                   </div>
@@ -417,19 +390,10 @@ export function FavpollListCard({
                       </Button>
                     </div>
                   )}
-                  {/* The mirrored step row — the way home. */}
+                  {/* The mirrored row: the way back, and a pledged card's
+                      gift on this step only (founder, 2026-09-01 — links
+                      or nothing, no inert labels). */}
                   <div className="relative z-10 mt-auto flex items-center justify-between px-3 pb-1.5">
-                    <span className="flex items-center gap-1.5">
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-border-strong"
-                      />
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-primary"
-                      />
-                      <span className="sr-only">Step 2 of 2</span>
-                    </span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -441,8 +405,23 @@ export function FavpollListCard({
                         data-icon="inline-start"
                         aria-hidden="true"
                       />
-                      Back to the story
+                      Story
                     </Button>
+                    {hasPledged && !isClosed && (
+                      <TooltipProvider>
+                        <Tooltip content="Pledge again" side="left">
+                          <Button
+                            type="button"
+                            size="icon-sm"
+                            aria-label="Pledge again"
+                            onClick={() => setPledgeOpen(true)}
+                            className="transition-none"
+                          >
+                            <Gift aria-hidden="true" />
+                          </Button>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 </div>
               </div>
