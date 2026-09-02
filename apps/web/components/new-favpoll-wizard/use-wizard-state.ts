@@ -263,7 +263,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
             : ""
         }`
       : "",
-    info: name.trim(),
+    info: [name.trim(), context.trim()].filter(Boolean).join(" · "),
     story: about.trim(),
     // Visibility always shows — the register-derived default (memorials
     // open link-only) is a fact worth surfacing before it is touched.
@@ -276,6 +276,14 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     ]
       .filter(Boolean)
       .join(" · "),
+  }
+
+  // The heavier steps (founder, 2026-09-02): Header and Story reserve a
+  // second rail line for their remaining answers — the opening line and
+  // the reveal.
+  const railExtra: Partial<Record<WizardStep, string>> = {
+    info: openingLine.trim(),
+    story: reveal.trim() ? `Reveal · ${reveal.trim()}` : "",
   }
 
   const railDone: Record<WizardStep, boolean> = {
@@ -581,6 +589,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     isEdit,
     stepLocked,
     railSummary,
+    railExtra,
     railDone,
     generating,
     generateExample,

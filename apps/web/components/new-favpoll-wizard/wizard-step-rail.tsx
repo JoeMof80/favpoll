@@ -26,10 +26,18 @@ export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
   details: Settings2,
 }
 
+// The heavier steps (founder, 2026-09-02): Header and Story hold more
+// answers than the rest, so they reserve a SECOND summary line — the
+// opening line, and the reveal. Reserved statically (invisible when
+// empty) exactly like the first line, so the no-reflow invariant holds.
+const EXTRA_STEPS: ReadonlySet<WizardStep> = new Set(["info", "story"])
+
 type Props = {
   currentStep: WizardStep
   summary: Record<WizardStep, string>
   done: Record<WizardStep, boolean>
+  /** Second summary line for the heavier steps (EXTRA_STEPS only). */
+  extra?: Partial<Record<WizardStep, string>>
   /** Entries the canJump gate allows become buttons that jump to their step. */
   onStepClick?: (step: WizardStep) => void
   /** Which steps a click may open (create mode: passed steps only). */
@@ -40,6 +48,7 @@ export function WizardStepRail({
   currentStep,
   summary,
   done,
+  extra,
   onStepClick,
   canJump,
 }: Props) {
@@ -99,6 +108,17 @@ export function WizardStepRail({
               >
                 {summary[s] || " "}
               </p>
+              {EXTRA_STEPS.has(s) && (
+                <p
+                  title={extra?.[s] || undefined}
+                  className={cn(
+                    "truncate pl-7.5 text-sm text-muted-foreground",
+                    !extra?.[s] && "invisible"
+                  )}
+                >
+                  {extra?.[s] || " "}
+                </p>
+              )}
             </Entry>
           )
         })}
