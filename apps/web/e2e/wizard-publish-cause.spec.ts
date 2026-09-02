@@ -126,7 +126,7 @@ test.describe("wizard → publish flow (cause)", () => {
       timeout: 10_000,
     })
 
-    const causeInput = page.getByPlaceholder(/name or cause/i)
+    const causeInput = page.getByPlaceholder(/marcus bell/i)
     await expect(causeInput).toBeVisible({ timeout: 5_000 })
     await causeInput.fill(TEST_CAUSE_LABEL)
 
