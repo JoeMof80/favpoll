@@ -21,6 +21,7 @@ import {
   WallOfFavourites,
   type WallEntry,
 } from "@/components/wall-of-favourites"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
@@ -63,14 +64,19 @@ const formatLongDate = (iso: string) =>
     year: "numeric",
   })
 
-// THE COMPLETE RECORD (founder, 2026-09-03: "everything there is to
-// show about the favpoll, all on one page in an administrative
-// context"). Vitals, then the CONTENT LEDGER — header fields, the full
-// story, the reveal at rest (badged as hidden from guests), the whole
-// favourite list, the charities — then settings with live controls,
-// the share kit, and the danger zone. Content is READ-ONLY with Edit
-// doors into the wizard; the moment this page edits words it has
-// rebuilt the in-place editor Phase 3 deleted.
+// THE COMPLETE RECORD, composed (founder, 2026-09-03: "redesign this
+// page in the most logical way possible"). Two lanes:
+//
+// - MAIN — the record itself, in THE FAVPOLL'S OWN ANATOMY (header →
+//   topic → story → charities, the order a guest meets it) so the
+//   organiser proofs the artefact as it will be experienced. Read-only
+//   with Edit doors into the wizard.
+// - SIDE — the operation, grouped by kind: Status (with its controls),
+//   Money (raised · goal · pledges · fund together), Share (links +
+//   QR), Activity (the guest wall).
+//
+// Headings wear SectionEyebrow, the site's own section grammar; the
+// header band carries only the DOORS (view / edit / print / keepsake).
 export function ManageClient({
   favpoll,
   wallEntries,
@@ -176,34 +182,38 @@ export function ManageClient({
     }
   }
 
-  // A ledger section: heading + Edit door into the wizard.
-  const Section = ({
+  // A card in either lane: SectionEyebrow heading, optional Edit door.
+  const Card = ({
     title,
     children,
-    editable = true,
+    editable = false,
+    headingless = false,
   }: {
-    title: string
+    title?: string
     children: React.ReactNode
     editable?: boolean
+    headingless?: boolean
   }) => (
     <section className="rounded-xl border border-border bg-background p-5">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-foreground">{title}</h2>
-        {editable && (
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
-            </Link>
-          </Button>
-        )}
-      </div>
-      <div className="mt-3">{children}</div>
+      {!headingless && (
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <SectionEyebrow as="h2">{title}</SectionEyebrow>
+          {editable && (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="-my-1.5 text-muted-foreground hover:text-foreground"
+            >
+              <Link href={`/favpolls/${favpoll.id}/edit`}>
+                <Pencil data-icon="inline-start" aria-hidden="true" />
+                Edit
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
+      {children}
     </section>
   )
 
@@ -211,15 +221,6 @@ export function ManageClient({
     <div className="min-w-0">
       <p className="text-xs text-muted-foreground">{label}</p>
       <div className="mt-0.5 text-sm text-foreground">{value}</div>
-    </div>
-  )
-
-  const vital = (label: string, value: React.ReactNode) => (
-    <div className="rounded-xl border border-border bg-background p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="mt-1 text-lg font-medium text-foreground tabular-nums">
-        {value}
-      </div>
     </div>
   )
 
@@ -293,7 +294,7 @@ export function ManageClient({
         Your favpolls
       </Link>
 
-      {/* ── Header: identity + the doors ── */}
+      {/* ── Header band: identity left, the doors right — nothing else. ── */}
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
@@ -316,7 +317,7 @@ export function ManageClient({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" size="sm">
+          <Button asChild size="sm">
             <a href={guestUrl} target="_blank" rel="noreferrer">
               <ExternalLink data-icon="inline-start" aria-hidden="true" />
               View favpoll
@@ -342,174 +343,36 @@ export function ManageClient({
               </Link>
             </Button>
           )}
-          {/* The operational controls sit INLINE with the doors
-              (founder, 2026-09-03: no settings or danger cards) —
-              switches as labelled pairs, delete as a quiet destructive
-              ghost at the row's end. */}
-          <span
-            aria-hidden="true"
-            className="mx-1 hidden h-5 w-px bg-border sm:block"
-          />
-          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
-            <Switch
-              checked={listed}
-              onCheckedChange={handleToggleListed}
-              disabled={listingPending || favpoll.isPrivate}
-              aria-label={
-                listed ? "Listed — click to unlist" : "Unlisted — click to list"
-              }
-            />
-            {favpoll.isPrivate ? "Private" : listed ? "Listed" : "Link only"}
-          </label>
-          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
-            <Switch
-              checked={guestItems}
-              onCheckedChange={handleToggleGuestItems}
-              disabled={guestItemsPending}
-              aria-label={
-                guestItems
-                  ? "Guests can add favourites — click to stop them"
-                  : "Guests cannot add favourites — click to allow it"
-              }
-            />
-            Guest additions
-          </label>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={!canDelete || deleting}
-            onClick={handleDelete}
-            aria-label="Delete favpoll"
-            title={
-              canDelete
-                ? "Delete favpoll"
-                : "Favpolls with pledges can't be deleted."
-            }
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 size={14} aria-hidden="true" />
-          </Button>
         </div>
       </div>
 
-      {/* ── Vitals ── */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {vital(
-          "Raised",
-          <>
-            {formatAmount(favpoll.total_raised)}
-            {favpoll.goal_amount ? (
-              <>
-                <span className="text-sm font-normal text-muted-foreground">
-                  {" "}
-                  of {formatAmount(favpoll.goal_amount)}
-                </span>
-                <span
-                  className="mt-2 block h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
-                  aria-label="Progress towards the pledge goal"
-                  aria-valuemin={0}
-                  aria-valuemax={favpoll.goal_amount}
-                  aria-valuenow={Math.min(
-                    favpoll.total_raised,
-                    favpoll.goal_amount
-                  )}
-                >
-                  <span
-                    className="block h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                    style={{
-                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
-                    }}
-                  />
-                </span>
-              </>
-            ) : null}
-          </>
-        )}
-        {vital("Pledges", `${favpoll.pledge_count}`)}
-        {vital(
-          "Shared fund",
-          favpoll.pot && favpoll.pot.total_deposited > 0 ? (
-            <>
-              {formatAmount(favpoll.pot.total_deposited)}
-              <span className="text-sm font-normal text-muted-foreground">
-                {" "}
-                · {formatAmount(favpoll.pot.total_allocated)} used
-              </span>
-            </>
-          ) : (
-            <span className="text-sm font-normal text-muted-foreground">
-              Empty
-            </span>
-          )
-        )}
-        {vital(
-          "Status",
-          <span className="text-sm font-normal text-foreground">
-            {isClosed ? "Closed" : "Open"}
-            {" · "}
-            {favpoll.isPrivate ? "Private" : listed ? "Listed" : "Link only"}
-          </span>
-        )}
-      </div>
-
-      {/* ── The content ledger ── */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-6">
-          <Section title="Header">
-            <div className="flex items-start gap-4">
-              {favpoll.photoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={favpoll.photoUrl}
-                  alt=""
-                  className="h-20 w-20 shrink-0 rounded-xl object-cover"
-                />
-              )}
+      {/* ── Two lanes: the RECORD (the favpoll's own anatomy) and the
+          OPERATION (status · money · share · activity). ── */}
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        {/* ═══ MAIN LANE — the record ═══ */}
+        <div className="flex min-w-0 flex-col gap-6">
+          <Card title="Header" editable>
+            <div className="flex items-start justify-between gap-4">
               <div className="grid min-w-0 flex-1 gap-3">
                 {fact("Opening line", favpoll.opening_line || "—")}
                 {fact("Name", name || "—")}
                 {fact("Context", favpoll.context || "—")}
               </div>
-            </div>
-          </Section>
-
-          <Section title="Story">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-              {favpoll.about || (
-                <span className="text-muted-foreground">None written.</span>
-              )}
-            </p>
-            <div className="mt-4 border-t border-border pt-3">
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <EyeOff size={12} aria-hidden="true" />
-                The reveal — hidden from guests until they pledge
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-                {favpoll.reveal || (
-                  <span className="text-muted-foreground">None written.</span>
-                )}
-              </p>
-            </div>
-          </Section>
-
-          <Section title="Charities">
-            <div className="flex flex-col gap-3">
-              {favpoll.charities.map(({ charity }) => (
-                <CharityRow
-                  key={charity.id}
-                  charity={{ ...charity, created_at: charity.created_at ?? "" }}
-                  amountRaised={perCharity}
-                  size="sm"
+              {favpoll.photoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={favpoll.photoUrl}
+                  alt=""
+                  className="h-24 w-24 shrink-0 rounded-xl object-cover"
                 />
-              ))}
+              )}
             </div>
-          </Section>
-        </div>
+          </Card>
 
-        <div className="flex flex-col gap-6">
-          <Section title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
+          <Card
+            title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}
+            editable
+          >
             {favpoll.favourites.length > 0 ? (
               <>
                 <div className="flex flex-wrap gap-1.5">
@@ -540,13 +403,166 @@ export function ManageClient({
             ) : (
               <p className="text-sm text-muted-foreground">No favourites.</p>
             )}
-          </Section>
+          </Card>
 
-          <section className="rounded-xl border border-border bg-background p-5">
-            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
-          </section>
+          <Card title="Story" editable>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+              {favpoll.about || (
+                <span className="text-muted-foreground">None written.</span>
+              )}
+            </p>
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <EyeOff size={12} aria-hidden="true" />
+                The reveal — hidden from guests until they pledge
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                {favpoll.reveal || (
+                  <span className="text-muted-foreground">None written.</span>
+                )}
+              </p>
+            </div>
+          </Card>
 
-          <Section title="Share" editable={false}>
+          <Card title="Charities" editable>
+            <div className="flex flex-col gap-3">
+              {favpoll.charities.map(({ charity }) => (
+                <CharityRow
+                  key={charity.id}
+                  charity={{ ...charity, created_at: charity.created_at ?? "" }}
+                  amountRaised={perCharity}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* ═══ SIDE LANE — the operation ═══ */}
+        <div className="flex min-w-0 flex-col gap-6">
+          <Card title="Status">
+            <p className="text-lg font-medium text-foreground">
+              {isClosed ? "Closed" : "Open"}
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                ·{" "}
+                {favpoll.isPrivate
+                  ? "Private"
+                  : listed
+                    ? "Listed"
+                    : "Link only"}
+              </span>
+            </p>
+            <div className="mt-4 grid gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-foreground">
+                  Listed on the public favpolls page
+                </span>
+                <Switch
+                  checked={listed}
+                  onCheckedChange={handleToggleListed}
+                  disabled={listingPending || favpoll.isPrivate}
+                  aria-label={
+                    listed
+                      ? "Listed — click to unlist"
+                      : "Unlisted — click to list"
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-foreground">
+                  Guests can add favourites
+                </span>
+                <Switch
+                  checked={guestItems}
+                  onCheckedChange={handleToggleGuestItems}
+                  disabled={guestItemsPending}
+                  aria-label={
+                    guestItems
+                      ? "Guests can add favourites — click to stop them"
+                      : "Guests cannot add favourites — click to allow it"
+                  }
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3">
+              <span className="text-xs text-muted-foreground">
+                {canDelete
+                  ? "Delete this favpoll permanently."
+                  : "Favpolls with pledges can't be deleted."}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                disabled={!canDelete || deleting}
+                onClick={handleDelete}
+                aria-label="Delete favpoll"
+                className="shrink-0 text-destructive hover:text-destructive"
+              >
+                <Trash2 size={14} aria-hidden="true" />
+              </Button>
+            </div>
+          </Card>
+
+          <Card title="Money">
+            <p className="text-lg font-medium text-foreground tabular-nums">
+              {formatAmount(favpoll.total_raised)}
+              {favpoll.goal_amount ? (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  of {formatAmount(favpoll.goal_amount)} goal
+                </span>
+              ) : (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  raised
+                </span>
+              )}
+            </p>
+            {favpoll.goal_amount ? (
+              <div
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label="Progress towards the pledge goal"
+                aria-valuemin={0}
+                aria-valuemax={favpoll.goal_amount}
+                aria-valuenow={Math.min(
+                  favpoll.total_raised,
+                  favpoll.goal_amount
+                )}
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                  style={{
+                    width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : null}
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-3">
+              {fact(
+                "Pledges",
+                <span className="tabular-nums">{favpoll.pledge_count}</span>
+              )}
+              {fact(
+                "Shared fund",
+                favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+                  <span className="tabular-nums">
+                    {formatAmount(favpoll.pot.total_deposited)}
+                    <span className="text-muted-foreground">
+                      {" "}
+                      · {formatAmount(favpoll.pot.total_allocated)} used
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">Empty</span>
+                )
+              )}
+            </div>
+          </Card>
+
+          <Card title="Share">
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                 {linkRow(
@@ -577,12 +593,16 @@ export function ManageClient({
               <div className="shrink-0" suppressHydrationWarning>
                 <BrandedQR
                   value={qrUrl}
-                  size={148}
+                  size={132}
                   aria-label="QR code for the guest-facing favpoll page"
                 />
               </div>
             </div>
-          </Section>
+          </Card>
+
+          <Card headingless>
+            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
+          </Card>
         </div>
       </div>
     </div>
