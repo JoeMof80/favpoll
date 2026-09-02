@@ -10,6 +10,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { Charity } from "@favpoll/types"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 
 // Concrete objects where one exists — a calendar, a gift, an assortment,
@@ -30,6 +31,12 @@ type Props = {
   currentStep: WizardStep
   summary: Record<WizardStep, string>
   done: Record<WizardStep, boolean>
+  /** Chosen charities — up to three avatar chips on the Charity line
+   * (option B, founder, 2026-09-02: the favpoll visibly assembling). */
+  charities?: Charity[]
+  /** The protagonist photo (or its crop preview) — a thumb on the
+   * Header line. */
+  photoUrl?: string | null
   /** Entries the canJump gate allows become buttons that jump to their step. */
   onStepClick?: (step: WizardStep) => void
   /** Which steps a click may open (create mode: passed steps only). */
@@ -40,6 +47,8 @@ export function WizardStepRail({
   currentStep,
   summary,
   done,
+  charities,
+  photoUrl,
   onStepClick,
   canJump,
 }: Props) {
@@ -49,6 +58,9 @@ export function WizardStepRail({
         {STEPS.map((s) => {
           const Icon = STEP_ICONS[s]
           const isActive = s === currentStep
+          const chips = s === "charity" ? (charities ?? []).slice(0, 3) : []
+          const photoChip = s === "info" ? (photoUrl ?? null) : null
+          const hasContent = !!summary[s] || chips.length > 0 || !!photoChip
           const clickable = !!onStepClick && (canJump ? canJump(s) : true)
           const Entry = clickable ? "button" : "div"
           return (
@@ -87,15 +99,49 @@ export function WizardStepRail({
               </div>
               {/* Always rendered — an empty summary keeps its line so the
                   rail never reflows as answers accumulate (justify-around
-                  would otherwise redistribute every entry). */}
-              <p
+                  would otherwise redistribute every entry). Chips are h-5,
+                  matching the text-sm line box, so the invariant holds
+                  with or without them. */}
+              <div
                 className={cn(
-                  "truncate pl-7.5 text-sm text-muted-foreground",
-                  !summary[s] && "invisible"
+                  "flex min-h-5 items-center gap-1.5 pl-7.5",
+                  !hasContent && "invisible"
                 )}
               >
-                {summary[s] || " "}
-              </p>
+                {photoChip && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={photoChip}
+                    alt=""
+                    className="h-5 w-5 shrink-0 rounded object-cover"
+                  />
+                )}
+                {chips.map((c) =>
+                  c.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={c.id}
+                      src={c.logo_url}
+                      alt=""
+                      className="h-5 w-5 shrink-0 rounded object-contain"
+                    />
+                  ) : (
+                    <span
+                      key={c.id}
+                      aria-hidden="true"
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/15 text-[10px] font-medium text-primary"
+                    >
+                      {c.name.charAt(0)}
+                    </span>
+                  )
+                )}
+                <p
+                  title={summary[s] || undefined}
+                  className="truncate text-sm text-muted-foreground"
+                >
+                  {summary[s] || " "}
+                </p>
+              </div>
             </Entry>
           )
         })}
