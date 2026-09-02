@@ -13,10 +13,7 @@ import { cn } from "@/lib/utils"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 
 // Concrete objects where one exists — a calendar, a gift, an assortment,
-// a person, a book; Settings wears its own glyph. The rail tracks the answers
-// as they accumulate (extended-wizard prototype, round 25): each step
-// shows a tick once its content is in, and the chosen thing itself as a
-// one-line summary beneath the label.
+// a person, a book; Settings wears its own glyph.
 export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
   event: Calendar,
   charity: Gift,
@@ -26,19 +23,28 @@ export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
   details: Settings2,
 }
 
-// THE RAIL'S PURPOSE (founder, 2026-09-02, settled after three same-day
-// calibrations — counts, word tallies, avatar chips, prose excerpts and
-// a second line per step were all tried and reverted): a glanceable
-// AUDIT OF CHOICES. It answers exactly three questions — where am I,
-// what's done, did I choose what I meant? — so every summary line
-// speaks ONE genre: nouns you chose, never sentences you wrote.
-// Identities and named states only. Prose steps show presence, not
-// contents (Story's bare "Reveal" tag). Test every future line idea
-// against this purpose before adding it.
+// THE RAIL'S PURPOSE (founder, 2026-09-02, the fourth same-day
+// calibration and the one that settled): the favpoll AT A GLANCE — a
+// series of LISTS tracking everything entered so far, one line per
+// answer. The noun-only audit before it "felt incomplete"; counts
+// alone, avatar chips, and per-step second lines each failed earlier
+// the same day. Every list line is reserved statically (invisible
+// until filled), so the rail never reflows as answers accumulate —
+// the one invariant every calibration kept.
+const STEP_SLOTS: Record<WizardStep, number> = {
+  event: 1,
+  charity: 2,
+  topic: 2,
+  info: 3,
+  story: 2,
+  details: 3,
+}
 
 type Props = {
   currentStep: WizardStep
-  summary: Record<WizardStep, string>
+  /** Per step: its entered answers, one line each, pre-clipped to
+   * STEP_SLOTS by the wizard state. */
+  summary: Record<WizardStep, string[]>
   done: Record<WizardStep, boolean>
   /** Entries the canJump gate allows become buttons that jump to their step. */
   onStepClick?: (step: WizardStep) => void
@@ -95,20 +101,18 @@ export function WizardStepRail({
                   />
                 )}
               </div>
-              {/* Always rendered — an empty summary keeps its line so the
-                  rail never reflows as answers accumulate (justify-around
-                  would otherwise redistribute every entry). The avatar-chip
-                  variant (option B) was tried and reverted same day —
-                  founder: text facts only ("the idea of A"). */}
-              <p
-                title={summary[s] || undefined}
-                className={cn(
-                  "truncate pl-7.5 text-sm text-muted-foreground",
-                  !summary[s] && "invisible"
-                )}
-              >
-                {summary[s] || " "}
-              </p>
+              {Array.from({ length: STEP_SLOTS[s] }, (_, i) => (
+                <p
+                  key={i}
+                  title={summary[s][i] || undefined}
+                  className={cn(
+                    "truncate pl-7.5 text-sm text-muted-foreground",
+                    !summary[s][i] && "invisible"
+                  )}
+                >
+                  {summary[s][i] || " "}
+                </p>
+              ))}
             </Entry>
           )
         })}

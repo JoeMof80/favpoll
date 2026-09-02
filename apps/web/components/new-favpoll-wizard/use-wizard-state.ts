@@ -233,35 +233,57 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     .map((id) => data.topics.find((t) => t.id === id))
     .filter((t): t is TopicWithMeta => !!t)
 
-  // THE RAIL'S PURPOSE (founder, 2026-09-02): a glanceable AUDIT OF
-  // CHOICES — nouns you chose, never sentences you wrote. Identities
-  // and named states only; no counts, no prose excerpts. See the
-  // doctrine comment in wizard-step-rail.tsx.
+  // THE RAIL'S PURPOSE (founder, 2026-09-02): the favpoll at a glance —
+  // a series of lists tracking everything entered, one line per answer,
+  // pre-clipped to the rail's reserved slots. See the doctrine comment
+  // in wizard-step-rail.tsx.
+  const charityNames = selectedCharities.map((c) => c.name)
+  const topicFavouriteCount = topics[0]
+    ? topics[0].isCustom
+      ? (customItemCount ?? 0)
+      : sortedExistingItems.length + customLabels.length
+    : 0
   const VISIBILITY_LABELS: Record<WizardVisibility, string> = {
     listed: "Listed",
     unlisted: "Link only",
     private: "Private",
   }
-  const railSummary: Record<WizardStep, string> = {
-    event: category ? category.charAt(0).toUpperCase() + category.slice(1) : "",
+  const railSummary: Record<WizardStep, string[]> = {
+    event: category
+      ? [category.charAt(0).toUpperCase() + category.slice(1)]
+      : [],
     charity:
-      selectedCharities.length <= 2
-        ? selectedCharities.map((c) => c.name).join(" & ")
-        : `${selectedCharities[0].name} + ${selectedCharities.length - 1} more`,
-    topic: topics[0]?.title ?? "",
-    info: name.trim(),
-    story: reveal.trim() ? "Reveal" : "",
-    // Visibility always shows — the register-derived default (memorials
-    // open link-only) is a fact worth surfacing before it is touched.
+      charityNames.length <= 2
+        ? charityNames
+        : [charityNames[0], `+ ${charityNames.length - 1} more`],
+    topic: topics[0]
+      ? [
+          topics[0].title,
+          ...(topicFavouriteCount > 0
+            ? [
+                `${topicFavouriteCount} favourite${topicFavouriteCount === 1 ? "" : "s"}`,
+              ]
+            : []),
+        ]
+      : [],
+    // The header's own display order: opening line above name above
+    // context (founder, 2026-09-02).
+    info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),
+    story: [about.trim(), reveal.trim()].filter(Boolean),
     details: [
-      goalAmount ? `£${goalAmount} goal` : null,
-      closesAt
-        ? `closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
-        : null,
+      ...(goalAmount ? [`£${goalAmount} goal`] : []),
+      ...(closesAt
+        ? [
+            `Closes ${closesAt.toLocaleString("en-GB", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`,
+          ]
+        : []),
       VISIBILITY_LABELS[visibility],
-    ]
-      .filter(Boolean)
-      .join(" · "),
+    ],
   }
 
   const railDone: Record<WizardStep, boolean> = {

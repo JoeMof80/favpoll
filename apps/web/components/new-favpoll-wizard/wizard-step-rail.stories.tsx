@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
+import type { WizardStep } from "@/lib/wizard-copy"
 import { WizardStepRail } from "./wizard-step-rail"
 
 const meta: Meta<typeof WizardStepRail> = {
@@ -16,13 +17,13 @@ export default meta
 
 type Story = StoryObj<typeof WizardStepRail>
 
-const EMPTY = {
-  event: "",
-  charity: "",
-  topic: "",
-  info: "",
-  story: "",
-  details: "",
+const EMPTY: Record<WizardStep, string[]> = {
+  event: [],
+  charity: [],
+  topic: [],
+  info: [],
+  story: [],
+  details: [],
 }
 const NONE = {
   event: false,
@@ -42,10 +43,10 @@ export const MidFlow: Story = {
     currentStep: "info",
     summary: {
       ...EMPTY,
-      event: "Memorial",
-      charity: "Marie Curie",
-      topic: "Colour",
-      details: "Link only",
+      event: ["Memorial"],
+      charity: ["Marie Curie"],
+      topic: ["Colour", "8 favourites"],
+      details: ["Link only"],
     },
     done: { ...NONE, event: true, charity: true, topic: true },
   },
@@ -55,12 +56,19 @@ export const NearlyDone: Story = {
   args: {
     currentStep: "details",
     summary: {
-      event: "Memorial",
-      charity: "Marie Curie & Shelter",
-      topic: "Colour",
-      info: "Mary Whitfield",
-      story: "Reveal",
-      details: "£250 goal · closes 14 Sept · Link only",
+      event: ["Memorial"],
+      charity: ["Marie Curie", "Shelter"],
+      topic: ["Colour", "8 favourites"],
+      info: [
+        "In loving memory of our headmistress",
+        "Mary Whitfield",
+        "Headmistress, retired",
+      ],
+      story: [
+        "A headmistress for forty-one years…",
+        "“Purple. Always purple.”",
+      ],
+      details: ["£250 goal", "Closes 14 Sept, 22:00", "Link only"],
     },
     done: {
       ...NONE,
