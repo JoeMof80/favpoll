@@ -3,7 +3,7 @@
 import { Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
-import { SectionLabel } from "@/components/favpoll-card/section-label"
+import { PollHeading } from "@/components/poll-heading"
 import { shortTopicLabel } from "@/lib/registers"
 import type { Favourite } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
@@ -28,7 +28,11 @@ export function WizardTopicCard({
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <div className="flex items-start justify-between gap-2">
-        <SectionLabel title={shortTopicLabel(topic.title)} size="lg" />
+        <PollHeading
+          topicTitle={shortTopicLabel(topic.title)}
+          size="lg"
+          inert
+        />
         <Button type="button" size="icon-sm" variant="ghost" onClick={onEdit}>
           <Edit className="h-4 w-4" />
         </Button>
