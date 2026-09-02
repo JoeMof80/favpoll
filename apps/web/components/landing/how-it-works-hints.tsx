@@ -62,14 +62,23 @@ import { cardFeeFor } from "@/lib/card-fee"
 // here, and Purple, Blue and Red are the standings two columns along.
 // Filtered from the topic so the labels stay the product's own, in the
 // order the real picker shows them.
+// ALL THIRTEEN since 2026-09-02 (founder: "extend the list of
+// favourite pills to match the height of the other steps") — the
+// level-with-the-prose tuning above is superseded: the column now
+// squares against the tallest hint (the pledge bill) instead.
 const MEMORIAL_SHOWN = [
   "Black",
   "Blue",
+  "Brown",
+  "Gold",
   "Green",
   "Grey",
+  "Orange",
   "Pink",
   "Purple",
   "Red",
+  "Silver",
+  "White",
   "Yellow",
 ]
 

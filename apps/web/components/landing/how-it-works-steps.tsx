@@ -93,21 +93,18 @@ export function HowItWorksSteps({
                   already sharing 1320px, so splitting each again left the
                   text at 155px — about twenty characters a line. Below xl
                   the hint drops under its own paragraph instead. */}
+              {/* The numbered label spans ABOVE the whole beat (founder,
+                  2026-09-02: "moving the headers above their columns" —
+                  superseding the in-column placement of 2026-08-27,
+                  whose float concern died with the rules). Style is the
+                  home page's beat-label, unchanged: this band is a
+                  miniature of that section, so the labels are the same
+                  thing at a smaller scale. */}
+              <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
+                {i + 1}. {step.label}
+              </p>
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
-                {/* The numbered label lives IN the left column with its
-                    own body (founder, 2026-08-27), not spanning above both.
-                    Spanning, the rule beside the hint began below it and the
-                    label floated free of the pair it heads. */}
                 <div className="min-w-0 xl:pr-2">
-                  {/* The home page's beat-label style, to the class:
-                      text-sm font-medium tracking-widest text-primary
-                      uppercase. This band is meant to read as a miniature
-                      of that section, so the labels have to be the same
-                      thing at a smaller scale — not a different treatment
-                      wearing the same words. */}
-                  <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
-                    {i + 1}. {step.label}
-                  </p>
                   <p className="leading-relaxed text-muted-foreground">
                     {step.body}
                   </p>
