@@ -42,7 +42,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   },
   fundraiser: {
     openingLine: "e.g. Cheering on",
-    name: "Name or Cause",
+    name: "e.g. Marcus Bell",
     context: "e.g. London Marathon run",
     about:
       "e.g. Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
