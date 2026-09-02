@@ -71,7 +71,14 @@ export function WizardStepRail({
     // rides along on scroll.
     <div className="hidden h-full bg-primary/10 md:block">
       <div className="sticky top-14 flex h-[calc(100vh-3.5rem)] flex-col gap-6 p-6">
-        <div className="flex flex-1 flex-col justify-around gap-5">
+        {/* STATIC AND EQUIDISTANT (founder, 2026-09-02, two calls): no
+            distribution arithmetic on CONTENT — justify-around moved
+            headers whenever any height changed. Instead: six equal grid
+            rows filling the viewport-pinned box, each header topping
+            its row — constant, evenly spaced positions that depend only
+            on the box. minmax(min-content, 1fr) keeps a short window
+            from crushing an entry below its reserved lines. */}
+        <div className="grid flex-1 auto-rows-[minmax(min-content,1fr)] gap-4">
           {STEPS.map((s) => {
             const Icon = STEP_ICONS[s]
             const isActive = s === currentStep
@@ -116,12 +123,17 @@ export function WizardStepRail({
                     />
                   )}
                 </div>
+                {/* min-h-5 on every slot line: an EMPTY slot's lone space
+                  collapses in CSS, so without the floor a reserved line
+                  is 0px tall and only grows when its value arrives —
+                  the real shift mechanism all along (founder,
+                  2026-09-02, third report). */}
                 {Array.from({ length: STEP_SLOTS[s] }, (_, i) => (
                   <p
                     key={i}
                     title={summary[s][i] || undefined}
                     className={cn(
-                      "truncate pl-8 text-sm text-muted-foreground",
+                      "min-h-5 truncate pl-8 text-sm text-muted-foreground",
                       !summary[s][i] && "invisible"
                     )}
                   >
