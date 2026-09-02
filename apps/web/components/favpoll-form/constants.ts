@@ -20,10 +20,13 @@ export const SECTION_LABEL =
 
 export const MAX_CHARITIES = 3
 
+// lg IS the form-control standard: 44px (founder, 2026-09-02 — one
+// height wherever form elements appear; matches WIZARD_INPUT_SIZE and
+// the contact form's FIELD).
 export const INPUT_SIZE: Record<PickerSize, string> = {
   sm: "h-8 text-xs md:text-xs",
   md: "h-9 text-sm md:text-sm",
-  lg: "h-10 text-base md:text-base",
+  lg: "h-11 text-base md:text-base",
 }
 
 export const TEXTAREA_SIZE: Record<PickerSize, string> = {

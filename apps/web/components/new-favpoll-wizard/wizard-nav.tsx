@@ -31,6 +31,7 @@ export function WizardNav({
         <Button
           variant="ghost"
           size="lg"
+          className="h-11 px-6 md:text-base"
           disabled={submitting}
           onClick={onBack}
         >
@@ -42,13 +43,19 @@ export function WizardNav({
       {isLast ? (
         <Button
           size="lg"
+          className="h-11 px-6 md:text-base"
           disabled={nextDisabled || submitting}
           onClick={onFinish}
         >
           {submitting ? submittingLabel : finishLabel}
         </Button>
       ) : (
-        <Button size="lg" disabled={nextDisabled} onClick={onNext}>
+        <Button
+          size="lg"
+          className="h-11 px-6 md:text-base"
+          disabled={nextDisabled}
+          onClick={onNext}
+        >
           Next
         </Button>
       )}
