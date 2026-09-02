@@ -79,7 +79,12 @@ export function WizardStepRail({
                 clickable && "cursor-pointer hover:opacity-100"
               )}
             >
-              <div className="flex items-center gap-2.5">
+              {/* gap-3 + pl-8: the label text lands at 56px from the
+                  rail edge — the header wordmark's own inset (logo glyph
+                  24px wide + gap-2) — so the rail reads as one column
+                  with the chrome above it (founder, 2026-09-02,
+                  measured). */}
+              <div className="flex items-center gap-3">
                 <Icon
                   className={cn(
                     "h-5 w-5 shrink-0",
@@ -106,7 +111,7 @@ export function WizardStepRail({
                   key={i}
                   title={summary[s][i] || undefined}
                   className={cn(
-                    "truncate pl-7.5 text-sm text-muted-foreground",
+                    "truncate pl-8 text-sm text-muted-foreground",
                     !summary[s][i] && "invisible"
                   )}
                 >
