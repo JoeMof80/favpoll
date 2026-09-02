@@ -116,12 +116,17 @@ export function WizardStepRail({
                     />
                   )}
                 </div>
+                {/* min-h-5 on every slot line: an EMPTY slot's lone space
+                  collapses in CSS, so without the floor a reserved line
+                  is 0px tall and only grows when its value arrives —
+                  the real shift mechanism all along (founder,
+                  2026-09-02, third report). */}
                 {Array.from({ length: STEP_SLOTS[s] }, (_, i) => (
                   <p
                     key={i}
                     title={summary[s][i] || undefined}
                     className={cn(
-                      "truncate pl-8 text-sm text-muted-foreground",
+                      "min-h-5 truncate pl-8 text-sm text-muted-foreground",
                       !summary[s][i] && "invisible"
                     )}
                   >
