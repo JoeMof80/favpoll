@@ -5,6 +5,7 @@ import { withLiveTotals } from "@/lib/live-totals"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
+import type { WallEntry } from "@/components/wall-of-favourites"
 import { ManageClient, type ManageFavpoll } from "./manage-client"
 
 export const metadata = {
@@ -118,6 +119,60 @@ export default async function ManageFavpollPage({
   }
 
   const [ev] = await withLiveTotals(supabase, [raw as unknown as RawRow])
+
+  // The guest wall, the guest page's own query (capped at 24, newest
+  // first) — but the organiser is always entitled, so labels always
+  // resolve. Names follow the anonymity model: anonymous → null →
+  // "Someone"; amounts never appear.
+  type WallRow = {
+    id: string
+    display_name: string | null
+    is_anonymous: boolean | null
+    clerk_user_id: string | null
+    created_at: string
+    pledge_allocations: { favourites: { label: string } | null }[] | null
+  }
+  const pollId = ev.favpoll_polls?.id ?? null
+  let wallEntries: WallEntry[] = []
+  if (pollId) {
+    const { data: wallRows } = await supabase
+      .from("pledges")
+      .select(
+        `id, display_name, is_anonymous, clerk_user_id, created_at,
+         pledge_allocations ( favourites ( label ) )`
+      )
+      .eq("favpoll_poll_id", pollId)
+      .is("withdrawn_at", null)
+      .order("created_at", { ascending: false })
+      .limit(24)
+    const rows = (wallRows ?? []) as unknown as WallRow[]
+    const clerkIds = [
+      ...new Set(
+        rows.map((r) => r.clerk_user_id).filter((v): v is string => !!v)
+      ),
+    ]
+    const { data: wallUsers } = clerkIds.length
+      ? await supabase
+          .from("users")
+          .select("id, display_name")
+          .in("id", clerkIds)
+      : { data: [] as { id: string; display_name: string | null }[] }
+    const names = Object.fromEntries(
+      (wallUsers ?? []).map((u) => [u.id, u.display_name])
+    )
+    wallEntries = rows.map((r) => ({
+      id: r.id,
+      name: r.is_anonymous
+        ? null
+        : r.clerk_user_id
+          ? (names[r.clerk_user_id] ?? null)
+          : (r.display_name ?? null),
+      labels: (r.pledge_allocations ?? [])
+        .map((a) => a.favourites?.label)
+        .filter((l): l is string => typeof l === "string"),
+      created_at: r.created_at,
+    }))
+  }
   const isCause = ev.subject === "cause"
 
   const favpoll: ManageFavpoll = {
@@ -170,7 +225,7 @@ export default async function ManageFavpollPage({
   return (
     <RegisterScope palette={palette}>
       <main className="min-h-screen bg-muted">
-        <ManageClient favpoll={favpoll} />
+        <ManageClient favpoll={favpoll} wallEntries={wallEntries} />
       </main>
     </RegisterScope>
   )

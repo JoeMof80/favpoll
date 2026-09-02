@@ -13,9 +13,14 @@ import {
   Monitor,
   Pencil,
   Printer,
+  Sparkles,
   Trash2,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
@@ -66,7 +71,13 @@ const formatLongDate = (iso: string) =>
 // the share kit, and the danger zone. Content is READ-ONLY with Edit
 // doors into the wizard; the moment this page edits words it has
 // rebuilt the in-place editor Phase 3 deleted.
-export function ManageClient({ favpoll }: { favpoll: ManageFavpoll }) {
+export function ManageClient({
+  favpoll,
+  wallEntries,
+}: {
+  favpoll: ManageFavpoll
+  wallEntries: WallEntry[]
+}) {
   const router = useRouter()
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -323,6 +334,62 @@ export function ManageClient({ favpoll }: { favpoll: ManageFavpoll }) {
               Print pack
             </a>
           </Button>
+          {isClosed && (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                Keepsake
+              </Link>
+            </Button>
+          )}
+          {/* The operational controls sit INLINE with the doors
+              (founder, 2026-09-03: no settings or danger cards) —
+              switches as labelled pairs, delete as a quiet destructive
+              ghost at the row's end. */}
+          <span
+            aria-hidden="true"
+            className="mx-1 hidden h-5 w-px bg-border sm:block"
+          />
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+            <Switch
+              checked={listed}
+              onCheckedChange={handleToggleListed}
+              disabled={listingPending || favpoll.isPrivate}
+              aria-label={
+                listed ? "Listed — click to unlist" : "Unlisted — click to list"
+              }
+            />
+            {favpoll.isPrivate ? "Private" : listed ? "Listed" : "Link only"}
+          </label>
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+            <Switch
+              checked={guestItems}
+              onCheckedChange={handleToggleGuestItems}
+              disabled={guestItemsPending}
+              aria-label={
+                guestItems
+                  ? "Guests can add favourites — click to stop them"
+                  : "Guests cannot add favourites — click to allow it"
+              }
+            />
+            Guest additions
+          </label>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            disabled={!canDelete || deleting}
+            onClick={handleDelete}
+            aria-label="Delete favpoll"
+            title={
+              canDelete
+                ? "Delete favpoll"
+                : "Favpolls with pledges can't be deleted."
+            }
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 size={14} aria-hidden="true" />
+          </Button>
         </div>
       </div>
 
@@ -475,62 +542,9 @@ export function ManageClient({ favpoll }: { favpoll: ManageFavpoll }) {
             )}
           </Section>
 
-          <Section title="Settings" editable={false}>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Visibility</p>
-                <div className="mt-1 flex items-center gap-2">
-                  <Switch
-                    checked={listed}
-                    onCheckedChange={handleToggleListed}
-                    disabled={listingPending || favpoll.isPrivate}
-                    aria-label={
-                      listed
-                        ? "Listed — click to unlist"
-                        : "Unlisted — click to list"
-                    }
-                  />
-                  <span className="text-sm text-foreground">
-                    {favpoll.isPrivate
-                      ? "Private"
-                      : listed
-                        ? "Listed"
-                        : "Link only"}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Guest additions</p>
-                <div className="mt-1 flex items-center gap-2">
-                  <Switch
-                    checked={guestItems}
-                    onCheckedChange={handleToggleGuestItems}
-                    disabled={guestItemsPending}
-                    aria-label={
-                      guestItems
-                        ? "Guests can add favourites — click to stop them"
-                        : "Guests cannot add favourites — click to allow it"
-                    }
-                  />
-                  <span className="text-sm text-foreground">
-                    {guestItems ? "Allowed" : "Off"}
-                  </span>
-                </div>
-              </div>
-              {fact(
-                isClosed ? "Closed" : "Closes",
-                formatLongDate(
-                  isClosed
-                    ? (favpoll.closed_at ?? favpoll.closes_at)
-                    : favpoll.closes_at
-                )
-              )}
-              {fact(
-                "Pledge goal",
-                favpoll.goal_amount ? formatAmount(favpoll.goal_amount) : "None"
-              )}
-            </div>
-          </Section>
+          <section className="rounded-xl border border-border bg-background p-5">
+            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
+          </section>
 
           <Section title="Share" editable={false}>
             <div className="flex flex-col gap-4 min-[480px]:flex-row">
@@ -568,25 +582,6 @@ export function ManageClient({ favpoll }: { favpoll: ManageFavpoll }) {
                 />
               </div>
             </div>
-          </Section>
-
-          <Section title="Danger zone" editable={false}>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!canDelete || deleting}
-              onClick={handleDelete}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 data-icon="inline-start" aria-hidden="true" />
-              {deleting ? "Deleting…" : "Delete favpoll"}
-            </Button>
-            {!canDelete && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                Favpolls with pledges can&apos;t be deleted.
-              </p>
-            )}
           </Section>
         </div>
       </div>
