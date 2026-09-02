@@ -95,8 +95,6 @@ export function NewFavpollWizard({ data, edit }: Props) {
             currentStep={w.step}
             summary={w.railSummary}
             done={w.railDone}
-            charities={w.selectedCharities}
-            photoUrl={w.photoUrl}
             onStepClick={w.goToStep}
             canJump={w.canJumpTo}
           />
