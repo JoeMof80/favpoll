@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
 import { CharityRow } from "@/components/charity-row"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
@@ -224,6 +225,17 @@ export function ManageClient({
     </div>
   )
 
+  // Label and value share a line (founder, 2026-09-03: "reduce
+  // height") — the header card is a form receipt, not a stack.
+  const inlineFact = (label: string, value: React.ReactNode) => (
+    <div className="flex items-baseline gap-3">
+      <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
+      <div className="min-w-0 flex-1 truncate text-sm text-foreground">
+        {value}
+      </div>
+    </div>
+  )
+
   const linkRow = (
     key: string,
     label: string,
@@ -353,19 +365,35 @@ export function ManageClient({
         <div className="flex min-w-0 flex-col gap-6">
           <Card title="Header" editable>
             <div className="flex items-start justify-between gap-4">
-              <div className="grid min-w-0 flex-1 gap-3">
-                {fact("Opening line", favpoll.opening_line || "—")}
-                {fact("Name", name || "—")}
-                {fact("Context", favpoll.context || "—")}
+              <div className="grid min-w-0 flex-1 gap-2">
+                {inlineFact("Opening line", favpoll.opening_line || "—")}
+                {inlineFact("Name", name || "—")}
+                {inlineFact("Context", favpoll.context || "—")}
               </div>
-              {favpoll.photoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={favpoll.photoUrl}
-                  alt=""
-                  className="h-24 w-24 shrink-0 rounded-xl object-cover"
-                />
+              <ProtagonistAvatar
+                name={name}
+                photoUrl={favpoll.photoUrl}
+                className="h-20 w-20 shrink-0"
+              />
+            </div>
+          </Card>
+
+          <Card title="Story" editable>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+              {favpoll.about || (
+                <span className="text-muted-foreground">None written.</span>
               )}
+            </p>
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <EyeOff size={12} aria-hidden="true" />
+                The reveal — hidden from guests until they pledge
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                {favpoll.reveal || (
+                  <span className="text-muted-foreground">None written.</span>
+                )}
+              </p>
             </div>
           </Card>
 
@@ -403,25 +431,6 @@ export function ManageClient({
             ) : (
               <p className="text-sm text-muted-foreground">No favourites.</p>
             )}
-          </Card>
-
-          <Card title="Story" editable>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-              {favpoll.about || (
-                <span className="text-muted-foreground">None written.</span>
-              )}
-            </p>
-            <div className="mt-4 border-t border-border pt-3">
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <EyeOff size={12} aria-hidden="true" />
-                The reveal — hidden from guests until they pledge
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-                {favpoll.reveal || (
-                  <span className="text-muted-foreground">None written.</span>
-                )}
-              </p>
-            </div>
           </Card>
 
           <Card title="Charities" editable>
