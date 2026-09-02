@@ -32,8 +32,11 @@ import type { WizardState } from "./use-wizard-state"
 // (founder, 2026-09-02): the chevron alone until a who is chosen, then
 // the selection's icon joins it. (The neutral person placeholder was
 // tried and cut same day; a chevron-less trigger read as a button, not
-// a menu.) The halves sit FLUSH with a hairline divider — a gap showed
-// the page through the seam.
+// a menu.) THE SEAM: every Button wears an invisible 1px border with
+// bg-clip-padding, so two flush halves still showed ~2px of page
+// between their clipped backgrounds — border-0 on both, with an
+// explicit 1px divider element between (founder, 2026-09-02: "why
+// still a gap?").
 const WHO_ICONS: Record<WhoValue, React.ElementType> = {
   he: Mars,
   she: Venus,
@@ -67,7 +70,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             aria-label={
               w.who ? `Who: ${WHO_LABELS[w.who]}` : "Who is this favpoll for?"
             }
-            className="rounded-r-none px-2"
+            className="rounded-r-none border-0 px-2"
           >
             {WhoIcon && <WhoIcon className="h-4 w-4" aria-hidden="true" />}
             <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
@@ -101,13 +104,14 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      <span aria-hidden="true" className="w-px self-stretch bg-primary/15" />
       <Button
         type="button"
         variant="secondary"
         size="sm"
         disabled={w.generating || w.topics.length === 0}
         onClick={w.generateExample}
-        className="rounded-l-none border-l border-primary/15"
+        className="rounded-l-none border-0"
       >
         {w.generating ? "Generating…" : "✦ Generate an example"}
       </Button>
