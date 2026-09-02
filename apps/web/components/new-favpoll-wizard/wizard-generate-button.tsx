@@ -6,7 +6,6 @@ import {
   Mars,
   NonBinary,
   Ribbon,
-  UserRound,
   Venus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,11 +29,11 @@ import type { WizardState } from "./use-wizard-state"
 //
 // The gendered icons (f8bff8f) and the founder-drawn Pair/Group figures
 // (components/icons/people.tsx). The trigger is the PREFIX half
-// (founder, 2026-09-02) and wears the selection — the neutral single
-// person until a who is chosen, the same grammar as its old name-field
-// home — plus the chevron (tried without, restored same day: the bare
-// person read as a button, not a menu). The halves sit FLUSH with a
-// hairline divider — a gap showed the page through the seam.
+// (founder, 2026-09-02): the chevron alone until a who is chosen, then
+// the selection's icon joins it. (The neutral person placeholder was
+// tried and cut same day; a chevron-less trigger read as a button, not
+// a menu.) The halves sit FLUSH with a hairline divider — a gap showed
+// the page through the seam.
 const WHO_ICONS: Record<WhoValue, React.ElementType> = {
   he: Mars,
   she: Venus,
@@ -56,7 +55,7 @@ const WHO_LABELS: Record<WhoValue, string> = {
 const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
 
 export function WizardGenerateButton({ w }: { w: WizardState }) {
-  const WhoIcon = w.who ? WHO_ICONS[w.who] : UserRound
+  const WhoIcon = w.who ? WHO_ICONS[w.who] : null
   return (
     <div className="flex">
       <DropdownMenu>
@@ -70,7 +69,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             }
             className="rounded-r-none px-2"
           >
-            <WhoIcon className="h-4 w-4" aria-hidden="true" />
+            {WhoIcon && <WhoIcon className="h-4 w-4" aria-hidden="true" />}
             <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
