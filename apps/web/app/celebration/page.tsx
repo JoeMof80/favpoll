@@ -68,7 +68,7 @@ const STEPS = [
 // registers "borrow them for now ... each can pass its own when its turn in
 // the rework comes."
 //
-// `shown` is twelve of the topic's twenty-eight, chosen not sliced
+// `shown` is eleven of the topic's twenty-eight, chosen not sliced
 // (eight until 2026-09-02 — another line to match the taller triad). Short
 // labels, because the hint column is 184px and long place names drop it to
 // one pill a row; and CHENGDU IS DELIBERATELY ABSENT, exactly as Purple is
@@ -90,7 +90,6 @@ const WEDDING_HINTS: HintScene = {
     "Japan",
     "Lisbon",
     "Norway",
-    "Paris",
     "Venice",
   ],
   picked: "Greece",
