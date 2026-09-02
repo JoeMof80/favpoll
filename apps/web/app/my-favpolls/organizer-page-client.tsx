@@ -3,7 +3,10 @@
 import { useState } from "react"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
 import { ListControls } from "@/components/list-controls"
-import { OrganizerRow } from "@/components/organizer-row"
+// Candidate A (2026-09-02): the console row replaces the accordion —
+// the old OrganizerRow remains in the tree for the manage hub's roots
+// and one git checkout away for comparison.
+import { ConsoleRow } from "@/components/organizer-row/console-row"
 import {
   type OrganizerFavpoll,
   type StatusFilter,
@@ -64,7 +67,7 @@ export function OrganizerPageClient({ favpolls }: Props) {
             role="list"
           >
             {displayed.map((fp) => (
-              <OrganizerRow key={fp.id} favpoll={fp} />
+              <ConsoleRow key={fp.id} favpoll={fp} />
             ))}
           </ul>
         ) : (
