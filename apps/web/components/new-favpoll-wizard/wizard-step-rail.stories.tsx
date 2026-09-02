@@ -44,7 +44,7 @@ export const MidFlow: Story = {
       ...EMPTY,
       event: "Memorial",
       charity: "Marie Curie",
-      topic: "Colour · 8 favourites",
+      topic: "Colour",
       details: "Link only",
     },
     done: { ...NONE, event: true, charity: true, topic: true },
@@ -56,15 +56,11 @@ export const NearlyDone: Story = {
     currentStep: "details",
     summary: {
       event: "Memorial",
-      charity: "Marie Curie + 1 more",
-      topic: "Colour · 8 favourites",
-      info: "Mary Whitfield · Headmistress, retired",
-      story: "A headmistress for forty-one years…",
+      charity: "Marie Curie & Shelter",
+      topic: "Colour",
+      info: "Mary Whitfield",
+      story: "Reveal",
       details: "£250 goal · closes 14 Sept · Link only",
-    },
-    extra: {
-      info: "In loving memory of our headmistress",
-      story: "Reveal · \u201CPurple. Always purple.\u201D",
     },
     done: {
       ...NONE,

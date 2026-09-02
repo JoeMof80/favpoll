@@ -233,16 +233,10 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     .map((id) => data.topics.find((t) => t.id === id))
     .filter((t): t is TopicWithMeta => !!t)
 
-  // The rail tracks the answers: a tick once a step's content is in, and
-  // the chosen thing itself as a one-line FACT (option B, founder,
-  // 2026-09-02) — counts and states. The story line
-  // is the exception: "52 words" was tried and rejected same day
-  // (founder: pointless) — it shows the story's own opening words.
-  const topicFavouriteCount = topics[0]
-    ? topics[0].isCustom
-      ? (customItemCount ?? 0)
-      : sortedExistingItems.length + customLabels.length
-    : 0
+  // THE RAIL'S PURPOSE (founder, 2026-09-02): a glanceable AUDIT OF
+  // CHOICES — nouns you chose, never sentences you wrote. Identities
+  // and named states only; no counts, no prose excerpts. See the
+  // doctrine comment in wizard-step-rail.tsx.
   const VISIBILITY_LABELS: Record<WizardVisibility, string> = {
     listed: "Listed",
     unlisted: "Link only",
@@ -251,20 +245,12 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   const railSummary: Record<WizardStep, string> = {
     event: category ? category.charAt(0).toUpperCase() + category.slice(1) : "",
     charity:
-      selectedCharities.length === 0
-        ? ""
-        : selectedCharities.length === 1
-          ? selectedCharities[0].name
-          : `${selectedCharities[0].name} + ${selectedCharities.length - 1} more`,
-    topic: topics[0]
-      ? `${topics[0].title}${
-          topicFavouriteCount > 0
-            ? ` · ${topicFavouriteCount} favourite${topicFavouriteCount === 1 ? "" : "s"}`
-            : ""
-        }`
-      : "",
-    info: [name.trim(), context.trim()].filter(Boolean).join(" · "),
-    story: about.trim(),
+      selectedCharities.length <= 2
+        ? selectedCharities.map((c) => c.name).join(" & ")
+        : `${selectedCharities[0].name} + ${selectedCharities.length - 1} more`,
+    topic: topics[0]?.title ?? "",
+    info: name.trim(),
+    story: reveal.trim() ? "Reveal" : "",
     // Visibility always shows — the register-derived default (memorials
     // open link-only) is a fact worth surfacing before it is touched.
     details: [
@@ -276,14 +262,6 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     ]
       .filter(Boolean)
       .join(" · "),
-  }
-
-  // The heavier steps (founder, 2026-09-02): Header and Story reserve a
-  // second rail line for their remaining answers — the opening line and
-  // the reveal.
-  const railExtra: Partial<Record<WizardStep, string>> = {
-    info: openingLine.trim(),
-    story: reveal.trim() ? `Reveal · ${reveal.trim()}` : "",
   }
 
   const railDone: Record<WizardStep, boolean> = {
@@ -589,7 +567,6 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     isEdit,
     stepLocked,
     railSummary,
-    railExtra,
     railDone,
     generating,
     generateExample,

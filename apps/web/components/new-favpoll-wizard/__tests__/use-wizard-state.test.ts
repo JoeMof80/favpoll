@@ -335,21 +335,15 @@ describe("useWizardState — the rail tracks the answers", () => {
     act(() => result.current.setName("Margaret"))
     expect(result.current.railDone.event).toBe(true)
     expect(result.current.railSummary.event).toBe("Memorial")
-    expect(result.current.railSummary.charity).toBe("Shelter + 1 more")
-    expect(result.current.railSummary.topic).toContain("Colour")
+    expect(result.current.railSummary.charity).toBe("Shelter & Crisis")
+    expect(result.current.railSummary.topic).toBe("Colour")
     expect(result.current.railSummary.info).toBe("Margaret")
-    act(() => result.current.setContext("Grandmother of six"))
-    expect(result.current.railSummary.info).toBe(
-      "Margaret · Grandmother of six"
-    )
-    act(() => result.current.setOpeningLine("In loving memory"))
-    expect(result.current.railExtra.info).toBe("In loving memory")
-    act(() => result.current.setReveal("Purple. She wore it always."))
-    expect(result.current.railExtra.story).toBe(
-      "Reveal · Purple. She wore it always."
-    )
+    // Prose is never excerpted — the Story line shows only the
+    // reveal's presence.
     act(() => result.current.setAbout("She loved every colour."))
-    expect(result.current.railSummary.story).toBe("She loved every colour.")
+    expect(result.current.railSummary.story).toBe("")
+    act(() => result.current.setReveal("Purple. She wore it always."))
+    expect(result.current.railSummary.story).toBe("Reveal")
     expect(result.current.railDone.details).toBe(false)
     act(() => result.current.setGoalAmount(250))
     act(() => result.current.setVisibility("unlisted"))
