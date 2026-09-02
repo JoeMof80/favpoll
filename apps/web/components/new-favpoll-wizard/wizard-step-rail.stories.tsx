@@ -55,6 +55,9 @@ export const MidFlow: Story = {
 export const NearlyDone: Story = {
   args: {
     currentStep: "details",
+    // Clickable entries, for judging the hover tint.
+    onStepClick: () => {},
+    canJump: () => true,
     summary: {
       event: ["Memorial"],
       charity: ["Marie Curie", "Shelter"],
