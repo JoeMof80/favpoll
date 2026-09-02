@@ -1,5 +1,7 @@
 "use client"
 
+import { Info } from "lucide-react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { InputGroupButton } from "@/components/ui/input-group"
@@ -189,6 +191,21 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "details" && (
                 <WizardStepShell title="Settings">
                   <WizardDetailsStep w={w} />
+                  {/* The PROACTIVE half of the lock story (founder,
+                      2026-09-02) — said once, at the moment of
+                      commitment; the reactive half is lockedBody's
+                      "Locked — guests have already pledged." Hidden
+                      once the lock has actually bitten. */}
+                  {!w.stepLocked.event && (
+                    <p className="mt-6 flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Info
+                        className="h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      Once a guest pledges, the event, charity and topic are
+                      locked in.
+                    </p>
+                  )}
                 </WizardStepShell>
               )}
 
