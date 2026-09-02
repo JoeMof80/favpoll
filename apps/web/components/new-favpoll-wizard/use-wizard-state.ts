@@ -252,22 +252,23 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
         ? charityNames
         : [charityNames[0], `+ ${charityNames.length - 1} more`],
     topic: topics[0] ? [topics[0].title] : [],
-    // The header's own display order: opening line above name above
-    // context (founder, 2026-09-02).
-    info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),
-    story: [about.trim(), reveal.trim()].filter(Boolean),
+    // POSITIONAL, never filtered (founder, 2026-09-02: "make sure the
+    // rail content doesn't shift as we add values") — each field OWNS
+    // its line, empty ones render invisible, so filling a field never
+    // moves another. Order is the header's own: opening line, name,
+    // context.
+    info: [openingLine.trim(), name.trim(), context.trim()],
+    story: [about.trim(), reveal.trim()],
     details: [
-      ...(goalAmount ? [`£${goalAmount} goal`] : []),
-      ...(closesAt
-        ? [
-            `Closes ${closesAt.toLocaleString("en-GB", {
-              day: "numeric",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}`,
-          ]
-        : []),
+      goalAmount ? `£${goalAmount} goal` : "",
+      closesAt
+        ? `Closes ${closesAt.toLocaleString("en-GB", {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`
+        : "",
       VISIBILITY_LABELS[visibility],
     ],
   }
