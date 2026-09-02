@@ -103,7 +103,7 @@ export function WizardStepRail({
         <span
           aria-hidden="true"
           style={{ top: line.top, height: line.height }}
-          className="absolute left-[13px] w-px bg-primary"
+          className="absolute left-[11.5px] w-px bg-primary"
         />
         {STEPS.map((s) => {
           const Icon = STEP_ICONS[s]
@@ -111,11 +111,13 @@ export function WizardStepRail({
           const clickable = !!onStepClick && (canJump ? canJump(s) : true)
           return (
             <div key={s} className="min-w-0 space-y-1">
-              {/* gap-1 + pl-8: the label text lands at 56px from the
-                  rail edge — the header wordmark's own inset — via the
-                  28px station button + 4px gap (founder, 2026-09-02,
-                  measured). */}
-              <div className="flex items-center gap-1">
+              {/* Chrome alignment, remeasured (founder, 2026-09-02:
+                  "don't quite line up with the logo mark and text").
+                  The station shifts left 2px (-ml-0.5) so the 28px
+                  button's CENTRE sits at 36px — the logo glyph's own
+                  centre — and gap-1.5 lands the label back on the
+                  wordmark's 56px line with breathing room. */}
+              <div className="flex items-center gap-1.5">
                 {/* THE ICONS ARE THE BUTTONS (founder, 2026-09-02,
                     settled spec): NO differentiation by colour — the
                     line, labels and glyphs are consistently primary,
@@ -137,7 +139,7 @@ export function WizardStepRail({
                         ? lastRef
                         : undefined
                   }
-                  className="relative shrink-0"
+                  className="relative -ml-0.5 shrink-0"
                 >
                   <span
                     aria-hidden="true"
