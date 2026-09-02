@@ -234,19 +234,49 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     .filter((t): t is TopicWithMeta => !!t)
 
   // The rail tracks the answers: a tick once a step's content is in, and
-  // the chosen thing itself as a one-line summary.
+  // the chosen thing itself as a one-line FACT (option B, founder,
+  // 2026-09-02) — counts and states, never truncated prose. The story
+  // line was the worst offender: the raw opening of the About text read
+  // as noise where "84 words" answers the actual question.
+  const topicFavouriteCount = topics[0]
+    ? topics[0].isCustom
+      ? (customItemCount ?? 0)
+      : sortedExistingItems.length + customLabels.length
+    : 0
+  const storyWordCount = about.trim() ? about.trim().split(/\s+/).length : 0
+  const VISIBILITY_LABELS: Record<WizardVisibility, string> = {
+    listed: "Listed",
+    unlisted: "Link only",
+    private: "Private",
+  }
   const railSummary: Record<WizardStep, string> = {
     event: category ? category.charAt(0).toUpperCase() + category.slice(1) : "",
-    charity: selectedCharities.map((c) => c.name).join(", "),
-    topic: topics[0]?.title ?? "",
+    charity:
+      selectedCharities.length === 0
+        ? ""
+        : selectedCharities.length === 1
+          ? selectedCharities[0].name
+          : `${selectedCharities[0].name} + ${selectedCharities.length - 1} more`,
+    topic: topics[0]
+      ? `${topics[0].title}${
+          topicFavouriteCount > 0
+            ? ` · ${topicFavouriteCount} favourite${topicFavouriteCount === 1 ? "" : "s"}`
+            : ""
+        }`
+      : "",
     info: name.trim(),
-    story: about.trim(),
+    story:
+      storyWordCount > 0
+        ? `${storyWordCount} word${storyWordCount === 1 ? "" : "s"}`
+        : "",
+    // Visibility always shows — the register-derived default (memorials
+    // open link-only) is a fact worth surfacing before it is touched.
     details: [
       goalAmount ? `£${goalAmount} goal` : null,
       closesAt
         ? `closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
         : null,
-      visibility === "listed" ? null : visibility,
+      VISIBILITY_LABELS[visibility],
     ]
       .filter(Boolean)
       .join(" · "),
@@ -258,7 +288,10 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     topic: topicDone,
     info: !!name.trim(),
     story: !!about.trim(),
-    details: false,
+    // Settings has defaults, so "done" means TOUCHED — the old hardcoded
+    // false meant the step could never earn its tick (option B fix).
+    details:
+      !!closesAt || goalAmount !== undefined || visibilityOverride !== null,
   }
 
   function handleAddItem(label: string) {
