@@ -149,6 +149,17 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
+  // The Settings defaults (visibility follows the register) join the
+  // rail only once the step has SHOWN them — an unseen default isn't
+  // entered information, and it read as stranded under an untouched
+  // step (founder, 2026-09-02). Edit mode counts as seen: everything
+  // is prefilled.
+  const [detailsSeen, setDetailsSeen] = useState(isEdit)
+
+  function changeStep(next: WizardStep) {
+    if (next === "details") setDetailsSeen(true)
+    setStep(next)
+  }
 
   const register = deriveRegister(category, grouping, subject)
 
@@ -269,7 +280,10 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
             minute: "2-digit",
           })}`
         : "",
-      VISIBILITY_LABELS[visibility],
+      // Seen or touched — never a stranded default.
+      detailsSeen || visibilityOverride !== null
+        ? VISIBILITY_LABELS[visibility]
+        : "",
     ],
   }
 
@@ -311,15 +325,15 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   }
 
   function handleNext() {
-    setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]!)
+    changeStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]!)
   }
 
   function handleBack() {
-    setStep(STEPS[Math.max(stepIndex - 1, 0)]!)
+    changeStep(STEPS[Math.max(stepIndex - 1, 0)]!)
   }
 
   function goToStep(target: WizardStep) {
-    setStep(target)
+    changeStep(target)
   }
 
   // Which steps a click may open. Edit mode: all of them (the favpoll
