@@ -105,9 +105,7 @@ export function HowItWorksSteps({
               </p>
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
                 <div className="min-w-0 xl:pr-2">
-                  {/* text-justify (founder, 2026-09-02) — the justified
-                      block squares the beat against its hint column. */}
-                  <p className="text-justify leading-relaxed text-muted-foreground">
+                  <p className="leading-relaxed text-muted-foreground">
                     {step.body}
                   </p>
                 </div>
