@@ -34,7 +34,7 @@ export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
 const STEP_SLOTS: Record<WizardStep, number> = {
   event: 1,
   charity: 2,
-  topic: 2,
+  topic: 1,
   info: 3,
   story: 2,
   details: 3,

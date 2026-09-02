@@ -336,7 +336,7 @@ describe("useWizardState — the rail tracks the answers", () => {
     expect(result.current.railDone.event).toBe(true)
     expect(result.current.railSummary.event).toEqual(["Memorial"])
     expect(result.current.railSummary.charity).toEqual(["Shelter", "Crisis"])
-    expect(result.current.railSummary.topic[0]).toBe("Colour")
+    expect(result.current.railSummary.topic).toEqual(["Colour"])
     expect(result.current.railSummary.info).toEqual(["Margaret"])
     act(() => result.current.setContext("Grandmother of six"))
     act(() => result.current.setOpeningLine("In loving memory"))
