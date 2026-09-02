@@ -118,26 +118,28 @@ test.describe("wizard → publish flow (cause)", () => {
 
     await page.getByRole("button", { name: /^next$/i }).click()
 
-    // ── 5. Header step: declare the cause on the who dropdown ──────────────────
+    // ── 5. Header step: the cause label goes in the name field ────────────────
+    // The who menu moved to the Story step's Generate split button
+    // (2026-09-02), so Header just takes the label — the field reads
+    // "Name or Cause" under Fundraiser.
     await expect(page.getByRole("heading", { name: "Header" })).toBeVisible({
+      timeout: 10_000,
+    })
+
+    const causeInput = page.getByPlaceholder(/name or cause/i)
+    await expect(causeInput).toBeVisible({ timeout: 5_000 })
+    await causeInput.fill(TEST_CAUSE_LABEL)
+
+    await page.getByRole("button", { name: /^next$/i }).click()
+
+    // ── 6. Story step: declare the cause on the Generate split button ─────────
+    await expect(page.getByRole("heading", { name: "Story" })).toBeVisible({
       timeout: 10_000,
     })
 
     await page.getByRole("button", { name: "Who is this favpoll for?" }).click()
     await page.getByRole("menuitem", { name: "Cause" }).click()
 
-    // Picking Cause renames the field; its ghost becomes the cause
-    // exemplar. Fill the cause label in the same field.
-    const causeInput = page.getByPlaceholder(/name or nickname|st mark/i)
-    await expect(causeInput).toBeVisible({ timeout: 5_000 })
-    await causeInput.fill(TEST_CAUSE_LABEL)
-
-    await page.getByRole("button", { name: /^next$/i }).click()
-
-    // ── 6. Story step ─────────────────────────────────────────────────────────
-    await expect(page.getByRole("heading", { name: "Story" })).toBeVisible({
-      timeout: 10_000,
-    })
     await page.locator("textarea").first().fill("An e2e cause about line.")
 
     await page.getByRole("button", { name: /^next$/i }).click()
