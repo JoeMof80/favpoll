@@ -189,6 +189,17 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "details" && (
                 <WizardStepShell title="Settings">
                   <WizardDetailsStep w={w} />
+                  {/* The PROACTIVE half of the lock story (founder,
+                      2026-09-02) — said once, at the moment of
+                      commitment; the reactive half is lockedBody's
+                      "Locked — guests have already pledged." Hidden
+                      once the lock has actually bitten. */}
+                  {!w.stepLocked.event && (
+                    <p className="mt-6 text-xs text-muted-foreground">
+                      Once a guest pledges, the event, charity and topic are
+                      locked in.
+                    </p>
+                  )}
                 </WizardStepShell>
               )}
 
