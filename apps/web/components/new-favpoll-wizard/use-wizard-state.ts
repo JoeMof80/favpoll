@@ -266,16 +266,20 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
             : []),
         ]
       : [],
-    info: [name.trim(), context.trim(), openingLine.trim()].filter(Boolean),
-    story: [
-      about.trim(),
-      ...(reveal.trim() ? [`Reveal · ${reveal.trim()}`] : []),
-    ].filter(Boolean),
+    // The header's own display order: opening line above name above
+    // context (founder, 2026-09-02).
+    info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),
+    story: [about.trim(), reveal.trim()].filter(Boolean),
     details: [
       ...(goalAmount ? [`£${goalAmount} goal`] : []),
       ...(closesAt
         ? [
-            `Closes ${closesAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`,
+            `Closes ${closesAt.toLocaleString("en-GB", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`,
           ]
         : []),
       VISIBILITY_LABELS[visibility],

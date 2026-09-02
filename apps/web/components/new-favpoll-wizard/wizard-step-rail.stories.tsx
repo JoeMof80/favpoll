@@ -60,15 +60,15 @@ export const NearlyDone: Story = {
       charity: ["Marie Curie", "Shelter"],
       topic: ["Colour", "8 favourites"],
       info: [
+        "In loving memory of our headmistress",
         "Mary Whitfield",
         "Headmistress, retired",
-        "In loving memory of our headmistress",
       ],
       story: [
         "A headmistress for forty-one years…",
-        "Reveal · “Purple. Always purple.”",
+        "“Purple. Always purple.”",
       ],
-      details: ["£250 goal", "Closes 14 Sept", "Link only"],
+      details: ["£250 goal", "Closes 14 Sept, 22:00", "Link only"],
     },
     done: {
       ...NONE,

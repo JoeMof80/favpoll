@@ -341,15 +341,15 @@ describe("useWizardState — the rail tracks the answers", () => {
     act(() => result.current.setContext("Grandmother of six"))
     act(() => result.current.setOpeningLine("In loving memory"))
     expect(result.current.railSummary.info).toEqual([
+      "In loving memory",
       "Margaret",
       "Grandmother of six",
-      "In loving memory",
     ])
     act(() => result.current.setAbout("She loved every colour."))
     act(() => result.current.setReveal("Purple. She wore it always."))
     expect(result.current.railSummary.story).toEqual([
       "She loved every colour.",
-      "Reveal · Purple. She wore it always.",
+      "Purple. She wore it always.",
     ])
     expect(result.current.railDone.details).toBe(false)
     act(() => result.current.setGoalAmount(250))
