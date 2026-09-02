@@ -373,7 +373,7 @@ export function ManageClient({
               <ProtagonistAvatar
                 name={name}
                 photoUrl={favpoll.photoUrl}
-                className="h-20 w-20 shrink-0"
+                className="h-18 w-18 shrink-0"
               />
             </div>
           </Card>
