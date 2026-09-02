@@ -466,6 +466,7 @@ describe("useWizardState — handleFinish publishes", () => {
     act(() => result.current.setAbout("About."))
     act(() => result.current.handleNext())
     sessionStorage.setItem(DRAFT_ADDITIONS_KEY, "{}")
+    act(() => result.current.setClosesAt(new Date("2026-10-01T22:59:00.000Z")))
     await act(async () => {
       await result.current.handleFinish()
     })
