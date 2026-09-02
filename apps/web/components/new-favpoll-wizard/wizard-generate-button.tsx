@@ -15,7 +15,7 @@ import type { WizardState } from "./use-wizard-state"
 
 // THE WHO MENU LIVES ON GENERATE NOW (founder, 2026-09-02, option B):
 // generation is the one consumer that degrades without a who, so the
-// selector sits exactly where it is required — the arrow half of a
+// selector sits exactly where it is required — the prefix half of a
 // split button. Its old home, a ghost icon inside the name field's end
 // addon, was easily missed; the who-variable placeholder ghosts it fed
 // retired with the move (see wizard-placeholders.ts).
