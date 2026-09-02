@@ -1,6 +1,14 @@
 "use client"
 
-import { Check, Mars, NonBinary, Ribbon, UserRound, Venus } from "lucide-react"
+import {
+  Check,
+  ChevronDown,
+  Mars,
+  NonBinary,
+  Ribbon,
+  UserRound,
+  Venus,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -24,7 +32,9 @@ import type { WizardState } from "./use-wizard-state"
 // (components/icons/people.tsx). The trigger is the PREFIX half
 // (founder, 2026-09-02) and wears the selection — the neutral single
 // person until a who is chosen, the same grammar as its old name-field
-// home. No chevron: the person IS the handle.
+// home — plus the chevron (tried without, restored same day: the bare
+// person read as a button, not a menu). The halves sit FLUSH with a
+// hairline divider — a gap showed the page through the seam.
 const WHO_ICONS: Record<WhoValue, React.ElementType> = {
   he: Mars,
   she: Venus,
@@ -48,7 +58,7 @@ const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
 export function WizardGenerateButton({ w }: { w: WizardState }) {
   const WhoIcon = w.who ? WHO_ICONS[w.who] : UserRound
   return (
-    <div className="flex gap-px">
+    <div className="flex">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -61,6 +71,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             className="rounded-r-none px-2"
           >
             <WhoIcon className="h-4 w-4" aria-hidden="true" />
+            <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
@@ -97,7 +108,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
         size="sm"
         disabled={w.generating || w.topics.length === 0}
         onClick={w.generateExample}
-        className="rounded-l-none"
+        className="rounded-l-none border-l border-primary/15"
       >
         {w.generating ? "Generating…" : "✦ Generate an example"}
       </Button>
