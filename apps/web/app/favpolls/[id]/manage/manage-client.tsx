@@ -9,6 +9,7 @@ import {
   Check,
   Copy,
   ExternalLink,
+  EyeOff,
   Monitor,
   Pencil,
   Printer,
@@ -17,6 +18,8 @@ import {
 import { BrandedQR } from "@/components/branded-qr"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Chip } from "@/components/ui/chip"
+import { CharityRow } from "@/components/charity-row"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
@@ -32,6 +35,22 @@ import {
   daysRemaining,
 } from "@/components/organizer-row/utils"
 
+/** The complete administrative record: the organiser list's row data
+ * plus every authored thing in full. */
+export type ManageFavpoll = OrganizerFavpoll & {
+  isPrivate: boolean
+  context: string | null
+  about: string | null
+  reveal: string | null
+  photoUrl: string | null
+  favourites: {
+    id: string
+    label: string
+    isGuestAdded: boolean
+    isHidden: boolean
+  }[]
+}
+
 const formatLongDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -39,11 +58,15 @@ const formatLongDate = (iso: string) =>
     year: "numeric",
   })
 
-// THE MANAGE HUB's body (candidate B, drafted 2026-09-02): everything
-// the accordion row held, laid out as a control room — header with the
-// doors (view / edit / print), a vitals band, the share card with QR,
-// and the controls card. Register-inked via the page's RegisterScope.
-export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
+// THE COMPLETE RECORD (founder, 2026-09-03: "everything there is to
+// show about the favpoll, all on one page in an administrative
+// context"). Vitals, then the CONTENT LEDGER — header fields, the full
+// story, the reveal at rest (badged as hidden from guests), the whole
+// favourite list, the charities — then settings with live controls,
+// the share kit, and the danger zone. Content is READ-ONLY with Edit
+// doors into the wizard; the moment this page edits words it has
+// rebuilt the in-place editor Phase 3 deleted.
+export function ManageClient({ favpoll }: { favpoll: ManageFavpoll }) {
   const router = useRouter()
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -70,7 +93,6 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
       ? (favpoll.cause_label ?? "")
       : (favpoll.protagonist?.name ?? "")
   const topicTitle = favpoll.poll?.topic?.title
-  const charity = favpoll.charities[0]?.charity ?? null
   const eyebrow =
     favpoll.occasion_type ??
     (favpoll.category
@@ -143,6 +165,53 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
     }
   }
 
+  // A ledger section: heading + Edit door into the wizard.
+  const Section = ({
+    title,
+    children,
+    editable = true,
+  }: {
+    title: string
+    children: React.ReactNode
+    editable?: boolean
+  }) => (
+    <section className="rounded-xl border border-border bg-background p-5">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-medium text-foreground">{title}</h2>
+        {editable && (
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Link href={`/favpolls/${favpoll.id}/edit`}>
+              <Pencil data-icon="inline-start" aria-hidden="true" />
+              Edit
+            </Link>
+          </Button>
+        )}
+      </div>
+      <div className="mt-3">{children}</div>
+    </section>
+  )
+
+  const fact = (label: string, value: React.ReactNode) => (
+    <div className="min-w-0">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <div className="mt-0.5 text-sm text-foreground">{value}</div>
+    </div>
+  )
+
+  const vital = (label: string, value: React.ReactNode) => (
+    <div className="rounded-xl border border-border bg-background p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <div className="mt-1 text-lg font-medium text-foreground tabular-nums">
+        {value}
+      </div>
+    </div>
+  )
+
   const linkRow = (
     key: string,
     label: string,
@@ -198,14 +267,10 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
     </div>
   )
 
-  const vital = (label: string, value: React.ReactNode) => (
-    <div className="rounded-xl border border-border bg-background p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="mt-1 text-lg font-medium text-foreground tabular-nums">
-        {value}
-      </div>
-    </div>
-  )
+  const perCharity =
+    favpoll.charities.length > 0
+      ? favpoll.total_raised / favpoll.charities.length
+      : 0
 
   return (
     <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
@@ -226,25 +291,12 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
           <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
             {name}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {topicTitle && <>Favourite {topicTitle.toLowerCase()}</>}
-            {charity && (
-              <>
-                {" "}
-                · {charity.name}
-                {favpoll.charities.length > 1 &&
-                  ` +${favpoll.charities.length - 1}`}
-              </>
-            )}
-          </p>
           <p
             className={cn(
               "mt-1 text-sm",
-              isClosed
-                ? "text-muted-foreground"
-                : isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-muted-foreground"
+              !isClosed && isWarning
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-muted-foreground"
             )}
           >
             {isClosed
@@ -326,46 +378,189 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
           )
         )}
         {vital(
-          "Reveal",
+          "Status",
           <span className="text-sm font-normal text-foreground">
-            {favpoll.has_reveal ? "Written" : "None"}
+            {isClosed ? "Closed" : "Open"}
+            {" · "}
+            {favpoll.isPrivate ? "Private" : listed ? "Listed" : "Link only"}
           </span>
         )}
       </div>
 
-      {/* ── Share | Controls ── */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <section className="rounded-xl border border-border bg-background p-5">
-          <h2 className="text-sm font-medium text-foreground">Share</h2>
-          <div className="mt-4 flex flex-col gap-4 min-[480px]:flex-row">
-            <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-              {linkRow(
-                "guest",
-                "favpoll",
-                ExternalLink,
-                guestUrl,
-                guestUrl,
-                true
+      {/* ── The content ledger ── */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-6">
+          <Section title="Header">
+            <div className="flex items-start gap-4">
+              {favpoll.photoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={favpoll.photoUrl}
+                  alt=""
+                  className="h-20 w-20 shrink-0 rounded-xl object-cover"
+                />
               )}
-              {linkRow(
-                "display",
-                "Live favpoll",
-                Monitor,
-                displayUrl,
-                displayUrl,
-                true
+              <div className="grid min-w-0 flex-1 gap-3">
+                {fact("Opening line", favpoll.opening_line || "—")}
+                {fact("Name", name || "—")}
+                {fact("Context", favpoll.context || "—")}
+              </div>
+            </div>
+          </Section>
+
+          <Section title="Story">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+              {favpoll.about || (
+                <span className="text-muted-foreground">None written.</span>
               )}
-              {linkRow(
-                "edit",
-                "Edit favpoll",
-                Pencil,
-                `/favpolls/${favpoll.id}/edit`,
-                editUrl,
-                false
+            </p>
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <EyeOff size={12} aria-hidden="true" />
+                The reveal — hidden from guests until they pledge
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                {favpoll.reveal || (
+                  <span className="text-muted-foreground">None written.</span>
+                )}
+              </p>
+            </div>
+          </Section>
+
+          <Section title="Charities">
+            <div className="flex flex-col gap-3">
+              {favpoll.charities.map(({ charity }) => (
+                <CharityRow
+                  key={charity.id}
+                  charity={{ ...charity, created_at: charity.created_at ?? "" }}
+                  amountRaised={perCharity}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </Section>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <Section title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
+            {favpoll.favourites.length > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-1.5">
+                  {favpoll.favourites.map((f) => (
+                    <Chip
+                      key={f.id}
+                      size="sm"
+                      readOnly
+                      className={cn(
+                        f.isGuestAdded &&
+                          "border-primary bg-primary/10 text-primary",
+                        f.isHidden && "opacity-40"
+                      )}
+                    >
+                      {f.label}
+                    </Chip>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {favpoll.favourites.length} favourite
+                  {favpoll.favourites.length === 1 ? "" : "s"}
+                  {favpoll.favourites.some((f) => f.isGuestAdded) &&
+                    " · tinted = added by guests"}
+                  {favpoll.favourites.some((f) => f.isHidden) &&
+                    " · faded = hidden from the poll"}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">No favourites.</p>
+            )}
+          </Section>
+
+          <Section title="Settings" editable={false}>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground">Visibility</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <Switch
+                    checked={listed}
+                    onCheckedChange={handleToggleListed}
+                    disabled={listingPending || favpoll.isPrivate}
+                    aria-label={
+                      listed
+                        ? "Listed — click to unlist"
+                        : "Unlisted — click to list"
+                    }
+                  />
+                  <span className="text-sm text-foreground">
+                    {favpoll.isPrivate
+                      ? "Private"
+                      : listed
+                        ? "Listed"
+                        : "Link only"}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Guest additions</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <Switch
+                    checked={guestItems}
+                    onCheckedChange={handleToggleGuestItems}
+                    disabled={guestItemsPending}
+                    aria-label={
+                      guestItems
+                        ? "Guests can add favourites — click to stop them"
+                        : "Guests cannot add favourites — click to allow it"
+                    }
+                  />
+                  <span className="text-sm text-foreground">
+                    {guestItems ? "Allowed" : "Off"}
+                  </span>
+                </div>
+              </div>
+              {fact(
+                isClosed ? "Closed" : "Closes",
+                formatLongDate(
+                  isClosed
+                    ? (favpoll.closed_at ?? favpoll.closes_at)
+                    : favpoll.closes_at
+                )
+              )}
+              {fact(
+                "Pledge goal",
+                favpoll.goal_amount ? formatAmount(favpoll.goal_amount) : "None"
               )}
             </div>
-            <div className="flex shrink-0 flex-col items-start gap-2">
-              <div suppressHydrationWarning>
+          </Section>
+
+          <Section title="Share" editable={false}>
+            <div className="flex flex-col gap-4 min-[480px]:flex-row">
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                {linkRow(
+                  "guest",
+                  "favpoll",
+                  ExternalLink,
+                  guestUrl,
+                  guestUrl,
+                  true
+                )}
+                {linkRow(
+                  "display",
+                  "Live favpoll",
+                  Monitor,
+                  displayUrl,
+                  displayUrl,
+                  true
+                )}
+                {linkRow(
+                  "edit",
+                  "Edit favpoll",
+                  Pencil,
+                  `/favpolls/${favpoll.id}/edit`,
+                  editUrl,
+                  false
+                )}
+              </div>
+              <div className="shrink-0" suppressHydrationWarning>
                 <BrandedQR
                   value={qrUrl}
                   size={148}
@@ -373,68 +568,27 @@ export function ManageClient({ favpoll }: { favpoll: OrganizerFavpoll }) {
                 />
               </div>
             </div>
-          </div>
-        </section>
+          </Section>
 
-        <section className="rounded-xl border border-border bg-background p-5">
-          <h2 className="text-sm font-medium text-foreground">Controls</h2>
-          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Visibility</p>
-              <div className="mt-1 flex items-center gap-2">
-                <Switch
-                  checked={listed}
-                  onCheckedChange={handleToggleListed}
-                  disabled={listingPending}
-                  aria-label={
-                    listed
-                      ? "Listed — click to unlist"
-                      : "Unlisted — click to list"
-                  }
-                />
-                <span className="text-sm text-foreground">
-                  {listed ? "Listed" : "Unlisted"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Guest additions</p>
-              <div className="mt-1 flex items-center gap-2">
-                <Switch
-                  checked={guestItems}
-                  onCheckedChange={handleToggleGuestItems}
-                  disabled={guestItemsPending}
-                  aria-label={
-                    guestItems
-                      ? "Guests can add favourites — click to stop them"
-                      : "Guests cannot add favourites — click to allow it"
-                  }
-                />
-                <span className="text-sm text-foreground">
-                  {guestItems ? "Allowed" : "Off"}
-                </span>
-              </div>
-            </div>
-            <div className="col-span-2 border-t border-border pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={!canDelete || deleting}
-                onClick={handleDelete}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 data-icon="inline-start" aria-hidden="true" />
-                {deleting ? "Deleting…" : "Delete favpoll"}
-              </Button>
-              {!canDelete && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Favpolls with pledges can&apos;t be deleted.
-                </p>
-              )}
-            </div>
-          </div>
-        </section>
+          <Section title="Danger zone" editable={false}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!canDelete || deleting}
+              onClick={handleDelete}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 data-icon="inline-start" aria-hidden="true" />
+              {deleting ? "Deleting…" : "Delete favpoll"}
+            </Button>
+            {!canDelete && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Favpolls with pledges can&apos;t be deleted.
+              </p>
+            )}
+          </Section>
+        </div>
       </div>
     </div>
   )

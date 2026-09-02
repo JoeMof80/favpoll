@@ -5,18 +5,20 @@ import { withLiveTotals } from "@/lib/live-totals"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import type { OrganizerFavpoll } from "@/components/organizer-row/utils"
-import { ManageClient } from "./manage-client"
+import { ManageClient, type ManageFavpoll } from "./manage-client"
 
 export const metadata = {
   title: "Manage favpoll — favpoll",
 }
 
-// THE MANAGE HUB (candidate B of the my-favpolls redesign, drafted
-// 2026-09-02): one page per favpoll for the organiser running it — the
-// control room the old accordion row squeezed into a drawer. Owner-only.
+// THE MANAGE PAGE (candidate B, reshaped 2026-09-03): the favpoll's
+// COMPLETE RECORD in administrative context — every authored thing in
+// full (including the reveal, visible at rest nowhere else), every
+// setting with its control, the share kit, the danger zone. Content is
+// read-only here with Edit doors into the wizard: the wizard stays THE
+// editor. Owner-only.
 //
-// DRAFT NOTE: the select + mapping duplicate app/my-favpolls/page.tsx;
+// DRAFT NOTE: the base select still shadows app/my-favpolls/page.tsx;
 // extract a shared fetch when the design is adopted.
 export default async function ManageFavpollPage({
   params,
@@ -43,15 +45,24 @@ export default async function ManageFavpollPage({
       grouping,
       subject,
       cause_label,
+      description,
+      photo_url,
       total_raised,
       goal_amount,
       is_listed,
+      is_private,
       allow_guest_items,
       created_at,
       created_by,
-      protagonists!favpolls_protagonist_id_fkey ( name ),
+      protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at ) ),
-      favpoll_polls ( id, personal_reveal, topics ( title ), pledges ( count ) ),
+      favpoll_polls (
+        id,
+        personal_reveal,
+        topics ( title ),
+        pledges ( count ),
+        favpoll_poll_favourites ( is_hidden, is_guest_added, favourites ( id, label ) )
+      ),
       favpoll_pots ( total_deposited, total_allocated )
     `
     )
@@ -75,27 +86,41 @@ export default async function ManageFavpollPage({
     grouping: string | null
     subject: string
     cause_label: string | null
+    description: string | null
+    photo_url: string | null
     total_raised: number
     goal_amount: number | null
     is_listed: boolean
+    is_private: boolean | null
     allow_guest_items: boolean | null
     created_at: string
-    protagonists: { name: string } | null
+    protagonists: {
+      name: string
+      context: string | null
+      about: string | null
+      photo_url: string | null
+    } | null
     favpoll_charities: {
-      charities: OrganizerFavpoll["charities"][number]["charity"]
+      charities: ManageFavpoll["charities"][number]["charity"]
     }[]
     favpoll_polls: {
       id: string
       personal_reveal: string | null
       topics: { title: string } | null
       pledges: { count: number }[]
+      favpoll_poll_favourites: {
+        is_hidden: boolean | null
+        is_guest_added: boolean | null
+        favourites: { id: string; label: string } | null
+      }[]
     } | null
     favpoll_pots: { total_deposited: number; total_allocated: number } | null
   }
 
   const [ev] = await withLiveTotals(supabase, [raw as unknown as RawRow])
+  const isCause = ev.subject === "cause"
 
-  const favpoll: OrganizerFavpoll = {
+  const favpoll: ManageFavpoll = {
     id: ev.id,
     live_slug: ev.live_slug,
     short_code: ev.short_code,
@@ -112,7 +137,7 @@ export default async function ManageFavpollPage({
     is_listed: ev.is_listed ?? true,
     allow_guest_items: ev.allow_guest_items ?? true,
     created_at: ev.created_at,
-    protagonist: ev.protagonists ?? null,
+    protagonist: ev.protagonists ? { name: ev.protagonists.name } : null,
     charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
     poll: ev.favpoll_polls
       ? { id: ev.favpoll_polls.id, topic: ev.favpoll_polls.topics ?? null }
@@ -120,6 +145,21 @@ export default async function ManageFavpollPage({
     pot: ev.favpoll_pots ?? null,
     pledge_count: ev.favpoll_polls?.pledges?.[0]?.count ?? 0,
     has_reveal: !!ev.favpoll_polls?.personal_reveal,
+    // ── The record's ledger fields ──
+    isPrivate: ev.is_private ?? false,
+    context: ev.protagonists?.context ?? null,
+    about: (isCause ? ev.description : ev.protagonists?.about) ?? null,
+    reveal: ev.favpoll_polls?.personal_reveal ?? null,
+    photoUrl: (isCause ? ev.photo_url : ev.protagonists?.photo_url) ?? null,
+    favourites: (ev.favpoll_polls?.favpoll_poll_favourites ?? [])
+      .filter((f) => f.favourites)
+      .map((f) => ({
+        id: f.favourites!.id,
+        label: f.favourites!.label,
+        isGuestAdded: !!f.is_guest_added,
+        isHidden: !!f.is_hidden,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   }
 
   const palette = paletteForFavpoll({
