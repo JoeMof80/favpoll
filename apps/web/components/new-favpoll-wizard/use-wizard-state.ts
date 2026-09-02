@@ -258,18 +258,15 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     event: category
       ? [category.charAt(0).toUpperCase() + category.slice(1)]
       : [],
-    charity:
-      charityNames.length <= 2
-        ? charityNames
-        : [charityNames[0], `+ ${charityNames.length - 1} more`],
+    charity: charityNames,
     topic: topics[0] ? [topics[0].title] : [],
-    // POSITIONAL, never filtered (founder, 2026-09-02: "make sure the
-    // rail content doesn't shift as we add values") — each field OWNS
-    // its line, empty ones render invisible, so filling a field never
-    // moves another. Order is the header's own: opening line, name,
+    // COMPACTED top-down (founder, 2026-09-02: a value below empty
+    // reserved lines "looks stranded") — the rail reserves uniform
+    // entry heights, so filled values stack from the top of the fixed
+    // frame and headers stay equidistant. Order is the header's own: opening line, name,
     // context.
-    info: [openingLine.trim(), name.trim(), context.trim()],
-    story: [about.trim(), reveal.trim()],
+    info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),
+    story: [about.trim(), reveal.trim()].filter(Boolean),
     details: [
       goalAmount ? `£${goalAmount} goal` : "",
       closesAt
@@ -284,7 +281,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       detailsSeen || visibilityOverride !== null
         ? VISIBILITY_LABELS[visibility]
         : "",
-    ],
+    ].filter(Boolean),
   }
 
   const railDone: Record<WizardStep, boolean> = {
@@ -337,11 +334,13 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   }
 
   // Which steps a click may open. Edit mode: all of them (the favpoll
-  // exists; every answer is revisitable). Create mode: only steps
-  // already passed — a forward jump would skip the step gates
-  // (nextDisabled), so onward travel stays with the Next button.
+  // exists; every answer is revisitable). Create mode: steps already
+  // passed OR already done — backing up must not strand completed
+  // steps ahead (founder, 2026-09-02). Forward jumps into UNFILLED
+  // steps stay barred: they'd skip the step gates (nextDisabled), so
+  // first-time onward travel stays with the Next button.
   function canJumpTo(target: WizardStep) {
-    return isEdit || STEPS.indexOf(target) < stepIndex
+    return isEdit || STEPS.indexOf(target) < stepIndex || railDone[target]
   }
 
   // The who axis lives on the Name field. Cause and Pair/Group are
