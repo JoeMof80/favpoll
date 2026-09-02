@@ -60,78 +60,67 @@ export function WizardStepRail({
   canJump,
 }: Props) {
   return (
-    // The TINT fills the whole grid column; the LAYOUT box inside is
-    // pinned to the viewport (sticky under the h-14 header, viewport
-    // height). justify-around spreads entries across the box's height,
-    // so the box must never track the CONTENT column — it used to be
-    // h-full, and every time the right side grew (a charity card, a
-    // topic card, a changed hint) the rail redistributed (founder,
-    // 2026-09-02: "the rail content is shifting again"). Viewport-pinned,
-    // its height only changes when the window does — and the rail now
-    // rides along on scroll.
-    <div className="hidden h-full bg-primary/10 md:block">
-      <div className="sticky top-14 flex h-[calc(100vh-3.5rem)] flex-col gap-6 p-6">
-        <div className="flex flex-1 flex-col justify-around gap-5">
-          {STEPS.map((s) => {
-            const Icon = STEP_ICONS[s]
-            const isActive = s === currentStep
-            const clickable = !!onStepClick && (canJump ? canJump(s) : true)
-            const Entry = clickable ? "button" : "div"
-            return (
-              <Entry
-                key={s}
-                {...(clickable
-                  ? { type: "button" as const, onClick: () => onStepClick?.(s) }
-                  : {})}
-                className={cn(
-                  "min-w-0 space-y-1 text-left transition-opacity",
-                  isActive || done[s] ? "opacity-100" : "opacity-60",
-                  clickable && "cursor-pointer hover:opacity-100"
-                )}
-              >
-                {/* gap-3 + pl-8: the label text lands at 56px from the
+    <div className="hidden h-full flex-col gap-6 bg-primary/10 p-6 md:flex">
+      <div className="flex flex-1 flex-col justify-around gap-5">
+        {STEPS.map((s) => {
+          const Icon = STEP_ICONS[s]
+          const isActive = s === currentStep
+          const clickable = !!onStepClick && (canJump ? canJump(s) : true)
+          const Entry = clickable ? "button" : "div"
+          return (
+            <Entry
+              key={s}
+              {...(clickable
+                ? { type: "button" as const, onClick: () => onStepClick?.(s) }
+                : {})}
+              className={cn(
+                "min-w-0 space-y-1 text-left transition-opacity",
+                isActive || done[s] ? "opacity-100" : "opacity-60",
+                clickable && "cursor-pointer hover:opacity-100"
+              )}
+            >
+              {/* gap-3 + pl-8: the label text lands at 56px from the
                   rail edge — the header wordmark's own inset (logo glyph
                   24px wide + gap-2) — so the rail reads as one column
                   with the chrome above it (founder, 2026-09-02,
                   measured). */}
-                <div className="flex items-center gap-3">
-                  <Icon
-                    className={cn(
-                      "h-5 w-5 shrink-0",
-                      isActive ? "text-primary" : "text-muted-foreground"
-                    )}
-                  />
-                  <p
-                    className={cn(
-                      "text-base font-medium tracking-widest uppercase",
-                      isActive ? "text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {STEP_LABELS[s]}
-                  </p>
-                  {done[s] && (
-                    <Check
-                      aria-label="Done"
-                      className="h-4 w-4 shrink-0 text-primary"
-                    />
+              <div className="flex items-center gap-3">
+                <Icon
+                  className={cn(
+                    "h-5 w-5 shrink-0",
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
-                </div>
-                {Array.from({ length: STEP_SLOTS[s] }, (_, i) => (
-                  <p
-                    key={i}
-                    title={summary[s][i] || undefined}
-                    className={cn(
-                      "truncate pl-8 text-sm text-muted-foreground",
-                      !summary[s][i] && "invisible"
-                    )}
-                  >
-                    {summary[s][i] || " "}
-                  </p>
-                ))}
-              </Entry>
-            )
-          })}
-        </div>
+                />
+                <p
+                  className={cn(
+                    "text-base font-medium tracking-widest uppercase",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {STEP_LABELS[s]}
+                </p>
+                {done[s] && (
+                  <Check
+                    aria-label="Done"
+                    className="h-4 w-4 shrink-0 text-primary"
+                  />
+                )}
+              </div>
+              {Array.from({ length: STEP_SLOTS[s] }, (_, i) => (
+                <p
+                  key={i}
+                  title={summary[s][i] || undefined}
+                  className={cn(
+                    "truncate pl-8 text-sm text-muted-foreground",
+                    !summary[s][i] && "invisible"
+                  )}
+                >
+                  {summary[s][i] || " "}
+                </p>
+              ))}
+            </Entry>
+          )
+        })}
       </div>
     </div>
   )
