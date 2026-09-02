@@ -58,9 +58,13 @@ export const NearlyDone: Story = {
       event: "Memorial",
       charity: "Marie Curie + 1 more",
       topic: "Colour · 8 favourites",
-      info: "Mary Whitfield",
+      info: "Mary Whitfield · Headmistress, retired",
       story: "A headmistress for forty-one years…",
       details: "£250 goal · closes 14 Sept · Link only",
+    },
+    extra: {
+      info: "In loving memory of our headmistress",
+      story: "Reveal · \u201CPurple. Always purple.\u201D",
     },
     done: {
       ...NONE,

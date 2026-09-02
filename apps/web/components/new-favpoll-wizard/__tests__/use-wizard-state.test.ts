@@ -338,6 +338,16 @@ describe("useWizardState — the rail tracks the answers", () => {
     expect(result.current.railSummary.charity).toBe("Shelter + 1 more")
     expect(result.current.railSummary.topic).toContain("Colour")
     expect(result.current.railSummary.info).toBe("Margaret")
+    act(() => result.current.setContext("Grandmother of six"))
+    expect(result.current.railSummary.info).toBe(
+      "Margaret · Grandmother of six"
+    )
+    act(() => result.current.setOpeningLine("In loving memory"))
+    expect(result.current.railExtra.info).toBe("In loving memory")
+    act(() => result.current.setReveal("Purple. She wore it always."))
+    expect(result.current.railExtra.story).toBe(
+      "Reveal · Purple. She wore it always."
+    )
     act(() => result.current.setAbout("She loved every colour."))
     expect(result.current.railSummary.story).toBe("She loved every colour.")
     expect(result.current.railDone.details).toBe(false)
