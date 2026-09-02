@@ -3,8 +3,9 @@
 // speak that kind's voice. The who-variable NAME ghosts retired when
 // the who menu moved to the Generate button (founder: "I never thought
 // it was necessary to have variable placeholders — it was the pronoun
-// selector that made them necessary"). The name ghost is now the plain
-// field promise: "Name", or "Name or Cause" under Fundraiser.
+// selector that made them necessary"). The name ghost speaks the category
+// exemplar's voice like every other field (founder, 2026-09-02) —
+// one static persona per category, no who-variability.
 export type FieldGhosts = {
   openingLine: string
   name: string
@@ -15,7 +16,7 @@ export type FieldGhosts = {
 
 export const DEFAULT_GHOSTS: FieldGhosts = {
   openingLine: "Replaces the default opening prefix",
-  name: "Name",
+  name: "Name or nickname",
   context: "e.g. turning 40 · Class of 2024",
   about:
     "Two or three sentences — tease the topic and the cause, but don't give too much away.",
@@ -26,7 +27,7 @@ export const DEFAULT_GHOSTS: FieldGhosts = {
 const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   memorial: {
     openingLine: "e.g. In loving memory of",
-    name: "Name",
+    name: "e.g. Mary Whitfield",
     context: "e.g. 1941 – 2026",
     about:
       "e.g. A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season she always loved most.",
@@ -34,7 +35,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   },
   celebration: {
     openingLine: "e.g. Celebrating",
-    name: "Name",
+    name: "e.g. Poppy Chen",
     context: "e.g. Sweet Sixteen",
     about:
       "e.g. Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",

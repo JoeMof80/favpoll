@@ -190,9 +190,12 @@ describe("NewFavpollWizard — the wizard continues past Topic", () => {
   it("Header gates on the name; Story and Settings follow; Publish is the last button", () => {
     reachInfo()
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled()
-    fireEvent.change(screen.getByPlaceholderText(/^Name$/), {
-      target: { value: "Poppy" },
-    })
+    fireEvent.change(
+      screen.getByPlaceholderText(/Poppy Chen|Name or nickname/),
+      {
+        target: { value: "Poppy" },
+      }
+    )
     expect(screen.getByRole("button", { name: "Next" })).not.toBeDisabled()
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument()
