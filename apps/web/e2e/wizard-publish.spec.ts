@@ -124,7 +124,7 @@ test.describe("wizard → publish flow", () => {
     await expect(page.getByRole("heading", { name: "Header" })).toBeVisible({
       timeout: 10_000,
     })
-    const nameInput = page.getByPlaceholder(/name or nickname|whitfield/i)
+    const nameInput = page.getByPlaceholder(/^name$/i)
     await expect(nameInput).toBeVisible({ timeout: 5_000 })
     await nameInput.fill(TEST_PROTAGONIST_NAME)
 
