@@ -339,7 +339,7 @@ describe("useWizardState — the rail tracks the answers", () => {
     expect(result.current.railSummary.topic).toContain("Colour")
     expect(result.current.railSummary.info).toBe("Margaret")
     act(() => result.current.setAbout("She loved every colour."))
-    expect(result.current.railSummary.story).toBe("4 words")
+    expect(result.current.railSummary.story).toBe("She loved every colour.")
     expect(result.current.railDone.details).toBe(false)
     act(() => result.current.setGoalAmount(250))
     act(() => result.current.setVisibility("unlisted"))

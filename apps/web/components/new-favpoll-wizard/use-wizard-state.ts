@@ -235,15 +235,14 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
 
   // The rail tracks the answers: a tick once a step's content is in, and
   // the chosen thing itself as a one-line FACT (option B, founder,
-  // 2026-09-02) — counts and states, never truncated prose. The story
-  // line was the worst offender: the raw opening of the About text read
-  // as noise where "84 words" answers the actual question.
+  // 2026-09-02) — counts and states. The story line
+  // is the exception: "52 words" was tried and rejected same day
+  // (founder: pointless) — it shows the story's own opening words.
   const topicFavouriteCount = topics[0]
     ? topics[0].isCustom
       ? (customItemCount ?? 0)
       : sortedExistingItems.length + customLabels.length
     : 0
-  const storyWordCount = about.trim() ? about.trim().split(/\s+/).length : 0
   const VISIBILITY_LABELS: Record<WizardVisibility, string> = {
     listed: "Listed",
     unlisted: "Link only",
@@ -265,10 +264,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
         }`
       : "",
     info: name.trim(),
-    story:
-      storyWordCount > 0
-        ? `${storyWordCount} word${storyWordCount === 1 ? "" : "s"}`
-        : "",
+    story: about.trim(),
     // Visibility always shows — the register-derived default (memorials
     // open link-only) is a fact worth surfacing before it is touched.
     details: [
