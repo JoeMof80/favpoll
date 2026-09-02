@@ -103,7 +103,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
       </WizardField>
 
       <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium">Photo</span>
+        <span className="block font-medium">Photo</span>
         {/* The avatar IS the button (founder, 2026-09-01): tap the photo —
             or the empty slot — to open the crop overlay. Same rounded-xl
             shape the page's ProtagonistAvatar wears, so what you press is
