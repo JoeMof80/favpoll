@@ -334,16 +334,23 @@ describe("useWizardState — the rail tracks the answers", () => {
     act(() => result.current.setTopics([EXISTING_TOPIC]))
     act(() => result.current.setName("Margaret"))
     expect(result.current.railDone.event).toBe(true)
-    expect(result.current.railSummary.event).toBe("Memorial")
-    expect(result.current.railSummary.charity).toBe("Shelter & Crisis")
-    expect(result.current.railSummary.topic).toBe("Colour")
-    expect(result.current.railSummary.info).toBe("Margaret")
-    // Prose is never excerpted — the Story line shows only the
-    // reveal's presence.
+    expect(result.current.railSummary.event).toEqual(["Memorial"])
+    expect(result.current.railSummary.charity).toEqual(["Shelter", "Crisis"])
+    expect(result.current.railSummary.topic[0]).toBe("Colour")
+    expect(result.current.railSummary.info).toEqual(["Margaret"])
+    act(() => result.current.setContext("Grandmother of six"))
+    act(() => result.current.setOpeningLine("In loving memory"))
+    expect(result.current.railSummary.info).toEqual([
+      "Margaret",
+      "Grandmother of six",
+      "In loving memory",
+    ])
     act(() => result.current.setAbout("She loved every colour."))
-    expect(result.current.railSummary.story).toBe("")
     act(() => result.current.setReveal("Purple. She wore it always."))
-    expect(result.current.railSummary.story).toBe("Reveal")
+    expect(result.current.railSummary.story).toEqual([
+      "She loved every colour.",
+      "Reveal · Purple. She wore it always.",
+    ])
     expect(result.current.railDone.details).toBe(false)
     act(() => result.current.setGoalAmount(250))
     act(() => result.current.setVisibility("unlisted"))

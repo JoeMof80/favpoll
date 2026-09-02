@@ -111,7 +111,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "event" && (
                 <WizardStepShell title="Event">
                   {w.stepLocked.event ? (
-                    lockedBody(w.railSummary.event)
+                    lockedBody(w.railSummary.event.join(" · "))
                   ) : (
                     <EventStep value={w.category} onChange={w.handleCategory} />
                   )}
@@ -121,7 +121,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "charity" && (
                 <WizardStepShell title="Charity">
                   {w.stepLocked.charity ? (
-                    lockedBody(w.railSummary.charity)
+                    lockedBody(w.railSummary.charity.join(" · "))
                   ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
@@ -147,7 +147,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "topic" && (
                 <WizardStepShell title="Topic">
                   {w.stepLocked.topic ? (
-                    lockedBody(w.railSummary.topic)
+                    lockedBody(w.railSummary.topic.join(" · "))
                   ) : w.topics.length > 0 ? (
                     <WizardTopicCard
                       topic={w.topics[0]!}
