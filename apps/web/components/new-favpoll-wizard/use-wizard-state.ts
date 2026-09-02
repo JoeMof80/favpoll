@@ -238,11 +238,6 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   // pre-clipped to the rail's reserved slots. See the doctrine comment
   // in wizard-step-rail.tsx.
   const charityNames = selectedCharities.map((c) => c.name)
-  const topicFavouriteCount = topics[0]
-    ? topics[0].isCustom
-      ? (customItemCount ?? 0)
-      : sortedExistingItems.length + customLabels.length
-    : 0
   const VISIBILITY_LABELS: Record<WizardVisibility, string> = {
     listed: "Listed",
     unlisted: "Link only",
@@ -256,16 +251,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       charityNames.length <= 2
         ? charityNames
         : [charityNames[0], `+ ${charityNames.length - 1} more`],
-    topic: topics[0]
-      ? [
-          topics[0].title,
-          ...(topicFavouriteCount > 0
-            ? [
-                `${topicFavouriteCount} favourite${topicFavouriteCount === 1 ? "" : "s"}`,
-              ]
-            : []),
-        ]
-      : [],
+    topic: topics[0] ? [topics[0].title] : [],
     // The header's own display order: opening line above name above
     // context (founder, 2026-09-02).
     info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),

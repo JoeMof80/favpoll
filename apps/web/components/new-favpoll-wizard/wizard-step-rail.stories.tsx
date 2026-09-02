@@ -45,7 +45,7 @@ export const MidFlow: Story = {
       ...EMPTY,
       event: ["Memorial"],
       charity: ["Marie Curie"],
-      topic: ["Colour", "8 favourites"],
+      topic: ["Colour"],
       details: ["Link only"],
     },
     done: { ...NONE, event: true, charity: true, topic: true },
@@ -58,7 +58,7 @@ export const NearlyDone: Story = {
     summary: {
       event: ["Memorial"],
       charity: ["Marie Curie", "Shelter"],
-      topic: ["Colour", "8 favourites"],
+      topic: ["Colour"],
       info: [
         "In loving memory of our headmistress",
         "Mary Whitfield",
