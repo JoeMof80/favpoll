@@ -71,7 +71,13 @@ export function WizardStepRail({
     // rides along on scroll.
     <div className="hidden h-full bg-primary/10 md:block">
       <div className="sticky top-14 flex h-[calc(100vh-3.5rem)] flex-col gap-6 p-6">
-        <div className="flex flex-1 flex-col justify-around gap-5">
+        {/* STATIC IN PLACE (founder, 2026-09-02): no distribution.
+            justify-around made every header's position a function of
+            box-height arithmetic, so any height bug anywhere moved
+            them. Top-anchored with a fixed gap, a header's position is
+            the constant sum of the constant-height entries above it —
+            nothing to redistribute, ever. */}
+        <div className="flex flex-col gap-8">
           {STEPS.map((s) => {
             const Icon = STEP_ICONS[s]
             const isActive = s === currentStep
