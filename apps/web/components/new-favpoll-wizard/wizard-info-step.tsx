@@ -2,61 +2,20 @@
 
 import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import {
-  Check,
-  ImagePlus,
-  Mars,
-  NonBinary,
-  Ribbon,
-  UserRound,
-  Venus,
-} from "lucide-react"
+import { ImagePlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { GroupIcon, PairIcon } from "@/components/icons/people"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
-import type { WhoValue } from "@/lib/who"
 import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
-
-// The gendered who icons (f8bff8f) and the founder-drawn Pair/Group
-// figures (components/icons/people.tsx). The TRIGGER reflects the
-// selection — the neutral single person until a who is chosen; the menu
-// items carry their glyphs (founder, prototype round 36).
-const WHO_ICONS: Record<WhoValue, React.ElementType> = {
-  he: Mars,
-  she: Venus,
-  they: NonBinary,
-  couple: PairIcon,
-  group: GroupIcon,
-  cause: Ribbon,
-}
-
-const WHO_LABELS: Record<WhoValue, string> = {
-  he: "He",
-  she: "She",
-  they: "They",
-  couple: "Pair",
-  group: "Group",
-  cause: "Cause",
-}
-
-const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
 
 export function WizardInfoStep({ w }: { w: WizardState }) {
   const [photoOpen, setPhotoOpen] = useState(false)
@@ -88,8 +47,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photoForm])
 
-  const ph = ghostsFor(w.category, w.who)
-  const WhoIcon = w.who ? WHO_ICONS[w.who] : UserRound
+  const ph = ghostsFor(w.category)
   const nameLabel =
     w.who === "cause"
       ? "Cause"
@@ -123,54 +81,7 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
             placeholder={ph.name}
             onChange={(e) => w.setName(e.target.value)}
           />
-          {/* !mr-0: the inline-end addon pulls itself -0.3rem right when
-              it holds a button, which misaligns the counter with its
-              neighbours (measured, prototype round 41). */}
-          <InputGroupAddon align="inline-end" className="!mr-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={
-                    w.who
-                      ? `Who: ${WHO_LABELS[w.who]}`
-                      : "Who is this favpoll for?"
-                  }
-                  className="text-muted-foreground/60 hover:text-foreground"
-                >
-                  <WhoIcon className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {PRONOUN_ORDER.map((k) => {
-                  const Icon = WHO_ICONS[k]
-                  return (
-                    <DropdownMenuItem key={k} onClick={() => w.handleWho(k)}>
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="flex-1">{WHO_LABELS[k]}</span>
-                      {w.who === k && <Check className="h-4 w-4" />}
-                    </DropdownMenuItem>
-                  )
-                })}
-                {/* Cause only under Fundraiser — a memorial or celebration
-                    is definitionally about someone, and subject "cause"
-                    would override the chosen type in deriveRegister. The
-                    who check keeps a prefilled cause representable in
-                    edit mode whatever its stored category. */}
-                {(w.category === "fundraiser" || w.who === "cause") && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => w.handleWho("cause")}>
-                      <Ribbon className="h-4 w-4 text-muted-foreground" />
-                      <span className="flex-1">Cause</span>
-                      {w.who === "cause" && <Check className="h-4 w-4" />}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <InputGroupAddon align="inline-end">
             <CharCounter value={w.name} max={40} />
           </InputGroupAddon>
         </InputGroup>
