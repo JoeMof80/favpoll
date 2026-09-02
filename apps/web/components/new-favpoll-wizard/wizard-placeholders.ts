@@ -1,10 +1,10 @@
-import type { WhoValue } from "@/lib/who"
-
-// Register-aware ghost text (extended-wizard prototype, rounds 17/36):
-// once the Event is picked the placeholders speak that kind's voice, and
-// the Name ghost follows the who selection — exactly the name Generate
-// would write. Guidance without prefilled text the organiser would have
-// to notice and delete.
+// Register-aware ghost text (extended-wizard prototype, rounds 17/36;
+// simplified 2026-09-02): once the Event is picked the placeholders
+// speak that kind's voice. The who-variable NAME ghosts retired when
+// the who menu moved to the Generate button (founder: "I never thought
+// it was necessary to have variable placeholders — it was the pronoun
+// selector that made them necessary"). The name ghost is now the plain
+// field promise: "Name", or "Name or Cause" under Fundraiser.
 export type FieldGhosts = {
   openingLine: string
   name: string
@@ -15,7 +15,7 @@ export type FieldGhosts = {
 
 export const DEFAULT_GHOSTS: FieldGhosts = {
   openingLine: "Replaces the default opening prefix",
-  name: "Name or nickname",
+  name: "Name",
   context: "e.g. turning 40 · Class of 2024",
   about:
     "Two or three sentences — tease the topic and the cause, but don't give too much away.",
@@ -26,7 +26,7 @@ export const DEFAULT_GHOSTS: FieldGhosts = {
 const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   memorial: {
     openingLine: "e.g. In loving memory of",
-    name: "e.g. Mary Whitfield",
+    name: "Name",
     context: "e.g. 1941 – 2026",
     about:
       "e.g. A headmistress for forty-one years with a gift for knowing every pupil's name. There was a season she always loved most.",
@@ -34,7 +34,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   },
   celebration: {
     openingLine: "e.g. Celebrating",
-    name: "e.g. Poppy Chen",
+    name: "Name",
     context: "e.g. Sweet Sixteen",
     about:
       "e.g. Sixteen on Saturday, and the family can't agree on one thing: the correct ice cream. Settle it with a pledge.",
@@ -42,7 +42,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   },
   fundraiser: {
     openingLine: "e.g. Cheering on",
-    name: "e.g. Marcus Bell",
+    name: "Name or Cause",
     context: "e.g. London Marathon run",
     about:
       "e.g. Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
@@ -51,34 +51,8 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
   },
 }
 
-const NAME_GHOSTS_BY_WHO: Record<string, Record<string, string>> = {
-  memorial: {
-    she: "Mary Whitfield",
-    he: "Edward Whitfield",
-    they: "Sam Whitfield",
-  },
-  celebration: { she: "Poppy Chen", he: "Alfie Chen", they: "Sam Chen" },
-  fundraiser: { she: "Amira Bell", he: "Marcus Bell", they: "Sam Bell" },
-}
-
-const WHO_NAME_GHOSTS: Partial<Record<WhoValue, string>> = {
-  couple: "Priya & Daniel",
-  group: "The Thursday Runners",
-  cause: "St Mark's Hospice",
-}
-
-export function ghostsFor(
-  category: string | null | undefined,
-  who: WhoValue | ""
-): FieldGhosts {
-  const base: FieldGhosts = category
+export function ghostsFor(category: string | null | undefined): FieldGhosts {
+  return category
     ? (GHOSTS_BY_CATEGORY[category] ?? DEFAULT_GHOSTS)
     : DEFAULT_GHOSTS
-  if (!who) return base
-  const whoName = WHO_NAME_GHOSTS[who]
-  const pronounName =
-    NAME_GHOSTS_BY_WHO[category ?? "celebration"]?.[who] ??
-    NAME_GHOSTS_BY_WHO.celebration?.[who]
-  const name = whoName ?? pronounName
-  return name ? { ...base, name: `e.g. ${name}` } : base
 }

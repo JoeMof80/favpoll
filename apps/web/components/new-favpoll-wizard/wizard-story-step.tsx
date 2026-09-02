@@ -7,7 +7,7 @@ import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
 
 export function WizardStoryStep({ w }: { w: WizardState }) {
-  const ph = ghostsFor(w.category, w.who)
+  const ph = ghostsFor(w.category)
   return (
     <div className="space-y-5">
       <WizardField

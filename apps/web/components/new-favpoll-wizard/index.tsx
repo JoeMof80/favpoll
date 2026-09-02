@@ -14,6 +14,7 @@ import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
 import { useWizardState } from "./use-wizard-state"
 import { WizardStepRail } from "./wizard-step-rail"
+import { WizardGenerateButton } from "./wizard-generate-button"
 import { WizardProgressStrip } from "./wizard-progress-strip"
 import { WizardNav } from "./wizard-nav"
 import { WizardCharityCard } from "./wizard-charity-card"
@@ -179,17 +180,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               {w.step === "story" && (
                 <WizardStepShell
                   title="Story"
-                  action={
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      disabled={w.generating || w.topics.length === 0}
-                      onClick={w.generateExample}
-                    >
-                      {w.generating ? "Generating…" : "✦ Generate an example"}
-                    </Button>
-                  }
+                  action={<WizardGenerateButton w={w} />}
                 >
                   <WizardStoryStep w={w} />
                 </WizardStepShell>
