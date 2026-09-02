@@ -113,6 +113,8 @@ function advanceToDetails(
   category: "celebration" | "fundraiser" | "memorial" = "celebration"
 ) {
   advanceToTopic(result, category)
+  // Close date is mandatory — the publish tests need one picked.
+  act(() => result.current.setClosesAt(new Date("2026-10-01T22:59:00.000Z")))
   act(() => result.current.setTopics([EXISTING_TOPIC]))
   act(() => result.current.handleNext())
   act(() => result.current.setName("Poppy Chen"))
@@ -464,6 +466,7 @@ describe("useWizardState — handleFinish publishes", () => {
     act(() => result.current.setAbout("About."))
     act(() => result.current.handleNext())
     sessionStorage.setItem(DRAFT_ADDITIONS_KEY, "{}")
+    act(() => result.current.setClosesAt(new Date("2026-10-01T22:59:00.000Z")))
     await act(async () => {
       await result.current.handleFinish()
     })

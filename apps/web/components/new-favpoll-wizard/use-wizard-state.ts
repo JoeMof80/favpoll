@@ -227,7 +227,10 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
             ? !name.trim()
             : step === "story"
               ? !about.trim()
-              : false
+              : // Close date is MANDATORY (founder, 2026-09-02) — the
+                // silent 14-day default let a memorial close at a
+                // moment nobody chose. Publish gates on it.
+                !closesAt
 
   const selectedCharities = data.charities.filter((c) =>
     charityIds.includes(c.id)
@@ -422,8 +425,9 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       const topicMeta = data.topics.find((t) => t.id === selected.topicId)
       const isCustomTopic = selected.isCustom ?? false
 
-      const resolvedClosesAt =
-        closesAt ?? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      // Guaranteed by the details gate; the throw guards direct calls.
+      if (!closesAt) throw new Error("Missing close date")
+      const resolvedClosesAt = closesAt
 
       sessionStorage.removeItem(DRAFT_ADDITIONS_KEY)
 

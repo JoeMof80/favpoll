@@ -83,7 +83,9 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
       </div>
 
       <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium">Close date</span>
+        <span className="font-medium">
+          Close date<span className="text-muted-foreground"> *</span>
+        </span>
         {/* The 90-day cap lives in the picker's disabled dates and the
             server-side guard — no hint sentence (prototype round 38). */}
         <DateTimePicker
