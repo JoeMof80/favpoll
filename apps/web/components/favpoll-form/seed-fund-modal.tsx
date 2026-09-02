@@ -131,7 +131,7 @@ export function SeedFundModal({
     <div className="flex flex-col gap-3">
       <Button
         type="button"
-        className="w-full"
+        className="h-11 w-full md:text-base"
         disabled={!isValid || submitting}
         onClick={handleSeed}
       >
@@ -140,7 +140,7 @@ export function SeedFundModal({
       <Button
         type="button"
         variant="ghost"
-        className="w-full"
+        className="h-11 w-full md:text-base"
         onClick={onCancel}
       >
         No thanks
@@ -150,7 +150,7 @@ export function SeedFundModal({
     <div className="flex flex-col gap-3">
       <Button
         type="button"
-        className="w-full"
+        className="h-11 w-full md:text-base"
         disabled={!isValid || submitting}
         onClick={handleSeed}
       >
@@ -159,7 +159,7 @@ export function SeedFundModal({
       <Button
         type="button"
         variant="ghost"
-        className="w-full"
+        className="h-11 w-full md:text-base"
         onClick={onComplete}
       >
         Skip for now
@@ -218,7 +218,7 @@ export function SeedFundModal({
             key={preset}
             type="button"
             variant="outline"
-            className="flex-1"
+            className="h-11 flex-1 md:text-base"
             onClick={() => setAmount(String(preset))}
           >
             £{preset}

@@ -147,14 +147,14 @@ export function PledgeDialog({
       <Button
         type="button"
         variant="outline"
-        className="flex-1"
+        className="h-11 flex-1 md:text-base"
         onClick={() => handleOpenChange(false)}
       >
         Cancel
       </Button>
       <Button
         type="button"
-        className="flex-1 text-base"
+        className="h-11 flex-1 text-base"
         disabled={!dialog.canAdvanceStep1}
         onClick={() => dialog.handleNext()}
       >
@@ -173,14 +173,14 @@ export function PledgeDialog({
       <Button
         type="button"
         variant="outline"
-        className="flex-1"
+        className="h-11 flex-1 md:text-base"
         onClick={dialog.handleBack}
       >
         ← Back
       </Button>
       <Button
         type="button"
-        className="flex-1 text-base"
+        className="h-11 flex-1 text-base"
         disabled={isNextDisabled}
         onClick={() => dialog.handleNext()}
       >
@@ -194,7 +194,7 @@ export function PledgeDialog({
       <Button
         type="button"
         variant="outline"
-        className="flex-1"
+        className="h-11 flex-1 md:text-base"
         disabled={stripeSubmitting}
         onClick={dialog.handleBack}
       >
@@ -203,7 +203,7 @@ export function PledgeDialog({
       <Button
         type="submit"
         form="pledge-checkout-form"
-        className="flex-1"
+        className="h-11 flex-1 md:text-base"
         disabled={stripeSubmitting || !stripeReady}
       >
         {stripeSubmitting ? "Processing…" : "Pay now"}

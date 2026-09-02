@@ -107,6 +107,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
               (founder, 2026-09-01: "use this UI"), replacing the fused
               toggle-group bar. */}
           <SegmentedControl
+            size="lg"
             label="Who can see this favpoll"
             value={w.visibility}
             onChange={(v) => w.setVisibility(v as WizardVisibility)}

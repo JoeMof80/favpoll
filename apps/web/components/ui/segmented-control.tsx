@@ -20,6 +20,7 @@ export function SegmentedControl<T extends string>({
   value,
   onChange,
   label,
+  size = "sm",
   className,
 }: {
   options: readonly Segment<T>[]
@@ -27,6 +28,10 @@ export function SegmentedControl<T extends string>({
   onChange: (value: T) => void
   /** Names the group for assistive tech — the visible label is separate. */
   label: string
+  /** "lg" is the 44px form-control scale (founder, 2026-09-02 — one
+   * height wherever form elements appear); "sm" stays the toolbar
+   * idiom. */
+  size?: "sm" | "lg"
   className?: string
 }) {
   return (
@@ -34,7 +39,8 @@ export function SegmentedControl<T extends string>({
       role="group"
       aria-label={label}
       className={cn(
-        "flex items-center rounded-lg border border-border bg-background p-0.5 shadow-xs",
+        "flex rounded-lg border border-border bg-background shadow-xs",
+        size === "lg" ? "h-11 items-stretch p-1" : "items-center p-0.5",
         className
       )}
     >
@@ -45,7 +51,8 @@ export function SegmentedControl<T extends string>({
           onClick={() => onChange(opt.value)}
           aria-pressed={value === opt.value}
           className={cn(
-            "rounded-md px-3 py-1 text-sm font-medium transition-colors",
+            "inline-flex items-center rounded-md font-medium transition-colors",
+            size === "lg" ? "px-4 text-sm md:text-base" : "px-3 py-1 text-sm",
             value === opt.value
               ? "bg-primary/10 text-primary"
               : "text-muted-foreground hover:text-foreground"
