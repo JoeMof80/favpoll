@@ -9,7 +9,6 @@ import {
   Check,
   Copy,
   ExternalLink,
-  EyeOff,
   Monitor,
   Pencil,
   Printer,
@@ -379,17 +378,15 @@ export function ManageClient({
           </Card>
 
           <Card title="Story" editable>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+            <p className="text-xs text-muted-foreground">About</p>
+            <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
               {favpoll.about || (
                 <span className="text-muted-foreground">None written.</span>
               )}
             </p>
             <div className="mt-4 border-t border-border pt-3">
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <EyeOff size={12} aria-hidden="true" />
-                The reveal — hidden from guests until they pledge
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+              <p className="text-xs text-muted-foreground">Reveal</p>
+              <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
                 {favpoll.reveal || (
                   <span className="text-muted-foreground">None written.</span>
                 )}
