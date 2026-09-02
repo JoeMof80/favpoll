@@ -1,13 +1,6 @@
 "use client"
 
-import {
-  Check,
-  ChevronDown,
-  Mars,
-  NonBinary,
-  Ribbon,
-  Venus,
-} from "lucide-react"
+import { Check, Mars, NonBinary, Ribbon, UserRound, Venus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -28,8 +21,10 @@ import type { WizardState } from "./use-wizard-state"
 // retired with the move (see wizard-placeholders.ts).
 //
 // The gendered icons (f8bff8f) and the founder-drawn Pair/Group figures
-// (components/icons/people.tsx). The trigger wears the selection — the
-// bare chevron until a who is chosen.
+// (components/icons/people.tsx). The trigger is the PREFIX half
+// (founder, 2026-09-02) and wears the selection — the neutral single
+// person until a who is chosen, the same grammar as its old name-field
+// home. No chevron: the person IS the handle.
 const WHO_ICONS: Record<WhoValue, React.ElementType> = {
   he: Mars,
   she: Venus,
@@ -51,19 +46,9 @@ const WHO_LABELS: Record<WhoValue, string> = {
 const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
 
 export function WizardGenerateButton({ w }: { w: WizardState }) {
-  const WhoIcon = w.who ? WHO_ICONS[w.who] : null
+  const WhoIcon = w.who ? WHO_ICONS[w.who] : UserRound
   return (
     <div className="flex gap-px">
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        disabled={w.generating || w.topics.length === 0}
-        onClick={w.generateExample}
-        className="rounded-r-none"
-      >
-        {w.generating ? "Generating…" : "✦ Generate an example"}
-      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -73,13 +58,12 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             aria-label={
               w.who ? `Who: ${WHO_LABELS[w.who]}` : "Who is this favpoll for?"
             }
-            className="rounded-l-none px-1.5"
+            className="rounded-r-none px-2"
           >
-            {WhoIcon && <WhoIcon className="h-4 w-4" aria-hidden="true" />}
-            <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            <WhoIcon className="h-4 w-4" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="start">
           {PRONOUN_ORDER.map((k) => {
             const Icon = WHO_ICONS[k]
             return (
@@ -107,6 +91,16 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        disabled={w.generating || w.topics.length === 0}
+        onClick={w.generateExample}
+        className="rounded-l-none"
+      >
+        {w.generating ? "Generating…" : "✦ Generate an example"}
+      </Button>
     </div>
   )
 }
