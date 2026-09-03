@@ -288,6 +288,12 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       detailsSeen || visibilityOverride !== null
         ? VISIBILITY_LABELS[visibility]
         : "",
+      // Same gate; an off prefilled from edit always shows.
+      detailsSeen || !allowGuestItems
+        ? allowGuestItems
+          ? "Guest additions on"
+          : "Guest additions off"
+        : "",
     ].filter(Boolean),
   }
 
