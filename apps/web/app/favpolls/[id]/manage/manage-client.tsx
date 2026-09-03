@@ -362,7 +362,7 @@ export function ManageClient({
           <Button asChild variant="outline" size="sm">
             <a href={`/favpolls/${favpoll.id}/pack`}>
               <Printer data-icon="inline-start" aria-hidden="true" />
-              Print pack
+              Stationery
             </a>
           </Button>
           {isClosed && (
