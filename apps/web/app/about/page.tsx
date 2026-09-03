@@ -53,14 +53,28 @@ const BASICS: { label: string; body: string }[] = [
 // is the questions with a real answer behind them — goal-as-milestone, the
 // shared fund, and what closing means. The fee question lives in the
 // "Where the money goes" section, not here.
-const FAQ_ITEMS: { q: string; a: string }[] = [
+// Answers are ReactNode since 2026-09-03: first mentions of features
+// link to their /features sections — the reference the FAQ leans on.
+const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
   {
     q: "If I set a goal, does pledging stop once it's reached?",
     a: "No. A goal is a milestone, not a finish line. The favpoll stays open until its closing date, and every pledge after the goal still counts.",
   },
   {
     q: "Can someone pledge for a guest who can't pay?",
-    a: "Yes. Anyone can top up a shared fund, so a child or a guest without means can still take part — and nobody sees who used it.",
+    a: (
+      <>
+        Yes. Anyone can top up a{" "}
+        <Link
+          href="/features#shared-fund"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          shared fund
+        </Link>
+        , so a child or a guest without means can still take part — and nobody
+        sees who used it.
+      </>
+    ),
   },
   {
     // The wall left /features on 2026-08-19 — folded into the live display,
@@ -69,7 +83,19 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     // the capability grid gave for keeping it on /features in the first place
     // ("absence reads as absence"). About is the spec now; /features is not.
     q: "Can guests see who pledged?",
-    a: "Names and favourites, never amounts. The wall of favourites shows who backed what — on the favpoll itself and on the live display — and anyone can appear as “Someone” instead.",
+    a: (
+      <>
+        Names and favourites, never amounts. The wall of favourites shows who
+        backed what — on the favpoll itself and on the{" "}
+        <Link
+          href="/features#display"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          live display
+        </Link>{" "}
+        — and anyone can appear as “Someone” instead.
+      </>
+    ),
   },
   {
     // THE PRIVACY PROMISE LANDS HERE (founder, 2026-08-19) because /features
@@ -85,7 +111,20 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     // dashboard reads aggregates only — total_raised, goal_amount, and the
     // pot's deposited/allocated. Nobody has a screen that shows who gave what.
     q: "Does anyone see how much I gave?",
-    a: "No. favpoll shows presence, not size — the wall of favourites, the keepsake and the spreadsheet export carry names and favourites, never what any one person gave. Standings show what each favourite raised between everyone, and the organiser sees the total.",
+    a: (
+      <>
+        No. favpoll shows presence, not size — the wall of favourites, the{" "}
+        <Link
+          href="/features#keepsake"
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          keepsake
+        </Link>{" "}
+        and the spreadsheet export carry names and favourites, never what any
+        one person gave. Standings show what each favourite raised between
+        everyone, and the organiser sees the total.
+      </>
+    ),
   },
   {
     q: "What happens when a favpoll closes?",
