@@ -96,16 +96,10 @@ export function IdeasSection({
                 </figcaption>
                 <div
                   className={cn(
-                    // The frame comes off: the vignettes wrap themselves in
-                    // Vignette's tinted, bordered box, which reads as a card
-                    // on /features where each sits alone in a section. Beside
-                    // a column of text it reads as a widget.
-                    //
-                    // overflow-visible goes with the rest of it: stripping
-                    // the border, radius and tint left an INVISIBLE clip
-                    // still cutting the live display's wall shadow, which is
-                    // a frame doing damage after being told to go away.
-                    "min-w-0 [&_[data-vignette]]:max-w-none [&_[data-vignette]]:overflow-visible [&_[data-vignette]]:rounded-none [&_[data-vignette]]:border-0 [&_[data-vignette]]:bg-transparent",
+                    // Vignette lost its visible chrome globally (2026-09-03),
+                    // so only the width release is still this page's own:
+                    // beside a column of text the artefact takes the column.
+                    "min-w-0 [&_[data-vignette]]:max-w-none",
                     mediaLeft && "lg:order-1"
                   )}
                 >

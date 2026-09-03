@@ -11,6 +11,14 @@ import { cn } from "@/lib/utils"
 // A width, a tint and a border, in one place. Everything inside is decorative
 // by definition: inert to pointer, hidden from the accessibility tree, and
 // never the only place a fact appears — the section lead says it in words.
+//
+// THE VISIBLE CHROME CAME OFF (founder, 2026-09-03: "they feel
+// pointless"). The register pages had already stripped the border, tint,
+// radius AND the overflow-hidden per-page — the last of those because an
+// invisible clip kept cutting the live display's wall shadow. What
+// remains is the component's real work: the shared max-width, the
+// inert/aria-hidden boundary, and the data-vignette hook the layout e2e
+// asserts on. Artefacts now sit directly on the page.
 
 export function Vignette({
   children,
@@ -47,7 +55,7 @@ export function Vignette({
       data-vignette
       aria-hidden={interactive ? undefined : "true"}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border bg-primary/5 select-none",
+        "relative select-none",
         !interactive && "pointer-events-none",
         wide ? "max-w-4xl" : "max-w-2xl",
         className
