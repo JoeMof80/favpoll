@@ -44,7 +44,9 @@ export default async function MyFavpollsPage() {
   const favpolls = withTotals.map(mapOrganizerFavpoll)
 
   return (
-    <main className="min-h-screen bg-muted">
+    // The favpoll surfaces' shared ground (PageLayout's register wash;
+    // default blue here — the list spans registers, so no scope).
+    <main className="min-h-screen bg-primary/5">
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (
