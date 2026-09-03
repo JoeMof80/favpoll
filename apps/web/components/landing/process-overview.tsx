@@ -47,6 +47,7 @@ import {
   DEMO_KEEPSAKE_WALKTHROUGH_DATA,
 } from "@/components/landing/demo-fixture"
 import { KeepsakeSheet } from "@/components/keepsake/keepsake-sheet"
+import Link from "next/link"
 import {
   DisplayStill,
   DISPLAY_STILL_ROOM,
@@ -92,6 +93,39 @@ type Beat = {
   label: string
   body: string
   medium: Medium
+}
+
+// FIRST MENTIONS LINK TO THE REFERENCE (founder, 2026-09-03, extending
+// the triad/ideas doctrine to the homepage walkthrough): the terms that
+// NAME a feature link to its /features section, first occurrence per
+// beat, quiet ink. Only naturally-occurring names — "shared fund" and
+// "printed stationery" — are in the table; the reveal, room and
+// keepsake beats carry no clean term in their bodies and stay plain
+// rather than force one. Structural: the founder's copy strings are
+// untouched.
+const LINK_TERMS: { term: string; href: string }[] = [
+  { term: "shared fund", href: "/features#shared-fund" },
+  { term: "printed stationery", href: "/features#stationery" },
+]
+
+function linkifyTerms(body: string): React.ReactNode {
+  for (const { term, href } of LINK_TERMS) {
+    const at = body.indexOf(term)
+    if (at === -1) continue
+    return (
+      <>
+        {body.slice(0, at)}
+        <Link
+          href={href}
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          {term}
+        </Link>
+        {body.slice(at + term.length)}
+      </>
+    )
+  }
+  return body
 }
 
 const BEATS: Beat[] = [
@@ -572,7 +606,7 @@ export function ProcessOverview() {
                     24px type in a 28rem column runs to ~30 characters a line
                     and reads as a narrow ribbon. */}
                 <p className="text-xl leading-relaxed text-muted-foreground md:text-2xl">
-                  {beat.body}
+                  {linkifyTerms(beat.body)}
                 </p>
                 {/* MOBILE: this beat's OWN medium, under its text (founder,
                     2026-08-17). The section used to stack six texts on mobile
