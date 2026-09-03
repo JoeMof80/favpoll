@@ -61,6 +61,7 @@ export type WizardEditConfig = {
     goalAmount: number | undefined
     isListed: boolean
     isPrivate: boolean
+    allowGuestItems: boolean
   }
 }
 
@@ -133,6 +134,9 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
   )
   const [closesAt, setClosesAt] = useState<Date | undefined>(
     edit?.initialClosesAt ? new Date(edit.initialClosesAt) : undefined
+  )
+  const [allowGuestItems, setAllowGuestItems] = useState(
+    init?.allowGuestItems ?? true
   )
   const [visibilityOverride, setVisibilityOverride] =
     useState<WizardVisibility | null>(
@@ -283,6 +287,12 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
       // Seen or touched — never a stranded default.
       detailsSeen || visibilityOverride !== null
         ? VISIBILITY_LABELS[visibility]
+        : "",
+      // Same gate; an off prefilled from edit always shows.
+      detailsSeen || !allowGuestItems
+        ? allowGuestItems
+          ? "Guest additions on"
+          : "Guest additions off"
         : "",
     ].filter(Boolean),
   }
@@ -448,6 +458,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
           closesAt: resolvedClosesAt.toISOString(),
           isPrivate,
           isListed,
+          allowGuestItems,
           potAmount: null,
           goalAmount: goalAmount ?? null,
           poll: {
@@ -490,6 +501,7 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
         closesAt: resolvedClosesAt.toISOString(),
         isPrivate,
         isListed,
+        allowGuestItems,
         potAmount: null,
         goalAmount: goalAmount ?? null,
         poll: {
@@ -589,6 +601,8 @@ export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
     setClosesAt,
     visibility,
     setVisibility: (v: WizardVisibility) => setVisibilityOverride(v),
+    allowGuestItems,
+    setAllowGuestItems,
     isCause,
     isEdit,
     stepLocked,

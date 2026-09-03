@@ -38,7 +38,7 @@ export const STEP_ICONS: Record<WizardStep, React.ElementType> = {
 // make the headers evenly spaced and immovable, and values COMPACT
 // top-down inside the fixed frame so none sits stranded below empty
 // reserved lines ("'Listed' looks stranded").
-const STEP_SLOTS = 3
+const STEP_SLOTS = 4
 
 type Props = {
   currentStep: WizardStep

@@ -1,0 +1,640 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  ExternalLink,
+  Monitor,
+  Pencil,
+  Printer,
+  Share2,
+  Sparkles,
+  Trash2,
+} from "lucide-react"
+import { BrandedQR } from "@/components/branded-qr"
+import {
+  WallOfFavourites,
+  type WallEntry,
+} from "@/components/wall-of-favourites"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { ToolbarBand } from "@/components/ui/toolbar-band"
+import {
+  SegmentedControl,
+  ToolbarLabel,
+} from "@/components/ui/segmented-control"
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Switch } from "@/components/ui/switch"
+import { Chip } from "@/components/ui/chip"
+import { CharityRow } from "@/components/charity-row"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { cn } from "@/lib/utils"
+import { formatAmount } from "@/lib/display"
+import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
+import {
+  deleteFavpoll,
+  setFavpollVisibility,
+  setFavpollGuestItems,
+} from "@/app/favpolls/[id]/actions"
+import {
+  type OrganizerFavpoll,
+  WARNING_THRESHOLD_DAYS,
+  isFavpollClosed,
+  daysRemaining,
+} from "@/components/organizer-row/utils"
+
+/** The complete administrative record: the organiser list's row data
+ * plus every authored thing in full. */
+export type ManageFavpoll = OrganizerFavpoll & {
+  isPrivate: boolean
+  context: string | null
+  about: string | null
+  reveal: string | null
+  photoUrl: string | null
+  favourites: {
+    id: string
+    label: string
+    isGuestAdded: boolean
+    isHidden: boolean
+  }[]
+}
+
+type Visibility = "listed" | "unlisted" | "private"
+
+// A card in either lane. ONE Edit door for the whole page — the
+// toolbar's (founder, 2026-09-03); per-card doors all led to the same
+// wizard anyway. Module scope, not inside ManageClient: a component
+// created during render is remade every pass (react-compiler error).
+function Card({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className="rounded-xl border border-border bg-background p-5">
+      <div className="mb-4">
+        <SectionEyebrow as="h2">{title}</SectionEyebrow>
+      </div>
+      {children}
+    </section>
+  )
+}
+
+const formatLongDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+
+// THE COMPLETE RECORD, composed (founder, 2026-09-03). The sticky
+// ToolbarBand leads the page — the stationery workspace's own
+// subheader, tools flush right, nothing else in it. Beneath, the page
+// column: back-link, identity, then two lanes —
+//
+// - MAIN — the record itself, in THE FAVPOLL'S OWN ANATOMY (header →
+//   story → topic → charities) so the organiser proofs the artefact as
+//   it will be experienced. Read-only with Edit doors into the wizard.
+// - SIDE — the operation, grouped by kind: Charities, Money (raised ·
+//   goal · pledges · fund), the guest wall. Visibility, guest
+//   additions, the doors and the share popover all ride the toolbar.
+export function ManageClient({
+  favpoll,
+  wallEntries,
+}: {
+  favpoll: ManageFavpoll
+  wallEntries: WallEntry[]
+}) {
+  const router = useRouter()
+  const isClosed = isFavpollClosed(favpoll)
+  const days = daysRemaining(favpoll.closes_at)
+  const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
+
+  // The origin resolves in an effect, not at render: reading
+  // window.location.origin during render makes the server (no window)
+  // and the client (tunnel hosts, ports) disagree — a hydration
+  // mismatch on every href built from it.
+  const [baseUrl, setBaseUrl] = useState(process.env.NEXT_PUBLIC_BASE_URL || "")
+  useEffect(() => {
+    setBaseUrl((prev) => prev || window.location.origin)
+  }, [])
+  const guestUrl = baseUrl
+    ? `${baseUrl}/favpolls/${favpoll.id}`
+    : `/favpolls/${favpoll.id}`
+  const qrUrl = baseUrl
+    ? `${baseUrl}/p/${favpoll.short_code}`
+    : `/p/${favpoll.short_code}`
+  const displayUrl = baseUrl
+    ? `${baseUrl}/live/${favpoll.live_slug}`
+    : `/live/${favpoll.live_slug}`
+
+  const name =
+    favpoll.subject === "cause"
+      ? (favpoll.cause_label ?? "")
+      : (favpoll.protagonist?.name ?? "")
+  const topicTitle = favpoll.poll?.topic?.title
+  const eyebrow =
+    favpoll.occasion_type ??
+    (favpoll.category
+      ? favpoll.category.charAt(0).toUpperCase() + favpoll.category.slice(1)
+      : "favpoll")
+
+  const [visibility, setVisibilityState] = useState<Visibility>(
+    favpoll.isPrivate ? "private" : favpoll.is_listed ? "listed" : "unlisted"
+  )
+  const [visibilityPending, setVisibilityPending] = useState(false)
+  const [guestItems, setGuestItems] = useState(
+    favpoll.allow_guest_items !== false
+  )
+  const [guestItemsPending, setGuestItemsPending] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  const copyTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  useEffect(() => {
+    const timers = copyTimersRef.current
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  function copy(key: string, url: string) {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(key)
+      copyTimersRef.current.push(setTimeout(() => setCopied(null), 2000))
+    })
+  }
+
+  async function handleVisibility(v: Visibility) {
+    const prev = visibility
+    setVisibilityState(v)
+    setVisibilityPending(true)
+    try {
+      await setFavpollVisibility(favpoll.id, v)
+    } catch {
+      setVisibilityState(prev)
+    } finally {
+      setVisibilityPending(false)
+    }
+  }
+
+  async function handleToggleGuestItems(value: boolean) {
+    setGuestItems(value)
+    setGuestItemsPending(true)
+    try {
+      await setFavpollGuestItems(favpoll.id, value)
+    } catch {
+      setGuestItems(!value)
+    } finally {
+      setGuestItemsPending(false)
+    }
+  }
+
+  const canDelete =
+    favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
+
+  async function handleDelete() {
+    if (
+      !window.confirm(`Delete ${name || "this favpoll"}? This can't be undone.`)
+    )
+      return
+    setDeleting(true)
+    try {
+      await deleteFavpoll(favpoll.id)
+      router.push("/my-favpolls")
+    } catch {
+      toast.error("Couldn't delete this favpoll — please try again.", {
+        style: TOAST_ERROR_STYLE,
+      })
+      setDeleting(false)
+    }
+  }
+
+  const fact = (label: string, value: React.ReactNode) => (
+    <div className="min-w-0">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <div className="mt-0.5 text-sm text-foreground">{value}</div>
+    </div>
+  )
+
+  // Label and value share a line — the record's gutter grammar.
+  const inlineFact = (label: string, value: React.ReactNode) => (
+    <div className="flex items-baseline gap-3">
+      <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
+      <div className="min-w-0 flex-1 truncate text-sm text-foreground">
+        {value}
+      </div>
+    </div>
+  )
+
+  const linkRow = (
+    key: string,
+    label: string,
+    Icon: typeof ExternalLink,
+    href: string,
+    display: string,
+    external: boolean
+  ) => {
+    // The scheme is noise in a 220px popover — show host+path, copy
+    // the full link (founder, 2026-09-03).
+    const shown = display.replace(/^https?:\/\//, "")
+    return (
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-foreground">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <Icon
+            size={11}
+            className="shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+          {external ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+              title={display}
+              suppressHydrationWarning
+            >
+              {shown}
+            </a>
+          ) : (
+            <Link
+              href={href}
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+              title={display}
+              suppressHydrationWarning
+            >
+              {shown}
+            </Link>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={() => copy(key, display)}
+            aria-label={`Copy ${label} link`}
+          >
+            {copied === key ? (
+              <Check size={12} aria-hidden="true" />
+            ) : (
+              <Copy size={12} aria-hidden="true" />
+            )}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const perCharity =
+    favpoll.charities.length > 0
+      ? favpoll.total_raised / favpoll.charities.length
+      : 0
+
+  return (
+    <>
+      {/* THE SUBHEADER (founder, 2026-09-03: "like the stationery
+          page") — the sticky ToolbarBand leads the page, tools flush
+          right, nothing else in it. Identity lives below, at the top
+          of the record column. */}
+      <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <Link
+          href="/my-favpolls"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft size={14} aria-hidden="true" />
+          Your favpolls
+        </Link>
+        <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-2">
+          <ToolbarLabel>Visibility</ToolbarLabel>
+          <SegmentedControl
+            label="Who can see this favpoll"
+            value={visibility}
+            onChange={(v) => {
+              if (!visibilityPending) handleVisibility(v as Visibility)
+            }}
+            options={[
+              { value: "listed", label: "Listed" },
+              { value: "unlisted", label: "Link only" },
+              { value: "private", label: "Private" },
+            ]}
+          />
+          <ToolbarLabel>Guest additions</ToolbarLabel>
+          <Switch
+            checked={guestItems}
+            onCheckedChange={handleToggleGuestItems}
+            disabled={guestItemsPending}
+            aria-label={
+              guestItems
+                ? "Guests can add favourites — click to stop them"
+                : "Guests cannot add favourites — click to allow it"
+            }
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            {/* The favpoll-object actions fuse into one control; the
+                surface doors (Stationery, Keepsake, Share) stand
+                alone (founder, 2026-09-03). */}
+            <ButtonGroup>
+              <Button asChild variant="outline">
+                <a href={guestUrl} target="_blank" rel="noreferrer">
+                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
+                  View
+                </a>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canDelete || deleting}
+                onClick={handleDelete}
+                title={
+                  canDelete
+                    ? undefined
+                    : "Favpolls with pledges can't be deleted."
+                }
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 data-icon="inline-start" aria-hidden="true" />
+                {deleting ? "Deleting…" : "Delete"}
+              </Button>
+            </ButtonGroup>
+            <Button asChild variant="outline">
+              <a href={`/favpolls/${favpoll.id}/stationery`}>
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                Stationery
+              </a>
+            </Button>
+            {isClosed && (
+              <Button asChild variant="outline">
+                <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                  <Sparkles data-icon="inline-start" aria-hidden="true" />
+                  Keepsake
+                </Link>
+              </Button>
+            )}
+            {/* SHARE AS A POPOVER (founder, 2026-09-03): sharing is an
+                action, so it rides the toolbar — a Popover, not a
+                menu, because the content is interactive (copy
+                buttons, QR). */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline">
+                  <Share2 data-icon="inline-start" aria-hidden="true" />
+                  Share
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-55 p-5">
+                {/* QR leads, near-full width — the thing handed
+                    across a table; links stack beneath (founder,
+                    2026-09-03). 288 read as too big; 180 settled. */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-center" suppressHydrationWarning>
+                    <BrandedQR
+                      value={qrUrl}
+                      size={180}
+                      aria-label="QR code for the guest-facing favpoll page"
+                    />
+                  </div>
+                  <div className="flex min-w-0 flex-col gap-3">
+                    {linkRow(
+                      "guest",
+                      "favpoll",
+                      ExternalLink,
+                      guestUrl,
+                      guestUrl,
+                      true
+                    )}
+                    {linkRow(
+                      "display",
+                      "Live favpoll",
+                      Monitor,
+                      displayUrl,
+                      displayUrl,
+                      true
+                    )}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </ToolbarBand>
+
+      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+        <div className="grid items-end gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+              {eyebrow}
+            </p>
+            <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+              {name}
+            </h1>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">
+              {isClosed ? "Closed" : "Closes"}
+            </p>
+            <p
+              className={cn(
+                "mt-0.5 text-2xl font-medium",
+                !isClosed && isWarning
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-foreground"
+              )}
+            >
+              {formatLongDate(
+                isClosed
+                  ? (favpoll.closed_at ?? favpoll.closes_at)
+                  : favpoll.closes_at
+              )}
+              {!isClosed && (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          {/* ═══ MAIN LANE — the record ═══ */}
+          <div className="flex min-w-0 flex-col gap-6">
+            <Card title="Header">
+              <div className="flex items-start justify-between gap-4">
+                <div className="grid min-w-0 flex-1 gap-2">
+                  {inlineFact("Opening line", favpoll.opening_line || "—")}
+                  {inlineFact("Name", name || "—")}
+                  {inlineFact("Context", favpoll.context || "—")}
+                </div>
+                <ProtagonistAvatar
+                  name={name}
+                  photoUrl={favpoll.photoUrl}
+                  className="h-18 w-18 shrink-0 md:h-18 md:w-18"
+                />
+              </div>
+            </Card>
+
+            <Card title="Story">
+              <div className="grid gap-3">
+                <div className="flex items-baseline gap-3">
+                  <p className="w-24 shrink-0 text-xs text-muted-foreground">
+                    About
+                  </p>
+                  <p className="min-w-0 flex-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                    {favpoll.about || (
+                      <span className="text-muted-foreground">
+                        None written.
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-baseline gap-3">
+                  <p className="w-24 shrink-0 text-xs text-muted-foreground">
+                    Reveal
+                  </p>
+                  <p className="min-w-0 flex-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                    {favpoll.reveal || (
+                      <span className="text-muted-foreground">
+                        None written.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
+              {favpoll.favourites.length > 0 ? (
+                <>
+                  <div className="flex flex-wrap gap-1.5">
+                    {favpoll.favourites.map((f) => (
+                      <Chip
+                        key={f.id}
+                        size="sm"
+                        readOnly
+                        className={cn(
+                          f.isGuestAdded &&
+                            "border-primary bg-primary/10 text-primary",
+                          f.isHidden && "opacity-40"
+                        )}
+                      >
+                        {f.label}
+                      </Chip>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {favpoll.favourites.length} favourite
+                    {favpoll.favourites.length === 1 ? "" : "s"}
+                    {favpoll.favourites.some((f) => f.isGuestAdded) &&
+                      " · tinted = added by guests"}
+                    {favpoll.favourites.some((f) => f.isHidden) &&
+                      " · faded = hidden from the poll"}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No favourites.</p>
+              )}
+            </Card>
+          </div>
+
+          {/* ═══ SIDE LANE — the operation ═══ */}
+          <div className="flex min-w-0 flex-col gap-6">
+            <Card title="Charities">
+              <div className="flex flex-col gap-3">
+                {favpoll.charities.map(({ charity }) => (
+                  <CharityRow
+                    key={charity.id}
+                    charity={{
+                      ...charity,
+                      created_at: charity.created_at ?? "",
+                    }}
+                    amountRaised={perCharity}
+                    size="sm"
+                  />
+                ))}
+              </div>
+            </Card>
+
+            <Card title="Money">
+              <p className="text-lg font-medium text-foreground tabular-nums">
+                {formatAmount(favpoll.total_raised)}
+                {favpoll.goal_amount ? (
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    of {formatAmount(favpoll.goal_amount)} goal
+                  </span>
+                ) : (
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    raised
+                  </span>
+                )}
+              </p>
+              {favpoll.goal_amount ? (
+                <div
+                  className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Progress towards the pledge goal"
+                  aria-valuemin={0}
+                  aria-valuemax={favpoll.goal_amount}
+                  aria-valuenow={Math.min(
+                    favpoll.total_raised,
+                    favpoll.goal_amount
+                  )}
+                >
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                    }}
+                  />
+                </div>
+              ) : null}
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-3">
+                {fact(
+                  "Pledges",
+                  <span className="tabular-nums">{favpoll.pledge_count}</span>
+                )}
+                {fact(
+                  "Shared fund",
+                  favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+                    <span className="tabular-nums">
+                      {formatAmount(favpoll.pot.total_deposited)}
+                      <span className="text-muted-foreground">
+                        {" "}
+                        · {formatAmount(favpoll.pot.total_allocated)} used
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Empty</span>
+                  )
+                )}
+              </div>
+            </Card>
+
+            {/* No wrapper: the wall draws its own card, eyebrow and
+                all (founder, 2026-09-03). */}
+            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

@@ -340,6 +340,7 @@ export async function updateFavpoll(
       closes_at: newClosesAt,
       is_private: input.isPrivate,
       is_listed: input.isListed,
+      allow_guest_items: input.allowGuestItems,
       description: input.description,
       goal_amount: input.goalAmount ?? null,
       // Cause favpolls keep photo/context on the favpoll row — person

@@ -244,7 +244,7 @@ describe("OrganizerRow", () => {
       )
       expect(screen.getByRole("link", { name: /Print pack/i })).toHaveAttribute(
         "href",
-        "/favpolls/fp-1/pack"
+        "/favpolls/fp-1/stationery"
       )
     })
 

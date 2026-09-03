@@ -8,7 +8,10 @@ import type {
   FavpollCategory,
   FavpollGrouping,
   FavpollSubject,
+  Favourite,
   Pronoun,
+  Topic,
+  TopicWithMeta,
 } from "@favpoll/types"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 
@@ -62,7 +65,30 @@ export default async function EditFavpollPage({ params }: Props) {
 
   let preselectedTopics: FavpollFormValues["topics"] = []
   if (rawPoll?.topic_id) {
-    const topic = data.topics.find((t) => t.id === rawPoll.topic_id)
+    let topic = data.topics.find((t) => t.id === rawPoll.topic_id)
+    // Homemade topics can sit is_active=false (rows from before the
+    // create path set true), and getWizardData filters those out — so
+    // the wizard list may not carry this poll's OWN topic, leaving the
+    // Topic step and rail showing "—" (founder bug report, 2026-09-03).
+    // Fetch it directly and fold it in; save-wise it stays a picked
+    // topic with an unchanged id, so updateFavpoll no-ops on it.
+    if (!topic) {
+      const { data: rawTopic } = await supabase
+        .from("topics")
+        .select("*, favourites(*), topic_categories(category_id)")
+        .eq("id", rawPoll.topic_id)
+        .maybeSingle()
+      if (rawTopic) {
+        topic = {
+          ...(rawTopic as Topic),
+          favourites: (rawTopic.favourites ?? []) as Favourite[],
+          category_ids: (
+            (rawTopic.topic_categories ?? []) as { category_id: string }[]
+          ).map((tc) => tc.category_id),
+        } satisfies TopicWithMeta
+        data.topics.push(topic)
+      }
+    }
     if (topic) {
       preselectedTopics = [
         {
@@ -116,6 +142,7 @@ export default async function EditFavpollPage({ params }: Props) {
       goalAmount: favpoll.goal_amount ?? undefined,
       isListed: favpoll.is_listed ?? true,
       isPrivate: favpoll.is_private ?? false,
+      allowGuestItems: favpoll.allow_guest_items !== false,
     },
   }
 

@@ -18,7 +18,7 @@ export default async function PackPage({ params }: Props) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      `id, short_code, subject, cause_label, occasion_type, opening_line, is_private,
+      `id, short_code, subject, category, grouping, cause_label, occasion_type, opening_line, is_private,
        protagonists!favpolls_protagonist_id_fkey ( name ),
        favpoll_polls (
          personal_reveal,
@@ -88,9 +88,9 @@ export default async function PackPage({ params }: Props) {
             data={data}
             leading={
               <Button asChild variant="ghost" size="sm">
-                <Link href={`/favpolls/${id}`}>
+                <Link href={`/favpolls/${id}/manage`}>
                   <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-                  Back
+                  Manage
                 </Link>
               </Button>
             }

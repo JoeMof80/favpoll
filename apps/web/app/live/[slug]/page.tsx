@@ -188,9 +188,10 @@ export default async function LiveDisplayPage({ params }: Props) {
         goalAmount={favpoll.goal_amount ?? null}
         poll={displayPoll}
         initialTotalRaised={initialTotalRaised}
-        favpollUrl={`${baseUrl}/favpolls/${id}`}
-        // QR target is the short form; favpollUrl stays long because the chrome
-        // navigates to it. See app/p/[code]/page.tsx.
+        favpollUrl={`${baseUrl}/favpolls/${id}/manage`}
+        // The chrome's menu navigates HERE — to the manage hub, the room
+        // the presenter came from (founder, 2026-09-03) — while the QR
+        // target stays the guest short form. See app/p/[code]/page.tsx.
         qrUrl={`${baseUrl}/p/${favpoll.short_code}`}
         initialWallEntries={initialWallEntries}
         charities={charityRows}
