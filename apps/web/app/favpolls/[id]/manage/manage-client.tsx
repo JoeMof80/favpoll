@@ -336,7 +336,7 @@ export function ManageClient({
           <Button asChild size="sm">
             <a href={guestUrl} target="_blank" rel="noreferrer">
               <ExternalLink data-icon="inline-start" aria-hidden="true" />
-              View favpoll
+              View
             </a>
           </Button>
           <Button asChild variant="outline" size="sm">
@@ -487,13 +487,12 @@ export function ManageClient({
               </span>
             </p>
             <div className="mt-4 grid gap-3">
-              <div className="grid gap-1.5">
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-sm text-foreground">Visibility</span>
-                {/* The wizard's own three-notch axis (founder,
-                    2026-09-03: "should be a three way switch now") —
-                    the 44px form scale, as everywhere. */}
+                {/* Toolbar size, inline with its label (founder,
+                    2026-09-03) — the compact idiom, like the switch
+                    row below. */}
                 <SegmentedControl
-                  size="lg"
                   label="Who can see this favpoll"
                   value={visibility}
                   onChange={(v) => {
