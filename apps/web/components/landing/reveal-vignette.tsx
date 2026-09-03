@@ -1,7 +1,6 @@
 "use client"
 
 import { paletteForSceneKind } from "@/lib/register-palette"
-import { Lock } from "lucide-react"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { PollHeading } from "@/components/poll-heading"
 import {
@@ -29,19 +28,6 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 // DERIVED, never typed. This was a hardcoded copy of the scene's own string
 // and drifted the moment the scene changed — a second definition of the one
 // sentence the whole vignette exists to show.
-const REVEAL = MEMORIAL_SCENE.poll.personal_reveal ?? ""
-
-// The decoy — real text, blurred past reading, exactly as poll-section does
-// it. Never the actual reveal: a blur is a picture, not a lock, and anyone
-// can lift it.
-const DECOY =
-  "Pledge to reveal her favourite. Pledge to reveal her favourite. Pledge to reveal her favourite."
-
-// Derived, never typed — the callout names the same person and the same
-// topic the card behind it does, because it reads them off the same scene.
-
-const FIRST_NAME = protagonistShortName(MEMORIAL_SCENE.protagonist?.name ?? "")
-const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
 
 // THE PHONE VARIANT (founder, 2026-08-27): "Show the same display as the
 // hero but with the Reveal magnified, even extending outside of the iphone
@@ -206,58 +192,6 @@ export function RevealVignettePhone({
                 personalReveal={reveal}
                 protagonistFirstName={firstName}
               />
-            </div>
-          </div>
-        </div>
-      </div>
-    </Vignette>
-  )
-}
-
-// TWO CARDS, BEFORE AND AFTER (founder, 2026-09-03). The card looped
-// locked → typing → held before, which meant the state a reader wanted
-// to inspect was always about to be replaced — and the founder's
-// standing call ("i'm not sure there is any need to animate these
-// vignettes") had already reached every other artefact on /features.
-// A pair shows the whole arc at once: the blurred decoy under its lock
-// line, and the same block given. Both halves are the REAL PollReveal.
-export function RevealVignette() {
-  return (
-    <Vignette>
-      <div className="mx-auto grid max-w-3xl gap-4 sm:grid-cols-2">
-        <div>
-          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            Before pledging
-          </p>
-          <div className="rounded-xl border border-border bg-background p-5 shadow-lg">
-            <p className="text-xs font-medium tracking-widest text-primary uppercase">
-              {FIRST_NAME}&apos;s favourite {TOPIC_TITLE.toLowerCase()}
-            </p>
-            <div className="relative mt-3">
-              <div className="pointer-events-none blur-[5px] select-none">
-                <PollReveal personalReveal={DECOY} />
-              </div>
-              {/* The lock line — an invitation, never a toll. "waiting for
-                  you", not "unlock": the reveal is a gift, not a gate. */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1.5 text-center text-sm text-foreground shadow-sm">
-                  <Lock className="h-3.5 w-3.5 shrink-0 text-primary" />
-                  Pledge, and {FIRST_NAME}&apos;s is waiting for you
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            After pledging
-          </p>
-          <div className="rounded-xl border border-border bg-background p-5 shadow-lg">
-            <p className="text-xs font-medium tracking-widest text-primary uppercase">
-              {FIRST_NAME}&apos;s favourite {TOPIC_TITLE.toLowerCase()}
-            </p>
-            <div className="mt-3">
-              <PollReveal personalReveal={REVEAL} />
             </div>
           </div>
         </div>

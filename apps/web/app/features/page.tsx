@@ -9,7 +9,7 @@ import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { PackVignette } from "@/components/landing/pack-vignette"
 import { FundVignette } from "@/components/landing/fund-vignette"
-import { RevealVignette } from "@/components/landing/reveal-vignette"
+import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 
 // /features, organised BY FEATURE (founder redesign, 2026-08-09).
@@ -257,7 +257,7 @@ export default function FeaturesPage() {
                 "A gift in return for sharing a favourite",
                 "It could be a moment of poignance or not required at all, as set by the favpoll organiser",
               ]}
-              artefact={<RevealVignette />}
+              artefact={<RevealVignettePhone />}
             />
 
             <Feature
