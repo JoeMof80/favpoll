@@ -318,7 +318,7 @@ export default function AboutPage() {
                 us.
               </p>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                favpoll is a trading name of Josmo Services Ltd.
+                favpoll is operated by Josmo Services Ltd.
               </p>
             </FadeIn>
             <ContactForm />
