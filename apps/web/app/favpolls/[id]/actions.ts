@@ -698,28 +698,6 @@ export async function setFavpollGuestItems(
   if (error) throw new Error(error.message)
 }
 
-export async function setFavpollListed(favpollId: string, isListed: boolean) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
-
-  const supabase = createAdminClient()
-
-  const { data: favpoll } = await supabase
-    .from("favpolls")
-    .select("created_by")
-    .eq("id", favpollId)
-    .single()
-
-  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
-
-  const { error } = await supabase
-    .from("favpolls")
-    .update({ is_listed: isListed })
-    .eq("id", favpollId)
-
-  if (error) throw new Error(error.message)
-}
-
 /** The three-notch visibility axis, writable from the manage page —
  * the wizard's own mapping: private implies unlisted. */
 export async function setFavpollVisibility(

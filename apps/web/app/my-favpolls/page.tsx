@@ -4,8 +4,12 @@ import { NewFavpollButton } from "@/components/new-favpoll-button"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
+import {
+  ORGANIZER_FAVPOLL_COLUMNS,
+  mapOrganizerFavpoll,
+  type RawOrganizerRow,
+} from "@/lib/organizer-favpolls"
 import { OrganizerPageClient } from "./organizer-page-client"
-import type { OrganizerFavpoll } from "@/components/organizer-row/utils"
 
 export const metadata = {
   title: "Your favpolls — favpoll",
@@ -20,104 +24,24 @@ export default async function MyFavpollsPage() {
   const { data: rawFavpolls } = await supabase
     .from("favpolls")
     .select(
-      `
-      id,
-      live_slug,
-      short_code,
-      opening_line,
-      closes_at,
-      closed_at,
-      occasion_type,
-      category,
-      grouping,
-      subject,
-      cause_label,
-      total_raised,
-      goal_amount,
-      is_listed,
-      allow_guest_items,
-      created_at,
+      `${ORGANIZER_FAVPOLL_COLUMNS},
       protagonists!favpolls_protagonist_id_fkey ( name ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description ) ),
       favpoll_polls ( id, personal_reveal, topics ( title ), pledges ( count ) ),
-      favpoll_pots ( total_deposited, total_allocated )
-    `
+      favpoll_pots ( total_deposited, total_allocated )`
     )
     .eq("created_by", userId)
     .order("created_at", { ascending: false })
-
-  type RawPot = { total_deposited: number; total_allocated: number }
-  type RawFavpoll = {
-    id: string
-    live_slug: string
-    short_code: string
-    opening_line: string
-    closes_at: string
-    closed_at: string | null
-    occasion_type: string | null
-    category: string | null
-    grouping: string | null
-    subject: string
-    cause_label: string | null
-    total_raised: number
-    goal_amount: number | null
-    is_listed: boolean
-    allow_guest_items: boolean | null
-    created_at: string
-    protagonists: { name: string } | null
-    favpoll_charities: {
-      charities: {
-        id: string
-        name: string
-        logo_url: string | null
-        registered_number: string | null
-        description: string | null
-        created_at: string
-      }
-    }[]
-    favpoll_polls: {
-      id: string
-      personal_reveal: string | null
-      topics: { title: string } | null
-      pledges: { count: number }[]
-    } | null
-    favpoll_pots: RawPot | null
-  }
 
   // total_raised is settlement-only (0 until close) — overlay live sums,
   // like every other money surface (the organiser row showed £0 against a
   // pledged poll; founder catch 2026-07-29)
   const withTotals = await withLiveTotals(
     supabase,
-    (rawFavpolls ?? []) as unknown as RawFavpoll[]
+    (rawFavpolls ?? []) as unknown as RawOrganizerRow[]
   )
 
-  const favpolls: OrganizerFavpoll[] = withTotals.map((ev) => ({
-    id: ev.id,
-    live_slug: ev.live_slug,
-    short_code: ev.short_code,
-    opening_line: ev.opening_line,
-    closes_at: ev.closes_at,
-    closed_at: ev.closed_at,
-    occasion_type: ev.occasion_type,
-    category: ev.category,
-    grouping: ev.grouping,
-    subject: ev.subject,
-    cause_label: ev.cause_label,
-    total_raised: ev.total_raised,
-    goal_amount: ev.goal_amount ?? null,
-    is_listed: ev.is_listed ?? true,
-    allow_guest_items: ev.allow_guest_items ?? true,
-    created_at: ev.created_at,
-    protagonist: ev.protagonists ?? null,
-    charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
-    poll: ev.favpoll_polls
-      ? { id: ev.favpoll_polls.id, topic: ev.favpoll_polls.topics ?? null }
-      : null,
-    pot: ev.favpoll_pots ?? null,
-    pledge_count: ev.favpoll_polls?.pledges?.[0]?.count ?? 0,
-    has_reveal: !!ev.favpoll_polls?.personal_reveal,
-  }))
+  const favpolls = withTotals.map(mapOrganizerFavpoll)
 
   return (
     <main className="min-h-screen bg-muted">
