@@ -80,7 +80,7 @@ const formatLongDate = (iso: string) =>
 //   story → topic → charities) so the organiser proofs the artefact as
 //   it will be experienced. Read-only with Edit doors into the wizard.
 // - SIDE — the operation, grouped by kind: Status (three-way
-//   visibility + guest additions), Money (raised · goal · pledges ·
+//   date, large), Charities, Money (raised · goal · pledges ·
 //   fund), Share (links + QR), Activity (the guest wall).
 export function ManageClient({
   favpoll,
@@ -316,71 +316,75 @@ export function ManageClient({
           <ArrowLeft size={14} aria-hidden="true" />
           Your favpolls
         </Link>
-        <ToolbarLabel>Visibility</ToolbarLabel>
-        <SegmentedControl
-          label="Who can see this favpoll"
-          value={visibility}
-          onChange={(v) => {
-            if (!visibilityPending) handleVisibility(v as Visibility)
-          }}
-          options={[
-            { value: "listed", label: "Listed" },
-            { value: "unlisted", label: "Link only" },
-            { value: "private", label: "Private" },
-          ]}
-        />
-        <ToolbarLabel>Guest additions</ToolbarLabel>
-        <Switch
-          checked={guestItems}
-          onCheckedChange={handleToggleGuestItems}
-          disabled={guestItemsPending}
-          aria-label={
-            guestItems
-              ? "Guests can add favourites — click to stop them"
-              : "Guests cannot add favourites — click to allow it"
-          }
-        />
-        <div className="ml-auto flex flex-wrap items-center gap-2">
-          <Button asChild size="sm">
-            <a href={guestUrl} target="_blank" rel="noreferrer">
-              <ExternalLink data-icon="inline-start" aria-hidden="true" />
-              View
-            </a>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
-            </Link>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!canDelete || deleting}
-            onClick={handleDelete}
-            title={
-              canDelete ? undefined : "Favpolls with pledges can't be deleted."
+        <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-2">
+          <ToolbarLabel>Visibility</ToolbarLabel>
+          <SegmentedControl
+            label="Who can see this favpoll"
+            value={visibility}
+            onChange={(v) => {
+              if (!visibilityPending) handleVisibility(v as Visibility)
+            }}
+            options={[
+              { value: "listed", label: "Listed" },
+              { value: "unlisted", label: "Link only" },
+              { value: "private", label: "Private" },
+            ]}
+          />
+          <ToolbarLabel>Guest additions</ToolbarLabel>
+          <Switch
+            checked={guestItems}
+            onCheckedChange={handleToggleGuestItems}
+            disabled={guestItemsPending}
+            aria-label={
+              guestItems
+                ? "Guests can add favourites — click to stop them"
+                : "Guests cannot add favourites — click to allow it"
             }
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 data-icon="inline-start" aria-hidden="true" />
-            {deleting ? "Deleting…" : "Delete"}
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-          {isClosed && (
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild size="sm">
+              <a href={guestUrl} target="_blank" rel="noreferrer">
+                <ExternalLink data-icon="inline-start" aria-hidden="true" />
+                View
+              </a>
+            </Button>
             <Button asChild variant="outline" size="sm">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
+              <Link href={`/favpolls/${favpoll.id}/edit`}>
+                <Pencil data-icon="inline-start" aria-hidden="true" />
+                Edit
               </Link>
             </Button>
-          )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!canDelete || deleting}
+              onClick={handleDelete}
+              title={
+                canDelete
+                  ? undefined
+                  : "Favpolls with pledges can't be deleted."
+              }
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 data-icon="inline-start" aria-hidden="true" />
+              {deleting ? "Deleting…" : "Delete"}
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a href={`/favpolls/${favpoll.id}/stationery`}>
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                Stationery
+              </a>
+            </Button>
+            {isClosed && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                  <Sparkles data-icon="inline-start" aria-hidden="true" />
+                  Keepsake
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </ToolbarBand>
 
@@ -392,18 +396,6 @@ export function ManageClient({
           <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
             {name}
           </h1>
-          <p
-            className={cn(
-              "mt-1 text-sm",
-              !isClosed && isWarning
-                ? "text-amber-600 dark:text-amber-400"
-                : "text-muted-foreground"
-            )}
-          >
-            {isClosed
-              ? `Closed ${formatLongDate(favpoll.closed_at ?? favpoll.closes_at)}`
-              : `Closes ${formatLongDate(favpoll.closes_at)} · ${Math.max(days, 0)} day${days === 1 ? "" : "s"} left`}
-          </p>
         </div>
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -488,6 +480,31 @@ export function ManageClient({
                 <p className="text-sm text-muted-foreground">No favourites.</p>
               )}
             </Card>
+          </div>
+
+          {/* ═══ SIDE LANE — the operation ═══ */}
+          <div className="flex min-w-0 flex-col gap-6">
+            <Card title={isClosed ? "Closed" : "Closes"}>
+              <p
+                className={cn(
+                  "text-2xl font-medium",
+                  !isClosed && isWarning
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-foreground"
+                )}
+              >
+                {formatLongDate(
+                  isClosed
+                    ? (favpoll.closed_at ?? favpoll.closes_at)
+                    : favpoll.closes_at
+                )}
+              </p>
+              {!isClosed && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+                </p>
+              )}
+            </Card>
 
             <Card title="Charities" editable>
               <div className="flex flex-col gap-3">
@@ -503,24 +520,6 @@ export function ManageClient({
                   />
                 ))}
               </div>
-            </Card>
-          </div>
-
-          {/* ═══ SIDE LANE — the operation ═══ */}
-          <div className="flex min-w-0 flex-col gap-6">
-            <Card title="Status">
-              <p className="text-lg font-medium text-foreground">
-                {isClosed ? "Closed" : "Open"}
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  ·{" "}
-                  {visibility === "private"
-                    ? "Private"
-                    : visibility === "listed"
-                      ? "Listed"
-                      : "Link only"}
-                </span>
-              </p>
             </Card>
 
             <Card title="Money">
