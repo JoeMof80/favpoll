@@ -37,6 +37,7 @@ type CreateFavpollInput = {
   closesAt: string
   isPrivate: boolean
   isListed: boolean
+  allowGuestItems: boolean
   potAmount: number | null
   goalAmount?: number | null
   poll: PollInput
@@ -281,6 +282,7 @@ export async function createFavpoll(
       extension_count: 0,
       is_private: input.isPrivate,
       is_listed: input.isListed,
+      allow_guest_items: input.allowGuestItems,
       description: input.description,
       goal_amount: input.goalAmount ?? null,
       // Cause favpolls keep photo/context on the favpoll row — person

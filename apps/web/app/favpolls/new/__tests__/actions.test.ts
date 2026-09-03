@@ -42,6 +42,7 @@ const BASE_INPUT = {
   charityIds: ["charity-1"],
   closesAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
   isPrivate: false,
+  allowGuestItems: true,
   isListed: true,
   potAmount: null,
 }

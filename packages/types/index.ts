@@ -265,6 +265,7 @@ export type CanvasSubmitData = {
   closesAt: string;
   isPrivate: boolean;
   isListed: boolean;
+  allowGuestItems: boolean;
   potAmount: number | null;
   /** Optional pledge goal in pounds; null = no goal. */
   goalAmount?: number | null;

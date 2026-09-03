@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { SegmentedControl } from "@/components/ui/segmented-control"
+import { Switch } from "@/components/ui/switch"
 import {
   InputGroup,
   InputGroupAddon,
@@ -121,6 +122,27 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
           />
           <p className="text-muted-foreground">
             {VISIBILITY_OPTIONS.find((o) => o.value === w.visibility)?.hint}
+          </p>
+        </div>
+      </div>
+
+      {/* Decided here, overridable mid-event from the manage toolbar
+          (founder, 2026-09-03). Not a rail line: the rail lists the
+          authored facts, and a default-on toggle isn't one. */}
+      <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6">
+        <span className="font-medium sm:flex sm:min-h-11 sm:items-center">
+          Guest additions
+        </span>
+        <div className="space-y-1.5 sm:flex sm:min-h-11 sm:flex-col sm:justify-center">
+          <Switch
+            checked={w.allowGuestItems}
+            onCheckedChange={w.setAllowGuestItems}
+            aria-label="Guests can add favourites"
+          />
+          <p className="text-muted-foreground">
+            {w.allowGuestItems
+              ? "Guests can add their own favourites to the topic."
+              : "Only your favourites appear."}
           </p>
         </div>
       </div>

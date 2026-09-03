@@ -34,6 +34,7 @@ function makeInput(
     charityIds: ["charity-1"],
     closesAt: "2028-01-01T00:00",
     isPrivate: false,
+    allowGuestItems: true,
     potAmount: null,
     poll: {
       id: "poll-1",

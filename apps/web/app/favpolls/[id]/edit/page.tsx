@@ -116,6 +116,7 @@ export default async function EditFavpollPage({ params }: Props) {
       goalAmount: favpoll.goal_amount ?? undefined,
       isListed: favpoll.is_listed ?? true,
       isPrivate: favpoll.is_private ?? false,
+      allowGuestItems: favpoll.allow_guest_items !== false,
     },
   }
 
