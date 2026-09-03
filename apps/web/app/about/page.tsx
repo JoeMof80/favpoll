@@ -25,12 +25,19 @@ const BASICS: { label: string; body: string }[] = [
     body: "It closes on its own when the date arrives, and the proceeds go on their way.",
   },
   {
+    // Rewritten 2026-09-03: since the wizard edits (#604), Event, Charity
+    // and Topic lock the moment any money lands — the old "change the
+    // charities any time" claim had become false, and the truth is the
+    // stronger trust line.
     label: "Editable after publishing",
-    body: "Change the details, the charities or the closing date any time before it closes.",
+    body: "Change the story, the goal or the closing date any time before it closes. The charity and topic lock the moment a guest pledges — nobody's gift can be redirected.",
   },
   {
+    // Rewritten 2026-09-03 for the three-notch model: this described
+    // unlisted while wearing the Private label, and the strongest tier
+    // went unstated.
     label: "Private if you need it",
-    body: "An unlisted favpoll is reachable only by the people you share it with, and never appears on the public favpolls page.",
+    body: "A link-only favpoll never appears on the public favpolls page. A private one goes further: guests must sign in, and shared links preview no details.",
   },
   {
     label: "Nothing to sign up for",
@@ -82,7 +89,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "What happens when a favpoll closes?",
-    a: "Pledging ends and the standings are final. The proceeds go to the charities you chose, and any reveal is shared with the guests who pledged.",
+    a: "Pledging ends and the standings are final, and the proceeds go to the charities you chose. The reveal needs no waiting — every guest saw it the moment they pledged.",
   },
 ]
 
@@ -149,9 +156,15 @@ export default function AboutPage() {
             </FadeIn>
             <FadeIn delay={0.24}>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Every pledge also feeds the record — favpoll&apos;s permanent
-                ranking of favourites. Nothing on it is gamed or free; every
-                standing was paid for.
+                Every pledge also feeds{" "}
+                <Link
+                  href="/record"
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  the record
+                </Link>{" "}
+                — favpoll&apos;s permanent ranking of favourites. Nothing on it
+                is gamed or free; every standing was paid for.
               </p>
             </FadeIn>
           </div>
@@ -187,16 +200,12 @@ export default function AboutPage() {
                 a charitable cause, with a registered charity as the recipient.
               </p>
             </FadeIn>
-            <FadeIn delay={0.24}>
-              <p className="text-base leading-relaxed text-muted-foreground">
-                Guests pledge with just an email — no account needed.
-              </p>
-            </FadeIn>
           </div>
         </section>
 
-        {/* ── Written in advance — the wills differentiator; the footer's
-            "Written in advance" blurb deep-links here ── */}
+        {/* ── Written in advance — the wills differentiator. Nothing
+            deep-links here any more (the footer blurb it once had is
+            gone); it stays as founder conviction, kept 2026-09-03. ── */}
         <section
           id="wills"
           className="scroll-mt-20 border-b border-border py-16"
@@ -307,6 +316,9 @@ export default function AboutPage() {
                 Whether you&apos;re a charity wondering how favpoll works, a
                 partner with an idea, or a writer with a question — this reaches
                 us.
+              </p>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                favpoll is operated by Josmo Services Ltd.
               </p>
             </FadeIn>
             <ContactForm />

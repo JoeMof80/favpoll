@@ -156,7 +156,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 favpoll</p>
+          <p>© 2026 favpoll · operated by Josmo Services Ltd</p>
           <p>Payments processed by Stripe</p>
         </div>
       </div>
