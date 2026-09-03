@@ -22,7 +22,10 @@ import {
 } from "@/components/wall-of-favourites"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
-import { SegmentedControl } from "@/components/ui/segmented-control"
+import {
+  SegmentedControl,
+  ToolbarLabel,
+} from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
@@ -305,50 +308,7 @@ export function ManageClient({
           page") — the sticky ToolbarBand leads the page, tools flush
           right, nothing else in it. Identity lives below, at the top
           of the record column. */}
-      <ToolbarBand className="flex flex-wrap items-center justify-end gap-2">
-        <Button asChild size="sm">
-          <a href={guestUrl} target="_blank" rel="noreferrer">
-            <ExternalLink data-icon="inline-start" aria-hidden="true" />
-            View
-          </a>
-        </Button>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/favpolls/${favpoll.id}/edit`}>
-            <Pencil data-icon="inline-start" aria-hidden="true" />
-            Edit
-          </Link>
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!canDelete || deleting}
-          onClick={handleDelete}
-          title={
-            canDelete ? undefined : "Favpolls with pledges can't be deleted."
-          }
-          className="text-destructive hover:text-destructive"
-        >
-          <Trash2 data-icon="inline-start" aria-hidden="true" />
-          {deleting ? "Deleting…" : "Delete"}
-        </Button>
-        <Button asChild variant="outline" size="sm">
-          <a href={`/favpolls/${favpoll.id}/stationery`}>
-            <Printer data-icon="inline-start" aria-hidden="true" />
-            Stationery
-          </a>
-        </Button>
-        {isClosed && (
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-              <Sparkles data-icon="inline-start" aria-hidden="true" />
-              Keepsake
-            </Link>
-          </Button>
-        )}
-      </ToolbarBand>
-
-      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+      <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <Link
           href="/my-favpolls"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -356,8 +316,76 @@ export function ManageClient({
           <ArrowLeft size={14} aria-hidden="true" />
           Your favpolls
         </Link>
+        <ToolbarLabel>Visibility</ToolbarLabel>
+        <SegmentedControl
+          label="Who can see this favpoll"
+          value={visibility}
+          onChange={(v) => {
+            if (!visibilityPending) handleVisibility(v as Visibility)
+          }}
+          options={[
+            { value: "listed", label: "Listed" },
+            { value: "unlisted", label: "Link only" },
+            { value: "private", label: "Private" },
+          ]}
+        />
+        <ToolbarLabel>Guest additions</ToolbarLabel>
+        <Switch
+          checked={guestItems}
+          onCheckedChange={handleToggleGuestItems}
+          disabled={guestItemsPending}
+          aria-label={
+            guestItems
+              ? "Guests can add favourites — click to stop them"
+              : "Guests cannot add favourites — click to allow it"
+          }
+        />
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <Button asChild size="sm">
+            <a href={guestUrl} target="_blank" rel="noreferrer">
+              <ExternalLink data-icon="inline-start" aria-hidden="true" />
+              View
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/favpolls/${favpoll.id}/edit`}>
+              <Pencil data-icon="inline-start" aria-hidden="true" />
+              Edit
+            </Link>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!canDelete || deleting}
+            onClick={handleDelete}
+            title={
+              canDelete ? undefined : "Favpolls with pledges can't be deleted."
+            }
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 data-icon="inline-start" aria-hidden="true" />
+            {deleting ? "Deleting…" : "Delete"}
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <a href={`/favpolls/${favpoll.id}/stationery`}>
+              <Printer data-icon="inline-start" aria-hidden="true" />
+              Stationery
+            </a>
+          </Button>
+          {isClosed && (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                Keepsake
+              </Link>
+            </Button>
+          )}
+        </div>
+      </ToolbarBand>
 
-        <div className="mt-4 min-w-0">
+      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+        <div className="min-w-0">
           <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
             {eyebrow}
           </p>
@@ -493,39 +521,6 @@ export function ManageClient({
                       : "Link only"}
                 </span>
               </p>
-              <div className="mt-4 grid gap-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-foreground">Visibility</span>
-                  <SegmentedControl
-                    label="Who can see this favpoll"
-                    value={visibility}
-                    onChange={(v) => {
-                      if (!visibilityPending) handleVisibility(v as Visibility)
-                    }}
-                    options={[
-                      { value: "listed", label: "Listed" },
-                      { value: "unlisted", label: "Link only" },
-                      { value: "private", label: "Private" },
-                    ]}
-                    className="w-fit"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-foreground">
-                    Guests can add favourites
-                  </span>
-                  <Switch
-                    checked={guestItems}
-                    onCheckedChange={handleToggleGuestItems}
-                    disabled={guestItemsPending}
-                    aria-label={
-                      guestItems
-                        ? "Guests can add favourites — click to stop them"
-                        : "Guests cannot add favourites — click to allow it"
-                    }
-                  />
-                </div>
-              </div>
             </Card>
 
             <Card title="Money">
