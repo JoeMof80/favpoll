@@ -133,218 +133,14 @@ export function ManageClient({
   const copyTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
     const timers = copyTimersRef.current
-    return () => timers.forEach(clearTimeout)
-  }, [])
-
-  function copy(key: string, url: string) {
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(key)
-      copyTimersRef.current.push(setTimeout(() => setCopied(null), 2000))
-    })
-  }
-
-  async function handleVisibility(v: Visibility) {
-    const prev = visibility
-    setVisibilityState(v)
-    setVisibilityPending(true)
-    try {
-      await setFavpollVisibility(favpoll.id, v)
-    } catch {
-      setVisibilityState(prev)
-    } finally {
-      setVisibilityPending(false)
-    }
-  }
-
-  async function handleToggleGuestItems(value: boolean) {
-    setGuestItems(value)
-    setGuestItemsPending(true)
-    try {
-      await setFavpollGuestItems(favpoll.id, value)
-    } catch {
-      setGuestItems(!value)
-    } finally {
-      setGuestItemsPending(false)
-    }
-  }
-
-  const canDelete =
-    favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
-
-  async function handleDelete() {
-    if (
-      !window.confirm(`Delete ${name || "this favpoll"}? This can't be undone.`)
-    )
-      return
-    setDeleting(true)
-    try {
-      await deleteFavpoll(favpoll.id)
-      router.push("/my-favpolls")
-    } catch {
-      toast.error("Couldn't delete this favpoll — please try again.", {
-        style: TOAST_ERROR_STYLE,
-      })
-      setDeleting(false)
-    }
-  }
-
-  // A card in either lane: SectionEyebrow heading, optional Edit door.
-  const Card = ({
-    title,
-    children,
-    editable = false,
-    headingless = false,
-  }: {
-    title?: string
-    children: React.ReactNode
-    editable?: boolean
-    headingless?: boolean
-  }) => (
-    <section className="rounded-xl border border-border bg-background p-5">
-      {!headingless && (
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <SectionEyebrow as="h2">{title}</SectionEyebrow>
-          {editable && (
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="-my-1.5 text-muted-foreground hover:text-foreground"
-            >
-              <Link href={`/favpolls/${favpoll.id}/edit`}>
-                <Pencil data-icon="inline-start" aria-hidden="true" />
-                Edit
-              </Link>
-            </Button>
-          )}
-        </div>
-      )}
-      {children}
-    </section>
-  )
-
-  const fact = (label: string, value: React.ReactNode) => (
-    <div className="min-w-0">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="mt-0.5 text-sm text-foreground">{value}</div>
-    </div>
-  )
-
-  // Label and value share a line (founder, 2026-09-03: "reduce
-  // height") — the header card is a form receipt, not a stack.
-  const inlineFact = (label: string, value: React.ReactNode) => (
-    <div className="flex items-baseline gap-3">
-      <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
-      <div className="min-w-0 flex-1 truncate text-sm text-foreground">
-        {value}
-      </div>
-    </div>
-  )
-
-  const linkRow = (
-    key: string,
-    label: string,
-    Icon: typeof ExternalLink,
-    href: string,
-    display: string,
-    external: boolean
-  ) => (
-    <div className="min-w-0">
-      <p className="text-xs font-medium text-foreground">{label}</p>
-      <div className="flex items-center gap-1.5">
-        <Icon
-          size={11}
-          className="shrink-0 text-muted-foreground"
-          aria-hidden="true"
-        />
-        {external ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-            title={display}
-            suppressHydrationWarning
-          >
-            {display}
-          </a>
-        ) : (
-          <Link
-            href={href}
-            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-            title={display}
-            suppressHydrationWarning
-          >
-            {display}
-          </Link>
-        )}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
-          onClick={() => copy(key, display)}
-          aria-label={`Copy ${label} link`}
-        >
-          {copied === key ? (
-            <Check size={12} aria-hidden="true" />
-          ) : (
-            <Copy size={12} aria-hidden="true" />
-          )}
-        </Button>
-      </div>
-    </div>
-  )
-
-  const perCharity =
-    favpoll.charities.length > 0
-      ? favpoll.total_raised / favpoll.charities.length
-      : 0
-
-  return (
+    return (
     <>
-      <div className="mx-auto w-full max-w-330 px-4 pt-6 pb-4 sm:px-6">
-        <Link
-          href="/my-favpolls"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft size={14} aria-hidden="true" />
-          Your favpolls
-        </Link>
-
-        {/* ── Header band: identity left, the doors right — nothing else. ── */}
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
-              {eyebrow}
-            </p>
-            <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
-              {name}
-            </h1>
-            <p
-              className={cn(
-                "mt-1 text-sm",
-                !isClosed && isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-muted-foreground"
-              )}
-            >
-              {isClosed
-                ? `Closed ${formatLongDate(favpoll.closed_at ?? favpoll.closes_at)}`
-                : `Closes ${formatLongDate(favpoll.closes_at)} · ${Math.max(days, 0)} day${days === 1 ? "" : "s"} left`}
-            </p>
-          </div>
-        </div>
-
-        {/* ── Two lanes: the RECORD (the favpoll's own anatomy) and the
-          OPERATION (status · money · share · activity). ── */}
-      </div>
-
       {/* THE SUBHEADER (founder, 2026-09-03: "like the stationery
-          page") — the workspace's own sticky ToolbarBand carries every
-          door. Full-bleed by contract: the page column closes above it
-          and reopens beneath. */}
+          page") — the sticky ToolbarBand leads the page, tools flush
+          right, nothing else in it. Identity lives below, at the top
+          of the record column. */}
       <ToolbarBand className="flex flex-wrap items-center justify-end gap-2">
+
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm">
             <a href={guestUrl} target="_blank" rel="noreferrer">
@@ -390,7 +186,36 @@ export function ManageClient({
       </ToolbarBand>
 
       <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <Link
+          href="/my-favpolls"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft size={14} aria-hidden="true" />
+          Your favpolls
+        </Link>
+
+        <div className="mt-4 min-w-0">
+          <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+            {eyebrow}
+          </p>
+          <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+            {name}
+          </h1>
+          <p
+            className={cn(
+              "mt-1 text-sm",
+              !isClosed && isWarning
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-muted-foreground"
+            )}
+          >
+            {isClosed
+              ? `Closed ${formatLongDate(favpoll.closed_at ?? favpoll.closes_at)}`
+              : `Closes ${formatLongDate(favpoll.closes_at)} · ${Math.max(days, 0)} day${days === 1 ? "" : "s"} left`}
+          </p>
+        </div>
+
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           {/* ═══ MAIN LANE — the record ═══ */}
           <div className="flex min-w-0 flex-col gap-6">
             <Card title="Header" editable>
