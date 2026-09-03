@@ -47,7 +47,6 @@ import {
   DEMO_KEEPSAKE_WALKTHROUGH_DATA,
 } from "@/components/landing/demo-fixture"
 import { KeepsakeSheet } from "@/components/keepsake/keepsake-sheet"
-import Link from "next/link"
 import {
   DisplayStill,
   DISPLAY_STILL_ROOM,
