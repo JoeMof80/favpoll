@@ -317,9 +317,6 @@ export default function AboutPage() {
                 partner with an idea, or a writer with a question — this reaches
                 us.
               </p>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                favpoll is operated by Josmo Services Ltd.
-              </p>
             </FadeIn>
             <ContactForm />
           </div>
