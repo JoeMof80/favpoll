@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import {
   PickHint,
@@ -49,6 +50,35 @@ const DEFAULT_MEDIA = [
  * illustration. Stacking on tablets costs a taller section and is the right
  * trade.
  */
+// FIRST MENTION LINKS TO THE REFERENCE (founder, 2026-09-03): "the
+// shared fund" in the triad used to dead-end for a cold reader; its
+// /features section answers it in one click. Structural, not
+// editorial — the founder's copy strings are untouched, the FIRST
+// occurrence across the whole band is wrapped in a quiet ink link,
+// and later mentions stay plain (link-litter reads as noise in
+// three-line beats). Marketing prose only; dialogs carry their own
+// sentence instead (the features/dialog copy doctrine, 2026-09-03).
+const LINK_TERM = "shared fund"
+const LINK_HREF = "/features#shared-fund"
+
+function linkifyOnce(body: string, spent: { done: boolean }) {
+  const at = body.indexOf(LINK_TERM)
+  if (spent.done || at === -1) return body
+  spent.done = true
+  return (
+    <>
+      {body.slice(0, at)}
+      <Link
+        href={LINK_HREF}
+        className="text-primary underline-offset-4 hover:underline"
+      >
+        {LINK_TERM}
+      </Link>
+      {body.slice(at + LINK_TERM.length)}
+    </>
+  )
+}
+
 export function HowItWorksSteps({
   title,
   steps,
@@ -56,6 +86,7 @@ export function HowItWorksSteps({
   title: string
   steps: { label: string; body: string; media?: React.ReactNode }[]
 }) {
+  const spent = { done: false }
   return (
     <section id="how" className="w-full scroll-mt-20">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
@@ -106,7 +137,7 @@ export function HowItWorksSteps({
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
                 <div className="min-w-0 xl:pr-2">
                   <p className="leading-relaxed text-muted-foreground">
-                    {step.body}
+                    {linkifyOnce(step.body, spent)}
                   </p>
                 </div>
                 {/* SPACING, NOT A RULE, IS WHAT GROUPS THESE (founder,
