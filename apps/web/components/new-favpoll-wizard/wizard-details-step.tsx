@@ -133,12 +133,17 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
         <span className="font-medium sm:flex sm:min-h-11 sm:items-center">
           Guest additions
         </span>
-        <div className="space-y-1.5 sm:flex sm:min-h-11 sm:flex-col sm:justify-center">
-          <Switch
-            checked={w.allowGuestItems}
-            onCheckedChange={w.setAllowGuestItems}
-            aria-label="Guests can add favourites"
-          />
+        <div className="space-y-1.5">
+          {/* The switch is shorter than the row's 44px control line, so
+              it takes its own min-h-11 centring box — that is what the
+              label is anchored to. */}
+          <div className="sm:flex sm:min-h-11 sm:items-center">
+            <Switch
+              checked={w.allowGuestItems}
+              onCheckedChange={w.setAllowGuestItems}
+              aria-label="Guests can add favourites"
+            />
+          </div>
           <p className="text-muted-foreground">
             {w.allowGuestItems
               ? "Guests can add their own favourites to the topic."
