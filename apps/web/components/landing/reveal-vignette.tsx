@@ -1,9 +1,7 @@
 "use client"
 
 import { paletteForSceneKind } from "@/lib/register-palette"
-import { useEffect, useState } from "react"
 import { Lock } from "lucide-react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { PollReveal } from "@/components/favpoll-card/poll-reveal"
 import { PollHeading } from "@/components/poll-heading"
 import {
@@ -44,10 +42,6 @@ const DECOY =
 
 const FIRST_NAME = protagonistShortName(MEMORIAL_SCENE.protagonist?.name ?? "")
 const TOPIC_TITLE = MEMORIAL_SCENE.poll.topic.title
-
-const LOCKED_MS = 2600
-const TYPE_TARGET_MS = 2100
-const HOLD_MS = 5200
 
 // THE PHONE VARIANT (founder, 2026-08-27): "Show the same display as the
 // hero but with the Reveal magnified, even extending outside of the iphone
@@ -220,75 +214,52 @@ export function RevealVignettePhone({
   )
 }
 
+// TWO CARDS, BEFORE AND AFTER (founder, 2026-09-03). The card looped
+// locked → typing → held before, which meant the state a reader wanted
+// to inspect was always about to be replaced — and the founder's
+// standing call ("i'm not sure there is any need to animate these
+// vignettes") had already reached every other artefact on /features.
+// A pair shows the whole arc at once: the blurred decoy under its lock
+// line, and the same block given. Both halves are the REAL PollReveal.
 export function RevealVignette() {
-  const reduced = useReducedMotion()
-  const [typed, setTyped] = useState(reduced ? REVEAL.length : -1)
-
-  // -1 = locked; 0..length = typing; length = held
-  useEffect(() => {
-    if (reduced) return
-    if (typed < 0) {
-      const id = setTimeout(() => setTyped(0), LOCKED_MS)
-      return () => clearTimeout(id)
-    }
-    if (typed < REVEAL.length) {
-      const id = setTimeout(
-        () => setTyped(typed + 1),
-        Math.max(12, Math.round(TYPE_TARGET_MS / REVEAL.length))
-      )
-      return () => clearTimeout(id)
-    }
-    const id = setTimeout(() => setTyped(-1), HOLD_MS)
-    return () => clearTimeout(id)
-  }, [typed, reduced])
-
-  const locked = typed < 0
-
   return (
     <Vignette>
-      <div className="mx-auto max-w-md rounded-xl border border-border bg-background p-5 shadow-lg">
-        <p className="text-xs font-medium tracking-widest text-primary uppercase">
-          Belinda&apos;s favourite colour
-        </p>
-
-        {/* Fixed height across both states: the card must not resize when the
-            reveal lands, or the whole page below it jumps. Sized to the
-            typed reveal at its longest, which is the taller of the two. */}
-        <div className="relative mt-3 h-24">
-          <AnimatePresence initial={false} mode="wait">
-            {locked ? (
-              <motion.div
-                key="locked"
-                initial={reduced ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={reduced ? undefined : { opacity: 0 }}
-                transition={{ duration: 0.35 }}
-                className="absolute inset-0"
-              >
-                <div className="pointer-events-none blur-[5px] select-none">
-                  <PollReveal personalReveal={DECOY} />
-                </div>
-                {/* The lock line — an invitation, never a toll. "waiting for
-                    you", not "unlock": the reveal is a gift, not a gate. */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1.5 text-sm text-foreground shadow-sm">
-                    <Lock className="h-3.5 w-3.5 text-primary" />
-                    Pledge, and Belinda&apos;s is waiting for you
-                  </span>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="revealed"
-                initial={reduced ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.35 }}
-                className="absolute inset-0"
-              >
-                <PollReveal personalReveal={REVEAL.slice(0, typed)} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+      <div className="mx-auto grid max-w-3xl gap-4 sm:grid-cols-2">
+        <div>
+          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            Before pledging
+          </p>
+          <div className="rounded-xl border border-border bg-background p-5 shadow-lg">
+            <p className="text-xs font-medium tracking-widest text-primary uppercase">
+              {FIRST_NAME}&apos;s favourite {TOPIC_TITLE.toLowerCase()}
+            </p>
+            <div className="relative mt-3">
+              <div className="pointer-events-none blur-[5px] select-none">
+                <PollReveal personalReveal={DECOY} />
+              </div>
+              {/* The lock line — an invitation, never a toll. "waiting for
+                  you", not "unlock": the reveal is a gift, not a gate. */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1.5 text-center text-sm text-foreground shadow-sm">
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  Pledge, and {FIRST_NAME}&apos;s is waiting for you
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            After pledging
+          </p>
+          <div className="rounded-xl border border-border bg-background p-5 shadow-lg">
+            <p className="text-xs font-medium tracking-widest text-primary uppercase">
+              {FIRST_NAME}&apos;s favourite {TOPIC_TITLE.toLowerCase()}
+            </p>
+            <div className="mt-3">
+              <PollReveal personalReveal={REVEAL} />
+            </div>
+          </div>
         </div>
       </div>
     </Vignette>
