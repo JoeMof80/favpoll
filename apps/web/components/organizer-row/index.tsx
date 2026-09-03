@@ -399,7 +399,7 @@ export function OrganizerRow({ favpoll }: Props) {
                   />
                 </div>
                 <Button asChild variant="outline" size="sm" className="w-37">
-                  <a href={`/favpolls/${favpoll.id}/pack`}>
+                  <a href={`/favpolls/${favpoll.id}/stationery`}>
                     <Printer data-icon="inline-start" aria-hidden="true" />
                     Print pack
                   </a>

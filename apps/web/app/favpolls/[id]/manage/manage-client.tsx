@@ -21,6 +21,7 @@ import {
   type WallEntry,
 } from "@/components/wall-of-favourites"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { ToolbarBand } from "@/components/ui/toolbar-band"
 import { SegmentedControl } from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -301,7 +302,8 @@ export function ManageClient({
       : 0
 
   return (
-    <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+    <>
+      <div className="mx-auto w-full max-w-330 px-4 pt-6 pb-4 sm:px-6">
       <Link
         href="/my-favpolls"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -332,6 +334,17 @@ export function ManageClient({
               : `Closes ${formatLongDate(favpoll.closes_at)} · ${Math.max(days, 0)} day${days === 1 ? "" : "s"} left`}
           </p>
         </div>
+      </div>
+
+      {/* ── Two lanes: the RECORD (the favpoll's own anatomy) and the
+          OPERATION (status · money · share · activity). ── */}
+      </div>
+
+      {/* THE SUBHEADER (founder, 2026-09-03: "like the stationery
+          page") — the workspace's own sticky ToolbarBand carries every
+          door. Full-bleed by contract: the page column closes above it
+          and reopens beneath. */}
+      <ToolbarBand className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm">
             <a href={guestUrl} target="_blank" rel="noreferrer">
@@ -360,7 +373,7 @@ export function ManageClient({
             {deleting ? "Deleting…" : "Delete"}
           </Button>
           <Button asChild variant="outline" size="sm">
-            <a href={`/favpolls/${favpoll.id}/pack`}>
+            <a href={`/favpolls/${favpoll.id}/stationery`}>
               <Printer data-icon="inline-start" aria-hidden="true" />
               Stationery
             </a>
@@ -374,11 +387,10 @@ export function ManageClient({
             </Button>
           )}
         </div>
-      </div>
+      </ToolbarBand>
 
-      {/* ── Two lanes: the RECORD (the favpoll's own anatomy) and the
-          OPERATION (status · money · share · activity). ── */}
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         {/* ═══ MAIN LANE — the record ═══ */}
         <div className="flex min-w-0 flex-col gap-6">
           <Card title="Header" editable>
@@ -624,6 +636,8 @@ export function ManageClient({
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+      </div>
+    </>
   )
 }
