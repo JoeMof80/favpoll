@@ -413,12 +413,12 @@ export function ManageClient({
               >
                 {/* QR leads, near-full width — the thing handed
                     across a table; links stack beneath (founder,
-                    2026-09-03). 288px fits the phone max-width. */}
+                    2026-09-03). 288 read as too big; 180 settled. */}
                 <div className="flex flex-col gap-4">
                   <div className="flex justify-center" suppressHydrationWarning>
                     <BrandedQR
                       value={qrUrl}
-                      size={288}
+                      size={180}
                       aria-label="QR code for the guest-facing favpoll page"
                     />
                   </div>
