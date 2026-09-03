@@ -70,11 +70,15 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
         href={`/favpolls/${favpoll.id}/manage`}
         className={cn(
           "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 transition-colors hover:bg-primary/5",
-          "sm:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]",
+          "sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]",
           isClosed && "opacity-70"
         )}
       >
-        {/* Identity — register ink on the eyebrow, like the cards. */}
+        {/* Identity — register ink on the eyebrow, like the cards. The
+            full triple on one line (founder, 2026-09-03): name · topic
+            · charity is how a professional recognises the row. Pledges
+            left the scan — an input metric the money column already
+            summarises; it lives on manage. */}
         <span className="min-w-0">
           <span className="block truncate text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
             {eyebrow}
@@ -85,6 +89,12 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
               <span className="font-normal text-muted-foreground">
                 {" "}
                 · {topicTitle}
+              </span>
+            )}
+            {charityLabel && (
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                · {charityLabel}
               </span>
             )}
           </span>
@@ -111,14 +121,6 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
                 ? "closing"
                 : `${days} day${days === 1 ? "" : "s"} left`}
           </span>
-        </span>
-
-        {/* Charity — the identity triple's third leg (founder,
-            2026-09-03: name · topic · charity is how a professional
-            recognises the row). Pledges left the scan: an input metric
-            the money column already summarises; it lives on manage. */}
-        <span className="hidden truncate text-xs text-muted-foreground sm:block">
-          {charityLabel}
         </span>
 
         {/* Raised, with the goal bar under it when one exists */}
@@ -180,7 +182,6 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
           <span className={cn(isWarning && "text-amber-600")}>
             {isClosed ? "Closed" : `${Math.max(days, 0)}d left`}
           </span>
-          <span className="min-w-0 truncate">{charityLabel}</span>
           <span className="font-medium text-primary tabular-nums">
             {formatAmount(favpoll.total_raised)}
           </span>
