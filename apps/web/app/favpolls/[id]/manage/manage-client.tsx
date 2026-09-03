@@ -411,8 +411,18 @@ export function ManageClient({
                 align="end"
                 className="w-96 max-w-[calc(100vw-2rem)] p-5"
               >
-                <div className="flex flex-col gap-4 min-[480px]:flex-row">
-                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                {/* QR leads, near-full width — the thing handed
+                    across a table; links stack beneath (founder,
+                    2026-09-03). 288px fits the phone max-width. */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-center" suppressHydrationWarning>
+                    <BrandedQR
+                      value={qrUrl}
+                      size={288}
+                      aria-label="QR code for the guest-facing favpoll page"
+                    />
+                  </div>
+                  <div className="flex min-w-0 flex-col gap-3">
                     {linkRow(
                       "guest",
                       "favpoll",
@@ -437,13 +447,6 @@ export function ManageClient({
                       editUrl,
                       false
                     )}
-                  </div>
-                  <div className="shrink-0" suppressHydrationWarning>
-                    <BrandedQR
-                      value={qrUrl}
-                      size={132}
-                      aria-label="QR code for the guest-facing favpoll page"
-                    />
                   </div>
                 </div>
               </PopoverContent>
