@@ -280,7 +280,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               <Button
                 type="button"
                 variant="ghost"
-                className="flex-1"
+                className="h-11 flex-1 md:text-base"
                 onClick={() => {
                   w.setTopicOpen(false)
                   setTopicSearch("")
@@ -290,7 +290,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               </Button>
               <Button
                 type="button"
-                className="flex-1"
+                className="h-11 flex-1 md:text-base"
                 onClick={() => {
                   w.setTopicOpen(false)
                   setTopicSearch("")
@@ -352,7 +352,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               <Button
                 type="button"
                 variant="ghost"
-                className="flex-1"
+                className="h-11 flex-1 md:text-base"
                 onClick={() => {
                   w.setCharityOpen(false)
                   setCharitySearch("")
@@ -362,7 +362,7 @@ export function NewFavpollWizard({ data, edit }: Props) {
               </Button>
               <Button
                 type="button"
-                className="flex-1"
+                className="h-11 flex-1 md:text-base"
                 onClick={() => {
                   w.setCharityOpen(false)
                   setCharitySearch("")

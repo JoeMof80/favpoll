@@ -111,12 +111,16 @@ export function TopicItemsDialog({
           <Button
             type="button"
             variant="ghost"
-            className="flex-1"
+            className="h-11 flex-1 md:text-base"
             onClick={handleClose}
           >
             Cancel
           </Button>
-          <Button type="button" className="flex-1" onClick={handleClose}>
+          <Button
+            type="button"
+            className="h-11 flex-1 md:text-base"
+            onClick={handleClose}
+          >
             Done
           </Button>
         </div>
