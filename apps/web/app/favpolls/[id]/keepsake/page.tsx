@@ -171,13 +171,14 @@ export default async function KeepsakePage({ params }: Props) {
     guestNames,
   }
 
-  // The SAME derivation the live display uses (app/live/[slug]): memorials
-  // open quiet, everything else opens with the total. Duplicating the rule
-  // rather than the decision — if the display's rule changes, this should
-  // follow it.
+  // The canonical category+grouping derivation. This call previously
+  // passed (occasion_type, name, subject) into (category, grouping,
+  // subject) — a stale signature that sent every person favpoll to the
+  // celebration register: wrong palette, wrong default variant
+  // (founder, 2026-09-03: "Keepsake should follow the theme").
   const register = deriveRegister(
-    favpoll.occasion_type,
-    favpoll.subject === "cause" ? null : protagonist?.name,
+    favpoll.category ?? null,
+    favpoll.grouping ?? "individual",
     favpoll.subject
   )
   const defaultVariant = register === "remembering" ? "tribute" : "fundraiser"
