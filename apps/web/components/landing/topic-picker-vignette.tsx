@@ -432,7 +432,10 @@ export function TopicPickerVignette({
               style={layer(1).style}
               exit={reduced ? undefined : { opacity: 0, y: -8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
+              // top-8 is headroom for spent layers receding upward; a still
+              // has none, and the inset read as a dead band above the
+              // dialog (founder, 2026-09-03).
+              className={`absolute inset-x-0 ${still ? "top-0" : "top-8"} overflow-hidden rounded-xl border border-border bg-background shadow-lg`}
             >
               {/* TopicItemsDialog's three bands: header (title + field), body
                   (the chips), and a footer with Cancel / Done behind a rule —
