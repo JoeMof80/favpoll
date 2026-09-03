@@ -90,6 +90,7 @@ const ARTEFACTS = [
     key: "pack",
     label: t("memorials.artefacts.pack.label"),
     body: t("memorials.artefacts.pack.body"),
+    feature: { label: "QR-coded stationery", href: "/features#stationery" },
     // NOT PackVignette, which showed favpoll's own A4/A5 and Avery sheets
     // beside copy about the family's order of service — the one place in
     // this section where the picture contradicted the words. This is that
@@ -110,6 +111,7 @@ const ARTEFACTS = [
     key: "reveal",
     label: t("memorials.artefacts.reveal.label"),
     body: t("memorials.artefacts.reveal.body"),
+    feature: { label: "the reveal", href: "/features#reveal" },
     // The hero's own PhoneFrame at half size, still, holding the reveal
     // already given — so the device at the top of this page and the device
     // here are one object at two scales.
@@ -119,6 +121,7 @@ const ARTEFACTS = [
     key: "display",
     label: t("memorials.artefacts.display.label"),
     body: t("memorials.artefacts.display.body"),
+    feature: { label: "the live display", href: "/features#display" },
     // Belinda's screen, not the celebration default — the last object on
     // the page that was still showing someone else's birthday.
     artefact: <LiveVignette scene={MEMORIAL_SCENE} still room />,
@@ -127,6 +130,7 @@ const ARTEFACTS = [
     key: "keepsake",
     label: t("memorials.artefacts.keepsake.label"),
     body: t("memorials.artefacts.keepsake.body"),
+    feature: { label: "the keepsake", href: "/features#keepsake" },
     // Cropped to the tribute's head — the prefix, her name, the topic and
     // the reveal. The data was always hers; two whole sheets at 0.28 put it
     // at 5px.
