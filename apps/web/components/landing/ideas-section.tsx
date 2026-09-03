@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -6,6 +7,9 @@ export type Idea = {
   label: string
   body: string
   artefact: React.ReactNode
+  /** The feature this idea leans on — renders a quiet "More about …"
+   * link to its /features section (founder, 2026-09-03). */
+  feature?: { label: string; href: string }
 }
 
 /**
@@ -61,7 +65,7 @@ export function IdeasSection({
             track takes what is left, with minmax(0,·) so IT can shrink rather
             than the page. */}
         <div className="space-y-16 lg:space-y-24">
-          {ideas.map(({ key, label, body, artefact }, i) => {
+          {ideas.map(({ key, label, body, artefact, feature }, i) => {
             // ALTERNATING SIDES. Four rows the same way round is a column of
             // text with a column of pictures beside it; the eye stops reading
             // and starts scanning. Swapping every other row makes each one
@@ -93,6 +97,16 @@ export function IdeasSection({
                   <p className="leading-relaxed text-muted-foreground">
                     {body}
                   </p>
+                  {feature && (
+                    <p className="mt-3 text-sm">
+                      <Link
+                        href={feature.href}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        More about {feature.label} →
+                      </Link>
+                    </p>
+                  )}
                 </figcaption>
                 <div
                   className={cn(

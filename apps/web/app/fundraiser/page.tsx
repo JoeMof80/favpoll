@@ -120,6 +120,7 @@ const IDEAS = [
     key: "topic",
     label: t("fundraisers.artefacts.topic.label"),
     body: t("fundraisers.artefacts.topic.body"),
+    feature: { label: "homemade topics", href: "/features#topics" },
     // STILL (founder, 2026-08-29: "it should probably just show the dialog
     // with the homemade topic that Marcus already created"). It ran the full
     // three-dialog sequence until now, which was the wrong picture twice
@@ -150,6 +151,7 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
+    feature: { label: "the reveal", href: "/features#reveal" },
     // THE ONLY MESSAGE REVEAL ON THE SITE, and the only surface demonstrating
     // isMessageReveal. On a poll with a consequence the protagonist's own
     // favourite is hollow — Marcus wears whatever the room picks — so he gives
@@ -161,6 +163,7 @@ const IDEAS = [
     key: "keepsake",
     label: t("fundraisers.artefacts.keepsake.label"),
     body: t("fundraisers.artefacts.keepsake.body"),
+    feature: { label: "the keepsake", href: "/features#keepsake" },
     // FUNDRAISER variant — the first page to use it, and its home. Tribute
     // leads on the person and their reveal; fundraiser leads on the money.
     // A memorial memento opening with a total would be crass and a wedding's

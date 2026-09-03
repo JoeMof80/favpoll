@@ -53,10 +53,10 @@ const DEFAULT_MEDIA = [
 // FIRST MENTION LINKS TO THE REFERENCE (founder, 2026-09-03): "the
 // shared fund" in the triad used to dead-end for a cold reader; its
 // /features section answers it in one click. Structural, not
-// editorial — the founder's copy strings are untouched, the FIRST
-// occurrence across the whole band is wrapped in a quiet ink link,
-// and later mentions stay plain (link-litter reads as noise in
-// three-line beats). Marketing prose only; dialogs carry their own
+// editorial — the founder's copy strings are untouched, and the FIRST
+// occurrence in EACH BEAT is wrapped in a quiet ink link (per-beat,
+// founder 2026-09-03: the columns are read as self-contained, so the
+// pledge beat's mention earns its own link). Marketing prose only; dialogs carry their own
 // sentence instead (the features/dialog copy doctrine, 2026-09-03).
 const LINK_TERM = "shared fund"
 const LINK_HREF = "/features#shared-fund"
@@ -86,7 +86,6 @@ export function HowItWorksSteps({
   title: string
   steps: { label: string; body: string; media?: React.ReactNode }[]
 }) {
-  const spent = { done: false }
   return (
     <section id="how" className="w-full scroll-mt-20">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
@@ -137,7 +136,7 @@ export function HowItWorksSteps({
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
                 <div className="min-w-0 xl:pr-2">
                   <p className="leading-relaxed text-muted-foreground">
-                    {linkifyOnce(step.body, spent)}
+                    {linkifyOnce(step.body, { done: false })}
                   </p>
                 </div>
                 {/* SPACING, NOT A RULE, IS WHAT GROUPS THESE (founder,
