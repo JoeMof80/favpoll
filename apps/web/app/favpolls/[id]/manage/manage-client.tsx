@@ -21,6 +21,7 @@ import {
   type WallEntry,
 } from "@/components/wall-of-favourites"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { SegmentedControl } from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
@@ -31,7 +32,7 @@ import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import {
   deleteFavpoll,
-  setFavpollListed,
+  setFavpollVisibility,
   setFavpollGuestItems,
 } from "@/app/favpolls/[id]/actions"
 import {
@@ -116,8 +117,11 @@ export function ManageClient({
       ? favpoll.category.charAt(0).toUpperCase() + favpoll.category.slice(1)
       : "favpoll")
 
-  const [listed, setListed] = useState(favpoll.is_listed)
-  const [listingPending, setListingPending] = useState(false)
+  type Visibility = "listed" | "unlisted" | "private"
+  const [visibility, setVisibilityState] = useState<Visibility>(
+    favpoll.isPrivate ? "private" : favpoll.is_listed ? "listed" : "unlisted"
+  )
+  const [visibilityPending, setVisibilityPending] = useState(false)
   const [guestItems, setGuestItems] = useState(
     favpoll.allow_guest_items !== false
   )
@@ -138,15 +142,16 @@ export function ManageClient({
     })
   }
 
-  async function handleToggleListed(value: boolean) {
-    setListed(value)
-    setListingPending(true)
+  async function handleVisibility(v: Visibility) {
+    const prev = visibility
+    setVisibilityState(v)
+    setVisibilityPending(true)
     try {
-      await setFavpollListed(favpoll.id, value)
+      await setFavpollVisibility(favpoll.id, v)
     } catch {
-      setListed(!value)
+      setVisibilityState(prev)
     } finally {
-      setListingPending(false)
+      setVisibilityPending(false)
     }
   }
 
@@ -403,7 +408,7 @@ export function ManageClient({
                   )}
                 </p>
               </div>
-              <div className="flex items-baseline gap-3 border-t border-border pt-3">
+              <div className="flex items-baseline gap-3">
                 <p className="w-24 shrink-0 text-xs text-muted-foreground">
                   Reveal
                 </p>
@@ -474,27 +479,32 @@ export function ManageClient({
               <span className="font-normal text-muted-foreground">
                 {" "}
                 ·{" "}
-                {favpoll.isPrivate
+                {visibility === "private"
                   ? "Private"
-                  : listed
+                  : visibility === "listed"
                     ? "Listed"
                     : "Link only"}
               </span>
             </p>
             <div className="mt-4 grid gap-3">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-foreground">
-                  Listed on the public favpolls page
-                </span>
-                <Switch
-                  checked={listed}
-                  onCheckedChange={handleToggleListed}
-                  disabled={listingPending || favpoll.isPrivate}
-                  aria-label={
-                    listed
-                      ? "Listed — click to unlist"
-                      : "Unlisted — click to list"
-                  }
+              <div className="grid gap-1.5">
+                <span className="text-sm text-foreground">Visibility</span>
+                {/* The wizard's own three-notch axis (founder,
+                    2026-09-03: "should be a three way switch now") —
+                    the 44px form scale, as everywhere. */}
+                <SegmentedControl
+                  size="lg"
+                  label="Who can see this favpoll"
+                  value={visibility}
+                  onChange={(v) => {
+                    if (!visibilityPending) handleVisibility(v as Visibility)
+                  }}
+                  options={[
+                    { value: "listed", label: "Listed" },
+                    { value: "unlisted", label: "Link only" },
+                    { value: "private", label: "Private" },
+                  ]}
+                  className="w-fit"
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
