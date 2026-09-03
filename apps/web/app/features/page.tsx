@@ -199,7 +199,7 @@ export default function FeaturesPage() {
                 "Allow guests to add favourites of their own - no account needed",
                 "Hide guest-added favourites that don’t belong",
               ]}
-              artefact={<TopicPickerVignette />}
+              artefact={<TopicPickerVignette still />}
             />
 
             <Feature
@@ -232,7 +232,7 @@ export default function FeaturesPage() {
                 "A pledge goal, if one is set, fills as pledges land and turns green the moment it is met",
                 "The wall of favourites updates in sync with the rankings as pledges arrive",
               ]}
-              artefact={<LiveVignette />}
+              artefact={<LiveVignette still room />}
             />
 
             <Feature
