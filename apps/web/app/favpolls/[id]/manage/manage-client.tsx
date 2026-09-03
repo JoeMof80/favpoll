@@ -403,7 +403,7 @@ export function ManageClient({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-96 max-w-[calc(100vw-2rem)]"
+                className="w-96 max-w-[calc(100vw-2rem)] p-5"
               >
                 <div className="flex flex-col gap-4 min-[480px]:flex-row">
                   <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
