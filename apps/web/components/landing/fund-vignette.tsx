@@ -47,8 +47,10 @@ export function FundVignette() {
               type="button"
               // The picked preset wears the pressed state — £25 is where
               // the amount above came from (founder, 2026-09-03).
+              // h-11 md:text-base mirrors the REAL modal's 44px form
+              // standard — this is a picture of that dialog.
               variant={preset === PICKED ? "default" : "outline"}
-              className="flex-1"
+              className="h-11 flex-1 md:text-base"
             >
               £{preset}
             </Button>
@@ -64,10 +66,14 @@ export function FundVignette() {
         {/* The dialog's footer: the primary is enabled because an amount is
             in — the state a guest is one click from giving. */}
         <div className="mt-5 flex flex-col gap-3">
-          <Button type="button" className="w-full">
+          <Button type="button" className="h-11 w-full md:text-base">
             Add to fund
           </Button>
-          <Button type="button" variant="ghost" className="w-full">
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-11 w-full md:text-base"
+          >
             No thanks
           </Button>
         </div>
