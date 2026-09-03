@@ -71,6 +71,27 @@ export type ManageFavpoll = OrganizerFavpoll & {
 
 type Visibility = "listed" | "unlisted" | "private"
 
+// A card in either lane. ONE Edit door for the whole page — the
+// toolbar's (founder, 2026-09-03); per-card doors all led to the same
+// wizard anyway. Module scope, not inside ManageClient: a component
+// created during render is remade every pass (react-compiler error).
+function Card({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className="rounded-xl border border-border bg-background p-5">
+      <div className="mb-4">
+        <SectionEyebrow as="h2">{title}</SectionEyebrow>
+      </div>
+      {children}
+    </section>
+  )
+}
+
 const formatLongDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -198,24 +219,6 @@ export function ManageClient({
       setDeleting(false)
     }
   }
-
-  // A card in either lane. ONE Edit door for the whole page — the
-  // toolbar's (founder, 2026-09-03); per-card doors all led to the
-  // same wizard anyway.
-  const Card = ({
-    title,
-    children,
-  }: {
-    title: string
-    children: React.ReactNode
-  }) => (
-    <section className="rounded-xl border border-border bg-background p-5">
-      <div className="mb-4">
-        <SectionEyebrow as="h2">{title}</SectionEyebrow>
-      </div>
-      {children}
-    </section>
-  )
 
   const fact = (label: string, value: React.ReactNode) => (
     <div className="min-w-0">
