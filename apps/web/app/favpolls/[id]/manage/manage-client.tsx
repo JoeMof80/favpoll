@@ -118,9 +118,6 @@ export function ManageClient({
   const displayUrl = baseUrl
     ? `${baseUrl}/live/${favpoll.live_slug}`
     : `/live/${favpoll.live_slug}`
-  const editUrl = baseUrl
-    ? `${baseUrl}/favpolls/${favpoll.id}/edit`
-    : `/favpolls/${favpoll.id}/edit`
 
   const name =
     favpoll.subject === "cause"
@@ -202,32 +199,19 @@ export function ManageClient({
     }
   }
 
-  // A card in either lane: SectionEyebrow heading, optional Edit door.
+  // A card in either lane. ONE Edit door for the whole page — the
+  // toolbar's (founder, 2026-09-03); per-card doors all led to the
+  // same wizard anyway.
   const Card = ({
     title,
     children,
-    editable = false,
   }: {
     title: string
     children: React.ReactNode
-    editable?: boolean
   }) => (
     <section className="rounded-xl border border-border bg-background p-5">
-      <div className="mb-4 flex items-center justify-between gap-2">
+      <div className="mb-4">
         <SectionEyebrow as="h2">{title}</SectionEyebrow>
-        {editable && (
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="-my-1.5 text-muted-foreground hover:text-foreground"
-          >
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
-            </Link>
-          </Button>
-        )}
       </div>
       {children}
     </section>
@@ -441,14 +425,6 @@ export function ManageClient({
                       displayUrl,
                       true
                     )}
-                    {linkRow(
-                      "edit",
-                      "Edit favpoll",
-                      Pencil,
-                      `/favpolls/${favpoll.id}/edit`,
-                      editUrl,
-                      false
-                    )}
                   </div>
                 </div>
               </PopoverContent>
@@ -497,7 +473,7 @@ export function ManageClient({
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           {/* ═══ MAIN LANE — the record ═══ */}
           <div className="flex min-w-0 flex-col gap-6">
-            <Card title="Header" editable>
+            <Card title="Header">
               <div className="flex items-start justify-between gap-4">
                 <div className="grid min-w-0 flex-1 gap-2">
                   {inlineFact("Opening line", favpoll.opening_line || "—")}
@@ -512,7 +488,7 @@ export function ManageClient({
               </div>
             </Card>
 
-            <Card title="Story" editable>
+            <Card title="Story">
               <div className="grid gap-3">
                 <div className="flex items-baseline gap-3">
                   <p className="w-24 shrink-0 text-xs text-muted-foreground">
@@ -541,10 +517,7 @@ export function ManageClient({
               </div>
             </Card>
 
-            <Card
-              title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}
-              editable
-            >
+            <Card title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
               {favpoll.favourites.length > 0 ? (
                 <>
                   <div className="flex flex-wrap gap-1.5">
@@ -580,7 +553,7 @@ export function ManageClient({
 
           {/* ═══ SIDE LANE — the operation ═══ */}
           <div className="flex min-w-0 flex-col gap-6">
-            <Card title="Charities" editable>
+            <Card title="Charities">
               <div className="flex flex-col gap-3">
                 {favpoll.charities.map(({ charity }) => (
                   <CharityRow
