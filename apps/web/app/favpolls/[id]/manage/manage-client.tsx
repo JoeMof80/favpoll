@@ -28,6 +28,7 @@ import {
   ToolbarLabel,
 } from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 import {
   Popover,
   PopoverContent,
@@ -349,33 +350,38 @@ export function ManageClient({
             }
           />
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline">
-              <a href={guestUrl} target="_blank" rel="noreferrer">
-                <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                View
-              </a>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/edit`}>
-                <Pencil data-icon="inline-start" aria-hidden="true" />
-                Edit
-              </Link>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!canDelete || deleting}
-              onClick={handleDelete}
-              title={
-                canDelete
-                  ? undefined
-                  : "Favpolls with pledges can't be deleted."
-              }
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 data-icon="inline-start" aria-hidden="true" />
-              {deleting ? "Deleting…" : "Delete"}
-            </Button>
+            {/* The favpoll-object actions fuse into one control; the
+                surface doors (Stationery, Keepsake, Share) stand
+                alone (founder, 2026-09-03). */}
+            <ButtonGroup>
+              <Button asChild variant="outline">
+                <a href={guestUrl} target="_blank" rel="noreferrer">
+                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
+                  View
+                </a>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canDelete || deleting}
+                onClick={handleDelete}
+                title={
+                  canDelete
+                    ? undefined
+                    : "Favpolls with pledges can't be deleted."
+                }
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 data-icon="inline-start" aria-hidden="true" />
+                {deleting ? "Deleting…" : "Delete"}
+              </Button>
+            </ButtonGroup>
             <Button asChild variant="outline">
               <a href={`/favpolls/${favpoll.id}/stationery`}>
                 <Printer data-icon="inline-start" aria-hidden="true" />
@@ -396,8 +402,9 @@ export function ManageClient({
                 buttons, QR). */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Share">
-                  <Share2 size={14} aria-hidden="true" />
+                <Button variant="outline">
+                  <Share2 data-icon="inline-start" aria-hidden="true" />
+                  Share
                 </Button>
               </PopoverTrigger>
               <PopoverContent
