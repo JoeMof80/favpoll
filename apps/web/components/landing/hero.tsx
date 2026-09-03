@@ -536,7 +536,20 @@ export function LandingHero({
                     the reader down the same page — which is a different
                     promise, and the only one a visitor can be disappointed by
                     if they expect a new page. */}
-                <Link href="#how">
+                <Link
+                  href="#how"
+                  // Explicit scroll on EVERY click (founder bug report,
+                  // 2026-09-03): with a bare hash link, the second click
+                  // is a no-op — the URL already ends #how, so nothing
+                  // changes and the browser won't re-scroll. The href
+                  // stays for semantics and no-JS.
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document
+                      .getElementById("how")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }}
+                >
                   {ctaSecondaryLabel ?? t("landing.cta.secondary")}
                   <ArrowDown data-icon="inline-end" aria-hidden="true" />
                 </Link>
