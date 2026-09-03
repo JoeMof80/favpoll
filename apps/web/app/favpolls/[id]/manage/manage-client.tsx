@@ -389,13 +389,40 @@ export function ManageClient({
       </ToolbarBand>
 
       <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
-        <div className="min-w-0">
-          <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
-            {eyebrow}
-          </p>
-          <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
-            {name}
-          </h1>
+        <div className="grid items-end gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+              {eyebrow}
+            </p>
+            <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+              {name}
+            </h1>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">
+              {isClosed ? "Closed" : "Closes"}
+            </p>
+            <p
+              className={cn(
+                "mt-0.5 text-2xl font-medium",
+                !isClosed && isWarning
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-foreground"
+              )}
+            >
+              {formatLongDate(
+                isClosed
+                  ? (favpoll.closed_at ?? favpoll.closes_at)
+                  : favpoll.closes_at
+              )}
+              {!isClosed && (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+                </span>
+              )}
+            </p>
+          </div>
         </div>
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -484,28 +511,6 @@ export function ManageClient({
 
           {/* ═══ SIDE LANE — the operation ═══ */}
           <div className="flex min-w-0 flex-col gap-6">
-            <Card title={isClosed ? "Closed" : "Closes"}>
-              <p
-                className={cn(
-                  "text-2xl font-medium",
-                  !isClosed && isWarning
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-foreground"
-                )}
-              >
-                {formatLongDate(
-                  isClosed
-                    ? (favpoll.closed_at ?? favpoll.closes_at)
-                    : favpoll.closes_at
-                )}
-              </p>
-              {!isClosed && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-                </p>
-              )}
-            </Card>
-
             <Card title="Charities" editable>
               <div className="flex flex-col gap-3">
                 {favpoll.charities.map(({ charity }) => (
