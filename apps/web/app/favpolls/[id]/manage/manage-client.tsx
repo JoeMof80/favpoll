@@ -12,6 +12,7 @@ import {
   Monitor,
   Pencil,
   Printer,
+  Share2,
   Sparkles,
   Trash2,
 } from "lucide-react"
@@ -27,6 +28,11 @@ import {
   ToolbarLabel,
 } from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
 import { Chip } from "@/components/ui/chip"
 import { CharityRow } from "@/components/charity-row"
@@ -384,6 +390,57 @@ export function ManageClient({
                 </Link>
               </Button>
             )}
+            {/* SHARE AS A POPOVER (founder, 2026-09-03): sharing is an
+                action, so it rides the toolbar — a Popover, not a
+                menu, because the content is interactive (copy
+                buttons, QR). */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon-sm" aria-label="Share">
+                  <Share2 size={14} aria-hidden="true" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-96 max-w-[calc(100vw-2rem)]"
+              >
+                <div className="flex flex-col gap-4 min-[480px]:flex-row">
+                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                    {linkRow(
+                      "guest",
+                      "favpoll",
+                      ExternalLink,
+                      guestUrl,
+                      guestUrl,
+                      true
+                    )}
+                    {linkRow(
+                      "display",
+                      "Live favpoll",
+                      Monitor,
+                      displayUrl,
+                      displayUrl,
+                      true
+                    )}
+                    {linkRow(
+                      "edit",
+                      "Edit favpoll",
+                      Pencil,
+                      `/favpolls/${favpoll.id}/edit`,
+                      editUrl,
+                      false
+                    )}
+                  </div>
+                  <div className="shrink-0" suppressHydrationWarning>
+                    <BrandedQR
+                      value={qrUrl}
+                      size={132}
+                      aria-label="QR code for the guest-facing favpoll page"
+                    />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </ToolbarBand>
@@ -581,44 +638,6 @@ export function ManageClient({
                     <span className="text-muted-foreground">Empty</span>
                   )
                 )}
-              </div>
-            </Card>
-
-            <Card title="Share">
-              <div className="flex flex-col gap-4 min-[480px]:flex-row">
-                <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                  {linkRow(
-                    "guest",
-                    "favpoll",
-                    ExternalLink,
-                    guestUrl,
-                    guestUrl,
-                    true
-                  )}
-                  {linkRow(
-                    "display",
-                    "Live favpoll",
-                    Monitor,
-                    displayUrl,
-                    displayUrl,
-                    true
-                  )}
-                  {linkRow(
-                    "edit",
-                    "Edit favpoll",
-                    Pencil,
-                    `/favpolls/${favpoll.id}/edit`,
-                    editUrl,
-                    false
-                  )}
-                </div>
-                <div className="shrink-0" suppressHydrationWarning>
-                  <BrandedQR
-                    value={qrUrl}
-                    size={132}
-                    aria-label="QR code for the guest-facing favpoll page"
-                  />
-                </div>
               </div>
             </Card>
 
