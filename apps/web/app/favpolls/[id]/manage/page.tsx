@@ -170,7 +170,10 @@ export default async function ManageFavpollPage({
 
   return (
     <RegisterScope palette={palette}>
-      <main className="min-h-screen bg-muted">
+      {/* The guest page's own ground (PageLayout's register wash), so
+          manage and the favpoll it manages read as one place
+          (founder, 2026-09-03). */}
+      <main className="min-h-screen bg-primary/5">
         <ManageClient favpoll={favpoll} wallEntries={wallEntries} />
       </main>
     </RegisterScope>
