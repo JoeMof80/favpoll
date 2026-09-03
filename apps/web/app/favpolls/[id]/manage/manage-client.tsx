@@ -344,7 +344,7 @@ export function ManageClient({
           page") — the workspace's own sticky ToolbarBand carries every
           door. Full-bleed by contract: the page column closes above it
           and reopens beneath. */}
-      <ToolbarBand className="flex flex-wrap items-center gap-2">
+      <ToolbarBand className="flex flex-wrap items-center justify-end gap-2">
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm">
             <a href={guestUrl} target="_blank" rel="noreferrer">
