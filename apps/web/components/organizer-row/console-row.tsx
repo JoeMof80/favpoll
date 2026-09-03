@@ -53,6 +53,12 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
       ? favpoll.category.charAt(0).toUpperCase() + favpoll.category.slice(1)
       : "favpoll")
 
+  // The identity triple's third leg: first charity, "+N" for the rest.
+  const charityLabel = favpoll.charities[0]
+    ? favpoll.charities[0].charity.name +
+      (favpoll.charities.length > 1 ? ` +${favpoll.charities.length - 1}` : "")
+    : ""
+
   const palette = paletteForFavpoll({
     category: (favpoll.category ?? null) as FavpollCategory | null,
     subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
@@ -107,9 +113,12 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
           </span>
         </span>
 
-        {/* Pledges */}
-        <span className="hidden truncate text-xs text-muted-foreground tabular-nums sm:block">
-          {favpoll.pledge_count} pledge{favpoll.pledge_count === 1 ? "" : "s"}
+        {/* Charity — the identity triple's third leg (founder,
+            2026-09-03: name · topic · charity is how a professional
+            recognises the row). Pledges left the scan: an input metric
+            the money column already summarises; it lives on manage. */}
+        <span className="hidden truncate text-xs text-muted-foreground sm:block">
+          {charityLabel}
         </span>
 
         {/* Raised, with the goal bar under it when one exists */}
@@ -171,7 +180,7 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
           <span className={cn(isWarning && "text-amber-600")}>
             {isClosed ? "Closed" : `${Math.max(days, 0)}d left`}
           </span>
-          <span className="tabular-nums">{favpoll.pledge_count} pledges</span>
+          <span className="min-w-0 truncate">{charityLabel}</span>
           <span className="font-medium text-primary tabular-nums">
             {formatAmount(favpoll.total_raised)}
           </span>
