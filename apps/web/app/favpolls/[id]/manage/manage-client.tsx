@@ -340,6 +340,20 @@ export function ManageClient({
               Edit
             </Link>
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!canDelete || deleting}
+            onClick={handleDelete}
+            title={
+              canDelete ? undefined : "Favpolls with pledges can't be deleted."
+            }
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 data-icon="inline-start" aria-hidden="true" />
+            {deleting ? "Deleting…" : "Delete"}
+          </Button>
           <Button asChild variant="outline" size="sm">
             <a href={`/favpolls/${favpoll.id}/pack`}>
               <Printer data-icon="inline-start" aria-hidden="true" />
@@ -372,25 +386,33 @@ export function ManageClient({
               <ProtagonistAvatar
                 name={name}
                 photoUrl={favpoll.photoUrl}
-                className="h-18 w-18 shrink-0"
+                className="h-18 w-18 shrink-0 md:h-18 md:w-18"
               />
             </div>
           </Card>
 
           <Card title="Story" editable>
-            <p className="text-xs text-muted-foreground">About</p>
-            <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-              {favpoll.about || (
-                <span className="text-muted-foreground">None written.</span>
-              )}
-            </p>
-            <div className="mt-4 border-t border-border pt-3">
-              <p className="text-xs text-muted-foreground">Reveal</p>
-              <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-                {favpoll.reveal || (
-                  <span className="text-muted-foreground">None written.</span>
-                )}
-              </p>
+            <div className="grid gap-3">
+              <div className="flex items-baseline gap-3">
+                <p className="w-24 shrink-0 text-xs text-muted-foreground">
+                  About
+                </p>
+                <p className="min-w-0 flex-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                  {favpoll.about || (
+                    <span className="text-muted-foreground">None written.</span>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-baseline gap-3 border-t border-border pt-3">
+                <p className="w-24 shrink-0 text-xs text-muted-foreground">
+                  Reveal
+                </p>
+                <p className="min-w-0 flex-1 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                  {favpoll.reveal || (
+                    <span className="text-muted-foreground">None written.</span>
+                  )}
+                </p>
+              </div>
             </div>
           </Card>
 
@@ -490,24 +512,6 @@ export function ManageClient({
                   }
                 />
               </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3">
-              <span className="text-xs text-muted-foreground">
-                {canDelete
-                  ? "Delete this favpoll permanently."
-                  : "Favpolls with pledges can't be deleted."}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                disabled={!canDelete || deleting}
-                onClick={handleDelete}
-                aria-label="Delete favpoll"
-                className="shrink-0 text-destructive hover:text-destructive"
-              >
-                <Trash2 size={14} aria-hidden="true" />
-              </Button>
             </div>
           </Card>
 
