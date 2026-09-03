@@ -100,9 +100,14 @@ export function ManageClient({
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (typeof window !== "undefined" ? window.location.origin : "")
+  // The origin resolves in an effect, not at render: reading
+  // window.location.origin during render makes the server (no window)
+  // and the client (tunnel hosts, ports) disagree — a hydration
+  // mismatch on every href built from it.
+  const [baseUrl, setBaseUrl] = useState(process.env.NEXT_PUBLIC_BASE_URL || "")
+  useEffect(() => {
+    setBaseUrl((prev) => prev || window.location.origin)
+  }, [])
   const guestUrl = baseUrl
     ? `${baseUrl}/favpolls/${favpoll.id}`
     : `/favpolls/${favpoll.id}`
