@@ -45,7 +45,9 @@ export function FundVignette() {
             <Button
               key={preset}
               type="button"
-              variant="outline"
+              // The picked preset wears the pressed state — £25 is where
+              // the amount above came from (founder, 2026-09-03).
+              variant={preset === PICKED ? "default" : "outline"}
               className="flex-1"
             >
               £{preset}
