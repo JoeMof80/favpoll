@@ -85,9 +85,9 @@ const formatLongDate = (iso: string) =>
 // - MAIN — the record itself, in THE FAVPOLL'S OWN ANATOMY (header →
 //   story → topic → charities) so the organiser proofs the artefact as
 //   it will be experienced. Read-only with Edit doors into the wizard.
-// - SIDE — the operation, grouped by kind: Status (three-way
-//   date, large), Charities, Money (raised · goal · pledges ·
-//   fund), Share (links + QR), Activity (the guest wall).
+// - SIDE — the operation, grouped by kind: Charities, Money (raised ·
+//   goal · pledges · fund), the guest wall. Visibility, guest
+//   additions, the doors and the share popover all ride the toolbar.
 export function ManageClient({
   favpoll,
   wallEntries,
@@ -206,32 +206,28 @@ export function ManageClient({
     title,
     children,
     editable = false,
-    headingless = false,
   }: {
-    title?: string
+    title: string
     children: React.ReactNode
     editable?: boolean
-    headingless?: boolean
   }) => (
     <section className="rounded-xl border border-border bg-background p-5">
-      {!headingless && (
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <SectionEyebrow as="h2">{title}</SectionEyebrow>
-          {editable && (
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="-my-1.5 text-muted-foreground hover:text-foreground"
-            >
-              <Link href={`/favpolls/${favpoll.id}/edit`}>
-                <Pencil data-icon="inline-start" aria-hidden="true" />
-                Edit
-              </Link>
-            </Button>
-          )}
-        </div>
-      )}
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <SectionEyebrow as="h2">{title}</SectionEyebrow>
+        {editable && (
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="-my-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Link href={`/favpolls/${favpoll.id}/edit`}>
+              <Pencil data-icon="inline-start" aria-hidden="true" />
+              Edit
+            </Link>
+          </Button>
+        )}
+      </div>
       {children}
     </section>
   )
@@ -646,9 +642,9 @@ export function ManageClient({
               </div>
             </Card>
 
-            <Card headingless>
-              <WallOfFavourites entries={wallEntries} teaseBacked={false} />
-            </Card>
+            {/* No wrapper: the wall draws its own card, eyebrow and
+                all (founder, 2026-09-03). */}
+            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
           </div>
         </div>
       </div>
