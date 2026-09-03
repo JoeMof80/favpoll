@@ -111,13 +111,13 @@ export function SeedFundModal({
     )
   }
 
-  const title = isGuest ? "Help others take part" : "Give guests a head start"
+  const title = isGuest ? "Add to the shared fund" : "Give guests a head start"
 
   const description = isGuest ? (
     <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-      Anyone can add to the shared fund. You&rsquo;re helping guests who
-      can&rsquo;t pledge on their own &mdash; children, students, or anyone
-      who&rsquo;d rather not &mdash; still be part of this moment.
+      Not everybody is in a position to pledge money of their own. The shared
+      fund is a float that helps them take part. Any money left in the shared
+      fund goes to the charity.
     </p>
   ) : (
     <p className="mt-5 text-sm leading-relaxed text-muted-foreground">

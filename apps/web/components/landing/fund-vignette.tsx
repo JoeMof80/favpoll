@@ -30,7 +30,7 @@ export function FundVignette() {
           row, then the body. */}
       <div className="mx-auto max-w-lg rounded-xl border border-border bg-background p-5 shadow-lg">
         <p className="text-lg font-semibold tracking-tight text-foreground">
-          Help others take part
+          Add to the shared fund
         </p>
 
         {/* Amount field — £ beside a borderless number input, as the dialog
@@ -56,9 +56,9 @@ export function FundVignette() {
         </div>
 
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-          Anyone can add to the shared fund. You&rsquo;re helping guests who
-          can&rsquo;t pledge on their own &mdash; children, students, or anyone
-          who&rsquo;d rather not &mdash; still be part of this moment.
+          Not everybody is in a position to pledge money of their own. The
+          shared fund is a float that helps them take part. Any money left in
+          the shared fund goes to the charity.
         </p>
 
         {/* The dialog's footer: the primary is enabled because an amount is
