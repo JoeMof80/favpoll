@@ -106,6 +106,7 @@ const IDEAS = [
     key: "cards",
     label: t("celebrations.artefacts.cards.label"),
     body: t("celebrations.artefacts.cards.body"),
+    feature: { label: "QR-coded stationery", href: "/features#stationery" },
     // A PLACE CARD, because the copy now says place names (founder,
     // 2026-08-28). Avery C32253, 110 x 40mm — a different face from the tent
     // card that was here, and the picture has to follow the words or it is
@@ -124,6 +125,7 @@ const IDEAS = [
     key: "reveal",
     label: t("celebrations.artefacts.reveal.label"),
     body: t("celebrations.artefacts.reveal.body"),
+    feature: { label: "the reveal", href: "/features#reveal" },
     // The couple's answer is not competing with the guests' at all — the
     // room says where it loves, they say where they are GOING — which makes
     // this a better register for the reveal than the memorial it was built
@@ -134,6 +136,7 @@ const IDEAS = [
     key: "display",
     label: t("celebrations.artefacts.display.label"),
     body: t("celebrations.artefacts.display.body"),
+    feature: { label: "the live display", href: "/features#display" },
     // FUNDRAISER variant, and it comes for free: DisplayStill derives the
     // presence dial from the scene's register, so a memorial gets tribute
     // and everything else gets the goal bar. A party screen should be loud
@@ -144,6 +147,7 @@ const IDEAS = [
     key: "keepsake",
     label: t("celebrations.artefacts.keepsake.label"),
     body: t("celebrations.artefacts.keepsake.body"),
+    feature: { label: "the keepsake", href: "/features#keepsake" },
     // TRIBUTE variant, despite the name, and it is right for a wedding:
     // tribute leads on the people and their reveal, fundraiser leads on the
     // money. A wedding memento opening with the total is the wrong way round.
