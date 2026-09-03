@@ -257,53 +257,58 @@ export function ManageClient({
     href: string,
     display: string,
     external: boolean
-  ) => (
-    <div className="min-w-0">
-      <p className="text-xs font-medium text-foreground">{label}</p>
-      <div className="flex items-center gap-1.5">
-        <Icon
-          size={11}
-          className="shrink-0 text-muted-foreground"
-          aria-hidden="true"
-        />
-        {external ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-            title={display}
-            suppressHydrationWarning
-          >
-            {display}
-          </a>
-        ) : (
-          <Link
-            href={href}
-            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-            title={display}
-            suppressHydrationWarning
-          >
-            {display}
-          </Link>
-        )}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
-          onClick={() => copy(key, display)}
-          aria-label={`Copy ${label} link`}
-        >
-          {copied === key ? (
-            <Check size={12} aria-hidden="true" />
+  ) => {
+    // The scheme is noise in a 220px popover — show host+path, copy
+    // the full link (founder, 2026-09-03).
+    const shown = display.replace(/^https?:\/\//, "")
+    return (
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-foreground">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <Icon
+            size={11}
+            className="shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+          {external ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+              title={display}
+              suppressHydrationWarning
+            >
+              {shown}
+            </a>
           ) : (
-            <Copy size={12} aria-hidden="true" />
+            <Link
+              href={href}
+              className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+              title={display}
+              suppressHydrationWarning
+            >
+              {shown}
+            </Link>
           )}
-        </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={() => copy(key, display)}
+            aria-label={`Copy ${label} link`}
+          >
+            {copied === key ? (
+              <Check size={12} aria-hidden="true" />
+            ) : (
+              <Copy size={12} aria-hidden="true" />
+            )}
+          </Button>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const perCharity =
     favpoll.charities.length > 0
@@ -407,10 +412,7 @@ export function ManageClient({
                   Share
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="w-96 max-w-[calc(100vw-2rem)] p-5"
-              >
+              <PopoverContent align="end" className="w-55 p-5">
                 {/* QR leads, near-full width — the thing handed
                     across a table; links stack beneath (founder,
                     2026-09-03). 288 read as too big; 180 settled. */}
