@@ -21,7 +21,8 @@ import { cn } from "@/lib/utils"
 // register colour — distinct from the white header above and from any
 // body below (bg-muted blended into muted-bodied pages like manage),
 // and inside the ink grammar, where the pale tint is already the hover
-// language. Stacked over bg-background because the band is sticky and
+// language (deepened /10 → /20, founder: 'a darker version of the
+// register'). Stacked over bg-background because the band is sticky and
 // a lone /10 tint would let scrolled content ghost through.
 
 export function ToolbarBand({
@@ -36,7 +37,7 @@ export function ToolbarBand({
 }) {
   return (
     <div className="sticky top-14 z-30 border-b border-border bg-background print:hidden">
-      <div className="bg-primary/10">
+      <div className="bg-primary/20">
         <div className={cn("mx-auto max-w-330 px-4 py-2.5", className)}>
           {children}
         </div>
