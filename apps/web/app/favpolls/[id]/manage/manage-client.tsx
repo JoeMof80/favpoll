@@ -349,13 +349,13 @@ export function ManageClient({
             }
           />
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild size="sm">
+            <Button asChild variant="outline">
               <a href={guestUrl} target="_blank" rel="noreferrer">
                 <ExternalLink data-icon="inline-start" aria-hidden="true" />
                 View
               </a>
             </Button>
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline">
               <Link href={`/favpolls/${favpoll.id}/edit`}>
                 <Pencil data-icon="inline-start" aria-hidden="true" />
                 Edit
@@ -364,7 +364,6 @@ export function ManageClient({
             <Button
               type="button"
               variant="outline"
-              size="sm"
               disabled={!canDelete || deleting}
               onClick={handleDelete}
               title={
@@ -377,14 +376,14 @@ export function ManageClient({
               <Trash2 data-icon="inline-start" aria-hidden="true" />
               {deleting ? "Deleting…" : "Delete"}
             </Button>
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline">
               <a href={`/favpolls/${favpoll.id}/stationery`}>
                 <Printer data-icon="inline-start" aria-hidden="true" />
                 Stationery
               </a>
             </Button>
             {isClosed && (
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline">
                 <Link href={`/favpolls/${favpoll.id}/keepsake`}>
                   <Sparkles data-icon="inline-start" aria-hidden="true" />
                   Keepsake
@@ -397,7 +396,7 @@ export function ManageClient({
                 buttons, QR). */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="icon-sm" aria-label="Share">
+                <Button variant="outline" size="icon" aria-label="Share">
                   <Share2 size={14} aria-hidden="true" />
                 </Button>
               </PopoverTrigger>
