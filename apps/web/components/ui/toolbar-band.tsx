@@ -16,6 +16,12 @@ import { cn } from "@/lib/utils"
 //
 // top-14 is the site header's height. Everything that sticks under the header
 // sticks at the same place, which is the point of doing this once.
+//
+// WHITE, LIKE THE HEADER (founder, 2026-09-03). The band is chrome, not
+// content: it scrolls as one unit with the site header, so it shares its
+// surface — the register-ink grammar (white surface, register as ink)
+// carried by the controls, not a tinted slab behind them. bg-muted also
+// blended into muted-bodied pages like manage.
 
 export function ToolbarBand({
   children,
@@ -28,7 +34,7 @@ export function ToolbarBand({
   className?: string
 }) {
   return (
-    <div className="sticky top-14 z-30 border-b border-border bg-muted print:hidden">
+    <div className="sticky top-14 z-30 border-b border-border bg-background print:hidden">
       <div className={cn("mx-auto max-w-330 px-4 py-2.5", className)}>
         {children}
       </div>
