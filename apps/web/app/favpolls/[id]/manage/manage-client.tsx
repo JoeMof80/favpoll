@@ -342,38 +342,38 @@ export function ManageClient({
             }
           />
           <div className="flex flex-wrap items-center gap-2">
-            {/* The favpoll-object actions fuse into one control; the
-                surface doors (Stationery, Keepsake, Share) stand
-                alone (founder, 2026-09-03). */}
-            <ButtonGroup>
-              <Button asChild variant="outline">
-                <a href={guestUrl} target="_blank" rel="noreferrer">
-                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                  View
-                </a>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!canDelete || deleting}
-                onClick={handleDelete}
-                title={
-                  canDelete
-                    ? undefined
-                    : "Favpolls with pledges can't be deleted."
-                }
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 data-icon="inline-start" aria-hidden="true" />
-                {deleting ? "Deleting…" : "Delete"}
-              </Button>
-            </ButtonGroup>
+            {/* The authoring actions fuse into one control and show
+                only while the favpoll is OPEN — editing a finished
+                favpoll is a nonsense action, and Delete's zero-pledges
+                guard made it an open-favpoll action anyway. View is
+                gone: the share popover's guest link is that door
+                (founder, 2026-09-03). The surface doors (Stationery,
+                Keepsake, Share) stand alone. */}
+            {!isClosed && (
+              <ButtonGroup>
+                <Button asChild variant="outline">
+                  <Link href={`/favpolls/${favpoll.id}/edit`}>
+                    <Pencil data-icon="inline-start" aria-hidden="true" />
+                    Edit
+                  </Link>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!canDelete || deleting}
+                  onClick={handleDelete}
+                  title={
+                    canDelete
+                      ? undefined
+                      : "Favpolls with pledges can't be deleted."
+                  }
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 data-icon="inline-start" aria-hidden="true" />
+                  {deleting ? "Deleting…" : "Delete"}
+                </Button>
+              </ButtonGroup>
+            )}
             <Button asChild variant="outline">
               <a href={`/favpolls/${favpoll.id}/stationery`}>
                 <Printer data-icon="inline-start" aria-hidden="true" />
