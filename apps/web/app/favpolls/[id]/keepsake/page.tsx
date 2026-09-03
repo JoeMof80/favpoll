@@ -200,9 +200,9 @@ export default async function KeepsakePage({ params }: Props) {
             defaultVariant={defaultVariant}
             leading={
               <Button asChild variant="ghost" size="sm">
-                <Link href={`/favpolls/${id}`}>
+                <Link href={`/favpolls/${id}/manage`}>
                   <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-                  Back
+                  Manage
                 </Link>
               </Button>
             }
