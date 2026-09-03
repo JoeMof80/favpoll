@@ -59,6 +59,8 @@ export type ManageFavpoll = OrganizerFavpoll & {
   }[]
 }
 
+type Visibility = "listed" | "unlisted" | "private"
+
 const formatLongDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -66,19 +68,17 @@ const formatLongDate = (iso: string) =>
     year: "numeric",
   })
 
-// THE COMPLETE RECORD, composed (founder, 2026-09-03: "redesign this
-// page in the most logical way possible"). Two lanes:
+// THE COMPLETE RECORD, composed (founder, 2026-09-03). The sticky
+// ToolbarBand leads the page — the stationery workspace's own
+// subheader, tools flush right, nothing else in it. Beneath, the page
+// column: back-link, identity, then two lanes —
 //
 // - MAIN — the record itself, in THE FAVPOLL'S OWN ANATOMY (header →
-//   topic → story → charities, the order a guest meets it) so the
-//   organiser proofs the artefact as it will be experienced. Read-only
-//   with Edit doors into the wizard.
-// - SIDE — the operation, grouped by kind: Status (with its controls),
-//   Money (raised · goal · pledges · fund together), Share (links +
-//   QR), Activity (the guest wall).
-//
-// Headings wear SectionEyebrow, the site's own section grammar; the
-// header band carries only the DOORS (view / edit / print / keepsake).
+//   story → topic → charities) so the organiser proofs the artefact as
+//   it will be experienced. Read-only with Edit doors into the wizard.
+// - SIDE — the operation, grouped by kind: Status (three-way
+//   visibility + guest additions), Money (raised · goal · pledges ·
+//   fund), Share (links + QR), Activity (the guest wall).
 export function ManageClient({
   favpoll,
   wallEntries,
@@ -118,7 +118,6 @@ export function ManageClient({
       ? favpoll.category.charAt(0).toUpperCase() + favpoll.category.slice(1)
       : "favpoll")
 
-  type Visibility = "listed" | "unlisted" | "private"
   const [visibility, setVisibilityState] = useState<Visibility>(
     favpoll.isPrivate ? "private" : favpoll.is_listed ? "listed" : "unlisted"
   )
@@ -133,56 +132,220 @@ export function ManageClient({
   const copyTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
     const timers = copyTimersRef.current
-    return (
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  function copy(key: string, url: string) {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(key)
+      copyTimersRef.current.push(setTimeout(() => setCopied(null), 2000))
+    })
+  }
+
+  async function handleVisibility(v: Visibility) {
+    const prev = visibility
+    setVisibilityState(v)
+    setVisibilityPending(true)
+    try {
+      await setFavpollVisibility(favpoll.id, v)
+    } catch {
+      setVisibilityState(prev)
+    } finally {
+      setVisibilityPending(false)
+    }
+  }
+
+  async function handleToggleGuestItems(value: boolean) {
+    setGuestItems(value)
+    setGuestItemsPending(true)
+    try {
+      await setFavpollGuestItems(favpoll.id, value)
+    } catch {
+      setGuestItems(!value)
+    } finally {
+      setGuestItemsPending(false)
+    }
+  }
+
+  const canDelete =
+    favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
+
+  async function handleDelete() {
+    if (
+      !window.confirm(`Delete ${name || "this favpoll"}? This can't be undone.`)
+    )
+      return
+    setDeleting(true)
+    try {
+      await deleteFavpoll(favpoll.id)
+      router.push("/my-favpolls")
+    } catch {
+      toast.error("Couldn't delete this favpoll — please try again.", {
+        style: TOAST_ERROR_STYLE,
+      })
+      setDeleting(false)
+    }
+  }
+
+  // A card in either lane: SectionEyebrow heading, optional Edit door.
+  const Card = ({
+    title,
+    children,
+    editable = false,
+    headingless = false,
+  }: {
+    title?: string
+    children: React.ReactNode
+    editable?: boolean
+    headingless?: boolean
+  }) => (
+    <section className="rounded-xl border border-border bg-background p-5">
+      {!headingless && (
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <SectionEyebrow as="h2">{title}</SectionEyebrow>
+          {editable && (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="-my-1.5 text-muted-foreground hover:text-foreground"
+            >
+              <Link href={`/favpolls/${favpoll.id}/edit`}>
+                <Pencil data-icon="inline-start" aria-hidden="true" />
+                Edit
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
+      {children}
+    </section>
+  )
+
+  const fact = (label: string, value: React.ReactNode) => (
+    <div className="min-w-0">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <div className="mt-0.5 text-sm text-foreground">{value}</div>
+    </div>
+  )
+
+  // Label and value share a line — the record's gutter grammar.
+  const inlineFact = (label: string, value: React.ReactNode) => (
+    <div className="flex items-baseline gap-3">
+      <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
+      <div className="min-w-0 flex-1 truncate text-sm text-foreground">
+        {value}
+      </div>
+    </div>
+  )
+
+  const linkRow = (
+    key: string,
+    label: string,
+    Icon: typeof ExternalLink,
+    href: string,
+    display: string,
+    external: boolean
+  ) => (
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-foreground">{label}</p>
+      <div className="flex items-center gap-1.5">
+        <Icon
+          size={11}
+          className="shrink-0 text-muted-foreground"
+          aria-hidden="true"
+        />
+        {external ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+            title={display}
+            suppressHydrationWarning
+          >
+            {display}
+          </a>
+        ) : (
+          <Link
+            href={href}
+            className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
+            title={display}
+            suppressHydrationWarning
+          >
+            {display}
+          </Link>
+        )}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+          onClick={() => copy(key, display)}
+          aria-label={`Copy ${label} link`}
+        >
+          {copied === key ? (
+            <Check size={12} aria-hidden="true" />
+          ) : (
+            <Copy size={12} aria-hidden="true" />
+          )}
+        </Button>
+      </div>
+    </div>
+  )
+
+  const perCharity =
+    favpoll.charities.length > 0
+      ? favpoll.total_raised / favpoll.charities.length
+      : 0
+
+  return (
     <>
       {/* THE SUBHEADER (founder, 2026-09-03: "like the stationery
           page") — the sticky ToolbarBand leads the page, tools flush
           right, nothing else in it. Identity lives below, at the top
           of the record column. */}
       <ToolbarBand className="flex flex-wrap items-center justify-end gap-2">
-
-        <div className="flex flex-wrap gap-2">
-          <Button asChild size="sm">
-            <a href={guestUrl} target="_blank" rel="noreferrer">
-              <ExternalLink data-icon="inline-start" aria-hidden="true" />
-              View
-            </a>
-          </Button>
+        <Button asChild size="sm">
+          <a href={guestUrl} target="_blank" rel="noreferrer">
+            <ExternalLink data-icon="inline-start" aria-hidden="true" />
+            View
+          </a>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/favpolls/${favpoll.id}/edit`}>
+            <Pencil data-icon="inline-start" aria-hidden="true" />
+            Edit
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!canDelete || deleting}
+          onClick={handleDelete}
+          title={
+            canDelete ? undefined : "Favpolls with pledges can't be deleted."
+          }
+          className="text-destructive hover:text-destructive"
+        >
+          <Trash2 data-icon="inline-start" aria-hidden="true" />
+          {deleting ? "Deleting…" : "Delete"}
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <a href={`/favpolls/${favpoll.id}/stationery`}>
+            <Printer data-icon="inline-start" aria-hidden="true" />
+            Stationery
+          </a>
+        </Button>
+        {isClosed && (
           <Button asChild variant="outline" size="sm">
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
+            <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+              <Sparkles data-icon="inline-start" aria-hidden="true" />
+              Keepsake
             </Link>
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!canDelete || deleting}
-            onClick={handleDelete}
-            title={
-              canDelete ? undefined : "Favpolls with pledges can't be deleted."
-            }
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 data-icon="inline-start" aria-hidden="true" />
-            {deleting ? "Deleting…" : "Delete"}
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-          {isClosed && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
-              </Link>
-            </Button>
-          )}
-        </div>
+        )}
       </ToolbarBand>
 
       <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
@@ -333,9 +496,6 @@ export function ManageClient({
               <div className="mt-4 grid gap-3">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm text-foreground">Visibility</span>
-                  {/* Toolbar size, inline with its label (founder,
-                    2026-09-03) — the compact idiom, like the switch
-                    row below. */}
                   <SegmentedControl
                     label="Who can see this favpoll"
                     value={visibility}
