@@ -35,7 +35,8 @@ import type { DisplayVariant } from "./index"
 // otherwise become the containing block for this fixed positioning.
 
 type Props = {
-  /** The guest-facing event page for this favpoll */
+  /** Where the menu's navigation item leads — the manage hub on the
+   * real display (the presenter's way back); home on the landing demo. */
   eventUrl: string
   /** Active display variant — omitted in contexts without the dial (stories) */
   variant?: DisplayVariant
@@ -119,7 +120,7 @@ export function DisplayChrome({ eventUrl, variant, onVariantChange }: Props) {
             )}
             <DropdownMenuItem onSelect={() => router.push(eventUrl)}>
               <ExternalLink aria-hidden="true" />
-              Event page
+              Manage favpoll
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={(e) => {
