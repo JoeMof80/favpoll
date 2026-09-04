@@ -3,6 +3,7 @@ import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
 import { fetchLiveFavpolls } from "@/lib/live-favpolls"
 import { Button } from "@/components/ui/button"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { LandingHero } from "@/components/landing/hero"
 import { OpenRightNow } from "@/components/landing/open-right-now"
 import { HeroTexture } from "@/components/landing/hero-texture"
@@ -130,7 +131,9 @@ export default async function HomePage() {
               variant="secondary"
               className="h-auto min-h-11 px-6 py-2 text-base"
             >
-              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+              <Link href="/favpolls/new">
+                {withQuietTail(t("landing.cta.primaryFree"))}
+              </Link>
             </Button>
           </FadeIn>
         </div>

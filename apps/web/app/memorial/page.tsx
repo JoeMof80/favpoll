@@ -9,6 +9,7 @@ import { LiveVignette } from "@/components/landing/live-vignette"
 import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { t } from "@/lib/i18n"
@@ -207,7 +208,7 @@ export default async function MemorialsPage() {
               className="h-auto min-h-11 px-6 py-2 text-base"
             >
               <Link href="/favpolls/new?category=memorial">
-                {t("memorials.close.cta")}
+                {withQuietTail(t("memorials.close.cta"))}
               </Link>
             </Button>
           </div>

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
 import { ProSection } from "@/components/landing/pro-section"
 import { Button } from "@/components/ui/button"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import {
   PickHint,
@@ -235,7 +236,7 @@ export default async function CelebrationsPage() {
               className="h-auto min-h-11 px-6 py-2 text-base"
             >
               <Link href="/favpolls/new?category=celebration">
-                {t("celebrations.close.cta")}
+                {withQuietTail(t("celebrations.close.cta"))}
               </Link>
             </Button>
           </div>
