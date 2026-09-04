@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { FadeIn } from "@/components/landing/fade-in"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { t } from "@/lib/i18n"
@@ -292,8 +293,15 @@ export default function FeaturesPage() {
             <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
               {t("landing.subheader")}
             </h2>
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="h-auto min-h-11 px-6 py-2 text-base"
+            >
+              <Link href="/favpolls/new">
+                {withQuietTail(t("landing.cta.primaryFree"))}
+              </Link>
             </Button>
           </FadeIn>
         </div>

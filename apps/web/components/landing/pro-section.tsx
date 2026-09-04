@@ -26,7 +26,15 @@ export function ProSection({
         <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
           {body}
         </p>
-        <Button asChild variant="outline">
+        {/* Hero poster scale (founder, 2026-09-05): the marketing
+            bands' CTAs share the hero primary's min-h-11 px-6
+            text-base. */}
+        <Button
+          asChild
+          size="lg"
+          variant="outline"
+          className="h-auto min-h-11 px-6 py-2 text-base"
+        >
           <Link href="/about#contact">{cta}</Link>
         </Button>
       </div>

@@ -20,6 +20,7 @@ import {
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { HeroScene, SceneKind } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
@@ -208,35 +209,6 @@ const ROUTER_CARDS = [
     results: MEMORIAL_RESULTS,
   },
 ] as const
-
-// The promise, set quieter than the action it qualifies (founder,
-// 2026-08-18: "can we style the '- always free' text slight differently?").
-//
-// SPLIT HERE, NOT IN messages/. The label stays ONE string so a locale pass
-// sees "Create a favpoll — always free" whole rather than two fragments it
-// has to reassemble in the right order — the same reasoning the retired
-// {next} token carried. Anything without the separator, which is every
-// register page's own ctaLabel, comes back untouched.
-//
-// opacity-80, NOT lower. Measured on the rendered pixels rather than eyeballed
-// — the tokens are oklch, so blending them by hand gets the wrong answer — and
-// the tail is 14px, which WCAG treats as normal text needing 4.5:1. Against
-// this button: 0.65 gives 3.3, 0.75 gives 4.13, 0.8 gives 4.63. The first two
-// look right and fail. The head sits at 7.34, so the two still read as
-// different weights.
-function withQuietTail(label: string) {
-  const [head, ...rest] = label.split(" — ")
-  if (!rest.length) return label
-  return (
-    <>
-      {head}
-      <span className="text-sm font-normal opacity-80">
-        {" — "}
-        {rest.join(" — ")}
-      </span>
-    </>
-  )
-}
 
 export function LandingHero({
   liveCount = 0,
