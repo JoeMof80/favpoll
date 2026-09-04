@@ -210,14 +210,6 @@ const ROUTER_CARDS = [
   },
 ] as const
 
-      <span className="text-sm font-normal opacity-80">
-        {" — "}
-        {rest.join(" — ")}
-      </span>
-    </>
-  )
-}
-
 export function LandingHero({
   liveCount = 0,
   totalLive = 0,
