@@ -130,8 +130,12 @@ export function HowItWorksSteps({
                   home page's beat-label, unchanged: this band is a
                   miniature of that section, so the labels are the same
                   thing at a smaller scale. */}
+              {/* UN-NUMBERED (founder, 2026-09-05): three beats whose
+                  labels narrate their own order need no scaffolding —
+                  the homepage walkthrough keeps its numbers, where
+                  seven scroll-pinned beats need a where-am-I. */}
               <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
-                {i + 1}. {step.label}
+                {step.label}
               </p>
               <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
                 <div className="min-w-0 xl:pr-2">
