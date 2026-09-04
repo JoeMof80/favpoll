@@ -198,6 +198,7 @@ export default async function FundraisersPage() {
           headline={t("fundraisers.headline")}
           subheader={t("fundraisers.subheader")}
           ctaLabel={t("fundraisers.cta.primary")}
+          ctaHref="/favpolls/new?category=fundraiser"
           ctaSecondaryLabel={t("fundraisers.cta.secondary")}
           hideStats
         />
@@ -221,7 +222,9 @@ export default async function FundraisersPage() {
               {t("fundraisers.close.headline")}
             </p>
             <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("fundraisers.close.cta")}</Link>
+              <Link href="/favpolls/new?category=fundraiser">
+                {t("fundraisers.close.cta")}
+              </Link>
             </Button>
           </div>
         </section>

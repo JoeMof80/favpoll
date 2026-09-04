@@ -69,6 +69,11 @@ type Props = {
   headline?: string
   subheader?: string
   ctaLabel?: string
+  /** Primary CTA destination — a register page passes the wizard URL
+   *  with its ?category= preselect so the Event step arrives answered
+   *  (founder, 2026-09-04: the label 'Create a celebration favpoll'
+   *  must deliver exactly that). */
+  ctaHref?: string
   /**
    * Label for the second, quieter path. Home supplies its own via `router`;
    * a register page passes its own string.
@@ -243,6 +248,7 @@ export function LandingHero({
   headline,
   subheader,
   ctaLabel,
+  ctaHref,
   ctaSecondaryLabel,
   bandClassName,
   router = false,
@@ -453,7 +459,7 @@ export function LandingHero({
                 // 390 up.
                 className="h-auto min-h-11 shrink flex-wrap px-6 py-2 text-base whitespace-normal"
               >
-                <Link href="/favpolls/new">
+                <Link href={ctaHref ?? "/favpolls/new"}>
                   {withQuietTail(ctaLabel ?? t("landing.cta.primaryFree"))}
                 </Link>
               </Button>

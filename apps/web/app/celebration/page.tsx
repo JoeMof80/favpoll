@@ -193,6 +193,7 @@ export default async function CelebrationsPage() {
           headline={t("celebrations.headline")}
           subheader={t("celebrations.subheader")}
           ctaLabel={t("celebrations.cta.primary")}
+          ctaHref="/favpolls/new?category=celebration"
           ctaSecondaryLabel={t("celebrations.cta.secondary")}
           hideStats
         />
@@ -220,7 +221,9 @@ export default async function CelebrationsPage() {
               {t("celebrations.close.headline")}
             </p>
             <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("celebrations.close.cta")}</Link>
+              <Link href="/favpolls/new?category=celebration">
+                {t("celebrations.close.cta")}
+              </Link>
             </Button>
           </div>
         </section>
