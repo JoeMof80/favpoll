@@ -2,6 +2,7 @@ import { RegisterScope } from "@/components/register-scope"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
+import { ProSection } from "@/components/landing/pro-section"
 import { OrderOfServiceVignette } from "@/components/landing/order-of-service-vignette"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import { LiveVignette } from "@/components/landing/live-vignette"
@@ -46,25 +47,6 @@ const STEPS = [
   {
     label: t("memorials.how.reveal.label"),
     body: t("memorials.how.reveal.body"),
-  },
-]
-
-const ASSURANCES = [
-  {
-    label: t("memorials.assure.free.label"),
-    body: t("memorials.assure.free.body"),
-  },
-  {
-    label: t("memorials.assure.charity.label"),
-    body: t("memorials.assure.charity.body"),
-  },
-  {
-    label: t("memorials.assure.nofave.label"),
-    body: t("memorials.assure.nofave.body"),
-  },
-  {
-    label: t("memorials.assure.phone.label"),
-    body: t("memorials.assure.phone.body"),
   },
 ]
 
@@ -205,36 +187,12 @@ export default async function MemorialsPage() {
 
         <OpenRightNow favpolls={live} />
 
-        {/* ── Reassurances ── */}
-        <section className="w-full">
-          <div className="mx-auto grid w-full max-w-330 gap-8 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
-            {ASSURANCES.map((item) => (
-              <div key={item.label}>
-                <p className="mb-1 font-medium text-foreground">{item.label}</p>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {item.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* ── For the gatekeepers this page is forwarded by ── */}
-        <section className="w-full bg-primary/5">
-          <div className="mx-auto w-full max-w-330 px-6 py-16">
-            <h2 className="mb-3 text-3xl font-light tracking-tight text-foreground">
-              {t("memorials.pro.title")}
-            </h2>
-            <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
-              {t("memorials.pro.body")}
-            </p>
-            <Button asChild variant="outline">
-              <a href="mailto:joseph.moffatt@favpoll.com">
-                {t("memorials.pro.cta")}
-              </a>
-            </Button>
-          </div>
-        </section>
+        <ProSection
+          title={t("memorials.pro.title")}
+          body={t("memorials.pro.body")}
+          cta={t("memorials.pro.cta")}
+        />
 
         {/* ── Close — the landing's purple monogram close, one line ── */}
         <section className="bg-primary text-primary-foreground">
