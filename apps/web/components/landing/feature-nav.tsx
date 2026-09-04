@@ -49,6 +49,19 @@ export function FeatureNav({
           <li key={s.id}>
             <a
               href={`#${s.id}`}
+              // JS smooth (2026-09-05): the global CSS smooth is gone —
+              // it animated every route change's scroll reset — so the
+              // menu scrolls itself, honouring reduced motion by hand.
+              onClick={(e) => {
+                e.preventDefault()
+                const reduced = window.matchMedia(
+                  "(prefers-reduced-motion: reduce)"
+                ).matches
+                document.getElementById(s.id)?.scrollIntoView({
+                  behavior: reduced ? "auto" : "smooth",
+                })
+                history.pushState(null, "", `#${s.id}`)
+              }}
               aria-current={active === s.id ? "true" : undefined}
               className={cn(
                 "-ml-px block border-l py-1.5 pl-4 text-sm transition-colors",
