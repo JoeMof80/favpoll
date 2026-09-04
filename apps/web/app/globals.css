@@ -153,18 +153,16 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* In-page anchors SCROLL rather than teleport (2026-08-17). The home hero's
-     "See how it works" lands in the Guest journey, whose six beats fade in and
-     out by scroll position — an instant jump drops you into that arc with no
-     sense of having travelled, and the /features sticky menu had the same
-     abruptness. Guarded by prefers-reduced-motion, which is the whole reason
-     this is CSS rather than scrollIntoView at each call site: the opt-out is
-     honoured for free, everywhere. */
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
-  }
+  /* GLOBAL SMOOTH SCROLLING REMOVED (founder bug report, 2026-09-05:
+     "if I scroll down the homepage and click the Celebration link, we
+     scroll to the top"). html{scroll-behavior:smooth} also animates the
+     App Router's scroll reset on EVERY route change — the new page
+     visibly scrolls up from the old position instead of simply being at
+     the top. Smoothness now lives at the two in-page call sites that
+     wanted it — the hero's #how CTA and FeatureNav — as
+     scrollIntoView({behavior:"smooth"}), each checking
+     prefers-reduced-motion itself (the opt-out the CSS used to give
+     for free). */
   body {
     @apply bg-background text-foreground;
   }
