@@ -200,7 +200,12 @@ export default async function MemorialsPage() {
             <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
               {t("memorials.close.headline")}
             </p>
-            <Button asChild size="lg" variant="secondary">
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="h-auto min-h-11 px-6 py-2 text-base"
+            >
               <Link href="/favpolls/new?category=memorial">
                 {t("memorials.close.cta")}
               </Link>

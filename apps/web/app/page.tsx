@@ -124,7 +124,12 @@ export default async function HomePage() {
                 now directly above says at more length — and the fee was
                 being stated three times on one page (hero button, that grid,
                 here). landing.cta.caption is retired with it. */}
-            <Button asChild size="lg" variant="secondary">
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="h-auto min-h-11 px-6 py-2 text-base"
+            >
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
           </FadeIn>

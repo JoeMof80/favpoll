@@ -292,7 +292,12 @@ export default function FeaturesPage() {
             <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
               {t("landing.subheader")}
             </h2>
-            <Button asChild size="lg" variant="secondary">
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="h-auto min-h-11 px-6 py-2 text-base"
+            >
               <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
             </Button>
           </FadeIn>
