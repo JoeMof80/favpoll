@@ -400,7 +400,10 @@ export function LandingHero({
           </h1>
           <p
             className={cn(
-              "mb-8 text-lg leading-relaxed opacity-80",
+              // whitespace-pre-line: the register subheaders are three-line
+              // triplets joined with \n (founder, 2026-09-04); the landing
+              // default is one line and renders unchanged.
+              "mb-8 text-lg leading-relaxed whitespace-pre-line opacity-80",
               // The subheader must not be WIDER than the headline above it.
               sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
             )}
