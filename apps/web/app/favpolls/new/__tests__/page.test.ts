@@ -35,9 +35,9 @@ describe("NewFavpollPage — /favpolls/new", () => {
   it("redirects to /sign-in when the user is not authenticated", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
 
-    await expect(NewFavpollPage()).rejects.toThrow(
-      "/sign-in?redirect_url=/favpolls/new"
-    )
+    await expect(
+      NewFavpollPage({ searchParams: Promise.resolve({}) })
+    ).rejects.toThrow("/sign-in?redirect_url=%2Ffavpolls%2Fnew")
   })
 
   it("fetches wizard data and renders without throwing when authenticated", async () => {
@@ -46,6 +46,8 @@ describe("NewFavpollPage — /favpolls/new", () => {
     mock.queue([]) // topics (with favourites + topic_categories joins)
     mock.queue([]) // categories
 
-    await expect(NewFavpollPage()).resolves.not.toThrow()
+    await expect(
+      NewFavpollPage({ searchParams: Promise.resolve({}) })
+    ).resolves.not.toThrow()
   })
 })
