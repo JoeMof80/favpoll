@@ -2,6 +2,7 @@ import { RegisterScope } from "@/components/register-scope"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
+import { ProSection } from "@/components/landing/pro-section"
 import { Button } from "@/components/ui/button"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import {
@@ -216,6 +217,13 @@ export default async function FundraisersPage() {
         {/* ── Close — matched to the other two registers: max-w-330,
           left-aligned, and variant="secondary" because a default Button is
           PRIMARY and this band is bg-primary. ── */}
+        {/* ── For the gatekeepers this page is forwarded by ── */}
+        <ProSection
+          title={t("fundraisers.pro.title")}
+          body={t("fundraisers.pro.body")}
+          cta={t("fundraisers.pro.cta")}
+        />
+
         <section className="bg-primary text-primary-foreground">
           <div className="mx-auto w-full max-w-330 px-6 py-16">
             <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
