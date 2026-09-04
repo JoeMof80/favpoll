@@ -26,15 +26,18 @@ import { WizardInfoStep } from "./wizard-info-step"
 import { WizardStoryStep } from "./wizard-story-step"
 import { WizardDetailsStep } from "./wizard-details-step"
 import type { WizardData, WizardEditConfig } from "./use-wizard-state"
+import type { FavpollCategory } from "@favpoll/types"
 
 type Props = {
   data: WizardData
   /** Present at /favpolls/[id]/edit — prefilled, clickable rail, Save. */
   edit?: WizardEditConfig
+  /** Create mode: seed the Event step (the register CTAs' preselect). */
+  initialCategory?: FavpollCategory
 }
 
-export function NewFavpollWizard({ data, edit }: Props) {
-  const w = useWizardState(data, edit)
+export function NewFavpollWizard({ data, edit, initialCategory }: Props) {
+  const w = useWizardState(data, edit, initialCategory)
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 

@@ -91,14 +91,19 @@ function sortTopicItems(items: Favourite[]): Favourite[] {
   })
 }
 
-export function useWizardState(data: WizardData, edit?: WizardEditConfig) {
+export function useWizardState(
+  data: WizardData,
+  edit?: WizardEditConfig,
+  /** Create-mode Event preselect (the register CTAs); edit wins. */
+  initialCategory?: FavpollCategory | null
+) {
   const isEdit = !!edit
   const init = edit?.initial
   const router = useRouter()
 
   const [step, setStep] = useState<WizardStep>("event")
   const [category, setCategory] = useState<FavpollCategory | null>(
-    init?.category ?? null
+    init?.category ?? initialCategory ?? null
   )
   const [grouping, setGrouping] = useState<FavpollGrouping>(
     init?.grouping ?? "individual"

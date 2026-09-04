@@ -169,6 +169,7 @@ export default async function MemorialsPage() {
           headline={t("memorials.headline")}
           subheader={t("memorials.subheader")}
           ctaLabel={t("memorials.cta.primary")}
+          ctaHref="/favpolls/new?category=memorial"
           ctaSecondaryLabel={t("memorials.cta.secondary")}
           hideStats
         />
@@ -242,7 +243,9 @@ export default async function MemorialsPage() {
               {t("memorials.close.headline")}
             </p>
             <Button asChild size="lg" variant="secondary">
-              <Link href="/favpolls/new">{t("memorials.close.cta")}</Link>
+              <Link href="/favpolls/new?category=memorial">
+                {t("memorials.close.cta")}
+              </Link>
             </Button>
           </div>
         </section>
