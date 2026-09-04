@@ -389,10 +389,19 @@ export function LandingHero({
               router && "2xl:text-6xl"
             )}
           >
+            {/* REGISTER HEADLINES DIM AFTER THE FIRST SENTENCE (founder,
+                2026-09-04): the hook holds full white, the supporting
+                sentence steps back. ONLY when a register passes its own
+                headline — the landing default is three PARALLEL beats
+                (Pick · Pledge · Reveal) where dimming any would break
+                the triad. */}
             {(headline ?? t("landing.headline"))
               .split(". ")
               .map((sentence, i, all) => (
-                <span key={sentence} className="block">
+                <span
+                  key={sentence}
+                  className={cn("block", headline && i > 0 && "opacity-70")}
+                >
                   {sentence}
                   {i < all.length - 1 ? "." : ""}
                 </span>
