@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
 type HeroLayoutProps = {
@@ -80,7 +80,11 @@ export function HeroLayout({
   // the fail-safe direction: too much cover, never a see-through band.
   const [coverH, setCoverH] = useState(999)
   const [avatarMounted, setAvatarMounted] = useState(false)
-  useEffect(() => {
+  // useLayoutEffect, not useEffect: the cover height and avatar
+  // endpoints are PAINT values — measured post-paint, the first frame
+  // wore the 999 fallback (caught at w390 in the breakpoint sweep),
+  // and a Fast-Refreshed tab kept a stale height until some resize.
+  useLayoutEffect(() => {
     const text = textRef.current
     const settledEl = settledRef.current
     if (!text || !settledEl) return
