@@ -2,16 +2,28 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { ImagePlus } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import {
+  WizardField,
+  WIZARD_INPUT_SIZE,
+} from "@/components/new-favpoll-wizard/wizard-field"
+import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { createAppeal, updateAppeal } from "./actions"
 
-// The appeal form — creation and editing share it, in the wizard
-// Details step's own row grammar (180px label column, 44px controls,
-// hint sentences under). This IS the future charity portal's surface;
-// today it sits behind the temporary gate (lib/appeals-admin). Slug
+// The appeal form, in the WIZARD INFO STEP's own grammar (founder mock,
+// 2026-09-06): WizardField rows, in-field CharCounters, "e.g."
+// placeholders, the dashed photo square, and the wizard-nav footer —
+// hairline, actions right, primary last. This IS the future charity
+// portal's surface behind the temporary gate (lib/appeals-admin). Slug
 // and charity are immutable after creation: members lock onto both.
 
 export type AppealFormInitial = {
@@ -25,9 +37,9 @@ export type AppealFormInitial = {
   isListed: boolean
 }
 
-const ROW =
-  "block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6"
-const LABEL = "font-medium sm:flex sm:min-h-11 sm:items-center"
+const NAME_MAX = 60
+const SLUG_MAX = 40
+const BLURB_MAX = 240
 
 export function AppealForm({
   initial,
@@ -89,129 +101,165 @@ export function AppealForm({
   }
 
   return (
-    <div className="space-y-6">
-      <div className={ROW}>
-        <span className={LABEL}>Name</span>
-        <Input
-          value={form.name}
-          onChange={(e) => set("name", e.target.value)}
-          placeholder="The Midnight Walk"
-          className="h-11 bg-background md:text-base"
-        />
-      </div>
-
-      <div className={ROW}>
-        <span className={LABEL}>Link name{editing && " *"}</span>
-        <div className="space-y-1.5">
-          <Input
-            value={form.slug}
-            disabled={editing}
-            onChange={(e) => set("slug", e.target.value)}
-            placeholder="midnight-walk"
-            className="h-11 bg-background font-mono md:text-base"
+    <div className="space-y-5">
+      <WizardField label="Name" required>
+        <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
+          <InputGroupInput
+            className="md:text-base"
+            value={form.name}
+            maxLength={NAME_MAX}
+            placeholder="e.g. The Midnight Walk"
+            onChange={(e) => set("name", e.target.value)}
           />
-          <p className="text-muted-foreground">
-            {editing
-              ? "Fixed — members carry this link."
-              : `The appeal's address: /appeals/…`}
-          </p>
-        </div>
-      </div>
+          <InputGroupAddon align="inline-end">
+            <CharCounter value={form.name} max={NAME_MAX} />
+          </InputGroupAddon>
+        </InputGroup>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Charity{editing && " *"}</span>
-        <div className="space-y-1.5">
-          <select
-            value={form.charityId}
+      <WizardField
+        label="Link name"
+        required={!editing}
+        hint={
+          editing
+            ? "Fixed — members carry this link."
+            : "The appeal's address: favpoll.com/appeals/…"
+        }
+      >
+        <InputGroup
+          className={cn(
+            WIZARD_INPUT_SIZE,
+            "bg-background",
+            editing && "opacity-50"
+          )}
+        >
+          <InputGroupInput
+            className="font-mono md:text-base"
+            value={form.slug}
+            maxLength={SLUG_MAX}
             disabled={editing}
-            onChange={(e) => set("charityId", e.target.value)}
-            className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
-          >
-            <option value="">Pick a charity…</option>
-            {charities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          <p className="text-muted-foreground">
-            {editing
-              ? "Fixed — every member favpoll raises for it."
-              : "Every favpoll under this appeal raises for it, always."}
-          </p>
-        </div>
-      </div>
+            placeholder="e.g. midnight-walk"
+            onChange={(e) => set("slug", e.target.value)}
+          />
+          <InputGroupAddon align="inline-end">
+            <CharCounter value={form.slug} max={SLUG_MAX} />
+          </InputGroupAddon>
+        </InputGroup>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Blurb</span>
-        <div className="space-y-1.5">
+      <WizardField
+        label="Charity"
+        required={!editing}
+        hint={
+          editing
+            ? "Fixed — every member favpoll raises for it."
+            : "Every favpoll under this appeal raises for it, always."
+        }
+      >
+        <select
+          value={form.charityId}
+          disabled={editing}
+          onChange={(e) => set("charityId", e.target.value)}
+          className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
+        >
+          <option value="">Pick a charity…</option>
+          {charities.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </WizardField>
+
+      <WizardField
+        label="Blurb"
+        hint="A few sentences at the top of the appeal page."
+      >
+        <div className="relative">
           <Textarea
             value={form.blurb}
+            maxLength={BLURB_MAX}
             onChange={(e) => set("blurb", e.target.value)}
             rows={3}
-            className="bg-background md:text-base"
+            className="bg-background pr-14 md:text-base"
           />
-          <p className="text-muted-foreground">
-            A few sentences at the top of the appeal page.
-          </p>
+          <CharCounter
+            value={form.blurb}
+            max={BLURB_MAX}
+            className="absolute right-3 bottom-2.5"
+          />
         </div>
-      </div>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Photo</span>
-        <Input
-          value={form.photoUrl}
-          onChange={(e) => set("photoUrl", e.target.value)}
-          placeholder="https://… (optional)"
-          className="h-11 bg-background md:text-base"
-        />
-      </div>
+      <WizardField label="Photo" hint="Paste an image URL — optional.">
+        <div className="flex items-start gap-3">
+          {/* The wizard's dashed square, as a live preview */}
+          <span
+            aria-hidden="true"
+            className={cn(
+              "flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border",
+              form.photoUrl
+                ? "border-border"
+                : "border-dashed border-border-strong text-muted-foreground"
+            )}
+          >
+            {form.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={form.photoUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <ImagePlus className="size-6" />
+            )}
+          </span>
+          <InputGroup className={cn(WIZARD_INPUT_SIZE, "flex-1 bg-background")}>
+            <InputGroupInput
+              className="md:text-base"
+              value={form.photoUrl}
+              placeholder="e.g. https://…"
+              onChange={(e) => set("photoUrl", e.target.value)}
+            />
+          </InputGroup>
+        </div>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Close date</span>
-        <div className="space-y-1.5">
-          <Input
+      <WizardField
+        label="Close date"
+        hint="Members inherit it. Leave blank for an evergreen appeal — members then pick their own dates."
+      >
+        <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
+          <InputGroupInput
             type="datetime-local"
+            className="md:text-base"
             value={form.closesAt}
             onChange={(e) => set("closesAt", e.target.value)}
-            className="h-11 bg-background md:text-base"
           />
-          <p className="text-muted-foreground">
-            Members inherit it. Leave blank for an evergreen appeal — members
-            then pick their own dates.
-          </p>
-        </div>
-      </div>
+        </InputGroup>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Listed</span>
-        <div className="space-y-1.5">
-          <div className="sm:flex sm:min-h-11 sm:items-center">
-            <Switch
-              checked={form.isListed}
-              onCheckedChange={(v) => set("isListed", v)}
-              aria-label="Listed on the charity page"
-            />
-          </div>
-          <p className="text-muted-foreground">
-            {form.isListed
-              ? "Appears on the charity's page."
-              : "Reachable only by its link."}
-          </p>
+      <WizardField
+        label="Listed"
+        hint={
+          form.isListed
+            ? "Appears on the charity's page."
+            : "Reachable only by its link."
+        }
+      >
+        <div className="flex min-h-11 items-center">
+          <Switch
+            checked={form.isListed}
+            onCheckedChange={(v) => set("isListed", v)}
+            aria-label="Listed on the charity page"
+          />
         </div>
-      </div>
+      </WizardField>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <div className="flex items-center gap-3 border-t border-border pt-6">
-        <Button
-          type="button"
-          disabled={isPending}
-          onClick={submit}
-          className="h-11 px-6 md:text-base"
-        >
-          {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
-        </Button>
+      {/* The wizard-nav footer: hairline, actions right, primary last */}
+      <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
         <Button
           type="button"
           variant="ghost"
@@ -220,6 +268,14 @@ export function AppealForm({
           className="h-11 px-6 md:text-base"
         >
           Cancel
+        </Button>
+        <Button
+          type="button"
+          disabled={isPending}
+          onClick={submit}
+          className="h-11 px-6 md:text-base"
+        >
+          {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
         </Button>
       </div>
     </div>
