@@ -2,7 +2,6 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
-import { RegisterScope } from "@/components/register-scope"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { formatAmount } from "@/lib/display"
@@ -85,109 +84,107 @@ export default async function AppealPage({
     .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <RegisterScope palette="fundraiser">
-      <main className="min-h-screen bg-primary/5">
-        <div className="mx-auto w-full max-w-3xl px-6 py-14">
-          <SectionEyebrow variant="muted">
-            An appeal for{" "}
-            <Link
-              href={`/charities/${appeal.charity_id}`}
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              {charityName}
-            </Link>
-          </SectionEyebrow>
-          <div className="mt-2 flex items-start justify-between gap-6">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-3">
-                <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
-                  {appeal.name}
-                </h1>
-                {canManage && (
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
-                  </Button>
-                )}
-              </div>
+    <main className="min-h-screen bg-primary/5">
+      <div className="mx-auto w-full max-w-3xl px-6 py-14">
+        <SectionEyebrow variant="muted">
+          An appeal for{" "}
+          <Link
+            href={`/charities/${appeal.charity_id}`}
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            {charityName}
+          </Link>
+        </SectionEyebrow>
+        <div className="mt-2 flex items-start justify-between gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
+                {appeal.name}
+              </h1>
+              {canManage && (
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
+                </Button>
+              )}
             </div>
-            {appeal.photo_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={appeal.photo_url}
-                alt=""
-                className="size-24 shrink-0 rounded-2xl object-cover md:size-33"
-              />
-            )}
           </div>
-          {appeal.blurb && (
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              {appeal.blurb}
-            </p>
-          )}
-
-          <div className="mt-8 rounded-xl border border-border bg-background p-5">
-            <SectionEyebrow as="h2" className="mb-2">
-              Raised so far
-            </SectionEyebrow>
-            <p className="text-4xl font-light text-primary tabular-nums">
-              {formatAmount(raised)}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              across {rows.length} favpoll{rows.length === 1 ? "" : "s"}
-              {appeal.closes_at &&
-                ` · closes ${new Date(appeal.closes_at).toLocaleDateString(
-                  "en-GB",
-                  { day: "numeric", month: "long", year: "numeric" }
-                )}`}
-            </p>
-          </div>
-
-          {isOpen && (
-            <div className="mt-6">
-              <Button
-                asChild
-                size="lg"
-                className="h-auto min-h-11 px-6 py-2 text-base"
-              >
-                <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
-                  {withQuietTail("Start your favpoll — always free")}
-                </Link>
-              </Button>
-            </div>
-          )}
-
-          {rows.length > 0 && (
-            <div className="mt-10">
-              <SectionEyebrow variant="muted" className="mb-3">
-                The favpolls
-              </SectionEyebrow>
-              <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
-                {rows.map((r) => (
-                  <li key={r.id}>
-                    <Link
-                      href={`/favpolls/${r.id}`}
-                      className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/5"
-                    >
-                      <span className="min-w-0 truncate text-sm font-medium text-foreground">
-                        {r.name}
-                        {r.topic && (
-                          <span className="font-normal text-muted-foreground">
-                            {" "}
-                            · {r.topic}
-                          </span>
-                        )}
-                      </span>
-                      <span className="shrink-0 text-sm font-medium text-primary tabular-nums">
-                        {formatAmount(r.raised)}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {appeal.photo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={appeal.photo_url}
+              alt=""
+              className="size-24 shrink-0 rounded-2xl object-cover md:size-33"
+            />
           )}
         </div>
-      </main>
-    </RegisterScope>
+        {appeal.blurb && (
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+            {appeal.blurb}
+          </p>
+        )}
+
+        <div className="mt-8 rounded-xl border border-border bg-background p-5">
+          <SectionEyebrow as="h2" className="mb-2">
+            Raised so far
+          </SectionEyebrow>
+          <p className="text-4xl font-light text-primary tabular-nums">
+            {formatAmount(raised)}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            across {rows.length} favpoll{rows.length === 1 ? "" : "s"}
+            {appeal.closes_at &&
+              ` · closes ${new Date(appeal.closes_at).toLocaleDateString(
+                "en-GB",
+                { day: "numeric", month: "long", year: "numeric" }
+              )}`}
+          </p>
+        </div>
+
+        {isOpen && (
+          <div className="mt-6">
+            <Button
+              asChild
+              size="lg"
+              className="h-auto min-h-11 px-6 py-2 text-base"
+            >
+              <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
+                {withQuietTail("Start your favpoll — always free")}
+              </Link>
+            </Button>
+          </div>
+        )}
+
+        {rows.length > 0 && (
+          <div className="mt-10">
+            <SectionEyebrow variant="muted" className="mb-3">
+              The favpolls
+            </SectionEyebrow>
+            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
+              {rows.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    href={`/favpolls/${r.id}`}
+                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/5"
+                  >
+                    <span className="min-w-0 truncate text-sm font-medium text-foreground">
+                      {r.name}
+                      {r.topic && (
+                        <span className="font-normal text-muted-foreground">
+                          {" "}
+                          · {r.topic}
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-sm font-medium text-primary tabular-nums">
+                      {formatAmount(r.raised)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </main>
   )
 }
