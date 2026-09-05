@@ -136,8 +136,6 @@ export function PollSection({
             (founder, 2026-09-05: "the buttons should only stick in
             that position after scrolling"). */}
         <PollHeading topicTitle={poll.topics.title} inert />
-          )}
-        </div>
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}
