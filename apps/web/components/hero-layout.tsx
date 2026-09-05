@@ -135,13 +135,12 @@ export function HeroLayout({
         // letting the about scroll visibly over that gap (founder-caught
         // on-device, 2026-08-02). Under a working header (z-40) the
         // cover is invisible.
-        // The after-strip is the SEAM MASK (founder, 2026-09-05): the about
-        // used to guillotine mid-glyph against the band's bottom edge; a
-        // 16px background→transparent gradient hanging below the band
-        // dissolves it instead. h-4 exactly matches the about's mt-4, so
-        // at rest the gradient dies precisely where the text begins and
-        // nothing is veiled.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-gradient-to-b after:from-background after:to-transparent md:pt-16"
+        // NO SEAM MASK (founder, 2026-09-05, reversing the same day's #705
+        // gradient): it ghosted the about's top line in open air below
+        // the band — "fading out too low". The band is opaque, so the
+        // about simply passes underneath and hard-cuts at its edge,
+        // exactly as the context does under the name.
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
