@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { ImagePlus } from "lucide-react"
+import { FormProvider, useForm } from "react-hook-form"
+import { ChevronDown, ImagePlus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,14 +18,23 @@ import {
   WIZARD_INPUT_SIZE,
 } from "@/components/new-favpoll-wizard/wizard-field"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
+import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
+import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
+import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema.ts"
+import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { createAppeal, updateAppeal } from "./actions"
 
 // The appeal form, in the WIZARD INFO STEP's own grammar (founder mock,
 // 2026-09-06): WizardField rows, in-field CharCounters, "e.g."
-// placeholders, the dashed photo square, and the wizard-nav footer —
-// hairline, actions right, primary last. This IS the future charity
-// portal's surface behind the temporary gate (lib/appeals-admin). Slug
-// and charity are immutable after creation: members lock onto both.
+// placeholders, and the REAL wizard controls — the dashed photo square
+// opens HeroPhotoOverlay (crop and all; the file uploads on submit via
+// uploadPersonPhoto, same bucket as favpoll heroes), the close date is
+// the wizard's DateTimePicker (appeals add a clear-to-evergreen link the
+// wizard doesn't need). Footer = wizard-nav: hairline, actions right,
+// primary last. This IS the future charity portal's surface behind the
+// temporary gate (lib/appeals-admin). Slug and charity are immutable
+// after creation: members lock onto both.
 
 export type AppealFormInitial = {
   id?: string
@@ -33,7 +43,7 @@ export type AppealFormInitial = {
   charityId: string
   blurb: string
   photoUrl: string
-  closesAt: string
+  closesAt: string // ISO or ""
   isListed: boolean
 }
 
@@ -53,34 +63,57 @@ export function AppealForm({
 }) {
   const router = useRouter()
   const editing = !!initial?.id
-  const [form, setForm] = useState<AppealFormInitial>(
-    initial ?? {
-      name: "",
-      slug: "",
-      charityId: defaultCharityId ?? "",
-      blurb: "",
-      photoUrl: "",
-      closesAt: "",
-      isListed: false,
-    }
+  const [form, setForm] = useState({
+    name: initial?.name ?? "",
+    slug: initial?.slug ?? "",
+    charityId: initial?.charityId ?? defaultCharityId ?? "",
+    blurb: initial?.blurb ?? "",
+    isListed: initial?.isListed ?? false,
+  })
+  const [closesAt, setClosesAt] = useState<Date | null>(
+    initial?.closesAt ? new Date(initial.closesAt) : null
   )
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-  const set = (f: keyof AppealFormInitial, v: string | boolean) =>
+  const set = (f: keyof typeof form, v: string | boolean) =>
     setForm((p) => ({ ...p, [f]: v }))
+
+  // The photo flow (HeroPhotoOverlay + crop) reads a form context; this
+  // scoped form carries just photo/photoUrl/name for it — the wizard's
+  // own arrangement (wizard-info-step.tsx).
+  const photoForm = useForm<FavpollFormValues>({
+    defaultValues: {
+      name: initial?.name ?? "",
+      photoUrl: initial?.photoUrl || undefined,
+    },
+  })
+  const [photoOpen, setPhotoOpen] = useState(false)
+  const photoFile = photoForm.watch("photo") as File | undefined
+  const photoPreview = photoForm.watch("photoUrl") ?? null
 
   function submit() {
     setError(null)
     startTransition(async () => {
-      const closesAt = form.closesAt
-        ? new Date(form.closesAt).toISOString()
-        : null
+      let photoUrl = ""
+      if (photoFile) {
+        const fd = new FormData()
+        fd.append("photo", photoFile)
+        try {
+          photoUrl = await uploadPersonPhoto(fd)
+        } catch {
+          setError("The photo failed to upload — try again.")
+          return
+        }
+      } else if (photoPreview && !photoPreview.startsWith("blob:")) {
+        photoUrl = photoPreview
+      }
+      const closes = closesAt ? closesAt.toISOString() : null
       const r = editing
-        ? await updateAppeal(form.id!, {
+        ? await updateAppeal(initial!.id!, {
             name: form.name,
             blurb: form.blurb,
-            photoUrl: form.photoUrl,
-            closesAt,
+            photoUrl,
+            closesAt: closes,
             isListed: form.isListed,
           })
         : await createAppeal({
@@ -88,8 +121,8 @@ export function AppealForm({
             slug: form.slug,
             charityId: form.charityId,
             blurb: form.blurb,
-            photoUrl: form.photoUrl,
-            closesAt,
+            photoUrl,
+            closesAt: closes,
             isListed: form.isListed,
           })
       if (r.error) setError(r.error)
@@ -109,7 +142,10 @@ export function AppealForm({
             value={form.name}
             maxLength={NAME_MAX}
             placeholder="e.g. The Midnight Walk"
-            onChange={(e) => set("name", e.target.value)}
+            onChange={(e) => {
+              set("name", e.target.value)
+              photoForm.setValue("name", e.target.value)
+            }}
           />
           <InputGroupAddon align="inline-end">
             <CharCounter value={form.name} max={NAME_MAX} />
@@ -156,19 +192,25 @@ export function AppealForm({
             : "Every favpoll under this appeal raises for it, always."
         }
       >
-        <select
-          value={form.charityId}
-          disabled={editing}
-          onChange={(e) => set("charityId", e.target.value)}
-          className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
-        >
-          <option value="">Pick a charity…</option>
-          {charities.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={form.charityId}
+            disabled={editing}
+            onChange={(e) => set("charityId", e.target.value)}
+            className="h-11 w-full appearance-none rounded-lg border border-border bg-background pr-10 pl-3 text-sm disabled:opacity-50 md:text-base"
+          >
+            <option value="">Pick a charity…</option>
+            {charities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+        </div>
       </WizardField>
 
       <WizardField
@@ -191,52 +233,57 @@ export function AppealForm({
         </div>
       </WizardField>
 
-      <WizardField label="Photo" hint="Paste an image URL — optional.">
-        <div className="flex items-start gap-3">
-          {/* The wizard's dashed square, as a live preview */}
-          <span
-            aria-hidden="true"
-            className={cn(
-              "flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border",
-              form.photoUrl
-                ? "border-border"
-                : "border-dashed border-border-strong text-muted-foreground"
-            )}
-          >
-            {form.photoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={form.photoUrl}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <ImagePlus className="size-6" />
-            )}
-          </span>
-          <InputGroup className={cn(WIZARD_INPUT_SIZE, "flex-1 bg-background")}>
-            <InputGroupInput
-              className="md:text-base"
-              value={form.photoUrl}
-              placeholder="e.g. https://…"
-              onChange={(e) => set("photoUrl", e.target.value)}
+      {/* The wizard's own photo control: the square IS the button
+          (founder, 2026-09-01) — tap it to open the crop overlay. */}
+      <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+        <span className="block font-medium">Photo</span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setPhotoOpen(true)}
+          aria-label={photoPreview ? "Change photo" : "Add a photo"}
+          className={cn(
+            "h-20 w-20 shrink-0 overflow-hidden rounded-xl p-0",
+            !photoPreview &&
+              "border-dashed border-border-strong text-muted-foreground"
+          )}
+        >
+          {photoPreview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photoPreview}
+              alt=""
+              className="h-full w-full object-cover"
             />
-          </InputGroup>
-        </div>
-      </WizardField>
+          ) : (
+            <ImagePlus className="size-6" aria-hidden="true" />
+          )}
+        </Button>
+      </div>
 
       <WizardField
         label="Close date"
         hint="Members inherit it. Leave blank for an evergreen appeal — members then pick their own dates."
       >
-        <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
-          <InputGroupInput
-            type="datetime-local"
-            className="md:text-base"
-            value={form.closesAt}
-            onChange={(e) => set("closesAt", e.target.value)}
+        <div className="flex flex-wrap items-center gap-3">
+          <DateTimePicker
+            value={closesAt ?? undefined}
+            onChange={setClosesAt}
+            size="lg"
+            presets={CLOSE_DATE_PRESETS}
           />
-        </InputGroup>
+          {closesAt && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => setClosesAt(null)}
+            >
+              Clear — evergreen
+            </Button>
+          )}
+        </div>
       </WizardField>
 
       <WizardField
@@ -278,6 +325,10 @@ export function AppealForm({
           {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
         </Button>
       </div>
+
+      <FormProvider {...photoForm}>
+        <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
+      </FormProvider>
     </div>
   )
 }
