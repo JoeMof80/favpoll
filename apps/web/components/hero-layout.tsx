@@ -224,7 +224,11 @@ export function HeroLayout({
           a measured value, set on measure, never on scroll. */}
       <div
         className="relative z-0 mb-5 md:mb-10"
-        style={{ marginTop: avatarDelta }}
+        // max(delta, 120): the SLOWEST channel sets the settle scroll —
+        // the subtitle's 120px window outlives a short avatar delta, and
+        // contact before full settle cuts the about below the name
+        // (measured: slope exactly -1, contact at gap0).
+        style={{ marginTop: Math.max(avatarDelta, 120) }}
       >
         {about}
       </div>
