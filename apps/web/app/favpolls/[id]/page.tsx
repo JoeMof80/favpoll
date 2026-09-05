@@ -59,6 +59,11 @@ export default async function FavpollPage({ params }: Props) {
     redirect(`/sign-in?redirect_url=/favpolls/${id}`)
   }
 
+  // The appeals embed, typed structurally — the row select is untyped.
+  const memberAppeal =
+    (favpoll as { appeals?: { name: string; slug: string } | null }).appeals ??
+    null
+
   const isOrganiser = userId === favpoll.created_by
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
@@ -353,13 +358,7 @@ export default async function FavpollPage({ params }: Props) {
         />
         <FavpollContent
           favpoll={typedFavpoll}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          appeal={
-            ((favpoll as any).appeals as {
-              name: string
-              slug: string
-            } | null) ?? null
-          }
+          appeal={memberAppeal}
           pollWithItems={visiblePoll}
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
