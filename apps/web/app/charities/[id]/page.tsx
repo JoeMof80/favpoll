@@ -42,6 +42,37 @@ export default async function CharityPage({ params }: Props) {
     live_count: 0,
   }
 
+  // The charity's own appeals — listed and open only (an unlisted
+  // appeal is invite-only by its link, concept 2026-09-05). Creation
+  // stays manual-by-us for now: the claim mailto below is the recorded
+  // "manual first step before a self-service portal", and a charity
+  // login role belongs to that portal conversation.
+  const { data: rawAppeals } = await supabase
+    .from("appeals")
+    .select("id, slug, name, closes_at, opens_at")
+    .eq("charity_id", id)
+    .eq("is_listed", true)
+  const now = new Date()
+  const openAppeals = (rawAppeals ?? []).filter(
+    (a) =>
+      new Date(a.opens_at) <= now &&
+      (!a.closes_at || new Date(a.closes_at) > now)
+  )
+  const { data: appealAgg } = openAppeals.length
+    ? await supabase.rpc("appeal_live_totals", {
+        p_appeal_ids: openAppeals.map((a) => a.id),
+      })
+    : { data: [] }
+  const aggByAppeal = new Map(
+    (
+      (appealAgg ?? []) as {
+        appeal_id: string
+        raised: number
+        member_count: number
+      }[]
+    ).map((r) => [r.appeal_id, r])
+  )
+
   // Open favpolls supporting this charity — the "charities market favpoll
   // for you" surface. Listed, open, non-private only.
   const { data: rawLive } = await supabase
@@ -158,6 +189,46 @@ export default async function CharityPage({ params }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Appeals — the charity's parent campaigns */}
+      {openAppeals.length > 0 && (
+        <section className="mt-12">
+          <SectionEyebrow className="mb-4">
+            Appeals for {charity.name}
+          </SectionEyebrow>
+          <ul className="max-w-2xl divide-y divide-border rounded-xl border border-border bg-card">
+            {openAppeals.map((a) => {
+              const agg = aggByAppeal.get(a.id)
+              return (
+                <li key={a.id}>
+                  <Link
+                    href={`/appeals/${a.slug}`}
+                    className="flex items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-primary/5"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-base font-medium text-foreground">
+                        {a.name}
+                      </span>
+                      <span className="block text-sm text-muted-foreground">
+                        {agg?.member_count ?? 0} favpoll
+                        {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                        {a.closes_at &&
+                          ` · closes ${new Date(a.closes_at).toLocaleDateString(
+                            "en-GB",
+                            { day: "numeric", month: "long", year: "numeric" }
+                          )}`}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-base font-medium text-primary tabular-nums">
+                      {formatPounds(Number(agg?.raised ?? 0))}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* Open favpolls */}
       <section className="mt-12">
