@@ -29,7 +29,7 @@ type HeroLayoutProps = {
 // The avatar shrink is what lets the stuck ribbon rise level with the
 // right rail's charity card on md+ (founder screenshot, 2026-07-29): the
 // unshrunk 132px box was holding the band open with 48px of dead air.
-// The var settles within the first ~120px of scroll — before the ribbon
+// The var settles early (avatar by 48px, text by 120px of scroll) — before the ribbon
 // or pledge pill reach their pin positions — so pinned pieces still hold
 // one position in practice.
 export function HeroLayout({
@@ -95,7 +95,12 @@ export function HeroLayout({
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
-  const avatarSize = useTransform(scrollY, t, [
+  // The avatar settles in the FIRST 48px of scroll (founder, 2026-09-05:
+  // the About met the band mid-shrink, with everything moving at once —
+  // the seam reads calmer once the composition is settled early). The
+  // text channels keep their 120px window.
+  const avatarT = [0, 48]
+  const avatarSize = useTransform(scrollY, avatarT, [
     avatarCfg.size,
     avatarCfg.size * avatarCfg.end,
   ])
@@ -119,7 +124,13 @@ export function HeroLayout({
         // letting the about scroll visibly over that gap (founder-caught
         // on-device, 2026-08-02). Under a working header (z-40) the
         // cover is invisible.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
+        // The after-strip is the SEAM MASK (founder, 2026-09-05): the about
+        // used to guillotine mid-glyph against the band's bottom edge; a
+        // 16px background→transparent gradient hanging below the band
+        // dissolves it instead. h-4 exactly matches the about's mt-4, so
+        // at rest the gradient dies precisely where the text begins and
+        // nothing is veiled.
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-gradient-to-b after:from-background after:to-transparent md:pt-16"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
