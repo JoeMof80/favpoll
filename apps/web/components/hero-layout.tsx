@@ -73,12 +73,11 @@ export function HeroLayout({
   // classes until mount.
   const textRef = useRef<HTMLDivElement>(null)
   const settledRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
   const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
-  // Until measured, 999 = a fully opaque band (today's behaviour) —
-  // the fail-safe direction: too much cover, never a see-through band.
-  const [coverH, setCoverH] = useState(999)
+  const [aboutH, setAboutH] = useState(160)
   const [avatarMounted, setAvatarMounted] = useState(false)
   // useLayoutEffect, not useEffect: the cover height and avatar
   // endpoints are PAINT values — measured post-paint, the first frame
@@ -92,26 +91,15 @@ export function HeroLayout({
       const rest = text.offsetHeight
       const settled = settledEl.offsetHeight
       if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
-      // The opaque cover ends at the NAME's bottom edge. RECT
-      // DIFFERENCE against the band root, not offsetTop — the row is
-      // position:relative, so it is the offsetParent and offsetTop
-      // silently lost the band's top padding (measured: an 85px cover
-      // against the needed 149, the about ghosting through the name
-      // zone). Same-frame rects cancel scroll.
-      const band = boxRef.current
-      if (band) {
-        const bottom = Math.round(
-          settledEl.getBoundingClientRect().bottom -
-            band.getBoundingClientRect().top
-        )
-        if (bottom > 0) setCoverH(bottom)
-      }
+      const ah = aboutRef.current?.offsetHeight ?? 0
+      if (ah > 0) setAboutH(ah)
     }
     set()
     setAvatarMounted(true)
     const ro = new ResizeObserver(set)
     ro.observe(text)
     ro.observe(settledEl)
+    if (aboutRef.current) ro.observe(aboutRef.current)
     return () => ro.disconnect()
   }, [])
 
@@ -124,6 +112,14 @@ export function HeroLayout({
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
   const subtitleY = useTransform(scrollY, t, [0, -120])
+  // THE ABOUT IS THE THIRD CLIP (founder redesign, 2026-09-05): its box
+  // collapses 1:1 with scroll while the text rides 1:1 — so it reads as
+  // ordinary page content scrolling away, vanishing at the name's edge,
+  // and the band stays opaque for everything that follows. The window
+  // is the about's own measured height. Either channel failing alone
+  // degrades to visible-or-clipped text, never an overlap.
+  const aboutMax = useTransform(scrollY, [0, aboutH], [aboutH, 0])
+  const aboutY = useTransform(scrollY, [0, aboutH], [0, -aboutH])
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
@@ -156,22 +152,15 @@ export function HeroLayout({
         // letting the about scroll visibly over that gap (founder-caught
         // on-device, 2026-08-02). Under a working header (z-40) the
         // cover is invisible.
-        // THE PAINT STOPS AT THE NAME (founder, 2026-09-05: "can't it
-        // disappear directly under the Name, like Context does?"). The
-        // band's BOX keeps its full height — the measured var, the
-        // ribbon pin and the fail-open doctrine are untouched — but the
-        // background moves onto an inner cover that ends at the name's
-        // bottom edge. Below that line the band is transparent: the
-        // about stays visible until it slides under the name (and under
-        // the photo, opaque by itself). Safe against the context
-        // because #704's 1:1 ride keeps the two at a constant gap.
-        className="sticky top-14 z-30 pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
+        // FULLY OPAQUE AGAIN (2026-09-05, ending the transparent-zone
+        // experiment): a see-through lower band could not tell the
+        // about from the reveal, decoy and standings streaming after it
+        // — everything ghosted through (founder screenshots ×2). The
+        // about now lives INSIDE the band as a third collapsing clip
+        // (below), so the band hides poll content at its bottom exactly
+        // as the original design did.
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 bg-background"
-          style={{ height: coverH }}
-        />
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
             than person heroes, whose shrunken avatar outgrows the
@@ -214,10 +203,21 @@ export function HeroLayout({
             </motion.div>
           )}
         </div>
+        {about && (
+          <motion.div
+            className="overflow-hidden"
+            style={{ maxHeight: aboutMax }}
+          >
+            <motion.div
+              ref={aboutRef}
+              className="pt-4 pb-5 md:pb-10"
+              style={{ y: aboutY }}
+            >
+              {about}
+            </motion.div>
+          </motion.div>
+        )}
       </div>
-
-      {/* About — scrolls away beneath the pinned hero */}
-      <div className="relative z-0 mt-4 mb-5 md:mb-10">{about}</div>
     </>
   )
 }
