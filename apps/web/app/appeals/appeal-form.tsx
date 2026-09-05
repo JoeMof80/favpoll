@@ -27,9 +27,12 @@ export type AppealFormInitial = {
 export function AppealForm({
   initial,
   charities,
+  defaultCharityId,
 }: {
   initial?: AppealFormInitial
   charities: { id: string; name: string }[]
+  /** The charity-page door arrives with its charity preselected. */
+  defaultCharityId?: string
 }) {
   const router = useRouter()
   const editing = !!initial?.id
@@ -37,7 +40,7 @@ export function AppealForm({
     initial ?? {
       name: "",
       slug: "",
-      charityId: "",
+      charityId: defaultCharityId ?? "",
       blurb: "",
       photoUrl: "",
       closesAt: "",

@@ -7,9 +7,14 @@ import { AppealForm } from "../appeal-form"
 // Appeal creation — in the MAIN app, its long-term home (founder,
 // 2026-09-05), behind the temporary gate. When charity accounts exist
 // the gate becomes a role check and this page is already the portal.
-export default async function NewAppealPage() {
+export default async function NewAppealPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ charity?: string }>
+}) {
   const { userId } = await auth()
   if (!canManageAppeals(userId)) notFound()
+  const { charity: defaultCharityId } = await searchParams
 
   const supabase = createAdminClient()
   const { data: charities } = await supabase
@@ -24,7 +29,10 @@ export default async function NewAppealPage() {
         <h1 className="mb-8 text-3xl font-light tracking-tight text-foreground">
           New appeal
         </h1>
-        <AppealForm charities={charities ?? []} />
+        <AppealForm
+          charities={charities ?? []}
+          defaultCharityId={defaultCharityId}
+        />
       </div>
     </main>
   )

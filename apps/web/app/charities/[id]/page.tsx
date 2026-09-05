@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { auth } from "@clerk/nextjs/server"
+import { canManageAppeals } from "@/lib/appeals-admin"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import {
@@ -21,6 +23,8 @@ type CharityStats = {
 
 export default async function CharityPage({ params }: Props) {
   const { id } = await params
+  const { userId } = await auth()
+  const canManage = canManageAppeals(userId)
   const supabase = createAdminClient()
 
   const { data: charity } = await supabase
@@ -190,43 +194,61 @@ export default async function CharityPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Appeals — the charity's parent campaigns */}
-      {openAppeals.length > 0 && (
+      {/* Appeals — the charity's parent campaigns. Gate-passers get
+          the creation door HERE, prefilled with this charity (founder,
+          2026-09-06: "shouldn't the link to the appeal form be on the
+          charity page?") — which is also where the future charity role
+          will find it. */}
+      {(openAppeals.length > 0 || canManage) && (
         <section className="mt-12">
-          <SectionEyebrow className="mb-4">
-            Appeals for {charity.name}
-          </SectionEyebrow>
-          <ul className="max-w-2xl divide-y divide-border rounded-xl border border-border bg-card">
-            {openAppeals.map((a) => {
-              const agg = aggByAppeal.get(a.id)
-              return (
-                <li key={a.id}>
-                  <Link
-                    href={`/appeals/${a.slug}`}
-                    className="flex items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-primary/5"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-base font-medium text-foreground">
-                        {a.name}
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <SectionEyebrow>Appeals for {charity.name}</SectionEyebrow>
+            {canManage && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/appeals/new?charity=${charity.id}`}>
+                  Create an appeal
+                </Link>
+              </Button>
+            )}
+          </div>
+          {openAppeals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No appeals yet.</p>
+          ) : (
+            <ul className="max-w-2xl divide-y divide-border rounded-xl border border-border bg-card">
+              {openAppeals.map((a) => {
+                const agg = aggByAppeal.get(a.id)
+                return (
+                  <li key={a.id}>
+                    <Link
+                      href={`/appeals/${a.slug}`}
+                      className="flex items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-primary/5"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-base font-medium text-foreground">
+                          {a.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {agg?.member_count ?? 0} favpoll
+                          {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                          {a.closes_at &&
+                            ` · closes ${new Date(
+                              a.closes_at
+                            ).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })}`}
+                        </span>
                       </span>
-                      <span className="block text-sm text-muted-foreground">
-                        {agg?.member_count ?? 0} favpoll
-                        {(agg?.member_count ?? 0) === 1 ? "" : "s"}
-                        {a.closes_at &&
-                          ` · closes ${new Date(a.closes_at).toLocaleDateString(
-                            "en-GB",
-                            { day: "numeric", month: "long", year: "numeric" }
-                          )}`}
+                      <span className="shrink-0 text-base font-medium text-primary tabular-nums">
+                        {formatPounds(Number(agg?.raised ?? 0))}
                       </span>
-                    </span>
-                    <span className="shrink-0 text-base font-medium text-primary tabular-nums">
-                      {formatPounds(Number(agg?.raised ?? 0))}
-                    </span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
         </section>
       )}
 
