@@ -62,25 +62,36 @@ export function HeroLayout({
     }
   }, [])
 
-  // Mobile rest size 104px = the eyebrow + name + context stack beside it,
-  // so the photo's bottom sits level with the context line (founder,
-  // on-device 2026-07-30). The settled stamp stays at the founder-tuned
-  // 72px ("shrinks too small" below that, 2026-07-26) — which also keeps
-  // the settled band height, and every pinned offset, unchanged.
-  const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
+  // THE REDESIGN'S CORE (founder, 2026-09-05): the avatar's endpoints
+  // are MEASURED, not stamped. Rest = the full text stack (eyebrow +
+  // name + context), so the photo's bottom sits level with the context
+  // line at any name length; settled = eyebrow + name alone, so a
+  // two-line name settles a taller image. Both read by ResizeObserver
+  // on LAYOUT changes only — never during scroll — the same
+  // measure-the-real-box philosophy as --hero-stuck-bottom. The old
+  // constants (104/132, founder-tuned 2026-07-30) are the SSR fallback
+  // classes until mount.
+  const textRef = useRef<HTMLDivElement>(null)
+  const settledRef = useRef<HTMLDivElement>(null)
+  const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
   const [avatarMounted, setAvatarMounted] = useState(false)
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)")
-    const set = () =>
-      setAvatarCfg(
-        mq.matches ? { end: 0.635, size: 132 } : { end: 72 / 104, size: 104 }
-      )
+    const text = textRef.current
+    const settledEl = settledRef.current
+    if (!text || !settledEl) return
+    const set = () => {
+      const rest = text.offsetHeight
+      const settled = settledEl.offsetHeight
+      if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
+    }
     set()
     setAvatarMounted(true)
-    mq.addEventListener("change", set)
-    return () => mq.removeEventListener("change", set)
+    const ro = new ResizeObserver(set)
+    ro.observe(text)
+    ro.observe(settledEl)
+    return () => ro.disconnect()
   }, [])
 
   const t = [0, 120]
@@ -95,15 +106,15 @@ export function HeroLayout({
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
-  // The avatar settles in the FIRST 48px of scroll (founder, 2026-09-05:
-  // the About met the band mid-shrink, with everything moving at once —
-  // the seam reads calmer once the composition is settled early). The
-  // text channels keep their 120px window.
-  const avatarT = [0, 48]
-  const avatarSize = useTransform(scrollY, avatarT, [
-    avatarCfg.size,
-    avatarCfg.size * avatarCfg.end,
-  ])
+  // The shrink window = the measured delta (floored at 48px), so the
+  // image gives up its extra height at ~scroll pace and the About
+  // scrolls the whole way to the settled edge before passing under.
+  const avatarDelta = Math.max(avatarCfg.rest - avatarCfg.settled, 48)
+  const avatarSize = useTransform(
+    scrollY,
+    [0, avatarDelta],
+    [avatarCfg.rest, avatarCfg.settled]
+  )
 
   return (
     <>
@@ -138,9 +149,11 @@ export function HeroLayout({
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
         <div className="flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
-          <div className="min-w-0 flex-1">
-            {eyebrowText}
-            {title}
+          <div ref={textRef} className="min-w-0 flex-1">
+            <div ref={settledRef}>
+              {eyebrowText}
+              {title}
+            </div>
             {subtitle && (
               /* items-end (founder, 2026-09-05): top-anchored text in a
                  bottom-up clip lost its LOWER half first, so mid-scroll

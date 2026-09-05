@@ -159,7 +159,12 @@ export function heroNameMobileSizeClass(name: string): string {
 }
 
 export function heroNameSizeClass(name: string): string {
-  return `${heroNameMobileSizeClass(name)} sm:text-4xl`
+  // The redesign (founder, 2026-09-05): a long name may BREAK onto two
+  // lines at a slightly reduced size — so the step-down now reaches sm+
+  // too, instead of every name forcing text-4xl into the clamp.
+  return name.trim().length >= HERO_NAME_STEP_DOWN_AT
+    ? `${heroNameMobileSizeClass(name)} sm:text-3xl`
+    : `${heroNameMobileSizeClass(name)} sm:text-4xl`
 }
 
 /**

@@ -15,7 +15,7 @@ describe("heroNameSizeClass", () => {
     expect("St Mark's Hospice".length).toBeGreaterThanOrEqual(
       HERO_NAME_STEP_DOWN_AT
     )
-    expect(heroNameSizeClass("St Mark's Hospice")).toBe("text-2xl sm:text-4xl")
+    expect(heroNameSizeClass("St Mark's Hospice")).toBe("text-2xl sm:text-3xl")
     expect(heroNameMobileSizeClass("Ending homelessness in the UK")).toBe(
       "text-2xl"
     )
