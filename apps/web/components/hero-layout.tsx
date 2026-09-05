@@ -88,10 +88,20 @@ export function HeroLayout({
       const rest = text.offsetHeight
       const settled = settledEl.offsetHeight
       if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
-      // The opaque cover ends at the NAME's bottom edge (offsetTop
-      // spans the band's top padding at any breakpoint).
-      const bottom = settledEl.offsetTop + settledEl.offsetHeight
-      if (bottom > 0) setCoverH(bottom)
+      // The opaque cover ends at the NAME's bottom edge. RECT
+      // DIFFERENCE against the band root, not offsetTop — the row is
+      // position:relative, so it is the offsetParent and offsetTop
+      // silently lost the band's top padding (measured: an 85px cover
+      // against the needed 149, the about ghosting through the name
+      // zone). Same-frame rects cancel scroll.
+      const band = boxRef.current
+      if (band) {
+        const bottom = Math.round(
+          settledEl.getBoundingClientRect().bottom -
+            band.getBoundingClientRect().top
+        )
+        if (bottom > 0) setCoverH(bottom)
+      }
     }
     set()
     setAvatarMounted(true)
