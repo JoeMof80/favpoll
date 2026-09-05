@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
 type HeroLayoutProps = {
@@ -41,18 +41,31 @@ export function HeroLayout({
 }: HeroLayoutProps) {
   const { scrollY } = useScroll()
 
-  // The hero's height still varies with CONTENT (wrapping name, subtitle
-  // presence), so the measured CSS var stays — set on layout changes only,
-  // never mutated during scroll.
+  // The var is the SETTLED band bottom, derived from geometry that is
+  // scroll-invariant (the name block's offset within the pinned band):
+  // never mutated during scroll — restored fully, 2026-09-05, after the
+  // about-clip's collapse made whole-band measurement rewrite the var
+  // every frame and everything pinned to it stuttered (founder: "i'm
+  // seeing glitching"). Rects, not offsetTop (the relative row is the
+  // offsetParent). Content changes (name wrap, breakpoint) still
+  // re-measure via the RO; scroll recomputes the same value.
   const boxRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = boxRef.current
     if (!el) return
-    const set = () =>
+    // pb-4 — the founder-tuned air under the name (2026-07-29).
+    const BAND_PB = 16
+    const set = () => {
+      const settledEl = settledRef.current
+      if (!settledEl) return
+      const inset =
+        settledEl.getBoundingClientRect().bottom -
+        el.getBoundingClientRect().top
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
-        `${56 + el.offsetHeight}px` // 56 = the h-14 site header above
+        `${Math.round(56 + inset + BAND_PB)}px` // 56 = the h-14 header
       )
+    }
     set()
     const ro = new ResizeObserver(set)
     ro.observe(el)
@@ -62,28 +75,54 @@ export function HeroLayout({
     }
   }, [])
 
-  // Mobile rest size 104px = the eyebrow + name + context stack beside it,
-  // so the photo's bottom sits level with the context line (founder,
-  // on-device 2026-07-30). The settled stamp stays at the founder-tuned
-  // 72px ("shrinks too small" below that, 2026-07-26) — which also keeps
-  // the settled band height, and every pinned offset, unchanged.
-  const [avatarCfg, setAvatarCfg] = useState({ end: 0.635, size: 132 })
+  // THE REDESIGN'S CORE (founder, 2026-09-05): the avatar's endpoints
+  // are MEASURED, not stamped. Rest = the full text stack (eyebrow +
+  // name + context), so the photo's bottom sits level with the context
+  // line at any name length; settled = eyebrow + name alone, so a
+  // two-line name settles a taller image. Both read by ResizeObserver
+  // on LAYOUT changes only — never during scroll — the same
+  // measure-the-real-box philosophy as --hero-stuck-bottom. The old
+  // constants (104/132, founder-tuned 2026-07-30) are the SSR fallback
+  // classes until mount.
+  const textRef = useRef<HTMLDivElement>(null)
+  const settledRef = useRef<HTMLDivElement>(null)
+  const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
   const [avatarMounted, setAvatarMounted] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)")
-    const set = () =>
-      setAvatarCfg(
-        mq.matches ? { end: 0.635, size: 132 } : { end: 72 / 104, size: 104 }
-      )
+  // useLayoutEffect, not useEffect: the cover height and avatar
+  // endpoints are PAINT values — measured post-paint, the first frame
+  // wore the 999 fallback (caught at w390 in the breakpoint sweep),
+  // and a Fast-Refreshed tab kept a stale height until some resize.
+  useLayoutEffect(() => {
+    const text = textRef.current
+    const settledEl = settledRef.current
+    if (!text || !settledEl) return
+    const set = () => {
+      const rest = text.offsetHeight
+      const settled = settledEl.offsetHeight
+      if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
+    }
     set()
     setAvatarMounted(true)
-    mq.addEventListener("change", set)
-    return () => mq.removeEventListener("change", set)
+    const ro = new ResizeObserver(set)
+    ro.observe(text)
+    ro.observe(settledEl)
+    return () => ro.disconnect()
   }, [])
 
-  const t = [0, 120]
+  // ONE SETTLE CONSTANT (founder, 2026-09-05: the 120px rest gap under
+  // the context was "way too low" for the about). Every channel —
+  // context fade/ride, avatar shrink, and the about's rest gap — shares
+  // this window, so the composition settles exactly as the about
+  // arrives and the rest gap IS this number. The avatar simply shrinks
+  // its measured delta a little faster. The founder's tuning knob.
+  // 24 = the 40px rest gap the founder chose (2026-09-05, "the other
+  // way around": both gaps at the ribbon's 40) minus the band's pb 16.
+  // The whole composition settles in the first 24px of scroll — brisk,
+  // but every law holds (contact at settle, slope -1).
+  const SETTLE_SCROLL = 24
+  const t = [0, SETTLE_SCROLL]
   const subtitleOpacity = useTransform(scrollY, t, [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
   // Context at the same pace as the About so the space between them
@@ -91,18 +130,13 @@ export function HeroLayout({
   // rate (0.4x), so the about visibly gained on it. A transform inside
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
-  const subtitleY = useTransform(scrollY, t, [0, -120])
+  const subtitleY = useTransform(scrollY, t, [0, -SETTLE_SCROLL])
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
-  // The avatar settles in the FIRST 48px of scroll (founder, 2026-09-05:
-  // the About met the band mid-shrink, with everything moving at once —
-  // the seam reads calmer once the composition is settled early). The
-  // text channels keep their 120px window.
-  const avatarT = [0, 48]
-  const avatarSize = useTransform(scrollY, avatarT, [
-    avatarCfg.size,
-    avatarCfg.size * avatarCfg.end,
+  const avatarSize = useTransform(scrollY, t, [
+    avatarCfg.rest,
+    avatarCfg.settled,
   ])
 
   return (
@@ -124,23 +158,26 @@ export function HeroLayout({
         // letting the about scroll visibly over that gap (founder-caught
         // on-device, 2026-08-02). Under a working header (z-40) the
         // cover is invisible.
-        // The after-strip is the SEAM MASK (founder, 2026-09-05): the about
-        // used to guillotine mid-glyph against the band's bottom edge; a
-        // 16px background→transparent gradient hanging below the band
-        // dissolves it instead. h-4 exactly matches the about's mt-4, so
-        // at rest the gradient dies precisely where the text begins and
-        // nothing is veiled.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-gradient-to-b after:from-background after:to-transparent md:pt-16"
+        // FULLY OPAQUE AGAIN (2026-09-05, ending the transparent-zone
+        // experiment): a see-through lower band could not tell the
+        // about from the reveal, decoy and standings streaming after it
+        // — everything ghosted through (founder screenshots ×2). The
+        // about now lives INSIDE the band as a third collapsing clip
+        // (below), so the band hides poll content at its bottom exactly
+        // as the original design did.
+        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
-        <div className="flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
-          <div className="min-w-0 flex-1">
-            {eyebrowText}
-            {title}
+        <div className="relative flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
+          <div ref={textRef} className="min-w-0 flex-1">
+            <div ref={settledRef}>
+              {eyebrowText}
+              {title}
+            </div>
             {subtitle && (
               /* items-end (founder, 2026-09-05): top-anchored text in a
                  bottom-up clip lost its LOWER half first, so mid-scroll
@@ -174,8 +211,36 @@ export function HeroLayout({
         </div>
       </div>
 
-      {/* About — scrolls away beneath the pinned hero */}
-      <div className="relative z-0 mt-4 mb-5 md:mb-10">{about}</div>
+      {/* About — ORDINARY FLOW, on purpose (2026-09-05, ending the
+          third-clip experiment): collapsing the band 1:1 with the about
+          made everything below approach at 2x, and the ribbon dived
+          under the band's opaque bottom before its pin (founder
+          screenshot). With the avatar settling to the name-block height,
+          the band's bottom IS the name edge — so plain flow content
+          vanishes exactly there, no animation needed.
+
+          THE REST GAP IS THE SHRINK DELTA (founder, 2026-09-05: "the
+          About is disappearing too low again" — caught mid-shrink). The
+          cancellation law: the about approaches the band bottom at
+          exactly 1x regardless of shrink, so it arrives after gap0 px of
+          scroll. gap0 = delta means it CANNOT reach the vanish line
+          before the avatar has settled — the spec's "scrolls all the way
+          to this new height before disappearing", and the large rest gap
+          the founder's mock drew between context and about. Layout from
+          a measured value, set on measure, never on scroll. */}
+      <div
+        // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
+        // the about sits equidistant. If SETTLE_SCROLL moves, move this
+        // with it.
+        className="relative z-0 mb-10"
+        // gap0 = the settle scroll: contact exactly at full settle
+        // (measured: slope exactly -1), so the cut line is the name
+        // edge from first touch — and the rest gap is as small as the
+        // settle window allows.
+        style={{ marginTop: SETTLE_SCROLL }}
+      >
+        {about}
+      </div>
     </>
   )
 }

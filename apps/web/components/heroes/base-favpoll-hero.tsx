@@ -33,7 +33,7 @@ export function BaseFavpollHero({
   const eyebrowText = (
     <SectionEyebrow
       variant="muted"
-      className="flex h-8 items-center truncate wrap-break-word"
+      className="mb-2 flex h-8 items-center truncate wrap-break-word"
     >
       {headline.prefix}
     </SectionEyebrow>
@@ -48,7 +48,7 @@ export function BaseFavpollHero({
   )
 
   const subtitle = headline.suffix ? (
-    <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+    <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
       {headline.suffix}
     </p>
   ) : undefined
