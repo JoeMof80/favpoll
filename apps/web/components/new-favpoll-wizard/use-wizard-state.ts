@@ -65,6 +65,18 @@ export type WizardEditConfig = {
   }
 }
 
+/** A parent appeal, joined via the appeal link. Charity locked to the
+ * appeal's; close date inherited (and locked) when the appeal has an
+ * end; members default unlisted. Concept:
+ * references/appeals-concept-2026-09-05.md. */
+export type WizardAppeal = {
+  id: string
+  name: string
+  charityId: string
+  charityName: string
+  closesAt: string | null
+}
+
 // The three-notch visibility axis. Listed = browsable on /favpolls;
 // unlisted = by link, not by browsing; private = the page itself gates
 // on sign-in and link previews show a placeholder. is_listed/is_private
@@ -95,7 +107,9 @@ export function useWizardState(
   data: WizardData,
   edit?: WizardEditConfig,
   /** Create-mode Event preselect (the register CTAs); edit wins. */
-  initialCategory?: FavpollCategory | null
+  initialCategory?: FavpollCategory | null,
+  /** Create-mode appeal membership (the appeal join link). */
+  appeal?: WizardAppeal | null
 ) {
   const isEdit = !!edit
   const init = edit?.initial
@@ -113,7 +127,9 @@ export function useWizardState(
   )
   const [pronoun, setPronoun] = useState<Pronoun | undefined>(init?.pronoun)
   const [topics, setTopics] = useState<WizardTopics>(init?.topics ?? [])
-  const [charityIds, setCharityIds] = useState<string[]>(init?.charityIds ?? [])
+  const [charityIds, setCharityIds] = useState<string[]>(
+    init?.charityIds ?? (appeal ? [appeal.charityId] : [])
+  )
   const [topicOpen, setTopicOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)
   const [itemsDialogOpen, setItemsDialogOpen] = useState(false)
@@ -138,7 +154,11 @@ export function useWizardState(
     init?.goalAmount ? String(init.goalAmount) : ""
   )
   const [closesAt, setClosesAt] = useState<Date | undefined>(
-    edit?.initialClosesAt ? new Date(edit.initialClosesAt) : undefined
+    edit?.initialClosesAt
+      ? new Date(edit.initialClosesAt)
+      : appeal?.closesAt
+        ? new Date(appeal.closesAt)
+        : undefined
   )
   const [allowGuestItems, setAllowGuestItems] = useState(
     init?.allowGuestItems ?? true
@@ -176,7 +196,11 @@ export function useWizardState(
   // (the old rule: isListed = register !== "remembering") — until the
   // organiser touches the control.
   const visibility =
-    visibilityOverride ?? (register === "remembering" ? "unlisted" : "listed")
+    visibilityOverride ??
+    // Appeal members default unlisted: their audience is their circle
+    // via the appeal page, and forty same-charity favpolls would flood
+    // the public shelf (concept decision, 2026-09-05).
+    (appeal ? "unlisted" : register === "remembering" ? "unlisted" : "listed")
   const isListed = visibility === "listed"
   const isPrivate = visibility === "private"
 
@@ -210,7 +234,9 @@ export function useWizardState(
   // locking; the server enforces the same rule in updateFavpoll).
   const stepLocked: Record<WizardStep, boolean> = {
     event: !!edit?.locked,
-    charity: !!edit?.locked,
+    // The appeal's charity is the appeal's whole meaning — locked from
+    // birth (server enforces in create/updateFavpoll).
+    charity: !!edit?.locked || !!appeal,
     topic: !!edit?.locked,
     info: false,
     story: false,
@@ -507,6 +533,7 @@ export function useWizardState(
         isPrivate,
         isListed,
         allowGuestItems,
+        appealId: appeal?.id ?? null,
         potAmount: null,
         goalAmount: goalAmount ?? null,
         poll: {
@@ -610,6 +637,7 @@ export function useWizardState(
     setAllowGuestItems,
     isCause,
     isEdit,
+    appeal: appeal ?? null,
     stepLocked,
     railSummary,
     railDone,

@@ -89,12 +89,29 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
         </span>
         {/* The 90-day cap lives in the picker's disabled dates and the
             server-side guard — no hint sentence (prototype round 38). */}
-        <DateTimePicker
-          value={w.closesAt}
-          onChange={w.setClosesAt}
-          size="lg"
-          presets={CLOSE_DATE_PRESETS}
-        />
+        {w.appeal?.closesAt ? (
+          // Inherited from the appeal and locked — one event, one
+          // announcement moment (concept decision, 2026-09-05).
+          <p className="flex min-h-11 items-center text-base text-foreground">
+            {w.closesAt?.toLocaleString("en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            <span className="ml-2 text-sm text-muted-foreground">
+              — set by {w.appeal.name}
+            </span>
+          </p>
+        ) : (
+          <DateTimePicker
+            value={w.closesAt}
+            onChange={w.setClosesAt}
+            size="lg"
+            presets={CLOSE_DATE_PRESETS}
+          />
+        )}
       </div>
 
       {/* items-start + a min-h-11 label box: the hint line makes this the
