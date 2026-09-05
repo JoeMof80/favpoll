@@ -131,43 +131,11 @@ export function PollSection({
             pre-pledge the lock card is the one CTA, so a second full-
             width button was redundant. Once entitled, a quiet icon at
             the ribbon's edge reopens the dialog to pledge again. */}
-        {/* Header left, controls right, ONE pinned line (founder,
-            2026-09-05: "pin the button and switch next to the Topic
-            header"). The controls' former own sticky row is gone. */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <PollHeading topicTitle={poll.topics.title} inert />
-          </div>
-          {entitled && hasItems && (
-            <div className="flex shrink-0 items-center gap-2">
-              {onOpenPledgeDialog && (
-                <TooltipProvider>
-                  <Tooltip content="Pledge again" side="left">
-                    <Button
-                      type="button"
-                      size="icon-sm"
-                      aria-label="Pledge again"
-                      onClick={onOpenPledgeDialog}
-                    >
-                      <Gift aria-hidden="true" />
-                    </Button>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              <Tabs
-                value={rankingView}
-                onValueChange={(v: string) => setRankingView(v as RankingView)}
-              >
-                <TabsList className="h-7 shadow">
-                  <TabsTrigger value="amount" className="px-3 text-xs">
-                    Amount
-                  </TabsTrigger>
-                  <TabsTrigger value="count" className="px-3 text-xs">
-                    Pledges
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+        {/* Pure header. The controls live on their own sticky row below
+            and DOCK onto this line only once scrolling pins them
+            (founder, 2026-09-05: "the buttons should only stick in
+            that position after scrolling"). */}
+        <PollHeading topicTitle={poll.topics.title} inert />
           )}
         </div>
       </div>
@@ -185,6 +153,41 @@ export function PollSection({
 
           {hasItems && (
             <>
+              {/* Rest: an ordinary row here. Pinned: docks beside the
+                  ribbon — top = var + 0.875rem centres the 28px controls
+                  against the two-line heading. z-20 after the ribbon in
+                  paint order, so it sits on the ribbon's backdrop. */}
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+0.875rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+0.875rem)]">
+                {onOpenPledgeDialog && (
+                  <TooltipProvider>
+                    <Tooltip content="Pledge again" side="left">
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        aria-label="Pledge again"
+                        onClick={onOpenPledgeDialog}
+                      >
+                        <Gift aria-hidden="true" />
+                      </Button>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                <Tabs
+                  value={rankingView}
+                  onValueChange={(v: string) =>
+                    setRankingView(v as RankingView)
+                  }
+                >
+                  <TabsList className="h-7 shadow">
+                    <TabsTrigger value="amount" className="px-3 text-xs">
+                      Amount
+                    </TabsTrigger>
+                    <TabsTrigger value="count" className="px-3 text-xs">
+                      Pledges
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
               <RankingList
                 initialItems={initialItems}
                 favpollPollId={poll.id}
