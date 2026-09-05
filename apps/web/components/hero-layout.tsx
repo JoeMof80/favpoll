@@ -225,7 +225,11 @@ export function HeroLayout({
           the founder's mock drew between context and about. Layout from
           a measured value, set on measure, never on scroll. */}
       <div
-        className="relative z-0 mb-5 md:mb-10"
+        // mb-20 = the upper gap's 80px (SETTLE_SCROLL 64 + the band's
+        // pb 16), so the about sits equidistant between the context and
+        // the topic ribbon (founder, 2026-09-05). If SETTLE_SCROLL
+        // moves, move this with it.
+        className="relative z-0 mb-20"
         // gap0 = the settle scroll: contact exactly at full settle
         // (measured: slope exactly -1), so the cut line is the name
         // edge from first touch — and the rest gap is as small as the
