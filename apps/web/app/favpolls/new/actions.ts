@@ -38,6 +38,7 @@ type CreateFavpollInput = {
   isPrivate: boolean
   isListed: boolean
   allowGuestItems: boolean
+  appealId?: string | null
   potAmount: number | null
   goalAmount?: number | null
   poll: PollInput
@@ -261,8 +262,38 @@ export async function createFavpoll(
     protagonistId = protagonist.id
   }
 
-  const closesAt = new Date(input.closesAt).toISOString()
-  const hardCloseAt = new Date(input.closesAt)
+  // Appeal membership is SERVER truth (concept, 2026-09-05): the
+  // charity is forced to the appeal's regardless of client input, and
+  // an appeal end date is inherited, capped at the 90-day window.
+  let appeal: {
+    id: string
+    charity_id: string
+    closes_at: string | null
+  } | null = null
+  if (input.appealId) {
+    const { data: a } = await supabase
+      .from("appeals")
+      .select("id, charity_id, closes_at, opens_at")
+      .eq("id", input.appealId)
+      .single()
+    if (!a) throw new Error("Unknown appeal")
+    if (new Date(a.opens_at) > new Date()) throw new Error("Appeal not open")
+    if (a.closes_at && new Date(a.closes_at) <= new Date())
+      throw new Error("Appeal has closed")
+    appeal = a
+  }
+  const effectiveCharityIds = appeal ? [appeal.charity_id] : input.charityIds
+
+  const cap = new Date()
+  cap.setDate(cap.getDate() + 90)
+  const inheritedClose =
+    appeal?.closes_at && new Date(appeal.closes_at) < cap
+      ? appeal.closes_at
+      : appeal?.closes_at
+        ? cap.toISOString()
+        : null
+  const closesAt = new Date(inheritedClose ?? input.closesAt).toISOString()
+  const hardCloseAt = new Date(closesAt)
   hardCloseAt.setDate(hardCloseAt.getDate() + 90)
 
   const { data: favpoll, error: favpollErr } = await supabase
@@ -283,6 +314,7 @@ export async function createFavpoll(
       is_private: input.isPrivate,
       is_listed: input.isListed,
       allow_guest_items: input.allowGuestItems,
+      appeal_id: appeal?.id ?? null,
       description: input.description,
       goal_amount: input.goalAmount ?? null,
       // Cause favpolls keep photo/context on the favpoll row — person
@@ -296,9 +328,9 @@ export async function createFavpoll(
   if (favpollErr || !favpoll)
     throw new Error(`Failed to create favpoll: ${favpollErr?.message}`)
 
-  if (input.charityIds.length > 0) {
+  if (effectiveCharityIds.length > 0) {
     await supabase.from("favpoll_charities").insert(
-      input.charityIds.map((charityId, i) => ({
+      effectiveCharityIds.map((charityId, i) => ({
         favpoll_id: favpoll.id,
         charity_id: charityId,
         display_order: i,

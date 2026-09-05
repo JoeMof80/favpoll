@@ -25,7 +25,11 @@ import { WizardStepShell } from "./wizard-step-shell"
 import { WizardInfoStep } from "./wizard-info-step"
 import { WizardStoryStep } from "./wizard-story-step"
 import { WizardDetailsStep } from "./wizard-details-step"
-import type { WizardData, WizardEditConfig } from "./use-wizard-state"
+import type {
+  WizardAppeal,
+  WizardData,
+  WizardEditConfig,
+} from "./use-wizard-state"
 import type { FavpollCategory } from "@favpoll/types"
 
 type Props = {
@@ -34,10 +38,17 @@ type Props = {
   edit?: WizardEditConfig
   /** Create mode: seed the Event step (the register CTAs' preselect). */
   initialCategory?: FavpollCategory
+  /** Create mode: appeal membership via the join link. */
+  appeal?: WizardAppeal
 }
 
-export function NewFavpollWizard({ data, edit, initialCategory }: Props) {
-  const w = useWizardState(data, edit, initialCategory)
+export function NewFavpollWizard({
+  data,
+  edit,
+  initialCategory,
+  appeal,
+}: Props) {
+  const w = useWizardState(data, edit, initialCategory, appeal)
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 

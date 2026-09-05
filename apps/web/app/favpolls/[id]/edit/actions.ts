@@ -233,7 +233,7 @@ export async function updateFavpoll(
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      "created_by, closes_at, hard_close_at, extension_count, category, favpoll_charities(charity_id)"
+      "created_by, closes_at, hard_close_at, extension_count, category, appeal_id, appeals(charity_id, closes_at), favpoll_charities(charity_id)"
     )
     .eq("id", favpollId)
     .single()
@@ -284,6 +284,24 @@ export async function updateFavpoll(
       throw new Error(
         "The event, charity and topic are locked once guests have pledged."
       )
+    }
+  }
+
+  // Appeal membership guards (concept, 2026-09-05): the charity is the
+  // appeal's, always; an inherited end date is not the member's to move.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const memberAppeal = favpoll.appeal_id ? (favpoll.appeals as any) : null
+  if (memberAppeal) {
+    const nextCharities = [...input.charityIds].sort().join(",")
+    if (nextCharities !== memberAppeal.charity_id) {
+      throw new Error("This favpoll's charity is set by its appeal.")
+    }
+    if (
+      memberAppeal.closes_at &&
+      new Date(input.closesAt).toISOString() !==
+        new Date(favpoll.closes_at).toISOString()
+    ) {
+      throw new Error("This favpoll's close date is set by its appeal.")
     }
   }
 
