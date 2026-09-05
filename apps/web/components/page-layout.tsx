@@ -6,7 +6,12 @@ type Props = {
 
 export function PageLayout({ left, right, children }: Props) {
   return (
-    <div className="overflow-x-clip bg-primary/5">
+    // [overflow-anchor:none] (2026-09-05): the hero band SHRINKS during
+    // scroll (the about/context clips collapse), and the browser's
+    // scroll anchoring compensates for layout shrink above its anchor —
+    // fighting the scroll-linked collapse in discrete jumps (founder:
+    // "glitching"). Anchoring off for this scroller.
+    <div className="overflow-x-clip bg-primary/5 [overflow-anchor:none]">
       <main // Mobile bottom padding clears the fixed charity footer by 1.5rem when
         // one is mounted (it publishes --charity-footer-h), and is the old
         // 6rem otherwise.
