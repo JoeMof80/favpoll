@@ -131,10 +131,45 @@ export function PollSection({
             pre-pledge the lock card is the one CTA, so a second full-
             width button was redundant. Once entitled, a quiet icon at
             the ribbon's edge reopens the dialog to pledge again. */}
-        {/* The ribbon is a pure header now — the pledge-again action
-            moved to the controls row beside the tabs (founder,
-            2026-09-05). */}
-        <PollHeading topicTitle={poll.topics.title} inert />
+        {/* Header left, controls right, ONE pinned line (founder,
+            2026-09-05: "pin the button and switch next to the Topic
+            header"). The controls' former own sticky row is gone. */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <PollHeading topicTitle={poll.topics.title} inert />
+          </div>
+          {entitled && hasItems && (
+            <div className="flex shrink-0 items-center gap-2">
+              {onOpenPledgeDialog && (
+                <TooltipProvider>
+                  <Tooltip content="Pledge again" side="left">
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      aria-label="Pledge again"
+                      onClick={onOpenPledgeDialog}
+                    >
+                      <Gift aria-hidden="true" />
+                    </Button>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <Tabs
+                value={rankingView}
+                onValueChange={(v: string) => setRankingView(v as RankingView)}
+              >
+                <TabsList className="h-7 shadow">
+                  <TabsTrigger value="amount" className="px-3 text-xs">
+                    Amount
+                  </TabsTrigger>
+                  <TabsTrigger value="count" className="px-3 text-xs">
+                    Pledges
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}
@@ -150,37 +185,6 @@ export function PollSection({
 
           {hasItems && (
             <>
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
-                {onOpenPledgeDialog && (
-                  <TooltipProvider>
-                    <Tooltip content="Pledge again" side="left">
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        aria-label="Pledge again"
-                        onClick={onOpenPledgeDialog}
-                      >
-                        <Gift aria-hidden="true" />
-                      </Button>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                <Tabs
-                  value={rankingView}
-                  onValueChange={(v: string) =>
-                    setRankingView(v as RankingView)
-                  }
-                >
-                  <TabsList className="h-7 shadow">
-                    <TabsTrigger value="amount" className="px-3 text-xs">
-                      Amount
-                    </TabsTrigger>
-                    <TabsTrigger value="count" className="px-3 text-xs">
-                      Pledges
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
               <RankingList
                 initialItems={initialItems}
                 favpollPollId={poll.id}
