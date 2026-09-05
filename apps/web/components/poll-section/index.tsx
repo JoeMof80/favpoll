@@ -131,24 +131,10 @@ export function PollSection({
             pre-pledge the lock card is the one CTA, so a second full-
             width button was redundant. Once entitled, a quiet icon at
             the ribbon's edge reopens the dialog to pledge again. */}
-        <div className="relative">
-          <PollHeading topicTitle={poll.topics.title} inert />
-          {entitled && onOpenPledgeDialog && (
-            <TooltipProvider>
-              <Tooltip content="Pledge again" side="left">
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  aria-label="Pledge again"
-                  onClick={onOpenPledgeDialog}
-                  className="absolute top-1/2 right-0 -translate-y-1/2 transition-none active:not-aria-[haspopup]:-translate-y-1/2"
-                >
-                  <Gift aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
+        {/* The ribbon is a pure header now — the pledge-again action
+            moved to the controls row beside the tabs (founder,
+            2026-09-05). */}
+        <PollHeading topicTitle={poll.topics.title} inert />
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}
@@ -164,7 +150,21 @@ export function PollSection({
 
           {hasItems && (
             <>
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+                {onOpenPledgeDialog && (
+                  <TooltipProvider>
+                    <Tooltip content="Pledge again" side="left">
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        aria-label="Pledge again"
+                        onClick={onOpenPledgeDialog}
+                      >
+                        <Gift aria-hidden="true" />
+                      </Button>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 <Tabs
                   value={rankingView}
                   onValueChange={(v: string) =>
