@@ -86,11 +86,9 @@ export function HeroLayout({
   // classes until mount.
   const textRef = useRef<HTMLDivElement>(null)
   const settledRef = useRef<HTMLDivElement>(null)
-  const aboutRef = useRef<HTMLDivElement>(null)
   const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
-  const [aboutH, setAboutH] = useState(160)
   const [avatarMounted, setAvatarMounted] = useState(false)
   // useLayoutEffect, not useEffect: the cover height and avatar
   // endpoints are PAINT values — measured post-paint, the first frame
@@ -104,15 +102,12 @@ export function HeroLayout({
       const rest = text.offsetHeight
       const settled = settledEl.offsetHeight
       if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
-      const ah = aboutRef.current?.offsetHeight ?? 0
-      if (ah > 0) setAboutH(ah)
     }
     set()
     setAvatarMounted(true)
     const ro = new ResizeObserver(set)
     ro.observe(text)
     ro.observe(settledEl)
-    if (aboutRef.current) ro.observe(aboutRef.current)
     return () => ro.disconnect()
   }, [])
 
@@ -125,14 +120,6 @@ export function HeroLayout({
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
   const subtitleY = useTransform(scrollY, t, [0, -120])
-  // THE ABOUT IS THE THIRD CLIP (founder redesign, 2026-09-05): its box
-  // collapses 1:1 with scroll while the text rides 1:1 — so it reads as
-  // ordinary page content scrolling away, vanishing at the name's edge,
-  // and the band stays opaque for everything that follows. The window
-  // is the about's own measured height. Either channel failing alone
-  // degrades to visible-or-clipped text, never an overlap.
-  const aboutMax = useTransform(scrollY, [0, aboutH], [aboutH, 0])
-  const aboutY = useTransform(scrollY, [0, aboutH], [0, -aboutH])
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
@@ -216,21 +203,16 @@ export function HeroLayout({
             </motion.div>
           )}
         </div>
-        {about && (
-          <motion.div
-            className="overflow-hidden"
-            style={{ maxHeight: aboutMax }}
-          >
-            <motion.div
-              ref={aboutRef}
-              className="pt-4 pb-5 md:pb-10"
-              style={{ y: aboutY }}
-            >
-              {about}
-            </motion.div>
-          </motion.div>
-        )}
       </div>
+
+      {/* About — ORDINARY FLOW, on purpose (2026-09-05, ending the
+          third-clip experiment): collapsing the band 1:1 with the about
+          made everything below approach at 2x, and the ribbon dived
+          under the band's opaque bottom before its pin (founder
+          screenshot). With the avatar settling to the name-block height,
+          the band's bottom IS the name edge — so plain flow content
+          vanishes exactly there, no animation needed. */}
+      <div className="relative z-0 mt-4 mb-5 md:mb-10">{about}</div>
     </>
   )
 }
