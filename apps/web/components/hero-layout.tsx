@@ -111,7 +111,14 @@ export function HeroLayout({
     return () => ro.disconnect()
   }, [])
 
-  const t = [0, 120]
+  // ONE SETTLE CONSTANT (founder, 2026-09-05: the 120px rest gap under
+  // the context was "way too low" for the about). Every channel —
+  // context fade/ride, avatar shrink, and the about's rest gap — shares
+  // this window, so the composition settles exactly as the about
+  // arrives and the rest gap IS this number. The avatar simply shrinks
+  // its measured delta a little faster. The founder's tuning knob.
+  const SETTLE_SCROLL = 64
+  const t = [0, SETTLE_SCROLL]
   const subtitleOpacity = useTransform(scrollY, t, [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
   // Context at the same pace as the About so the space between them
@@ -119,19 +126,14 @@ export function HeroLayout({
   // rate (0.4x), so the about visibly gained on it. A transform inside
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
-  const subtitleY = useTransform(scrollY, t, [0, -120])
+  const subtitleY = useTransform(scrollY, t, [0, -SETTLE_SCROLL])
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
-  // The shrink window = the measured delta (floored at 48px), so the
-  // image gives up its extra height at ~scroll pace and the About
-  // scrolls the whole way to the settled edge before passing under.
-  const avatarDelta = Math.max(avatarCfg.rest - avatarCfg.settled, 48)
-  const avatarSize = useTransform(
-    scrollY,
-    [0, avatarDelta],
-    [avatarCfg.rest, avatarCfg.settled]
-  )
+  const avatarSize = useTransform(scrollY, t, [
+    avatarCfg.rest,
+    avatarCfg.settled,
+  ])
 
   return (
     <>
@@ -224,11 +226,11 @@ export function HeroLayout({
           a measured value, set on measure, never on scroll. */}
       <div
         className="relative z-0 mb-5 md:mb-10"
-        // max(delta, 120): the SLOWEST channel sets the settle scroll —
-        // the subtitle's 120px window outlives a short avatar delta, and
-        // contact before full settle cuts the about below the name
-        // (measured: slope exactly -1, contact at gap0).
-        style={{ marginTop: Math.max(avatarDelta, 120) }}
+        // gap0 = the settle scroll: contact exactly at full settle
+        // (measured: slope exactly -1), so the cut line is the name
+        // edge from first touch — and the rest gap is as small as the
+        // settle window allows.
+        style={{ marginTop: SETTLE_SCROLL }}
       >
         {about}
       </div>
