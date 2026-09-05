@@ -131,10 +131,9 @@ export function PollSection({
             pre-pledge the lock card is the one CTA, so a second full-
             width button was redundant. Once entitled, a quiet icon at
             the ribbon's edge reopens the dialog to pledge again. */}
-        {/* Pure header. The controls live on their own sticky row below
-            and DOCK onto this line only once scrolling pins them
-            (founder, 2026-09-05: "the buttons should only stick in
-            that position after scrolling"). */}
+        {/* The ribbon is a pure header now — the pledge-again action
+            moved to the controls row beside the tabs (founder,
+            2026-09-05). */}
         <PollHeading topicTitle={poll.topics.title} inert />
       </div>
 
@@ -151,11 +150,7 @@ export function PollSection({
 
           {hasItems && (
             <>
-              {/* Rest: an ordinary row here. Pinned: docks beside the
-                  ribbon — top = var + 0.875rem centres the 28px controls
-                  against the two-line heading. z-20 after the ribbon in
-                  paint order, so it sits on the ribbon's backdrop. */}
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+0.875rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+0.875rem)]">
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
                 {onOpenPledgeDialog && (
                   <TooltipProvider>
                     <Tooltip content="Pledge again" side="left">
