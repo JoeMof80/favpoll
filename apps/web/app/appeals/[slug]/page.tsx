@@ -6,6 +6,7 @@ import { RegisterScope } from "@/components/register-scope"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { formatAmount } from "@/lib/display"
+import { withQuietTail } from "@/components/landing/quiet-tail"
 import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
 
@@ -96,14 +97,26 @@ export default async function AppealPage({
               {charityName}
             </Link>
           </SectionEyebrow>
-          <div className="mt-2 flex items-start justify-between gap-3">
-            <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
-              {appeal.name}
-            </h1>
-            {canManage && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
-              </Button>
+          <div className="mt-2 flex items-start justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
+                  {appeal.name}
+                </h1>
+                {canManage && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+            {appeal.photo_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={appeal.photo_url}
+                alt=""
+                className="size-24 shrink-0 rounded-2xl object-cover md:size-33"
+              />
             )}
           </div>
           {appeal.blurb && (
@@ -113,8 +126,10 @@ export default async function AppealPage({
           )}
 
           <div className="mt-8 rounded-xl border border-border bg-background p-5">
-            <p className="text-sm text-muted-foreground">Raised so far</p>
-            <p className="mt-1 text-4xl font-light text-primary tabular-nums">
+            <SectionEyebrow as="h2" className="mb-2">
+              Raised so far
+            </SectionEyebrow>
+            <p className="text-4xl font-light text-primary tabular-nums">
               {formatAmount(raised)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -135,7 +150,7 @@ export default async function AppealPage({
                 className="h-auto min-h-11 px-6 py-2 text-base"
               >
                 <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
-                  Start your favpoll
+                  {withQuietTail("Start your favpoll — always free")}
                 </Link>
               </Button>
             </div>
@@ -146,7 +161,7 @@ export default async function AppealPage({
               <SectionEyebrow variant="muted" className="mb-3">
                 The favpolls
               </SectionEyebrow>
-              <ul className="divide-y divide-border rounded-xl border border-border bg-background">
+              <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
                 {rows.map((r) => (
                   <li key={r.id}>
                     <Link

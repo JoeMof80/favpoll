@@ -8,10 +8,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { createAppeal, updateAppeal } from "./actions"
 
-// The appeal form — creation and editing share it. This IS the future
-// charity portal's core surface; today it sits behind the temporary
-// env gate (lib/appeals-admin). Slug and charity are immutable after
-// creation: members lock onto both.
+// The appeal form — creation and editing share it, in the wizard
+// Details step's own row grammar (180px label column, 44px controls,
+// hint sentences under). This IS the future charity portal's surface;
+// today it sits behind the temporary gate (lib/appeals-admin). Slug
+// and charity are immutable after creation: members lock onto both.
 
 export type AppealFormInitial = {
   id?: string
@@ -23,6 +24,10 @@ export type AppealFormInitial = {
   closesAt: string
   isListed: boolean
 }
+
+const ROW =
+  "block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6"
+const LABEL = "font-medium sm:flex sm:min-h-11 sm:items-center"
 
 export function AppealForm({
   initial,
@@ -83,97 +88,140 @@ export function AppealForm({
     })
   }
 
-  const row = "block space-y-1.5 text-sm"
   return (
-    <div className="space-y-5">
-      <label className={row}>
-        <span className="font-medium">Name</span>
+    <div className="space-y-6">
+      <div className={ROW}>
+        <span className={LABEL}>Name</span>
         <Input
           value={form.name}
           onChange={(e) => set("name", e.target.value)}
           placeholder="The Midnight Walk"
-          className="h-11 md:text-base"
+          className="h-11 bg-background md:text-base"
         />
-      </label>
-      <label className={row}>
-        <span className="font-medium">
-          Link name{" "}
-          <span className="font-normal text-muted-foreground">
-            — /appeals/…{editing && " (fixed)"}
-          </span>
-        </span>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Link name{editing && " *"}</span>
+        <div className="space-y-1.5">
+          <Input
+            value={form.slug}
+            disabled={editing}
+            onChange={(e) => set("slug", e.target.value)}
+            placeholder="midnight-walk"
+            className="h-11 bg-background font-mono md:text-base"
+          />
+          <p className="text-muted-foreground">
+            {editing
+              ? "Fixed — members carry this link."
+              : `The appeal's address: /appeals/…`}
+          </p>
+        </div>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Charity{editing && " *"}</span>
+        <div className="space-y-1.5">
+          <select
+            value={form.charityId}
+            disabled={editing}
+            onChange={(e) => set("charityId", e.target.value)}
+            className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
+          >
+            <option value="">Pick a charity…</option>
+            {charities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-muted-foreground">
+            {editing
+              ? "Fixed — every member favpoll raises for it."
+              : "Every favpoll under this appeal raises for it, always."}
+          </p>
+        </div>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Blurb</span>
+        <div className="space-y-1.5">
+          <Textarea
+            value={form.blurb}
+            onChange={(e) => set("blurb", e.target.value)}
+            rows={3}
+            className="bg-background md:text-base"
+          />
+          <p className="text-muted-foreground">
+            A few sentences at the top of the appeal page.
+          </p>
+        </div>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Photo</span>
         <Input
-          value={form.slug}
-          disabled={editing}
-          onChange={(e) => set("slug", e.target.value)}
-          placeholder="midnight-walk"
-          className="h-11 md:text-base"
+          value={form.photoUrl}
+          onChange={(e) => set("photoUrl", e.target.value)}
+          placeholder="https://… (optional)"
+          className="h-11 bg-background md:text-base"
         />
-      </label>
-      <label className={row}>
-        <span className="font-medium">
-          Charity
-          {editing && (
-            <span className="font-normal text-muted-foreground"> (fixed)</span>
-          )}
-        </span>
-        <select
-          value={form.charityId}
-          disabled={editing}
-          onChange={(e) => set("charityId", e.target.value)}
-          className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
-        >
-          <option value="">Pick a charity…</option>
-          {charities.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={row}>
-        <span className="font-medium">
-          Blurb{" "}
-          <span className="font-normal text-muted-foreground">
-            — a few sentences on the appeal page
-          </span>
-        </span>
-        <Textarea
-          value={form.blurb}
-          onChange={(e) => set("blurb", e.target.value)}
-          rows={3}
-        />
-      </label>
-      <label className={row}>
-        <span className="font-medium">
-          Close date{" "}
-          <span className="font-normal text-muted-foreground">
-            — blank for an evergreen appeal
-          </span>
-        </span>
-        <Input
-          type="datetime-local"
-          value={form.closesAt}
-          onChange={(e) => set("closesAt", e.target.value)}
-          className="h-11 md:text-base"
-        />
-      </label>
-      <label className="flex items-center gap-3 text-sm">
-        <Switch
-          checked={form.isListed}
-          onCheckedChange={(v) => set("isListed", v)}
-        />
-        <span className="font-medium">Listed on the charity page</span>
-      </label>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Close date</span>
+        <div className="space-y-1.5">
+          <Input
+            type="datetime-local"
+            value={form.closesAt}
+            onChange={(e) => set("closesAt", e.target.value)}
+            className="h-11 bg-background md:text-base"
+          />
+          <p className="text-muted-foreground">
+            Members inherit it. Leave blank for an evergreen appeal — members
+            then pick their own dates.
+          </p>
+        </div>
+      </div>
+
+      <div className={ROW}>
+        <span className={LABEL}>Listed</span>
+        <div className="space-y-1.5">
+          <div className="sm:flex sm:min-h-11 sm:items-center">
+            <Switch
+              checked={form.isListed}
+              onCheckedChange={(v) => set("isListed", v)}
+              aria-label="Listed on the charity page"
+            />
+          </div>
+          <p className="text-muted-foreground">
+            {form.isListed
+              ? "Appears on the charity's page."
+              : "Reachable only by its link."}
+          </p>
+        </div>
+      </div>
+
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button
-        type="button"
-        disabled={isPending}
-        onClick={submit}
-        className="h-11 px-6 md:text-base"
-      >
-        {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
-      </Button>
+
+      <div className="flex items-center gap-3 border-t border-border pt-6">
+        <Button
+          type="button"
+          disabled={isPending}
+          onClick={submit}
+          className="h-11 px-6 md:text-base"
+        >
+          {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isPending}
+          onClick={() => router.back()}
+          className="h-11 px-6 md:text-base"
+        >
+          Cancel
+        </Button>
+      </div>
     </div>
   )
 }
