@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Pencil, Target } from "lucide-react"
 import type { Charity } from "@favpoll/types"
 import { Button } from "@/components/ui/button"
@@ -8,6 +9,10 @@ import { formatPounds } from "@/lib/i18n"
 type Props = {
   charities: Charity[]
   totalRaised: number
+  /** Appeal membership — one truncating line above the charity rows
+   * (founder, 2026-09-06: the appeal is WHY this charity; one line
+   * keeps mobile honest). */
+  appeal?: { name: string; slug: string } | null
   /** Optional pledge goal in pounds — renders an understated progress bar. */
   goalAmount?: number | null
   /**
@@ -21,6 +26,7 @@ type Props = {
 export function CharityBanner({
   charities,
   totalRaised,
+  appeal,
   goalAmount,
   onEditGoal,
 }: Props) {
@@ -28,6 +34,17 @@ export function CharityBanner({
 
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
+      {appeal && (
+        <p className="mb-3 truncate border-b border-border pb-3 text-sm text-muted-foreground">
+          Part of{" "}
+          <Link
+            href={`/appeals/${appeal.slug}`}
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            {appeal.name}
+          </Link>
+        </p>
+      )}
       <div className="space-y-3">
         {charities.map((charity) => (
           <CharityRow

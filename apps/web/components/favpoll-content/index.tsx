@@ -33,6 +33,8 @@ import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
   favpoll: FavpollWithDetails
+  /** Appeal membership, for the charity card's one-line note. */
+  appeal?: { name: string; slug: string } | null
   pollWithItems: FavpollPollWithItems | null
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
@@ -51,6 +53,7 @@ type Props = {
 
 export function FavpollContent({
   favpoll,
+  appeal,
   pollWithItems,
   pot,
   userPotAllocation,
@@ -226,6 +229,7 @@ export function FavpollContent({
       <CharityBanner
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
+        appeal={appeal}
         goalAmount={favpoll.goal_amount ?? null}
       />
 

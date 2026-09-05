@@ -48,7 +48,7 @@ export default async function FavpollPage({ params }: Props) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*))"
+      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*)), appeals(name, slug)"
     )
     .eq("id", id)
     .single()
@@ -353,6 +353,13 @@ export default async function FavpollPage({ params }: Props) {
         />
         <FavpollContent
           favpoll={typedFavpoll}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          appeal={
+            ((favpoll as any).appeals as {
+              name: string
+              slug: string
+            } | null) ?? null
+          }
           pollWithItems={visiblePoll}
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
