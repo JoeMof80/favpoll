@@ -124,8 +124,14 @@ export function HeroLayout({
             {eyebrowText}
             {title}
             {subtitle && (
+              /* items-end (founder, 2026-09-05): top-anchored text in a
+                 bottom-up clip lost its LOWER half first, so mid-scroll
+                 the about read as covering the context. Bottom-anchored,
+                 the shrinking box clips the TOP first and the line slides
+                 up behind the name instead. Still one animated value —
+                 anchoring is static layout, the doctrine holds. */
               <motion.div
-                className="overflow-hidden"
+                className="flex items-end overflow-hidden"
                 style={{
                   opacity: subtitleOpacity,
                   maxHeight: subtitleMaxHeight,
