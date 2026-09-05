@@ -211,8 +211,23 @@ export function HeroLayout({
           under the band's opaque bottom before its pin (founder
           screenshot). With the avatar settling to the name-block height,
           the band's bottom IS the name edge — so plain flow content
-          vanishes exactly there, no animation needed. */}
-      <div className="relative z-0 mt-4 mb-5 md:mb-10">{about}</div>
+          vanishes exactly there, no animation needed.
+
+          THE REST GAP IS THE SHRINK DELTA (founder, 2026-09-05: "the
+          About is disappearing too low again" — caught mid-shrink). The
+          cancellation law: the about approaches the band bottom at
+          exactly 1x regardless of shrink, so it arrives after gap0 px of
+          scroll. gap0 = delta means it CANNOT reach the vanish line
+          before the avatar has settled — the spec's "scrolls all the way
+          to this new height before disappearing", and the large rest gap
+          the founder's mock drew between context and about. Layout from
+          a measured value, set on measure, never on scroll. */}
+      <div
+        className="relative z-0 mb-5 md:mb-10"
+        style={{ marginTop: avatarDelta }}
+      >
+        {about}
+      </div>
     </>
   )
 }
