@@ -187,7 +187,7 @@ export default async function FundraisersPage() {
 
   return (
     <RegisterScope palette="fundraiser">
-      <main>
+      <main className="overflow-x-clip">
         {/* ── The opening — the REAL landing hero, register-configured, now
           the same shape as the other two (see /celebrations for the `still`
           reasoning). The page wears the fundraiser palette (RegisterScope)

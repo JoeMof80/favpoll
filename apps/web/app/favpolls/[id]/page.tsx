@@ -48,7 +48,7 @@ export default async function FavpollPage({ params }: Props) {
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*))"
+      "*, protagonists!favpolls_protagonist_id_fkey(*), favpoll_charities(charities(*)), appeals(name, slug)"
     )
     .eq("id", id)
     .single()
@@ -58,6 +58,11 @@ export default async function FavpollPage({ params }: Props) {
   if (favpoll.is_private && !userId) {
     redirect(`/sign-in?redirect_url=/favpolls/${id}`)
   }
+
+  // The appeals embed, typed structurally — the row select is untyped.
+  const memberAppeal =
+    (favpoll as { appeals?: { name: string; slug: string } | null }).appeals ??
+    null
 
   const isOrganiser = userId === favpoll.created_by
   const isClosed =
@@ -353,6 +358,7 @@ export default async function FavpollPage({ params }: Props) {
         />
         <FavpollContent
           favpoll={typedFavpoll}
+          appeal={memberAppeal}
           pollWithItems={visiblePoll}
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
