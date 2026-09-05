@@ -2,17 +2,39 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { FormProvider, useForm } from "react-hook-form"
+import { ChevronDown, ImagePlus } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import {
+  WizardField,
+  WIZARD_INPUT_SIZE,
+} from "@/components/new-favpoll-wizard/wizard-field"
+import { CharCounter } from "@/components/favpoll-form/edit-helpers"
+import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
+import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
+import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
+import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { createAppeal, updateAppeal } from "./actions"
 
-// The appeal form — creation and editing share it, in the wizard
-// Details step's own row grammar (180px label column, 44px controls,
-// hint sentences under). This IS the future charity portal's surface;
-// today it sits behind the temporary gate (lib/appeals-admin). Slug
-// and charity are immutable after creation: members lock onto both.
+// The appeal form, in the WIZARD INFO STEP's own grammar (founder mock,
+// 2026-09-06): WizardField rows, in-field CharCounters, "e.g."
+// placeholders, and the REAL wizard controls — the dashed photo square
+// opens HeroPhotoOverlay (crop and all; the file uploads on submit via
+// uploadPersonPhoto, same bucket as favpoll heroes), the close date is
+// the wizard's DateTimePicker (appeals add a clear-to-evergreen link the
+// wizard doesn't need). Footer = wizard-nav: hairline, actions right,
+// primary last. This IS the future charity portal's surface behind the
+// temporary gate (lib/appeals-admin). Slug and charity are immutable
+// after creation: members lock onto both.
 
 export type AppealFormInitial = {
   id?: string
@@ -21,13 +43,13 @@ export type AppealFormInitial = {
   charityId: string
   blurb: string
   photoUrl: string
-  closesAt: string
+  closesAt: string // ISO or ""
   isListed: boolean
 }
 
-const ROW =
-  "block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6"
-const LABEL = "font-medium sm:flex sm:min-h-11 sm:items-center"
+const NAME_MAX = 60
+const SLUG_MAX = 40
+const BLURB_MAX = 240
 
 export function AppealForm({
   initial,
@@ -41,34 +63,57 @@ export function AppealForm({
 }) {
   const router = useRouter()
   const editing = !!initial?.id
-  const [form, setForm] = useState<AppealFormInitial>(
-    initial ?? {
-      name: "",
-      slug: "",
-      charityId: defaultCharityId ?? "",
-      blurb: "",
-      photoUrl: "",
-      closesAt: "",
-      isListed: false,
-    }
+  const [form, setForm] = useState({
+    name: initial?.name ?? "",
+    slug: initial?.slug ?? "",
+    charityId: initial?.charityId ?? defaultCharityId ?? "",
+    blurb: initial?.blurb ?? "",
+    isListed: initial?.isListed ?? false,
+  })
+  const [closesAt, setClosesAt] = useState<Date | null>(
+    initial?.closesAt ? new Date(initial.closesAt) : null
   )
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-  const set = (f: keyof AppealFormInitial, v: string | boolean) =>
+  const set = (f: keyof typeof form, v: string | boolean) =>
     setForm((p) => ({ ...p, [f]: v }))
+
+  // The photo flow (HeroPhotoOverlay + crop) reads a form context; this
+  // scoped form carries just photo/photoUrl/name for it — the wizard's
+  // own arrangement (wizard-info-step.tsx).
+  const photoForm = useForm<FavpollFormValues>({
+    defaultValues: {
+      name: initial?.name ?? "",
+      photoUrl: initial?.photoUrl || undefined,
+    },
+  })
+  const [photoOpen, setPhotoOpen] = useState(false)
+  const photoFile = photoForm.watch("photo") as File | undefined
+  const photoPreview = photoForm.watch("photoUrl") ?? null
 
   function submit() {
     setError(null)
     startTransition(async () => {
-      const closesAt = form.closesAt
-        ? new Date(form.closesAt).toISOString()
-        : null
+      let photoUrl = ""
+      if (photoFile) {
+        const fd = new FormData()
+        fd.append("photo", photoFile)
+        try {
+          photoUrl = await uploadPersonPhoto(fd)
+        } catch {
+          setError("The photo failed to upload — try again.")
+          return
+        }
+      } else if (photoPreview && !photoPreview.startsWith("blob:")) {
+        photoUrl = photoPreview
+      }
+      const closes = closesAt ? closesAt.toISOString() : null
       const r = editing
-        ? await updateAppeal(form.id!, {
+        ? await updateAppeal(initial!.id!, {
             name: form.name,
             blurb: form.blurb,
-            photoUrl: form.photoUrl,
-            closesAt,
+            photoUrl,
+            closesAt: closes,
             isListed: form.isListed,
           })
         : await createAppeal({
@@ -76,8 +121,8 @@ export function AppealForm({
             slug: form.slug,
             charityId: form.charityId,
             blurb: form.blurb,
-            photoUrl: form.photoUrl,
-            closesAt,
+            photoUrl,
+            closesAt: closes,
             isListed: form.isListed,
           })
       if (r.error) setError(r.error)
@@ -89,43 +134,70 @@ export function AppealForm({
   }
 
   return (
-    <div className="space-y-6">
-      <div className={ROW}>
-        <span className={LABEL}>Name</span>
-        <Input
-          value={form.name}
-          onChange={(e) => set("name", e.target.value)}
-          placeholder="The Midnight Walk"
-          className="h-11 bg-background md:text-base"
-        />
-      </div>
-
-      <div className={ROW}>
-        <span className={LABEL}>Link name{editing && " *"}</span>
-        <div className="space-y-1.5">
-          <Input
-            value={form.slug}
-            disabled={editing}
-            onChange={(e) => set("slug", e.target.value)}
-            placeholder="midnight-walk"
-            className="h-11 bg-background font-mono md:text-base"
+    <div className="space-y-5">
+      <WizardField label="Name" required>
+        <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
+          <InputGroupInput
+            className="md:text-base"
+            value={form.name}
+            maxLength={NAME_MAX}
+            placeholder="e.g. The Midnight Walk"
+            onChange={(e) => {
+              set("name", e.target.value)
+              photoForm.setValue("name", e.target.value)
+            }}
           />
-          <p className="text-muted-foreground">
-            {editing
-              ? "Fixed — members carry this link."
-              : `The appeal's address: /appeals/…`}
-          </p>
-        </div>
-      </div>
+          <InputGroupAddon align="inline-end">
+            <CharCounter value={form.name} max={NAME_MAX} />
+          </InputGroupAddon>
+        </InputGroup>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Charity{editing && " *"}</span>
-        <div className="space-y-1.5">
+      <WizardField
+        label="Link name"
+        required={!editing}
+        hint={
+          editing
+            ? "Fixed — members carry this link."
+            : "The appeal's address: favpoll.com/appeals/…"
+        }
+      >
+        <InputGroup
+          className={cn(
+            WIZARD_INPUT_SIZE,
+            "bg-background",
+            editing && "opacity-50"
+          )}
+        >
+          <InputGroupInput
+            className="font-mono md:text-base"
+            value={form.slug}
+            maxLength={SLUG_MAX}
+            disabled={editing}
+            placeholder="e.g. midnight-walk"
+            onChange={(e) => set("slug", e.target.value)}
+          />
+          <InputGroupAddon align="inline-end">
+            <CharCounter value={form.slug} max={SLUG_MAX} />
+          </InputGroupAddon>
+        </InputGroup>
+      </WizardField>
+
+      <WizardField
+        label="Charity"
+        required={!editing}
+        hint={
+          editing
+            ? "Fixed — every member favpoll raises for it."
+            : "Every favpoll under this appeal raises for it, always."
+        }
+      >
+        <div className="relative">
           <select
             value={form.charityId}
             disabled={editing}
             onChange={(e) => set("charityId", e.target.value)}
-            className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm disabled:opacity-50 md:text-base"
+            className="h-11 w-full appearance-none rounded-lg border border-border bg-background pr-10 pl-3 text-sm disabled:opacity-50 md:text-base"
           >
             <option value="">Pick a charity…</option>
             {charities.map((c) => (
@@ -134,84 +206,107 @@ export function AppealForm({
               </option>
             ))}
           </select>
-          <p className="text-muted-foreground">
-            {editing
-              ? "Fixed — every member favpoll raises for it."
-              : "Every favpoll under this appeal raises for it, always."}
-          </p>
+          <ChevronDown
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
+          />
         </div>
-      </div>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Blurb</span>
-        <div className="space-y-1.5">
+      <WizardField
+        label="Blurb"
+        hint="A few sentences at the top of the appeal page."
+      >
+        <div className="relative">
           <Textarea
             value={form.blurb}
+            maxLength={BLURB_MAX}
             onChange={(e) => set("blurb", e.target.value)}
             rows={3}
-            className="bg-background md:text-base"
+            className="bg-background pr-14 md:text-base"
           />
-          <p className="text-muted-foreground">
-            A few sentences at the top of the appeal page.
-          </p>
-        </div>
-      </div>
-
-      <div className={ROW}>
-        <span className={LABEL}>Photo</span>
-        <Input
-          value={form.photoUrl}
-          onChange={(e) => set("photoUrl", e.target.value)}
-          placeholder="https://… (optional)"
-          className="h-11 bg-background md:text-base"
-        />
-      </div>
-
-      <div className={ROW}>
-        <span className={LABEL}>Close date</span>
-        <div className="space-y-1.5">
-          <Input
-            type="datetime-local"
-            value={form.closesAt}
-            onChange={(e) => set("closesAt", e.target.value)}
-            className="h-11 bg-background md:text-base"
+          <CharCounter
+            value={form.blurb}
+            max={BLURB_MAX}
+            className="absolute right-3 bottom-2.5"
           />
-          <p className="text-muted-foreground">
-            Members inherit it. Leave blank for an evergreen appeal — members
-            then pick their own dates.
-          </p>
         </div>
-      </div>
+      </WizardField>
 
-      <div className={ROW}>
-        <span className={LABEL}>Listed</span>
-        <div className="space-y-1.5">
-          <div className="sm:flex sm:min-h-11 sm:items-center">
-            <Switch
-              checked={form.isListed}
-              onCheckedChange={(v) => set("isListed", v)}
-              aria-label="Listed on the charity page"
+      {/* The wizard's own photo control: the square IS the button
+          (founder, 2026-09-01) — tap it to open the crop overlay. */}
+      <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+        <span className="block font-medium">Photo</span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setPhotoOpen(true)}
+          aria-label={photoPreview ? "Change photo" : "Add a photo"}
+          className={cn(
+            "h-20 w-20 shrink-0 overflow-hidden rounded-xl p-0",
+            !photoPreview &&
+              "border-dashed border-border-strong text-muted-foreground"
+          )}
+        >
+          {photoPreview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photoPreview}
+              alt=""
+              className="h-full w-full object-cover"
             />
-          </div>
-          <p className="text-muted-foreground">
-            {form.isListed
-              ? "Appears on the charity's page."
-              : "Reachable only by its link."}
-          </p>
-        </div>
+          ) : (
+            <ImagePlus className="size-6" aria-hidden="true" />
+          )}
+        </Button>
       </div>
+
+      <WizardField
+        label="Close date"
+        hint="Members inherit it. Leave blank for an evergreen appeal — members then pick their own dates."
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <DateTimePicker
+            value={closesAt ?? undefined}
+            onChange={setClosesAt}
+            size="lg"
+            presets={CLOSE_DATE_PRESETS}
+          />
+          {closesAt && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => setClosesAt(null)}
+            >
+              Clear — evergreen
+            </Button>
+          )}
+        </div>
+      </WizardField>
+
+      <WizardField
+        label="Listed"
+        hint={
+          form.isListed
+            ? "Appears on the charity's page."
+            : "Reachable only by its link."
+        }
+      >
+        <div className="flex min-h-11 items-center">
+          <Switch
+            checked={form.isListed}
+            onCheckedChange={(v) => set("isListed", v)}
+            aria-label="Listed on the charity page"
+          />
+        </div>
+      </WizardField>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <div className="flex items-center gap-3 border-t border-border pt-6">
-        <Button
-          type="button"
-          disabled={isPending}
-          onClick={submit}
-          className="h-11 px-6 md:text-base"
-        >
-          {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
-        </Button>
+      {/* The wizard-nav footer: hairline, actions right, primary last */}
+      <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
         <Button
           type="button"
           variant="ghost"
@@ -221,7 +316,19 @@ export function AppealForm({
         >
           Cancel
         </Button>
+        <Button
+          type="button"
+          disabled={isPending}
+          onClick={submit}
+          className="h-11 px-6 md:text-base"
+        >
+          {isPending ? "Saving…" : editing ? "Save changes" : "Create appeal"}
+        </Button>
       </div>
+
+      <FormProvider {...photoForm}>
+        <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
+      </FormProvider>
     </div>
   )
 }
