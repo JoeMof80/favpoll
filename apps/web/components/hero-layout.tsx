@@ -117,7 +117,11 @@ export function HeroLayout({
   // this window, so the composition settles exactly as the about
   // arrives and the rest gap IS this number. The avatar simply shrinks
   // its measured delta a little faster. The founder's tuning knob.
-  const SETTLE_SCROLL = 64
+  // 24 = the 40px rest gap the founder chose (2026-09-05, "the other
+  // way around": both gaps at the ribbon's 40) minus the band's pb 16.
+  // The whole composition settles in the first 24px of scroll — brisk,
+  // but every law holds (contact at settle, slope -1).
+  const SETTLE_SCROLL = 24
   const t = [0, SETTLE_SCROLL]
   const subtitleOpacity = useTransform(scrollY, t, [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
@@ -225,11 +229,10 @@ export function HeroLayout({
           the founder's mock drew between context and about. Layout from
           a measured value, set on measure, never on scroll. */}
       <div
-        // mb-20 = the upper gap's 80px (SETTLE_SCROLL 64 + the band's
-        // pb 16), so the about sits equidistant between the context and
-        // the topic ribbon (founder, 2026-09-05). If SETTLE_SCROLL
-        // moves, move this with it.
-        className="relative z-0 mb-20"
+        // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
+        // the about sits equidistant. If SETTLE_SCROLL moves, move this
+        // with it.
+        className="relative z-0 mb-10"
         // gap0 = the settle scroll: contact exactly at full settle
         // (measured: slope exactly -1), so the cut line is the name
         // edge from first touch — and the rest gap is as small as the
