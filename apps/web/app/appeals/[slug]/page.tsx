@@ -6,6 +6,8 @@ import { RegisterScope } from "@/components/register-scope"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { formatAmount } from "@/lib/display"
+import { auth } from "@clerk/nextjs/server"
+import { canManageAppeals } from "@/lib/appeals-admin"
 
 // THE APPEAL PAGE (concept: references/appeals-concept-2026-09-05.md).
 // An appeal is an AGGREGATION VIEW — one charity, many member favpolls,
@@ -23,6 +25,8 @@ export default async function AppealPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const { userId } = await auth()
+  const canManage = canManageAppeals(userId)
   const supabase = createAdminClient()
 
   const { data: appeal } = await supabase
@@ -92,9 +96,16 @@ export default async function AppealPage({
               {charityName}
             </Link>
           </SectionEyebrow>
-          <h1 className="mt-2 text-4xl leading-tight font-light tracking-tight text-foreground">
-            {appeal.name}
-          </h1>
+          <div className="mt-2 flex items-start justify-between gap-3">
+            <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
+              {appeal.name}
+            </h1>
+            {canManage && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
+              </Button>
+            )}
+          </div>
           {appeal.blurb && (
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
               {appeal.blurb}
