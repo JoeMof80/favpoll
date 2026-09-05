@@ -76,6 +76,9 @@ export function HeroLayout({
   const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
   // Style binding waits for mount: SSR + first client paint use the CSS
   // size classes, so server and client markup can't disagree.
+  // Until measured, 999 = a fully opaque band (today's behaviour) —
+  // the fail-safe direction: too much cover, never a see-through band.
+  const [coverH, setCoverH] = useState(999)
   const [avatarMounted, setAvatarMounted] = useState(false)
   useEffect(() => {
     const text = textRef.current
@@ -85,6 +88,10 @@ export function HeroLayout({
       const rest = text.offsetHeight
       const settled = settledEl.offsetHeight
       if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
+      // The opaque cover ends at the NAME's bottom edge (offsetTop
+      // spans the band's top padding at any breakpoint).
+      const bottom = settledEl.offsetTop + settledEl.offsetHeight
+      if (bottom > 0) setCoverH(bottom)
     }
     set()
     setAvatarMounted(true)
@@ -135,19 +142,28 @@ export function HeroLayout({
         // letting the about scroll visibly over that gap (founder-caught
         // on-device, 2026-08-02). Under a working header (z-40) the
         // cover is invisible.
-        // NO SEAM MASK (founder, 2026-09-05, reversing the same day's #705
-        // gradient): it ghosted the about's top line in open air below
-        // the band — "fading out too low". The band is opaque, so the
-        // about simply passes underneath and hard-cuts at its edge,
-        // exactly as the context does under the name.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
+        // THE PAINT STOPS AT THE NAME (founder, 2026-09-05: "can't it
+        // disappear directly under the Name, like Context does?"). The
+        // band's BOX keeps its full height — the measured var, the
+        // ribbon pin and the fail-open doctrine are untouched — but the
+        // background moves onto an inner cover that ends at the name's
+        // bottom edge. Below that line the band is transparent: the
+        // about stays visible until it slides under the name (and under
+        // the photo, opaque by itself). Safe against the context
+        // because #704's 1:1 ride keeps the two at a constant gap.
+        className="sticky top-14 z-30 pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
       >
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 bg-background"
+          style={{ height: coverH }}
+        />
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
-        <div className="flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
+        <div className="relative flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
               {eyebrowText}
