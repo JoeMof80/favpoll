@@ -41,18 +41,31 @@ export function HeroLayout({
 }: HeroLayoutProps) {
   const { scrollY } = useScroll()
 
-  // The hero's height still varies with CONTENT (wrapping name, subtitle
-  // presence), so the measured CSS var stays — set on layout changes only,
-  // never mutated during scroll.
+  // The var is the SETTLED band bottom, derived from geometry that is
+  // scroll-invariant (the name block's offset within the pinned band):
+  // never mutated during scroll — restored fully, 2026-09-05, after the
+  // about-clip's collapse made whole-band measurement rewrite the var
+  // every frame and everything pinned to it stuttered (founder: "i'm
+  // seeing glitching"). Rects, not offsetTop (the relative row is the
+  // offsetParent). Content changes (name wrap, breakpoint) still
+  // re-measure via the RO; scroll recomputes the same value.
   const boxRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = boxRef.current
     if (!el) return
-    const set = () =>
+    // pb-4 — the founder-tuned air under the name (2026-07-29).
+    const BAND_PB = 16
+    const set = () => {
+      const settledEl = settledRef.current
+      if (!settledEl) return
+      const inset =
+        settledEl.getBoundingClientRect().bottom -
+        el.getBoundingClientRect().top
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
-        `${56 + el.offsetHeight}px` // 56 = the h-14 site header above
+        `${Math.round(56 + inset + BAND_PB)}px` // 56 = the h-14 header
       )
+    }
     set()
     const ro = new ResizeObserver(set)
     ro.observe(el)
