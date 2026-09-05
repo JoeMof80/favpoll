@@ -28,7 +28,7 @@ export default async function AppealPage({
   const { data: appeal } = await supabase
     .from("appeals")
     .select(
-      "id, slug, name, blurb, photo_url, closes_at, opens_at, charities(name)"
+      "id, slug, name, blurb, photo_url, closes_at, opens_at, charity_id, charities(name)"
     )
     .eq("slug", slug)
     .maybeSingle()
@@ -84,7 +84,13 @@ export default async function AppealPage({
       <main className="min-h-screen bg-primary/5">
         <div className="mx-auto w-full max-w-3xl px-6 py-14">
           <SectionEyebrow variant="muted">
-            An appeal for {charityName}
+            An appeal for{" "}
+            <Link
+              href={`/charities/${appeal.charity_id}`}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              {charityName}
+            </Link>
           </SectionEyebrow>
           <h1 className="mt-2 text-4xl leading-tight font-light tracking-tight text-foreground">
             {appeal.name}
