@@ -21,7 +21,7 @@ import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
 import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
 import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
-import type { FavpollFormValues } from "@/components/favpoll-form/schema.ts"
+import type { FavpollFormValues } from "@/components/favpoll-form/schema"
 import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { createAppeal, updateAppeal } from "./actions"
 
