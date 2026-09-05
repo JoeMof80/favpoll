@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Button } from "@favpoll/ui";
+import { Button } from "@/components/ui/button";
 import { createAppeal, updateAppeal, type Appeal } from "@/lib/actions/appeals";
 import type { Charity } from "@/lib/actions/charities";
 
