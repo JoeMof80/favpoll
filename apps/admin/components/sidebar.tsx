@@ -10,6 +10,7 @@ import {
   CalendarDays,
   Users,
   Sparkles,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/placeholders", label: "Placeholders", icon: FileText },
   { href: "/contributions", label: "Contributions", icon: Gift },
   { href: "/charities", label: "Charities", icon: Heart },
+  { href: "/appeals", label: "Appeals", icon: Megaphone },
   { href: "/generated-drafts", label: "Generated Drafts", icon: Sparkles },
   { href: "/favpolls", label: "Favpolls", icon: CalendarDays },
   { href: "/access", label: "Access", icon: Users },
