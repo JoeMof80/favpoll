@@ -85,6 +85,13 @@ export function HeroLayout({
 
   const t = [0, 120]
   const subtitleOpacity = useTransform(scrollY, t, [1, 0])
+  // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
+  // Context at the same pace as the About so the space between them
+  // remains constant") — the collapse alone moved it at maxHeight's
+  // rate (0.4x), so the about visibly gained on it. A transform inside
+  // the clip, so layout never depends on it: if it fails the line
+  // merely sits still and clips as before.
+  const subtitleY = useTransform(scrollY, t, [0, -120])
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
   const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
@@ -137,7 +144,7 @@ export function HeroLayout({
                   maxHeight: subtitleMaxHeight,
                 }}
               >
-                {subtitle}
+                <motion.div style={{ y: subtitleY }}>{subtitle}</motion.div>
               </motion.div>
             )}
           </div>
