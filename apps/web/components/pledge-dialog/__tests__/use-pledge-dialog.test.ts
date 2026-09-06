@@ -327,6 +327,19 @@ describe("usePledgeDialog — total-then-split", () => {
     expect(result.current.pledgeAmount).toBe("1")
   })
 
+  it("setFundTo maps an absolute pound value onto the parts (slider)", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleTotalChange("20"))
+    act(() => result.current.setFundTo(5))
+    expect(result.current.fundPart).toBe(5)
+    expect(result.current.pledgeAmount).toBe("15")
+    expect(result.current.topUpAmount).toBe("5")
+    act(() => result.current.setFundTo(0))
+    expect(result.current.fundPart).toBe(0)
+    expect(result.current.pledgeAmount).toBe("20")
+    expect(result.current.topUpAmount).toBe("")
+  })
+
   it("switching to the shared-fund tab zeroes the split", () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.handleTotalChange("20"))

@@ -130,6 +130,12 @@ export function usePledgeDialog({
     applySplit(totalInput, fundPart + delta)
   }
 
+  // The slider names an absolute value; applySplit still clamps it
+  // (whole pounds, favourite keeps at least £1).
+  function setFundTo(pounds: number) {
+    applySplit(totalInput, pounds)
+  }
+
   // Drawing FROM the fund and paying INTO it are exclusive — entering
   // fund mode zeroes the split. Guarded so a toggle with no split never
   // rewrites amounts set through the legacy updatePledgeAmount path.
@@ -276,6 +282,7 @@ export function usePledgeDialog({
     fundPart,
     handleTotalChange,
     stepFund,
+    setFundTo,
     toggleFund: toggleFundAndResetSplit,
     updateTip,
     // breakdowns

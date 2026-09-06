@@ -349,7 +349,7 @@ export function PledgeDialog({
           <StepSplit
             favouriteBreakdown={dialog.favouriteBreakdown}
             fundPart={dialog.fundPart}
-            onFundStep={dialog.stepFund}
+            onFundChange={dialog.setFundTo}
             numericTotal={parseFloat(dialog.totalInput) || 0}
           />
         )}
