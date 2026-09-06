@@ -262,9 +262,9 @@ export default async function CharityPage({ params }: Props) {
                 <Link
                   key={a.id}
                   href={`/appeals/${a.slug}`}
-                  className="block rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
+                  className="flex flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
                 >
-                  <div className="p-3">
+                  <div className="flex-1 p-3">
                     <FavpollHeader
                       hideEmptyAvatar
                       protagonist={{ name: a.name, photo_url: null }}
