@@ -127,18 +127,6 @@ export function FavpollListCard({
   function reseatAfterOverlay() {
     const seat = () => {
       rootRef.current?.scrollIntoView({ block: "center" })
-      try {
-        const log = JSON.parse(
-          sessionStorage.getItem("favpolls:debug-log") ?? "[]"
-        )
-        log.push(
-          `${new Date().toISOString().slice(11, 19)} CARD reseat ${favpoll.id.slice(0, 8)}`
-        )
-        sessionStorage.setItem(
-          "favpolls:debug-log",
-          JSON.stringify(log.slice(-22))
-        )
-      } catch {}
     }
     requestAnimationFrame(() => requestAnimationFrame(seat))
     setTimeout(seat, 250)
@@ -149,16 +137,6 @@ export function FavpollListCard({
     try {
       sessionStorage.setItem("favpolls:return", `/favpolls/${favpoll.id}`)
       sessionStorage.setItem("favpolls:return-t", String(Date.now()))
-      const log = JSON.parse(
-        sessionStorage.getItem("favpolls:debug-log") ?? "[]"
-      )
-      log.push(
-        `${new Date().toISOString().slice(11, 19)} CARD arm ${favpoll.id.slice(0, 8)}`
-      )
-      sessionStorage.setItem(
-        "favpolls:debug-log",
-        JSON.stringify(log.slice(-22))
-      )
     } catch {
       // best effort
     }
