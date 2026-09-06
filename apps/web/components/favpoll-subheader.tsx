@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Pencil } from "lucide-react"
+import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 
@@ -15,7 +15,10 @@ type Props = {
 
 // Floating action cluster, bottom right. Share is for EVERYONE — a guest
 // at a wake is the favpoll's best distribution channel (the JustGiving
-// borrow, 2026-07-29); organisers additionally get Edit while open.
+// borrow, 2026-07-29); organisers additionally get the MANAGE door
+// (founder, 2026-09-06 — manage is the one door; the old pencil went
+// straight to edit, a pre-hub relic). Open or closed: a closed
+// favpoll's manage page is where the keepsake lives.
 export function FavpollSubheader({
   favpollId,
   favpollName,
@@ -38,15 +41,15 @@ export function FavpollSubheader({
         shareTitle={`${favpollName} — favpoll`}
         className="md:hidden"
       />
-      {isOrganiser && !isClosed && (
+      {isOrganiser && (
         <Button
           asChild
           size="icon"
-          aria-label="Edit Favpoll"
+          aria-label="Manage favpoll"
           className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
-          <Link href={`/favpolls/${favpollId}/edit`}>
-            <Pencil aria-hidden="true" />
+          <Link href={`/favpolls/${favpollId}/manage`}>
+            <Settings2 aria-hidden="true" />
           </Link>
         </Button>
       )}
