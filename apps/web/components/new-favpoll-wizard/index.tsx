@@ -40,6 +40,8 @@ type Props = {
   initialCategory?: FavpollCategory
   /** Create mode: appeal membership via the join link. */
   appeal?: WizardAppeal
+  /** Create mode: the charity page's create tile preselects it. */
+  initialCharityId?: string
 }
 
 export function NewFavpollWizard({
@@ -47,8 +49,15 @@ export function NewFavpollWizard({
   edit,
   initialCategory,
   appeal,
+  initialCharityId,
 }: Props) {
-  const w = useWizardState(data, edit, initialCategory, appeal)
+  const w = useWizardState(
+    data,
+    edit,
+    initialCategory,
+    appeal,
+    initialCharityId
+  )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
 

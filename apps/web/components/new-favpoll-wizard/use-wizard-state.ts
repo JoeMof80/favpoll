@@ -109,7 +109,10 @@ export function useWizardState(
   /** Create-mode Event preselect (the register CTAs); edit wins. */
   initialCategory?: FavpollCategory | null,
   /** Create-mode appeal membership (the appeal join link). */
-  appeal?: WizardAppeal | null
+  appeal?: WizardAppeal | null,
+  /** Create-mode charity preselect (the charity page's tile) —
+      preselected, never locked; the appeal's charity wins. */
+  initialCharityId?: string | null
 ) {
   const isEdit = !!edit
   const init = edit?.initial
@@ -128,7 +131,8 @@ export function useWizardState(
   const [pronoun, setPronoun] = useState<Pronoun | undefined>(init?.pronoun)
   const [topics, setTopics] = useState<WizardTopics>(init?.topics ?? [])
   const [charityIds, setCharityIds] = useState<string[]>(
-    init?.charityIds ?? (appeal ? [appeal.charityId] : [])
+    init?.charityIds ??
+      (appeal ? [appeal.charityId] : initialCharityId ? [initialCharityId] : [])
   )
   const [topicOpen, setTopicOpen] = useState(false)
   const [charityOpen, setCharityOpen] = useState(false)

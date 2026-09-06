@@ -307,7 +307,7 @@ export default async function CharityPage({ params }: Props) {
         </SectionEyebrow>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Link
-            href="/favpolls/new"
+            href={`/favpolls/new?charity=${charity.id}`}
             className="flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-background p-5 text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
           >
             <Plus className="size-6" aria-hidden="true" />
