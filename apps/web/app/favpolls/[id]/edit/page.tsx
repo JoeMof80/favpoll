@@ -38,6 +38,8 @@ export default async function EditFavpollPage({ params }: Props) {
 
   if (!favpoll) notFound()
   if (favpoll.created_by !== userId) redirect(`/favpolls/${id}`)
+  // Settled favpolls are records — no edit surface (audit, 2026-09-06).
+  if (favpoll.closed_at) redirect(`/favpolls/${id}/manage`)
 
   const [data, { data: rawPoll }, { data: pot }] = await Promise.all([
     getWizardData(),

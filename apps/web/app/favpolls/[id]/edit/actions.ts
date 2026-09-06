@@ -176,11 +176,17 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
 
   const { data: favpoll } = await supabase
     .from("favpolls")
-    .select("created_by, closes_at, hard_close_at, extension_count")
+    .select("created_by, closed_at, closes_at, hard_close_at, extension_count")
     .eq("id", favpollId)
     .single()
 
   if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  // A settled favpoll is a record (audit, 2026-09-06): charges are
+  // captured and the reveal has been shown — nothing is editable after
+  // close. The manage toolbar already hides Edit; this is the truth.
+  if (favpoll.closed_at)
+    throw new Error("This favpoll has closed and can no longer be edited.")
 
   const newClosesAt = new Date(closesAt).toISOString()
   const currentClosesAt = new Date(favpoll.closes_at)
@@ -238,12 +244,18 @@ export async function updateFavpoll(
   const { data: favpoll } = await supabase
     .from("favpolls")
     .select(
-      "created_by, closes_at, hard_close_at, extension_count, category, appeal_id, appeals(charity_id, closes_at), favpoll_charities(charity_id)"
+      "created_by, closed_at, closes_at, hard_close_at, extension_count, category, subject, grouping, appeal_id, appeals(charity_id, closes_at), favpoll_charities(charity_id)"
     )
     .eq("id", favpollId)
     .single()
 
   if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  // A settled favpoll is a record (audit, 2026-09-06): charges are
+  // captured and the reveal has been shown — nothing is editable after
+  // close. The manage toolbar already hides Edit; this is the truth.
+  if (favpoll.closed_at)
+    throw new Error("This favpoll has closed and can no longer be edited.")
 
   // ── Step locking (extended-wizard Phase 2) ────────────────────────────
   // Once money has moved — any pledge, or any shared-fund deposit — the
@@ -283,6 +295,11 @@ export async function updateFavpoll(
       : false
     if (
       (favpoll.category ?? null) !== (input.category ?? null) ||
+      // The who axis is structural too (audit, 2026-09-06): subject
+      // flips someone<->cause, grouping rewrites is_plural — both
+      // change the identity guests pledged on.
+      (favpoll.subject ?? null) !== (input.subject ?? null) ||
+      (favpoll.grouping ?? null) !== (input.grouping ?? null) ||
       currentCharities !== nextCharities ||
       topicChanged
     ) {
@@ -313,6 +330,15 @@ export async function updateFavpoll(
   const newClosesAt = new Date(input.closesAt).toISOString()
   const currentClosesAt = new Date(favpoll.closes_at)
   const isExtension = new Date(newClosesAt) > currentClosesAt
+
+  // Shortening is a deal change once money is in (audit, 2026-09-06):
+  // guests pledged against the published close. Extensions stay policed
+  // by the block below; bringing the date forward is refused outright.
+  if (moneyMoved && new Date(newClosesAt) < currentClosesAt) {
+    throw new Error(
+      "The close date can't be brought forward once guests have pledged."
+    )
+  }
 
   if (isExtension) {
     if (new Date(newClosesAt) <= new Date()) {
