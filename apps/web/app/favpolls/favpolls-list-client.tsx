@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useLayoutEffect, useState } from "react"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
 import type { ComponentProps, ReactNode } from "react"
 import { FavpollListCard } from "@/components/favpoll-list-card"
@@ -49,6 +49,33 @@ export function FavpollsListClient({
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
 
+  // Restore-once scroll (founder, 2026-09-06): pledging happens on the
+  // favpoll page, and the common way back is the header's "All
+  // favpolls" — a fresh navigation that lands at the top, leaving the
+  // card you pledged on off-screen. Save the position on the way OUT
+  // (any card click, capture phase), restore exactly once on the way
+  // back; arrivals from anywhere else keep the natural top.
+  useLayoutEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("favpolls:scroll")
+      if (saved) {
+        sessionStorage.removeItem("favpolls:scroll")
+        window.scrollTo(0, parseInt(saved, 10) || 0)
+      }
+    } catch {
+      // sessionStorage unavailable — the natural top is fine
+    }
+  }, [])
+  function saveScroll(e: React.MouseEvent) {
+    const a = (e.target as HTMLElement).closest?.('a[href^="/favpolls/"]')
+    if (!a) return
+    try {
+      sessionStorage.setItem("favpolls:scroll", String(window.scrollY))
+    } catch {
+      // best effort
+    }
+  }
+
   const displayed = filterAndSortPublic(favpolls, status, sort, search)
   const groups = groupPublic(displayed, sort)
 
@@ -72,7 +99,10 @@ export function FavpollsListClient({
         />
       </ToolbarBand>
 
-      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
+      <div
+        className="mx-auto max-w-330 px-4 pt-8 pb-16"
+        onClickCapture={saveScroll}
+      >
         {favpolls.length === 0 ? (
           <FavpollListCardEmpty />
         ) : displayed.length === 0 ? (
