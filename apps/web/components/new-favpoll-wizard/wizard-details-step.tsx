@@ -105,7 +105,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
              2026-09-06): the date+time pair then lines up with the
              calendar popover beneath it instead of stretching across
              the wizard's wider column. */
-          <div className="max-w-md">
+          <div className="max-w-[468px]">
             <DateTimePicker
               value={w.closesAt}
               onChange={w.setClosesAt}
