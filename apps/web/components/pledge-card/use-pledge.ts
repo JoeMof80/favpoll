@@ -9,7 +9,6 @@ import {
   pledgeFromFund,
 } from "@/app/favpolls/[id]/actions"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
-import { cardFeeFor } from "@/lib/card-fee"
 import type {
   FavpollPollWithItems,
   FavpollPot,
@@ -119,13 +118,10 @@ export function usePledge({
     ? baseTipOptions
     : [...baseTipOptions, tipAmount].sort((a, b) => a - b)
   const ownTip = ownBase > 0 ? tipAmount : 0
-  // The card fee the GUEST covers, so the charity receives the pledge whole
-  // (see lib/card-fee). Computed here to DISPLAY it; the server computes it
-  // again from the same helper and that one is what is charged.
-  // Nothing when the shared fund pays — no card, no fee.
+  // No card fee on the guest (founder, 2026-09-06): processing is
+  // absorbed at settlement — the charge is exactly the parts.
   const ownNet = Math.round((ownBase + ownTopUp + ownTip) * 100) / 100
-  const ownCardFee = useSharedFund ? 0 : cardFeeFor(ownNet)
-  const ownCharge = Math.round((ownNet + ownCardFee) * 100) / 100
+  const ownCharge = ownNet
 
   const fundBarPct =
     isPledgeValid && available > 0 ? numericPledge / available : 0
@@ -158,10 +154,6 @@ export function usePledge({
               label: `To ${charityLabel}`,
               amount: Math.round((numericPledge + ownTopUp) * 100) / 100,
             },
-            // SHOWN, ALWAYS, never folded into the total. The guest is paying
-            // it, so they are told — and it is the line that proves the
-            // charity line above is whole rather than net of something.
-            { label: "Card fee", amount: ownCardFee },
           ],
           total: { label: "Total charged", amount: ownCharge },
         }

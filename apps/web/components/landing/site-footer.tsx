@@ -148,8 +148,8 @@ export function SiteFooter() {
                 Where the money goes
               </Link>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                favpoll takes no fee from donations. 100% of every pledge
-                reaches your chosen charity in full.
+                favpoll takes no platform fee from donations — only card
+                processing costs apply.
               </p>
             </div>
           </div>

@@ -6,7 +6,6 @@ import {
   ipFromHeaders,
   RATE_LIMIT_MESSAGE,
 } from "@/lib/rate-limit"
-import { cardFeeFor } from "@/lib/card-fee"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -62,14 +61,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
   }
 
-  // THE CARD FEE IS COMPUTED HERE AND NOWHERE ELSE ON THE WIRE. It is
-  // deliberately NOT a body field: a client that could name its own fee could
-  // name zero, and the charge would silently stop covering itself. The client
-  // computes the same number from the same helper only to DISPLAY it.
+  // NO FEE ON THE CHARGE (founder, 2026-09-06): processing is absorbed
+  // at settlement — the charge is exactly the parts.
   const net = Math.round((pledgeAmount + tipAmount + topUpAmount) * 100) / 100
-  const feeAmount = cardFeeFor(net)
 
-  const totalPence = Math.round((net + feeAmount) * 100)
+  const totalPence = Math.round(net * 100)
   if (totalPence <= 0) {
     return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
   }
@@ -104,10 +100,9 @@ export async function POST(req: Request) {
       pledge_amount: String(pledgeAmount),
       tip_amount: String(tipAmount),
       topup_amount: String(topUpAmount),
-      // Recorded for reconciliation only. verifyPledgePayment checks the
-      // PARTS, not the PaymentIntent total, so the fee riding along cannot
-      // affect what a pledge is allowed to record.
-      fee_amount: String(feeAmount),
+      // Zero since 2026-09-06 (processing absorbed at settlement); kept
+      // so reconciliation reads a consistent shape across eras.
+      fee_amount: "0",
     },
   })
 

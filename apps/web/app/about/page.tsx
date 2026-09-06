@@ -194,7 +194,7 @@ export default function AboutPage() {
             <FadeIn delay={0.16}>
               <p className="text-base leading-relaxed text-muted-foreground">
                 Guests pick their favourite (Golden Retriever) and pledge money
-                towards it; 100% goes to the charity. Pledging reveals the
+                towards it; favpoll takes no platform fee. Pledging reveals the
                 rankings and — optionally — the subject&apos;s favourite.
               </p>
             </FadeIn>
@@ -231,10 +231,10 @@ export default function AboutPage() {
           <div className="flex max-w-2xl flex-col gap-5">
             <FadeIn delay={0.08}>
               <p className="text-base leading-relaxed text-muted-foreground">
-                favpoll takes no fee from donations. 100% of every pledge
-                reaches your chosen charity in full. Payments are processed by
-                Stripe, and favpoll is supported by optional contributions —
-                never by your pledge.
+                favpoll takes no platform fee from donations — only card
+                processing costs apply. Payments are processed by Stripe, and
+                favpoll is supported by optional contributions — never by your
+                pledge.
               </p>
             </FadeIn>
             <FadeIn delay={0.16}>

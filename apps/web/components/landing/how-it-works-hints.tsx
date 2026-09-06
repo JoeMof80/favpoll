@@ -11,7 +11,6 @@ import { RankingBar } from "@/components/ui/ranking-bar"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import type { Charity } from "@favpoll/types"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
-import { cardFeeFor } from "@/lib/card-fee"
 
 // A HINT OF EACH BEAT (founder, 2026-08-27), built from the app's own
 // Button, CharityRow and RankingBar — so a hint cannot show a control the
@@ -141,11 +140,6 @@ const PICKED_AMOUNT = 20
 export function PledgeHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
   const CHARITY = hints.scene.charities[0] as Charity
   const PICKED = hints.picked
-  // THE CARD FEE, because the real dialog charges one (lib/card-fee) and this
-  // hint claims to be that dialog. It went in on 2026-08-27 and this bill
-  // still said "Total charged £20" against a real total of £20.51 — a hint
-  // showing a total the product would not take.
-  const CARD_FEE = cardFeeFor(PICKED_AMOUNT)
   return (
     <div className="space-y-3" aria-hidden="true">
       <div className="grid grid-cols-4 gap-1.5">
@@ -202,13 +196,10 @@ export function PledgeHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
             // showing it taking anything.
             { label: "Shared fund", amount: 0 },
             // The guest's, not the charity's and not favpoll's — it goes to
-            // Stripe. Shown here for the same reason the real dialog shows
-            // it: the guest is paying it.
-            { label: "Card fee", amount: CARD_FEE },
           ]}
           total={{
             label: "Total charged",
-            amount: Math.round((PICKED_AMOUNT + CARD_FEE) * 100) / 100,
+            amount: PICKED_AMOUNT,
           }}
         />
       </div>

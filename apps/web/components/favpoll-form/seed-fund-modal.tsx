@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { cardFeeFor, chargeWithCardFee } from "@/lib/card-fee"
 import { formatPoundsExact } from "@/lib/i18n"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
@@ -104,7 +103,7 @@ export function SeedFundModal({
         // so passing the bare amount here would show a total lower than the
         // one actually taken — the worst kind of payment bug, and a silent
         // one.
-        chargeAmount={chargeWithCardFee(numeric)}
+        chargeAmount={numeric}
         onSuccess={handlePaymentSuccess}
         onClose={handlePaymentCancel}
       />
@@ -201,13 +200,9 @@ export function SeedFundModal({
         />
       </div>
 
-      {/* The fee, said before the card screen rather than on it. The whole
-          amount reaches the fund and therefore the charity; the fee is added
-          on top and goes to the payment provider. */}
       {isValid && (
         <p className="-mt-2 text-xs text-muted-foreground">
-          Plus a {formatPoundsExact(cardFeeFor(numeric))} card fee — every penny
-          of your {formatPoundsExact(numeric)} reaches the fund.
+          Every penny of your {formatPoundsExact(numeric)} reaches the fund.
         </p>
       )}
 

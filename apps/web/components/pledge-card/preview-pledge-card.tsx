@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { TOAST_WARNING_STYLE } from "@/lib/toast-styles"
-import { cardFeeFor } from "@/lib/card-fee"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,24 +44,19 @@ export function PreviewPledgeCard({
     fundBarPct <= 0.8 ? FUND_GREEN : fundBarPct <= 1.0 ? FUND_AMBER : FUND_RED
   const fundOverAvailable = available > 0 && numericPledge > available
 
-  // No platform fee — 100% of the pledge goes to charity
   const ownNet = Math.round((numericPledge + numericTopUp) * 100) / 100
   // The preview exists to look like the guest page, so it carries the card
   // fee the guest will actually be charged (lib/card-fee). Without it an
   // organiser previewing their own favpoll would be shown a total no guest
   // ever sees.
-  const ownCardFee = cardFeeFor(ownNet)
-  const ownCharge = Math.round((ownNet + ownCardFee) * 100) / 100
+  const ownCharge = Math.round(ownNet * 100) / 100
   const charityLabel = formatCharityLabel(charityNames)
 
   const ownBreakdown =
     !useSharedFund && isPledgeValid
       ? {
           // One charity line covering pledge + fund (matches use-pledge)
-          lines: [
-            { label: `To ${charityLabel}`, amount: ownNet },
-            { label: "Card fee", amount: ownCardFee },
-          ],
+          lines: [{ label: `To ${charityLabel}`, amount: ownNet }],
           total: { label: "Total charged", amount: ownCharge },
         }
       : null
