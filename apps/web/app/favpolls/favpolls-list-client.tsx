@@ -49,13 +49,12 @@ export function FavpollsListClient({
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
 
-  // Restore-once, ELEMENT-anchored (founder, 2026-09-06, v2 after the
-  // Y-based restore lost on mobile): pledging happens on the favpoll
-  // page, and the common way back is the header's "All favpolls" — a
-  // fresh navigation that lands at the top. Save WHICH card was left
-  // on the way out; on return, scroll that card into view after two
-  // animation frames — past the App Router's own scroll reset, and
-  // immune to any layout shift a raw scrollY restore is not.
+  // Restore-once, ELEMENT-anchored (founder, 2026-09-06; v3): the
+  // favpoll page arms "favpolls:return" with its own href on mount
+  // (FavpollSubheader) — no fragile outbound click detection. On the
+  // list's next mount, scroll that card into view after two animation
+  // frames — past the App Router's scroll reset, immune to layout
+  // shifts. The key is consumed once; fresh arrivals keep the top.
   useLayoutEffect(() => {
     let href: string | null = null
     try {
@@ -75,19 +74,6 @@ export function FavpollsListClient({
     )
     return () => cancelAnimationFrame(raf)
   }, [])
-  function saveScroll(e: React.MouseEvent) {
-    // The card's navigation link is STRETCHED (absolute inset-0) — card
-    // content is its sibling, so closest('a') finds nothing from a face
-    // click. Detect the card's li and record its favpoll link.
-    const li = (e.target as HTMLElement).closest?.("li")
-    const a = li?.querySelector<HTMLAnchorElement>('a[href^="/favpolls/"]')
-    if (!a) return
-    try {
-      sessionStorage.setItem("favpolls:return", a.getAttribute("href")!)
-    } catch {
-      // best effort
-    }
-  }
 
   const displayed = filterAndSortPublic(favpolls, status, sort, search)
   const groups = groupPublic(displayed, sort)
@@ -112,10 +98,7 @@ export function FavpollsListClient({
         />
       </ToolbarBand>
 
-      <div
-        className="mx-auto max-w-330 px-4 pt-8 pb-16"
-        onClickCapture={saveScroll}
-      >
+      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
         {favpolls.length === 0 ? (
           <FavpollListCardEmpty />
         ) : displayed.length === 0 ? (
