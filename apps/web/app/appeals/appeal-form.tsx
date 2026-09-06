@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { FormProvider, useForm } from "react-hook-form"
-import { ChevronDown, ImagePlus } from "lucide-react"
+import { ChevronDown, ImagePlus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -353,12 +353,13 @@ export function AppealForm({
           {closesAt && (
             <Button
               type="button"
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground"
+              variant="outline"
+              size="icon"
+              aria-label="Clear close date — evergreen"
+              className="size-11 text-muted-foreground"
               onClick={() => setClosesAt(null)}
             >
-              Clear — evergreen
+              <X aria-hidden="true" />
             </Button>
           )}
         </div>
