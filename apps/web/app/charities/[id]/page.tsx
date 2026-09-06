@@ -244,7 +244,7 @@ export default async function CharityPage({ params }: Props) {
           {openAppeals.length === 0 ? (
             <p className="text-sm text-muted-foreground">No appeals yet.</p>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {openAppeals.map((a) => {
                 const agg = aggByAppeal.get(a.id)
                 return (
@@ -292,7 +292,7 @@ export default async function CharityPage({ params }: Props) {
             {charity.name} in full.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {liveFavpolls.map((favpoll) => (
               <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
             ))}
