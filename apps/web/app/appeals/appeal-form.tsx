@@ -68,11 +68,24 @@ export function AppealForm({
     slug: initial?.slug ?? "",
     charityId: initial?.charityId ?? defaultCharityId ?? "",
     blurb: initial?.blurb ?? "",
-    isListed: initial?.isListed ?? false,
+    // Listed by default (founder, 2026-09-06): creation is gated and
+    // charity-led, appeals are few, and the charity page is their shop
+    // window — no flood risk (unlike member favpolls). The toggle
+    // stays: unlisting is the retire mechanism (no delete) and the
+    // quiet-launch lever.
+    isListed: initial?.isListed ?? true,
   })
   const [closesAt, setClosesAt] = useState<Date | null>(
     initial?.closesAt ? new Date(initial.closesAt) : null
   )
+  // The charity-page door preselects the charity — the dropdown is a
+  // question already answered, so it hides and the charity lives in
+  // the page eyebrow instead (founder, 2026-09-06). The row survives
+  // only for the bare-URL fallback and edit mode.
+  const charityKnown =
+    !editing &&
+    !!defaultCharityId &&
+    charities.some((c) => c.id === defaultCharityId)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const set = (f: keyof typeof form, v: string | boolean) =>
@@ -159,7 +172,7 @@ export function AppealForm({
         hint={
           editing
             ? "Fixed — members carry this link."
-            : "The appeal's address: favpoll.com/appeals/…"
+            : `favpoll.com/appeals/${form.slug || "…"}`
         }
       >
         <InputGroup
@@ -183,40 +196,39 @@ export function AppealForm({
         </InputGroup>
       </WizardField>
 
-      <WizardField
-        label="Charity"
-        required={!editing}
-        hint={
-          editing
-            ? "Fixed — every member favpoll raises for it."
-            : "Every favpoll under this appeal raises for it, always."
-        }
-      >
-        <div className="relative">
-          <select
-            value={form.charityId}
-            disabled={editing}
-            onChange={(e) => set("charityId", e.target.value)}
-            className="h-11 w-full appearance-none rounded-lg border border-border bg-background pr-10 pl-3 text-sm disabled:opacity-50 md:text-base"
-          >
-            <option value="">Pick a charity…</option>
-            {charities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-        </div>
-      </WizardField>
+      {(editing || !charityKnown) && (
+        <WizardField
+          label="Charity"
+          required={!editing}
+          hint={
+            editing
+              ? "Fixed — every member favpoll raises for it."
+              : "Every favpoll under this appeal raises for it, always."
+          }
+        >
+          <div className="relative">
+            <select
+              value={form.charityId}
+              disabled={editing}
+              onChange={(e) => set("charityId", e.target.value)}
+              className="h-11 w-full appearance-none rounded-lg border border-border bg-background pr-10 pl-3 text-sm disabled:opacity-50 md:text-base"
+            >
+              <option value="">Pick a charity…</option>
+              {charities.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+          </div>
+        </WizardField>
+      )}
 
-      <WizardField
-        label="Blurb"
-        hint="A few sentences at the top of the appeal page."
-      >
+      <WizardField label="About">
         <div className="relative">
           <Textarea
             value={form.blurb}
