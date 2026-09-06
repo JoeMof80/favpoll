@@ -64,15 +64,41 @@ export function FavpollsListClient({
       // sessionStorage unavailable — the natural top is fine
     }
     if (!href) return
-    const raf = requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        document
-          .querySelector(`a[href="${CSS.escape(href!)}"]`)
-          ?.closest("li")
-          ?.scrollIntoView({ block: "center" })
-      })
-    )
-    return () => cancelAnimationFrame(raf)
+    // One-shot centring drifted on the founder's phone: images/fonts
+    // above the target finish loading AFTER the scroll, growing the
+    // content above and leaving the viewport ~two cards short. Keep
+    // re-centring for a short window, and stop the moment the user
+    // touches anything — never fight a human scroll.
+    let interrupted = false
+    const stop = () => {
+      interrupted = true
+    }
+    const opts = { passive: true } as const
+    window.addEventListener("touchstart", stop, opts)
+    window.addEventListener("wheel", stop, opts)
+    window.addEventListener("keydown", stop)
+    const centre = () => {
+      if (interrupted) return
+      const li = document
+        .querySelector(`a[href="${CSS.escape(href!)}"]`)
+        ?.closest("li")
+      if (!li) return
+      const r = li.getBoundingClientRect()
+      const target =
+        window.scrollY + r.top - (window.innerHeight - r.height) / 2
+      if (Math.abs(window.scrollY - target) > 8) {
+        window.scrollTo(0, Math.max(0, target))
+      }
+    }
+    const raf = requestAnimationFrame(() => requestAnimationFrame(centre))
+    const timers = [300, 800, 1500, 2500].map((ms) => setTimeout(centre, ms))
+    return () => {
+      cancelAnimationFrame(raf)
+      timers.forEach(clearTimeout)
+      window.removeEventListener("touchstart", stop)
+      window.removeEventListener("wheel", stop)
+      window.removeEventListener("keydown", stop)
+    }
   }, [])
 
   const displayed = filterAndSortPublic(favpolls, status, sort, search)
