@@ -15,7 +15,7 @@ export function PledgeBreakdown({
   extraRow?: React.ReactNode
 }) {
   return (
-    <div className="space-y-1.5 border-t border-border pt-3 text-xs">
+    <div className="space-y-2 border-t border-border pt-3 text-sm">
       {lines
         .filter((l) => !l.hidden)
         .map((line, i) => (
@@ -27,7 +27,7 @@ export function PledgeBreakdown({
           </div>
         ))}
       {extraRow}
-      <div className="flex justify-between border-t border-border pt-1.5 text-sm">
+      <div className="flex justify-between border-t border-border pt-2 text-base">
         <span className="font-medium">{total.label}</span>
         <span className="font-semibold tabular-nums">
           {formatPoundsExact(total.amount)}

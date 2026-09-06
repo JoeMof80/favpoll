@@ -86,16 +86,16 @@ export function StepPay({
             <div className="mb-3 space-y-2">
               {favouriteBreakdown.map((line, i) => (
                 <div key={i} className="flex justify-between">
-                  <span className="text-sm">{line.label}</span>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-base">{line.label}</span>
+                  <span className="text-base font-semibold tabular-nums">
                     {formatPoundsExact(line.amount)}
                   </span>
                 </div>
               ))}
               {fundPart > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-sm">Shared pot</span>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-base">Shared pot</span>
+                  <span className="text-base font-semibold tabular-nums">
                     {formatPoundsExact(fundPart)}
                   </span>
                 </div>
@@ -147,13 +147,15 @@ export function StepPay({
 
       {/* One identity unit — email (required) and wall name were two
           cards with the charge lines between; the email read as an
-          afterthought (founder, 2026-07-26). */}
-      <div className="mb-4 rounded-lg border border-border bg-card">
-        <p className="px-4 pt-3 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-          {isGuest ? "Your details" : "On the wall of favourites"}
-        </p>
-        <div className="space-y-2.5 px-4 py-2.5">
-          {isGuest && (
+          afterthought (founder, 2026-07-26). Signed-in guests get the
+          MINIMAL form (founder, 2026-09-07): the card chrome carried one
+          switch, so the switch stands alone with a quiet line under it. */}
+      {isGuest ? (
+        <div className="mb-4 rounded-lg border border-border bg-card">
+          <p className="px-4 pt-3 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+            Your details
+          </p>
+          <div className="space-y-2.5 px-4 py-2.5">
             <Input
               type="email"
               value={guestEmail}
@@ -161,20 +163,30 @@ export function StepPay({
               placeholder="you@example.com"
               aria-label="Email address for receipt and withdrawal link"
             />
-          )}
-          {isGuest ? (
             <Input
               value={displayName}
               onChange={(e) => onDisplayNameChange(e.target.value)}
               placeholder="Your name (optional)"
               aria-label="Name shown on the wall of favourites"
             />
-          ) : (
-            <p className="text-sm text-foreground">
-              You&apos;ll appear as your account name.
-            </p>
-          )}
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Switch
+                checked={isAnonymous}
+                onCheckedChange={onIsAnonymousChange}
+                aria-label="Hide my name from the wall of favourites"
+              />
+              Hide my name from the wall of favourites
+            </label>
+          </div>
+          <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
+            Your receipt and withdrawal link go to this email — no account
+            needed. The organiser can always see your name; leave it blank to
+            appear as “Someone”.
+          </p>
+        </div>
+      ) : (
+        <div className="mb-4">
+          <label className="flex items-center gap-2 text-sm text-foreground">
             <Switch
               checked={isAnonymous}
               onCheckedChange={onIsAnonymousChange}
@@ -182,13 +194,12 @@ export function StepPay({
             />
             Hide my name from the wall of favourites
           </label>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Otherwise you appear as your account name. The organiser can always
+            see it for thank-yous.
+          </p>
         </div>
-        <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
-          {isGuest
-            ? "Your receipt and withdrawal link go to this email — no account needed. The organiser can always see your name; leave it blank to appear as “Someone”."
-            : "The organiser can always see your name for thank-yous."}
-        </p>
-      </div>
+      )}
       {/* Keyed on the secret: a tip change re-prices the intent, and the
           Elements provider must remount onto the new one. */}
       <StripeCheckout
