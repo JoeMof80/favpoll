@@ -303,10 +303,7 @@ export function AppealForm({
         </Button>
       </div>
 
-      <WizardField
-        label="Goal"
-        hint="Optional — shown as a progress bar on the appeal page."
-      >
+      <WizardField label="Goal">
         <div className="flex flex-wrap gap-2">
           {GOAL_PRESETS.map((g) => (
             <Button
