@@ -49,33 +49,41 @@ export function FavpollsListClient({
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
 
-  // Restore-once scroll (founder, 2026-09-06): pledging happens on the
-  // favpoll page, and the common way back is the header's "All
-  // favpolls" — a fresh navigation that lands at the top, leaving the
-  // card you pledged on off-screen. Save the position on the way OUT
-  // (any card click, capture phase), restore exactly once on the way
-  // back; arrivals from anywhere else keep the natural top.
+  // Restore-once, ELEMENT-anchored (founder, 2026-09-06, v2 after the
+  // Y-based restore lost on mobile): pledging happens on the favpoll
+  // page, and the common way back is the header's "All favpolls" — a
+  // fresh navigation that lands at the top. Save WHICH card was left
+  // on the way out; on return, scroll that card into view after two
+  // animation frames — past the App Router's own scroll reset, and
+  // immune to any layout shift a raw scrollY restore is not.
   useLayoutEffect(() => {
+    let href: string | null = null
     try {
-      const saved = sessionStorage.getItem("favpolls:scroll")
-      if (saved) {
-        sessionStorage.removeItem("favpolls:scroll")
-        window.scrollTo(0, parseInt(saved, 10) || 0)
-      }
+      href = sessionStorage.getItem("favpolls:return")
+      if (href) sessionStorage.removeItem("favpolls:return")
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
+    if (!href) return
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        document
+          .querySelector(`a[href="${CSS.escape(href!)}"]`)
+          ?.closest("li")
+          ?.scrollIntoView({ block: "center" })
+      })
+    )
+    return () => cancelAnimationFrame(raf)
   }, [])
   function saveScroll(e: React.MouseEvent) {
     // The card's navigation link is STRETCHED (absolute inset-0) — card
-    // content is its sibling, so closest('a') from a face click finds
-    // nothing. Detect the card itself: any click inside an li that
-    // carries a favpoll link. Non-navigating clicks may save too —
-    // harmless, the key is consumed-or-cleared on next mount.
+    // content is its sibling, so closest('a') finds nothing from a face
+    // click. Detect the card's li and record its favpoll link.
     const li = (e.target as HTMLElement).closest?.("li")
-    if (!li?.querySelector('a[href^="/favpolls/"]')) return
+    const a = li?.querySelector<HTMLAnchorElement>('a[href^="/favpolls/"]')
+    if (!a) return
     try {
-      sessionStorage.setItem("favpolls:scroll", String(window.scrollY))
+      sessionStorage.setItem("favpolls:return", a.getAttribute("href")!)
     } catch {
       // best effort
     }
