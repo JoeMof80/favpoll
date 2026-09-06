@@ -201,11 +201,16 @@ export default async function AppealPage({
   )
 
   return (
-    <PageLayout left={left} right={factsCard} rightSticky={false}>
-      {fullWidth}
+    <>
+      <PageLayout left={left} right={factsCard} rightSticky={false}>
+        {fullWidth}
+      </PageLayout>
       {/* The gated manage door is the bottom-right circle everywhere
-          (founder, 2026-09-06) — the favpoll page's own FAB. No fixed
-          footer on this page, so no clearing arithmetic. */}
+          (founder, 2026-09-06) — the favpoll page's own FAB. OUTSIDE
+          PageLayout: the sheet's drop-shadow filter makes it a
+          containing block, so a fixed FAB inside it pins to the sheet
+          corner, not the viewport (founder screenshot) — the same
+          reason FavpollSubheader renders beside PageLayout, not in it. */}
       {canManage && (
         <Button
           asChild
@@ -218,6 +223,6 @@ export default async function AppealPage({
           </Link>
         </Button>
       )}
-    </PageLayout>
+    </>
   )
 }
