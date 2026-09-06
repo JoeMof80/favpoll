@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, Settings2 } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -126,25 +126,18 @@ export default async function AppealPage({
       {/* ── Header: the favpoll hero's composition, static ── */}
       <header className="flex items-start gap-4 pt-6 md:gap-6 md:pt-16">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <SectionEyebrow
-              variant="muted"
-              className="mb-2 flex h-8 items-center truncate wrap-break-word"
+          <SectionEyebrow
+            variant="muted"
+            className="mb-2 flex h-8 items-center truncate wrap-break-word"
+          >
+            An appeal for{" "}
+            <Link
+              href={`/charities/${appeal.charity_id}`}
+              className="ml-1 text-primary underline-offset-4 hover:underline"
             >
-              An appeal for{" "}
-              <Link
-                href={`/charities/${appeal.charity_id}`}
-                className="ml-1 text-primary underline-offset-4 hover:underline"
-              >
-                {charityName}
-              </Link>
-            </SectionEyebrow>
-            {canManage && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
-              </Button>
-            )}
-          </div>
+              {charityName}
+            </Link>
+          </SectionEyebrow>
           <h1
             className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(appeal.name)}`}
           >
@@ -210,6 +203,21 @@ export default async function AppealPage({
   return (
     <PageLayout left={left} right={factsCard} rightSticky={false}>
       {fullWidth}
+      {/* The gated manage door is the bottom-right circle everywhere
+          (founder, 2026-09-06) — the favpoll page's own FAB. No fixed
+          footer on this page, so no clearing arithmetic. */}
+      {canManage && (
+        <Button
+          asChild
+          size="icon"
+          aria-label="Manage appeal"
+          className="fixed right-5 bottom-5 z-30 size-14 rounded-full shadow-lg [&_svg]:size-6"
+        >
+          <Link href={`/appeals/${appeal.slug}/manage`}>
+            <Settings2 aria-hidden="true" />
+          </Link>
+        </Button>
+      )}
     </PageLayout>
   )
 }
