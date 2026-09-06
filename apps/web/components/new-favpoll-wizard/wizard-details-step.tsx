@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/input-group"
 import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
 import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
-import { WIZARD_INPUT_SIZE } from "./wizard-field"
+import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import type { WizardState, WizardVisibility } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
 
@@ -43,11 +43,10 @@ const VISIBILITY_OPTIONS: {
 export function WizardDetailsStep({ w }: { w: WizardState }) {
   return (
     <div className="space-y-6">
-      {/* sm:min-h-11 on every row: the controls differ in height (h-11
-          buttons, h-10 picker, a bare switch) and the labels are centered,
-          so without one shared row height the equal gaps read unevenly. */}
-      <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium">Pledge goal</span>
+      {/* Every row is a WizardField (founder, 2026-09-06: the hand-rolled
+          rows' inline labels sat flush on mobile, unlike the other steps
+          — one grammar, no drift). */}
+      <WizardField label="Pledge goal">
         <div className="flex gap-2">
           {GOAL_PRESETS.map((g) => (
             <Button
@@ -81,14 +80,11 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             />
           </InputGroup>
         </div>
-      </div>
+      </WizardField>
 
-      <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium">
-          Close date<span className="text-muted-foreground"> *</span>
-        </span>
-        {/* The 90-day cap lives in the picker's disabled dates and the
-            server-side guard — no hint sentence (prototype round 38). */}
+      {/* The 90-day cap lives in the picker's disabled dates and the
+          server-side guard — no hint sentence (prototype round 38). */}
+      <WizardField label="Close date" required>
         {w.appeal?.closesAt ? (
           // Inherited from the appeal and locked — one event, one
           // announcement moment (concept decision, 2026-09-05).
@@ -112,62 +108,49 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             presets={CLOSE_DATE_PRESETS}
           />
         )}
-      </div>
+      </WizardField>
 
-      {/* items-start + a min-h-11 label box: the hint line makes this the
-          one row taller than its control, so centering the label against
-          the whole cell would break the even label rhythm — anchor it to
-          the toggle bar's 44px line instead. */}
-      <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium sm:flex sm:min-h-11 sm:items-center">
-          Visibility
-        </span>
-        <div className="space-y-1.5">
-          {/* SegmentedControl — the /favpolls toolbar's own status control
-              (founder, 2026-09-01: "use this UI"), replacing the fused
-              toggle-group bar. */}
-          <SegmentedControl
-            size="lg"
-            label="Who can see this favpoll"
-            value={w.visibility}
-            onChange={(v) => w.setVisibility(v as WizardVisibility)}
-            options={VISIBILITY_OPTIONS.map(({ value, label }) => ({
-              value,
-              label,
-            }))}
-            className="w-fit"
-          />
-          <p className="text-muted-foreground">
-            {VISIBILITY_OPTIONS.find((o) => o.value === w.visibility)?.hint}
-          </p>
-        </div>
-      </div>
+      <WizardField
+        label="Visibility"
+        hint={VISIBILITY_OPTIONS.find((o) => o.value === w.visibility)?.hint}
+      >
+        {/* SegmentedControl — the /favpolls toolbar's own status control
+            (founder, 2026-09-01: "use this UI"), replacing the fused
+            toggle-group bar. */}
+        <SegmentedControl
+          size="lg"
+          label="Who can see this favpoll"
+          value={w.visibility}
+          onChange={(v) => w.setVisibility(v as WizardVisibility)}
+          options={VISIBILITY_OPTIONS.map(({ value, label }) => ({
+            value,
+            label,
+          }))}
+          className="w-fit"
+        />
+      </WizardField>
 
       {/* Decided here, overridable mid-event from the manage toolbar
           (founder, 2026-09-03). Not a rail line: the rail lists the
           authored facts, and a default-on toggle isn't one. */}
-      <div className="block space-y-1.5 text-sm sm:grid sm:min-h-11 sm:grid-cols-[180px_1fr] sm:items-start sm:space-y-0 sm:gap-x-6">
-        <span className="font-medium sm:flex sm:min-h-11 sm:items-center">
-          Guest additions
-        </span>
-        <div className="space-y-1.5">
-          {/* The switch is shorter than the row's 44px control line, so
-              it takes its own min-h-11 centring box — that is what the
-              label is anchored to. */}
-          <div className="sm:flex sm:min-h-11 sm:items-center">
-            <Switch
-              checked={w.allowGuestItems}
-              onCheckedChange={w.setAllowGuestItems}
-              aria-label="Guests can add favourites"
-            />
-          </div>
-          <p className="text-muted-foreground">
-            {w.allowGuestItems
-              ? "Guests can add their own favourites to the topic."
-              : "Only your favourites appear."}
-          </p>
+      <WizardField
+        label="Guest additions"
+        hint={
+          w.allowGuestItems
+            ? "Guests can add their own favourites to the topic."
+            : "Only your favourites appear."
+        }
+      >
+        {/* The switch is shorter than the 44px control line, so it takes
+            its own min-h-11 centring box. */}
+        <div className="flex min-h-11 items-center">
+          <Switch
+            checked={w.allowGuestItems}
+            onCheckedChange={w.setAllowGuestItems}
+            aria-label="Guests can add favourites"
+          />
         </div>
-      </div>
+      </WizardField>
     </div>
   )
 }
