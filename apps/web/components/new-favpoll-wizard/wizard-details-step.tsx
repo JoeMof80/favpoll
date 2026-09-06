@@ -14,7 +14,7 @@ import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import type { WizardState, WizardVisibility } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
 
-const GOAL_PRESETS = [100, 250, 500, 750]
+const GOAL_PRESETS = [100, 250, 500, 1000]
 
 // The three-notch visibility axis (listed ⊃ unlisted ⊃ private) as one
 // control — two stacked switches would leave the hierarchy illegible.
@@ -52,7 +52,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             <Button
               key={g}
               type="button"
-              className="h-11 px-4 md:text-base"
+              className="h-11 px-3.5 md:text-base"
               variant={w.goalAmount === g ? "default" : "outline"}
               onClick={() => {
                 w.setGoalAmount(g)
@@ -62,7 +62,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
               £{g.toLocaleString("en-GB")}
             </Button>
           ))}
-          <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-32 bg-background")}>
+          <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-28 bg-background")}>
             <InputGroupAddon align="inline-start">
               <span className="text-muted-foreground">£</span>
             </InputGroupAddon>
