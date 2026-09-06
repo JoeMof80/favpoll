@@ -157,9 +157,7 @@ export default async function CharityPage({ params }: Props) {
             variant="muted"
             className="mb-2 flex h-8 items-center truncate wrap-break-word"
           >
-            {charity.registered_number
-              ? `Registered charity ${charity.registered_number}`
-              : "Charity"}
+            Charity
           </SectionEyebrow>
           <h1
             className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(charity.name)}`}
@@ -173,9 +171,9 @@ export default async function CharityPage({ params }: Props) {
               />
             )}
           </h1>
-          {charity.description && (
+          {charity.registered_number && (
             <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
-              {charity.description}
+              Registered charity {charity.registered_number}
             </p>
           )}
         </div>
@@ -195,6 +193,14 @@ export default async function CharityPage({ params }: Props) {
           </div>
         )}
       </header>
+
+      {/* The description wears the favpoll About's classes, in the
+          About's slot below the header (static — no clip machinery). */}
+      {charity.description && (
+        <p className="mt-6 line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
+          {charity.description}
+        </p>
+      )}
 
       {charity.impact_statement && (
         <p className="mt-6 inline-block rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
