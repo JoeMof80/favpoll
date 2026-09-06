@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { ListControls } from "@/components/list-controls"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import type { Category, Topic, Favourite } from "@favpoll/types"
-import { SectionLabel } from "@/components/favpoll-card/section-label"
+import { PollHeading } from "@/components/poll-heading"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import { isEstablishedRecord, topicPledgedTotal } from "@/lib/record"
 import { formatCount, formatPounds } from "@/lib/i18n"
@@ -55,7 +55,7 @@ function TopicCard({ topic }: { topic: TopicWithItems }) {
     >
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <SectionLabel title={topic.title} />
+          <PollHeading topicTitle={topic.title} size="md" />
           <span className="text-xs text-muted-foreground transition-colors group-hover:text-primary">
             See all →
           </span>
