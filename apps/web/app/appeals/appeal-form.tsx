@@ -275,7 +275,7 @@ export function AppealForm({
 
       <WizardField
         label="Close date"
-        hint="Members inherit it. Leave blank for an evergreen appeal — members then pick their own dates."
+        hint="Leave blank for an evergreen appeal."
       >
         <div className="flex flex-wrap items-center gap-3">
           <DateTimePicker

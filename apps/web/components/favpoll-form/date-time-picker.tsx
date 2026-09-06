@@ -46,9 +46,14 @@ export function DateTimePicker({
       })
     : "Pick a close date"
 
+  // No date, no time (founder, 2026-09-06): a blank picker showing
+  // 23:59 read as a value already chosen. Empty renders the native
+  // --:-- state; typing a time first still works (handleTimeChange
+  // bases it on today), and 23:59 remains the default the moment a
+  // date arrives via preset or calendar.
   const timeStr = value
     ? `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
-    : "23:59"
+    : ""
 
   function handlePreset(days: number) {
     const base =
