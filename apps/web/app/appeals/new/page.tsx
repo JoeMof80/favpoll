@@ -28,7 +28,13 @@ export default async function NewAppealPage({
   return (
     <PageSheet>
       <div className="mx-auto w-full max-w-2xl pt-10 md:pt-16">
-        <SectionEyebrow variant="muted">Appeal</SectionEyebrow>
+        {/* The preselected charity lives here, not in a dropdown — the
+            appeal page's own idiom ("Appeal for {charity}"). */}
+        <SectionEyebrow variant="muted">
+          {(charities ?? []).find((c) => c.id === defaultCharityId)
+            ? `Appeal for ${(charities ?? []).find((c) => c.id === defaultCharityId)!.name}`
+            : "Appeal"}
+        </SectionEyebrow>
         <h1 className="mt-2 mb-8 text-4xl leading-tight font-light tracking-tight text-foreground">
           New appeal
         </h1>
