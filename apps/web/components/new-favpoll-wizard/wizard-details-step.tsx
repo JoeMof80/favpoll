@@ -14,7 +14,7 @@ import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import type { WizardState, WizardVisibility } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
 
-const GOAL_PRESETS = [100, 250, 500, 1000]
+const GOAL_PRESETS = [100, 250, 500, 750]
 
 // The three-notch visibility axis (listed ⊃ unlisted ⊃ private) as one
 // control — two stacked switches would leave the hierarchy illegible.
