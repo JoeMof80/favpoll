@@ -123,9 +123,9 @@ ${charityLine}`
     const opener = revealOpener(register, pronoun, displayName)
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
     // wrote "him/his" for a pair because plurality never reached it).
-    const plural = grouping === "pair" || grouping === "group"
+    const plural = grouping === "couple" || grouping === "group"
     const pronounHint = plural
-      ? ` The favpoll honours ${grouping === "pair" ? "a PAIR — two people together" : "a GROUP of people"}: use "they/them/their" and plural agreement in every sentence ("their favourite", "they have loved"), and treat the name as referring to ${grouping === "pair" ? "both of them" : "all of them"}, never one individual.`
+      ? ` The favpoll honours ${grouping === "couple" ? "a PAIR — two people together" : "a GROUP of people"}: use "they/them/their" and plural agreement in every sentence ("their favourite", "they have loved"), and treat the name as referring to ${grouping === "couple" ? "both of them" : "all of them"}, never one individual.`
       : pronoun
         ? ` Use "${pronoun}" pronouns for the person.`
         : ""
