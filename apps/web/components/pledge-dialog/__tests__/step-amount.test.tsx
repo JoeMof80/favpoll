@@ -45,6 +45,20 @@ describe("StepAmountHeader — two-part entry (founder mock, 2026-09-06)", () =>
     expect(onFundAmountChange).toHaveBeenCalledWith("5")
   })
 
+  it("takes the single-figure path when no favourite is picked", () => {
+    render(
+      <StepAmountHeader
+        pledgeAmount="18"
+        updatePledgeAmount={vi.fn()}
+        fundAmount=""
+        onFundAmountChange={vi.fn()}
+        favouriteCount={0}
+      />
+    )
+    expect(screen.getByText("Your pledge")).toBeInTheDocument()
+    expect(screen.queryByText("Shared fund")).not.toBeInTheDocument()
+  })
+
   it("falls back to the single figure without a fund handler (fund mode)", () => {
     render(
       <StepAmountHeader

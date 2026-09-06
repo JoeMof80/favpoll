@@ -40,9 +40,16 @@ export function StepAmountHeader({
   fundOverAvailable = false,
   error = null,
 }: HeaderProps) {
-  // Two co-equal figures on the card path: the favourites' worth and the
-  // shared fund riding on top — the guest's charge is the two together.
-  const twoUp = !useSharedFund && !!onFundAmountChange
+  // Two co-equal figures on the card path WITH a favourite picked. A
+  // no-pick pledge takes the single-figure path (founder, 2026-09-06):
+  // with nothing on the favourite side there is no pair to hold.
+  const twoUp = !useSharedFund && !!onFundAmountChange && favouriteCount > 0
+  const numericFund = parseFloat(fundAmount)
+  const fundQuiet = isNaN(numericFund) || numericFund <= 0
+  // The header's block-end carries only the fund-mode lines and errors —
+  // the fee line lives in the body's shared-fund note, so the slider
+  // sits right under the figures (founder, 2026-09-06).
+  const hasBlockEnd = useSharedFund || !!error
   return (
     <InputGroup className="h-auto rounded-none border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
       <InputGroupAddon
@@ -69,7 +76,13 @@ export function StepAmountHeader({
         )}
       </InputGroupAddon>
 
-      <div className="flex w-full items-baseline gap-4 px-5 py-3">
+      <div
+        className={
+          hasBlockEnd
+            ? "flex w-full items-baseline gap-4 px-5 py-3"
+            : "flex w-full items-baseline gap-4 px-5 pt-3 pb-4"
+        }
+      >
         <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
           <span
             className="text-2xl text-muted-foreground select-none"
@@ -94,7 +107,7 @@ export function StepAmountHeader({
           />
         </div>
         {twoUp && (
-          <div className="flex items-baseline justify-end gap-1.5">
+          <div className="flex shrink-0 items-baseline justify-end gap-1.5">
             <span
               className="text-2xl text-muted-foreground select-none"
               aria-hidden="true"
@@ -110,36 +123,38 @@ export function StepAmountHeader({
               onChange={(e) => onFundAmountChange!(e.target.value)}
               placeholder="0"
               aria-label="Shared fund amount in pounds, on top of your pledge"
-              className="w-24 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              // Sized to its digits so the figure sits flush right; quiet
+              // ink until the fund actually holds money (founder,
+              // 2026-09-06).
+              style={{ width: `${Math.max(1, fundAmount.length)}ch` }}
+              className={`border-0 bg-transparent text-right text-3xl outline-none placeholder:text-muted-foreground focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                fundQuiet ? "text-muted-foreground" : "text-foreground"
+              }`}
             />
           </div>
         )}
       </div>
 
-      <InputGroupAddon align="block-end" className="px-5 pb-4">
-        <div className="w-full space-y-1.5">
-          {!useSharedFund && (
-            <p className="text-[11px] text-muted-foreground">
-              Give what feels right. Processed securely by Stripe — favpoll
-              takes no platform fee.
-            </p>
-          )}
-          {useSharedFund && !fundOverAvailable && (
-            <p className="text-[11px] text-muted-foreground">
-              {isPledgeValid && available > 0
-                ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
-                : `${formatPoundsExact(available)} available in the shared fund`}
-            </p>
-          )}
-          {useSharedFund && fundOverAvailable && (
-            <p className="text-[11px] text-destructive">
-              Shared fund has {formatPoundsExact(available)} available — reduce
-              your pledge to use it
-            </p>
-          )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
-        </div>
-      </InputGroupAddon>
+      {hasBlockEnd && (
+        <InputGroupAddon align="block-end" className="px-5 pb-4">
+          <div className="w-full space-y-1.5">
+            {useSharedFund && !fundOverAvailable && (
+              <p className="text-[11px] text-muted-foreground">
+                {isPledgeValid && available > 0
+                  ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
+                  : `${formatPoundsExact(available)} available in the shared fund`}
+              </p>
+            )}
+            {useSharedFund && fundOverAvailable && (
+              <p className="text-[11px] text-destructive">
+                Shared fund has {formatPoundsExact(available)} available —
+                reduce your pledge to use it
+              </p>
+            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
+          </div>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   )
 }
@@ -239,11 +254,15 @@ export function StepAmount({
           )}
         </div>
 
-        {showSplit && (
+        {/* One note carries the fund's meaning AND the fee line — moved
+            out of the header's block-end so the slider sits close to the
+            figures (founder, 2026-09-06). */}
+        {!useSharedFund && (
           <p className="text-[11px] text-muted-foreground">
-            The shared fund backs guests without a favourite, and reaches the
-            charity too. Add to it, or slide to rebalance — your pledge is the
-            two together.
+            {showSplit &&
+              "The shared fund backs guests without a favourite, and reaches the charity too. Add to it, or slide to rebalance — your pledge is the two together. "}
+            Give what feels right. Processed securely by Stripe — favpoll takes
+            no platform fee.
           </p>
         )}
 
