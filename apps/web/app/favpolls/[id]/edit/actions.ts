@@ -227,6 +227,11 @@ export async function updateFavpoll(
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
+  if (input.subject === "someone" && !input.protagonistName.trim())
+    throw new Error("A name is required")
+  if (input.subject === "cause" && !input.causeLabel?.trim())
+    throw new Error("A cause name is required")
+
   const supabase = createAdminClient()
 
   // Verify ownership and fetch current closes_at/extension fields

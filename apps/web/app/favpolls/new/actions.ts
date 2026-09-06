@@ -240,6 +240,13 @@ export async function createFavpoll(
   const supabase = createAdminClient()
   await ensureUser(supabase, userId)
 
+  // Server-side guards (the wizard validates too, but the server is
+  // the truth — a nameless favpoll published on 2026-09-06).
+  if (input.subject === "someone" && !input.protagonistName.trim())
+    throw new Error("A name is required")
+  if (input.subject === "cause" && !input.causeLabel?.trim())
+    throw new Error("A cause name is required")
+
   let protagonistId: string | null = null
   if (input.subject === "someone") {
     const protagonistRow: Record<string, unknown> = {
