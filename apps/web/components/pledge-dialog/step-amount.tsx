@@ -202,8 +202,8 @@ export function StepAmount({
         )}
 
         {showSplit && (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <Slider
                 value={[fundPart]}
                 min={0}
@@ -218,16 +218,16 @@ export function StepAmount({
                 trackClassName="bg-primary/20"
                 rangeClassName="bg-chart-3"
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex items-baseline justify-between text-sm text-muted-foreground">
                 <span>
                   Shared fund{" "}
-                  <span className="font-semibold text-foreground tabular-nums">
+                  <span className="text-lg font-semibold text-foreground tabular-nums">
                     {formatPoundsExact(fundPart)}
                   </span>
                 </span>
                 <span>
                   {favouriteBreakdown.length === 1 ? "Favourite" : "Favourites"}{" "}
-                  <span className="font-semibold text-foreground tabular-nums">
+                  <span className="text-lg font-semibold text-foreground tabular-nums">
                     {formatPoundsExact(favouriteShare)}
                   </span>
                 </span>
@@ -240,7 +240,7 @@ export function StepAmount({
             </div>
 
             {/* The list, re-pricing live under the thumb */}
-            <div className="space-y-2 border-t border-border pt-3">
+            <div className="space-y-3 border-t border-border pt-4">
               {favouriteBreakdown.map((line, i) => (
                 <div key={i} className="flex justify-between">
                   <span className="text-base">{line.label}</span>
