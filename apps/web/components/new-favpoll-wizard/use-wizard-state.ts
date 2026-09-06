@@ -384,7 +384,15 @@ export function useWizardState(
   // steps stay barred: they'd skip the step gates (nextDisabled), so
   // first-time onward travel stays with the Next button.
   function canJumpTo(target: WizardStep) {
-    return isEdit || STEPS.indexOf(target) < stepIndex || railDone[target]
+    // Forward jumps need EVERY step up to the target done, not just the
+    // target — an appeal seeds Details done at birth, and jumping onto
+    // it would sail past unfilled Info/Story (the nameless-favpoll bug,
+    // 2026-09-06).
+    return (
+      isEdit ||
+      STEPS.indexOf(target) < stepIndex ||
+      STEPS.slice(0, STEPS.indexOf(target) + 1).every((st) => railDone[st])
+    )
   }
 
   // The who axis lives on the Name field. Cause and Pair/Group are
@@ -452,6 +460,30 @@ export function useWizardState(
   async function handleFinish() {
     if (submitting) return
     setError(null)
+
+    // WHOLE-FORM validation (founder bug, 2026-09-06: a nameless
+    // favpoll published). Publish must not trust the per-step Next
+    // gates — an appeal seed marks Details done at birth, so the rail
+    // could carry a jump past unfilled steps straight to Publish.
+    // Check every step here and walk back to the first gap.
+    const firstGap: [WizardStep, string] | null = !category
+      ? ["event", "Pick an event type before publishing."]
+      : charityIds.length === 0
+        ? ["charity", "Pick a charity before publishing."]
+        : !topicDone
+          ? ["topic", "Pick a topic before publishing."]
+          : !name.trim()
+            ? ["info", "A name is required before publishing."]
+            : !about.trim()
+              ? ["story", "The About is required before publishing."]
+              : !closesAt
+                ? ["details", "Pick a close date before publishing."]
+                : null
+    if (firstGap) {
+      changeStep(firstGap[0])
+      setError(firstGap[1])
+      return
+    }
     setSubmitting(true)
     try {
       let resolvedPhotoUrl = photoUrl
