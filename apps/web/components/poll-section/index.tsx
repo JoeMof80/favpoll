@@ -150,7 +150,16 @@ export function PollSection({
 
           {hasItems && (
             <>
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-20 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-10 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+                {/* Opaque shelf (founder, 2026-09-06: standings should
+                    disappear behind the Amount/Pledges controls, not
+                    thread past them to the ribbon). Same panel trick as
+                    the ribbon above; -top-12 seals the slit between the
+                    two sticky boxes. The row sits at z-10 — one layer
+                    BELOW the ribbon — so the over-extension tucks under
+                    the ribbon's panel instead of painting over the
+                    topic header (founder screenshot, first attempt). */}
+                <div className="pointer-events-none absolute -inset-x-1 -top-12 bottom-0 -z-10 bg-background" />
                 {onOpenPledgeDialog && (
                   <TooltipProvider>
                     <Tooltip content="Pledge again" side="left">
