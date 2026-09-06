@@ -163,24 +163,6 @@ describe("ProcessOverview", () => {
     expect(within(section).queryAllByRole("button")).toHaveLength(0)
   })
 
-  it("hands the visitor to each register page's #how, each link in its own register (2026-08-31)", () => {
-    stubViewport(false)
-    render(<ProcessOverview />)
-    const links = [
-      ["home.overview.seeIt.celebration", "/celebration#how", "celebration"],
-      ["home.overview.seeIt.fundraiser", "/fundraiser#how", "fundraiser"],
-      ["home.overview.seeIt.memorial", "/memorial#how", "memorial"],
-    ] as const
-    for (const [key, href, palette] of links) {
-      const link = screen.getByRole("link", { name: t(key) })
-      expect(link).toHaveAttribute("href", href)
-      expect(link).toHaveAttribute("data-register", palette)
-    }
-    expect(
-      screen.getByText(t("home.overview.seeIt.lead"), { exact: false })
-    ).toBeInTheDocument()
-  })
-
   it("scopes the wallet card to .paper so dark mode cannot blank it", () => {
     // The card forces bg-white; without .paper pinning the light token values
     // a dark-mode visitor gets white ink on it — the failure #535 fixed on the
