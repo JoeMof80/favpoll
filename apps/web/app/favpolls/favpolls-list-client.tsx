@@ -83,7 +83,13 @@ export function FavpollsListClient({
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
-    dbg(`mount key=${href ?? "NONE"} y=${Math.round(window.scrollY)}`)
+    let armed: string | null = null
+    try {
+      armed = sessionStorage.getItem("favpolls:debug-armed")
+    } catch {}
+    dbg(
+      `mount key=${href ?? "NONE"} armed=${armed ?? "never"} y=${Math.round(window.scrollY)}`
+    )
     if (!href) return
     // One-shot centring drifted on the founder's phone: images/fonts
     // above the target finish loading AFTER the scroll, growing the

@@ -120,12 +120,19 @@ export function FavpollListCard({
   function armReturn() {
     try {
       sessionStorage.setItem("favpolls:return", `/favpolls/${favpoll.id}`)
+      // Debug breadcrumb (temporary): proves arming ran in this page's
+      // lifetime — the list's mount log prints it.
+      sessionStorage.setItem(
+        "favpolls:debug-armed",
+        `${new Date().toISOString().slice(11, 19)} ${favpoll.id.slice(0, 8)}`
+      )
     } catch {
       // best effort
     }
   }
 
   async function handlePledgeSuccess(guestToken?: string) {
+    armReturn()
     setHasPledged(true)
     // The back body swaps from mechanic to standings — stay on it.
     setFlipped(true)
