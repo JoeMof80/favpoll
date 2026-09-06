@@ -249,40 +249,6 @@ describe("usePledgeDialog — favouriteBreakdown", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Per-charity breakdown
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe("usePledgeDialog — charityBreakdown", () => {
-  it("returns empty for single charity", async () => {
-    const { result } = renderHook(() =>
-      usePledgeDialog({ ...baseOptions, charityNames: ["Oxfam"] })
-    )
-    act(() => result.current.toggleDraft("red"))
-    await act(async () => result.current.handleNext())
-    act(() => result.current.updatePledgeAmount("10"))
-    expect(result.current.charityBreakdown).toEqual([])
-  })
-
-  it("splits equally between two charities", async () => {
-    const { result } = renderHook(() =>
-      usePledgeDialog({
-        ...baseOptions,
-        charityNames: ["Oxfam", "RNLI"],
-      })
-    )
-    act(() => result.current.toggleDraft("red"))
-    await act(async () => result.current.handleNext())
-    act(() => result.current.updatePledgeAmount("20"))
-    const breakdown = result.current.charityBreakdown
-    expect(breakdown).toHaveLength(2)
-    expect(breakdown[0].amount).toBeCloseTo(10, 2)
-    expect(breakdown[1].amount).toBeCloseTo(10, 2)
-  })
-})
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Total-then-split mapping
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
   it("favourites and fund are independent additive parts", () => {

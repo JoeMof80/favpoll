@@ -151,17 +151,24 @@ export function usePledge({
   } | null =
     !useSharedFund && isPledgeValid
       ? {
-          // ONE charity line covering pledge + fund: shared-fund money
-          // reaches the charity too — drawn by guests it helps, and any
-          // residual goes to the charity at settlement (founder policy,
-          // 2026-07-31). A separate "contribution" line read as if the
-          // fund money went elsewhere.
-          lines: [
-            {
-              label: `To ${charityLabel}`,
-              amount: Math.round((numericPledge + ownTopUp) * 100) / 100,
-            },
-          ],
+          // The charity lines cover pledge + pot: shared-pot money reaches
+          // the charity too — drawn by guests it helps, and any residual
+          // goes to the charity at settlement (founder policy, 2026-07-31).
+          // EACH charity gets its own line (founder, 2026-09-07),
+          // penny-even like the allocator: shares differ by at most 1p.
+          lines: (() => {
+            const totalPence = Math.round((numericPledge + ownTopUp) * 100)
+            if (charityNames.length <= 1) {
+              return [{ label: `To ${charityLabel}`, amount: totalPence / 100 }]
+            }
+            const base = Math.floor(totalPence / charityNames.length)
+            let spare = totalPence - base * charityNames.length
+            return charityNames.map((name) => {
+              const pence = base + (spare > 0 ? 1 : 0)
+              if (spare > 0) spare--
+              return { label: `To ${name}`, amount: pence / 100 }
+            })
+          })(),
           total: { label: "Total charged", amount: ownCharge },
         }
       : null
