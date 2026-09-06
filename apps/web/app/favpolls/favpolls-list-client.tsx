@@ -67,8 +67,13 @@ export function FavpollsListClient({
     }
   }, [])
   function saveScroll(e: React.MouseEvent) {
-    const a = (e.target as HTMLElement).closest?.('a[href^="/favpolls/"]')
-    if (!a) return
+    // The card's navigation link is STRETCHED (absolute inset-0) — card
+    // content is its sibling, so closest('a') from a face click finds
+    // nothing. Detect the card itself: any click inside an li that
+    // carries a favpoll link. Non-navigating clicks may save too —
+    // harmless, the key is consumed-or-cleared on next mount.
+    const li = (e.target as HTMLElement).closest?.("li")
+    if (!li?.querySelector('a[href^="/favpolls/"]')) return
     try {
       sessionStorage.setItem("favpolls:scroll", String(window.scrollY))
     } catch {
