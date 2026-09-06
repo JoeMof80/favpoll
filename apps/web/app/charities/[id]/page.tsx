@@ -219,7 +219,15 @@ export default async function CharityPage({ params }: Props) {
       {/* The facts live in the rail on md+ (the favpoll page's own
           column); the rail hides on mobile, so surface them here. */}
       <div className="mt-6 md:hidden">{factsCard}</div>
+    </>
+  )
 
+  // Full-width row beneath the header columns (founder, 2026-09-06:
+  // "Appeals and Open favpolls should be on a new row, without
+  // columns") — PageLayout children render below the grid, spanning
+  // the whole sheet.
+  const fullWidth = (
+    <>
       {/* ── Appeals ── */}
       {(openAppeals.length > 0 || canManage) && (
         <section className="mt-12">
@@ -325,5 +333,9 @@ export default async function CharityPage({ params }: Props) {
     </>
   )
 
-  return <PageLayout left={left} right={factsCard} />
+  return (
+    <PageLayout left={left} right={factsCard}>
+      {fullWidth}
+    </PageLayout>
+  )
 }
