@@ -82,12 +82,16 @@ export function FavpollsListClient({
       const li = document
         .querySelector(`a[href="${CSS.escape(href!)}"]`)
         ?.closest("li")
-      if (!li) return
+      if (!li) {
+        return
+      }
       const r = li.getBoundingClientRect()
       const target =
         window.scrollY + r.top - (window.innerHeight - r.height) / 2
+      const before = Math.round(window.scrollY)
       if (Math.abs(window.scrollY - target) > 8) {
         window.scrollTo(0, Math.max(0, target))
+      } else {
       }
     }
     const raf = requestAnimationFrame(() => requestAnimationFrame(centre))

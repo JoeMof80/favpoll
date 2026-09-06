@@ -111,7 +111,22 @@ export function FavpollListCard({
       widthPercent: decoyWidth(i),
     }))
 
+  // Arm the list's return target the moment a pledge begins (founder's
+  // debug panel, 2026-09-06: an in-card pledge showed a FRESH MOUNT
+  // with no key — Safari can evict and reload the tab around the
+  // payment sheet, and the in-card path never visits a favpoll PAGE,
+  // so nothing had armed the return). With the key set here, even a
+  // full reload centres this card.
+  function armReturn() {
+    try {
+      sessionStorage.setItem("favpolls:return", `/favpolls/${favpoll.id}`)
+    } catch {
+      // best effort
+    }
+  }
+
   async function handlePledgeSuccess(guestToken?: string) {
+    armReturn()
     setHasPledged(true)
     // The back body swaps from mechanic to standings — stay on it.
     setFlipped(true)
@@ -377,7 +392,10 @@ export function FavpollListCard({
                       <Button
                         type="button"
                         variant="ghost"
-                        onClick={() => setPledgeOpen(true)}
+                        onClick={() => {
+                          armReturn()
+                          setPledgeOpen(true)
+                        }}
                         aria-label="Pledge your favourite"
                         className="absolute inset-0 z-10 h-auto w-full items-start justify-center rounded-none p-0 pt-1.5 whitespace-normal hover:bg-transparent"
                       >
@@ -425,7 +443,10 @@ export function FavpollListCard({
                             type="button"
                             size="icon-sm"
                             aria-label="Pledge again"
-                            onClick={() => setPledgeOpen(true)}
+                            onClick={() => {
+                              armReturn()
+                              setPledgeOpen(true)
+                            }}
                             className="transition-none"
                           >
                             <Gift aria-hidden="true" />
