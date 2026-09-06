@@ -263,7 +263,7 @@ describe("generateDraft — cache miss, person", () => {
       .find((c) => c.method === "insert")
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
-      cache_key: "v3:cause:topic-1:charity-1:someone:none:none",
+      cache_key: "v4:cause:topic-1:charity-1:someone:none:individual:none",
     })
   })
 
