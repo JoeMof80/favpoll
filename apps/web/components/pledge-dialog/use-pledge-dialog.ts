@@ -163,14 +163,6 @@ export function usePledgeDialog({
     })
   }
 
-  // --- per-charity breakdown (collapsible secondary) ---
-  function getCharityBreakdown() {
-    if (!isPledgeValid || charityNames.length < 2) return []
-    const perCharity =
-      Math.round((numericPledge / charityNames.length) * 100) / 100
-    return charityNames.map((name) => ({ label: name, amount: perCharity }))
-  }
-
   // --- navigation ---
   // PICKING IS OPTIONAL (founder, 2026-08-17). This required at least one
   // favourite, so a guest who could not decide was stuck on step 1 with a
@@ -256,7 +248,6 @@ export function usePledgeDialog({
     updateTip,
     // breakdowns
     favouriteBreakdown: getFavouriteBreakdown(),
-    charityBreakdown: getCharityBreakdown(),
     // navigation
     handleNext,
     handleBack,

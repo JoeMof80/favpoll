@@ -624,10 +624,40 @@ describe("usePledge — ownBreakdown", () => {
       result.current.setTopUpAmount("5")
     })
     const lines = result.current.ownBreakdown!.lines
-    // Exactly ONE charity line, carrying the top-up whole. No fee line —
-    // processing is absorbed at settlement (2026-09-06).
+    // ONE line for a single charity, carrying the top-up whole. No fee
+    // line — processing is absorbed at settlement (2026-09-06).
     expect(lines).toHaveLength(1)
     expect(lines[0]).toMatchObject({ label: "To Oxfam", amount: 15 })
+  })
+
+  it("gives each charity its own penny-even line (founder, 2026-09-07)", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, charityNames: ["Oxfam", "RNLI"] })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("10")
+      result.current.setTopUpAmount("5")
+    })
+    const lines = result.current.ownBreakdown!.lines
+    expect(lines).toEqual([
+      { label: "To Oxfam", amount: 7.5 },
+      { label: "To RNLI", amount: 7.5 },
+    ])
+  })
+
+  it("spreads odd pennies across the charity lines — never a bulge", () => {
+    const { result } = renderHook(() =>
+      usePledge({ ...baseOptions, charityNames: ["A", "B", "C"] })
+    )
+    act(() => {
+      result.current.updatePledgeAmount("2")
+    })
+    const lines = result.current.ownBreakdown!.lines
+    expect(lines).toEqual([
+      { label: "To A", amount: 0.67 },
+      { label: "To B", amount: 0.67 },
+      { label: "To C", amount: 0.66 },
+    ])
   })
 })
 
