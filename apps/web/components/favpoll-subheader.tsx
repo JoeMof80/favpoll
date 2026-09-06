@@ -34,6 +34,7 @@ export function FavpollSubheader({
   useEffect(() => {
     try {
       sessionStorage.setItem("favpolls:return", `/favpolls/${favpollId}`)
+      sessionStorage.setItem("favpolls:return-t", String(Date.now()))
     } catch {
       // best effort
     }

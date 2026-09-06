@@ -56,43 +56,59 @@ export function FavpollsListClient({
   // frames — past the App Router's scroll reset, immune to layout
   // shifts. The key is consumed once; fresh arrivals keep the top.
   useLayoutEffect(() => {
+    // StrictMode-proof consumption: the key is deleted only AFTER a
+    // successful centring — a doomed dev double-mount first pass never
+    // gets there, so the surviving pass still finds it. A staleness
+    // window (stamped at arm time) stops ancient keys resurfacing.
     let href: string | null = null
     try {
       href = sessionStorage.getItem("favpolls:return")
-      if (href) sessionStorage.removeItem("favpolls:return")
+      const t = Number(sessionStorage.getItem("favpolls:return-t") ?? 0)
+      if (href && Date.now() - t > 10 * 60 * 1000) {
+        sessionStorage.removeItem("favpolls:return")
+        sessionStorage.removeItem("favpolls:return-t")
+        href = null
+      }
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
     if (!href) return
-    // One-shot centring drifted on the founder's phone: images/fonts
-    // above the target finish loading AFTER the scroll, growing the
-    // content above and leaving the viewport ~two cards short. Keep
-    // re-centring for a short window, and stop the moment the user
-    // touches anything — never fight a human scroll.
     let interrupted = false
+    let listenersOn = false
     const stop = () => {
       interrupted = true
     }
     const opts = { passive: true } as const
-    window.addEventListener("touchstart", stop, opts)
-    window.addEventListener("wheel", stop, opts)
-    window.addEventListener("keydown", stop)
+    // Attach only AFTER the first centring attempt: a synthetic touch
+    // during Safari's reload restoration must not pre-empt the scroll.
+    const attach = () => {
+      if (listenersOn) return
+      listenersOn = true
+      window.addEventListener("touchstart", stop, opts)
+      window.addEventListener("wheel", stop, opts)
+      window.addEventListener("keydown", stop)
+    }
     const centre = () => {
       if (interrupted) return
       const li = document
         .querySelector(`a[href="${CSS.escape(href!)}"]`)
         ?.closest("li")
       if (!li) {
+        attach()
         return
       }
       const r = li.getBoundingClientRect()
       const target =
         window.scrollY + r.top - (window.innerHeight - r.height) / 2
-      const before = Math.round(window.scrollY)
       if (Math.abs(window.scrollY - target) > 8) {
         window.scrollTo(0, Math.max(0, target))
-      } else {
       }
+      // Consumed only on success — see the StrictMode note above.
+      try {
+        sessionStorage.removeItem("favpolls:return")
+        sessionStorage.removeItem("favpolls:return-t")
+      } catch {}
+      attach()
     }
     const raf = requestAnimationFrame(() => requestAnimationFrame(centre))
     const timers = [300, 800, 1500, 2500].map((ms) => setTimeout(centre, ms))
