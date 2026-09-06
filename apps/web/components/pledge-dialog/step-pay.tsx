@@ -31,7 +31,7 @@ type Props = {
     total: { label: string; amount: number }
   } | null
   favouriteBreakdown: FavouriteBreakdownLine[]
-  /** Pounds of the total moved to the shared fund (step 3's split). */
+  /** Pounds of the total moved to the shared pot (step 3's split). */
   fundPart: number
   tipAmount: number
   tipOptions: number[]
@@ -94,7 +94,7 @@ export function StepPay({
               ))}
               {fundPart > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-sm">Shared fund</span>
+                  <span className="text-sm">Shared pot</span>
                   <span className="text-sm font-semibold tabular-nums">
                     {formatPoundsExact(fundPart)}
                   </span>

@@ -36,8 +36,8 @@ export function PledgeCardWrapper({ children }: Props) {
           </PopoverTrigger>
           <PopoverContent align="end" className="w-56 text-xs leading-relaxed">
             Pledge the amount that reflects how strongly you feel about your
-            favourites. Add more to the shared fund, if you wish. All pledges
-            are anonymous.
+            favourites. Add more to the shared pot, if you wish. All pledges are
+            anonymous.
           </PopoverContent>
         </Popover>
       </div>

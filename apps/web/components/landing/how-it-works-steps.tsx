@@ -51,14 +51,14 @@ const DEFAULT_MEDIA = [
  * trade.
  */
 // FIRST MENTION LINKS TO THE REFERENCE (founder, 2026-09-03): "the
-// shared fund" in the triad used to dead-end for a cold reader; its
+// shared pot" in the triad used to dead-end for a cold reader; its
 // /features section answers it in one click. Structural, not
 // editorial — the founder's copy strings are untouched, and the FIRST
 // occurrence in EACH BEAT is wrapped in a quiet ink link (per-beat,
 // founder 2026-09-03: the columns are read as self-contained, so the
 // pledge beat's mention earns its own link). Marketing prose only; dialogs carry their own
 // sentence instead (the features/dialog copy doctrine, 2026-09-03).
-const LINK_TERM = "shared fund"
+const LINK_TERM = "shared pot"
 const LINK_HREF = "/features#shared-fund"
 
 function linkifyOnce(body: string, spent: { done: boolean }) {

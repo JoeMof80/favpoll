@@ -41,9 +41,9 @@ describe("buildMechanicSteps", () => {
     expect(isQuoteReveal(undefined)).toBe(false)
   })
 
-  it("footer routes the favourite-less guest to the shared fund", () => {
+  it("footer routes the favourite-less guest to the shared pot", () => {
     expect(mechanicFooter("Seaside town")).toBe(
-      "Don't have a favourite seaside town? That's okay — you can still give to the shared fund."
+      "Don't have a favourite seaside town? That's okay — you can still give to the shared pot."
     )
   })
 })

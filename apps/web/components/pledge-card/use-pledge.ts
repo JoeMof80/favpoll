@@ -174,7 +174,7 @@ export function usePledge({
       ? {
           lines: [
             { label: `To ${charityLabel}`, amount: numericPledge },
-            { label: "Deducted from shared fund", amount: numericPledge },
+            { label: "Deducted from shared pot", amount: numericPledge },
           ],
           total: { label: "Charged to you", amount: 0 },
         }

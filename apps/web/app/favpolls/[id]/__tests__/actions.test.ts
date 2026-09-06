@@ -563,7 +563,7 @@ describe("deleteFavpoll", () => {
     ).toHaveLength(0)
   })
 
-  it("refuses when the shared fund holds deposits", async () => {
+  it("refuses when the shared pot holds deposits", async () => {
     mock.queue({
       ...OWNED_EMPTY,
       favpoll_pots: [{ id: "pot-1", total_deposited: 25 }],

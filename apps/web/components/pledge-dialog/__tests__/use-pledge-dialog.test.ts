@@ -328,11 +328,11 @@ describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared fund path
+// Shared pot path
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("usePledgeDialog — shared fund path", () => {
-  it("step stays at 2 (no split, no review) when shared fund pledge succeeds", async () => {
+describe("usePledgeDialog — shared pot path", () => {
+  it("step stays at 2 (no split, no review) when shared pot pledge succeeds", async () => {
     const pot = makePot(100, 0)
     const onPledgeSuccess = vi.fn()
     const { result } = renderHook(() =>

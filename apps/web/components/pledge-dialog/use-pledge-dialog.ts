@@ -100,7 +100,7 @@ export function usePledgeDialog({
 
   // --- step 2: TWO-PART entry (founder mock, 2026-09-06 — supersedes
   // total-then-split). The favourites figure IS usePledge's pledgeAmount
-  // ("pledge its worth"), the shared fund is topUpAmount riding on top,
+  // ("pledge its worth"), the shared pot is topUpAmount riding on top,
   // and the slider between them REBALANCES the current sum without
   // changing it. No mapping layer: these are the rail's native parts.
   const numericPledge = parseFloat(pledge.pledgeAmount)
@@ -176,7 +176,7 @@ export function usePledgeDialog({
   // favourite, so a guest who could not decide was stuck on step 1 with a
   // dead Next button and no way out but to close the dialog. Giving without
   // backing anything is already a shape the product has — "a gift with no
-  // favourite attached" is how the shared fund describes it — and the money
+  // favourite attached" is how the shared pot describes it — and the money
   // reaches the charity either way. A no-pick pledge lands with a total and
   // no allocations (and sees no slider — nothing to rebalance).
   const canAdvanceStep1 = true

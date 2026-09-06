@@ -71,7 +71,7 @@ export function StepAmountHeader({
             htmlFor="dialog-fund-amount"
             className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
           >
-            Shared fund
+            Shared pot
           </label>
         )}
       </InputGroupAddon>
@@ -122,7 +122,7 @@ export function StepAmountHeader({
               value={fundAmount}
               onChange={(e) => onFundAmountChange!(e.target.value)}
               placeholder="0"
-              aria-label="Shared fund amount in pounds, on top of your pledge"
+              aria-label="Shared pot amount in pounds, on top of your pledge"
               // Sized to its digits so the figure sits flush right; quiet
               // ink until the fund actually holds money (founder,
               // 2026-09-06).
@@ -142,13 +142,13 @@ export function StepAmountHeader({
               <p className="text-[11px] text-muted-foreground">
                 {isPledgeValid && available > 0
                   ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
-                  : `${formatPoundsExact(available)} available in the shared fund`}
+                  : `${formatPoundsExact(available)} available in the shared pot`}
               </p>
             )}
             {useSharedFund && fundOverAvailable && (
               <p className="text-[11px] text-destructive">
-                Shared fund has {formatPoundsExact(available)} available —
-                reduce your pledge to use it
+                Shared pot has {formatPoundsExact(available)} available — reduce
+                your pledge to use it
               </p>
             )}
             {error && <p className="text-sm text-destructive">{error}</p>}
@@ -170,7 +170,7 @@ type Props = {
   /** Two-part entry (founder mock, 2026-09-06): omit onFavShare (hero
    *  demo) to hide the slider and list entirely. */
   favouriteBreakdown?: FavouriteBreakdownLine[]
-  /** Pounds in the shared fund, on top of the pledge. */
+  /** Pounds in the shared pot, on top of the pledge. */
   fundPart?: number
   /** Set the favourites' share of the current sum (the slider). */
   onFavShare?: (pounds: number) => void
@@ -203,7 +203,7 @@ export function StepAmount({
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
         {/* The slider rebalances the header's two figures — favourites on
-            the left (primary fill), shared fund on the right — moving
+            the left (primary fill), shared pot on the right — moving
             whole pounds while the sum holds still. */}
         {showSplit && (
           <Slider
@@ -260,7 +260,7 @@ export function StepAmount({
         {!useSharedFund && (
           <p className="text-[11px] text-muted-foreground">
             {showSplit &&
-              "The shared fund backs guests without a favourite, and reaches the charity too. Add to it, or slide to rebalance — your pledge is the two together. "}
+              "The shared pot backs guests without a favourite, and reaches the charity too. Add to it, or slide to rebalance — your pledge is the two together. "}
             Give what feels right. Processed securely by Stripe — favpoll takes
             no platform fee.
           </p>
@@ -279,7 +279,7 @@ export function StepAmount({
                 Pay with card
               </TabsTrigger>
               <TabsTrigger value="fund" className="flex-1">
-                Use shared fund
+                Use shared pot
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -297,7 +297,7 @@ export function StepAmount({
               </div>
             ))}
             <div className="flex justify-between">
-              <span className="text-base">Shared fund</span>
+              <span className="text-base">Shared pot</span>
               <span className="text-base font-semibold tabular-nums">
                 {formatPoundsExact(fundPart)}
               </span>

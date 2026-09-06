@@ -51,7 +51,7 @@ const BASICS: { label: string; body: string }[] = [
 // The basics arrived above: run length, editability, account-free pledging
 // and unlisted privacy restated the spec grid word for word. What remains
 // is the questions with a real answer behind them — goal-as-milestone, the
-// shared fund, and what closing means. The fee question lives in the
+// shared pot, and what closing means. The fee question lives in the
 // "Where the money goes" section, not here.
 // Answers are ReactNode since 2026-09-03: first mentions of features
 // link to their /features sections — the reference the FAQ leans on.
@@ -69,7 +69,7 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
           href="/features#shared-fund"
           className="text-primary underline-offset-4 hover:underline"
         >
-          shared fund
+          shared pot
         </Link>
         , so a child or a guest without means can still take part — and nobody
         sees who used it.
@@ -100,7 +100,7 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
   {
     // THE PRIVACY PROMISE LANDS HERE (founder, 2026-08-19) because /features
     // stopped making it. Two bullets carrying it were dropped from that page
-    // the same day — the shared fund's "nobody sees who used it" and the
+    // the same day — the shared pot's "nobody sees who used it" and the
     // keepsake's "No individual amounts — what people gave stays theirs" —
     // leaving the pitch silent on a question anyone giving money in front of
     // other people actually asks.

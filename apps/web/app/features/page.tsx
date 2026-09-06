@@ -80,14 +80,14 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared fund, the reveal and a printable keepsake.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared pot, the reveal and a printable keepsake.",
 }
 
 const SECTIONS = [
   { id: "topics", label: "Homemade topics" },
   { id: "stationery", label: "QR-coded stationery" },
   { id: "display", label: "Live display" },
-  { id: "shared-fund", label: "Shared fund" },
+  { id: "shared-fund", label: "Shared pot" },
   { id: "reveal", label: "The reveal" },
   { id: "keepsake", label: "Keepsake" },
 ]
@@ -243,13 +243,13 @@ export default function FeaturesPage() {
 
             <Feature
               id="shared-fund"
-              title="Shared fund"
+              title="Shared pot"
               lead="A float to help everybody take part or give without taking part."
               bullets={[
                 "Give to charity without picking a favourite",
-                "Give more than your favourite is worth to you. e.g. £50 for your favourite, £50 to the shared fund",
-                "Help those without money take part. They can select from the shared fund at checkout",
-                "Anything remaining in the shared fund goes to the charity when the favpoll closes",
+                "Give more than your favourite is worth to you. e.g. £50 for your favourite, £50 to the shared pot",
+                "Help those without money take part. They can select from the shared pot at checkout",
+                "Anything remaining in the shared pot goes to the charity when the favpoll closes",
               ]}
               artefact={<FundVignette />}
             />

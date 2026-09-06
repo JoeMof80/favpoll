@@ -61,7 +61,7 @@ describe("SeedFundModal — initial render", () => {
     expect(
       screen.getByRole("heading", { name: "Give guests a head start" })
     ).toBeInTheDocument()
-    expect(screen.getByText(/shared fund lets guests/i)).toBeInTheDocument()
+    expect(screen.getByText(/shared pot lets guests/i)).toBeInTheDocument()
   })
 
   it("renders preset amount buttons", () => {

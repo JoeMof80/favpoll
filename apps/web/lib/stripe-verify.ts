@@ -89,7 +89,7 @@ export async function verifyPledgePayment({
 
 type VerifyTopUpInput = {
   paymentIntentId: string
-  /** The favpoll whose shared fund is being credited */
+  /** The favpoll whose shared pot is being credited */
   favpollId: string
   /** Pounds — the amount being credited to the fund */
   topUpAmount: number

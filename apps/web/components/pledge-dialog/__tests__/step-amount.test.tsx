@@ -37,9 +37,9 @@ describe("StepAmountHeader — two-part entry (founder mock, 2026-09-06)", () =>
       />
     )
     expect(screen.getByText("Favourites")).toBeInTheDocument()
-    expect(screen.getByText("Shared fund")).toBeInTheDocument()
+    expect(screen.getByText("Shared pot")).toBeInTheDocument()
     const fund = screen.getByLabelText(
-      "Shared fund amount in pounds, on top of your pledge"
+      "Shared pot amount in pounds, on top of your pledge"
     )
     fireEvent.change(fund, { target: { value: "5" } })
     expect(onFundAmountChange).toHaveBeenCalledWith("5")
@@ -56,7 +56,7 @@ describe("StepAmountHeader — two-part entry (founder mock, 2026-09-06)", () =>
       />
     )
     expect(screen.getByText("Your pledge")).toBeInTheDocument()
-    expect(screen.queryByText("Shared fund")).not.toBeInTheDocument()
+    expect(screen.queryByText("Shared pot")).not.toBeInTheDocument()
   })
 
   it("falls back to the single figure without a fund handler (fund mode)", () => {
@@ -68,7 +68,7 @@ describe("StepAmountHeader — two-part entry (founder mock, 2026-09-06)", () =>
       />
     )
     expect(screen.getByText("Your pledge")).toBeInTheDocument()
-    expect(screen.queryByText("Shared fund")).not.toBeInTheDocument()
+    expect(screen.queryByText("Shared pot")).not.toBeInTheDocument()
   })
 })
 
@@ -111,7 +111,7 @@ describe("StepAmount — the rebalancing slider", () => {
     render(<StepAmount {...BASE} {...SPLIT} />)
     expect(screen.getByText("Blue")).toBeInTheDocument()
     expect(screen.getByText(/£18/)).toBeInTheDocument()
-    expect(screen.getByText("Shared fund")).toBeInTheDocument()
+    expect(screen.getByText("Shared pot")).toBeInTheDocument()
     expect(screen.getByText(/£2\.00/)).toBeInTheDocument()
   })
 
