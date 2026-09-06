@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { BadgeCheck } from "lucide-react"
+import { BadgeCheck, Plus } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
-import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PageLayout } from "@/components/page-layout"
 import { heroNameSizeClass } from "@/lib/display"
@@ -121,7 +120,15 @@ export default async function CharityPage({ params }: Props) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (c: any) => ({ charity: c.charity })
       ),
-      poll: { topic: f.favpoll_polls?.[0]?.topics ?? null },
+      // favpoll_polls is a TO-ONE join here — PostgREST returns an
+      // object, not an array (verified against staging; indexing [0]
+      // silently nulled the topic and the card hid its topic row).
+      poll: {
+        topic:
+          (Array.isArray(f.favpoll_polls)
+            ? f.favpoll_polls[0]?.topics
+            : f.favpoll_polls?.topics) ?? null,
+      },
     }
   })
 
@@ -131,12 +138,15 @@ export default async function CharityPage({ params }: Props) {
     process.env.SUPPORT_EMAIL ??
     "hello@favpoll.com"
 
+  // The card fills the avatar's own height (md:h-33) so the header row
+  // reads as one unit: text stack, logo, facts (founder, 2026-09-06 —
+  // and no stickiness: it is a header element, not a rail companion).
   const factsCard = (
-    <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+    <div className="flex flex-col justify-center space-y-1 rounded-lg border border-border bg-card px-5 py-4 md:h-33">
       <SectionEyebrow variant="muted" className="font-semibold">
         Raised through favpoll
       </SectionEyebrow>
-      <p className="text-xl font-medium text-primary tabular-nums">
+      <p className="text-3xl font-light text-primary tabular-nums">
         {formatPounds(stats.total_raised)}
       </p>
       <p className="text-xs text-muted-foreground">
@@ -211,57 +221,66 @@ export default async function CharityPage({ params }: Props) {
       {/* The facts live in the rail on md+ (the favpoll page's own
           column); the rail hides on mobile, so surface them here. */}
       <div className="mt-6 md:hidden">{factsCard}</div>
+    </>
+  )
 
+  // Full-width row beneath the header columns (founder, 2026-09-06:
+  // "Appeals and Open favpolls should be on a new row, without
+  // columns") — PageLayout children render below the grid, spanning
+  // the whole sheet.
+  const fullWidth = (
+    <>
       {/* ── Appeals ── */}
       {(openAppeals.length > 0 || canManage) && (
         <section className="mt-12">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <SectionEyebrow as="h2">Appeals for {charity.name}</SectionEyebrow>
+          <SectionEyebrow as="h2" className="mb-5">
+            Appeals for {charity.name}
+          </SectionEyebrow>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* The create door IS a card, first in the list (founder,
+                2026-09-06) — the dashed add-tile, the wizard photo
+                square's own grammar. */}
             {canManage && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/appeals/new?charity=${charity.id}`}>
-                  Create an appeal
-                </Link>
-              </Button>
+              <Link
+                href={`/appeals/new?charity=${charity.id}`}
+                className="flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-background p-5 text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+              >
+                <Plus className="size-6" aria-hidden="true" />
+                <span className="text-sm font-medium">Create an appeal</span>
+              </Link>
             )}
+            {openAppeals.map((a) => {
+              const agg = aggByAppeal.get(a.id)
+              return (
+                <Link
+                  key={a.id}
+                  href={`/appeals/${a.slug}`}
+                  className="group rounded-xl border border-border bg-background p-5 transition-shadow hover:shadow-md"
+                >
+                  <p className="truncate text-lg font-medium text-foreground group-hover:text-primary">
+                    {a.name}
+                  </p>
+                  {a.blurb && (
+                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                      {a.blurb}
+                    </p>
+                  )}
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    <span className="font-medium text-primary tabular-nums">
+                      {formatPounds(Number(agg?.raised ?? 0))}
+                    </span>{" "}
+                    · {agg?.member_count ?? 0} favpoll
+                    {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                    {a.closes_at &&
+                      ` · closes ${new Date(a.closes_at).toLocaleDateString(
+                        "en-GB",
+                        { day: "numeric", month: "long" }
+                      )}`}
+                  </p>
+                </Link>
+              )
+            })}
           </div>
-          {openAppeals.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No appeals yet.</p>
-          ) : (
-            <div className="grid gap-5 sm:grid-cols-2">
-              {openAppeals.map((a) => {
-                const agg = aggByAppeal.get(a.id)
-                return (
-                  <Link
-                    key={a.id}
-                    href={`/appeals/${a.slug}`}
-                    className="group rounded-xl border border-border bg-background p-5 transition-shadow hover:shadow-md"
-                  >
-                    <p className="truncate text-lg font-medium text-foreground group-hover:text-primary">
-                      {a.name}
-                    </p>
-                    {a.blurb && (
-                      <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                        {a.blurb}
-                      </p>
-                    )}
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      <span className="font-medium text-primary tabular-nums">
-                        {formatPounds(Number(agg?.raised ?? 0))}
-                      </span>{" "}
-                      · {agg?.member_count ?? 0} favpoll
-                      {(agg?.member_count ?? 0) === 1 ? "" : "s"}
-                      {a.closes_at &&
-                        ` · closes ${new Date(a.closes_at).toLocaleDateString(
-                          "en-GB",
-                          { day: "numeric", month: "long" }
-                        )}`}
-                    </p>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
         </section>
       )}
 
@@ -270,18 +289,20 @@ export default async function CharityPage({ params }: Props) {
         <SectionEyebrow as="h2" className="mb-5">
           Open favpolls supporting {charity.name}
         </SectionEyebrow>
-        {liveFavpolls.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No open favpolls right now — start one and every pledge reaches{" "}
-            {charity.name} in full.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {liveFavpolls.map((favpoll) => (
-              <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            href="/favpolls/new"
+            className="flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-background p-5 text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+          >
+            <Plus className="size-6" aria-hidden="true" />
+            <span className="text-sm font-medium">
+              {withQuietTail("Create a favpoll — always free")}
+            </span>
+          </Link>
+          {liveFavpolls.map((favpoll) => (
+            <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
+          ))}
+        </div>
         {/* Charity claim — the manual first step before a portal */}
         <p className="mt-8 text-sm text-muted-foreground">
           Is this your charity?{" "}
@@ -298,24 +319,12 @@ export default async function CharityPage({ params }: Props) {
           to help keep this page up to date.
         </p>
       </section>
-
-      {/* ── Close — quiet, inside the sheet ── */}
-      <section className="mt-14 border-t border-border pt-10">
-        <p className="mb-5 text-2xl leading-tight font-light tracking-tight text-foreground md:text-3xl">
-          Honour someone, and support {charity.name}.
-        </p>
-        <Button
-          asChild
-          size="lg"
-          className="h-auto min-h-11 px-6 py-2 text-base"
-        >
-          <Link href="/favpolls/new">
-            {withQuietTail("Create a favpoll — always free")}
-          </Link>
-        </Button>
-      </section>
     </>
   )
 
-  return <PageLayout left={left} right={factsCard} />
+  return (
+    <PageLayout left={left} right={factsCard} rightSticky={false}>
+      {fullWidth}
+    </PageLayout>
+  )
 }

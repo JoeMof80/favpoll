@@ -1,10 +1,18 @@
 type Props = {
   left: React.ReactNode
   right?: React.ReactNode
+  /** The favpoll rail pins below the header; destination pages that
+      use the rail as a header-row element (charity facts) opt out. */
+  rightSticky?: boolean
   children?: React.ReactNode
 }
 
-export function PageLayout({ left, right, children }: Props) {
+export function PageLayout({
+  left,
+  right,
+  rightSticky = true,
+  children,
+}: Props) {
   return (
     // [overflow-anchor:none] (2026-09-05): the hero band SHRINKS during
     // scroll (the about/context clips collapse), and the browser's
@@ -24,7 +32,13 @@ export function PageLayout({ left, right, children }: Props) {
               off-screen, right margin gone (found on iOS, 2026-07-26) */}
           <div className="min-w-0">{left}</div>
           {right !== undefined && (
-            <div className="sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16">
+            <div
+              className={
+                rightSticky
+                  ? "sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16"
+                  : "hidden space-y-4 self-start md:block md:pt-16"
+              }
+            >
               {right}
             </div>
           )}
