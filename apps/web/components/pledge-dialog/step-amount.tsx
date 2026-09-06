@@ -1,22 +1,10 @@
 "use client"
 
-import { useState } from "react"
-
-import type { BreakdownLine } from "@/components/pledge-card/pledge-breakdown"
-import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
-import { formatTipLabel } from "@/components/pledge-card/utils"
 import { formatPoundsExact } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles, Info, Minus, Plus } from "lucide-react"
-
-type FavouriteBreakdownLine = { label: string; amount: number }
+import { Sparkles } from "lucide-react"
 
 const PRESETS = [5, 10, 20, 50]
 
@@ -108,58 +96,25 @@ type Props = {
   updatePledgeAmount: (v: string) => void
   useSharedFund: boolean
   hasFund: boolean
-  ownBreakdown: {
-    lines: BreakdownLine[]
-    total: { label: string; amount: number }
-  } | null
-  fundBreakdown: {
-    lines: BreakdownLine[]
-    total: { label: string; amount: number }
-  } | null
-  favouriteBreakdown: FavouriteBreakdownLine[]
   toggleFund: () => void
   /** Admin-curated impact lines per charity ("£20 funds an hour…") */
   impactStatements?: string[]
-  tipAmount: number
-  setTipAmount: (v: number) => void
-  /** Chip values for the current pledge tier (see tipOptionsFor) */
-  tipOptions: number[]
-  /** false hides the contribution row (hero demo) */
-  showTip?: boolean
-  isListed?: boolean
-  /** Pounds of the total moved to the shared fund (dialog split). */
-  fundPart?: number
-  /** Step the fund by ±£1 — omitted (hero demo) hides the split row. */
-  onFundStep?: (delta: number) => void
 }
 
+/**
+ * LEAN since 2026-09-06 (the four-step flow): the amount, the presets, the
+ * fund tabs — nothing else. The split became its own step, and the tip and
+ * itemised bill moved to the review page, where they are read at the
+ * moment of payment.
+ */
 export function StepAmount({
   pledgeAmount,
   updatePledgeAmount,
   useSharedFund,
   hasFund,
-  ownBreakdown,
-  fundBreakdown,
-  favouriteBreakdown,
   toggleFund,
   impactStatements,
-  tipAmount,
-  setTipAmount,
-  tipOptions,
-  showTip = true,
-  isListed,
-  fundPart = 0,
-  onFundStep,
 }: Props) {
-  // The split is an advanced move most guests never make (founder,
-  // 2026-09-06: the sheet read as overwhelming) — folded behind a
-  // quiet row until asked for, or already in use.
-  const [splitOpen, setSplitOpen] = useState(false)
-  const numericTotal = parseFloat(pledgeAmount)
-  const totalValid = !isNaN(numericTotal) && numericTotal > 0
-  // The favourite keeps at least £1 of worth
-  const canStepUp = totalValid && fundPart + 1 <= Math.floor(numericTotal - 1)
-  const showSplit = !useSharedFund && !!onFundStep && totalValid
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
@@ -200,143 +155,24 @@ export function StepAmount({
           )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          {hasFund && (
-            <Tabs
-              value={useSharedFund ? "fund" : "card"}
-              onValueChange={(v) => {
-                if ((v === "fund") !== useSharedFund) toggleFund()
-              }}
-              className="border-b border-border"
-            >
-              <TabsList className="w-full" variant="line">
-                <TabsTrigger value="card" className="flex-1">
-                  Pay with card
-                </TabsTrigger>
-                <TabsTrigger value="fund" className="flex-1">
-                  Use shared fund
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          )}
-
-          {favouriteBreakdown.length > 0 && (
-            <div className="space-y-2">
-              <div className="space-y-2">
-                {favouriteBreakdown.map((line, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span className="text-sm">{line.label}</span>
-                    <span className="text-sm font-semibold tabular-nums">
-                      {formatPoundsExact(line.amount)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {/* The split: whole pounds move from the favourite(s) to the
-                  shared fund — the favourite lines above tick down as this
-                  ticks up, total unchanged (founder redesign, 2026-07-31) */}
-              {showSplit && !splitOpen && fundPart <= 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSplitOpen(true)}
-                  className="w-fit text-left text-sm text-primary underline-offset-4 hover:underline"
-                >
-                  + Split with the shared fund
-                </button>
-              )}
-              {showSplit && (splitOpen || fundPart > 0) && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Shared fund</span>
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-xs"
-                      aria-label="Move £1 back to your favourite"
-                      disabled={fundPart <= 0}
-                      onClick={() => onFundStep!(-1)}
-                    >
-                      <Minus />
-                    </Button>
-                    <span className="w-14 text-center text-sm font-semibold tabular-nums">
-                      {formatPoundsExact(fundPart)}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-xs"
-                      aria-label="Move £1 to the shared fund"
-                      disabled={!canStepUp}
-                      onClick={() => onFundStep!(1)}
-                    >
-                      <Plus />
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {/* Tip control lives with the other decisions (founder,
-                  2026-07-31) — the receipt below shows it as a plain
-                  line, like everything else charged */}
-              {showTip && !useSharedFund && totalValid && (
-                <>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm">Tip for favpoll</span>
-                    <div
-                      className="flex gap-1"
-                      role="radiogroup"
-                      aria-label="Optional contribution to favpoll"
-                    >
-                      {tipOptions.map((value) => (
-                        <Button
-                          key={value}
-                          type="button"
-                          size="xs"
-                          role="radio"
-                          aria-checked={tipAmount === value}
-                          variant={tipAmount === value ? "secondary" : "ghost"}
-                          className="px-2 font-normal aria-checked:font-medium"
-                          onClick={() => setTipAmount(value)}
-                        >
-                          {formatTipLabel(value)}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Optional — never taken from your pledge.
-                  </p>
-                </>
-              )}
-            </div>
-          )}
-
-          {(ownBreakdown ?? fundBreakdown) && (
-            <PledgeBreakdown
-              {...(ownBreakdown ?? fundBreakdown)!}
-              extraRow={
-                showTip && !useSharedFund && tipAmount > 0 ? (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-muted-foreground">
-                      Tip for favpoll
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {formatPoundsExact(tipAmount)}
-                    </span>
-                  </div>
-                ) : null
-              }
-            />
-          )}
-
-          {/* Last thing read before Pledge (founder, 2026-07-31): the
-              privacy reassurance lands at the moment of commitment */}
-          {isListed && (
-            <p className="rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-              This is a public favpoll. Your pledge amount and identity are
-              always private.
-            </p>
-          )}
-        </div>
+        {hasFund && (
+          <Tabs
+            value={useSharedFund ? "fund" : "card"}
+            onValueChange={(v) => {
+              if ((v === "fund") !== useSharedFund) toggleFund()
+            }}
+            className="border-b border-border"
+          >
+            <TabsList className="w-full" variant="line">
+              <TabsTrigger value="card" className="flex-1">
+                Pay with card
+              </TabsTrigger>
+              <TabsTrigger value="fund" className="flex-1">
+                Use shared fund
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
       </div>
     </div>
   )

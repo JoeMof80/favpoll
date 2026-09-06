@@ -38,6 +38,9 @@ export type UsePledgeOptions = {
    *  the quietest ask for the most sensitive register). When true the
    *  suggestion scales with the pledge (see tipOptionsFor). */
   suggestTip?: boolean
+  /** Dialog flow: allow confirming with no favourite picked (2026-08-17 —
+   *  "a gift with no favourite attached"). The legacy card keeps its gate. */
+  allowEmptySelection?: boolean
 }
 
 export function usePledge({
@@ -51,6 +54,7 @@ export function usePledge({
   onPledgeAmountChange,
   onPledgeSuccess,
   suggestTip = true,
+  allowEmptySelection = false,
 }: UsePledgeOptions) {
   const router = useRouter()
 
@@ -81,6 +85,8 @@ export function usePledge({
   const [pendingTopUp, setPendingTopUp] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // A step-4 tip change re-prices the PaymentIntent (see refreshIntentWithTip)
+  const [refreshingIntent, setRefreshingIntent] = useState(false)
 
   function updatePledgeAmount(v: string) {
     setPledgeAmount(v)
@@ -133,7 +139,8 @@ export function usePledge({
     : true
 
   const hasAnySelection = (pollSelections[pollWithItems.id]?.length ?? 0) > 0
-  const baseCanConfirm = isPledgeValid && hasAnySelection && !submitting
+  const baseCanConfirm =
+    isPledgeValid && (hasAnySelection || allowEmptySelection) && !submitting
   const canOwnConfirm =
     baseCanConfirm && (!clerkUserId ? isGuestEmailValid : true)
   const canFundConfirm = baseCanConfirm && !fundOverAvailable
@@ -244,6 +251,37 @@ export function usePledge({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       setSubmitting(false)
+    }
+  }
+
+  // Tip chips live on the review page (founder, 2026-09-06). A chip tap
+  // after the intent exists re-creates it with the new parts — the client
+  // never names its own total, it only asks the route to price the parts
+  // again. The caller disables the chips and Pay while this is in flight.
+  async function refreshIntentWithTip(tip: number) {
+    if (!pledgeClientSecret) return
+    setRefreshingIntent(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/stripe/payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          favpollPollId: pollWithItems.id,
+          favpollId,
+          pledgeAmount: ownBase,
+          tipAmount: ownBase > 0 ? tip : 0,
+          topUpAmount: ownTopUp,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? "Failed to update payment")
+      setPledgePaymentIntentId(data.paymentIntentId ?? null)
+      setPledgeClientSecret(data.clientSecret)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong")
+    } finally {
+      setRefreshingIntent(false)
     }
   }
 
@@ -383,6 +421,8 @@ export function usePledge({
     fundBreakdown,
     // handlers
     handleOwnConfirm,
+    refreshIntentWithTip,
+    refreshingIntent,
     handleFundConfirm,
     handlePledgePaymentSuccess,
     pledgePreflight,
