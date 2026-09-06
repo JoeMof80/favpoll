@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { PageSheet } from "@/components/page-sheet"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import {
   FavpollSummaryCard,
@@ -21,18 +22,18 @@ type CharityStats = {
   live_count: number
 }
 
-// REBUILT 2026-09-06 (founder: "why is the charity page themed green?
-// I'm not sure about this layout. You can do better."). Two verdicts
-// honoured:
-// - NEUTRAL, not a register palette: registers belong to OCCASIONS,
-//   not organisations — a hospice's page full of memorial favpolls in
-//   fundraiser green misread. Default brand palette, like the other
-//   register-spanning surfaces.
-// - A REGISTER-LANDING page, not a dashboard: hero band with the
-//   stats as one quiet facts line, full-width bands (appeals, the
-//   favpoll shelf), and the register pages' own purple close band —
-//   this is a public profile, and its kin are /memorial and friends,
-//   not the manage hub.
+// REBUILT AGAIN 2026-09-06 (founder: "base the design of the charity
+// page on the favpoll page — especially the width, border and
+// header"): this page now stands on the favpoll page's own sheet
+// (PageSheet — max-w-5xl white on the wash, drop-shadow edge) with the
+// hero's STATIC composition: eyebrow, name, facts line, the logo where
+// the avatar sits (rounded-xl, the avatar's own shape). No pinning, no
+// settle machinery — that stays favpoll-only. The shelf is a GRID, not
+// a carousel (deliberate: the homepage carousel is a showcase, this is
+// an inventory — a carousel of two cards is machinery apologising for
+// itself). Earlier verdicts still in force: NEUTRAL palette (registers
+// belong to occasions, not organisations); appeals band; the claim
+// mailto as the manual step before a charity portal.
 export default async function CharityPage({ params }: Props) {
   const { id } = await params
   const { userId } = await auth()
@@ -130,179 +131,167 @@ export default async function CharityPage({ params }: Props) {
     "hello@favpoll.com"
 
   return (
-    <main className="flex flex-col">
-      {/* ── Hero band: identity + the quiet facts line ── */}
-      <section className="w-full border-b border-border">
-        <div className="mx-auto w-full max-w-330 px-6 py-14">
-          <div className="flex items-start justify-between gap-8">
-            <div className="min-w-0 flex-1">
-              <SectionEyebrow variant="muted">
-                {charity.registered_number
-                  ? `Registered charity ${charity.registered_number}`
-                  : "Charity"}
-              </SectionEyebrow>
-              <h1 className="mt-2 flex items-center gap-3 text-4xl leading-tight font-light tracking-tight text-foreground">
-                {charity.name}
-                {isVerified && (
-                  <BadgeCheck
-                    className="size-6 shrink-0 text-primary"
-                    role="img"
-                    aria-label="Verified with the Charity Commission"
-                  />
-                )}
-              </h1>
-              {charity.description && (
-                <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                  {charity.description}
-                </p>
-              )}
-              {charity.impact_statement && (
-                <p className="mt-4 inline-block rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                  {charity.impact_statement}
-                </p>
-              )}
-              {/* The facts, one quiet line — not a dashboard card */}
-              <p className="mt-6 text-sm text-muted-foreground">
-                <span className="font-medium text-primary tabular-nums">
-                  {formatPounds(stats.total_raised)}
-                </span>{" "}
-                raised through favpoll ·{" "}
-                <span className="tabular-nums">{stats.favpoll_count}</span>{" "}
-                favpoll{stats.favpoll_count === 1 ? "" : "s"} in their name ·{" "}
-                <span className="tabular-nums">{stats.live_count}</span> open
-                now
-              </p>
-            </div>
-            {charity.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={charity.logo_url}
-                alt={charity.name}
-                className="size-24 shrink-0 rounded-2xl border border-border bg-background object-contain p-2 md:size-33"
+    <PageSheet>
+      {/* ── Header: the favpoll hero's composition, static ── */}
+      <header className="flex items-start justify-between gap-6 pt-10 md:pt-16">
+        <div className="min-w-0 flex-1">
+          <SectionEyebrow variant="muted">
+            {charity.registered_number
+              ? `Registered charity ${charity.registered_number}`
+              : "Charity"}
+          </SectionEyebrow>
+          <h1 className="mt-2 flex items-center gap-3 text-4xl leading-tight font-light tracking-tight text-foreground">
+            {charity.name}
+            {isVerified && (
+              <BadgeCheck
+                className="size-6 shrink-0 text-primary"
+                role="img"
+                aria-label="Verified with the Charity Commission"
               />
-            ) : (
-              <div
-                className="flex size-24 shrink-0 items-center justify-center rounded-2xl border border-border bg-primary/10 text-3xl font-medium text-primary md:size-33"
-                aria-hidden="true"
-              >
-                {charity.name.charAt(0)}
-              </div>
             )}
-          </div>
+          </h1>
+          {charity.description && (
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+              {charity.description}
+            </p>
+          )}
+          {charity.impact_statement && (
+            <p className="mt-4 inline-block rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              {charity.impact_statement}
+            </p>
+          )}
+          {/* The facts, one quiet line — not a dashboard card */}
+          <p className="mt-6 text-sm text-muted-foreground">
+            <span className="font-medium text-primary tabular-nums">
+              {formatPounds(stats.total_raised)}
+            </span>{" "}
+            raised through favpoll ·{" "}
+            <span className="tabular-nums">{stats.favpoll_count}</span> favpoll
+            {stats.favpoll_count === 1 ? "" : "s"} in their name ·{" "}
+            <span className="tabular-nums">{stats.live_count}</span> open now
+          </p>
         </div>
-      </section>
+        {/* The logo sits where the favpoll avatar sits — same shape */}
+        {charity.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={charity.logo_url}
+            alt={charity.name}
+            className="size-24 shrink-0 rounded-xl border border-border bg-background object-contain p-2 md:size-33"
+          />
+        ) : (
+          <div
+            className="flex size-24 shrink-0 items-center justify-center rounded-xl border border-border bg-primary/10 text-3xl font-medium text-primary md:size-33"
+            aria-hidden="true"
+          >
+            {charity.name.charAt(0)}
+          </div>
+        )}
+      </header>
 
-      {/* ── Appeals band ── */}
+      {/* ── Appeals ── */}
       {(openAppeals.length > 0 || canManage) && (
-        <section className="w-full border-b border-border">
-          <div className="mx-auto w-full max-w-330 px-6 py-14">
-            <div className="mb-6 flex items-center justify-between gap-3">
-              <SectionEyebrow as="h2">
-                Appeals for {charity.name}
-              </SectionEyebrow>
-              {canManage && (
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/appeals/new?charity=${charity.id}`}>
-                    Create an appeal
-                  </Link>
-                </Button>
-              )}
-            </div>
-            {openAppeals.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No appeals yet.</p>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {openAppeals.map((a) => {
-                  const agg = aggByAppeal.get(a.id)
-                  return (
-                    <Link
-                      key={a.id}
-                      href={`/appeals/${a.slug}`}
-                      className="group rounded-xl border border-border bg-background p-5 transition-shadow hover:shadow-md"
-                    >
-                      <p className="truncate text-lg font-medium text-foreground group-hover:text-primary">
-                        {a.name}
-                      </p>
-                      {a.blurb && (
-                        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                          {a.blurb}
-                        </p>
-                      )}
-                      <p className="mt-3 text-sm text-muted-foreground">
-                        <span className="font-medium text-primary tabular-nums">
-                          {formatPounds(Number(agg?.raised ?? 0))}
-                        </span>{" "}
-                        · {agg?.member_count ?? 0} favpoll
-                        {(agg?.member_count ?? 0) === 1 ? "" : "s"}
-                        {a.closes_at &&
-                          ` · closes ${new Date(a.closes_at).toLocaleDateString(
-                            "en-GB",
-                            { day: "numeric", month: "long" }
-                          )}`}
-                      </p>
-                    </Link>
-                  )
-                })}
-              </div>
+        <section className="mt-12">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <SectionEyebrow as="h2">Appeals for {charity.name}</SectionEyebrow>
+            {canManage && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/appeals/new?charity=${charity.id}`}>
+                  Create an appeal
+                </Link>
+              </Button>
             )}
           </div>
+          {openAppeals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No appeals yet.</p>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2">
+              {openAppeals.map((a) => {
+                const agg = aggByAppeal.get(a.id)
+                return (
+                  <Link
+                    key={a.id}
+                    href={`/appeals/${a.slug}`}
+                    className="group rounded-xl border border-border bg-background p-5 transition-shadow hover:shadow-md"
+                  >
+                    <p className="truncate text-lg font-medium text-foreground group-hover:text-primary">
+                      {a.name}
+                    </p>
+                    {a.blurb && (
+                      <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                        {a.blurb}
+                      </p>
+                    )}
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      <span className="font-medium text-primary tabular-nums">
+                        {formatPounds(Number(agg?.raised ?? 0))}
+                      </span>{" "}
+                      · {agg?.member_count ?? 0} favpoll
+                      {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                      {a.closes_at &&
+                        ` · closes ${new Date(a.closes_at).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "long" }
+                        )}`}
+                    </p>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </section>
       )}
 
-      {/* ── The shelf: open favpolls, full width ── */}
-      <section className="w-full">
-        <div className="mx-auto w-full max-w-330 px-6 py-14">
-          <SectionEyebrow as="h2" className="mb-6">
-            Open favpolls supporting {charity.name}
-          </SectionEyebrow>
-          {liveFavpolls.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No open favpolls right now — start one and every pledge reaches{" "}
-              {charity.name} in full.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {liveFavpolls.map((favpoll) => (
-                <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
-              ))}
-            </div>
-          )}
-          {/* Charity claim — the manual first step before a portal */}
-          <p className="mt-10 text-sm text-muted-foreground">
-            Is this your charity?{" "}
-            <a
-              href={`mailto:${contactEmail}?subject=${encodeURIComponent(
-                `Charity page — ${charity.name}`
-              )}&body=${encodeURIComponent(
-                `We'd like to help keep ${charity.name}'s favpoll page up to date (logo, description, impact statement).\n\nCharity: ${charity.name}\nReference: ${charity.id}`
-              )}`}
-              className="font-medium text-primary underline-offset-4 hover:underline"
-            >
-              Get in touch
-            </a>{" "}
-            to help keep this page up to date.
+      {/* ── The shelf: a grid, deliberately not a carousel ── */}
+      <section className="mt-12">
+        <SectionEyebrow as="h2" className="mb-5">
+          Open favpolls supporting {charity.name}
+        </SectionEyebrow>
+        {liveFavpolls.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No open favpolls right now — start one and every pledge reaches{" "}
+            {charity.name} in full.
           </p>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {liveFavpolls.map((favpoll) => (
+              <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
+            ))}
+          </div>
+        )}
+        {/* Charity claim — the manual first step before a portal */}
+        <p className="mt-8 text-sm text-muted-foreground">
+          Is this your charity?{" "}
+          <a
+            href={`mailto:${contactEmail}?subject=${encodeURIComponent(
+              `Charity page — ${charity.name}`
+            )}&body=${encodeURIComponent(
+              `We'd like to help keep ${charity.name}'s favpoll page up to date (logo, description, impact statement).\n\nCharity: ${charity.name}\nReference: ${charity.id}`
+            )}`}
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Get in touch
+          </a>{" "}
+          to help keep this page up to date.
+        </p>
       </section>
 
-      {/* ── Close — the register pages' own purple band ── */}
-      <section className="w-full bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-330 px-6 py-16">
-          <p className="mb-6 text-3xl leading-tight font-light tracking-tight md:text-4xl">
-            Honour someone, and support {charity.name}.
-          </p>
-          <Button
-            asChild
-            size="lg"
-            variant="secondary"
-            className="h-auto min-h-11 px-6 py-2 text-base"
-          >
-            <Link href="/favpolls/new">
-              {withQuietTail("Create a favpoll — always free")}
-            </Link>
-          </Button>
-        </div>
+      {/* ── Close — quiet, inside the sheet (the purple band was the
+          register-landing grammar; the sheet closes like a page) ── */}
+      <section className="mt-14 border-t border-border pt-10">
+        <p className="mb-5 text-2xl leading-tight font-light tracking-tight text-foreground md:text-3xl">
+          Honour someone, and support {charity.name}.
+        </p>
+        <Button
+          asChild
+          size="lg"
+          className="h-auto min-h-11 px-6 py-2 text-base"
+        >
+          <Link href="/favpolls/new">
+            {withQuietTail("Create a favpoll — always free")}
+          </Link>
+        </Button>
       </section>
-    </main>
+    </PageSheet>
   )
 }

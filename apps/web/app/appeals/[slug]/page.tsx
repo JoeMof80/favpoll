@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { PageSheet } from "@/components/page-sheet"
 import { formatAmount } from "@/lib/display"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { auth } from "@clerk/nextjs/server"
@@ -17,8 +18,10 @@ import { canManageAppeals } from "@/lib/appeals-admin"
 // memorial-adjacent and "most raised" reads competitive where
 // competition is wrong (founder decision, 2026-09-05).
 //
-// Fundraiser palette: an appeal is charity-led — the money is the
-// point, the cause register's own reasoning.
+// 2026-09-06: stands on the favpoll page's own sheet (PageSheet) with
+// the hero's static composition — eyebrow, name, photo where the
+// avatar sits (rounded-xl). Neutral palette: registers belong to
+// occasions, not drives.
 export default async function AppealPage({
   params,
 }: {
@@ -84,107 +87,107 @@ export default async function AppealPage({
     .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <main className="min-h-screen bg-primary/5">
-      <div className="mx-auto w-full max-w-3xl px-6 py-14">
-        <SectionEyebrow variant="muted">
-          An appeal for{" "}
-          <Link
-            href={`/charities/${appeal.charity_id}`}
-            className="text-primary underline-offset-4 hover:underline"
-          >
-            {charityName}
-          </Link>
-        </SectionEyebrow>
-        <div className="mt-2 flex items-start justify-between gap-6">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
-                {appeal.name}
-              </h1>
-              {canManage && (
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
-                </Button>
-              )}
-            </div>
+    <PageSheet>
+      {/* ── Header: the favpoll hero's composition, static ── */}
+      <header className="flex items-start justify-between gap-6 pt-10 md:pt-16">
+        <div className="min-w-0 flex-1">
+          <SectionEyebrow variant="muted">
+            An appeal for{" "}
+            <Link
+              href={`/charities/${appeal.charity_id}`}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              {charityName}
+            </Link>
+          </SectionEyebrow>
+          <div className="mt-2 flex items-start justify-between gap-3">
+            <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
+              {appeal.name}
+            </h1>
+            {canManage && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
+              </Button>
+            )}
           </div>
-          {appeal.photo_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={appeal.photo_url}
-              alt=""
-              className="size-24 shrink-0 rounded-2xl object-cover md:size-33"
-            />
+          {appeal.blurb && (
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+              {appeal.blurb}
+            </p>
           )}
         </div>
-        {appeal.blurb && (
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            {appeal.blurb}
-          </p>
+        {/* The photo sits where the favpoll avatar sits — same shape */}
+        {appeal.photo_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={appeal.photo_url}
+            alt=""
+            className="size-24 shrink-0 rounded-xl object-cover md:size-33"
+          />
         )}
+      </header>
 
-        <div className="mt-8 rounded-xl border border-border bg-background p-5">
-          <SectionEyebrow as="h2" className="mb-2">
-            Raised so far
-          </SectionEyebrow>
-          <p className="text-4xl font-light text-primary tabular-nums">
-            {formatAmount(raised)}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            across {rows.length} favpoll{rows.length === 1 ? "" : "s"}
-            {appeal.closes_at &&
-              ` · closes ${new Date(appeal.closes_at).toLocaleDateString(
-                "en-GB",
-                { day: "numeric", month: "long", year: "numeric" }
-              )}`}
-          </p>
-        </div>
-
-        {isOpen && (
-          <div className="mt-6">
-            <Button
-              asChild
-              size="lg"
-              className="h-auto min-h-11 px-6 py-2 text-base"
-            >
-              <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
-                {withQuietTail("Start your favpoll — always free")}
-              </Link>
-            </Button>
-          </div>
-        )}
-
-        {rows.length > 0 && (
-          <div className="mt-10">
-            <SectionEyebrow variant="muted" className="mb-3">
-              The favpolls
-            </SectionEyebrow>
-            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
-              {rows.map((r) => (
-                <li key={r.id}>
-                  <Link
-                    href={`/favpolls/${r.id}`}
-                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/5"
-                  >
-                    <span className="min-w-0 truncate text-sm font-medium text-foreground">
-                      {r.name}
-                      {r.topic && (
-                        <span className="font-normal text-muted-foreground">
-                          {" "}
-                          · {r.topic}
-                        </span>
-                      )}
-                    </span>
-                    <span className="shrink-0 text-sm font-medium text-primary tabular-nums">
-                      {formatAmount(r.raised)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      <div className="mt-10 rounded-xl border border-border bg-background p-5">
+        <SectionEyebrow as="h2" className="mb-2">
+          Raised so far
+        </SectionEyebrow>
+        <p className="text-4xl font-light text-primary tabular-nums">
+          {formatAmount(raised)}
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          across {rows.length} favpoll{rows.length === 1 ? "" : "s"}
+          {appeal.closes_at &&
+            ` · closes ${new Date(appeal.closes_at).toLocaleDateString(
+              "en-GB",
+              { day: "numeric", month: "long", year: "numeric" }
+            )}`}
+        </p>
       </div>
-    </main>
+
+      {isOpen && (
+        <div className="mt-6">
+          <Button
+            asChild
+            size="lg"
+            className="h-auto min-h-11 px-6 py-2 text-base"
+          >
+            <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
+              {withQuietTail("Start your favpoll — always free")}
+            </Link>
+          </Button>
+        </div>
+      )}
+
+      {rows.length > 0 && (
+        <div className="mt-10">
+          <SectionEyebrow variant="muted" className="mb-3">
+            The favpolls
+          </SectionEyebrow>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
+            {rows.map((r) => (
+              <li key={r.id}>
+                <Link
+                  href={`/favpolls/${r.id}`}
+                  className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/5"
+                >
+                  <span className="min-w-0 truncate text-sm font-medium text-foreground">
+                    {r.name}
+                    {r.topic && (
+                      <span className="font-normal text-muted-foreground">
+                        {" "}
+                        · {r.topic}
+                      </span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-sm font-medium text-primary tabular-nums">
+                    {formatAmount(r.raised)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </PageSheet>
   )
 }
