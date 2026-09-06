@@ -97,11 +97,7 @@ export function DateTimePicker({
             type="button"
             variant="outline"
             className={cn(
-              // Capped at the popover's measured natural width (311px,
-              // 2026-09-06): the button sized to the calendar, never the
-              // calendar stretched to the button (founder). Narrow
-              // viewports shrink the button; the popover then overhangs.
-              "w-full max-w-[311px] min-w-0 cursor-pointer justify-start gap-2 bg-background! font-normal",
+              "min-w-0 flex-1 cursor-pointer justify-start gap-2 bg-background! font-normal",
               INPUT_SIZE[size],
               !value && "text-muted-foreground"
             )}

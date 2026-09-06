@@ -101,12 +101,18 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             </span>
           </p>
         ) : (
-          <DateTimePicker
-            value={w.closesAt}
-            onChange={w.setClosesAt}
-            size="lg"
-            presets={CLOSE_DATE_PRESETS}
-          />
+          /* Capped to the appeal form's field width (founder,
+             2026-09-06): the date+time pair then lines up with the
+             calendar popover beneath it instead of stretching across
+             the wizard's wider column. */
+          <div className="max-w-md">
+            <DateTimePicker
+              value={w.closesAt}
+              onChange={w.setClosesAt}
+              size="lg"
+              presets={CLOSE_DATE_PRESETS}
+            />
+          </div>
         )}
       </WizardField>
 
