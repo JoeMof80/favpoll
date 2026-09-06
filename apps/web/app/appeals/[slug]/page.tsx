@@ -165,6 +165,7 @@ export default async function AppealPage({
     <>
       {factsCard}
       <ShareFavpollButton
+        label="Share this appeal"
         shareTitle={`${appeal.name} — favpoll appeal`}
         className="w-full"
       />

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 type Props = {
+  /** Inline-variant label — the appeal page says "Share this appeal". */
+  label?: string
   /** Share-sheet title, e.g. "Stanley's favpoll" */
   shareTitle: string
   /** Defaults to the current page URL at click time */
@@ -20,6 +22,7 @@ type Props = {
 // sheet (navigator.share) reaches whatever the guest actually uses;
 // clipboard is the desktop fallback.
 export function ShareFavpollButton({
+  label = "Share this favpoll",
   shareTitle,
   url,
   variant = "inline",
@@ -81,7 +84,7 @@ export function ShareFavpollButton({
       ) : (
         <Share2 data-icon="inline-start" aria-hidden="true" />
       )}
-      {copied ? "Link copied" : "Share this favpoll"}
+      {copied ? "Link copied" : label}
     </Button>
   )
 }
