@@ -59,6 +59,15 @@ const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
 
 export function WizardGenerateButton({ w }: { w: WizardState }) {
   const WhoIcon = w.who ? WHO_ICONS[w.who] : null
+  // Money moved: subject/grouping are structural (server-enforced).
+  // Pronoun swaps stay legal — he/she/they change nothing guests
+  // pledged on — but Pair/Group/Cause leave the menu, and a favpoll
+  // already outside the pronoun family locks the control entirely.
+  const lockStructural = w.stepLocked.event
+  const whoIsPronoun = w.who === "he" || w.who === "she" || w.who === "they"
+  const whoOptions = lockStructural
+    ? PRONOUN_ORDER.filter((k) => k === "he" || k === "she" || k === "they")
+    : PRONOUN_ORDER
   return (
     <div className="flex">
       <DropdownMenu>
@@ -67,6 +76,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             type="button"
             variant="secondary"
             size="sm"
+            disabled={lockStructural && !whoIsPronoun}
             aria-label={
               w.who ? `Who: ${WHO_LABELS[w.who]}` : "Who is this favpoll for?"
             }
@@ -77,7 +87,7 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          {PRONOUN_ORDER.map((k) => {
+          {whoOptions.map((k) => {
             const Icon = WHO_ICONS[k]
             return (
               <DropdownMenuItem key={k} onClick={() => w.handleWho(k)}>
@@ -92,16 +102,17 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
               override the chosen type in deriveRegister. The who check
               keeps a prefilled cause representable in edit mode whatever
               its stored category. */}
-          {(w.category === "fundraiser" || w.who === "cause") && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => w.handleWho("cause")}>
-                <Ribbon className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1">Cause</span>
-                {w.who === "cause" && <Check className="h-4 w-4" />}
-              </DropdownMenuItem>
-            </>
-          )}
+          {!lockStructural &&
+            (w.category === "fundraiser" || w.who === "cause") && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => w.handleWho("cause")}>
+                  <Ribbon className="h-4 w-4 text-muted-foreground" />
+                  <span className="flex-1">Cause</span>
+                  {w.who === "cause" && <Check className="h-4 w-4" />}
+                </DropdownMenuItem>
+              </>
+            )}
         </DropdownMenuContent>
       </DropdownMenu>
       <span aria-hidden="true" className="w-px self-stretch bg-primary/15" />
