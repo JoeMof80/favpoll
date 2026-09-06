@@ -51,6 +51,9 @@ export type AppealFormInitial = {
 const NAME_MAX = 60
 const SLUG_MAX = 40
 const BLURB_MAX = 240
+// Appeal-scale goal presets (founder, 2026-09-06: the wizard's pledge
+// goal row pattern). No commas — the founder's rule.
+const GOAL_PRESETS = [1000, 5000, 10000]
 
 // The link name follows the Name until touched by hand (founder,
 // 2026-09-06) — the universal slug convention. Lowercase, diacritics
@@ -304,21 +307,36 @@ export function AppealForm({
         label="Goal"
         hint="Optional — shown as a progress bar on the appeal page."
       >
-        <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-40 bg-background")}>
-          <InputGroupAddon align="inline-start">
-            <span className="text-muted-foreground">£</span>
-          </InputGroupAddon>
-          <InputGroupInput
-            className="md:text-base"
-            inputMode="numeric"
-            placeholder="10,000"
-            aria-label="Appeal goal amount"
-            value={goalDraft}
-            onChange={(e) =>
-              setGoalDraft(e.target.value.replace(/[^0-9]/g, ""))
-            }
-          />
-        </InputGroup>
+        <div className="flex flex-wrap gap-2">
+          {GOAL_PRESETS.map((g) => (
+            <Button
+              key={g}
+              type="button"
+              className="h-11 px-3.5 md:text-base"
+              variant={goalDraft === String(g) ? "default" : "outline"}
+              onClick={() => setGoalDraft(String(g))}
+            >
+              £{g}
+            </Button>
+          ))}
+          <InputGroup
+            className={cn(WIZARD_INPUT_SIZE, "min-w-28 flex-1 bg-background")}
+          >
+            <InputGroupAddon align="inline-start">
+              <span className="text-muted-foreground">£</span>
+            </InputGroupAddon>
+            <InputGroupInput
+              className="md:text-base"
+              inputMode="numeric"
+              placeholder="other"
+              aria-label="Appeal goal amount"
+              value={goalDraft}
+              onChange={(e) =>
+                setGoalDraft(e.target.value.replace(/[^0-9]/g, ""))
+              }
+            />
+          </InputGroup>
+        </div>
       </WizardField>
 
       <WizardField
