@@ -26,7 +26,6 @@ import {
   PickerItems,
 } from "@/components/pledge-dialog/step-pick-favourites"
 import { StepAmount } from "@/components/pledge-dialog/step-amount"
-import { tipOptionsFor } from "@/components/pledge-card/utils"
 import { PollHeading } from "@/components/poll-heading"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
@@ -231,45 +230,17 @@ export function DemoCard({
   const dispAmount = amountActive ? amountNum : 0
   const dispAmountStr = amountActive ? amountStr : ""
 
-  // The pledge step, shown WHOLE (founder, 2026-08-09). The demo used to
-  // withhold onFundStep and pass showTip={false}, hiding both optional rows —
-  // so the one beat about deciding what to give showed neither decision.
-  // Showing the shared fund but not the contribution was the odder halfway
-  // house: the brand's rule is to state the optional contribution plainly and
-  // never apologetically, and hiding it from the demo is a quiet apology.
-  //
-  // £10 pledge, £2 moved to the shared fund, £1 contribution — the preselected
-  // suggestion for this tier, since tipOptionsFor(10) is [0, 0.5, 1, 2] and
-  // defaultTipFor takes the third. Favourite ticks down to £8 and the total
-  // pledge is unchanged at £10; the fund money reaches the charity too, which
-  // is why one charity line covers both. £11 is charged.
-  const FUND_PART = 2
-  const TIP = 1
-
-  const renderAmountStep = (amt: number, amtStr: string) => (
+  // The amount step went LEAN 2026-09-06 (the four-step flow): the split
+  // and the tip moved to their own later steps, so this beat shows what a
+  // guest now meets here — the amount, the presets, the fund tabs. The
+  // 2026-08-09 shown-WHOLE doctrine moved with them.
+  const renderAmountStep = (_amt: number, amtStr: string) => (
     <StepAmount
       pledgeAmount={amtStr}
       updatePledgeAmount={() => {}}
       useSharedFund={false}
       hasFund
-      ownBreakdown={{
-        // "To <charity>" and "Total charged" are the real labels — the demo
-        // had "<charity>" and "Total".
-        lines: [{ label: `To ${charityName}`, amount: amt }],
-        total: { label: "Total charged", amount: amt + TIP },
-      }}
-      fundBreakdown={null}
-      favouriteBreakdown={[
-        { label: selected.label, amount: Math.max(0, amt - FUND_PART) },
-      ]}
-      fundPart={FUND_PART}
-      onFundStep={() => {}}
       toggleFund={() => {}}
-      tipAmount={TIP}
-      setTipAmount={() => {}}
-      tipOptions={tipOptionsFor(amt)}
-      showTip
-      isListed={false}
     />
   )
 

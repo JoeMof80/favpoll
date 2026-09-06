@@ -10,7 +10,7 @@ import type {
   Favourite,
 } from "@favpoll/types"
 
-export type PledgeDialogStep = 1 | 2 | 3
+export type PledgeDialogStep = 1 | 2 | 3 | 4
 
 export type UsePledgeDialogOptions = {
   favpollId: string
@@ -82,14 +82,14 @@ export function usePledgeDialog({
 
   // --- step 2: total-then-split state (founder redesign, 2026-07-31) ---
   // The guest enters ONE total, defaulting entirely to their favourite;
-  // a stepper moves whole pounds into the shared fund. usePledge keeps
+  // step 3 moves whole pounds into the shared fund. usePledge keeps
   // its original semantics (pledgeAmount = the charity portion,
   // topUpAmount = the fund portion) so the verified payment rail and the
   // legacy pledge card are untouched — this is a pure mapping layer.
   const [totalInput, setTotalInput] = useState("")
   const [fundPart, setFundPart] = useState(0)
 
-  // --- step 2/3: pledge state via usePledge ---
+  // --- steps 2–4: pledge state via usePledge ---
   const pledge = usePledge({
     favpollId,
     clerkUserId,
@@ -101,6 +101,10 @@ export function usePledgeDialog({
     onPledgeAmountChange: () => {},
     onPledgeSuccess,
     suggestTip,
+    // Picking is optional in the dialog (founder, 2026-08-17) — a guest
+    // may give with no favourite attached, so the confirm gate must not
+    // require a selection here. The legacy card keeps its own gate.
+    allowEmptySelection: true,
   })
 
   // Push a (total, fund) pair down into usePledge's parts. The fund is
@@ -126,6 +130,12 @@ export function usePledgeDialog({
     applySplit(totalInput, fundPart + delta)
   }
 
+  // The slider names an absolute value; applySplit still clamps it
+  // (whole pounds, favourite keeps at least £1).
+  function setFundTo(pounds: number) {
+    applySplit(totalInput, pounds)
+  }
+
   // Drawing FROM the fund and paying INTO it are exclusive — entering
   // fund mode zeroes the split. Guarded so a toggle with no split never
   // rewrites amounts set through the legacy updatePledgeAmount path.
@@ -134,14 +144,21 @@ export function usePledgeDialog({
     pledge.toggleFund()
   }
 
-  // Auto-advance to step 3 when PI is created
+  // The split step exists only on the card path with a favourite to split
+  // FROM — a no-pick pledge has nothing on the favourite side, and the
+  // fund path never splits. Recomputed, so Back from the review lands on
+  // the same steps the guest walked forward through.
+  const hasSplitStep = !pledge.useSharedFund && selectedIds.length > 0
+
+  // Advance to the review once the PaymentIntent exists — from step 2
+  // (split skipped) or step 3.
   useEffect(() => {
-    if (pledge.pledgeClientSecret && step === 2) {
-      setStep(3)
+    if (pledge.pledgeClientSecret && (step === 2 || step === 3)) {
+      setStep(4)
     }
   }, [pledge.pledgeClientSecret, step])
 
-  // --- per-favourite breakdown (step 2 primary view) ---
+  // --- per-favourite breakdown ---
   const numericPledge = parseFloat(pledge.pledgeAmount)
   const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
 
@@ -165,7 +182,7 @@ export function usePledgeDialog({
     })
   }
 
-  // --- per-charity breakdown (step 2 secondary, collapsible) ---
+  // --- per-charity breakdown (collapsible secondary) ---
   function getCharityBreakdown() {
     if (!isPledgeValid || charityNames.length < 2) return []
     const perCharity =
@@ -179,13 +196,8 @@ export function usePledgeDialog({
   // dead Next button and no way out but to close the dialog. Giving without
   // backing anything is already a shape the product has — "a gift with no
   // favourite attached" is how the shared fund describes it — and the money
-  // reaches the charity either way.
-  //
-  // Nothing downstream needed changing to allow it: computePledgeAllocations
-  // returns [] for an empty selection, and step 2 hides the favourite lines
-  // and the fund split behind `favouriteBreakdown.length > 0`, so the guest
-  // simply names an amount and pays. The pledge lands with a total and no
-  // allocations, counting towards the favpoll but towards no favourite.
+  // reaches the charity either way. A no-pick pledge lands with a total and
+  // no allocations, and skips the split step (nothing to split from).
   const canAdvanceStep1 = true
 
   async function handleNext() {
@@ -198,22 +210,40 @@ export function usePledgeDialog({
       if (pledge.useSharedFund) {
         await pledge.handleFundConfirm()
         // onPledgeSuccess closes the dialog via the caller
-      } else {
-        await pledge.handleOwnConfirm()
-        // useEffect above advances to step 3 when clientSecret is set
+        return
       }
+      if (hasSplitStep) {
+        setStep(3)
+        return
+      }
+      // Split skipped — price the intent now; the effect above advances
+      await pledge.handleOwnConfirm()
+      return
+    }
+    if (step === 3) {
+      await pledge.handleOwnConfirm()
     }
   }
 
   function handleBack() {
-    if (step === 3) {
+    if (step === 4) {
       pledge.setPledgeClientSecret(null)
       pledge.setSubmitting(false)
+      setStep(hasSplitStep ? 3 : 2)
+    } else if (step === 3) {
       setStep(2)
     } else if (step === 2) {
       setDraftIds(selectedIds)
       setStep(1)
     }
+  }
+
+  // Tip chips live on the review page (founder, 2026-09-06): a chip tap
+  // re-prices the PaymentIntent server-side. Chips and Pay are disabled
+  // while refreshingIntent is true.
+  function updateTip(v: number) {
+    pledge.setTipAmount(v)
+    void pledge.refreshIntentWithTip(v)
   }
 
   function handleClose() {
@@ -228,6 +258,7 @@ export function usePledgeDialog({
   return {
     // step
     step,
+    hasSplitStep,
     // step 1
     draftIds,
     toggleDraft,
@@ -244,14 +275,16 @@ export function usePledgeDialog({
     addError,
     handleAdd,
     canAdvanceStep1,
-    // step 2/3 (delegate to usePledge)
+    // steps 2–4 (delegate to usePledge)
     ...pledge,
     // total-then-split mapping (overrides ride below the spread)
     totalInput,
     fundPart,
     handleTotalChange,
     stepFund,
+    setFundTo,
     toggleFund: toggleFundAndResetSplit,
+    updateTip,
     // breakdowns
     favouriteBreakdown: getFavouriteBreakdown(),
     charityBreakdown: getCharityBreakdown(),
