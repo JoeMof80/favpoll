@@ -94,3 +94,20 @@ outreach can carry.
 Launch flip and Fundraising Regulator work outrank building this.
 This note exists so a pilot conversation can pull it off the shelf —
 the natural trigger is the first hospice reply to the outreach.
+
+## Portal creation flow — settled design (2026-09-06)
+
+When the charity portal arrives (trigger: the first charity answering
+the claim mailto), appeal creation/management becomes a WIZARD in the
+favpoll wizard's own grammar, per the founder's step mapping:
+
+1. **Header** — name, link name, photo
+2. **About** — the story
+3. **Settings** — goal, close date, listed
+
+Deliberately NOT built pre-portal (2026-09-06 decision): today's steps
+are two-or-three flat fields each — a wizard over thin content is
+ceremony, and the audience it serves (charity staff on first visit)
+doesn't exist yet. The later pile (updates, assets, team) is expected
+to fatten these steps into earning a guided flow. The single-page form
+(wizard row grammar, real wizard controls) is the pre-portal surface.
