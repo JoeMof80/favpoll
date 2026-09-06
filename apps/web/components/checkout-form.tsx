@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
+import {
+  PaymentElement,
+  ExpressCheckoutElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js"
+import type {
+  StripeExpressCheckoutElementConfirmEvent,
+  StripeExpressCheckoutElementReadyEvent,
+} from "@stripe/stripe-js"
 
 export type CheckoutFormProps = {
   onSuccess: (email?: string) => void | Promise<void>
@@ -50,6 +59,10 @@ export function CheckoutForm({
   const stripe = useStripe()
   const elements = useElements()
   const [email, setEmail] = useState("")
+  // True once the Express Checkout Element reports a wallet this device
+  // can actually offer (Apple Pay needs a Stripe-registered domain) —
+  // gates the "or pay with card" divider so cardless devices see no seam.
+  const [expressAvailable, setExpressAvailable] = useState(false)
 
   const onReadyRef = useRef(onStripeReadyChange)
   useEffect(() => {
@@ -65,16 +78,10 @@ export function CheckoutForm({
     mode: "sign-in" | "sign-up"
   } | null>(null)
 
-  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!stripe || !elements) return
-    const effectiveEmail = showEmailCapture ? email : externalEmail
-    const emailRequired = showEmailCapture || externalEmail !== undefined
-    if (emailRequired && !effectiveEmail?.trim()) {
-      setError("Please enter your email address")
-      return
-    }
-
+  // The one payment routine both paths share: preflight veto, confirm,
+  // record. The card form and the wallet buttons differ only in how the
+  // email arrives.
+  async function runPayment(effectiveEmail: string | undefined) {
     setSubmitting(true)
     setError(null)
     setAuthHandOff(null)
@@ -82,6 +89,10 @@ export function CheckoutForm({
     if (preflight) {
       const veto = await preflight(effectiveEmail)
       if (veto) {
+        // NOTE: inside a wallet confirm this leaves the payment sheet to
+        // time out on its own (Stripe's express confirm has no abort) —
+        // acceptable for the rare duplicate-guest veto; our message and
+        // hand-off render beneath either way.
         setError(veto.message)
         setAuthHandOff(
           veto.signInEmail
@@ -93,8 +104,8 @@ export function CheckoutForm({
       }
     }
 
-    const { error: stripeError } = await stripe.confirmPayment({
-      elements,
+    const { error: stripeError } = await stripe!.confirmPayment({
+      elements: elements!,
       confirmParams: {
         return_url: window.location.href,
         ...(effectiveEmail ? { receipt_email: effectiveEmail } : {}),
@@ -119,6 +130,41 @@ export function CheckoutForm({
       )
       setSubmitting(false)
     }
+  }
+
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!stripe || !elements) return
+    const effectiveEmail = showEmailCapture ? email : externalEmail
+    const emailRequired = showEmailCapture || externalEmail !== undefined
+    if (emailRequired && !effectiveEmail?.trim()) {
+      setError("Please enter your email address")
+      return
+    }
+    await runPayment(effectiveEmail)
+  }
+
+  // Wallet path (founder, 2026-09-07). A typed email wins; otherwise the
+  // wallet sheet's own email (emailRequired below) carries the receipt and
+  // withdrawal link — an Apple Pay guest never touches the keyboard.
+  async function handleExpressConfirm(
+    event: StripeExpressCheckoutElementConfirmEvent
+  ) {
+    if (!stripe || !elements) return
+    const typed = showEmailCapture ? email : externalEmail
+    const effectiveEmail =
+      typed?.trim() || event.billingDetails?.email || undefined
+    const emailRequired = showEmailCapture || externalEmail !== undefined
+    if (emailRequired && !effectiveEmail) {
+      setError("Please enter your email address")
+      return
+    }
+    await runPayment(effectiveEmail)
+  }
+
+  function handleExpressReady(event: StripeExpressCheckoutElementReadyEvent) {
+    const methods = event.availablePaymentMethods
+    setExpressAvailable(!!methods && Object.values(methods).some(Boolean))
   }
 
   return (
@@ -146,6 +192,24 @@ export function CheckoutForm({
           <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
             For your receipt and withdrawal link — no account needed.
           </p>
+        </div>
+      )}
+      {/* Wallets first (founder, 2026-09-07): one thumb-press for most
+          phones. Renders nothing on devices with no wallet (and Apple Pay
+          shows only on Stripe-registered domains), so the divider waits
+          for onReady to report an actual method. */}
+      <ExpressCheckoutElement
+        options={{ emailRequired: true }}
+        onConfirm={handleExpressConfirm}
+        onReady={handleExpressReady}
+      />
+      {expressAvailable && (
+        <div className="flex items-center gap-4" aria-hidden="true">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">
+            or pay with card
+          </span>
+          <div className="h-px flex-1 bg-border" />
         </div>
       )}
       <PaymentElement />
