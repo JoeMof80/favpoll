@@ -59,7 +59,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
                 w.setGoalDraft(String(g))
               }}
             >
-              £{g.toLocaleString("en-GB")}
+              £{g}
             </Button>
           ))}
           <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-28 bg-background")}>
