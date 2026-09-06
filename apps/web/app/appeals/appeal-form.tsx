@@ -44,6 +44,7 @@ export type AppealFormInitial = {
   blurb: string
   photoUrl: string
   closesAt: string // ISO or ""
+  goalAmount: string // digits or ""
   isListed: boolean
 }
 
@@ -91,6 +92,7 @@ export function AppealForm({
   const [closesAt, setClosesAt] = useState<Date | null>(
     initial?.closesAt ? new Date(initial.closesAt) : null
   )
+  const [goalDraft, setGoalDraft] = useState(initial?.goalAmount ?? "")
   // Once the link name is edited directly it goes its own way; clearing
   // it entirely resumes the auto-follow.
   const [slugTouched, setSlugTouched] = useState(false)
@@ -137,6 +139,9 @@ export function AppealForm({
         photoUrl = photoPreview
       }
       const closes = closesAt ? closesAt.toISOString() : null
+      const parsedGoal = parseInt(goalDraft, 10)
+      const goal =
+        Number.isFinite(parsedGoal) && parsedGoal > 0 ? parsedGoal : null
       const r = editing
         ? await updateAppeal(initial!.id!, {
             name: form.name,
@@ -144,6 +149,7 @@ export function AppealForm({
             photoUrl,
             closesAt: closes,
             isListed: form.isListed,
+            goalAmount: goal,
           })
         : await createAppeal({
             name: form.name,
@@ -153,6 +159,7 @@ export function AppealForm({
             photoUrl,
             closesAt: closes,
             isListed: form.isListed,
+            goalAmount: goal,
           })
       if (r.error) setError(r.error)
       else
@@ -216,7 +223,7 @@ export function AppealForm({
         </InputGroup>
       </WizardField>
 
-      {(editing || !charityKnown) && (
+      {!editing && !charityKnown && (
         <WizardField
           label="Charity"
           required={!editing}
@@ -292,6 +299,27 @@ export function AppealForm({
           )}
         </Button>
       </div>
+
+      <WizardField
+        label="Goal"
+        hint="Optional — shown as a progress bar on the appeal page."
+      >
+        <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-40 bg-background")}>
+          <InputGroupAddon align="inline-start">
+            <span className="text-muted-foreground">£</span>
+          </InputGroupAddon>
+          <InputGroupInput
+            className="md:text-base"
+            inputMode="numeric"
+            placeholder="10,000"
+            aria-label="Appeal goal amount"
+            value={goalDraft}
+            onChange={(e) =>
+              setGoalDraft(e.target.value.replace(/[^0-9]/g, ""))
+            }
+          />
+        </InputGroup>
+      </WizardField>
 
       <WizardField
         label="Close date"

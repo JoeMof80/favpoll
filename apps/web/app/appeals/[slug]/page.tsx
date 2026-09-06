@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PageLayout } from "@/components/page-layout"
 import { heroNameSizeClass, formatAmount } from "@/lib/display"
+import { GoalProgress } from "@/components/goal-progress"
+import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
@@ -40,7 +42,7 @@ export default async function AppealPage({
   const { data: appeal } = await supabase
     .from("appeals")
     .select(
-      "id, slug, name, blurb, photo_url, closes_at, opens_at, charity_id, charities(name)"
+      "id, slug, name, blurb, photo_url, closes_at, opens_at, charity_id, goal_amount, charities(name)"
     )
     .eq("slug", slug)
     .maybeSingle()
@@ -56,6 +58,7 @@ export default async function AppealPage({
     p_appeal_ids: [appeal.id],
   })
   const raised = Number(agg?.[0]?.raised ?? 0)
+  const goal = appeal.goal_amount ? Number(appeal.goal_amount) : null
 
   const { data: rawMembers } = await supabase
     .from("favpolls")
@@ -64,7 +67,7 @@ export default async function AppealPage({
        closes_at, closed_at, total_raised,
        protagonist:protagonists!favpolls_protagonist_id_fkey ( name, photo_url ),
        favpoll_charities ( charity:charities ( id, name, logo_url, registered_number ) ),
-       favpoll_polls ( topics ( title ) )`
+       favpoll_polls ( id, topics ( title ) )`
     )
     .eq("appeal_id", appeal.id)
 
@@ -106,19 +109,70 @@ export default async function AppealPage({
       return name(a).localeCompare(name(b))
     })
 
+  // Supporter count — charities think in pledges, not rows
+  // (founder, 2026-09-06). favpoll_polls is a TO-ONE join: object.
+  const pollIds = (rawMembers ?? [])
+    .map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fp = (r as any).favpoll_polls
+      return Array.isArray(fp) ? fp[0]?.id : fp?.id
+    })
+    .filter(Boolean)
+  let pledgeCount = 0
+  if (pollIds.length > 0) {
+    const { count } = await supabase
+      .from("pledges")
+      .select("id", { count: "exact", head: true })
+      .in("favpoll_poll_id", pollIds)
+    pledgeCount = count ?? 0
+  }
+
   const factsCard = (
-    <div className="flex flex-col justify-center space-y-1 rounded-lg border border-border bg-card px-5 py-4 md:h-33">
+    <div className="flex flex-col justify-center space-y-1 rounded-lg border border-border bg-card px-5 py-4 md:min-h-33">
       <SectionEyebrow variant="muted" className="font-semibold">
         Raised so far
       </SectionEyebrow>
       <p className="text-3xl font-light text-primary tabular-nums">
         {formatAmount(raised)}
       </p>
+      {goal && (
+        <>
+          <GoalProgress
+            totalRaised={raised}
+            goalAmount={goal}
+            className="mt-1 h-1"
+          />
+          <p className="text-xs text-muted-foreground">
+            {raised >= goal
+              ? `${formatAmount(goal)} goal reached`
+              : `of the ${formatAmount(goal)} goal`}
+          </p>
+        </>
+      )}
       <p className="text-xs text-muted-foreground">
-        across <span className="tabular-nums">{members.length}</span> favpoll
+        <span className="tabular-nums">{pledgeCount}</span> pledge
+        {pledgeCount === 1 ? "" : "s"} across{" "}
+        <span className="tabular-nums">{members.length}</span> favpoll
         {members.length === 1 ? "" : "s"}
       </p>
     </div>
+  )
+
+  // The rail column: the card, the share door (the charity's whole job
+  // is promoting this link), and the trust line — the sentence a
+  // charity most wants its supporters to read.
+  const rightColumn = (
+    <>
+      {factsCard}
+      <ShareFavpollButton
+        shareTitle={`${appeal.name} — favpoll appeal`}
+        className="w-full"
+      />
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        favpoll takes no fee — 100% of every pledge reaches {charityName} in
+        full.
+      </p>
+    </>
   )
 
   const left = (
@@ -172,7 +226,7 @@ export default async function AppealPage({
         </p>
       )}
 
-      <div className="mt-6 md:hidden">{factsCard}</div>
+      <div className="mt-6 space-y-4 md:hidden">{rightColumn}</div>
     </>
   )
 
@@ -202,7 +256,7 @@ export default async function AppealPage({
 
   return (
     <>
-      <PageLayout left={left} right={factsCard} rightSticky={false}>
+      <PageLayout left={left} right={rightColumn} rightSticky={false}>
         {fullWidth}
       </PageLayout>
       {/* The gated manage door is the bottom-right circle everywhere
