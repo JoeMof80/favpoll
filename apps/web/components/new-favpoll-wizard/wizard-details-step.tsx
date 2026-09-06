@@ -14,7 +14,7 @@ import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import type { WizardState, WizardVisibility } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
 
-const GOAL_PRESETS = [100, 250, 500]
+const GOAL_PRESETS = [100, 250, 500, 1000]
 
 // The three-notch visibility axis (listed ⊃ unlisted ⊃ private) as one
 // control — two stacked switches would leave the hierarchy illegible.
@@ -47,12 +47,12 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
           rows' inline labels sat flush on mobile, unlike the other steps
           — one grammar, no drift). */}
       <WizardField label="Pledge goal">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {GOAL_PRESETS.map((g) => (
             <Button
               key={g}
               type="button"
-              className="h-11 px-5 md:text-base"
+              className="h-11 px-3.5 md:text-base"
               variant={w.goalAmount === g ? "default" : "outline"}
               onClick={() => {
                 w.setGoalAmount(g)
@@ -62,7 +62,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
               £{g}
             </Button>
           ))}
-          <InputGroup className={cn(WIZARD_INPUT_SIZE, "flex-1 bg-background")}>
+          <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-28 bg-background")}>
             <InputGroupAddon align="inline-start">
               <span className="text-muted-foreground">£</span>
             </InputGroupAddon>
@@ -101,18 +101,12 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             </span>
           </p>
         ) : (
-          /* Capped to the appeal form's field width (founder,
-             2026-09-06): the date+time pair then lines up with the
-             calendar popover beneath it instead of stretching across
-             the wizard's wider column. */
-          <div className="max-w-[468px]">
-            <DateTimePicker
-              value={w.closesAt}
-              onChange={w.setClosesAt}
-              size="lg"
-              presets={CLOSE_DATE_PRESETS}
-            />
-          </div>
+          <DateTimePicker
+            value={w.closesAt}
+            onChange={w.setClosesAt}
+            size="lg"
+            presets={CLOSE_DATE_PRESETS}
+          />
         )}
       </WizardField>
 
