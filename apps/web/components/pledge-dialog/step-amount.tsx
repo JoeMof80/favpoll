@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import type { BreakdownLine } from "@/components/pledge-card/pledge-breakdown"
 import { PledgeBreakdown } from "@/components/pledge-card/pledge-breakdown"
 import { formatTipLabel } from "@/components/pledge-card/utils"
@@ -77,9 +79,8 @@ export function StepAmountHeader({
         <div className="w-full space-y-1.5">
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
-              Give what feels right — you can split it below between your
-              favourite and the shared fund. Processed securely by Stripe;
-              favpoll takes no fee.
+              Give what feels right. Processed securely by Stripe — favpoll
+              takes no fee.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (
@@ -150,6 +151,10 @@ export function StepAmount({
   fundPart = 0,
   onFundStep,
 }: Props) {
+  // The split is an advanced move most guests never make (founder,
+  // 2026-09-06: the sheet read as overwhelming) — folded behind a
+  // quiet row until asked for, or already in use.
+  const [splitOpen, setSplitOpen] = useState(false)
   const numericTotal = parseFloat(pledgeAmount)
   const totalValid = !isNaN(numericTotal) && numericTotal > 0
   // The favourite keeps at least £1 of worth
@@ -217,34 +222,6 @@ export function StepAmount({
 
           {favouriteBreakdown.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-1">
-                <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                  {favouriteBreakdown.length === 1
-                    ? "Your favourite · its worth"
-                    : "Your favourites · their worth"}
-                </p>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      aria-label="About your favourite's worth"
-                      className="h-4 w-4 rounded-full"
-                    >
-                      <Info className="h-3 w-3" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    className="w-64 text-xs leading-relaxed"
-                  >
-                    This amount is what your favourite&apos;s worth — it&apos;s
-                    what counts in the standings. Anything you move to the
-                    shared fund helps guests who can&apos;t pledge take part.
-                  </PopoverContent>
-                </Popover>
-              </div>
               <div className="space-y-2">
                 {favouriteBreakdown.map((line, i) => (
                   <div key={i} className="flex justify-between">
@@ -258,7 +235,16 @@ export function StepAmount({
               {/* The split: whole pounds move from the favourite(s) to the
                   shared fund — the favourite lines above tick down as this
                   ticks up, total unchanged (founder redesign, 2026-07-31) */}
-              {showSplit && (
+              {showSplit && !splitOpen && fundPart <= 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSplitOpen(true)}
+                  className="w-fit text-left text-sm text-primary underline-offset-4 hover:underline"
+                >
+                  + Split with the shared fund
+                </button>
+              )}
+              {showSplit && (splitOpen || fundPart > 0) && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Shared fund</span>
                   <div className="flex items-center gap-1.5">
