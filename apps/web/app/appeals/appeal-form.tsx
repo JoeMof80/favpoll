@@ -357,7 +357,7 @@ export function AppealForm({
               reserved for real deletions. */}
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="icon"
             disabled={!closesAt}
             aria-label="Clear close date — evergreen"
