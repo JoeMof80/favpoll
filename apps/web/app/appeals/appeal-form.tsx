@@ -350,18 +350,22 @@ export function AppealForm({
             size="lg"
             presets={CLOSE_DATE_PRESETS}
           />
-          {closesAt && (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Clear close date — evergreen"
-              className="size-11 text-muted-foreground"
-              onClick={() => setClosesAt(null)}
-            >
-              <X aria-hidden="true" />
-            </Button>
-          )}
+          {/* Always rendered, disabled when blank (founder): the row's
+              composition never shifts mid-interaction, and disabled
+              answers "clear what?" honestly — blank IS evergreen.
+              Ghost, not destructive: clearing is reversible; red stays
+              reserved for real deletions. */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={!closesAt}
+            aria-label="Clear close date — evergreen"
+            className="size-11 text-muted-foreground"
+            onClick={() => setClosesAt(null)}
+          >
+            <X aria-hidden="true" />
+          </Button>
         </div>
       </WizardField>
 
