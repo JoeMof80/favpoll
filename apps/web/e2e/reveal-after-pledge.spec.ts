@@ -124,13 +124,15 @@ test.describe("reveal after pledge", () => {
     await expect(firstPreset).toBeVisible()
     await firstPreset.click()
 
-    // "Pledge" button creates the Stripe PaymentIntent and advances to step 3
-    await dialog.getByRole("button", { name: /^pledge$/i }).click()
+    // "Next →" prices the Stripe PaymentIntent and advances to the review
+    // (the card path's commitment word moved to Pay now — 2026-09-06 flow;
+    // "Pledge" now only appears on the shared-pot payment path)
+    await dialog.getByRole("button", { name: /^next/i }).click()
 
-    // ── 6. Step 3: Complete Stripe payment ────────────────────────────────────
-    // StepPay renders StripeCheckout inline=true, with showEmailCapture=true
-    // because clerkUserId is null for an unauthenticated guest.
-    await expect(dialog).toContainText(/complete payment/i, { timeout: 15_000 })
+    // ── 6. Step 3: Review & pay ───────────────────────────────────────────────
+    // StepPay renders the itemised bill, then StripeCheckout inline=true,
+    // with showEmailCapture=true (clerkUserId null for a guest).
+    await expect(dialog).toContainText(/review & pay/i, { timeout: 15_000 })
 
     // Guest email — rendered above the Stripe PaymentElement
     const emailInput = dialog.getByLabel(
