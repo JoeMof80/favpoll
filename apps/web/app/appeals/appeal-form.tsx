@@ -51,6 +51,19 @@ const NAME_MAX = 60
 const SLUG_MAX = 40
 const BLURB_MAX = 240
 
+// The link name follows the Name until touched by hand (founder,
+// 2026-09-06) — the universal slug convention. Lowercase, diacritics
+// stripped, runs of non-alphanumerics become single hyphens.
+function slugify(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, SLUG_MAX)
+}
+
 export function AppealForm({
   initial,
   charities,
@@ -78,6 +91,9 @@ export function AppealForm({
   const [closesAt, setClosesAt] = useState<Date | null>(
     initial?.closesAt ? new Date(initial.closesAt) : null
   )
+  // Once the link name is edited directly it goes its own way; clearing
+  // it entirely resumes the auto-follow.
+  const [slugTouched, setSlugTouched] = useState(false)
   // The charity-page door preselects the charity — the dropdown is a
   // question already answered, so it hides and the charity lives in
   // the page eyebrow instead (founder, 2026-09-06). The row survives
@@ -158,6 +174,7 @@ export function AppealForm({
             onChange={(e) => {
               set("name", e.target.value)
               photoForm.setValue("name", e.target.value)
+              if (!editing && !slugTouched) set("slug", slugify(e.target.value))
             }}
           />
           <InputGroupAddon align="inline-end">
@@ -188,7 +205,10 @@ export function AppealForm({
             maxLength={SLUG_MAX}
             disabled={editing}
             placeholder="e.g. midnight-walk"
-            onChange={(e) => set("slug", e.target.value)}
+            onChange={(e) => {
+              setSlugTouched(e.target.value !== "")
+              set("slug", e.target.value)
+            }}
           />
           <InputGroupAddon align="inline-end">
             <CharCounter value={form.slug} max={SLUG_MAX} />
