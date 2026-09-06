@@ -51,6 +51,15 @@ with `vercel env pull`.
 
 ## 3. Buildable code features (still open)
 
+- **CSV exports — parked deliberately (2026-09-06).** A favpolls-level
+  export is near-valueless at current volumes; the pledge-level export
+  people would actually want (per-guest amounts, emails) is a GDPR
+  posture decision — guests gave that data to favpoll, not necessarily
+  the organiser — and charity reconciliation belongs to the
+  Goodstack/Gift Aid rail. Revisit when the professional audience
+  (celebrants/planners running many favpolls) or the charity portal
+  arrives; design per-favpoll/per-appeal with the privacy line first.
+
 | Task                                       | Notes                                                                                                                                                                            | My steer                                                                                                                   |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **Mobile-form pass**                       | Goal + closing-date editing are desktop-only (`hidden md:block`).                                                                                                                | **Best next build** — real usability gap, self-contained, no dependency/decision needed.                                   |
