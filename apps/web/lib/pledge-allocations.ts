@@ -1,43 +1,31 @@
 import type { Favourite } from "@favpoll/types"
 
-// How a pledge splits across the guest's selected favourites: equal shares,
-// with the rounding remainder going to the first selection. Rehomed from the
-// retired PledgePanel component — the pledge card and pledge dialog both
-// compute their allocations here.
-
-export type Allocation = {
-  favouriteId: string
-  percentage: number
-}
-
-function computeAllocations(
-  selectedIds: string[],
-  allItems: Favourite[]
-): Allocation[] {
-  if (selectedIds.length === 0) {
-    return allItems.map((item) => ({ favouriteId: item.id, percentage: 0 }))
-  }
-  const equal = Math.floor(100 / selectedIds.length)
-  const remainder = 100 - equal * selectedIds.length
-  return allItems.map((item) => {
-    const idx = selectedIds.indexOf(item.id)
-    if (idx === -1) return { favouriteId: item.id, percentage: 0 }
-    return {
-      favouriteId: item.id,
-      percentage: idx === 0 ? equal + remainder : equal,
-    }
-  })
-}
+// How a pledge splits across the guest's selected favourites: penny-even.
+// Shares differ by at most 1p — the remainder pennies go one each to the
+// earliest selections. (The first cut worked in whole PERCENTAGE points,
+// so £2 across three favourites read £0.68/£0.66/£0.66 — the founder
+// caught it on the split list, 2026-09-06.) The sum always equals the
+// input amount exactly; output order follows allItems.
 
 export function computePledgeAllocations(
   selectedIds: string[],
   allItems: Favourite[],
   amount: number
 ) {
-  return computeAllocations(selectedIds, allItems)
-    .filter((a) => a.percentage > 0)
-    .map((a) => ({
-      favouriteId: a.favouriteId,
-      amount: Math.round(((amount * a.percentage) / 100) * 100) / 100,
+  if (selectedIds.length === 0) return []
+  const totalPence = Math.round(amount * 100)
+  const base = Math.floor(totalPence / selectedIds.length)
+  let spare = totalPence - base * selectedIds.length
+  // A penny each to the earliest selections
+  const pence = new Map<string, number>()
+  for (const id of selectedIds) {
+    pence.set(id, base + (spare > 0 ? 1 : 0))
+    if (spare > 0) spare--
+  }
+  return allItems
+    .filter((item) => pence.has(item.id))
+    .map((item) => ({
+      favouriteId: item.id,
+      amount: (pence.get(item.id) ?? 0) / 100,
     }))
 }

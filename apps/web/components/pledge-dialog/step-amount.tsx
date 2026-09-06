@@ -243,15 +243,15 @@ export function StepAmount({
             <div className="space-y-2 border-t border-border pt-3">
               {favouriteBreakdown.map((line, i) => (
                 <div key={i} className="flex justify-between">
-                  <span className="text-sm">{line.label}</span>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-base">{line.label}</span>
+                  <span className="text-base font-semibold tabular-nums">
                     {formatPoundsExact(line.amount)}
                   </span>
                 </div>
               ))}
               <div className="flex justify-between">
-                <span className="text-sm">Shared fund</span>
-                <span className="text-sm font-semibold tabular-nums">
+                <span className="text-base">Shared fund</span>
+                <span className="text-base font-semibold tabular-nums">
                   {formatPoundsExact(fundPart)}
                 </span>
               </div>
