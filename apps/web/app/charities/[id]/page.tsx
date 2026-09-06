@@ -121,7 +121,15 @@ export default async function CharityPage({ params }: Props) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (c: any) => ({ charity: c.charity })
       ),
-      poll: { topic: f.favpoll_polls?.[0]?.topics ?? null },
+      // favpoll_polls is a TO-ONE join here — PostgREST returns an
+      // object, not an array (verified against staging; indexing [0]
+      // silently nulled the topic and the card hid its topic row).
+      poll: {
+        topic:
+          (Array.isArray(f.favpoll_polls)
+            ? f.favpoll_polls[0]?.topics
+            : f.favpoll_polls?.topics) ?? null,
+      },
     }
   })
 
