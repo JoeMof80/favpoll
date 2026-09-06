@@ -79,12 +79,16 @@ export function overlayFooter(onSave: () => void, onCancel: () => void) {
       <Button
         type="button"
         variant="ghost"
-        className="flex-1"
+        className="h-11 flex-1 md:text-base"
         onClick={onCancel}
       >
         Cancel
       </Button>
-      <Button type="button" className="flex-1" onClick={onSave}>
+      <Button
+        type="button"
+        className="h-11 flex-1 md:text-base"
+        onClick={onSave}
+      >
         Save
       </Button>
     </div>

@@ -146,7 +146,7 @@ export function PledgeDialog({
     <div className="flex gap-3">
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         className="h-11 flex-1 md:text-base"
         onClick={() => handleOpenChange(false)}
       >
