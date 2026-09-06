@@ -49,12 +49,6 @@ export function FavpollsListClient({
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
 
-  // Restore-once, ELEMENT-anchored (founder, 2026-09-06; v3): the
-  // favpoll page arms "favpolls:return" with its own href on mount
-  // (FavpollSubheader) — no fragile outbound click detection. On the
-  // list's next mount, scroll that card into view after two animation
-  // frames — past the App Router's scroll reset, immune to layout
-  // shifts. The key is consumed once; fresh arrivals keep the top.
   useLayoutEffect(() => {
     // StrictMode-proof consumption: the key is deleted only AFTER a
     // successful centring — a doomed dev double-mount first pass never

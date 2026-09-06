@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -117,6 +117,22 @@ export function FavpollListCard({
   // payment sheet, and the in-card path never visits a favpoll PAGE,
   // so nothing had armed the return). With the key set here, even a
   // full reload centres this card.
+  const rootRef = useRef<HTMLLIElement>(null)
+
+  // THE REAL BUG (founder's log, 2026-09-06 20:06): the in-card pledge
+  // never navigates — the full-screen overlay closes and iOS loses the
+  // page's scroll underneath (no LIST mount ever appears in the log,
+  // so the return mechanism never runs). On close, the card re-seats
+  // itself into view, with retries across the restore window.
+  function reseatAfterOverlay() {
+    const seat = () => {
+      rootRef.current?.scrollIntoView({ block: "center" })
+    }
+    requestAnimationFrame(() => requestAnimationFrame(seat))
+    setTimeout(seat, 250)
+    setTimeout(seat, 600)
+  }
+
   function armReturn() {
     try {
       sessionStorage.setItem("favpolls:return", `/favpolls/${favpoll.id}`)
@@ -225,7 +241,7 @@ export function FavpollListCard({
   const canFlip = !!pollWithItems && topicItems.length > 0
 
   return (
-    <li className={cn("list-none", className)}>
+    <li ref={rootRef} className={cn("list-none", className)}>
       {/* THE WHOLE CARD NAVIGATES (founder, 2026-09-01) — every surface
           except the contained buttons, which keep their own actions. The
           stretched link below covers the static regions (and carries the
@@ -481,7 +497,10 @@ export function FavpollListCard({
             onPledgeSuccess={handlePledgeSuccess}
             isListed
             open={pledgeOpen}
-            onOpenChange={setPledgeOpen}
+            onOpenChange={(o) => {
+              setPledgeOpen(o)
+              if (!o) reseatAfterOverlay()
+            }}
           />
         )}
       </div>
