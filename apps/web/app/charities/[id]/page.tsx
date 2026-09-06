@@ -271,21 +271,25 @@ export default async function CharityPage({ params }: Props) {
                       eyebrow="Appeal"
                       size="md"
                     />
+                    {/* Count + countdown live in the body (founder,
+                        2026-09-06); the footer keeps the £ alone. */}
+                    <div className="mt-2 flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                      <span>
+                        {agg?.member_count ?? 0} favpoll
+                        {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                      </span>
+                      {a.closes_at && (
+                        <ClosingLabel
+                          closesAt={a.closes_at}
+                          className="whitespace-nowrap"
+                        />
+                      )}
+                    </div>
                   </div>
-                  <div className="relative border-t border-border px-3 py-2">
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-medium text-primary tabular-nums">
-                        {formatPounds(Number(agg?.raised ?? 0))}
-                      </span>{" "}
-                      · {agg?.member_count ?? 0} favpoll
-                      {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                  <div className="border-t border-border px-3 py-2">
+                    <p className="text-sm font-medium text-primary tabular-nums">
+                      {formatPounds(Number(agg?.raised ?? 0))}
                     </p>
-                    {a.closes_at && (
-                      <ClosingLabel
-                        closesAt={a.closes_at}
-                        className="absolute top-2 right-3 whitespace-nowrap"
-                      />
-                    )}
                   </div>
                 </Link>
               )
