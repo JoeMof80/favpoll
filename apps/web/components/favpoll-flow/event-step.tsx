@@ -13,6 +13,9 @@ import type { RegisterPalette } from "@/lib/register-palette"
 type Props = {
   value: FavpollCategory | null
   onChange: (value: FavpollCategory) => void
+  /** Locked (edit with pledges): the cards stay visible — the chosen
+      one keeps its pill — but take no clicks (founder, 2026-09-06). */
+  disabled?: boolean
 }
 
 // One axis, three answers: what KIND of favpoll is this.
@@ -64,7 +67,7 @@ const ITEM_CLASS = cn(
   "data-[state=on]:border-primary data-[state=on]:bg-primary/10 data-[state=on]:font-medium dark:data-[state=on]:border-chart-2 dark:data-[state=on]:bg-chart-2/15"
 )
 
-export function EventStep({ value, onChange }: Props) {
+export function EventStep({ value, onChange, disabled = false }: Props) {
   // The step-shell guidance asks the question, so there is no heading here.
   return (
     <ToggleGroup
@@ -77,6 +80,7 @@ export function EventStep({ value, onChange }: Props) {
         <ToggleGroupItem
           key={v}
           value={v}
+          disabled={disabled}
           data-register={palette}
           className={ITEM_CLASS}
         >

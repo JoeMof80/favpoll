@@ -128,7 +128,16 @@ export function NewFavpollWizard({
               {w.step === "event" && (
                 <WizardStepShell title="Event">
                   {w.stepLocked.event ? (
-                    lockedBody(w.railSummary.event.join(" · "))
+                    <div className="space-y-3">
+                      <EventStep
+                        value={w.category}
+                        onChange={() => {}}
+                        disabled
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Locked — guests have already pledged.
+                      </p>
+                    </div>
                   ) : (
                     <EventStep value={w.category} onChange={w.handleCategory} />
                   )}
@@ -143,7 +152,7 @@ export function NewFavpollWizard({
                         charities={w.selectedCharities}
                         lockedReason={
                           w.appeal
-                            ? `Locked — set by ${w.appeal.name}.`
+                            ? `Locked — part of ${w.appeal.name}.`
                             : "Locked — guests have already pledged."
                         }
                       />
@@ -175,7 +184,19 @@ export function NewFavpollWizard({
               {w.step === "topic" && (
                 <WizardStepShell title="Topic">
                   {w.stepLocked.topic ? (
-                    lockedBody(w.railSummary.topic.join(" · "))
+                    w.topics.length > 0 ? (
+                      <WizardTopicCard
+                        topic={w.topics[0]!}
+                        sortedExistingItems={w.sortedExistingItems}
+                        customLabels={w.customLabels}
+                        showItemsSection={w.showItemsSection}
+                        onEdit={() => {}}
+                        onOpenItemsDialog={() => {}}
+                        lockedReason="Locked — guests have already pledged."
+                      />
+                    ) : (
+                      lockedBody(w.railSummary.topic.join(" · "))
+                    )
                   ) : w.topics.length > 0 ? (
                     <WizardTopicCard
                       topic={w.topics[0]!}
