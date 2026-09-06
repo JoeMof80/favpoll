@@ -191,14 +191,14 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
             <Button
               type="button"
               variant="ghost"
-              className="flex-1"
+              className="h-11 flex-1 md:text-base"
               onClick={cancel}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              className="flex-1"
+              className="h-11 flex-1 md:text-base"
               disabled={savingCrop || (cropSrc ? !croppedAreaPixels : false)}
               onClick={save}
             >

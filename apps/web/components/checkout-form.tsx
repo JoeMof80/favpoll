@@ -167,17 +167,17 @@ export function CheckoutForm({
         <div className="flex gap-3 pt-2">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={onCancel}
             disabled={submitting}
-            className="flex-1"
+            className="h-11 flex-1 md:text-base"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={submitting || !stripe}
-            className="flex-1"
+            className="h-11 flex-1 md:text-base"
           >
             {submitting ? "Processing…" : "Pay now"}
           </Button>
