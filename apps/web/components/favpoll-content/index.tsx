@@ -294,6 +294,7 @@ export function FavpollContent({
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
         goalAmount={favpoll.goal_amount ?? null}
+        appeal={appeal}
       />
     </PageLayout>
   )
