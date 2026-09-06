@@ -6,7 +6,7 @@ import { formatPounds } from "@/lib/i18n"
 export const metadata = {
   title: "Charities — favpoll",
   description:
-    "The charities favpoll supports. Every pledge reaches them in full — favpoll takes no fee.",
+    "The charities favpoll supports — favpoll takes no platform fee.",
 }
 
 type Stat = { total_raised: number; live_count: number }
@@ -43,8 +43,7 @@ export default async function CharitiesIndexPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-foreground">Charities</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          The causes favpoll supports. Every pledge reaches them in full —
-          favpoll takes no fee.
+          The causes favpoll supports — favpoll takes no platform fee.
         </p>
       </div>
 

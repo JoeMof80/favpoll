@@ -80,7 +80,7 @@ export function StepAmountHeader({
           {!useSharedFund && (
             <p className="text-[11px] text-muted-foreground">
               Give what feels right. Processed securely by Stripe — favpoll
-              takes no fee.
+              takes no platform fee.
             </p>
           )}
           {useSharedFund && !fundOverAvailable && (

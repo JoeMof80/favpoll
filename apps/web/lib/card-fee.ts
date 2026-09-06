@@ -1,23 +1,16 @@
-// The card fee the GUEST pays, so the charity receives the pledge whole and
-// favpoll never pays for someone else's favpoll.
+// SUPERSEDED 2026-09-06 (founder): the guest no longer pays the card
+// fee — processing is absorbed at settlement, the JustGiving posture.
+// The 2026-08-27 guest-pays decision (kept below for the record) held
+// "100% of your pledge reaches the charity" literally true; the founder
+// consciously retired that claim estate-wide today in exchange for a
+// calmer checkout (total = pledge + tip, no creep). The charity's
+// remittance is pledge minus its processing share, computed at
+// settlement with the helpers below — which is why this module stays.
 //
-// WHY IT EXISTS (founder, 2026-08-27). Two decisions had been travelling as
-// one: "favpoll takes no platform fee" (real, decided 2026-07) and "favpoll
-// absorbs the card processing cost" (never actually decided, but built and
-// then written into the brand doc). They are separable — JustGiving has no
-// platform fee either and still passes processing to the charity — and the
-// second one meant a favpoll where nobody contributed cost favpoll ~£16 per
-// £600 raised, with nothing coming back. That is a hole that scales with
-// success.
-//
-// Putting it on the guest rather than the charity is what keeps "100% of your
-// pledge goes to charity" literally true, which is the line that gets a
-// charity to sign an agreement in an afternoon. It costs the guest about 50p
-// on a £20 pledge.
-//
-// FAVPOLL EARNS NOTHING FROM THIS. Every penny goes to Stripe. The optional
-// contribution remains favpoll's only income, and is now pure margin rather
-// than something the business depends on to break even.
+// (2026-08-27, superseded) The card fee the GUEST pays, so the charity
+// receives the pledge whole and favpoll never pays for someone else's
+// favpoll. Putting it on the guest kept "100% of your pledge goes to
+// charity" literally true. Favpoll earned nothing from it.
 
 /**
  * Stripe UK standard pricing for domestic cards. EEA and international cards
