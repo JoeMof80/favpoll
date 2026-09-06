@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { canManageAppeals } from "@/lib/appeals-admin"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { PageSheet } from "@/components/page-sheet"
 import { AppealForm } from "../appeal-form"
 
 // Appeal creation — in the MAIN app, its long-term home (founder,
@@ -25,8 +26,8 @@ export default async function NewAppealPage({
     .order("name")
 
   return (
-    <main className="min-h-screen bg-primary/5">
-      <div className="mx-auto w-full max-w-2xl px-6 py-14">
+    <PageSheet>
+      <div className="mx-auto w-full max-w-2xl pt-10 md:pt-16">
         <SectionEyebrow variant="muted">Appeal</SectionEyebrow>
         <h1 className="mt-2 mb-8 text-4xl leading-tight font-light tracking-tight text-foreground">
           New appeal
@@ -36,6 +37,6 @@ export default async function NewAppealPage({
           defaultCharityId={defaultCharityId}
         />
       </div>
-    </main>
+    </PageSheet>
   )
 }
