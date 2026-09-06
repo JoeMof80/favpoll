@@ -175,44 +175,34 @@ describe("usePledgeDialog — step navigation", () => {
     expect(result.current.draftIds).toEqual(["red"])
   })
 
-  it("card path with a pick walks 2 → 3 (split) → 4 (review)", async () => {
+  it("card path prices the intent at step 2 and advances to the review", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.toggleDraft("blue"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())
-    // the split is its own beat — no PaymentIntent priced yet
     expect(result.current.step).toBe(3)
-    expect(mockFetch).not.toHaveBeenCalled()
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(4)
     expect(mockFetch).toHaveBeenCalledTimes(1)
   })
 
-  it("a no-pick pledge skips the split — 2 → 4 directly", async () => {
-    // Picking is optional (founder, 2026-08-17); with nothing on the
-    // favourite side there is nothing to split from.
+  it("a no-pick pledge takes the same path (picking is optional)", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
-    expect(result.current.hasSplitStep).toBe(false)
     await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(4)
+    expect(result.current.step).toBe(3)
   })
 
-  it("handleBack from the review clears clientSecret, lands on the split", async () => {
+  it("handleBack from the review clears clientSecret, returns to step 2", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.toggleDraft("blue"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(4)
-    act(() => result.current.handleBack())
     expect(result.current.step).toBe(3)
-    expect(result.current.pledgeClientSecret).toBeNull()
     act(() => result.current.handleBack())
     expect(result.current.step).toBe(2)
+    expect(result.current.pledgeClientSecret).toBeNull()
   })
 
   it("handleClose resets to step 1 and clears draftIds", async () => {
@@ -390,7 +380,6 @@ describe("usePledgeDialog — payment success", () => {
     act(() => result.current.toggleDraft("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext()) // → split
     await act(async () => result.current.handleNext()) // → review
     await act(async () => result.current.handlePledgePaymentSuccess())
     expect(mockActions.createPledge).toHaveBeenCalled()
@@ -410,8 +399,7 @@ describe("usePledgeDialog — review tip", () => {
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(4)
+    expect(result.current.step).toBe(3)
     await act(async () => {
       result.current.updateTip(2)
     })
@@ -420,6 +408,6 @@ describe("usePledgeDialog — review tip", () => {
     const body = JSON.parse(mockFetch.mock.calls[1][1].body)
     expect(body.tipAmount).toBe(2)
     // the review holds — only the intent behind it was re-priced
-    expect(result.current.step).toBe(4)
+    expect(result.current.step).toBe(3)
   })
 })

@@ -1,6 +1,7 @@
 "use client"
 
 import { formatPoundsExact } from "@/lib/i18n"
+import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -99,13 +100,24 @@ type Props = {
   toggleFund: () => void
   /** Admin-curated impact lines per charity ("£20 funds an hour…") */
   impactStatements?: string[]
+  /** The split (consolidated back into this step, founder 2026-09-06):
+   *  omit onFundChange (hero demo) to hide it entirely. */
+  favouriteBreakdown?: FavouriteBreakdownLine[]
+  /** Pounds of the total moved to the shared fund. */
+  fundPart?: number
+  /** Set the fund to an absolute pound value (the slider's grammar). */
+  onFundChange?: (pounds: number) => void
 }
 
+type FavouriteBreakdownLine = { label: string; amount: number }
+
 /**
- * LEAN since 2026-09-06 (the four-step flow): the amount, the presets, the
- * fund tabs — nothing else. The split became its own step, and the tip and
- * itemised bill moved to the review page, where they are read at the
- * moment of payment.
+ * Reshaped 2026-09-06: the amount, the presets, the fund tabs, and the
+ * SPLIT — a slider whose thumb divides the total, shared fund to its
+ * left and favourite(s) to its right, the list below re-pricing live.
+ * (A separate split step was auditioned and consolidated back the same
+ * day.) The tip and the itemised bill live on the review page, read at
+ * the moment of payment.
  */
 export function StepAmount({
   pledgeAmount,
@@ -114,7 +126,22 @@ export function StepAmount({
   hasFund,
   toggleFund,
   impactStatements,
+  favouriteBreakdown = [],
+  fundPart = 0,
+  onFundChange,
 }: Props) {
+  const numericTotal = parseFloat(pledgeAmount)
+  const totalValid = !isNaN(numericTotal) && numericTotal > 0
+  // Whole pounds only, and the favourite keeps at least £1 of worth
+  const maxFund = totalValid ? Math.max(0, Math.floor(numericTotal - 1)) : 0
+  const favouriteShare = totalValid
+    ? Math.round((numericTotal - fundPart) * 100) / 100
+    : 0
+  const showSplit =
+    !useSharedFund &&
+    !!onFundChange &&
+    totalValid &&
+    favouriteBreakdown.length > 0
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
@@ -172,6 +199,64 @@ export function StepAmount({
               </TabsTrigger>
             </TabsList>
           </Tabs>
+        )}
+
+        {showSplit && (
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
+              <Slider
+                value={[fundPart]}
+                min={0}
+                // min === max degenerates Radix's thumb maths at a £1
+                // total, so the range stays real and disabled carries
+                // the meaning.
+                max={Math.max(1, maxFund)}
+                step={1}
+                disabled={maxFund === 0}
+                onValueChange={([v]) => onFundChange!(v)}
+                aria-label="Pounds to the shared fund"
+                trackClassName="bg-primary/20"
+                rangeClassName="bg-chart-3"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>
+                  Shared fund{" "}
+                  <span className="font-semibold text-foreground tabular-nums">
+                    {formatPoundsExact(fundPart)}
+                  </span>
+                </span>
+                <span>
+                  {favouriteBreakdown.length === 1 ? "Favourite" : "Favourites"}{" "}
+                  <span className="font-semibold text-foreground tabular-nums">
+                    {formatPoundsExact(favouriteShare)}
+                  </span>
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Move whole pounds to the shared fund — it backs guests without a
+                favourite, and reaches the charity too. Your total stays the
+                same.
+              </p>
+            </div>
+
+            {/* The list, re-pricing live under the thumb */}
+            <div className="space-y-2 border-t border-border pt-3">
+              {favouriteBreakdown.map((line, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-sm">{line.label}</span>
+                  <span className="text-sm font-semibold tabular-nums">
+                    {formatPoundsExact(line.amount)}
+                  </span>
+                </div>
+              ))}
+              <div className="flex justify-between">
+                <span className="text-sm">Shared fund</span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {formatPoundsExact(fundPart)}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

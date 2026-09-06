@@ -10,7 +10,7 @@ import type {
   Favourite,
 } from "@favpoll/types"
 
-export type PledgeDialogStep = 1 | 2 | 3 | 4
+export type PledgeDialogStep = 1 | 2 | 3
 
 export type UsePledgeDialogOptions = {
   favpollId: string
@@ -82,7 +82,7 @@ export function usePledgeDialog({
 
   // --- step 2: total-then-split state (founder redesign, 2026-07-31) ---
   // The guest enters ONE total, defaulting entirely to their favourite;
-  // step 3 moves whole pounds into the shared fund. usePledge keeps
+  // its slider moves whole pounds into the shared fund. usePledge keeps
   // its original semantics (pledgeAmount = the charity portion,
   // topUpAmount = the fund portion) so the verified payment rail and the
   // legacy pledge card are untouched — this is a pure mapping layer.
@@ -144,17 +144,10 @@ export function usePledgeDialog({
     pledge.toggleFund()
   }
 
-  // The split step exists only on the card path with a favourite to split
-  // FROM — a no-pick pledge has nothing on the favourite side, and the
-  // fund path never splits. Recomputed, so Back from the review lands on
-  // the same steps the guest walked forward through.
-  const hasSplitStep = !pledge.useSharedFund && selectedIds.length > 0
-
-  // Advance to the review once the PaymentIntent exists — from step 2
-  // (split skipped) or step 3.
+  // Advance to the review once the PaymentIntent exists
   useEffect(() => {
-    if (pledge.pledgeClientSecret && (step === 2 || step === 3)) {
-      setStep(4)
+    if (pledge.pledgeClientSecret && step === 2) {
+      setStep(3)
     }
   }, [pledge.pledgeClientSecret, step])
 
@@ -197,7 +190,7 @@ export function usePledgeDialog({
   // backing anything is already a shape the product has — "a gift with no
   // favourite attached" is how the shared fund describes it — and the money
   // reaches the charity either way. A no-pick pledge lands with a total and
-  // no allocations, and skips the split step (nothing to split from).
+  // no allocations (and sees no split — nothing to split from).
   const canAdvanceStep1 = true
 
   async function handleNext() {
@@ -210,27 +203,17 @@ export function usePledgeDialog({
       if (pledge.useSharedFund) {
         await pledge.handleFundConfirm()
         // onPledgeSuccess closes the dialog via the caller
-        return
+      } else {
+        // Price the intent; the effect above advances to the review
+        await pledge.handleOwnConfirm()
       }
-      if (hasSplitStep) {
-        setStep(3)
-        return
-      }
-      // Split skipped — price the intent now; the effect above advances
-      await pledge.handleOwnConfirm()
-      return
-    }
-    if (step === 3) {
-      await pledge.handleOwnConfirm()
     }
   }
 
   function handleBack() {
-    if (step === 4) {
+    if (step === 3) {
       pledge.setPledgeClientSecret(null)
       pledge.setSubmitting(false)
-      setStep(hasSplitStep ? 3 : 2)
-    } else if (step === 3) {
       setStep(2)
     } else if (step === 2) {
       setDraftIds(selectedIds)
@@ -258,7 +241,6 @@ export function usePledgeDialog({
   return {
     // step
     step,
-    hasSplitStep,
     // step 1
     draftIds,
     toggleDraft,
