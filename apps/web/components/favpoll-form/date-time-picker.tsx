@@ -97,7 +97,13 @@ export function DateTimePicker({
             type="button"
             variant="outline"
             className={cn(
-              "min-w-0 flex-1 cursor-pointer justify-start gap-2 bg-background! font-normal",
+              // FIXED at 175px (founder, 2026-09-06): date 175 + gap 8 +
+              // time 128 = 311 — the popover's measured natural width —
+              // so the PAIR spans exactly the dropdown, in any context,
+              // whatever the value. flex-1 made the width depend on the
+              // container (wizard stretched) or the text (appeal drifted
+              // once a date was picked).
+              "w-[175px] min-w-0 shrink-0 cursor-pointer justify-start gap-2 bg-background! font-normal",
               INPUT_SIZE[size],
               !value && "text-muted-foreground"
             )}
