@@ -29,6 +29,7 @@
 //
 // Scripted loop; reduced motion gets the final frame.
 import { useEffect, useState } from "react"
+import { PollHeading } from "@/components/poll-heading"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Chip } from "@/components/ui/chip"
 import {
@@ -138,7 +139,6 @@ export function TopicPickerVignette({
   // Read into the names the body already uses, so parameterising this cost
   // four lines rather than twenty scattered renames.
   const { topic: TOPIC, items: ITEMS, guestItem: GUEST_ITEM } = scene
-  const HEADING = `Favourite ${TOPIC}`
 
   const reduced = useReducedMotion()
   const [phase, setPhase] = useState<Phase>(
@@ -442,9 +442,7 @@ export function TopicPickerVignette({
                   ResponsiveOverlay's own shape. Without the footer this read
                   as a card rather than a dialog. */}
               <div className="space-y-2 px-4 py-4">
-                <p className="text-lg font-medium tracking-tight text-foreground">
-                  {HEADING}
-                </p>
+                <PollHeading topicTitle={TOPIC} size="lg" inert />
                 <div className="flex items-center gap-2">
                   <span
                     className={`flex-1 text-base ${inputText ? "text-foreground" : "text-muted-foreground/50"}`}

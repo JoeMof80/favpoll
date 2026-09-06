@@ -27,7 +27,7 @@ import { formatPounds } from "@/lib/i18n"
 const RECORD_ITEMS = ["Jaffa Cake", "Custard Cream", "Bourbon"] as const
 type RecordItem = (typeof RECORD_ITEMS)[number]
 
-const TOPIC = "Favourite Biscuit"
+const TOPIC = "Biscuit"
 
 type Mini = {
   eyebrow: string
@@ -233,6 +233,10 @@ export function RecordFlow() {
             <p className="text-[11px] font-medium text-foreground">
               {mini.title}
             </p>
+            {/* The two-line Favourite grammar, at the mini's own scale */}
+            <p className="text-[7px] font-medium tracking-widest text-primary/55 uppercase">
+              Favourite
+            </p>
             <p className="mb-1 text-[8px] font-medium tracking-widest text-primary uppercase">
               {TOPIC}
             </p>
@@ -285,7 +289,12 @@ export function RecordFlow() {
         <p className="text-[10px] font-medium tracking-widest text-primary uppercase">
           The record
         </p>
-        <p className="mb-2 text-sm font-medium text-foreground">{TOPIC}</p>
+        <p className="text-[10px] font-medium tracking-[0.09em] text-primary/55 uppercase">
+          Favourite
+        </p>
+        <p className="mb-2 text-sm font-medium tracking-[0.09em] text-primary uppercase">
+          {TOPIC}
+        </p>
         <div
           className="relative"
           style={{ height: RECORD_ITEMS.length * RECORD_ROW_H }}

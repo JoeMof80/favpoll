@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import type { Favourite } from "@favpoll/types"
-import { SectionLabel } from "@/components/favpoll-card/section-label"
+import { PollHeading } from "@/components/poll-heading"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -58,7 +58,7 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
           </Link>
         </Button>
         <div className="flex items-center justify-between">
-          <SectionLabel title={topicTitle} />
+          <PollHeading topicTitle={topicTitle} size="lg" inert />
           <Tabs value={view} onValueChange={(v) => setView(v as RankingView)}>
             <TabsList className="h-7">
               <TabsTrigger value="amount" className="px-3 text-xs">
