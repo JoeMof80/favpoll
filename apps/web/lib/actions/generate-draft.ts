@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import type { Pronoun, Register } from "@favpoll/types"
+import type { FavpollGrouping, Pronoun, Register } from "@favpoll/types"
 import {
   checkRateLimit,
   incrementRateLimitCount,
@@ -72,6 +72,7 @@ function buildPrompt(opts: {
   charityName: string | null
   charityDescription: string | null
   pronoun?: Pronoun
+  grouping?: FavpollGrouping
   displayName?: string | null
 }): string {
   const {
@@ -82,6 +83,7 @@ function buildPrompt(opts: {
     charityName,
     charityDescription,
     pronoun,
+    grouping,
     displayName,
   } = opts
 
@@ -119,9 +121,14 @@ ${charityLine}`
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName)
-    const pronounHint = pronoun
-      ? ` Use "${pronoun}" pronouns for the person.`
-      : ""
+    // Pair/Group are structural (founder bug, 2026-09-06: the generator
+    // wrote "him/his" for a pair because plurality never reached it).
+    const plural = grouping === "pair" || grouping === "group"
+    const pronounHint = plural
+      ? ` The favpoll honours ${grouping === "pair" ? "a PAIR — two people together" : "a GROUP of people"}: use "they/them/their" and plural agreement in every sentence ("their favourite", "they have loved"), and treat the name as referring to ${grouping === "pair" ? "both of them" : "all of them"}, never one individual.`
+      : pronoun
+        ? ` Use "${pronoun}" pronouns for the person.`
+        : ""
     const namePoss = namePossessive(displayName)
     const nameHint = namePoss
       ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with a clause like "and ${namePoss} will be revealed" or "and we'll reveal ${namePoss}". The reveal opener below already contains the name — never repeat it beyond these two places.`
@@ -223,6 +230,8 @@ export type GenerateDraftInput = {
   /** Required when topicId is empty — the organiser's custom item labels. */
   itemLabels?: string[]
   pronoun?: Pronoun
+  /** Pair/Group plurality — structural for the copy's agreement. */
+  grouping?: FavpollGrouping
   /** Protagonist name or cause label — prompt context only, never cached into copy. */
   displayName?: string | null
 }
@@ -275,6 +284,7 @@ export async function generateDraft(
       charityName,
       charityDescription,
       pronoun: input.subject === "someone" ? input.pronoun : undefined,
+      grouping: input.subject === "someone" ? input.grouping : undefined,
       displayName: input.displayName ?? null,
     })
 
@@ -313,7 +323,8 @@ export async function generateDraft(
     input.subject,
     input.primaryCharityId,
     input.pronoun,
-    input.displayName
+    input.displayName,
+    input.grouping
   )
 
   const { data: cached } = await supabase
@@ -365,6 +376,7 @@ export async function generateDraft(
     charityName,
     charityDescription,
     pronoun: input.subject === "someone" ? input.pronoun : undefined,
+    grouping: input.subject === "someone" ? input.grouping : undefined,
     displayName: input.displayName ?? null,
   })
 

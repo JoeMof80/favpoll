@@ -443,6 +443,7 @@ export function useWizardState(
         itemLabels: topic.isCustom ? (topic.customLabels ?? []) : undefined,
         primaryCharityId: primaryCharity?.id ?? null,
         pronoun,
+        grouping,
         displayName: name.trim() || null,
       })
       if (!result) return

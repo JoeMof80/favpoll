@@ -87,7 +87,8 @@ export function buildCacheKey(
   subject: "someone" | "cause",
   primaryCharityId?: string | null,
   pronoun?: string | null,
-  displayName?: string | null
+  displayName?: string | null,
+  grouping?: string | null
 ): string {
   // v3: charity ALWAYS keys the cache (the About names it) and the display
   // name is hashed in — the model's is-this-actually-a-person judgement
@@ -100,5 +101,8 @@ export function buildCacheKey(
     nameHash = (nameHash * 31 + ch.charCodeAt(0)) >>> 0
   }
   const namePart = displayName ? nameHash.toString(36) : "none"
-  return `v3:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${namePart}`
+  // v4: grouping keys the cache — a pair's plural draft must never be
+  // served from a singular one (founder bug, 2026-09-06).
+  const groupPart = subject === "someone" ? (grouping ?? "individual") : "none"
+  return `v4:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${namePart}`
 }
