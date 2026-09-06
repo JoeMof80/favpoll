@@ -14,7 +14,7 @@ type FavouriteBreakdownLine = { label: string; amount: number }
 type HeaderProps = {
   pledgeAmount: string
   updatePledgeAmount: (v: string) => void
-  /** The shared-fund figure beside it (two-part entry, founder mock
+  /** The shared-pot figure beside it (two-part entry, founder mock
    *  2026-09-06) — omit to render the single-figure header. */
   fundAmount?: string
   onFundAmountChange?: (v: string) => void
@@ -47,7 +47,7 @@ export function StepAmountHeader({
   const numericFund = parseFloat(fundAmount)
   const fundQuiet = isNaN(numericFund) || numericFund <= 0
   // The header's block-end carries only the fund-mode lines and errors —
-  // the fee line lives in the body's shared-fund note, so the slider
+  // the fee line lives in the body's shared-pot note, so the slider
   // sits right under the figures (founder, 2026-09-06).
   const hasBlockEnd = useSharedFund || !!error
   return (
@@ -179,7 +179,7 @@ type Props = {
 /**
  * Two-part entry (founder mock, 2026-09-06, superseding total-then-split):
  * the header holds TWO figures — the favourites' worth and the shared
- * fund on top — and the slider here rebalances their sum without
+ * pot on top — and the slider here rebalances their sum without
  * changing it. Presets set the favourites side ("pledge its worth").
  * The tip and the itemised bill live on the review page.
  */
