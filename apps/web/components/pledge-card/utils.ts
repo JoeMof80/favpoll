@@ -21,9 +21,13 @@ export function tipOptionsFor(pledge: number): number[] {
   return [0, 0.5, 1, 2]
 }
 
-/** The preselected suggestion for a tier — the second-largest option. */
+/** The preselected suggestion — roughly 10% at every tier. The
+ *  second-largest chip, except under £10 where that would run to 20%+
+ *  (founder, 2026-09-06: a flat suggestion reads as a shakedown on a
+ *  small pledge) — there the second-smallest (50p) holds the line. */
 export function defaultTipFor(pledge: number): number {
-  return tipOptionsFor(pledge)[2]
+  const options = tipOptionsFor(pledge)
+  return pledge < 10 ? options[1] : options[2]
 }
 
 export function formatTipLabel(value: number): string {

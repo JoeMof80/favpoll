@@ -34,8 +34,11 @@ describe("StepAmount — total-then-split", () => {
     expect(onFundStep).toHaveBeenCalledWith(-1)
   })
 
-  it("cannot step below zero", () => {
+  it("cannot step below zero (behind the fold at zero)", () => {
     render(<StepAmount {...BASE} fundPart={0} onFundStep={vi.fn()} />)
+    // At zero the stepper folds behind the quiet split row (founder,
+    // 2026-09-06) — open it first.
+    fireEvent.click(screen.getByText("+ Split with the shared fund"))
     expect(stepDown()).toBeDisabled()
     expect(stepUp()).toBeEnabled()
   })
@@ -45,29 +48,20 @@ describe("StepAmount — total-then-split", () => {
     expect(stepUp()).toBeDisabled()
   })
 
-  it("frames the favourite line as its worth, with the info popover", () => {
+  it("folds the split behind a quiet row at zero, stepper open in use", () => {
+    // The heading and info popover retired with the calm pass (founder,
+    // 2026-09-06); the split is disclosure-first.
     render(<StepAmount {...BASE} fundPart={0} onFundStep={vi.fn()} />)
-    expect(screen.getByText("Your favourite · its worth")).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: "About your favourite's worth" })
-    ).toBeInTheDocument()
+    expect(screen.getByText("+ Split with the shared fund")).toBeInTheDocument()
+    expect(screen.queryByText("Shared fund")).not.toBeInTheDocument()
   })
 
-  it("pluralises the worth label for several favourites", () => {
-    render(
-      <StepAmount
-        {...BASE}
-        favouriteBreakdown={[
-          { label: "Blue", amount: 9 },
-          { label: "Green", amount: 9 },
-        ]}
-        fundPart={2}
-        onFundStep={vi.fn()}
-      />
-    )
+  it("shows the stepper without a click when a split is already in use", () => {
+    render(<StepAmount {...BASE} fundPart={2} onFundStep={vi.fn()} />)
+    expect(screen.getByText("Shared fund")).toBeInTheDocument()
     expect(
-      screen.getByText("Your favourites · their worth")
-    ).toBeInTheDocument()
+      screen.queryByText("+ Split with the shared fund")
+    ).not.toBeInTheDocument()
   })
 
   it("hides the split on the shared-fund path", () => {
