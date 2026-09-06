@@ -120,6 +120,7 @@ export function FavpollListCard({
   function armReturn() {
     try {
       sessionStorage.setItem("favpolls:return", `/favpolls/${favpoll.id}`)
+      sessionStorage.setItem("favpolls:return-t", String(Date.now()))
       // TEMPORARY persistent debug log entry
       const log = JSON.parse(
         sessionStorage.getItem("favpolls:debug-log") ?? "[]"

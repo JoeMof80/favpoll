@@ -92,10 +92,20 @@ export function FavpollsListClient({
       } catch {}
       forceRender((n) => n + 1)
     }
+    // StrictMode-proof consumption (founder's log, 2026-09-06: TWO
+    // mounts in the same second — the first consumed the key and its
+    // cleanup cancelled the centring timers; the survivor found NONE).
+    // The key is deleted only AFTER a successful centring; a staleness
+    // window stops ancient keys resurfacing.
     let href: string | null = null
     try {
       href = sessionStorage.getItem("favpolls:return")
-      if (href) sessionStorage.removeItem("favpolls:return")
+      const t = Number(sessionStorage.getItem("favpolls:return-t") ?? 0)
+      if (href && Date.now() - t > 10 * 60 * 1000) {
+        sessionStorage.removeItem("favpolls:return")
+        sessionStorage.removeItem("favpolls:return-t")
+        href = null
+      }
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
@@ -139,6 +149,12 @@ export function FavpollsListClient({
       } else {
         dbg(`ok y=${before} top=${Math.round(r.top)}`)
       }
+      // Consumed only now — a doomed StrictMode first pass never gets
+      // here, so the surviving pass still finds the key.
+      try {
+        sessionStorage.removeItem("favpolls:return")
+        sessionStorage.removeItem("favpolls:return-t")
+      } catch {}
       attach()
     }
     const raf = requestAnimationFrame(() => requestAnimationFrame(centre))
