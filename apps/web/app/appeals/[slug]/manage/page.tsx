@@ -19,7 +19,7 @@ export default async function ManageAppealPage({
   const { data: appeal } = await supabase
     .from("appeals")
     .select(
-      "id, slug, name, blurb, photo_url, charity_id, closes_at, is_listed"
+      "id, slug, name, blurb, photo_url, charity_id, closes_at, is_listed, goal_amount"
     )
     .eq("slug", slug)
     .maybeSingle()
@@ -34,7 +34,11 @@ export default async function ManageAppealPage({
   return (
     <PageSheet>
       <div className="mx-auto w-full max-w-2xl pt-10 md:pt-16">
-        <SectionEyebrow variant="muted">Appeal</SectionEyebrow>
+        <SectionEyebrow variant="muted">
+          {(charities ?? []).find((c) => c.id === appeal.charity_id)
+            ? `Appeal for ${(charities ?? []).find((c) => c.id === appeal.charity_id)!.name}`
+            : "Appeal"}
+        </SectionEyebrow>
         <h1 className="mt-2 mb-8 text-4xl leading-tight font-light tracking-tight text-foreground">
           {appeal.name}
         </h1>
@@ -48,6 +52,7 @@ export default async function ManageAppealPage({
             blurb: appeal.blurb ?? "",
             photoUrl: appeal.photo_url ?? "",
             closesAt: appeal.closes_at ? appeal.closes_at.slice(0, 16) : "",
+            goalAmount: appeal.goal_amount ? String(appeal.goal_amount) : "",
             isListed: appeal.is_listed,
           }}
         />

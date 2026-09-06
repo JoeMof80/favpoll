@@ -15,6 +15,7 @@ export type AppealInput = {
   photoUrl?: string
   closesAt?: string | null
   isListed?: boolean
+  goalAmount?: number | null
 }
 
 async function requireManager() {
@@ -43,6 +44,7 @@ export async function createAppeal(
     photo_url: input.photoUrl?.trim() || null,
     closes_at: input.closesAt || null,
     is_listed: input.isListed ?? false,
+    goal_amount: input.goalAmount ?? null,
     created_by: userId,
   })
   if (error) return { error: error.message }
@@ -70,6 +72,7 @@ export async function updateAppeal(
       photo_url: input.photoUrl?.trim() || null,
       closes_at: input.closesAt || null,
       is_listed: input.isListed ?? false,
+      goal_amount: input.goalAmount ?? null,
     })
     .eq("id", id)
   if (error) return { error: error.message }
