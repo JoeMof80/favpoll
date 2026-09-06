@@ -97,7 +97,11 @@ export function DateTimePicker({
             type="button"
             variant="outline"
             className={cn(
-              "min-w-0 flex-1 cursor-pointer justify-start gap-2 bg-background! font-normal",
+              // Capped at the popover's measured natural width (311px,
+              // 2026-09-06): the button sized to the calendar, never the
+              // calendar stretched to the button (founder). Narrow
+              // viewports shrink the button; the popover then overhangs.
+              "w-full max-w-[311px] min-w-0 cursor-pointer justify-start gap-2 bg-background! font-normal",
               INPUT_SIZE[size],
               !value && "text-muted-foreground"
             )}
@@ -111,19 +115,9 @@ export function DateTimePicker({
             </span>
           </Button>
         </PopoverTrigger>
-        {/* Width follows the trigger (measured 2026-09-06: content's
-            natural width is ~311px, the trigger ~330 — the button used
-            to jut past the popover's edge). The Radix var makes the
-            edges align by construction; min-w-fit guards the narrow-
-            trigger case (phones), where content width wins. */}
-        <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] min-w-fit p-0"
-          align="start"
-        >
-          <Card size="sm" className="w-full shadow-none ring-0">
-            <CardContent
-              className={presets ? "flex justify-between gap-3" : undefined}
-            >
+        <PopoverContent className="w-auto p-0" align="start">
+          <Card size="sm" className="w-fit shadow-none ring-0">
+            <CardContent className={presets ? "flex gap-3" : undefined}>
               <Calendar
                 mode="single"
                 captionLayout="dropdown"
