@@ -134,16 +134,15 @@ export function StepPay({
           <p className="mt-1.5 text-[11px] text-muted-foreground">
             The tip is optional — never taken from your pledge.
           </p>
+          {/* The privacy reassurance, quiet under the bill (unboxed
+              2026-09-07 — the muted panel read as a third card) */}
+          {isListed && (
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              This is a public favpoll. Your pledge amount and identity are
+              always private.
+            </p>
+          )}
         </div>
-      )}
-
-      {/* Last thing read before paying (founder, 2026-07-31): the privacy
-          reassurance lands at the moment of commitment */}
-      {isListed && (
-        <p className="mb-4 rounded-md bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-          This is a public favpoll. Your pledge amount and identity are always
-          private.
-        </p>
       )}
 
       {/* One identity unit — email (required) and wall name were two
