@@ -80,16 +80,7 @@ export function usePledgeDialog({
     }
   }
 
-  // --- step 2: total-then-split state (founder redesign, 2026-07-31) ---
-  // The guest enters ONE total, defaulting entirely to their favourite;
-  // its slider moves whole pounds into the shared fund. usePledge keeps
-  // its original semantics (pledgeAmount = the charity portion,
-  // topUpAmount = the fund portion) so the verified payment rail and the
-  // legacy pledge card are untouched — this is a pure mapping layer.
-  const [totalInput, setTotalInput] = useState("")
-  const [fundPart, setFundPart] = useState(0)
-
-  // --- steps 2–4: pledge state via usePledge ---
+  // --- steps 2–3: pledge state via usePledge ---
   const pledge = usePledge({
     favpollId,
     clerkUserId,
@@ -107,40 +98,40 @@ export function usePledgeDialog({
     allowEmptySelection: true,
   })
 
-  // Push a (total, fund) pair down into usePledge's parts. The fund is
-  // clamped so the favourite always keeps at least £1 of worth, and
-  // collapses to 0 when the total empties or shrinks beneath it.
-  function applySplit(total: string, fund: number) {
-    const t = parseFloat(total)
-    const valid = !isNaN(t) && t > 0
-    const f = valid ? Math.max(0, Math.min(fund, Math.floor(t - 1))) : 0
-    setTotalInput(total)
-    setFundPart(f)
-    pledge.updatePledgeAmount(
-      valid ? String(Math.round((t - f) * 100) / 100) : total
-    )
-    pledge.setTopUpAmount(f > 0 ? String(f) : "")
+  // --- step 2: TWO-PART entry (founder mock, 2026-09-06 — supersedes
+  // total-then-split). The favourites figure IS usePledge's pledgeAmount
+  // ("pledge its worth"), the shared fund is topUpAmount riding on top,
+  // and the slider between them REBALANCES the current sum without
+  // changing it. No mapping layer: these are the rail's native parts.
+  const numericPledge = parseFloat(pledge.pledgeAmount)
+  const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
+  const numericFund = parseFloat(pledge.topUpAmount)
+  const fundPart = !isNaN(numericFund) && numericFund > 0 ? numericFund : 0
+
+  function handleFavChange(v: string) {
+    pledge.updatePledgeAmount(v)
   }
 
-  function handleTotalChange(v: string) {
-    applySplit(v, fundPart)
+  function handleFundChange(v: string) {
+    pledge.setTopUpAmount(v)
   }
 
-  function stepFund(delta: number) {
-    applySplit(totalInput, fundPart + delta)
-  }
-
-  // The slider names an absolute value; applySplit still clamps it
-  // (whole pounds, favourite keeps at least £1).
-  function setFundTo(pounds: number) {
-    applySplit(totalInput, pounds)
+  // Slider grammar: value = the favourites' share of the current sum.
+  // Clamped so a picked favourite keeps at least £1 of worth.
+  function setFavShare(pounds: number) {
+    const fav = isPledgeValid ? numericPledge : 0
+    const total = Math.round((fav + fundPart) * 100) / 100
+    const floor = selectedIds.length > 0 ? Math.min(1, total) : 0
+    const f = Math.max(floor, Math.min(pounds, total))
+    const fund = Math.round((total - f) * 100) / 100
+    pledge.updatePledgeAmount(f > 0 ? String(f) : "")
+    pledge.setTopUpAmount(fund > 0 ? String(fund) : "")
   }
 
   // Drawing FROM the fund and paying INTO it are exclusive — entering
-  // fund mode zeroes the split. Guarded so a toggle with no split never
-  // rewrites amounts set through the legacy updatePledgeAmount path.
+  // fund mode zeroes the fund part.
   function toggleFundAndResetSplit() {
-    if (fundPart > 0) applySplit(totalInput, 0)
+    if (fundPart > 0) pledge.setTopUpAmount("")
     pledge.toggleFund()
   }
 
@@ -152,9 +143,6 @@ export function usePledgeDialog({
   }, [pledge.pledgeClientSecret, step])
 
   // --- per-favourite breakdown ---
-  const numericPledge = parseFloat(pledge.pledgeAmount)
-  const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
-
   function getFavouriteBreakdown() {
     if (selectedIds.length === 0) return []
     if (!isPledgeValid) {
@@ -190,7 +178,7 @@ export function usePledgeDialog({
   // backing anything is already a shape the product has — "a gift with no
   // favourite attached" is how the shared fund describes it — and the money
   // reaches the charity either way. A no-pick pledge lands with a total and
-  // no allocations (and sees no split — nothing to split from).
+  // no allocations (and sees no slider — nothing to rebalance).
   const canAdvanceStep1 = true
 
   async function handleNext() {
@@ -234,8 +222,8 @@ export function usePledgeDialog({
     setDraftIds([])
     setSearch("")
     setAddError(null)
-    setTotalInput("")
-    setFundPart(0)
+    pledge.updatePledgeAmount("")
+    pledge.setTopUpAmount("")
   }
 
   return {
@@ -257,14 +245,13 @@ export function usePledgeDialog({
     addError,
     handleAdd,
     canAdvanceStep1,
-    // steps 2–4 (delegate to usePledge)
+    // steps 2–3 (delegate to usePledge)
     ...pledge,
-    // total-then-split mapping (overrides ride below the spread)
-    totalInput,
+    // two-part entry (overrides ride below the spread)
     fundPart,
-    handleTotalChange,
-    stepFund,
-    setFundTo,
+    handleFavChange,
+    handleFundChange,
+    setFavShare,
     toggleFund: toggleFundAndResetSplit,
     updateTip,
     // breakdowns

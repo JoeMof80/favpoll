@@ -284,56 +284,42 @@ describe("usePledgeDialog — charityBreakdown", () => {
 // Total-then-split mapping
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("usePledgeDialog — total-then-split", () => {
-  it("maps total and fund steps onto pledge/topUp parts", () => {
+describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
+  it("favourites and fund are independent additive parts", () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.handleTotalChange("20"))
+    act(() => result.current.handleFavChange("20"))
+    act(() => result.current.handleFundChange("5"))
     expect(result.current.pledgeAmount).toBe("20")
-    act(() => result.current.stepFund(1))
-    act(() => result.current.stepFund(1))
-    expect(result.current.fundPart).toBe(2)
-    expect(result.current.pledgeAmount).toBe("18")
-    expect(result.current.topUpAmount).toBe("2")
-    act(() => result.current.stepFund(-1))
-    expect(result.current.fundPart).toBe(1)
-    expect(result.current.pledgeAmount).toBe("19")
-  })
-
-  it("clamps the fund so the favourite keeps at least £1", () => {
-    const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.handleTotalChange("5"))
-    for (let i = 0; i < 10; i++) act(() => result.current.stepFund(1))
-    expect(result.current.fundPart).toBe(4)
-    expect(result.current.pledgeAmount).toBe("1")
-  })
-
-  it("shrinking the total pulls the fund down with it", () => {
-    const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.handleTotalChange("20"))
-    for (let i = 0; i < 5; i++) act(() => result.current.stepFund(1))
-    expect(result.current.fundPart).toBe(5)
-    act(() => result.current.handleTotalChange("3"))
-    expect(result.current.fundPart).toBe(2)
-    expect(result.current.pledgeAmount).toBe("1")
-  })
-
-  it("setFundTo maps an absolute pound value onto the parts (slider)", () => {
-    const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.handleTotalChange("20"))
-    act(() => result.current.setFundTo(5))
-    expect(result.current.fundPart).toBe(5)
-    expect(result.current.pledgeAmount).toBe("15")
     expect(result.current.topUpAmount).toBe("5")
-    act(() => result.current.setFundTo(0))
-    expect(result.current.fundPart).toBe(0)
-    expect(result.current.pledgeAmount).toBe("20")
+    expect(result.current.fundPart).toBe(5)
+  })
+
+  it("setFavShare rebalances the sum without changing it (slider)", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleFavChange("20"))
+    act(() => result.current.handleFundChange("5"))
+    act(() => result.current.setFavShare(15))
+    expect(result.current.pledgeAmount).toBe("15")
+    expect(result.current.topUpAmount).toBe("10")
+    act(() => result.current.setFavShare(25))
+    expect(result.current.pledgeAmount).toBe("25")
     expect(result.current.topUpAmount).toBe("")
   })
 
-  it("switching to the shared-fund tab zeroes the split", () => {
+  it("keeps a picked favourite at least £1 of worth", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.handleTotalChange("20"))
-    act(() => result.current.stepFund(1))
+    act(() => result.current.toggleDraft("red"))
+    await act(async () => result.current.handleNext())
+    act(() => result.current.handleFavChange("20"))
+    act(() => result.current.setFavShare(0))
+    expect(result.current.pledgeAmount).toBe("1")
+    expect(result.current.topUpAmount).toBe("19")
+  })
+
+  it("switching to the shared-fund tab zeroes the fund part", () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.handleFavChange("20"))
+    act(() => result.current.handleFundChange("2"))
     act(() => result.current.toggleFund())
     expect(result.current.fundPart).toBe(0)
     expect(result.current.pledgeAmount).toBe("20")

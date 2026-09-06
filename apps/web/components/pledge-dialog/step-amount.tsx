@@ -9,9 +9,16 @@ import { Sparkles } from "lucide-react"
 
 const PRESETS = [5, 10, 20, 50]
 
+type FavouriteBreakdownLine = { label: string; amount: number }
+
 type HeaderProps = {
   pledgeAmount: string
   updatePledgeAmount: (v: string) => void
+  /** The shared-fund figure beside it (two-part entry, founder mock
+   *  2026-09-06) — omit to render the single-figure header. */
+  fundAmount?: string
+  onFundAmountChange?: (v: string) => void
+  favouriteCount?: number
   useSharedFund?: boolean
   available?: number
   numericPledge?: number
@@ -23,6 +30,9 @@ type HeaderProps = {
 export function StepAmountHeader({
   pledgeAmount,
   updatePledgeAmount,
+  fundAmount = "",
+  onFundAmountChange,
+  favouriteCount = 0,
   useSharedFund = false,
   available = 0,
   numericPledge = 0,
@@ -30,6 +40,9 @@ export function StepAmountHeader({
   fundOverAvailable = false,
   error = null,
 }: HeaderProps) {
+  // Two co-equal figures on the card path: the favourites' worth and the
+  // shared fund riding on top — the guest's charge is the two together.
+  const twoUp = !useSharedFund && !!onFundAmountChange
   return (
     <InputGroup className="h-auto rounded-none border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0">
       <InputGroupAddon
@@ -40,28 +53,67 @@ export function StepAmountHeader({
           htmlFor="dialog-pledge-amount"
           className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
         >
-          Your pledge
+          {twoUp
+            ? favouriteCount === 1
+              ? "Favourite"
+              : "Favourites"
+            : "Your pledge"}
         </label>
+        {twoUp && (
+          <label
+            htmlFor="dialog-fund-amount"
+            className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+          >
+            Shared fund
+          </label>
+        )}
       </InputGroupAddon>
 
-      <div className="flex w-full items-baseline gap-1.5 px-5 py-3">
-        <span
-          className="text-2xl text-muted-foreground select-none"
-          aria-hidden="true"
-        >
-          £
-        </span>
-        <input
-          id="dialog-pledge-amount"
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={pledgeAmount}
-          onChange={(e) => updatePledgeAmount(e.target.value)}
-          placeholder="0"
-          aria-label="Pledge amount in pounds"
-          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-        />
+      <div className="flex w-full items-baseline gap-4 px-5 py-3">
+        <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
+          <span
+            className="text-2xl text-muted-foreground select-none"
+            aria-hidden="true"
+          >
+            £
+          </span>
+          <input
+            id="dialog-pledge-amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value={pledgeAmount}
+            onChange={(e) => updatePledgeAmount(e.target.value)}
+            placeholder="0"
+            aria-label={
+              twoUp
+                ? "Amount your favourites are worth, in pounds"
+                : "Pledge amount in pounds"
+            }
+            className="w-full min-w-0 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
+        </div>
+        {twoUp && (
+          <div className="flex items-baseline justify-end gap-1.5">
+            <span
+              className="text-2xl text-muted-foreground select-none"
+              aria-hidden="true"
+            >
+              £
+            </span>
+            <input
+              id="dialog-fund-amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value={fundAmount}
+              onChange={(e) => onFundAmountChange!(e.target.value)}
+              placeholder="0"
+              aria-label="Shared fund amount in pounds, on top of your pledge"
+              className="w-24 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+          </div>
+        )}
       </div>
 
       <InputGroupAddon align="block-end" className="px-5 pb-4">
@@ -100,24 +152,21 @@ type Props = {
   toggleFund: () => void
   /** Admin-curated impact lines per charity ("£20 funds an hour…") */
   impactStatements?: string[]
-  /** The split (consolidated back into this step, founder 2026-09-06):
-   *  omit onFundChange (hero demo) to hide it entirely. */
+  /** Two-part entry (founder mock, 2026-09-06): omit onFavShare (hero
+   *  demo) to hide the slider and list entirely. */
   favouriteBreakdown?: FavouriteBreakdownLine[]
-  /** Pounds of the total moved to the shared fund. */
+  /** Pounds in the shared fund, on top of the pledge. */
   fundPart?: number
-  /** Set the fund to an absolute pound value (the slider's grammar). */
-  onFundChange?: (pounds: number) => void
+  /** Set the favourites' share of the current sum (the slider). */
+  onFavShare?: (pounds: number) => void
 }
 
-type FavouriteBreakdownLine = { label: string; amount: number }
-
 /**
- * Reshaped 2026-09-06: the amount, the presets, the fund tabs, and the
- * SPLIT — a slider whose thumb divides the total, shared fund to its
- * left and favourite(s) to its right, the list below re-pricing live.
- * (A separate split step was auditioned and consolidated back the same
- * day.) The tip and the itemised bill live on the review page, read at
- * the moment of payment.
+ * Two-part entry (founder mock, 2026-09-06, superseding total-then-split):
+ * the header holds TWO figures — the favourites' worth and the shared
+ * fund on top — and the slider here rebalances their sum without
+ * changing it. Presets set the favourites side ("pledge its worth").
+ * The tip and the itemised bill live on the review page.
  */
 export function StepAmount({
   pledgeAmount,
@@ -128,26 +177,34 @@ export function StepAmount({
   impactStatements,
   favouriteBreakdown = [],
   fundPart = 0,
-  onFundChange,
+  onFavShare,
 }: Props) {
-  const numericTotal = parseFloat(pledgeAmount)
-  const totalValid = !isNaN(numericTotal) && numericTotal > 0
-  // Whole pounds only, and the favourite keeps at least £1 of worth
-  const maxFund = totalValid ? Math.max(0, Math.floor(numericTotal - 1)) : 0
-  const favouriteShare = totalValid
-    ? Math.round((numericTotal - fundPart) * 100) / 100
-    : 0
+  const numericFav = parseFloat(pledgeAmount)
+  const favShare = !isNaN(numericFav) && numericFav > 0 ? numericFav : 0
+  const total = Math.round((favShare + fundPart) * 100) / 100
   const showSplit =
-    !useSharedFund &&
-    !!onFundChange &&
-    totalValid &&
-    favouriteBreakdown.length > 0
+    !useSharedFund && !!onFavShare && total > 0 && favouriteBreakdown.length > 0
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
-        {/* Presets quick-set the header amount — a horizontal row under
-            it at every width, matching the pledge card and hero demo (the
-            desktop two-column stack was the app's one layout island) */}
+        {/* The slider rebalances the header's two figures — favourites on
+            the left (primary fill), shared fund on the right — moving
+            whole pounds while the sum holds still. */}
+        {showSplit && (
+          <Slider
+            value={[favShare]}
+            min={0}
+            max={Math.max(1, total)}
+            step={1}
+            onValueChange={([v]) => onFavShare!(v)}
+            aria-label="Pounds to your favourites"
+            trackClassName="bg-chart-3/40"
+            rangeClassName="bg-primary"
+          />
+        )}
+
+        {/* Presets quick-set the favourites' worth — a horizontal row at
+            every width, matching the pledge card and hero demo */}
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-4 gap-2">
             {PRESETS.map((preset) => (
@@ -182,6 +239,14 @@ export function StepAmount({
           )}
         </div>
 
+        {showSplit && (
+          <p className="text-[11px] text-muted-foreground">
+            The shared fund backs guests without a favourite, and reaches the
+            charity too. Add to it, or slide to rebalance — your pledge is the
+            two together.
+          </p>
+        )}
+
         {hasFund && (
           <Tabs
             value={useSharedFund ? "fund" : "card"}
@@ -201,60 +266,22 @@ export function StepAmount({
           </Tabs>
         )}
 
+        {/* The list, re-pricing live as either figure moves */}
         {showSplit && (
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Slider
-                value={[fundPart]}
-                min={0}
-                // min === max degenerates Radix's thumb maths at a £1
-                // total, so the range stays real and disabled carries
-                // the meaning.
-                max={Math.max(1, maxFund)}
-                step={1}
-                disabled={maxFund === 0}
-                onValueChange={([v]) => onFundChange!(v)}
-                aria-label="Pounds to the shared fund"
-                trackClassName="bg-primary/20"
-                rangeClassName="bg-chart-3"
-              />
-              <div className="flex items-baseline justify-between text-sm text-muted-foreground">
-                <span>
-                  Shared fund{" "}
-                  <span className="text-lg font-semibold text-foreground tabular-nums">
-                    {formatPoundsExact(fundPart)}
-                  </span>
-                </span>
-                <span>
-                  {favouriteBreakdown.length === 1 ? "Favourite" : "Favourites"}{" "}
-                  <span className="text-lg font-semibold text-foreground tabular-nums">
-                    {formatPoundsExact(favouriteShare)}
-                  </span>
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Move whole pounds to the shared fund — it backs guests without a
-                favourite, and reaches the charity too. Your total stays the
-                same.
-              </p>
-            </div>
-
-            {/* The list, re-pricing live under the thumb */}
-            <div className="space-y-3 border-t border-border pt-4">
-              {favouriteBreakdown.map((line, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-base">{line.label}</span>
-                  <span className="text-base font-semibold tabular-nums">
-                    {formatPoundsExact(line.amount)}
-                  </span>
-                </div>
-              ))}
-              <div className="flex justify-between">
-                <span className="text-base">Shared fund</span>
+          <div className="space-y-3 border-t border-border pt-4">
+            {favouriteBreakdown.map((line, i) => (
+              <div key={i} className="flex justify-between">
+                <span className="text-base">{line.label}</span>
                 <span className="text-base font-semibold tabular-nums">
-                  {formatPoundsExact(fundPart)}
+                  {formatPoundsExact(line.amount)}
                 </span>
               </div>
+            ))}
+            <div className="flex justify-between">
+              <span className="text-base">Shared fund</span>
+              <span className="text-base font-semibold tabular-nums">
+                {formatPoundsExact(fundPart)}
+              </span>
             </div>
           </div>
         )}

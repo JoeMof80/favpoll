@@ -113,8 +113,11 @@ export function PledgeDialog({
   // Step 2 header: amount input with block-start label and block-end fund status
   const step2Header = (
     <StepAmountHeader
-      pledgeAmount={dialog.totalInput}
-      updatePledgeAmount={dialog.handleTotalChange}
+      pledgeAmount={dialog.pledgeAmount}
+      updatePledgeAmount={dialog.handleFavChange}
+      fundAmount={dialog.topUpAmount}
+      onFundAmountChange={dialog.handleFundChange}
+      favouriteCount={dialog.favouriteBreakdown.length}
       useSharedFund={dialog.useSharedFund}
       available={dialog.available}
       numericPledge={dialog.numericPledge}
@@ -303,15 +306,15 @@ export function PledgeDialog({
 
         {dialog.step === 2 && (
           <StepAmount
-            pledgeAmount={dialog.totalInput}
-            updatePledgeAmount={dialog.handleTotalChange}
+            pledgeAmount={dialog.pledgeAmount}
+            updatePledgeAmount={dialog.handleFavChange}
             useSharedFund={dialog.useSharedFund}
             hasFund={dialog.hasFund}
             toggleFund={dialog.toggleFund}
             impactStatements={impactStatements}
             favouriteBreakdown={dialog.favouriteBreakdown}
             fundPart={dialog.fundPart}
-            onFundChange={dialog.setFundTo}
+            onFavShare={dialog.setFavShare}
           />
         )}
 
