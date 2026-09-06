@@ -6,6 +6,8 @@ import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PageLayout } from "@/components/page-layout"
+import { FavpollHeader } from "@/components/favpoll-card/favpoll-header"
+import { ClosingLabel } from "@/components/closing-label"
 import { heroNameSizeClass } from "@/lib/display"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import {
@@ -252,31 +254,45 @@ export default async function CharityPage({ params }: Props) {
             {openAppeals.map((a) => {
               const agg = aggByAppeal.get(a.id)
               return (
+                // The favpoll card's grammar (founder, 2026-09-06):
+                // APPEAL in the eyebrow slot, name as the card title,
+                // facts in the border-t row with the closing label on
+                // the right — no blurb (cards are identity, not story;
+                // it lives on the appeal page).
                 <Link
                   key={a.id}
                   href={`/appeals/${a.slug}`}
-                  className="group rounded-xl border border-border bg-background p-5 transition-shadow hover:shadow-md"
+                  className="flex flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
                 >
-                  <p className="truncate text-lg font-medium text-foreground group-hover:text-primary">
-                    {a.name}
-                  </p>
-                  {a.blurb && (
-                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                      {a.blurb}
-                    </p>
-                  )}
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    <span className="font-medium text-primary tabular-nums">
+                  {/* Three bordered rows — the favpoll card's own
+                      structure: header, then count+countdown where the
+                      topic row sits, then the £ where the charity row
+                      sits, right-aligned (founder, 2026-09-06). */}
+                  <div className="flex-1 p-3">
+                    <FavpollHeader
+                      hideEmptyAvatar
+                      protagonist={{ name: a.name, photo_url: null }}
+                      eyebrow="Appeal"
+                      size="md"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t border-border px-3 py-2 text-sm text-muted-foreground">
+                    <span>
+                      {agg?.member_count ?? 0} favpoll
+                      {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                    </span>
+                    {a.closes_at && (
+                      <ClosingLabel
+                        closesAt={a.closes_at}
+                        className="whitespace-nowrap"
+                      />
+                    )}
+                  </div>
+                  <div className="border-t border-border px-3 py-2">
+                    <p className="text-right text-sm font-medium text-primary tabular-nums">
                       {formatPounds(Number(agg?.raised ?? 0))}
-                    </span>{" "}
-                    · {agg?.member_count ?? 0} favpoll
-                    {(agg?.member_count ?? 0) === 1 ? "" : "s"}
-                    {a.closes_at &&
-                      ` · closes ${new Date(a.closes_at).toLocaleDateString(
-                        "en-GB",
-                        { day: "numeric", month: "long" }
-                      )}`}
-                  </p>
+                    </p>
+                  </div>
                 </Link>
               )
             })}
