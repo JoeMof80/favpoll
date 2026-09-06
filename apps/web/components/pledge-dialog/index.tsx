@@ -11,7 +11,6 @@ import type {
 import { usePledgeDialog } from "./use-pledge-dialog"
 import { PickerHeader, PickerItems } from "./step-pick-favourites"
 import { StepAmount, StepAmountHeader } from "./step-amount"
-import { StepSplit } from "./step-split"
 import { StepPay } from "./step-pay"
 import { PollHeading } from "../poll-heading"
 
@@ -90,7 +89,7 @@ export function PledgeDialog({
 
   // Reset Stripe state whenever we leave the review step (back or re-entry)
   useEffect(() => {
-    if (dialog.step !== 4) {
+    if (dialog.step !== 3) {
       setStripeSubmitting(false)
       setStripeReady(false)
     }
@@ -114,8 +113,11 @@ export function PledgeDialog({
   // Step 2 header: amount input with block-start label and block-end fund status
   const step2Header = (
     <StepAmountHeader
-      pledgeAmount={dialog.totalInput}
-      updatePledgeAmount={dialog.handleTotalChange}
+      pledgeAmount={dialog.pledgeAmount}
+      updatePledgeAmount={dialog.handleFavChange}
+      fundAmount={dialog.topUpAmount}
+      onFundAmountChange={dialog.handleFundChange}
+      favouriteCount={dialog.favouriteBreakdown.length}
       useSharedFund={dialog.useSharedFund}
       available={dialog.available}
       numericPledge={dialog.numericPledge}
@@ -196,33 +198,9 @@ export function PledgeDialog({
     </div>
   )
 
-  // Split step: Next is never gated (founder, 2026-09-06) — the default
-  // all-to-favourite is a complete answer.
-  const step3Label = dialog.submitting ? "Processing…" : "Next →"
-  const step3Footer = (
-    <div className="flex gap-3">
-      <Button
-        type="button"
-        variant="outline"
-        className="h-11 flex-1 md:text-base"
-        onClick={dialog.handleBack}
-      >
-        ← Back
-      </Button>
-      <Button
-        type="button"
-        className="h-11 flex-1 text-base"
-        disabled={dialog.submitting}
-        onClick={() => dialog.handleNext()}
-      >
-        {step3Label}
-      </Button>
-    </div>
-  )
-
   const payDisabled =
     stripeSubmitting || !stripeReady || dialog.refreshingIntent
-  const step4Footer = (
+  const step3Footer = (
     <div className="flex gap-3">
       <Button
         type="button"
@@ -247,15 +225,13 @@ export function PledgeDialog({
   const titleByStep = {
     1: `Pick your favourite ${topicTitle.toLowerCase()}`,
     2: "Your pledge",
-    3: "Split your pledge",
-    4: "Review & pay",
+    3: "Review & pay",
   }
 
   const footerByStep = {
     1: step1Footer,
     2: step2Footer,
     3: step3Footer,
-    4: step4Footer,
   }
 
   return (
@@ -282,7 +258,7 @@ export function PledgeDialog({
             : {
                 label: "Back",
                 onClick: dialog.handleBack,
-                disabled: dialog.step === 4 && stripeSubmitting,
+                disabled: dialog.step === 3 && stripeSubmitting,
               }
         }
         mobileSave={
@@ -298,17 +274,11 @@ export function PledgeDialog({
                   onClick: () => dialog.handleNext(),
                   disabled: isNextDisabled,
                 }
-              : dialog.step === 3
-                ? {
-                    label: step3Label,
-                    onClick: () => dialog.handleNext(),
-                    disabled: dialog.submitting,
-                  }
-                : {
-                    label: stripeSubmitting ? "Processing…" : "Pay now",
-                    form: "pledge-checkout-form",
-                    disabled: payDisabled,
-                  }
+              : {
+                  label: stripeSubmitting ? "Processing…" : "Pay now",
+                  form: "pledge-checkout-form",
+                  disabled: payDisabled,
+                }
         }
         headerClassName={
           dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
@@ -336,25 +306,19 @@ export function PledgeDialog({
 
         {dialog.step === 2 && (
           <StepAmount
-            pledgeAmount={dialog.totalInput}
-            updatePledgeAmount={dialog.handleTotalChange}
+            pledgeAmount={dialog.pledgeAmount}
+            updatePledgeAmount={dialog.handleFavChange}
             useSharedFund={dialog.useSharedFund}
             hasFund={dialog.hasFund}
             toggleFund={dialog.toggleFund}
             impactStatements={impactStatements}
-          />
-        )}
-
-        {dialog.step === 3 && (
-          <StepSplit
             favouriteBreakdown={dialog.favouriteBreakdown}
             fundPart={dialog.fundPart}
-            onFundChange={dialog.setFundTo}
-            numericTotal={parseFloat(dialog.totalInput) || 0}
+            onFavShare={dialog.setFavShare}
           />
         )}
 
-        {dialog.step === 4 && dialog.pledgeClientSecret && (
+        {dialog.step === 3 && dialog.pledgeClientSecret && (
           <StepPay
             clientSecret={dialog.pledgeClientSecret}
             chargeAmount={dialog.ownCharge}

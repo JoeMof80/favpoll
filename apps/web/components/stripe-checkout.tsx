@@ -109,7 +109,11 @@ export function StripeCheckout({
     []
   )
 
-  const inner = (
+  // The overlay's charge summary. NOT rendered inline (founder,
+  // 2026-09-07): the review page's itemised bill already says the total,
+  // and saying it twice made the page read long. The legacy overlay keeps
+  // it — there it is the only amount on screen.
+  const summary = (
     <>
       <p className="mb-1 text-sm text-muted-foreground">
         You will be charged{" "}
@@ -119,10 +123,16 @@ export function StripeCheckout({
       </p>
       {charityAmount !== undefined && (
         <p className="mb-5 text-xs text-muted-foreground">
-          {formatPoundsExact(charityAmount)} to charity — favpoll takes no fee
+          {formatPoundsExact(charityAmount)} to charity — favpoll takes no
+          platform fee
         </p>
       )}
       {charityAmount === undefined && <div className="mb-5" />}
+    </>
+  )
+
+  const inner = (
+    <>
       <Elements
         stripe={stripePromise}
         options={{
@@ -167,6 +177,7 @@ export function StripeCheckout({
         <h2 className="mb-1 text-lg font-medium text-foreground">
           Complete your pledge
         </h2>
+        {summary}
         {inner}
       </div>
     </div>

@@ -69,13 +69,13 @@ type Beat = {
 // FIRST MENTIONS LINK TO THE REFERENCE (founder, 2026-09-03, extending
 // the triad/ideas doctrine to the homepage walkthrough): the terms that
 // NAME a feature link to its /features section, first occurrence per
-// beat, quiet ink. Only naturally-occurring names — "shared fund" and
+// beat, quiet ink. Only naturally-occurring names — "shared pot" and
 // "printed stationery" — are in the table; the reveal, room and
 // keepsake beats carry no clean term in their bodies and stay plain
 // rather than force one. Structural: the founder's copy strings are
 // untouched.
 const LINK_TERMS: { term: string; href: string }[] = [
-  { term: "shared fund", href: "/features#shared-fund" },
+  { term: "shared pot", href: "/features#shared-fund" },
   { term: "printed stationery", href: "/features#stationery" },
 ]
 
@@ -255,7 +255,7 @@ const SHADOW_ROOM = 14
 const KEEPSAKE_SCALE = "scale-[0.34] lg:scale-[0.47] xl:scale-[0.57]"
 
 // The "click Next" token is gone with the copy that carried it (founder,
-// 2026-08-18). Step 3 now ends "Can't decide? Give to the shared fund
+// 2026-08-18). Step 3 now ends "Can't decide? Give to the shared pot
 // instead", so there is no control to name and nothing to weight — the
 // {next} placeholder, NEXT_TOKEN and withNextToken went with it.
 

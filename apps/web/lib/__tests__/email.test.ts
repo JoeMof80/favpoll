@@ -70,7 +70,7 @@ describe("sendPledgeConfirmation", () => {
     favpollId: "fav-1",
   }
 
-  it("sends the branded confirmation with the 100% claim and ordinal date", async () => {
+  it("sends the branded confirmation with the no-platform-fee line and ordinal date", async () => {
     await sendPledgeConfirmation(params)
 
     const call = mockSend.mock.calls[0][0]
@@ -78,7 +78,7 @@ describe("sendPledgeConfirmation", () => {
     expect(call.subject).toBe("Your pledge for Belinda")
     expect(call.html).toContain("Thank you.")
     expect(call.html).toContain("Age UK &amp; RNLI")
-    expect(call.html).toContain("100% of your pledge goes to charity")
+    expect(call.html).toContain("favpoll takes no platform fee")
     expect(call.html).toContain("1st August 2026")
     expect(call.html).toContain("/favpolls/fav-1")
     expect(call.html).toContain("/pledges/withdraw?token=tok-123")

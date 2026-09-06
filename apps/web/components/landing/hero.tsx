@@ -717,7 +717,7 @@ export function LandingHero({
                           whole favpoll's — without this line the figures read
                           as a column that doesn't add up (£735 shown against
                           £1,005). The gap is real and correct: more items sit
-                          below, and every favpoll's shared fund takes pledges
+                          below, and every favpoll's shared pot takes pledges
                           that attach to no favourite, so a total can never be
                           just the sum of its visible rows. */}
                       <p className="text-xs text-muted-foreground dark:text-primary-foreground/55">

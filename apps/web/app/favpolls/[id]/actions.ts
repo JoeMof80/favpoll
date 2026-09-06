@@ -517,7 +517,7 @@ export async function pledgeFromFund(input: {
   )
   if (potErr) throw new Error(potErr.message)
   if (!allocated) {
-    throw new Error("There isn't enough left in the shared fund for that.")
+    throw new Error("There isn't enough left in the shared pot for that.")
   }
 
   const { data: pledge, error: pledgeErr } = await supabase

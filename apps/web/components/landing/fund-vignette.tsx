@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { Vignette } from "@/components/landing/vignette"
 
-// THE shared fund dialog — SeedFundModal in its guest variant, the one a
+// THE shared pot dialog — SeedFundModal in its guest variant, the one a
 // guest opens to put money in the pot for somebody else.
 //
 // It showed StepAmount's split row before (founder, 2026-08-09): the control
 // for moving part of your OWN pledge across. That is a shared-fund feature
-// but it is not the shared fund dialog, and the section is about the fund
+// but it is not the shared pot dialog, and the section is about the fund
 // itself — a thing anyone can top up, that a guest with no means draws on.
 //
 // Mirrored rather than mounted, the way TopicPickerVignette mirrors the two
@@ -30,7 +30,7 @@ export function FundVignette() {
           row, then the body. */}
       <div className="mx-auto max-w-lg rounded-xl border border-border bg-background p-5 shadow-lg">
         <p className="text-lg font-semibold tracking-tight text-foreground">
-          Add to the shared fund
+          Add to the shared pot
         </p>
 
         {/* Amount field — £ beside a borderless number input, as the dialog
@@ -59,8 +59,8 @@ export function FundVignette() {
 
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
           Not everybody is in a position to pledge money of their own. The
-          shared fund is a float that helps them take part. Any money left in
-          the shared fund goes to the charity.
+          shared pot helps them take part. Any money left in the shared pot goes
+          to the charity.
         </p>
 
         {/* The dialog's footer: the primary is enabled because an amount is

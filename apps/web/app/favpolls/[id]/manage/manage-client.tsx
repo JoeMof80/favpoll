@@ -613,7 +613,7 @@ export function ManageClient({
                   <span className="tabular-nums">{favpoll.pledge_count}</span>
                 )}
                 {fact(
-                  "Shared fund",
+                  "Shared pot",
                   favpoll.pot && favpoll.pot.total_deposited > 0 ? (
                     <span className="tabular-nums">
                       {formatAmount(favpoll.pot.total_deposited)}

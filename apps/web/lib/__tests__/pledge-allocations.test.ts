@@ -44,14 +44,22 @@ describe("computePledgeAllocations", () => {
     expect(result[1]).toEqual({ favouriteId: "b", amount: 5 })
   })
 
-  it("splits £10 three ways with remainder on first item", () => {
-    // floor(100/3)=33, remainder=1 → idx 0 gets 34%, idx 1&2 get 33%
-    // 34% of £10 = £3.40, 33% of £10 = £3.30
+  it("splits £10 three ways with shares within a penny", () => {
+    // 1000p / 3 = 333p base, 1p spare → first selection gets £3.34
     const result = computePledgeAllocations(["a", "b", "c"], items, 10)
     expect(result).toHaveLength(3)
-    expect(result[0]).toEqual({ favouriteId: "a", amount: 3.4 })
-    expect(result[1]).toEqual({ favouriteId: "b", amount: 3.3 })
-    expect(result[2]).toEqual({ favouriteId: "c", amount: 3.3 })
+    expect(result[0]).toEqual({ favouriteId: "a", amount: 3.34 })
+    expect(result[1]).toEqual({ favouriteId: "b", amount: 3.33 })
+    expect(result[2]).toEqual({ favouriteId: "c", amount: 3.33 })
+  })
+
+  it("spreads the remainder pennies — never a 2p bulge on one share", () => {
+    // £2 / 3: 66p base, 2p spare → 67/67/66, NOT the old 68/66/66
+    // (whole-percentage shares; founder caught it on the split list)
+    const result = computePledgeAllocations(["a", "b", "c"], items, 2)
+    expect(result[0]).toEqual({ favouriteId: "a", amount: 0.67 })
+    expect(result[1]).toEqual({ favouriteId: "b", amount: 0.67 })
+    expect(result[2]).toEqual({ favouriteId: "c", amount: 0.66 })
   })
 
   it("total of all allocations equals the input amount (3-way split, £10)", () => {
@@ -61,7 +69,7 @@ describe("computePledgeAllocations", () => {
   })
 
   it("handles £1 split three ways (penny-level rounding)", () => {
-    // 34% of £1 = £0.34, 33% of £1 = £0.33
+    // 100p / 3 = 33p base, 1p spare → 34/33/33
     const result = computePledgeAllocations(["a", "b", "c"], items, 1)
     expect(result[0]).toEqual({ favouriteId: "a", amount: 0.34 })
     expect(result[1]).toEqual({ favouriteId: "b", amount: 0.33 })
@@ -82,15 +90,15 @@ describe("computePledgeAllocations", () => {
     expect(result[1].favouriteId).toBe("c")
   })
 
-  it("remainder percentage goes to the item at selectedIds index 0 (3-way split)", () => {
-    // selectedIds = ["c", "b", "a"]: idx 0 = "c" gets the extra percentage point
+  it("remainder penny goes to the item at selectedIds index 0 (3-way split)", () => {
+    // selectedIds = ["c", "b", "a"]: idx 0 = "c" gets the spare penny
     const result = computePledgeAllocations(["c", "b", "a"], items, 10)
     const a = result.find((r) => r.favouriteId === "a")!
     const b = result.find((r) => r.favouriteId === "b")!
     const c = result.find((r) => r.favouriteId === "c")!
-    expect(c.amount).toBe(3.4) // c is selectedIds[0] → gets remainder (34%)
-    expect(b.amount).toBe(3.3)
-    expect(a.amount).toBe(3.3)
+    expect(c.amount).toBe(3.34) // c is selectedIds[0] → gets the spare penny
+    expect(b.amount).toBe(3.33)
+    expect(a.amount).toBe(3.33)
   })
 
   it("works correctly when allItems contains only the selected item", () => {

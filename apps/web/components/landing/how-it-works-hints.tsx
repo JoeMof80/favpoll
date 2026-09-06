@@ -194,7 +194,7 @@ export function PledgeHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
             // chosen charity" — and against the 0% promise. The line still
             // earns its place at zero: it shows the split exists without
             // showing it taking anything.
-            { label: "Shared fund", amount: 0 },
+            { label: "Shared pot", amount: 0 },
             // The guest's, not the charity's and not favpoll's — it goes to
           ]}
           total={{

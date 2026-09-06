@@ -20,7 +20,7 @@ import type { Register } from "@/lib/registers"
  * contexts: subline examples (max 40 chars, no full stop) — a date,
  * fact, or event detail. Never a fee promise, an instruction to guests,
  * or bare sentiment: those collide with the about (which owns the
- * "reaches the charity in full" clause) or aren't context at all
+ * "no platform fee" clause) or aren't context at all
  * (founder, 2026-07-30: "Every pledge goes in full" is not context).
  */
 /**

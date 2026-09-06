@@ -247,18 +247,18 @@ export function FavpollContent({
         expandable
       />
 
-      {/* Guest shared fund contribution card — always shown on open favpolls.
+      {/* Guest shared pot contribution card — always shown on open favpolls.
           Carries both jobs explicitly: how to USE the fund (pledge step) and
           how to GIVE to it (the button). */}
       {!isClosed && pot && (
         <div className="rounded-lg border border-border bg-background px-5 py-4">
           <p className="mt-1 text-sm text-muted-foreground">
-            <b>{formatPoundsExact(fundAvailable)}</b> in the shared fund, for
-            any guest who needs help to pledge.
+            <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
+            guest who needs help to pledge.
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {fundAvailable > 0
-              ? "To use it, pick “Use shared fund” when you pledge — or top it up for others."
+              ? "To use it, pick “Use shared pot” when you pledge — or top it up for others."
               : "Top it up so every guest can take part."}
           </p>
           <Button
@@ -269,7 +269,7 @@ export function FavpollContent({
             onClick={() => setShowGuestFund(true)}
           >
             <Gift size={4} />
-            Add to the shared fund
+            Add to the shared pot
           </Button>
         </div>
       )}

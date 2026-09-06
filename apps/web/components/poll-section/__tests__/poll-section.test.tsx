@@ -410,7 +410,7 @@ describe("PollSection — lock explainer", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Don't have a favourite colour? That's okay — you can still give to the shared fund."
+        "Don't have a favourite colour? That's okay — you can still give to the shared pot."
       )
     ).toBeInTheDocument()
   })

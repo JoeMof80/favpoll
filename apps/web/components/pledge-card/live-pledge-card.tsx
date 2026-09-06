@@ -104,7 +104,7 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
                 htmlFor="top-up-amount"
                 className="text-xs text-muted-foreground"
               >
-                Add to the shared fund
+                Add to the shared pot
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -112,7 +112,7 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
                     type="button"
                     variant="ghost"
                     size="icon-xs"
-                    aria-label="About the shared fund"
+                    aria-label="About the shared pot"
                     className="h-4 w-4 rounded-full"
                   >
                     <InfoIcon className="h-3 w-3" />
@@ -166,13 +166,13 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
               <p className="mt-1 text-[11px] text-muted-foreground">
                 {isPledgeValid
                   ? `Using ${formatPoundsExact(numericPledge)} of ${formatPoundsExact(available)} available`
-                  : `${formatPoundsExact(available)} available in the shared fund`}
+                  : `${formatPoundsExact(available)} available in the shared pot`}
               </p>
             </div>
             {fundOverAvailable && (
               <p className="text-[11px] text-destructive">
-                Shared fund has {formatPoundsExact(available)} available —
-                reduce your pledge to use it
+                Shared pot has {formatPoundsExact(available)} available — reduce
+                your pledge to use it
               </p>
             )}
           </div>
@@ -227,7 +227,7 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
             {submitting ? "Processing…" : "Pledge favourites"}
           </Button>
 
-          {/* Shared fund trigger */}
+          {/* Shared pot trigger */}
           {hasFund && (
             <>
               <div className="my-1 flex w-full items-center justify-center gap-4">
@@ -243,11 +243,11 @@ export function LivePledgeCard(props: LivePledgeCardProps) {
                 aria-label={
                   useSharedFund
                     ? "Use your own funds instead"
-                    : "Use the shared fund instead"
+                    : "Use the shared pot instead"
                 }
                 className="w-full text-muted-foreground hover:text-primary"
               >
-                {useSharedFund ? "Use your own funds" : "Use the shared fund"}
+                {useSharedFund ? "Use your own funds" : "Use the shared pot"}
               </Button>
             </>
           )}

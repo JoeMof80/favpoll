@@ -101,8 +101,10 @@ export function buildCacheKey(
     nameHash = (nameHash * 31 + ch.charCodeAt(0)) >>> 0
   }
   const namePart = displayName ? nameHash.toString(36) : "none"
+  // v5: the prompt's fee clause changed (2026-09-07, "in full" claim
+  // retired estate-wide) — cached drafts carrying the old claim retire.
   // v4: grouping keys the cache — a pair's plural draft must never be
   // served from a singular one (founder bug, 2026-09-06).
   const groupPart = subject === "someone" ? (grouping ?? "individual") : "none"
-  return `v4:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${namePart}`
+  return `v5:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${namePart}`
 }
