@@ -95,7 +95,19 @@ export function KeepsakeDocument({
     rest > 0
       ? `and ${rest} more ${rest === 1 ? "favourite" : "favourites"}`
       : null
-  const topicLine = `Favourite ${data.topicTitle.toLowerCase()}`
+  // The two-line Favourite grammar (founder sweep, 2026-09-06),
+  // LEFT-aligned to the 150mm content column shared by the quote's
+  // gutter and the standings list.
+  const topicHeading = (
+    <h2 className="w-full max-w-[150mm] text-left">
+      <span className="block text-[11px] font-medium tracking-[0.09em] text-primary/55 uppercase">
+        Favourite
+      </span>
+      <span className="block text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
+        {data.topicTitle}
+      </span>
+    </h2>
+  )
 
   return (
     <article
@@ -246,9 +258,7 @@ export function KeepsakeDocument({
                     style (PollHeading: uppercase, tracked, primary) so the
                     keepsake echoes what guests saw all day (founder,
                     2026-08-16 — supersedes the earlier 2xl heading). */}
-                <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
-                  {topicLine}
-                </h2>
+                {topicHeading}
                 {/* The quote's pl matches the list's text gutter below (7mm
                   number column + 8px gap − 2px rule), so the quote's text
                   and the list's labels share a left edge. */}
@@ -361,9 +371,7 @@ export function KeepsakeDocument({
                   reveal above them to do so. */}
               {!data.rankHistory && data.reveal && (
                 <section className="mx-auto w-full max-w-[150mm]">
-                  <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
-                    {topicLine}
-                  </h2>
+                  {topicHeading}
                   <p className="mt-[3mm] border-l-2 border-primary-muted pl-[calc(7mm+8px-2px)] text-base leading-relaxed text-primary/80 italic">
                     {data.reveal}
                   </p>
@@ -374,11 +382,7 @@ export function KeepsakeDocument({
                   data.rankHistory ? undefined : "mx-auto w-full max-w-[150mm]"
                 }
               >
-                {(data.rankHistory || !data.reveal) && (
-                  <h2 className="text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
-                    {topicLine}
-                  </h2>
-                )}
+                {(data.rankHistory || !data.reveal) && topicHeading}
                 {/* Compact rows when the chart shares the page; roomy ones
                     when it does not. Print stays compact either way — the
                     printed sheet is 20mm shorter. */}
