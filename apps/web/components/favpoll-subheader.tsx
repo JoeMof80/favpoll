@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,18 @@ export function FavpollSubheader({
   isOrganiser,
   isClosed,
 }: Props) {
+  // Mark this favpoll as the list's return target (founder, 2026-09-06
+  // v3): the outbound click-capture save proved unverifiable on the
+  // founder's phone, so the favpoll page itself arms the return — any
+  // route in (card tap, step row, share link) counts, and the All
+  // favpolls list scrolls this card into view on its next mount.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("favpolls:return", `/favpolls/${favpollId}`)
+    } catch {
+      // best effort
+    }
+  }, [favpollId])
   return (
     <div
       // Mobile: the fixed charity bar owns the bottom edge — clear it so
