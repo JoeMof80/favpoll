@@ -1,27 +1,32 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { Plus } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { withLiveTotals } from "@/lib/live-totals"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { PageSheet } from "@/components/page-sheet"
-import { formatAmount } from "@/lib/display"
+import { PageLayout } from "@/components/page-layout"
+import { heroNameSizeClass, formatAmount } from "@/lib/display"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
+import {
+  FavpollSummaryCard,
+  type FavpollSummaryCardFavpoll,
+} from "@/components/favpoll-summary-card"
 
 // THE APPEAL PAGE (concept: references/appeals-concept-2026-09-05.md).
 // An appeal is an AGGREGATION VIEW — one charity, many member favpolls,
 // one total. The blurb is the one place long-form story legitimately
-// lives (the 08-06 verdict keeps it off favpolls). Members are listed
-// QUIETLY — alphabetical with totals shown, never a podium: appeals sit
-// memorial-adjacent and "most raised" reads competitive where
-// competition is wrong (founder decision, 2026-09-05).
+// lives (the 08-06 verdict keeps it off favpolls).
 //
-// 2026-09-06: stands on the favpoll page's own sheet (PageSheet) with
-// the hero's static composition — eyebrow, name, photo where the
-// avatar sits (rounded-xl). Neutral palette: registers belong to
-// occasions, not drives.
+// 2026-09-06, mirroring the charity page (founder: "Redesign the
+// Appeals page in the same way"): PageLayout columns — hero-grammar
+// header (eyebrow / name / close date as the context line / photo in
+// the avatar box) beside the avatar-height Raised-so-far card — then
+// the members as a full-width 3-up FavpollSummaryCard grid led by the
+// dashed start door. Members stay ALPHABETICAL and the cards carry no
+// money — the aggregate lives in the facts card alone, keeping the
+// 2026-09-05 not-a-leaderboard doctrine on memorial-adjacent appeals.
 export default async function AppealPage({
   params,
 }: {
@@ -52,67 +57,107 @@ export default async function AppealPage({
   })
   const raised = Number(agg?.[0]?.raised ?? 0)
 
-  type MemberRow = {
-    id: string
-    closed_at: string | null
-    total_raised: number
-    subject: string
-    cause_label: string | null
-    protagonists: { name: string } | null
-    favpoll_polls: { topics: { title: string } | null } | null
-  }
   const { data: rawMembers } = await supabase
     .from("favpolls")
     .select(
-      `id, closed_at, total_raised, subject, cause_label,
-       protagonists!favpolls_protagonist_id_fkey ( name ),
+      `id, occasion_type, subject, cause_label, category, opening_line,
+       closes_at, closed_at, total_raised,
+       protagonist:protagonists!favpolls_protagonist_id_fkey ( name, photo_url ),
+       favpoll_charities ( charity:charities ( id, name, logo_url, registered_number ) ),
        favpoll_polls ( topics ( title ) )`
     )
     .eq("appeal_id", appeal.id)
-  const members = await withLiveTotals(
-    supabase,
-    (rawMembers ?? []) as unknown as MemberRow[]
-  )
-  const rows = members
-    .map((m) => ({
-      id: m.id,
-      name:
+
+  const members: FavpollSummaryCardFavpoll[] = (rawMembers ?? [])
+    .map((r) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const f = r as any
+      return {
+        id: f.id,
+        occasion_type: f.occasion_type,
+        subject: f.subject,
+        cause_label: f.cause_label,
+        category: f.category,
+        opening_line: f.opening_line ?? "",
+        closes_at: f.closes_at,
+        closed_at: f.closed_at,
+        total_raised: f.total_raised ?? 0,
+        protagonist: f.protagonist,
+        charities: (f.favpoll_charities ?? []).map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (c: any) => ({ charity: c.charity })
+        ),
+        poll: {
+          // favpoll_polls is a TO-ONE join — object, not array (the
+          // charity-shelf lesson, 2026-09-06).
+          topic:
+            (Array.isArray(f.favpoll_polls)
+              ? f.favpoll_polls[0]?.topics
+              : f.favpoll_polls?.topics) ?? null,
+        },
+      }
+    })
+    // Quiet, alphabetical — deliberately not a leaderboard.
+    .sort((a, b) => {
+      const name = (m: FavpollSummaryCardFavpoll) =>
         m.subject === "cause"
           ? (m.cause_label ?? "")
-          : (m.protagonists?.name ?? ""),
-      topic: m.favpoll_polls?.topics?.title ?? null,
-      raised: m.total_raised,
-    }))
-    // Quiet, alphabetical — deliberately not a leaderboard.
-    .sort((a, b) => a.name.localeCompare(b.name))
+          : (m.protagonist?.name ?? "")
+      return name(a).localeCompare(name(b))
+    })
 
-  return (
-    <PageSheet>
+  const factsCard = (
+    <div className="flex flex-col justify-center space-y-1 rounded-lg border border-border bg-card px-5 py-4 md:h-33">
+      <SectionEyebrow variant="muted" className="font-semibold">
+        Raised so far
+      </SectionEyebrow>
+      <p className="text-3xl font-light text-primary tabular-nums">
+        {formatAmount(raised)}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        across <span className="tabular-nums">{members.length}</span> favpoll
+        {members.length === 1 ? "" : "s"}
+      </p>
+    </div>
+  )
+
+  const left = (
+    <>
       {/* ── Header: the favpoll hero's composition, static ── */}
-      <header className="flex items-start justify-between gap-6 pt-10 md:pt-16">
+      <header className="flex items-start gap-4 pt-6 md:gap-6 md:pt-16">
         <div className="min-w-0 flex-1">
-          <SectionEyebrow variant="muted">
-            An appeal for{" "}
-            <Link
-              href={`/charities/${appeal.charity_id}`}
-              className="text-primary underline-offset-4 hover:underline"
+          <div className="flex items-center justify-between gap-3">
+            <SectionEyebrow
+              variant="muted"
+              className="mb-2 flex h-8 items-center truncate wrap-break-word"
             >
-              {charityName}
-            </Link>
-          </SectionEyebrow>
-          <div className="mt-2 flex items-start justify-between gap-3">
-            <h1 className="text-4xl leading-tight font-light tracking-tight text-foreground">
-              {appeal.name}
-            </h1>
+              An appeal for{" "}
+              <Link
+                href={`/charities/${appeal.charity_id}`}
+                className="ml-1 text-primary underline-offset-4 hover:underline"
+              >
+                {charityName}
+              </Link>
+            </SectionEyebrow>
             {canManage && (
               <Button asChild variant="outline" size="sm">
                 <Link href={`/appeals/${appeal.slug}/manage`}>Manage</Link>
               </Button>
             )}
           </div>
-          {appeal.blurb && (
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              {appeal.blurb}
+          <h1
+            className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(appeal.name)}`}
+          >
+            {appeal.name}
+          </h1>
+          {appeal.closes_at && (
+            <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+              Closes{" "}
+              {new Date(appeal.closes_at).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </p>
           )}
         </div>
@@ -122,72 +167,49 @@ export default async function AppealPage({
           <img
             src={appeal.photo_url}
             alt=""
-            className="size-24 shrink-0 rounded-xl object-cover md:size-33"
+            className="h-26 w-26 shrink-0 rounded-xl object-cover md:h-33 md:w-33"
           />
         )}
       </header>
 
-      <div className="mt-10 rounded-xl border border-border bg-background p-5">
-        <SectionEyebrow as="h2" className="mb-2">
-          Raised so far
-        </SectionEyebrow>
-        <p className="text-4xl font-light text-primary tabular-nums">
-          {formatAmount(raised)}
+      {/* The blurb wears the favpoll About's classes, in its slot */}
+      {appeal.blurb && (
+        <p className="mt-6 text-base leading-relaxed wrap-break-word text-muted-foreground">
+          {appeal.blurb}
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          across {rows.length} favpoll{rows.length === 1 ? "" : "s"}
-          {appeal.closes_at &&
-            ` · closes ${new Date(appeal.closes_at).toLocaleDateString(
-              "en-GB",
-              { day: "numeric", month: "long", year: "numeric" }
-            )}`}
-        </p>
-      </div>
+      )}
 
-      {isOpen && (
-        <div className="mt-6">
-          <Button
-            asChild
-            size="lg"
-            className="h-auto min-h-11 px-6 py-2 text-base"
+      <div className="mt-6 md:hidden">{factsCard}</div>
+    </>
+  )
+
+  const fullWidth = (
+    <section className="mt-12">
+      <SectionEyebrow as="h2" className="mb-5">
+        Favpolls in this appeal
+      </SectionEyebrow>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {isOpen && (
+          <Link
+            href={`/favpolls/new?appeal=${appeal.slug}`}
+            className="flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-background p-5 text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
           >
-            <Link href={`/favpolls/new?appeal=${appeal.slug}`}>
+            <Plus className="size-6" aria-hidden="true" />
+            <span className="text-sm font-medium">
               {withQuietTail("Start your favpoll — always free")}
-            </Link>
-          </Button>
-        </div>
-      )}
+            </span>
+          </Link>
+        )}
+        {members.map((favpoll) => (
+          <FavpollSummaryCard key={favpoll.id} favpoll={favpoll} />
+        ))}
+      </div>
+    </section>
+  )
 
-      {rows.length > 0 && (
-        <div className="mt-10">
-          <SectionEyebrow variant="muted" className="mb-3">
-            The favpolls
-          </SectionEyebrow>
-          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
-            {rows.map((r) => (
-              <li key={r.id}>
-                <Link
-                  href={`/favpolls/${r.id}`}
-                  className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-primary/5"
-                >
-                  <span className="min-w-0 truncate text-sm font-medium text-foreground">
-                    {r.name}
-                    {r.topic && (
-                      <span className="font-normal text-muted-foreground">
-                        {" "}
-                        · {r.topic}
-                      </span>
-                    )}
-                  </span>
-                  <span className="shrink-0 text-sm font-medium text-primary tabular-nums">
-                    {formatAmount(r.raised)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </PageSheet>
+  return (
+    <PageLayout left={left} right={factsCard} rightSticky={false}>
+      {fullWidth}
+    </PageLayout>
   )
 }
