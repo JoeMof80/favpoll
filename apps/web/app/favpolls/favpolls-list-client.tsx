@@ -48,29 +48,6 @@ export function FavpollsListClient({
   const [status, setStatus] = useState<PublicStatusFilter>(initialStatus)
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
-  // TEMPORARY instrumentation v2 (founder's phone): PERSISTENT log in
-  // sessionStorage so the story survives reloads. Arm once with
-  // /favpolls?debug=return; sticky for the session.
-  const [, forceRender] = useState(0)
-  const debugOn =
-    typeof window !== "undefined" &&
-    (() => {
-      try {
-        if (window.location.search.includes("debug=return")) {
-          sessionStorage.setItem("favpolls:debug", "1")
-        }
-        return sessionStorage.getItem("favpolls:debug") === "1"
-      } catch {
-        return false
-      }
-    })()
-  function readLog(): string[] {
-    try {
-      return JSON.parse(sessionStorage.getItem("favpolls:debug-log") ?? "[]")
-    } catch {
-      return []
-    }
-  }
 
   // Restore-once, ELEMENT-anchored (founder, 2026-09-06; v3): the
   // favpoll page arms "favpolls:return" with its own href on mount
@@ -79,24 +56,10 @@ export function FavpollsListClient({
   // frames — past the App Router's scroll reset, immune to layout
   // shifts. The key is consumed once; fresh arrivals keep the top.
   useLayoutEffect(() => {
-    const dbg = (line: string) => {
-      try {
-        const log = JSON.parse(
-          sessionStorage.getItem("favpolls:debug-log") ?? "[]"
-        )
-        log.push(`${new Date().toISOString().slice(11, 19)} LIST ${line}`)
-        sessionStorage.setItem(
-          "favpolls:debug-log",
-          JSON.stringify(log.slice(-25))
-        )
-      } catch {}
-      forceRender((n) => n + 1)
-    }
-    // StrictMode-proof consumption (founder's log, 2026-09-06: TWO
-    // mounts in the same second — the first consumed the key and its
-    // cleanup cancelled the centring timers; the survivor found NONE).
-    // The key is deleted only AFTER a successful centring; a staleness
-    // window stops ancient keys resurfacing.
+    // StrictMode-proof consumption: the key is deleted only AFTER a
+    // successful centring — a doomed dev double-mount first pass never
+    // gets there, so the surviving pass still finds it. A staleness
+    // window (stamped at arm time) stops ancient keys resurfacing.
     let href: string | null = null
     try {
       href = sessionStorage.getItem("favpolls:return")
@@ -109,13 +72,11 @@ export function FavpollsListClient({
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
-    dbg(`mount key=${href ?? "NONE"} y=${Math.round(window.scrollY)}`)
     if (!href) return
     let interrupted = false
     let listenersOn = false
-    const stop = (e: Event) => {
+    const stop = () => {
       interrupted = true
-      dbg(`interrupt ${e.type}`)
     }
     const opts = { passive: true } as const
     // Attach only AFTER the first centring attempt: a synthetic touch
@@ -133,24 +94,16 @@ export function FavpollsListClient({
         .querySelector(`a[href="${CSS.escape(href!)}"]`)
         ?.closest("li")
       if (!li) {
-        dbg("li NOT FOUND")
         attach()
         return
       }
       const r = li.getBoundingClientRect()
       const target =
         window.scrollY + r.top - (window.innerHeight - r.height) / 2
-      const before = Math.round(window.scrollY)
       if (Math.abs(window.scrollY - target) > 8) {
         window.scrollTo(0, Math.max(0, target))
-        dbg(
-          `centre y=${before}->${Math.round(target)} top=${Math.round(r.top)}`
-        )
-      } else {
-        dbg(`ok y=${before} top=${Math.round(r.top)}`)
       }
-      // Consumed only now — a doomed StrictMode first pass never gets
-      // here, so the surviving pass still finds the key.
+      // Consumed only on success — see the StrictMode note above.
       try {
         sessionStorage.removeItem("favpolls:return")
         sessionStorage.removeItem("favpolls:return-t")
@@ -173,13 +126,6 @@ export function FavpollsListClient({
 
   return (
     <>
-      {debugOn && (
-        <div className="fixed bottom-2 left-2 z-50 max-w-[95vw] rounded bg-black/85 p-2 font-mono text-[10px] leading-tight text-green-300">
-          {readLog().map((l, i) => (
-            <div key={i}>{l}</div>
-          ))}
-        </div>
-      )}
       {/* One sticky band: occasion rail + list controls */}
       <ToolbarBand below={rail}>
         <ListControls
