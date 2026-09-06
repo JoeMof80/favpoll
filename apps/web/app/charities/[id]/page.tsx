@@ -6,7 +6,8 @@ import { auth } from "@clerk/nextjs/server"
 import { canManageAppeals } from "@/lib/appeals-admin"
 import { Button } from "@/components/ui/button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { PageSheet } from "@/components/page-sheet"
+import { PageLayout } from "@/components/page-layout"
+import { heroNameSizeClass } from "@/lib/display"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import {
   FavpollSummaryCard,
@@ -130,64 +131,86 @@ export default async function CharityPage({ params }: Props) {
     process.env.SUPPORT_EMAIL ??
     "hello@favpoll.com"
 
-  return (
-    <PageSheet>
-      {/* ── Header: the favpoll hero's composition, static ── */}
-      <header className="flex items-start justify-between gap-6 pt-10 md:pt-16">
+  const factsCard = (
+    <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+      <SectionEyebrow variant="muted" className="font-semibold">
+        Raised through favpoll
+      </SectionEyebrow>
+      <p className="text-xl font-medium text-primary tabular-nums">
+        {formatPounds(stats.total_raised)}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        <span className="tabular-nums">{stats.favpoll_count}</span> favpoll
+        {stats.favpoll_count === 1 ? "" : "s"} in their name ·{" "}
+        <span className="tabular-nums">{stats.live_count}</span> open now
+      </p>
+    </div>
+  )
+
+  const left = (
+    <>
+      {/* ── Header: the favpoll hero, static — same eyebrow / name /
+          context classes as BaseFavpollHero, logo in the avatar box ── */}
+      <header className="flex items-start gap-4 pt-6 md:gap-6 md:pt-16">
         <div className="min-w-0 flex-1">
-          <SectionEyebrow variant="muted">
-            {charity.registered_number
-              ? `Registered charity ${charity.registered_number}`
-              : "Charity"}
+          <SectionEyebrow
+            variant="muted"
+            className="mb-2 flex h-8 items-center truncate wrap-break-word"
+          >
+            Charity
           </SectionEyebrow>
-          <h1 className="mt-2 flex items-center gap-3 text-4xl leading-tight font-light tracking-tight text-foreground">
+          <h1
+            className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(charity.name)}`}
+          >
             {charity.name}
             {isVerified && (
               <BadgeCheck
-                className="size-6 shrink-0 text-primary"
+                className="ml-2 inline size-6 shrink-0 align-baseline text-primary"
                 role="img"
                 aria-label="Verified with the Charity Commission"
               />
             )}
           </h1>
-          {charity.description && (
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              {charity.description}
+          {charity.registered_number && (
+            <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+              Registered charity {charity.registered_number}
             </p>
           )}
-          {charity.impact_statement && (
-            <p className="mt-4 inline-block rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-              {charity.impact_statement}
-            </p>
-          )}
-          {/* The facts, one quiet line — not a dashboard card */}
-          <p className="mt-6 text-sm text-muted-foreground">
-            <span className="font-medium text-primary tabular-nums">
-              {formatPounds(stats.total_raised)}
-            </span>{" "}
-            raised through favpoll ·{" "}
-            <span className="tabular-nums">{stats.favpoll_count}</span> favpoll
-            {stats.favpoll_count === 1 ? "" : "s"} in their name ·{" "}
-            <span className="tabular-nums">{stats.live_count}</span> open now
-          </p>
         </div>
-        {/* The logo sits where the favpoll avatar sits — same shape */}
         {charity.logo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={charity.logo_url}
             alt={charity.name}
-            className="size-24 shrink-0 rounded-xl border border-border bg-background object-contain p-2 md:size-33"
+            className="h-26 w-26 shrink-0 rounded-xl border border-border bg-background object-contain p-2 md:h-33 md:w-33"
           />
         ) : (
           <div
-            className="flex size-24 shrink-0 items-center justify-center rounded-xl border border-border bg-primary/10 text-3xl font-medium text-primary md:size-33"
+            className="flex h-26 w-26 shrink-0 items-center justify-center rounded-xl border border-border bg-primary/10 text-3xl font-medium text-primary md:h-33 md:w-33"
             aria-hidden="true"
           >
             {charity.name.charAt(0)}
           </div>
         )}
       </header>
+
+      {/* The description wears the favpoll About's classes, in the
+          About's slot below the header (static — no clip machinery). */}
+      {charity.description && (
+        <p className="mt-6 line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
+          {charity.description}
+        </p>
+      )}
+
+      {charity.impact_statement && (
+        <p className="mt-6 inline-block rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+          {charity.impact_statement}
+        </p>
+      )}
+
+      {/* The facts live in the rail on md+ (the favpoll page's own
+          column); the rail hides on mobile, so surface them here. */}
+      <div className="mt-6 md:hidden">{factsCard}</div>
 
       {/* ── Appeals ── */}
       {(openAppeals.length > 0 || canManage) && (
@@ -276,8 +299,7 @@ export default async function CharityPage({ params }: Props) {
         </p>
       </section>
 
-      {/* ── Close — quiet, inside the sheet (the purple band was the
-          register-landing grammar; the sheet closes like a page) ── */}
+      {/* ── Close — quiet, inside the sheet ── */}
       <section className="mt-14 border-t border-border pt-10">
         <p className="mb-5 text-2xl leading-tight font-light tracking-tight text-foreground md:text-3xl">
           Honour someone, and support {charity.name}.
@@ -292,6 +314,8 @@ export default async function CharityPage({ params }: Props) {
           </Link>
         </Button>
       </section>
-    </PageSheet>
+    </>
   )
+
+  return <PageLayout left={left} right={factsCard} />
 }
