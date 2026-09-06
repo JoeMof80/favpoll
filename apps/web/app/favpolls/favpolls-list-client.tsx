@@ -48,6 +48,26 @@ export function FavpollsListClient({
   const [status, setStatus] = useState<PublicStatusFilter>(initialStatus)
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
+  // TEMPORARY instrumentation (founder's phone, 2026-09-06): arm once
+  // with /favpolls?debug=return, then sticky for the session. Renders
+  // a fixed log panel of everything the return mechanism sees.
+  const [debugLog, setDebugLog] = useState<string[]>([])
+  const debugOn =
+    typeof window !== "undefined" &&
+    (() => {
+      try {
+        if (window.location.search.includes("debug=return")) {
+          sessionStorage.setItem("favpolls:debug", "1")
+        }
+        return sessionStorage.getItem("favpolls:debug") === "1"
+      } catch {
+        return false
+      }
+    })()
+  function dbg(line: string) {
+    const entry = `${Math.round(performance.now())}ms ${line}`
+    setDebugLog((l) => [...l.slice(-14), entry])
+  }
 
   // Restore-once, ELEMENT-anchored (founder, 2026-09-06; v3): the
   // favpoll page arms "favpolls:return" with its own href on mount
@@ -63,6 +83,7 @@ export function FavpollsListClient({
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
+    dbg(`mount key=${href ?? "NONE"} y=${Math.round(window.scrollY)}`)
     if (!href) return
     // One-shot centring drifted on the founder's phone: images/fonts
     // above the target finish loading AFTER the scroll, growing the
@@ -72,6 +93,7 @@ export function FavpollsListClient({
     let interrupted = false
     const stop = () => {
       interrupted = true
+      dbg("user interrupt")
     }
     const opts = { passive: true } as const
     window.addEventListener("touchstart", stop, opts)
@@ -82,12 +104,21 @@ export function FavpollsListClient({
       const li = document
         .querySelector(`a[href="${CSS.escape(href!)}"]`)
         ?.closest("li")
-      if (!li) return
+      if (!li) {
+        dbg("li NOT FOUND")
+        return
+      }
       const r = li.getBoundingClientRect()
       const target =
         window.scrollY + r.top - (window.innerHeight - r.height) / 2
+      const before = Math.round(window.scrollY)
       if (Math.abs(window.scrollY - target) > 8) {
         window.scrollTo(0, Math.max(0, target))
+        dbg(
+          `centre y=${before}->${Math.round(target)} top=${Math.round(r.top)} h=${Math.round(r.height)}`
+        )
+      } else {
+        dbg(`ok y=${before} top=${Math.round(r.top)}`)
       }
     }
     const raf = requestAnimationFrame(() => requestAnimationFrame(centre))
@@ -106,6 +137,13 @@ export function FavpollsListClient({
 
   return (
     <>
+      {debugOn && debugLog.length > 0 && (
+        <div className="fixed bottom-2 left-2 z-50 max-w-[95vw] rounded bg-black/85 p-2 font-mono text-[10px] leading-tight text-green-300">
+          {debugLog.map((l, i) => (
+            <div key={i}>{l}</div>
+          ))}
+        </div>
+      )}
       {/* One sticky band: occasion rail + list controls */}
       <ToolbarBand below={rail}>
         <ListControls
