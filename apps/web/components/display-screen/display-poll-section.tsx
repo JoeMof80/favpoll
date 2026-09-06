@@ -44,8 +44,13 @@ export function DisplayPollSection({
           card-sized ramp reads small across a room. */}
       {/* --display-topic is set by DisplayScreen on a live room surface;
           the fallback is the @3xl:text-2xl this has always been. */}
-      <h2 className="mb-6 truncate text-xl font-medium tracking-[0.09em] text-primary uppercase @3xl:text-[length:var(--display-topic,1.5rem)]">
-        Favourite {poll.topic.title}
+      <h2 className="mb-6">
+        <span className="block text-xl font-medium tracking-[0.09em] text-primary/55 uppercase @3xl:text-[length:var(--display-topic,1.5rem)]">
+          Favourite
+        </span>
+        <span className="block truncate text-xl font-medium tracking-[0.09em] text-primary uppercase @3xl:text-[length:var(--display-topic,1.5rem)]">
+          {poll.topic.title}
+        </span>
       </h2>
 
       {!!revealText && justClosed && (
