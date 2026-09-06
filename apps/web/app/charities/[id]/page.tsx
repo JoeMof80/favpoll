@@ -138,12 +138,15 @@ export default async function CharityPage({ params }: Props) {
     process.env.SUPPORT_EMAIL ??
     "hello@favpoll.com"
 
+  // The card fills the avatar's own height (md:h-33) so the header row
+  // reads as one unit: text stack, logo, facts (founder, 2026-09-06 —
+  // and no stickiness: it is a header element, not a rail companion).
   const factsCard = (
-    <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+    <div className="flex flex-col justify-center space-y-1 rounded-lg border border-border bg-card px-5 py-4 md:h-33">
       <SectionEyebrow variant="muted" className="font-semibold">
         Raised through favpoll
       </SectionEyebrow>
-      <p className="text-xl font-medium text-primary tabular-nums">
+      <p className="text-3xl font-light text-primary tabular-nums">
         {formatPounds(stats.total_raised)}
       </p>
       <p className="text-xs text-muted-foreground">
@@ -320,7 +323,7 @@ export default async function CharityPage({ params }: Props) {
   )
 
   return (
-    <PageLayout left={left} right={factsCard}>
+    <PageLayout left={left} right={factsCard} rightSticky={false}>
       {fullWidth}
     </PageLayout>
   )
