@@ -138,7 +138,18 @@ export function NewFavpollWizard({
               {w.step === "charity" && (
                 <WizardStepShell title="Charity">
                   {w.stepLocked.charity ? (
-                    lockedBody(w.railSummary.charity.join(" · "))
+                    w.selectedCharities.length > 0 ? (
+                      <WizardCharityCard
+                        charities={w.selectedCharities}
+                        lockedReason={
+                          w.appeal
+                            ? `Locked — set by ${w.appeal.name}.`
+                            : "Locked — guests have already pledged."
+                        }
+                      />
+                    ) : (
+                      lockedBody(w.railSummary.charity.join(" · "))
+                    )
                   ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
