@@ -264,6 +264,10 @@ export default async function CharityPage({ params }: Props) {
                   href={`/appeals/${a.slug}`}
                   className="flex flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
                 >
+                  {/* Three bordered rows — the favpoll card's own
+                      structure: header, then count+countdown where the
+                      topic row sits, then the £ where the charity row
+                      sits, right-aligned (founder, 2026-09-06). */}
                   <div className="flex-1 p-3">
                     <FavpollHeader
                       hideEmptyAvatar
@@ -271,23 +275,21 @@ export default async function CharityPage({ params }: Props) {
                       eyebrow="Appeal"
                       size="md"
                     />
-                    {/* Count + countdown live in the body (founder,
-                        2026-09-06); the footer keeps the £ alone. */}
-                    <div className="mt-2 flex items-center justify-between gap-3 text-sm text-muted-foreground">
-                      <span>
-                        {agg?.member_count ?? 0} favpoll
-                        {(agg?.member_count ?? 0) === 1 ? "" : "s"}
-                      </span>
-                      {a.closes_at && (
-                        <ClosingLabel
-                          closesAt={a.closes_at}
-                          className="whitespace-nowrap"
-                        />
-                      )}
-                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t border-border px-3 py-2 text-sm text-muted-foreground">
+                    <span>
+                      {agg?.member_count ?? 0} favpoll
+                      {(agg?.member_count ?? 0) === 1 ? "" : "s"}
+                    </span>
+                    {a.closes_at && (
+                      <ClosingLabel
+                        closesAt={a.closes_at}
+                        className="whitespace-nowrap"
+                      />
+                    )}
                   </div>
                   <div className="border-t border-border px-3 py-2">
-                    <p className="text-sm font-medium text-primary tabular-nums">
+                    <p className="text-right text-sm font-medium text-primary tabular-nums">
                       {formatPounds(Number(agg?.raised ?? 0))}
                     </p>
                   </div>
