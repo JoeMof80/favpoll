@@ -46,7 +46,7 @@ export async function sendPledgeConfirmation(params: PledgeConfirmationParams) {
     html: renderEmail({
       preheader: `${formatPoundsExact(amount)} to ${charityNames.join(" & ") || "charity"}, in honour of ${protagonistName}.`,
       heading: "Thank you.",
-      bodyHtml: `<p style="margin:0 0 12px;">You pledged <strong>${formatPoundsExact(amount)}</strong> to ${charityLabel}, in honour of ${name}. favpoll takes no fee — 100% of your pledge goes to charity.</p>${
+      bodyHtml: `<p style="margin:0 0 12px;">You pledged <strong>${formatPoundsExact(amount)}</strong> to ${charityLabel}, in honour of ${name}. favpoll takes no platform fee.</p>${
         closesDate
           ? `<p style="margin:0;">The poll closes on ${escapeHtml(closesDate)}. Until then, your favourite stands in the running.</p>`
           : ""

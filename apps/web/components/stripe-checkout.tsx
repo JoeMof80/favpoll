@@ -119,7 +119,8 @@ export function StripeCheckout({
       </p>
       {charityAmount !== undefined && (
         <p className="mb-5 text-xs text-muted-foreground">
-          {formatPoundsExact(charityAmount)} to charity — favpoll takes no fee
+          {formatPoundsExact(charityAmount)} to charity — favpoll takes no
+          platform fee
         </p>
       )}
       {charityAmount === undefined && <div className="mb-5" />}

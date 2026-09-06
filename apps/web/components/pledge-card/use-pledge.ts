@@ -107,11 +107,11 @@ export function usePledge({
   const ownBase = isPledgeValid ? numericPledge : 0
   const ownTopUp = isTopUpValid ? numericTopUp : 0
   // THREE SEPARATE THINGS, and they had been conflated (2026-08-27):
-  //   · No PLATFORM fee — 100% of the pledge goes to charity (decided
-  //     2026-07). Absolute, and the reason a charity signs quickly.
-  //   · The CARD fee is the guest's, added to the charge and passed to
-  //     Stripe. favpoll keeps none of it. See lib/card-fee for why it moved
-  //     off favpoll and onto the guest rather than onto the charity.
+  //   · No PLATFORM fee — favpoll never takes a cut of a pledge.
+  //     Absolute, and the reason a charity signs quickly.
+  //   · CARD processing is absorbed at settlement since 2026-09-06 (the
+  //     charity nets pledge minus its processing share — lib/card-fee
+  //     records all three eras). Nothing rides on the guest's charge.
   //   · The optional CONTRIBUTION is favpoll's, and its only income. It
   //     rides the same charge and lives in tip_amount, never total_amount.
   const tipAmount =
