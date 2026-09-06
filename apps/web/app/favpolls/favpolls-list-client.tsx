@@ -48,36 +48,8 @@ export function FavpollsListClient({
   const [status, setStatus] = useState<PublicStatusFilter>(initialStatus)
   const [sort, setSort] = useState<PublicSortKey>("closing_soonest")
   const [search, setSearch] = useState("")
-  // TEMPORARY on-device log (persists across reloads). Always on.
-  const [, forceRender] = useState(0)
-  function readLog(): string[] {
-    try {
-      return JSON.parse(sessionStorage.getItem("favpolls:debug-log") ?? "[]")
-    } catch {
-      return []
-    }
-  }
 
-  // Restore-once, ELEMENT-anchored (founder, 2026-09-06; v3): the
-  // favpoll page arms "favpolls:return" with its own href on mount
-  // (FavpollSubheader) — no fragile outbound click detection. On the
-  // list's next mount, scroll that card into view after two animation
-  // frames — past the App Router's scroll reset, immune to layout
-  // shifts. The key is consumed once; fresh arrivals keep the top.
   useLayoutEffect(() => {
-    const dbg = (line: string) => {
-      try {
-        const log = JSON.parse(
-          sessionStorage.getItem("favpolls:debug-log") ?? "[]"
-        )
-        log.push(`${new Date().toISOString().slice(11, 19)} LIST ${line}`)
-        sessionStorage.setItem(
-          "favpolls:debug-log",
-          JSON.stringify(log.slice(-22))
-        )
-      } catch {}
-      forceRender((n) => n + 1)
-    }
     // StrictMode-proof consumption: the key is deleted only AFTER a
     // successful centring — a doomed dev double-mount first pass never
     // gets there, so the surviving pass still finds it. A staleness
@@ -94,13 +66,11 @@ export function FavpollsListClient({
     } catch {
       // sessionStorage unavailable — the natural top is fine
     }
-    dbg(`mount key=${href ?? "NONE"} y=${Math.round(window.scrollY)}`)
     if (!href) return
     let interrupted = false
     let listenersOn = false
-    const stop = (e: Event) => {
+    const stop = () => {
       interrupted = true
-      dbg(`interrupt ${e.type}`)
     }
     const opts = { passive: true } as const
     // Attach only AFTER the first centring attempt: a synthetic touch
@@ -118,7 +88,6 @@ export function FavpollsListClient({
         .querySelector(`a[href="${CSS.escape(href!)}"]`)
         ?.closest("li")
       if (!li) {
-        dbg("li NOT FOUND")
         attach()
         return
       }
@@ -127,9 +96,6 @@ export function FavpollsListClient({
         window.scrollY + r.top - (window.innerHeight - r.height) / 2
       if (Math.abs(window.scrollY - target) > 8) {
         window.scrollTo(0, Math.max(0, target))
-        dbg(`centre ->${Math.round(target)} top=${Math.round(r.top)}`)
-      } else {
-        dbg(`ok y=${Math.round(window.scrollY)} top=${Math.round(r.top)}`)
       }
       // Consumed only on success — see the StrictMode note above.
       try {
@@ -154,11 +120,6 @@ export function FavpollsListClient({
 
   return (
     <>
-      <div className="fixed bottom-2 left-2 z-50 max-w-[95vw] rounded bg-black/85 p-2 font-mono text-[10px] leading-tight text-green-300">
-        {readLog().map((l, i) => (
-          <div key={i}>{l}</div>
-        ))}
-      </div>
       {/* One sticky band: occasion rail + list controls */}
       <ToolbarBand below={rail}>
         <ListControls
