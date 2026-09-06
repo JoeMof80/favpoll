@@ -52,7 +52,7 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
             <Button
               key={g}
               type="button"
-              className="h-11 px-5 md:text-base"
+              className="h-11 px-4 md:text-base"
               variant={w.goalAmount === g ? "default" : "outline"}
               onClick={() => {
                 w.setGoalAmount(g)
