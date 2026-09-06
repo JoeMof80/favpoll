@@ -100,7 +100,7 @@ export function KeepsakeDocument({
   // gutter and the standings list.
   const topicHeading = (
     <h2 className="w-full max-w-[150mm] text-left">
-      <span className="block text-[11px] font-medium tracking-[0.09em] text-primary/55 uppercase">
+      <span className="block text-[17px] font-medium tracking-[0.09em] text-primary/55 uppercase">
         Favourite
       </span>
       <span className="block text-[17px] font-medium tracking-[0.09em] text-primary uppercase">
