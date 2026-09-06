@@ -62,7 +62,9 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
               £{g}
             </Button>
           ))}
-          <InputGroup className={cn(WIZARD_INPUT_SIZE, "w-28 bg-background")}>
+          <InputGroup
+            className={cn(WIZARD_INPUT_SIZE, "min-w-28 flex-1 bg-background")}
+          >
             <InputGroupAddon align="inline-start">
               <span className="text-muted-foreground">£</span>
             </InputGroupAddon>
