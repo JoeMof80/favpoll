@@ -1,14 +1,18 @@
 "use client"
 
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Lock, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Charity } from "@favpoll/types"
 
 type Props = {
   charities: Charity[]
-  onEdit: () => void
-  onRemove: (id: string) => void
-  onPickAnother: () => void
+  onEdit?: () => void
+  onRemove?: (id: string) => void
+  onPickAnother?: () => void
+  /** Locked mode (founder, 2026-09-06): same card, but the edit icon
+      becomes a lock and the pick-another line becomes the REASON the
+      charity is locked — the appeal that set it, or pledged guests. */
+  lockedReason?: string
 }
 
 export function WizardCharityCard({
@@ -16,7 +20,9 @@ export function WizardCharityCard({
   onEdit,
   onRemove,
   onPickAnother,
+  lockedReason,
 }: Props) {
+  const locked = !!lockedReason
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       {charities.map((c) => (
@@ -44,36 +50,53 @@ export function WizardCharityCard({
               )}
             </span>
             <div className="flex shrink-0 items-center">
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="ghost"
-                onClick={onEdit}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              {charities.length > 1 && (
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  variant="ghost"
-                  onClick={() => onRemove(c.id)}
+              {locked ? (
+                <span
+                  className="flex size-8 items-center justify-center text-muted-foreground"
+                  aria-hidden="true"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  <Lock className="h-4 w-4" />
+                </span>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    size="icon-sm"
+                    variant="ghost"
+                    onClick={onEdit}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  {charities.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      variant="ghost"
+                      onClick={() => onRemove?.(c.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </div>
         </div>
       ))}
-      {charities.length < 3 && (
-        <button
-          type="button"
-          onClick={onPickAnother}
-          className="border-t border-border pt-3 text-left text-sm text-primary hover:underline"
-        >
-          + Pick another charity
-        </button>
+      {locked ? (
+        <p className="border-t border-border pt-3 text-sm text-muted-foreground">
+          {lockedReason}
+        </p>
+      ) : (
+        charities.length < 3 && (
+          <button
+            type="button"
+            onClick={onPickAnother}
+            className="border-t border-border pt-3 text-left text-sm text-primary hover:underline"
+          >
+            + Pick another charity
+          </button>
+        )
       )}
     </div>
   )
