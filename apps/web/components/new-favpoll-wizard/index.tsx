@@ -12,6 +12,7 @@ import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
+import { findOrCreateRegisterCharity } from "@/app/favpolls/new/actions"
 import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
 import { useWizardState } from "./use-wizard-state"
@@ -30,7 +31,7 @@ import type {
   WizardData,
   WizardEditConfig,
 } from "./use-wizard-state"
-import type { FavpollCategory } from "@favpoll/types"
+import type { Charity, FavpollCategory } from "@favpoll/types"
 
 type Props = {
   data: WizardData
@@ -60,6 +61,21 @@ export function NewFavpollWizard({
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
+  // Charities added live from the Charity Commission register (PR C) —
+  // appended to the catalogue list for this wizard session.
+  const [extraCharities, setExtraCharities] = useState<Charity[]>([])
+  async function handleRegisterAdd(pick: {
+    registeredNumber: string
+    displayName: string
+  }) {
+    const c = await findOrCreateRegisterCharity(pick)
+    setExtraCharities((prev) =>
+      prev.some((x) => x.id === c.id) ? prev : [...prev, c]
+    )
+    if (!w.charityIds.includes(c.id) && w.charityIds.length < 3) {
+      w.setCharityIds([...w.charityIds, c.id])
+    }
+  }
 
   const trimmedTopicSearch = topicSearch.trim()
   const topicShowCreate =
@@ -429,10 +445,11 @@ export function NewFavpollWizard({
           }
         >
           <CharityStep
-            charities={data.charities}
+            charities={[...data.charities, ...extraCharities]}
             value={w.charityIds}
             onChange={w.setCharityIds}
             search={charitySearch}
+            onRegisterAdd={handleRegisterAdd}
           />
         </ResponsiveOverlay>
 

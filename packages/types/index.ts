@@ -13,6 +13,11 @@ export type Charity = {
   description: string | null;
   logo_url: string | null;
   registered_number: string | null;
+  /** Consent gate (2026-09-07): has the charity AGREED to appear and
+   *  receive pledges? Enforcement rides CHARITY_CONSENT_POSTURE. */
+  consent_status?: "pending" | "approved" | "declined";
+  consent_contacted_at?: string | null;
+  consent_decided_at?: string | null;
   /** Admin-curated impact line shown at pledge time; null = none */
   impact_statement?: string | null;
   /** Charity Commission check, written by the admin app; null = never checked */

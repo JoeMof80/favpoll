@@ -2,6 +2,8 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { verifyCharityNumber } from "@/lib/charity-commission"
+import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
   title: string
@@ -355,4 +357,57 @@ export async function createFavpoll(
   if (potErr) throw new Error(`Failed to create fund: ${potErr?.message}`)
 
   return { favpollId: favpoll.id }
+}
+
+/**
+ * The any-charity picker's landing (consent-gate PR C, 2026-09-07): an
+ * organiser picks a charity straight from the Charity Commission
+ * register. Reuses an existing row when the number is already known;
+ * otherwise verifies against the register and creates the charity
+ * OFF the public catalogue (is_active false) and consent 'pending' —
+ * approval flips both.
+ */
+export async function findOrCreateRegisterCharity(input: {
+  registeredNumber: string
+  displayName: string
+}): Promise<Charity> {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const number = input.registeredNumber.replace(/\D/g, "")
+  if (!number) throw new Error("Invalid charity number")
+  const name = input.displayName.trim()
+  if (!name) throw new Error("Charity name required")
+
+  const supabase = createAdminClient()
+  const { data: existing } = await supabase
+    .from("charities")
+    .select("*")
+    .eq("registered_number", number)
+    .maybeSingle()
+  if (existing) return existing as Charity
+
+  const check = await verifyCharityNumber(number, name)
+  if (check.status === "removed" || check.status === "not_found") {
+    throw new Error("That charity isn't currently on the register")
+  }
+
+  const { data: created, error } = await supabase
+    .from("charities")
+    .insert({
+      name,
+      registered_number: number,
+      market: "en-GB",
+      is_active: false,
+      consent_status: "pending",
+      verification_status: check.status,
+      verified_name: check.registeredName,
+      verified_at: new Date().toISOString(),
+    })
+    .select("*")
+    .single()
+  if (error || !created) {
+    throw new Error(error?.message ?? "Failed to add charity")
+  }
+  return created as Charity
 }
