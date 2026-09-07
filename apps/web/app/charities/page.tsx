@@ -18,7 +18,11 @@ export default async function CharitiesIndexPage() {
     supabase
       .from("charities")
       .select("id, name, logo_url, verification_status")
+      // THE EARNED SHELF (founder, 2026-09-08): the public catalogue lists
+      // only charities that have AGREED to receive pledges — privilege is
+      // earned by consent, never by dev-era seeding.
       .eq("is_active", true)
+      .eq("consent_status", "approved")
       .order("name"),
     supabase.rpc("all_charity_stats"),
   ])

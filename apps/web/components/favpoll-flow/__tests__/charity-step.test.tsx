@@ -1,97 +1,79 @@
 import { describe, it, expect, vi } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import { CharityStep } from "../charity-step"
 import type { Charity } from "@favpoll/types"
 
-const makeCharity = (id: string, name: string): Charity =>
+// Minimal rows — the component only reads id/name/consent_status/registered_number.
+const charity = (over: Partial<Charity>): Charity =>
   ({
-    id,
-    name,
+    id: "c-x",
+    name: "Charity X",
+    registered_number: "1234567",
     is_active: true,
-    description: null,
-    logo_url: null,
-    registered_number: null,
-    market: "en-GB",
-    created_at: null,
-  }) as unknown as Charity
+    ...over,
+  }) as Charity
 
-const CHARITIES = [
-  makeCharity("c1", "Shelter"),
-  makeCharity("c2", "Oxfam"),
-  makeCharity("c3", "RSPB"),
-  makeCharity("c4", "BHF"),
-]
+const approved = charity({
+  id: "c-approved",
+  name: "Age UK",
+  consent_status: "approved",
+})
+const pending = charity({
+  id: "c-pending",
+  name: "Dogs Trust",
+  consent_status: "pending",
+})
 
-describe("CharityStep", () => {
-  it("renders all charity chips", () => {
-    render(<CharityStep charities={CHARITIES} value={[]} onChange={() => {}} />)
-    expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
-  })
-
-  it("renders selected charities as selected", () => {
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={() => {}} />
-    )
-    expect(screen.getByRole("button", { name: "Shelter" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
-  })
-
-  it("calls onChange with new id when unselected charity is clicked", () => {
-    const onChange = vi.fn()
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={onChange} />
-    )
-    fireEvent.click(screen.getByRole("button", { name: "Oxfam" }))
-    expect(onChange).toHaveBeenCalledWith(["c1", "c2"])
-  })
-
-  it("calls onChange without id when selected charity is clicked", () => {
-    const onChange = vi.fn()
-    render(
-      <CharityStep charities={CHARITIES} value={["c1"]} onChange={onChange} />
-    )
-    fireEvent.click(screen.getByRole("button", { name: "Shelter" }))
-    expect(onChange).toHaveBeenCalledWith([])
-  })
-
-  it("filters chips by search prop", () => {
+describe("CharityStep — the earned shelf", () => {
+  it("default cloud shows only approved charities", () => {
     render(
       <CharityStep
-        charities={CHARITIES}
+        charities={[approved, pending]}
         value={[]}
-        onChange={() => {}}
-        search="ox"
+        onChange={vi.fn()}
       />
     )
-    expect(screen.getByRole("button", { name: "Oxfam" })).toBeInTheDocument()
+    expect(screen.getByText("Age UK")).toBeInTheDocument()
+    expect(screen.queryByText("Dogs Trust")).not.toBeInTheDocument()
+  })
+
+  it("a selected unapproved charity stays visible for review/undo", () => {
+    render(
+      <CharityStep
+        charities={[approved, pending]}
+        value={["c-pending"]}
+        onChange={vi.fn()}
+      />
+    )
+    expect(screen.getByText("Dogs Trust")).toBeInTheDocument()
+  })
+
+  it("searching surfaces unapproved catalogue matches", () => {
+    render(
+      <CharityStep
+        charities={[approved, pending]}
+        value={[]}
+        onChange={vi.fn()}
+        search="dogs"
+      />
+    )
+    expect(screen.getByText("Dogs Trust")).toBeInTheDocument()
+    expect(screen.queryByText("Age UK")).not.toBeInTheDocument()
+  })
+
+  it("an empty shelf invites the register search", () => {
+    render(
+      <CharityStep
+        charities={[pending]}
+        value={[]}
+        onChange={vi.fn()}
+        onRegisterAdd={vi.fn()}
+      />
+    )
     expect(
-      screen.queryByRole("button", { name: "Shelter" })
-    ).not.toBeInTheDocument()
-  })
-
-  it("shows no-results message when search prop matches nothing", () => {
-    render(
-      <CharityStep
-        charities={CHARITIES}
-        value={[]}
-        onChange={() => {}}
-        search="zzz"
-      />
-    )
-    expect(screen.getByText("No results.")).toBeInTheDocument()
-  })
-
-  it("does not call onChange when at max and an unselected charity is clicked", () => {
-    const onChange = vi.fn()
-    render(
-      <CharityStep
-        charities={CHARITIES}
-        value={["c1", "c2", "c3"]}
-        onChange={onChange}
-      />
-    )
-    fireEvent.click(screen.getByRole("button", { name: "BHF" }))
-    expect(onChange).not.toHaveBeenCalled()
+      screen.getByText(
+        "Search any UK charity — the whole Charity Commission register."
+      )
+    ).toBeInTheDocument()
   })
 })

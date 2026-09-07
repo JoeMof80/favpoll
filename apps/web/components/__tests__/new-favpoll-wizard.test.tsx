@@ -26,8 +26,19 @@ import type { Category, Charity, TopicWithMeta } from "@favpoll/types"
 
 const MOCK_DATA = {
   charities: [
-    { id: "c1", name: "Charity One", is_active: true } as unknown as Charity,
-    { id: "c2", name: "Charity Two", is_active: true } as unknown as Charity,
+    // Approved: the earned shelf only shows consented charities by default.
+    {
+      id: "c1",
+      name: "Charity One",
+      is_active: true,
+      consent_status: "approved",
+    } as unknown as Charity,
+    {
+      id: "c2",
+      name: "Charity Two",
+      is_active: true,
+      consent_status: "approved",
+    } as unknown as Charity,
   ],
   topics: [
     {
