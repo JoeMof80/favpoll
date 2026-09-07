@@ -86,7 +86,10 @@ export function CheckoutForm({
   // The one payment routine both paths share: preflight veto, confirm,
   // record. The card form and the wallet buttons differ only in how the
   // email arrives.
-  async function runPayment(effectiveEmail: string | undefined) {
+  async function runPayment(
+    effectiveEmail: string | undefined,
+    onFail?: () => void
+  ) {
     setSubmitting(true)
     setError(null)
     setAuthHandOff(null)
@@ -94,16 +97,17 @@ export function CheckoutForm({
     if (preflight) {
       const veto = await preflight(effectiveEmail)
       if (veto) {
-        // NOTE: inside a wallet confirm this leaves the payment sheet to
-        // time out on its own (Stripe's express confirm has no abort) —
-        // acceptable for the rare duplicate-guest veto; our message and
-        // hand-off render beneath either way.
+        // onFail dismisses a wallet's payment sheet cleanly
+        // (event.paymentFailed — #763 wrongly said express had no abort;
+        // the founder hit the hanging sheet with his own account email,
+        // 2026-09-07). The message and hand-off render beneath.
         setError(veto.message)
         setAuthHandOff(
           veto.signInEmail
             ? { email: veto.signInEmail, mode: veto.authMode ?? "sign-up" }
             : null
         )
+        onFail?.()
         setSubmitting(false)
         return
       }
@@ -120,6 +124,7 @@ export function CheckoutForm({
 
     if (stripeError) {
       setError(stripeError.message ?? "Payment failed")
+      onFail?.()
       setSubmitting(false)
       return
     }
@@ -162,9 +167,12 @@ export function CheckoutForm({
     const emailRequired = showEmailCapture || externalEmail !== undefined
     if (emailRequired && !effectiveEmail) {
       setError("Please enter your email address")
+      event.paymentFailed({ reason: "fail" })
       return
     }
-    await runPayment(effectiveEmail)
+    await runPayment(effectiveEmail, () =>
+      event.paymentFailed({ reason: "fail" })
+    )
   }
 
   function handleExpressReady(event: StripeExpressCheckoutElementReadyEvent) {
@@ -208,6 +216,23 @@ export function CheckoutForm({
         onConfirm={handleExpressConfirm}
         onReady={handleExpressReady}
       />
+      {/* The veto/error message and its hand-off sit NEXT TO the wallet
+          buttons (founder, 2026-09-07) — that is where a dismissed sheet
+          leaves the guest looking. Card errors surface here too. */}
+      {error && <p className="text-sm text-destructive">{error}</p>}
+      {authHandOff && (
+        <Button asChild variant="outline" className="w-full">
+          <a
+            href={`/${authHandOff.mode}?email_address=${encodeURIComponent(authHandOff.email)}&redirect_url=${encodeURIComponent(
+              typeof window !== "undefined" ? window.location.pathname : "/"
+            )}`}
+          >
+            {authHandOff.mode === "sign-in"
+              ? "Sign in with this email →"
+              : "Create an account with this email →"}
+          </a>
+        </Button>
+      )}
       {expressAvailable && (
         <div className="flex items-center gap-4" aria-hidden="true">
           <div className="h-px flex-1 bg-border" />
@@ -227,20 +252,6 @@ export function CheckoutForm({
           wallets: { applePay: "never", googlePay: "never", link: "never" },
         }}
       />
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {authHandOff && (
-        <Button asChild variant="outline" className="w-full">
-          <a
-            href={`/${authHandOff.mode}?email_address=${encodeURIComponent(authHandOff.email)}&redirect_url=${encodeURIComponent(
-              typeof window !== "undefined" ? window.location.pathname : "/"
-            )}`}
-          >
-            {authHandOff.mode === "sign-in"
-              ? "Sign in with this email →"
-              : "Create an account with this email →"}
-          </a>
-        </Button>
-      )}
       {showButtons && (
         <div className="flex gap-3 pt-2">
           <Button
