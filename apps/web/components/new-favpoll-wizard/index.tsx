@@ -318,7 +318,7 @@ export function NewFavpollWizard({
                     handleCreateTopic()
                   }
                 }}
-                className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+                className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
               />
               {topicShowCreate && (
                 <InputGroupButton
@@ -399,7 +399,7 @@ export function NewFavpollWizard({
               placeholder="Search charities…"
               value={charitySearch}
               onChange={(e) => setCharitySearch(e.target.value)}
-              className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
             />
           }
           footer={
