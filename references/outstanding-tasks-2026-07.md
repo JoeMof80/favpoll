@@ -52,6 +52,7 @@ with `vercel env pull`.
 | ~~Goodstack (lead disbursement rail)~~ | **RETIRED (founder, 2026-09-06/07 — stated twice).** The enquiry/chase history stands in `references/disbursement-enquiries-2026-07.md` as record. The disbursement rail is an OPEN question again; the Gift Aid confidence that rode on Goodstack's HMRC recognition reopens with it. |
 | **PPGF**                               | Was demoted to Gift-Aid-only interest while Goodstack led; with Goodstack retired, PPGF/CAF/Swiftaid are back on the open rail question.                                                                                                                                            |
 | **Stripe Connect**                     | Application pending approval; disbursement not wired (cron has a placeholder).                                                                                                                                                                                                     |
+| **PF/CP legal opinion**                | qLegal DECLINED (2026-09-07): regulatory questions out of their scope; signposted CMS startups / Wiggin / Founders Law / Deborah Lawunmi (Setfords) + a pro bono sheet. Next: scoped fixed-fee quote from a charity-law specialist (Bates Wells or Lawunmi); TrustLaw possible under social-enterprise framing. Raised urgency now favpoll.com is live — pilot-consent path is the interim mitigation. |
 
 ## 3. Buildable code features (still open)
 
