@@ -141,7 +141,12 @@ describe("verifyCharityNumber", () => {
 
 // ─── searchRegister + titleCaseCharityName ────────────────────────────────────
 
-import { searchRegister, titleCaseCharityName } from "@/lib/charity-commission";
+import {
+  searchRegister,
+  searchRegisterRanked,
+  registerQueryVariants,
+  titleCaseCharityName,
+} from "@/lib/charity-commission";
 
 describe("titleCaseCharityName", () => {
   it("title-cases ordinary words", () => {
@@ -250,5 +255,135 @@ describe("searchRegister", () => {
 
     expect(await searchRegister("age uk")).toEqual([]);
     expect(mockFetch).not.toHaveBeenCalled();
+  });
+});
+
+// ─── apostrophe variants + relevance ranking (2026-09-07) ─────────────────────
+
+describe("registerQueryVariants", () => {
+  it("searches both apostrophe spellings", () => {
+    expect(registerQueryVariants("st lukes")).toEqual([
+      "st lukes",
+      "st luke's",
+    ]);
+    expect(registerQueryVariants("st luke's")).toEqual([
+      "st luke's",
+      "st lukes",
+    ]);
+  });
+
+  it("collapses when no apostrophe is in play", () => {
+    expect(registerQueryVariants("age uk")).toEqual(["age uk"]);
+  });
+
+  it("drops variants below the 3-char search floor", () => {
+    expect(registerQueryVariants("ab")).toEqual([]);
+  });
+});
+
+describe("searchRegisterRanked", () => {
+  function searchRow(overrides: Record<string, unknown> = {}) {
+    return {
+      reg_charity_number: 1128267,
+      charity_name: "AGE UK",
+      reg_status: "R",
+      group_subsid_suffix: 0,
+      ...overrides,
+    };
+  }
+
+  it("ranks starts-with above word-boundary above substring", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [
+        searchRow({
+          reg_charity_number: 1,
+          charity_name: "12TH CROSBY (ST LUKES) SCOUT GROUP",
+        }),
+        searchRow({ reg_charity_number: 2, charity_name: "ST LUKES HOSPICE" }),
+        searchRow({
+          reg_charity_number: 3,
+          charity_name: "BEST LUKES FELLOWSHIP",
+        }),
+      ],
+    });
+
+    const { results } = await searchRegisterRanked("st lukes");
+
+    expect(results.map((r) => r.registeredName)).toEqual([
+      "ST LUKES HOSPICE",
+      "12TH CROSBY (ST LUKES) SCOUT GROUP",
+      "BEST LUKES FELLOWSHIP",
+    ]);
+  });
+
+  it("merges both spellings and reports the pre-cap total", async () => {
+    mockFetch.mockImplementation((url: string) =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () =>
+          String(url).includes("luke's")
+            ? [
+                searchRow({
+                  reg_charity_number: 10,
+                  charity_name: "ST LUKE'S CHESHIRE HOSPICE",
+                }),
+              ]
+            : [
+                searchRow({
+                  reg_charity_number: 11,
+                  charity_name: "ST LUKES SCOUT GROUP",
+                }),
+              ],
+      }),
+    );
+
+    const { results, total } = await searchRegisterRanked("st lukes");
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(total).toBe(2);
+    expect(results.map((r) => r.registeredNumber).sort()).toEqual([
+      "10",
+      "11",
+    ]);
+  });
+
+  it("the apostrophe-stripped ranking finds the hospice from 'st lukes'", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [
+        searchRow({
+          reg_charity_number: 20,
+          charity_name: "1ST LOSCOE ST LUKES SCOUT GROUP",
+        }),
+        searchRow({
+          reg_charity_number: 21,
+          charity_name: "ST LUKE'S CHESHIRE HOSPICE",
+        }),
+      ],
+    });
+
+    const { results } = await searchRegisterRanked("st lukes");
+
+    expect(results[0].registeredName).toBe("ST LUKE'S CHESHIRE HOSPICE");
+  });
+
+  it("total exceeds the 8-result cap when the register has more", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () =>
+        Array.from({ length: 20 }, (_, i) =>
+          searchRow({ reg_charity_number: i + 1 }),
+        ),
+    });
+
+    const { results, total } = await searchRegisterRanked("charity");
+
+    expect(results).toHaveLength(8);
+    expect(total).toBe(20);
   });
 });
