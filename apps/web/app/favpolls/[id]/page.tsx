@@ -138,7 +138,7 @@ export default async function FavpollPage({ params }: Props) {
             .range(from, to)
         )
       : Promise.resolve([]),
-    // Wall of favourites: names resolve server-side (guest display_name, or
+    // Guest book: names resolve server-side (guest display_name, or
     // users.display_name for signed-in pledgers); anonymous → null →
     // rendered as "Someone". Amounts never appear on the wall.
     pollId

@@ -8,7 +8,7 @@ import {
 } from "@/components/wall-of-favourites"
 import { Vignette } from "@/components/landing/vignette"
 
-// The wall of favourites, filling as pledges land.
+// The guest book, filling as pledges land.
 //
 // The REAL WallOfFavourites with animate — the rows spring in here exactly as they
 // do on a favpoll, because it is the same AnimatePresence doing it.

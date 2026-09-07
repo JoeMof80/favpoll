@@ -40,7 +40,7 @@ type CreatePledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
-  /** Hide the name from the public wall of favourites (organiser still sees it) */
+  /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
@@ -106,9 +106,9 @@ type CreateGuestPledgeInput = {
   totalAmount: number
   /** Optional contribution to favpoll (pounds) — never charity money */
   tipAmount?: number
-  /** Name shown on the wall of favourites; blank = appears as "Someone" */
+  /** Name shown on the guest book; blank = appears as "Someone" */
   displayName?: string | null
-  /** Hide the name from the public wall of favourites (organiser still sees it) */
+  /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */

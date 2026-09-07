@@ -29,7 +29,7 @@ import { t } from "@/lib/i18n"
 //
 // Copy lives in messages/en-GB.json, per the landing-page convention.
 
-// SIX, not eight (founder, 2026-08-08). Pledge goal and Wall of favourites left for
+// SIX, not eight (founder, 2026-08-08). Pledge goal and Guest book left for
 // /features: this section is the TRAILER, and a target and a donor feed are
 // what any giving platform has — standard features dilute a trailer. They
 // stay on the reference page for the opposite reason, since an evaluator

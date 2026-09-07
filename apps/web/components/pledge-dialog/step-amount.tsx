@@ -254,17 +254,6 @@ export function StepAmount({
           )}
         </div>
 
-        {/* One note carries the fund's meaning AND the fee line — moved
-            out of the header's block-end so the slider sits close to the
-            figures (founder, 2026-09-06). */}
-        {!useSharedFund && (
-          <p className="text-[11px] text-muted-foreground">
-            {showSplit &&
-              "The shared pot backs guests without a favourite — add to it, or slide to rebalance. "}
-            Processed securely by Stripe — favpoll takes no platform fee.
-          </p>
-        )}
-
         {hasFund && (
           <Tabs
             value={useSharedFund ? "fund" : "card"}

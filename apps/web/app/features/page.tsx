@@ -236,7 +236,7 @@ export default function FeaturesPage() {
                 "Tribute mode to centre the person being honoured",
                 "Fundraiser mode for a telethon-style centrepiece",
                 "A pledge goal, if one is set, fills as pledges land and turns green the moment it is met",
-                "The wall of favourites updates in sync with the rankings as pledges arrive",
+                "The guest book updates in sync with the rankings as pledges arrive",
               ]}
               artefact={<LiveVignette still room />}
             />

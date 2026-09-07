@@ -85,8 +85,8 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
     q: "Can guests see who pledged?",
     a: (
       <>
-        Names and favourites, never amounts. The wall of favourites shows who
-        backed what — on the favpoll itself and on the{" "}
+        Names and favourites, never amounts. The guest book shows who backed
+        what — on the favpoll itself and on the{" "}
         <Link
           href="/features#display"
           className="text-primary underline-offset-4 hover:underline"
@@ -113,7 +113,7 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
     q: "Does anyone see how much I gave?",
     a: (
       <>
-        No. favpoll shows presence, not size — the wall of favourites, the{" "}
+        No. favpoll shows presence, not size — the guest book, the{" "}
         <Link
           href="/features#keepsake"
           className="text-primary underline-offset-4 hover:underline"
