@@ -28,6 +28,9 @@ export type Charity = {
   verification_status: VerificationStatus | null;
   verified_name: string | null;
   verified_at: string | null;
+  consent_status: "pending" | "approved" | "declined" | null;
+  consent_contacted_at: string | null;
+  consent_decided_at: string | null;
   is_active: boolean;
   market: string;
   created_at: string;
@@ -65,7 +68,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, is_active, market, created_at",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_contacted_at, consent_decided_at, is_active, market, created_at",
     )
     .order("name", { ascending: true });
 
@@ -262,6 +265,32 @@ export async function setCharityTopics(
 
     if (insError) return { error: insError.message };
   }
+
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+/** CONSENT — approve or decline a charity for receiving pledges (the
+ * PF/CP posture machinery; see apps/web/lib/charity-consent.ts). Approval
+ * also lists the charity — register-added ones arrive is_active=false —
+ * and declining delists it. Under the consent-first posture these
+ * statuses are what gates money on the web app. */
+export async function setCharityConsent(
+  id: string,
+  status: "approved" | "declined",
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("charities")
+    .update({
+      consent_status: status,
+      consent_decided_at: new Date().toISOString(),
+      is_active: status === "approved",
+    })
+    .eq("id", id);
+
+  if (error) return { error: error.message };
 
   revalidatePath("/charities");
   return { error: null };

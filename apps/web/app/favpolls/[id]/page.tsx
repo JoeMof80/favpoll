@@ -7,6 +7,7 @@ import { getFavpollOgSource } from "@/lib/og/favpoll-og-data"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { unconsentedNamesByFavpoll } from "@/lib/charity-consent"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
 import {
@@ -67,6 +68,11 @@ export default async function FavpollPage({ params }: Props) {
   const isOrganiser = userId === favpoll.created_by
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
+
+  // CONSENT GATE — under the consent-first posture (CHARITY_CONSENT_POSTURE),
+  // pledging is withheld while any of this favpoll's charities hasn't yet
+  // agreed to receive money. Empty under the open posture (no query runs).
+  const gatedCharityNames = await unconsentedNamesByFavpoll(supabase, id)
 
   // Round trip 2 — both keyed on the favpoll id alone
   const [{ data: rawPoll }, { data: pot }] = await Promise.all([
@@ -372,6 +378,7 @@ export default async function FavpollPage({ params }: Props) {
           hasReveal={hasReveal}
           revealIsQuote={revealIsQuote}
           revealIsMessage={revealIsMessage}
+          gatedCharityNames={gatedCharityNames}
         />
       </>
     </RegisterScope>

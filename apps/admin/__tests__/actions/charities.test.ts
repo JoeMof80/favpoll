@@ -21,6 +21,7 @@ import {
   deactivateCharity,
   getCharityTopics,
   setCharityTopics,
+  setCharityConsent,
 } from "@/lib/actions/charities";
 
 beforeEach(() => {
@@ -436,5 +437,46 @@ describe("setCharityTopics", () => {
     const { error } = await setCharityTopics("charity-1", ["t-1"]);
 
     expect(error).toBe("insert failed");
+  });
+});
+
+describe("setCharityConsent", () => {
+  it("approve stamps the decision and lists the charity", async () => {
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      consent_status: "approved",
+      is_active: true,
+    });
+    expect(update.args[0].consent_decided_at).toEqual(expect.any(String));
+  });
+
+  it("decline delists the charity", async () => {
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "declined");
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      consent_status: "declined",
+      is_active: false,
+    });
+  });
+
+  it("returns error on DB failure", async () => {
+    mock.queue(null, { message: "update failed" });
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toBe("update failed");
   });
 });

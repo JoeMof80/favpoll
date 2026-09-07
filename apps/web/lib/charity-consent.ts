@@ -31,12 +31,15 @@ export function unconsentedCharityNames(charities: ConsentCharity[]): string[] {
     .map((c) => c.name)
 }
 
-function throwIfUnconsented(charities: ConsentCharity[]): void {
-  const names = unconsentedCharityNames(charities)
+function throwIfUnconsentedNames(names: string[]): void {
   if (names.length === 0) return
   throw new Error(
     `Pledges open once ${names.join(" & ")} confirms — the charity hasn't yet agreed to receive them.`
   )
+}
+
+function throwIfUnconsented(charities: ConsentCharity[]): void {
+  throwIfUnconsentedNames(unconsentedCharityNames(charities))
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- nested join shapes */
@@ -58,12 +61,14 @@ export async function assertPledgeableCharitiesByPoll(
   throwIfUnconsented(charities)
 }
 
-/** Gate by favpoll id (fund top-ups carry favpollId, not a poll id). */
-export async function assertPledgeableCharitiesByFavpoll(
+/** Names blocking a favpoll, for the UI — empty under the open posture
+ * (no query runs). The public favpoll page uses this to withhold the
+ * pledge CTA and show the quiet "opens once X confirms" notice instead. */
+export async function unconsentedNamesByFavpoll(
   supabase: AdminClient,
   favpollId: string
-): Promise<void> {
-  if (consentPosture() === "open") return
+): Promise<string[]> {
+  if (consentPosture() === "open") return []
   const { data } = await supabase
     .from("favpolls")
     .select("favpoll_charities(charities(name, consent_status))")
@@ -72,5 +77,13 @@ export async function assertPledgeableCharitiesByFavpoll(
   const charities: ConsentCharity[] = (
     ((data as any)?.favpoll_charities ?? []) as any[]
   ).map((fc: any) => fc.charities)
-  throwIfUnconsented(charities)
+  return unconsentedCharityNames(charities)
+}
+
+/** Gate by favpoll id (fund top-ups carry favpollId, not a poll id). */
+export async function assertPledgeableCharitiesByFavpoll(
+  supabase: AdminClient,
+  favpollId: string
+): Promise<void> {
+  throwIfUnconsentedNames(await unconsentedNamesByFavpoll(supabase, favpollId))
 }

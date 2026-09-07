@@ -30,6 +30,9 @@ export type OrganizerFavpoll = {
       registered_number: string | null
       description: string | null
       created_at: string
+      /** Consent columns ride only the manage hub's wider select. */
+      consent_status?: "pending" | "approved" | "declined"
+      consent_contacted_at?: string | null
     }
   }[]
   poll: { id: string; topic: { title: string } | null } | null
