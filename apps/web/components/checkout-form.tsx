@@ -216,6 +216,23 @@ export function CheckoutForm({
         onConfirm={handleExpressConfirm}
         onReady={handleExpressReady}
       />
+      {/* The veto/error message and its hand-off sit NEXT TO the wallet
+          buttons (founder, 2026-09-07) — that is where a dismissed sheet
+          leaves the guest looking. Card errors surface here too. */}
+      {error && <p className="text-sm text-destructive">{error}</p>}
+      {authHandOff && (
+        <Button asChild variant="outline" className="w-full">
+          <a
+            href={`/${authHandOff.mode}?email_address=${encodeURIComponent(authHandOff.email)}&redirect_url=${encodeURIComponent(
+              typeof window !== "undefined" ? window.location.pathname : "/"
+            )}`}
+          >
+            {authHandOff.mode === "sign-in"
+              ? "Sign in with this email →"
+              : "Create an account with this email →"}
+          </a>
+        </Button>
+      )}
       {expressAvailable && (
         <div className="flex items-center gap-4" aria-hidden="true">
           <div className="h-px flex-1 bg-border" />
@@ -235,20 +252,6 @@ export function CheckoutForm({
           wallets: { applePay: "never", googlePay: "never", link: "never" },
         }}
       />
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {authHandOff && (
-        <Button asChild variant="outline" className="w-full">
-          <a
-            href={`/${authHandOff.mode}?email_address=${encodeURIComponent(authHandOff.email)}&redirect_url=${encodeURIComponent(
-              typeof window !== "undefined" ? window.location.pathname : "/"
-            )}`}
-          >
-            {authHandOff.mode === "sign-in"
-              ? "Sign in with this email →"
-              : "Create an account with this email →"}
-          </a>
-        </Button>
-      )}
       {showButtons && (
         <div className="flex gap-3 pt-2">
           <Button
