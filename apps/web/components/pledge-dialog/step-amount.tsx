@@ -254,6 +254,17 @@ export function StepAmount({
           )}
         </div>
 
+        {/* One note carries the pot's meaning AND the fee line (founder,
+            2026-09-06). The 2026-09-07 helper-text cull was the Review &
+            pay page only — this caption stays. */}
+        {!useSharedFund && (
+          <p className="text-[11px] text-muted-foreground">
+            {showSplit &&
+              "The shared pot backs guests without a favourite — add to it, or slide to rebalance. "}
+            Processed securely by Stripe — favpoll takes no platform fee.
+          </p>
+        )}
+
         {hasFund && (
           <Tabs
             value={useSharedFund ? "fund" : "card"}
