@@ -8,6 +8,10 @@ import {
   RATE_LIMIT_MESSAGE,
 } from "@/lib/rate-limit"
 import { createAdminClient } from "@/lib/supabase/admin"
+import {
+  assertPledgeableCharitiesByPoll,
+  assertPledgeableCharitiesByFavpoll,
+} from "@/lib/charity-consent"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
 
@@ -59,6 +63,7 @@ export async function createPledge(input: CreatePledgeInput) {
   })
 
   const supabase = createAdminClient()
+  await assertPledgeableCharitiesByPoll(supabase, input.favpollPollId)
   await assertUnusedPaymentIntent(supabase, input.paymentIntentId)
 
   const { data: pledge, error: pledgeErr } = await supabase
@@ -181,6 +186,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
   })
 
   const supabase = createAdminClient()
+  await assertPledgeableCharitiesByPoll(supabase, input.favpollPollId)
   await assertUnusedPaymentIntent(supabase, input.paymentIntentId)
 
   // Check for existing active pledge from same email on same poll
@@ -507,6 +513,7 @@ export async function pledgeFromFund(input: {
   if (!userId) throw new Error("Not authenticated")
 
   const supabase = createAdminClient()
+  await assertPledgeableCharitiesByPoll(supabase, input.favpollPollId)
 
   // Atomic guarded reservation (pot_allocate refuses to allocate more than
   // the fund holds) — the server no longer trusts a client-supplied

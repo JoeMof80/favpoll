@@ -6,6 +6,12 @@ import {
   ipFromHeaders,
   RATE_LIMIT_MESSAGE,
 } from "@/lib/rate-limit"
+import { createAdminClient } from "@/lib/supabase/admin"
+import {
+  assertPledgeableCharitiesByPoll,
+  assertPledgeableCharitiesByFavpoll,
+  consentPosture,
+} from "@/lib/charity-consent"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -78,6 +84,25 @@ export async function POST(req: Request) {
   // ever record a pledge there. Fund-only top-ups carry a favpoll instead.
   if (pledgeAmount > 0 && !favpollPollId) {
     return NextResponse.json({ error: "Missing poll" }, { status: 400 })
+  }
+
+  // CONSENT GATE (posture-flagged; 'open' short-circuits with no query).
+  // This route is the choke point for all card money — pledges and fund
+  // top-ups both charge through here.
+  if (consentPosture() === "consent-first") {
+    try {
+      const supabase = createAdminClient()
+      if (favpollPollId) {
+        await assertPledgeableCharitiesByPoll(supabase, favpollPollId)
+      } else if (favpollId) {
+        await assertPledgeableCharitiesByFavpoll(supabase, favpollId)
+      }
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Pledges not open" },
+        { status: 403 }
+      )
+    }
   }
 
   const paymentIntent = await stripe.paymentIntents.create({
