@@ -138,51 +138,7 @@ export function StepPay({
           noisy and superfluous). Guests: two bare inputs + the guest-book
           switch; signed-in: the switch alone. The receipt/withdrawal-link
           and organiser-visibility explanations retired with the chrome. */}
-      {isGuest ? (
-        /* No hide-switch for guests (founder, 2026-09-07): the name field
-           IS the choice — typed appears in the guest book, blank appears
-           as "Someone". Two levers for one outcome read as one approving
-           the other. The switch remains signed-in-only, where the name
-           arrives from the account with no field to blank. */
-        /* Styled to the Stripe fields directly below (founder, 2026-09-07:
-           one grammar on the page) — label above, 44px field, the 10px
-           radius our Stripe appearance config sets. aria-labels keep the
-           fuller accessible names (and the E2E selector). */
-        <div className="mb-4 space-y-3">
-          <div>
-            <label
-              htmlFor="pledge-guest-email"
-              className="mb-1 block text-[15px] text-foreground"
-            >
-              Email
-            </label>
-            <Input
-              id="pledge-guest-email"
-              type="email"
-              value={guestEmail}
-              onChange={(e) => onGuestEmailChange(e.target.value)}
-              placeholder="you@example.com"
-              aria-label="Email address for receipt and withdrawal link"
-              className="h-11 rounded-[10px] md:text-base"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="pledge-guest-name"
-              className="mb-1 block text-[15px] text-foreground"
-            >
-              Your name (optional)
-            </label>
-            <Input
-              id="pledge-guest-name"
-              value={displayName}
-              onChange={(e) => onDisplayNameChange(e.target.value)}
-              aria-label="Name shown in the guest book — leave blank to appear as Someone"
-              className="h-11 rounded-[10px] md:text-base"
-            />
-          </div>
-        </div>
-      ) : (
+      {isGuest ? null : (
         <div className="mb-4">
           <label className="flex items-center gap-2 text-sm text-foreground">
             <Switch
@@ -196,8 +152,49 @@ export function StepPay({
       )}
       {/* Keyed on the secret: a tip change re-prices the intent, and the
           Elements provider must remount onto the new one. */}
+      {/* Guest fields ride INSIDE the payment block (founder, 2026-09-07):
+          below the wallet buttons, just before the card inputs — wallet
+          payers get their email from the sheet and never need them. */}
       <StripeCheckout
         key={clientSecret}
+        fieldsSlot={
+          isGuest ? (
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="pledge-guest-email"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  Email
+                </label>
+                <Input
+                  id="pledge-guest-email"
+                  type="email"
+                  value={guestEmail}
+                  onChange={(e) => onGuestEmailChange(e.target.value)}
+                  placeholder="you@example.com"
+                  aria-label="Email address for receipt and withdrawal link"
+                  className="h-11 rounded-[10px] md:text-base"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="pledge-guest-name"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  Your name (optional)
+                </label>
+                <Input
+                  id="pledge-guest-name"
+                  value={displayName}
+                  onChange={(e) => onDisplayNameChange(e.target.value)}
+                  aria-label="Name shown in the guest book — leave blank to appear as Someone"
+                  className="h-11 rounded-[10px] md:text-base"
+                />
+              </div>
+            </div>
+          ) : undefined
+        }
         inline
         formId="pledge-checkout-form"
         clientSecret={clientSecret}

@@ -66,6 +66,8 @@ type Props = {
   showEmailCapture?: boolean
   /** Guest email captured outside the form (see CheckoutForm.externalEmail) */
   externalEmail?: string
+  /** Rendered between the wallet row and the card element (CheckoutForm.fieldsSlot) */
+  fieldsSlot?: React.ReactNode
 }
 
 export function StripeCheckout({
@@ -81,6 +83,7 @@ export function StripeCheckout({
   onStripeReadyChange,
   showEmailCapture,
   externalEmail,
+  fieldsSlot,
 }: Props) {
   const [submitting, setSubmittingRaw] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -159,6 +162,7 @@ export function StripeCheckout({
           onStripeReadyChange={onStripeReadyChange}
           showEmailCapture={showEmailCapture}
           externalEmail={externalEmail}
+          fieldsSlot={fieldsSlot}
         />
       </Elements>
     </>
