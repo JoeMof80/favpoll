@@ -144,20 +144,43 @@ export function StepPay({
            as "Someone". Two levers for one outcome read as one approving
            the other. The switch remains signed-in-only, where the name
            arrives from the account with no field to blank. */
-        <div className="mb-4 space-y-2.5">
-          <Input
-            type="email"
-            value={guestEmail}
-            onChange={(e) => onGuestEmailChange(e.target.value)}
-            placeholder="you@example.com"
-            aria-label="Email address for receipt and withdrawal link"
-          />
-          <Input
-            value={displayName}
-            onChange={(e) => onDisplayNameChange(e.target.value)}
-            placeholder="Your name (optional)"
-            aria-label="Name shown in the guest book — leave blank to appear as Someone"
-          />
+        /* Styled to the Stripe fields directly below (founder, 2026-09-07:
+           one grammar on the page) — label above, 44px field, the 10px
+           radius our Stripe appearance config sets. aria-labels keep the
+           fuller accessible names (and the E2E selector). */
+        <div className="mb-4 space-y-3">
+          <div>
+            <label
+              htmlFor="pledge-guest-email"
+              className="mb-1 block text-[15px] text-foreground"
+            >
+              Email
+            </label>
+            <Input
+              id="pledge-guest-email"
+              type="email"
+              value={guestEmail}
+              onChange={(e) => onGuestEmailChange(e.target.value)}
+              placeholder="you@example.com"
+              aria-label="Email address for receipt and withdrawal link"
+              className="h-11 rounded-[10px] md:text-base"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="pledge-guest-name"
+              className="mb-1 block text-[15px] text-foreground"
+            >
+              Your name (optional)
+            </label>
+            <Input
+              id="pledge-guest-name"
+              value={displayName}
+              onChange={(e) => onDisplayNameChange(e.target.value)}
+              aria-label="Name shown in the guest book — leave blank to appear as Someone"
+              className="h-11 rounded-[10px] md:text-base"
+            />
+          </div>
         </div>
       ) : (
         <div className="mb-4">
