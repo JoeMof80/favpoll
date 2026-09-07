@@ -60,10 +60,20 @@ with `vercel env pull`.
   (celebrants/planners running many favpolls) or the charity portal
   arrives; design per-favpoll/per-appeal with the privacy line first.
 
+- **PayPal — parked for after launch (2026-09-07).** Not a toggle: PayPal
+  via Stripe is a REDIRECT method, and pledge recording happens
+  client-side after confirmPayment resolves in the open dialog — a
+  redirect return would charge the guest and record nothing (the same
+  reason payment-intent pins `card`). Building it means a persisted
+  pledge draft surviving the redirect + return-param completion on
+  load. With Apple Pay/Google Pay/Link/card live (#763/#764), the
+  marginal audience is desktop PayPal-balance users. Revisit on guest
+  demand; design the redirect-safe recording first.
+
 | Task                                       | Notes                                                                                                                                                                            | My steer                                                                                                                   |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **Mobile-form pass**                       | Goal + closing-date editing are desktop-only (`hidden md:block`).                                                                                                                | **Best next build** — real usability gap, self-contained, no dependency/decision needed.                                   |
-| **Wallet payments (Apple/Google Pay)** | Scoped 2026-07-21 (`references/wallet-payments-scope-2026-07.md`): PaymentElement is already wallet-ready; work = Apple Pay domain file + registration, device QA. ~½ day. | High-leverage, small: wallets fit the phone-in-hand guest moment. Borrowed from the pledge.to evaluation. |
+| ~~Wallet payments (Apple/Google Pay)~~ | DONE 2026-09-07 (#763/#764): Express Checkout row leads the payment block; card form suppresses its in-form wallets; Apple Pay verified live on the registered domain. | Shipped. |
 | **Featured tiles on /favpolls**            | Wider first-row cards for closing-soon / highest-raised (the Polymarket move).                                                                                                   | Judge against real photo'd data first — the value row + photos may be enough.                                              |
 | ~~/record links vs "Coming soon"~~         | DONE 2026-07-21 (#310): header/footer/about links hidden with restore-at-launch comments; topics breadcrumb kept.                                                                | Resolved as "hide until the record launches".                                                              |
 | **Card money-figure dedupe**               | Single-charity cards show the same figure twice (value row total = footer share).                                                                                                | Watch it in real use; dropping the footer amount on cards is a one-liner.                                                  |
