@@ -31,9 +31,17 @@ export function CharityStep({
 }: CharityStepProps) {
   const atMax = value.length >= MAX_CHARITIES
   const trimmed = (search ?? "").trim()
-  const visible = charities.filter(
-    (c) => !trimmed || c.name.toLowerCase().includes(trimmed.toLowerCase())
-  )
+  const isApproved = (c: Charity) => c.consent_status === "approved"
+  const visible = trimmed
+    ? charities.filter((c) =>
+        c.name.toLowerCase().includes(trimmed.toLowerCase())
+      )
+    : // THE EARNED SHELF (founder, 2026-09-08): the default cloud shows
+      // only charities that have AGREED to receive pledges — privilege is
+      // earned by consent, never by dev-era seeding. Everything else is
+      // reachable by search (catalogue and the whole register). Selected
+      // charities always stay visible so a pick can be reviewed or undone.
+      charities.filter((c) => isApproved(c) || value.includes(c.id))
 
   // ── Charity Commission register search (debounced) ──
   const [registerResults, setRegisterResults] = useState<RegisterPick[]>([])
@@ -115,7 +123,9 @@ export function CharityStep({
         <p className="py-3 text-center text-sm text-muted-foreground">
           {registerActive
             ? `No registered charity matches “${trimmed}”.`
-            : "No results."}
+            : trimmed || !onRegisterAdd
+              ? "No results."
+              : "Search any UK charity — the whole Charity Commission register."}
         </p>
       ) : (
         /* ONE ranked list (founder, 2026-09-07): catalogue matches lead
@@ -130,11 +140,13 @@ export function CharityStep({
               selected={value.includes(c.id)}
               disabled={!value.includes(c.id) && atMax}
               title={
-                registerActive ? "Ready — in the favpoll catalogue" : undefined
+                isApproved(c)
+                  ? "Has agreed to receive pledges through favpoll"
+                  : undefined
               }
               onClick={() => toggle(c.id)}
             >
-              {registerActive ? `✓ ${c.name}` : c.name}
+              {registerActive && isApproved(c) ? `✓ ${c.name}` : c.name}
             </Chip>
           ))}
           {registerActive &&
