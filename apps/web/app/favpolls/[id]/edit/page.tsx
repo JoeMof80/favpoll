@@ -65,6 +65,26 @@ export default async function EditFavpollPage({ params }: Props) {
   }
   const locked = pledgeCount > 0 || (pot?.total_deposited ?? 0) > 0
 
+  // Register-added charities sit is_active=false until approved (the
+  // consent gate's catalogue lever) and getWizardData filters those out —
+  // so the wizard list may not carry this favpoll's OWN charities, leaving
+  // the Charity step and rail blank (founder bug report, 2026-09-08).
+  // Same pattern as the homemade-topic fold-in below: fetch directly and
+  // fold in; an unchanged selection no-ops on save.
+  const ownCharityIds = (favpoll.favpoll_charities ?? []).map(
+    (ec: { charity_id: string }) => ec.charity_id
+  )
+  const missingCharityIds = ownCharityIds.filter(
+    (cid: string) => !data.charities.some((c) => c.id === cid)
+  )
+  if (missingCharityIds.length > 0) {
+    const { data: missing } = await supabase
+      .from("charities")
+      .select("*")
+      .in("id", missingCharityIds)
+    data.charities.push(...((missing ?? []) as typeof data.charities))
+  }
+
   let preselectedTopics: FavpollFormValues["topics"] = []
   if (rawPoll?.topic_id) {
     let topic = data.topics.find((t) => t.id === rawPoll.topic_id)

@@ -2,7 +2,7 @@
 
 import { Info } from "lucide-react"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { InputGroupButton } from "@/components/ui/input-group"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -52,8 +52,26 @@ export function NewFavpollWizard({
   appeal,
   initialCharityId,
 }: Props) {
+  // Register-added charities (consent-gate) — appended to the catalogue
+  // for this wizard session, and folded into the data handed to the hook
+  // so selectedCharities/primaryCharity, the rail and the review card all
+  // resolve them (founder bug report, 2026-09-08: picked from the
+  // register, the field stayed “Pick a charity”).
+  const [extraCharities, setExtraCharities] = useState<Charity[]>([])
+  const wizardData = useMemo(
+    () => ({
+      ...data,
+      charities: [
+        ...data.charities,
+        ...extraCharities.filter(
+          (x) => !data.charities.some((c) => c.id === x.id)
+        ),
+      ],
+    }),
+    [data, extraCharities]
+  )
   const w = useWizardState(
-    data,
+    wizardData,
     edit,
     initialCategory,
     appeal,
@@ -61,9 +79,6 @@ export function NewFavpollWizard({
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
-  // Charities added live from the Charity Commission register (PR C) —
-  // appended to the catalogue list for this wizard session.
-  const [extraCharities, setExtraCharities] = useState<Charity[]>([])
   async function handleRegisterAdd(pick: {
     registeredNumber: string
     displayName: string
@@ -445,7 +460,7 @@ export function NewFavpollWizard({
           }
         >
           <CharityStep
-            charities={[...data.charities, ...extraCharities]}
+            charities={wizardData.charities}
             value={w.charityIds}
             onChange={w.setCharityIds}
             search={charitySearch}
