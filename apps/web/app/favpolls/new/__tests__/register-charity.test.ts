@@ -16,8 +16,16 @@ vi.mock("@clerk/nextjs/server", () => ({
   auth: mockAuth,
   currentUser: mockCurrentUser,
 }))
+const mockContact = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    email: "enquiries@dogstrust.org.uk",
+    website: "www.dogstrust.org.uk",
+  })
+)
+
 vi.mock("@/lib/charity-commission", () => ({
   verifyCharityNumber: mockVerify,
+  fetchRegisterContact: mockContact,
 }))
 
 let mock = makeSupabaseMock()
@@ -80,6 +88,8 @@ describe("findOrCreateRegisterCharity", () => {
       consent_status: "pending",
       verification_status: "verified",
       verified_name: "DOGS TRUST",
+      registered_email: "enquiries@dogstrust.org.uk",
+      registered_website: "www.dogstrust.org.uk",
     })
   })
 

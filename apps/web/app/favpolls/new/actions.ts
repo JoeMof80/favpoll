@@ -2,7 +2,10 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { verifyCharityNumber } from "@/lib/charity-commission"
+import {
+  verifyCharityNumber,
+  fetchRegisterContact,
+} from "@/lib/charity-commission"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -392,6 +395,8 @@ export async function findOrCreateRegisterCharity(input: {
     throw new Error("That charity isn't currently on the register")
   }
 
+  const contact = await fetchRegisterContact(number)
+
   const { data: created, error } = await supabase
     .from("charities")
     .insert({
@@ -403,6 +408,8 @@ export async function findOrCreateRegisterCharity(input: {
       verification_status: check.status,
       verified_name: check.registeredName,
       verified_at: new Date().toISOString(),
+      registered_email: contact.email,
+      registered_website: contact.website,
     })
     .select("*")
     .single()

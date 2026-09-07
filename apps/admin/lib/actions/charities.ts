@@ -7,6 +7,7 @@ import {
   verifyCharityNumber,
   type RegisterSearchResult,
   type VerificationStatus,
+  fetchRegisterContact,
 } from "@/lib/charity-commission";
 
 /** Live search of the Register of Charities for the admin typeahead. */
@@ -102,11 +103,17 @@ export async function createCharity(input: {
   const name = input.name.trim();
   const registeredNumber = input.registered_number?.trim() || null;
 
+  const contact = registeredNumber
+    ? await fetchRegisterContact(registeredNumber)
+    : { email: null, website: null };
+
   const { error } = await supabase.from("charities").insert({
     name,
     description: input.description?.trim() || null,
     impact_statement: input.impact_statement?.trim() || null,
     registered_number: registeredNumber,
+    registered_email: contact.email,
+    registered_website: contact.website,
     logo_url: input.logo_url?.trim() || null,
     market: input.market,
     is_active: true,

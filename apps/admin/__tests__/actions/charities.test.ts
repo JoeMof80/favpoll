@@ -5,8 +5,12 @@ import { makeSupabaseMock } from "@/tests/mocks/supabase-admin";
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const mockVerify = vi.hoisted(() => vi.fn());
+const mockContact = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ email: null, website: null }),
+);
 vi.mock("@/lib/charity-commission", () => ({
   verifyCharityNumber: mockVerify,
+  fetchRegisterContact: mockContact,
 }));
 
 let mock = makeSupabaseMock();
