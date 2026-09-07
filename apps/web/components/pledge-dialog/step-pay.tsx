@@ -139,6 +139,11 @@ export function StepPay({
           switch; signed-in: the switch alone. The receipt/withdrawal-link
           and organiser-visibility explanations retired with the chrome. */}
       {isGuest ? (
+        /* No hide-switch for guests (founder, 2026-09-07): the name field
+           IS the choice — typed appears in the guest book, blank appears
+           as "Someone". Two levers for one outcome read as one approving
+           the other. The switch remains signed-in-only, where the name
+           arrives from the account with no field to blank. */
         <div className="mb-4 space-y-2.5">
           <Input
             type="email"
@@ -151,16 +156,8 @@ export function StepPay({
             value={displayName}
             onChange={(e) => onDisplayNameChange(e.target.value)}
             placeholder="Your name (optional)"
-            aria-label="Name shown in the guest book"
+            aria-label="Name shown in the guest book — leave blank to appear as Someone"
           />
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Switch
-              checked={isAnonymous}
-              onCheckedChange={onIsAnonymousChange}
-              aria-label="Hide my name from the guest book"
-            />
-            Hide my name from the guest book
-          </label>
         </div>
       ) : (
         <div className="mb-4">
