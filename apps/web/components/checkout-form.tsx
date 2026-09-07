@@ -40,6 +40,10 @@ export type CheckoutFormProps = {
    * When set, it is validated and used for preflight/receipt/onSuccess
    * exactly as the built-in field would be. */
   externalEmail?: string
+  /** Rendered between the wallet row and the card element (founder,
+   * 2026-09-07): wallet payers get their email from the sheet, so the
+   * typed fields belong to the card path, just before its inputs. */
+  fieldsSlot?: React.ReactNode
 }
 
 export function CheckoutForm({
@@ -55,6 +59,7 @@ export function CheckoutForm({
   onStripeReadyChange,
   showEmailCapture,
   externalEmail,
+  fieldsSlot,
 }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
@@ -216,6 +221,7 @@ export function CheckoutForm({
           2026-09-07): the card form suppresses its own Link banner/email
           and its Apple/Google buttons, which duplicated the express
           buttons the moment they were available. */}
+      {fieldsSlot}
       <PaymentElement
         options={{
           wallets: { applePay: "never", googlePay: "never", link: "never" },
