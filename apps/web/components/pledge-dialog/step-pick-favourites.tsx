@@ -97,8 +97,8 @@ export function PickerHeader({
           placeholder={hasSelections ? "" : placeholder}
           className={
             hasSelections
-              ? "w-0 overflow-hidden bg-transparent text-base outline-none"
-              : "min-w-30 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
+              ? "w-0 overflow-hidden bg-transparent text-lg outline-none"
+              : "min-w-30 flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
           }
         />
         {showCreate && (

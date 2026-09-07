@@ -212,7 +212,7 @@ export function TopicStep({
               }}
               placeholder="Search topics…"
               autoFocus
-              className="h-auto px-3 py-2 md:text-base"
+              className="h-auto px-3 py-2 text-lg md:text-lg"
             />
             {showCreate && (
               <InputGroupAddon align="inline-end">
