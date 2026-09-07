@@ -212,7 +212,15 @@ export function CheckoutForm({
           <div className="h-px flex-1 bg-border" />
         </div>
       )}
-      <PaymentElement />
+      {/* The Express row above is the ONE wallet home (founder,
+          2026-09-07): the card form suppresses its own Link banner/email
+          and its Apple/Google buttons, which duplicated the express
+          buttons the moment they were available. */}
+      <PaymentElement
+        options={{
+          wallets: { applePay: "never", googlePay: "never", link: "never" },
+        }}
+      />
       {error && <p className="text-sm text-destructive">{error}</p>}
       {authHandOff && (
         <Button asChild variant="outline" className="w-full">
