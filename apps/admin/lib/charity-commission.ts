@@ -177,44 +177,124 @@ export function titleCaseCharityName(name: string): string {
   });
 }
 
-/**
- * Search the Register of Charities by name. Never throws — returns []
- * on upstream failure; the caller falls back to manual entry. Only
- * currently-registered main charities (suffix 0) are returned.
- */
-export async function searchRegister(
-  query: string,
-): Promise<RegisterSearchResult[]> {
-  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
+/** Query variants covering the register's literal substring match: the
+ * Commission API treats "st lukes" and "st luke's" as different strings,
+ * so we search both spellings and merge (found the hard way — the founder
+ * couldn't find St Luke's Cheshire Hospice, 2026-09-07). */
+export function registerQueryVariants(query: string): string[] {
   const trimmed = query.trim();
-  if (!apiKey || trimmed.length < 3) return [];
+  const stripped = trimmed.replace(/['\u2019]/g, "");
+  const possessive = stripped.replace(/([a-z])s(\s|$)/gi, "$1's$2");
+  return [...new Set([trimmed, stripped, possessive])].filter(
+    (v) => v.length >= 3,
+  );
+}
+
+function normForMatch(s: string): string {
+  return s.toLowerCase().replace(/['\u2019]/g, "");
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Relevance over the register's alphabetical order: names starting with
+ * the query beat word-boundary matches beat mere substrings; shorter
+ * names beat longer within a band (the hospice above the scout groups). */
+function rankRows(
+  rows: RegisterSearchRow[],
+  variants: string[],
+): RegisterSearchRow[] {
+  const norms = variants.map(normForMatch).filter(Boolean);
+  const score = (name: string): number => {
+    const n = normForMatch(name);
+    let best = 3;
+    for (const v of norms) {
+      if (n.startsWith(v)) return 0;
+      if (best > 1 && new RegExp(`\\b${escapeRegex(v)}`).test(n)) best = 1;
+      else if (best > 2 && n.includes(v)) best = 2;
+    }
+    return best;
+  }
+  return rows
+    .map((r) => ({ r, s: score(r.charity_name) }))
+    .sort(
+      (a, b) =>
+        a.s - b.s ||
+        a.r.charity_name.length - b.r.charity_name.length ||
+        a.r.charity_name.localeCompare(b.r.charity_name),
+    )
+    .map((x) => x.r);
+}
+
+export type RegisterSearch = {
+  results: RegisterSearchResult[];
+  /** Registered main-charity matches before the cap — drives the
+   * "N matches — keep typing" hint. */
+  total: number;
+}
+
+async function fetchRegisterRows(
+  apiKey: string,
+  variant: string,
+): Promise<RegisterSearchRow[]> {
+  const res = await fetch(
+    `${API_BASE}/searchCharityName/${encodeURIComponent(variant)}`,
+    {
+      headers: { "Ocp-Apim-Subscription-Key": apiKey },
+      cache: "no-store",
+    },
+  );
+
+  if (res.status === 404) return [] // the API 404s on "no matches"
+  if (!res.ok) {
+    console.error(`[charity-commission] search failed: HTTP ${res.status}`);
+    return [];
+  }
+  return (await res.json()) as RegisterSearchRow[];
+}
+
+/**
+ * Search the Register of Charities by name, apostrophe-normalised and
+ * relevance-ranked. Never throws — returns empty on upstream failure;
+ * the caller falls back to manual entry. Only currently-registered main
+ * charities (suffix 0) are returned.
+ */
+export async function searchRegisterRanked(
+  query: string,
+): Promise<RegisterSearch> {
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
+  const variants = registerQueryVariants(query);
+  if (!apiKey || variants.length === 0) return { results: [], total: 0 };
 
   try {
-    const res = await fetch(
-      `${API_BASE}/searchCharityName/${encodeURIComponent(trimmed)}`,
-      {
-        headers: { "Ocp-Apim-Subscription-Key": apiKey },
-        cache: "no-store",
-      },
+    const lists = await Promise.all(
+      variants.map((v) => fetchRegisterRows(apiKey, v)),
     );
-
-    if (res.status === 404) return []; // the API 404s on "no matches"
-    if (!res.ok) {
-      console.error(`[charity-commission] search failed: HTTP ${res.status}`);
-      return [];
+    const byNumber = new Map<number, RegisterSearchRow>();
+    for (const row of lists.flat()) {
+      if (row.reg_status === "R" && row.group_subsid_suffix === 0) {
+        byNumber.set(row.reg_charity_number, row);
+      }
     }
-
-    const rows = (await res.json()) as RegisterSearchRow[];
-    return rows
-      .filter((r) => r.reg_status === "R" && r.group_subsid_suffix === 0)
-      .slice(0, 8)
-      .map((r) => ({
+    const ranked = rankRows([...byNumber.values()], variants);
+    return {
+      total: ranked.length,
+      results: ranked.slice(0, 8).map((r) => ({
         registeredNumber: String(r.reg_charity_number),
         registeredName: r.charity_name,
         displayName: titleCaseCharityName(r.charity_name),
-      }));
+      })),
+    };
   } catch (err) {
     console.error("[charity-commission] search error:", err);
-    return [];
+    return { results: [], total: 0 };
   }
+}
+
+/** Results-only view of searchRegisterRanked (admin typeahead shape). */
+export async function searchRegister(
+  query: string,
+): Promise<RegisterSearchResult[]> {
+  return (await searchRegisterRanked(query)).results;
 }

@@ -18,7 +18,7 @@ type CharityStepProps = {
   search?: string
   /** Any-charity picker (consent-gate PR C): called when the organiser
    *  picks a charity from the Charity Commission register results.
-   *  Omit to hide the register section entirely. */
+   *  Omit to hide the register results entirely. */
   onRegisterAdd?: (pick: RegisterPick) => Promise<void>
 }
 
@@ -37,6 +37,7 @@ export function CharityStep({
 
   // ── Charity Commission register search (debounced) ──
   const [registerResults, setRegisterResults] = useState<RegisterPick[]>([])
+  const [registerTotal, setRegisterTotal] = useState(0)
   const [registerLoading, setRegisterLoading] = useState(false)
   const [busyNumber, setBusyNumber] = useState<string | null>(null)
   const registerActive = !!onRegisterAdd && trimmed.length >= 3
@@ -44,6 +45,7 @@ export function CharityStep({
   useEffect(() => {
     if (!registerActive) {
       setRegisterResults([])
+      setRegisterTotal(0)
       return
     }
     let cancelled = false
@@ -53,10 +55,16 @@ export function CharityStep({
         const res = await fetch(
           `/api/charities/register-search?q=${encodeURIComponent(trimmed)}`
         )
-        const data = res.ok ? await res.json() : { results: [] }
-        if (!cancelled) setRegisterResults(data.results ?? [])
+        const data = res.ok ? await res.json() : { results: [], total: 0 }
+        if (!cancelled) {
+          setRegisterResults(data.results ?? [])
+          setRegisterTotal(data.total ?? 0)
+        }
       } catch {
-        if (!cancelled) setRegisterResults([])
+        if (!cancelled) {
+          setRegisterResults([])
+          setRegisterTotal(0)
+        }
       } finally {
         if (!cancelled) setRegisterLoading(false)
       }
@@ -97,13 +105,23 @@ export function CharityStep({
     }
   }
 
+  const noMatches =
+    visible.length === 0 &&
+    (!registerActive || (freshResults.length === 0 && !registerLoading))
+
   return (
     <div>
-      {visible.length === 0 && !registerActive ? (
+      {noMatches ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
-          No results.
+          {registerActive
+            ? `No registered charity matches “${trimmed}”.`
+            : "No results."}
         </p>
       ) : (
+        /* ONE ranked list (founder, 2026-09-07): catalogue matches lead
+           wearing a small ready-mark, register results follow seamlessly.
+           A register pick creates the charity consent-pending and off the
+           public catalogue — the consent posture decides what that means. */
         <div className="flex flex-wrap gap-1.5 px-5 py-4">
           {visible.map((c) => (
             <Chip
@@ -111,48 +129,39 @@ export function CharityStep({
               size="lg"
               selected={value.includes(c.id)}
               disabled={!value.includes(c.id) && atMax}
+              title={
+                registerActive ? "Ready — in the favpoll catalogue" : undefined
+              }
               onClick={() => toggle(c.id)}
             >
-              {c.name}
+              {registerActive ? `✓ ${c.name}` : c.name}
             </Chip>
           ))}
+          {registerActive &&
+            freshResults.map((r) => (
+              <Chip
+                key={r.registeredNumber}
+                size="lg"
+                disabled={atMax || busyNumber !== null}
+                title={`Charity no. ${r.registeredNumber}`}
+                onClick={() => pickFromRegister(r)}
+              >
+                {busyNumber === r.registeredNumber ? "Adding…" : r.displayName}
+              </Chip>
+            ))}
         </div>
       )}
 
-      {/* Any UK charity, straight from the register (consent-gate PR C).
-          The created charity starts consent-pending and off the public
-          catalogue — the consent posture decides what pending means. */}
-      {registerActive && (
-        <div className="border-t border-border px-5 py-4">
-          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            From the Charity Commission register
-          </p>
-          {registerLoading ? (
-            <p className="text-sm text-muted-foreground">
-              Searching the register…
-            </p>
-          ) : freshResults.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No further registered charity matches “{trimmed}”.
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {freshResults.map((r) => (
-                <Chip
-                  key={r.registeredNumber}
-                  size="lg"
-                  disabled={atMax || busyNumber !== null}
-                  title={`Charity no. ${r.registeredNumber}`}
-                  onClick={() => pickFromRegister(r)}
-                >
-                  {busyNumber === r.registeredNumber
-                    ? "Adding…"
-                    : r.displayName}
-                </Chip>
-              ))}
-            </div>
-          )}
-        </div>
+      {registerActive && !noMatches && (
+        <p className="px-5 pb-3 text-xs text-muted-foreground">
+          {registerLoading
+            ? "Searching the Charity Commission register…"
+            : registerTotal > freshResults.length
+              ? `Results from the Charity Commission register · ${registerTotal} matches — keep typing to narrow`
+              : freshResults.length > 0
+                ? "Results from the Charity Commission register"
+                : null}
+        </p>
       )}
     </div>
   )

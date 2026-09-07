@@ -35,3 +35,9 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 afterEach(() => {
   vi.restoreAllMocks()
 })
+
+// The developer's .env.local may flip CHARITY_CONSENT_POSTURE (e.g. to
+// test the consent gate in the browser) — tests must always start from
+// the shipped default ('open'). Tests that want consent-first stub it
+// explicitly with vi.stubEnv.
+delete process.env.CHARITY_CONSENT_POSTURE
