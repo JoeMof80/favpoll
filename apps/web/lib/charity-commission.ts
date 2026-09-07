@@ -299,3 +299,40 @@ export async function searchRegister(
 ): Promise<RegisterSearchResult[]> {
   return (await searchRegisterRanked(query)).results
 }
+
+// ─── Register contact details (consent-outreach email prefill) ───────────────
+
+export type RegisterContact = {
+  email: string | null
+  website: string | null
+}
+
+/** The register's contact details for a charity number — prefills the
+ * consent-invite mailto (and keeps the website for a possible future
+ * logo-suggestion flow). Never throws any failure returns nulls so
+ * contact stays strictly optional. */
+export async function fetchRegisterContact(
+  registeredNumber: string
+): Promise<RegisterContact> {
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
+  const digits = registeredNumber.replace(/\D/g, "")
+  if (!apiKey || !digits) return { email: null, website: null }
+
+  try {
+    const res = await fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
+      headers: { "Ocp-Apim-Subscription-Key": apiKey },
+      cache: "no-store",
+    })
+    if (!res.ok) return { email: null, website: null }
+    const details = (await res.json()) as {
+      email?: string | null
+      web?: string | null
+    }
+    return {
+      email: details.email?.trim() || null,
+      website: details.web?.trim() || null,
+    }
+  } catch {
+    return { email: null, website: null }
+  }
+}

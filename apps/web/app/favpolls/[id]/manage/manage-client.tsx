@@ -581,7 +581,10 @@ export function ManageClient({
                               Awaiting the charity&apos;s agreement to receive
                               pledges.{" "}
                               <a
-                                href={charityInviteMailto(charity.name)}
+                                href={charityInviteMailto(
+                                  charity.name,
+                                  charity.registered_email ?? null
+                                )}
                                 className="font-medium text-foreground underline underline-offset-2"
                                 onClick={() =>
                                   void inviteCharityConsent(
@@ -669,10 +672,13 @@ export function ManageClient({
 }
 
 // CONSENT OUTREACH — the organiser's invite email, drafted for them. We
-// don't hold charity contact addresses, so the recipient is left blank for
-// the organiser to fill in; hello@favpoll.com rides along in cc so the
-// team can follow up with the paperwork.
-function charityInviteMailto(charityName: string): string {
+// prefill the recipient from the register's public enquiries email when
+// we hold it (fetchRegisterContact), else leave it for the organiser;
+// hello@favpoll.com rides along in cc so the team can follow up.
+function charityInviteMailto(
+  charityName: string,
+  email: string | null
+): string {
   const subject = `Receiving pledges through favpoll — ${charityName}`
   const body = [
     "Hello,",
@@ -683,7 +689,7 @@ function charityInviteMailto(charityName: string): string {
     "",
     "Thank you!",
   ].join("\n")
-  return `mailto:?cc=hello@favpoll.com&subject=${encodeURIComponent(
+  return `mailto:${encodeURIComponent(email ?? "")}?cc=hello@favpoll.com&subject=${encodeURIComponent(
     subject
   )}&body=${encodeURIComponent(body)}`
 }
