@@ -9,7 +9,13 @@ Stone King variant keeps the orientation question (unknown there;
 redundant for Carew-Jones, who advertises commercial-participator work).
 
 Routes: Bates Wells — Molly Carew-Jones (020 7551 7677 /
-bateswells.co.uk/contact). Stone King — quick enquiry form at
+bateswells.co.uk/contact). UPDATE 2026-09-07: Carew-Jones on
+maternity leave; her OOO redirected to Shannon Hood
+(S.Hood@bateswells.co.uk) + Julia Robbins (J.Robbins@bateswells.co.uk)
+— the same text re-sent to both with a one-line bridge ("I wrote to
+Molly Carew-Jones, whose out-of-office kindly pointed me to you
+both."). Stone King enquiry submitted via their form the same day.
+Both firms now pending. Stone King — quick enquiry form at
 stoneking.co.uk/charity-social-enterprise / 0800 111 4336.
 
 ---
