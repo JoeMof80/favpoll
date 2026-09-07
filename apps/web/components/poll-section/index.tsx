@@ -150,12 +150,13 @@ export function PollSection({
 
           {hasItems && (
             <>
-              {/* mt-8: the seal band below reaches 48px up (-top-12); the
-                  section's space-y-4 leaves only 16px, so a TWO-LINE
-                  reveal lost its second line under the band (founder's
-                  Elizabeth memorial, 2026-09-07 — read as an iOS bug,
-                  actually any narrow viewport). 16 + 32 = the band. */}
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-10 mt-8 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              {/* mt-12: the seal band below reaches 48px up (-top-12) and
+                  overpainted the reveal's second line (founder's Elizabeth
+                  memorial, 2026-09-07). NOT additive with the section's
+                  space-y-4 — adjacent block margins COLLAPSE to the larger
+                  (the first mt-8 attempt yielded 32px and a half-eaten
+                  line), so the margin itself must equal the band. */}
+              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+3rem)] z-10 mt-12 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
                 {/* Opaque shelf (founder, 2026-09-06: standings should
                     disappear behind the Amount/Pledges controls, not
                     thread past them to the ribbon). Same panel trick as
