@@ -260,9 +260,8 @@ export function StepAmount({
         {!useSharedFund && (
           <p className="text-[11px] text-muted-foreground">
             {showSplit &&
-              "The shared pot backs guests without a favourite, and reaches the charity too. Add to it, or slide to rebalance — your pledge is the two together. "}
-            Give what feels right. Processed securely by Stripe — favpoll takes
-            no platform fee.
+              "The shared pot backs guests without a favourite — add to it, or slide to rebalance. "}
+            Processed securely by Stripe — favpoll takes no platform fee.
           </p>
         )}
 
