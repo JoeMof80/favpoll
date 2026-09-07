@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Show, SignInButton, SignUpButton, useClerk } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
-import { UserButtonClient } from "@/components/user-button-client"
+import { AccountMenu } from "@/components/account-menu"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -248,7 +248,7 @@ export function Header() {
               and the account actions live in the menu. */}
       <Show when="signed-in">
         <div className="hidden md:block">
-          <UserButtonClient />
+          <AccountMenu />
         </div>
       </Show>
 
