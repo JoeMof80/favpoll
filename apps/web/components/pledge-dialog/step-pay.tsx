@@ -105,41 +105,42 @@ export function StepPay({
           <PledgeBreakdown
             {...ownBreakdown}
             extraRow={
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-muted-foreground">Tip for favpoll</span>
-                <div
-                  className="flex gap-1"
-                  role="radiogroup"
-                  aria-label="Optional contribution to favpoll"
-                >
-                  {tipOptions.map((value) => (
-                    <Button
-                      key={value}
-                      type="button"
-                      size="xs"
-                      role="radio"
-                      aria-checked={tipAmount === value}
-                      variant={tipAmount === value ? "secondary" : "ghost"}
-                      className="px-2 font-normal aria-checked:font-medium"
-                      disabled={refreshingIntent}
-                      onClick={() => onTipChange(value)}
-                    >
-                      {formatTipLabel(value)}
-                    </Button>
-                  ))}
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground">Tip for favpoll</span>
+                  <div
+                    className="flex gap-1"
+                    role="radiogroup"
+                    aria-label="Optional contribution to favpoll"
+                  >
+                    {tipOptions.map((value) => (
+                      <Button
+                        key={value}
+                        type="button"
+                        size="xs"
+                        role="radio"
+                        aria-checked={tipAmount === value}
+                        variant={tipAmount === value ? "secondary" : "ghost"}
+                        className="px-2 font-normal aria-checked:font-medium"
+                        disabled={refreshingIntent}
+                        onClick={() => onTipChange(value)}
+                      >
+                        {formatTipLabel(value)}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+                <p className="text-[11px] font-normal text-muted-foreground">
+                  The tip is optional — never taken from your pledge.
+                </p>
+              </>
             }
           />
-          <p className="mt-1.5 text-[11px] text-muted-foreground">
-            The tip is optional — never taken from your pledge.
-          </p>
           {/* The privacy reassurance, quiet under the bill (unboxed
               2026-09-07 — the muted panel read as a third card) */}
           {isListed && (
             <p className="mt-1 text-[11px] text-muted-foreground">
-              This is a public favpoll. Your pledge amount and identity are
-              always private.
+              Your pledge amount and identity are always private.
             </p>
           )}
         </div>
