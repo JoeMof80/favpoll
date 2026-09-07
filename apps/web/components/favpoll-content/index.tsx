@@ -49,6 +49,9 @@ type Props = {
   revealIsMessage?: boolean
   wallEntries: WallEntry[]
   rankHistory: RankHistory | null
+  /** Charities that haven't yet consented to receive pledges (consent-first
+   * posture only) — non-empty withholds every pledge entry point. */
+  gatedCharityNames?: string[]
 }
 
 export function FavpollContent({
@@ -67,6 +70,7 @@ export function FavpollContent({
   revealIsMessage = false,
   wallEntries,
   rankHistory,
+  gatedCharityNames = [],
 }: Props) {
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
@@ -90,6 +94,17 @@ export function FavpollContent({
 
   const isCause = favpoll.subject === "cause"
   const isListed = favpoll.is_listed ?? true
+
+  // CONSENT GATE — pledging is withheld while a charity hasn't agreed to
+  // receive money. Same posture the server actions enforce; hiding the
+  // controls is courtesy, the actions are the permission check.
+  const pledgesGated = gatedCharityNames.length > 0
+  const pledgesGatedNotice =
+    !isClosed && pledgesGated
+      ? `Pledges open once ${gatedCharityNames.join(" & ")} ${
+          gatedCharityNames.length > 1 ? "confirm" : "confirms"
+        }.`
+      : undefined
   const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
   const closedAt = favpoll.closed_at
@@ -113,7 +128,7 @@ export function FavpollContent({
     // No suggestTip override: memorials once defaulted the tip to None
     // (quietest ask) — dropped 2026-07-31 on celebrant feedback: a None
     // default simply stays None; nobody read the ask as insensitive.
-    !isClosed && pollWithItems ? (
+    !isClosed && !pledgesGated && pollWithItems ? (
       <PledgeDialog
         favpollId={favpoll.id}
         clerkUserId={clerkUserId}
@@ -170,8 +185,11 @@ export function FavpollContent({
             charityLine={charityLine || null}
             initialItems={effectiveItems}
             onOpenPledgeDialog={
-              !isClosed ? () => setPledgeDialogOpen(true) : undefined
+              !isClosed && !pledgesGated
+                ? () => setPledgeDialogOpen(true)
+                : undefined
             }
+            pledgesGatedNotice={pledgesGatedNotice}
           />
           {pledgeDialog}
         </>
@@ -250,7 +268,7 @@ export function FavpollContent({
       {/* Guest shared pot contribution card — always shown on open favpolls.
           Carries both jobs explicitly: how to USE the fund (pledge step) and
           how to GIVE to it (the button). */}
-      {!isClosed && pot && (
+      {!isClosed && !pledgesGated && pot && (
         <div className="rounded-lg border border-border bg-background px-5 py-4">
           <p className="mt-1 text-sm text-muted-foreground">
             <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any

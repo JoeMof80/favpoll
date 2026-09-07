@@ -45,6 +45,7 @@ import {
   deleteFavpoll,
   setFavpollVisibility,
   setFavpollGuestItems,
+  inviteCharityConsent,
 } from "@/app/favpolls/[id]/actions"
 import {
   type OrganizerFavpoll,
@@ -559,15 +560,43 @@ export function ManageClient({
             <Card title="Charities">
               <div className="flex flex-col gap-3">
                 {favpoll.charities.map(({ charity }) => (
-                  <CharityRow
-                    key={charity.id}
-                    charity={{
-                      ...charity,
-                      created_at: charity.created_at ?? "",
-                    }}
-                    amountRaised={perCharity}
-                    size="sm"
-                  />
+                  <div key={charity.id} className="flex flex-col gap-1">
+                    <CharityRow
+                      charity={{
+                        ...charity,
+                        created_at: charity.created_at ?? "",
+                      }}
+                      amountRaised={perCharity}
+                      size="sm"
+                    />
+                    {charity.consent_status &&
+                      charity.consent_status !== "approved" && (
+                        <p className="text-xs text-muted-foreground">
+                          {charity.consent_status === "declined" ? (
+                            "The charity has declined — pledges here are paused."
+                          ) : charity.consent_contacted_at ? (
+                            "Invited — awaiting the charity's confirmation."
+                          ) : (
+                            <>
+                              Awaiting the charity's agreement to receive
+                              pledges.{" "}
+                              <a
+                                href={charityInviteMailto(charity.name)}
+                                className="font-medium text-foreground underline underline-offset-2"
+                                onClick={() =>
+                                  void inviteCharityConsent(
+                                    favpoll.id,
+                                    charity.id
+                                  )
+                                }
+                              >
+                                Invite {charity.name}
+                              </a>
+                            </>
+                          )}
+                        </p>
+                      )}
+                  </div>
                 ))}
               </div>
             </Card>
@@ -637,4 +666,24 @@ export function ManageClient({
       </div>
     </>
   )
+}
+
+// CONSENT OUTREACH — the organiser's invite email, drafted for them. We
+// don't hold charity contact addresses, so the recipient is left blank for
+// the organiser to fill in; hello@favpoll.com rides along in cc so the
+// team can follow up with the paperwork.
+function charityInviteMailto(charityName: string): string {
+  const subject = `Receiving pledges through favpoll — ${charityName}`
+  const body = [
+    "Hello,",
+    "",
+    `I'm organising a favpoll — a pledge poll where guests pick a favourite and pledge money to charity — and I've picked ${charityName} to receive what it raises.`,
+    "",
+    "Before collecting any money, favpoll (https://favpoll.com) asks each charity to confirm it's happy to receive donations this way. Could you confirm by reply, keeping hello@favpoll.com in copy? The favpoll team will follow up with the details.",
+    "",
+    "Thank you!",
+  ].join("\n")
+  return `mailto:?cc=hello@favpoll.com&subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`
 }

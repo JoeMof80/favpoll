@@ -47,6 +47,10 @@ type Props = {
   revealIsMessage?: boolean
   /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
   charityLine?: string | null
+  /** Consent gate — set when pledging is withheld awaiting the charity's
+   * agreement; renders as a quiet notice in the lock slot in place of the
+   * pledge CTA (which arrives via onOpenPledgeDialog being undefined). */
+  pledgesGatedNotice?: string
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -72,6 +76,7 @@ export function PollSection({
   charityLine = null,
   initialItems,
   onOpenPledgeDialog,
+  pledgesGatedNotice,
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -295,6 +300,22 @@ export function PollSection({
                     topicTitle={poll.topics.title}
                   />
                 </Button>
+              </span>
+            </div>
+          )}
+
+          {!onOpenPledgeDialog && pledgesGatedNotice && (
+            /* CONSENT GATE — the CTA's slot carries a quiet notice while
+               the charity hasn't yet agreed to receive pledges. Same
+               sticky geometry as the lock card so it sits where guests
+               expect the way in to be. */
+            <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+                <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
+                  <p className="text-sm text-muted-foreground">
+                    {pledgesGatedNotice}
+                  </p>
+                </div>
               </span>
             </div>
           )}

@@ -5,6 +5,7 @@ import {
   consentPosture,
   unconsentedCharityNames,
   assertPledgeableCharitiesByPoll,
+  unconsentedNamesByFavpoll,
   assertPledgeableCharitiesByFavpoll,
 } from "@/lib/charity-consent"
 
@@ -92,5 +93,29 @@ describe("assertPledgeableCharitiesByFavpoll", () => {
     await expect(
       assertPledgeableCharitiesByFavpoll(mock.supabase as never, "fav-1")
     ).rejects.toThrow(/RNLI/)
+  })
+})
+
+describe("unconsentedNamesByFavpoll", () => {
+  it("returns [] with NO query when the posture is open", async () => {
+    const mock = makeSupabaseMock()
+    await expect(
+      unconsentedNamesByFavpoll(mock.supabase as never, "fav-1")
+    ).resolves.toEqual([])
+    expect(mock.calls.length).toBe(0)
+  })
+
+  it("names the blocking charities under consent-first", async () => {
+    vi.stubEnv("CHARITY_CONSENT_POSTURE", "consent-first")
+    const mock = makeSupabaseMock()
+    mock.queue({
+      favpoll_charities: [
+        { charities: { name: "RNLI", consent_status: "pending" } },
+        { charities: { name: "Shelter", consent_status: "approved" } },
+      ],
+    })
+    await expect(
+      unconsentedNamesByFavpoll(mock.supabase as never, "fav-1")
+    ).resolves.toEqual(["RNLI"])
   })
 })

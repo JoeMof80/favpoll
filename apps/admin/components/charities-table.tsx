@@ -11,6 +11,7 @@ import {
   getCharityTopics,
   setCharityTopics,
   searchCharityRegister,
+  setCharityConsent,
 } from "@/lib/actions/charities";
 import type { RegisterSearchResult } from "@/lib/charity-commission";
 import type { AdminTopic } from "@/lib/actions/topics";
@@ -56,6 +57,36 @@ function VerificationBadge({
       title={
         status === "name_mismatch" && verifiedName
           ? `Register name: ${verifiedName}`
+          : undefined
+      }
+    >
+      {badge.label}
+    </StatusBadge>
+  );
+}
+
+const CONSENT_BADGES: Record<string, { label: string; tone: StatusTone }> = {
+  pending: { label: "Pending", tone: "warning" },
+  approved: { label: "Approved", tone: "success" },
+  declined: { label: "Declined", tone: "destructive" },
+};
+
+function ConsentBadge({
+  status,
+  contactedAt,
+}: {
+  status: string | null;
+  contactedAt: string | null;
+}) {
+  if (!status) return <span className="text-muted-foreground">—</span>;
+  const badge = CONSENT_BADGES[status];
+  if (!badge) return <span className="text-muted-foreground">—</span>;
+  return (
+    <StatusBadge
+      tone={badge.tone}
+      title={
+        status === "pending" && contactedAt
+          ? `Invited ${new Date(contactedAt).toLocaleDateString("en-GB")}`
           : undefined
       }
     >
@@ -530,6 +561,15 @@ function CharityRow({
     });
   }
 
+  function handleConsent(status: "approved" | "declined") {
+    setError(null);
+    setWarning(null);
+    startTransition(async () => {
+      const result = await setCharityConsent(charity.id, status);
+      if (result.error) setError(result.error);
+    });
+  }
+
   const Chevron = open ? ChevronDown : ChevronRight;
 
   return (
@@ -555,6 +595,12 @@ function CharityRow({
           />
         </TableCell>
         <TableCell>
+          <ConsentBadge
+            status={charity.consent_status}
+            contactedAt={charity.consent_contacted_at}
+          />
+        </TableCell>
+        <TableCell>
           <StatusBadge tone="info">{charity.market}</StatusBadge>
         </TableCell>
         <TableCell className="text-right">
@@ -568,7 +614,7 @@ function CharityRow({
 
       {open && (
         <TableRow className="hover:bg-transparent">
-          <TableCell colSpan={6} className="bg-muted/30 py-4">
+          <TableCell colSpan={7} className="bg-muted/30 py-4">
             <div
               className="max-w-2xl space-y-4"
               onClick={(e) => e.stopPropagation()}
@@ -676,6 +722,37 @@ function CharityRow({
                       </Button>
                     )}
                   </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Consent:
+                    </span>
+                    <ConsentBadge
+                      status={charity.consent_status}
+                      contactedAt={charity.consent_contacted_at}
+                    />
+                    {charity.consent_status !== "approved" && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={isPending}
+                        onClick={() => handleConsent("approved")}
+                      >
+                        {isPending ? "…" : "Approve"}
+                      </Button>
+                    )}
+                    {charity.consent_status !== "declined" && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        disabled={isPending}
+                        onClick={() => handleConsent("declined")}
+                      >
+                        Decline
+                      </Button>
+                    )}
+                  </div>
                 </>
               )}
             </div>
@@ -708,6 +785,7 @@ export function CharitiesTable({
             <TableHead>Name</TableHead>
             <TableHead>Number</TableHead>
             <TableHead>Verification</TableHead>
+            <TableHead>Consent</TableHead>
             <TableHead>Market</TableHead>
             <TableHead className="text-right">Status</TableHead>
           </TableRow>

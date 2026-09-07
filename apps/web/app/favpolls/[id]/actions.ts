@@ -734,3 +734,42 @@ export async function setFavpollVisibility(
 
   if (error) throw new Error(error.message)
 }
+
+/** CONSENT OUTREACH — the organiser has opened the invite email for a
+ * charity. Stamps consent_contacted_at (first invite only) so the manage
+ * page and the admin console can see outreach happened. The mailto itself
+ * opens client-side; this is just the record. */
+export async function inviteCharityConsent(
+  favpollId: string,
+  charityId: string
+) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: favpoll } = await supabase
+    .from("favpolls")
+    .select("created_by")
+    .eq("id", favpollId)
+    .single()
+
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  const { data: link } = await supabase
+    .from("favpoll_charities")
+    .select("charity_id")
+    .eq("favpoll_id", favpollId)
+    .eq("charity_id", charityId)
+    .maybeSingle()
+
+  if (!link) throw new Error("Charity is not on this favpoll")
+
+  const { error } = await supabase
+    .from("charities")
+    .update({ consent_contacted_at: new Date().toISOString() })
+    .eq("id", charityId)
+    .is("consent_contacted_at", null)
+
+  if (error) throw new Error(error.message)
+}
