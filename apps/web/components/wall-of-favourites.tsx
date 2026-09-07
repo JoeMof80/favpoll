@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Maximize2 } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 
-// The wall of favourites: presence, not size. Names (or "Someone") and what they
+// The guest book: presence, not size. Names (or "Someone") and what they
 // backed — never amounts (anonymity model, decided 2026-07-05). Anonymous
 // pledges appear as "Someone" but count fully everywhere.
 export type WallEntry = {
@@ -132,7 +132,7 @@ export function WallOfFavourites({
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <div className="flex items-start justify-between gap-2">
         <SectionEyebrow variant="muted" className="font-semibold">
-          Wall of favourites
+          Guest book
         </SectionEyebrow>
         {/* Expand to a dialog (founder, 2026-08-02) — the card itself
             scrolls within a max height below */}
@@ -141,7 +141,7 @@ export function WallOfFavourites({
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label="Expand wall of favourites"
+            aria-label="Expand guest book"
             onClick={() => setAllOpen(true)}
           >
             <Maximize2 aria-hidden="true" />
@@ -189,7 +189,7 @@ export function WallOfFavourites({
         <ResponsiveOverlay
           open={allOpen}
           onOpenChange={setAllOpen}
-          title="Wall of favourites"
+          title="Guest book"
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
           <ul className="space-y-2" aria-label="All pledges">

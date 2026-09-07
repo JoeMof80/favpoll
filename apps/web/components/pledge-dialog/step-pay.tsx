@@ -38,7 +38,6 @@ type Props = {
   onTipChange: (v: number) => void
   /** True while a tip change is re-pricing the PaymentIntent. */
   refreshingIntent?: boolean
-  isListed?: boolean
   /** Wall identity (anonymity model, 2026-07-05) */
   isGuest: boolean
   guestEmail: string
@@ -66,7 +65,6 @@ export function StepPay({
   tipOptions,
   onTipChange,
   refreshingIntent = false,
-  isListed,
   isGuest,
   guestEmail,
   onGuestEmailChange,
@@ -130,60 +128,39 @@ export function StepPay({
                     ))}
                   </div>
                 </div>
-                <p className="text-[11px] font-normal text-muted-foreground">
-                  The tip is optional — never taken from your pledge.
-                </p>
               </>
             }
           />
-          {/* The privacy reassurance, quiet under the bill (unboxed
-              2026-09-07 — the muted panel read as a third card) */}
-          {isListed && (
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              Your pledge amount and identity are always private.
-            </p>
-          )}
         </div>
       )}
 
-      {/* One identity unit — email (required) and wall name were two
-          cards with the charge lines between; the email read as an
-          afterthought (founder, 2026-07-26). Signed-in guests get the
-          MINIMAL form (founder, 2026-09-07): the card chrome carried one
-          switch, so the switch stands alone with a quiet line under it. */}
+      {/* Identity, MINIMAL (founder, 2026-09-07: all helper text out —
+          noisy and superfluous). Guests: two bare inputs + the guest-book
+          switch; signed-in: the switch alone. The receipt/withdrawal-link
+          and organiser-visibility explanations retired with the chrome. */}
       {isGuest ? (
-        <div className="mb-4 rounded-lg border border-border bg-card">
-          <p className="px-4 pt-3 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            Your details
-          </p>
-          <div className="space-y-2.5 px-4 py-2.5">
-            <Input
-              type="email"
-              value={guestEmail}
-              onChange={(e) => onGuestEmailChange(e.target.value)}
-              placeholder="you@example.com"
-              aria-label="Email address for receipt and withdrawal link"
+        <div className="mb-4 space-y-2.5">
+          <Input
+            type="email"
+            value={guestEmail}
+            onChange={(e) => onGuestEmailChange(e.target.value)}
+            placeholder="you@example.com"
+            aria-label="Email address for receipt and withdrawal link"
+          />
+          <Input
+            value={displayName}
+            onChange={(e) => onDisplayNameChange(e.target.value)}
+            placeholder="Your name (optional)"
+            aria-label="Name shown in the guest book"
+          />
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Switch
+              checked={isAnonymous}
+              onCheckedChange={onIsAnonymousChange}
+              aria-label="Hide my name from the guest book"
             />
-            <Input
-              value={displayName}
-              onChange={(e) => onDisplayNameChange(e.target.value)}
-              placeholder="Your name (optional)"
-              aria-label="Name shown on the wall of favourites"
-            />
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Switch
-                checked={isAnonymous}
-                onCheckedChange={onIsAnonymousChange}
-                aria-label="Hide my name from the wall of favourites"
-              />
-              Hide my name from the wall of favourites
-            </label>
-          </div>
-          <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
-            Your receipt and withdrawal link go to this email — no account
-            needed. The organiser can always see your name; leave it blank to
-            appear as “Someone”.
-          </p>
+            Hide my name from the guest book
+          </label>
         </div>
       ) : (
         <div className="mb-4">
@@ -191,14 +168,10 @@ export function StepPay({
             <Switch
               checked={isAnonymous}
               onCheckedChange={onIsAnonymousChange}
-              aria-label="Hide my name from the wall of favourites"
+              aria-label="Hide my name from the guest book"
             />
-            Hide my name from the wall of favourites
+            Hide my name from the guest book
           </label>
-          <p className="mt-1.5 text-[11px] text-muted-foreground">
-            Otherwise you appear as your account name. The organiser can always
-            see it for thank-yous.
-          </p>
         </div>
       )}
       {/* Keyed on the secret: a tip change re-prices the intent, and the

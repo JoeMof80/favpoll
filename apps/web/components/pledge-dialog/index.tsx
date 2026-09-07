@@ -45,7 +45,6 @@ export function PledgeDialog({
   onPledgeSuccess,
   onAddItem,
   suggestTip,
-  isListed,
   dataRegister,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
@@ -330,7 +329,6 @@ export function PledgeDialog({
             tipOptions={dialog.tipOptions}
             onTipChange={dialog.updateTip}
             refreshingIntent={dialog.refreshingIntent}
-            isListed={isListed}
             guestEmail={dialog.guestEmail}
             onGuestEmailChange={dialog.setGuestEmail}
             onSuccess={dialog.handlePledgePaymentSuccess}

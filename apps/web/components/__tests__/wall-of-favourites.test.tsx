@@ -65,7 +65,7 @@ describe("WallOfFavourites — expandable collapse", () => {
       "overflow-y-auto"
     )
     expect(
-      screen.getByRole("button", { name: "Expand wall of favourites" })
+      screen.getByRole("button", { name: "Expand guest book" })
     ).toBeInTheDocument()
   })
 
@@ -75,7 +75,7 @@ describe("WallOfFavourites — expandable collapse", () => {
       screen.getByRole("list", { name: "Recent pledges" })
     ).not.toHaveClass("max-h-72")
     expect(
-      screen.queryByRole("button", { name: "Expand wall of favourites" })
+      screen.queryByRole("button", { name: "Expand guest book" })
     ).toBeNull()
   })
 })

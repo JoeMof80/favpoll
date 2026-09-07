@@ -18,7 +18,7 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 //
 // So there is now ONE definition of the display. Whatever changes there
 // changes here, including the parts a reduction would have quietly lost —
-// the goal-free "Raised so far" silhouette, the charity rows, the wall of favourites,
+// the goal-free "Raised so far" silhouette, the charity rows, the guest book,
 // the two-column banner.
 
 /**
