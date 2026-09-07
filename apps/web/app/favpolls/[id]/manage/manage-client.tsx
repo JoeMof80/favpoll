@@ -578,7 +578,7 @@ export function ManageClient({
                             "Invited — awaiting the charity's confirmation."
                           ) : (
                             <>
-                              Awaiting the charity's agreement to receive
+                              Awaiting the charity&apos;s agreement to receive
                               pledges.{" "}
                               <a
                                 href={charityInviteMailto(charity.name)}
