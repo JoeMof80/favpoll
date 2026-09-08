@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Charity } from "@favpoll/types"
 
@@ -153,30 +152,40 @@ export function CharityStep({
     visible.length === 0 &&
     (!registerActive || (freshResults.length === 0 && !registerLoading))
 
-  // ONE row grammar everywhere (founder, 2026-09-08): the pill cloud is
-  // gone — the default list is the onboarded charities in the SAME row
-  // form as search results (avatar, identity line, website link), so
-  // typing filters the list rather than switching layouts. The website
-  // link lives INSIDE the card (a sibling of the pick button, never
-  // nested), so websiteless rows leave no ragged edge.
-  const rowCard = (selected: boolean) =>
-    `flex items-center rounded-lg border ${
-      selected ? "border-primary bg-primary/5" : "border-border bg-card"
-    }`
+  // FULL-BLEED ROWS (founder, 2026-09-08): rows hug the dialog's edges —
+  // hairline dividers, pale tint on hover, the register-ink idiom
+  // (#587/#588) rather than cards-inside-a-card. The whole row is the
+  // hit area (an overlay button); the website link floats above it so
+  // identity stays one click away. Avatar sits at the right.
+  const rowClass = (selected: boolean, dimmed: boolean) =>
+    `relative flex items-center gap-3 px-5 py-3 transition-colors ${
+      selected ? "bg-primary/10" : "hover:bg-secondary/40"
+    } ${dimmed ? "opacity-50" : ""}`
+
+  const overlayButton = (
+    label: string,
+    disabled: boolean,
+    onClick: () => void
+  ) => (
+    <Button
+      type="button"
+      variant="ghost"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="absolute inset-0 h-auto rounded-none p-0 hover:bg-transparent"
+    />
+  )
 
   const siteLink = (website: string) => (
     <a
       href={websiteHref(website)}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex shrink-0 items-center gap-1 self-stretch px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      className="relative z-10 hover:text-foreground hover:underline"
       title={`Visit ${websiteLabel(website)}`}
     >
-      <span className="hidden max-w-40 truncate sm:block">
-        {websiteLabel(website)}
-      </span>
-      <ExternalLink className="size-3.5" aria-hidden="true" />
-      <span className="sr-only">Visit {websiteLabel(website)}</span>
+      {websiteLabel(website)}
     </a>
   )
 
@@ -191,74 +200,63 @@ export function CharityStep({
               : "Search any UK charity — the whole Charity Commission register."}
         </p>
       ) : (
-        <div className="flex flex-col gap-1.5 px-5 py-4">
+        <div className="flex flex-col divide-y divide-border">
           {visible.map((c) => {
             const selected = value.includes(c.id)
             return (
-              <div key={c.id} className={rowCard(selected)}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={!selected && atMax}
-                  aria-label={c.name}
-                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left whitespace-normal hover:bg-transparent"
-                  onClick={() => toggle(c.id)}
-                >
-                  <Avatar name={c.name} logoUrl={c.logo_url} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium text-foreground">
-                      {c.name}
-                    </span>
-                    <span className="block text-xs font-normal text-muted-foreground">
-                      {c.registered_number
-                        ? `Charity no. ${c.registered_number}`
-                        : "On favpoll"}
-                      {isApproved(c) && " · has agreed to receive pledges"}
-                    </span>
+              <div
+                key={c.id}
+                className={rowClass(selected, !selected && atMax)}
+              >
+                {overlayButton(c.name, !selected && atMax, () => toggle(c.id))}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-foreground">
+                    {c.name}
                   </span>
-                  {isApproved(c) && (
-                    <span aria-hidden="true" className="shrink-0 text-primary">
-                      ✓
-                    </span>
-                  )}
-                </Button>
-                {c.registered_website && siteLink(c.registered_website)}
+                  <span className="block text-xs text-muted-foreground">
+                    {c.registered_number
+                      ? `Charity no. ${c.registered_number}`
+                      : "On favpoll"}
+                    {c.registered_website && (
+                      <> · {siteLink(c.registered_website)}</>
+                    )}
+                  </span>
+                </span>
+                <Avatar name={c.name} logoUrl={c.logo_url} />
               </div>
             )
           })}
           {registerActive &&
             freshResults.map((r) => (
-              <div key={r.registeredNumber} className={rowCard(false)}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={atMax || busyNumber !== null}
-                  aria-label={r.displayName}
-                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left whitespace-normal hover:bg-transparent"
-                  onClick={() => void addFromRegister(r)}
-                >
-                  <Avatar name={r.displayName} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium text-foreground">
-                      {busyNumber === r.registeredNumber
-                        ? "Adding…"
-                        : r.displayName}
-                    </span>
-                    <span className="block text-xs font-normal text-muted-foreground">
-                      {[`Charity no. ${r.registeredNumber}`, r.place]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
+              <div
+                key={r.registeredNumber}
+                className={rowClass(false, atMax || busyNumber !== null)}
+              >
+                {overlayButton(
+                  r.displayName,
+                  atMax || busyNumber !== null,
+                  () => void addFromRegister(r)
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-foreground">
+                    {busyNumber === r.registeredNumber
+                      ? "Adding…"
+                      : r.displayName}
                   </span>
-                </Button>
-                {r.website && siteLink(r.website)}
+                  <span className="block text-xs text-muted-foreground">
+                    Charity no. {r.registeredNumber}
+                    {r.place && <> · {r.place}</>}
+                    {r.website && <> · {siteLink(r.website)}</>}
+                  </span>
+                </span>
+                <Avatar name={r.displayName} />
               </div>
             ))}
         </div>
       )}
 
       {registerActive && !noMatches && (
-        <p className="px-5 pb-3 text-xs text-muted-foreground">
+        <p className="px-5 py-3 text-xs text-muted-foreground">
           {registerLoading
             ? "Searching the Charity Commission register…"
             : registerTotal > freshResults.length

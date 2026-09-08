@@ -61,9 +61,6 @@ describe("CharityStep — the earned shelf", () => {
     expect(screen.getByText("Age UK")).toBeInTheDocument()
     expect(screen.queryByText("Dogs Trust")).not.toBeInTheDocument()
     // Rows everywhere: the default list carries the same identity + link
-    expect(
-      screen.getByText(/has agreed to receive pledges/)
-    ).toBeInTheDocument()
     expect(screen.getByTitle("Visit www.ageuk.org.uk")).toHaveAttribute(
       "href",
       "https://www.ageuk.org.uk"
@@ -145,12 +142,13 @@ describe("CharityStep — search rows", () => {
         onRegisterAdd={onRegisterAdd}
       />
     )
-    const row = await screen.findByText(
-      "St Luke's Cheshire Hospice",
-      undefined,
-      { timeout: 2000 }
+    await screen.findByText("St Luke's Cheshire Hospice", undefined, {
+      timeout: 2000,
+    })
+    // The whole row is an overlay button — click through the role
+    fireEvent.click(
+      screen.getByRole("button", { name: "St Luke's Cheshire Hospice" })
     )
-    fireEvent.click(row)
     await waitFor(() =>
       expect(onRegisterAdd).toHaveBeenCalledWith(
         expect.objectContaining({
