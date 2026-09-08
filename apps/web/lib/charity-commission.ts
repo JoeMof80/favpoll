@@ -300,39 +300,77 @@ export async function searchRegister(
   return (await searchRegisterRanked(query)).results
 }
 
-// ─── Register contact details (consent-outreach email prefill) ───────────────
+// ─── Register contact details (email prefill + picker confirm) ───────────────
 
 export type RegisterContact = {
   email: string | null
   website: string | null
+  /** The register's (ALL CAPS) name — identity check for the confirm step. */
+  registeredName: string | null
+  /** "Town, County" from the registered address — the human disambiguator. */
+  place: string | null
+}
+
+const EMPTY_CONTACT: RegisterContact = {
+  email: null,
+  website: null,
+  registeredName: null,
+  place: null,
+}
+
+function titleCasePlace(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(
+      /(^|[\s-])([a-z])/g,
+      (_m, a: string, b: string) => a + b.toUpperCase()
+    )
 }
 
 /** The register's contact details for a charity number — prefills the
- * consent-invite mailto (and keeps the website for a possible future
- * logo-suggestion flow). Never throws any failure returns nulls so
- * contact stays strictly optional. */
+ * consent-invite mailto and identifies the charity on the picker's
+ * confirm step. Never throws any failure returns nulls so contact
+ * stays strictly optional. */
 export async function fetchRegisterContact(
   registeredNumber: string
 ): Promise<RegisterContact> {
   const apiKey = process.env.CHARITY_COMMISSION_API_KEY
   const digits = registeredNumber.replace(/\D/g, "")
-  if (!apiKey || !digits) return { email: null, website: null }
+  if (!apiKey || !digits) return EMPTY_CONTACT
 
   try {
     const res = await fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
       headers: { "Ocp-Apim-Subscription-Key": apiKey },
       cache: "no-store",
     })
-    if (!res.ok) return { email: null, website: null }
+    if (!res.ok) return EMPTY_CONTACT
     const details = (await res.json()) as {
       email?: string | null
       web?: string | null
+      charity_name?: string | null
+      address_line_one?: string | null
+      address_line_two?: string | null
+      address_line_three?: string | null
+      address_line_four?: string | null
+      address_line_five?: string | null
     }
+    const lines = [
+      details.address_line_one,
+      details.address_line_two,
+      details.address_line_three,
+      details.address_line_four,
+      details.address_line_five,
+    ]
+      .map((l) => (l ?? "").trim())
+      .filter(Boolean)
     return {
       email: details.email?.trim() || null,
       website: details.web?.trim() || null,
+      registeredName: details.charity_name?.trim() || null,
+      // The last two address lines are typically town + county.
+      place: lines.slice(-2).map(titleCasePlace).join(", ") || null,
     }
   } catch {
-    return { email: null, website: null }
+    return EMPTY_CONTACT
   }
 }
