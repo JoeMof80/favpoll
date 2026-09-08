@@ -233,7 +233,12 @@ export function CharityStep({
                   SEED_SEARCHES[eventCategory ?? "default"] ??
                   SEED_SEARCHES.default
                 ).map((q) => (
-                  <Chip key={q} size="lg" onClick={() => onSeedSearch(q)}>
+                  <Chip
+                    key={q}
+                    size="lg"
+                    className="rounded-lg"
+                    onClick={() => onSeedSearch(q)}
+                  >
                     {q}
                   </Chip>
                 ))}
@@ -304,7 +309,7 @@ export function CharityStep({
                row-sized text with a spinner while the register responds. */
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              Searching the Charity Commission register…
+              Searching…
             </p>
           ) : registerTotal > freshResults.length ? (
             <p className="text-xs text-muted-foreground">
