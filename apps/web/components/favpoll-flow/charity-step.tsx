@@ -219,16 +219,16 @@ export function CharityStep({
       ) : noMatches ? (
         /* The empty shelf — a cold start, so the prompt comes with seed
            searches, wearing the topic dialog's suggestion grammar. */
-        <div className="px-5 py-6">
-          <p className="text-center text-sm text-muted-foreground">
+        <div className="px-5 py-4">
+          <p className="text-sm text-muted-foreground">
             Search any UK charity — the whole Charity Commission register.
           </p>
           {onSeedSearch && (
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <span className="text-[11px] font-medium tracking-widest text-primary uppercase">
+            <div className="mt-3 flex items-center gap-2">
+              <span className="shrink-0 text-[11px] font-medium tracking-widest text-primary uppercase">
                 Not sure? Try
               </span>
-              <div className="flex flex-wrap justify-center gap-1.5">
+              <div className="flex gap-1.5 overflow-x-auto">
                 {(
                   SEED_SEARCHES[eventCategory ?? "default"] ??
                   SEED_SEARCHES.default
