@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { ExternalLink } from "lucide-react"
-import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import type { Charity } from "@favpoll/types"
 
@@ -35,6 +34,27 @@ function websiteLabel(website: string): string {
   return website.replace(/^https?:\/\//, "").replace(/\/$/, "")
 }
 
+/** Logo when we hold one, initial tile otherwise — the charity-row idiom,
+ * sized for the picker. Register results never have a logo (the register
+ * holds no imagery); the tile keeps every row's geometry identical. */
+function Avatar({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
+  return logoUrl ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logoUrl}
+      alt=""
+      className="size-10 shrink-0 rounded object-contain"
+    />
+  ) : (
+    <div
+      className="flex size-10 shrink-0 items-center justify-center rounded bg-primary/10 text-sm font-medium text-primary"
+      aria-hidden="true"
+    >
+      {name.charAt(0)}
+    </div>
+  )
+}
+
 export function CharityStep({
   charities,
   value,
@@ -49,7 +69,7 @@ export function CharityStep({
     ? charities.filter((c) =>
         c.name.toLowerCase().includes(trimmed.toLowerCase())
       )
-    : // THE EARNED SHELF (founder, 2026-09-08): the default cloud shows
+    : // THE EARNED SHELF (founder, 2026-09-08): the default list shows
       // only charities that have AGREED to receive pledges — privilege is
       // earned by consent, never by dev-era seeding. Everything else is
       // reachable by search (catalogue and the whole register). Selected
@@ -133,9 +153,12 @@ export function CharityStep({
     visible.length === 0 &&
     (!registerActive || (freshResults.length === 0 && !registerLoading))
 
-  // ONE full-width card per row — the website link lives INSIDE the card
-  // (a sibling of the pick button, never nested), so rows without a
-  // website don't leave ragged edges (founder, 2026-09-08).
+  // ONE row grammar everywhere (founder, 2026-09-08): the pill cloud is
+  // gone — the default list is the onboarded charities in the SAME row
+  // form as search results (avatar, identity line, website link), so
+  // typing filters the list rather than switching layouts. The website
+  // link lives INSIDE the card (a sibling of the pick button, never
+  // nested), so websiteless rows leave no ragged edge.
   const rowCard = (selected: boolean) =>
     `flex items-center rounded-lg border ${
       selected ? "border-primary bg-primary/5" : "border-border bg-card"
@@ -167,30 +190,7 @@ export function CharityStep({
               ? "No results."
               : "Search any UK charity — the whole Charity Commission register."}
         </p>
-      ) : !trimmed ? (
-        /* The approved shelf — a small known set, where pills belong. */
-        <div className="flex flex-wrap gap-1.5 px-5 py-4">
-          {visible.map((c) => (
-            <Chip
-              key={c.id}
-              size="lg"
-              selected={value.includes(c.id)}
-              disabled={!value.includes(c.id) && atMax}
-              title={
-                isApproved(c)
-                  ? "Has agreed to receive pledges through favpoll"
-                  : undefined
-              }
-              onClick={() => toggle(c.id)}
-            >
-              {c.name}
-            </Chip>
-          ))}
-        </div>
       ) : (
-        /* SEARCH RESULTS AS ROWS (founder, 2026-09-08): names alone are
-           ambiguous, so every row carries its charity number, place and
-           website — the website link is the quickest identity check. */
         <div className="flex flex-col gap-1.5 px-5 py-4">
           {visible.map((c) => {
             const selected = value.includes(c.id)
@@ -200,9 +200,11 @@ export function CharityStep({
                   type="button"
                   variant="ghost"
                   disabled={!selected && atMax}
-                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-4 py-2.5 text-left whitespace-normal hover:bg-transparent"
+                  aria-label={c.name}
+                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left whitespace-normal hover:bg-transparent"
                   onClick={() => toggle(c.id)}
                 >
+                  <Avatar name={c.name} logoUrl={c.logo_url} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-foreground">
                       {c.name}
@@ -231,9 +233,11 @@ export function CharityStep({
                   type="button"
                   variant="ghost"
                   disabled={atMax || busyNumber !== null}
-                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-4 py-2.5 text-left whitespace-normal hover:bg-transparent"
+                  aria-label={r.displayName}
+                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left whitespace-normal hover:bg-transparent"
                   onClick={() => void addFromRegister(r)}
                 >
+                  <Avatar name={r.displayName} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-foreground">
                       {busyNumber === r.registeredNumber

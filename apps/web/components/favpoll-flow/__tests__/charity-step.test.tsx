@@ -60,6 +60,14 @@ describe("CharityStep — the earned shelf", () => {
     )
     expect(screen.getByText("Age UK")).toBeInTheDocument()
     expect(screen.queryByText("Dogs Trust")).not.toBeInTheDocument()
+    // Rows everywhere: the default list carries the same identity + link
+    expect(
+      screen.getByText(/has agreed to receive pledges/)
+    ).toBeInTheDocument()
+    expect(screen.getByTitle("Visit www.ageuk.org.uk")).toHaveAttribute(
+      "href",
+      "https://www.ageuk.org.uk"
+    )
   })
 
   it("a selected unapproved charity stays visible for review/undo", () => {
