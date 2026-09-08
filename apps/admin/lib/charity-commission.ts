@@ -198,9 +198,11 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** Relevance over the register's alphabetical order: names starting with
- * the query beat word-boundary matches beat mere substrings; shorter
- * names beat longer within a band (the hospice above the scout groups). */
+/** Relevance over the register's flat order: names starting with the
+ * query beat word-boundary matches beat mere substrings; alphabetical
+ * within a band. (Shortest-first was tried and retired 2026-09-09 — with
+ * 54 St Luke's prefix matches it buried the Cheshire hospice at #23
+ * behind every shorter St Luke's.) */
 function rankRows(
   rows: RegisterSearchRow[],
   variants: string[],
@@ -219,10 +221,7 @@ function rankRows(
   return rows
     .map((r) => ({ r, s: score(r.charity_name) }))
     .sort(
-      (a, b) =>
-        a.s - b.s ||
-        a.r.charity_name.length - b.r.charity_name.length ||
-        a.r.charity_name.localeCompare(b.r.charity_name),
+      (a, b) => a.s - b.s || a.r.charity_name.localeCompare(b.r.charity_name),
     )
     .map((x) => x.r);
 }
@@ -280,7 +279,7 @@ export async function searchRegisterRanked(
     const ranked = rankRows([...byNumber.values()], variants);
     return {
       total: ranked.length,
-      results: ranked.slice(0, 8).map((r) => ({
+      results: ranked.slice(0, 20).map((r) => ({
         registeredNumber: String(r.reg_charity_number),
         registeredName: r.charity_name,
         displayName: titleCaseCharityName(r.charity_name),

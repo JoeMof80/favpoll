@@ -219,19 +219,19 @@ describe("searchRegister", () => {
     expect(results).toHaveLength(1);
   });
 
-  it("caps results at 8", async () => {
+  it("caps results at 20", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () =>
-        Array.from({ length: 20 }, (_, i) =>
+        Array.from({ length: 30 }, (_, i) =>
           searchRow({ reg_charity_number: i + 1 }),
         ),
     });
 
     const results = await searchRegister("charity");
 
-    expect(results).toHaveLength(8);
+    expect(results).toHaveLength(20);
   });
 
   it("returns [] on 404 (the API's no-matches response)", async () => {
@@ -369,20 +369,20 @@ describe("searchRegisterRanked", () => {
     expect(results[0].registeredName).toBe("ST LUKE'S CHESHIRE HOSPICE");
   });
 
-  it("total exceeds the 8-result cap when the register has more", async () => {
+  it("total exceeds the 20-result cap when the register has more", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () =>
-        Array.from({ length: 20 }, (_, i) =>
+        Array.from({ length: 30 }, (_, i) =>
           searchRow({ reg_charity_number: i + 1 }),
         ),
     });
 
     const { results, total } = await searchRegisterRanked("charity");
 
-    expect(results).toHaveLength(8);
-    expect(total).toBe(20);
+    expect(results).toHaveLength(20);
+    expect(total).toBe(30);
   });
 });
 
