@@ -6,6 +6,7 @@ import type { Charity } from "@favpoll/types"
 import { FavpollListCardCharityCarousel } from "@/components/favpoll-list-card/favpoll-list-card-charity-carousel"
 import { GoalProgress } from "@/components/goal-progress"
 import { formatPounds } from "@/lib/i18n"
+import { useHideOnScrollDown } from "./use-hide-on-scroll"
 
 type Props = {
   charities: Charity[]
@@ -48,6 +49,7 @@ export function MobileCharityFooter({
   appeal,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const hidden = useHideOnScrollDown()
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -72,7 +74,9 @@ export function MobileCharityFooter({
   return (
     <div
       ref={ref}
-      className="fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 md:hidden"
+      className={`fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 transition-transform duration-300 md:hidden ${
+        hidden ? "translate-y-full" : "translate-y-0"
+      }`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
       {/* Slim appeal strip, the banner's own arrangement: above the
