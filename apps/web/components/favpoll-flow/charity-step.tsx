@@ -331,7 +331,7 @@ export function CharityStep({
                 className="h-auto w-full justify-center rounded-none px-5 py-3 text-sm font-normal text-muted-foreground hover:bg-secondary/40"
                 onClick={() => setRegisterLimit((l) => l + 20)}
               >
-                More · {registerTotal - registerResults.length}
+                {registerTotal - registerResults.length} more
               </Button>
             )}
         </div>
