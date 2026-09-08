@@ -18,6 +18,9 @@ export type Charity = {
   consent_status?: "pending" | "approved" | "declined";
   consent_contacted_at?: string | null;
   consent_decided_at?: string | null;
+  /** The register's public contact (2026-09-08) — outreach + row identity */
+  registered_email?: string | null;
+  registered_website?: string | null;
   /** Admin-curated impact line shown at pledge time; null = none */
   impact_statement?: string | null;
   /** Charity Commission check, written by the admin app; null = never checked */
