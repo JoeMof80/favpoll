@@ -322,7 +322,7 @@ export function CharityStep({
             it at full strength while stale rows fade behind it. */}
           {registerActive &&
             (registerLoading || registerTotal > registerResults.length) && (
-              <div className="sticky bottom-0 border-t border-border bg-background">
+              <div className="sticky bottom-0 z-20 border-t border-border bg-background">
                 {registerLoading ? (
                   <p className="flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground">
                     <Loader2
