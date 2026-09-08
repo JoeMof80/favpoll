@@ -387,13 +387,19 @@ describe("searchRegisterRanked", () => {
 });
 
 describe("fetchRegisterContact", () => {
-  it("returns the register's email and website", async () => {
+  it("returns the register's email, website, name and place", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
         email: "enquiries@slhospice.co.uk",
         web: "www.slhospice.co.uk ",
+        charity_name: "ST LUKE'S CHESHIRE HOSPICE",
+        address_line_one: "Grosvenor House",
+        address_line_two: "Queensway",
+        address_line_three: "WINSFORD",
+        address_line_four: "Cheshire",
+        address_line_five: null,
       }),
     });
 
@@ -402,39 +408,38 @@ describe("fetchRegisterContact", () => {
     expect(contact).toEqual({
       email: "enquiries@slhospice.co.uk",
       website: "www.slhospice.co.uk",
+      registeredName: "ST LUKE'S CHESHIRE HOSPICE",
+      place: "Winsford, Cheshire",
     });
     expect(mockFetch.mock.calls[0][0]).toContain("/allcharitydetails/515595/0");
   });
 
   it("returns nulls on 404, empty fields, or fetch failure", async () => {
-    mockFetch.mockResolvedValue({ ok: false, status: 404 });
-    expect(await fetchRegisterContact("9999999")).toEqual({
+    const empty = {
       email: null,
       website: null,
-    });
+      registeredName: null,
+      place: null,
+    };
+
+    mockFetch.mockResolvedValue({ ok: false, status: 404 });
+    expect(await fetchRegisterContact("9999999")).toEqual(empty);
 
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({ email: "", web: null }),
     });
-    expect(await fetchRegisterContact("515595")).toEqual({
-      email: null,
-      website: null,
-    });
+    expect(await fetchRegisterContact("515595")).toEqual(empty);
 
     mockFetch.mockRejectedValue(new Error("network down"));
-    expect(await fetchRegisterContact("515595")).toEqual({
-      email: null,
-      website: null,
-    });
+    expect(await fetchRegisterContact("515595")).toEqual(empty);
   });
 
   it("returns nulls without calling the API when key or digits are missing", async () => {
-    expect(await fetchRegisterContact("n/a")).toEqual({
-      email: null,
-      website: null,
-    });
+    const contact = await fetchRegisterContact("n/a");
+    expect(contact.email).toBeNull();
+    expect(contact.place).toBeNull();
     expect(mockFetch).not.toHaveBeenCalled();
   });
 });
