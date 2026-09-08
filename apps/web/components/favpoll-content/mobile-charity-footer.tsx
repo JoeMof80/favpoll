@@ -41,6 +41,10 @@ type Props = {
 // rendered height is written to `--charity-footer-h` on <html> and the
 // other two derive from it: change what is in here and they follow.
 export const CHARITY_FOOTER_HEIGHT_VAR = "--charity-footer-h"
+// The FABs ride this one instead (founder, 2026-09-09): it drops to 0px
+// while the footer is tucked away, so they glide down into the corner —
+// X-style — while page padding keeps the constant var and never reflows.
+export const CHARITY_FOOTER_VISIBLE_VAR = "--charity-footer-visible-h"
 
 export function MobileCharityFooter({
   charities,
@@ -55,19 +59,20 @@ export function MobileCharityFooter({
     const el = ref.current
     const root = document.documentElement
     if (!el || typeof ResizeObserver === "undefined") return
-    const publish = () =>
-      root.style.setProperty(
-        CHARITY_FOOTER_HEIGHT_VAR,
-        `${el.getBoundingClientRect().height}px`
-      )
+    const publish = () => {
+      const h = `${el.getBoundingClientRect().height}px`
+      root.style.setProperty(CHARITY_FOOTER_HEIGHT_VAR, h)
+      root.style.setProperty(CHARITY_FOOTER_VISIBLE_VAR, hidden ? "0px" : h)
+    }
     publish()
     const observer = new ResizeObserver(publish)
     observer.observe(el)
     return () => {
       observer.disconnect()
       root.style.removeProperty(CHARITY_FOOTER_HEIGHT_VAR)
+      root.style.removeProperty(CHARITY_FOOTER_VISIBLE_VAR)
     }
-  }, [])
+  }, [hidden])
 
   if (charities.length === 0) return null
 

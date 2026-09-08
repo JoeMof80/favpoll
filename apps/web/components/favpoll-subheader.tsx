@@ -43,11 +43,13 @@ export function FavpollSubheader({
     <div
       // Mobile: the fixed charity bar owns the bottom edge — clear it so
       // the FABs never sit over its £ figure (founder catch, 2026-07-29).
-      // Desktop (md+) has no bar; hug the corner as before.
-      // Sits 1.5rem above the mobile charity footer, whatever its height — the
-      // footer publishes --charity-footer-h (see MobileCharityFooter). The
-      // fallback is the footer's no-goal height, for the paint before hydration.
-      className="fixed right-5 bottom-[calc(var(--charity-footer-h,calc(env(safe-area-inset-bottom)+3.1rem))+1.5rem)] z-30 flex flex-col items-end gap-2 md:bottom-5"
+      // The FABs ride --charity-footer-visible-h (see MobileCharityFooter):
+      // when the footer tucks away on scroll-down it drops to 0px, so they
+      // GLIDE down into the corner, X-style, floored at the safe-area
+      // (founder, 2026-09-09 — "move down too but stay visible, slightly
+      // further into the corner"). Fallback is the footer's no-goal height,
+      // for the paint before hydration. Desktop (md+) has no bar.
+      className="fixed right-4 bottom-[calc(max(var(--charity-footer-visible-h,calc(env(safe-area-inset-bottom)+3.1rem)),env(safe-area-inset-bottom))+1rem)] z-30 flex flex-col items-end gap-2 transition-[bottom] duration-300 md:right-5 md:bottom-5"
     >
       {/* Mobile only — desktop share lives in the right rail */}
       <ShareFavpollButton
