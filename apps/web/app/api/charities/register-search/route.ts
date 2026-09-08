@@ -46,6 +46,39 @@ export async function GET(req: Request) {
   }
   const q = new URL(req.url).searchParams.get("q") ?? ""
   const { results, total } = await searchRegisterRanked(q)
+
+  // PLACE-AWARE FALLBACK (founder, 2026-09-09): what an organiser knows
+  // is often the town — "st lukes winsford" — but the register matches
+  // NAMES only, so that query draws a blank. Retry with trailing words
+  // dropped and use them as a place filter over the enriched candidates.
+  // Bounded (40 candidates) and cached; this path only runs where the
+  // answer today is nothing at all.
+  if (results.length === 0) {
+    const words = q.trim().split(/\s+/).filter(Boolean)
+    for (let k = words.length - 1; k >= 1; k--) {
+      const base = words.slice(0, k).join(" ")
+      if (base.length < 3) break
+      const placeTerms = words.slice(k).map((w) => w.toLowerCase())
+      const cand = await searchRegisterRanked(base, 40)
+      if (cand.results.length === 0) continue
+      const enrichedCand = await Promise.all(
+        cand.results.map(async (r) => ({
+          ...r,
+          ...(await rowContact(r.registeredNumber)),
+        }))
+      )
+      const filtered = enrichedCand.filter((r) =>
+        placeTerms.every((t) => (r.place ?? "").toLowerCase().includes(t))
+      )
+      if (filtered.length > 0) {
+        return NextResponse.json({
+          results: filtered.slice(0, 20),
+          total: filtered.length,
+        })
+      }
+    }
+  }
+
   const enriched = await Promise.all(
     results.map(async (r) => ({
       ...r,
