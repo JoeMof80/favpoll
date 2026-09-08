@@ -210,7 +210,7 @@ export function ResponsiveOverlay({
           )}
           {header && (
             <div
-              className={`shrink-0 ${separators ? "border-b border-border" : ""}${headerClassName ?? "px-4 py-4"}`}
+              className={`shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-4 py-4"}`}
             >
               {header}
             </div>
@@ -256,7 +256,7 @@ export function ResponsiveOverlay({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetHeader
-            className={`shrink-0 ${separators ? "border-b border-border" : ""}${headerClassName ?? "px-4 py-4"}`}
+            className={`shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-4 py-4"}`}
           >
             {header ? (
               <>
@@ -279,7 +279,7 @@ export function ResponsiveOverlay({
           )}
           {footer && (
             <div
-              className={`shrink-0 px-4 py-3${separators ? "border-t border-border" : ""}`}
+              className={`shrink-0 px-4 py-3 ${separators ? "border-t border-border" : ""}`}
               style={{
                 paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
               }}
@@ -304,7 +304,7 @@ export function ResponsiveOverlay({
         showCloseButton={!hideCloseButton}
       >
         <DialogHeader
-          className={`shrink-0 ${separators ? "border-b border-border" : ""}${headerClassName ?? "px-5 py-4"}`}
+          className={`shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-5 py-4"}`}
         >
           {header ? (
             <>
@@ -325,7 +325,7 @@ export function ResponsiveOverlay({
         )}
         {footer && (
           <div
-            className={`shrink-0 px-5 py-4${separators ? "border-t border-border" : ""}`}
+            className={`shrink-0 px-5 py-4 ${separators ? "border-t border-border" : ""}`}
           >
             {footer}
           </div>
