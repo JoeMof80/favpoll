@@ -44,8 +44,16 @@ export async function GET(req: Request) {
   if (limited) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 })
   }
-  const q = new URL(req.url).searchParams.get("q") ?? ""
-  const { results, total } = await searchRegisterRanked(q)
+  const url = new URL(req.url)
+  const q = url.searchParams.get("q") ?? ""
+  // The More row re-asks the SAME query with a wider window; enrichment
+  // is cached per charity number, so growth only pays for the new rows.
+  const limitRaw = parseInt(url.searchParams.get("limit") ?? "20", 10)
+  const limit = Math.min(
+    Math.max(Number.isFinite(limitRaw) ? limitRaw : 20, 20),
+    100
+  )
+  const { results, total } = await searchRegisterRanked(q, limit)
 
   // PLACE-AWARE FALLBACK (founder, 2026-09-09): what an organiser knows
   // is often the town — "st lukes winsford" — but the register matches
@@ -59,7 +67,7 @@ export async function GET(req: Request) {
       const base = words.slice(0, k).join(" ")
       if (base.length < 3) break
       const placeTerms = words.slice(k).map((w) => w.toLowerCase())
-      const cand = await searchRegisterRanked(base, 40)
+      const cand = await searchRegisterRanked(base, Math.max(40, limit))
       if (cand.results.length === 0) continue
       const enrichedCand = await Promise.all(
         cand.results.map(async (r) => ({
@@ -72,7 +80,7 @@ export async function GET(req: Request) {
       )
       if (filtered.length > 0) {
         return NextResponse.json({
-          results: filtered.slice(0, 20),
+          results: filtered.slice(0, limit),
           total: filtered.length,
         })
       }

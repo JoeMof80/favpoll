@@ -178,4 +178,37 @@ describe("CharityStep — search rows", () => {
     )
     expect(screen.queryByText("Add this charity")).not.toBeInTheDocument()
   })
+
+  it("More re-asks the same query with a wider window", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [
+          {
+            registeredNumber: "1",
+            displayName: "A Charity",
+            place: null,
+            website: null,
+          },
+        ],
+        total: 50,
+      }),
+    })
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onChange={vi.fn()}
+        search="charity"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText("A Charity", undefined, { timeout: 2000 })
+    expect(String(fetchMock.mock.calls[0][0])).toContain("limit=20")
+
+    fireEvent.click(screen.getByRole("button", { name: "More · 49" }))
+    await waitFor(() =>
+      expect(String(fetchMock.mock.calls.at(-1)?.[0])).toContain("limit=40")
+    )
+  })
 })

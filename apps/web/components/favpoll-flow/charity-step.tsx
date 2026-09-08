@@ -98,8 +98,14 @@ export function CharityStep({
   const [registerResults, setRegisterResults] = useState<RegisterPick[]>([])
   const [registerTotal, setRegisterTotal] = useState(0)
   const [registerLoading, setRegisterLoading] = useState(false)
+  const [registerLimit, setRegisterLimit] = useState(20)
   const [busyNumber, setBusyNumber] = useState<string | null>(null)
   const registerActive = !!onRegisterAdd && trimmed.length >= 3
+
+  // A new query starts back at the first window.
+  useEffect(() => {
+    setRegisterLimit(20)
+  }, [trimmed])
 
   useEffect(() => {
     if (!registerActive) {
@@ -112,7 +118,7 @@ export function CharityStep({
     const id = setTimeout(async () => {
       try {
         const res = await fetch(
-          `/api/charities/register-search?q=${encodeURIComponent(trimmed)}`
+          `/api/charities/register-search?q=${encodeURIComponent(trimmed)}&limit=${registerLimit}`
         )
         const data = res.ok ? await res.json() : { results: [], total: 0 }
         if (!cancelled) {
@@ -133,7 +139,7 @@ export function CharityStep({
       clearTimeout(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trimmed, registerActive])
+  }, [trimmed, registerActive, registerLimit])
 
   // Results already in the catalogue dedupe away (by number, then name)
   const knownNumbers = new Set(
@@ -312,20 +318,22 @@ export function CharityStep({
                 <Avatar name={r.displayName} />
               </div>
             ))}
-        </div>
-      )}
-
-      {registerActive && !noMatches && !registerLoading && (
-        <div className="px-5 py-3">
-          {registerTotal > freshResults.length ? (
-            <p className="text-xs text-muted-foreground">
-              {`Results from the Charity Commission register · ${registerTotal} matches — keep typing, a town works too`}
-            </p>
-          ) : freshResults.length > 0 ? (
-            <p className="text-xs text-muted-foreground">
-              Results from the Charity Commission register
-            </p>
-          ) : null}
+          {/* MORE (founder, 2026-09-09): the caption becomes a working
+              row — same query, wider window. Remaining count says what
+              a tap buys. Register attribution lives in the empty-state
+              prompt. */}
+          {registerActive &&
+            !registerLoading &&
+            registerTotal > registerResults.length && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-auto w-full justify-center rounded-none px-5 py-3 text-sm font-normal text-muted-foreground hover:bg-secondary/40"
+                onClick={() => setRegisterLimit((l) => l + 20)}
+              >
+                More · {registerTotal - registerResults.length}
+              </Button>
+            )}
         </div>
       )}
     </div>
