@@ -406,6 +406,7 @@ export function NewFavpollWizard({
 
         {/* Charity overlay */}
         <ResponsiveOverlay
+          separators
           open={w.charityOpen}
           onOpenChange={(o) => {
             w.setCharityOpen(o)
