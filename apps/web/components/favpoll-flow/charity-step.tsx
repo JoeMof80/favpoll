@@ -216,15 +216,6 @@ export function CharityStep({
 
   return (
     <div>
-      {/* The searching indicator lives at the TOP (founder, 2026-09-09) —
-          at the bottom it hid below the fold while stale results filled
-          the list. The stale list dims until the register answers. */}
-      {registerActive && registerLoading && (
-        <p className="flex items-center gap-2 border-b border-border px-5 py-2.5 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-          Searching…
-        </p>
-      )}
       {noMatches && (trimmed || !onRegisterAdd) ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           {registerActive
@@ -262,79 +253,97 @@ export function CharityStep({
           )}
         </div>
       ) : (
-        <div
-          className={`flex flex-col divide-y divide-border transition-opacity ${
-            registerLoading ? "opacity-60" : ""
-          }`}
-        >
-          {visible.map((c) => {
-            const selected = value.includes(c.id)
-            return (
-              <div
-                key={c.id}
-                className={rowClass(selected, !selected && atMax)}
-              >
-                {overlayButton(c.name, !selected && atMax, () => toggle(c.id))}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-foreground">
-                    {c.name}
+        <>
+          <div
+            className={`flex flex-col divide-y divide-border transition-opacity ${
+              registerLoading ? "opacity-60" : ""
+            }`}
+          >
+            {visible.map((c) => {
+              const selected = value.includes(c.id)
+              return (
+                <div
+                  key={c.id}
+                  className={rowClass(selected, !selected && atMax)}
+                >
+                  {overlayButton(c.name, !selected && atMax, () =>
+                    toggle(c.id)
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium text-foreground">
+                      {c.name}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {c.registered_number
+                        ? `Charity no. ${c.registered_number}`
+                        : "On favpoll"}
+                      {c.registered_website && (
+                        <> · {siteLink(c.registered_website)}</>
+                      )}
+                    </span>
                   </span>
-                  <span className="block text-xs text-muted-foreground">
-                    {c.registered_number
-                      ? `Charity no. ${c.registered_number}`
-                      : "On favpoll"}
-                    {c.registered_website && (
-                      <> · {siteLink(c.registered_website)}</>
-                    )}
+                  <Avatar name={c.name} logoUrl={c.logo_url} />
+                </div>
+              )
+            })}
+            {registerActive &&
+              freshResults.map((r) => (
+                <div
+                  key={r.registeredNumber}
+                  className={rowClass(false, atMax || busyNumber !== null)}
+                >
+                  {overlayButton(
+                    r.displayName,
+                    atMax || busyNumber !== null,
+                    () => void addFromRegister(r)
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium text-foreground">
+                      {busyNumber === r.registeredNumber
+                        ? "Adding…"
+                        : r.displayName}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Charity no. {r.registeredNumber}
+                      {r.place && <> · {r.place}</>}
+                      {r.website && <> · {siteLink(r.website)}</>}
+                    </span>
                   </span>
-                </span>
-                <Avatar name={c.name} logoUrl={c.logo_url} />
-              </div>
-            )
-          })}
+                  <Avatar name={r.displayName} />
+                </div>
+              ))}
+          </div>
+
+          {/* THE STICKY LIST-STATUS BAR (founder, 2026-09-09): one slot,
+            pinned above the footer, that is either the More button or —
+            while the register responds, from typing or from a More tap —
+            the spinner. Sticky cures the invisibility that once pushed
+            the spinner to the top; sitting OUTSIDE the dimmed list keeps
+            it at full strength while stale rows fade behind it. */}
           {registerActive &&
-            freshResults.map((r) => (
-              <div
-                key={r.registeredNumber}
-                className={rowClass(false, atMax || busyNumber !== null)}
-              >
-                {overlayButton(
-                  r.displayName,
-                  atMax || busyNumber !== null,
-                  () => void addFromRegister(r)
+            (registerLoading || registerTotal > registerResults.length) && (
+              <div className="sticky bottom-0 z-20 border-t border-border bg-background">
+                {registerLoading ? (
+                  <p className="flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground">
+                    <Loader2
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                    Searching…
+                  </p>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="h-auto w-full justify-center rounded-none px-5 py-3 text-sm font-normal text-muted-foreground hover:bg-secondary/40"
+                    onClick={() => setRegisterLimit((l) => l + 20)}
+                  >
+                    {registerTotal - registerResults.length} more
+                  </Button>
                 )}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-foreground">
-                    {busyNumber === r.registeredNumber
-                      ? "Adding…"
-                      : r.displayName}
-                  </span>
-                  <span className="block text-xs text-muted-foreground">
-                    Charity no. {r.registeredNumber}
-                    {r.place && <> · {r.place}</>}
-                    {r.website && <> · {siteLink(r.website)}</>}
-                  </span>
-                </span>
-                <Avatar name={r.displayName} />
               </div>
-            ))}
-          {/* MORE (founder, 2026-09-09): the caption becomes a working
-              row — same query, wider window. Remaining count says what
-              a tap buys. Register attribution lives in the empty-state
-              prompt. */}
-          {registerActive &&
-            !registerLoading &&
-            registerTotal > registerResults.length && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-auto w-full justify-center rounded-none px-5 py-3 text-sm font-normal text-muted-foreground hover:bg-secondary/40"
-                onClick={() => setRegisterLimit((l) => l + 20)}
-              >
-                {registerTotal - registerResults.length} more
-              </Button>
             )}
-        </div>
+        </>
       )}
     </div>
   )
