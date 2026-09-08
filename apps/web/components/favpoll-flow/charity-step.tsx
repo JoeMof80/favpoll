@@ -210,6 +210,15 @@ export function CharityStep({
 
   return (
     <div>
+      {/* The searching indicator lives at the TOP (founder, 2026-09-09) —
+          at the bottom it hid below the fold while stale results filled
+          the list. The stale list dims until the register answers. */}
+      {registerActive && registerLoading && (
+        <p className="flex items-center gap-2 border-b border-border px-5 py-2.5 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          Searching…
+        </p>
+      )}
       {noMatches && (trimmed || !onRegisterAdd) ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           {registerActive
@@ -247,7 +256,11 @@ export function CharityStep({
           )}
         </div>
       ) : (
-        <div className="flex flex-col divide-y divide-border">
+        <div
+          className={`flex flex-col divide-y divide-border transition-opacity ${
+            registerLoading ? "opacity-60" : ""
+          }`}
+        >
           {visible.map((c) => {
             const selected = value.includes(c.id)
             return (
@@ -302,18 +315,11 @@ export function CharityStep({
         </div>
       )}
 
-      {registerActive && !noMatches && (
+      {registerActive && !noMatches && !registerLoading && (
         <div className="px-5 py-3">
-          {registerLoading ? (
-            /* A proper status row, not a whisper (founder, 2026-09-08) —
-               row-sized text with a spinner while the register responds. */
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              Searching…
-            </p>
-          ) : registerTotal > freshResults.length ? (
+          {registerTotal > freshResults.length ? (
             <p className="text-xs text-muted-foreground">
-              {`Results from the Charity Commission register · ${registerTotal} matches — keep typing to narrow`}
+              {`Results from the Charity Commission register · ${registerTotal} matches — keep typing, a town works too`}
             </p>
           ) : freshResults.length > 0 ? (
             <p className="text-xs text-muted-foreground">

@@ -261,7 +261,8 @@ async function fetchRegisterRows(
  * charities (suffix 0) are returned.
  */
 export async function searchRegisterRanked(
-  query: string
+  query: string,
+  cap = 20
 ): Promise<RegisterSearch> {
   const apiKey = process.env.CHARITY_COMMISSION_API_KEY
   const variants = registerQueryVariants(query)
@@ -280,7 +281,7 @@ export async function searchRegisterRanked(
     const ranked = rankRows([...byNumber.values()], variants)
     return {
       total: ranked.length,
-      results: ranked.slice(0, 20).map((r) => ({
+      results: ranked.slice(0, cap).map((r) => ({
         registeredNumber: String(r.reg_charity_number),
         registeredName: r.charity_name,
         displayName: titleCaseCharityName(r.charity_name),

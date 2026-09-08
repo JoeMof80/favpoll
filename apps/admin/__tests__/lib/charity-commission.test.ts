@@ -384,6 +384,21 @@ describe("searchRegisterRanked", () => {
     expect(results).toHaveLength(20);
     expect(total).toBe(30);
   });
+
+  it("the cap widens on request (the place-aware fallback asks for 40)", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () =>
+        Array.from({ length: 30 }, (_, i) =>
+          searchRow({ reg_charity_number: i + 1 }),
+        ),
+    });
+
+    const { results } = await searchRegisterRanked("charity", 40);
+
+    expect(results).toHaveLength(30);
+  });
 });
 
 describe("fetchRegisterContact", () => {
