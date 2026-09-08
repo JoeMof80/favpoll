@@ -22,7 +22,7 @@ type CharityStepProps = {
   onChange: (v: string[]) => void
   search?: string
   /** Any-charity picker (consent-gate PR C): called when the organiser
-   *  confirms a charity from the Charity Commission register results.
+   *  picks a charity from the Charity Commission register results.
    *  Omit to hide the register results entirely. */
   onRegisterAdd?: (pick: RegisterPick) => Promise<void>
 }
@@ -61,15 +61,9 @@ export function CharityStep({
   const [registerTotal, setRegisterTotal] = useState(0)
   const [registerLoading, setRegisterLoading] = useState(false)
   const [busyNumber, setBusyNumber] = useState<string | null>(null)
-  // The confirm step (founder, 2026-09-08): a pick routes money, so a
-  // register row shows its identity line once more before anything is
-  // created. The row data already carries place + website, so the card
-  // renders instantly — no second fetch.
-  const [confirm, setConfirm] = useState<RegisterPick | null>(null)
   const registerActive = !!onRegisterAdd && trimmed.length >= 3
 
   useEffect(() => {
-    setConfirm(null)
     if (!registerActive) {
       setRegisterResults([])
       setRegisterTotal(0)
@@ -122,12 +116,14 @@ export function CharityStep({
     }
   }
 
+  // A tap selects (founder, 2026-09-08: "if we're clicking, we're
+  // selecting") — the row itself already carries the identity line
+  // (number · place · website), so there is no confirm step.
   async function addFromRegister(pick: RegisterPick) {
     if (!onRegisterAdd || atMax || busyNumber) return
     setBusyNumber(pick.registeredNumber)
     try {
       await onRegisterAdd(pick)
-      setConfirm(null)
     } finally {
       setBusyNumber(null)
     }
@@ -137,8 +133,11 @@ export function CharityStep({
     visible.length === 0 &&
     (!registerActive || (freshResults.length === 0 && !registerLoading))
 
-  const rowClass = (selected: boolean) =>
-    `h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-left whitespace-normal ${
+  // ONE full-width card per row — the website link lives INSIDE the card
+  // (a sibling of the pick button, never nested), so rows without a
+  // website don't leave ragged edges (founder, 2026-09-08).
+  const rowCard = (selected: boolean) =>
+    `flex items-center rounded-lg border ${
       selected ? "border-primary bg-primary/5" : "border-border bg-card"
     }`
 
@@ -147,7 +146,7 @@ export function CharityStep({
       href={websiteHref(website)}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex shrink-0 items-center gap-1 rounded-lg border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      className="flex shrink-0 items-center gap-1 self-stretch px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
       title={`Visit ${websiteLabel(website)}`}
     >
       <span className="hidden max-w-40 truncate sm:block">
@@ -160,50 +159,7 @@ export function CharityStep({
 
   return (
     <div>
-      {confirm ? (
-        /* CONFIRM (founder, 2026-09-08): the identity line once more —
-           the last look before a charity is wired into the money path. */
-        <div className="px-5 py-4">
-          <div className="rounded-lg border border-border bg-card px-4 py-3">
-            <p className="font-medium text-foreground">{confirm.displayName}</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              {[`Charity no. ${confirm.registeredNumber}`, confirm.place]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-            {confirm.website && (
-              <a
-                href={websiteHref(confirm.website)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-0.5 inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
-              >
-                {websiteLabel(confirm.website)}
-                <ExternalLink className="size-3.5" aria-hidden="true" />
-              </a>
-            )}
-            <div className="mt-3 flex gap-2">
-              <Button
-                type="button"
-                size="sm"
-                disabled={busyNumber !== null}
-                onClick={() => void addFromRegister(confirm)}
-              >
-                {busyNumber ? "Adding…" : "Add this charity"}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                disabled={busyNumber !== null}
-                onClick={() => setConfirm(null)}
-              >
-                Back
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : noMatches ? (
+      {noMatches ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           {registerActive
             ? `No registered charity matches “${trimmed}”.`
@@ -234,18 +190,17 @@ export function CharityStep({
       ) : (
         /* SEARCH RESULTS AS ROWS (founder, 2026-09-08): names alone are
            ambiguous, so every row carries its charity number, place and
-           website — the website link is the quickest identity check —
-           and a register pick passes through the confirm step above. */
+           website — the website link is the quickest identity check. */
         <div className="flex flex-col gap-1.5 px-5 py-4">
           {visible.map((c) => {
             const selected = value.includes(c.id)
             return (
-              <div key={c.id} className="flex items-stretch gap-1.5">
+              <div key={c.id} className={rowCard(selected)}>
                 <Button
                   type="button"
                   variant="ghost"
                   disabled={!selected && atMax}
-                  className={rowClass(selected)}
+                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-4 py-2.5 text-left whitespace-normal hover:bg-transparent"
                   onClick={() => toggle(c.id)}
                 >
                   <span className="min-w-0 flex-1">
@@ -271,20 +226,19 @@ export function CharityStep({
           })}
           {registerActive &&
             freshResults.map((r) => (
-              <div
-                key={r.registeredNumber}
-                className="flex items-stretch gap-1.5"
-              >
+              <div key={r.registeredNumber} className={rowCard(false)}>
                 <Button
                   type="button"
                   variant="ghost"
                   disabled={atMax || busyNumber !== null}
-                  className={rowClass(false)}
-                  onClick={() => setConfirm(r)}
+                  className="h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg px-4 py-2.5 text-left whitespace-normal hover:bg-transparent"
+                  onClick={() => void addFromRegister(r)}
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-foreground">
-                      {r.displayName}
+                      {busyNumber === r.registeredNumber
+                        ? "Adding…"
+                        : r.displayName}
                     </span>
                     <span className="block text-xs font-normal text-muted-foreground">
                       {[`Charity no. ${r.registeredNumber}`, r.place]
@@ -299,7 +253,7 @@ export function CharityStep({
         </div>
       )}
 
-      {!confirm && registerActive && !noMatches && (
+      {registerActive && !noMatches && (
         <p className="px-5 pb-3 text-xs text-muted-foreground">
           {registerLoading
             ? "Searching the Charity Commission register…"

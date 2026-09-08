@@ -90,8 +90,8 @@ describe("CharityStep — the earned shelf", () => {
   })
 })
 
-describe("CharityStep — search rows and the confirm step", () => {
-  it("catalogue rows carry number and a website link", () => {
+describe("CharityStep — search rows", () => {
+  it("catalogue rows carry number and a website link inside the card", () => {
     render(
       <CharityStep
         charities={[approved, pending]}
@@ -126,7 +126,7 @@ describe("CharityStep — search rows and the confirm step", () => {
     )
   })
 
-  it("a register pick confirms — instantly, from row data — before adding", async () => {
+  it("tapping a register row selects it directly — no confirm step", async () => {
     const onRegisterAdd = vi.fn().mockResolvedValue(undefined)
     render(
       <CharityStep
@@ -143,14 +143,6 @@ describe("CharityStep — search rows and the confirm step", () => {
       { timeout: 2000 }
     )
     fireEvent.click(row)
-
-    // Identity line + website, no second fetch, nothing created yet
-    expect(screen.getByText(/Charity no\. 515595/)).toBeInTheDocument()
-    expect(screen.getByText(/Winsford, Cheshire/)).toBeInTheDocument()
-    expect(onRegisterAdd).not.toHaveBeenCalled()
-    expect(fetchMock).toHaveBeenCalledTimes(1) // the search only
-
-    fireEvent.click(screen.getByRole("button", { name: "Add this charity" }))
     await waitFor(() =>
       expect(onRegisterAdd).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -159,31 +151,6 @@ describe("CharityStep — search rows and the confirm step", () => {
         })
       )
     )
-  })
-
-  it("Back dismisses the confirm without adding", async () => {
-    const onRegisterAdd = vi.fn().mockResolvedValue(undefined)
-    render(
-      <CharityStep
-        charities={[]}
-        value={[]}
-        onChange={vi.fn()}
-        search="st lukes"
-        onRegisterAdd={onRegisterAdd}
-      />
-    )
-    const row = await screen.findByText(
-      "St Luke's Cheshire Hospice",
-      undefined,
-      { timeout: 2000 }
-    )
-    fireEvent.click(row)
-    fireEvent.click(screen.getByRole("button", { name: "Back" }))
-    expect(
-      await screen.findByText("St Luke's Cheshire Hospice", undefined, {
-        timeout: 2000,
-      })
-    ).toBeInTheDocument()
-    expect(onRegisterAdd).not.toHaveBeenCalled()
+    expect(screen.queryByText("Add this charity")).not.toBeInTheDocument()
   })
 })
