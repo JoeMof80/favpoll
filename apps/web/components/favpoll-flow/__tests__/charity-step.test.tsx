@@ -206,7 +206,7 @@ describe("CharityStep — search rows", () => {
     await screen.findByText("A Charity", undefined, { timeout: 2000 })
     expect(String(fetchMock.mock.calls[0][0])).toContain("limit=20")
 
-    fireEvent.click(screen.getByRole("button", { name: "More · 49" }))
+    fireEvent.click(screen.getByRole("button", { name: "49 more" }))
     await waitFor(() =>
       expect(String(fetchMock.mock.calls.at(-1)?.[0])).toContain("limit=40")
     )
