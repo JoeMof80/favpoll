@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { ExternalLink } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
 import { Button } from "@/components/ui/button"
 import type { Charity } from "@favpoll/types"
@@ -10,18 +11,9 @@ const MAX_CHARITIES = 3
 export type RegisterPick = {
   registeredNumber: string
   displayName: string
-}
-
-type RegisterDetails = {
-  registeredName: string | null
-  place: string | null
-  website: string | null
-}
-
-type ConfirmState = {
-  pick: RegisterPick
-  details: RegisterDetails | null
-  loading: boolean
+  /** Row identity (founder, 2026-09-08) — enriched by the search route. */
+  place?: string | null
+  website?: string | null
 }
 
 type CharityStepProps = {
@@ -33,6 +25,14 @@ type CharityStepProps = {
    *  confirms a charity from the Charity Commission register results.
    *  Omit to hide the register results entirely. */
   onRegisterAdd?: (pick: RegisterPick) => Promise<void>
+}
+
+function websiteHref(website: string): string {
+  return /^https?:\/\//.test(website) ? website : `https://${website}`
+}
+
+function websiteLabel(website: string): string {
+  return website.replace(/^https?:\/\//, "").replace(/\/$/, "")
 }
 
 export function CharityStep({
@@ -61,11 +61,11 @@ export function CharityStep({
   const [registerTotal, setRegisterTotal] = useState(0)
   const [registerLoading, setRegisterLoading] = useState(false)
   const [busyNumber, setBusyNumber] = useState<string | null>(null)
-  // The confirm step (founder, 2026-09-08): charity names are ambiguous —
-  // four "St Luke's Hospice"s exist — and a pick routes money, so a
-  // register row shows the register's own identity line (name, number,
-  // place, website) before anything is created.
-  const [confirm, setConfirm] = useState<ConfirmState | null>(null)
+  // The confirm step (founder, 2026-09-08): a pick routes money, so a
+  // register row shows its identity line once more before anything is
+  // created. The row data already carries place + website, so the card
+  // renders instantly — no second fetch.
+  const [confirm, setConfirm] = useState<RegisterPick | null>(null)
   const registerActive = !!onRegisterAdd && trimmed.length >= 3
 
   useEffect(() => {
@@ -122,28 +122,6 @@ export function CharityStep({
     }
   }
 
-  async function openConfirm(pick: RegisterPick) {
-    if (atMax || busyNumber) return
-    setConfirm({ pick, details: null, loading: true })
-    try {
-      const res = await fetch(
-        `/api/charities/register-details?number=${pick.registeredNumber}`
-      )
-      const d: RegisterDetails | null = res.ok ? await res.json() : null
-      setConfirm((cur) =>
-        cur && cur.pick.registeredNumber === pick.registeredNumber
-          ? { pick: cur.pick, details: d, loading: false }
-          : cur
-      )
-    } catch {
-      setConfirm((cur) =>
-        cur && cur.pick.registeredNumber === pick.registeredNumber
-          ? { pick: cur.pick, details: null, loading: false }
-          : cur
-      )
-    }
-  }
-
   async function addFromRegister(pick: RegisterPick) {
     if (!onRegisterAdd || atMax || busyNumber) return
     setBusyNumber(pick.registeredNumber)
@@ -160,37 +138,56 @@ export function CharityStep({
     (!registerActive || (freshResults.length === 0 && !registerLoading))
 
   const rowClass = (selected: boolean) =>
-    `h-auto w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-left whitespace-normal ${
+    `h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-left whitespace-normal ${
       selected ? "border-primary bg-primary/5" : "border-border bg-card"
     }`
+
+  const siteLink = (website: string) => (
+    <a
+      href={websiteHref(website)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex shrink-0 items-center gap-1 rounded-lg border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      title={`Visit ${websiteLabel(website)}`}
+    >
+      <span className="hidden max-w-40 truncate sm:block">
+        {websiteLabel(website)}
+      </span>
+      <ExternalLink className="size-3.5" aria-hidden="true" />
+      <span className="sr-only">Visit {websiteLabel(website)}</span>
+    </a>
+  )
 
   return (
     <div>
       {confirm ? (
-        /* CONFIRM (founder, 2026-09-08): the register's identity line —
-           place and website are what separate the four St Luke's. */
+        /* CONFIRM (founder, 2026-09-08): the identity line once more —
+           the last look before a charity is wired into the money path. */
         <div className="px-5 py-4">
           <div className="rounded-lg border border-border bg-card px-4 py-3">
-            <p className="font-medium text-foreground">
-              {confirm.pick.displayName}
-            </p>
+            <p className="font-medium text-foreground">{confirm.displayName}</p>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              {confirm.loading
-                ? "Checking the register…"
-                : [
-                    `Charity no. ${confirm.pick.registeredNumber}`,
-                    confirm.details?.place,
-                    confirm.details?.website,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
+              {[`Charity no. ${confirm.registeredNumber}`, confirm.place]
+                .filter(Boolean)
+                .join(" · ")}
             </p>
+            {confirm.website && (
+              <a
+                href={websiteHref(confirm.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-0.5 inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                {websiteLabel(confirm.website)}
+                <ExternalLink className="size-3.5" aria-hidden="true" />
+              </a>
+            )}
             <div className="mt-3 flex gap-2">
               <Button
                 type="button"
                 size="sm"
-                disabled={confirm.loading || busyNumber !== null}
-                onClick={() => void addFromRegister(confirm.pick)}
+                disabled={busyNumber !== null}
+                onClick={() => void addFromRegister(confirm)}
               >
                 {busyNumber ? "Adding…" : "Add this charity"}
               </Button>
@@ -236,59 +233,68 @@ export function CharityStep({
         </div>
       ) : (
         /* SEARCH RESULTS AS ROWS (founder, 2026-09-08): names alone are
-           ambiguous, so every result carries its charity number, and a
-           register pick passes through the confirm step above. */
+           ambiguous, so every row carries its charity number, place and
+           website — the website link is the quickest identity check —
+           and a register pick passes through the confirm step above. */
         <div className="flex flex-col gap-1.5 px-5 py-4">
           {visible.map((c) => {
             const selected = value.includes(c.id)
             return (
-              <Button
-                key={c.id}
-                type="button"
-                variant="ghost"
-                disabled={!selected && atMax}
-                className={rowClass(selected)}
-                onClick={() => toggle(c.id)}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-foreground">
-                    {c.name}
+              <div key={c.id} className="flex items-stretch gap-1.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={!selected && atMax}
+                  className={rowClass(selected)}
+                  onClick={() => toggle(c.id)}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium text-foreground">
+                      {c.name}
+                    </span>
+                    <span className="block text-xs font-normal text-muted-foreground">
+                      {c.registered_number
+                        ? `Charity no. ${c.registered_number}`
+                        : "On favpoll"}
+                      {isApproved(c) && " · has agreed to receive pledges"}
+                    </span>
                   </span>
-                  <span className="block text-xs font-normal text-muted-foreground">
-                    {c.registered_number
-                      ? `Charity no. ${c.registered_number}`
-                      : "On favpoll"}
-                    {isApproved(c) && " · has agreed to receive pledges"}
-                  </span>
-                </span>
-                {isApproved(c) && (
-                  <span aria-hidden="true" className="shrink-0 text-primary">
-                    ✓
-                  </span>
-                )}
-              </Button>
+                  {isApproved(c) && (
+                    <span aria-hidden="true" className="shrink-0 text-primary">
+                      ✓
+                    </span>
+                  )}
+                </Button>
+                {c.registered_website && siteLink(c.registered_website)}
+              </div>
             )
           })}
           {registerActive &&
             freshResults.map((r) => (
-              <Button
+              <div
                 key={r.registeredNumber}
-                type="button"
-                variant="ghost"
-                disabled={atMax || busyNumber !== null}
-                className={rowClass(false)}
-                onClick={() => void openConfirm(r)}
+                className="flex items-stretch gap-1.5"
               >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-foreground">
-                    {r.displayName}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={atMax || busyNumber !== null}
+                  className={rowClass(false)}
+                  onClick={() => setConfirm(r)}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium text-foreground">
+                      {r.displayName}
+                    </span>
+                    <span className="block text-xs font-normal text-muted-foreground">
+                      {[`Charity no. ${r.registeredNumber}`, r.place]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
                   </span>
-                  <span className="block text-xs font-normal text-muted-foreground">
-                    Charity no. {r.registeredNumber} · Charity Commission
-                    register
-                  </span>
-                </span>
-              </Button>
+                </Button>
+                {r.website && siteLink(r.website)}
+              </div>
             ))}
         </div>
       )}
