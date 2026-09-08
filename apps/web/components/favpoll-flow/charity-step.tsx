@@ -331,7 +331,7 @@ export function CharityStep({
                     />
                     Searching…
                   </p>
-                ) : (
+                ) : registerResults.length >= registerLimit ? (
                   <Button
                     type="button"
                     variant="ghost"
@@ -340,6 +340,14 @@ export function CharityStep({
                   >
                     {registerTotal - registerResults.length} more
                   </Button>
+                ) : (
+                  /* The server returned fewer rows than the window asked —
+                     its clamp is reached (founder hit this stuck at "35
+                     more"). A wider tap can't help; narrowing can. */
+                  <p className="px-5 py-3 text-center text-sm text-muted-foreground">
+                    {registerTotal - registerResults.length} more — keep typing
+                    to narrow
+                  </p>
                 )}
               </div>
             )}

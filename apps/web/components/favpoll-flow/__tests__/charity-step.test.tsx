@@ -183,14 +183,14 @@ describe("CharityStep — search rows", () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
-        results: [
-          {
-            registeredNumber: "1",
-            displayName: "A Charity",
-            place: null,
-            website: null,
-          },
-        ],
+        // A full window — the button only shows while the server can
+        // still widen it.
+        results: Array.from({ length: 20 }, (_, i) => ({
+          registeredNumber: String(i + 1),
+          displayName: i === 0 ? "A Charity" : `Charity ${i + 1}`,
+          place: null,
+          website: null,
+        })),
         total: 50,
       }),
     })
@@ -206,9 +206,42 @@ describe("CharityStep — search rows", () => {
     await screen.findByText("A Charity", undefined, { timeout: 2000 })
     expect(String(fetchMock.mock.calls[0][0])).toContain("limit=20")
 
-    fireEvent.click(screen.getByRole("button", { name: "49 more" }))
+    fireEvent.click(screen.getByRole("button", { name: "30 more" }))
     await waitFor(() =>
       expect(String(fetchMock.mock.calls.at(-1)?.[0])).toContain("limit=40")
     )
+  })
+
+  it("a clamped response degrades More to a keep-typing hint", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        // Fewer rows than the 20-window asked, yet more exist — the
+        // server's clamp is reached; a wider tap can't help.
+        results: Array.from({ length: 5 }, (_, i) => ({
+          registeredNumber: String(i + 1),
+          displayName: `Charity ${i + 1}`,
+          place: null,
+          website: null,
+        })),
+        total: 40,
+      }),
+    })
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onChange={vi.fn()}
+        search="charity"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText("Charity 1", undefined, { timeout: 2000 })
+    expect(
+      screen.getByText(/35 more — keep\s+typing to narrow/)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", { name: /more/ })
+    ).not.toBeInTheDocument()
   })
 })

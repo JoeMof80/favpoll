@@ -49,9 +49,13 @@ export async function GET(req: Request) {
   // The More row re-asks the SAME query with a wider window; enrichment
   // is cached per charity number, so growth only pays for the new rows.
   const limitRaw = parseInt(url.searchParams.get("limit") ?? "20", 10)
+  // 200, not 100: the founder hit the old clamp at "35 more" and every
+  // further tap re-asked for the same window — stuck. The client detects
+  // a clamped response (fewer rows than the window asked) and degrades
+  // the More button to a keep-typing hint.
   const limit = Math.min(
     Math.max(Number.isFinite(limitRaw) ? limitRaw : 20, 20),
-    100
+    200
   )
   const { results, total } = await searchRegisterRanked(q, limit)
 
